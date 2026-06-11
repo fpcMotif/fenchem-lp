@@ -1,0 +1,3 @@
+{
+  "extends": "@fenchem-lp/config/tsconfig.base.json"
+}

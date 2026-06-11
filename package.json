@@ -1,0 +1,59 @@
+{
+  "name": "fenchem-lp",
+  "private": true,
+  "workspaces": {
+    "packages": [
+      "apps/*",
+      "packages/*"
+    ],
+    "catalog": {
+      "dotenv": "^17.2.2",
+      "zod": "^4.1.13",
+      "typescript": "^6",
+      "next-themes": "^0.4.6",
+      "react": "^19.2.6",
+      "react-dom": "^19.2.6",
+      "convex": "^1.33.1",
+      "better-auth": "~1.6.9",
+      "@convex-dev/better-auth": "^0.12.2",
+      "@types/react": "^19.2.15",
+      "@types/react-dom": "^19.2.3",
+      "alchemy": "^0.91.2"
+    }
+  },
+  "type": "module",
+  "scripts": {
+    "dev": "vp run -r dev",
+    "build": "vp run -r build",
+    "check-types": "vp run -r check-types",
+    "check": "oxlint && oxfmt --write",
+    "lint": "vp lint",
+    "format": "vp fmt",
+    "staged": "vp staged",
+    "dev:web": "vp run --filter web dev",
+    "dev:server": "vp run --filter @fenchem-lp/backend dev",
+    "dev:setup": "vp run --filter @fenchem-lp/backend dev:setup",
+    "deploy": "vp run --filter @fenchem-lp/infra deploy",
+    "destroy": "vp run --filter @fenchem-lp/infra destroy"
+  },
+  "dependencies": {
+    "@fenchem-lp/env": "workspace:*",
+    "dotenv": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20251213.0",
+    "@fenchem-lp/config": "workspace:*",
+    "lefthook": "^2.1.9",
+    "oxfmt": "^0.53.0",
+    "oxlint": "^1.68.0",
+    "rolldown": "1.1.0",
+    "typescript": "catalog:",
+    "vite-plus": "0.1.24"
+  },
+  "overrides": {
+    "vite": "npm:@voidzero-dev/vite-plus-core@0.1.24",
+    "vitest": "npm:@voidzero-dev/vite-plus-test@0.1.24"
+  },
+  "packageManager": "bun@1.4.0"
+}
