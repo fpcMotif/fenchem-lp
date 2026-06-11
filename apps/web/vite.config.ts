@@ -13,7 +13,7 @@ const shouldUseAlchemy = existsSync(alchemyConfigPath);
 const cloudflareWorkersShimPath = fileURLToPath(
   new URL("../../packages/env/src/cloudflare-local.ts", import.meta.url),
 );
-const cloudflareWorkersAlias = shouldUseAlchemy
+const cloudflareWorkersAlias: Record<string, string> = shouldUseAlchemy
   ? {}
   : {
       "cloudflare:workers": cloudflareWorkersShimPath,
@@ -35,5 +35,15 @@ export default defineConfig({
   ],
   ssr: {
     noExternal: ["@convex-dev/better-auth"],
+  },
+  optimizeDeps: {
+    // PROTOTYPE — keep better-auth out of the dep optimizer. Bun's isolated linker
+    // doesn't expose transitive deps in apps/web/node_modules, so the optimizer
+    // resolves bare "@better-auth/core/*" entries from the project root and walks up
+    // to a stale @better-auth/core@1.6.11 in C:/Users/<user>/node_modules. The raw
+    // better-auth@1.6.16 client modules then fail ESM linking against that chunk
+    // (missing exports like isSafeUrlScheme), which blocks hydration forever.
+    // Excluding them makes Vite resolve per-importer (realpath) to the correct copy.
+    exclude: ["better-auth", "@better-auth/core"],
   },
 });

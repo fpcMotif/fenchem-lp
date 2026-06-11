@@ -9,12 +9,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@fenchem-lp/ui/components/dropdown-menu";
-import { useQuery } from "convex/react";
+import { convexQuery } from "@convex-dev/react-query";
+import { useQuery } from "@tanstack/react-query";
 
 import { authClient } from "@/lib/auth-client";
 
 export default function UserMenu() {
-  const user = useQuery(api.auth.getCurrentUser);
+  const { data: user } = useQuery(convexQuery(api.auth.getCurrentUser, {}));
 
   return (
     <DropdownMenu>

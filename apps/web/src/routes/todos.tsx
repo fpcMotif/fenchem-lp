@@ -1,6 +1,6 @@
 import { convexQuery } from "@convex-dev/react-query";
 import { api } from "@fenchem-lp/backend/convex/_generated/api";
-import type { Id } from "@fenchem-lp/backend/convex/_generated/dataModel";
+import type { Doc, Id } from "@fenchem-lp/backend/convex/_generated/dataModel";
 import { Button } from "@fenchem-lp/ui/components/button";
 import {
   Card,
@@ -11,7 +11,7 @@ import {
 } from "@fenchem-lp/ui/components/card";
 import { Checkbox } from "@fenchem-lp/ui/components/checkbox";
 import { Input } from "@fenchem-lp/ui/components/input";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation } from "convex/react";
 import { Trash2 } from "lucide-react";
@@ -24,8 +24,7 @@ export const Route = createFileRoute("/todos")({
 function TodosRoute() {
   const [newTodoText, setNewTodoText] = useState("");
 
-  const todosQuery = useSuspenseQuery(convexQuery(api.todos.getAll, {}));
-  const todos = todosQuery.data;
+  const { data: todos } = useQuery(convexQuery(api.todos.getAll, {}));
 
   const createTodo = useMutation(api.todos.create);
   const toggleTodo = useMutation(api.todos.toggle);
@@ -80,11 +79,11 @@ function TodosRoute() {
             </Button>
           </form>
 
-          {todos?.length === 0 ? (
+          {!todos || todos.length === 0 ? (
             <p className="py-4 text-center">No todos yet. Add one above!</p>
           ) : (
             <ul className="space-y-2">
-              {todos?.map((todo) => (
+              {todos.map((todo: Doc<"todos">) => (
                 <li
                   key={todo._id}
                   className="flex items-center justify-between rounded-md border p-2"

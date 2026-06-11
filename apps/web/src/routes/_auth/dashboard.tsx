@@ -1,6 +1,7 @@
 import { api } from "@fenchem-lp/backend/convex/_generated/api";
+import { convexQuery } from "@convex-dev/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { useQuery } from "convex/react";
+import { useQuery } from "@tanstack/react-query";
 
 import UserMenu from "@/components/user-menu";
 
@@ -9,7 +10,7 @@ export const Route = createFileRoute("/_auth/dashboard")({
 });
 
 function DashboardContent() {
-  const privateData = useQuery(api.privateData.get);
+  const { data: privateData } = useQuery(convexQuery(api.privateData.get, {}));
 
   return (
     <div>

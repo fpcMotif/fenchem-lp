@@ -34,7 +34,8 @@
     "dev:server": "vp run --filter @fenchem-lp/backend dev",
     "dev:setup": "vp run --filter @fenchem-lp/backend dev:setup",
     "deploy": "vp run --filter @fenchem-lp/infra deploy",
-    "destroy": "vp run --filter @fenchem-lp/infra destroy"
+    "destroy": "vp run --filter @fenchem-lp/infra destroy",
+    "doctor": "react-doctor"
   },
   "dependencies": {
     "@fenchem-lp/env": "workspace:*",
@@ -47,6 +48,7 @@
     "lefthook": "^2.1.9",
     "oxfmt": "^0.53.0",
     "oxlint": "^1.68.0",
+    "react-doctor": "^0.5.1",
     "rolldown": "1.1.0",
     "typescript": "catalog:",
     "vite-plus": "0.1.24"

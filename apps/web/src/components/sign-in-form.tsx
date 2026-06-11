@@ -50,10 +50,8 @@ export default function SignInForm({ onSwitchToSignUp }: { onSwitchToSignUp: () 
       <h1 className="mb-6 text-center text-3xl font-bold">Welcome Back</h1>
 
       <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          form.handleSubmit();
+        action={() => {
+          void form.handleSubmit();
         }}
         className="space-y-4"
       >

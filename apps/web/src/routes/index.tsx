@@ -1,51 +1,30 @@
-import { convexQuery } from "@convex-dev/react-query";
-import { api } from "@fenchem-lp/backend/convex/_generated/api";
-import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 
+import { PrototypeSwitcher, type VariantKey } from "@/components/prototype/prototype-switcher";
+import { VariantA } from "@/components/prototype/variant-a";
+import { VariantB } from "@/components/prototype/variant-b";
+import { VariantC } from "@/components/prototype/variant-c";
+
+/*
+ * PROTOTYPE — three radically different Fenchem landing pages on this route,
+ * switchable via ?variant= (a|b|c) and the floating bottom bar.
+ * See src/components/prototype/PROTOTYPE-BRIEF.md for the design contract.
+ */
 export const Route = createFileRoute("/")({
+  validateSearch: (search: Record<string, unknown>): { variant: VariantKey } => ({
+    variant: search.variant === "b" || search.variant === "c" ? search.variant : "a",
+  }),
   component: HomeComponent,
 });
 
-const TITLE_TEXT = `
- ██████╗ ███████╗████████╗████████╗███████╗██████╗
- ██╔══██╗██╔════╝╚══██╔══╝╚══██╔══╝██╔════╝██╔══██╗
- ██████╔╝█████╗     ██║      ██║   █████╗  ██████╔╝
- ██╔══██╗██╔══╝     ██║      ██║   ██╔══╝  ██╔══██╗
- ██████╔╝███████╗   ██║      ██║   ███████╗██║  ██║
- ╚═════╝ ╚══════╝   ╚═╝      ╚═╝   ╚══════╝╚═╝  ╚═╝
-
- ████████╗    ███████╗████████╗ █████╗  ██████╗██╗  ██╗
- ╚══██╔══╝    ██╔════╝╚══██╔══╝██╔══██╗██╔════╝██║ ██╔╝
-    ██║       ███████╗   ██║   ███████║██║     █████╔╝
-    ██║       ╚════██║   ██║   ██╔══██║██║     ██╔═██╗
-    ██║       ███████║   ██║   ██║  ██║╚██████╗██║  ██╗
-    ╚═╝       ╚══════╝   ╚═╝   ╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝
- `;
-
 function HomeComponent() {
-  const healthCheck = useQuery(convexQuery(api.healthCheck.get, {}));
-
+  const { variant } = Route.useSearch();
   return (
-    <div className="container mx-auto max-w-3xl px-4 py-2">
-      <pre className="overflow-x-auto font-mono text-sm">{TITLE_TEXT}</pre>
-      <div className="grid gap-6">
-        <section className="rounded-lg border p-4">
-          <h2 className="mb-2 font-medium">API Status</h2>
-          <div className="flex items-center gap-2">
-            <div
-              className={`h-2 w-2 rounded-full ${healthCheck.data === "OK" ? "bg-green-500" : healthCheck.isLoading ? "bg-orange-400" : "bg-red-500"}`}
-            />
-            <span className="text-muted-foreground text-sm">
-              {healthCheck.isLoading
-                ? "Checking..."
-                : healthCheck.data === "OK"
-                  ? "Connected"
-                  : "Error"}
-            </span>
-          </div>
-        </section>
-      </div>
-    </div>
+    <>
+      {variant === "a" && <VariantA />}
+      {variant === "b" && <VariantB />}
+      {variant === "c" && <VariantC />}
+      <PrototypeSwitcher current={variant} />
+    </>
   );
 }

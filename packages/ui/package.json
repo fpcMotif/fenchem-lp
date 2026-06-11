@@ -32,5 +32,12 @@
     "@types/react-dom": "catalog:",
     "tailwindcss": "^4.1.18",
     "typescript": "catalog:"
+  },
+  "knip": {
+    "entry": [
+      "src/components/*.tsx",
+      "src/lib/*.ts",
+      "src/styles/globals.css"
+    ]
   }
 }

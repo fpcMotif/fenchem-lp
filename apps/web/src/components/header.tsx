@@ -1,12 +1,12 @@
 import { Link } from "@tanstack/react-router";
 
-export default function Header() {
-  const links = [
-    { to: "/", label: "Home" },
-    { to: "/dashboard", label: "Dashboard" },
-    { to: "/todos", label: "Todos" },
-  ] as const;
+const links = [
+  { to: "/", label: "Home" },
+  { to: "/dashboard", label: "Dashboard" },
+  { to: "/todos", label: "Todos" },
+] as const;
 
+export default function Header() {
   return (
     <div>
       <div className="flex flex-row items-center justify-between px-2 py-1">

@@ -1,0 +1,40 @@
+# React Doctor — finds security, performance, correctness, accessibility,
+# bundle-size, and architecture issues in React codebases.
+#
+# Docs: https://www.react.doctor/ci
+# Source: https://github.com/millionco/react-doctor
+
+name: React Doctor
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+  # Also scan `main` on every push to catch regressions that slipped past PR review.
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+# Cancels any in-flight scan for the same PR (or branch, on push) the moment a
+# new commit arrives, so reviewers only ever see the latest run.
+concurrency:
+  group: react-doctor-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  react-doctor:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version-file: package.json
+
+      - run: bun install --frozen-lockfile
+
+      # Full scan of every workspace project (web and @fenchem-lp/ui).
+      # --blocking warning guards the 100/100 baseline: any new warning or
+      # error fails the job, not just errors.
+      - run: bun run doctor --yes --blocking warning
