@@ -289,7 +289,7 @@ function HeroSection({ heroRef, blobY }: HeroSectionProps) {
         className="pointer-events-none absolute -top-32 left-[-10%] h-[600px] w-[600px] rounded-full bg-brand-green-50 blur-3xl opacity-60"
       />
 
-      <div className="mx-auto grid max-w-[1280px] grid-cols-1 items-center gap-16 px-6 md:px-12 lg:grid-cols-12 lg:gap-10 lg:px-16">
+      <div className="relative z-10 mx-auto grid max-w-[1280px] grid-cols-1 items-center gap-16 px-6 md:px-12 lg:grid-cols-12 lg:gap-10 lg:px-16">
 
         {/* Left: headline copy */}
         <div className="lg:col-span-7">
@@ -301,9 +301,9 @@ function HeroSection({ heroRef, blobY }: HeroSectionProps) {
           </Intro>
 
           <Intro delay={0.18}>
-            <h1 className="mt-8 font-display text-[clamp(3rem,7.5vw,6.25rem)] font-light leading-[1.02] tracking-[-0.03em] text-ink">
+            <h1 className="mt-8 font-display text-[clamp(3rem,7.5vw,6.25rem)] font-normal leading-[1.02] tracking-[-0.03em] text-ink">
               Nurturing{" "}
-              <em className="not-italic text-brand-green-500">Vitality</em>
+              <em className="not-italic text-brand-green-700">Vitality</em>
               <br />
               through Botanical
               <br />
@@ -312,7 +312,7 @@ function HeroSection({ heroRef, blobY }: HeroSectionProps) {
           </Intro>
 
           <Intro delay={0.3}>
-            <p className="mt-8 max-w-xl font-body text-lg leading-relaxed text-mute-500 md:text-xl">
+            <p className="mt-8 max-w-xl font-body text-lg leading-relaxed text-mute-600 md:text-xl">
               Premium botanical and functional ingredients for nutrition, food and personal care —
               bridging ancient plant wisdom with modern scientific precision.
             </p>
