@@ -60,69 +60,93 @@ export default function SignUpForm({ onSwitchToSignIn }: { onSwitchToSignIn: () 
       >
         <div>
           <form.Field name="name">
-            {(field) => (
-              <div className="space-y-2">
-                <Label htmlFor={field.name}>Name</Label>
-                <Input
-                  id={field.name}
-                  name={field.name}
-                  value={field.state.value}
-                  onBlur={field.handleBlur}
-                  onChange={(e) => field.handleChange(e.target.value)}
-                />
-                {field.state.meta.errors.map((error) => (
-                  <p key={error?.message} className="text-red-500">
-                    {error?.message}
-                  </p>
-                ))}
-              </div>
-            )}
+            {(field) => {
+              const error = field.state.meta.errors[0]?.message;
+              const errorId = `${field.name}-error`;
+              return (
+                <div className="space-y-2">
+                  <Label htmlFor={field.name}>Name</Label>
+                  <Input
+                    id={field.name}
+                    name={field.name}
+                    autoComplete="name"
+                    required
+                    value={field.state.value}
+                    aria-invalid={!!error}
+                    aria-describedby={error ? errorId : undefined}
+                    onBlur={field.handleBlur}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                  />
+                  {error ? (
+                    <p id={errorId} role="alert" className="text-destructive">
+                      {error}
+                    </p>
+                  ) : null}
+                </div>
+              );
+            }}
           </form.Field>
         </div>
 
         <div>
           <form.Field name="email">
-            {(field) => (
-              <div className="space-y-2">
-                <Label htmlFor={field.name}>Email</Label>
-                <Input
-                  id={field.name}
-                  name={field.name}
-                  type="email"
-                  value={field.state.value}
-                  onBlur={field.handleBlur}
-                  onChange={(e) => field.handleChange(e.target.value)}
-                />
-                {field.state.meta.errors.map((error) => (
-                  <p key={error?.message} className="text-red-500">
-                    {error?.message}
-                  </p>
-                ))}
-              </div>
-            )}
+            {(field) => {
+              const error = field.state.meta.errors[0]?.message;
+              const errorId = `${field.name}-error`;
+              return (
+                <div className="space-y-2">
+                  <Label htmlFor={field.name}>Email</Label>
+                  <Input
+                    id={field.name}
+                    name={field.name}
+                    type="email"
+                    autoComplete="email"
+                    required
+                    value={field.state.value}
+                    aria-invalid={!!error}
+                    aria-describedby={error ? errorId : undefined}
+                    onBlur={field.handleBlur}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                  />
+                  {error ? (
+                    <p id={errorId} role="alert" className="text-destructive">
+                      {error}
+                    </p>
+                  ) : null}
+                </div>
+              );
+            }}
           </form.Field>
         </div>
 
         <div>
           <form.Field name="password">
-            {(field) => (
-              <div className="space-y-2">
-                <Label htmlFor={field.name}>Password</Label>
-                <Input
-                  id={field.name}
-                  name={field.name}
-                  type="password"
-                  value={field.state.value}
-                  onBlur={field.handleBlur}
-                  onChange={(e) => field.handleChange(e.target.value)}
-                />
-                {field.state.meta.errors.map((error) => (
-                  <p key={error?.message} className="text-red-500">
-                    {error?.message}
-                  </p>
-                ))}
-              </div>
-            )}
+            {(field) => {
+              const error = field.state.meta.errors[0]?.message;
+              const errorId = `${field.name}-error`;
+              return (
+                <div className="space-y-2">
+                  <Label htmlFor={field.name}>Password</Label>
+                  <Input
+                    id={field.name}
+                    name={field.name}
+                    type="password"
+                    autoComplete="new-password"
+                    required
+                    value={field.state.value}
+                    aria-invalid={!!error}
+                    aria-describedby={error ? errorId : undefined}
+                    onBlur={field.handleBlur}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                  />
+                  {error ? (
+                    <p id={errorId} role="alert" className="text-destructive">
+                      {error}
+                    </p>
+                  ) : null}
+                </div>
+              );
+            }}
           </form.Field>
         </div>
 

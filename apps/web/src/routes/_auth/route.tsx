@@ -25,7 +25,9 @@ function AuthLayout() {
         )}
       </Unauthenticated>
       <AuthLoading>
-        <div>Loading...</div>
+        <output aria-live="polite" className="block p-6">
+          Loading account status...
+        </output>
       </AuthLoading>
     </>
   );

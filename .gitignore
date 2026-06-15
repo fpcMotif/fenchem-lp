@@ -46,9 +46,14 @@ lerna-debug.log*
 # Testing
 coverage
 .nyc_output
+test-results
+playwright-report
 
 # Misc
 *.tgz
 .cache
 tmp
 temp
+
+# Personal learning workspace (/teach skill) — not product code
+/learn-landing-design/

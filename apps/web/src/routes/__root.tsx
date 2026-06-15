@@ -20,13 +20,13 @@ import Header from "../components/header";
 
 import appCss from "../index.css?url";
 
-// PROTOTYPE — no real Convex deployment exists; the .env URLs are placeholders.
+// Landing page preview: no real Convex deployment exists; the .env URLs are placeholders.
 // When detected, skip all Convex/auth wiring so the landing page never waits on
 // a dead backend (proxy makes those fetches hang ~30s). Real URLs keep the full path.
 const isPlaceholderConvex = (url: string | undefined) => !url || url.includes("placeholder");
 
 const getAuth = createServerFn({ method: "GET" }).handler(async () => {
-  // PROTOTYPE — no Convex deployment is configured yet; never let auth block rendering
+  // Landing page preview: no Convex deployment is configured yet; never let auth block rendering.
   try {
     return await Promise.race([
       getToken(),
@@ -44,11 +44,11 @@ export interface RouterAppContext {
 
 export const Route = createRootRouteWithContext<RouterAppContext>()({
   beforeLoad: async (ctx) => {
-    // PROTOTYPE — placeholder Convex deployment: skip the auth round-trip entirely
+    // Landing page preview: placeholder Convex deployment skips the auth round-trip entirely.
     if (isPlaceholderConvex(ctx.context.convexQueryClient.convexClient.url)) {
       return { isAuthenticated: false, token: null };
     }
-    // PROTOTYPE — cap the auth round-trip so hydration can never stall on it
+    // Cap the auth round-trip so hydration can never stall on it.
     const token = await Promise.race([
       getAuth(),
       new Promise<null>((resolve) => setTimeout(() => resolve(null), 1500)),
@@ -88,7 +88,7 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
 
 function RootDocument() {
   const context = useRouteContext({ from: Route.id });
-  // PROTOTYPE — the landing-page variants on "/" bring their own nav; hide the app chrome there
+  // The public landing page on "/" brings its own navigation; hide the app chrome there.
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const appShell = (
     <html lang="en" className="dark">
@@ -105,12 +105,12 @@ function RootDocument() {
           </div>
         )}
         <Toaster richColors />
-        <TanStackRouterDevtools position="bottom-left" />
+        {pathname === "/" ? null : <TanStackRouterDevtools position="bottom-left" />}
         <Scripts />
       </body>
     </html>
   );
-  // PROTOTYPE — with a placeholder Convex URL, skip ConvexBetterAuthProvider so it
+  // With a placeholder Convex URL, skip ConvexBetterAuthProvider so it
   // never opens a websocket / session fetch against a dead deployment (30s proxy hangs).
   if (isPlaceholderConvex(context.convexQueryClient.convexClient.url)) {
     return appShell;

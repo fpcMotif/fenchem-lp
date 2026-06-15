@@ -29,6 +29,9 @@
     "check": "oxlint && oxfmt --write",
     "lint": "vp lint",
     "format": "vp fmt",
+    "test": "vp run --filter web test",
+    "test:coverage": "vp run --filter web test:coverage",
+    "test:e2e": "vp run --filter web test:e2e",
     "staged": "vp staged",
     "dev:web": "vp run --filter web dev",
     "dev:server": "vp run --filter @fenchem-lp/backend dev",
@@ -45,13 +48,16 @@
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20251213.0",
     "@fenchem-lp/config": "workspace:*",
+    "@playwright/test": "^1.60.0",
+    "@vitest/coverage-v8": "^4.1.8",
     "lefthook": "^2.1.9",
     "oxfmt": "^0.53.0",
     "oxlint": "^1.68.0",
     "react-doctor": "^0.5.1",
     "rolldown": "1.1.0",
     "typescript": "catalog:",
-    "vite-plus": "0.1.24"
+    "vite-plus": "0.1.24",
+    "vitest": "^0.1.24"
   },
   "overrides": {
     "vite": "npm:@voidzero-dev/vite-plus-core@0.1.24",

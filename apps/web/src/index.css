@@ -2,10 +2,8 @@
 @import "@fenchem-lp/ui/globals.css";
 
 /*
- * PROTOTYPE — "Botanical Essence" design tokens for the Fenchem landing page
- * variants. Source of truth: DESIGN-STITCH.md (pulled from the Stitch project
- * "Fenchem: Innovation Lab - PRD"). Fold the winning variant's tokens into the
- * ui package when the prototype is resolved.
+ * Fenchem landing page tokens. These sit at the app layer because the product
+ * site has a more editorial palette than the shared shadcn primitives.
  */
 @theme {
   --color-forest: oklch(0.288 0.04 160.598);
@@ -38,5 +36,47 @@
     to {
       transform: translateX(-50%);
     }
+  }
+}
+
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-size-adjust: 100%;
+  }
+
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+
+  p,
+  li,
+  figcaption {
+    text-wrap: pretty;
+  }
+
+  :where(a, button, [role="button"], input, select, textarea):focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 4px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
   }
 }
