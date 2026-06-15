@@ -376,7 +376,7 @@ function SectionHead({
     <div className="flex flex-col gap-8 border-b border-line px-5 py-14 md:flex-row md:items-end md:justify-between md:px-10 md:py-20">
       <Reveal>
         <p className="font-tech text-[11px] uppercase tracking-[0.28em] text-mute-500">{code}</p>
-        <h2 className="mt-5 font-display text-4xl font-black leading-[1.02] tracking-[-0.03em] text-ink md:text-5xl">
+        <h2 className="mt-5 font-body text-4xl font-black leading-[1.02] tracking-[-0.03em] text-ink md:text-5xl">
           {title}{" "}
           <span className="text-brand-green-500">{sub}</span>
         </h2>
@@ -450,7 +450,7 @@ function HeroSection() {
             </span>
           </Reveal>
           <Reveal delay={0.1}>
-            <h1 className="mt-10 font-display text-[clamp(2.7rem,6.4vw,6rem)] font-black leading-[0.98] tracking-[-0.04em] text-ink">
+            <h1 className="mt-10 font-body text-[clamp(2.7rem,6.4vw,6rem)] font-black leading-[0.98] tracking-[-0.04em] text-ink">
               Nurturing Vitality through{" "}
               <span className="text-brand-green-500">
                 Botanical Excellence
@@ -583,7 +583,7 @@ function StatBand() {
               <span className="font-body text-4xl font-black tracking-[-0.04em] text-brand-green-500 md:text-6xl">
                 {s.value}
               </span>
-              <span className="font-display text-lg font-medium text-mute-500 md:text-2xl">
+              <span className="font-body text-lg font-medium text-mute-500 md:text-2xl">
                 {s.unit}
               </span>
             </div>
@@ -823,7 +823,7 @@ function CtaNetworkSection() {
           <p className="font-tech text-[11px] uppercase tracking-[0.28em] text-brand-green-300">
             SYS.CONTACT // OPEN CHANNEL
           </p>
-          <h2 className="mt-6 max-w-4xl font-display text-4xl font-black leading-[1.02] tracking-[-0.03em] text-paper md:text-6xl">
+          <h2 className="mt-6 max-w-4xl font-body text-4xl font-black leading-[1.02] tracking-[-0.03em] text-paper md:text-6xl">
             Your next formulation,{" "}
             <span className="text-brand-green-400">engineered to specification.</span>
           </h2>
@@ -898,7 +898,7 @@ function FooterSection() {
           >
             FENCHEM
           </a>
-          <p className="mt-4 max-w-xs font-display text-lg font-medium text-mute-500">
+          <p className="mt-4 max-w-xs font-body text-lg font-medium text-mute-500">
             Rooted in nature, refined by science.
           </p>
           <p className="mt-6 font-tech text-[10px] uppercase leading-loose tracking-[0.22em] text-mute-400">

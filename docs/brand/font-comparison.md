@@ -17,8 +17,8 @@ Screenshots are real captures at 1366×860 (reduced-motion), saved under
 > • **D** was always the "editorial" variant, so its *headline* is Newsreader serif in **both**
 >   shots — D's change is the **body** font (Noto → Plus Jakarta) **plus** the hero contrast
 >   fix (commit `78811c8`), so its "after" is crisper for more than one reason.
-> • **E** and **F** are the clean *font-only* comparisons — their headlines flipped from
->   Source Han Sans (sans) to Newsreader (serif).
+> • **E** and **F** are the clean *font-only* comparisons. F's headline flipped Source Han Sans →
+>   Newsreader serif; **E's** flipped Source Han Sans → **Plus Jakarta Sans** (grotesque — the Swiss choice).
 
 ---
 
@@ -34,15 +34,16 @@ green veil no longer washes it, weight 300→400, accent green-500→green-700).
 
 ## E — Innovation Lab
 
-| Before · Source Han Sans headline | After · Newsreader serif headline |
+| Before · Source Han Sans grotesque | After · Plus Jakarta Sans grotesque |
 |---|---|
 | ![E before](screenshots/font-before-e.png) | ![E after](screenshots/font-after-e.png) |
 
-The clearest swap. **Before** is a heavy Source Han Sans headline — which actually *suits*
-the Swiss / spec-sheet genre, but its Latin letterforms are generic. **After** is an elegant
-Newsreader serif, more premium but less "laboratory." **Judgment call:** the serif reads
-better as craft, yet E's Swiss identity might be served best by a **dedicated grotesque sans**
-(not Source Han) for the headline. See recommendation. *(Body + mono labels improve in both.)*
+A like-for-like swap — both are heavy **sans** headlines, which is right for E's Swiss /
+spec-sheet identity. **Before** is Source Han Sans (Noto SC) bold: on-genre, but its Latin
+letterforms are generic. **After** is **Plus Jakarta Sans** at its heaviest weight — same Swiss
+energy, cleaner and more characterful Latin. (A Newsreader serif was trialled here and rejected:
+elegant, but too "editorial" for a lab look.) **After wins** — keeps the grotesque genre,
+upgrades the letterforms.
 
 ## F — Deep Green
 
@@ -61,7 +62,7 @@ wins clearly.**
 | Variant | Better setting | Why |
 |---|---|---|
 | **D** | **After** (current) | Cleaner body font + the hero contrast fix; headline serif unchanged. |
-| **E** | **After**, with an asterisk | Serif is more elegant; but a clean grotesque sans would suit the Swiss/lab look even better than either Source Han **or** serif. |
+| **E** | **After** (current) | Plus Jakarta grotesque keeps the Swiss/lab genre with cleaner Latin than Source Han. (Serif was trialled and rejected for E.) |
 | **F** | **After** (current) | Serif italic is perfect for the dark luxury flagship; Source Han looked generic. |
 
 **Overall:** the current pairing (Newsreader + Plus Jakarta + JetBrains Mono) is the stronger,
@@ -69,8 +70,8 @@ more premium choice for the **English** site across all three — the win is lar
 **body text everywhere** (Plus Jakarta vs Noto's CJK-harmonized Latin). Source Han Sans remains
 correct for **Chinese** materials (kept as a local CJK fallback).
 
-## Open recommendation (E only)
+## Resolved — E uses Plus Jakarta Sans
 
-If E (Innovation Lab) should feel more like a Swiss spec-sheet, try its **headline in Plus
-Jakarta Sans (or a dedicated grotesque), not the serif** — keeping the serif for D/F. That
-gives each variant the type personality its layout wants. Say the word and I'll prototype it.
+E's headline is now **Plus Jakarta Sans** (heavy grotesque), not the serif — giving the Swiss
+spec-sheet its proper voice while **D** and **F** keep the Newsreader serif. Each variant now
+has the type personality its layout wants: D/F editorial-serif, E grotesque-sans.
