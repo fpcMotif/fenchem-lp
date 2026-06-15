@@ -376,7 +376,7 @@ function SectionHead({
     <div className="flex flex-col gap-8 border-b border-line px-5 py-14 md:flex-row md:items-end md:justify-between md:px-10 md:py-20">
       <Reveal>
         <p className="font-tech text-[11px] uppercase tracking-[0.28em] text-mute-500">{code}</p>
-        <h2 className="mt-5 font-brand text-4xl font-black leading-[1.02] tracking-[-0.03em] text-ink md:text-5xl">
+        <h2 className="mt-5 font-display text-4xl font-black leading-[1.02] tracking-[-0.03em] text-ink md:text-5xl">
           {title}{" "}
           <span className="text-brand-green-500">{sub}</span>
         </h2>
@@ -450,7 +450,7 @@ function HeroSection() {
             </span>
           </Reveal>
           <Reveal delay={0.1}>
-            <h1 className="mt-10 font-brand text-[clamp(2.7rem,6.4vw,6rem)] font-black leading-[0.98] tracking-[-0.04em] text-ink">
+            <h1 className="mt-10 font-display text-[clamp(2.7rem,6.4vw,6rem)] font-black leading-[0.98] tracking-[-0.04em] text-ink">
               Nurturing Vitality through{" "}
               <span className="text-brand-green-500">
                 Botanical Excellence
@@ -458,7 +458,7 @@ function HeroSection() {
             </h1>
           </Reveal>
           <Reveal delay={0.2}>
-            <p className="mt-8 max-w-xl text-base leading-relaxed text-mute-600 md:text-lg font-brand">
+            <p className="mt-8 max-w-xl text-base leading-relaxed text-mute-600 md:text-lg font-body">
               Fenchem converts raw botanical complexity into precisely specified, clinically
               validated actives — supplied at industrial scale to formulators in more than forty
               countries.
@@ -580,14 +580,14 @@ function StatBand() {
               {s.label}
             </p>
             <div className="mt-5 flex flex-wrap items-baseline gap-x-2.5">
-              <span className="font-brand text-4xl font-black tracking-[-0.04em] text-brand-green-500 md:text-6xl">
+              <span className="font-body text-4xl font-black tracking-[-0.04em] text-brand-green-500 md:text-6xl">
                 {s.value}
               </span>
-              <span className="font-brand text-lg font-medium text-mute-500 md:text-2xl">
+              <span className="font-display text-lg font-medium text-mute-500 md:text-2xl">
                 {s.unit}
               </span>
             </div>
-            <p className="mt-4 text-sm leading-relaxed text-mute-600 font-brand">{s.desc}</p>
+            <p className="mt-4 text-sm leading-relaxed text-mute-600 font-body">{s.desc}</p>
           </div>
         </Reveal>
       ))}
@@ -647,7 +647,7 @@ function MatrixSection() {
                       {item.code}
                     </span>
                   </div>
-                  <h3 className="mt-3 font-brand text-xl font-bold tracking-[-0.02em] text-ink transition-colors duration-300 group-hover:text-brand-green-600">
+                  <h3 className="mt-3 font-body text-xl font-bold tracking-[-0.02em] text-ink transition-colors duration-300 group-hover:text-brand-green-600">
                     {item.name}
                   </h3>
                   {/* Division badge */}
@@ -733,14 +733,14 @@ function ProtocolSection() {
                 </span>
                 <div className="md:col-span-10">
                   <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
-                    <h3 className="font-brand text-2xl font-bold tracking-[-0.02em] text-ink md:text-3xl">
+                    <h3 className="font-body text-2xl font-bold tracking-[-0.02em] text-ink md:text-3xl">
                       {p.title}
                     </h3>
                     <span className="font-tech text-[10px] uppercase tracking-[0.22em] text-mute-400">
                       {p.tag}
                     </span>
                   </div>
-                  <p className="mt-4 max-w-xl text-sm leading-relaxed text-mute-600 font-brand md:text-base">
+                  <p className="mt-4 max-w-xl text-sm leading-relaxed text-mute-600 font-body md:text-base">
                     {p.desc}
                   </p>
                 </div>
@@ -787,11 +787,11 @@ function DomainsSection() {
                   </p>
                 </div>
                 <h3
-                  className={`font-brand text-2xl font-bold tracking-[-0.03em] text-ink transition-colors duration-300 group-hover:text-brand-green-600 md:col-span-5 md:text-4xl`}
+                  className={`font-body text-2xl font-bold tracking-[-0.03em] text-ink transition-colors duration-300 group-hover:text-brand-green-600 md:col-span-5 md:text-4xl`}
                 >
                   {d.title}
                 </h3>
-                <p className="text-sm leading-relaxed text-mute-600 font-brand md:col-span-4">
+                <p className="text-sm leading-relaxed text-mute-600 font-body md:col-span-4">
                   {d.desc}
                 </p>
                 <div className="flex md:col-span-1 md:justify-end">
@@ -823,11 +823,11 @@ function CtaNetworkSection() {
           <p className="font-tech text-[11px] uppercase tracking-[0.28em] text-brand-green-300">
             SYS.CONTACT // OPEN CHANNEL
           </p>
-          <h2 className="mt-6 max-w-4xl font-brand text-4xl font-black leading-[1.02] tracking-[-0.03em] text-paper md:text-6xl">
+          <h2 className="mt-6 max-w-4xl font-display text-4xl font-black leading-[1.02] tracking-[-0.03em] text-paper md:text-6xl">
             Your next formulation,{" "}
             <span className="text-brand-green-400">engineered to specification.</span>
           </h2>
-          <p className="mt-7 max-w-xl text-sm leading-relaxed text-paper/70 font-brand md:text-base">
+          <p className="mt-7 max-w-xl text-sm leading-relaxed text-paper/70 font-body md:text-base">
             Submit a target spec — purity, form, matrix, regulatory map — and our laboratory returns
             a validated proposal with full documentation within one business day.
           </p>
@@ -873,10 +873,10 @@ function CtaNetworkSection() {
                   <span>{n.id}</span>
                   <span className="text-paper/40">{n.coords}</span>
                 </div>
-                <p className="mt-4 font-brand text-xl font-bold tracking-[-0.02em] text-paper">
+                <p className="mt-4 font-body text-xl font-bold tracking-[-0.02em] text-paper">
                   {n.city}
                 </p>
-                <p className="mt-1 text-sm text-paper/60 font-brand">{n.role}</p>
+                <p className="mt-1 text-sm text-paper/60 font-body">{n.role}</p>
               </div>
             </Reveal>
           ))}
@@ -894,11 +894,11 @@ function FooterSection() {
         <div className="md:col-span-5">
           <a
             href="#"
-            className="font-brand text-2xl font-black tracking-[-0.04em] text-brand-green-600 transition-opacity duration-300 hover:opacity-70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-green-500"
+            className="font-body text-2xl font-black tracking-[-0.04em] text-brand-green-600 transition-opacity duration-300 hover:opacity-70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-green-500"
           >
             FENCHEM
           </a>
-          <p className="mt-4 max-w-xs font-brand text-lg font-medium text-mute-500">
+          <p className="mt-4 max-w-xs font-display text-lg font-medium text-mute-500">
             Rooted in nature, refined by science.
           </p>
           <p className="mt-6 font-tech text-[10px] uppercase leading-loose tracking-[0.22em] text-mute-400">
@@ -930,7 +930,7 @@ function FooterSection() {
       </div>
       <p
         aria-hidden
-        className="select-none overflow-hidden whitespace-nowrap px-5 font-brand text-[17vw] font-black leading-[0.78] tracking-[-0.06em] text-brand-green-500/[0.06] md:px-10 min-[1481px]:text-[15rem]"
+        className="select-none overflow-hidden whitespace-nowrap px-5 font-body text-[17vw] font-black leading-[0.78] tracking-[-0.06em] text-brand-green-500/[0.06] md:px-10 min-[1481px]:text-[15rem]"
       >
         FENCHEM
       </p>
@@ -948,7 +948,7 @@ export function VariantE() {
   const { scrollYProgress } = useScroll();
 
   return (
-    <div className="bg-paper font-brand text-ink antialiased selection:bg-brand-green-100 selection:text-brand-green-800">
+    <div className="bg-paper font-body text-ink antialiased selection:bg-brand-green-100 selection:text-brand-green-800">
       {/* ===== Sticky top bar ===== */}
       <header className="sticky top-0 z-50 border-b border-line bg-paper/90 backdrop-blur-md">
         <div className="mx-auto max-w-[1480px] border-line min-[1481px]:border-x">
@@ -974,7 +974,7 @@ export function VariantE() {
               href="#"
               className="flex items-baseline gap-3 transition-opacity duration-300 hover:opacity-70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-green-500"
             >
-              <span className="font-brand text-xl font-black tracking-[-0.04em] text-brand-green-600">
+              <span className="font-body text-xl font-black tracking-[-0.04em] text-brand-green-600">
                 FENCHEM
               </span>
               <span className="hidden font-tech text-[9px] uppercase tracking-[0.3em] text-mute-400 sm:inline">

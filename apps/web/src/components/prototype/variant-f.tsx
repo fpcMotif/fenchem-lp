@@ -178,7 +178,7 @@ function HeroNav({ reduce }: { reduce: boolean | null }) {
       <div className="mx-auto flex max-w-[880px] items-center justify-between rounded-full border border-white/10 bg-brand-green-950/60 py-2 pr-2 pl-6 backdrop-blur-xl">
         <a
           href="#top"
-          className="font-brand text-xl font-light tracking-tight text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-green-400"
+          className="font-display text-xl font-light tracking-tight text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-green-400"
         >
           Fenchem
         </a>
@@ -254,7 +254,7 @@ function HeroHeader({ reduce }: { reduce: boolean | null }) {
           initial={reduce ? { opacity: 0 } : { opacity: 0, y: 32 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1.1, delay: 0.55, ease: EASE }}
-          className="mx-auto mt-8 max-w-5xl font-brand text-[clamp(3rem,9vw,7.5rem)] font-light leading-[1.02] tracking-[-0.02em] text-white"
+          className="mx-auto mt-8 max-w-5xl font-display text-[clamp(3rem,9vw,7.5rem)] font-light leading-[1.02] tracking-[-0.02em] text-white"
         >
           Rooted in Nature,
           <br />
@@ -326,7 +326,7 @@ function StatsBand() {
         ).map(([stat, label], i) => (
           <Reveal key={label} delay={i * 0.1}>
             <div className="rounded-3xl border border-brand-green-800/60 bg-brand-green-900/40 px-8 py-10 text-center backdrop-blur transition-colors duration-500 hover:border-brand-green-500/50">
-              <p className="font-brand text-5xl font-light text-brand-green-300 md:text-6xl">
+              <p className="font-display text-5xl font-light text-brand-green-300 md:text-6xl">
                 {stat}
               </p>
               <p className="mt-3 font-tech text-[11px] uppercase tracking-[0.2em] text-white/50">
@@ -361,7 +361,7 @@ function OriginChapter() {
             </p>
             <h2
               id="origin-heading"
-              className="mt-6 font-brand text-4xl font-light leading-[1.08] tracking-tight text-white md:text-6xl"
+              className="mt-6 font-display text-4xl font-light leading-[1.08] tracking-tight text-white md:text-6xl"
             >
               Grown with{" "}
               <span className="italic text-brand-green-300">patience.</span>
@@ -370,7 +370,7 @@ function OriginChapter() {
               Our botanicals begin in soil we know by name — a global network of partner farms
               cultivated over decades, where harvests are timed to the plant, never to the quarter.
             </p>
-            <blockquote className="mt-10 border-l-2 border-brand-green-500/40 pl-6 font-brand text-2xl italic leading-snug text-brand-green-200 md:text-3xl">
+            <blockquote className="mt-10 border-l-2 border-brand-green-500/40 pl-6 font-display text-2xl italic leading-snug text-brand-green-200 md:text-3xl">
               "Nature holds the keys to human vitality. We simply refuse to lose them in
               translation."
             </blockquote>
@@ -396,7 +396,7 @@ function ScienceChapter() {
             </p>
             <h2
               id="science-heading"
-              className="mt-6 font-brand text-4xl font-light leading-[1.08] tracking-tight text-white md:text-6xl"
+              className="mt-6 font-display text-4xl font-light leading-[1.08] tracking-tight text-white md:text-6xl"
             >
               Refined to the{" "}
               <span className="italic text-brand-green-300">molecule.</span>
@@ -444,7 +444,7 @@ function IngredientRail() {
             </p>
             <h2
               id="portfolio-heading"
-              className="mt-6 font-brand text-4xl font-light leading-tight tracking-tight text-white md:text-6xl"
+              className="mt-6 font-display text-4xl font-light leading-tight tracking-tight text-white md:text-6xl"
             >
               The <span className="italic text-brand-green-300">living</span> library
             </h2>
@@ -468,7 +468,7 @@ function IngredientRail() {
                   />
                 </div>
                 <div className="p-7">
-                  <h3 className="font-brand text-2xl font-light text-white">{item.name}</h3>
+                  <h3 className="font-display text-2xl font-light text-white">{item.name}</h3>
                   <p className="mt-1 text-sm italic text-white/40">{item.latin}</p>
                   <dl className="mt-6 space-y-2.5 border-t border-brand-green-800/60 pt-5">
                     {item.data.map(([k, v]) => (
@@ -504,7 +504,7 @@ function StandardsPillars() {
           </p>
           <h2
             id="standards-heading"
-            className="mx-auto mt-6 max-w-2xl font-brand text-4xl font-light leading-tight tracking-tight text-white md:text-5xl"
+            className="mx-auto mt-6 max-w-2xl font-display text-4xl font-light leading-tight tracking-tight text-white md:text-5xl"
           >
             Our promise, <span className="italic text-brand-green-300">codified.</span>
           </h2>
@@ -519,7 +519,7 @@ function StandardsPillars() {
                 >
                   <pillar.icon className="h-5 w-5" />
                 </span>
-                <h3 className="mt-7 font-brand text-2xl font-light text-white">{pillar.title}</h3>
+                <h3 className="mt-7 font-display text-2xl font-light text-white">{pillar.title}</h3>
                 <p className="mt-3 text-sm leading-relaxed text-white/55">{pillar.copy}</p>
               </div>
             </Reveal>
@@ -592,7 +592,7 @@ function CtaSection() {
         </p>
         <h2
           id="cta-heading"
-          className="mx-auto mt-8 max-w-3xl font-brand text-[clamp(2.5rem,6vw,5rem)] font-light leading-[1.05] tracking-tight text-white"
+          className="mx-auto mt-8 max-w-3xl font-display text-[clamp(2.5rem,6vw,5rem)] font-light leading-[1.05] tracking-tight text-white"
         >
           Bring the forest to{" "}
           <span className="italic text-brand-green-300">your formulation.</span>
@@ -629,7 +629,7 @@ function SiteFooter() {
     <footer className="border-t border-brand-green-800/40 bg-gradient-to-b from-brand-green-950 to-black px-6 pb-10 pt-16">
       <div className="mx-auto flex max-w-6xl flex-col items-center gap-8 text-center">
         <div>
-          <p className="font-brand text-3xl font-light text-white/80">Fenchem</p>
+          <p className="font-display text-3xl font-light text-white/80">Fenchem</p>
           <p className="mt-1 font-tech text-[11px] uppercase tracking-[0.3em] text-brand-green-500/60">
             Rooted in Nature, Refined by Science
           </p>
@@ -660,7 +660,7 @@ export function VariantF() {
 
   return (
     <AnimatePresence>
-      <main className="bg-brand-green-950 font-brand text-white antialiased selection:bg-brand-green-500 selection:text-white">
+      <main className="bg-brand-green-950 font-body text-white antialiased selection:bg-brand-green-500 selection:text-white">
         <HeroNav reduce={reduce} />
         <HeroHeader reduce={reduce} />
         <StatsBand />

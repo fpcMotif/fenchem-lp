@@ -23,7 +23,7 @@ import type { ReactNode } from "react";
 /*
  * PROTOTYPE — Variant D: "Botanical Editorial" (green-led, brand book)
  * Premium wellness-magazine feel. Clean white (bg-paper) canvas, NOT warm cream.
- * font-editorial for big display headlines only; font-brand for everything else.
+ * font-display (Newsreader serif) for display headlines; font-body (Plus Jakarta) elsewhere.
  * GREEN-LED: brand-green-500/600 as primary accents, brand-blue-700 secondary.
  * Deep green footer (bg-brand-green-950) with paper text.
  * Floating pill nav, blob-masked hero image, asymmetric industry cards,
@@ -199,7 +199,7 @@ function NavBar() {
       <div className="mx-auto flex max-w-[960px] items-center justify-between rounded-full border border-line bg-paper/85 py-2 pl-6 pr-2 shadow-sm backdrop-blur-md">
         <a
           href="#top"
-          className="font-brand text-xl font-semibold tracking-tight text-ink transition-colors duration-300 hover:text-brand-green-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-green-500"
+          className="font-body text-xl font-semibold tracking-tight text-ink transition-colors duration-300 hover:text-brand-green-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-green-500"
         >
           Fenchem
         </a>
@@ -210,7 +210,7 @@ function NavBar() {
             <a
               key={link.href}
               href={link.href}
-              className="font-brand text-sm text-mute-500 transition-colors duration-300 hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-green-500 rounded-sm"
+              className="font-body text-sm text-mute-500 transition-colors duration-300 hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-green-500 rounded-sm"
             >
               {link.label}
             </a>
@@ -220,7 +220,7 @@ function NavBar() {
         <div className="flex items-center gap-2">
           <a
             href="#contact"
-            className="inline-flex items-center gap-1.5 rounded-full bg-brand-green-500 px-5 py-2.5 font-brand text-sm font-semibold text-paper shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:bg-brand-green-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-green-400 min-h-11"
+            className="inline-flex items-center gap-1.5 rounded-full bg-brand-green-500 px-5 py-2.5 font-body text-sm font-semibold text-paper shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:bg-brand-green-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-green-400 min-h-11"
           >
             Partner with Us
           </a>
@@ -257,7 +257,7 @@ function NavBar() {
                   <a
                     href={link.href}
                     onClick={() => setMenuOpen(false)}
-                    className="block rounded-xl px-3 py-3 font-brand text-sm text-mute-600 transition-colors hover:bg-brand-green-50 hover:text-brand-green-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-green-500 min-h-11"
+                    className="block rounded-xl px-3 py-3 font-body text-sm text-mute-600 transition-colors hover:bg-brand-green-50 hover:text-brand-green-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-green-500 min-h-11"
                   >
                     {link.label}
                   </a>
@@ -301,7 +301,7 @@ function HeroSection({ heroRef, blobY }: HeroSectionProps) {
           </Intro>
 
           <Intro delay={0.18}>
-            <h1 className="mt-8 font-editorial text-[clamp(3rem,7.5vw,6.25rem)] font-light leading-[1.02] tracking-[-0.03em] text-ink">
+            <h1 className="mt-8 font-display text-[clamp(3rem,7.5vw,6.25rem)] font-light leading-[1.02] tracking-[-0.03em] text-ink">
               Nurturing{" "}
               <em className="not-italic text-brand-green-500">Vitality</em>
               <br />
@@ -312,7 +312,7 @@ function HeroSection({ heroRef, blobY }: HeroSectionProps) {
           </Intro>
 
           <Intro delay={0.3}>
-            <p className="mt-8 max-w-xl font-brand text-lg leading-relaxed text-mute-500 md:text-xl">
+            <p className="mt-8 max-w-xl font-body text-lg leading-relaxed text-mute-500 md:text-xl">
               Premium botanical and functional ingredients for nutrition, food and personal care —
               bridging ancient plant wisdom with modern scientific precision.
             </p>
@@ -321,14 +321,14 @@ function HeroSection({ heroRef, blobY }: HeroSectionProps) {
           <Intro delay={0.44} className="mt-10 flex flex-wrap items-center gap-4">
             <a
               href="#ingredients"
-              className="inline-flex items-center gap-2 rounded-full bg-brand-green-500 px-8 py-4 font-brand text-sm font-semibold tracking-wide text-paper shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:bg-brand-green-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-green-400 min-h-11"
+              className="inline-flex items-center gap-2 rounded-full bg-brand-green-500 px-8 py-4 font-body text-sm font-semibold tracking-wide text-paper shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:bg-brand-green-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-green-400 min-h-11"
             >
               Explore Portfolio
               <ArrowUpRight className="h-4 w-4" aria-hidden />
             </a>
             <a
               href="mailto:sales@fenchem.com"
-              className="inline-flex items-center gap-2 rounded-full border border-brand-blue-200 px-8 py-4 font-brand text-sm font-semibold tracking-wide text-brand-blue-700 transition-all duration-300 hover:border-brand-blue-400 hover:bg-brand-blue-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-blue-500 min-h-11"
+              className="inline-flex items-center gap-2 rounded-full border border-brand-blue-200 px-8 py-4 font-body text-sm font-semibold tracking-wide text-brand-blue-700 transition-all duration-300 hover:border-brand-blue-400 hover:bg-brand-blue-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-blue-500 min-h-11"
             >
               Request a Specification
             </a>
@@ -379,8 +379,8 @@ function HeroSection({ heroRef, blobY }: HeroSectionProps) {
                 <p className="font-tech text-[10px] uppercase tracking-[0.25em] text-mute-400">
                   Extraction Yield
                 </p>
-                <p className="mt-2 font-editorial text-4xl font-light text-brand-green-500">98%</p>
-                <p className="mt-1 font-brand text-xs leading-relaxed text-mute-400">
+                <p className="mt-2 font-display text-4xl font-light text-brand-green-500">98%</p>
+                <p className="mt-1 font-body text-xs leading-relaxed text-mute-400">
                   Bio-active retention across our extraction process.
                 </p>
               </m.div>
@@ -401,12 +401,12 @@ function IndustriesSection() {
         <Reveal className="flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
           <div className="max-w-xl">
             <Eyebrow>Where our ingredients work</Eyebrow>
-            <h2 className="mt-5 font-editorial text-4xl font-light tracking-tight text-ink md:text-5xl lg:text-6xl">
+            <h2 className="mt-5 font-display text-4xl font-light tracking-tight text-ink md:text-5xl lg:text-6xl">
               Purity across{" "}
               <em className="italic text-brand-green-500">industries</em>
             </h2>
           </div>
-          <p className="max-w-sm font-brand text-base leading-relaxed text-mute-500">
+          <p className="max-w-sm font-body text-base leading-relaxed text-mute-500">
             Crafted to meet the rigorous demands of global leaders in health, wellness and beauty.
           </p>
         </Reveal>
@@ -432,14 +432,14 @@ function IndustriesSection() {
                   <span className="font-tech text-xs tracking-[0.2em] text-brand-green-400">
                     {industry.index}
                   </span>
-                  <h3 className="font-editorial text-2xl font-medium tracking-tight text-ink md:text-[1.65rem]">
+                  <h3 className="font-display text-2xl font-medium tracking-tight text-ink md:text-[1.65rem]">
                     {industry.title}
                   </h3>
                 </div>
-                <p className="mt-3 font-brand text-sm leading-relaxed text-mute-500">
+                <p className="mt-3 font-body text-sm leading-relaxed text-mute-500">
                   {industry.copy}
                 </p>
-                <span className="mt-5 inline-flex items-center gap-2 font-brand text-sm font-semibold text-brand-green-600 transition-colors duration-300 group-hover:text-brand-green-700">
+                <span className="mt-5 inline-flex items-center gap-2 font-body text-sm font-semibold text-brand-green-600 transition-colors duration-300 group-hover:text-brand-green-700">
                   Explore applications
                   <ArrowUpRight
                     className="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
@@ -504,12 +504,12 @@ function ScienceSection() {
           <div>
             <Reveal>
               <Eyebrow>The Fenchem legacy</Eyebrow>
-              <h2 className="mt-5 font-editorial text-4xl font-light leading-[1.08] tracking-tight text-ink md:text-5xl lg:text-6xl">
+              <h2 className="mt-5 font-display text-4xl font-light leading-[1.08] tracking-tight text-ink md:text-5xl lg:text-6xl">
                 Rooted in Nature,
                 <br />
                 <em className="italic text-brand-green-500">Refined by Science.</em>
               </h2>
-              <p className="mt-8 max-w-xl font-brand text-lg leading-relaxed text-mute-500">
+              <p className="mt-8 max-w-xl font-body text-lg leading-relaxed text-mute-500">
                 Our journey began with a simple belief: that nature holds the keys to human vitality.
                 Today we manage a global network of sustainable farms and advanced laboratories to
                 bring those keys to our partners, lot after lot.
@@ -520,10 +520,10 @@ function ScienceSection() {
               {STATS.map((stat, i) => (
                 <Reveal key={stat.value} delay={i * 0.08}>
                   <div className="h-full rounded-[20px] border border-line bg-paper px-6 py-5 shadow-sm transition-all duration-300 hover:border-brand-green-300 hover:shadow-md">
-                    <span className={`font-editorial text-3xl font-light md:text-4xl ${stat.color}`}>
+                    <span className={`font-display text-3xl font-light md:text-4xl ${stat.color}`}>
                       {stat.value}
                     </span>
-                    <p className="mt-1.5 font-brand text-xs leading-relaxed text-mute-400 md:text-sm">
+                    <p className="mt-1.5 font-body text-xs leading-relaxed text-mute-400 md:text-sm">
                       {stat.label}
                     </p>
                   </div>
@@ -545,10 +545,10 @@ function ScienceSection() {
                   <span className="flex h-12 w-12 items-center justify-center rounded-full bg-brand-green-100 text-brand-green-600 transition-colors duration-300 group-hover:bg-brand-green-500 group-hover:text-paper">
                     <pillar.icon className="h-5 w-5" aria-hidden />
                   </span>
-                  <h3 className="mt-6 font-editorial text-2xl font-medium tracking-tight text-ink">
+                  <h3 className="mt-6 font-display text-2xl font-medium tracking-tight text-ink">
                     {pillar.title}
                   </h3>
-                  <p className="mt-3 max-w-xs font-brand text-sm leading-relaxed text-mute-500">
+                  <p className="mt-3 max-w-xs font-body text-sm leading-relaxed text-mute-500">
                     {pillar.copy}
                   </p>
                 </div>
@@ -601,10 +601,10 @@ function IngredientsSection() {
       <div className="mx-auto max-w-[1080px] px-6 text-center md:px-12">
         <Reveal>
           <Eyebrow className="text-center">The portfolio</Eyebrow>
-          <h2 className="mx-auto mt-5 max-w-3xl font-editorial text-4xl font-light tracking-tight text-ink md:text-5xl lg:text-6xl">
+          <h2 className="mx-auto mt-5 max-w-3xl font-display text-4xl font-light tracking-tight text-ink md:text-5xl lg:text-6xl">
             A <em className="italic text-brand-green-500">living library</em> of botanical actives
           </h2>
-          <p className="mx-auto mt-7 max-w-xl font-brand text-base leading-relaxed text-mute-500 md:text-lg">
+          <p className="mx-auto mt-7 max-w-xl font-body text-base leading-relaxed text-mute-500 md:text-lg">
             Standardized extracts and functional ingredients, each backed by full identity, potency
             and stability documentation.
           </p>
@@ -618,7 +618,7 @@ function IngredientsSection() {
             <a
               key={name}
               href="mailto:sales@fenchem.com"
-              className="group inline-flex items-center gap-2.5 rounded-full border border-brand-green-200 bg-brand-green-50 px-6 py-3 font-brand text-sm font-medium text-brand-green-700 transition-all duration-300 hover:-translate-y-0.5 hover:border-brand-green-400 hover:bg-brand-green-100 hover:shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-green-500 min-h-11"
+              className="group inline-flex items-center gap-2.5 rounded-full border border-brand-green-200 bg-brand-green-50 px-6 py-3 font-body text-sm font-medium text-brand-green-700 transition-all duration-300 hover:-translate-y-0.5 hover:border-brand-green-400 hover:bg-brand-green-100 hover:shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-green-500 min-h-11"
             >
               <Leaf
                 className="h-3.5 w-3.5 text-brand-green-500 transition-transform duration-300 group-hover:rotate-12"
@@ -632,7 +632,7 @@ function IngredientsSection() {
         <Reveal delay={0.3} className="mt-12">
           <a
             href="mailto:sales@fenchem.com"
-            className="group inline-flex items-center gap-2 font-brand text-sm font-semibold text-brand-green-600 transition-colors duration-300 hover:text-brand-green-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-green-500 rounded-sm"
+            className="group inline-flex items-center gap-2 font-body text-sm font-semibold text-brand-green-600 transition-colors duration-300 hover:text-brand-green-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-green-500 rounded-sm"
           >
             Request a Specification
             <ArrowUpRight
@@ -670,7 +670,7 @@ function QualitySection() {
                     <span className="font-tech text-xs font-semibold uppercase tracking-[0.2em] text-ink transition-colors duration-300 hover:text-brand-green-600">
                       {cert.name}
                     </span>
-                    <span className="font-brand text-[10px] text-mute-400">{cert.sub}</span>
+                    <span className="font-body text-[10px] text-mute-400">{cert.sub}</span>
                   </li>
                 ))}
               </ul>
@@ -691,7 +691,7 @@ function GlobalSection() {
         <Reveal className="flex flex-col gap-10 md:flex-row md:items-start md:gap-20">
           <div className="shrink-0 md:w-64">
             <Eyebrow>Global intelligent research</Eyebrow>
-            <h2 className="mt-4 font-editorial text-3xl font-light tracking-tight text-ink md:text-4xl">
+            <h2 className="mt-4 font-display text-3xl font-light tracking-tight text-ink md:text-4xl">
               Six bases,<br />
               <em className="italic text-brand-blue-700">one standard.</em>
             </h2>
@@ -703,7 +703,7 @@ function GlobalSection() {
                 <Reveal key={office} delay={i * 0.07}>
                   <li className="flex items-center gap-3 rounded-2xl border border-line px-5 py-4 transition-all duration-300 hover:border-brand-blue-200 hover:bg-brand-blue-50/30">
                     <MapPin className="h-4 w-4 shrink-0 text-brand-blue-400" aria-hidden />
-                    <span className="font-brand text-sm text-mute-600">{office}</span>
+                    <span className="font-body text-sm text-mute-600">{office}</span>
                   </li>
                 </Reveal>
               ))}
@@ -735,11 +735,11 @@ function CtaSection() {
 
             <div className="relative">
               <Eyebrow className="text-center">Start the conversation</Eyebrow>
-              <h2 className="mx-auto mt-6 max-w-3xl font-editorial text-4xl font-light leading-[1.08] tracking-tight text-ink md:text-6xl">
+              <h2 className="mx-auto mt-6 max-w-3xl font-display text-4xl font-light leading-[1.08] tracking-tight text-ink md:text-6xl">
                 Let&rsquo;s formulate{" "}
                 <em className="italic text-brand-green-500">what&rsquo;s next.</em>
               </h2>
-              <p className="mx-auto mt-7 max-w-xl font-brand text-base leading-relaxed text-mute-500 md:text-lg">
+              <p className="mx-auto mt-7 max-w-xl font-body text-base leading-relaxed text-mute-500 md:text-lg">
                 From first sample to full-scale supply — tell us what you&rsquo;re building and our
                 technical team will respond within one business day.
               </p>
@@ -747,14 +747,14 @@ function CtaSection() {
               <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
                 <a
                   href="mailto:sales@fenchem.com"
-                  className="inline-flex items-center gap-2 rounded-full bg-brand-green-500 px-9 py-4 font-brand text-sm font-semibold tracking-wide text-paper shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:bg-brand-green-600 hover:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-green-400 min-h-11"
+                  className="inline-flex items-center gap-2 rounded-full bg-brand-green-500 px-9 py-4 font-body text-sm font-semibold tracking-wide text-paper shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:bg-brand-green-600 hover:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-green-400 min-h-11"
                 >
                   Partner with Fenchem
                   <ArrowUpRight className="h-4 w-4" aria-hidden />
                 </a>
                 <a
                   href="#ingredients"
-                  className="inline-flex items-center gap-2 rounded-full border border-brand-blue-300 bg-paper/60 px-9 py-4 font-brand text-sm font-semibold tracking-wide text-brand-blue-700 transition-all duration-300 hover:border-brand-blue-500 hover:bg-brand-blue-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-blue-500 min-h-11"
+                  className="inline-flex items-center gap-2 rounded-full border border-brand-blue-300 bg-paper/60 px-9 py-4 font-body text-sm font-semibold tracking-wide text-brand-blue-700 transition-all duration-300 hover:border-brand-blue-500 hover:bg-brand-blue-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-blue-500 min-h-11"
                 >
                   Explore Portfolio
                 </a>
@@ -777,20 +777,20 @@ function FooterSection() {
           <p className="font-tech text-[10px] uppercase tracking-[0.3em] text-brand-green-400/70 md:text-[11px]">
             Rooted in Nature, Refined by Science
           </p>
-          <p className="mt-6 font-editorial text-[clamp(4rem,13vw,10rem)] font-light leading-[0.95] tracking-tight text-paper">
+          <p className="mt-6 font-display text-[clamp(4rem,13vw,10rem)] font-light leading-[0.95] tracking-tight text-paper">
             Fenchem<span className="text-brand-green-400">.</span>
           </p>
         </Reveal>
 
         <div className="mt-16 grid grid-cols-1 gap-12 md:grid-cols-3 md:gap-10">
           <Reveal>
-            <p className="max-w-xs font-brand text-sm leading-relaxed text-brand-green-200/70">
+            <p className="max-w-xs font-body text-sm leading-relaxed text-brand-green-200/70">
               A global B2B supplier of botanical and functional ingredients for nutrition, food
               &amp; beverage and personal care — since 1995.
             </p>
             <a
               href="mailto:sales@fenchem.com"
-              className="mt-6 inline-flex items-center gap-2 font-brand text-sm font-semibold text-brand-green-400 transition-colors duration-300 hover:text-brand-green-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-green-400 rounded-sm"
+              className="mt-6 inline-flex items-center gap-2 font-body text-sm font-semibold text-brand-green-400 transition-colors duration-300 hover:text-brand-green-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-green-400 rounded-sm"
             >
               sales@fenchem.com
               <ArrowUpRight className="h-3.5 w-3.5" aria-hidden />
@@ -806,7 +806,7 @@ function FooterSection() {
                 <li key={link.href}>
                   <a
                     href={link.href}
-                    className="font-brand text-sm text-brand-green-200/70 transition-colors duration-300 hover:text-brand-green-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-green-400 rounded-sm"
+                    className="font-body text-sm text-brand-green-200/70 transition-colors duration-300 hover:text-brand-green-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-green-400 rounded-sm"
                   >
                     {link.label}
                   </a>
@@ -815,7 +815,7 @@ function FooterSection() {
               <li>
                 <a
                   href="#contact"
-                  className="font-brand text-sm text-brand-green-200/70 transition-colors duration-300 hover:text-brand-green-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-green-400 rounded-sm"
+                  className="font-body text-sm text-brand-green-200/70 transition-colors duration-300 hover:text-brand-green-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-green-400 rounded-sm"
                 >
                   Partner with Us
                 </a>
@@ -829,7 +829,7 @@ function FooterSection() {
             </p>
             <ul className="mt-5 space-y-3">
               {OFFICES.map((office) => (
-                <li key={office} className="font-brand text-sm text-brand-green-200/70">
+                <li key={office} className="font-body text-sm text-brand-green-200/70">
                   {office}
                 </li>
               ))}
@@ -838,19 +838,19 @@ function FooterSection() {
         </div>
 
         <div className="mt-16 flex flex-col items-center justify-between gap-4 border-t border-brand-green-800 pt-8 md:flex-row">
-          <p className="font-brand text-xs text-brand-green-400/50">
+          <p className="font-body text-xs text-brand-green-400/50">
             © 2026 Fenchem Biotek Ltd. All rights reserved.
           </p>
           <div className="flex items-center gap-8">
             <a
               href="#top"
-              className="font-brand text-xs text-brand-green-400/50 transition-colors duration-300 hover:text-brand-green-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-green-400 rounded-sm"
+              className="font-body text-xs text-brand-green-400/50 transition-colors duration-300 hover:text-brand-green-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-green-400 rounded-sm"
             >
               Privacy Policy
             </a>
             <a
               href="#top"
-              className="font-brand text-xs text-brand-green-400/50 transition-colors duration-300 hover:text-brand-green-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-green-400 rounded-sm"
+              className="font-body text-xs text-brand-green-400/50 transition-colors duration-300 hover:text-brand-green-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-green-400 rounded-sm"
             >
               Terms of Service
             </a>
@@ -875,7 +875,7 @@ export function VariantD() {
   return (
     <LazyMotion features={domAnimation} strict>
       <main
-        className="overflow-x-clip bg-paper font-brand text-ink antialiased selection:bg-brand-green-100 selection:text-brand-green-800"
+        className="overflow-x-clip bg-paper font-body text-ink antialiased selection:bg-brand-green-100 selection:text-brand-green-800"
         id="top"
       >
         <NavBar />

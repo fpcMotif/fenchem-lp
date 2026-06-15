@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300..700;1,6..72,300..700&family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&family=JetBrains+Mono:wght@400;500;600&family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300..700;1,6..72,300..700&family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&family=JetBrains+Mono:wght@400;500;600&display=swap");
 @import "@fenchem-lp/ui/globals.css";
 
 /*
@@ -77,14 +77,16 @@
   --color-chem: oklch(0.631 0.146 250.852); /* #3A8DDE 化工 */
   --color-nutrition: oklch(0.957 0.141 104.856); /* #FFF67F 营养 */
 
+  /*
+   * English-site typography (see docs/adr/0002-english-site-typography.md):
+   * Newsreader (display serif) + Plus Jakarta Sans (body/UI) + JetBrains Mono
+   * (technical). "Noto Sans SC" (Source Han Sans) stays only as a LOCAL CJK
+   * fallback — no web-font import — so 中文 glyphs use the brand face when present.
+   */
   --font-display: "Newsreader", "Georgia", "Times New Roman", serif;
-  --font-body: "Plus Jakarta Sans", "Inter Variable", system-ui, sans-serif;
+  --font-body: "Plus Jakarta Sans", "Noto Sans SC", "Inter Variable", system-ui, sans-serif;
   --font-tech: "JetBrains Mono", ui-monospace, "SFMono-Regular", monospace;
 
-  /* Brand typography — Source Han Sans (思源黑体) via Noto Sans SC (EN + 中文). */
-  --font-brand: "Noto Sans SC", "Source Han Sans SC", "Source Han Sans", system-ui, sans-serif;
-  /* Serif display — brand-book exception, variant D (editorial) headlines only. */
-  --font-editorial: "Newsreader", "Georgia", "Times New Roman", serif;
 
   --shadow-ambient: 0 24px 48px -12px oklch(0.288 0.04 160.598 / 0.08);
   --shadow-lift: 0 12px 32px -8px oklch(0.288 0.04 160.598 / 0.06);
