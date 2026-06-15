@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300..700;1,6..72,300..700&family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&family=JetBrains+Mono:wght@400;500;600&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300..700;1,6..72,300..700&family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&family=JetBrains+Mono:wght@400;500;600&family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap");
 @import "@fenchem-lp/ui/globals.css";
 
 /*
@@ -20,9 +20,71 @@
   --color-clay: oklch(0.392 0.115 22.782);
   --color-blush: oklch(0.919 0.041 21.601);
 
+  /* ============================================================
+   * FENCHEM BRAND BOOK tokens — used by prototype variants D/E/F/G.
+   * Source: docs/brand/fenchem-brand-book.md. All values are exact
+   * OKLCH conversions of the brand book's sRGB values.
+   * Brand Blue #0743AE · Brand Green #64A733 · Clean White · Neutral Gray
+   * + 6 division (auxiliary) accents.
+   * ============================================================ */
+
+  /* Brand Blue — #0743AE anchored at -700 */
+  --color-brand-blue-50: oklch(0.97 0.02 261.5);
+  --color-brand-blue-100: oklch(0.93 0.04 261.5);
+  --color-brand-blue-200: oklch(0.87 0.07 261.5);
+  --color-brand-blue-300: oklch(0.78 0.11 261.5);
+  --color-brand-blue-400: oklch(0.66 0.15 261.5);
+  --color-brand-blue-500: oklch(0.55 0.19 261.5);
+  --color-brand-blue-600: oklch(0.48 0.2 261.5);
+  --color-brand-blue-700: oklch(0.424 0.18 261.5); /* #0743AE */
+  --color-brand-blue-800: oklch(0.36 0.155 261.5);
+  --color-brand-blue-900: oklch(0.29 0.125 261.5);
+  --color-brand-blue-950: oklch(0.2 0.09 261.5);
+
+  /* Brand Green — #64A733 anchored at -500 */
+  --color-brand-green-50: oklch(0.97 0.03 134.7);
+  --color-brand-green-100: oklch(0.94 0.05 134.7);
+  --color-brand-green-200: oklch(0.89 0.08 134.7);
+  --color-brand-green-300: oklch(0.83 0.11 134.7);
+  --color-brand-green-400: oklch(0.74 0.14 134.7);
+  --color-brand-green-500: oklch(0.66 0.163 134.7); /* #64A733 */
+  --color-brand-green-600: oklch(0.58 0.15 134.7);
+  --color-brand-green-700: oklch(0.5 0.13 134.7);
+  --color-brand-green-800: oklch(0.42 0.105 134.7);
+  --color-brand-green-900: oklch(0.35 0.085 134.7);
+  --color-brand-green-950: oklch(0.26 0.065 134.7);
+
+  /* Neutrals */
+  --color-paper: oklch(1 0 0); /* Clean White #FFFFFF */
+  --color-ink: oklch(0.22 0 0); /* near-black text */
+  --color-line: oklch(0.858 0 0); /* Neutral Gray #D0D0D0 */
+  --color-mute-50: oklch(0.985 0 0);
+  --color-mute-100: oklch(0.96 0 0);
+  --color-mute-200: oklch(0.922 0 0);
+  --color-mute-300: oklch(0.858 0 0);
+  --color-mute-400: oklch(0.72 0 0);
+  --color-mute-500: oklch(0.62 0 0);
+  --color-mute-600: oklch(0.5 0 0);
+  --color-mute-700: oklch(0.4 0 0);
+  --color-mute-800: oklch(0.3 0 0);
+  --color-mute-900: oklch(0.22 0 0);
+
+  /* Division (auxiliary) accents — exact brand book values */
+  --color-feed: oklch(0.81 0.157 128.606); /* #A2D45E 饲料 */
+  --color-cosmetics: oklch(0.59 0.145 317.586); /* #A05EB5 化妆品 */
+  --color-agro: oklch(0.669 0.084 178.19); /* #55A695 农化 */
+  --color-food: oklch(0.703 0.148 55.168); /* #E48336 食品 */
+  --color-chem: oklch(0.631 0.146 250.852); /* #3A8DDE 化工 */
+  --color-nutrition: oklch(0.957 0.141 104.856); /* #FFF67F 营养 */
+
   --font-display: "Newsreader", "Georgia", "Times New Roman", serif;
   --font-body: "Plus Jakarta Sans", "Inter Variable", system-ui, sans-serif;
   --font-tech: "JetBrains Mono", ui-monospace, "SFMono-Regular", monospace;
+
+  /* Brand typography — Source Han Sans (思源黑体) via Noto Sans SC (EN + 中文). */
+  --font-brand: "Noto Sans SC", "Source Han Sans SC", "Source Han Sans", system-ui, sans-serif;
+  /* Serif display — brand-book exception, variant D (editorial) headlines only. */
+  --font-editorial: "Newsreader", "Georgia", "Times New Roman", serif;
 
   --shadow-ambient: 0 24px 48px -12px oklch(0.288 0.04 160.598 / 0.08);
   --shadow-lift: 0 12px 32px -8px oklch(0.288 0.04 160.598 / 0.06);
