@@ -8,7 +8,8 @@ import {
   useTransform,
 } from "motion/react";
 import { useRef } from "react";
-import type { ReactNode } from "react";
+import { EASE, Reveal } from "@/components/prototype/motion";
+import { getFeaturedIngredients, pillars } from "@/components/landing/landing-content";
 
 /*
  * PROTOTYPE — Variant C: "Deep Forest"
@@ -16,8 +17,6 @@ import type { ReactNode } from "react";
  * parallax, horizontal scroll-snap ingredient rail, glowing mint CTA.
  * New direction — no Stitch base. See PROTOTYPE-BRIEF.md.
  */
-
-const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
 const img = (id: string, w = 1600, q = 80) =>
   `https://images.unsplash.com/${id}?auto=format&fit=crop&w=${w}&q=${q}`;
@@ -29,103 +28,20 @@ const NAV_LINKS = [
   { label: "Standards", href: "#standards" },
 ] as const;
 
-const RAIL = [
-  {
-    name: "Ashwagandha KSM-66",
-    latin: "Withania somnifera",
-    data: [
-      ["PURITY", "≥ 5% withanolides"],
-      ["FORM", "Root extract"],
-    ],
-    image: img("photo-1501004318641-b39e6451bec6", 800),
-  },
-  {
-    name: "Lutein",
-    latin: "Tagetes erecta",
-    data: [
-      ["PURITY", "≥ 98% trans"],
-      ["FORM", "Beadlet · Oil"],
-    ],
-    image: img("photo-1518531933037-91b2f5f229cc", 800),
-  },
-  {
-    name: "Astaxanthin",
-    latin: "Haematococcus pluvialis",
-    data: [
-      ["PURITY", "≥ 10% oleoresin"],
-      ["FORM", "Softgel-ready"],
-    ],
-    image: img("photo-1505576399279-565b52d4ac71", 800),
-  },
-  {
-    name: "Coenzyme Q10",
-    latin: "Fermentation grade",
-    data: [
-      ["PURITY", "≥ 99.5%"],
-      ["FORM", "Powder · Liposomal"],
-    ],
-    image: img("photo-1610348725531-843dff563e2c", 800),
-  },
-  {
-    name: "Curcumin",
-    latin: "Curcuma longa",
-    data: [
-      ["PURITY", "≥ 95% curcuminoids"],
-      ["FORM", "Water-dispersible"],
-    ],
-    image: img("photo-1607619056574-7b8d3ee536b2", 800),
-  },
-  {
-    name: "Hyaluronic Acid",
-    latin: "Bio-fermented",
-    data: [
-      ["GRADE", "Cosmetic · Food"],
-      ["MW", "8 kDa – 1.8 MDa"],
-    ],
-    image: img("photo-1512069772995-ec65ed45afd6", 800),
-  },
-] as const;
-
-const PILLARS = [
+const PILLAR_DETAIL = [
   {
     icon: Sprout,
-    title: "Traceable Sourcing",
     copy: "A documented chain of custody from origin farm to finished extract — every lot, every season.",
   },
   {
     icon: FlaskConical,
-    title: "Clinical-Grade R&D",
     copy: "Identity, potency and stability validated in-house; third-party verification on request.",
   },
   {
     icon: Globe2,
-    title: "Global Compliance",
     copy: "ISO and GMP certified systems with regulatory dossiers prepared for 40+ markets.",
   },
 ] as const;
-
-function Reveal({
-  children,
-  className,
-  delay = 0,
-}: {
-  children: ReactNode;
-  className?: string;
-  delay?: number;
-}) {
-  const reduce = useReducedMotion();
-  return (
-    <m.div
-      className={className}
-      initial={reduce ? { opacity: 0 } : { opacity: 0, y: 36 }}
-      whileInView={reduce ? { opacity: 1 } : { opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-100px" }}
-      transition={{ duration: 0.9, delay: reduce ? 0 : delay, ease: EASE }}
-    >
-      {children}
-    </m.div>
-  );
-}
 
 function ChapterImage({ src, alt }: { src: string; alt: string }) {
   const reduce = useReducedMotion();
@@ -386,13 +302,13 @@ function IngredientRail() {
       </div>
       <div className="mt-14 overflow-x-auto pb-6 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         <div className="flex snap-x snap-mandatory gap-6 px-6 md:px-[max(1.5rem,calc((100vw-72rem)/2))]">
-          {RAIL.map((item, i) => (
+          {getFeaturedIngredients().map((item, i) => (
             <Reveal key={item.name} delay={Math.min(i * 0.08, 0.3)} className="snap-start">
               <article className="group w-[300px] shrink-0 overflow-hidden rounded-3xl border border-white/10 bg-white/5 backdrop-blur transition-colors duration-500 hover:border-mint/40 md:w-[340px]">
                 <div className="h-52 overflow-hidden">
                   <img
-                    src={item.image}
-                    alt={item.name}
+                    src={item.image.src}
+                    alt={item.image.alt}
                     className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
                     loading="lazy"
                   />
@@ -401,7 +317,7 @@ function IngredientRail() {
                   <h3 className="font-display text-2xl text-cream">{item.name}</h3>
                   <p className="mt-1 text-cream/40 text-sm italic">{item.latin}</p>
                   <dl className="mt-6 space-y-2.5 border-white/10 border-t pt-5">
-                    {item.data.map(([k, v]) => (
+                    {[["Purity", item.purity], ["Form", item.form]].map(([k, v]) => (
                       <div key={k} className="flex items-baseline justify-between gap-4">
                         <dt className="font-tech text-[10px] text-mint/70 uppercase tracking-[0.2em]">
                           {k}
@@ -424,17 +340,20 @@ function StandardsPillars() {
   return (
     <section id="standards" className="scroll-mt-24 px-6 py-16 md:py-24">
       <div className="mx-auto grid max-w-6xl gap-6 md:grid-cols-3">
-        {PILLARS.map((pillar, i) => (
+        {pillars.map((pillar, i) => {
+          const Icon = PILLAR_DETAIL[i].icon;
+          return (
           <Reveal key={pillar.title} delay={i * 0.1}>
             <div className="h-full rounded-3xl border border-white/10 bg-gradient-to-b from-white/[0.07] to-transparent p-9 backdrop-blur transition-colors duration-500 hover:border-mint/40">
               <span className="flex h-12 w-12 items-center justify-center rounded-full border border-mint/30 text-mint">
-                <pillar.icon className="h-5 w-5" aria-hidden />
+                <Icon className="h-5 w-5" aria-hidden />
               </span>
               <h3 className="mt-7 font-display text-2xl text-cream">{pillar.title}</h3>
-              <p className="mt-3 text-cream/55 text-sm leading-relaxed">{pillar.copy}</p>
+              <p className="mt-3 text-cream/55 text-sm leading-relaxed">{PILLAR_DETAIL[i].copy}</p>
             </div>
           </Reveal>
-        ))}
+          );
+        })}
       </div>
     </section>
   );

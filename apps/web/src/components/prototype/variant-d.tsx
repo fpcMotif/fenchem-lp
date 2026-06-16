@@ -18,7 +18,16 @@ import {
 } from "motion/react";
 import type { MotionValue } from "motion/react";
 import { useRef, useState } from "react";
-import type { ReactNode } from "react";
+import { EASE, Reveal, Intro, Eyebrow } from "@/components/prototype/motion";
+import {
+  company,
+  stats,
+  industries,
+  pillars,
+  ingredients,
+  certificationDetails,
+  regions,
+} from "@/components/landing/landing-content";
 
 /*
  * PROTOTYPE — Variant D: "Botanical Editorial" (green-led, brand book)
@@ -31,8 +40,6 @@ import type { ReactNode } from "react";
  * quiet certification strip, full-width CTA band.
  */
 
-const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
-
 const NAV_LINKS = [
   { label: "Industries", href: "#industries" },
   { label: "Science", href: "#science" },
@@ -40,146 +47,20 @@ const NAV_LINKS = [
   { label: "Quality", href: "#quality" },
 ] as const;
 
-type Industry = {
-  index: string;
-  title: string;
-  copy: string;
-  img: string;
-  alt: string;
-  offset: string;
-  aspect: string;
-};
-
-const INDUSTRIES: Industry[] = [
-  {
-    index: "01",
-    title: "Nutrition & Supplements",
-    copy: "Clinically supported actives — from Ashwagandha KSM-66 to Coenzyme Q10 — standardized for potency, stability and dose accuracy.",
-    img: "https://images.unsplash.com/photo-1610348725531-843dff563e2c?auto=format&fit=crop&w=900&q=80",
-    alt: "Botanical supplement capsules arranged on a neutral surface",
-    offset: "",
-    aspect: "aspect-[3/4]",
-  },
-  {
-    index: "02",
-    title: "Food & Beverage",
-    copy: "Natural carotenoids, plant proteins and functional botanicals engineered for clean-label formulation at production scale.",
-    img: "https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&w=900&q=80",
-    alt: "Fresh, vibrant food bowl with greens and grains in soft daylight",
-    offset: "md:mt-16 lg:mt-24",
-    aspect: "aspect-[4/5]",
-  },
-  {
-    index: "03",
-    title: "Personal Care & Cosmeceuticals",
-    copy: "Bioactive botanicals and hyaluronic acid systems for skin, hair and beauty-from-within applications.",
-    img: "https://images.unsplash.com/photo-1556228578-8c89e6adf883?auto=format&fit=crop&w=900&q=80",
-    alt: "Minimal skincare bottle in warm natural light",
-    offset: "md:mt-8 lg:mt-12",
-    aspect: "aspect-[3/4]",
-  },
-];
-
-const STATS = [
-  { value: "25+", label: "Years of botanical expertise since 1995", color: "text-brand-green-600" },
-  { value: "6", label: "Global bases across three continents", color: "text-brand-blue-700" },
-  { value: "40+", label: "Countries served by our supply network", color: "text-brand-green-600" },
-  { value: "ISO/GMP", label: "Certified manufacturing and quality systems", color: "text-brand-blue-700" },
+const INDUSTRY_LAYOUT = [
+  { offset: "", aspect: "aspect-[3/4]" },
+  { offset: "md:mt-16 lg:mt-24", aspect: "aspect-[4/5]" },
+  { offset: "md:mt-8 lg:mt-12", aspect: "aspect-[3/4]" },
 ] as const;
 
-const PILLARS = [
-  {
-    icon: Sprout,
-    title: "Traceable Sourcing",
-    copy: "Direct partnerships with growers and a documented chain of custody — from field and harvest to finished extract.",
-  },
-  {
-    icon: FlaskConical,
-    title: "Clinical-Grade R&D",
-    copy: "In-house laboratories validate identity, potency and stability on every lot, with third-party verification on request.",
-  },
-  {
-    icon: Globe,
-    title: "Global Compliance",
-    copy: "Regulatory dossiers and documentation support for more than forty markets, prepared before you ask.",
-  },
+const STAT_COLORS = [
+  "text-brand-green-600",
+  "text-brand-blue-700",
+  "text-brand-green-600",
+  "text-brand-blue-700",
 ] as const;
 
-const INGREDIENTS = [
-  "Ashwagandha KSM-66",
-  "Lutein",
-  "Astaxanthin",
-  "Coenzyme Q10",
-  "Phytosterols",
-  "Curcumin",
-  "Hyaluronic Acid",
-  "Beta-Carotene",
-] as const;
-
-const CERTIFICATIONS = [
-  { name: "ISO 9001", sub: "Quality Management" },
-  { name: "FSSC 22000", sub: "Food Safety" },
-  { name: "GMP", sub: "Good Manufacturing Practice" },
-  { name: "HACCP", sub: "Hazard Analysis" },
-  { name: "Kosher", sub: "Dietary Certified" },
-  { name: "Halal", sub: "Certified" },
-] as const;
-
-const OFFICES = [
-  "Nanjing, China — HQ",
-  "Hackensack, United States",
-  "Frankfurt, Germany",
-  "Johannesburg, South Africa",
-  "São Paulo, Brazil",
-  "Kuala Lumpur, Malaysia",
-] as const;
-
-/* ─── Primitives ─────────────────────────────────────────────── */
-
-type MotionBlockProps = {
-  children: ReactNode;
-  className?: string;
-  delay?: number;
-};
-
-function Intro({ children, className, delay = 0 }: MotionBlockProps) {
-  const reduce = useReducedMotion();
-  return (
-    <m.div
-      className={className}
-      initial={reduce ? { opacity: 0 } : { opacity: 0, y: 28 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: reduce ? 0 : 0.9, delay: reduce ? 0 : delay, ease: EASE }}
-    >
-      {children}
-    </m.div>
-  );
-}
-
-function Reveal({ children, className, delay = 0 }: MotionBlockProps) {
-  const reduce = useReducedMotion();
-  return (
-    <m.div
-      className={className}
-      initial={reduce ? { opacity: 0 } : { opacity: 0, y: 32 }}
-      whileInView={reduce ? { opacity: 1 } : { opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-80px" }}
-      transition={{ duration: reduce ? 0 : 0.8, delay: reduce ? 0 : delay, ease: EASE }}
-    >
-      {children}
-    </m.div>
-  );
-}
-
-function Eyebrow({ children, className = "" }: { children: ReactNode; className?: string }) {
-  return (
-    <p
-      className={`font-tech text-[11px] uppercase tracking-[0.35em] text-brand-green-600 md:text-xs ${className}`}
-    >
-      {children}
-    </p>
-  );
-}
+const PILLAR_ICONS = [Sprout, FlaskConical, Globe] as const;
 
 /* ─── NavBar ─────────────────────────────────────────────────── */
 
@@ -327,7 +208,7 @@ function HeroSection({ heroRef, blobY }: HeroSectionProps) {
               <ArrowUpRight className="h-4 w-4" aria-hidden />
             </a>
             <a
-              href="mailto:sales@fenchem.com"
+              href={`mailto:${company.email}`}
               className="inline-flex items-center gap-2 rounded-full border border-brand-blue-200 px-8 py-4 font-body text-sm font-semibold tracking-wide text-brand-blue-700 transition-all duration-300 hover:border-brand-blue-400 hover:bg-brand-blue-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-blue-500 min-h-11"
             >
               Request a Specification
@@ -412,25 +293,25 @@ function IndustriesSection() {
         </Reveal>
 
         <div className="mt-16 grid grid-cols-1 gap-12 md:mt-24 md:grid-cols-3 md:gap-8 lg:gap-10">
-          {INDUSTRIES.map((industry, i) => (
-            <Reveal key={industry.index} delay={i * 0.12} className={industry.offset}>
+          {industries.map((industry, i) => (
+            <Reveal key={industry.title} delay={i * 0.12} className={INDUSTRY_LAYOUT[i].offset}>
               <a
                 href="#ingredients"
                 className="group block focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-green-500 rounded-3xl"
               >
                 <div
-                  className={`overflow-hidden rounded-[24px] shadow-sm transition-shadow duration-500 group-hover:shadow-md ${industry.aspect}`}
+                  className={`overflow-hidden rounded-[24px] shadow-sm transition-shadow duration-500 group-hover:shadow-md ${INDUSTRY_LAYOUT[i].aspect}`}
                 >
                   <img
-                    src={industry.img}
-                    alt={industry.alt}
+                    src={industry.image.src}
+                    alt={industry.image.alt}
                     className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
                     loading="lazy"
                   />
                 </div>
                 <div className="mt-7 flex items-baseline gap-4">
                   <span className="font-tech text-xs tracking-[0.2em] text-brand-green-400">
-                    {industry.index}
+                    {String(i + 1).padStart(2, "0")}
                   </span>
                   <h3 className="font-display text-2xl font-medium tracking-tight text-ink md:text-[1.65rem]">
                     {industry.title}
@@ -517,10 +398,10 @@ function ScienceSection() {
             </Reveal>
 
             <div className="mt-12 grid grid-cols-1 gap-4 sm:grid-cols-2">
-              {STATS.map((stat, i) => (
+              {stats.map((stat, i) => (
                 <Reveal key={stat.value} delay={i * 0.08}>
                   <div className="h-full rounded-[20px] border border-line bg-paper px-6 py-5 shadow-sm transition-all duration-300 hover:border-brand-green-300 hover:shadow-md">
-                    <span className={`font-display text-3xl font-light md:text-4xl ${stat.color}`}>
+                    <span className={`font-display text-3xl font-light md:text-4xl ${STAT_COLORS[i]}`}>
                       {stat.value}
                     </span>
                     <p className="mt-1.5 font-body text-xs leading-relaxed text-mute-400 md:text-sm">
@@ -539,21 +420,24 @@ function ScienceSection() {
             <Eyebrow className="text-center">Three pillars of excellence</Eyebrow>
           </Reveal>
           <div className="mt-14 grid grid-cols-1 gap-12 md:grid-cols-3 md:gap-10">
-            {PILLARS.map((pillar, i) => (
-              <Reveal key={pillar.title} delay={i * 0.12}>
-                <div className="group">
-                  <span className="flex h-12 w-12 items-center justify-center rounded-full bg-brand-green-100 text-brand-green-600 transition-colors duration-300 group-hover:bg-brand-green-500 group-hover:text-paper">
-                    <pillar.icon className="h-5 w-5" aria-hidden />
-                  </span>
-                  <h3 className="mt-6 font-display text-2xl font-medium tracking-tight text-ink">
-                    {pillar.title}
-                  </h3>
-                  <p className="mt-3 max-w-xs font-body text-sm leading-relaxed text-mute-500">
-                    {pillar.copy}
-                  </p>
-                </div>
-              </Reveal>
-            ))}
+            {pillars.map((pillar, i) => {
+              const Icon = PILLAR_ICONS[i];
+              return (
+                <Reveal key={pillar.title} delay={i * 0.12}>
+                  <div className="group">
+                    <span className="flex h-12 w-12 items-center justify-center rounded-full bg-brand-green-100 text-brand-green-600 transition-colors duration-300 group-hover:bg-brand-green-500 group-hover:text-paper">
+                      <Icon className="h-5 w-5" aria-hidden />
+                    </span>
+                    <h3 className="mt-6 font-display text-2xl font-medium tracking-tight text-ink">
+                      {pillar.title}
+                    </h3>
+                    <p className="mt-3 max-w-xs font-body text-sm leading-relaxed text-mute-500">
+                      {pillar.copy}
+                    </p>
+                  </div>
+                </Reveal>
+              );
+            })}
           </div>
         </div>
       </div>
@@ -614,24 +498,24 @@ function IngredientsSection() {
           delay={0.15}
           className="mt-14 flex flex-wrap items-center justify-center gap-3 md:gap-4"
         >
-          {INGREDIENTS.map((name) => (
+          {ingredients.map((ingredient) => (
             <a
-              key={name}
-              href="mailto:sales@fenchem.com"
+              key={ingredient.name}
+              href={`mailto:${company.email}`}
               className="group inline-flex items-center gap-2.5 rounded-full border border-brand-green-200 bg-brand-green-50 px-6 py-3 font-body text-sm font-medium text-brand-green-700 transition-all duration-300 hover:-translate-y-0.5 hover:border-brand-green-400 hover:bg-brand-green-100 hover:shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-green-500 min-h-11"
             >
               <Leaf
                 className="h-3.5 w-3.5 text-brand-green-500 transition-transform duration-300 group-hover:rotate-12"
                 aria-hidden
               />
-              {name}
+              {ingredient.name}
             </a>
           ))}
         </Reveal>
 
         <Reveal delay={0.3} className="mt-12">
           <a
-            href="mailto:sales@fenchem.com"
+            href={`mailto:${company.email}`}
             className="group inline-flex items-center gap-2 font-body text-sm font-semibold text-brand-green-600 transition-colors duration-300 hover:text-brand-green-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-green-500 rounded-sm"
           >
             Request a Specification
@@ -665,7 +549,7 @@ function QualitySection() {
               </div>
 
               <ul className="flex flex-wrap items-center gap-x-6 gap-y-4 md:gap-x-10">
-                {CERTIFICATIONS.map((cert) => (
+                {certificationDetails.map((cert) => (
                   <li key={cert.name} className="flex flex-col items-center gap-0.5">
                     <span className="font-tech text-xs font-semibold uppercase tracking-[0.2em] text-ink transition-colors duration-300 hover:text-brand-green-600">
                       {cert.name}
@@ -699,11 +583,13 @@ function GlobalSection() {
 
           <div className="flex-1">
             <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              {OFFICES.map((office, i) => (
-                <Reveal key={office} delay={i * 0.07}>
+              {regions.map((region, i) => (
+                <Reveal key={region.city} delay={i * 0.07}>
                   <li className="flex items-center gap-3 rounded-2xl border border-line px-5 py-4 transition-all duration-300 hover:border-brand-blue-200 hover:bg-brand-blue-50/30">
                     <MapPin className="h-4 w-4 shrink-0 text-brand-blue-400" aria-hidden />
-                    <span className="font-body text-sm text-mute-600">{office}</span>
+                    <span className="font-body text-sm text-mute-600">
+                      {`${region.city}, ${region.country}${region.city === "Nanjing" ? " — HQ" : ""}`}
+                    </span>
                   </li>
                 </Reveal>
               ))}
@@ -746,7 +632,7 @@ function CtaSection() {
 
               <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
                 <a
-                  href="mailto:sales@fenchem.com"
+                  href={`mailto:${company.email}`}
                   className="inline-flex items-center gap-2 rounded-full bg-brand-green-500 px-9 py-4 font-body text-sm font-semibold tracking-wide text-paper shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:bg-brand-green-600 hover:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-green-400 min-h-11"
                 >
                   Partner with Fenchem
@@ -789,10 +675,10 @@ function FooterSection() {
               &amp; beverage and personal care — since 1995.
             </p>
             <a
-              href="mailto:sales@fenchem.com"
+              href={`mailto:${company.email}`}
               className="mt-6 inline-flex items-center gap-2 font-body text-sm font-semibold text-brand-green-400 transition-colors duration-300 hover:text-brand-green-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-green-400 rounded-sm"
             >
-              sales@fenchem.com
+              {company.email}
               <ArrowUpRight className="h-3.5 w-3.5" aria-hidden />
             </a>
           </Reveal>
@@ -828,9 +714,9 @@ function FooterSection() {
               Global bases
             </p>
             <ul className="mt-5 space-y-3">
-              {OFFICES.map((office) => (
-                <li key={office} className="font-body text-sm text-brand-green-200/70">
-                  {office}
+              {regions.map((region) => (
+                <li key={region.city} className="font-body text-sm text-brand-green-200/70">
+                  {`${region.city}, ${region.country}${region.city === "Nanjing" ? " — HQ" : ""}`}
                 </li>
               ))}
             </ul>

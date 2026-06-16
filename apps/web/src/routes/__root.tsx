@@ -15,6 +15,7 @@ import { createServerFn } from "@tanstack/react-start";
 
 import { authClient } from "@/lib/auth-client";
 import { getToken } from "@/lib/auth-server";
+import { deploymentMode, AUTH_TOKEN_BUDGET_MS, AUTH_ROUNDTRIP_BUDGET_MS } from "@/lib/deployment-mode";
 
 import Header from "../components/header";
 
@@ -23,14 +24,13 @@ import appCss from "../index.css?url";
 // Landing page preview: no real Convex deployment exists; the .env URLs are placeholders.
 // When detected, skip all Convex/auth wiring so the landing page never waits on
 // a dead backend (proxy makes those fetches hang ~30s). Real URLs keep the full path.
-const isPlaceholderConvex = (url: string | undefined) => !url || url.includes("placeholder");
 
 const getAuth = createServerFn({ method: "GET" }).handler(async () => {
   // Landing page preview: no Convex deployment is configured yet; never let auth block rendering.
   try {
     return await Promise.race([
       getToken(),
-      new Promise<null>((resolve) => setTimeout(() => resolve(null), 1200)),
+      new Promise<null>((resolve) => setTimeout(() => resolve(null), AUTH_TOKEN_BUDGET_MS)),
     ]);
   } catch {
     return null;
@@ -45,13 +45,13 @@ export interface RouterAppContext {
 export const Route = createRootRouteWithContext<RouterAppContext>()({
   beforeLoad: async (ctx) => {
     // Landing page preview: placeholder Convex deployment skips the auth round-trip entirely.
-    if (isPlaceholderConvex(ctx.context.convexQueryClient.convexClient.url)) {
+    if (deploymentMode(ctx.context.convexQueryClient.convexClient.url).skipAuth) {
       return { isAuthenticated: false, token: null };
     }
     // Cap the auth round-trip so hydration can never stall on it.
     const token = await Promise.race([
       getAuth(),
-      new Promise<null>((resolve) => setTimeout(() => resolve(null), 1500)),
+      new Promise<null>((resolve) => setTimeout(() => resolve(null), AUTH_ROUNDTRIP_BUDGET_MS)),
     ]).catch(() => null);
     if (token) {
       ctx.context.convexQueryClient.serverHttpClient?.setAuth(token);
@@ -112,7 +112,7 @@ function RootDocument() {
   );
   // With a placeholder Convex URL, skip ConvexBetterAuthProvider so it
   // never opens a websocket / session fetch against a dead deployment (30s proxy hangs).
-  if (isPlaceholderConvex(context.convexQueryClient.convexClient.url)) {
+  if (deploymentMode(context.convexQueryClient.convexClient.url).skipAuth) {
     return appShell;
   }
   return (

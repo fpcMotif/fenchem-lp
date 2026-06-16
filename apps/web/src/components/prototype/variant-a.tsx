@@ -9,7 +9,15 @@ import {
 } from "motion/react";
 import type { MotionValue } from "motion/react";
 import { useRef } from "react";
-import type { ReactNode } from "react";
+import { EASE, Eyebrow, Intro, Reveal } from "@/components/prototype/motion";
+import {
+  industries,
+  stats,
+  pillars,
+  ingredients,
+  certifications,
+  regions,
+} from "@/components/landing/landing-content";
 
 /*
  * PROTOTYPE — Variant A: "Botanical Editorial"
@@ -19,8 +27,6 @@ import type { ReactNode } from "react";
  * chips, quiet certification strip, deep forest footer.
  */
 
-const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
-
 const NAV_LINKS = [
   { label: "Industries", href: "#industries" },
   { label: "Science", href: "#science" },
@@ -28,139 +34,13 @@ const NAV_LINKS = [
   { label: "Quality", href: "#quality" },
 ] as const;
 
-type Industry = {
-  index: string;
-  title: string;
-  copy: string;
-  img: string;
-  alt: string;
-  offset: string;
-  aspect: string;
-};
-
-const INDUSTRIES: Industry[] = [
-  {
-    index: "01",
-    title: "Nutrition & Supplements",
-    copy: "Clinically supported actives — from Ashwagandha KSM-66 to Coenzyme Q10 — standardized for potency, stability and dose accuracy.",
-    img: "https://images.unsplash.com/photo-1610348725531-843dff563e2c?auto=format&fit=crop&w=900&q=80",
-    alt: "Botanical supplement capsules arranged on a neutral surface",
-    offset: "",
-    aspect: "aspect-[3/4]",
-  },
-  {
-    index: "02",
-    title: "Food & Beverage",
-    copy: "Natural carotenoids, plant proteins and functional botanicals engineered for clean-label formulation at production scale.",
-    img: "https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&w=900&q=80",
-    alt: "Fresh, vibrant food bowl with greens and grains in soft daylight",
-    offset: "md:mt-16 lg:mt-24",
-    aspect: "aspect-[4/5]",
-  },
-  {
-    index: "03",
-    title: "Personal Care & Cosmeceuticals",
-    copy: "Bioactive botanicals and hyaluronic acid systems for skin, hair and beauty-from-within applications.",
-    img: "https://images.unsplash.com/photo-1556228578-8c89e6adf883?auto=format&fit=crop&w=900&q=80",
-    alt: "Minimal skincare bottle in warm natural light",
-    offset: "md:mt-8 lg:mt-12",
-    aspect: "aspect-[3/4]",
-  },
-];
-
-const STATS = [
-  { value: "25+", label: "Years of botanical expertise since 1995" },
-  { value: "6", label: "Global bases across three continents" },
-  { value: "40+", label: "Countries served by our supply network" },
-  { value: "ISO/GMP", label: "Certified manufacturing and quality systems" },
+const INDUSTRY_LAYOUT = [
+  { offset: "", aspect: "aspect-[3/4]" },
+  { offset: "md:mt-16 lg:mt-24", aspect: "aspect-[4/5]" },
+  { offset: "md:mt-8 lg:mt-12", aspect: "aspect-[3/4]" },
 ] as const;
 
-const PILLARS = [
-  {
-    icon: Sprout,
-    title: "Traceable Sourcing",
-    copy: "Direct partnerships with growers and a documented chain of custody — from field and harvest to finished extract.",
-  },
-  {
-    icon: FlaskConical,
-    title: "Clinical-Grade R&D",
-    copy: "In-house laboratories validate identity, potency and stability on every lot, with third-party verification on request.",
-  },
-  {
-    icon: Globe,
-    title: "Global Compliance",
-    copy: "Regulatory dossiers and documentation support for more than forty markets, prepared before you ask.",
-  },
-] as const;
-
-const INGREDIENTS = [
-  "Ashwagandha KSM-66",
-  "Lutein",
-  "Astaxanthin",
-  "Coenzyme Q10",
-  "Phytosterols",
-  "Curcumin",
-  "Hyaluronic Acid",
-  "Beta-Carotene",
-] as const;
-
-const CERTIFICATIONS = ["ISO 9001", "FSSC 22000", "GMP", "HACCP", "Kosher", "Halal"] as const;
-
-const OFFICES = [
-  "Nanjing, China — HQ",
-  "Hackensack, United States",
-  "Frankfurt, Germany",
-  "Johannesburg, South Africa",
-  "São Paulo, Brazil",
-  "Kuala Lumpur, Malaysia",
-] as const;
-
-type MotionBlockProps = {
-  children: ReactNode;
-  className?: string;
-  delay?: number;
-};
-
-/** Mount-time entrance for above-the-fold hero content. */
-function Intro({ children, className, delay = 0 }: MotionBlockProps) {
-  const reduce = useReducedMotion();
-  return (
-    <m.div
-      className={className}
-      initial={reduce ? { opacity: 0 } : { opacity: 0, y: 28 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.9, delay: reduce ? 0 : delay, ease: EASE }}
-    >
-      {children}
-    </m.div>
-  );
-}
-
-/** Scroll-triggered reveal for everything below the fold. */
-function Reveal({ children, className, delay = 0 }: MotionBlockProps) {
-  const reduce = useReducedMotion();
-  return (
-    <m.div
-      className={className}
-      initial={reduce ? { opacity: 0 } : { opacity: 0, y: 32 }}
-      whileInView={reduce ? { opacity: 1 } : { opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-80px" }}
-      transition={{ duration: 0.8, delay: reduce ? 0 : delay, ease: EASE }}
-    >
-      {children}
-    </m.div>
-  );
-}
-
-function Eyebrow({ children, className = "" }: { children: ReactNode; className?: string }) {
-  return (
-    <p
-      className={`font-tech text-[11px] uppercase tracking-[0.35em] text-moss md:text-xs ${className}`}
-    >
-      {children}
-    </p>
-  );
-}
+const PILLAR_ICONS = [Sprout, FlaskConical, Globe] as const;
 
 function NavBar() {
   const reduce = useReducedMotion();
@@ -296,7 +176,7 @@ function IndustriesSection() {
       <div className="mx-auto max-w-[1280px] px-6 md:px-12 lg:px-16">
         <Reveal className="flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
           <div className="max-w-xl">
-            <Eyebrow>Where our ingredients work</Eyebrow>
+            <Eyebrow accent="text-moss">Where our ingredients work</Eyebrow>
             <h2 className="mt-5 font-display text-4xl font-light tracking-tight text-forest md:text-5xl lg:text-6xl">
               Purity across <em className="italic text-moss">industries</em>
             </h2>
@@ -307,22 +187,22 @@ function IndustriesSection() {
         </Reveal>
 
         <div className="mt-16 grid grid-cols-1 gap-12 md:mt-24 md:grid-cols-3 md:gap-8 lg:gap-10">
-          {INDUSTRIES.map((industry, i) => (
-            <Reveal key={industry.index} delay={i * 0.12} className={industry.offset}>
+          {industries.map((industry, i) => (
+            <Reveal key={industry.title} delay={i * 0.12} className={INDUSTRY_LAYOUT[i].offset}>
               <a href="#ingredients" className="group block">
                 <div
-                  className={`overflow-hidden rounded-[24px] shadow-lift transition-shadow duration-500 group-hover:shadow-ambient ${industry.aspect}`}
+                  className={`overflow-hidden rounded-[24px] shadow-lift transition-shadow duration-500 group-hover:shadow-ambient ${INDUSTRY_LAYOUT[i].aspect}`}
                 >
                   <img
-                    src={industry.img}
-                    alt={industry.alt}
+                    src={industry.image.src}
+                    alt={industry.image.alt}
                     className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
                     loading="lazy"
                   />
                 </div>
                 <div className="mt-7 flex items-baseline gap-4">
                   <span className="font-tech text-xs tracking-[0.2em] text-moss">
-                    {industry.index}
+                    {String(i + 1).padStart(2, "0")}
                   </span>
                   <h3 className="font-display text-2xl font-medium tracking-tight text-forest md:text-[1.65rem]">
                     {industry.title}
@@ -377,7 +257,7 @@ function ScienceSection() {
 
           <div>
             <Reveal>
-              <Eyebrow>The Fenchem legacy</Eyebrow>
+              <Eyebrow accent="text-moss">The Fenchem legacy</Eyebrow>
               <h2 className="mt-5 font-display text-4xl font-light leading-[1.08] tracking-tight text-forest md:text-5xl lg:text-6xl">
                 Rooted in Nature,
                 <br />
@@ -390,7 +270,7 @@ function ScienceSection() {
               </p>
             </Reveal>
             <div className="mt-12 grid grid-cols-1 gap-4 sm:grid-cols-2">
-              {STATS.map((stat, i) => (
+              {stats.map((stat, i) => (
                 <Reveal key={stat.value} delay={i * 0.08}>
                   <div className="h-full rounded-[20px] border border-pebble bg-white/70 px-6 py-5 shadow-lift transition-colors duration-300 hover:border-mint hover:bg-mint/30">
                     <span className="font-display text-3xl font-light text-forest md:text-4xl">
@@ -409,21 +289,24 @@ function ScienceSection() {
         {/* Pillars */}
         <div className="mt-24 border-t border-pebble pt-16 md:mt-32 md:pt-20">
           <div className="grid grid-cols-1 gap-12 md:grid-cols-3 md:gap-10">
-            {PILLARS.map((pillar, i) => (
-              <Reveal key={pillar.title} delay={i * 0.12}>
-                <div className="group">
-                  <span className="flex h-12 w-12 items-center justify-center rounded-full bg-mint text-fern transition-colors duration-300 group-hover:bg-mist">
-                    <pillar.icon className="h-5 w-5" aria-hidden />
-                  </span>
-                  <h3 className="mt-6 font-display text-2xl font-medium tracking-tight text-forest">
-                    {pillar.title}
-                  </h3>
-                  <p className="mt-3 max-w-xs text-sm leading-relaxed text-bark/60">
-                    {pillar.copy}
-                  </p>
-                </div>
-              </Reveal>
-            ))}
+            {pillars.map((pillar, i) => {
+              const Icon = PILLAR_ICONS[i];
+              return (
+                <Reveal key={pillar.title} delay={i * 0.12}>
+                  <div className="group">
+                    <span className="flex h-12 w-12 items-center justify-center rounded-full bg-mint text-fern transition-colors duration-300 group-hover:bg-mist">
+                      <Icon className="h-5 w-5" aria-hidden />
+                    </span>
+                    <h3 className="mt-6 font-display text-2xl font-medium tracking-tight text-forest">
+                      {pillar.title}
+                    </h3>
+                    <p className="mt-3 max-w-xs text-sm leading-relaxed text-bark/60">
+                      {pillar.copy}
+                    </p>
+                  </div>
+                </Reveal>
+              );
+            })}
           </div>
         </div>
       </div>
@@ -436,7 +319,7 @@ function IngredientsSection() {
     <section id="ingredients" className="scroll-mt-28 py-28 md:py-40">
       <div className="mx-auto max-w-[1080px] px-6 text-center md:px-12">
         <Reveal>
-          <Eyebrow className="text-center">The portfolio</Eyebrow>
+          <Eyebrow accent="text-moss" className="text-center">The portfolio</Eyebrow>
           <h2 className="mx-auto mt-5 max-w-3xl font-display text-4xl font-light tracking-tight text-forest md:text-5xl lg:text-6xl">
             A <em className="italic text-moss">living library</em> of botanical actives
           </h2>
@@ -449,9 +332,9 @@ function IngredientsSection() {
           delay={0.15}
           className="mt-14 flex flex-wrap items-center justify-center gap-3 md:gap-4"
         >
-          {INGREDIENTS.map((name) => (
+          {ingredients.map((ingredient) => (
             <a
-              key={name}
+              key={ingredient.name}
               href="#contact"
               className="group inline-flex items-center gap-2.5 rounded-full bg-mint px-6 py-3 font-body text-sm font-medium text-fern transition-all duration-300 hover:-translate-y-0.5 hover:bg-mist hover:shadow-lift"
             >
@@ -459,7 +342,7 @@ function IngredientsSection() {
                 className="h-3.5 w-3.5 text-moss transition-transform duration-300 group-hover:rotate-12"
                 aria-hidden
               />
-              {name}
+              {ingredient.name}
             </a>
           ))}
         </Reveal>
@@ -490,7 +373,7 @@ function QualitySection() {
               Certified quality systems
             </p>
             <ul className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3">
-              {CERTIFICATIONS.map((cert) => (
+              {certifications.map((cert) => (
                 <li
                   key={cert}
                   className="font-tech text-xs uppercase tracking-[0.2em] text-moss transition-colors duration-300 hover:text-forest"
@@ -521,7 +404,7 @@ function CtaSection() {
               className="absolute -bottom-32 -right-16 h-80 w-80 rounded-full bg-mist/70 blur-3xl"
             />
             <div className="relative">
-              <Eyebrow className="text-center">Start the conversation</Eyebrow>
+              <Eyebrow accent="text-moss" className="text-center">Start the conversation</Eyebrow>
               <h2 className="mx-auto mt-6 max-w-3xl font-display text-4xl font-light leading-[1.08] tracking-tight text-forest md:text-6xl">
                 Let&rsquo;s formulate <em className="italic text-moss">what&rsquo;s next.</em>
               </h2>
@@ -601,9 +484,9 @@ function FooterSection() {
               Global bases
             </p>
             <ul className="mt-5 space-y-3">
-              {OFFICES.map((office) => (
-                <li key={office} className="text-sm text-mist/70">
-                  {office}
+              {regions.map((region) => (
+                <li key={region.city} className="text-sm text-mist/70">
+                  {`${region.city}, ${region.country}${region.city === "Nanjing" ? " — HQ" : ""}`}
                 </li>
               ))}
             </ul>

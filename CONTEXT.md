@@ -58,6 +58,29 @@ all sans-serif.
 _Avoid_: Noto (ambiguous), Newsreader/serif (off-brand except the variant D
 display exception).
 
+### Content
+
+**Content seam**:
+`apps/web/src/components/landing/landing-content.ts` — the single typed module
+that owns every stable domain fact the landing surface renders (ingredients,
+industries, pillars, stats, certifications, regions, company facts). Every
+variant (A–G) and the folded-in `LandingPage` render *through* it; only
+per-variant **prose** (headlines, eyebrows, bespoke section copy) and
+presentation (Tailwind classes, motion, icons, layout) stay local.
+_Avoid_: "the data file", "constants" — it is an interface, not a dumping ground.
+
+**Featured ingredient**:
+The six-ingredient curated subset (`getFeaturedIngredients()`) shown in the
+matrix / rail presentations, vs. the full eight in `ingredients`. Phytosterols
+and Beta-Carotene are the two non-featured.
+
+**Canonical footprint**:
+The six Fenchem regions in `regions` (Nanjing HQ, Hackensack, Frankfurt,
+Johannesburg, São Paulo, Kuala Lumpur), each with `coords`. Reconciled once
+here; the earlier per-variant "node" lists (California / Tokyo / Bangkok) are
+retired so the footprint lives in one place.
+_Avoid_: a separate office/node list per variant.
+
 ### Landing variants
 
 **A / B / C**:

@@ -8,9 +8,10 @@
  *   Nav → Hero (editorial-scale, stat band inline) → Industries → Ingredient Matrix → Deep-Green Finale → Footer
  */
 import { useRef } from "react";
-import type { ReactNode } from "react";
 import {
-  motion,
+  LazyMotion,
+  domAnimation,
+  m,
   useReducedMotion,
   useScroll,
   useTransform,
@@ -24,22 +25,23 @@ import {
   Sprout,
   CheckCircle2,
 } from "lucide-react";
+import { Reveal } from "@/components/prototype/motion";
+import {
+  company,
+  ingredients,
+  getFeaturedIngredients,
+  industries,
+  pillars,
+  regions,
+  certifications,
+} from "@/components/landing/landing-content";
 
 /* ─────────────────────────────── Constants ─────────────────────────────── */
-
-const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
 const IMG = {
   hero: "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?auto=format&fit=crop&w=1600&q=80",
   heroThumb: "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?auto=format&fit=crop&w=900&q=80",
   lab: "https://images.unsplash.com/photo-1576086213369-97a306d36557?auto=format&fit=crop&w=1400&q=80",
-  glassware: "https://images.unsplash.com/photo-1532634922-8fe0b757fb13?auto=format&fit=crop&w=900&q=80",
-  leafMacro: "https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?auto=format&fit=crop&w=900&q=80",
-  paleLeaves: "https://images.unsplash.com/photo-1501004318641-b39e6451bec6?auto=format&fit=crop&w=900&q=80",
-  capsules: "https://images.unsplash.com/photo-1610348725531-843dff563e2c?auto=format&fit=crop&w=900&q=80",
-  skincare: "https://images.unsplash.com/photo-1556228578-8c89e6adf883?auto=format&fit=crop&w=900&q=80",
-  foodBowl: "https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&w=900&q=80",
-  herbalTea: "https://images.unsplash.com/photo-1512069772995-ec65ed45afd6?auto=format&fit=crop&w=900&q=80",
 } as const;
 
 const NAV_LINKS = [
@@ -56,158 +58,56 @@ const STATS = [
   { value: "40+", unit: "Countries", desc: "Regulated markets supplied" },
 ] as const;
 
-const TICKER = [
-  "Ashwagandha KSM-66",
-  "Lutein",
-  "Astaxanthin",
-  "Coenzyme Q10",
-  "Phytosterols",
-  "Curcumin",
-  "Hyaluronic Acid",
-  "Beta-Carotene",
+const INDUSTRY_COPY = [
+  "Bioavailable actives standardized for potency, stability and dose accuracy — from Ashwagandha KSM-66 to Coenzyme Q10.",
+  "Heat- and pH-stable carotenoids, plant proteins and functional botanicals for clean-label fortification at scale.",
+  "Dermatologically active botanicals and hyaluronic acid systems formulated for cellular compatibility and sensory performance.",
 ] as const;
 
-type Industry = {
-  index: string;
-  title: string;
-  copy: string;
-  img: string;
-  alt: string;
-};
-
-const INDUSTRIES: Industry[] = [
+const MATRIX_DETAIL = [
   {
-    index: "01",
-    title: "Nutrition & Supplements",
-    copy: "Bioavailable actives standardized for potency, stability and dose accuracy — from Ashwagandha KSM-66 to Coenzyme Q10.",
-    img: IMG.capsules,
-    alt: "Botanical supplement capsules arranged on a neutral surface in clinical lighting",
-  },
-  {
-    index: "02",
-    title: "Food & Beverage",
-    copy: "Heat- and pH-stable carotenoids, plant proteins and functional botanicals for clean-label fortification at scale.",
-    img: IMG.foodBowl,
-    alt: "Fresh, vibrant food bowl with greens and grains in soft natural daylight",
-  },
-  {
-    index: "03",
-    title: "Personal Care & Cosmeceuticals",
-    copy: "Dermatologically active botanicals and hyaluronic acid systems formulated for cellular compatibility and sensory performance.",
-    img: IMG.skincare,
-    alt: "Minimal cosmetic serum bottle in clean studio lighting",
-  },
-];
-
-type MatrixItem = {
-  index: string;
-  code: string;
-  name: string;
-  latin: string;
-  purity: string;
-  form: string;
-  division: string;
-  divisionClass: string;
-  divisionBg: string;
-  img: string;
-  alt: string;
-};
-
-const MATRIX: MatrixItem[] = [
-  {
-    index: "01",
-    code: "FN-014",
-    name: "Ashwagandha KSM-66",
-    latin: "Withania somnifera",
-    purity: "≥ 5% withanolides",
-    form: "Root extract · Powder",
     division: "Nutrition",
     divisionClass: "text-ink bg-nutrition/30 border-nutrition",
     divisionBg: "bg-nutrition/10",
-    img: IMG.herbalTea,
-    alt: "Dried botanical herbs and roots arranged for extraction processing",
   },
   {
-    index: "02",
-    code: "FN-027",
-    name: "Lutein",
-    latin: "Tagetes erecta",
-    purity: "5% – 80% gradient",
-    form: "Beadlet · Oil suspension",
     division: "Nutrition",
     divisionClass: "text-ink bg-nutrition/30 border-nutrition",
     divisionBg: "bg-nutrition/10",
-    img: IMG.paleLeaves,
-    alt: "Pale botanical leaves photographed in soft, diffused laboratory light",
   },
   {
-    index: "03",
-    code: "FN-033",
-    name: "Astaxanthin",
-    latin: "Haematococcus pluvialis",
-    purity: "2.5% – 10% oleoresin",
-    form: "Beadlet · Softgel-ready",
     division: "Food & Bev",
     divisionClass: "text-paper bg-food border-food",
     divisionBg: "bg-food/10",
-    img: IMG.leafMacro,
-    alt: "Close-up macro photograph of a leaf surface with dew droplets in golden light",
   },
   {
-    index: "04",
-    code: "FN-041",
-    name: "Coenzyme Q10",
-    latin: "Fermentation grade",
-    purity: "≥ 98% ubiquinone",
-    form: "Powder · Water-dispersible",
     division: "Nutrition",
     divisionClass: "text-ink bg-nutrition/30 border-nutrition",
     divisionBg: "bg-nutrition/10",
-    img: IMG.capsules,
-    alt: "Supplement capsules arranged in a precise grid on a clinical white surface",
   },
   {
-    index: "05",
-    code: "FN-052",
-    name: "Curcumin",
-    latin: "Curcuma longa",
-    purity: "≥ 95% curcuminoids",
-    form: "Granular · Micronized",
     division: "Food & Bev",
     divisionClass: "text-paper bg-food border-food",
     divisionBg: "bg-food/10",
-    img: IMG.glassware,
-    alt: "Laboratory glassware showing botanical extraction process",
   },
   {
-    index: "06",
-    code: "FN-068",
-    name: "Hyaluronic Acid",
-    latin: "Bio-fermented · Na-HA",
-    purity: "Cosmetic & food grade",
-    form: "Sodium hyaluronate",
     division: "Cosmetics",
     divisionClass: "text-paper bg-cosmetics border-cosmetics",
     divisionBg: "bg-cosmetics/10",
-    img: IMG.skincare,
-    alt: "Minimal skincare product bottle in warm natural light on clean surface",
   },
-];
+] as const;
 
-const PILLARS = [
+const PILLAR_DETAIL = [
   {
     icon: Sprout,
-    title: "Traceable Sourcing",
     copy: "Every botanical lot is geo-tagged at origin and tracked through extraction, refinement and release — an unbroken record from field to finished certificate of analysis.",
   },
   {
     icon: FlaskConical,
-    title: "Clinical-Grade R&D",
     copy: "In-house laboratories run identity, potency and stability programs on every compound — chromatographic and microbiological panels executed on each production batch.",
   },
   {
     icon: Globe,
-    title: "Global Compliance",
     copy: "Documentation engineered for your regulatory map — ISO, GMP, HACCP, Halal and Kosher dossiers prepared and maintained for more than forty markets.",
   },
 ] as const;
@@ -241,31 +141,6 @@ const FOOTER_COLS = [
     ],
   },
 ] as const;
-
-/* ─────────────────────────────── Primitives ─────────────────────────────── */
-
-function Reveal({
-  children,
-  className,
-  delay = 0,
-}: {
-  children: ReactNode;
-  className?: string;
-  delay?: number;
-}) {
-  const reduce = useReducedMotion();
-  return (
-    <motion.div
-      className={className}
-      initial={{ opacity: 0, y: reduce ? 0 : 28 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-80px" }}
-      transition={{ duration: reduce ? 0.01 : 0.8, delay: reduce ? 0 : delay, ease: EASE }}
-    >
-      {children}
-    </motion.div>
-  );
-}
 
 /* ─────────────────────────────── Nav ─────────────────────────────── */
 
@@ -334,7 +209,7 @@ function NavBar() {
         </nav>
       </div>
       {/* Progress hairline */}
-      <motion.div
+      <m.div
         aria-hidden
         className="absolute inset-x-0 bottom-0 h-0.5 origin-left bg-brand-green-500"
         style={{ scaleX: scrollYProgress }}
@@ -422,7 +297,7 @@ function HeroSection() {
           {/* Right: botanical image */}
           <div className="relative overflow-hidden border-t border-line lg:col-span-5 lg:border-l lg:border-t-0">
             <div ref={imgRef} className="absolute inset-0">
-              <motion.img
+              <m.img
                 src={IMG.hero}
                 alt="Lush green botanical leaves in morning light — representing Fenchem's natural ingredient sourcing"
                 className="h-[116%] w-full object-cover"
@@ -460,12 +335,12 @@ function TickerSection() {
       <div className="flex w-max animate-marquee motion-reduce:animate-none">
         {([0, 1] as const).map((copy) => (
           <ul key={copy} aria-hidden={copy === 1} className="flex shrink-0 items-center">
-            {TICKER.map((name, i) => (
-              <li key={name} className="flex items-center gap-8 pr-8">
+            {ingredients.map((ingredient, i) => (
+              <li key={ingredient.name} className="flex items-center gap-8 pr-8">
                 <span className="whitespace-nowrap font-tech text-[11px] uppercase tracking-[0.3em] text-brand-green-700">
                   <span className="text-brand-blue-700">{String(i + 1).padStart(2, "0")}</span>
                   {" — "}
-                  {name}
+                  {ingredient.name}
                 </span>
                 <span aria-hidden className="size-1.5 rotate-45 bg-brand-green-400" />
               </li>
@@ -506,9 +381,9 @@ function IndustriesSection() {
 
         {/* Industry rows */}
         <div>
-          {INDUSTRIES.map((ind, i) => (
+          {industries.map((industry, i) => (
             <a
-              key={ind.index}
+              key={industry.title}
               href="#contact"
               className="group block border-b border-line last:border-b-0 transition-colors duration-400 hover:bg-brand-green-50 focus-visible:outline-2"
             >
@@ -519,22 +394,22 @@ function IndustriesSection() {
                 {/* Index */}
                 <div className="md:col-span-1">
                   <span className="font-tech text-sm tracking-[0.22em] text-brand-green-500">
-                    {ind.index}
+                    {String(i + 1).padStart(2, "0")}
                   </span>
                 </div>
                 {/* Title */}
                 <h3 className="font-body text-2xl font-bold tracking-[-0.03em] text-ink transition-colors duration-300 group-hover:text-brand-green-600 md:col-span-4 md:text-3xl">
-                  {ind.title}
+                  {industry.title}
                 </h3>
                 {/* Copy */}
                 <p className="font-body text-sm leading-relaxed text-mute-600 md:col-span-5">
-                  {ind.copy}
+                  {INDUSTRY_COPY[i]}
                 </p>
                 {/* Image thumbnail */}
                 <div className="relative aspect-video overflow-hidden rounded-sm md:col-span-1 md:aspect-square">
                   <img
-                    src={ind.img}
-                    alt={ind.alt}
+                    src={industry.image.src}
+                    alt={industry.image.alt}
                     className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.06]"
                     loading="lazy"
                   />
@@ -591,22 +466,22 @@ function MatrixSection() {
 
         {/* Matrix grid */}
         <div className="grid grid-cols-1 gap-px bg-line md:grid-cols-2 lg:grid-cols-3">
-          {MATRIX.map((item, i) => (
+          {getFeaturedIngredients().map((item, i) => (
             <Reveal key={item.code} delay={(i % 3) * 0.08} className="group bg-paper">
               <article>
                 {/* Image */}
                 <div className="relative aspect-[4/3] overflow-hidden border-b border-line">
                   <img
-                    src={item.img}
-                    alt={item.alt}
+                    src={item.image.src}
+                    alt={item.image.alt}
                     className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.05]"
                     loading="lazy"
                   />
                   {/* Division badge */}
                   <span
-                    className={`absolute right-3 top-3 rounded-sm border px-2 py-1 font-tech text-[9px] uppercase tracking-[0.2em] backdrop-blur-sm ${item.divisionClass}`}
+                    className={`absolute right-3 top-3 rounded-sm border px-2 py-1 font-tech text-[9px] uppercase tracking-[0.2em] backdrop-blur-sm ${MATRIX_DETAIL[i].divisionClass}`}
                   >
-                    {item.division}
+                    {MATRIX_DETAIL[i].division}
                   </span>
                   {/* Hover overlay */}
                   <div className="absolute inset-0 bg-brand-green-950/0 transition-colors duration-500 group-hover:bg-brand-green-950/10" />
@@ -615,7 +490,7 @@ function MatrixSection() {
                 <div className="px-5 py-7 md:px-7 md:py-8">
                   <div className="flex items-baseline justify-between">
                     <span className="font-tech text-[11px] tracking-[0.22em] text-brand-green-600">
-                      {item.index} —
+                      {String(i + 1).padStart(2, "0")} —
                     </span>
                     <span className="font-tech text-[10px] uppercase tracking-[0.22em] text-mute-400">
                       {item.code}
@@ -703,7 +578,7 @@ function StandardsSection() {
           {/* Image */}
           <div className="relative overflow-hidden border-b border-line lg:col-span-5 lg:border-b-0 lg:border-r">
             <div ref={imgRef} className="relative min-h-72 lg:min-h-full">
-              <motion.img
+              <m.img
                 src={IMG.lab}
                 alt="Fenchem analyst at a microscope inside the quality control laboratory in Nanjing"
                 className="h-[480px] w-full object-cover lg:absolute lg:inset-0 lg:h-full"
@@ -725,14 +600,14 @@ function StandardsSection() {
 
           {/* Pillars */}
           <div className="lg:col-span-7">
-            {PILLARS.map((p, i) => {
-              const Icon = p.icon;
+            {pillars.map((pillar, i) => {
+              const Icon = PILLAR_DETAIL[i].icon;
               return (
                 <Reveal
-                  key={p.title}
+                  key={pillar.title}
                   delay={i * 0.09}
                   className={
-                    i < PILLARS.length - 1 ? "border-b border-line" : ""
+                    i < pillars.length - 1 ? "border-b border-line" : ""
                   }
                 >
                   <div className="flex gap-5 px-5 py-10 transition-colors duration-400 hover:bg-brand-green-50 md:gap-8 md:px-10 md:py-12">
@@ -741,10 +616,10 @@ function StandardsSection() {
                     </div>
                     <div>
                       <h3 className="font-body text-xl font-bold tracking-[-0.02em] text-ink md:text-2xl">
-                        {p.title}
+                        {pillar.title}
                       </h3>
                       <p className="mt-3 font-body text-sm leading-relaxed text-mute-600 md:text-base">
-                        {p.copy}
+                        {PILLAR_DETAIL[i].copy}
                       </p>
                       <div className="mt-4 flex items-center gap-2 font-tech text-[10px] uppercase tracking-[0.22em] text-brand-green-600">
                         <CheckCircle2 aria-hidden className="size-3.5" />
@@ -781,7 +656,7 @@ function FinaleSection() {
       className="relative overflow-hidden bg-brand-green-950"
     >
       {/* Parallax botanical background */}
-      <motion.div
+      <m.div
         aria-hidden
         className="pointer-events-none absolute inset-0"
         style={{ y: reduce ? 0 : bgY }}
@@ -792,7 +667,7 @@ function FinaleSection() {
           className="h-full w-full object-cover opacity-10"
           loading="lazy"
         />
-      </motion.div>
+      </m.div>
       {/* Gradient overlay */}
       <div
         aria-hidden
@@ -821,7 +696,7 @@ function FinaleSection() {
 
           <Reveal delay={0.15} className="mt-10 flex flex-wrap gap-4">
             <a
-              href="mailto:sales@fenchem.com"
+              href={`mailto:${company.email}`}
               className="group inline-flex items-center gap-3 rounded-sm bg-brand-green-500 px-8 py-4 font-body text-sm font-bold text-paper shadow-[0_0_40px_oklch(0.66_0.163_134.7_/_0.3)] transition-all duration-300 hover:bg-brand-green-400 hover:shadow-[0_0_64px_oklch(0.66_0.163_134.7_/_0.5)] focus-visible:outline-2 min-h-11"
             >
               Partner with Fenchem
@@ -852,22 +727,13 @@ function FinaleSection() {
               </p>
             </Reveal>
             <div className="mt-8 grid grid-cols-2 gap-px bg-brand-green-800 sm:grid-cols-3 lg:grid-cols-6">
-              {(
-                [
-                  { city: "Nanjing", role: "HQ · R&D", coords: "N 32° E 118°" },
-                  { city: "California", role: "Americas", coords: "N 34° W 117°" },
-                  { city: "Frankfurt", role: "Europe", coords: "N 50° E 8°" },
-                  { city: "Tokyo", role: "Japan", coords: "N 35° E 139°" },
-                  { city: "Bangkok", role: "SE Asia", coords: "N 13° E 100°" },
-                  { city: "Johannesburg", role: "Africa", coords: "S 26° E 28°" },
-                ] as const
-              ).map((node, i) => (
-                <Reveal key={node.city} delay={i * 0.06} className="bg-brand-green-950/80">
+              {regions.map((region, i) => (
+                <Reveal key={region.city} delay={i * 0.06} className="bg-brand-green-950/80">
                   <div className="px-4 py-6 transition-colors duration-300 hover:bg-brand-green-900/60">
-                    <p className="font-body text-sm font-semibold text-paper">{node.city}</p>
-                    <p className="mt-0.5 font-body text-xs text-brand-green-400/70">{node.role}</p>
+                    <p className="font-body text-sm font-semibold text-paper">{region.city}</p>
+                    <p className="mt-0.5 font-body text-xs text-brand-green-400/70">{region.short}</p>
                     <p className="mt-2 font-tech text-[9px] tracking-[0.16em] text-brand-green-600/60">
-                      {node.coords}
+                      {region.coords}
                     </p>
                   </div>
                 </Reveal>
@@ -904,7 +770,7 @@ function FooterSection() {
               Est. 1995 — Nanjing, China
             </p>
             <div className="mt-6 flex flex-wrap gap-2">
-              {(["ISO 9001", "GMP", "HACCP", "Kosher", "Halal"] as const).map((cert) => (
+              {certifications.map((cert) => (
                 <span
                   key={cert}
                   className="rounded-sm border border-brand-blue-200 bg-brand-blue-50 px-2.5 py-1 font-tech text-[9px] uppercase tracking-[0.18em] text-brand-blue-700"
@@ -960,17 +826,19 @@ function FooterSection() {
 
 export function VariantG() {
   return (
-    <div className="bg-paper font-body text-ink antialiased selection:bg-brand-green-200 selection:text-brand-green-900">
-      <NavBar />
-      <main>
-        <HeroSection />
-        <TickerSection />
-        <IndustriesSection />
-        <MatrixSection />
-        <StandardsSection />
-        <FinaleSection />
-      </main>
-      <FooterSection />
-    </div>
+    <LazyMotion features={domAnimation} strict>
+      <div className="bg-paper font-body text-ink antialiased selection:bg-brand-green-200 selection:text-brand-green-900">
+        <NavBar />
+        <main>
+          <HeroSection />
+          <TickerSection />
+          <IndustriesSection />
+          <MatrixSection />
+          <StandardsSection />
+          <FinaleSection />
+        </main>
+        <FooterSection />
+      </div>
+    </LazyMotion>
   );
 }

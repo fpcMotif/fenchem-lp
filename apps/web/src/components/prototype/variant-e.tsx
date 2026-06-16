@@ -8,32 +8,29 @@
 import { useRef } from "react";
 import type { ReactNode } from "react";
 import {
-  motion,
+  LazyMotion,
+  domAnimation,
+  m,
   useReducedMotion,
   useScroll,
   useTransform,
 } from "motion/react";
 import { ArrowRight, ArrowUpRight, Plus } from "lucide-react";
-
-const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
+import { Reveal } from "@/components/prototype/motion";
+import {
+  ingredients,
+  getFeaturedIngredients,
+  divisionForApplication,
+  industries,
+  pillars,
+  regions,
+} from "@/components/landing/landing-content";
 
 const IMG = {
   glassware:
     "https://images.unsplash.com/photo-1466781783364-36c955e42a7f?auto=format&fit=crop&w=1000&q=80",
   microscope:
     "https://images.unsplash.com/photo-1576086213369-97a306d36557?auto=format&fit=crop&w=1400&q=80",
-  botanicals:
-    "https://images.unsplash.com/photo-1512069772995-ec65ed45afd6?auto=format&fit=crop&w=900&q=80",
-  paleLeaves:
-    "https://images.unsplash.com/photo-1501004318641-b39e6451bec6?auto=format&fit=crop&w=900&q=80",
-  leafMacro:
-    "https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?auto=format&fit=crop&w=900&q=80",
-  capsules:
-    "https://images.unsplash.com/photo-1610348725531-843dff563e2c?auto=format&fit=crop&w=900&q=80",
-  herbalCapsules:
-    "https://images.unsplash.com/photo-1559757148-5c350d0d3c56?auto=format&fit=crop&w=900&q=80",
-  skincare:
-    "https://images.unsplash.com/photo-1556228578-8c89e6adf883?auto=format&fit=crop&w=900&q=80",
 } as const;
 
 const NAV_LINKS = [
@@ -50,16 +47,6 @@ const HERO_META = [
   { k: "CERT", v: "ISO 9001 / GMP" },
 ] as const;
 
-const TICKER = [
-  "Ashwagandha KSM-66",
-  "Lutein",
-  "Astaxanthin",
-  "Coenzyme Q10",
-  "Phytosterols",
-  "Curcumin",
-  "Hyaluronic Acid",
-  "Beta-Carotene",
-] as const;
 
 const STATS = [
   {
@@ -133,154 +120,46 @@ const DIVISION_STYLES: Record<
   },
 };
 
-const MATRIX = [
-  {
-    index: "01",
-    code: "BTN-014",
-    cat: "ADAPTOGEN",
-    name: "Ashwagandha KSM-66",
-    purity: "≥ 5% withanolides",
-    form: "Root extract — powder",
-    application: "Nutrition & Supplements",
-    division: "nutrition" as DivisionKey,
-    img: IMG.botanicals,
-    alt: "Dried botanical roots and herbs arranged for extraction",
-  },
-  {
-    index: "02",
-    code: "BTN-027",
-    cat: "CAROTENOID",
-    name: "Lutein",
-    purity: "5% – 80% gradient",
-    form: "Beadlet / oil suspension",
-    application: "Ocular health systems",
-    division: "nutrition" as DivisionKey,
-    img: IMG.paleLeaves,
-    alt: "Pale botanical leaves photographed in soft laboratory light",
-  },
-  {
-    index: "03",
-    code: "BTN-033",
-    cat: "ANTIOXIDANT",
-    name: "Astaxanthin",
-    purity: "2.5% – 10% oleoresin",
-    form: "Beadlet / softgel-ready",
-    application: "Sports & recovery",
-    division: "feed" as DivisionKey,
-    img: IMG.leafMacro,
-    alt: "Macro photograph of a leaf surface with dew droplets",
-  },
-  {
-    index: "04",
-    code: "BTN-041",
-    cat: "BIOENERGETIC",
-    name: "Coenzyme Q10",
-    purity: "≥ 98% ubiquinone",
-    form: "Powder / water-dispersible",
-    application: "Cardiovascular health",
-    division: "chem" as DivisionKey,
-    img: IMG.capsules,
-    alt: "Supplement capsules arranged in a precise grid",
-  },
-  {
-    index: "05",
-    code: "BTN-052",
-    cat: "POLYPHENOL",
-    name: "Curcumin",
-    purity: "≥ 95% curcuminoids",
-    form: "Granular / micronized",
-    application: "Food & Beverage",
-    division: "food" as DivisionKey,
-    img: IMG.herbalCapsules,
-    alt: "Assorted herbal supplement capsules in a loose pile",
-  },
-  {
-    index: "06",
-    code: "BTN-068",
-    cat: "HUMECTANT",
-    name: "Hyaluronic Acid",
-    purity: "Cosmetic & food grade",
-    form: "Sodium hyaluronate",
-    application: "Personal Care",
-    division: "cosmetics" as DivisionKey,
-    img: IMG.skincare,
-    alt: "Minimal cosmetic serum bottle in clinical lighting",
-  },
-] as const;
 
-const PROTOCOL = [
+const PROTOCOL_DETAIL = [
   {
     step: "01",
-    title: "Traceable Sourcing",
     tag: "CHAIN.OF.CUSTODY",
     desc: "Every botanical lot is geo-tagged at origin and tracked through extraction, refinement and release — an unbroken record from field coordinate to finished certificate of analysis.",
   },
   {
     step: "02",
-    title: "Clinical-Grade R&D",
     tag: "HPLC // GC // MICRO",
     desc: "In-house laboratories run identity, potency and stability programs on every compound — chromatographic and microbiological panels executed on each production batch.",
   },
   {
     step: "03",
-    title: "Global Compliance",
     tag: "ISO.9001 / GMP / HACCP",
     desc: "Documentation engineered for your regulatory map — ISO, GMP, HACCP, Halal and Kosher dossiers prepared and maintained for more than forty markets.",
   },
 ] as const;
 
-const DOMAINS = [
+const DOMAIN_DETAIL = [
   {
     code: "A-01",
     cat: "CAT: NUTRI",
-    title: "Nutrition & Supplements",
     desc: "Bioavailable actives engineered for capsules, tablets, softgels and powder delivery systems.",
     division: "nutrition" as DivisionKey,
   },
   {
     code: "B-02",
     cat: "CAT: F&B",
-    title: "Food & Beverage",
     desc: "Heat- and pH-stable functional ingredients for fortification, natural color and clean-label claims.",
     division: "food" as DivisionKey,
   },
   {
     code: "C-03",
     cat: "CAT: CARE",
-    title: "Personal Care & Cosmeceuticals",
     desc: "Dermatologically active agents formulated for cellular compatibility and sensory performance.",
     division: "cosmetics" as DivisionKey,
   },
 ] as const;
 
-const NODES = [
-  {
-    id: "NODE 01",
-    city: "Nanjing",
-    role: "HQ — R&D / manufacturing",
-    coords: "N 32.06 / E 118.79",
-  },
-  {
-    id: "NODE 02",
-    city: "California",
-    role: "Americas distribution",
-    coords: "N 34.05 / W 117.75",
-  },
-  { id: "NODE 03", city: "Frankfurt", role: "European compliance hub", coords: "N 50.11 / E 8.68" },
-  { id: "NODE 04", city: "Tokyo", role: "Japan technical office", coords: "N 35.68 / E 139.69" },
-  {
-    id: "NODE 05",
-    city: "Bangkok",
-    role: "Southeast Asia logistics",
-    coords: "N 13.75 / E 100.50",
-  },
-  {
-    id: "NODE 06",
-    city: "Johannesburg",
-    role: "Africa market gateway",
-    coords: "S 26.20 / E 28.05",
-  },
-] as const;
 
 const FOOTER_COLS = [
   {
@@ -311,30 +190,6 @@ const FOOTER_COLS = [
     ],
   },
 ] as const;
-
-/* Shared scroll-reveal wrapper */
-function Reveal({
-  children,
-  className,
-  delay = 0,
-}: {
-  children: ReactNode;
-  className?: string;
-  delay?: number;
-}) {
-  const reduce = useReducedMotion();
-  return (
-    <motion.div
-      className={className}
-      initial={{ opacity: 0, y: reduce ? 0 : 28 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-80px" }}
-      transition={{ duration: reduce ? 0 : 0.8, delay: reduce ? 0 : delay, ease: EASE }}
-    >
-      {children}
-    </motion.div>
-  );
-}
 
 /* Division color dot chip */
 function DivisionDot({ division }: { division: DivisionKey }) {
@@ -397,7 +252,7 @@ function ProtocolFigure() {
   const y = useTransform(scrollYProgress, [0, 1], ["-7%", "7%"]);
   return (
     <div ref={ref} className="group relative overflow-hidden border border-line">
-      <motion.img
+      <m.img
         src={IMG.microscope}
         alt="Analyst working at a microscope inside the Fenchem laboratory"
         className="h-[380px] w-full object-cover grayscale transition-[filter] duration-700 group-hover:grayscale-0 md:h-[480px]"
@@ -546,12 +401,12 @@ function TickerSection() {
       <div className="flex w-max animate-marquee motion-reduce:animate-none">
         {[0, 1].map((copy) => (
           <ul key={copy} aria-hidden={copy === 1} className="flex shrink-0 items-center">
-            {TICKER.map((name, i) => (
-              <li key={name} className="flex items-center gap-8 pr-8 md:gap-12 md:pr-12">
+            {ingredients.map((ingredient, i) => (
+              <li key={ingredient.name} className="flex items-center gap-8 pr-8 md:gap-12 md:pr-12">
                 <span className="whitespace-nowrap font-tech text-[11px] uppercase tracking-[0.3em] text-mute-600 md:text-xs">
                   <span className="text-brand-green-500">{String(i + 1).padStart(2, "0")}</span>
                   {" — "}
-                  {name}
+                  {ingredient.name}
                 </span>
                 <span
                   aria-hidden
@@ -617,31 +472,32 @@ function MatrixSection() {
         }
       />
       <div className="grid grid-cols-1 gap-px bg-line md:grid-cols-2 lg:grid-cols-3">
-        {MATRIX.map((item, i) => {
-          const divStyle = DIVISION_STYLES[item.division];
+        {getFeaturedIngredients().map((item, i) => {
+          const division = divisionForApplication(item.application);
+          const divStyle = DIVISION_STYLES[division];
           return (
             <Reveal key={item.code} delay={(i % 3) * 0.08} className="group bg-paper">
               {/* Left-border accent via division color */}
               <div className={`h-full border-l-2 ${divStyle.border}`}>
                 <div className="relative aspect-[4/3] overflow-hidden border-b border-line">
                   <img
-                    src={item.img}
-                    alt={item.alt}
+                    src={item.image.src}
+                    alt={item.image.alt}
                     className="h-full w-full object-cover grayscale transition-all duration-700 ease-out group-hover:scale-[1.04] group-hover:grayscale-0"
                     loading="lazy"
                   />
                   {/* Division tag overlay */}
                   <span className="absolute right-4 top-4 flex items-center gap-1.5 border border-line bg-paper/90 px-2 py-1 backdrop-blur-sm">
-                    <DivisionDot division={item.division} />
+                    <DivisionDot division={division} />
                     <span className="font-tech text-[9px] uppercase tracking-[0.2em] text-ink">
-                      {item.cat}
+                      {item.category}
                     </span>
                   </span>
                 </div>
                 <div className="px-5 py-7 md:px-7 md:py-8">
                   <div className="flex items-baseline justify-between">
                     <span className="font-tech text-[11px] tracking-[0.22em] text-brand-green-500">
-                      {item.index} —
+                      {String(i + 1).padStart(2, "0")} —
                     </span>
                     <span className="font-tech text-[10px] uppercase tracking-[0.22em] text-mute-400">
                       {item.code}
@@ -652,7 +508,7 @@ function MatrixSection() {
                   </h3>
                   {/* Division badge */}
                   <div className="mt-2">
-                    <DivisionTag division={item.division} />
+                    <DivisionTag division={division} />
                   </div>
                   <dl className="mt-5 space-y-2.5 border-t border-line pt-4">
                     <div className="flex items-baseline justify-between gap-4">
@@ -676,7 +532,7 @@ function MatrixSection() {
                         Application
                       </dt>
                       <dd className="text-right font-tech text-[11px] text-mute-600">
-                        {item.application}
+                        {item.useCase}
                       </dd>
                     </div>
                   </dl>
@@ -721,32 +577,35 @@ function ProtocolSection() {
           </Reveal>
         </div>
         <div className="border-t border-line lg:col-span-7 lg:border-l lg:border-t-0">
-          {PROTOCOL.map((p, i) => (
-            <Reveal
-              key={p.step}
-              delay={i * 0.08}
-              className={i < PROTOCOL.length - 1 ? "border-b border-line" : ""}
-            >
-              <div className="grid gap-4 px-5 py-10 transition-colors duration-500 hover:bg-brand-green-50 md:grid-cols-12 md:gap-6 md:px-10 md:py-12">
-                <span className="font-tech text-sm tracking-[0.22em] text-brand-green-500 md:col-span-2">
-                  {p.step} —
-                </span>
-                <div className="md:col-span-10">
-                  <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
-                    <h3 className="font-body text-2xl font-bold tracking-[-0.02em] text-ink md:text-3xl">
-                      {p.title}
-                    </h3>
-                    <span className="font-tech text-[10px] uppercase tracking-[0.22em] text-mute-400">
-                      {p.tag}
-                    </span>
+          {pillars.map((pillar, i) => {
+            const detail = PROTOCOL_DETAIL[i];
+            return (
+              <Reveal
+                key={pillar.title}
+                delay={i * 0.08}
+                className={i < pillars.length - 1 ? "border-b border-line" : ""}
+              >
+                <div className="grid gap-4 px-5 py-10 transition-colors duration-500 hover:bg-brand-green-50 md:grid-cols-12 md:gap-6 md:px-10 md:py-12">
+                  <span className="font-tech text-sm tracking-[0.22em] text-brand-green-500 md:col-span-2">
+                    {detail.step} —
+                  </span>
+                  <div className="md:col-span-10">
+                    <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
+                      <h3 className="font-body text-2xl font-bold tracking-[-0.02em] text-ink md:text-3xl">
+                        {pillar.title}
+                      </h3>
+                      <span className="font-tech text-[10px] uppercase tracking-[0.22em] text-mute-400">
+                        {detail.tag}
+                      </span>
+                    </div>
+                    <p className="mt-4 max-w-xl text-sm leading-relaxed text-mute-600 font-body md:text-base">
+                      {detail.desc}
+                    </p>
                   </div>
-                  <p className="mt-4 max-w-xl text-sm leading-relaxed text-mute-600 font-body md:text-base">
-                    {p.desc}
-                  </p>
                 </div>
-              </div>
-            </Reveal>
-          ))}
+              </Reveal>
+            );
+          })}
         </div>
       </div>
     </section>
@@ -763,11 +622,12 @@ function DomainsSection() {
         sub="industries."
       />
       <div>
-        {DOMAINS.map((d, i) => {
-          const divStyle = DIVISION_STYLES[d.division];
+        {industries.map((industry, i) => {
+          const detail = DOMAIN_DETAIL[i];
+          const divStyle = DIVISION_STYLES[detail.division];
           return (
             <a
-              key={d.code}
+              key={industry.title}
               href="#contact"
               className="group block border-b border-line transition-colors duration-500 last:border-b-0 hover:bg-brand-green-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-green-500"
             >
@@ -777,22 +637,22 @@ function DomainsSection() {
               >
                 <div className="md:col-span-2">
                   <div className="flex items-center gap-2">
-                    <DivisionDot division={d.division} />
+                    <DivisionDot division={detail.division} />
                     <p className="font-tech text-[11px] tracking-[0.22em] text-brand-green-500">
-                      {d.code}
+                      {detail.code}
                     </p>
                   </div>
                   <p className="mt-1 font-tech text-[10px] uppercase tracking-[0.22em] text-mute-400">
-                    {d.cat}
+                    {detail.cat}
                   </p>
                 </div>
                 <h3
                   className={`font-body text-2xl font-bold tracking-[-0.03em] text-ink transition-colors duration-300 group-hover:text-brand-green-600 md:col-span-5 md:text-4xl`}
                 >
-                  {d.title}
+                  {industry.title}
                 </h3>
                 <p className="text-sm leading-relaxed text-mute-600 font-body md:col-span-4">
-                  {d.desc}
+                  {detail.desc}
                 </p>
                 <div className="flex md:col-span-1 md:justify-end">
                   <ArrowUpRight
@@ -866,17 +726,17 @@ function CtaNetworkSection() {
           </span>
         </div>
         <div className="grid grid-cols-1 gap-px bg-paper/10 sm:grid-cols-2 lg:grid-cols-3">
-          {NODES.map((n, i) => (
-            <Reveal key={n.id} delay={(i % 3) * 0.08} className="bg-brand-blue-700">
+          {regions.map((region, i) => (
+            <Reveal key={region.city} delay={(i % 3) * 0.08} className="bg-brand-blue-700">
               <div className="h-full px-5 py-7 transition-colors duration-500 hover:bg-brand-blue-800 md:px-8 md:py-9">
                 <div className="flex items-baseline justify-between font-tech text-[10px] uppercase tracking-[0.2em] text-brand-green-400">
-                  <span>{n.id}</span>
-                  <span className="text-paper/40">{n.coords}</span>
+                  <span>{`NODE ${String(i + 1).padStart(2, "0")}`}</span>
+                  <span className="text-paper/40">{region.coords}</span>
                 </div>
                 <p className="mt-4 font-body text-xl font-bold tracking-[-0.02em] text-paper">
-                  {n.city}
+                  {region.city}
                 </p>
-                <p className="mt-1 text-sm text-paper/60 font-body">{n.role}</p>
+                <p className="mt-1 text-sm text-paper/60 font-body">{region.role}</p>
               </div>
             </Reveal>
           ))}
@@ -948,6 +808,7 @@ export function VariantE() {
   const { scrollYProgress } = useScroll();
 
   return (
+    <LazyMotion features={domAnimation} strict>
     <div className="bg-paper font-body text-ink antialiased selection:bg-brand-green-100 selection:text-brand-green-800">
       {/* ===== Sticky top bar ===== */}
       <header className="sticky top-0 z-50 border-b border-line bg-paper/90 backdrop-blur-md">
@@ -1008,7 +869,7 @@ export function VariantE() {
           </nav>
         </div>
         {/* Scroll progress hairline — brand green */}
-        <motion.div
+        <m.div
           aria-hidden
           className="absolute inset-x-0 bottom-0 h-0.5 origin-left bg-brand-green-500"
           style={{ scaleX: reduce ? 0 : scrollYProgress }}
@@ -1030,5 +891,6 @@ export function VariantE() {
         <FooterSection />
       </div>
     </div>
+    </LazyMotion>
   );
 }

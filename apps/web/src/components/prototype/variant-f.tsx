@@ -8,13 +8,16 @@ import {
 } from "lucide-react";
 import {
   AnimatePresence,
-  motion,
+  LazyMotion,
+  domAnimation,
+  m,
   useReducedMotion,
   useScroll,
   useTransform,
 } from "motion/react";
 import { useRef } from "react";
-import type { ReactNode } from "react";
+import { EASE, Reveal } from "@/components/prototype/motion";
+import { getFeaturedIngredients, pillars } from "@/components/landing/landing-content";
 
 /*
  * PROTOTYPE — Variant F: "Deep Green Immersive"
@@ -22,8 +25,6 @@ import type { ReactNode } from "react";
  * story chapters, horizontal snap ingredient rail, glowing brand-green CTA.
  * Reinterpretation of Variant C with full brand-book compliance.
  */
-
-const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
 const img = (id: string, w = 1600, q = 80) =>
   `https://images.unsplash.com/${id}?auto=format&fit=crop&w=${w}&q=${q}`;
@@ -35,103 +36,20 @@ const NAV_LINKS = [
   { label: "Standards", href: "#standards" },
 ] as const;
 
-const RAIL = [
-  {
-    name: "Ashwagandha KSM-66",
-    latin: "Withania somnifera",
-    data: [
-      ["PURITY", "≥ 5% withanolides"],
-      ["FORM", "Root extract"],
-    ],
-    image: img("photo-1501004318641-b39e6451bec6", 800),
-  },
-  {
-    name: "Lutein",
-    latin: "Tagetes erecta",
-    data: [
-      ["PURITY", "≥ 98% trans"],
-      ["FORM", "Beadlet · Oil"],
-    ],
-    image: img("photo-1518531933037-91b2f5f229cc", 800),
-  },
-  {
-    name: "Astaxanthin",
-    latin: "Haematococcus pluvialis",
-    data: [
-      ["PURITY", "≥ 10% oleoresin"],
-      ["FORM", "Softgel-ready"],
-    ],
-    image: img("photo-1610348725531-843dff563e2c", 800),
-  },
-  {
-    name: "Coenzyme Q10",
-    latin: "Fermentation grade",
-    data: [
-      ["PURITY", "≥ 99.5%"],
-      ["FORM", "Powder · Liposomal"],
-    ],
-    image: img("photo-1559757148-5c350d0d3c56", 800),
-  },
-  {
-    name: "Curcumin",
-    latin: "Curcuma longa",
-    data: [
-      ["PURITY", "≥ 95% curcuminoids"],
-      ["FORM", "Water-dispersible"],
-    ],
-    image: img("photo-1490645935967-10de6ba17061", 800),
-  },
-  {
-    name: "Hyaluronic Acid",
-    latin: "Bio-fermented",
-    data: [
-      ["GRADE", "Cosmetic · Food"],
-      ["MW", "8 kDa – 1.8 MDa"],
-    ],
-    image: img("photo-1512069772995-ec65ed45afd6", 800),
-  },
-] as const;
-
-const PILLARS = [
+const PILLAR_DETAIL = [
   {
     icon: Sprout,
-    title: "Traceable Sourcing",
     copy: "A documented chain of custody from origin farm to finished extract — every lot, every season.",
   },
   {
     icon: FlaskConical,
-    title: "Clinical-Grade R&D",
     copy: "Identity, potency and stability validated in-house; third-party verification on request.",
   },
   {
     icon: Globe2,
-    title: "Global Compliance",
     copy: "ISO and GMP certified systems with regulatory dossiers prepared for 40+ markets.",
   },
 ] as const;
-
-function Reveal({
-  children,
-  className,
-  delay = 0,
-}: {
-  children: ReactNode;
-  className?: string;
-  delay?: number;
-}) {
-  const reduce = useReducedMotion();
-  return (
-    <motion.div
-      className={className}
-      initial={reduce ? { opacity: 0 } : { opacity: 0, y: 36 }}
-      whileInView={reduce ? { opacity: 1 } : { opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-100px" }}
-      transition={{ duration: 0.9, delay: reduce ? 0 : delay, ease: EASE }}
-    >
-      {children}
-    </motion.div>
-  );
-}
 
 function ChapterImage({ src, alt }: { src: string; alt: string }) {
   const reduce = useReducedMotion();
@@ -146,7 +64,7 @@ function ChapterImage({ src, alt }: { src: string; alt: string }) {
       ref={ref}
       className="relative h-[60vh] overflow-hidden rounded-[28px] border border-white/10 md:h-[78vh]"
     >
-      <motion.img
+      <m.img
         src={src}
         alt={alt}
         style={{ y: reduce ? 0 : y }}
@@ -168,7 +86,7 @@ function ChapterImage({ src, alt }: { src: string; alt: string }) {
 
 function HeroNav({ reduce }: { reduce: boolean | null }) {
   return (
-    <motion.nav
+    <m.nav
       initial={reduce ? { opacity: 0 } : { opacity: 0, y: -16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8, delay: 0.2, ease: EASE }}
@@ -200,7 +118,7 @@ function HeroNav({ reduce }: { reduce: boolean | null }) {
           Inquire
         </a>
       </div>
-    </motion.nav>
+    </m.nav>
   );
 }
 
@@ -220,14 +138,14 @@ function HeroHeader({ reduce }: { reduce: boolean | null }) {
       className="relative flex min-h-svh items-center justify-center overflow-hidden bg-brand-green-950"
     >
       {/* Parallax canopy image */}
-      <motion.div style={{ y: reduce ? 0 : heroY }} className="absolute inset-0">
+      <m.div style={{ y: reduce ? 0 : heroY }} className="absolute inset-0">
         <img
           src={img("photo-1542601906990-b4d3fb778b09", 2000)}
           alt="Sunlight breaking through a deep forest canopy of green leaves"
           className="h-full w-full scale-110 object-cover"
           loading="eager"
         />
-      </motion.div>
+      </m.div>
       {/* Deep brand-green-950 gradient overlay */}
       <div
         className="absolute inset-0"
@@ -238,19 +156,19 @@ function HeroHeader({ reduce }: { reduce: boolean | null }) {
         aria-hidden
       />
 
-      <motion.div
+      <m.div
         style={{ opacity: reduce ? 1 : heroFade }}
         className="relative z-10 px-6 text-center"
       >
-        <motion.p
+        <m.p
           initial={reduce ? { opacity: 0 } : { opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.4, ease: EASE }}
           className="font-tech text-[11px] uppercase tracking-[0.45em] text-brand-green-400 md:text-xs"
         >
           Botanical Intelligence Since 1995
-        </motion.p>
-        <motion.h1
+        </m.p>
+        <m.h1
           initial={reduce ? { opacity: 0 } : { opacity: 0, y: 32 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1.1, delay: 0.55, ease: EASE }}
@@ -259,8 +177,8 @@ function HeroHeader({ reduce }: { reduce: boolean | null }) {
           Rooted in Nature,
           <br />
           <span className="text-brand-green-300 italic">Refined by Science.</span>
-        </motion.h1>
-        <motion.p
+        </m.h1>
+        <m.p
           initial={reduce ? { opacity: 0 } : { opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.75, ease: EASE }}
@@ -268,8 +186,8 @@ function HeroHeader({ reduce }: { reduce: boolean | null }) {
         >
           Premium botanical ingredients for the world&rsquo;s most demanding formulations — grown
           with patience, perfected in the laboratory.
-        </motion.p>
-        <motion.div
+        </m.p>
+        <m.div
           initial={reduce ? { opacity: 0 } : { opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.9, ease: EASE }}
@@ -287,10 +205,10 @@ function HeroHeader({ reduce }: { reduce: boolean | null }) {
           >
             Our Story
           </a>
-        </motion.div>
-      </motion.div>
+        </m.div>
+      </m.div>
 
-      <motion.a
+      <m.a
         href="#origin"
         aria-label="Scroll down to read our story"
         animate={reduce ? undefined : { y: [0, 8, 0] }}
@@ -300,7 +218,7 @@ function HeroHeader({ reduce }: { reduce: boolean | null }) {
         className="-translate-x-1/2 absolute bottom-8 left-1/2 z-10 min-h-11 text-white/50 transition-colors hover:text-brand-green-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-green-400"
       >
         <ChevronDown className="h-6 w-6" aria-hidden />
-      </motion.a>
+      </m.a>
     </header>
   );
 }
@@ -456,12 +374,12 @@ function IngredientRail() {
       </div>
       <div className="mt-14 overflow-x-auto pb-6 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         <div className="flex snap-x snap-mandatory gap-6 px-6 md:px-[max(1.5rem,calc((100vw-72rem)/2))]">
-          {RAIL.map((item, i) => (
+          {getFeaturedIngredients().map((item, i) => (
             <Reveal key={item.name} delay={Math.min(i * 0.08, 0.3)} className="snap-start">
               <article className="group w-[300px] shrink-0 overflow-hidden rounded-3xl border border-brand-green-700/40 bg-white/5 backdrop-blur transition-colors duration-500 hover:border-brand-green-400/60 md:w-[340px]">
                 <div className="h-52 overflow-hidden">
                   <img
-                    src={item.image}
+                    src={item.image.src}
                     alt={`${item.name} — ${item.latin} ingredient`}
                     className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
                     loading="lazy"
@@ -471,7 +389,7 @@ function IngredientRail() {
                   <h3 className="font-display text-2xl font-light text-white">{item.name}</h3>
                   <p className="mt-1 text-sm italic text-white/40">{item.latin}</p>
                   <dl className="mt-6 space-y-2.5 border-t border-brand-green-800/60 pt-5">
-                    {item.data.map(([k, v]) => (
+                    {([["Purity", item.purity], ["Form", item.form]] as const).map(([k, v]) => (
                       <div key={k} className="flex items-baseline justify-between gap-4">
                         <dt className="font-tech text-[10px] uppercase tracking-[0.2em] text-brand-green-400/70">
                           {k}
@@ -510,20 +428,24 @@ function StandardsPillars() {
           </h2>
         </Reveal>
         <div className="grid gap-6 md:grid-cols-3">
-          {PILLARS.map((pillar, i) => (
-            <Reveal key={pillar.title} delay={i * 0.1}>
-              <div className="group h-full rounded-3xl border border-brand-green-800/60 bg-gradient-to-b from-brand-green-900/60 to-brand-green-950/40 p-9 backdrop-blur transition-colors duration-500 hover:border-brand-green-500/50">
-                <span
-                  className="flex h-12 w-12 items-center justify-center rounded-full border border-brand-green-500/40 text-brand-green-400 shadow-[0_0_16px_oklch(0.55_0.17_145_/_0.15)] transition-shadow duration-500 group-hover:shadow-[0_0_28px_oklch(0.55_0.17_145_/_0.3)]"
-                  aria-hidden
-                >
-                  <pillar.icon className="h-5 w-5" />
-                </span>
-                <h3 className="mt-7 font-display text-2xl font-light text-white">{pillar.title}</h3>
-                <p className="mt-3 text-sm leading-relaxed text-white/55">{pillar.copy}</p>
-              </div>
-            </Reveal>
-          ))}
+          {pillars.map((pillar, i) => {
+            const detail = PILLAR_DETAIL[i];
+            const Icon = detail.icon;
+            return (
+              <Reveal key={pillar.title} delay={i * 0.1}>
+                <div className="group h-full rounded-3xl border border-brand-green-800/60 bg-gradient-to-b from-brand-green-900/60 to-brand-green-950/40 p-9 backdrop-blur transition-colors duration-500 hover:border-brand-green-500/50">
+                  <span
+                    className="flex h-12 w-12 items-center justify-center rounded-full border border-brand-green-500/40 text-brand-green-400 shadow-[0_0_16px_oklch(0.55_0.17_145_/_0.15)] transition-shadow duration-500 group-hover:shadow-[0_0_28px_oklch(0.55_0.17_145_/_0.3)]"
+                    aria-hidden
+                  >
+                    <Icon className="h-5 w-5" />
+                  </span>
+                  <h3 className="mt-7 font-display text-2xl font-light text-white">{pillar.title}</h3>
+                  <p className="mt-3 text-sm leading-relaxed text-white/55">{detail.copy}</p>
+                </div>
+              </Reveal>
+            );
+          })}
         </div>
       </div>
     </section>
@@ -659,19 +581,21 @@ export function VariantF() {
   const reduce = useReducedMotion();
 
   return (
-    <AnimatePresence>
-      <main className="bg-brand-green-950 font-body text-white antialiased selection:bg-brand-green-500 selection:text-white">
-        <HeroNav reduce={reduce} />
-        <HeroHeader reduce={reduce} />
-        <StatsBand />
-        <MarqueeStrip />
-        <OriginChapter />
-        <ScienceChapter />
-        <IngredientRail />
-        <StandardsPillars />
-        <CtaSection />
-        <SiteFooter />
-      </main>
-    </AnimatePresence>
+    <LazyMotion features={domAnimation} strict>
+      <AnimatePresence>
+        <main className="bg-brand-green-950 font-body text-white antialiased selection:bg-brand-green-500 selection:text-white">
+          <HeroNav reduce={reduce} />
+          <HeroHeader reduce={reduce} />
+          <StatsBand />
+          <MarqueeStrip />
+          <OriginChapter />
+          <ScienceChapter />
+          <IngredientRail />
+          <StandardsPillars />
+          <CtaSection />
+          <SiteFooter />
+        </main>
+      </AnimatePresence>
+    </LazyMotion>
   );
 }
