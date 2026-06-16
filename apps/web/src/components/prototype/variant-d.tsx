@@ -18,7 +18,8 @@ import {
 } from "motion/react";
 import type { MotionValue } from "motion/react";
 import { useRef, useState } from "react";
-import { EASE, Reveal, Intro, Eyebrow } from "@/components/prototype/motion";
+import { EASE } from "@/components/prototype/motion-constants";
+import { Reveal, Intro, Eyebrow } from "@/components/prototype/motion";
 import {
   company,
   stats,
@@ -226,7 +227,7 @@ function HeroSection({ heroRef, blobY }: HeroSectionProps) {
               style={{
                 borderRadius: "42% 58% 62% 38% / 47% 59% 41% 53%",
                 background: "oklch(0.78 0.15 145)",
-                filter: "blur(32px)",
+                filter: "blur(8px)",
               }}
             />
 

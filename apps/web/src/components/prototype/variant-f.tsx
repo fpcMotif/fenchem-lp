@@ -16,7 +16,8 @@ import {
   useTransform,
 } from "motion/react";
 import { useRef } from "react";
-import { EASE, Reveal } from "@/components/prototype/motion";
+import { EASE } from "@/components/prototype/motion-constants";
+import { Reveal } from "@/components/prototype/motion";
 import { getFeaturedIngredients, pillars } from "@/components/landing/landing-content";
 
 /*
@@ -452,17 +453,18 @@ function StandardsPillars() {
   );
 }
 
+const MARQUEE_ITEMS = [
+  "Nutrition & Supplements",
+  "Food & Beverage",
+  "Personal Care & Cosmeceuticals",
+  "ISO Certified",
+  "GMP Compliant",
+  "40+ Countries",
+  "25+ Years",
+];
+const MARQUEE_TRACK = [...MARQUEE_ITEMS, ...MARQUEE_ITEMS];
+
 function MarqueeStrip() {
-  const items = [
-    "Nutrition & Supplements",
-    "Food & Beverage",
-    "Personal Care & Cosmeceuticals",
-    "ISO Certified",
-    "GMP Compliant",
-    "40+ Countries",
-    "25+ Years",
-  ];
-  const track = [...items, ...items];
 
   return (
     <div
@@ -470,9 +472,9 @@ function MarqueeStrip() {
       className="overflow-hidden border-y border-brand-green-800/40 bg-brand-green-950 py-4"
     >
       <div className="animate-marquee flex w-max gap-16">
-        {track.map((label, i) => (
+        {MARQUEE_TRACK.map((label, i) => (
           <span
-            key={i}
+            key={`${label}-${i}`}
             className="shrink-0 font-tech text-[11px] uppercase tracking-[0.3em] text-brand-green-500/60"
           >
             {label}

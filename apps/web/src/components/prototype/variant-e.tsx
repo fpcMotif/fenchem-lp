@@ -753,7 +753,7 @@ function FooterSection() {
       <div className="grid gap-12 px-5 py-14 md:grid-cols-12 md:px-10 md:py-16">
         <div className="md:col-span-5">
           <a
-            href="#"
+            href="/"
             className="font-body text-2xl font-black tracking-[-0.04em] text-brand-green-600 transition-opacity duration-300 hover:opacity-70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-green-500"
           >
             FENCHEM
@@ -832,7 +832,7 @@ export function VariantE() {
           {/* Nav row */}
           <nav aria-label="Main navigation" className="flex items-center justify-between px-5 py-4 md:px-10">
             <a
-              href="#"
+              href="/"
               className="flex items-baseline gap-3 transition-opacity duration-300 hover:opacity-70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-green-500"
             >
               <span className="font-body text-xl font-black tracking-[-0.04em] text-brand-green-600">

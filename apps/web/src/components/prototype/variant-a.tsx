@@ -9,7 +9,8 @@ import {
 } from "motion/react";
 import type { MotionValue } from "motion/react";
 import { useRef } from "react";
-import { EASE, Eyebrow, Intro, Reveal } from "@/components/prototype/motion";
+import { EASE } from "@/components/prototype/motion-constants";
+import { Eyebrow, Intro, Reveal } from "@/components/prototype/motion";
 import {
   industries,
   stats,

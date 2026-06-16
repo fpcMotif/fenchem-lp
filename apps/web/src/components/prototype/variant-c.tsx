@@ -8,7 +8,8 @@ import {
   useTransform,
 } from "motion/react";
 import { useRef } from "react";
-import { EASE, Reveal } from "@/components/prototype/motion";
+import { EASE } from "@/components/prototype/motion-constants";
+import { Reveal } from "@/components/prototype/motion";
 import { getFeaturedIngredients, pillars } from "@/components/landing/landing-content";
 
 /*

@@ -1,6 +1,8 @@
 import { m, useReducedMotion } from "motion/react";
 import type { ReactNode } from "react";
 
+import { EASE } from "./motion-constants";
+
 /*
  * Shared motion primitives for the Fenchem landing prototypes.
  *
@@ -17,8 +19,6 @@ import type { ReactNode } from "react";
  * drop the translate, zero the duration and delay, and only settle opacity.
  */
 
-/** Shared entrance easing — a soft, decelerating cubic-bezier. */
-export const EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
 type RevealProps = {
   children: ReactNode;
