@@ -21,7 +21,7 @@
         "rolldown": "1.1.0",
         "typescript": "catalog:",
         "vite-plus": "0.1.24",
-        "vitest": "^0.1.24",
+        "vitest": "npm:@voidzero-dev/vite-plus-test@0.1.24",
       },
     },
     "apps/web": {

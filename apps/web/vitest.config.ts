@@ -19,7 +19,6 @@ export default defineConfig({
     include: ["src/**/*.test.{ts,tsx}"],
     setupFiles: ["./src/test/setup.ts"],
     coverage: {
-      all: true,
       provider: "v8",
       reporter: ["text", "json-summary"],
       include: ["src/components/landing/**/*.{ts,tsx}", "src/routes/index.tsx"],

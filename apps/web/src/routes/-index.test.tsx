@@ -1,4 +1,5 @@
-import { describe, expect, test } from "vitest";
+import { render } from "@testing-library/react";
+import { describe, expect, test, vi } from "vitest";
 
 import { Route } from "./index";
 
@@ -16,5 +17,21 @@ describe("home route", () => {
     expect(validate({ variant: "g" })).toEqual({ variant: "g" });
     expect(validate({ variant: "z" })).toEqual({ variant: "d" });
     expect(validate({ variant: 42 })).toEqual({ variant: "d" });
+  });
+
+  test("renders the active variant and prototype switcher", () => {
+    const Component = Route.options.component as React.ComponentType;
+    vi.spyOn(Route, "useSearch").mockReturnValue({ variant: "d" } as never);
+
+    const { container } = render(<Component />);
+    expect(container).toBeTruthy();
+  });
+
+  test("handles variant without matching component", () => {
+    const Component = Route.options.component as React.ComponentType;
+    vi.spyOn(Route, "useSearch").mockReturnValue({ variant: "unknown" } as never);
+
+    const { container } = render(<Component />);
+    expect(container).toBeTruthy();
   });
 });

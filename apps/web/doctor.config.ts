@@ -1,4 +1,4 @@
-import type { ReactDoctorConfig } from "react-doctor";
+import type { ReactDoctorConfig } from "react-doctor/api";
 
 export default {
   ignore: {
