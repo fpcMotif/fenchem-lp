@@ -116,7 +116,7 @@ export const proofCards: ProofCard[] = [
   {
     title: "Nutrition actives",
     copy: "Standardized botanical extracts, carotenoids, and bioenergetic compounds built for precise dose targets.",
-    metric: "25+ years",
+    metric: "30+ years",
     image: {
       src: "https://images.unsplash.com/photo-1610348725531-843dff563e2c?auto=format&fit=crop&w=1000&q=80",
       alt: "Supplement capsules arranged on a neutral laboratory surface",
@@ -156,7 +156,7 @@ export const proofCards: ProofCard[] = [
  * Order: tenure, footprint, reach, certification.
  */
 export const stats: Stat[] = [
-  { value: "25+", label: "Years of botanical expertise since 1995" },
+  { value: "30+", label: "Years of botanical expertise since 1995" },
   { value: "6", label: "Global bases across three continents" },
   { value: "40+", label: "Countries served by our supply network" },
   { value: "ISO/GMP", label: "Certified manufacturing and quality systems" },
@@ -367,7 +367,9 @@ export const certificationDetails: Certification[] = [
 ];
 
 /** Certification names only — derived so the two views never drift. */
-export const certifications: string[] = certificationDetails.map((certification) => certification.name);
+export const certifications: string[] = certificationDetails.map(
+  (certification) => certification.name,
+);
 
 export const regions: Region[] = [
   {

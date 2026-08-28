@@ -7,6 +7,10 @@ import { VariantD } from "./variant-d";
 import { VariantE } from "./variant-e";
 import { VariantF } from "./variant-f";
 import { VariantG } from "./variant-g";
+import { VariantH } from "./variant-h";
+import { VariantI } from "./variant-i";
+import { VariantJ } from "./variant-j/index";
+import { VariantK } from "./variant-k";
 
 /*
  * PROTOTYPE — single source of truth for the Fenchem landing variants.
@@ -18,6 +22,7 @@ import { VariantG } from "./variant-g";
  * Array order IS the switcher order: each original sits beside its brand twin
  * (A↔D, B↔E, C↔F) so ←/→ toggles a pair; G (hybrid, no twin) trails.
  * `twinOf` makes the A↔D / B↔E / C↔F pairing data instead of a comment.
+ * K is H's vivid division-color twin (←/→ toggles H↔K).
  * Delete this file (and the losing variants) once a direction wins.
  */
 
@@ -37,10 +42,14 @@ export const VARIANTS = [
   { key: "c", Component: VariantC, name: "Deep Forest · original" },
   { key: "f", Component: VariantF, name: "Deep Green · brand", twinOf: "c" },
   { key: "g", Component: VariantG, name: "Hybrid · brand" },
+  { key: "h", Component: VariantH, name: "Production · recommended" },
+  { key: "i", Component: VariantI, name: "Production+ · map & WebGL" },
+  { key: "j", Component: VariantJ, name: "Greenhouse Ledger · motion" },
+  { key: "k", Component: VariantK, name: "Production · vivid", twinOf: "h" },
 ] as const satisfies readonly VariantEntry[];
 
 export type VariantKey = (typeof VARIANTS)[number]["key"];
 
 export const VARIANT_KEYS: readonly VariantKey[] = VARIANTS.map((v) => v.key);
 
-export const DEFAULT_VARIANT: VariantKey = "d";
+export const DEFAULT_VARIANT: VariantKey = "k";

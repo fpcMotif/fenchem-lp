@@ -55,7 +55,8 @@ silently does nothing. Two safe paths:
   <Eyebrow accent="text-brand-green-600">Our Divisions</Eyebrow>
   <Intro>
     <h2 style={{ fontFamily: "Newsreader, serif", fontSize: 56, color: "var(--color-ink)" }}>
-      Rooted in Nature, <em style={{ color: "var(--color-brand-green-600)" }}>Refined by Science</em>
+      Rooted in Nature,{" "}
+      <em style={{ color: "var(--color-brand-green-600)" }}>Refined by Science</em>
     </h2>
   </Intro>
   <Reveal delay={0.1}>

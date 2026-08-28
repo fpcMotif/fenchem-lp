@@ -1,11 +1,4 @@
-import {
-  ArrowRight,
-  ArrowUpRight,
-  ChevronDown,
-  FlaskConical,
-  Globe2,
-  Sprout,
-} from "lucide-react";
+import { ArrowRight, ArrowUpRight, ChevronDown, FlaskConical, Globe2, Sprout } from "lucide-react";
 import {
   AnimatePresence,
   LazyMotion,
@@ -72,12 +65,12 @@ function ChapterImage({ src, alt }: { src: string; alt: string }) {
         className="absolute inset-0 h-[116%] w-full object-cover"
         loading="lazy"
       />
-      {/* Dark green gradient overlay using oklch matching brand-green-950 */}
+      {/* Dark green gradient overlay derived from the brand-green-950 hue */}
       <div
         className="absolute inset-0"
         style={{
           background:
-            "linear-gradient(to top, oklch(0.14 0.06 145) 0%, transparent 55%, oklch(0.14 0.06 145 / 0.3) 100%)",
+            "linear-gradient(to top, oklch(from var(--color-brand-green-950) 0.14 0.06 h) 0%, transparent 55%, oklch(from var(--color-brand-green-950) 0.14 0.06 h / 0.3) 100%)",
         }}
         aria-hidden
       />
@@ -114,7 +107,7 @@ function HeroNav({ reduce }: { reduce: boolean | null }) {
         </div>
         <a
           href="mailto:sales@fenchem.com"
-          className="min-h-11 rounded-full bg-brand-green-500 px-5 py-2.5 text-sm font-semibold text-white shadow-[0_0_24px_oklch(0.55_0.17_145_/_0.35)] transition-all duration-300 hover:bg-brand-green-400 hover:shadow-[0_0_40px_oklch(0.55_0.17_145_/_0.55)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-white"
+          className="min-h-11 rounded-full bg-brand-green-500 px-5 py-2.5 text-sm font-semibold text-brand-green-950 shadow-[0_0_24px_oklch(from_var(--color-brand-green-500)_l_c_h_/_0.35)] transition-[background-color,box-shadow] duration-300 hover:bg-brand-green-400 hover:shadow-[0_0_40px_oklch(from_var(--color-brand-green-500)_l_c_h_/_0.55)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-white"
         >
           Inquire
         </a>
@@ -147,20 +140,17 @@ function HeroHeader({ reduce }: { reduce: boolean | null }) {
           loading="eager"
         />
       </m.div>
-      {/* Deep brand-green-950 gradient overlay */}
+      {/* Deep green gradient overlay derived from the brand-green-950 hue */}
       <div
         className="absolute inset-0"
         style={{
           background:
-            "linear-gradient(to bottom, oklch(0.14 0.06 145 / 0.85) 0%, oklch(0.14 0.06 145 / 0.35) 45%, oklch(0.14 0.06 145) 100%)",
+            "linear-gradient(to bottom, oklch(from var(--color-brand-green-950) 0.14 0.06 h / 0.85) 0%, oklch(from var(--color-brand-green-950) 0.14 0.06 h / 0.35) 45%, oklch(from var(--color-brand-green-950) 0.14 0.06 h) 100%)",
         }}
         aria-hidden
       />
 
-      <m.div
-        style={{ opacity: reduce ? 1 : heroFade }}
-        className="relative z-10 px-6 text-center"
-      >
+      <m.div style={{ opacity: reduce ? 1 : heroFade }} className="relative z-10 px-6 text-center">
         <m.p
           initial={reduce ? { opacity: 0 } : { opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -196,7 +186,7 @@ function HeroHeader({ reduce }: { reduce: boolean | null }) {
         >
           <a
             href="#portfolio"
-            className="min-h-11 rounded-full bg-brand-green-500 px-9 py-4 text-sm font-semibold text-white shadow-[0_0_32px_oklch(0.55_0.17_145_/_0.35)] transition-all duration-300 hover:bg-brand-green-400 hover:shadow-[0_0_56px_oklch(0.55_0.17_145_/_0.55)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-white"
+            className="min-h-11 rounded-full bg-brand-green-500 px-9 py-4 text-sm font-semibold text-brand-green-950 shadow-[0_0_32px_oklch(from_var(--color-brand-green-500)_l_c_h_/_0.35)] transition-[background-color,box-shadow] duration-300 hover:bg-brand-green-400 hover:shadow-[0_0_56px_oklch(from_var(--color-brand-green-500)_l_c_h_/_0.55)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-white"
           >
             Explore the Portfolio
           </a>
@@ -213,9 +203,7 @@ function HeroHeader({ reduce }: { reduce: boolean | null }) {
         href="#origin"
         aria-label="Scroll down to read our story"
         animate={reduce ? undefined : { y: [0, 8, 0] }}
-        transition={
-          reduce ? undefined : { duration: 2.2, repeat: Infinity, ease: "easeInOut" }
-        }
+        transition={reduce ? undefined : { duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
         className="-translate-x-1/2 absolute bottom-8 left-1/2 z-10 min-h-11 text-white/50 transition-colors hover:text-brand-green-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-green-400"
       >
         <ChevronDown className="h-6 w-6" aria-hidden />
@@ -238,7 +226,7 @@ function StatsBand() {
       <div className="mx-auto grid max-w-5xl gap-5 sm:grid-cols-3">
         {(
           [
-            ["25+", "Years of botanical R&D"],
+            ["30+", "Years of botanical R&D"],
             ["6", "Global production bases"],
             ["40+", "Markets with full dossiers"],
           ] as const
@@ -282,8 +270,7 @@ function OriginChapter() {
               id="origin-heading"
               className="mt-6 font-display text-4xl font-light leading-[1.08] tracking-tight text-white md:text-6xl"
             >
-              Grown with{" "}
-              <span className="italic text-brand-green-300">patience.</span>
+              Grown with <span className="italic text-brand-green-300">patience.</span>
             </h2>
             <p className="mt-8 max-w-md leading-relaxed text-white/65 md:text-lg">
               Our botanicals begin in soil we know by name — a global network of partner farms
@@ -317,8 +304,7 @@ function ScienceChapter() {
               id="science-heading"
               className="mt-6 font-display text-4xl font-light leading-[1.08] tracking-tight text-white md:text-6xl"
             >
-              Refined to the{" "}
-              <span className="italic text-brand-green-300">molecule.</span>
+              Refined to the <span className="italic text-brand-green-300">molecule.</span>
             </h2>
             <p className="mt-8 max-w-md leading-relaxed text-white/65 md:text-lg">
               Every extract passes through clinical-grade validation — identity, potency, stability
@@ -368,7 +354,7 @@ function IngredientRail() {
               The <span className="italic text-brand-green-300">living</span> library
             </h2>
           </div>
-          <p className="font-tech text-[11px] uppercase tracking-[0.25em] text-white/40">
+          <p className="font-tech text-[11px] uppercase tracking-[0.25em] text-white/60">
             Scroll →
           </p>
         </Reveal>
@@ -388,11 +374,16 @@ function IngredientRail() {
                 </div>
                 <div className="p-7">
                   <h3 className="font-display text-2xl font-light text-white">{item.name}</h3>
-                  <p className="mt-1 text-sm italic text-white/40">{item.latin}</p>
+                  <p className="mt-1 text-sm italic text-white/60">{item.latin}</p>
                   <dl className="mt-6 space-y-2.5 border-t border-brand-green-800/60 pt-5">
-                    {([["Purity", item.purity], ["Form", item.form]] as const).map(([k, v]) => (
+                    {(
+                      [
+                        ["Purity", item.purity],
+                        ["Form", item.form],
+                      ] as const
+                    ).map(([k, v]) => (
                       <div key={k} className="flex items-baseline justify-between gap-4">
-                        <dt className="font-tech text-[10px] uppercase tracking-[0.2em] text-brand-green-400/70">
+                        <dt className="font-tech text-[10px] uppercase tracking-[0.2em] text-brand-green-300">
                           {k}
                         </dt>
                         <dd className="font-tech text-xs text-white/70">{v}</dd>
@@ -436,12 +427,14 @@ function StandardsPillars() {
               <Reveal key={pillar.title} delay={i * 0.1}>
                 <div className="group h-full rounded-3xl border border-brand-green-800/60 bg-gradient-to-b from-brand-green-900/60 to-brand-green-950/40 p-9 backdrop-blur transition-colors duration-500 hover:border-brand-green-500/50">
                   <span
-                    className="flex h-12 w-12 items-center justify-center rounded-full border border-brand-green-500/40 text-brand-green-400 shadow-[0_0_16px_oklch(0.55_0.17_145_/_0.15)] transition-shadow duration-500 group-hover:shadow-[0_0_28px_oklch(0.55_0.17_145_/_0.3)]"
+                    className="flex h-12 w-12 items-center justify-center rounded-full border border-brand-green-500/40 text-brand-green-400 shadow-[0_0_16px_oklch(from_var(--color-brand-green-500)_l_c_h_/_0.15)] transition-shadow duration-500 group-hover:shadow-[0_0_28px_oklch(from_var(--color-brand-green-500)_l_c_h_/_0.3)]"
                     aria-hidden
                   >
                     <Icon className="h-5 w-5" />
                   </span>
-                  <h3 className="mt-7 font-display text-2xl font-light text-white">{pillar.title}</h3>
+                  <h3 className="mt-7 font-display text-2xl font-light text-white">
+                    {pillar.title}
+                  </h3>
                   <p className="mt-3 text-sm leading-relaxed text-white/55">{detail.copy}</p>
                 </div>
               </Reveal>
@@ -460,12 +453,11 @@ const MARQUEE_ITEMS = [
   "ISO Certified",
   "GMP Compliant",
   "40+ Countries",
-  "25+ Years",
+  "30+ Years",
 ];
 const MARQUEE_TRACK = [...MARQUEE_ITEMS, ...MARQUEE_ITEMS];
 
 function MarqueeStrip() {
-
   return (
     <div
       aria-hidden
@@ -498,7 +490,7 @@ function CtaSection() {
         className="-translate-x-1/2 -translate-y-1/2 pointer-events-none absolute top-1/2 left-1/2 h-[32rem] w-[32rem] rounded-full"
         style={{
           background:
-            "radial-gradient(circle, oklch(0.55 0.17 145 / 0.12) 0%, transparent 70%)",
+            "radial-gradient(circle, oklch(from var(--color-brand-green-500) l c h / 0.12) 0%, transparent 70%)",
         }}
       />
       {/* Secondary brand-blue glow accent — minor */}
@@ -507,7 +499,7 @@ function CtaSection() {
         className="-translate-x-1/2 -translate-y-1/2 pointer-events-none absolute top-1/2 left-1/2 h-[48rem] w-[48rem] rounded-full"
         style={{
           background:
-            "radial-gradient(circle, oklch(0.42 0.18 265 / 0.06) 0%, transparent 65%)",
+            "radial-gradient(circle, oklch(from var(--color-brand-blue-700) l c h / 0.06) 0%, transparent 65%)",
         }}
       />
       <Reveal className="relative">
@@ -518,8 +510,7 @@ function CtaSection() {
           id="cta-heading"
           className="mx-auto mt-8 max-w-3xl font-display text-[clamp(2.5rem,6vw,5rem)] font-light leading-[1.05] tracking-tight text-white"
         >
-          Bring the forest to{" "}
-          <span className="italic text-brand-green-300">your formulation.</span>
+          Bring the forest to <span className="italic text-brand-green-300">your formulation.</span>
         </h2>
         <p className="mx-auto mt-6 max-w-lg text-lg leading-relaxed text-white/55">
           Our team of botanical scientists and regulatory specialists are ready to accelerate your
@@ -528,7 +519,7 @@ function CtaSection() {
         <div className="mt-12 flex flex-wrap items-center justify-center gap-4">
           <a
             href="mailto:sales@fenchem.com"
-            className="group inline-flex min-h-11 items-center gap-3 rounded-full bg-brand-green-500 px-10 py-5 text-sm font-semibold text-white shadow-[0_0_40px_oklch(0.55_0.17_145_/_0.4)] transition-all duration-300 hover:bg-brand-green-400 hover:shadow-[0_0_72px_oklch(0.55_0.17_145_/_0.6)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-white"
+            className="group inline-flex min-h-11 items-center gap-3 rounded-full bg-brand-green-500 px-10 py-5 text-sm font-semibold text-brand-green-950 shadow-[0_0_40px_oklch(from_var(--color-brand-green-500)_l_c_h_/_0.4)] transition-[background-color,box-shadow] duration-300 hover:bg-brand-green-400 hover:shadow-[0_0_72px_oklch(from_var(--color-brand-green-500)_l_c_h_/_0.6)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-white"
           >
             Request a Specification
             <ArrowUpRight
@@ -554,24 +545,27 @@ function SiteFooter() {
       <div className="mx-auto flex max-w-6xl flex-col items-center gap-8 text-center">
         <div>
           <p className="font-display text-3xl font-light text-white/80">Fenchem</p>
-          <p className="mt-1 font-tech text-[11px] uppercase tracking-[0.3em] text-brand-green-500/60">
+          <p className="mt-1 font-tech text-[11px] uppercase tracking-[0.3em] text-brand-green-500">
             Rooted in Nature, Refined by Science
           </p>
         </div>
-        <nav aria-label="Footer navigation" className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3">
+        <nav
+          aria-label="Footer navigation"
+          className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3"
+        >
           {["Privacy Policy", "Terms of Service", "Ingredient Transparency", "Global Offices"].map(
             (label) => (
               <a
                 key={label}
                 href="#top"
-                className="text-xs uppercase tracking-[0.15em] text-white/40 transition-colors duration-300 hover:text-brand-green-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-green-400"
+                className="text-xs uppercase tracking-[0.15em] text-white/60 transition-colors duration-300 hover:text-brand-green-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-green-400"
               >
                 {label}
               </a>
             ),
           )}
         </nav>
-        <p className="font-tech text-[10px] uppercase tracking-[0.25em] text-white/25">
+        <p className="font-tech text-[10px] uppercase tracking-[0.25em] text-white/50">
           &copy; 2026 Fenchem Biotek Ltd. — ISO &amp; GMP Certified · 40+ Countries
         </p>
       </div>
@@ -585,7 +579,7 @@ export function VariantF() {
   return (
     <LazyMotion features={domAnimation} strict>
       <AnimatePresence>
-        <main className="bg-brand-green-950 font-body text-white antialiased selection:bg-brand-green-500 selection:text-white">
+        <main className="bg-brand-green-950 font-body text-white antialiased selection:bg-brand-green-500 selection:text-brand-green-950">
           <HeroNav reduce={reduce} />
           <HeroHeader reduce={reduce} />
           <StatsBand />

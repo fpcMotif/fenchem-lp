@@ -48,7 +48,7 @@ const HERO_META = [
 const STATS = [
   {
     label: "[SYS.UPTIME]",
-    value: "25+",
+    value: "30+",
     unit: "years",
     desc: "Continuous ingredient engineering and refinement since 1995.",
   },
@@ -185,7 +185,7 @@ function ProtocolFigure() {
         loading="lazy"
       />
       <div className="absolute inset-x-0 bottom-0 flex items-center justify-between border-t border-pebble bg-white/90 px-4 py-2.5 backdrop-blur-sm">
-        <span className="font-tech text-[10px] uppercase tracking-[0.22em] text-bark/60">
+        <span className="font-tech text-[10px] uppercase tracking-[0.22em] text-bark/70">
           FIG. 02 — ANALYTICAL LAB, NANJING
         </span>
         <span className="font-tech text-[10px] tracking-[0.22em] text-moss">HPLC-7</span>
@@ -200,7 +200,7 @@ function HeroSection() {
     <section className="relative border-b border-pebble">
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,oklch(0.288_0.04_160.598_/_0.035)_1px,transparent_1px),linear-gradient(to_bottom,oklch(0.288_0.04_160.598_/_0.035)_1px,transparent_1px)] bg-[size:56px_56px]"
+        className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,oklch(from_var(--color-forest)_l_c_h_/_0.035)_1px,transparent_1px),linear-gradient(to_bottom,oklch(from_var(--color-forest)_l_c_h_/_0.035)_1px,transparent_1px)] bg-[size:56px_56px]"
       />
       <Plus aria-hidden strokeWidth={1} className="absolute left-4 top-4 size-4 text-bark/20" />
       <Plus
@@ -259,7 +259,7 @@ function HeroSection() {
             <dl className="divide-y divide-pebble border-b border-pebble">
               {HERO_META.map((row) => (
                 <div key={row.k} className="flex items-baseline justify-between px-5 py-4 md:px-8">
-                  <dt className="font-tech text-[10px] uppercase tracking-[0.22em] text-bark/40">
+                  <dt className="font-tech text-[10px] uppercase tracking-[0.22em] text-bark/60">
                     {row.k}
                   </dt>
                   <dd className="font-tech text-[11px] uppercase tracking-[0.18em] text-bark/80">
@@ -268,7 +268,7 @@ function HeroSection() {
                 </div>
               ))}
               <div className="flex items-baseline justify-between px-5 py-4 md:px-8">
-                <dt className="font-tech text-[10px] uppercase tracking-[0.22em] text-bark/40">
+                <dt className="font-tech text-[10px] uppercase tracking-[0.22em] text-bark/60">
                   STATUS
                 </dt>
                 <dd className="flex items-center gap-2 font-tech text-[11px] uppercase tracking-[0.18em] text-moss">
@@ -281,11 +281,11 @@ function HeroSection() {
               <img
                 src={IMG.glassware}
                 alt="Laboratory glassware during botanical extraction work"
-                className="absolute inset-0 h-full w-full object-cover grayscale transition-all duration-700 ease-out group-hover:scale-[1.03] group-hover:grayscale-0"
+                className="absolute inset-0 h-full w-full object-cover grayscale transition-[scale,filter] duration-700 ease-out group-hover:scale-[1.03] group-hover:grayscale-0"
                 loading="lazy"
               />
               <div className="absolute inset-x-0 bottom-0 flex items-center justify-between border-t border-pebble bg-white/90 px-4 py-2.5 backdrop-blur-sm">
-                <span className="font-tech text-[10px] uppercase tracking-[0.22em] text-bark/60">
+                <span className="font-tech text-[10px] uppercase tracking-[0.22em] text-bark/70">
                   FIG. 01 — EXTRACTION LAB
                 </span>
                 <span className="font-tech text-[10px] tracking-[0.22em] text-moss">
@@ -337,7 +337,7 @@ function StatBand() {
       {STATS.map((s, i) => (
         <Reveal key={s.label} delay={i * 0.08} className="bg-white">
           <div className="h-full px-5 py-9 transition-colors duration-500 hover:bg-mint/20 md:px-8 md:py-12">
-            <p className="font-tech text-[10px] uppercase tracking-[0.28em] text-bark/40">
+            <p className="font-tech text-[10px] uppercase tracking-[0.28em] text-bark/70">
               {s.label}
             </p>
             <div className="mt-5 flex flex-wrap items-baseline gap-x-2.5">
@@ -348,7 +348,7 @@ function StatBand() {
                 {s.unit}
               </span>
             </div>
-            <p className="mt-4 text-sm leading-relaxed text-bark/60">{s.desc}</p>
+            <p className="mt-4 text-sm leading-relaxed text-bark/70">{s.desc}</p>
           </div>
         </Reveal>
       ))}
@@ -381,7 +381,7 @@ function MatrixSection() {
               <img
                 src={item.image.src}
                 alt={item.image.alt}
-                className="h-full w-full object-cover grayscale transition-all duration-700 ease-out group-hover:scale-[1.04] group-hover:grayscale-0"
+                className="h-full w-full object-cover grayscale transition-[scale,filter] duration-700 ease-out group-hover:scale-[1.04] group-hover:grayscale-0"
                 loading="lazy"
               />
               <span className="absolute right-4 top-4 border border-pebble bg-white/90 px-2 py-1 font-tech text-[9px] uppercase tracking-[0.2em] text-bark/70 backdrop-blur-sm">
@@ -393,7 +393,7 @@ function MatrixSection() {
                 <span className="font-tech text-[11px] tracking-[0.22em] text-moss">
                   {String(i + 1).padStart(2, "0")} —
                 </span>
-                <span className="font-tech text-[10px] uppercase tracking-[0.22em] text-bark/40">
+                <span className="font-tech text-[10px] uppercase tracking-[0.22em] text-bark/60">
                   {item.code}
                 </span>
               </div>
@@ -402,24 +402,22 @@ function MatrixSection() {
               </h3>
               <dl className="mt-5 space-y-2.5 border-t border-pebble pt-4">
                 <div className="flex items-baseline justify-between gap-4">
-                  <dt className="font-tech text-[10px] uppercase tracking-[0.2em] text-bark/40">
+                  <dt className="font-tech text-[10px] uppercase tracking-[0.2em] text-bark/60">
                     Purity
                   </dt>
                   <dd className="text-right font-tech text-[11px] text-bark/70">{item.purity}</dd>
                 </div>
                 <div className="flex items-baseline justify-between gap-4">
-                  <dt className="font-tech text-[10px] uppercase tracking-[0.2em] text-bark/40">
+                  <dt className="font-tech text-[10px] uppercase tracking-[0.2em] text-bark/60">
                     Form
                   </dt>
                   <dd className="text-right font-tech text-[11px] text-bark/70">{item.form}</dd>
                 </div>
                 <div className="flex items-baseline justify-between gap-4">
-                  <dt className="font-tech text-[10px] uppercase tracking-[0.2em] text-bark/40">
+                  <dt className="font-tech text-[10px] uppercase tracking-[0.2em] text-bark/60">
                     Application
                   </dt>
-                  <dd className="text-right font-tech text-[11px] text-bark/70">
-                    {item.useCase}
-                  </dd>
+                  <dd className="text-right font-tech text-[11px] text-bark/70">{item.useCase}</dd>
                 </div>
               </dl>
               <a
@@ -446,7 +444,7 @@ function ProtocolSection() {
         title="Operating"
         italic="protocol."
         right={
-          <p className="max-w-xs font-tech text-[10px] uppercase leading-relaxed tracking-[0.2em] text-bark/40">
+          <p className="max-w-xs font-tech text-[10px] uppercase leading-relaxed tracking-[0.2em] text-bark/60">
             Rooted in nature, refined by science — every lot, every market, every release.
           </p>
         }
@@ -473,11 +471,11 @@ function ProtocolSection() {
                     <h3 className="font-body text-2xl font-semibold tracking-[-0.02em] text-bark md:text-3xl">
                       {pillar.title}
                     </h3>
-                    <span className="font-tech text-[10px] uppercase tracking-[0.22em] text-bark/40">
+                    <span className="font-tech text-[10px] uppercase tracking-[0.22em] text-bark/70">
                       {PROTOCOL_DETAIL[i].tag}
                     </span>
                   </div>
-                  <p className="mt-4 max-w-xl text-sm leading-relaxed text-bark/60 md:text-base">
+                  <p className="mt-4 max-w-xl text-sm leading-relaxed text-bark/70 md:text-base">
                     {PROTOCOL_DETAIL[i].desc}
                   </p>
                 </div>
@@ -511,17 +509,21 @@ function DomainsSection() {
               className="grid items-center gap-3 px-5 py-9 md:grid-cols-12 md:gap-6 md:px-10 md:py-12"
             >
               <div className="md:col-span-2">
-                <p className="font-tech text-[11px] tracking-[0.22em] text-moss">{DOMAIN_DETAIL[i].code}</p>
-                <p className="mt-1 font-tech text-[10px] uppercase tracking-[0.22em] text-bark/40">
+                <p className="font-tech text-[11px] tracking-[0.22em] text-moss">
+                  {DOMAIN_DETAIL[i].code}
+                </p>
+                <p className="mt-1 font-tech text-[10px] uppercase tracking-[0.22em] text-bark/70">
                   {DOMAIN_DETAIL[i].cat}
                 </p>
               </div>
               <h3 className="font-body text-2xl font-semibold tracking-[-0.03em] text-bark transition-colors duration-300 group-hover:text-forest md:col-span-5 md:text-4xl">
                 {industry.title}
               </h3>
-              <p className="text-sm leading-relaxed text-bark/60 md:col-span-4">{DOMAIN_DETAIL[i].desc}</p>
+              <p className="text-sm leading-relaxed text-bark/70 md:col-span-4">
+                {DOMAIN_DETAIL[i].desc}
+              </p>
               <div className="flex md:col-span-1 md:justify-end">
-                <ArrowUpRight className="size-6 text-bark/30 transition-all duration-300 group-hover:-translate-y-1 group-hover:translate-x-1 group-hover:text-forest" />
+                <ArrowUpRight className="size-6 text-bark/30 transition-[translate,color] duration-300 group-hover:-translate-y-1 group-hover:translate-x-1 group-hover:text-forest" />
               </div>
             </Reveal>
           </a>
@@ -567,7 +569,7 @@ function CtaNetworkSection() {
           </a>
         </Reveal>
         <Reveal delay={0.25}>
-          <p className="mt-10 font-tech text-[10px] uppercase tracking-[0.28em] text-cream/40">
+          <p className="mt-10 font-tech text-[10px] uppercase tracking-[0.28em] text-cream/60">
             RESPONSE.TIME &lt; 24H — TECHNICAL DOSSIERS ON REQUEST
           </p>
         </Reveal>
@@ -577,7 +579,7 @@ function CtaNetworkSection() {
           <span className="font-tech text-[10px] uppercase tracking-[0.26em] text-mint/70">
             SYS.NET // 6 ACTIVE NODES
           </span>
-          <span className="hidden font-tech text-[10px] uppercase tracking-[0.26em] text-cream/40 md:block">
+          <span className="hidden font-tech text-[10px] uppercase tracking-[0.26em] text-cream/60 md:block">
             LAT/LONG VERIFIED — 2026.06
           </span>
         </div>
@@ -587,7 +589,7 @@ function CtaNetworkSection() {
               <div className="h-full px-5 py-7 transition-colors duration-500 hover:bg-fern md:px-8 md:py-9">
                 <div className="flex items-baseline justify-between font-tech text-[10px] uppercase tracking-[0.2em] text-mint/70">
                   <span>{`NODE ${String(i + 1).padStart(2, "0")}`}</span>
-                  <span className="text-cream/40">{region.coords}</span>
+                  <span className="text-cream/60">{region.coords}</span>
                 </div>
                 <p className="mt-4 font-body text-xl font-semibold tracking-[-0.02em] text-cream">
                   {region.city}
@@ -617,7 +619,7 @@ function FooterSection() {
           <p className="mt-4 max-w-xs font-display text-lg font-light italic text-moss">
             Rooted in nature, refined by science.
           </p>
-          <p className="mt-6 font-tech text-[10px] uppercase leading-loose tracking-[0.22em] text-bark/40">
+          <p className="mt-6 font-tech text-[10px] uppercase leading-loose tracking-[0.22em] text-bark/60">
             ISO 9001 : 2015 / GMP / HACCP
             <br />
             EST. 1995 — NANJING, CHINA
@@ -625,7 +627,7 @@ function FooterSection() {
         </div>
         {FOOTER_COLS.map((col) => (
           <div key={col.head} className="md:col-span-2">
-            <p className="font-tech text-[10px] uppercase tracking-[0.28em] text-bark/40">
+            <p className="font-tech text-[10px] uppercase tracking-[0.28em] text-bark/60">
               {col.head}
             </p>
             <ul className="mt-5 space-y-3">
@@ -650,10 +652,10 @@ function FooterSection() {
       >
         FENCHEM
       </p>
-      <div className="flex flex-col gap-2 border-t border-pebble px-5 py-4 font-tech text-[10px] uppercase tracking-[0.22em] text-bark/40 md:flex-row md:items-center md:justify-between md:px-10">
+      <div className="flex flex-col gap-2 border-t border-pebble px-5 py-4 font-tech text-[10px] uppercase tracking-[0.22em] text-bark/60 md:flex-row md:items-center md:justify-between md:px-10">
         <span>© 2026 Fenchem — All Rights Reserved</span>
         <span>N 32.06 / E 118.79 — Nanjing</span>
-        <span className="text-moss/70">SYS.EOF // END OF SPEC</span>
+        <span className="text-moss">SYS.EOF // END OF SPEC</span>
       </div>
     </footer>
   );
@@ -670,17 +672,17 @@ export function VariantB() {
           <div className="mx-auto max-w-[1480px] border-pebble min-[1481px]:border-x">
             {/* Micro-label strip */}
             <div className="hidden items-center justify-between border-b border-pebble px-5 py-2 md:flex md:px-10">
-              <span className="flex items-center gap-2 font-tech text-[10px] uppercase tracking-[0.25em] text-bark/50">
+              <span className="flex items-center gap-2 font-tech text-[10px] uppercase tracking-[0.25em] text-bark/60">
                 <span className="relative flex size-1.5">
                   <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-moss/60 motion-reduce:animate-none" />
                   <span className="relative inline-flex size-1.5 rounded-full bg-moss" />
                 </span>
                 SYS.ACTIVE — INGREDIENT ENGINEERING
               </span>
-              <span className="font-tech text-[10px] uppercase tracking-[0.25em] text-bark/50">
+              <span className="font-tech text-[10px] uppercase tracking-[0.25em] text-bark/60">
                 N 32.06 / E 118.79 — NANJING HQ
               </span>
-              <span className="font-tech text-[10px] uppercase tracking-[0.25em] text-bark/50">
+              <span className="font-tech text-[10px] uppercase tracking-[0.25em] text-bark/60">
                 ISO 9001 : 2015 / GMP
               </span>
             </div>
@@ -693,7 +695,7 @@ export function VariantB() {
                 <span className="font-body text-xl font-bold tracking-[-0.04em] text-forest">
                   FENCHEM
                 </span>
-                <span className="hidden font-tech text-[9px] uppercase tracking-[0.3em] text-bark/40 sm:inline">
+                <span className="hidden font-tech text-[9px] uppercase tracking-[0.3em] text-bark/60 sm:inline">
                   Innovation Lab
                 </span>
               </button>
@@ -704,7 +706,7 @@ export function VariantB() {
                     href={link.href}
                     className="font-tech text-[11px] uppercase tracking-[0.22em] text-bark/60 transition-colors duration-300 hover:text-forest"
                   >
-                    <span className="mr-1.5 text-moss/70">{String(i + 1).padStart(2, "0")}</span>
+                    <span className="mr-1.5 text-moss">{String(i + 1).padStart(2, "0")}</span>
                     {link.label}
                   </a>
                 ))}

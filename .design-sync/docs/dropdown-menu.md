@@ -1,9 +1,11 @@
 ---
 category: Base UI
 ---
+
 Menu overlay — DropdownMenuTrigger + DropdownMenuContent with items, checkbox/radio items, labels, separators, shortcuts, and submenus.
 
 ## Usage
+
 ```tsx
 <DropdownMenu>
   <DropdownMenuTrigger render={<Button variant="outline">Regions</Button>} />

@@ -15,7 +15,11 @@ import { createServerFn } from "@tanstack/react-start";
 
 import { authClient } from "@/lib/auth-client";
 import { getToken } from "@/lib/auth-server";
-import { deploymentMode, AUTH_TOKEN_BUDGET_MS, AUTH_ROUNDTRIP_BUDGET_MS } from "@/lib/deployment-mode";
+import {
+  deploymentMode,
+  AUTH_TOKEN_BUDGET_MS,
+  AUTH_ROUNDTRIP_BUDGET_MS,
+} from "@/lib/deployment-mode";
 
 import Header from "../components/header";
 

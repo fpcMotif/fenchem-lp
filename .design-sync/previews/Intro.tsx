@@ -27,8 +27,8 @@ export const HeroHeadline = () => (
             marginTop: 16,
           }}
         >
-          Fenchem supplies clinically studied botanical actives to
-          formulators across nutrition, cosmetics, and food & beverage.
+          Fenchem supplies clinically studied botanical actives to formulators across nutrition,
+          cosmetics, and food & beverage.
         </p>
       </div>
     </Intro>
@@ -78,8 +78,8 @@ export const StaggeredHero = () => (
             marginTop: 12,
           }}
         >
-          Industrial-scale botanical ingredients backed by three decades of
-          research and a global regulatory footprint.
+          Industrial-scale botanical ingredients backed by three decades of research and a global
+          regulatory footprint.
         </p>
       </Intro>
     </div>

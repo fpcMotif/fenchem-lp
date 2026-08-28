@@ -1,0 +1,238 @@
+<!-- @dsCard group="landing-production" -->
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../../styles.css" />
+    <link rel="stylesheet" href="../../../_ds_bundle.css" />
+    <style>
+      /* Hand-authored note card (no bundle JS) — continuous-improvement log for
+       VariantH. Brand tokens come from the compiled css vars; every var()
+       carries a literal fallback so the card renders standalone too. */
+      body {
+        margin: 0;
+        background: var(--color-paper, #fff);
+        color: var(--color-ink, oklch(0.22 0 0));
+        font-family: var(--font-body, "Plus Jakarta Sans", system-ui, sans-serif);
+        padding: 28px;
+      }
+      .eyebrow {
+        font-family: var(--font-tech, "JetBrains Mono", monospace);
+        font-size: 11px;
+        letter-spacing: 0.32em;
+        text-transform: uppercase;
+        color: var(--color-brand-green-700, oklch(0.5 0.13 134.7));
+      }
+      h1 {
+        font-family: var(--font-display, Newsreader, serif);
+        font-size: 34px;
+        line-height: 1.05;
+        letter-spacing: -0.02em;
+        margin: 10px 0 0;
+        font-weight: 700;
+      }
+      .meta {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        margin-top: 14px;
+        flex-wrap: wrap;
+      }
+      .chip {
+        font-family: var(--font-tech, monospace);
+        font-size: 11px;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        padding: 4px 10px;
+        border-radius: 2px;
+      }
+      .chip.block {
+        background: var(--color-clay, oklch(0.392 0.115 22.782));
+        color: #fff;
+      }
+      .chip.count {
+        border: 1px solid var(--color-line, #d0d0d0);
+        color: var(--color-mute-600, oklch(0.5 0 0));
+      }
+      .high {
+        margin-top: 18px;
+        border-left: 3px solid var(--color-clay, oklch(0.392 0.115 22.782));
+        background: var(--color-blush, oklch(0.919 0.041 21.601));
+        padding: 14px 16px;
+        border-radius: 2px;
+      }
+      .high h2 {
+        font-size: 15px;
+        margin: 0 0 4px;
+        font-weight: 700;
+      }
+      .high p {
+        font-size: 13px;
+        line-height: 1.55;
+        margin: 0;
+        color: var(--color-mute-700, oklch(0.4 0 0));
+      }
+      .high code,
+      .row code {
+        font-family: var(--font-tech, monospace);
+        font-size: 11px;
+      }
+      .note {
+        font-size: 12px;
+        margin: 10px 0 0;
+        color: var(--color-mute-600, oklch(0.5 0 0));
+      }
+      .sect {
+        margin-top: 22px;
+      }
+      .sect h3 {
+        font-family: var(--font-tech, monospace);
+        font-size: 11px;
+        letter-spacing: 0.26em;
+        text-transform: uppercase;
+        color: var(--color-mute-600, oklch(0.5 0 0));
+        margin: 0 0 8px;
+        font-weight: 500;
+      }
+      .row {
+        display: flex;
+        gap: 10px;
+        align-items: baseline;
+        padding: 7px 0;
+        border-top: 1px solid var(--color-line, #d0d0d0);
+        font-size: 13px;
+        line-height: 1.5;
+      }
+      .row .sev {
+        flex: none;
+        font-family: var(--font-tech, monospace);
+        font-size: 10px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        padding: 2px 7px;
+        border-radius: 2px;
+      }
+      .sev.med {
+        background: var(--color-food, oklch(0.703 0.148 55.168));
+        color: #fff;
+      }
+      .sev.low {
+        border: 1px solid var(--color-line, #d0d0d0);
+        color: var(--color-mute-600, oklch(0.5 0 0));
+      }
+      .sev.done {
+        background: var(--color-brand-green-500, oklch(0.66 0.163 134.7));
+        color: var(--color-brand-green-950, oklch(0.26 0.065 134.7));
+      }
+      .keep {
+        margin-top: 22px;
+        border-left: 3px solid var(--color-brand-green-500, oklch(0.66 0.163 134.7));
+        background: var(--color-brand-green-50, oklch(0.97 0.03 134.7));
+        padding: 12px 16px;
+        border-radius: 2px;
+        font-size: 13px;
+        line-height: 1.6;
+        color: var(--color-brand-green-800, oklch(0.42 0.105 134.7));
+      }
+      footer {
+        margin-top: 24px;
+        font-family: var(--font-tech, monospace);
+        font-size: 11px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--color-mute-600, oklch(0.5 0 0));
+      }
+    </style>
+  </head>
+  <body>
+    <p class="eyebrow">Continuous Improvement — VariantH</p>
+    <h1>2026-08-28 interface review — work the list top-down</h1>
+    <div class="meta">
+      <span class="chip block">Verdict: Block</span>
+      <span class="chip count">3 High</span>
+      <span class="chip count">4 Medium</span>
+      <span class="chip count">2 Low</span>
+    </div>
+
+    <div class="high">
+      <h2>H1 — Submit discards the configured spec</h2>
+      <p>
+        All three inquiry CTAs fall back to a generic partnership mailto; the user's application /
+        delivery form / regulatory picks never travel. Serialize the selection into the mailto.
+        <code>variant-h.tsx:1177,928,938 · landing-content.ts:462</code>
+      </p>
+    </div>
+    <div class="high">
+      <h2>H2 — Hero image invisible on mobile</h2>
+      <p>
+        The image column collapses to 375×1&nbsp;px below <code>lg</code> (only absolute children,
+        no min-height). Add <code>min-h-72</code> like Origin/Standards.
+        <code>variant-h.tsx:508</code>
+      </p>
+    </div>
+    <div class="high">
+      <h2>H3 — Portfolio dropdown clips at tablet widths</h2>
+      <p>
+        640px menu sits at <code>left:−37px</code> at a 768px viewport; the first column is cut with
+        no way to reach it. Clamp: <code>w-[min(640px,calc(100vw-2rem))]</code>.
+        <code>variant-h.tsx:227</code>
+      </p>
+      <p class="note">
+        Elevated Medium → High per f (2026-08-28): primary nav surface of the recommended production
+        variant — release-blocking.
+      </p>
+    </div>
+
+    <div class="sect">
+      <h3>Medium — schedule next</h3>
+      <div class="row">
+        <span class="sev med">Med</span
+        ><span
+          >Hero alt describes leaves; photo is a soil scoop — fix alt or swap photo.
+          <code>:512</code></span
+        >
+      </div>
+      <div class="row">
+        <span class="sev med">Med</span><span>No skip-to-content link before the 6-stop nav.</span>
+      </div>
+      <div class="row">
+        <span class="sev med">Med</span
+        ><span
+          >Footer cert chips are static blue; blue is interactive-only here.
+          <code>:1450</code></span
+        >
+      </div>
+      <div class="row">
+        <span class="sev med">Med</span
+        ><span>CTA capitalization mixes title and sentence case — pick one.</span>
+      </div>
+    </div>
+
+    <div class="sect">
+      <h3>Low — polish backlog</h3>
+      <div class="row">
+        <span class="sev low">Low</span
+        ><span>320px nav CTA wraps to two lines flush to the edge. <code>:408</code></span>
+      </div>
+      <div class="row">
+        <span class="sev low">Low</span
+        ><span>MobileNav lacks PortfolioMenu's Escape/outside close. <code>:283</code></span>
+      </div>
+      <div class="row">
+        <span class="sev done">Done</span
+        ><span
+          >Resolved 2026-08-28: <code>transition-all</code> → named properties; press scale unified
+          at 0.96.</span
+        >
+      </div>
+    </div>
+
+    <div class="keep">
+      <strong>Keep:</strong> every contrast claim in the header comment verifies to the decimal;
+      keyboard, reduced-motion and heading structure all pass. Full detail:
+      <code>guidelines/docs/brand/variant-h-continuous-improvement.md</code>.
+    </div>
+
+    <footer>better-interface review · 2026-08-28 · re-run after the High rows land</footer>
+  </body>
+</html>

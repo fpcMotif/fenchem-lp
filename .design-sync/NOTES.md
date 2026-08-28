@@ -43,7 +43,7 @@ Repo-specific gotchas for re-syncs. Read before running the driver.
   `[FONT_REMOTE]` at validate is expected — do not chase. "Inter Variable" and
   "Cambria" in that warn come from shadcn/tailwind fallback stacks.
 
-## Capture harness (frozen clock) — why previews/_lib/capture-static.tsx exists
+## Capture harness (frozen clock) — why previews/\_lib/capture-static.tsx exists
 
 - `package-capture.mjs` freezes the page clock (`page.clock.setFixedTime`), so
   Motion animation loops starve: entrance content sticks at `opacity: 0`, and
@@ -106,6 +106,19 @@ Repo-specific gotchas for re-syncs. Read before running the driver.
 - Pre-authoring `[RENDER_BLANK]` on Button/Card/Checkbox/Input floor cards —
   resolved by authored previews; should not reappear.
 
+## 2026-08-28 polish pass (VariantH + editorial LandingPage)
+
+- VariantH source gained an interface-polish pass (explicit transition lists,
+  uniform 0.96 press scale, icon cross-fades, animated mobile menu, optical
+  Play centering, 44px hit extensions, 1px black/10 photo outlines) — its
+  uploaded card/capture is STALE; next driver run re-captures it.
+- New guideline doc `docs/brand/landing-polish-improvements.md` added to
+  `guidelinesGlob` and ALREADY pushed directly to the project (with
+  `guidelines/index.md` + `VariantH.prompt.md` updates) via incremental
+  DesignSync on 2026-08-28 — the next driver run will see it as unchanged.
+- `.design-sync/docs/variant-h.md` gained a matching continuous-improvement
+  section (kept in lockstep with the remote prompt.md).
+
 ## 2026-08 additions pending sync (VariantI / VariantJ / principles)
 
 - `entry.ts`, `config.json` (componentSrcMap / docsMap / overrides /
@@ -140,6 +153,23 @@ Repo-specific gotchas for re-syncs. Read before running the driver.
   a variant is redesigned or deleted (registry: `apps/web/src/components/prototype/variants.ts`).
 - Images inside variants hot-link external URLs (Unsplash etc.) — previews need
   network at render time; offline captures show broken art.
+
+## Out-of-band push: VariantH continuous-improvement note (2026-08-28)
+
+- A `better-interface` review of VariantH produced
+  `docs/brand/variant-h-continuous-improvement.md` (added to `guidelinesGlob`)
+  and a hand-authored note card `.design-sync/cards/ContinuousImprovement.html`.
+- Both were pushed directly via DesignSync (outside the driver):
+  remote `guidelines/docs/brand/variant-h-continuous-improvement.md`,
+  remote `components/landing-production/ContinuousImprovement/ContinuousImprovement.html`,
+  and `guidelines/index.md` gained a link line.
+- The card is static HTML (no `_preview/*.js`, no bundle JS) with a
+  first-line `@dsCard group="landing-production"` marker — the pane's
+  self-check indexes it on recompile. **Do not let a driver re-sync delete
+  it**: it has no converter-side source, so treat
+  `components/landing-production/ContinuousImprovement/**` as keep-list.
+- Same findings were mirrored to FigJam ("Fenchem LP — Continuous
+  Improvement" board) for the design side.
 
 ## VariantJ card state (2026-08, sync session)
 

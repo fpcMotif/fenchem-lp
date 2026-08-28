@@ -47,11 +47,10 @@ const HERO_META = [
   { k: "CERT", v: "ISO 9001 / GMP" },
 ] as const;
 
-
 const STATS = [
   {
     label: "[SYS.UPTIME]",
-    value: "25+",
+    value: "30+",
     unit: "years",
     desc: "Continuous ingredient engineering and refinement since 1995.",
   },
@@ -90,7 +89,7 @@ const DIVISION_STYLES: Record<
   },
   food: {
     bg: "bg-food",
-    text: "text-paper",
+    text: "text-ink",
     border: "border-food",
     label: "FOOD & BEV",
   },
@@ -102,13 +101,13 @@ const DIVISION_STYLES: Record<
   },
   chem: {
     bg: "bg-chem",
-    text: "text-paper",
+    text: "text-ink",
     border: "border-chem",
     label: "SPECIALTY CHEM",
   },
   agro: {
     bg: "bg-agro",
-    text: "text-paper",
+    text: "text-ink",
     border: "border-agro",
     label: "AGRO",
   },
@@ -119,7 +118,6 @@ const DIVISION_STYLES: Record<
     label: "FEED",
   },
 };
-
 
 const PROTOCOL_DETAIL = [
   {
@@ -159,7 +157,6 @@ const DOMAIN_DETAIL = [
     division: "cosmetics" as DivisionKey,
   },
 ] as const;
-
 
 const FOOTER_COLS = [
   {
@@ -230,10 +227,9 @@ function SectionHead({
   return (
     <div className="flex flex-col gap-8 border-b border-line px-5 py-14 md:flex-row md:items-end md:justify-between md:px-10 md:py-20">
       <Reveal>
-        <p className="font-tech text-[11px] uppercase tracking-[0.28em] text-mute-500">{code}</p>
+        <p className="font-tech text-[11px] uppercase tracking-[0.28em] text-mute-600">{code}</p>
         <h2 className="mt-5 font-body text-4xl font-black leading-[1.02] tracking-[-0.03em] text-ink md:text-5xl">
-          {title}{" "}
-          <span className="text-brand-green-500">{sub}</span>
+          {title} <span className="text-brand-green-600">{sub}</span>
         </h2>
       </Reveal>
       {right ? <Reveal delay={0.15}>{right}</Reveal> : null}
@@ -260,12 +256,10 @@ function ProtocolFigure() {
         loading="lazy"
       />
       <div className="absolute inset-x-0 bottom-0 flex items-center justify-between border-t border-line bg-paper/90 px-4 py-2.5 backdrop-blur-sm">
-        <span className="font-tech text-[10px] uppercase tracking-[0.22em] text-mute-500">
+        <span className="font-tech text-[10px] uppercase tracking-[0.22em] text-mute-600">
           FIG. 02 — ANALYTICAL LAB, NANJING
         </span>
-        <span className="font-tech text-[10px] tracking-[0.22em] text-brand-green-500">
-          HPLC-7
-        </span>
+        <span className="font-tech text-[10px] tracking-[0.22em] text-brand-green-700">HPLC-7</span>
       </div>
     </div>
   );
@@ -278,13 +272,9 @@ function HeroSection() {
       {/* Grid lines */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,oklch(0.858_0_0_/_0.4)_1px,transparent_1px),linear-gradient(to_bottom,oklch(0.858_0_0_/_0.4)_1px,transparent_1px)] bg-[size:56px_56px]"
+        className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,oklch(from_var(--color-line)_l_c_h_/_0.4)_1px,transparent_1px),linear-gradient(to_bottom,oklch(from_var(--color-line)_l_c_h_/_0.4)_1px,transparent_1px)] bg-[size:56px_56px]"
       />
-      <Plus
-        aria-hidden
-        strokeWidth={1}
-        className="absolute left-4 top-4 size-4 text-mute-300"
-      />
+      <Plus aria-hidden strokeWidth={1} className="absolute left-4 top-4 size-4 text-mute-300" />
       <Plus
         aria-hidden
         strokeWidth={1}
@@ -299,7 +289,7 @@ function HeroSection() {
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-green-500/50 motion-reduce:animate-none" />
                 <span className="relative inline-flex size-2 rounded-full bg-brand-green-500" />
               </span>
-              <span className="font-tech text-[10px] uppercase tracking-[0.3em] text-mute-500">
+              <span className="font-tech text-[10px] uppercase tracking-[0.3em] text-mute-600">
                 SYS.ACTIVE — Botanical Intelligence Since 1995
               </span>
             </span>
@@ -307,9 +297,7 @@ function HeroSection() {
           <Reveal delay={0.1}>
             <h1 className="mt-10 font-body text-[clamp(2.7rem,6.4vw,6rem)] font-black leading-[0.98] tracking-[-0.04em] text-ink">
               Nurturing Vitality through{" "}
-              <span className="text-brand-green-500">
-                Botanical Excellence
-              </span>
+              <span className="text-brand-green-600">Botanical Excellence</span>
             </h1>
           </Reveal>
           <Reveal delay={0.2}>
@@ -322,7 +310,7 @@ function HeroSection() {
           <Reveal delay={0.3} className="mt-10 flex flex-wrap gap-3 md:gap-4">
             <a
               href="#matrix"
-              className="group inline-flex min-h-11 items-center gap-3 bg-brand-green-500 px-7 py-4 font-tech text-[11px] uppercase tracking-[0.22em] text-paper transition-colors duration-300 hover:bg-brand-green-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-green-500"
+              className="group inline-flex min-h-11 items-center gap-3 bg-brand-green-500 px-7 py-4 font-tech text-[11px] uppercase tracking-[0.22em] text-brand-green-950 transition-colors duration-300 hover:bg-brand-green-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-green-500"
             >
               Explore Portfolio
               <ArrowRight
@@ -346,11 +334,8 @@ function HeroSection() {
           <Reveal delay={0.25} className="flex h-full flex-col">
             <dl className="divide-y divide-line border-b border-line">
               {HERO_META.map((row) => (
-                <div
-                  key={row.k}
-                  className="flex items-baseline justify-between px-5 py-4 md:px-8"
-                >
-                  <dt className="font-tech text-[10px] uppercase tracking-[0.22em] text-mute-400">
+                <div key={row.k} className="flex items-baseline justify-between px-5 py-4 md:px-8">
+                  <dt className="font-tech text-[10px] uppercase tracking-[0.22em] text-mute-600">
                     {row.k}
                   </dt>
                   <dd className="font-tech text-[11px] uppercase tracking-[0.18em] text-ink">
@@ -359,10 +344,10 @@ function HeroSection() {
                 </div>
               ))}
               <div className="flex items-baseline justify-between px-5 py-4 md:px-8">
-                <dt className="font-tech text-[10px] uppercase tracking-[0.22em] text-mute-400">
+                <dt className="font-tech text-[10px] uppercase tracking-[0.22em] text-mute-600">
                   STATUS
                 </dt>
-                <dd className="flex items-center gap-2 font-tech text-[11px] uppercase tracking-[0.18em] text-brand-green-600">
+                <dd className="flex items-center gap-2 font-tech text-[11px] uppercase tracking-[0.18em] text-brand-green-700">
                   <span className="size-1.5 rounded-full bg-brand-green-500" aria-hidden />
                   OPERATIONAL
                 </dd>
@@ -372,14 +357,14 @@ function HeroSection() {
               <img
                 src={IMG.glassware}
                 alt="Laboratory glassware during botanical extraction work at Fenchem"
-                className="absolute inset-0 h-full w-full object-cover grayscale transition-all duration-700 ease-out group-hover:scale-[1.03] group-hover:grayscale-0"
+                className="absolute inset-0 h-full w-full object-cover grayscale transition-[scale,filter] duration-700 ease-out group-hover:scale-[1.03] group-hover:grayscale-0"
                 loading="lazy"
               />
               <div className="absolute inset-x-0 bottom-0 flex items-center justify-between border-t border-line bg-paper/90 px-4 py-2.5 backdrop-blur-sm">
-                <span className="font-tech text-[10px] uppercase tracking-[0.22em] text-mute-500">
+                <span className="font-tech text-[10px] uppercase tracking-[0.22em] text-mute-600">
                   FIG. 01 — EXTRACTION LAB
                 </span>
-                <span className="font-tech text-[10px] tracking-[0.22em] text-brand-green-500">
+                <span className="font-tech text-[10px] tracking-[0.22em] text-brand-green-700">
                   BATCH 2026.06
                 </span>
               </div>
@@ -404,14 +389,11 @@ function TickerSection() {
             {ingredients.map((ingredient, i) => (
               <li key={ingredient.name} className="flex items-center gap-8 pr-8 md:gap-12 md:pr-12">
                 <span className="whitespace-nowrap font-tech text-[11px] uppercase tracking-[0.3em] text-mute-600 md:text-xs">
-                  <span className="text-brand-green-500">{String(i + 1).padStart(2, "0")}</span>
+                  <span className="text-brand-green-700">{String(i + 1).padStart(2, "0")}</span>
                   {" — "}
                   {ingredient.name}
                 </span>
-                <span
-                  aria-hidden
-                  className="size-1.5 rotate-45 bg-brand-green-400"
-                />
+                <span aria-hidden className="size-1.5 rotate-45 bg-brand-green-400" />
               </li>
             ))}
           </ul>
@@ -431,14 +413,14 @@ function StatBand() {
       {STATS.map((s, i) => (
         <Reveal key={s.label} delay={i * 0.08} className="bg-paper">
           <div className="h-full px-5 py-9 transition-colors duration-500 hover:bg-brand-green-50 md:px-8 md:py-12">
-            <p className="font-tech text-[10px] uppercase tracking-[0.28em] text-mute-400">
+            <p className="font-tech text-[10px] uppercase tracking-[0.28em] text-mute-600">
               {s.label}
             </p>
             <div className="mt-5 flex flex-wrap items-baseline gap-x-2.5">
-              <span className="font-body text-4xl font-black tracking-[-0.04em] text-brand-green-500 md:text-6xl">
+              <span className="font-body text-4xl font-black tracking-[-0.04em] text-brand-green-600 md:text-6xl">
                 {s.value}
               </span>
-              <span className="font-body text-lg font-medium text-mute-500 md:text-2xl">
+              <span className="font-body text-lg font-medium text-mute-600 md:text-2xl">
                 {s.unit}
               </span>
             </div>
@@ -461,7 +443,7 @@ function MatrixSection() {
         right={
           <a
             href="#contact"
-            className="group inline-flex min-h-11 items-center gap-2.5 border border-line px-5 py-3 font-tech text-[10px] uppercase tracking-[0.26em] text-mute-600 transition-colors duration-300 hover:border-brand-green-500 hover:text-brand-green-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-green-500"
+            className="group inline-flex min-h-11 items-center gap-2.5 border border-line px-5 py-3 font-tech text-[10px] uppercase tracking-[0.26em] text-mute-600 transition-colors duration-300 hover:border-brand-green-500 hover:text-brand-green-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-green-500"
           >
             View Full Specs
             <ArrowRight
@@ -483,7 +465,7 @@ function MatrixSection() {
                   <img
                     src={item.image.src}
                     alt={item.image.alt}
-                    className="h-full w-full object-cover grayscale transition-all duration-700 ease-out group-hover:scale-[1.04] group-hover:grayscale-0"
+                    className="h-full w-full object-cover grayscale transition-[scale,filter] duration-700 ease-out group-hover:scale-[1.04] group-hover:grayscale-0"
                     loading="lazy"
                   />
                   {/* Division tag overlay */}
@@ -496,10 +478,10 @@ function MatrixSection() {
                 </div>
                 <div className="px-5 py-7 md:px-7 md:py-8">
                   <div className="flex items-baseline justify-between">
-                    <span className="font-tech text-[11px] tracking-[0.22em] text-brand-green-500">
+                    <span className="font-tech text-[11px] tracking-[0.22em] text-brand-green-700">
                       {String(i + 1).padStart(2, "0")} —
                     </span>
-                    <span className="font-tech text-[10px] uppercase tracking-[0.22em] text-mute-400">
+                    <span className="font-tech text-[10px] uppercase tracking-[0.22em] text-mute-600">
                       {item.code}
                     </span>
                   </div>
@@ -512,7 +494,7 @@ function MatrixSection() {
                   </div>
                   <dl className="mt-5 space-y-2.5 border-t border-line pt-4">
                     <div className="flex items-baseline justify-between gap-4">
-                      <dt className="font-tech text-[10px] uppercase tracking-[0.2em] text-mute-400">
+                      <dt className="font-tech text-[10px] uppercase tracking-[0.2em] text-mute-600">
                         Purity
                       </dt>
                       <dd className="text-right font-tech text-[11px] text-mute-600">
@@ -520,7 +502,7 @@ function MatrixSection() {
                       </dd>
                     </div>
                     <div className="flex items-baseline justify-between gap-4">
-                      <dt className="font-tech text-[10px] uppercase tracking-[0.2em] text-mute-400">
+                      <dt className="font-tech text-[10px] uppercase tracking-[0.2em] text-mute-600">
                         Form
                       </dt>
                       <dd className="text-right font-tech text-[11px] text-mute-600">
@@ -528,7 +510,7 @@ function MatrixSection() {
                       </dd>
                     </div>
                     <div className="flex items-baseline justify-between gap-4">
-                      <dt className="font-tech text-[10px] uppercase tracking-[0.2em] text-mute-400">
+                      <dt className="font-tech text-[10px] uppercase tracking-[0.2em] text-mute-600">
                         Application
                       </dt>
                       <dd className="text-right font-tech text-[11px] text-mute-600">
@@ -538,7 +520,7 @@ function MatrixSection() {
                   </dl>
                   <a
                     href="#contact"
-                    className="group/spec mt-6 inline-flex min-h-11 items-center gap-2 font-tech text-[10px] uppercase tracking-[0.24em] text-mute-500 transition-colors duration-300 hover:text-brand-green-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-green-500"
+                    className="group/spec mt-6 inline-flex min-h-11 items-center gap-2 font-tech text-[10px] uppercase tracking-[0.24em] text-mute-600 transition-colors duration-300 hover:text-brand-green-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-green-500"
                   >
                     Request Spec
                     <ArrowUpRight
@@ -565,7 +547,7 @@ function ProtocolSection() {
         title="Operating"
         sub="protocol."
         right={
-          <p className="max-w-xs font-tech text-[10px] uppercase leading-relaxed tracking-[0.2em] text-mute-400">
+          <p className="max-w-xs font-tech text-[10px] uppercase leading-relaxed tracking-[0.2em] text-mute-600">
             Rooted in nature, refined by science — every lot, every market, every release.
           </p>
         }
@@ -586,7 +568,7 @@ function ProtocolSection() {
                 className={i < pillars.length - 1 ? "border-b border-line" : ""}
               >
                 <div className="grid gap-4 px-5 py-10 transition-colors duration-500 hover:bg-brand-green-50 md:grid-cols-12 md:gap-6 md:px-10 md:py-12">
-                  <span className="font-tech text-sm tracking-[0.22em] text-brand-green-500 md:col-span-2">
+                  <span className="font-tech text-sm tracking-[0.22em] text-brand-green-700 md:col-span-2">
                     {detail.step} —
                   </span>
                   <div className="md:col-span-10">
@@ -594,7 +576,7 @@ function ProtocolSection() {
                       <h3 className="font-body text-2xl font-bold tracking-[-0.02em] text-ink md:text-3xl">
                         {pillar.title}
                       </h3>
-                      <span className="font-tech text-[10px] uppercase tracking-[0.22em] text-mute-400">
+                      <span className="font-tech text-[10px] uppercase tracking-[0.22em] text-mute-600">
                         {detail.tag}
                       </span>
                     </div>
@@ -638,11 +620,11 @@ function DomainsSection() {
                 <div className="md:col-span-2">
                   <div className="flex items-center gap-2">
                     <DivisionDot division={detail.division} />
-                    <p className="font-tech text-[11px] tracking-[0.22em] text-brand-green-500">
+                    <p className="font-tech text-[11px] tracking-[0.22em] text-brand-green-700">
                       {detail.code}
                     </p>
                   </div>
-                  <p className="mt-1 font-tech text-[10px] uppercase tracking-[0.22em] text-mute-400">
+                  <p className="mt-1 font-tech text-[10px] uppercase tracking-[0.22em] text-mute-600">
                     {detail.cat}
                   </p>
                 </div>
@@ -656,7 +638,7 @@ function DomainsSection() {
                 </p>
                 <div className="flex md:col-span-1 md:justify-end">
                   <ArrowUpRight
-                    className={`size-6 text-mute-300 transition-all duration-300 group-hover:-translate-y-1 group-hover:translate-x-1 group-hover:text-brand-green-500 motion-reduce:transition-none`}
+                    className={`size-6 text-mute-300 transition-[translate,color] duration-300 group-hover:-translate-y-1 group-hover:translate-x-1 group-hover:text-brand-green-500 motion-reduce:transition-none`}
                     aria-hidden
                   />
                 </div>
@@ -695,7 +677,7 @@ function CtaNetworkSection() {
         <Reveal delay={0.15} className="mt-10 flex flex-wrap gap-3 md:gap-4">
           <a
             href="mailto:sales@fenchem.com"
-            className="group inline-flex min-h-11 items-center gap-3 bg-brand-green-500 px-7 py-4 font-tech text-[11px] uppercase tracking-[0.22em] text-paper transition-colors duration-300 hover:bg-brand-green-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-green-300"
+            className="group inline-flex min-h-11 items-center gap-3 bg-brand-green-500 px-7 py-4 font-tech text-[11px] uppercase tracking-[0.22em] text-brand-green-950 transition-colors duration-300 hover:bg-brand-green-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-green-300"
           >
             Partner with Fenchem
             <ArrowRight
@@ -711,7 +693,7 @@ function CtaNetworkSection() {
           </a>
         </Reveal>
         <Reveal delay={0.25}>
-          <p className="mt-10 font-tech text-[10px] uppercase tracking-[0.28em] text-paper/40">
+          <p className="mt-10 font-tech text-[10px] uppercase tracking-[0.28em] text-paper/65">
             RESPONSE.TIME &lt; 24H — TECHNICAL DOSSIERS ON REQUEST
           </p>
         </Reveal>
@@ -721,7 +703,7 @@ function CtaNetworkSection() {
           <span className="font-tech text-[10px] uppercase tracking-[0.26em] text-brand-green-300">
             SYS.NET // 6 ACTIVE NODES
           </span>
-          <span className="hidden font-tech text-[10px] uppercase tracking-[0.26em] text-paper/40 md:block">
+          <span className="hidden font-tech text-[10px] uppercase tracking-[0.26em] text-paper/65 md:block">
             LAT/LONG VERIFIED — 2026.06
           </span>
         </div>
@@ -729,14 +711,14 @@ function CtaNetworkSection() {
           {regions.map((region, i) => (
             <Reveal key={region.city} delay={(i % 3) * 0.08} className="bg-brand-blue-700">
               <div className="h-full px-5 py-7 transition-colors duration-500 hover:bg-brand-blue-800 md:px-8 md:py-9">
-                <div className="flex items-baseline justify-between font-tech text-[10px] uppercase tracking-[0.2em] text-brand-green-400">
+                <div className="flex items-baseline justify-between font-tech text-[10px] uppercase tracking-[0.2em] text-brand-green-300">
                   <span>{`NODE ${String(i + 1).padStart(2, "0")}`}</span>
-                  <span className="text-paper/40">{region.coords}</span>
+                  <span className="text-paper/65">{region.coords}</span>
                 </div>
                 <p className="mt-4 font-body text-xl font-bold tracking-[-0.02em] text-paper">
                   {region.city}
                 </p>
-                <p className="mt-1 text-sm text-paper/60 font-body">{region.role}</p>
+                <p className="mt-1 text-sm text-paper/70 font-body">{region.role}</p>
               </div>
             </Reveal>
           ))}
@@ -758,10 +740,10 @@ function FooterSection() {
           >
             FENCHEM
           </a>
-          <p className="mt-4 max-w-xs font-body text-lg font-medium text-mute-500">
+          <p className="mt-4 max-w-xs font-body text-lg font-medium text-mute-600">
             Rooted in nature, refined by science.
           </p>
-          <p className="mt-6 font-tech text-[10px] uppercase leading-loose tracking-[0.22em] text-mute-400">
+          <p className="mt-6 font-tech text-[10px] uppercase leading-loose tracking-[0.22em] text-mute-600">
             ISO 9001 : 2015 / GMP / HACCP
             <br />
             EST. 1995 — NANJING, CHINA
@@ -769,7 +751,7 @@ function FooterSection() {
         </div>
         {FOOTER_COLS.map((col) => (
           <div key={col.head} className="md:col-span-2">
-            <p className="font-tech text-[10px] uppercase tracking-[0.28em] text-mute-400">
+            <p className="font-tech text-[10px] uppercase tracking-[0.28em] text-mute-600">
               {col.head}
             </p>
             <ul className="mt-5 space-y-3">
@@ -777,7 +759,7 @@ function FooterSection() {
                 <li key={link.label}>
                   <a
                     href={link.href}
-                    className="text-sm text-mute-600 underline decoration-line underline-offset-4 transition-colors duration-300 hover:text-brand-green-600 hover:decoration-brand-green-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-green-500"
+                    className="text-sm text-mute-600 underline decoration-line underline-offset-4 transition-colors duration-300 hover:text-brand-green-700 hover:decoration-brand-green-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-green-500"
                   >
                     {link.label}
                   </a>
@@ -794,10 +776,10 @@ function FooterSection() {
       >
         FENCHEM
       </p>
-      <div className="flex flex-col gap-2 border-t border-line px-5 py-4 font-tech text-[10px] uppercase tracking-[0.22em] text-mute-400 md:flex-row md:items-center md:justify-between md:px-10">
+      <div className="flex flex-col gap-2 border-t border-line px-5 py-4 font-tech text-[10px] uppercase tracking-[0.22em] text-mute-600 md:flex-row md:items-center md:justify-between md:px-10">
         <span>© 2026 Fenchem — All Rights Reserved</span>
         <span>N 32.06 / E 118.79 — Nanjing</span>
-        <span className="text-brand-green-500/70">SYS.EOF // END OF SPEC</span>
+        <span className="text-brand-green-700">SYS.EOF // END OF SPEC</span>
       </div>
     </footer>
   );
@@ -809,88 +791,91 @@ export function VariantE() {
 
   return (
     <LazyMotion features={domAnimation} strict>
-    <div className="bg-paper font-body text-ink antialiased selection:bg-brand-green-100 selection:text-brand-green-800">
-      {/* ===== Sticky top bar ===== */}
-      <header className="sticky top-0 z-50 border-b border-line bg-paper/90 backdrop-blur-md">
-        <div className="mx-auto max-w-[1480px] border-line min-[1481px]:border-x">
-          {/* Micro-label strip */}
-          <div className="hidden items-center justify-between border-b border-line bg-mute-50 px-5 py-2 md:flex md:px-10">
-            <span className="flex items-center gap-2 font-tech text-[10px] uppercase tracking-[0.25em] text-mute-500">
-              <span className="relative flex size-1.5">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-green-500/60 motion-reduce:animate-none" />
-                <span className="relative inline-flex size-1.5 rounded-full bg-brand-green-500" />
+      <div className="bg-paper font-body text-ink antialiased selection:bg-brand-green-100 selection:text-brand-green-800">
+        {/* ===== Sticky top bar ===== */}
+        <header className="sticky top-0 z-50 border-b border-line bg-paper/90 backdrop-blur-md">
+          <div className="mx-auto max-w-[1480px] border-line min-[1481px]:border-x">
+            {/* Micro-label strip */}
+            <div className="hidden items-center justify-between border-b border-line bg-mute-50 px-5 py-2 md:flex md:px-10">
+              <span className="flex items-center gap-2 font-tech text-[10px] uppercase tracking-[0.25em] text-mute-600">
+                <span className="relative flex size-1.5">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-green-500/60 motion-reduce:animate-none" />
+                  <span className="relative inline-flex size-1.5 rounded-full bg-brand-green-500" />
+                </span>
+                SYS.ACTIVE — INGREDIENT ENGINEERING
               </span>
-              SYS.ACTIVE — INGREDIENT ENGINEERING
-            </span>
-            <span className="font-tech text-[10px] uppercase tracking-[0.25em] text-mute-500">
-              N 32.06 / E 118.79 — NANJING HQ
-            </span>
-            <span className="font-tech text-[10px] uppercase tracking-[0.25em] text-mute-500">
-              ISO 9001 : 2015 / GMP
-            </span>
-          </div>
-          {/* Nav row */}
-          <nav aria-label="Main navigation" className="flex items-center justify-between px-5 py-4 md:px-10">
-            <a
-              href="/"
-              className="flex items-baseline gap-3 transition-opacity duration-300 hover:opacity-70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-green-500"
-            >
-              <span className="font-body text-xl font-black tracking-[-0.04em] text-brand-green-600">
-                FENCHEM
+              <span className="font-tech text-[10px] uppercase tracking-[0.25em] text-mute-600">
+                N 32.06 / E 118.79 — NANJING HQ
               </span>
-              <span className="hidden font-tech text-[9px] uppercase tracking-[0.3em] text-mute-400 sm:inline">
-                Innovation Lab
+              <span className="font-tech text-[10px] uppercase tracking-[0.25em] text-mute-600">
+                ISO 9001 : 2015 / GMP
               </span>
-            </a>
-            <div className="hidden items-center gap-8 md:flex">
-              {NAV_LINKS.map((link, i) => (
-                <a
-                  key={link.href}
-                  href={link.href}
-                  className="font-tech text-[11px] uppercase tracking-[0.22em] text-mute-500 transition-colors duration-300 hover:text-brand-green-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-green-500"
-                >
-                  <span className="mr-1.5 text-brand-green-400/70">
-                    {String(i + 1).padStart(2, "0")}
-                  </span>
-                  {link.label}
-                </a>
-              ))}
             </div>
-            <a
-              href="#contact"
-              className="group inline-flex min-h-11 items-center gap-2.5 bg-brand-blue-700 px-5 py-2.5 font-tech text-[10px] uppercase tracking-[0.22em] text-paper transition-colors duration-300 hover:bg-brand-blue-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-blue-700"
+            {/* Nav row */}
+            <nav
+              aria-label="Main navigation"
+              className="flex items-center justify-between px-5 py-4 md:px-10"
             >
-              Request a Specification
-              <ArrowRight
-                className="size-3 transition-transform duration-300 group-hover:translate-x-1 motion-reduce:transition-none"
-                aria-hidden
-              />
-            </a>
-          </nav>
+              <a
+                href="/"
+                className="flex items-baseline gap-3 transition-opacity duration-300 hover:opacity-70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-green-500"
+              >
+                <span className="font-body text-xl font-black tracking-[-0.04em] text-brand-green-600">
+                  FENCHEM
+                </span>
+                <span className="hidden font-tech text-[9px] uppercase tracking-[0.3em] text-mute-600 sm:inline">
+                  Innovation Lab
+                </span>
+              </a>
+              <div className="hidden items-center gap-8 md:flex">
+                {NAV_LINKS.map((link, i) => (
+                  <a
+                    key={link.href}
+                    href={link.href}
+                    className="font-tech text-[11px] uppercase tracking-[0.22em] text-mute-600 transition-colors duration-300 hover:text-brand-green-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-green-500"
+                  >
+                    <span className="mr-1.5 text-brand-green-700">
+                      {String(i + 1).padStart(2, "0")}
+                    </span>
+                    {link.label}
+                  </a>
+                ))}
+              </div>
+              <a
+                href="#contact"
+                className="group inline-flex min-h-11 items-center gap-2.5 bg-brand-blue-700 px-5 py-2.5 font-tech text-[10px] uppercase tracking-[0.22em] text-paper transition-colors duration-300 hover:bg-brand-blue-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-blue-700"
+              >
+                Request a Specification
+                <ArrowRight
+                  className="size-3 transition-transform duration-300 group-hover:translate-x-1 motion-reduce:transition-none"
+                  aria-hidden
+                />
+              </a>
+            </nav>
+          </div>
+          {/* Scroll progress hairline — brand green */}
+          <m.div
+            aria-hidden
+            className="absolute inset-x-0 bottom-0 h-0.5 origin-left bg-brand-green-500"
+            style={{ scaleX: reduce ? 0 : scrollYProgress }}
+          />
+        </header>
+
+        {/* ===== Framed spec-sheet ===== */}
+        <div className="mx-auto max-w-[1480px] border-line min-[1481px]:border-x">
+          <main>
+            <HeroSection />
+            <TickerSection />
+            <StatBand />
+            <MatrixSection />
+            <ProtocolSection />
+            <DomainsSection />
+            <CtaNetworkSection />
+          </main>
+
+          <FooterSection />
         </div>
-        {/* Scroll progress hairline — brand green */}
-        <m.div
-          aria-hidden
-          className="absolute inset-x-0 bottom-0 h-0.5 origin-left bg-brand-green-500"
-          style={{ scaleX: reduce ? 0 : scrollYProgress }}
-        />
-      </header>
-
-      {/* ===== Framed spec-sheet ===== */}
-      <div className="mx-auto max-w-[1480px] border-line min-[1481px]:border-x">
-        <main>
-          <HeroSection />
-          <TickerSection />
-          <StatBand />
-          <MatrixSection />
-          <ProtocolSection />
-          <DomainsSection />
-          <CtaNetworkSection />
-        </main>
-
-        <FooterSection />
       </div>
-    </div>
     </LazyMotion>
   );
 }

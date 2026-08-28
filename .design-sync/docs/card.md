@@ -1,9 +1,11 @@
 ---
 category: Base UI
 ---
+
 Content container — composes CardHeader, CardTitle, CardDescription, CardAction, CardContent, CardFooter.
 
 ## Usage
+
 ```tsx
 <Card>
   <CardHeader>

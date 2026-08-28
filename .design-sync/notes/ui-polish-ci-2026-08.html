@@ -1,0 +1,205 @@
+<!-- @dsCard group="Notes" -->
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Continuous Improvement — UI Polish (2026-08-28)</title>
+    <style>
+      :root {
+        --paper: #ffffff;
+        --ink: #232323;
+        --line: #d0d0d0;
+        --mute: #6f6f6f;
+        --green-500: #64a733;
+        --green-700: #3f7020;
+        --green-50: #f3f9ec;
+        --high: #b42318;
+        --high-bg: #fef3f2;
+        --high-line: #f4b8b2;
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+      }
+      body {
+        background: var(--paper);
+        color: var(--ink);
+        font-family: "Plus Jakarta Sans", "Segoe UI", system-ui, sans-serif;
+        padding: 28px;
+        line-height: 1.5;
+      }
+      .eyebrow {
+        font-family: "JetBrains Mono", ui-monospace, monospace;
+        font-size: 11px;
+        letter-spacing: 0.26em;
+        text-transform: uppercase;
+        color: var(--green-700);
+      }
+      h1 {
+        margin-top: 10px;
+        font-size: 26px;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+      }
+      .meta {
+        margin-top: 4px;
+        font-family: "JetBrains Mono", ui-monospace, monospace;
+        font-size: 11px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--mute);
+      }
+      .high {
+        margin-top: 20px;
+        border: 1px solid var(--high-line);
+        border-left: 4px solid var(--high);
+        background: var(--high-bg);
+        border-radius: 4px;
+        padding: 16px 18px;
+      }
+      .chip {
+        display: inline-block;
+        font-family: "JetBrains Mono", ui-monospace, monospace;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: #fff;
+        background: var(--high);
+        border-radius: 999px;
+        padding: 3px 12px;
+      }
+      .high h2 {
+        margin-top: 10px;
+        font-size: 16px;
+        font-weight: 700;
+      }
+      .high p {
+        margin-top: 6px;
+        font-size: 13.5px;
+        color: #5a2521;
+      }
+      .high code,
+      .rows code {
+        font-family: "JetBrains Mono", ui-monospace, monospace;
+        font-size: 12px;
+        background: rgba(0 0 0 / 0.05);
+        border-radius: 3px;
+        padding: 1px 5px;
+      }
+      .elevated {
+        margin-top: 10px;
+        font-family: "JetBrains Mono", ui-monospace, monospace;
+        font-size: 10.5px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--high);
+      }
+      .rows {
+        margin-top: 20px;
+        border-top: 1px solid var(--line);
+      }
+      .row {
+        display: flex;
+        gap: 14px;
+        align-items: baseline;
+        padding: 11px 2px;
+        border-bottom: 1px solid var(--line);
+        font-size: 13.5px;
+      }
+      .sev {
+        flex: 0 0 72px;
+        font-family: "JetBrains Mono", ui-monospace, monospace;
+        font-size: 10.5px;
+        font-weight: 600;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+      }
+      .sev.med {
+        color: #b54708;
+      }
+      .sev.low {
+        color: var(--mute);
+      }
+      .foot {
+        margin-top: 18px;
+        padding: 12px 14px;
+        background: var(--green-50);
+        border: 1px solid #d8e9c6;
+        border-radius: 4px;
+        font-size: 12.5px;
+        color: var(--green-700);
+      }
+      .foot code {
+        background: rgba(0 0 0 / 0.06);
+      }
+    </style>
+  </head>
+  <body>
+    <p class="eyebrow">Continuous Improvement — Landing UI Polish</p>
+    <h1>better-ui review · Variants H &amp; I</h1>
+    <p class="meta">
+      2026-08-28 · browser-verified · source: docs/brand/landing-ui-polish-ci-notes.md
+    </p>
+
+    <div class="high">
+      <span class="chip">High</span>
+      <h2>Portfolio dropdown clips off-viewport at tablet widths</h2>
+      <p>
+        Measured at 800×900: the 640px menu's left edge sits at <strong>−34px</strong> — the first
+        column's division dot and label starts are unreachable. <code>variant-h.tsx:227</code> ·
+        fix: <code>w-[min(640px,calc(100vw-2rem))]</code>
+        or edge-aware positioning; re-measure at 768 / 800 / 900px.
+      </p>
+      <p class="elevated">
+        Severity elevated medium → high per f — release-blocking for the recommended variant.
+      </p>
+    </div>
+
+    <div class="rows">
+      <div class="row">
+        <span class="sev med">Medium</span
+        ><span
+          ><code>transition-all</code> on Variant I CTAs, map pins, arrows — name the exact
+          properties (H's fixed pattern).</span
+        >
+      </div>
+      <div class="row">
+        <span class="sev med">Medium</span
+        ><span
+          >Press scale <code>0.98</code> / missing on Variant I; must be exactly <code>0.96</code>,
+          with its own 150ms ease-out (H currently rides 300ms).</span
+        >
+      </div>
+      <div class="row">
+        <span class="sev med">Medium</span
+        ><span
+          >Active map route snaps on region change — cross-fade via <code>AnimatePresence</code>,
+          spring 0.3 / bounce 0.</span
+        >
+      </div>
+      <div class="row">
+        <span class="sev med">Medium</span
+        ><span
+          >Variant I division photos missing the 1px pure-black/10 image outline H applies
+          everywhere.</span
+        >
+      </div>
+      <div class="row">
+        <span class="sev low">Low</span
+        ><span
+          >Icon stroke vs text weight mismatched both directions; Variant I lacks SmoothScroll +
+          reduce-gating on the progress hairline; link hovers above the 150ms color floor.</span
+        >
+      </div>
+    </div>
+
+    <p class="foot">
+      Variant H received most fixes mid-review (press 0.96, named transitions, icon cross-fades,
+      image outlines). Variant I still needs the full pass — the fastest path is mirroring H. Full
+      tables, line refs and verification notes live in
+      <code>guidelines/docs/brand/landing-ui-polish-ci-notes.md</code>.
+    </p>
+  </body>
+</html>

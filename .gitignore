@@ -57,3 +57,17 @@ temp
 
 # Personal learning workspace (/teach skill) — not product code
 /learn-landing-design/
+.ds-sync/
+ds-bundle/
+.design-sync/.cache/
+.design-sync/learnings/
+.design-sync/node_modules
+
+# Agent & IDE tool states
+/.agent/
+/.agents/
+/.claude/
+/.crush/
+/.factory/
+/.windsurf/
+/.vite-hooks/

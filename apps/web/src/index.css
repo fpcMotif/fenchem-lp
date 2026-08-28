@@ -29,9 +29,9 @@
    * ============================================================ */
 
   /* Brand Blue — #0743AE anchored at -700 */
-  --color-brand-blue-50: oklch(0.97 0.02 261.5);
-  --color-brand-blue-100: oklch(0.93 0.04 261.5);
-  --color-brand-blue-200: oklch(0.87 0.07 261.5);
+  --color-brand-blue-50: oklch(0.97 0.014 261.5);
+  --color-brand-blue-100: oklch(0.93 0.033 261.5);
+  --color-brand-blue-200: oklch(0.87 0.063 261.5);
   --color-brand-blue-300: oklch(0.78 0.11 261.5);
   --color-brand-blue-400: oklch(0.66 0.15 261.5);
   --color-brand-blue-500: oklch(0.55 0.19 261.5);
@@ -77,6 +77,12 @@
   --color-chem: oklch(0.631 0.146 250.852); /* #3A8DDE 化工 */
   --color-nutrition: oklch(0.957 0.141 104.856); /* #FFF67F 营养 */
 
+  /* Cosmetics division tint — text zone for the vivid color-field panels
+   * (variant K). Full-saturation cosmetics (L 0.59) cannot carry AA text in
+   * either polarity, so its panel text sits on this L 0.90 tint (ink ≈ 9:1).
+   * Same hue, chroma tapered — matches the brand-book tint methodology. */
+  --color-cosmetics-200: oklch(0.9 0.06 317.586);
+
   /*
    * English-site typography (see docs/adr/0002-english-site-typography.md):
    * Newsreader (display serif) + Plus Jakarta Sans (body/UI) + JetBrains Mono
@@ -86,7 +92,6 @@
   --font-display: "Newsreader", "Georgia", "Times New Roman", serif;
   --font-body: "Plus Jakarta Sans", "Noto Sans SC", "Inter Variable", system-ui, sans-serif;
   --font-tech: "JetBrains Mono", ui-monospace, "SFMono-Regular", monospace;
-
 
   --shadow-ambient: 0 24px 48px -12px oklch(0.288 0.04 160.598 / 0.08);
   --shadow-lift: 0 12px 32px -8px oklch(0.288 0.04 160.598 / 0.06);

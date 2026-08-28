@@ -1,12 +1,4 @@
-import {
-  ArrowUpRight,
-  FlaskConical,
-  Globe,
-  Leaf,
-  Sprout,
-  Award,
-  MapPin,
-} from "lucide-react";
+import { ArrowUpRight, FlaskConical, Globe, Leaf, Sprout, Award, MapPin } from "lucide-react";
 import {
   AnimatePresence,
   LazyMotion,
@@ -81,7 +73,7 @@ function NavBar() {
       <div className="mx-auto flex max-w-[960px] items-center justify-between rounded-full border border-line bg-paper/85 py-2 pl-6 pr-2 shadow-sm backdrop-blur-md">
         <a
           href="#top"
-          className="font-body text-xl font-semibold tracking-tight text-ink transition-colors duration-300 hover:text-brand-green-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-green-500"
+          className="font-body text-xl font-semibold tracking-tight text-ink transition-colors duration-300 hover:text-brand-green-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-green-500"
         >
           Fenchem
         </a>
@@ -92,7 +84,7 @@ function NavBar() {
             <a
               key={link.href}
               href={link.href}
-              className="font-body text-sm text-mute-500 transition-colors duration-300 hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-green-500 rounded-sm"
+              className="font-body text-sm text-mute-600 transition-colors duration-300 hover:text-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-green-500 rounded-sm"
             >
               {link.label}
             </a>
@@ -102,7 +94,7 @@ function NavBar() {
         <div className="flex items-center gap-2">
           <a
             href="#contact"
-            className="inline-flex items-center gap-1.5 rounded-full bg-brand-green-500 px-5 py-2.5 font-body text-sm font-semibold text-paper shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:bg-brand-green-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-green-400 min-h-11"
+            className="inline-flex items-center gap-1.5 rounded-full bg-brand-green-500 px-5 py-2.5 font-body text-sm font-semibold text-brand-green-950 shadow-sm transition-[background-color,translate] duration-300 hover:-translate-y-0.5 hover:bg-brand-green-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-green-400 min-h-11"
           >
             Partner with Us
           </a>
@@ -112,12 +104,18 @@ function NavBar() {
             aria-label={menuOpen ? "Close menu" : "Open menu"}
             aria-expanded={menuOpen}
             onClick={() => setMenuOpen((v) => !v)}
-            className="flex h-10 w-10 items-center justify-center rounded-full border border-line text-mute-500 transition-colors hover:border-brand-green-300 hover:text-brand-green-600 md:hidden focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-green-500"
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-line text-mute-600 transition-colors hover:border-brand-green-300 hover:text-brand-green-600 md:hidden focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-green-500"
           >
             <span aria-hidden className="grid gap-1">
-              <span className={`block h-0.5 w-5 bg-current transition-transform duration-300 ${menuOpen ? "translate-y-1.5 rotate-45" : ""}`} />
-              <span className={`block h-0.5 w-5 bg-current transition-opacity duration-300 ${menuOpen ? "opacity-0" : ""}`} />
-              <span className={`block h-0.5 w-5 bg-current transition-transform duration-300 ${menuOpen ? "-translate-y-1.5 -rotate-45" : ""}`} />
+              <span
+                className={`block h-0.5 w-5 bg-current transition-transform duration-300 ${menuOpen ? "translate-y-1.5 rotate-45" : ""}`}
+              />
+              <span
+                className={`block h-0.5 w-5 bg-current transition-opacity duration-300 ${menuOpen ? "opacity-0" : ""}`}
+              />
+              <span
+                className={`block h-0.5 w-5 bg-current transition-transform duration-300 ${menuOpen ? "-translate-y-1.5 -rotate-45" : ""}`}
+              />
             </span>
           </button>
         </div>
@@ -164,7 +162,11 @@ function HeroSection({ heroRef, blobY }: HeroSectionProps) {
   const reduce = useReducedMotion();
 
   return (
-    <header id="top" ref={heroRef} className="relative overflow-hidden pb-24 pt-36 md:pb-40 md:pt-52">
+    <header
+      id="top"
+      ref={heroRef}
+      className="relative overflow-hidden pb-24 pt-36 md:pb-40 md:pt-52"
+    >
       {/* Subtle green radial glow behind hero text */}
       <div
         aria-hidden
@@ -172,11 +174,10 @@ function HeroSection({ heroRef, blobY }: HeroSectionProps) {
       />
 
       <div className="relative z-10 mx-auto grid max-w-[1280px] grid-cols-1 items-center gap-16 px-6 md:px-12 lg:grid-cols-12 lg:gap-10 lg:px-16">
-
         {/* Left: headline copy */}
         <div className="lg:col-span-7">
           <Intro delay={0.05}>
-            <span className="inline-flex items-center gap-2 rounded-full border border-brand-green-200 bg-brand-green-50 px-4 py-1.5 font-tech text-[10px] uppercase tracking-[0.25em] text-brand-green-600 md:text-[11px]">
+            <span className="inline-flex items-center gap-2 rounded-full border border-brand-green-200 bg-brand-green-50 px-4 py-1.5 font-tech text-[10px] uppercase tracking-[0.25em] text-brand-green-700 md:text-[11px]">
               <Leaf className="h-3.5 w-3.5" aria-hidden />
               Botanical Intelligence Since 1995
             </span>
@@ -184,8 +185,7 @@ function HeroSection({ heroRef, blobY }: HeroSectionProps) {
 
           <Intro delay={0.18}>
             <h1 className="mt-8 font-display text-[clamp(3rem,7.5vw,6.25rem)] font-normal leading-[1.02] tracking-[-0.03em] text-ink">
-              Nurturing{" "}
-              <em className="not-italic text-brand-green-700">Vitality</em>
+              Nurturing <em className="not-italic text-brand-green-700">Vitality</em>
               <br />
               through Botanical
               <br />
@@ -203,14 +203,14 @@ function HeroSection({ heroRef, blobY }: HeroSectionProps) {
           <Intro delay={0.44} className="mt-10 flex flex-wrap items-center gap-4">
             <a
               href="#ingredients"
-              className="inline-flex items-center gap-2 rounded-full bg-brand-green-500 px-8 py-4 font-body text-sm font-semibold tracking-wide text-paper shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:bg-brand-green-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-green-400 min-h-11"
+              className="inline-flex items-center gap-2 rounded-full bg-brand-green-500 px-8 py-4 font-body text-sm font-semibold tracking-wide text-brand-green-950 shadow-sm transition-[background-color,translate] duration-300 hover:-translate-y-0.5 hover:bg-brand-green-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-green-400 min-h-11"
             >
               Explore Portfolio
               <ArrowUpRight className="h-4 w-4" aria-hidden />
             </a>
             <a
               href={`mailto:${company.email}`}
-              className="inline-flex items-center gap-2 rounded-full border border-brand-blue-200 px-8 py-4 font-body text-sm font-semibold tracking-wide text-brand-blue-700 transition-all duration-300 hover:border-brand-blue-400 hover:bg-brand-blue-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-blue-500 min-h-11"
+              className="inline-flex items-center gap-2 rounded-full border border-brand-blue-200 px-8 py-4 font-body text-sm font-semibold tracking-wide text-brand-blue-700 transition-colors duration-300 hover:border-brand-blue-400 hover:bg-brand-blue-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-blue-500 min-h-11"
             >
               Request a Specification
             </a>
@@ -226,7 +226,7 @@ function HeroSection({ heroRef, blobY }: HeroSectionProps) {
               className="absolute -inset-6 rotate-6 opacity-40"
               style={{
                 borderRadius: "42% 58% 62% 38% / 47% 59% 41% 53%",
-                background: "oklch(0.78 0.15 145)",
+                background: "var(--color-brand-green-400)",
                 filter: "blur(8px)",
               }}
             />
@@ -246,7 +246,7 @@ function HeroSection({ heroRef, blobY }: HeroSectionProps) {
               </div>
 
               {/* ISO badge */}
-              <span className="absolute right-0 top-8 rounded-full border border-line bg-paper/90 px-4 py-2 font-tech text-[10px] uppercase tracking-[0.25em] text-brand-green-600 shadow-sm backdrop-blur md:-right-4 md:top-12">
+              <span className="absolute right-0 top-8 rounded-full border border-line bg-paper/90 px-4 py-2 font-tech text-[10px] uppercase tracking-[0.25em] text-brand-green-700 shadow-sm backdrop-blur md:-right-4 md:top-12">
                 ISO · GMP Certified
               </span>
 
@@ -258,11 +258,11 @@ function HeroSection({ heroRef, blobY }: HeroSectionProps) {
                 }
                 className="absolute -bottom-6 left-0 max-w-[220px] rounded-3xl border border-line bg-paper p-6 shadow-md md:-bottom-8 md:-left-8"
               >
-                <p className="font-tech text-[10px] uppercase tracking-[0.25em] text-mute-400">
+                <p className="font-tech text-[10px] uppercase tracking-[0.25em] text-mute-600">
                   Extraction Yield
                 </p>
-                <p className="mt-2 font-display text-4xl font-light text-brand-green-500">98%</p>
-                <p className="mt-1 font-body text-xs leading-relaxed text-mute-400">
+                <p className="mt-2 font-display text-4xl font-light text-brand-green-600">98%</p>
+                <p className="mt-1 font-body text-xs leading-relaxed text-mute-600">
                   Bio-active retention across our extraction process.
                 </p>
               </m.div>
@@ -284,11 +284,10 @@ function IndustriesSection() {
           <div className="max-w-xl">
             <Eyebrow>Where our ingredients work</Eyebrow>
             <h2 className="mt-5 font-display text-4xl font-light tracking-tight text-ink md:text-5xl lg:text-6xl">
-              Purity across{" "}
-              <em className="italic text-brand-green-500">industries</em>
+              Purity across <em className="italic text-brand-green-600">industries</em>
             </h2>
           </div>
-          <p className="max-w-sm font-body text-base leading-relaxed text-mute-500">
+          <p className="max-w-sm font-body text-base leading-relaxed text-mute-600">
             Crafted to meet the rigorous demands of global leaders in health, wellness and beauty.
           </p>
         </Reveal>
@@ -311,17 +310,17 @@ function IndustriesSection() {
                   />
                 </div>
                 <div className="mt-7 flex items-baseline gap-4">
-                  <span className="font-tech text-xs tracking-[0.2em] text-brand-green-400">
+                  <span className="font-tech text-xs tracking-[0.2em] text-brand-green-700">
                     {String(i + 1).padStart(2, "0")}
                   </span>
                   <h3 className="font-display text-2xl font-medium tracking-tight text-ink md:text-[1.65rem]">
                     {industry.title}
                   </h3>
                 </div>
-                <p className="mt-3 font-body text-sm leading-relaxed text-mute-500">
+                <p className="mt-3 font-body text-sm leading-relaxed text-mute-600">
                   {industry.copy}
                 </p>
-                <span className="mt-5 inline-flex items-center gap-2 font-body text-sm font-semibold text-brand-green-600 transition-colors duration-300 group-hover:text-brand-green-700">
+                <span className="mt-5 inline-flex items-center gap-2 font-body text-sm font-semibold text-brand-green-700 transition-colors duration-300 group-hover:text-brand-green-800">
                   Explore applications
                   <ArrowUpRight
                     className="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
@@ -347,7 +346,6 @@ function ScienceSection() {
 
       <div className="mx-auto max-w-[1280px] px-6 md:px-12 lg:px-16 pt-20 pb-8">
         <div className="grid grid-cols-1 items-center gap-20 lg:grid-cols-2 lg:gap-28">
-
           {/* Image collage */}
           <Reveal>
             <div className="relative">
@@ -366,7 +364,10 @@ function ScienceSection() {
                 <div
                   aria-hidden
                   className="pointer-events-none absolute inset-0"
-                  style={{ background: "linear-gradient(180deg, transparent 60%, oklch(0.35 0.12 145 / 0.35) 100%)" }}
+                  style={{
+                    background:
+                      "linear-gradient(180deg, transparent 60%, oklch(from var(--color-brand-green-900) l c h / 0.35) 100%)",
+                  }}
                 />
               </div>
 
@@ -389,23 +390,25 @@ function ScienceSection() {
               <h2 className="mt-5 font-display text-4xl font-light leading-[1.08] tracking-tight text-ink md:text-5xl lg:text-6xl">
                 Rooted in Nature,
                 <br />
-                <em className="italic text-brand-green-500">Refined by Science.</em>
+                <em className="italic text-brand-green-600">Refined by Science.</em>
               </h2>
-              <p className="mt-8 max-w-xl font-body text-lg leading-relaxed text-mute-500">
-                Our journey began with a simple belief: that nature holds the keys to human vitality.
-                Today we manage a global network of sustainable farms and advanced laboratories to
-                bring those keys to our partners, lot after lot.
+              <p className="mt-8 max-w-xl font-body text-lg leading-relaxed text-mute-600">
+                Our journey began with a simple belief: that nature holds the keys to human
+                vitality. Today we manage a global network of sustainable farms and advanced
+                laboratories to bring those keys to our partners, lot after lot.
               </p>
             </Reveal>
 
             <div className="mt-12 grid grid-cols-1 gap-4 sm:grid-cols-2">
               {stats.map((stat, i) => (
                 <Reveal key={stat.value} delay={i * 0.08}>
-                  <div className="h-full rounded-[20px] border border-line bg-paper px-6 py-5 shadow-sm transition-all duration-300 hover:border-brand-green-300 hover:shadow-md">
-                    <span className={`font-display text-3xl font-light md:text-4xl ${STAT_COLORS[i]}`}>
+                  <div className="h-full rounded-[20px] border border-line bg-paper px-6 py-5 shadow-sm transition-[border-color,box-shadow] duration-300 hover:border-brand-green-300 hover:shadow-md">
+                    <span
+                      className={`font-display text-3xl font-light md:text-4xl ${STAT_COLORS[i]}`}
+                    >
                       {stat.value}
                     </span>
-                    <p className="mt-1.5 font-body text-xs leading-relaxed text-mute-400 md:text-sm">
+                    <p className="mt-1.5 font-body text-xs leading-relaxed text-mute-600 md:text-sm">
                       {stat.label}
                     </p>
                   </div>
@@ -426,13 +429,13 @@ function ScienceSection() {
               return (
                 <Reveal key={pillar.title} delay={i * 0.12}>
                   <div className="group">
-                    <span className="flex h-12 w-12 items-center justify-center rounded-full bg-brand-green-100 text-brand-green-600 transition-colors duration-300 group-hover:bg-brand-green-500 group-hover:text-paper">
+                    <span className="flex h-12 w-12 items-center justify-center rounded-full bg-brand-green-100 text-brand-green-600 transition-colors duration-300 group-hover:bg-brand-green-500 group-hover:text-brand-green-950">
                       <Icon className="h-5 w-5" aria-hidden />
                     </span>
                     <h3 className="mt-6 font-display text-2xl font-medium tracking-tight text-ink">
                       {pillar.title}
                     </h3>
-                    <p className="mt-3 max-w-xs font-body text-sm leading-relaxed text-mute-500">
+                    <p className="mt-3 max-w-xs font-body text-sm leading-relaxed text-mute-600">
                       {pillar.copy}
                     </p>
                   </div>
@@ -487,9 +490,9 @@ function IngredientsSection() {
         <Reveal>
           <Eyebrow className="text-center">The portfolio</Eyebrow>
           <h2 className="mx-auto mt-5 max-w-3xl font-display text-4xl font-light tracking-tight text-ink md:text-5xl lg:text-6xl">
-            A <em className="italic text-brand-green-500">living library</em> of botanical actives
+            A <em className="italic text-brand-green-600">living library</em> of botanical actives
           </h2>
-          <p className="mx-auto mt-7 max-w-xl font-body text-base leading-relaxed text-mute-500 md:text-lg">
+          <p className="mx-auto mt-7 max-w-xl font-body text-base leading-relaxed text-mute-600 md:text-lg">
             Standardized extracts and functional ingredients, each backed by full identity, potency
             and stability documentation.
           </p>
@@ -503,7 +506,7 @@ function IngredientsSection() {
             <a
               key={ingredient.name}
               href={`mailto:${company.email}`}
-              className="group inline-flex items-center gap-2.5 rounded-full border border-brand-green-200 bg-brand-green-50 px-6 py-3 font-body text-sm font-medium text-brand-green-700 transition-all duration-300 hover:-translate-y-0.5 hover:border-brand-green-400 hover:bg-brand-green-100 hover:shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-green-500 min-h-11"
+              className="group inline-flex items-center gap-2.5 rounded-full border border-brand-green-200 bg-brand-green-50 px-6 py-3 font-body text-sm font-medium text-brand-green-700 transition-[background-color,border-color,translate,box-shadow] duration-300 hover:-translate-y-0.5 hover:border-brand-green-400 hover:bg-brand-green-100 hover:shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-green-500 min-h-11"
             >
               <Leaf
                 className="h-3.5 w-3.5 text-brand-green-500 transition-transform duration-300 group-hover:rotate-12"
@@ -517,7 +520,7 @@ function IngredientsSection() {
         <Reveal delay={0.3} className="mt-12">
           <a
             href={`mailto:${company.email}`}
-            className="group inline-flex items-center gap-2 font-body text-sm font-semibold text-brand-green-600 transition-colors duration-300 hover:text-brand-green-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-green-500 rounded-sm"
+            className="group inline-flex items-center gap-2 font-body text-sm font-semibold text-brand-green-700 transition-colors duration-300 hover:text-brand-green-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-green-500 rounded-sm"
           >
             Request a Specification
             <ArrowUpRight
@@ -544,7 +547,7 @@ function QualitySection() {
                 <span className="flex h-10 w-10 items-center justify-center rounded-full bg-brand-green-100 text-brand-green-600">
                   <Award className="h-5 w-5" aria-hidden />
                 </span>
-                <p className="font-tech text-[10px] uppercase tracking-[0.3em] text-mute-400 md:text-[11px]">
+                <p className="font-tech text-[10px] uppercase tracking-[0.3em] text-mute-600 md:text-[11px]">
                   Certified quality systems
                 </p>
               </div>
@@ -552,10 +555,10 @@ function QualitySection() {
               <ul className="flex flex-wrap items-center gap-x-6 gap-y-4 md:gap-x-10">
                 {certificationDetails.map((cert) => (
                   <li key={cert.name} className="flex flex-col items-center gap-0.5">
-                    <span className="font-tech text-xs font-semibold uppercase tracking-[0.2em] text-ink transition-colors duration-300 hover:text-brand-green-600">
+                    <span className="font-tech text-xs font-semibold uppercase tracking-[0.2em] text-ink transition-colors duration-300 hover:text-brand-green-700">
                       {cert.name}
                     </span>
-                    <span className="font-body text-[10px] text-mute-400">{cert.sub}</span>
+                    <span className="font-body text-[10px] text-mute-600">{cert.sub}</span>
                   </li>
                 ))}
               </ul>
@@ -577,7 +580,8 @@ function GlobalSection() {
           <div className="shrink-0 md:w-64">
             <Eyebrow>Global intelligent research</Eyebrow>
             <h2 className="mt-4 font-display text-3xl font-light tracking-tight text-ink md:text-4xl">
-              Six bases,<br />
+              Six bases,
+              <br />
               <em className="italic text-brand-blue-700">one standard.</em>
             </h2>
           </div>
@@ -586,7 +590,7 @@ function GlobalSection() {
             <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {regions.map((region, i) => (
                 <Reveal key={region.city} delay={i * 0.07}>
-                  <li className="flex items-center gap-3 rounded-2xl border border-line px-5 py-4 transition-all duration-300 hover:border-brand-blue-200 hover:bg-brand-blue-50/30">
+                  <li className="flex items-center gap-3 rounded-2xl border border-line px-5 py-4 transition-colors duration-300 hover:border-brand-blue-200 hover:bg-brand-blue-50/30">
                     <MapPin className="h-4 w-4 shrink-0 text-brand-blue-400" aria-hidden />
                     <span className="font-body text-sm text-mute-600">
                       {`${region.city}, ${region.country}${region.city === "Nanjing" ? " — HQ" : ""}`}
@@ -624,9 +628,9 @@ function CtaSection() {
               <Eyebrow className="text-center">Start the conversation</Eyebrow>
               <h2 className="mx-auto mt-6 max-w-3xl font-display text-4xl font-light leading-[1.08] tracking-tight text-ink md:text-6xl">
                 Let&rsquo;s formulate{" "}
-                <em className="italic text-brand-green-500">what&rsquo;s next.</em>
+                <em className="italic text-brand-green-600">what&rsquo;s next.</em>
               </h2>
-              <p className="mx-auto mt-7 max-w-xl font-body text-base leading-relaxed text-mute-500 md:text-lg">
+              <p className="mx-auto mt-7 max-w-xl font-body text-base leading-relaxed text-mute-600 md:text-lg">
                 From first sample to full-scale supply — tell us what you&rsquo;re building and our
                 technical team will respond within one business day.
               </p>
@@ -634,14 +638,14 @@ function CtaSection() {
               <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
                 <a
                   href={`mailto:${company.email}`}
-                  className="inline-flex items-center gap-2 rounded-full bg-brand-green-500 px-9 py-4 font-body text-sm font-semibold tracking-wide text-paper shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:bg-brand-green-600 hover:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-green-400 min-h-11"
+                  className="inline-flex items-center gap-2 rounded-full bg-brand-green-500 px-9 py-4 font-body text-sm font-semibold tracking-wide text-brand-green-950 shadow-sm transition-[background-color,translate,box-shadow] duration-300 hover:-translate-y-0.5 hover:bg-brand-green-400 hover:shadow-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-green-400 min-h-11"
                 >
                   Partner with Fenchem
                   <ArrowUpRight className="h-4 w-4" aria-hidden />
                 </a>
                 <a
                   href="#ingredients"
-                  className="inline-flex items-center gap-2 rounded-full border border-brand-blue-300 bg-paper/60 px-9 py-4 font-body text-sm font-semibold tracking-wide text-brand-blue-700 transition-all duration-300 hover:border-brand-blue-500 hover:bg-brand-blue-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-blue-500 min-h-11"
+                  className="inline-flex items-center gap-2 rounded-full border border-brand-blue-300 bg-paper/60 px-9 py-4 font-body text-sm font-semibold tracking-wide text-brand-blue-700 transition-colors duration-300 hover:border-brand-blue-500 hover:bg-brand-blue-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-blue-500 min-h-11"
                 >
                   Explore Portfolio
                 </a>
@@ -661,7 +665,7 @@ function FooterSection() {
     <footer className="bg-brand-green-950 text-paper">
       <div className="mx-auto max-w-[1280px] px-6 pb-10 pt-20 md:px-12 md:pt-28 lg:px-16">
         <Reveal>
-          <p className="font-tech text-[10px] uppercase tracking-[0.3em] text-brand-green-400/70 md:text-[11px]">
+          <p className="font-tech text-[10px] uppercase tracking-[0.3em] text-brand-green-400/80 md:text-[11px]">
             Rooted in Nature, Refined by Science
           </p>
           <p className="mt-6 font-display text-[clamp(4rem,13vw,10rem)] font-light leading-[0.95] tracking-tight text-paper">
@@ -685,7 +689,7 @@ function FooterSection() {
           </Reveal>
 
           <Reveal delay={0.08}>
-            <p className="font-tech text-[10px] uppercase tracking-[0.25em] text-brand-green-400/50">
+            <p className="font-tech text-[10px] uppercase tracking-[0.25em] text-brand-green-400/80">
               Explore
             </p>
             <ul className="mt-5 space-y-3">
@@ -711,7 +715,7 @@ function FooterSection() {
           </Reveal>
 
           <Reveal delay={0.16}>
-            <p className="font-tech text-[10px] uppercase tracking-[0.25em] text-brand-green-400/50">
+            <p className="font-tech text-[10px] uppercase tracking-[0.25em] text-brand-green-400/80">
               Global bases
             </p>
             <ul className="mt-5 space-y-3">
@@ -725,19 +729,19 @@ function FooterSection() {
         </div>
 
         <div className="mt-16 flex flex-col items-center justify-between gap-4 border-t border-brand-green-800 pt-8 md:flex-row">
-          <p className="font-body text-xs text-brand-green-400/50">
+          <p className="font-body text-xs text-brand-green-400/80">
             © 2026 Fenchem Biotek Ltd. All rights reserved.
           </p>
           <div className="flex items-center gap-8">
             <a
               href="#top"
-              className="font-body text-xs text-brand-green-400/50 transition-colors duration-300 hover:text-brand-green-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-green-400 rounded-sm"
+              className="font-body text-xs text-brand-green-400/80 transition-colors duration-300 hover:text-brand-green-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-green-400 rounded-sm"
             >
               Privacy Policy
             </a>
             <a
               href="#top"
-              className="font-body text-xs text-brand-green-400/50 transition-colors duration-300 hover:text-brand-green-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-green-400 rounded-sm"
+              className="font-body text-xs text-brand-green-400/80 transition-colors duration-300 hover:text-brand-green-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-green-400 rounded-sm"
             >
               Terms of Service
             </a>

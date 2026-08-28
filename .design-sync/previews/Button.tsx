@@ -16,13 +16,17 @@ export const Sizes = () => (
     <Button size="sm">Small</Button>
     <Button size="default">Default</Button>
     <Button size="lg">Large</Button>
-    <Button size="icon" aria-label="Open">→</Button>
+    <Button size="icon" aria-label="Open">
+      →
+    </Button>
   </div>
 );
 
 export const States = () => (
   <div style={{ display: "flex", gap: 12, alignItems: "center", padding: 8 }}>
     <Button disabled>Disabled</Button>
-    <Button variant="outline" disabled>Disabled outline</Button>
+    <Button variant="outline" disabled>
+      Disabled outline
+    </Button>
   </div>
 );

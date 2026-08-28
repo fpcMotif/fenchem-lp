@@ -42,5 +42,5 @@ site must match the corporate brand, not a bespoke theme. Exact tokens live in
   `?variant=` and will fold the winner in later (see `prototype/NOTES.md`).
 - **Literal recolor of A/B/C.** Rejected: A's identity is its serif + warm
   cream and C's is dark forest-green — both removed by the brand book — so the
-  variants are reinterpreted (D keeps a scoped serif; F becomes deep *green*
+  variants are reinterpreted (D keeps a scoped serif; F becomes deep _green_
   immersive) rather than mechanically repainted.

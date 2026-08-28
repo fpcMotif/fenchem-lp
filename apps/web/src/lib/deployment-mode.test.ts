@@ -1,19 +1,10 @@
 import { describe, expect, test } from "vitest";
 
-import {
-  AUTH_ROUNDTRIP_BUDGET_MS,
-  AUTH_TOKEN_BUDGET_MS,
-  deploymentMode,
-} from "./deployment-mode";
+import { AUTH_ROUNDTRIP_BUDGET_MS, AUTH_TOKEN_BUDGET_MS, deploymentMode } from "./deployment-mode";
 
 describe("deploymentMode", () => {
   test.each([
-    [
-      "https://placeholder-prototype.convex.cloud",
-      "preview",
-      true,
-      "the real .env preview URL",
-    ],
+    ["https://placeholder-prototype.convex.cloud", "preview", true, "the real .env preview URL"],
     [
       "https://acute-mallard-123.convex.cloud",
       "live",
@@ -34,12 +25,7 @@ describe("deploymentMode", () => {
       true,
       "documented false-positive footgun, preserved deliberately",
     ],
-    [
-      "https://app.convex.cloud/has-placeholder/x",
-      "preview",
-      true,
-      "substring mid-path",
-    ],
+    ["https://app.convex.cloud/has-placeholder/x", "preview", true, "substring mid-path"],
   ] as const)(
     "url=%s => mode=%s, skipAuth=%s (%s)",
     (url, expectedMode, expectedSkipAuth, _why) => {

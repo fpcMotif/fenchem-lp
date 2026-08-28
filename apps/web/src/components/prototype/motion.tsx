@@ -19,7 +19,6 @@ import { EASE } from "./motion-constants";
  * drop the translate, zero the duration and delay, and only settle opacity.
  */
 
-
 type RevealProps = {
   children: ReactNode;
   className?: string;
@@ -88,9 +87,15 @@ type EyebrowProps = {
 };
 
 /** Static uppercase micro-label above a section heading. */
-export function Eyebrow({ children, className = "", accent = "text-brand-green-600" }: EyebrowProps) {
+export function Eyebrow({
+  children,
+  className = "",
+  accent = "text-brand-green-600",
+}: EyebrowProps) {
   return (
-    <p className={`font-tech text-[11px] uppercase tracking-[0.35em] ${accent} md:text-xs ${className}`}>
+    <p
+      className={`font-tech text-[11px] uppercase tracking-[0.35em] ${accent} md:text-xs ${className}`}
+    >
       {children}
     </p>
   );

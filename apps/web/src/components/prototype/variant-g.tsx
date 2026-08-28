@@ -40,7 +40,8 @@ import {
 
 const IMG = {
   hero: "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?auto=format&fit=crop&w=1600&q=80",
-  heroThumb: "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?auto=format&fit=crop&w=900&q=80",
+  heroThumb:
+    "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?auto=format&fit=crop&w=900&q=80",
   lab: "https://images.unsplash.com/photo-1576086213369-97a306d36557?auto=format&fit=crop&w=1400&q=80",
 } as const;
 
@@ -52,7 +53,7 @@ const NAV_LINKS = [
 ] as const;
 
 const STATS = [
-  { value: "25+", unit: "Years", desc: "Botanical expertise since 1995" },
+  { value: "30+", unit: "Years", desc: "Botanical expertise since 1995" },
   { value: "6", unit: "Global Bases", desc: "R&D hubs across three continents" },
   { value: "ISO/GMP", unit: "Certified", desc: "Audited quality on every lot" },
   { value: "40+", unit: "Countries", desc: "Regulated markets supplied" },
@@ -77,7 +78,7 @@ const MATRIX_DETAIL = [
   },
   {
     division: "Food & Bev",
-    divisionClass: "text-paper bg-food border-food",
+    divisionClass: "text-ink bg-food border-food",
     divisionBg: "bg-food/10",
   },
   {
@@ -87,7 +88,7 @@ const MATRIX_DETAIL = [
   },
   {
     division: "Food & Bev",
-    divisionClass: "text-paper bg-food border-food",
+    divisionClass: "text-ink bg-food border-food",
     divisionBg: "bg-food/10",
   },
   {
@@ -152,17 +153,17 @@ function NavBar() {
       <div className="mx-auto max-w-[1480px]">
         {/* Micro-strip */}
         <div className="hidden md:flex items-center justify-between border-b border-line px-6 py-1.5">
-          <span className="flex items-center gap-2 font-tech text-[10px] uppercase tracking-[0.28em] text-mute-500">
+          <span className="flex items-center gap-2 font-tech text-[10px] uppercase tracking-[0.28em] text-mute-600">
             <span className="relative flex size-1.5">
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-green-500/50 motion-reduce:animate-none" />
               <span className="relative inline-flex size-1.5 rounded-full bg-brand-green-500" />
             </span>
             Global Intelligent Research — Botanical Intelligence Since 1995
           </span>
-          <span className="font-tech text-[10px] uppercase tracking-[0.28em] text-mute-400">
+          <span className="font-tech text-[10px] uppercase tracking-[0.28em] text-mute-600">
             ISO 9001 · GMP · HACCP
           </span>
-          <span className="font-tech text-[10px] uppercase tracking-[0.28em] text-mute-400">
+          <span className="font-tech text-[10px] uppercase tracking-[0.28em] text-mute-600">
             N 32.06 / E 118.79 — Nanjing HQ
           </span>
         </div>
@@ -190,7 +191,7 @@ function NavBar() {
               <a
                 key={link.href}
                 href={link.href}
-                className="font-body text-sm text-mute-600 transition-colors duration-300 hover:text-brand-green-600 focus-visible:outline-2"
+                className="font-body text-sm text-mute-600 transition-colors duration-300 hover:text-brand-green-700 focus-visible:outline-2"
               >
                 {link.label}
               </a>
@@ -198,7 +199,7 @@ function NavBar() {
           </div>
           <a
             href="#contact"
-            className="group inline-flex items-center gap-2 rounded-sm bg-brand-green-500 px-5 py-2.5 font-body text-sm font-semibold text-paper transition-all duration-300 hover:bg-brand-green-600 focus-visible:outline-2 min-h-11"
+            className="group inline-flex items-center gap-2 rounded-sm bg-brand-green-500 px-5 py-2.5 font-body text-sm font-semibold text-brand-green-950 transition-colors duration-300 hover:bg-brand-green-400 focus-visible:outline-2 min-h-11"
           >
             Request a Specification
             <ArrowRight
@@ -233,7 +234,6 @@ function HeroSection() {
     <section id="top" aria-label="Hero" className="relative border-b border-line bg-paper">
       <div className="mx-auto max-w-[1480px]">
         <div className="grid lg:grid-cols-12 min-h-[80vh]">
-
           {/* Left: Headline block */}
           <div className="flex flex-col justify-center px-5 py-16 md:px-10 md:py-24 lg:col-span-7 lg:py-32">
             <Reveal>
@@ -245,9 +245,9 @@ function HeroSection() {
               <h1 className="mt-8 font-display text-[clamp(2.6rem,6vw,5.5rem)] font-bold leading-[1.0] tracking-[-0.04em] text-ink">
                 Nurturing Vitality
                 <br />
-                <span className="text-brand-green-500">through Botanical</span>
+                <span className="text-brand-green-600">through Botanical</span>
                 <br />
-                <span className="text-brand-green-500">Excellence</span>
+                <span className="text-brand-green-600">Excellence</span>
               </h1>
             </Reveal>
             <Reveal delay={0.18}>
@@ -260,7 +260,7 @@ function HeroSection() {
             <Reveal delay={0.26} className="mt-9 flex flex-wrap gap-3">
               <a
                 href="#matrix"
-                className="group inline-flex items-center gap-2.5 rounded-sm bg-brand-green-500 px-7 py-4 font-body text-sm font-semibold text-paper transition-all duration-300 hover:bg-brand-green-600 focus-visible:outline-2 min-h-11"
+                className="group inline-flex items-center gap-2.5 rounded-sm bg-brand-green-500 px-7 py-4 font-body text-sm font-semibold text-brand-green-950 transition-colors duration-300 hover:bg-brand-green-400 focus-visible:outline-2 min-h-11"
               >
                 Explore Portfolio
                 <ArrowRight
@@ -270,7 +270,7 @@ function HeroSection() {
               </a>
               <a
                 href="#contact"
-                className="inline-flex items-center gap-2.5 rounded-sm border border-brand-blue-700 px-7 py-4 font-body text-sm font-semibold text-brand-blue-700 transition-all duration-300 hover:bg-brand-blue-50 focus-visible:outline-2 min-h-11"
+                className="inline-flex items-center gap-2.5 rounded-sm border border-brand-blue-700 px-7 py-4 font-body text-sm font-semibold text-brand-blue-700 transition-colors duration-300 hover:bg-brand-blue-50 focus-visible:outline-2 min-h-11"
               >
                 Partner with Fenchem
               </a>
@@ -281,13 +281,13 @@ function HeroSection() {
               <dl className="mt-14 grid grid-cols-2 gap-px border border-line rounded-sm overflow-hidden bg-line sm:grid-cols-4">
                 {STATS.map((s) => (
                   <div key={s.value} className="bg-paper px-4 py-5">
-                    <dt className="font-tech text-[10px] uppercase tracking-[0.24em] text-mute-400">
+                    <dt className="font-tech text-[10px] uppercase tracking-[0.24em] text-mute-600">
                       {s.unit}
                     </dt>
                     <dd className="mt-1.5 font-body text-2xl font-bold tracking-[-0.03em] text-brand-green-600 md:text-3xl">
                       {s.value}
                     </dd>
-                    <p className="mt-1 font-body text-xs text-mute-500">{s.desc}</p>
+                    <p className="mt-1 font-body text-xs text-mute-600">{s.desc}</p>
                   </div>
                 ))}
               </dl>
@@ -312,7 +312,7 @@ function HeroSection() {
                 <span className="font-tech text-[10px] uppercase tracking-[0.22em] text-mute-600">
                   Rooted in Nature, Refined by Science
                 </span>
-                <span className="font-tech text-[10px] uppercase tracking-[0.22em] text-brand-green-600">
+                <span className="font-tech text-[10px] uppercase tracking-[0.22em] text-brand-green-700">
                   Since 1995
                 </span>
               </div>
@@ -356,7 +356,11 @@ function TickerSection() {
 
 function IndustriesSection() {
   return (
-    <section id="industries" aria-labelledby="industries-heading" className="border-b border-line bg-paper">
+    <section
+      id="industries"
+      aria-labelledby="industries-heading"
+      className="border-b border-line bg-paper"
+    >
       <div className="mx-auto max-w-[1480px]">
         {/* Section header */}
         <div className="flex flex-col gap-6 border-b border-line px-5 py-14 md:flex-row md:items-end md:justify-between md:px-10 md:py-20">
@@ -368,13 +372,13 @@ function IndustriesSection() {
               id="industries-heading"
               className="mt-4 font-display text-4xl font-bold leading-[1.02] tracking-[-0.03em] text-ink md:text-5xl"
             >
-              Built for three{" "}
-              <span className="text-brand-green-500">industries</span>
+              Built for three <span className="text-brand-green-600">industries</span>
             </h2>
           </Reveal>
           <Reveal delay={0.1}>
-            <p className="max-w-xs font-body text-sm leading-relaxed text-mute-500">
-              Clinically supported actives engineered for the precise demands of each formulation discipline.
+            <p className="max-w-xs font-body text-sm leading-relaxed text-mute-600">
+              Clinically supported actives engineered for the precise demands of each formulation
+              discipline.
             </p>
           </Reveal>
         </div>
@@ -393,7 +397,7 @@ function IndustriesSection() {
               >
                 {/* Index */}
                 <div className="md:col-span-1">
-                  <span className="font-tech text-sm tracking-[0.22em] text-brand-green-500">
+                  <span className="font-tech text-sm tracking-[0.22em] text-brand-green-700">
                     {String(i + 1).padStart(2, "0")}
                   </span>
                 </div>
@@ -418,7 +422,7 @@ function IndustriesSection() {
                 <div className="flex justify-end md:col-span-1">
                   <ArrowUpRight
                     aria-hidden
-                    className="size-5 text-mute-300 transition-all duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-brand-green-500"
+                    className="size-5 text-mute-300 transition-[translate,color] duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-brand-green-500"
                   />
                 </div>
               </Reveal>
@@ -434,7 +438,11 @@ function IndustriesSection() {
 
 function MatrixSection() {
   return (
-    <section id="matrix" aria-labelledby="matrix-heading" className="border-b border-line bg-mute-50">
+    <section
+      id="matrix"
+      aria-labelledby="matrix-heading"
+      className="border-b border-line bg-mute-50"
+    >
       <div className="mx-auto max-w-[1480px]">
         {/* Header */}
         <div className="flex flex-col gap-6 border-b border-line px-5 py-14 md:flex-row md:items-end md:justify-between md:px-10 md:py-20">
@@ -446,14 +454,13 @@ function MatrixSection() {
               id="matrix-heading"
               className="mt-4 font-display text-4xl font-bold leading-[1.02] tracking-[-0.03em] text-ink md:text-5xl"
             >
-              Ingredient{" "}
-              <span className="text-brand-green-500">matrix</span>
+              Ingredient <span className="text-brand-green-600">matrix</span>
             </h2>
           </Reveal>
           <Reveal delay={0.1}>
             <a
               href="#contact"
-              className="group inline-flex items-center gap-2 rounded-sm border border-brand-blue-700 px-5 py-3 font-body text-sm font-semibold text-brand-blue-700 transition-all duration-300 hover:bg-brand-blue-50 focus-visible:outline-2 min-h-11"
+              className="group inline-flex items-center gap-2 rounded-sm border border-brand-blue-700 px-5 py-3 font-body text-sm font-semibold text-brand-blue-700 transition-colors duration-300 hover:bg-brand-blue-50 focus-visible:outline-2 min-h-11"
             >
               Request Full Specifications
               <ArrowRight
@@ -489,22 +496,22 @@ function MatrixSection() {
                 {/* Content */}
                 <div className="px-5 py-7 md:px-7 md:py-8">
                   <div className="flex items-baseline justify-between">
-                    <span className="font-tech text-[11px] tracking-[0.22em] text-brand-green-600">
+                    <span className="font-tech text-[11px] tracking-[0.22em] text-brand-green-700">
                       {String(i + 1).padStart(2, "0")} —
                     </span>
-                    <span className="font-tech text-[10px] uppercase tracking-[0.22em] text-mute-400">
+                    <span className="font-tech text-[10px] uppercase tracking-[0.22em] text-mute-600">
                       {item.code}
                     </span>
                   </div>
                   <h3 className="mt-3 font-body text-xl font-bold tracking-[-0.02em] text-ink transition-colors duration-300 group-hover:text-brand-green-600">
                     {item.name}
                   </h3>
-                  <p className="font-tech text-[11px] italic tracking-[0.06em] text-mute-500">
+                  <p className="font-tech text-[11px] italic tracking-[0.06em] text-mute-600">
                     {item.latin}
                   </p>
                   <dl className="mt-5 space-y-2.5 border-t border-line pt-4">
                     <div className="flex items-baseline justify-between gap-4">
-                      <dt className="font-tech text-[10px] uppercase tracking-[0.2em] text-mute-400">
+                      <dt className="font-tech text-[10px] uppercase tracking-[0.2em] text-mute-600">
                         Purity
                       </dt>
                       <dd className="text-right font-tech text-[11px] text-mute-700">
@@ -512,15 +519,17 @@ function MatrixSection() {
                       </dd>
                     </div>
                     <div className="flex items-baseline justify-between gap-4">
-                      <dt className="font-tech text-[10px] uppercase tracking-[0.2em] text-mute-400">
+                      <dt className="font-tech text-[10px] uppercase tracking-[0.2em] text-mute-600">
                         Form
                       </dt>
-                      <dd className="text-right font-tech text-[11px] text-mute-700">{item.form}</dd>
+                      <dd className="text-right font-tech text-[11px] text-mute-700">
+                        {item.form}
+                      </dd>
                     </div>
                   </dl>
                   <a
                     href="#contact"
-                    className="group/spec mt-6 inline-flex items-center gap-2 font-tech text-[10px] uppercase tracking-[0.24em] text-brand-blue-700 transition-colors duration-300 hover:text-brand-green-600 focus-visible:outline-2 min-h-11"
+                    className="group/spec mt-6 inline-flex items-center gap-2 font-tech text-[10px] uppercase tracking-[0.24em] text-brand-blue-700 transition-colors duration-300 hover:text-brand-green-700 focus-visible:outline-2 min-h-11"
                   >
                     Request Spec
                     <ArrowUpRight
@@ -550,7 +559,11 @@ function StandardsSection() {
   const imgY = useTransform(scrollYProgress, [0, 1], ["-7%", "7%"]);
 
   return (
-    <section id="standards" aria-labelledby="standards-heading" className="border-b border-line bg-paper">
+    <section
+      id="standards"
+      aria-labelledby="standards-heading"
+      className="border-b border-line bg-paper"
+    >
       <div className="mx-auto max-w-[1480px]">
         {/* Header */}
         <div className="flex flex-col gap-6 border-b border-line px-5 py-14 md:flex-row md:items-end md:justify-between md:px-10 md:py-20">
@@ -562,12 +575,11 @@ function StandardsSection() {
               id="standards-heading"
               className="mt-4 font-display text-4xl font-bold leading-[1.02] tracking-[-0.03em] text-ink md:text-5xl"
             >
-              Science-backed{" "}
-              <span className="text-brand-green-500">standards</span>
+              Science-backed <span className="text-brand-green-600">standards</span>
             </h2>
           </Reveal>
           <Reveal delay={0.1}>
-            <p className="max-w-xs font-body text-sm leading-relaxed text-mute-500">
+            <p className="max-w-xs font-body text-sm leading-relaxed text-mute-600">
               Every lot. Every market. Every release — documented to your regulatory map.
             </p>
           </Reveal>
@@ -591,7 +603,7 @@ function StandardsSection() {
                 <span className="font-tech text-[10px] uppercase tracking-[0.22em] text-mute-600">
                   QC Laboratory — Nanjing
                 </span>
-                <span className="font-tech text-[10px] uppercase tracking-[0.22em] text-brand-green-600">
+                <span className="font-tech text-[10px] uppercase tracking-[0.22em] text-brand-green-700">
                   HPLC · GC · Micro
                 </span>
               </div>
@@ -606,9 +618,7 @@ function StandardsSection() {
                 <Reveal
                   key={pillar.title}
                   delay={i * 0.09}
-                  className={
-                    i < pillars.length - 1 ? "border-b border-line" : ""
-                  }
+                  className={i < pillars.length - 1 ? "border-b border-line" : ""}
                 >
                   <div className="flex gap-5 px-5 py-10 transition-colors duration-400 hover:bg-brand-green-50 md:gap-8 md:px-10 md:py-12">
                     <div className="mt-1 flex size-10 shrink-0 items-center justify-center rounded-sm bg-brand-green-100 text-brand-green-600 md:size-12">
@@ -621,7 +631,7 @@ function StandardsSection() {
                       <p className="mt-3 font-body text-sm leading-relaxed text-mute-600 md:text-base">
                         {PILLAR_DETAIL[i].copy}
                       </p>
-                      <div className="mt-4 flex items-center gap-2 font-tech text-[10px] uppercase tracking-[0.22em] text-brand-green-600">
+                      <div className="mt-4 flex items-center gap-2 font-tech text-[10px] uppercase tracking-[0.22em] text-brand-green-700">
                         <CheckCircle2 aria-hidden className="size-3.5" />
                         ISO 9001 · GMP Certified
                       </div>
@@ -689,15 +699,15 @@ function FinaleSection() {
               <span className="text-brand-green-400">engineered to specification</span>
             </h2>
             <p className="mt-7 max-w-xl font-body text-base leading-relaxed text-brand-green-100/70 md:text-lg">
-              Submit a target spec — purity, form, matrix, regulatory map — and our laboratory returns
-              a validated proposal with full documentation within one business day.
+              Submit a target spec — purity, form, matrix, regulatory map — and our laboratory
+              returns a validated proposal with full documentation within one business day.
             </p>
           </Reveal>
 
           <Reveal delay={0.15} className="mt-10 flex flex-wrap gap-4">
             <a
               href={`mailto:${company.email}`}
-              className="group inline-flex items-center gap-3 rounded-sm bg-brand-green-500 px-8 py-4 font-body text-sm font-bold text-paper shadow-[0_0_40px_oklch(0.66_0.163_134.7_/_0.3)] transition-all duration-300 hover:bg-brand-green-400 hover:shadow-[0_0_64px_oklch(0.66_0.163_134.7_/_0.5)] focus-visible:outline-2 min-h-11"
+              className="group inline-flex items-center gap-3 rounded-sm bg-brand-green-500 px-8 py-4 font-body text-sm font-bold text-brand-green-950 shadow-[0_0_40px_oklch(from_var(--color-brand-green-500)_l_c_h_/_0.3)] transition-[background-color,box-shadow] duration-300 hover:bg-brand-green-400 hover:shadow-[0_0_64px_oklch(from_var(--color-brand-green-500)_l_c_h_/_0.5)] focus-visible:outline-2 min-h-11"
             >
               Partner with Fenchem
               <ArrowRight
@@ -707,14 +717,14 @@ function FinaleSection() {
             </a>
             <a
               href="#matrix"
-              className="inline-flex items-center gap-3 rounded-sm border border-brand-green-500/40 px-8 py-4 font-body text-sm font-semibold text-brand-green-200 transition-all duration-300 hover:border-brand-green-400 hover:bg-brand-green-900/40 hover:text-paper focus-visible:outline-2 min-h-11"
+              className="inline-flex items-center gap-3 rounded-sm border border-brand-green-500/40 px-8 py-4 font-body text-sm font-semibold text-brand-green-200 transition-colors duration-300 hover:border-brand-green-400 hover:bg-brand-green-900/40 hover:text-paper focus-visible:outline-2 min-h-11"
             >
               Explore Portfolio
             </a>
           </Reveal>
 
           <Reveal delay={0.25}>
-            <p className="mt-10 font-tech text-[10px] uppercase tracking-[0.28em] text-brand-green-500/50">
+            <p className="mt-10 font-tech text-[10px] uppercase tracking-[0.28em] text-brand-green-400">
               Response Time &lt; 24h — Technical Dossiers on Request
             </p>
           </Reveal>
@@ -722,7 +732,7 @@ function FinaleSection() {
           {/* Office nodes */}
           <div className="mt-20 border-t border-brand-green-800 pt-14">
             <Reveal>
-              <p className="font-tech text-[10px] uppercase tracking-[0.3em] text-brand-green-500/60">
+              <p className="font-tech text-[10px] uppercase tracking-[0.3em] text-brand-green-400">
                 6 Global Bases — 40+ Countries Served
               </p>
             </Reveal>
@@ -731,8 +741,8 @@ function FinaleSection() {
                 <Reveal key={region.city} delay={i * 0.06} className="bg-brand-green-950/80">
                   <div className="px-4 py-6 transition-colors duration-300 hover:bg-brand-green-900/60">
                     <p className="font-body text-sm font-semibold text-paper">{region.city}</p>
-                    <p className="mt-0.5 font-body text-xs text-brand-green-400/70">{region.short}</p>
-                    <p className="mt-2 font-tech text-[9px] tracking-[0.16em] text-brand-green-600/60">
+                    <p className="mt-0.5 font-body text-xs text-brand-green-400">{region.short}</p>
+                    <p className="mt-2 font-tech text-[9px] tracking-[0.16em] text-brand-green-400">
                       {region.coords}
                     </p>
                   </div>
@@ -761,10 +771,10 @@ function FooterSection() {
               </span>
               <Leaf aria-hidden className="size-5 text-brand-green-500" strokeWidth={1.5} />
             </div>
-            <p className="mt-3 font-body text-base font-medium text-brand-green-600">
+            <p className="mt-3 font-body text-base font-medium text-brand-green-700">
               Rooted in Nature, Refined by Science.
             </p>
-            <p className="mt-5 font-tech text-[10px] uppercase leading-loose tracking-[0.22em] text-mute-400">
+            <p className="mt-5 font-tech text-[10px] uppercase leading-loose tracking-[0.22em] text-mute-600">
               ISO 9001 : 2015 · GMP · HACCP
               <br />
               Est. 1995 — Nanjing, China
@@ -784,7 +794,7 @@ function FooterSection() {
           {/* Nav columns */}
           {FOOTER_COLS.map((col) => (
             <div key={col.head} className="md:col-span-2">
-              <p className="font-tech text-[10px] uppercase tracking-[0.3em] text-mute-400">
+              <p className="font-tech text-[10px] uppercase tracking-[0.3em] text-mute-600">
                 {col.head}
               </p>
               <ul className="mt-5 space-y-3">
@@ -792,7 +802,7 @@ function FooterSection() {
                   <li key={link.label}>
                     <a
                       href={link.href}
-                      className="font-body text-sm text-mute-600 underline decoration-line underline-offset-4 transition-colors duration-300 hover:text-brand-green-600 hover:decoration-brand-green-400 focus-visible:outline-2"
+                      className="font-body text-sm text-mute-600 underline decoration-line underline-offset-4 transition-colors duration-300 hover:text-brand-green-700 hover:decoration-brand-green-400 focus-visible:outline-2"
                     >
                       {link.label}
                     </a>
@@ -812,10 +822,10 @@ function FooterSection() {
         </p>
 
         {/* Legal strip */}
-        <div className="flex flex-col gap-2 border-t border-line px-5 py-4 font-tech text-[10px] uppercase tracking-[0.22em] text-mute-400 md:flex-row md:items-center md:justify-between md:px-10">
+        <div className="flex flex-col gap-2 border-t border-line px-5 py-4 font-tech text-[10px] uppercase tracking-[0.22em] text-mute-600 md:flex-row md:items-center md:justify-between md:px-10">
           <span>© 2026 Fenchem Biochemical Group — All Rights Reserved</span>
           <span>N 32.06 / E 118.79 — Nanjing, China</span>
-          <span className="text-brand-green-500/60">Botanical Intelligence Since 1995</span>
+          <span className="text-brand-green-700">Botanical Intelligence Since 1995</span>
         </div>
       </div>
     </footer>

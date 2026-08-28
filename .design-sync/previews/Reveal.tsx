@@ -27,8 +27,8 @@ export const SectionTitle = () => (
             marginTop: 12,
           }}
         >
-          Three decades of extraction science, supplying formulators across
-          nutrition, cosmetics, and food & beverage.
+          Three decades of extraction science, supplying formulators across nutrition, cosmetics,
+          and food & beverage.
         </p>
       </div>
     </Reveal>

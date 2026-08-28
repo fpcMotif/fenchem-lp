@@ -64,7 +64,7 @@ display exception).
 `apps/web/src/components/landing/landing-content.ts` — the single typed module
 that owns every stable domain fact the landing surface renders (ingredients,
 industries, pillars, stats, certifications, regions, company facts). Every
-variant (A–G) and the folded-in `LandingPage` render *through* it; only
+variant (A–G) and the folded-in `LandingPage` render _through_ it; only
 per-variant **prose** (headlines, eyebrows, bespoke section copy) and
 presentation (Tailwind classes, motion, icons, layout) stay local.
 _Avoid_: "the data file", "constants" — it is an interface, not a dumping ground.

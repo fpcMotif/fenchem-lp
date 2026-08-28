@@ -64,7 +64,7 @@ function NavBar() {
             <a
               key={link.href}
               href={link.href}
-              className="font-body text-sm text-bark/60 transition-colors duration-300 hover:text-forest"
+              className="font-body text-sm text-bark/65 transition-colors duration-300 hover:text-forest"
             >
               {link.label}
             </a>
@@ -72,7 +72,7 @@ function NavBar() {
         </div>
         <a
           href="#contact"
-          className="inline-flex items-center gap-1.5 rounded-full bg-forest px-5 py-2.5 font-body text-sm font-semibold text-cream shadow-lift transition-all duration-300 hover:-translate-y-0.5 hover:bg-fern"
+          className="inline-flex items-center gap-1.5 rounded-full bg-forest px-5 py-2.5 font-body text-sm font-semibold text-cream shadow-lift transition-[background-color,translate] duration-300 hover:-translate-y-0.5 hover:bg-fern"
         >
           Partner with Us
         </a>
@@ -112,7 +112,7 @@ function HeroSection({ heroRef, blobY }: HeroSectionProps) {
           <Intro delay={0.46} className="mt-10 flex flex-wrap items-center gap-4">
             <a
               href="#ingredients"
-              className="inline-flex items-center gap-2 rounded-full bg-forest px-8 py-4 font-body text-sm font-semibold tracking-wide text-cream shadow-lift transition-all duration-300 hover:-translate-y-0.5 hover:bg-fern hover:shadow-ambient"
+              className="inline-flex items-center gap-2 rounded-full bg-forest px-8 py-4 font-body text-sm font-semibold tracking-wide text-cream shadow-lift transition-[background-color,translate,box-shadow] duration-300 hover:-translate-y-0.5 hover:bg-fern hover:shadow-ambient"
             >
               Explore Portfolio
               <ArrowUpRight className="h-4 w-4" aria-hidden />
@@ -159,7 +159,7 @@ function HeroSection({ heroRef, blobY }: HeroSectionProps) {
                   Extraction Yield
                 </p>
                 <p className="mt-2 font-display text-4xl font-light text-forest">98%</p>
-                <p className="mt-1 text-xs leading-relaxed text-bark/55">
+                <p className="mt-1 text-xs leading-relaxed text-bark/65">
                   Bio-active retention across our extraction process.
                 </p>
               </m.div>
@@ -182,7 +182,7 @@ function IndustriesSection() {
               Purity across <em className="italic text-moss">industries</em>
             </h2>
           </div>
-          <p className="max-w-sm text-base leading-relaxed text-bark/60">
+          <p className="max-w-sm text-base leading-relaxed text-bark/65">
             Crafted to meet the rigorous demands of global leaders in health, wellness and beauty.
           </p>
         </Reveal>
@@ -209,7 +209,7 @@ function IndustriesSection() {
                     {industry.title}
                   </h3>
                 </div>
-                <p className="mt-3 text-sm leading-relaxed text-bark/60">{industry.copy}</p>
+                <p className="mt-3 text-sm leading-relaxed text-bark/65">{industry.copy}</p>
                 <span className="mt-5 inline-flex items-center gap-2 font-body text-sm font-semibold text-fern transition-colors duration-300 group-hover:text-forest">
                   Explore applications
                   <ArrowUpRight
@@ -277,7 +277,7 @@ function ScienceSection() {
                     <span className="font-display text-3xl font-light text-forest md:text-4xl">
                       {stat.value}
                     </span>
-                    <p className="mt-1.5 text-xs leading-relaxed text-bark/55 md:text-sm">
+                    <p className="mt-1.5 text-xs leading-relaxed text-bark/65 md:text-sm">
                       {stat.label}
                     </p>
                   </div>
@@ -301,7 +301,7 @@ function ScienceSection() {
                     <h3 className="mt-6 font-display text-2xl font-medium tracking-tight text-forest">
                       {pillar.title}
                     </h3>
-                    <p className="mt-3 max-w-xs text-sm leading-relaxed text-bark/60">
+                    <p className="mt-3 max-w-xs text-sm leading-relaxed text-bark/65">
                       {pillar.copy}
                     </p>
                   </div>
@@ -320,11 +320,13 @@ function IngredientsSection() {
     <section id="ingredients" className="scroll-mt-28 py-28 md:py-40">
       <div className="mx-auto max-w-[1080px] px-6 text-center md:px-12">
         <Reveal>
-          <Eyebrow accent="text-moss" className="text-center">The portfolio</Eyebrow>
+          <Eyebrow accent="text-moss" className="text-center">
+            The portfolio
+          </Eyebrow>
           <h2 className="mx-auto mt-5 max-w-3xl font-display text-4xl font-light tracking-tight text-forest md:text-5xl lg:text-6xl">
             A <em className="italic text-moss">living library</em> of botanical actives
           </h2>
-          <p className="mx-auto mt-7 max-w-xl text-base leading-relaxed text-bark/60 md:text-lg">
+          <p className="mx-auto mt-7 max-w-xl text-base leading-relaxed text-bark/65 md:text-lg">
             Standardized extracts and functional ingredients, each backed by full identity, potency
             and stability documentation.
           </p>
@@ -337,7 +339,7 @@ function IngredientsSection() {
             <a
               key={ingredient.name}
               href="#contact"
-              className="group inline-flex items-center gap-2.5 rounded-full bg-mint px-6 py-3 font-body text-sm font-medium text-fern transition-all duration-300 hover:-translate-y-0.5 hover:bg-mist hover:shadow-lift"
+              className="group inline-flex items-center gap-2.5 rounded-full bg-mint px-6 py-3 font-body text-sm font-medium text-fern transition-[background-color,translate,box-shadow] duration-300 hover:-translate-y-0.5 hover:bg-mist hover:shadow-lift"
             >
               <Leaf
                 className="h-3.5 w-3.5 text-moss transition-transform duration-300 group-hover:rotate-12"
@@ -370,7 +372,7 @@ function QualitySection() {
       <div className="mx-auto max-w-[1280px] px-6 md:px-12 lg:px-16">
         <Reveal>
           <div className="flex flex-col items-center gap-6 border-y border-pebble py-10 md:flex-row md:justify-between md:py-12">
-            <p className="font-tech text-[10px] uppercase tracking-[0.3em] text-bark/40 md:text-[11px]">
+            <p className="font-tech text-[10px] uppercase tracking-[0.3em] text-bark/65 md:text-[11px]">
               Certified quality systems
             </p>
             <ul className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3">
@@ -405,18 +407,20 @@ function CtaSection() {
               className="absolute -bottom-32 -right-16 h-80 w-80 rounded-full bg-mist/70 blur-3xl"
             />
             <div className="relative">
-              <Eyebrow accent="text-moss" className="text-center">Start the conversation</Eyebrow>
+              <Eyebrow accent="text-moss" className="text-center">
+                Start the conversation
+              </Eyebrow>
               <h2 className="mx-auto mt-6 max-w-3xl font-display text-4xl font-light leading-[1.08] tracking-tight text-forest md:text-6xl">
                 Let&rsquo;s formulate <em className="italic text-moss">what&rsquo;s next.</em>
               </h2>
-              <p className="mx-auto mt-7 max-w-xl text-base leading-relaxed text-bark/60 md:text-lg">
+              <p className="mx-auto mt-7 max-w-xl text-base leading-relaxed text-bark/65 md:text-lg">
                 From first sample to full-scale supply — tell us what you&rsquo;re building and our
                 technical team will respond within one business day.
               </p>
               <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
                 <button
                   type="button"
-                  className="inline-flex items-center gap-2 rounded-full bg-forest px-9 py-4 font-body text-sm font-semibold tracking-wide text-cream shadow-lift transition-all duration-300 hover:-translate-y-0.5 hover:bg-fern hover:shadow-ambient"
+                  className="inline-flex items-center gap-2 rounded-full bg-forest px-9 py-4 font-body text-sm font-semibold tracking-wide text-cream shadow-lift transition-[background-color,translate,box-shadow] duration-300 hover:-translate-y-0.5 hover:bg-fern hover:shadow-ambient"
                 >
                   Partner with Fenchem
                   <ArrowUpRight className="h-4 w-4" aria-hidden />
@@ -441,7 +445,7 @@ function FooterSection() {
     <footer className="bg-forest text-cream">
       <div className="mx-auto max-w-[1280px] px-6 pb-10 pt-20 md:px-12 md:pt-28 lg:px-16">
         <Reveal>
-          <p className="font-tech text-[10px] uppercase tracking-[0.3em] text-mist/50 md:text-[11px]">
+          <p className="font-tech text-[10px] uppercase tracking-[0.3em] text-mist/70 md:text-[11px]">
             Rooted in Nature, Refined by Science
           </p>
           <p className="mt-6 font-display text-[clamp(4rem,13vw,10rem)] font-light leading-[0.95] tracking-tight">
@@ -456,7 +460,7 @@ function FooterSection() {
             </p>
           </Reveal>
           <Reveal delay={0.08}>
-            <p className="font-tech text-[10px] uppercase tracking-[0.25em] text-mist/40">
+            <p className="font-tech text-[10px] uppercase tracking-[0.25em] text-mist/60">
               Explore
             </p>
             <ul className="mt-5 space-y-3">
@@ -481,7 +485,7 @@ function FooterSection() {
             </ul>
           </Reveal>
           <Reveal delay={0.16}>
-            <p className="font-tech text-[10px] uppercase tracking-[0.25em] text-mist/40">
+            <p className="font-tech text-[10px] uppercase tracking-[0.25em] text-mist/60">
               Global bases
             </p>
             <ul className="mt-5 space-y-3">
@@ -494,17 +498,17 @@ function FooterSection() {
           </Reveal>
         </div>
         <div className="mt-16 flex flex-col items-center justify-between gap-4 border-t border-cream/10 pt-8 md:flex-row">
-          <p className="text-xs text-mist/50">© 2026 Fenchem Biotek Ltd. All rights reserved.</p>
+          <p className="text-xs text-mist/70">© 2026 Fenchem Biotek Ltd. All rights reserved.</p>
           <div className="flex items-center gap-8">
             <button
               type="button"
-              className="text-xs text-mist/50 transition-colors duration-300 hover:text-mint"
+              className="text-xs text-mist/70 transition-colors duration-300 hover:text-mint"
             >
               Privacy Policy
             </button>
             <button
               type="button"
-              className="text-xs text-mist/50 transition-colors duration-300 hover:text-mint"
+              className="text-xs text-mist/70 transition-colors duration-300 hover:text-mint"
             >
               Terms of Service
             </button>

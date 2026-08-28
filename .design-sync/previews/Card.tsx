@@ -16,8 +16,8 @@ export const IngredientCard = () => (
       <CardDescription>Joint health · Nutrition division</CardDescription>
     </CardHeader>
     <CardContent>
-      Clinically studied collagen peptide supporting mobility and cartilage
-      health, supplied at industrial scale to formulators in 40+ countries.
+      Clinically studied collagen peptide supporting mobility and cartilage health, supplied at
+      industrial scale to formulators in 40+ countries.
     </CardContent>
     <CardFooter>
       <Button size="sm">Request specification</Button>
@@ -31,12 +31,13 @@ export const WithAction = () => (
       <CardTitle>Lutein 20% Beadlet</CardTitle>
       <CardDescription>Eye health · stable formulation</CardDescription>
       <CardAction>
-        <Button variant="ghost" size="sm">View</Button>
+        <Button variant="ghost" size="sm">
+          View
+        </Button>
       </CardAction>
     </CardHeader>
     <CardContent>
-      Marigold-derived lutein esters, microencapsulated for tablet and capsule
-      applications.
+      Marigold-derived lutein esters, microencapsulated for tablet and capsule applications.
     </CardContent>
   </Card>
 );

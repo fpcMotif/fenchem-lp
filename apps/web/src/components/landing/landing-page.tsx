@@ -26,7 +26,7 @@ const focusOnDark =
 const focusOnLight =
   "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-forest";
 const actionBase =
-  "box-border inline-flex min-h-11 w-full max-w-full min-w-0 flex-wrap items-center justify-center gap-2 whitespace-normal break-words rounded-full text-center font-semibold text-sm/5 transition-[background-color,border-color,color,transform] duration-200 ease-out active:scale-[0.96] sm:w-fit";
+  "box-border inline-flex min-h-11 w-full max-w-full min-w-0 flex-wrap items-center justify-center gap-2 whitespace-normal break-words rounded-full text-center font-semibold text-sm/5 transition-[background-color,border-color,color,scale] duration-200 ease-out active:scale-[0.96] sm:w-fit";
 const darkAction = `${actionBase} ${focusOnDark}`;
 const lightAction = `${actionBase} ${focusOnLight}`;
 const eyebrow = "font-tech text-xs/5 uppercase";
@@ -40,7 +40,7 @@ const ingredientGroups = [
 
 export function LandingPage() {
   return (
-    <main className="w-full max-w-full overflow-x-hidden bg-cream font-body text-bark selection:bg-mint selection:text-forest">
+    <main className="w-full max-w-full overflow-x-hidden bg-cream font-body text-bark antialiased selection:bg-mint selection:text-forest">
       <a
         href="#industries"
         className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-lg focus:bg-cream focus:px-4 focus:py-3 focus:text-forest focus:shadow-ambient focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-forest"
@@ -66,7 +66,7 @@ function Hero() {
         className="absolute inset-0 h-full w-full object-cover"
         loading="eager"
       />
-      <div className="absolute inset-0 bg-[linear-gradient(90deg,oklch(0.224_0.006_121.918_/_0.88),oklch(0.288_0.04_160.598_/_0.62),oklch(0.224_0.006_121.918_/_0.25))]" />
+      <div className="absolute inset-0 bg-[linear-gradient(90deg,oklch(from_var(--color-bark)_l_c_h_/_0.88),oklch(from_var(--color-forest)_l_c_h_/_0.62),oklch(from_var(--color-bark)_l_c_h_/_0.25))]" />
       <header className="relative z-10 mx-auto flex max-w-7xl flex-wrap items-center gap-x-4 gap-y-3 px-5 py-5 md:px-8 lg:px-10">
         <a
           href="#top"
@@ -106,7 +106,7 @@ function Hero() {
           <h1 className="mt-6 max-w-6xl text-balance font-display text-5xl leading-none text-cream sm:text-7xl lg:text-8xl">
             Fenchem
           </h1>
-          <p className="mt-7 max-w-2xl text-cream/86 text-lg leading-8 md:text-xl">
+          <p className="mt-7 max-w-2xl text-pretty text-cream/86 text-lg leading-8 md:text-xl">
             Production-ready botanical and functional ingredients for nutrition, food, beverage, and
             personal care teams that need clean specifications without procurement friction.
           </p>
@@ -131,7 +131,7 @@ function Hero() {
       <div className="relative z-10 border-cream/15 border-t bg-bark/35">
         <dl className="mx-auto grid max-w-7xl grid-cols-1 divide-y divide-cream/15 px-5 md:grid-cols-3 md:divide-x md:divide-y-0 md:px-8 lg:px-10">
           {[
-            ["25+", "years of ingredient expertise"],
+            ["30+", "years of ingredient expertise"],
             ["40+", "countries supported"],
             ["ISO/GMP", "audited quality systems"],
           ].map(([value, label]) => (
@@ -157,7 +157,7 @@ function IndustryProof() {
               Built for real formulation work.
             </h2>
           </div>
-          <p className="max-w-2xl text-bark/72 text-lg leading-8">
+          <p className="max-w-2xl text-pretty text-bark/72 text-lg leading-8">
             The page is quiet on purpose: direct ingredient categories, visible proof, and clear
             contact routes for buyers who already know what they need.
           </p>
@@ -194,7 +194,7 @@ function IndustryProof() {
                       <h3 className="mt-7 text-balance font-display text-3xl leading-tight text-forest">
                         {card.title}
                       </h3>
-                      <p className="mt-4 text-bark/72 leading-7">{card.copy}</p>
+                      <p className="mt-4 text-pretty text-bark/72 leading-7">{card.copy}</p>
                     </div>
                     <p className={`${eyebrow} mt-8 text-clay`}>{card.metric}</p>
                   </div>
@@ -241,7 +241,7 @@ function QualityProcess() {
                 </span>
                 <div>
                   <h3 className="text-balance font-display text-2xl text-forest">{step.title}</h3>
-                  <p className="mt-2 text-bark/72 leading-7">{step.copy}</p>
+                  <p className="mt-2 text-pretty text-bark/72 leading-7">{step.copy}</p>
                 </div>
               </div>
             </li>
@@ -292,7 +292,9 @@ function IngredientPortfolio() {
                     className="border-pebble border-t pt-4 first:border-t-0 first:pt-0"
                   >
                     <p className="font-semibold text-forest">{ingredient.name}</p>
-                    <p className="mt-1 text-bark/72 text-sm">{ingredient.specification}</p>
+                    <p className="mt-1 text-pretty text-bark/72 text-sm">
+                      {ingredient.specification}
+                    </p>
                   </li>
                 ))}
               </ul>
@@ -314,7 +316,7 @@ function GlobalSupply() {
             <h2 className="mt-5 text-balance font-display text-4xl leading-tight text-cream sm:text-5xl md:text-6xl">
               Regional support without handoff fog.
             </h2>
-            <p className="mt-6 max-w-lg text-cream/76 leading-8">
+            <p className="mt-6 max-w-lg text-pretty text-cream/76 leading-8">
               Fenchem pairs global production with local commercial and documentation support so
               teams can move from inquiry to compliant supply with fewer loops.
             </p>
@@ -350,7 +352,7 @@ function ContactFooter() {
           <h2 className="mt-5 max-w-3xl text-balance font-display text-4xl leading-tight text-cream sm:text-5xl md:text-6xl">
             Tell Fenchem what you are formulating.
           </h2>
-          <p className="mt-6 max-w-xl text-cream/74 leading-8">
+          <p className="mt-6 max-w-xl text-pretty text-cream/74 leading-8">
             Send a target ingredient, application, format, and market. The technical team can return
             documentation, lead times, and sampling options within one business day.
           </p>

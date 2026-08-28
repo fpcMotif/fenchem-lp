@@ -9,7 +9,10 @@
   "guidelinesGlob": [
     "docs/brand/fenchem-brand-book.md",
     "docs/brand/landing-variants-design-review.md",
-    "docs/brand/landing-design-principles.md"
+    "docs/brand/landing-design-principles.md",
+    "docs/brand/landing-ui-polish-ci-notes.md",
+    "docs/brand/variant-h-continuous-improvement.md",
+    "docs/brand/landing-polish-improvements.md"
   ],
   "dtsPropsFor": {
     "Button": "variant?: \"default\" | \"destructive\" | \"outline\" | \"secondary\" | \"ghost\" | \"link\"; size?: \"default\" | \"sm\" | \"lg\" | \"icon\"; disabled?: boolean; className?: string; children?: React.ReactNode; onClick?: React.MouseEventHandler;",

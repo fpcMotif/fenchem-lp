@@ -14,18 +14,18 @@ Screenshots are real captures at 1366×860 (reduced-motion), saved under
 `docs/brand/screenshots/font-{before,after}-{d,e,f}.png`.
 
 > **Honest caveats.**
-> • **D** was always the "editorial" variant, so its *headline* is Newsreader serif in **both**
->   shots — D's change is the **body** font (Noto → Plus Jakarta) **plus** the hero contrast
->   fix (commit `78811c8`), so its "after" is crisper for more than one reason.
-> • **E** and **F** are the clean *font-only* comparisons. F's headline flipped Source Han Sans →
->   Newsreader serif; **E's** flipped Source Han Sans → **Plus Jakarta Sans** (grotesque — the Swiss choice).
+> • **D** was always the "editorial" variant, so its _headline_ is Newsreader serif in **both**
+> shots — D's change is the **body** font (Noto → Plus Jakarta) **plus** the hero contrast
+> fix (commit `78811c8`), so its "after" is crisper for more than one reason.
+> • **E** and **F** are the clean _font-only_ comparisons. F's headline flipped Source Han Sans →
+> Newsreader serif; **E's** flipped Source Han Sans → **Plus Jakarta Sans** (grotesque — the Swiss choice).
 
 ---
 
 ## D — Botanical Editorial
 
-| Before · Source Han Sans body | After · Plus Jakarta body + contrast fix |
-|---|---|
+| Before · Source Han Sans body              | After · Plus Jakarta body + contrast fix |
+| ------------------------------------------ | ---------------------------------------- |
 | ![D before](screenshots/font-before-d.png) | ![D after](screenshots/font-after-d.png) |
 
 The serif headline is unchanged. In the **after**, the lede/body switches to Plus Jakarta
@@ -34,8 +34,8 @@ green veil no longer washes it, weight 300→400, accent green-500→green-700).
 
 ## E — Innovation Lab
 
-| Before · Source Han Sans grotesque | After · Plus Jakarta Sans grotesque |
-|---|---|
+| Before · Source Han Sans grotesque         | After · Plus Jakarta Sans grotesque      |
+| ------------------------------------------ | ---------------------------------------- |
 | ![E before](screenshots/font-before-e.png) | ![E after](screenshots/font-after-e.png) |
 
 A like-for-like swap — both are heavy **sans** headlines, which is right for E's Swiss /
@@ -47,23 +47,23 @@ upgrades the letterforms.
 
 ## F — Deep Green
 
-| Before · Source Han Sans headline | After · Newsreader serif headline |
-|---|---|
+| Before · Source Han Sans headline          | After · Newsreader serif headline        |
+| ------------------------------------------ | ---------------------------------------- |
 | ![F before](screenshots/font-before-f.png) | ![F after](screenshots/font-after-f.png) |
 
 Decisive. **Before** is a plain sans on the dark hero; **after** is Newsreader with an italic
-"*Refined by Science.*" — exactly the luxury-flagship register this variant wants. **After
+"_Refined by Science._" — exactly the luxury-flagship register this variant wants. **After
 wins clearly.**
 
 ---
 
 ## Verdict
 
-| Variant | Better setting | Why |
-|---|---|---|
-| **D** | **After** (current) | Cleaner body font + the hero contrast fix; headline serif unchanged. |
-| **E** | **After** (current) | Plus Jakarta grotesque keeps the Swiss/lab genre with cleaner Latin than Source Han. (Serif was trialled and rejected for E.) |
-| **F** | **After** (current) | Serif italic is perfect for the dark luxury flagship; Source Han looked generic. |
+| Variant | Better setting      | Why                                                                                                                           |
+| ------- | ------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| **D**   | **After** (current) | Cleaner body font + the hero contrast fix; headline serif unchanged.                                                          |
+| **E**   | **After** (current) | Plus Jakarta grotesque keeps the Swiss/lab genre with cleaner Latin than Source Han. (Serif was trialled and rejected for E.) |
+| **F**   | **After** (current) | Serif italic is perfect for the dark luxury flagship; Source Han looked generic.                                              |
 
 **Overall:** the current pairing (Newsreader + Plus Jakarta + JetBrains Mono) is the stronger,
 more premium choice for the **English** site across all three — the win is largest on F and on
