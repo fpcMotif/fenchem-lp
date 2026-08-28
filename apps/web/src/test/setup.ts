@@ -41,7 +41,7 @@ Object.defineProperty(window, "matchMedia", {
   writable: true,
   configurable: true,
   value: vi.fn((query: string) => ({
-    matches: false,
+    matches: query.includes("prefers-reduced-motion"),
     media: query,
     onchange: null,
     addListener: vi.fn(),
@@ -51,6 +51,18 @@ Object.defineProperty(window, "matchMedia", {
     dispatchEvent: vi.fn(),
   })),
 });
+if (typeof document !== "undefined") {
+  Object.defineProperty(document, "fonts", {
+    writable: true,
+    configurable: true,
+    value: {
+      ready: Promise.resolve(),
+      check: vi.fn(() => true),
+      add: vi.fn(),
+      load: vi.fn(() => Promise.resolve([])),
+    },
+  });
+}
 
 afterEach(() => {
   cleanup();

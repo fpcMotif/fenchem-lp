@@ -5,6 +5,7 @@
   "scripts": {
     "build": "vp build",
     "serve": "vp preview",
+    "dev": "vp dev",
     "dev:bare": "vp dev",
     "test": "node ../../node_modules/vitest/dist/cli.js run --config vitest.config.ts",
     "test:coverage": "node ../../node_modules/vitest/dist/cli.js run --config vitest.config.ts --coverage",
@@ -34,6 +35,7 @@
     "react-dom": "catalog:",
     "sonner": "^2.0.7",
     "tailwindcss": "^4.2.2",
+    "three": "^0.185.1",
     "zod": "catalog:"
   },
   "devDependencies": {
@@ -44,6 +46,7 @@
     "@testing-library/react": "^16.3.2",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
+    "@types/three": "^0.185.4",
     "@vitejs/plugin-react": "^6.0.1",
     "alchemy": "catalog:",
     "jsdom": "^29.0.2",

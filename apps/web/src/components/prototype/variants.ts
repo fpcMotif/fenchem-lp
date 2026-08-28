@@ -11,6 +11,7 @@ import { VariantH } from "./variant-h";
 import { VariantI } from "./variant-i";
 import { VariantJ } from "./variant-j/index";
 import { VariantK } from "./variant-k";
+import { VariantWaterfall } from "./variant-waterfall";
 
 /*
  * PROTOTYPE — single source of truth for the Fenchem landing variants.
@@ -46,6 +47,7 @@ export const VARIANTS = [
   { key: "i", Component: VariantI, name: "Production+ · map & WebGL" },
   { key: "j", Component: VariantJ, name: "Greenhouse Ledger · motion" },
   { key: "k", Component: VariantK, name: "Production · vivid", twinOf: "h" },
+  { key: "w", Component: VariantWaterfall, name: "Three.js Waterfall Fountain" },
 ] as const satisfies readonly VariantEntry[];
 
 export type VariantKey = (typeof VARIANTS)[number]["key"];

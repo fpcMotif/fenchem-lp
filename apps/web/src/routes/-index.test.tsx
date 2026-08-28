@@ -61,6 +61,14 @@ describe("home route", () => {
     expect(container).toBeTruthy();
   });
 
+  test("renders the waterfall fountain variant (w)", () => {
+    const Component = Route.options.component as React.ComponentType;
+    vi.spyOn(Route, "useSearch").mockReturnValue({ variant: "w" } as never);
+
+    const { container } = render(<Component />);
+    expect(container.textContent).toContain("FENCHEM");
+  });
+
   test("handles variant without matching component", () => {
     const Component = Route.options.component as React.ComponentType;
     vi.spyOn(Route, "useSearch").mockReturnValue({ variant: "unknown" } as never);
