@@ -1,0 +1,10 @@
+import { VariantA } from "@fenchem-lp/ui";
+import { CaptureStatic, SnapDelayed } from "./_lib/capture-static";
+
+export const BotanicalEditorial = () => (
+  <>
+    <CaptureStatic />
+    <SnapDelayed />
+    <VariantA />
+  </>
+);
