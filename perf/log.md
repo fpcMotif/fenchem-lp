@@ -8,9 +8,17 @@ Full source data (including per-run cold-start samples) lives in `perf/log.json`
 
 **Tool boundary — never mixed** (per issue #3): `hyperfine` measures compile wall-time
 only · Playwright/`PerformanceObserver` measures local cold-start paint timings only ·
-deployed Cloudflare cold-start + real-user web-vitals are a separate follow-up not yet
-wired here (see `perf/README.md`).
+deployed Cloudflare cold-start + real-user web-vitals are a separate follow-up (the
+`--url` mode on `measure-coldstart.mjs` covers synthetic deployed probing; a
+`Server-Timing` Worker-share header and real-user RUM are not wired — see
+`perf/README.md`).
 
-| Date | Stack | Commit | Full build (cold, n=1) | Web bundle (hyperfine) | CSS raw/gzip | JS raw/gzip | TTFB | FCP | LCP | CLS |
+Cold-start columns show **median / p75** — p75 is the percentile Core Web Vitals
+actually grades on. `coldstart.method` in `log.json` distinguishes rows measured
+before vs. after the LCP-stabilization-poll fix (the earlier fixed-500ms-post-load read
+undercounted LCP on this site's animated hero); mixed-method rows aren't a fair diff.
+
+| Date | Stack | Commit | Full build (cold, n=1) | Web bundle (hyperfine) | CSS raw/gzip | JS raw/gzip | TTFB med/p75 | FCP med/p75 | LCP med/p75 | CLS med/p75 |
 |---|---|---|---|---|---|---|---|---|---|---|
-| 2026-08-31 | tailwind | 2ec7f83* | 6.84 s | 7.31 s | 156.09 kB / 22.01 kB | 2149.13 kB / 578.74 kB | 23 ms | 1.04 s | 1.60 s | 0.002 |
+| 2026-08-31 | tailwind | 2ec7f83* | 6.84 s | 7.31 s | 156.09 kB / 22.01 kB | 2149.13 kB / 578.74 kB | — / — | — / — | — / — | — / — |
+| 2026-08-31 | tailwind | 9ed0b0f* | 30.77 s | 28.73 s | 156.09 kB / 22.01 kB | 2150.00 kB / 579.01 kB | 58 ms / 81 ms | 1.37 s / 1.44 s | 1.58 s / 1.69 s | 0.002 / 0.002 |

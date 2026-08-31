@@ -25,6 +25,16 @@ export function mean(nums) {
   return nums.reduce((a, b) => a + b, 0) / nums.length;
 }
 
+/** Nearest-rank percentile (p in [0,100]) — the metric Core Web Vitals actually grades
+ * on (p75), not the mean/median. With small sample counts (n<10) this is coarse — more
+ * runs sharpen it — but it's still the methodologically right number to report. */
+export function percentile(nums, p) {
+  if (nums.length === 0) return null;
+  const sorted = [...nums].sort((a, b) => a - b);
+  const rank = Math.ceil((p / 100) * sorted.length) - 1;
+  return sorted[Math.min(Math.max(rank, 0), sorted.length - 1)];
+}
+
 export function fmtMs(ms) {
   if (ms == null || Number.isNaN(ms)) return "—";
   return ms >= 1000 ? `${(ms / 1000).toFixed(2)} s` : `${ms.toFixed(0)} ms`;

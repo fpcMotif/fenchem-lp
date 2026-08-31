@@ -57,10 +57,17 @@ Full source data (including per-run cold-start samples) lives in \`perf/log.json
 
 **Tool boundary — never mixed** (per issue #3): \`hyperfine\` measures compile wall-time
 only · Playwright/\`PerformanceObserver\` measures local cold-start paint timings only ·
-deployed Cloudflare cold-start + real-user web-vitals are a separate follow-up not yet
-wired here (see \`perf/README.md\`).
+deployed Cloudflare cold-start + real-user web-vitals are a separate follow-up (the
+\`--url\` mode on \`measure-coldstart.mjs\` covers synthetic deployed probing; a
+\`Server-Timing\` Worker-share header and real-user RUM are not wired — see
+\`perf/README.md\`).
 
-| Date | Stack | Commit | Full build (cold, n=1) | Web bundle (${log[0]?.build?.web?.tool ?? "hyperfine"}) | CSS raw/gzip | JS raw/gzip | TTFB | FCP | LCP | CLS |
+Cold-start columns show **median / p75** — p75 is the percentile Core Web Vitals
+actually grades on. \`coldstart.method\` in \`log.json\` distinguishes rows measured
+before vs. after the LCP-stabilization-poll fix (the earlier fixed-500ms-post-load read
+undercounted LCP on this site's animated hero); mixed-method rows aren't a fair diff.
+
+| Date | Stack | Commit | Full build (cold, n=1) | Web bundle (${log[0]?.build?.web?.tool ?? "hyperfine"}) | CSS raw/gzip | JS raw/gzip | TTFB med/p75 | FCP med/p75 | LCP med/p75 | CLS med/p75 |
 |---|---|---|---|---|---|---|---|---|---|---|
 `;
   const rows = log
@@ -68,10 +75,14 @@ wired here (see \`perf/README.md\`).
       const css = `${fmtKB(e.assets.buckets.css.raw)} / ${fmtKB(e.assets.buckets.css.gzip)}`;
       const js = `${fmtKB(e.assets.buckets.js.raw)} / ${fmtKB(e.assets.buckets.js.gzip)}`;
       const commit = `${e.git.commit}${e.git.dirty ? "*" : ""}`;
+      const c = e.coldstart;
+      const pair = (medianKey, p75Key, fmt) => `${fmt(c[medianKey])} / ${fmt(c[p75Key])}`;
+      const fmtCls = (v) => (v == null ? "—" : v.toFixed(3));
       return (
         `| ${e.date.slice(0, 10)} | ${e.stack} | ${commit} | ${fmtMs(e.build.full?.mean_ms)} | ` +
-        `${fmtMs(e.build.web.mean_ms)} | ${css} | ${js} | ${fmtMs(e.coldstart.ttfb_ms)} | ` +
-        `${fmtMs(e.coldstart.fcp_ms)} | ${fmtMs(e.coldstart.lcp_ms)} | ${e.coldstart.cls?.toFixed(3) ?? "—"} |`
+        `${fmtMs(e.build.web.mean_ms)} | ${css} | ${js} | ${pair("ttfb_median", "ttfb_p75", fmtMs)} | ` +
+        `${pair("fcp_median", "fcp_p75", fmtMs)} | ${pair("lcp_median", "lcp_p75", fmtMs)} | ` +
+        `${pair("cls_median", "cls_p75", fmtCls)} |`
       );
     })
     .join("\n");
@@ -83,7 +94,7 @@ async function main() {
     stack: "tailwind",
     buildRuns: 5,
     buildWarmup: 1,
-    coldstartRuns: 5,
+    coldstartRuns: 7,
     skipFull: false,
   });
   const startedAt = new Date().toISOString();
@@ -123,8 +134,11 @@ async function main() {
     `JS payload:   ${fmtKB(assets.buckets.js.raw)} raw / ${fmtKB(assets.buckets.js.gzip)} gzip`,
   );
   console.log(
-    `Cold start (median of ${coldstart.runs}): TTFB ${fmtMs(coldstart.ttfb_ms)} · FCP ${fmtMs(coldstart.fcp_ms)} · ` +
-      `LCP ${fmtMs(coldstart.lcp_ms)} · CLS ${coldstart.cls?.toFixed(3)}`,
+    `Cold start (n=${coldstart.runs}, median/p75): ` +
+      `TTFB ${fmtMs(coldstart.ttfb_median)}/${fmtMs(coldstart.ttfb_p75)} · ` +
+      `FCP ${fmtMs(coldstart.fcp_median)}/${fmtMs(coldstart.fcp_p75)} · ` +
+      `LCP ${fmtMs(coldstart.lcp_median)}/${fmtMs(coldstart.lcp_p75)} · ` +
+      `CLS ${coldstart.cls_median?.toFixed(3)}/${coldstart.cls_p75?.toFixed(3)}`,
   );
   console.log(`\nAppended to perf/log.json and regenerated perf/log.md`);
 }
