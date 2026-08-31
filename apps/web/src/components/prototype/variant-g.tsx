@@ -8,14 +8,7 @@
  *   Nav → Hero (editorial-scale, stat band inline) → Industries → Ingredient Matrix → Deep-Green Finale → Footer
  */
 import { useRef } from "react";
-import {
-  LazyMotion,
-  domAnimation,
-  m,
-  useReducedMotion,
-  useScroll,
-  useTransform,
-} from "motion/react";
+import { LazyMotion, domAnimation, m, useScroll, useTransform } from "motion/react";
 import {
   ArrowRight,
   ArrowUpRight,
@@ -26,6 +19,7 @@ import {
   CheckCircle2,
 } from "lucide-react";
 import { Reveal } from "@/components/prototype/motion";
+import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 import {
   company,
   ingredients,

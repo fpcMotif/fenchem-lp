@@ -48,7 +48,8 @@
     "VariantG": "apps/web/src/components/prototype/variant-g.tsx",
     "VariantH": "apps/web/src/components/prototype/variant-h.tsx",
     "VariantI": "apps/web/src/components/prototype/variant-i.tsx",
-    "VariantJ": "apps/web/src/components/prototype/variant-j/index.tsx"
+    "VariantJ": "apps/web/src/components/prototype/variant-j/index.tsx",
+    "VariantK": "apps/web/src/components/prototype/variant-k.tsx"
   },
   "docsMap": {
     "Button": ".design-sync/docs/button.md",
@@ -71,7 +72,8 @@
     "VariantG": ".design-sync/docs/variant-g.md",
     "VariantH": ".design-sync/docs/variant-h.md",
     "VariantI": ".design-sync/docs/variant-i.md",
-    "VariantJ": ".design-sync/docs/variant-j.md"
+    "VariantJ": ".design-sync/docs/variant-j.md",
+    "VariantK": ".design-sync/docs/variant-k.md"
   },
   "overrides": {
     "VariantA": {
@@ -115,6 +117,10 @@
       "viewport": "1280x800"
     },
     "VariantJ": {
+      "cardMode": "single",
+      "viewport": "1280x800"
+    },
+    "VariantK": {
       "cardMode": "single",
       "viewport": "1280x800"
     }

@@ -112,10 +112,12 @@ Repo-specific gotchas for re-syncs. Read before running the driver.
   uniform 0.96 press scale, icon cross-fades, animated mobile menu, optical
   Play centering, 44px hit extensions, 1px black/10 photo outlines) — its
   uploaded card/capture is STALE; next driver run re-captures it.
-- New guideline doc `docs/brand/landing-polish-improvements.md` added to
-  `guidelinesGlob` and ALREADY pushed directly to the project (with
-  `guidelines/index.md` + `VariantH.prompt.md` updates) via incremental
-  DesignSync on 2026-08-28 — the next driver run will see it as unchanged.
+- New guideline doc `docs/brand/landing-polish-improvements.md` (applied-changes
+  ledger: before → after → why-better; complements the two running-log CI docs)
+  added to `guidelinesGlob`. Direct DesignSync push was attempted 2026-08-28 but
+  write_files is blocked in non-interactive sessions (needs `/design-login`) —
+  the doc, the `guidelines/index.md` NEW-entry highlight, and the
+  `VariantH.prompt.md` CI section land on the next driver run / interactive push.
 - `.design-sync/docs/variant-h.md` gained a matching continuous-improvement
   section (kept in lockstep with the remote prompt.md).
 
@@ -169,7 +171,31 @@ Repo-specific gotchas for re-syncs. Read before running the driver.
   it**: it has no converter-side source, so treat
   `components/landing-production/ContinuousImprovement/**` as keep-list.
 - Same findings were mirrored to FigJam ("Fenchem LP — Continuous
-  Improvement" board) for the design side.
+  Improvement" board) for the design side:
+  https://www.figma.com/board/EhUsgRpEC5RsfdAwDWGZ3I — the H3 dropdown-clip
+  sticky carries the "elevated to High per f" note; update the board when a
+  High row lands.
+
+## Out-of-band update: 2026-08-31 layout stress-test entry (better-layout)
+
+- A `/interfaces:better-layout` review re-confirmed both open HIGHs with fresh
+  measurements (hero column 375×1 / 768×1 px; dropdown left −37px @768) and
+  added 2 Medium + 2 Low findings plus the measured why-H-supersedes-G
+  rationale. Everything was folded into the existing log
+  `docs/brand/variant-h-continuous-improvement.md` (newest-first entry) and
+  into `.design-sync/cards/ContinuousImprovement.html` +
+  `.design-sync/docs/variant-h.md` — NOT a new sibling doc.
+- **Remote push DONE (2026-08-31, after /design-login re-auth)** — 5 files
+  written and read back verified: the merged CI log, the updated
+  ContinuousImprovement card, the regenerated VariantH prompt doc (now carries
+  both CI sections), plus `guidelines/docs/brand/landing-polish-improvements.md`
+  (was registered in guidelinesGlob but missing remotely) and its
+  `guidelines/index.md` link line.
+- FigJam: the 08-31 entry was added to the existing board
+  https://www.figma.com/board/EhUsgRpEC5RsfdAwDWGZ3I. A stray EMPTY duplicate
+  board "Fenchem LP — Continuous Improvement"
+  (https://www.figma.com/board/BSvfEPrVSHxCFE6KO7DEP6) was created before the
+  original was discovered — safe to trash in Figma drafts.
 
 ## VariantJ card state (2026-08, sync session)
 
@@ -180,3 +206,49 @@ Repo-specific gotchas for re-syncs. Read before running the driver.
   needs-work (stays on the re-verify worklist). Fix options for J's author:
   honor reduced motion in the gsap timeline (jump to end state), or export a
   preview story that skips the intro.
+- **Resolved 2026-08-31 (driver run):** J's capture now shows the real page
+  (nav + hero + stat band) — the intro no longer starves; GreenhouseLedger
+  cell graded good.
+
+## 2026-08-31 driver run — UPLOADED (atomic path, complete)
+
+- **Upload completed 2026-08-31** after design-auth was restored: fresh anchor
+  fetched (it had MOVED — an interactive session had already synced H/I/J from
+  a newer tree, so the first local build was discarded rather than uploaded
+  over it), driver re-run against the fresh anchor (0 pendingGrade, all
+  carried forward), then the full §5 sequence: sentinel → 119 content files
+  in 8 chunks → sentinel re-arm → `_ds_sync.json` last. Post-upload
+  `list_files` matches the bundle exactly; `report_validate` filed
+  (21/0/0/0, 1 iteration).
+- The hand-authored `ContinuousImprovement.html` card (08-31 edit) rode the
+  upload inside `components/landing-production/` — remote is current again.
+- Remote extras deliberately preserved: `notes/ui-polish-ci-2026-08.html`
+  (another session's out-of-band card) and app-generated manifest files.
+- **VariantK was registered in config.json DURING this upload** (concurrent
+  session) — it is NOT in this build or anchor; the next driver run picks it
+  up as `added` (needs `.design-sync/docs/variant-k.md` + an entry.ts export
+  - a preview to escape the floor card).
+
+## Superseded record of that run (pre-upload state)
+
+- Full re-sync driver ran clean (build/diff/validate/capture all exit 0;
+  render check: 21 components, 0 bad/thin/identical). Verification partition:
+  changed Button/Card/Intro/Reveal, added VariantH/I/J; all five pendingGrade
+  graded good and `carried forward` on the confirming capture run.
+- Conventions header validated against the fresh build: every enumerated
+  class, token, component, and guideline doc resolves. **Prose drift to fix
+  (authors' call):** "The seven `Variant*` components" and "study `VariantG`
+  (production candidate)" — the set is now ten (A–J) and the same file's
+  principles section already names VariantH/I as the references.
+- `ds-bundle/` is the upload-ready build: verdict `upload.any: true`, full
+  writes, `deletePaths: []` (so the hand-authored ContinuousImprovement card
+  survives). It carries ALL pending guideline docs from every session
+  (polish-improvements, ui-polish-ci-notes, variant-h CI incl. the 08-31
+  layout entry, regenerated VariantH.prompt.md, index).
+- Upload blocked: DesignSync design-authorization lapsed mid-session again
+  (worked earlier in the same session for the out-of-band push, then
+  expired). Next authorized session: fetch fresh `_ds_sync.json` →
+  re-run the driver (cheap, all carried forward) → §5 atomic upload, and
+  ALSO push `.design-sync/cards/ContinuousImprovement.html` →
+  `components/landing-production/ContinuousImprovement/ContinuousImprovement.html`
+  (hand-authored, not in ds-bundle; remote copy is stale vs the 08-31 edit).

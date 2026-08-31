@@ -1,15 +1,9 @@
 import { ArrowRight, ArrowUpRight, ChevronDown, FlaskConical, Globe2, Sprout } from "lucide-react";
-import {
-  LazyMotion,
-  domAnimation,
-  m,
-  useReducedMotion,
-  useScroll,
-  useTransform,
-} from "motion/react";
+import { LazyMotion, domAnimation, m, useScroll, useTransform } from "motion/react";
 import { useRef } from "react";
 import { EASE } from "@/components/prototype/motion-constants";
 import { Reveal } from "@/components/prototype/motion";
+import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 import { getFeaturedIngredients, pillars } from "@/components/landing/landing-content";
 
 /*

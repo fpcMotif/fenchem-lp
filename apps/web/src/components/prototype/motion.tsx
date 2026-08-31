@@ -1,7 +1,8 @@
-import { m, useReducedMotion } from "motion/react";
+import { m } from "motion/react";
 import type { ReactNode } from "react";
 
 import { EASE } from "./motion-constants";
+import { useReducedMotion } from "./use-reduced-motion";
 
 /*
  * Shared motion primitives for the Fenchem landing prototypes.
@@ -46,7 +47,7 @@ export function Reveal({
     <m.div
       className={className}
       initial={reduce ? { opacity: 0 } : { opacity: 0, y }}
-      whileInView={reduce ? { opacity: 1 } : { opacity: 1, y: 0 }}
+      whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin }}
       transition={{ duration: reduce ? 0 : duration, delay: reduce ? 0 : delay, ease: EASE }}
     >

@@ -19,3 +19,7 @@ Renders the complete production page. Interactive: the formulation presenter hol
 ## Continuous improvement — 2026-08-28 interface-polish pass
 
 Eight micro-refinements now baked in: explicit transition property lists (no `transition-all`), one uniform `active:scale-[0.96]` press that actually eases (`scale` in the transition list — Tailwind v4 `scale-*` ≠ `transform`), Play/Pause and Menu/X cross-fades (scale 0.25→1 + 4px blur, spring bounce 0, `initial={false}`), animated mobile-menu enter with softer exit, optically centered Play glyph (`ml-px`), 44px hit targets via invisible extension (visual sizes unchanged), and 1px black/10 inset outlines on all content photography. The before → after → why-better ledger is law for new pages: `guidelines/docs/brand/landing-polish-improvements.md`.
+
+## Continuous improvement — 2026-08-31 layout stress-test
+
+Browser-verified at 320/375/768/1440. Two HIGHs remain open and release-blocking: the hero image column collapses to **1px** below `lg` (`variant-h.tsx:507` — fix with the Dossier image's own `min-h-80` idiom) and the Portfolio dropdown (`w-[640px]`, trigger-centered, `:227`) clips **37px** off-viewport at 768px (anchor to the header and clamp the width, the MobileNav pattern). New this pass: industries photo renders 34×34px at `md`; 15 physical left/right utilities block the RTL mirror; footer fills 11 of 12 tracks; hero `min-h-[80vh]` → `svh`. Full tables, the verification record, and the measured why-H-supersedes-G rationale: `guidelines/docs/brand/variant-h-continuous-improvement.md`.

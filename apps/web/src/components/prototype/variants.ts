@@ -11,6 +11,7 @@ import { VariantH } from "./variant-h";
 import { VariantI } from "./variant-i";
 import { VariantJ } from "./variant-j/index";
 import { VariantK } from "./variant-k";
+import { VariantV } from "./variant-v";
 import { VariantWaterfall } from "./variant-waterfall";
 
 /*
@@ -23,7 +24,7 @@ import { VariantWaterfall } from "./variant-waterfall";
  * Array order IS the switcher order: each original sits beside its brand twin
  * (A↔D, B↔E, C↔F) so ←/→ toggles a pair; G (hybrid, no twin) trails.
  * `twinOf` makes the A↔D / B↔E / C↔F pairing data instead of a comment.
- * K is H's vivid division-color twin (←/→ toggles H↔K).
+ * V is H's vivid duotone twin (←/→ toggles H↔V).
  * Delete this file (and the losing variants) once a direction wins.
  */
 
@@ -44,9 +45,10 @@ export const VARIANTS = [
   { key: "f", Component: VariantF, name: "Deep Green · brand", twinOf: "c" },
   { key: "g", Component: VariantG, name: "Hybrid · brand" },
   { key: "h", Component: VariantH, name: "Production · recommended" },
-  { key: "i", Component: VariantI, name: "Production+ · map & WebGL" },
+  { key: "i", Component: VariantI, name: "Market Portal · Seppic-style" },
   { key: "j", Component: VariantJ, name: "Greenhouse Ledger · motion" },
-  { key: "k", Component: VariantK, name: "Production · vivid", twinOf: "h" },
+  { key: "k", Component: VariantK, name: "Color Block · campaign" },
+  { key: "v", Component: VariantV, name: "Production · vivid", twinOf: "h" },
   { key: "w", Component: VariantWaterfall, name: "Three.js Waterfall Fountain" },
 ] as const satisfies readonly VariantEntry[];
 
@@ -54,4 +56,4 @@ export type VariantKey = (typeof VARIANTS)[number]["key"];
 
 export const VARIANT_KEYS: readonly VariantKey[] = VARIANTS.map((v) => v.key);
 
-export const DEFAULT_VARIANT: VariantKey = "k";
+export const DEFAULT_VARIANT: VariantKey = "v";

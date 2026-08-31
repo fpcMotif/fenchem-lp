@@ -86,7 +86,7 @@ export function HeroSection() {
             {HERO.primaryCta}
           </a>
           <a
-            href="#contact"
+            href="#global-supply"
             className="rounded-full border border-cream/30 px-7 py-3.5 font-semibold text-cream text-sm transition-colors hover:border-cream/70 hover:bg-cream/10 focus-visible:outline-2 focus-visible:outline-brand-green-300"
           >
             {HERO.secondaryCta}

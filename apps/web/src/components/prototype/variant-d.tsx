@@ -4,7 +4,6 @@ import {
   LazyMotion,
   domAnimation,
   m,
-  useReducedMotion,
   useScroll,
   useTransform,
 } from "motion/react";
@@ -12,6 +11,7 @@ import type { MotionValue } from "motion/react";
 import { useRef, useState } from "react";
 import { EASE } from "@/components/prototype/motion-constants";
 import { Reveal, Intro, Eyebrow } from "@/components/prototype/motion";
+import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 import {
   company,
   stats,

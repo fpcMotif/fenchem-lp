@@ -45,7 +45,7 @@ export function NavBar() {
           ))}
         </div>
         <a
-          href="#contact"
+          href="#global-supply"
           className="rounded-full bg-brand-green-500 px-5 py-2.5 font-semibold text-brand-green-950 text-sm transition-colors hover:bg-brand-green-400 focus-visible:outline-2 focus-visible:outline-cream"
         >
           Partner with Us

@@ -17,6 +17,7 @@ describe("home route", () => {
     expect(validate({})).toEqual({ variant: DEFAULT_VARIANT });
     expect(validate({ variant: "g" })).toEqual({ variant: "g" });
     expect(validate({ variant: "k" })).toEqual({ variant: "k" });
+    expect(validate({ variant: "v" })).toEqual({ variant: "v" });
     expect(validate({ variant: "z" })).toEqual({ variant: DEFAULT_VARIANT });
     expect(validate({ variant: 42 })).toEqual({ variant: DEFAULT_VARIANT });
   });
@@ -32,6 +33,14 @@ describe("home route", () => {
   test("renders the vivid production variant (k)", () => {
     const Component = Route.options.component as React.ComponentType;
     vi.spyOn(Route, "useSearch").mockReturnValue({ variant: "k" } as never);
+
+    const { container } = render(<Component />);
+    expect(container.textContent).toContain("FENCHEM");
+  });
+
+  test("renders the vivid duotone variant (v)", () => {
+    const Component = Route.options.component as React.ComponentType;
+    vi.spyOn(Route, "useSearch").mockReturnValue({ variant: "v" } as never);
 
     const { container } = render(<Component />);
     expect(container.textContent).toContain("FENCHEM");

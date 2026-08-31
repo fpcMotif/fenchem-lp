@@ -6,16 +6,10 @@
  */
 import { useRef } from "react";
 import type { ReactNode } from "react";
-import {
-  LazyMotion,
-  domAnimation,
-  m,
-  useReducedMotion,
-  useScroll,
-  useTransform,
-} from "motion/react";
+import { LazyMotion, domAnimation, m, useScroll, useTransform } from "motion/react";
 import { ArrowRight, ArrowUpRight, Plus } from "lucide-react";
 import { Reveal } from "@/components/prototype/motion";
+import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 import {
   ingredients,
   getFeaturedIngredients,

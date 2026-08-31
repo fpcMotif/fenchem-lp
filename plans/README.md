@@ -8,14 +8,29 @@ before starting, honor its STOP conditions, and update your row when done.
 
 ## Execution order & status
 
-| Plan | Title                                                               | Priority | Effort | Depends on | Status                                       |
-| ---- | ------------------------------------------------------------------- | -------- | ------ | ---------- | -------------------------------------------- |
-| 001  | Ship Variant K — vivid division-color landing with spec-sheet rigor | P1       | M      | —          | IN PROGRESS (executor dispatched 2026-08-28) |
+| Plan | Title                                                                   | Priority | Effort | Depends on | Status                                                                                                                                                                                                       |
+| ---- | ----------------------------------------------------------------------- | -------- | ------ | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 001  | Ship Variant K — vivid division-color landing with spec-sheet rigor     | P1       | M      | —          | RESOLVED 2026-08-31 — owner chose "keep both"; superseded by plan 002 (Color Block keeps `k`; duotone rebuilds as `v`)                                                                                       |
+| 002  | Build Variant V — duotone division-color landing, alongside Color Block | P1       | M      | 001        | DONE — verified 2026-08-31: gates green (typecheck 0, lint 0, 55/55 tests), diff reviewed hunk-by-hunk, browser-verified clean on `/` (V), `?variant=k`, `?variant=h`; work is uncommitted — commit promptly |
 
 > Reconciled 2026-08-28: the plan originally targeted key `j`, which has since
 > been claimed by a parallel build ("Greenhouse Ledger · motion",
 > `apps/web/src/components/prototype/variant-j/`). The vivid variant is now
 > **K** (`variant-k.tsx`); the Greenhouse Ledger files are out of scope.
+
+> Execution outcome (reviewed 2026-08-31): the executor's scaffolding landed
+> and was verified — `--color-cosmetics-200` token, registry entry `k`
+> ("Production · vivid", twin of H), `DEFAULT_VARIANT = "k"`, route tests for
+> `k`, and `variant-h.tsx` byte-identical. All gates green (typecheck 0,
+> lint 0, 54/54 tests; `/` renders K, `?variant=h` renders H unchanged).
+> However, minutes after execution, `variant-k.tsx` itself was overwritten by
+> an undocumented concurrent rewrite ("Color Block": division washes at 8–15%
+> plus saturated trims — a more conservative brand-book reading than the
+> planned full-saturation duotone fields). The planned duotone build is
+> unrecoverable (never committed; executor transcript expired). Owner to
+> choose: keep Color Block as K (it is live, green, and on-brief), or
+> re-execute steps 3–7 of plan 001 to rebuild the duotone design (this would
+> overwrite Color Block).
 
 Status values: TODO | IN PROGRESS | DONE | BLOCKED (with one-line reason) | REJECTED (with one-line rationale)
 

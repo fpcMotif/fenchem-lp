@@ -1,44 +1,25 @@
 /*
- * PROTOTYPE — Variant W: "Conversion" — VariantH's exact visual language,
- * restructured for conversion per docs/brand/landing-conversion-plan.md
- * (§2 hero action, §3 outcome-first benefits, §4 buyer journey, §5 FAQ,
- * §6 risk reversal, §8 section order).
+ * PROTOTYPE — Variant V: "Production · vivid" — VariantH plus the vivid
+ * division color system. Category imagery renders as duotones (grayscale
+ * photo multiplied onto a division auxiliary-color field), the industries
+ * section becomes three division color-field panels labeled with their
+ * brand-book Pantone/HEX like calibrated specimens, and matrix/dossier
+ * imagery is tinted by the division it belongs to.
  *
- * Provenance: forked wholesale from variant-h.tsx (2026-08 production
- * direction). Everything the conversion plan does not touch — ticker, matrix,
- * dossier, formulation presenter, standards imagery, footer chrome — is
- * unchanged from H.
+ * Brand-book compliance: auxiliary colors are wayfinding — each accent
+ * appears ONLY in the UI representing its own division (three hues total:
+ * nutrition, food, cosmetics). Clean White stays the canvas; Brand Green
+ * stays the lead accent. Do not extend division color beyond these
+ * placements.
  *
- * Conversion deltas (all local to this file; shared content untouched):
- *   1. Hero primary CTA is the conversion action — "Request Specifications"
- *      (createInquiryHref mailto); portfolio demoted to the blue outline.
- *      24h answer micro-line beneath the CTA row.
- *   2. Quality pillars rewritten outcome-first (local PILLARS_OUTCOME const).
- *   3. "What happens next" strip carries the 3-step buyer journey
- *      (local BUYER_JOURNEY const).
- *   4. NEW FAQ accordion (8 items, spec-sheet rows, FAQ.01–08 codes) after
- *      Standards. The plan's two [confirm] items are phrased honestly with
- *      no invented MOQ or audit specifics.
- *   5. NEW risk-reversal band ("Zero-commitment start.") between FAQ and
- *      the finale.
- *   6. Finale primary CTA matches the hero: "Request Specifications".
+ * Measured color rules (see plans/002-variant-v-duotone-rebuild.md):
+ *   - Full-opacity ink on bg-nutrition (~11:1), bg-food (~5.9:1),
+ *     bg-cosmetics-200 (~9:1). No alpha-muted text on color fields.
+ *   - bg-cosmetics (L 0.59) carries imagery and paper-chip badges only —
+ *     never bare text (white fails 4.5:1, ink ~4.0:1).
+ *   - font-tech micro-labels floor at 11px (inherited from VariantH).
  *
- * Measured color decisions (WCAG ratios in docs/brand/landing-variants-design-review.md):
- *   - Primary CTA: text-brand-green-950 on bg-brand-green-500 (5.18:1);
- *     hover bg-brand-green-400 (6.92:1). White-on-green-500 failed at 2.95:1.
- *   - Blue is INTERACTIVE-ONLY (outline CTAs, links). Eyebrows/section
- *     numerals use brand-green-700 (5.73:1 on paper).
- *   - Small text floor: mute-600 (6.00:1); mute-400/500 are border/decoration
- *     tier only. font-tech micro-labels floor at 11px.
- *   - Division badges: solid paper chip + ink text + color dot — readable
- *     over any photograph (white-on-food failed at 2.76:1).
- *   - Finale labels: full-opacity green-400 (6.92:1) / green-300 coords
- *     (9.35:1); the alpha-muted greens failed at 2.2–2.8:1.
- *
- * Section order:
- *   Nav (portfolio menu) → Hero (conversion CTA + stat band) → Ticker
- *   → Industries → Matrix → Product Dossier → Formulation Presenter
- *   → Origin + Standards → FAQ → Risk Reversal → Finale → Footer
+ * Section order: unchanged from VariantH.
  */
 import { useEffect, useRef, useState } from "react";
 import {
@@ -54,7 +35,6 @@ import {
   ArrowUpRight,
   CheckCircle2,
   ChevronDown,
-  FileCheck2,
   FileDown,
   FlaskConical,
   Globe,
@@ -62,6 +42,7 @@ import {
   Menu,
   Pause,
   Play,
+  Sprout,
   X,
 } from "lucide-react";
 import { EASE, STAGGER } from "@/components/prototype/motion-constants";
@@ -77,6 +58,8 @@ import {
   getIngredientsByApplication,
   industries,
   ingredients,
+  pillars,
+  processSteps,
   regions,
   type Ingredient,
   type IngredientApplication,
@@ -131,88 +114,29 @@ const INDUSTRY_COPY = [
   "Dermatologically active botanicals and hyaluronic acid systems formulated for cellular compatibility and sensory performance.",
 ] as const;
 
-/**
- * Conversion plan §3 — the shared `pillars` are capability-first; this local
- * const reframes them outcome-first without touching the shared module.
+/*
+ * Panel presentation per application — index-aligned with `industries`.
+ * Auxiliary accents are wayfinding: each division's color appears only on
+ * its own panel. Specimen lines quote the brand book's Pantone/HEX so the
+ * color fields read as calibrated standards, not decoration.
+ * Cosmetics text sits on its 200 tint — see the contrast table in the plan.
  */
-const PILLARS_OUTCOME = [
+const INDUSTRY_PANELS = [
   {
-    title: "Documentation before sampling",
-    copy: "Specifications, allergen statements, regulatory dossiers, and lot traceability arrive before you ask — every sample ships audit-ready.",
+    imageField: "bg-nutrition",
+    textField: "bg-nutrition",
+    specimen: "Pantone Yellow 012 · #FFF67F — Nutrition Division",
   },
   {
-    title: "Potency you can put on a label",
-    copy: "Standardized assays — ≥ 95% curcuminoids, ≥ 98% CoQ10 — validated by in-house chromatography on every lot.",
+    imageField: "bg-food",
+    textField: "bg-food",
+    specimen: "Pantone 164 C · #E48336 — Food Division",
   },
   {
-    title: "Regulatory cover in 40+ markets",
-    copy: "Dossiers prepared for your target jurisdictions, not generic paperwork — compliance support wherever your product ships.",
+    imageField: "bg-cosmetics",
+    textField: "bg-cosmetics-200",
+    specimen: "Pantone 2583 C · #A05EB5 — Cosmetics Division",
   },
-] as const;
-
-/**
- * Conversion plan §4 — buyer journey in three steps; replaces the shared
- * four-step `processSteps` copy in the formulation presenter (local only).
- */
-const BUYER_JOURNEY = [
-  {
-    title: "Send your target spec",
-    copy: "Ingredient, assay, format, market. A technical response with matching specifications lands within 24 hours.",
-  },
-  {
-    title: "Sample with full documentation",
-    copy: "CoA, allergen statement, and regulatory dossier travel with every sample; third-party verification on request.",
-  },
-  {
-    title: "Scale with traceable supply",
-    copy: "Production lots with chain-of-custody records, shipped from the nearest of six global bases.",
-  },
-] as const;
-
-/**
- * Conversion plan §5 — FAQ. Items 4 and 8 were flagged [confirm] in the plan;
- * both are phrased honestly here with no invented MOQs or audit specifics.
- */
-const FAQ_ITEMS = [
-  {
-    q: "What documentation comes with a sample?",
-    a: "Specification sheet, CoA, allergen statement, and the regulatory dossier for your market — prepared before sampling, with lot traceability on request.",
-  },
-  {
-    q: "Which certifications do your facilities hold?",
-    a: "ISO 9001, FSSC 22000, GMP, HACCP, Kosher, and Halal.",
-  },
-  {
-    q: "Do you support our regulatory filings?",
-    a: "Yes — dossiers and documentation support for more than forty markets, prepared for your target jurisdiction.",
-  },
-  {
-    q: "What are your minimum order quantities?",
-    a: "Minimums vary by ingredient and format — send your target spec and volumes and the quote covers both.",
-  },
-  {
-    q: "How fast do you respond to a spec request?",
-    a: "Within 24 hours, from the regional office nearest you.",
-  },
-  {
-    q: "Can you match a delivery format to our system?",
-    a: "Yes — powder, beadlet, oil suspension, and water-dispersible formats are selected around your delivery system.",
-  },
-  {
-    q: "Where do you ship from?",
-    a: "Six bases: Nanjing (HQ/R&D), Hackensack, Frankfurt, Johannesburg, São Paulo, Kuala Lumpur.",
-  },
-  {
-    q: "Can we audit your quality systems?",
-    a: "In-house laboratories validate identity, potency, and stability on every lot, with third-party verification on request. Audit arrangements are made through our quality team.",
-  },
-] as const;
-
-/** Conversion plan §6 — the three risk-reversal facts, framed as such. */
-const RISK_POINTS = [
-  "Specs within 24 hours",
-  "Documentation before sampling",
-  "Third-party verification on request",
 ] as const;
 
 /** Division accent dot for badge chips — chip stays paper/ink for contrast. */
@@ -225,7 +149,20 @@ const DIVISION_DOT: Record<string, string> = {
   feed: "bg-feed",
 };
 
-const PILLAR_ICONS = [FileCheck2, FlaskConical, Globe] as const;
+/** Division → full-saturation auxiliary field for duotone backplates. */
+const DIVISION_FIELD: Record<string, string> = {
+  nutrition: "bg-nutrition",
+  food: "bg-food",
+  cosmetics: "bg-cosmetics",
+  chem: "bg-chem",
+  agro: "bg-agro",
+  feed: "bg-feed",
+};
+
+/** Duotone classes for an <img> sitting on a division color field. */
+const DUOTONE_IMG = "grayscale contrast-110 mix-blend-multiply";
+
+const PILLAR_ICONS = [Sprout, FlaskConical, Globe] as const;
 
 const FOOTER_COLS = [
   {
@@ -243,7 +180,7 @@ const FOOTER_COLS = [
       { label: "Quality Charter", href: "#standards" },
       { label: "Regulatory Dossiers", href: "#contact" },
       { label: "Sourcing Standards", href: "#standards" },
-      { label: "FAQ", href: "#faq" },
+      { label: "Ingredient Transparency", href: "#matrix" },
     ],
   },
   {
@@ -255,14 +192,6 @@ const FOOTER_COLS = [
       { label: "Global Offices", href: "#contact" },
     ],
   },
-] as const;
-
-const MOBILE_LINKS = [
-  { label: "Industries", href: "#industries" },
-  { label: "Portfolio", href: "#matrix" },
-  { label: "Formulation", href: "#formulation" },
-  { label: "Standards", href: "#standards" },
-  { label: "FAQ", href: "#faq" },
 ] as const;
 
 /** Reusable label style: the spec-sheet voice at its measured floor (11px, mute-600). */
@@ -387,6 +316,12 @@ function PortfolioMenu() {
 function MobileNav() {
   const [open, setOpen] = useState(false);
   const reduce = useReducedMotion();
+  const links = [
+    { label: "Industries", href: "#industries" },
+    { label: "Portfolio", href: "#matrix" },
+    { label: "Formulation", href: "#formulation" },
+    { label: "Standards", href: "#standards" },
+  ];
 
   return (
     <div className="md:hidden">
@@ -422,7 +357,7 @@ function MobileNav() {
             className="absolute inset-x-0 top-full border-b border-line bg-paper shadow-lg"
           >
             <ul className="px-5 py-3">
-              {MOBILE_LINKS.map((link) => (
+              {links.map((link) => (
                 <li key={link.href}>
                   <a
                     href={link.href}
@@ -503,12 +438,6 @@ function NavBar() {
             >
               Standards
             </a>
-            <a
-              href="#faq"
-              className="inline-flex min-h-11 items-center font-body text-sm text-mute-600 transition-colors duration-300 hover:text-brand-green-700 focus-visible:outline-2"
-            >
-              FAQ
-            </a>
           </div>
           <div className="flex items-center gap-2">
             <MobileNav />
@@ -573,29 +502,23 @@ function HeroSection() {
                 countries.
               </p>
             </Reveal>
-            {/* Conversion plan §2: the primary action IS the conversion action. */}
-            <Reveal delay={STAGGER * 3} className="mt-9">
-              <div className="flex flex-wrap gap-3">
-                <a
-                  href={createInquiryHref()}
-                  className="group inline-flex min-h-11 items-center gap-2.5 rounded-sm bg-brand-green-500 px-7 py-4 font-body text-sm font-semibold text-brand-green-950 transition-[background-color,scale] duration-300 active:scale-[0.96] hover:bg-brand-green-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-green-700"
-                >
-                  Request Specifications
-                  <ArrowRight
-                    aria-hidden
-                    className="size-4 transition-transform duration-300 group-hover:translate-x-1"
-                  />
-                </a>
-                <a
-                  href="#matrix"
-                  className="inline-flex min-h-11 items-center gap-2.5 rounded-sm border border-brand-blue-700 px-7 py-4 font-body text-sm font-semibold text-brand-blue-700 transition-[background-color,scale] duration-300 active:scale-[0.96] hover:bg-brand-blue-50 focus-visible:outline-2"
-                >
-                  Explore Portfolio
-                </a>
-              </div>
-              <p className="mt-3.5 font-body text-xs text-mute-600">
-                Specs, dossiers, and pricing — answered within 24 hours.
-              </p>
+            <Reveal delay={STAGGER * 3} className="mt-9 flex flex-wrap gap-3">
+              <a
+                href="#matrix"
+                className="group inline-flex min-h-11 items-center gap-2.5 rounded-sm bg-brand-green-500 px-7 py-4 font-body text-sm font-semibold text-brand-green-950 transition-[background-color,scale] duration-300 active:scale-[0.96] hover:bg-brand-green-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-green-700"
+              >
+                Explore Portfolio
+                <ArrowRight
+                  aria-hidden
+                  className="size-4 transition-transform duration-300 group-hover:translate-x-1"
+                />
+              </a>
+              <a
+                href="#formulation"
+                className="inline-flex min-h-11 items-center gap-2.5 rounded-sm border border-brand-blue-700 px-7 py-4 font-body text-sm font-semibold text-brand-blue-700 transition-[background-color,scale] duration-300 active:scale-[0.96] hover:bg-brand-blue-50 focus-visible:outline-2"
+              >
+                Build a Formulation
+              </a>
             </Reveal>
 
             {/* Stat band */}
@@ -620,11 +543,11 @@ function HeroSection() {
 
           {/* Right: botanical image */}
           <div className="relative overflow-hidden border-t border-line lg:col-span-5 lg:border-l lg:border-t-0">
-            <div ref={imgRef} className="absolute inset-0">
+            <div ref={imgRef} className="absolute inset-0 bg-brand-green-600 isolate">
               <m.img
                 src={IMG.hero}
                 alt="Lush green botanical leaves in morning light — representing Fenchem's natural ingredient sourcing"
-                className="h-[116%] w-full object-cover"
+                className={`h-[116%] w-full object-cover ${DUOTONE_IMG}`}
                 style={{ y: reduce ? 0 : imgY }}
                 initial={reduce ? false : { scale: 1.06 }}
                 animate={{ scale: 1 }}
@@ -780,46 +703,55 @@ function IndustriesSection() {
           }
         />
 
-        <div>
-          {industries.map((industry, i) => (
-            <a
-              key={industry.title}
-              href="#matrix"
-              aria-label={`${industry.title} — view in the ingredient matrix`}
-              className="group block border-b border-line transition-colors duration-400 last:border-b-0 hover:bg-brand-green-50 focus-visible:outline-2"
-            >
-              <Reveal
-                delay={i * STAGGER}
-                className="grid items-center gap-4 px-5 py-10 md:grid-cols-12 md:gap-6 md:px-10 md:py-12"
+        <div className="grid gap-px bg-line lg:grid-cols-3">
+          {industries.map((industry, i) => {
+            const panel = INDUSTRY_PANELS[i];
+            return (
+              <a
+                key={industry.title}
+                href="#matrix"
+                aria-label={`${industry.title} — view in the ingredient matrix`}
+                className="group block focus-visible:outline-2"
               >
-                <div className="md:col-span-1">
-                  <span className="font-tech text-sm tracking-[0.22em] text-brand-green-700">
-                    {String(i + 1).padStart(2, "0")}
-                  </span>
-                </div>
-                <h3 className="font-body text-2xl font-bold tracking-[-0.03em] text-ink transition-colors duration-300 group-hover:text-brand-green-700 md:col-span-4 md:text-3xl">
-                  {industry.title}
-                </h3>
-                <p className="text-pretty font-body text-sm leading-relaxed text-mute-600 md:col-span-5">
-                  {INDUSTRY_COPY[i]}
-                </p>
-                <div className="relative aspect-video overflow-hidden rounded-sm md:col-span-1 md:aspect-square">
-                  <img
-                    src={industry.image.src}
-                    alt={industry.image.alt}
-                    className="h-full w-full object-cover outline outline-1 -outline-offset-1 outline-black/10 transition-transform duration-700 ease-out group-hover:scale-[1.06]"
-                    loading="lazy"
-                  />
-                </div>
-                <div className="flex justify-end md:col-span-1">
-                  <ArrowUpRight
-                    aria-hidden
-                    className="size-5 text-mute-400 transition-[translate,color] duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-brand-green-500"
-                  />
-                </div>
-              </Reveal>
-            </a>
-          ))}
+                <Reveal delay={i * STAGGER} className="flex h-full flex-col">
+                  {/* Duotone image on the division's full-saturation field */}
+                  <div
+                    className={`relative isolate aspect-[4/3] overflow-hidden ${panel.imageField}`}
+                  >
+                    <img
+                      src={industry.image.src}
+                      alt={industry.image.alt}
+                      className={`h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.05] ${DUOTONE_IMG}`}
+                      loading="lazy"
+                    />
+                    {/* Paper specimen chip — readable over any field (VariantH badge pattern) */}
+                    <span className="absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-sm border border-line bg-paper/95 px-2 py-1 font-tech text-[11px] uppercase tracking-[0.16em] text-ink backdrop-blur-sm">
+                      <span aria-hidden className={`size-1.5 rounded-full ${panel.imageField}`} />
+                      {String(i + 1).padStart(2, "0")}
+                    </span>
+                  </div>
+                  {/* Text zone — full-opacity ink on a ≥5:1 field */}
+                  <div className={`flex flex-1 flex-col px-5 py-8 md:px-7 ${panel.textField}`}>
+                    <h3 className="font-body text-2xl font-bold tracking-[-0.03em] text-ink md:text-3xl">
+                      {industry.title}
+                    </h3>
+                    <p className="mt-3 text-pretty font-body text-sm leading-relaxed text-ink">
+                      {INDUSTRY_COPY[i]}
+                    </p>
+                    <div className="mt-auto flex items-center justify-between gap-4 pt-8">
+                      <span className="font-tech text-[11px] uppercase tracking-[0.18em] text-ink">
+                        {panel.specimen}
+                      </span>
+                      <ArrowUpRight
+                        aria-hidden
+                        className="size-5 shrink-0 text-ink transition-all duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+                      />
+                    </div>
+                  </div>
+                </Reveal>
+              </a>
+            );
+          })}
         </div>
       </div>
     </section>
@@ -870,15 +802,17 @@ function MatrixSection() {
           {getFeaturedIngredients().map((item, i) => (
             <Reveal key={item.code} delay={(i % 3) * STAGGER} className="group bg-paper">
               <article>
-                <div className="relative aspect-[4/3] overflow-hidden border-b border-line">
+                <div
+                  className={`relative isolate aspect-[4/3] overflow-hidden border-b border-line ${DIVISION_FIELD[divisionForApplication(item.application)]}`}
+                >
                   <img
                     src={imgFor(item).src}
                     alt={imgFor(item).alt}
-                    className="h-full w-full object-cover outline outline-1 -outline-offset-1 outline-black/10 transition-transform duration-700 ease-out group-hover:scale-[1.05]"
+                    className={`h-full w-full object-cover outline outline-1 -outline-offset-1 outline-black/10 transition-transform duration-700 ease-out group-hover:scale-[1.05] ${DUOTONE_IMG}`}
                     loading="lazy"
                   />
                   <DivisionBadge ingredient={item} />
-                  <div className="absolute inset-0 bg-brand-green-950/0 transition-colors duration-500 group-hover:bg-brand-green-950/10" />
+                  <div className="absolute inset-0 bg-ink/0 transition-colors duration-500 group-hover:bg-ink/10" />
                 </div>
                 <div className="px-5 py-7 md:px-7 md:py-8">
                   <div className="flex items-baseline justify-between">
@@ -935,16 +869,15 @@ function MatrixSection() {
 
 const DOSSIER = ingredients[0]; // Ashwagandha KSM-66 — the flagship trade-name active.
 
-const DOSSIER_SPEC_ROWS = [
-  { label: "Spec Ref", value: DOSSIER.code },
-  { label: "Assay", value: DOSSIER.purity },
-  { label: "Form", value: DOSSIER.form },
-  { label: "Class", value: DOSSIER.category },
-  { label: "Application", value: DOSSIER.useCase },
-] as const;
-
 function DossierSection() {
   const division = divisionForApplication(DOSSIER.application);
+  const specRows = [
+    { label: "Spec Ref", value: DOSSIER.code },
+    { label: "Assay", value: DOSSIER.purity },
+    { label: "Form", value: DOSSIER.form },
+    { label: "Class", value: DOSSIER.category },
+    { label: "Application", value: DOSSIER.useCase },
+  ];
 
   return (
     <section
@@ -969,14 +902,15 @@ function DossierSection() {
 
         <div className="grid lg:grid-cols-12">
           {/* Image */}
-          <div className="relative min-h-80 overflow-hidden border-b border-line lg:col-span-5 lg:border-b-0 lg:border-r">
+          <div
+            className={`relative isolate min-h-80 overflow-hidden border-b border-line lg:col-span-5 lg:border-b-0 lg:border-r ${DIVISION_FIELD[division]}`}
+          >
             <img
               src={imgFor(DOSSIER).src}
               alt={imgFor(DOSSIER).alt}
-              className="absolute inset-0 h-full w-full object-cover outline outline-1 -outline-offset-1 outline-black/10"
+              className={`absolute inset-0 h-full w-full object-cover outline outline-1 -outline-offset-1 outline-black/10 ${DUOTONE_IMG}`}
               loading="lazy"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-brand-green-950/25 via-transparent to-transparent" />
             <span className="absolute left-4 top-4 inline-flex items-center gap-1.5 rounded-sm border border-line bg-paper/95 px-2 py-1 font-tech text-[11px] uppercase tracking-[0.16em] text-ink backdrop-blur-sm">
               <span aria-hidden className={`size-1.5 rounded-full ${DIVISION_DOT[division]}`} />
               {DOSSIER.application}
@@ -1007,7 +941,7 @@ function DossierSection() {
 
             <Reveal delay={STAGGER}>
               <dl className="mt-8 max-w-xl border-t border-line">
-                {DOSSIER_SPEC_ROWS.map((row) => (
+                {specRows.map((row) => (
                   <div
                     key={row.label}
                     className="flex items-baseline justify-between gap-6 border-b border-line py-3"
@@ -1227,11 +1161,11 @@ function FormulationSection() {
               </div>
             </fieldset>
 
-            {/* Buyer journey strip — conversion plan §4 (replaces shared processSteps) */}
+            {/* Process strip */}
             <div className="mt-12 border-t border-line pt-8">
               <p className={TECH_LABEL}>What happens next</p>
-              <ol className="mt-4 grid gap-4 sm:grid-cols-3">
-                {BUYER_JOURNEY.map((step, i) => (
+              <ol className="mt-4 grid gap-4 sm:grid-cols-2">
+                {processSteps.map((step, i) => (
                   <li key={step.title} className="flex gap-3">
                     <span className="font-tech text-sm tracking-[0.16em] text-brand-green-700">
                       {String(i + 1).padStart(2, "0")}
@@ -1398,15 +1332,15 @@ function StandardsSection() {
             </div>
           </div>
 
-          {/* Pillars — outcome-first copy per conversion plan §3 */}
+          {/* Pillars */}
           <div className="lg:col-span-7">
-            {PILLARS_OUTCOME.map((pillar, i) => {
+            {pillars.map((pillar, i) => {
               const Icon = PILLAR_ICONS[i];
               return (
                 <Reveal
                   key={pillar.title}
                   delay={i * STAGGER}
-                  className={i < PILLARS_OUTCOME.length - 1 ? "border-b border-line" : ""}
+                  className={i < pillars.length - 1 ? "border-b border-line" : ""}
                 >
                   <div className="flex gap-5 px-5 py-10 transition-colors duration-400 hover:bg-brand-green-50 md:gap-8 md:px-10 md:py-12">
                     <div className="mt-1 flex size-10 shrink-0 items-center justify-center rounded-sm bg-brand-green-100 text-brand-green-700 md:size-12">
@@ -1429,145 +1363,6 @@ function StandardsSection() {
               );
             })}
           </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ─────────────────────────────── FAQ ─────────────────────────────── */
-
-function FaqRow({ index, question, answer }: { index: number; question: string; answer: string }) {
-  const [open, setOpen] = useState(false);
-  const reduce = useReducedMotion();
-  const code = String(index + 1).padStart(2, "0");
-  const buttonId = `faq-trigger-${code}`;
-  const panelId = `faq-panel-${code}`;
-
-  return (
-    <div className="border-b border-line last:border-b-0">
-      <h3>
-        <button
-          id={buttonId}
-          type="button"
-          aria-expanded={open}
-          aria-controls={panelId}
-          onClick={() => setOpen((v) => !v)}
-          className="flex min-h-11 w-full items-center justify-between gap-6 px-5 py-5 text-left transition-colors duration-300 hover:bg-brand-green-50 focus-visible:outline-2 md:px-10 md:py-6"
-        >
-          <span className="grid flex-1 grid-cols-1 items-baseline gap-1.5 md:grid-cols-[6.5rem_1fr] md:gap-6">
-            <span className="font-tech text-[11px] uppercase tracking-[0.22em] text-brand-green-700">
-              FAQ.{code}
-            </span>
-            <span className="font-body text-base font-semibold tracking-[-0.01em] text-ink md:text-lg">
-              {question}
-            </span>
-          </span>
-          <ChevronDown
-            aria-hidden
-            className={`size-4 shrink-0 text-mute-600 transition-transform duration-300 ${open ? "rotate-180" : ""}`}
-          />
-        </button>
-      </h3>
-      <AnimatePresence initial={false}>
-        {open && (
-          <m.div
-            id={panelId}
-            role="region"
-            aria-labelledby={buttonId}
-            initial={reduce ? { opacity: 0 } : { height: 0, opacity: 0 }}
-            animate={reduce ? { opacity: 1 } : { height: "auto", opacity: 1 }}
-            exit={reduce ? { opacity: 0 } : { height: 0, opacity: 0 }}
-            transition={{ duration: reduce ? 0 : 0.32, ease: EASE }}
-            className="overflow-hidden"
-          >
-            <div className="px-5 pb-7 md:px-10 md:pb-8">
-              <p className="max-w-3xl text-pretty font-body text-sm leading-relaxed text-mute-600 md:ml-[8rem] md:text-base">
-                {answer}
-              </p>
-            </div>
-          </m.div>
-        )}
-      </AnimatePresence>
-    </div>
-  );
-}
-
-function FaqSection() {
-  return (
-    <section
-      id="faq"
-      aria-labelledby="faq-heading"
-      className="scroll-mt-28 border-b border-line bg-paper"
-    >
-      <div className="mx-auto max-w-[1480px]">
-        <SectionHeader
-          id="faq-heading"
-          number="06"
-          label="FAQ"
-          title="Answers before"
-          accent="you ask"
-          aside={
-            <p className="max-w-xs text-pretty font-body text-sm leading-relaxed text-mute-600">
-              Grounded in the documentation that travels with every lot. Anything else — a technical
-              response lands within 24 hours.
-            </p>
-          }
-        />
-        <div>
-          {FAQ_ITEMS.map((item, i) => (
-            <FaqRow key={item.q} index={i} question={item.q} answer={item.a} />
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ─────────────────────────────── Risk Reversal ─────────────────────────────── */
-
-function RiskReversalSection() {
-  return (
-    <section aria-labelledby="risk-heading" className="border-b border-line bg-brand-green-50/60">
-      <div className="mx-auto max-w-[1480px] px-5 py-16 md:px-10 md:py-20">
-        <div className="grid gap-10 lg:grid-cols-12 lg:items-center">
-          <Reveal className="lg:col-span-6">
-            <p className="font-tech text-[11px] uppercase tracking-[0.32em] text-brand-green-700">
-              Risk Reversal
-            </p>
-            <h2
-              id="risk-heading"
-              className="mt-4 text-balance font-display text-3xl font-bold leading-[1.1] tracking-[-0.02em] text-ink md:text-4xl"
-            >
-              Zero-commitment <span className="text-brand-green-600">start.</span>
-            </h2>
-            <p className="mt-4 max-w-lg text-pretty font-body text-base leading-relaxed text-mute-600">
-              Send a spec, validate a sample with full documentation — before any purchase order.
-            </p>
-          </Reveal>
-          <Reveal delay={STAGGER} className="lg:col-span-6">
-            <ul className="space-y-3">
-              {RISK_POINTS.map((point) => (
-                <li
-                  key={point}
-                  className="flex items-center gap-3 font-body text-sm font-medium text-ink md:text-base"
-                >
-                  <CheckCircle2 aria-hidden className="size-4 shrink-0 text-brand-green-600" />
-                  {point}
-                </li>
-              ))}
-            </ul>
-            <a
-              href={createInquiryHref()}
-              className="group mt-7 inline-flex min-h-11 items-center gap-2.5 rounded-sm bg-brand-green-500 px-7 py-4 font-body text-sm font-semibold text-brand-green-950 transition-[background-color,scale] duration-300 active:scale-[0.96] hover:bg-brand-green-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-green-700"
-            >
-              Request Specifications
-              <ArrowRight
-                aria-hidden
-                className="size-4 transition-transform duration-300 group-hover:translate-x-1"
-              />
-            </a>
-          </Reveal>
         </div>
       </div>
     </section>
@@ -1613,7 +1408,7 @@ function FinaleSection() {
         <div className="px-5 py-24 md:px-10 md:py-32">
           <Reveal>
             <p className="font-tech text-[11px] uppercase tracking-[0.32em] text-brand-green-400">
-              07 — Partner with Fenchem
+              06 — Partner with Fenchem
             </p>
             <h2
               id="contact-heading"
@@ -1630,10 +1425,10 @@ function FinaleSection() {
 
           <Reveal delay={STAGGER * 2} className="mt-10 flex flex-wrap gap-4">
             <a
-              href={createInquiryHref()}
+              href={createInquiryHref("contact")}
               className="group inline-flex min-h-11 items-center gap-3 rounded-sm bg-brand-green-500 px-8 py-4 font-body text-sm font-bold text-brand-green-950 shadow-[0_0_40px_oklch(from_var(--color-brand-green-500)_l_c_h_/_0.3)] transition-[background-color,scale,box-shadow] duration-300 active:scale-[0.96] hover:bg-brand-green-400 hover:shadow-[0_0_64px_oklch(from_var(--color-brand-green-500)_l_c_h_/_0.5)] focus-visible:outline-2"
             >
-              Request Specifications
+              Partner with Fenchem
               <ArrowRight
                 aria-hidden
                 className="size-4 transition-transform duration-300 group-hover:translate-x-1"
@@ -1777,7 +1572,7 @@ function SmoothScroll() {
   return null;
 }
 
-export function VariantW() {
+export function VariantV() {
   return (
     <LazyMotion features={domAnimation} strict>
       <div className="bg-paper font-body text-ink antialiased selection:bg-brand-green-200 selection:text-brand-green-900">
@@ -1791,8 +1586,6 @@ export function VariantW() {
           <DossierSection />
           <FormulationSection />
           <StandardsSection />
-          <FaqSection />
-          <RiskReversalSection />
           <FinaleSection />
         </main>
         <FooterSection />

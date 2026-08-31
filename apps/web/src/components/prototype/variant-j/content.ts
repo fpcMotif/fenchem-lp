@@ -1,4 +1,4 @@
-import type { Ingredient } from "@/components/landing/landing-content";
+import type { Industry, Ingredient } from "@/components/landing/landing-content";
 
 /*
  * PROTOTYPE — Variant I content: imagery manifest + page-specific copy.
@@ -54,6 +54,31 @@ export const IMAGE_OVERRIDES: Record<string, { src: string; alt: string }> = {
 
 export const imgFor = (item: Ingredient): { src: string; alt: string } =>
   IMAGE_OVERRIDES[item.code] ?? item.image;
+
+/**
+ * Industry-row imagery override: the registry's Nutrition & Supplements image
+ * is the capsule-pile stock the design review excludes — roots and soil
+ * (already in the approved pool) tell the same story on-direction.
+ */
+export const INDUSTRY_IMAGES: Record<string, { src: string; alt: string }> = {
+  "Nutrition & Supplements": {
+    src: "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=640&q=80",
+    alt: "Hands holding soil and a young seedling — raw botanical origin of nutritional actives",
+  },
+};
+
+export const imgForIndustry = (industry: Industry): { src: string; alt: string } =>
+  INDUSTRY_IMAGES[industry.title] ?? industry.image;
+
+/** Sharper spec-voice row copy for the industries ledger (from variant-h). */
+export const INDUSTRY_COPY: Record<string, string> = {
+  "Nutrition & Supplements":
+    "Bioavailable actives standardized for potency, stability and dose accuracy — from Ashwagandha KSM-66 to Coenzyme Q10.",
+  "Food & Beverage":
+    "Heat- and pH-stable carotenoids, plant proteins and functional botanicals for clean-label fortification at scale.",
+  "Personal Care & Cosmeceuticals":
+    "Dermatologically active botanicals and hyaluronic acid systems formulated for cellular compatibility and sensory performance.",
+};
 
 /** Shared ledger-label class (mono, tracked, uppercase — 11px floor). */
 export const TECH_LABEL = "font-tech text-[11px] uppercase tracking-[0.26em] text-mute-600";

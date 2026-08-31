@@ -38,10 +38,11 @@
  *   → Deep-green finale → Slim footer
  */
 import { useEffect, useState } from "react";
-import { AnimatePresence, LazyMotion, domAnimation, m, useReducedMotion } from "motion/react";
+import { AnimatePresence, LazyMotion, domAnimation, m } from "motion/react";
 import { ArrowRight, ArrowUpRight, Leaf, Menu, X } from "lucide-react";
 import { EASE, STAGGER } from "@/components/prototype/motion-constants";
 import { Eyebrow, Intro, Reveal } from "@/components/prototype/motion";
+import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 import {
   certificationDetails,
   company,
@@ -222,7 +223,7 @@ function NavBar() {
         <a
           href="#top"
           aria-label="Fenchem home"
-          className="flex items-baseline gap-2.5 transition-opacity duration-300 hover:opacity-75 focus-visible:outline-2"
+          className="flex items-baseline gap-2.5 transition-opacity duration-300 hover:opacity-85 focus-visible:outline-2"
         >
           <span className="font-body text-xl font-bold tracking-[-0.04em] text-brand-green-600">
             FENCHEM

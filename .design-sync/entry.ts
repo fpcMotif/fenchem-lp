@@ -26,3 +26,4 @@ export { toast } from "sonner";
 export * from "../apps/web/src/components/prototype/variant-h";
 export * from "../apps/web/src/components/prototype/variant-i";
 export * from "../apps/web/src/components/prototype/variant-j";
+export * from "../apps/web/src/components/prototype/variant-k";

@@ -46,17 +46,11 @@
  *   → 08 Colophon (footer)
  */
 import { useEffect, useState } from "react";
-import {
-  AnimatePresence,
-  LazyMotion,
-  domAnimation,
-  m,
-  useReducedMotion,
-  useScroll,
-} from "motion/react";
+import { AnimatePresence, LazyMotion, domAnimation, m, useScroll } from "motion/react";
 import { ArrowRight, ArrowUpRight, Menu, X } from "lucide-react";
 import { EASE, STAGGER } from "@/components/prototype/motion-constants";
 import { Eyebrow, Intro, Reveal } from "@/components/prototype/motion";
+import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 import {
   certificationDetails,
   certifications,
@@ -72,10 +66,7 @@ import {
 
 /* ─────────────────────────────── Constants ─────────────────────────────── */
 
-/**
- * Local stat literals — the shared `stats` module still says "25+ years",
- * which is stale math in 2026. 30+ is rendered here, same approach as H.
- */
+/** Local stat literals — this page's phrasing diverges from the shared `stats` labels. */
 const STATS = [
   { value: "30+", label: "Years — botanical actives since 1995" },
   { value: "6", label: "Global bases on three continents" },

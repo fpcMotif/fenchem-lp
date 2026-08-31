@@ -27,7 +27,6 @@ import {
   LazyMotion,
   domAnimation,
   m,
-  useReducedMotion,
   useScroll,
   useTransform,
 } from "motion/react";
@@ -48,6 +47,7 @@ import {
 } from "lucide-react";
 import { EASE, STAGGER } from "@/components/prototype/motion-constants";
 import { Reveal } from "@/components/prototype/motion";
+import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 import {
   certificationDetails,
   certifications,

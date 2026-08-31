@@ -7,10 +7,10 @@ import {
   useContext,
   useEffect,
   useRef,
-  useState,
   type ReactNode,
   type RefObject,
 } from "react";
+import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
 /*
  * PROTOTYPE — Variant I motion core ("germination" system).
@@ -31,28 +31,13 @@ export const EASE_SETTLE = "power2.inOut";
 
 const ReducedMotionContext = createContext(false);
 
-export function usePrefersReducedMotion(): boolean {
-  const [reduced, setReduced] = useState(() => {
-    if (typeof window === "undefined") return false;
-    return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  });
-  useEffect(() => {
-    const query = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setReduced(query.matches);
-    const onChange = (event: MediaQueryListEvent) => setReduced(event.matches);
-    query.addEventListener("change", onChange);
-    return () => query.removeEventListener("change", onChange);
-  }, []);
-  return reduced;
-}
-
 export function useReducedMotionFlag(): boolean {
   return useContext(ReducedMotionContext);
 }
 
 /** Page root: owns the sole Lenis instance and the ScrollTrigger wiring. */
 export function MotionRoot({ children }: { children: ReactNode }) {
-  const reduced = usePrefersReducedMotion();
+  const reduced = useReducedMotion();
 
   useEffect(() => {
     if (reduced) return;
@@ -92,7 +77,9 @@ export function useSectionAnimation<T extends HTMLElement = HTMLElement>(
       if (reduced || !ref.current) return;
       build(ref.current);
     },
-    { scope: ref, dependencies: [reduced] },
+    /* revertOnUpdate: the reduce flag settles one render after hydration, so
+     * the tweens a non-reduce first pass created must revert when it flips. */
+    { scope: ref, dependencies: [reduced], revertOnUpdate: true },
   );
   return ref;
 }
@@ -183,8 +170,8 @@ export function drawRule(
  */
 export function marquee(root: HTMLElement, trackSel: string, durationSeconds = 32) {
   const track = root.querySelector<HTMLElement>(trackSel);
-  if (!track) return;
-  gsap.to(track, { xPercent: -50, duration: durationSeconds, ease: "none", repeat: -1 });
+  if (!track) return undefined;
+  return gsap.to(track, { xPercent: -50, duration: durationSeconds, ease: "none", repeat: -1 });
 }
 
 /* ── Accessible word splitting ─────────────────────────────────────────── */

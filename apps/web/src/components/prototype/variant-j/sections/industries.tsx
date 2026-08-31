@@ -1,6 +1,6 @@
 import { ArrowUpRight } from "lucide-react";
 import { industries } from "@/components/landing/landing-content";
-import { TECH_LABEL } from "../content";
+import { imgForIndustry, INDUSTRY_COPY, TECH_LABEL } from "../content";
 import {
   drawRule,
   revealWords,
@@ -89,14 +89,14 @@ export function IndustriesSection() {
                     {industry.title}
                   </h3>
                   <p className="max-w-md text-sm leading-relaxed text-mute-600 md:col-span-4">
-                    {industry.copy}
+                    {INDUSTRY_COPY[industry.title] ?? industry.copy}
                   </p>
                   <div className="flex items-center justify-between gap-5 md:col-span-3 md:justify-end">
                     <span className="block size-16 shrink-0 overflow-hidden rounded-xl md:size-20">
                       <img
                         data-ind-thumb
-                        src={industry.image.src}
-                        alt={industry.image.alt}
+                        src={imgForIndustry(industry).src}
+                        alt={imgForIndustry(industry).alt}
                         loading="lazy"
                         className="h-full w-full object-cover outline outline-1 -outline-offset-1 outline-black/10"
                       />

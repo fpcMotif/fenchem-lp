@@ -36,10 +36,11 @@
  *   → Global network (#network) → Finale (#contact) → Footer
  */
 import { useEffect, useState } from "react";
-import { AnimatePresence, LazyMotion, domAnimation, m, useReducedMotion } from "motion/react";
+import { AnimatePresence, LazyMotion, domAnimation, m } from "motion/react";
 import { ArrowRight, ArrowUpRight, Menu, Search, X } from "lucide-react";
 import { EASE, STAGGER } from "@/components/prototype/motion-constants";
 import { Eyebrow, Intro, Reveal } from "@/components/prototype/motion";
+import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 import {
   certifications,
   company,
@@ -62,7 +63,7 @@ const IMG = {
     "https://images.unsplash.com/photo-1466692476868-aef1dfb1e735?auto=format&fit=crop&w=1200&q=80",
 } as const;
 
-/** Local stat const — the shared `stats` module still carries stale "25+" copy. */
+/** Local stat const — this page needs unit/desc splits the shared `stats` shape lacks. */
 const STATS = [
   { value: "30+", unit: "Years", desc: "Botanical supply since 1995" },
   { value: "6", unit: "Global Bases", desc: "Across three continents" },
@@ -286,7 +287,7 @@ function IngredientSearch() {
             onChange={(event) => setQuery(event.target.value)}
             placeholder='Try "Lutein", "Curcuma longa" or "Personal Care"'
             autoComplete="off"
-            className="min-h-11 w-full rounded-lg border border-line bg-mute-50 py-3 pl-10 pr-4 font-body text-base text-ink placeholder:text-mute-500 focus-visible:outline-2"
+            className="min-h-11 w-full rounded-lg border border-line bg-mute-50 py-3 pl-10 pr-4 font-body text-base text-ink placeholder:text-mute-600 focus-visible:outline-2"
           />
         </div>
       </form>

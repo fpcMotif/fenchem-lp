@@ -146,12 +146,23 @@
   </head>
   <body>
     <p class="eyebrow">Continuous Improvement — VariantH</p>
-    <h1>2026-08-28 interface review — work the list top-down</h1>
+    <h1>08-31 layout stress-test + 08-28 interface review</h1>
     <div class="meta">
       <span class="chip block">Verdict: Block</span>
       <span class="chip count">3 High</span>
-      <span class="chip count">4 Medium</span>
-      <span class="chip count">2 Low</span>
+      <span class="chip count">6 Medium</span>
+      <span class="chip count">4 Low</span>
+      <span class="chip count">Verified 320 / 375 / 768 / 1440</span>
+    </div>
+
+    <div class="keep" style="margin-top: 18px">
+      <strong>Why H is the production aesthetic (measured, not vibes):</strong> CTAs green-950 on
+      green-500 at 5.18:1 (hover 6.92:1) — white-on-green banned at 2.95:1; blue interactive-only,
+      eyebrows green-700 (5.73:1); type floors mute-600 / 11px mono — G carried 22 sub-floor labels,
+      H zero; paper-chip badges over photos (G's white chip: 2.76:1); finale labels 6.92 / 9.35:1;
+      one easing, one reveal, 0.08s stagger, reduced-motion gated. Plus the three modules the set
+      was missing: Portfolio dropdown, Product Dossier, Formulation Presenter. G is formally
+      superseded.
     </div>
 
     <div class="high">
@@ -165,16 +176,18 @@
     <div class="high">
       <h2>H2 — Hero image invisible on mobile</h2>
       <p>
-        The image column collapses to 375×1&nbsp;px below <code>lg</code> (only absolute children,
-        no min-height). Add <code>min-h-72</code> like Origin/Standards.
-        <code>variant-h.tsx:508</code>
+        The image column collapses below <code>lg</code> (only absolute children, no min-height).
+        Re-measured 08-31: <strong>375×1&nbsp;px and 768×1&nbsp;px</strong>. Add
+        <code>min-h-80</code> like the Dossier image (<code>:856</code>).
+        <code>variant-h.tsx:507</code>
       </p>
     </div>
     <div class="high">
       <h2>H3 — Portfolio dropdown clips at tablet widths</h2>
       <p>
-        640px menu sits at <code>left:−37px</code> at a 768px viewport; the first column is cut with
-        no way to reach it. Clamp: <code>w-[min(640px,calc(100vw-2rem))]</code>.
+        640px menu sits at <code>left:−37px</code> at a 768px viewport (re-confirmed 08-31); the
+        first column is cut with no way to reach it. Anchor to the header, MobileNav-style:
+        <code>absolute inset-x-0 top-full mx-auto w-[min(640px,calc(100vw-2.5rem))]</code>.
         <code>variant-h.tsx:227</code>
       </p>
       <p class="note">
@@ -206,17 +219,49 @@
         <span class="sev med">Med</span
         ><span>CTA capitalization mixes title and sentence case — pick one.</span>
       </div>
+      <div class="row">
+        <span class="sev med">Med</span
+        ><span
+          >Industries photo renders 34×34&nbsp;px at <code>md</code> — a 1/12 track cannot hold a
+          photograph. <code>:691</code> (08-31)</span
+        >
+      </div>
+      <div class="row">
+        <span class="sev med">Med</span
+        ><span
+          >15 physical left/right utilities block the RTL mirror — swap to logical variants
+          (<code>end-*</code>, <code>pe-*</code>, <code>text-end</code>, <code>border-s/e</code>).
+          (08-31)</span
+        >
+      </div>
     </div>
 
     <div class="sect">
       <h3>Low — polish backlog</h3>
       <div class="row">
         <span class="sev low">Low</span
-        ><span>320px nav CTA wraps to two lines flush to the edge. <code>:408</code></span>
+        ><span
+          >Nav CTA wraps to two lines flush to the edge — re-confirmed at 375px too (60px tall,
+          08-31). Short label below <code>sm</code>. <code>:410</code></span
+        >
       </div>
       <div class="row">
         <span class="sev low">Low</span
         ><span>MobileNav lacks PortfolioMenu's Escape/outside close. <code>:283</code></span>
+      </div>
+      <div class="row">
+        <span class="sev low">Low</span
+        ><span
+          >Footer grid fills 11 of 12 tracks — stray empty trailing column.
+          <code>:1440</code> (08-31)</span
+        >
+      </div>
+      <div class="row">
+        <span class="sev low">Low</span
+        ><span
+          >Hero <code>min-h-[80vh]</code> → <code>svh</code> (sibling page already uses it).
+          <code>:445</code> (08-31)</span
+        >
       </div>
       <div class="row">
         <span class="sev done">Done</span
@@ -233,6 +278,6 @@
       <code>guidelines/docs/brand/variant-h-continuous-improvement.md</code>.
     </div>
 
-    <footer>better-interface review · 2026-08-28 · re-run after the High rows land</footer>
+    <footer>better-interface 08-28 · better-layout 08-31 · re-run after the High rows land</footer>
   </body>
 </html>
