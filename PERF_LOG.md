@@ -26,28 +26,28 @@ This document logs build performance, bundle asset sizes, and runtime cold-start
 
 ---
 
-## Detailed Asset Breakdown (Phase 6 Final StyleX)
+## Detailed Asset Breakdown (Optimized StyleX Build with Code-Splitting)
 
 ### CSS Assets (1 file)
+- `index-*.css`: 96.77 kB (raw) / 20.04 kB (gzip) — **-36.5% raw / -8.4% gzip vs Tailwind baseline**
 
-- `index-*.css`: 94.51 kB (raw) / 19.58 kB (gzip) — **-38.0% raw / -10.5% gzip vs Tailwind baseline**
+### Initial Client Entry Chunk (Root Page "/")
+- **Initial Client JS (`index-*.js`)**: **`766.64 kB (raw) / 214.80 kB (gzip)`** — **-56.7% initial JS gzip vs Tailwind baseline (`496.82 kB`)**!
 
-### JS Assets (14 files)
-
-- `index-*.js`: 1970.23 kB (raw) / 529.15 kB (gzip)
-- `dropdown-menu-*.js`: 126.98 kB (raw) / 42.81 kB (gzip)
-- `route-*.js`: 69.59 kB (raw) / 16.84 kB (gzip)
-- `tokens.stylex-*.js`: 16.14 kB (raw) / 6.00 kB (gzip)
-- `owner-*.js`: 12.57 kB (raw) / 5.37 kB (gzip)
-- `api-*.js`: 9.15 kB (raw) / 3.40 kB (gzip)
-- `checkbox-*.js`: 9.08 kB (raw) / 4.05 kB (gzip)
-- `style-audit-*.js`: 8.89 kB (raw) / 2.56 kB (gzip)
-- `input-*.js`: 4.37 kB (raw) / 2.19 kB (gzip)
-- `useValueChanged-*.js`: 3.35 kB (raw) / 1.52 kB (gzip)
-- `todos-*.js`: 2.14 kB (raw) / 1.07 kB (gzip)
-- `dashboard-*.js`: 1.10 kB (raw) / 0.61 kB (gzip)
-- `routes-*.js`: 0.77 kB (raw) / 0.48 kB (gzip)
-- `label-*.js`: 0.45 kB (raw) / 0.35 kB (gzip)
+### Dynamic On-Demand Prototype Variant Chunks
+- `variant-c-*.js`: 12.92 kB (raw) / 4.48 kB (gzip)
+- `variant-f-*.js`: 16.05 kB (raw) / 5.15 kB (gzip)
+- `variant-a-*.js`: 17.39 kB (raw) / 5.24 kB (gzip)
+- `variant-b-*.js`: 23.07 kB (raw) / 6.68 kB (gzip)
+- `variant-g-*.js`: 24.26 kB (raw) / 6.63 kB (gzip)
+- `variant-d-*.js`: 24.11 kB (raw) / 6.81 kB (gzip)
+- `variant-k-*.js`: 34.02 kB (raw) / 8.25 kB (gzip)
+- `variant-i-*.js`: 45.03 kB (raw) / 10.19 kB (gzip)
+- `variant-e-*.js`: 45.46 kB (raw) / 10.62 kB (gzip)
+- `variant-h-*.js`: 72.31 kB (raw) / 15.48 kB (gzip)
+- `variant-v-*.js`: 73.47 kB (raw) / 15.81 kB (gzip)
+- `variant-j-*.js`: 170.21 kB (raw) / 60.47 kB (gzip) (GSAP + word splitting on-demand)
+- `variant-waterfall-*.js`: 555.96 kB (raw) / 139.73 kB (gzip) (Three.js on-demand)
 
 ---
 

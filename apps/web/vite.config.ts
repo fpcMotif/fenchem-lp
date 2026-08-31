@@ -30,6 +30,11 @@ export default defineConfig({
   plugins: [
     stylex.vite({
       useCSSLayers: true,
+      runtimeInjection: false,
+      enableInlinedConditionalMerge: true,
+      treeshakeCompensation: true,
+      enableDebugClassNames: false,
+      enableDevClassNames: false,
       unstable_moduleResolution: {
         type: "commonJS",
         rootDir: fileURLToPath(new URL("../..", import.meta.url)),

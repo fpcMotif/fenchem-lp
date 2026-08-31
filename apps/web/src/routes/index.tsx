@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { Suspense } from "react";
 
 import { PrototypeSwitcher } from "@/components/prototype/prototype-switcher";
 import {
@@ -32,7 +33,7 @@ function HomeComponent() {
   const Active = VARIANTS.find((v) => v.key === variant)?.Component;
   return (
     <>
-      {Active ? <Active /> : null}
+      <Suspense fallback={null}>{Active ? <Active /> : null}</Suspense>
       <PrototypeSwitcher current={variant} />
     </>
   );
