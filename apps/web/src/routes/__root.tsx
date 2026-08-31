@@ -85,11 +85,14 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
         rel: "stylesheet",
         href: appCss,
       },
+      // Dev-only: @stylexswc/unplugin's dev middleware serves the collected
+      // atomic rules at this URL. In production the rules are spliced into
+      // index.css at the `@stylex;` marker instead (useCssPlaceholder).
       ...(import.meta.env.DEV
         ? [
             {
               rel: "stylesheet",
-              href: "/virtual:stylex.css",
+              href: "/stylex.css",
             },
           ]
         : []),

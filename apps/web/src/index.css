@@ -129,3 +129,6 @@ figcaption {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* @stylexswc/unplugin splices the compiled atomic StyleX CSS here (useCssPlaceholder). */
+@stylex;

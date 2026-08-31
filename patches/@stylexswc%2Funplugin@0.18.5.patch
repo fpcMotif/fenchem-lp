@@ -1,0 +1,36 @@
+diff --git a/dist/src-Bf3Dpcuq.js b/dist/src-Bf3Dpcuq.js
+index 71306294aad8362466841f4c168f6c7d1b24f61b..4bc1fdfc91ebd356524014fcfba16df54ca6c07f 100644
+--- a/dist/src-Bf3Dpcuq.js
++++ b/dist/src-Bf3Dpcuq.js
+@@ -644,6 +644,13 @@ const unpluginFactory = (options = {}, meta) => {
+ 				});
+ 			},
+ 			configureServer(server) {
++				// PATCH(fenchem-lp): arm the dev CSS middleware and HMR channel here.
++				// Upstream arms both in transformIndexHtml, which SSR frameworks
++				// (TanStack Start) never invoke — without this the middleware
++				// falls through and the framework router answers /stylex.css
++				// with HTML.
++				wsSend || (wsSend = server.ws.send.bind(server.ws));
++				cssFileName || (cssFileName = ensureLeadingSlash(normalizedOptions.fileName));
+ 				if (cssRefreshTimer) {
+ 					clearTimeout(cssRefreshTimer);
+ 					cssRefreshTimer = null;
+diff --git a/dist/src-CiDXNNyr.cjs b/dist/src-CiDXNNyr.cjs
+index 8f01568e5b5d4b23fc34695976c2eb598d735289..e2da163c4c7631ee3f7c8ea95f3272c8138b0362 100644
+--- a/dist/src-CiDXNNyr.cjs
++++ b/dist/src-CiDXNNyr.cjs
+@@ -670,6 +670,13 @@ const unpluginFactory = (options = {}, meta) => {
+ 				});
+ 			},
+ 			configureServer(server) {
++				// PATCH(fenchem-lp): arm the dev CSS middleware and HMR channel here.
++				// Upstream arms both in transformIndexHtml, which SSR frameworks
++				// (TanStack Start) never invoke — without this the middleware
++				// falls through and the framework router answers /stylex.css
++				// with HTML.
++				wsSend || (wsSend = server.ws.send.bind(server.ws));
++				cssFileName || (cssFileName = ensureLeadingSlash(normalizedOptions.fileName));
+ 				if (cssRefreshTimer) {
+ 					clearTimeout(cssRefreshTimer);
+ 					cssRefreshTimer = null;

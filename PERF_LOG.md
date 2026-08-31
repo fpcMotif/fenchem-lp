@@ -2,6 +2,20 @@
 
 This document logs build performance, bundle asset sizes, and runtime cold-start metrics across every phase of the StyleX migration for `fenchem-lp`.
 
+## Phase 7: Babel → Rust/SWC StyleX Compiler (`@stylexswc/unplugin@0.18.5`)
+
+Same protocol and machine as the phases below; compared against Phase 6 (final Babel-based StyleX build). Decision record: [ADR-0003](docs/adr/0003-stylex-swc-compiler.md).
+
+| Metric                               | Phase 6 (Babel)        | Phase 7 (SWC/Rust)     | Delta              |
+| ------------------------------------ | ---------------------- | ---------------------- | ------------------ |
+| **Full Build Time (Hyperfine Mean)** | 3.839 s ± 0.024 s      | 2.783 s ± 0.018 s      | **-27.5%**         |
+| **Vite Client Build Time**           | 1.81 s                 | 0.989 s                | **-45.4%**         |
+| **CSS Assets (Raw / Gzip)**          | 94.51 kB / 19.58 kB    | 72.61 kB / 17.95 kB    | **-23.2% / -8.3%** |
+| **JS Assets (Raw / Gzip)**           | 2182.50 kB / 602.02 kB | 2171.90 kB / 610.12 kB | -0.5% / +1.3%      |
+| **Total Assets (Raw / Gzip)**        | 2277.01 kB / 621.59 kB | 2244.51 kB / 628.08 kB | -1.4% / +1.0%      |
+
+Takeaway: the swap is a **build-speed** win, not a shipped-size win — both compilers emit the same atomic-CSS model, so total gzip is flat by design. The CSS-only reduction comes from the new single-stylesheet `useCssPlaceholder` emission.
+
 ## Methodology & Protocol
 
 - **Build Time**: Cold workspace build (`bun run build`) benchmarked via `hyperfine --warmup 2 --runs 5`.

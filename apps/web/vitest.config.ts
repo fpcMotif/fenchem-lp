@@ -1,6 +1,6 @@
 import { fileURLToPath } from "node:url";
 
-import stylex from "@stylexjs/unplugin";
+import stylexRs from "@stylexswc/unplugin/vite";
 import viteReact from "@vitejs/plugin-react";
 import { defineConfig } from "vitest/config";
 
@@ -10,11 +10,14 @@ const rootDir = fileURLToPath(new URL("../..", import.meta.url));
 
 export default defineConfig({
   plugins: [
-    stylex.vite({
+    stylexRs({
       useCSSLayers: true,
-      unstable_moduleResolution: {
-        type: "commonJS",
-        rootDir,
+      rsOptions: {
+        dev: true,
+        unstable_moduleResolution: {
+          type: "commonJS",
+          rootDir,
+        },
       },
     }),
     viteReact(),
