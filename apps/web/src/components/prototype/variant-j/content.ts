@@ -80,13 +80,6 @@ export const INDUSTRY_COPY: Record<string, string> = {
     "Dermatologically active botanicals and hyaluronic acid systems formulated for cellular compatibility and sensory performance.",
 };
 
-/** Shared ledger-label class (mono, tracked, uppercase — 11px floor). */
-export const TECH_LABEL = "font-tech text-[11px] uppercase tracking-[0.26em] text-mute-600";
-
-/** Dark-ground variant of the ledger label. */
-export const TECH_LABEL_DARK =
-  "font-tech text-[11px] uppercase tracking-[0.26em] text-brand-green-400";
-
 export const HERO = {
   eyebrow: "Botanical Intelligence Since 1995",
   lede: "Premium botanical and functional ingredients for the world's most demanding formulations — grown with patience, perfected in the laboratory, documented to specification.",

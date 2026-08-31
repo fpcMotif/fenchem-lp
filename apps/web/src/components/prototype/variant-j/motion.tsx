@@ -1,4 +1,6 @@
 import { useGSAP } from "@gsap/react";
+import type { StyleXStyles } from "@stylexjs/stylex";
+import * as stylex from "@stylexjs/stylex";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Lenis from "lenis";
@@ -95,7 +97,7 @@ const START = "top 78%";
 
 /** Word-by-word rise for a SplitWords heading. `sel` targets the heading. */
 export function revealWords(root: HTMLElement, sel: string, options: TriggerOptions = {}) {
-  const targets = root.querySelectorAll(`${sel} .vi-word-inner`);
+  const targets = root.querySelectorAll(`${sel} [data-word-inner], ${sel} .vi-word-inner`);
   if (!targets.length) return;
   gsap.from(targets, {
     yPercent: 112,
@@ -176,10 +178,35 @@ export function marquee(root: HTMLElement, trackSel: string, durationSeconds = 3
 
 /* ── Accessible word splitting ─────────────────────────────────────────── */
 
+const styles = stylex.create({
+  srOnly: {
+    position: "absolute",
+    width: 1,
+    height: 1,
+    padding: 0,
+    margin: -1,
+    overflow: "hidden",
+    clip: "rect(0, 0, 0, 0)",
+    whiteSpace: "nowrap",
+    borderWidth: 0,
+  },
+  word: {
+    display: "inline-block",
+    overflow: "hidden",
+    paddingBottom: "0.08em",
+    marginBottom: "-0.08em",
+    verticalAlign: "baseline",
+  },
+  wordInner: {
+    display: "inline-block",
+    willChange: "transform",
+  },
+});
+
 export type Segment = {
   text: string;
-  /** Extra classes for this segment's words (e.g. italic accent). */
-  className?: string;
+  /** Extra StyleX styles for this segment's words (e.g. italic accent). */
+  sx?: StyleXStyles;
 };
 
 /**
@@ -188,24 +215,23 @@ export type Segment = {
  * the visual words are aria-hidden. Never wrap links or interactive content.
  * Under no-JS the split words are simply visible in place.
  */
-export function SplitWords({ segments, className }: { segments: Segment[]; className?: string }) {
+export function SplitWords({ segments, sx }: { segments: Segment[]; sx?: StyleXStyles }) {
   const plain = segments.map((segment) => segment.text).join(" ");
   return (
-    <span className={className}>
-      <span className="sr-only">{plain}</span>
+    <span {...stylex.props(sx)}>
+      <span {...stylex.props(styles.srOnly)}>{plain}</span>
       <span aria-hidden="true">
         {segments.map((segment, segmentIndex) =>
           segment.text.split(/\s+/).map((word, wordIndex) => (
             <span
               // eslint-disable-next-line react/no-array-index-key -- static content, order never changes
               key={`${segmentIndex}-${wordIndex}`}
-              className="vi-word inline-block overflow-hidden pb-[0.08em] -mb-[0.08em] align-baseline"
+              data-word
+              {...stylex.props(styles.word)}
             >
-              <span
-                className={`vi-word-inner inline-block will-change-transform ${segment.className ?? ""}`}
-              >
+              <span data-word-inner {...stylex.props(styles.wordInner, segment.sx)}>
                 {word}
-                {" "}
+                {"\u00A0"}
               </span>
             </span>
           )),

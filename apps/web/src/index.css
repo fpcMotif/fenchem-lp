@@ -2,10 +2,10 @@
 @import "@fenchem-lp/ui/globals.css";
 
 /*
- * Fenchem landing page tokens. These sit at the app layer because the product
- * site has a more editorial palette than the shared shadcn primitives.
+ * Fenchem landing page tokens. All values are exact
+ * OKLCH conversions of the brand book's sRGB values.
  */
-@theme {
+:root {
   --color-forest: oklch(0.288 0.04 160.598);
   --color-fern: oklch(0.372 0.04 160.099);
   --color-moss: oklch(0.477 0.04 160.078);
@@ -19,14 +19,6 @@
   --color-bark: oklch(0.224 0.006 121.918);
   --color-clay: oklch(0.392 0.115 22.782);
   --color-blush: oklch(0.919 0.041 21.601);
-
-  /* ============================================================
-   * FENCHEM BRAND BOOK tokens — used by prototype variants D/E/F/G.
-   * Source: docs/brand/fenchem-brand-book.md. All values are exact
-   * OKLCH conversions of the brand book's sRGB values.
-   * Brand Blue #0743AE · Brand Green #64A733 · Clean White · Neutral Gray
-   * + 6 division (auxiliary) accents.
-   * ============================================================ */
 
   /* Brand Blue — #0743AE anchored at -700 */
   --color-brand-blue-50: oklch(0.97 0.014 261.5);
@@ -76,19 +68,9 @@
   --color-food: oklch(0.703 0.148 55.168); /* #E48336 食品 */
   --color-chem: oklch(0.631 0.146 250.852); /* #3A8DDE 化工 */
   --color-nutrition: oklch(0.957 0.141 104.856); /* #FFF67F 营养 */
-
-  /* Cosmetics division tint — text zone for the vivid color-field panels
-   * (variant K). Full-saturation cosmetics (L 0.59) cannot carry AA text in
-   * either polarity, so its panel text sits on this L 0.90 tint (ink ≈ 9:1).
-   * Same hue, chroma tapered — matches the brand-book tint methodology. */
   --color-cosmetics-200: oklch(0.9 0.06 317.586);
 
-  /*
-   * English-site typography (see docs/adr/0002-english-site-typography.md):
-   * Newsreader (display serif) + Plus Jakarta Sans (body/UI) + JetBrains Mono
-   * (technical). "Noto Sans SC" (Source Han Sans) stays only as a LOCAL CJK
-   * fallback — no web-font import — so 中文 glyphs use the brand face when present.
-   */
+  /* English-site typography */
   --font-display: "Newsreader", "Georgia", "Times New Roman", serif;
   --font-body: "Plus Jakarta Sans", "Noto Sans SC", "Inter Variable", system-ui, sans-serif;
   --font-tech: "JetBrains Mono", ui-monospace, "SFMono-Regular", monospace;
@@ -97,46 +79,44 @@
   --shadow-lift: 0 12px 32px -8px oklch(0.288 0.04 160.598 / 0.06);
 
   --animate-marquee: marquee 32s linear infinite;
+}
 
-  @keyframes marquee {
-    from {
-      transform: translateX(0);
-    }
-    to {
-      transform: translateX(-50%);
-    }
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
   }
 }
 
-@layer base {
-  *,
-  *::before,
-  *::after {
-    box-sizing: border-box;
-  }
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
 
-  html {
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    text-size-adjust: 100%;
-  }
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-size-adjust: 100%;
+}
 
-  h1,
-  h2,
-  h3 {
-    text-wrap: balance;
-  }
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+}
 
-  p,
-  li,
-  figcaption {
-    text-wrap: pretty;
-  }
+p,
+li,
+figcaption {
+  text-wrap: pretty;
+}
 
-  :where(a, button, [role="button"], input, select, textarea):focus-visible {
-    outline: 2px solid currentColor;
-    outline-offset: 4px;
-  }
+:where(a, button, [role="button"], input, select, textarea):focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 4px;
 }
 
 @media (prefers-reduced-motion: reduce) {

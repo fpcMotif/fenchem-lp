@@ -1,3 +1,6 @@
+import { breakpoints, colors, radii, typography } from "@fenchem-lp/ui/tokens.stylex";
+import type { StyleXStyles } from "@stylexjs/stylex";
+import * as stylex from "@stylexjs/stylex";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
 import {
   type DivisionKey,
@@ -6,8 +9,9 @@ import {
   type Ingredient,
   ingredients,
 } from "@/components/landing/landing-content";
-import { imgFor, TECH_LABEL } from "../content";
+import { imgFor } from "../content";
 import { drawRule, revealWords, riseIn, SplitWords, useSectionAnimation } from "../motion";
+import { sharedStyles } from "../styles";
 
 /*
  * Variant J — the ingredient ledger. Six featured actives on a hairline grid
@@ -17,14 +21,250 @@ import { drawRule, revealWords, riseIn, SplitWords, useSectionAnimation } from "
  * hairlines draw themselves in per card. SSR markup is the final state.
  */
 
-/** Division accent dot — the chip itself stays paper/ink for contrast. */
-const DIVISION_DOT: Record<DivisionKey, string> = {
-  nutrition: "bg-nutrition border border-brand-green-700/30",
-  food: "bg-food",
-  cosmetics: "bg-cosmetics",
-  feed: "bg-feed",
-  agro: "bg-agro",
-  chem: "bg-chem",
+const styles = stylex.create({
+  section: {
+    scrollMarginTop: "7rem",
+    backgroundColor: colors.paper,
+    paddingBlock: "7rem",
+  },
+  container: {
+    marginInline: "auto",
+    maxWidth: "1480px",
+    paddingInline: {
+      default: "1.25rem",
+      [breakpoints.md]: "2.5rem",
+    },
+  },
+  header: {
+    display: "flex",
+    flexDirection: {
+      default: "column",
+      [breakpoints.md]: "row",
+    },
+    gap: "2rem",
+    alignItems: {
+      [breakpoints.md]: "flex-end",
+    },
+    justifyContent: {
+      [breakpoints.md]: "space-between",
+    },
+  },
+  heading: {
+    marginTop: "1.25rem",
+    maxWidth: "42rem",
+    textWrap: "balance",
+    fontFamily: typography.display,
+    fontWeight: 300,
+    fontSize: "clamp(2.4rem, 4.6vw, 4rem)",
+    color: colors.ink,
+    lineHeight: 1.06,
+    letterSpacing: "-0.03em",
+  },
+  headingItalic: {
+    fontStyle: "italic",
+    color: colors.brandGreen700,
+  },
+  asideLink: {
+    display: "inline-flex",
+    minHeight: "2.75rem",
+    alignItems: "center",
+    gap: "0.5rem",
+    fontWeight: 600,
+    color: {
+      default: colors.brandBlue700,
+      ":hover": colors.brandBlue800,
+    },
+    fontSize: "0.875rem",
+    textUnderlineOffset: "4px",
+    textDecoration: {
+      default: "none",
+      ":hover": "underline",
+    },
+    outline: {
+      ":focus-visible": `2px solid ${colors.brandBlue700}`,
+    },
+    outlineOffset: {
+      ":focus-visible": 2,
+    },
+  },
+  arrowRightIcon: {
+    width: "0.875rem",
+    height: "0.875rem",
+    transition: "transform 300ms ease",
+  },
+  band: {
+    marginTop: "3.5rem",
+    backgroundColor: colors.mute50,
+    paddingBlock: "3.5rem",
+  },
+  grid: {
+    display: "grid",
+    gridTemplateColumns: {
+      default: "1fr",
+      [breakpoints.sm]: "repeat(2, 1fr)",
+      [breakpoints.md]: "repeat(3, 1fr)",
+    },
+    gap: "1px",
+    borderWidth: 1,
+    borderStyle: "solid",
+    borderColor: colors.line,
+    backgroundColor: colors.line,
+  },
+  card: {
+    display: "flex",
+    flexDirection: "column",
+    backgroundColor: colors.paper,
+  },
+  mediaWrap: {
+    position: "relative",
+    aspectRatio: "4/3",
+    overflow: "hidden",
+  },
+  cardImg: {
+    height: "100%",
+    width: "100%",
+    objectFit: "cover",
+    outline: "1px solid rgba(0, 0, 0, 0.1)",
+    outlineOffset: -1,
+    transition: "transform 700ms cubic-bezier(0.16, 1, 0.3, 1)",
+  },
+  badge: {
+    position: "absolute",
+    top: "0.75rem",
+    right: "0.75rem",
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "0.375rem",
+    borderRadius: radii.sm,
+    borderWidth: 1,
+    borderStyle: "solid",
+    borderColor: colors.line,
+    backgroundColor: colors.paper,
+    paddingInline: "0.5rem",
+    paddingBlock: "0.25rem",
+    fontFamily: typography.tech,
+    fontSize: "10px",
+    color: colors.ink,
+    textTransform: "uppercase",
+    letterSpacing: "0.18em",
+  },
+  dotBase: {
+    width: "0.375rem",
+    height: "0.375rem",
+    borderRadius: radii.full,
+  },
+  dotNutrition: {
+    backgroundColor: colors.nutrition,
+    borderWidth: 1,
+    borderStyle: "solid",
+    borderColor: "color-mix(in oklch, var(--color-brand-green-700) 30%, transparent)",
+  },
+  dotFood: {
+    backgroundColor: colors.food,
+  },
+  dotCosmetics: {
+    backgroundColor: colors.cosmetics,
+  },
+  dotFeed: {
+    backgroundColor: colors.feed,
+  },
+  dotAgro: {
+    backgroundColor: colors.agro,
+  },
+  dotChem: {
+    backgroundColor: colors.chem,
+  },
+  cardBody: {
+    display: "flex",
+    flex: "1 1 0%",
+    flexDirection: "column",
+    paddingInline: {
+      default: "1.5rem",
+      [breakpoints.md]: "1.75rem",
+    },
+    paddingBlock: "1.75rem",
+  },
+  cardHeader: {
+    display: "flex",
+    alignItems: "baseline",
+    justifyContent: "space-between",
+    gap: "1rem",
+  },
+  cardTitle: {
+    marginTop: "1rem",
+    fontFamily: typography.display,
+    fontWeight: 300,
+    fontSize: "1.5rem",
+    color: colors.ink,
+    lineHeight: 1.25,
+    letterSpacing: "-0.02em",
+  },
+  cardLatin: {
+    marginTop: "0.25rem",
+    fontFamily: typography.display,
+    color: colors.mute600,
+    fontSize: "0.875rem",
+    fontStyle: "italic",
+  },
+  ledgerWrap: {
+    marginTop: "1.5rem",
+  },
+  dl: {
+    display: "flex",
+    alignItems: "baseline",
+    justifyContent: "space-between",
+    gap: "1rem",
+    paddingBlock: "0.75rem",
+    margin: 0,
+  },
+  dd: {
+    textAlign: "right",
+    color: colors.ink,
+    fontSize: "0.875rem",
+    lineHeight: 1.375,
+    margin: 0,
+  },
+  specLink: {
+    marginTop: "auto",
+    display: "inline-flex",
+    minHeight: "2.75rem",
+    alignItems: "center",
+    gap: "0.5rem",
+    paddingTop: "1.25rem",
+    fontFamily: typography.tech,
+    fontSize: "11px",
+    color: {
+      default: colors.brandBlue700,
+      ":hover": colors.brandBlue800,
+    },
+    textTransform: "uppercase",
+    letterSpacing: "0.26em",
+    textUnderlineOffset: "4px",
+    textDecoration: {
+      default: "none",
+      ":hover": "underline",
+    },
+    outline: {
+      ":focus-visible": `2px solid ${colors.brandBlue700}`,
+    },
+    outlineOffset: {
+      ":focus-visible": 2,
+    },
+  },
+  specArrowIcon: {
+    width: "0.875rem",
+    height: "0.875rem",
+    transition: "transform 300ms ease",
+  },
+});
+
+const DIVISION_DOT_STYLES: Record<DivisionKey, StyleXStyles> = {
+  nutrition: styles.dotNutrition,
+  food: styles.dotFood,
+  cosmetics: styles.dotCosmetics,
+  feed: styles.dotFeed,
+  agro: styles.dotAgro,
+  chem: styles.dotChem,
 };
 
 const FEATURED = getFeaturedIngredients();
@@ -34,10 +274,10 @@ const MATRIX_ITEMS: Ingredient[] = FEATURED.length === 6 ? FEATURED : ingredient
 function LedgerRow({ label, value }: { label: string; value: string }) {
   return (
     <>
-      <span data-rule aria-hidden="true" className="block h-px origin-left bg-line" />
-      <dl className="flex items-baseline justify-between gap-4 py-3">
-        <dt className={TECH_LABEL}>{label}</dt>
-        <dd className="text-right text-ink text-sm leading-snug">{value}</dd>
+      <span data-rule aria-hidden="true" {...stylex.props(sharedStyles.ruleLine)} />
+      <dl {...stylex.props(styles.dl)}>
+        <dt {...stylex.props(sharedStyles.techLabel)}>{label}</dt>
+        <dd {...stylex.props(styles.dd)}>{value}</dd>
       </dl>
     </>
   );
@@ -59,76 +299,63 @@ export function MatrixSection() {
       ref={ref}
       id="ingredients"
       aria-labelledby="ingredients-heading"
-      className="scroll-mt-28 bg-paper py-28"
+      {...stylex.props(styles.section)}
     >
-      <div className="mx-auto max-w-[1480px] px-5 md:px-10">
-        <div className="flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
+      <div {...stylex.props(styles.container)}>
+        <div {...stylex.props(styles.header)}>
           <div>
-            <p data-matrix-eyebrow className={TECH_LABEL}>
+            <p data-matrix-eyebrow {...stylex.props(sharedStyles.techLabel)}>
               02 — Active Compounds
             </p>
-            <h2
-              id="ingredients-heading"
-              data-matrix-heading
-              className="mt-5 max-w-2xl text-balance font-display font-light text-[clamp(2.4rem,4.6vw,4rem)] text-ink leading-[1.06] tracking-[-0.03em]"
-            >
+            <h2 id="ingredients-heading" data-matrix-heading {...stylex.props(styles.heading)}>
               <SplitWords
                 segments={[
                   { text: "The ingredient" },
-                  { text: "matrix.", className: "italic text-brand-green-700" },
+                  { text: "matrix.", sx: styles.headingItalic },
                 ]}
               />
             </h2>
           </div>
-          <a
-            data-matrix-aside
-            href="#contact"
-            className="group inline-flex min-h-11 items-center gap-2 font-semibold text-brand-blue-700 text-sm underline-offset-4 transition-colors hover:text-brand-blue-800 hover:underline focus-visible:outline-2 focus-visible:outline-brand-blue-700 focus-visible:outline-offset-2"
-          >
+          <a data-matrix-aside href="#contact" {...stylex.props(styles.asideLink)}>
             Request full specifications
-            <ArrowRight
-              aria-hidden="true"
-              className="size-3.5 transition-transform duration-300 group-hover:translate-x-1"
-            />
+            <ArrowRight aria-hidden="true" {...stylex.props(styles.arrowRightIcon)} />
           </a>
         </div>
       </div>
 
-      <div className="mt-14 bg-mute-50 py-14">
-        <div className="mx-auto max-w-[1480px] px-5 md:px-10">
-          <div className="grid grid-cols-1 gap-px border border-line bg-line sm:grid-cols-2 md:grid-cols-3">
+      <div {...stylex.props(styles.band)}>
+        <div {...stylex.props(styles.container)}>
+          <div {...stylex.props(styles.grid)}>
             {MATRIX_ITEMS.map((item) => {
               const art = imgFor(item);
               const division = divisionForApplication(item.application);
               return (
-                <article key={item.code} data-matrix-card className="group flex flex-col bg-paper">
-                  <div className="relative aspect-[4/3] overflow-hidden">
+                <article key={item.code} data-matrix-card {...stylex.props(styles.card)}>
+                  <div {...stylex.props(styles.mediaWrap)}>
                     <img
                       src={art.src}
                       alt={art.alt}
                       loading="lazy"
-                      className="h-full w-full object-cover outline outline-1 -outline-offset-1 outline-black/10 transition-transform duration-700 ease-out group-hover:scale-105"
+                      {...stylex.props(styles.cardImg)}
                     />
-                    <span className="absolute top-3 right-3 inline-flex items-center gap-1.5 rounded-sm border border-line bg-paper px-2 py-1 font-tech text-[10px] text-ink uppercase tracking-[0.18em]">
+                    <span {...stylex.props(styles.badge)}>
                       <span
                         aria-hidden="true"
-                        className={`size-1.5 rounded-full ${DIVISION_DOT[division]}`}
+                        {...stylex.props(styles.dotBase, DIVISION_DOT_STYLES[division])}
                       />
                       {item.application}
                     </span>
                   </div>
 
-                  <div className="flex flex-1 flex-col px-6 py-7 md:px-7">
-                    <div className="flex items-baseline justify-between gap-4">
-                      <span className={TECH_LABEL}>{item.code}</span>
-                      <span className={TECH_LABEL}>{item.category}</span>
+                  <div {...stylex.props(styles.cardBody)}>
+                    <div {...stylex.props(styles.cardHeader)}>
+                      <span {...stylex.props(sharedStyles.techLabel)}>{item.code}</span>
+                      <span {...stylex.props(sharedStyles.techLabel)}>{item.category}</span>
                     </div>
-                    <h3 className="mt-4 font-display font-light text-2xl text-ink leading-tight tracking-[-0.02em]">
-                      {item.name}
-                    </h3>
-                    <p className="mt-1 font-display text-mute-600 text-sm italic">{item.latin}</p>
+                    <h3 {...stylex.props(styles.cardTitle)}>{item.name}</h3>
+                    <p {...stylex.props(styles.cardLatin)}>{item.latin}</p>
 
-                    <div className="mt-6">
+                    <div {...stylex.props(styles.ledgerWrap)}>
                       <LedgerRow label="Purity" value={item.purity} />
                       <LedgerRow label="Form" value={item.form} />
                     </div>
@@ -136,13 +363,10 @@ export function MatrixSection() {
                     <a
                       href="#contact"
                       aria-label={`Request spec for ${item.name}`}
-                      className="group/spec mt-auto inline-flex min-h-11 items-center gap-2 pt-5 font-tech text-[11px] text-brand-blue-700 uppercase tracking-[0.26em] underline-offset-4 transition-colors hover:text-brand-blue-800 hover:underline focus-visible:outline-2 focus-visible:outline-brand-blue-700 focus-visible:outline-offset-2"
+                      {...stylex.props(styles.specLink)}
                     >
                       Request spec
-                      <ArrowUpRight
-                        aria-hidden="true"
-                        className="size-3.5 transition-transform duration-300 group-hover/spec:-translate-y-0.5 group-hover/spec:translate-x-0.5"
-                      />
+                      <ArrowUpRight aria-hidden="true" {...stylex.props(styles.specArrowIcon)} />
                     </a>
                   </div>
                 </article>

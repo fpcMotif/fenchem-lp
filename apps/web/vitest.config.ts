@@ -1,13 +1,24 @@
 import { fileURLToPath } from "node:url";
 
+import stylex from "@stylexjs/unplugin";
 import viteReact from "@vitejs/plugin-react";
 import { defineConfig } from "vitest/config";
 
 const appSrc = fileURLToPath(new URL("./src", import.meta.url));
 const uiSrc = fileURLToPath(new URL("../../packages/ui/src", import.meta.url));
+const rootDir = fileURLToPath(new URL("../..", import.meta.url));
 
 export default defineConfig({
-  plugins: [viteReact()],
+  plugins: [
+    stylex.vite({
+      useCSSLayers: true,
+      unstable_moduleResolution: {
+        type: "commonJS",
+        rootDir,
+      },
+    }),
+    viteReact(),
+  ],
   resolve: {
     alias: {
       "@": appSrc,

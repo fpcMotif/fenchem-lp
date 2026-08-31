@@ -1,17 +1,18 @@
-import { ArrowRight, ArrowUpRight, ChevronDown, FlaskConical, Globe2, Sprout } from "lucide-react";
-import { LazyMotion, domAnimation, m, useScroll, useTransform } from "motion/react";
-import { useRef } from "react";
-import { EASE } from "@/components/prototype/motion-constants";
-import { Reveal } from "@/components/prototype/motion";
-import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
-import { getFeaturedIngredients, pillars } from "@/components/landing/landing-content";
-
 /*
  * PROTOTYPE — Variant C: "Deep Forest"
  * Immersive cinematic dark luxury. Full-viewport hero, story chapters with
  * parallax, horizontal scroll-snap ingredient rail, glowing mint CTA.
  * New direction — no Stitch base. See PROTOTYPE-BRIEF.md.
  */
+import { getFeaturedIngredients, pillars } from "@/components/landing/landing-content";
+import { Reveal } from "@/components/prototype/motion";
+import { EASE } from "@/components/prototype/motion-constants";
+import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
+import { breakpoints, colors, radii, typography } from "@fenchem-lp/ui/tokens.stylex";
+import * as stylex from "@stylexjs/stylex";
+import { ArrowRight, ArrowUpRight, ChevronDown, FlaskConical, Globe2, Sprout } from "lucide-react";
+import { domAnimation, LazyMotion, m, useScroll, useTransform } from "motion/react";
+import { useRef } from "react";
 
 const img = (id: string, w = 1600, q = 80) =>
   `https://images.unsplash.com/${id}?auto=format&fit=crop&w=${w}&q=${q}`;
@@ -38,6 +39,642 @@ const PILLAR_DETAIL = [
   },
 ] as const;
 
+const styles = stylex.create({
+  main: {
+    backgroundColor: colors.bark,
+    fontFamily: typography.body,
+    color: colors.cream,
+    WebkitFontSmoothing: "antialiased",
+  },
+  // Nav
+  nav: {
+    position: "fixed",
+    left: { default: "1rem", [breakpoints.md]: 0 },
+    right: { default: "1rem", [breakpoints.md]: 0 },
+    top: { default: "1rem", [breakpoints.md]: "1.5rem" },
+    zIndex: 50,
+  },
+  navInner: {
+    marginInline: "auto",
+    display: "flex",
+    maxWidth: "880px",
+    alignItems: "center",
+    justifyContent: "space-between",
+    borderRadius: radii.full,
+    borderWidth: "1px",
+    borderStyle: "solid",
+    borderColor: "rgba(255, 255, 255, 0.1)",
+    backgroundColor: "rgba(255, 255, 255, 0.05)",
+    paddingBlock: "0.5rem",
+    paddingLeft: "1.5rem",
+    paddingRight: "0.5rem",
+    backdropFilter: "blur(24px)",
+    WebkitBackdropFilter: "blur(24px)",
+  },
+  navLogo: {
+    fontFamily: typography.display,
+    color: colors.cream,
+    fontSize: "1.25rem",
+    letterSpacing: "-0.025em",
+    textDecoration: "none",
+  },
+  navLinksWrapper: {
+    display: { default: "none", [breakpoints.md]: "flex" },
+    alignItems: "center",
+    gap: "1.75rem",
+  },
+  navLink: {
+    color: {
+      default: "color-mix(in oklab, var(--color-cream) 60%, transparent)",
+      ":hover": colors.cream,
+    },
+    fontSize: "0.875rem",
+    transitionProperty: "color",
+    transitionDuration: "300ms",
+    textDecoration: "none",
+  },
+  navInquireBtn: {
+    borderRadius: radii.full,
+    backgroundColor: colors.mint,
+    paddingInline: "1.25rem",
+    paddingBlock: "0.625rem",
+    fontWeight: 600,
+    color: colors.forest,
+    fontSize: "0.875rem",
+    boxShadow: {
+      default: "0 0 24px color-mix(in oklab, var(--color-mint) 25%, transparent)",
+      ":hover": "0 0 40px color-mix(in oklab, var(--color-mint) 45%, transparent)",
+    },
+    transitionProperty: "box-shadow",
+    transitionDuration: "300ms",
+    textDecoration: "none",
+  },
+  // Hero
+  heroHeader: {
+    position: "relative",
+    display: "flex",
+    minHeight: "100svh",
+    alignItems: "center",
+    justifyContent: "center",
+    overflow: "hidden",
+  },
+  heroBgDiv: {
+    position: "absolute",
+    inset: 0,
+  },
+  heroBgImg: {
+    height: "100%",
+    width: "100%",
+    transform: "scale(1.1)",
+    objectFit: "cover",
+    display: "block",
+  },
+  heroGradientOverlay: {
+    position: "absolute",
+    inset: 0,
+    backgroundImage:
+      "linear-gradient(to bottom, color-mix(in oklab, var(--color-bark) 80%, transparent), color-mix(in oklab, var(--color-forest) 40%, transparent), var(--color-bark))",
+  },
+  heroTextContainer: {
+    position: "relative",
+    zIndex: 10,
+    paddingInline: "1.5rem",
+    textAlign: "center",
+  },
+  heroEyebrow: {
+    fontFamily: typography.tech,
+    fontSize: { default: "11px", [breakpoints.md]: "12px" },
+    color: colors.mint,
+    textTransform: "uppercase",
+    letterSpacing: "0.45em",
+  },
+  heroTitle: {
+    marginInline: "auto",
+    marginTop: "2rem",
+    maxWidth: "80rem",
+    fontFamily: typography.display,
+    fontWeight: 300,
+    fontSize: "clamp(3rem, 9vw, 7.5rem)",
+    color: colors.cream,
+    lineHeight: 1.02,
+    letterSpacing: "-0.02em",
+  },
+  heroMistItalic: {
+    color: colors.mist,
+    fontStyle: "italic",
+  },
+  heroDesc: {
+    marginInline: "auto",
+    marginTop: "2rem",
+    maxWidth: "36rem",
+    color: "color-mix(in oklab, var(--color-cream) 70%, transparent)",
+    fontSize: "1.125rem",
+    lineHeight: 1.625,
+  },
+  heroButtons: {
+    marginTop: "3rem",
+    display: "flex",
+    flexWrap: "wrap",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: "1rem",
+  },
+  heroPrimaryBtn: {
+    borderRadius: radii.full,
+    backgroundColor: colors.mint,
+    paddingInline: "2.25rem",
+    paddingBlock: "1rem",
+    fontWeight: 600,
+    color: colors.forest,
+    fontSize: "0.875rem",
+    boxShadow: {
+      default: "0 0 32px color-mix(in oklab, var(--color-mint) 30%, transparent)",
+      ":hover": "0 0 56px color-mix(in oklab, var(--color-mint) 50%, transparent)",
+    },
+    transitionProperty: "box-shadow",
+    transitionDuration: "300ms",
+    textDecoration: "none",
+  },
+  heroSecondaryBtn: {
+    borderRadius: radii.full,
+    borderWidth: "1px",
+    borderStyle: "solid",
+    borderColor: {
+      default: "color-mix(in oklab, var(--color-cream) 25%, transparent)",
+      ":hover": "color-mix(in oklab, var(--color-cream) 60%, transparent)",
+    },
+    paddingInline: "2.25rem",
+    paddingBlock: "1rem",
+    fontWeight: 600,
+    color: colors.cream,
+    fontSize: "0.875rem",
+    backgroundColor: {
+      default: "transparent",
+      ":hover": "rgba(255, 255, 255, 0.05)",
+    },
+    transitionProperty: "border-color, background-color",
+    transitionDuration: "300ms",
+    textDecoration: "none",
+  },
+  scrollChevron: {
+    position: "absolute",
+    bottom: "2rem",
+    left: "50%",
+    transform: "translateX(-50%)",
+    zIndex: 10,
+    color: {
+      default: "color-mix(in oklab, var(--color-cream) 50%, transparent)",
+      ":hover": colors.mint,
+    },
+    transitionProperty: "color",
+    transitionDuration: "150ms",
+  },
+  chevronIcon: {
+    width: "1.5rem",
+    height: "1.5rem",
+  },
+  // Stats
+  statsSection: {
+    position: "relative",
+    paddingInline: "1.5rem",
+    paddingBlock: { default: "6rem", [breakpoints.md]: "8rem" },
+  },
+  statsGrid: {
+    marginInline: "auto",
+    display: "grid",
+    maxWidth: "64rem",
+    gap: "1.25rem",
+    gridTemplateColumns: { default: "1fr", [breakpoints.sm]: "repeat(3, 1fr)" },
+  },
+  statCard: {
+    borderRadius: "24px",
+    borderWidth: "1px",
+    borderStyle: "solid",
+    borderColor: {
+      default: "rgba(255, 255, 255, 0.1)",
+      ":hover": "color-mix(in oklab, var(--color-mint) 40%, transparent)",
+    },
+    backgroundColor: "rgba(255, 255, 255, 0.05)",
+    paddingInline: "2rem",
+    paddingBlock: "2.5rem",
+    textAlign: "center",
+    backdropFilter: "blur(8px)",
+    WebkitBackdropFilter: "blur(8px)",
+    transitionProperty: "border-color",
+    transitionDuration: "500ms",
+  },
+  statNumber: {
+    fontFamily: typography.display,
+    fontWeight: 300,
+    fontSize: { default: "3rem", [breakpoints.md]: "3.75rem" },
+    color: colors.mist,
+  },
+  statLabel: {
+    marginTop: "0.75rem",
+    fontFamily: typography.tech,
+    fontSize: "11px",
+    color: "color-mix(in oklab, var(--color-cream) 50%, transparent)",
+    textTransform: "uppercase",
+    letterSpacing: "0.2em",
+  },
+  // Chapters
+  chapterImgBox: {
+    position: "relative",
+    height: { default: "60vh", [breakpoints.md]: "78vh" },
+    overflow: "hidden",
+    borderRadius: "28px",
+    borderWidth: "1px",
+    borderStyle: "solid",
+    borderColor: "rgba(255, 255, 255, 0.1)",
+  },
+  chapterImg: {
+    position: "absolute",
+    inset: 0,
+    height: "116%",
+    width: "100%",
+    objectFit: "cover",
+  },
+  chapterImgOverlay: {
+    position: "absolute",
+    inset: 0,
+    backgroundImage:
+      "linear-gradient(to top, color-mix(in oklab, var(--color-bark) 70%, transparent), transparent, color-mix(in oklab, var(--color-bark) 30%, transparent))",
+  },
+  originSection: {
+    scrollMarginTop: "6rem",
+    paddingInline: "1.5rem",
+    paddingBlock: { default: "4rem", [breakpoints.md]: "6rem" },
+  },
+  chapterGrid: {
+    marginInline: "auto",
+    display: "grid",
+    maxWidth: "72rem",
+    alignItems: "center",
+    gap: "3.5rem",
+    gridTemplateColumns: { default: "1fr", [breakpoints.lg]: "repeat(2, 1fr)" },
+  },
+  originTextCol: {
+    paddingLeft: { default: 0, [breakpoints.lg]: "2rem" },
+  },
+  chapterEyebrow: {
+    fontFamily: typography.tech,
+    fontSize: "11px",
+    color: colors.mint,
+    textTransform: "uppercase",
+    letterSpacing: "0.4em",
+  },
+  chapterTitle: {
+    marginTop: "1.5rem",
+    fontFamily: typography.display,
+    fontWeight: 300,
+    fontSize: { default: "2.25rem", [breakpoints.md]: "3.75rem" },
+    color: colors.cream,
+    lineHeight: 1.08,
+    letterSpacing: "-0.025em",
+  },
+  chapterCopy: {
+    marginTop: "2rem",
+    maxWidth: "28rem",
+    color: "color-mix(in oklab, var(--color-cream) 65%, transparent)",
+    lineHeight: 1.625,
+    fontSize: { default: "1rem", [breakpoints.md]: "1.125rem" },
+  },
+  originQuote: {
+    marginTop: "2.5rem",
+    borderLeftWidth: "2px",
+    borderLeftStyle: "solid",
+    borderLeftColor: "color-mix(in oklab, var(--color-mint) 30%, transparent)",
+    paddingLeft: "1.5rem",
+    fontFamily: typography.display,
+    fontSize: { default: "1.5rem", [breakpoints.md]: "1.875rem" },
+    color: colors.mist,
+    fontStyle: "italic",
+    lineHeight: 1.375,
+  },
+  scienceSection: {
+    scrollMarginTop: "6rem",
+    paddingInline: "1.5rem",
+    paddingBlock: { default: "4rem", [breakpoints.md]: "6rem" },
+  },
+  scienceTextCol: {
+    order: { default: 2, [breakpoints.lg]: 1 },
+    paddingRight: { default: 0, [breakpoints.lg]: "2rem" },
+  },
+  scienceImgCol: {
+    order: { default: 1, [breakpoints.lg]: 2 },
+  },
+  scienceLink: {
+    marginTop: "2.5rem",
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "0.75rem",
+    color: {
+      default: colors.mint,
+      ":hover": colors.mist,
+    },
+    fontSize: "0.875rem",
+    textTransform: "uppercase",
+    letterSpacing: "0.2em",
+    transitionProperty: "color",
+    transitionDuration: "150ms",
+    textDecoration: "none",
+  },
+  iconSm: {
+    width: "1rem",
+    height: "1rem",
+  },
+  // Portfolio Rail
+  portfolioSection: {
+    scrollMarginTop: "6rem",
+    paddingBlock: { default: "6rem", [breakpoints.md]: "8rem" },
+  },
+  portfolioHeaderWrap: {
+    marginInline: "auto",
+    maxWidth: "72rem",
+    paddingInline: "1.5rem",
+  },
+  portfolioHeaderFlex: {
+    display: "flex",
+    flexWrap: "wrap",
+    alignItems: "flex-end",
+    justifyContent: "space-between",
+    gap: "1.5rem",
+  },
+  portfolioScrollTag: {
+    fontFamily: typography.tech,
+    fontSize: "11px",
+    color: "color-mix(in oklab, var(--color-cream) 55%, transparent)",
+    textTransform: "uppercase",
+    letterSpacing: "0.25em",
+  },
+  portfolioRailScroll: {
+    marginTop: "3.5rem",
+    overflowX: "auto",
+    paddingBottom: "1.5rem",
+    scrollbarWidth: "none",
+    msOverflowStyle: "none",
+    "::-webkit-scrollbar": {
+      display: "none",
+    },
+  },
+  portfolioRailTrack: {
+    display: "flex",
+    scrollSnapType: "x mandatory",
+    gap: "1.5rem",
+    paddingInline: {
+      default: "1.5rem",
+      [breakpoints.md]: "max(1.5rem, calc((100vw - 72rem) / 2))",
+    },
+  },
+  portfolioRailItem: {
+    scrollSnapAlign: "start",
+  },
+  ingredientCard: {
+    width: { default: "300px", [breakpoints.md]: "340px" },
+    flexShrink: 0,
+    overflow: "hidden",
+    borderRadius: "24px",
+    borderWidth: "1px",
+    borderStyle: "solid",
+    borderColor: {
+      default: "rgba(255, 255, 255, 0.1)",
+      ":hover": "color-mix(in oklab, var(--color-mint) 40%, transparent)",
+    },
+    backgroundColor: "rgba(255, 255, 255, 0.05)",
+    backdropFilter: "blur(8px)",
+    WebkitBackdropFilter: "blur(8px)",
+    transitionProperty: "border-color",
+    transitionDuration: "500ms",
+  },
+  ingredientCardImgWrap: {
+    height: "13rem",
+    overflow: "hidden",
+  },
+  ingredientCardImg: {
+    height: "100%",
+    width: "100%",
+    objectFit: "cover",
+    transform: {
+      default: "scale(1)",
+      ":hover": "scale(1.05)",
+    },
+    transitionProperty: "transform",
+    transitionDuration: "700ms",
+    transitionTimingFunction: "ease-out",
+  },
+  ingredientCardBody: {
+    padding: "1.75rem",
+  },
+  ingredientCardTitle: {
+    fontFamily: typography.display,
+    fontSize: "1.5rem",
+    color: colors.cream,
+  },
+  ingredientCardLatin: {
+    marginTop: "0.25rem",
+    color: "color-mix(in oklab, var(--color-cream) 55%, transparent)",
+    fontSize: "0.875rem",
+    fontStyle: "italic",
+  },
+  ingredientCardDl: {
+    marginTop: "1.5rem",
+    display: "flex",
+    flexDirection: "column",
+    gap: "0.625rem",
+    borderTopWidth: "1px",
+    borderTopStyle: "solid",
+    borderTopColor: "rgba(255, 255, 255, 0.1)",
+    paddingTop: "1.25rem",
+  },
+  ingredientCardDlRow: {
+    display: "flex",
+    alignItems: "baseline",
+    justifyContent: "space-between",
+    gap: "1rem",
+  },
+  ingredientCardDt: {
+    fontFamily: typography.tech,
+    fontSize: "10px",
+    color: "color-mix(in oklab, var(--color-mint) 70%, transparent)",
+    textTransform: "uppercase",
+    letterSpacing: "0.2em",
+  },
+  ingredientCardDd: {
+    fontFamily: typography.tech,
+    color: "color-mix(in oklab, var(--color-cream) 70%, transparent)",
+    fontSize: "0.75rem",
+  },
+  // Standards Pillars
+  standardsSection: {
+    scrollMarginTop: "6rem",
+    paddingInline: "1.5rem",
+    paddingBlock: { default: "4rem", [breakpoints.md]: "6rem" },
+  },
+  standardsGrid: {
+    marginInline: "auto",
+    display: "grid",
+    maxWidth: "72rem",
+    gap: "1.5rem",
+    gridTemplateColumns: { default: "1fr", [breakpoints.md]: "repeat(3, 1fr)" },
+  },
+  pillarCard: {
+    height: "100%",
+    borderRadius: "24px",
+    borderWidth: "1px",
+    borderStyle: "solid",
+    borderColor: {
+      default: "rgba(255, 255, 255, 0.1)",
+      ":hover": "color-mix(in oklab, var(--color-mint) 40%, transparent)",
+    },
+    backgroundImage: "linear-gradient(to bottom, rgba(255, 255, 255, 0.07), transparent)",
+    padding: "2.25rem",
+    backdropFilter: "blur(8px)",
+    WebkitBackdropFilter: "blur(8px)",
+    transitionProperty: "border-color",
+    transitionDuration: "500ms",
+  },
+  pillarIconBox: {
+    display: "flex",
+    height: "3rem",
+    width: "3rem",
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: radii.full,
+    borderWidth: "1px",
+    borderStyle: "solid",
+    borderColor: "color-mix(in oklab, var(--color-mint) 30%, transparent)",
+    color: colors.mint,
+  },
+  pillarIcon: {
+    width: "1.25rem",
+    height: "1.25rem",
+  },
+  pillarTitle: {
+    marginTop: "1.75rem",
+    fontFamily: typography.display,
+    fontSize: "1.5rem",
+    color: colors.cream,
+  },
+  pillarCopy: {
+    marginTop: "0.75rem",
+    color: "color-mix(in oklab, var(--color-cream) 55%, transparent)",
+    fontSize: "0.875rem",
+    lineHeight: 1.625,
+  },
+  // CTA
+  ctaSection: {
+    position: "relative",
+    scrollMarginTop: "6rem",
+    overflow: "hidden",
+    paddingInline: "1.5rem",
+    paddingBlock: { default: "8rem", [breakpoints.md]: "11rem" },
+    textAlign: "center",
+  },
+  ctaGlow: {
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    height: "28rem",
+    width: "28rem",
+    borderRadius: radii.full,
+    backgroundColor: "color-mix(in oklab, var(--color-mint) 10%, transparent)",
+    filter: "blur(48px)",
+  },
+  ctaContentWrap: {
+    position: "relative",
+  },
+  ctaEyebrow: {
+    fontFamily: typography.tech,
+    fontSize: "11px",
+    color: colors.mint,
+    textTransform: "uppercase",
+    letterSpacing: "0.45em",
+  },
+  ctaHeading: {
+    marginInline: "auto",
+    marginTop: "2rem",
+    maxWidth: "48rem",
+    fontFamily: typography.display,
+    fontWeight: 300,
+    fontSize: "clamp(2.5rem, 6vw, 5rem)",
+    color: colors.cream,
+    lineHeight: 1.05,
+    letterSpacing: "-0.025em",
+  },
+  ctaBtn: {
+    marginTop: "3rem",
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "0.75rem",
+    borderRadius: radii.full,
+    backgroundColor: colors.mint,
+    paddingInline: "2.5rem",
+    paddingBlock: "1.25rem",
+    fontWeight: 600,
+    color: colors.forest,
+    fontSize: "0.875rem",
+    boxShadow: {
+      default: "0 0 40px color-mix(in oklab, var(--color-mint) 35%, transparent)",
+      ":hover": "0 0 72px color-mix(in oklab, var(--color-mint) 55%, transparent)",
+    },
+    transitionProperty: "box-shadow",
+    transitionDuration: "300ms",
+    textDecoration: "none",
+  },
+  // Site footer
+  footer: {
+    borderTopWidth: "1px",
+    borderTopStyle: "solid",
+    borderColor: "rgba(255, 255, 255, 0.1)",
+    backgroundImage: "linear-gradient(to bottom, var(--color-bark), #000000)",
+    paddingInline: "1.5rem",
+    paddingTop: "4rem",
+    paddingBottom: "2.5rem",
+  },
+  footerContainer: {
+    marginInline: "auto",
+    display: "flex",
+    maxWidth: "72rem",
+    flexDirection: "column",
+    alignItems: "center",
+    gap: "2rem",
+    textAlign: "center",
+  },
+  footerTitle: {
+    fontFamily: typography.display,
+    fontSize: "1.875rem",
+    color: "color-mix(in oklab, var(--color-cream) 80%, transparent)",
+  },
+  footerNav: {
+    display: "flex",
+    flexWrap: "wrap",
+    alignItems: "center",
+    justifyContent: "center",
+    columnGap: "2rem",
+    rowGap: "0.75rem",
+  },
+  footerLink: {
+    color: {
+      default: "color-mix(in oklab, var(--color-cream) 55%, transparent)",
+      ":hover": colors.mint,
+    },
+    fontSize: "0.75rem",
+    textTransform: "uppercase",
+    letterSpacing: "0.15em",
+    transitionProperty: "color",
+    transitionDuration: "300ms",
+    textDecoration: "none",
+  },
+  footerCopyright: {
+    fontFamily: typography.tech,
+    fontSize: "10px",
+    color: "color-mix(in oklab, var(--color-cream) 50%, transparent)",
+    textTransform: "uppercase",
+    letterSpacing: "0.25em",
+  },
+});
+
 function ChapterImage({ src, alt }: { src: string; alt: string }) {
   const reduce = useReducedMotion();
   const ref = useRef<HTMLDivElement | null>(null);
@@ -47,18 +684,15 @@ function ChapterImage({ src, alt }: { src: string; alt: string }) {
   });
   const y = useTransform(scrollYProgress, [0, 1], ["-8%", "8%"]);
   return (
-    <div
-      ref={ref}
-      className="relative h-[60vh] overflow-hidden rounded-[28px] border border-white/10 md:h-[78vh]"
-    >
+    <div ref={ref} {...stylex.props(styles.chapterImgBox)}>
       <m.img
         src={src}
         alt={alt}
         style={{ y: reduce ? 0 : y }}
-        className="absolute inset-0 h-[116%] w-full object-cover"
+        {...stylex.props(styles.chapterImg)}
         loading="lazy"
       />
-      <div className="absolute inset-0 bg-gradient-to-t from-bark/70 via-transparent to-bark/30" />
+      <div aria-hidden {...stylex.props(styles.chapterImgOverlay)} />
     </div>
   );
 }
@@ -69,27 +703,20 @@ function HeroNav({ reduce }: { reduce: boolean | null }) {
       initial={reduce ? { opacity: 0 } : { opacity: 0, y: -16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8, delay: 0.2, ease: EASE }}
-      className="fixed inset-x-4 top-4 z-50 md:inset-x-0 md:top-6"
+      {...stylex.props(styles.nav)}
     >
-      <div className="mx-auto flex max-w-[880px] items-center justify-between rounded-full border border-white/10 bg-white/5 py-2 pr-2 pl-6 backdrop-blur-xl">
-        <a href="#top" className="font-display text-cream text-xl tracking-tight">
+      <div {...stylex.props(styles.navInner)}>
+        <a href="#top" {...stylex.props(styles.navLogo)}>
           Fenchem
         </a>
-        <div className="hidden items-center gap-7 md:flex">
+        <div {...stylex.props(styles.navLinksWrapper)}>
           {NAV_LINKS.map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
-              className="text-cream/60 text-sm transition-colors duration-300 hover:text-cream"
-            >
+            <a key={link.href} href={link.href} {...stylex.props(styles.navLink)}>
               {link.label}
             </a>
           ))}
         </div>
-        <a
-          href="#contact"
-          className="rounded-full bg-mint px-5 py-2.5 font-semibold text-forest text-sm shadow-[0_0_24px_oklch(from_var(--color-mint)_l_c_h_/_0.25)] transition-shadow duration-300 hover:shadow-[0_0_40px_oklch(from_var(--color-mint)_l_c_h_/_0.45)]"
-        >
+        <a href="#contact" {...stylex.props(styles.navInquireBtn)}>
           Inquire
         </a>
       </div>
@@ -107,27 +734,23 @@ function HeroHeader({ reduce }: { reduce: boolean | null }) {
   const heroFade = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
 
   return (
-    <header
-      id="top"
-      ref={heroRef}
-      className="relative flex min-h-svh items-center justify-center overflow-hidden"
-    >
-      <m.div style={{ y: reduce ? 0 : heroY }} className="absolute inset-0">
+    <header id="top" ref={heroRef} {...stylex.props(styles.heroHeader)}>
+      <m.div style={{ y: reduce ? 0 : heroY }} {...stylex.props(styles.heroBgDiv)}>
         <img
           src={img("photo-1542601906990-b4d3fb778b09", 2000)}
           alt="Sunlight breaking through a deep forest canopy"
-          className="h-full w-full scale-110 object-cover"
+          {...stylex.props(styles.heroBgImg)}
           loading="eager"
         />
       </m.div>
-      <div className="absolute inset-0 bg-gradient-to-b from-bark/80 via-forest/40 to-bark" />
+      <div aria-hidden {...stylex.props(styles.heroGradientOverlay)} />
 
-      <m.div style={{ opacity: reduce ? 1 : heroFade }} className="relative z-10 px-6 text-center">
+      <m.div style={{ opacity: reduce ? 1 : heroFade }} {...stylex.props(styles.heroTextContainer)}>
         <m.p
           initial={reduce ? { opacity: 0 } : { opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.4, ease: EASE }}
-          className="font-tech text-[11px] text-mint uppercase tracking-[0.45em] md:text-xs"
+          {...stylex.props(styles.heroEyebrow)}
         >
           Botanical Intelligence Since 1995
         </m.p>
@@ -135,17 +758,17 @@ function HeroHeader({ reduce }: { reduce: boolean | null }) {
           initial={reduce ? { opacity: 0 } : { opacity: 0, y: 32 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1.1, delay: 0.55, ease: EASE }}
-          className="mx-auto mt-8 max-w-5xl font-display font-light text-[clamp(3rem,9vw,7.5rem)] text-cream leading-[1.02] tracking-[-0.02em]"
+          {...stylex.props(styles.heroTitle)}
         >
           Rooted in Nature,
           <br />
-          <em className="text-mist italic">Refined by Science.</em>
+          <em {...stylex.props(styles.heroMistItalic)}>Refined by Science.</em>
         </m.h1>
         <m.p
           initial={reduce ? { opacity: 0 } : { opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.75, ease: EASE }}
-          className="mx-auto mt-8 max-w-xl text-cream/70 text-lg leading-relaxed"
+          {...stylex.props(styles.heroDesc)}
         >
           Premium botanical ingredients for the world&rsquo;s most demanding formulations — grown
           with patience, perfected in the laboratory.
@@ -154,18 +777,12 @@ function HeroHeader({ reduce }: { reduce: boolean | null }) {
           initial={reduce ? { opacity: 0 } : { opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.9, ease: EASE }}
-          className="mt-12 flex flex-wrap items-center justify-center gap-4"
+          {...stylex.props(styles.heroButtons)}
         >
-          <a
-            href="#portfolio"
-            className="rounded-full bg-mint px-9 py-4 font-semibold text-forest text-sm shadow-[0_0_32px_oklch(from_var(--color-mint)_l_c_h_/_0.3)] transition-shadow duration-300 hover:shadow-[0_0_56px_oklch(from_var(--color-mint)_l_c_h_/_0.5)]"
-          >
+          <a href="#portfolio" {...stylex.props(styles.heroPrimaryBtn)}>
             Explore the Portfolio
           </a>
-          <a
-            href="#origin"
-            className="rounded-full border border-cream/25 px-9 py-4 font-semibold text-cream text-sm transition-colors duration-300 hover:border-cream/60 hover:bg-white/5"
-          >
+          <a href="#origin" {...stylex.props(styles.heroSecondaryBtn)}>
             Our Story
           </a>
         </m.div>
@@ -176,9 +793,9 @@ function HeroHeader({ reduce }: { reduce: boolean | null }) {
         aria-label="Scroll to story"
         animate={reduce ? undefined : { y: [0, 8, 0] }}
         transition={reduce ? undefined : { duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
-        className="-translate-x-1/2 absolute bottom-8 left-1/2 z-10 text-cream/50 transition-colors hover:text-mint"
+        {...stylex.props(styles.scrollChevron)}
       >
-        <ChevronDown className="h-6 w-6" />
+        <ChevronDown {...stylex.props(styles.chevronIcon)} />
       </m.a>
     </header>
   );
@@ -186,19 +803,17 @@ function HeroHeader({ reduce }: { reduce: boolean | null }) {
 
 function StatsBand() {
   return (
-    <section className="relative px-6 py-24 md:py-32">
-      <div className="mx-auto grid max-w-5xl gap-5 sm:grid-cols-3">
+    <section {...stylex.props(styles.statsSection)}>
+      <div {...stylex.props(styles.statsGrid)}>
         {[
           ["30+", "Years of botanical R&D"],
           ["6", "Global production bases"],
           ["40+", "Markets with full dossiers"],
         ].map(([stat, label], i) => (
           <Reveal key={label} delay={i * 0.1}>
-            <div className="rounded-3xl border border-white/10 bg-white/5 px-8 py-10 text-center backdrop-blur transition-colors duration-500 hover:border-mint/40">
-              <p className="font-display font-light text-5xl text-mist md:text-6xl">{stat}</p>
-              <p className="mt-3 font-tech text-[11px] text-cream/50 uppercase tracking-[0.2em]">
-                {label}
-              </p>
+            <div {...stylex.props(styles.statCard)}>
+              <p {...stylex.props(styles.statNumber)}>{stat}</p>
+              <p {...stylex.props(styles.statLabel)}>{label}</p>
             </div>
           </Reveal>
         ))}
@@ -209,29 +824,27 @@ function StatsBand() {
 
 function OriginChapter() {
   return (
-    <section id="origin" className="scroll-mt-24 px-6 py-16 md:py-24">
-      <div className="mx-auto grid max-w-6xl items-center gap-14 lg:grid-cols-2">
+    <section id="origin" {...stylex.props(styles.originSection)}>
+      <div {...stylex.props(styles.chapterGrid)}>
         <Reveal>
           <ChapterImage
             src={img("photo-1466781783364-36c955e42a7f", 1200)}
             alt="Dense green foliage in soft light"
           />
         </Reveal>
-        <div className="lg:pl-8">
+        <div {...stylex.props(styles.originTextCol)}>
           <Reveal>
-            <p className="font-tech text-[11px] text-mint uppercase tracking-[0.4em]">
-              01 — Origin
-            </p>
-            <h2 className="mt-6 font-display font-light text-4xl text-cream leading-[1.08] tracking-tight md:text-6xl">
-              Grown with <em className="text-mist italic">patience.</em>
+            <p {...stylex.props(styles.chapterEyebrow)}>01 — Origin</p>
+            <h2 {...stylex.props(styles.chapterTitle)}>
+              Grown with <em {...stylex.props(styles.heroMistItalic)}>patience.</em>
             </h2>
-            <p className="mt-8 max-w-md text-cream/65 leading-relaxed md:text-lg">
+            <p {...stylex.props(styles.chapterCopy)}>
               Our botanicals begin in soil we know by name — a global network of partner farms
               cultivated over decades, where harvests are timed to the plant, never to the quarter.
             </p>
-            <blockquote className="mt-10 border-mint/30 border-l-2 pl-6 font-display text-2xl text-mist italic leading-snug md:text-3xl">
-              "Nature holds the keys to human vitality. We simply refuse to lose them in
-              translation."
+            <blockquote {...stylex.props(styles.originQuote)}>
+              &ldquo;Nature holds the keys to human vitality. We simply refuse to lose them in
+              translation.&rdquo;
             </blockquote>
           </Reveal>
         </div>
@@ -242,31 +855,26 @@ function OriginChapter() {
 
 function ScienceChapter() {
   return (
-    <section id="science" className="scroll-mt-24 px-6 py-16 md:py-24">
-      <div className="mx-auto grid max-w-6xl items-center gap-14 lg:grid-cols-2">
-        <div className="order-2 lg:order-1 lg:pr-8">
+    <section id="science" {...stylex.props(styles.scienceSection)}>
+      <div {...stylex.props(styles.chapterGrid)}>
+        <div {...stylex.props(styles.scienceTextCol)}>
           <Reveal>
-            <p className="font-tech text-[11px] text-mint uppercase tracking-[0.4em]">
-              02 — Science
-            </p>
-            <h2 className="mt-6 font-display font-light text-4xl text-cream leading-[1.08] tracking-tight md:text-6xl">
-              Refined to the <em className="text-mist italic">molecule.</em>
+            <p {...stylex.props(styles.chapterEyebrow)}>02 — Science</p>
+            <h2 {...stylex.props(styles.chapterTitle)}>
+              Refined to the <em {...stylex.props(styles.heroMistItalic)}>molecule.</em>
             </h2>
-            <p className="mt-8 max-w-md text-cream/65 leading-relaxed md:text-lg">
+            <p {...stylex.props(styles.chapterCopy)}>
               Every extract passes through clinical-grade validation — identity, potency, stability
               — before it carries the Fenchem name. 98% bio-active retention across our extraction
               process is not a goal; it is the specification.
             </p>
-            <a
-              href="#portfolio"
-              className="group mt-10 inline-flex items-center gap-3 text-mint text-sm uppercase tracking-[0.2em] transition-colors hover:text-mist"
-            >
+            <a href="#portfolio" {...stylex.props(styles.scienceLink)}>
               See what we make
-              <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+              <ArrowRight {...stylex.props(styles.iconSm)} />
             </a>
           </Reveal>
         </div>
-        <Reveal className="order-1 lg:order-2">
+        <Reveal sx={styles.scienceImgCol}>
           <ChapterImage
             src={img("photo-1576086213369-97a306d36557", 1200)}
             alt="Biotech laboratory with microscope under red light"
@@ -279,48 +887,42 @@ function ScienceChapter() {
 
 function IngredientRail() {
   return (
-    <section id="portfolio" className="scroll-mt-24 py-24 md:py-32">
-      <div className="mx-auto max-w-6xl px-6">
-        <Reveal className="flex flex-wrap items-end justify-between gap-6">
+    <section id="portfolio" {...stylex.props(styles.portfolioSection)}>
+      <div {...stylex.props(styles.portfolioHeaderWrap)}>
+        <Reveal sx={styles.portfolioHeaderFlex}>
           <div>
-            <p className="font-tech text-[11px] text-mint uppercase tracking-[0.4em]">
-              03 — Portfolio
-            </p>
-            <h2 className="mt-6 font-display font-light text-4xl text-cream leading-tight tracking-tight md:text-6xl">
-              The <em className="text-mist italic">living</em> library
+            <p {...stylex.props(styles.chapterEyebrow)}>03 — Portfolio</p>
+            <h2 {...stylex.props(styles.chapterTitle)}>
+              The <em {...stylex.props(styles.heroMistItalic)}>living</em> library
             </h2>
           </div>
-          <p className="font-tech text-[11px] text-cream/55 uppercase tracking-[0.25em]">
-            Scroll →
-          </p>
+          <p {...stylex.props(styles.portfolioScrollTag)}>Scroll &rarr;</p>
         </Reveal>
       </div>
-      <div className="mt-14 overflow-x-auto pb-6 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-        <div className="flex snap-x snap-mandatory gap-6 px-6 md:px-[max(1.5rem,calc((100vw-72rem)/2))]">
+      <div {...stylex.props(styles.portfolioRailScroll)}>
+        <div {...stylex.props(styles.portfolioRailTrack)}>
           {getFeaturedIngredients().map((item, i) => (
-            <Reveal key={item.name} delay={Math.min(i * 0.08, 0.3)} className="snap-start">
-              <article className="group w-[300px] shrink-0 overflow-hidden rounded-3xl border border-white/10 bg-white/5 backdrop-blur transition-colors duration-500 hover:border-mint/40 md:w-[340px]">
-                <div className="h-52 overflow-hidden">
+            <Reveal key={item.name} delay={Math.min(i * 0.08, 0.3)} sx={styles.portfolioRailItem}>
+              <article {...stylex.props(styles.ingredientCard)}>
+                <div {...stylex.props(styles.ingredientCardImgWrap)}>
                   <img
                     src={item.image.src}
                     alt={item.image.alt}
-                    className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                    {...stylex.props(styles.ingredientCardImg)}
                     loading="lazy"
                   />
                 </div>
-                <div className="p-7">
-                  <h3 className="font-display text-2xl text-cream">{item.name}</h3>
-                  <p className="mt-1 text-cream/55 text-sm italic">{item.latin}</p>
-                  <dl className="mt-6 space-y-2.5 border-white/10 border-t pt-5">
+                <div {...stylex.props(styles.ingredientCardBody)}>
+                  <h3 {...stylex.props(styles.ingredientCardTitle)}>{item.name}</h3>
+                  <p {...stylex.props(styles.ingredientCardLatin)}>{item.latin}</p>
+                  <dl {...stylex.props(styles.ingredientCardDl)}>
                     {[
                       ["Purity", item.purity],
                       ["Form", item.form],
                     ].map(([k, v]) => (
-                      <div key={k} className="flex items-baseline justify-between gap-4">
-                        <dt className="font-tech text-[10px] text-mint/70 uppercase tracking-[0.2em]">
-                          {k}
-                        </dt>
-                        <dd className="font-tech text-cream/70 text-xs">{v}</dd>
+                      <div key={k} {...stylex.props(styles.ingredientCardDlRow)}>
+                        <dt {...stylex.props(styles.ingredientCardDt)}>{k}</dt>
+                        <dd {...stylex.props(styles.ingredientCardDd)}>{v}</dd>
                       </div>
                     ))}
                   </dl>
@@ -336,20 +938,18 @@ function IngredientRail() {
 
 function StandardsPillars() {
   return (
-    <section id="standards" className="scroll-mt-24 px-6 py-16 md:py-24">
-      <div className="mx-auto grid max-w-6xl gap-6 md:grid-cols-3">
+    <section id="standards" {...stylex.props(styles.standardsSection)}>
+      <div {...stylex.props(styles.standardsGrid)}>
         {pillars.map((pillar, i) => {
           const Icon = PILLAR_DETAIL[i].icon;
           return (
             <Reveal key={pillar.title} delay={i * 0.1}>
-              <div className="h-full rounded-3xl border border-white/10 bg-gradient-to-b from-white/[0.07] to-transparent p-9 backdrop-blur transition-colors duration-500 hover:border-mint/40">
-                <span className="flex h-12 w-12 items-center justify-center rounded-full border border-mint/30 text-mint">
-                  <Icon className="h-5 w-5" aria-hidden />
+              <div {...stylex.props(styles.pillarCard)}>
+                <span {...stylex.props(styles.pillarIconBox)}>
+                  <Icon {...stylex.props(styles.pillarIcon)} aria-hidden />
                 </span>
-                <h3 className="mt-7 font-display text-2xl text-cream">{pillar.title}</h3>
-                <p className="mt-3 text-cream/55 text-sm leading-relaxed">
-                  {PILLAR_DETAIL[i].copy}
-                </p>
+                <h3 {...stylex.props(styles.pillarTitle)}>{pillar.title}</h3>
+                <p {...stylex.props(styles.pillarCopy)}>{PILLAR_DETAIL[i].copy}</p>
               </div>
             </Reveal>
           );
@@ -361,27 +961,16 @@ function StandardsPillars() {
 
 function CtaSection() {
   return (
-    <section
-      id="contact"
-      className="relative scroll-mt-24 overflow-hidden px-6 py-32 text-center md:py-44"
-    >
-      <div
-        aria-hidden
-        className="-translate-x-1/2 absolute top-1/2 left-1/2 h-[28rem] w-[28rem] -translate-y-1/2 rounded-full bg-mint/10 blur-3xl"
-      />
-      <Reveal className="relative">
-        <p className="font-tech text-[11px] text-mint uppercase tracking-[0.45em]">
-          Partner with Fenchem
-        </p>
-        <h2 className="mx-auto mt-8 max-w-3xl font-display font-light text-[clamp(2.5rem,6vw,5rem)] text-cream leading-[1.05] tracking-tight">
-          Bring the forest to <em className="text-mist italic">your formulation.</em>
+    <section id="contact" {...stylex.props(styles.ctaSection)}>
+      <div aria-hidden {...stylex.props(styles.ctaGlow)} />
+      <Reveal sx={styles.ctaContentWrap}>
+        <p {...stylex.props(styles.ctaEyebrow)}>Partner with Fenchem</p>
+        <h2 {...stylex.props(styles.ctaHeading)}>
+          Bring the forest to <em {...stylex.props(styles.heroMistItalic)}>your formulation.</em>
         </h2>
-        <a
-          href="#top"
-          className="group mt-12 inline-flex items-center gap-3 rounded-full bg-mint px-10 py-5 font-semibold text-forest text-sm shadow-[0_0_40px_oklch(from_var(--color-mint)_l_c_h_/_0.35)] transition-shadow duration-300 hover:shadow-[0_0_72px_oklch(from_var(--color-mint)_l_c_h_/_0.55)]"
-        >
+        <a href="#top" {...stylex.props(styles.ctaBtn)}>
           Request a Specification
-          <ArrowUpRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+          <ArrowUpRight {...stylex.props(styles.iconSm)} />
         </a>
       </Reveal>
     </section>
@@ -390,23 +979,19 @@ function CtaSection() {
 
 function SiteFooter() {
   return (
-    <footer className="border-white/10 border-t bg-gradient-to-b from-bark to-black px-6 pt-16 pb-10">
-      <div className="mx-auto flex max-w-6xl flex-col items-center gap-8 text-center">
-        <p className="font-display text-3xl text-cream/80">Fenchem</p>
-        <nav className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3">
+    <footer {...stylex.props(styles.footer)}>
+      <div {...stylex.props(styles.footerContainer)}>
+        <p {...stylex.props(styles.footerTitle)}>Fenchem</p>
+        <nav {...stylex.props(styles.footerNav)}>
           {["Privacy Policy", "Terms of Service", "Ingredient Transparency", "Global Offices"].map(
             (l) => (
-              <a
-                key={l}
-                href="#top"
-                className="text-cream/55 text-xs uppercase tracking-[0.15em] transition-colors duration-300 hover:text-mint"
-              >
+              <a key={l} href="#top" {...stylex.props(styles.footerLink)}>
                 {l}
               </a>
             ),
           )}
         </nav>
-        <p className="font-tech text-[10px] text-cream/50 uppercase tracking-[0.25em]">
+        <p {...stylex.props(styles.footerCopyright)}>
           © 2026 Fenchem Biotek Ltd. — Rooted in Nature, Refined by Science
         </p>
       </div>
@@ -419,7 +1004,7 @@ export function VariantC() {
 
   return (
     <LazyMotion features={domAnimation} strict>
-      <main className="bg-bark font-body text-cream antialiased selection:bg-mint selection:text-forest">
+      <main {...stylex.props(styles.main)}>
         <HeroNav reduce={reduce} />
         <HeroHeader reduce={reduce} />
         <StatsBand />

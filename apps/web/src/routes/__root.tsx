@@ -1,3 +1,4 @@
+import * as stylex from "@stylexjs/stylex";
 import { ConvexBetterAuthProvider } from "@convex-dev/better-auth/react";
 import type { ConvexQueryClient } from "@convex-dev/react-query";
 import { Toaster } from "@fenchem-lp/ui/components/sonner";
@@ -90,6 +91,14 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
   component: RootDocument,
 });
 
+const rootStyles = stylex.create({
+  shell: {
+    display: "grid",
+    height: "100svh",
+    gridTemplateRows: "auto 1fr",
+  },
+});
+
 function RootDocument() {
   const context = useRouteContext({ from: Route.id });
   // The public landing page on "/" brings its own navigation; hide the app chrome there.
@@ -103,7 +112,7 @@ function RootDocument() {
         {pathname === "/" ? (
           <Outlet />
         ) : (
-          <div className="grid h-svh grid-rows-[auto_1fr]">
+          <div {...stylex.props(rootStyles.shell)}>
             <Header />
             <Outlet />
           </div>

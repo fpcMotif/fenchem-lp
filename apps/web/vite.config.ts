@@ -1,7 +1,7 @@
 import { existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
-import tailwindcss from "@tailwindcss/vite";
+import stylex from "@stylexjs/unplugin";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import viteReact from "@vitejs/plugin-react";
 import alchemy from "alchemy/cloudflare/tanstack-start";
@@ -28,7 +28,13 @@ export default defineConfig({
     alias: cloudflareWorkersAlias,
   },
   plugins: [
-    tailwindcss(),
+    stylex.vite({
+      useCSSLayers: true,
+      unstable_moduleResolution: {
+        type: "commonJS",
+        rootDir: fileURLToPath(new URL("../..", import.meta.url)),
+      },
+    }),
     tanstackStart(),
     viteReact(),
     ...(shouldUseAlchemy ? [alchemy({ configPath: alchemyConfigPath })] : []),

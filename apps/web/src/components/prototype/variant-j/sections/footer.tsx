@@ -1,3 +1,5 @@
+import { breakpoints, colors, radii, typography } from "@fenchem-lp/ui/tokens.stylex";
+import * as stylex from "@stylexjs/stylex";
 import {
   certifications,
   company,
@@ -6,8 +8,8 @@ import {
   regions,
   toAnchor,
 } from "@/components/landing/landing-content";
-import { TECH_LABEL_DARK } from "../content";
 import { drawRule, riseIn, useSectionAnimation } from "../motion";
+import { sharedStyles } from "../styles";
 
 /*
  * Variant J — the ledger's colophon. Deep green darkening to near-black at
@@ -17,6 +19,238 @@ import { drawRule, riseIn, useSectionAnimation } from "../motion";
  * Certifications are text only (no borrowed logos). SSR markup is the final
  * state; hairlines and columns only animate when motion is welcome.
  */
+
+const styles = stylex.create({
+  footer: {
+    position: "relative",
+    scrollMarginTop: "6rem",
+    overflow: "hidden",
+    backgroundColor: colors.brandGreen950,
+  },
+  overlay: {
+    pointerEvents: "none",
+    position: "absolute",
+    inset: 0,
+    backgroundImage:
+      "linear-gradient(to bottom, transparent, color-mix(in oklch, var(--color-brand-green-950) 40%, transparent), color-mix(in oklch, var(--color-ink) 85%, transparent))",
+  },
+  container: {
+    position: "relative",
+    marginInline: "auto",
+    maxWidth: "1480px",
+    paddingInline: {
+      default: "1.5rem",
+      [breakpoints.md]: "2.5rem",
+    },
+    paddingTop: {
+      default: "5rem",
+      [breakpoints.md]: "6rem",
+    },
+  },
+  certHeader: {
+    marginBottom: "1.25rem",
+  },
+  certChips: {
+    display: "flex",
+    flexWrap: "wrap",
+    gap: "0.5rem",
+    listStyle: "none",
+    margin: 0,
+    padding: 0,
+  },
+  certChip: {
+    display: "inline-block",
+    borderRadius: radii.full,
+    borderWidth: 1,
+    borderStyle: "solid",
+    borderColor: "color-mix(in oklch, var(--color-paper) 20%, transparent)",
+    paddingInline: "0.75rem",
+    paddingBlock: "0.25rem",
+    fontFamily: typography.tech,
+    fontSize: "11px",
+    color: "color-mix(in oklch, var(--color-paper) 70%, transparent)",
+    textTransform: "uppercase",
+    letterSpacing: "0.22em",
+  },
+  ruleTop: {
+    marginTop: "2.5rem",
+    height: 1,
+    transformOrigin: "left",
+    backgroundColor: "color-mix(in oklch, var(--color-paper) 10%, transparent)",
+  },
+  grid: {
+    display: "grid",
+    gap: {
+      default: "3rem",
+      [breakpoints.md]: "2.5rem",
+    },
+    paddingTop: "3.5rem",
+    gridTemplateColumns: {
+      default: "1fr",
+      [breakpoints.md]: "repeat(12, 1fr)",
+    },
+  },
+  brandCol: {
+    gridColumn: {
+      [breakpoints.md]: "span 5",
+    },
+  },
+  brandName: {
+    fontFamily: typography.display,
+    fontWeight: 300,
+    fontSize: "1.5rem",
+    color: colors.paper,
+    letterSpacing: "-0.025em",
+  },
+  brandTagline: {
+    marginTop: "0.75rem",
+  },
+  brandDescription: {
+    marginTop: "1.5rem",
+    maxWidth: "24rem",
+    textWrap: "pretty",
+    color: "color-mix(in oklch, var(--color-paper) 70%, transparent)",
+    fontSize: "0.875rem",
+    lineHeight: 1.625,
+  },
+  exploreCol: {
+    gridColumn: {
+      [breakpoints.md]: "span 2",
+    },
+  },
+  linksList: {
+    marginTop: "1.25rem",
+    display: "flex",
+    flexDirection: "column",
+    gap: "0.75rem",
+    listStyle: "none",
+    marginInline: 0,
+    padding: 0,
+  },
+  link: {
+    color: {
+      default: "color-mix(in oklch, var(--color-paper) 75%, transparent)",
+      ":hover": colors.brandGreen300,
+      ":focus-visible": colors.brandGreen300,
+    },
+    fontSize: "0.875rem",
+    textDecoration: "none",
+    transition: "color 200ms ease",
+    outline: {
+      ":focus-visible": `2px solid ${colors.brandGreen300}`,
+    },
+    outlineOffset: {
+      ":focus-visible": 4,
+    },
+  },
+  basesCol: {
+    gridColumn: {
+      [breakpoints.md]: "span 3",
+    },
+  },
+  baseItem: {
+    color: "color-mix(in oklch, var(--color-paper) 75%, transparent)",
+    fontSize: "0.875rem",
+  },
+  countryText: {
+    color: "color-mix(in oklch, var(--color-paper) 60%, transparent)",
+  },
+  directCol: {
+    gridColumn: {
+      [breakpoints.md]: "span 2",
+    },
+  },
+  emailLink: {
+    wordBreak: "break-word",
+    color: {
+      default: "color-mix(in oklch, var(--color-paper) 75%, transparent)",
+      ":hover": colors.brandGreen300,
+      ":focus-visible": colors.brandGreen300,
+    },
+    fontSize: "0.875rem",
+    textDecoration: "none",
+    transition: "color 200ms ease",
+    outline: {
+      ":focus-visible": `2px solid ${colors.brandGreen300}`,
+    },
+    outlineOffset: {
+      ":focus-visible": 4,
+    },
+  },
+  directText: {
+    color: "color-mix(in oklch, var(--color-paper) 75%, transparent)",
+    fontSize: "0.875rem",
+  },
+  coordsText: {
+    fontFamily: typography.tech,
+    fontSize: "11px",
+    color: "color-mix(in oklch, var(--color-paper) 60%, transparent)",
+    fontVariantNumeric: "tabular-nums",
+    letterSpacing: "0.14em",
+  },
+  wordmarkWrap: {
+    position: "relative",
+    overflow: "hidden",
+    paddingInline: {
+      default: "1.5rem",
+      [breakpoints.md]: "2.5rem",
+    },
+    paddingTop: "2.5rem",
+  },
+  wordmarkText: {
+    marginBottom: "-0.18em",
+    userSelect: "none",
+    whiteSpace: "nowrap",
+    fontFamily: typography.display,
+    fontWeight: 300,
+    fontSize: "clamp(120px, 18vw, 240px)",
+    color: colors.paper,
+    lineHeight: 1,
+    letterSpacing: "-0.04em",
+    opacity: 0.06,
+  },
+  legalWrap: {
+    position: "relative",
+    marginInline: "auto",
+    maxWidth: "1480px",
+    paddingInline: {
+      default: "1.5rem",
+      [breakpoints.md]: "2.5rem",
+    },
+    paddingBottom: "2rem",
+  },
+  ruleLegal: {
+    height: 1,
+    transformOrigin: "left",
+    backgroundColor: "color-mix(in oklch, var(--color-paper) 10%, transparent)",
+  },
+  legalContent: {
+    display: "flex",
+    flexDirection: {
+      default: "column",
+      [breakpoints.sm]: "row",
+    },
+    gap: "0.75rem",
+    paddingTop: "1.25rem",
+    color: "color-mix(in oklch, var(--color-paper) 60%, transparent)",
+    fontSize: "0.75rem",
+    alignItems: {
+      [breakpoints.sm]: "center",
+    },
+    justifyContent: {
+      [breakpoints.sm]: "space-between",
+    },
+  },
+  legalList: {
+    display: "flex",
+    alignItems: "center",
+    gap: "1.5rem",
+    listStyle: "none",
+    margin: 0,
+    padding: 0,
+  },
+});
+
 export function FooterSection() {
   const ref = useSectionAnimation<HTMLElement>((root) => {
     riseIn(root, "[data-footer-chip]", { stagger: 0.05, start: "top 94%" });
@@ -28,58 +262,45 @@ export function FooterSection() {
   });
 
   return (
-    <footer
-      ref={ref}
-      id="contact"
-      className="relative scroll-mt-24 overflow-hidden bg-brand-green-950"
-    >
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 bg-gradient-to-b from-transparent via-brand-green-950/40 to-ink/85"
-      />
+    <footer ref={ref} id="contact" {...stylex.props(styles.footer)}>
+      <div aria-hidden="true" {...stylex.props(styles.overlay)} />
 
-      <div className="relative mx-auto max-w-[1480px] px-6 pt-20 md:px-10 md:pt-24">
+      <div {...stylex.props(styles.container)}>
         {/* Certification record — real certifications, set as text */}
-        <h2 className="sr-only">Contact Fenchem</h2>
-        <p className={`${TECH_LABEL_DARK} mb-5`}>Certified to</p>
-        <ul className="flex flex-wrap gap-2">
+        <h2 {...stylex.props(sharedStyles.srOnly)}>Contact Fenchem</h2>
+        <p {...stylex.props(sharedStyles.techLabelDark, styles.certHeader)}>Certified to</p>
+        <ul {...stylex.props(styles.certChips)}>
           {certifications.map((certification) => (
             <li key={certification}>
-              <span
-                data-footer-chip
-                className="inline-block rounded-full border border-paper/20 px-3 py-1 font-tech text-[11px] text-paper/70 uppercase tracking-[0.22em]"
-              >
+              <span data-footer-chip {...stylex.props(styles.certChip)}>
                 {certification}
               </span>
             </li>
           ))}
         </ul>
 
-        <div data-rule-top className="mt-10 h-px origin-left bg-paper/10" />
+        <div data-rule-top {...stylex.props(styles.ruleTop)} />
 
         {/* Brand + wayfinding */}
-        <div className="grid gap-12 pt-14 md:grid-cols-12 md:gap-10">
-          <div data-footer-col className="md:col-span-5">
-            <p className="font-display font-light text-2xl text-paper tracking-tight">
-              {company.name}
+        <div {...stylex.props(styles.grid)}>
+          <div data-footer-col {...stylex.props(styles.brandCol)}>
+            <p {...stylex.props(styles.brandName)}>{company.name}</p>
+            <p {...stylex.props(sharedStyles.techLabelDark, styles.brandTagline)}>
+              {company.tagline}
             </p>
-            <p className={`${TECH_LABEL_DARK} mt-3`}>{company.tagline}</p>
-            <p className="mt-6 max-w-sm text-pretty text-paper/70 text-sm leading-relaxed">
+            <p {...stylex.props(styles.brandDescription)}>
               {company.legalName} has supplied premium botanical and functional ingredients since{" "}
               {company.founded} — six global bases across three continents, forty-plus countries
               served, and a documented chain of custody behind every lot.
             </p>
           </div>
 
-          <nav data-footer-col aria-label="Footer" className="md:col-span-2">
-            <p className={TECH_LABEL_DARK}>Explore</p>
-            <ul className="mt-5 space-y-3">
+          <nav data-footer-col aria-label="Footer" {...stylex.props(styles.exploreCol)}>
+            <p {...stylex.props(sharedStyles.techLabelDark)}>Explore</p>
+            <ul {...stylex.props(styles.linksList)}>
               {navLinks.map((link) => (
                 <li key={link.section}>
-                  <a
-                    href={toAnchor(link.section)}
-                    className="text-paper/75 text-sm transition-colors hover:text-brand-green-300 focus-visible:text-brand-green-300 focus-visible:outline-2 focus-visible:outline-brand-green-300 focus-visible:outline-offset-4"
-                  >
+                  <a href={toAnchor(link.section)} {...stylex.props(styles.link)}>
                     {link.label}
                   </a>
                 </li>
@@ -87,71 +308,51 @@ export function FooterSection() {
             </ul>
           </nav>
 
-          <div data-footer-col className="md:col-span-3">
-            <p className={TECH_LABEL_DARK}>Global bases</p>
-            <ul className="mt-5 space-y-3">
+          <div data-footer-col {...stylex.props(styles.basesCol)}>
+            <p {...stylex.props(sharedStyles.techLabelDark)}>Global bases</p>
+            <ul {...stylex.props(styles.linksList)}>
               {regions.map((region) => (
-                <li key={region.city} className="text-paper/75 text-sm">
+                <li key={region.city} {...stylex.props(styles.baseItem)}>
                   {region.city}
-                  <span className="text-paper/60"> — {region.country}</span>
+                  <span {...stylex.props(styles.countryText)}> — {region.country}</span>
                 </li>
               ))}
             </ul>
           </div>
 
-          <div data-footer-col className="md:col-span-2">
-            <p className={TECH_LABEL_DARK}>Direct</p>
-            <ul className="mt-5 space-y-3">
+          <div data-footer-col {...stylex.props(styles.directCol)}>
+            <p {...stylex.props(sharedStyles.techLabelDark)}>Direct</p>
+            <ul {...stylex.props(styles.linksList)}>
               <li>
-                <a
-                  href={createInquiryHref("contact")}
-                  className="break-words text-paper/75 text-sm transition-colors hover:text-brand-green-300 focus-visible:text-brand-green-300 focus-visible:outline-2 focus-visible:outline-brand-green-300 focus-visible:outline-offset-4"
-                >
+                <a href={createInquiryHref("contact")} {...stylex.props(styles.emailLink)}>
                   {company.email}
                 </a>
               </li>
-              <li className="text-paper/75 text-sm">{company.since}</li>
-              <li className="font-tech text-[11px] text-paper/60 tabular-nums tracking-[0.14em]">
-                HQ {company.hq.coords}
-              </li>
+              <li {...stylex.props(styles.directText)}>{company.since}</li>
+              <li {...stylex.props(styles.coordsText)}>HQ {company.hq.coords}</li>
             </ul>
           </div>
         </div>
       </div>
 
       {/* Ghost wordmark — decorative, half-submerged in the fold */}
-      <div
-        data-footer-mark
-        aria-hidden="true"
-        className="relative overflow-hidden px-6 pt-10 md:px-10"
-      >
-        <p className="-mb-[0.18em] select-none whitespace-nowrap font-display font-light text-[clamp(120px,18vw,240px)] text-paper leading-none tracking-[-0.04em] opacity-[0.06]">
-          FENCHEM
-        </p>
+      <div data-footer-mark aria-hidden="true" {...stylex.props(styles.wordmarkWrap)}>
+        <p {...stylex.props(styles.wordmarkText)}>FENCHEM</p>
       </div>
 
       {/* Legal strip */}
-      <div className="relative mx-auto max-w-[1480px] px-6 pb-8 md:px-10">
-        <div data-rule-legal className="h-px origin-left bg-paper/10" />
-        <div
-          data-footer-legal
-          className="flex flex-col gap-3 pt-5 text-paper/60 text-xs sm:flex-row sm:items-center sm:justify-between"
-        >
+      <div {...stylex.props(styles.legalWrap)}>
+        <div data-rule-legal {...stylex.props(styles.ruleLegal)} />
+        <div data-footer-legal {...stylex.props(styles.legalContent)}>
           <p>© 2026 {company.legalName} — All rights reserved.</p>
-          <ul className="flex items-center gap-6">
+          <ul {...stylex.props(styles.legalList)}>
             <li>
-              <a
-                href="/privacy"
-                className="text-paper/70 transition-colors hover:text-brand-green-300 focus-visible:text-brand-green-300 focus-visible:outline-2 focus-visible:outline-brand-green-300 focus-visible:outline-offset-4"
-              >
+              <a href="/privacy" {...stylex.props(styles.link)}>
                 Privacy
               </a>
             </li>
             <li>
-              <a
-                href="/terms"
-                className="text-paper/70 transition-colors hover:text-brand-green-300 focus-visible:text-brand-green-300 focus-visible:outline-2 focus-visible:outline-brand-green-300 focus-visible:outline-offset-4"
-              >
+              <a href="/terms" {...stylex.props(styles.link)}>
                 Terms
               </a>
             </li>

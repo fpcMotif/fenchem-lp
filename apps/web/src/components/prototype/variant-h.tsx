@@ -45,6 +45,8 @@ import {
   Sprout,
   X,
 } from "lucide-react";
+import * as stylex from "@stylexjs/stylex";
+import { breakpoints, colors, radii, typography } from "@fenchem-lp/ui/tokens.stylex";
 import { EASE, STAGGER } from "@/components/prototype/motion-constants";
 import { Reveal } from "@/components/prototype/motion";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
@@ -61,6 +63,7 @@ import {
   pillars,
   processSteps,
   regions,
+  type DivisionKey,
   type Ingredient,
   type IngredientApplication,
 } from "@/components/landing/landing-content";
@@ -75,104 +78,2519 @@ const IMG = {
   origin:
     "https://images.unsplash.com/photo-1466692476868-aef1dfb1e735?auto=format&fit=crop&w=1200&q=80",
 } as const;
-
-/*
- * Local overrides for shared-data stock images the design review rejected
- * (competitor-branded tube, drugstore pill piles). Verified-rendering assets;
- * the durable fix is origin photography — see the review doc.
- */
-const IMAGE_OVERRIDES: Record<string, { src: string; alt: string }> = {
-  /* Ashwagandha: renders as a pill bottle upstream — root story instead. */
+const IMAGE_OVERRIDES: Record<
+  string,
+  {
+    src: string;
+    alt: string;
+  }
+> = {
   "FN-014": {
     src: "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=900&q=80",
     alt: "Hands holding soil and a young seedling — the root origin of Ashwagandha KSM-66",
   },
-  /* Curcumin: colorful pharma pile upstream — clean-label food instead. */
   "FN-052": {
     src: "https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&w=900&q=80",
     alt: "Fresh food bowl with vibrant natural ingredients — curcumin as clean-label color",
   },
-  /* Hyaluronic acid: competitor-branded tube upstream — dew as hydration. */
   "FN-068": {
     src: "https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?auto=format&fit=crop&w=900&q=80",
     alt: "Macro leaf covered in dew droplets — hydration, the signature of hyaluronic acid",
   },
 };
-
 const imgFor = (item: Ingredient) => IMAGE_OVERRIDES[item.code] ?? item.image;
-
 const STATS = [
-  { value: "30+", unit: "Years", desc: "Botanical expertise since 1995" },
-  { value: "6", unit: "Global Bases", desc: "R&D hubs across three continents" },
-  { value: "ISO/GMP", unit: "Certified", desc: "Audited quality on every lot" },
-  { value: "40+", unit: "Countries", desc: "Regulated markets supplied" },
+  {
+    value: "30+",
+    unit: "Years",
+    desc: "Botanical expertise since 1995",
+  },
+  {
+    value: "6",
+    unit: "Global Bases",
+    desc: "R&D hubs across three continents",
+  },
+  {
+    value: "ISO/GMP",
+    unit: "Certified",
+    desc: "Audited quality on every lot",
+  },
+  {
+    value: "40+",
+    unit: "Countries",
+    desc: "Regulated markets supplied",
+  },
 ] as const;
-
 const INDUSTRY_COPY = [
   "Bioavailable actives standardized for potency, stability and dose accuracy — from Ashwagandha KSM-66 to Coenzyme Q10.",
   "Heat- and pH-stable carotenoids, plant proteins and functional botanicals for clean-label fortification at scale.",
   "Dermatologically active botanicals and hyaluronic acid systems formulated for cellular compatibility and sensory performance.",
 ] as const;
-
-/** Division accent dot for badge chips — chip stays paper/ink for contrast. */
-const DIVISION_DOT: Record<string, string> = {
-  nutrition: "bg-nutrition border border-brand-green-700/30",
-  food: "bg-food",
-  cosmetics: "bg-cosmetics",
-  chem: "bg-chem",
-  agro: "bg-agro",
-  feed: "bg-feed",
-};
-
 const PILLAR_ICONS = [Sprout, FlaskConical, Globe] as const;
-
 const FOOTER_COLS = [
   {
     head: "Portfolio",
     links: [
-      { label: "Ingredient Matrix", href: "#matrix" },
-      { label: "Product Dossiers", href: "#product" },
-      { label: "Formulation Support", href: "#formulation" },
-      { label: "Nutrition Actives", href: "#matrix" },
+      {
+        label: "Ingredient Matrix",
+        href: "#matrix",
+      },
+      {
+        label: "Product Dossiers",
+        href: "#product",
+      },
+      {
+        label: "Formulation Support",
+        href: "#formulation",
+      },
+      {
+        label: "Nutrition Actives",
+        href: "#matrix",
+      },
     ],
   },
   {
     head: "Standards",
     links: [
-      { label: "Quality Charter", href: "#standards" },
-      { label: "Regulatory Dossiers", href: "#contact" },
-      { label: "Sourcing Standards", href: "#standards" },
-      { label: "Ingredient Transparency", href: "#matrix" },
+      {
+        label: "Quality Charter",
+        href: "#standards",
+      },
+      {
+        label: "Regulatory Dossiers",
+        href: "#contact",
+      },
+      {
+        label: "Sourcing Standards",
+        href: "#standards",
+      },
+      {
+        label: "Ingredient Transparency",
+        href: "#matrix",
+      },
     ],
   },
   {
     head: "Partner",
     links: [
-      { label: "Request a Specification", href: "#contact" },
-      { label: "Partner Inquiries", href: "#contact" },
-      { label: "Technical Dossiers", href: "#contact" },
-      { label: "Global Offices", href: "#contact" },
+      {
+        label: "Request a Specification",
+        href: "#contact",
+      },
+      {
+        label: "Partner Inquiries",
+        href: "#contact",
+      },
+      {
+        label: "Technical Dossiers",
+        href: "#contact",
+      },
+      {
+        label: "Global Offices",
+        href: "#contact",
+      },
     ],
   },
 ] as const;
-
-/** Reusable label style: the spec-sheet voice at its measured floor (11px, mute-600). */
-const TECH_LABEL = "font-tech text-[11px] uppercase tracking-[0.26em] text-mute-600";
-
-/* ─────────────────────────────── Nav + Portfolio menu ─────────────────────────────── */
-
 const MENU_APPLICATIONS: IngredientApplication[] = [
   "Nutrition",
   "Food & Beverage",
   "Personal Care",
 ];
+const FORM_OPTIONS = ["Powder", "Beadlet", "Oil suspension", "Granular"] as const;
+
+/* ─────────────────────────────── Styles ─────────────────────────────── */
+
+const pulseAnim = stylex.keyframes({
+  "0%, 100%": {
+    opacity: 1,
+  },
+  "50%": {
+    opacity: 0.5,
+  },
+});
+const marqueeAnim = stylex.keyframes({
+  from: {
+    transform: "translateX(0)",
+  },
+  to: {
+    transform: "translateX(-50%)",
+  },
+});
+const styles = stylex.create({
+  root: {
+    backgroundColor: colors.paper,
+    fontFamily: typography.body,
+    color: colors.ink,
+    WebkitFontSmoothing: "antialiased",
+    MozOsxFontSmoothing: "grayscale",
+    "::selection": {
+      backgroundColor: colors.brandGreen200,
+      color: colors.brandGreen900,
+    },
+  },
+  container: {
+    maxWidth: 1480,
+    marginLeft: "auto",
+    marginRight: "auto",
+  },
+  techLabel: {
+    fontFamily: typography.tech,
+    fontSize: 11,
+    textTransform: "uppercase",
+    letterSpacing: "0.26em",
+    color: colors.mute600,
+  },
+  eyebrowGreen: {
+    fontFamily: typography.tech,
+    fontSize: 11,
+    textTransform: "uppercase",
+    letterSpacing: "0.32em",
+    color: colors.brandGreen700,
+  },
+  eyebrowGreen400: {
+    fontFamily: typography.tech,
+    fontSize: 11,
+    textTransform: "uppercase",
+    letterSpacing: "0.32em",
+    color: colors.brandGreen400,
+  },
+  textGreen600: {
+    color: colors.brandGreen600,
+  },
+  ctaPrimary: {
+    display: "inline-flex",
+    minHeight: 44,
+    alignItems: "center",
+    gap: 10,
+    borderRadius: radii.sm,
+    backgroundColor: {
+      default: colors.brandGreen500,
+      ":hover": colors.brandGreen400,
+    },
+    paddingLeft: 28,
+    paddingRight: 28,
+    paddingTop: 16,
+    paddingBottom: 16,
+    fontFamily: typography.body,
+    fontSize: 14,
+    fontWeight: 600,
+    color: colors.brandGreen950,
+    textDecoration: "none",
+    transitionProperty: "background-color, transform",
+    transitionDuration: "300ms",
+    transform: {
+      default: "scale(1)",
+      ":active": "scale(0.96)",
+    },
+    outline: {
+      default: "none",
+      ":focus-visible": `2px solid ${colors.brandGreen700}`,
+    },
+    outlineOffset: {
+      ":focus-visible": 2,
+    },
+  },
+  ctaPrimaryCompact: {
+    display: "inline-flex",
+    minHeight: 44,
+    alignItems: "center",
+    gap: 8,
+    borderRadius: radii.sm,
+    backgroundColor: {
+      default: colors.brandGreen500,
+      ":hover": colors.brandGreen400,
+    },
+    paddingLeft: 20,
+    paddingRight: 20,
+    paddingTop: 10,
+    paddingBottom: 10,
+    fontFamily: typography.body,
+    fontSize: 14,
+    fontWeight: 600,
+    color: colors.brandGreen950,
+    textDecoration: "none",
+    transitionProperty: "background-color, transform",
+    transitionDuration: "300ms",
+    transform: {
+      default: "scale(1)",
+      ":active": "scale(0.96)",
+    },
+    outline: {
+      default: "none",
+      ":focus-visible": `2px solid ${colors.brandGreen700}`,
+    },
+    outlineOffset: {
+      ":focus-visible": 2,
+    },
+  },
+  ctaPrimaryDark: {
+    display: "inline-flex",
+    minHeight: 44,
+    alignItems: "center",
+    gap: 12,
+    borderRadius: radii.sm,
+    backgroundColor: {
+      default: colors.brandGreen500,
+      ":hover": colors.brandGreen400,
+    },
+    paddingLeft: 32,
+    paddingRight: 32,
+    paddingTop: 16,
+    paddingBottom: 16,
+    fontFamily: typography.body,
+    fontSize: 14,
+    fontWeight: 700,
+    color: colors.brandGreen950,
+    boxShadow: "0 0 40px oklch(from var(--color-brand-green-500) l c h / 0.3)",
+    textDecoration: "none",
+    transitionProperty: "background-color, transform, box-shadow",
+    transitionDuration: "300ms",
+    transform: {
+      default: "scale(1)",
+      ":active": "scale(0.96)",
+    },
+    outline: {
+      default: "none",
+      ":focus-visible": "2px solid currentColor",
+    },
+  },
+  ctaOutlineBlue: {
+    display: "inline-flex",
+    minHeight: 44,
+    alignItems: "center",
+    gap: 10,
+    borderRadius: radii.sm,
+    borderWidth: 1,
+    borderStyle: "solid",
+    borderColor: colors.brandBlue700,
+    paddingLeft: 28,
+    paddingRight: 28,
+    paddingTop: 16,
+    paddingBottom: 16,
+    fontFamily: typography.body,
+    fontSize: 14,
+    fontWeight: 600,
+    color: colors.brandBlue700,
+    textDecoration: "none",
+    backgroundColor: {
+      default: "transparent",
+      ":hover": colors.brandBlue50,
+    },
+    transitionProperty: "background-color, transform",
+    transitionDuration: "300ms",
+    transform: {
+      default: "scale(1)",
+      ":active": "scale(0.96)",
+    },
+    outline: {
+      default: "none",
+      ":focus-visible": `2px solid ${colors.brandBlue700}`,
+    },
+  },
+  ctaOutlineBlueCompact: {
+    display: "inline-flex",
+    minHeight: 44,
+    alignItems: "center",
+    gap: 8,
+    borderRadius: radii.sm,
+    borderWidth: 1,
+    borderStyle: "solid",
+    borderColor: colors.brandBlue700,
+    paddingLeft: 20,
+    paddingRight: 20,
+    paddingTop: 12,
+    paddingBottom: 12,
+    fontFamily: typography.body,
+    fontSize: 14,
+    fontWeight: 600,
+    color: colors.brandBlue700,
+    textDecoration: "none",
+    backgroundColor: {
+      default: "transparent",
+      ":hover": colors.brandBlue50,
+    },
+    transitionProperty: "background-color, transform",
+    transitionDuration: "300ms",
+    transform: {
+      default: "scale(1)",
+      ":active": "scale(0.96)",
+    },
+    outline: {
+      default: "none",
+      ":focus-visible": `2px solid ${colors.brandBlue700}`,
+    },
+  },
+  /* Division Dots */
+  dotBase: {
+    width: 8,
+    height: 8,
+    borderRadius: radii.full,
+    flexShrink: 0,
+  },
+  dot_nutrition: {
+    backgroundColor: colors.nutrition,
+    borderWidth: 1,
+    borderStyle: "solid",
+    borderColor: "color-mix(in oklch, var(--color-brand-green-700) 30%, transparent)",
+  },
+  dot_food: {
+    backgroundColor: colors.food,
+  },
+  dot_cosmetics: {
+    backgroundColor: colors.cosmetics,
+  },
+  dot_chem: {
+    backgroundColor: colors.chem,
+  },
+  dot_agro: {
+    backgroundColor: colors.agro,
+  },
+  dot_feed: {
+    backgroundColor: colors.feed,
+  },
+  /* Header & Nav */
+  header: {
+    position: "sticky",
+    top: 0,
+    zIndex: 50,
+    borderBottomWidth: 1,
+    borderBottomStyle: "solid",
+    borderBottomColor: colors.line,
+    backgroundColor: "color-mix(in oklch, var(--color-paper) 95%, transparent)",
+    backdropFilter: "blur(12px)",
+    WebkitBackdropFilter: "blur(12px)",
+  },
+  microStrip: {
+    display: {
+      default: "none",
+      [breakpoints.md]: "flex",
+    },
+    alignItems: "center",
+    justifyContent: "space-between",
+    borderBottomWidth: 1,
+    borderBottomStyle: "solid",
+    borderBottomColor: colors.line,
+    paddingLeft: 24,
+    paddingRight: 24,
+    paddingTop: 6,
+    paddingBottom: 6,
+  },
+  microStripItem: {
+    display: "flex",
+    alignItems: "center",
+    gap: 8,
+    fontFamily: typography.tech,
+    fontSize: 11,
+    textTransform: "uppercase",
+    letterSpacing: "0.26em",
+    color: colors.mute600,
+  },
+  liveDotOuter: {
+    position: "relative",
+    display: "flex",
+    width: 6,
+    height: 6,
+  },
+  liveDotPing: {
+    position: "absolute",
+    display: "inline-flex",
+    width: "100%",
+    height: "100%",
+    borderRadius: radii.full,
+    backgroundColor: "color-mix(in oklch, var(--color-brand-green-500) 60%, transparent)",
+    animationName: pulseAnim,
+    animationDuration: "2.4s",
+    animationIterationCount: "infinite",
+  },
+  liveDotInner: {
+    position: "relative",
+    display: "inline-flex",
+    width: 6,
+    height: 6,
+    borderRadius: radii.full,
+    backgroundColor: colors.brandGreen500,
+  },
+  navInner: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingLeft: {
+      default: 20,
+      [breakpoints.md]: 32,
+    },
+    paddingRight: {
+      default: 20,
+      [breakpoints.md]: 32,
+    },
+    paddingTop: 12,
+    paddingBottom: 12,
+  },
+  brandLink: {
+    display: "flex",
+    alignItems: "baseline",
+    gap: 10,
+    textDecoration: "none",
+    transitionProperty: "opacity",
+    transitionDuration: "300ms",
+    opacity: {
+      default: 1,
+      ":hover": 0.75,
+    },
+    outline: {
+      default: "none",
+      ":focus-visible": "2px solid currentColor",
+    },
+  },
+  brandText: {
+    fontFamily: typography.body,
+    fontSize: 20,
+    fontWeight: 700,
+    letterSpacing: "-0.04em",
+    color: colors.brandGreen600,
+  },
+  brandLeaf: {
+    width: 16,
+    height: 16,
+    alignSelf: "center",
+    color: colors.brandGreen500,
+  },
+  navDesktopLinks: {
+    display: {
+      default: "none",
+      [breakpoints.md]: "flex",
+    },
+    alignItems: "center",
+    gap: 28,
+  },
+  navLink: {
+    display: "inline-flex",
+    minHeight: 44,
+    alignItems: "center",
+    fontFamily: typography.body,
+    fontSize: 14,
+    color: {
+      default: colors.mute600,
+      ":hover": colors.brandGreen700,
+    },
+    textDecoration: "none",
+    transitionProperty: "color",
+    transitionDuration: "300ms",
+    outline: {
+      default: "none",
+      ":focus-visible": "2px solid currentColor",
+    },
+  },
+  navRight: {
+    display: "flex",
+    alignItems: "center",
+    gap: 8,
+  },
+  progressHairline: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: 0,
+    height: 2,
+    transformOrigin: "left",
+    backgroundColor: colors.brandGreen500,
+  },
+  /* Portfolio Menu */
+  portfolioMenuRoot: {
+    position: "relative",
+  },
+  portfolioMenuBtn: {
+    display: "inline-flex",
+    minHeight: 44,
+    alignItems: "center",
+    gap: 6,
+    fontFamily: typography.body,
+    fontSize: 14,
+    color: {
+      default: colors.mute600,
+      ":hover": colors.brandGreen700,
+    },
+    backgroundColor: "transparent",
+    borderWidth: 0,
+    cursor: "pointer",
+    transitionProperty: "color",
+    transitionDuration: "300ms",
+    outline: {
+      default: "none",
+      ":focus-visible": "2px solid currentColor",
+    },
+  },
+  portfolioChevron: {
+    width: 14,
+    height: 14,
+    transitionProperty: "transform",
+    transitionDuration: "300ms",
+  },
+  portfolioChevronOpen: {
+    transform: "rotate(180deg)",
+  },
+  portfolioPopover: {
+    position: "absolute",
+    left: "50%",
+    top: "100%",
+    zIndex: 50,
+    marginTop: 8,
+    width: 640,
+    borderRadius: radii.sm,
+    borderWidth: 1,
+    borderStyle: "solid",
+    borderColor: colors.line,
+    backgroundColor: colors.paper,
+    boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)",
+  },
+  portfolioGrid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(3, 1fr)",
+    gap: 1,
+    backgroundColor: colors.line,
+  },
+  portfolioCol: {
+    backgroundColor: colors.paper,
+    padding: 20,
+  },
+  portfolioColHeader: {
+    display: "flex",
+    alignItems: "center",
+    gap: 8,
+    fontFamily: typography.tech,
+    fontSize: 11,
+    textTransform: "uppercase",
+    letterSpacing: "0.2em",
+    color: colors.mute600,
+    margin: 0,
+  },
+  portfolioItemList: {
+    listStyle: "none",
+    margin: 0,
+    padding: 0,
+    marginTop: 12,
+    display: "flex",
+    flexDirection: "column",
+    gap: 8,
+  },
+  portfolioItemLink: {
+    fontFamily: typography.body,
+    fontSize: 14,
+    color: {
+      default: colors.ink,
+      ":hover": colors.brandGreen700,
+    },
+    textDecoration: "none",
+    transitionProperty: "color",
+    transitionDuration: "200ms",
+    outline: {
+      default: "none",
+      ":focus-visible": "2px solid currentColor",
+    },
+  },
+  portfolioFooter: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    borderTopWidth: 1,
+    borderTopStyle: "solid",
+    borderTopColor: colors.line,
+    paddingLeft: 20,
+    paddingRight: 20,
+    paddingTop: 12,
+    paddingBottom: 12,
+  },
+  portfolioFooterLink: {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: 6,
+    fontFamily: typography.body,
+    fontSize: 14,
+    fontWeight: 600,
+    color: {
+      default: colors.brandBlue700,
+      ":hover": colors.brandGreen700,
+    },
+    textDecoration: "none",
+    transitionProperty: "color",
+    transitionDuration: "200ms",
+    outline: {
+      default: "none",
+      ":focus-visible": "2px solid currentColor",
+    },
+  },
+  /* Mobile Nav */
+  mobileNavWrapper: {
+    display: {
+      default: "block",
+      [breakpoints.md]: "none",
+    },
+  },
+  mobileMenuBtn: {
+    display: "inline-flex",
+    minHeight: 44,
+    minWidth: 44,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: radii.sm,
+    borderWidth: 0,
+    backgroundColor: "transparent",
+    color: {
+      default: colors.ink,
+      ":hover": colors.brandGreen700,
+    },
+    cursor: "pointer",
+    transitionProperty: "color",
+    transitionDuration: "200ms",
+    outline: {
+      default: "none",
+      ":focus-visible": "2px solid currentColor",
+    },
+  },
+  mobileMenuPopover: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    top: "100%",
+    borderBottomWidth: 1,
+    borderBottomStyle: "solid",
+    borderBottomColor: colors.line,
+    backgroundColor: colors.paper,
+    boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1)",
+  },
+  mobileMenuList: {
+    listStyle: "none",
+    margin: 0,
+    paddingLeft: 20,
+    paddingRight: 20,
+    paddingTop: 12,
+    paddingBottom: 12,
+  },
+  mobileNavLink: {
+    display: "block",
+    borderBottomWidth: 1,
+    borderBottomStyle: "solid",
+    borderBottomColor: colors.line,
+    paddingTop: 12,
+    paddingBottom: 12,
+    fontFamily: typography.body,
+    fontSize: 16,
+    color: {
+      default: colors.ink,
+      ":hover": colors.brandGreen700,
+    },
+    textDecoration: "none",
+    outline: {
+      default: "none",
+      ":focus-visible": "2px solid currentColor",
+    },
+  },
+  mobileNavLinkLast: {
+    borderBottomWidth: 0,
+  },
+  /* Hero */
+  heroSection: {
+    position: "relative",
+    borderBottomWidth: 1,
+    borderBottomStyle: "solid",
+    borderBottomColor: colors.line,
+    backgroundColor: colors.paper,
+  },
+  heroGrid: {
+    display: "grid",
+    minHeight: "80vh",
+    gridTemplateColumns: {
+      default: null,
+      [breakpoints.lg]: "repeat(12, 1fr)",
+    },
+  },
+  heroLeft: {
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    paddingLeft: {
+      default: 20,
+      [breakpoints.md]: 40,
+    },
+    paddingRight: {
+      default: 20,
+      [breakpoints.md]: 40,
+    },
+    paddingTop: {
+      default: 64,
+      [breakpoints.md]: 96,
+      [breakpoints.lg]: 128,
+    },
+    paddingBottom: {
+      default: 64,
+      [breakpoints.md]: 96,
+      [breakpoints.lg]: 128,
+    },
+    gridColumn: {
+      default: null,
+      [breakpoints.lg]: "span 7 / span 7",
+    },
+  },
+  heroBadge: {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: 8,
+    borderRadius: radii.full,
+    borderWidth: 1,
+    borderStyle: "solid",
+    borderColor: colors.brandGreen200,
+    backgroundColor: colors.brandGreen50,
+    paddingLeft: 16,
+    paddingRight: 16,
+    paddingTop: 6,
+    paddingBottom: 6,
+    fontFamily: typography.tech,
+    fontSize: 11,
+    textTransform: "uppercase",
+    letterSpacing: "0.32em",
+    color: colors.brandGreen700,
+    margin: 0,
+  },
+  heroHeading: {
+    marginTop: 32,
+    fontFamily: typography.display,
+    fontSize: "clamp(2.6rem, 6vw, 5.5rem)",
+    fontWeight: 700,
+    lineHeight: {
+      default: 1.1,
+      [breakpoints.md]: 1.05,
+    },
+    letterSpacing: "-0.04em",
+    color: colors.ink,
+    margin: 0,
+  },
+  heroLead: {
+    marginTop: 28,
+    maxWidth: 512,
+    fontFamily: typography.body,
+    fontSize: {
+      default: 16,
+      [breakpoints.md]: 18,
+    },
+    lineHeight: 1.625,
+    color: colors.mute600,
+    margin: 0,
+  },
+  heroActions: {
+    marginTop: 36,
+    display: "flex",
+    flexWrap: "wrap",
+    gap: 12,
+  },
+  heroStatGrid: {
+    marginTop: 56,
+    display: "grid",
+    gridTemplateColumns: {
+      default: "repeat(2, 1fr)",
+      [breakpoints.sm]: "repeat(4, 1fr)",
+    },
+    gap: 1,
+    overflow: "hidden",
+    borderRadius: radii.sm,
+    borderWidth: 1,
+    borderStyle: "solid",
+    borderColor: colors.line,
+    backgroundColor: colors.line,
+    margin: 0,
+    padding: 0,
+  },
+  heroStatItem: {
+    backgroundColor: colors.paper,
+    paddingLeft: 16,
+    paddingRight: 16,
+    paddingTop: 20,
+    paddingBottom: 20,
+  },
+  heroStatUnit: {
+    fontFamily: typography.tech,
+    fontSize: 11,
+    textTransform: "uppercase",
+    letterSpacing: "0.24em",
+    color: colors.mute600,
+  },
+  heroStatValue: {
+    fontFamily: typography.display,
+    fontSize: {
+      default: 30,
+      [breakpoints.md]: 36,
+    },
+    fontWeight: 600,
+    letterSpacing: "-0.02em",
+    color: colors.brandGreen600,
+    margin: 0,
+  },
+  heroStatDesc: {
+    marginTop: 4,
+    fontFamily: typography.body,
+    fontSize: 12,
+    color: colors.mute600,
+    margin: 0,
+  },
+  heroRight: {
+    position: "relative",
+    overflow: "hidden",
+    borderTopWidth: {
+      default: 1,
+      [breakpoints.lg]: 0,
+    },
+    borderTopStyle: "solid",
+    borderTopColor: colors.line,
+    gridColumn: {
+      default: null,
+      [breakpoints.lg]: "span 5 / span 5",
+    },
+    borderLeftWidth: {
+      default: null,
+      [breakpoints.lg]: 1,
+    },
+    borderLeftStyle: {
+      default: null,
+      [breakpoints.lg]: "solid",
+    },
+    borderLeftColor: {
+      default: null,
+      [breakpoints.lg]: colors.line,
+    },
+  },
+  heroImgContainer: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
+  heroImg: {
+    height: "116%",
+    width: "100%",
+    objectFit: "cover",
+  },
+  heroImgScrim: {
+    pointerEvents: "none",
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    background:
+      "linear-gradient(to top, color-mix(in oklch, var(--color-brand-green-950) 30%, transparent), transparent, transparent)",
+  },
+  heroCaptionBadge: {
+    position: "absolute",
+    bottom: 16,
+    left: 16,
+    right: 16,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    borderRadius: radii.sm,
+    borderWidth: 1,
+    borderStyle: "solid",
+    borderColor: colors.line,
+    backgroundColor: "color-mix(in oklch, var(--color-paper) 95%, transparent)",
+    paddingLeft: 16,
+    paddingRight: 16,
+    paddingTop: 10,
+    paddingBottom: 10,
+    backdropFilter: "blur(4px)",
+    WebkitBackdropFilter: "blur(4px)",
+  },
+  /* Ticker */
+  tickerSection: {
+    position: "relative",
+    overflow: "hidden",
+    borderBottomWidth: 1,
+    borderBottomStyle: "solid",
+    borderBottomColor: colors.line,
+    backgroundColor: colors.brandGreen50,
+    paddingTop: 14,
+    paddingBottom: 14,
+  },
+  tickerFadeLeft: {
+    pointerEvents: "none",
+    position: "absolute",
+    left: 0,
+    top: 0,
+    bottom: 0,
+    zIndex: 10,
+    width: 64,
+    background: "linear-gradient(to right, var(--color-brand-green-50), transparent)",
+  },
+  tickerFadeRight: {
+    pointerEvents: "none",
+    position: "absolute",
+    right: 0,
+    top: 0,
+    bottom: 0,
+    zIndex: 10,
+    width: 64,
+    background: "linear-gradient(to left, var(--color-brand-green-50), transparent)",
+  },
+  tickerPauseBtn: {
+    position: "absolute",
+    right: 8,
+    top: "50%",
+    transform: "translateY(-50%)",
+    zIndex: 20,
+    display: "inline-flex",
+    width: 32,
+    height: 32,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: radii.full,
+    borderWidth: 1,
+    borderStyle: "solid",
+    borderColor: colors.brandGreen200,
+    backgroundColor: "color-mix(in oklch, var(--color-paper) 95%, transparent)",
+    color: colors.brandGreen700,
+    cursor: "pointer",
+    transitionProperty: "background-color",
+    transitionDuration: "200ms",
+    ":hover": {
+      backgroundColor: colors.brandGreen100,
+    },
+    outline: {
+      default: "none",
+      ":focus-visible": "2px solid currentColor",
+    },
+  },
+  tickerMarqueeTrack: {
+    display: "flex",
+    width: "max-content",
+    animationName: marqueeAnim,
+    animationDuration: "32s",
+    animationTimingFunction: "linear",
+    animationIterationCount: "infinite",
+  },
+  tickerList: {
+    display: "flex",
+    flexShrink: 0,
+    alignItems: "center",
+    listStyle: "none",
+    margin: 0,
+    padding: 0,
+  },
+  tickerItem: {
+    display: "flex",
+    alignItems: "center",
+    gap: 32,
+    paddingRight: 32,
+  },
+  tickerText: {
+    whiteSpace: "nowrap",
+    fontFamily: typography.tech,
+    fontSize: 11,
+    textTransform: "uppercase",
+    letterSpacing: "0.3em",
+    color: colors.brandGreen700,
+  },
+  tickerIndex: {
+    color: colors.brandGreen800,
+  },
+  tickerDiamond: {
+    width: 6,
+    height: 6,
+    transform: "rotate(45deg)",
+    backgroundColor: colors.brandGreen400,
+  },
+  /* Section Header */
+  sectionHeaderRow: {
+    display: "flex",
+    flexDirection: {
+      default: "column",
+      [breakpoints.md]: "row",
+    },
+    gap: 24,
+    borderBottomWidth: 1,
+    borderBottomStyle: "solid",
+    borderBottomColor: colors.line,
+    paddingLeft: {
+      default: 20,
+      [breakpoints.md]: 40,
+    },
+    paddingRight: {
+      default: 20,
+      [breakpoints.md]: 40,
+    },
+    paddingTop: {
+      default: 56,
+      [breakpoints.md]: 80,
+    },
+    paddingBottom: {
+      default: 56,
+      [breakpoints.md]: 80,
+    },
+    alignItems: {
+      default: null,
+      [breakpoints.md]: "flex-end",
+    },
+    justifyContent: {
+      default: null,
+      [breakpoints.md]: "space-between",
+    },
+  },
+  sectionHeading: {
+    marginTop: 16,
+    fontFamily: typography.display,
+    fontSize: {
+      default: 36,
+      [breakpoints.md]: 48,
+    },
+    fontWeight: 700,
+    lineHeight: 1.05,
+    letterSpacing: "-0.03em",
+    color: colors.ink,
+    margin: 0,
+  },
+  sectionAsideLead: {
+    maxWidth: 320,
+    fontFamily: typography.body,
+    fontSize: 14,
+    lineHeight: 1.625,
+    color: colors.mute600,
+    margin: 0,
+  },
+  /* Industries */
+  industriesSection: {
+    borderBottomWidth: 1,
+    borderBottomStyle: "solid",
+    borderBottomColor: colors.line,
+    backgroundColor: colors.paper,
+  },
+  industryRowLink: {
+    display: "block",
+    borderBottomWidth: 1,
+    borderBottomStyle: "solid",
+    borderBottomColor: colors.line,
+    textDecoration: "none",
+    transitionProperty: "background-color",
+    transitionDuration: "400ms",
+    backgroundColor: {
+      default: "transparent",
+      ":hover": colors.brandGreen50,
+    },
+    outline: {
+      default: "none",
+      ":focus-visible": "2px solid currentColor",
+    },
+  },
+  industryRowLinkLast: {
+    borderBottomWidth: 0,
+  },
+  industryRowGrid: {
+    display: "grid",
+    alignItems: "center",
+    gap: {
+      default: 16,
+      [breakpoints.md]: 24,
+    },
+    paddingLeft: {
+      default: 20,
+      [breakpoints.md]: 40,
+    },
+    paddingRight: {
+      default: 20,
+      [breakpoints.md]: 40,
+    },
+    paddingTop: {
+      default: 40,
+      [breakpoints.md]: 48,
+    },
+    paddingBottom: {
+      default: 40,
+      [breakpoints.md]: 48,
+    },
+    gridTemplateColumns: {
+      default: null,
+      [breakpoints.md]: "repeat(12, 1fr)",
+    },
+  },
+  industryColIndex: {
+    gridColumn: {
+      default: null,
+      [breakpoints.md]: "span 1 / span 1",
+    },
+  },
+  industryIndexText: {
+    fontFamily: typography.tech,
+    fontSize: 14,
+    letterSpacing: "0.22em",
+    color: colors.brandGreen700,
+  },
+  industryColTitle: {
+    gridColumn: {
+      default: null,
+      [breakpoints.md]: "span 4 / span 4",
+    },
+  },
+  industryTitle: {
+    fontFamily: typography.body,
+    fontSize: {
+      default: 24,
+      [breakpoints.md]: 30,
+    },
+    fontWeight: 700,
+    letterSpacing: "-0.03em",
+    color: colors.ink,
+    margin: 0,
+    transitionProperty: "color",
+    transitionDuration: "300ms",
+  },
+  industryColCopy: {
+    gridColumn: {
+      default: null,
+      [breakpoints.md]: "span 5 / span 5",
+    },
+  },
+  industryCopy: {
+    fontFamily: typography.body,
+    fontSize: 14,
+    lineHeight: 1.625,
+    color: colors.mute600,
+    margin: 0,
+  },
+  industryColImg: {
+    position: "relative",
+    aspectRatio: {
+      default: "16 / 9",
+      [breakpoints.md]: "1 / 1",
+    },
+    overflow: "hidden",
+    borderRadius: radii.sm,
+    gridColumn: {
+      default: null,
+      [breakpoints.md]: "span 1 / span 1",
+    },
+  },
+  industryImg: {
+    width: "100%",
+    height: "100%",
+    objectFit: "cover",
+    outline: "1px solid rgba(0, 0, 0, 0.1)",
+    outlineOffset: -1,
+    transitionProperty: "transform",
+    transitionDuration: "700ms",
+    transitionTimingFunction: "ease-out",
+  },
+  industryColArrow: {
+    display: "flex",
+    justifyContent: "flex-end",
+    gridColumn: {
+      default: null,
+      [breakpoints.md]: "span 1 / span 1",
+    },
+  },
+  industryArrowIcon: {
+    color: colors.mute400,
+    transitionProperty: "transform, color",
+    transitionDuration: "300ms",
+  },
+  /* Division Badge */
+  divisionBadge: {
+    position: "absolute",
+    right: 12,
+    top: 12,
+    display: "inline-flex",
+    alignItems: "center",
+    gap: 6,
+    borderRadius: radii.sm,
+    borderWidth: 1,
+    borderStyle: "solid",
+    borderColor: colors.line,
+    backgroundColor: "color-mix(in oklch, var(--color-paper) 95%, transparent)",
+    paddingLeft: 8,
+    paddingRight: 8,
+    paddingTop: 4,
+    paddingBottom: 4,
+    fontFamily: typography.tech,
+    fontSize: 11,
+    textTransform: "uppercase",
+    letterSpacing: "0.16em",
+    color: colors.ink,
+    backdropFilter: "blur(4px)",
+    WebkitBackdropFilter: "blur(4px)",
+  },
+  /* Matrix */
+  matrixSection: {
+    borderBottomWidth: 1,
+    borderBottomStyle: "solid",
+    borderBottomColor: colors.line,
+    backgroundColor: colors.mute50,
+  },
+  matrixGrid: {
+    display: "grid",
+    gridTemplateColumns: {
+      default: "1fr",
+      [breakpoints.md]: "repeat(2, 1fr)",
+      [breakpoints.lg]: "repeat(3, 1fr)",
+    },
+    gap: 1,
+    backgroundColor: colors.line,
+  },
+  matrixCardBg: {
+    backgroundColor: colors.paper,
+  },
+  matrixCardImgBox: {
+    position: "relative",
+    aspectRatio: "4 / 3",
+    overflow: "hidden",
+    borderBottomWidth: 1,
+    borderBottomStyle: "solid",
+    borderBottomColor: colors.line,
+  },
+  matrixCardImg: {
+    width: "100%",
+    height: "100%",
+    objectFit: "cover",
+    outline: "1px solid rgba(0, 0, 0, 0.1)",
+    outlineOffset: -1,
+    transitionProperty: "transform",
+    transitionDuration: "700ms",
+    transitionTimingFunction: "ease-out",
+  },
+  matrixCardHoverOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "transparent",
+    transitionProperty: "background-color",
+    transitionDuration: "500ms",
+  },
+  matrixCardBody: {
+    paddingLeft: {
+      default: 20,
+      [breakpoints.md]: 28,
+    },
+    paddingRight: {
+      default: 20,
+      [breakpoints.md]: 28,
+    },
+    paddingTop: {
+      default: 28,
+      [breakpoints.md]: 32,
+    },
+    paddingBottom: {
+      default: 28,
+      [breakpoints.md]: 32,
+    },
+  },
+  matrixCardMeta: {
+    display: "flex",
+    alignItems: "baseline",
+    justifyContent: "space-between",
+  },
+  matrixCardIndex: {
+    fontFamily: typography.tech,
+    fontSize: 11,
+    letterSpacing: "0.22em",
+    color: colors.brandGreen700,
+  },
+  matrixCardCode: {
+    fontFamily: typography.tech,
+    fontSize: 11,
+    textTransform: "uppercase",
+    letterSpacing: "0.22em",
+    color: colors.mute600,
+  },
+  matrixCardTitle: {
+    marginTop: 12,
+    fontFamily: typography.body,
+    fontSize: 20,
+    fontWeight: 700,
+    letterSpacing: "-0.02em",
+    color: colors.ink,
+    margin: 0,
+    transitionProperty: "color",
+    transitionDuration: "300ms",
+  },
+  matrixCardLatin: {
+    marginTop: 2,
+    fontFamily: typography.display,
+    fontSize: 14,
+    fontStyle: "italic",
+    color: colors.mute600,
+    margin: 0,
+  },
+  matrixCardDl: {
+    marginTop: 20,
+    borderTopWidth: 1,
+    borderTopStyle: "solid",
+    borderTopColor: colors.line,
+    paddingTop: 16,
+    display: "flex",
+    flexDirection: "column",
+    gap: 10,
+    margin: 0,
+  },
+  matrixCardDlRow: {
+    display: "flex",
+    alignItems: "baseline",
+    justifyContent: "space-between",
+    gap: 16,
+  },
+  matrixSpecLink: {
+    marginTop: 24,
+    display: "inline-flex",
+    minHeight: 44,
+    alignItems: "center",
+    gap: 8,
+    fontFamily: typography.tech,
+    fontSize: 12,
+    textTransform: "uppercase",
+    letterSpacing: "0.24em",
+    color: {
+      default: colors.brandBlue700,
+      ":hover": colors.brandGreen700,
+    },
+    textDecoration: "none",
+    transitionProperty: "color",
+    transitionDuration: "300ms",
+    outline: {
+      default: "none",
+      ":focus-visible": "2px solid currentColor",
+    },
+  },
+  /* Dossier */
+  dossierSection: {
+    borderBottomWidth: 1,
+    borderBottomStyle: "solid",
+    borderBottomColor: colors.line,
+    backgroundColor: colors.paper,
+  },
+  dossierGrid: {
+    display: "grid",
+    gridTemplateColumns: {
+      default: null,
+      [breakpoints.lg]: "repeat(12, 1fr)",
+    },
+  },
+  dossierImgCol: {
+    position: "relative",
+    minHeight: 320,
+    overflow: "hidden",
+    borderBottomWidth: {
+      default: 1,
+      [breakpoints.lg]: 0,
+    },
+    borderBottomStyle: "solid",
+    borderBottomColor: colors.line,
+    gridColumn: {
+      default: null,
+      [breakpoints.lg]: "span 5 / span 5",
+    },
+    borderRightWidth: {
+      default: null,
+      [breakpoints.lg]: 1,
+    },
+    borderRightStyle: {
+      default: null,
+      [breakpoints.lg]: "solid",
+    },
+    borderRightColor: {
+      default: null,
+      [breakpoints.lg]: colors.line,
+    },
+  },
+  dossierImg: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    width: "100%",
+    height: "100%",
+    objectFit: "cover",
+    outline: "1px solid rgba(0, 0, 0, 0.1)",
+    outlineOffset: -1,
+  },
+  dossierImgScrim: {
+    pointerEvents: "none",
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    background:
+      "linear-gradient(to top, color-mix(in oklch, var(--color-brand-green-950) 25%, transparent), transparent, transparent)",
+  },
+  dossierBadgeTopLeft: {
+    position: "absolute",
+    left: 16,
+    top: 16,
+    display: "inline-flex",
+    alignItems: "center",
+    gap: 6,
+    borderRadius: radii.sm,
+    borderWidth: 1,
+    borderStyle: "solid",
+    borderColor: colors.line,
+    backgroundColor: "color-mix(in oklch, var(--color-paper) 95%, transparent)",
+    paddingLeft: 8,
+    paddingRight: 8,
+    paddingTop: 4,
+    paddingBottom: 4,
+    fontFamily: typography.tech,
+    fontSize: 11,
+    textTransform: "uppercase",
+    letterSpacing: "0.16em",
+    color: colors.ink,
+    backdropFilter: "blur(4px)",
+    WebkitBackdropFilter: "blur(4px)",
+  },
+  dossierBadgeBottom: {
+    position: "absolute",
+    bottom: 16,
+    left: 16,
+    right: 16,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    borderRadius: radii.sm,
+    borderWidth: 1,
+    borderStyle: "solid",
+    borderColor: colors.line,
+    backgroundColor: "color-mix(in oklch, var(--color-paper) 95%, transparent)",
+    paddingLeft: 16,
+    paddingRight: 16,
+    paddingTop: 10,
+    paddingBottom: 10,
+    backdropFilter: "blur(4px)",
+    WebkitBackdropFilter: "blur(4px)",
+  },
+  dossierBodyCol: {
+    paddingLeft: {
+      default: 20,
+      [breakpoints.md]: 40,
+    },
+    paddingRight: {
+      default: 20,
+      [breakpoints.md]: 40,
+    },
+    paddingTop: {
+      default: 48,
+      [breakpoints.md]: 64,
+    },
+    paddingBottom: {
+      default: 48,
+      [breakpoints.md]: 64,
+    },
+    gridColumn: {
+      default: null,
+      [breakpoints.lg]: "span 7 / span 7",
+    },
+  },
+  dossierTitle: {
+    fontFamily: typography.display,
+    fontSize: {
+      default: 30,
+      [breakpoints.md]: 36,
+    },
+    fontWeight: 700,
+    letterSpacing: "-0.03em",
+    color: colors.ink,
+    margin: 0,
+  },
+  dossierLatin: {
+    marginTop: 4,
+    fontFamily: typography.display,
+    fontSize: 16,
+    fontStyle: "italic",
+    color: colors.mute600,
+    margin: 0,
+  },
+  dossierDescription: {
+    marginTop: 20,
+    maxWidth: 576,
+    fontFamily: typography.body,
+    fontSize: 16,
+    lineHeight: 1.625,
+    color: colors.mute600,
+    margin: 0,
+  },
+  dossierDl: {
+    marginTop: 32,
+    maxWidth: 576,
+    borderTopWidth: 1,
+    borderTopStyle: "solid",
+    borderTopColor: colors.line,
+    margin: 0,
+    padding: 0,
+  },
+  dossierDlRow: {
+    display: "flex",
+    alignItems: "baseline",
+    justifyContent: "space-between",
+    gap: 24,
+    borderBottomWidth: 1,
+    borderBottomStyle: "solid",
+    borderBottomColor: colors.line,
+    paddingTop: 12,
+    paddingBottom: 12,
+  },
+  dossierDd: {
+    textAlign: "right",
+    fontFamily: typography.tech,
+    fontSize: 14,
+    color: colors.ink,
+    margin: 0,
+  },
+  dossierFormatsRow: {
+    marginTop: 24,
+    display: "flex",
+    flexWrap: "wrap",
+    gap: 8,
+  },
+  dossierFormatPill: {
+    borderRadius: radii.full,
+    borderWidth: 1,
+    borderStyle: "solid",
+    borderColor: colors.brandGreen200,
+    backgroundColor: colors.brandGreen50,
+    paddingLeft: 12,
+    paddingRight: 12,
+    paddingTop: 4,
+    paddingBottom: 4,
+    fontFamily: typography.body,
+    fontSize: 12,
+    fontWeight: 500,
+    color: colors.brandGreen800,
+  },
+  dossierActionsRow: {
+    marginTop: 32,
+    display: "flex",
+    flexWrap: "wrap",
+    gap: 12,
+  },
+  /* Chips */
+  chipBase: {
+    minHeight: 44,
+    borderRadius: radii.sm,
+    borderWidth: 1,
+    borderStyle: "solid",
+    paddingLeft: 16,
+    paddingRight: 16,
+    paddingTop: 8,
+    paddingBottom: 8,
+    fontFamily: typography.body,
+    fontSize: 14,
+    fontWeight: 500,
+    cursor: "pointer",
+    transitionProperty: "background-color, border-color, color, transform",
+    transitionDuration: "200ms",
+    transform: {
+      default: "scale(1)",
+      ":active": "scale(0.96)",
+    },
+    outline: {
+      default: "none",
+      ":focus-visible": `2px solid ${colors.brandGreen700}`,
+    },
+  },
+  chipSelected: {
+    borderColor: colors.brandGreen600,
+    backgroundColor: colors.brandGreen500,
+    color: colors.brandGreen950,
+  },
+  chipUnselected: {
+    borderColor: {
+      default: colors.line,
+      ":hover": colors.brandGreen400,
+    },
+    backgroundColor: colors.paper,
+    color: {
+      default: colors.mute600,
+      ":hover": colors.ink,
+    },
+  },
+  /* Formulation Presenter */
+  formulationSection: {
+    borderBottomWidth: 1,
+    borderBottomStyle: "solid",
+    borderBottomColor: colors.line,
+    backgroundColor: "color-mix(in oklch, var(--color-brand-green-50) 60%, transparent)",
+  },
+  formulationGrid: {
+    display: "grid",
+    gap: 1,
+    backgroundColor: colors.line,
+    gridTemplateColumns: {
+      default: null,
+      [breakpoints.lg]: "repeat(12, 1fr)",
+    },
+  },
+  formulationLeft: {
+    backgroundColor: colors.paper,
+    paddingLeft: {
+      default: 20,
+      [breakpoints.md]: 40,
+    },
+    paddingRight: {
+      default: 20,
+      [breakpoints.md]: 40,
+    },
+    paddingTop: {
+      default: 40,
+      [breakpoints.md]: 48,
+    },
+    paddingBottom: {
+      default: 40,
+      [breakpoints.md]: 48,
+    },
+    gridColumn: {
+      default: null,
+      [breakpoints.lg]: "span 7 / span 7",
+    },
+  },
+  formulationFieldset: {
+    borderWidth: 0,
+    margin: 0,
+    padding: 0,
+    marginTop: 32,
+  },
+  chipsWrapRow: {
+    marginTop: 12,
+    display: "flex",
+    flexWrap: "wrap",
+    gap: 8,
+  },
+  processStripOuter: {
+    marginTop: 48,
+    borderTopWidth: 1,
+    borderTopStyle: "solid",
+    borderTopColor: colors.line,
+    paddingTop: 32,
+  },
+  processOl: {
+    listStyle: "none",
+    margin: 0,
+    padding: 0,
+    marginTop: 16,
+    display: "grid",
+    gap: 16,
+    gridTemplateColumns: {
+      default: null,
+      [breakpoints.sm]: "repeat(2, 1fr)",
+    },
+  },
+  processLi: {
+    display: "flex",
+    gap: 12,
+  },
+  processIndex: {
+    fontFamily: typography.tech,
+    fontSize: 14,
+    letterSpacing: "0.16em",
+    color: colors.brandGreen700,
+  },
+  processTitle: {
+    fontFamily: typography.body,
+    fontSize: 14,
+    fontWeight: 600,
+    color: colors.ink,
+    margin: 0,
+  },
+  processCopy: {
+    marginTop: 4,
+    fontFamily: typography.body,
+    fontSize: 12,
+    lineHeight: 1.625,
+    color: colors.mute600,
+    margin: 0,
+  },
+  formulationRight: {
+    backgroundColor: colors.brandGreen950,
+    paddingLeft: {
+      default: 20,
+      [breakpoints.md]: 32,
+    },
+    paddingRight: {
+      default: 20,
+      [breakpoints.md]: 32,
+    },
+    paddingTop: {
+      default: 40,
+      [breakpoints.md]: 48,
+    },
+    paddingBottom: {
+      default: 40,
+      [breakpoints.md]: 48,
+    },
+    gridColumn: {
+      default: null,
+      [breakpoints.lg]: "span 5 / span 5",
+    },
+  },
+  specDraftHeader: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  specDraftLabel: {
+    fontFamily: typography.tech,
+    fontSize: 11,
+    textTransform: "uppercase",
+    letterSpacing: "0.28em",
+    color: colors.brandGreen400,
+  },
+  specDraftCode: {
+    fontFamily: typography.tech,
+    fontSize: 11,
+    textTransform: "uppercase",
+    letterSpacing: "0.28em",
+    color: colors.brandGreen300,
+    fontVariantNumeric: "tabular-nums",
+  },
+  specDraftDl: {
+    marginTop: 24,
+    borderTopWidth: 1,
+    borderTopStyle: "solid",
+    borderTopColor: colors.brandGreen800,
+    margin: 0,
+    padding: 0,
+  },
+  specDraftDlRow: {
+    display: "flex",
+    alignItems: "baseline",
+    justifyContent: "space-between",
+    gap: 16,
+    borderBottomWidth: 1,
+    borderBottomStyle: "solid",
+    borderBottomColor: colors.brandGreen800,
+    paddingTop: 14,
+    paddingBottom: 14,
+  },
+  specDraftDt: {
+    fontFamily: typography.tech,
+    fontSize: 11,
+    textTransform: "uppercase",
+    letterSpacing: "0.24em",
+    color: colors.brandGreen400,
+  },
+  specDraftDd: {
+    textAlign: "right",
+    fontFamily: typography.tech,
+    fontSize: 14,
+    color: colors.paper,
+    fontVariantNumeric: "tabular-nums",
+    margin: 0,
+  },
+  specMatchesList: {
+    listStyle: "none",
+    margin: 0,
+    padding: 0,
+    marginTop: 20,
+    display: "flex",
+    flexDirection: "column",
+    gap: 6,
+  },
+  specMatchItem: {
+    display: "flex",
+    alignItems: "center",
+    gap: 8,
+    fontFamily: typography.tech,
+    fontSize: 11,
+    textTransform: "uppercase",
+    letterSpacing: "0.18em",
+    color: colors.brandGreen300,
+  },
+  specSubmitBtn: {
+    marginTop: 32,
+    display: "inline-flex",
+    minHeight: 44,
+    width: "100%",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 10,
+    borderRadius: radii.sm,
+    backgroundColor: {
+      default: colors.brandGreen500,
+      ":hover": colors.brandGreen400,
+    },
+    paddingLeft: 24,
+    paddingRight: 24,
+    paddingTop: 16,
+    paddingBottom: 16,
+    fontFamily: typography.body,
+    fontSize: 14,
+    fontWeight: 700,
+    color: colors.brandGreen950,
+    textDecoration: "none",
+    transitionProperty: "background-color, transform",
+    transitionDuration: "300ms",
+    transform: {
+      default: "scale(1)",
+      ":active": "scale(0.96)",
+    },
+    outline: {
+      default: "none",
+      ":focus-visible": `2px solid ${colors.brandGreen300}`,
+    },
+    outlineOffset: {
+      ":focus-visible": 2,
+    },
+  },
+  specDossiersRequestNote: {
+    marginTop: 16,
+    textAlign: "center",
+    fontFamily: typography.tech,
+    fontSize: 11,
+    textTransform: "uppercase",
+    letterSpacing: "0.24em",
+    color: colors.brandGreen400,
+    margin: 0,
+  },
+  /* Standards */
+  standardsSection: {
+    borderBottomWidth: 1,
+    borderBottomStyle: "solid",
+    borderBottomColor: colors.line,
+    backgroundColor: colors.paper,
+  },
+  originGrid: {
+    display: "grid",
+    gap: 1,
+    borderBottomWidth: 1,
+    borderBottomStyle: "solid",
+    borderBottomColor: colors.line,
+    backgroundColor: colors.line,
+    gridTemplateColumns: {
+      default: null,
+      [breakpoints.lg]: "repeat(12, 1fr)",
+    },
+  },
+  originImgCol: {
+    position: "relative",
+    minHeight: 288,
+    overflow: "hidden",
+    backgroundColor: colors.paper,
+    gridColumn: {
+      default: null,
+      [breakpoints.lg]: "span 5 / span 5",
+    },
+  },
+  originImg: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    width: "100%",
+    height: "100%",
+    objectFit: "cover",
+    outline: "1px solid rgba(0, 0, 0, 0.1)",
+    outlineOffset: -1,
+  },
+  originTextCol: {
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    backgroundColor: colors.paper,
+    paddingLeft: {
+      default: 20,
+      [breakpoints.md]: 40,
+    },
+    paddingRight: {
+      default: 20,
+      [breakpoints.md]: 40,
+    },
+    paddingTop: {
+      default: 48,
+      [breakpoints.md]: 64,
+    },
+    paddingBottom: {
+      default: 48,
+      [breakpoints.md]: 64,
+    },
+    gridColumn: {
+      default: null,
+      [breakpoints.lg]: "span 7 / span 7",
+    },
+  },
+  originTitle: {
+    marginTop: 16,
+    fontFamily: typography.display,
+    fontSize: {
+      default: 30,
+      [breakpoints.md]: 36,
+    },
+    fontWeight: 700,
+    lineHeight: 1.1,
+    letterSpacing: "-0.02em",
+    color: colors.ink,
+    margin: 0,
+  },
+  originQuote: {
+    marginTop: 24,
+    maxWidth: 576,
+    borderLeftWidth: 2,
+    borderLeftStyle: "solid",
+    borderLeftColor: colors.brandGreen400,
+    paddingLeft: 20,
+    fontFamily: typography.display,
+    fontSize: 18,
+    fontStyle: "italic",
+    lineHeight: 1.625,
+    color: colors.brandGreen800,
+    margin: 0,
+  },
+  standardsGrid: {
+    display: "grid",
+    gridTemplateColumns: {
+      default: null,
+      [breakpoints.lg]: "repeat(12, 1fr)",
+    },
+  },
+  labImgCol: {
+    position: "relative",
+    overflow: "hidden",
+    borderBottomWidth: {
+      default: 1,
+      [breakpoints.lg]: 0,
+    },
+    borderBottomStyle: "solid",
+    borderBottomColor: colors.line,
+    gridColumn: {
+      default: null,
+      [breakpoints.lg]: "span 5 / span 5",
+    },
+    borderRightWidth: {
+      default: null,
+      [breakpoints.lg]: 1,
+    },
+    borderRightStyle: {
+      default: null,
+      [breakpoints.lg]: "solid",
+    },
+    borderRightColor: {
+      default: null,
+      [breakpoints.lg]: colors.line,
+    },
+  },
+  labImgContainer: {
+    position: "relative",
+    minHeight: {
+      default: 288,
+      [breakpoints.lg]: "100%",
+    },
+  },
+  labImg: {
+    height: {
+      default: 480,
+      [breakpoints.lg]: "100%",
+    },
+    width: "100%",
+    objectFit: "cover",
+    outline: "1px solid rgba(0, 0, 0, 0.1)",
+    outlineOffset: -1,
+    position: {
+      default: null,
+      [breakpoints.lg]: "absolute",
+    },
+    top: {
+      default: null,
+      [breakpoints.lg]: 0,
+    },
+    left: {
+      default: null,
+      [breakpoints.lg]: 0,
+    },
+    right: {
+      default: null,
+      [breakpoints.lg]: 0,
+    },
+    bottom: {
+      default: null,
+      [breakpoints.lg]: 0,
+    },
+  },
+  labImgScrim: {
+    pointerEvents: "none",
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    background:
+      "linear-gradient(to top, color-mix(in oklch, var(--color-brand-green-950) 20%, transparent), transparent, transparent)",
+  },
+  labCaptionBadge: {
+    position: "absolute",
+    bottom: 16,
+    left: 16,
+    right: 16,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    borderRadius: radii.sm,
+    borderWidth: 1,
+    borderStyle: "solid",
+    borderColor: colors.line,
+    backgroundColor: "color-mix(in oklch, var(--color-paper) 95%, transparent)",
+    paddingLeft: 16,
+    paddingRight: 16,
+    paddingTop: 10,
+    paddingBottom: 10,
+    backdropFilter: "blur(4px)",
+    WebkitBackdropFilter: "blur(4px)",
+  },
+  pillarsCol: {
+    gridColumn: {
+      default: null,
+      [breakpoints.lg]: "span 7 / span 7",
+    },
+  },
+  pillarRowBorder: {
+    borderBottomWidth: 1,
+    borderBottomStyle: "solid",
+    borderBottomColor: colors.line,
+  },
+  pillarInner: {
+    display: "flex",
+    gap: {
+      default: 20,
+      [breakpoints.md]: 32,
+    },
+    paddingLeft: {
+      default: 20,
+      [breakpoints.md]: 40,
+    },
+    paddingRight: {
+      default: 20,
+      [breakpoints.md]: 40,
+    },
+    paddingTop: {
+      default: 40,
+      [breakpoints.md]: 48,
+    },
+    paddingBottom: {
+      default: 40,
+      [breakpoints.md]: 48,
+    },
+    transitionProperty: "background-color",
+    transitionDuration: "400ms",
+    ":hover": {
+      backgroundColor: colors.brandGreen50,
+    },
+  },
+  pillarIconBox: {
+    marginTop: 4,
+    display: "flex",
+    width: {
+      default: 40,
+      [breakpoints.md]: 48,
+    },
+    height: {
+      default: 40,
+      [breakpoints.md]: 48,
+    },
+    flexShrink: 0,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: radii.sm,
+    backgroundColor: colors.brandGreen100,
+    color: colors.brandGreen700,
+  },
+  pillarTitle: {
+    fontFamily: typography.body,
+    fontSize: {
+      default: 20,
+      [breakpoints.md]: 24,
+    },
+    fontWeight: 700,
+    letterSpacing: "-0.02em",
+    color: colors.ink,
+    margin: 0,
+  },
+  pillarCopy: {
+    marginTop: 12,
+    maxWidth: 576,
+    fontFamily: typography.body,
+    fontSize: {
+      default: 14,
+      [breakpoints.md]: 16,
+    },
+    lineHeight: 1.625,
+    color: colors.mute600,
+    margin: 0,
+  },
+  pillarCert: {
+    marginTop: 16,
+    display: "flex",
+    alignItems: "center",
+    gap: 8,
+    fontFamily: typography.tech,
+    fontSize: 11,
+    textTransform: "uppercase",
+    letterSpacing: "0.2em",
+    color: colors.brandGreen700,
+  },
+  /* Finale */
+  finaleSection: {
+    position: "relative",
+    overflow: "hidden",
+    backgroundColor: colors.brandGreen950,
+  },
+  finaleThumbImg: {
+    width: "100%",
+    height: "100%",
+    objectFit: "cover",
+    opacity: 0.1,
+  },
+  finaleScrim: {
+    pointerEvents: "none",
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    background:
+      "linear-gradient(to bottom right, color-mix(in oklch, var(--color-brand-green-950) 90%, transparent), color-mix(in oklch, var(--color-brand-green-950) 70%, transparent), color-mix(in oklch, var(--color-brand-green-900) 90%, transparent))",
+  },
+  finaleInner: {
+    position: "relative",
+    paddingLeft: {
+      default: 20,
+      [breakpoints.md]: 40,
+    },
+    paddingRight: {
+      default: 20,
+      [breakpoints.md]: 40,
+    },
+    paddingTop: {
+      default: 96,
+      [breakpoints.md]: 128,
+    },
+    paddingBottom: {
+      default: 96,
+      [breakpoints.md]: 128,
+    },
+  },
+  finaleHeading: {
+    marginTop: 24,
+    maxWidth: 896,
+    fontFamily: typography.display,
+    fontSize: {
+      default: 36,
+      [breakpoints.md]: 60,
+    },
+    fontWeight: 700,
+    lineHeight: 1.05,
+    letterSpacing: "-0.03em",
+    color: colors.paper,
+    margin: 0,
+  },
+  finaleLead: {
+    marginTop: 28,
+    maxWidth: 576,
+    fontFamily: typography.body,
+    fontSize: {
+      default: 16,
+      [breakpoints.md]: 18,
+    },
+    lineHeight: 1.625,
+    color: "color-mix(in oklch, var(--color-brand-green-100) 70%, transparent)",
+    margin: 0,
+  },
+  finaleActions: {
+    marginTop: 40,
+    display: "flex",
+    flexWrap: "wrap",
+    gap: 16,
+  },
+  finaleSecondaryBtn: {
+    display: "inline-flex",
+    minHeight: 44,
+    alignItems: "center",
+    gap: 12,
+    borderRadius: radii.sm,
+    borderWidth: 1,
+    borderStyle: "solid",
+    borderColor: "color-mix(in oklch, var(--color-brand-green-500) 40%, transparent)",
+    paddingLeft: 32,
+    paddingRight: 32,
+    paddingTop: 16,
+    paddingBottom: 16,
+    fontFamily: typography.body,
+    fontSize: 14,
+    fontWeight: 600,
+    color: colors.brandGreen200,
+    textDecoration: "none",
+    transitionProperty: "background-color, border-color, color, transform",
+    transitionDuration: "300ms",
+    transform: {
+      default: "scale(1)",
+      ":active": "scale(0.96)",
+    },
+    ":hover": {
+      borderColor: colors.brandGreen400,
+      backgroundColor: "color-mix(in oklch, var(--color-brand-green-900) 40%, transparent)",
+      color: colors.paper,
+    },
+    outline: {
+      default: "none",
+      ":focus-visible": "2px solid currentColor",
+    },
+  },
+  finaleResponseTime: {
+    marginTop: 40,
+    fontFamily: typography.tech,
+    fontSize: 11,
+    textTransform: "uppercase",
+    letterSpacing: "0.28em",
+    color: colors.brandGreen400,
+  },
+  officesOuter: {
+    marginTop: 80,
+    borderTopWidth: 1,
+    borderTopStyle: "solid",
+    borderTopColor: colors.brandGreen800,
+    paddingTop: 56,
+  },
+  officesGrid: {
+    marginTop: 32,
+    display: "grid",
+    gridTemplateColumns: {
+      default: "repeat(2, 1fr)",
+      [breakpoints.sm]: "repeat(3, 1fr)",
+      [breakpoints.lg]: "repeat(6, 1fr)",
+    },
+    gap: 1,
+    backgroundColor: colors.brandGreen800,
+  },
+  officeCardBg: {
+    backgroundColor: "color-mix(in oklch, var(--color-brand-green-950) 80%, transparent)",
+  },
+  officeCardInner: {
+    paddingLeft: 16,
+    paddingRight: 16,
+    paddingTop: 24,
+    paddingBottom: 24,
+    transitionProperty: "background-color",
+    transitionDuration: "300ms",
+    ":hover": {
+      backgroundColor: "color-mix(in oklch, var(--color-brand-green-900) 60%, transparent)",
+    },
+  },
+  officeCity: {
+    fontFamily: typography.body,
+    fontSize: 14,
+    fontWeight: 600,
+    color: colors.paper,
+    margin: 0,
+  },
+  officeShort: {
+    marginTop: 2,
+    fontFamily: typography.body,
+    fontSize: 12,
+    color: colors.brandGreen300,
+    margin: 0,
+  },
+  officeCoords: {
+    marginTop: 8,
+    fontFamily: typography.tech,
+    fontSize: 11,
+    letterSpacing: "0.14em",
+    color: colors.brandGreen300,
+    fontVariantNumeric: "tabular-nums",
+    margin: 0,
+  },
+  /* Footer */
+  footer: {
+    borderTopWidth: 1,
+    borderTopStyle: "solid",
+    borderTopColor: colors.line,
+    backgroundColor: colors.paper,
+  },
+  footerGrid: {
+    display: "grid",
+    gap: 48,
+    paddingLeft: {
+      default: 20,
+      [breakpoints.md]: 40,
+    },
+    paddingRight: {
+      default: 20,
+      [breakpoints.md]: 40,
+    },
+    paddingTop: {
+      default: 56,
+      [breakpoints.md]: 64,
+    },
+    paddingBottom: {
+      default: 56,
+      [breakpoints.md]: 64,
+    },
+    gridTemplateColumns: {
+      default: null,
+      [breakpoints.md]: "repeat(12, 1fr)",
+    },
+  },
+  footerBrandCol: {
+    gridColumn: {
+      default: null,
+      [breakpoints.md]: "span 5 / span 5",
+    },
+  },
+  footerBrandRow: {
+    display: "flex",
+    alignItems: "center",
+    gap: 8,
+  },
+  footerBrandTagline: {
+    marginTop: 12,
+    fontFamily: typography.body,
+    fontSize: 16,
+    fontWeight: 500,
+    color: colors.brandGreen700,
+    margin: 0,
+  },
+  footerEst: {
+    marginTop: 20,
+    fontFamily: typography.tech,
+    fontSize: 11,
+    textTransform: "uppercase",
+    lineHeight: 2,
+    letterSpacing: "0.22em",
+    color: colors.mute600,
+    margin: 0,
+  },
+  footerCertsList: {
+    marginTop: 24,
+    display: "flex",
+    flexWrap: "wrap",
+    gap: 8,
+  },
+  footerCertBadge: {
+    borderRadius: radii.sm,
+    borderWidth: 1,
+    borderStyle: "solid",
+    borderColor: colors.brandBlue200,
+    backgroundColor: colors.brandBlue50,
+    paddingLeft: 10,
+    paddingRight: 10,
+    paddingTop: 4,
+    paddingBottom: 4,
+    fontFamily: typography.tech,
+    fontSize: 11,
+    textTransform: "uppercase",
+    letterSpacing: "0.16em",
+    color: colors.brandBlue700,
+  },
+  footerNavCol: {
+    gridColumn: {
+      default: null,
+      [breakpoints.md]: "span 2 / span 2",
+    },
+  },
+  footerNavList: {
+    listStyle: "none",
+    margin: 0,
+    padding: 0,
+    marginTop: 20,
+    display: "flex",
+    flexDirection: "column",
+    gap: 12,
+  },
+  footerNavLink: {
+    fontFamily: typography.body,
+    fontSize: 14,
+    color: {
+      default: colors.mute600,
+      ":hover": colors.brandGreen700,
+    },
+    textDecoration: "underline",
+    textDecorationColor: {
+      default: colors.line,
+      ":hover": colors.brandGreen400,
+    },
+    textUnderlineOffset: 4,
+    transitionProperty: "color, text-decoration-color",
+    transitionDuration: "300ms",
+    outline: {
+      default: "none",
+      ":focus-visible": "2px solid currentColor",
+    },
+  },
+  footerWordmark: {
+    userSelect: "none",
+    overflow: "hidden",
+    whiteSpace: "nowrap",
+    paddingLeft: {
+      default: 20,
+      [breakpoints.md]: 40,
+    },
+    paddingRight: {
+      default: 20,
+      [breakpoints.md]: 40,
+    },
+    fontFamily: typography.body,
+    fontSize: {
+      default: "17vw",
+      "@media (min-width: 1481px)": "15rem",
+    },
+    fontWeight: 800,
+    lineHeight: 0.78,
+    letterSpacing: "-0.06em",
+    color: "color-mix(in oklch, var(--color-brand-green-500) 5%, transparent)",
+    margin: 0,
+  },
+  footerLegal: {
+    display: "flex",
+    flexDirection: {
+      default: "column",
+      [breakpoints.md]: "row",
+    },
+    gap: 8,
+    borderTopWidth: 1,
+    borderTopStyle: "solid",
+    borderTopColor: colors.line,
+    paddingLeft: {
+      default: 20,
+      [breakpoints.md]: 40,
+    },
+    paddingRight: {
+      default: 20,
+      [breakpoints.md]: 40,
+    },
+    paddingTop: 16,
+    paddingBottom: 16,
+    fontFamily: typography.tech,
+    fontSize: 11,
+    textTransform: "uppercase",
+    letterSpacing: "0.2em",
+    color: colors.mute600,
+    alignItems: {
+      default: null,
+      [breakpoints.md]: "center",
+    },
+    justifyContent: {
+      default: null,
+      [breakpoints.md]: "space-between",
+    },
+  },
+});
+const DIVISION_DOT_KEYS: Record<DivisionKey, keyof typeof styles> = {
+  nutrition: "dot_nutrition",
+  food: "dot_food",
+  cosmetics: "dot_cosmetics",
+  chem: "dot_chem",
+  agro: "dot_agro",
+  feed: "dot_feed",
+};
+
+/* ─────────────────────────────── Nav + Portfolio menu ─────────────────────────────── */
 
 function PortfolioMenu() {
   const [open, setOpen] = useState(false);
   const reduce = useReducedMotion();
   const rootRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
-
   useEffect(() => {
     if (!open) return;
     const onPointerDown = (event: PointerEvent) => {
@@ -191,13 +2609,11 @@ function PortfolioMenu() {
       document.removeEventListener("keydown", onKeyDown);
     };
   }, [open]);
-
   return (
     <div
       ref={rootRef}
-      className="relative"
+      {...stylex.props(styles.portfolioMenuRoot)}
       onBlur={(event) => {
-        /* Close when keyboard focus leaves the disclosure entirely. */
         if (!rootRef.current?.contains(event.relatedTarget as Node)) setOpen(false);
       }}
     >
@@ -207,12 +2623,12 @@ function PortfolioMenu() {
         aria-expanded={open}
         aria-controls="portfolio-menu"
         onClick={() => setOpen((v) => !v)}
-        className="inline-flex min-h-11 items-center gap-1.5 font-body text-sm text-mute-600 transition-colors duration-300 hover:text-brand-green-700 focus-visible:outline-2"
+        {...stylex.props(styles.portfolioMenuBtn)}
       >
         Portfolio
         <ChevronDown
           aria-hidden
-          className={`size-3.5 transition-transform duration-300 ${open ? "rotate-180" : ""}`}
+          {...stylex.props(styles.portfolioChevron, open && styles.portfolioChevronOpen)}
         />
       </button>
 
@@ -220,33 +2636,59 @@ function PortfolioMenu() {
         {open && (
           <m.div
             id="portfolio-menu"
-            initial={reduce ? { opacity: 0 } : { opacity: 0, y: -6 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={reduce ? { opacity: 0 } : { opacity: 0, y: -4 }}
-            transition={{ duration: reduce ? 0 : 0.22, ease: EASE }}
-            className="absolute left-1/2 top-full z-50 mt-2 w-[640px] rounded-sm border border-line bg-paper shadow-xl"
-            style={{ x: "-50%" }}
+            initial={
+              reduce
+                ? {
+                    opacity: 0,
+                  }
+                : {
+                    opacity: 0,
+                    y: -6,
+                  }
+            }
+            animate={{
+              opacity: 1,
+              y: 0,
+            }}
+            exit={
+              reduce
+                ? {
+                    opacity: 0,
+                  }
+                : {
+                    opacity: 0,
+                    y: -4,
+                  }
+            }
+            transition={{
+              duration: reduce ? 0 : 0.22,
+              ease: EASE,
+            }}
+            style={{
+              x: "-50%",
+            }}
+            {...stylex.props(styles.portfolioPopover)}
           >
-            <div className="grid grid-cols-3 gap-px bg-line">
+            <div {...stylex.props(styles.portfolioGrid)}>
               {MENU_APPLICATIONS.map((application) => {
                 const items = getIngredientsByApplication(application).slice(0, 4);
                 const division = divisionForApplication(application);
                 return (
-                  <div key={application} className="bg-paper p-5">
-                    <p className="flex items-center gap-2 font-tech text-[11px] uppercase tracking-[0.2em] text-mute-600">
+                  <div key={application} {...stylex.props(styles.portfolioCol)}>
+                    <p {...stylex.props(styles.portfolioColHeader)}>
                       <span
                         aria-hidden
-                        className={`size-2 rounded-full ${DIVISION_DOT[division]}`}
+                        {...stylex.props(styles.dotBase, styles[DIVISION_DOT_KEYS[division]])}
                       />
                       {application}
                     </p>
-                    <ul className="mt-3 space-y-2">
+                    <ul {...stylex.props(styles.portfolioItemList)}>
                       {items.map((item) => (
                         <li key={item.code}>
                           <a
                             href="#matrix"
                             onClick={() => setOpen(false)}
-                            className="font-body text-sm text-ink transition-colors duration-200 hover:text-brand-green-700 focus-visible:outline-2"
+                            {...stylex.props(styles.portfolioItemLink)}
                           >
                             {item.name}
                           </a>
@@ -257,15 +2699,15 @@ function PortfolioMenu() {
                 );
               })}
             </div>
-            <div className="flex items-center justify-between border-t border-line px-5 py-3">
-              <span className={TECH_LABEL}>{ingredients.length} active compounds</span>
+            <div {...stylex.props(styles.portfolioFooter)}>
+              <span {...stylex.props(styles.techLabel)}>{ingredients.length} active compounds</span>
               <a
                 href="#formulation"
                 onClick={() => setOpen(false)}
-                className="inline-flex items-center gap-1.5 font-body text-sm font-semibold text-brand-blue-700 transition-colors duration-200 hover:text-brand-green-700 focus-visible:outline-2"
+                {...stylex.props(styles.portfolioFooterLink)}
               >
                 Build a formulation
-                <ArrowRight aria-hidden className="size-3.5" />
+                <ArrowRight aria-hidden size={14} />
               </a>
             </div>
           </m.div>
@@ -274,37 +2716,71 @@ function PortfolioMenu() {
     </div>
   );
 }
-
 function MobileNav() {
   const [open, setOpen] = useState(false);
   const reduce = useReducedMotion();
   const links = [
-    { label: "Industries", href: "#industries" },
-    { label: "Portfolio", href: "#matrix" },
-    { label: "Formulation", href: "#formulation" },
-    { label: "Standards", href: "#standards" },
+    {
+      label: "Industries",
+      href: "#industries",
+    },
+    {
+      label: "Portfolio",
+      href: "#matrix",
+    },
+    {
+      label: "Formulation",
+      href: "#formulation",
+    },
+    {
+      label: "Standards",
+      href: "#standards",
+    },
   ];
-
   return (
-    <div className="md:hidden">
+    <div {...stylex.props(styles.mobileNavWrapper)}>
       <button
         type="button"
         aria-expanded={open}
         aria-controls="mobile-menu"
         aria-label={open ? "Close menu" : "Open menu"}
         onClick={() => setOpen((v) => !v)}
-        className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-sm text-ink transition-colors duration-200 hover:text-brand-green-700 focus-visible:outline-2"
+        {...stylex.props(styles.mobileMenuBtn)}
       >
         <AnimatePresence initial={false} mode="popLayout">
           <m.span
             key={open ? "close" : "open"}
-            className="inline-flex"
-            initial={{ opacity: 0, scale: 0.25, filter: "blur(4px)" }}
-            animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
-            exit={{ opacity: 0, scale: 0.25, filter: "blur(4px)" }}
-            transition={reduce ? { duration: 0 } : { type: "spring", duration: 0.3, bounce: 0 }}
+            initial={{
+              opacity: 0,
+              scale: 0.25,
+              filter: "blur(4px)",
+            }}
+            animate={{
+              opacity: 1,
+              scale: 1,
+              filter: "blur(0px)",
+            }}
+            exit={{
+              opacity: 0,
+              scale: 0.25,
+              filter: "blur(4px)",
+            }}
+            transition={
+              reduce
+                ? {
+                    duration: 0,
+                  }
+                : {
+                    type: "spring",
+                    duration: 0.3,
+                    bounce: 0,
+                  }
+            }
+            style={{
+              display: "inline-flex",
+            }}
           >
-            {open ? <X aria-hidden className="size-5" /> : <Menu aria-hidden className="size-5" />}
+            {open ? <X aria-hidden size={20} /> : <Menu aria-hidden size={20} />}
           </m.span>
         </AnimatePresence>
       </button>
@@ -312,19 +2788,46 @@ function MobileNav() {
         {open && (
           <m.div
             id="mobile-menu"
-            initial={reduce ? { opacity: 0 } : { opacity: 0, y: -6 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={reduce ? { opacity: 0 } : { opacity: 0, y: -4 }}
-            transition={{ duration: reduce ? 0 : 0.22, ease: EASE }}
-            className="absolute inset-x-0 top-full border-b border-line bg-paper shadow-lg"
+            initial={
+              reduce
+                ? {
+                    opacity: 0,
+                  }
+                : {
+                    opacity: 0,
+                    y: -6,
+                  }
+            }
+            animate={{
+              opacity: 1,
+              y: 0,
+            }}
+            exit={
+              reduce
+                ? {
+                    opacity: 0,
+                  }
+                : {
+                    opacity: 0,
+                    y: -4,
+                  }
+            }
+            transition={{
+              duration: reduce ? 0 : 0.22,
+              ease: EASE,
+            }}
+            {...stylex.props(styles.mobileMenuPopover)}
           >
-            <ul className="px-5 py-3">
-              {links.map((link) => (
+            <ul {...stylex.props(styles.mobileMenuList)}>
+              {links.map((link, idx) => (
                 <li key={link.href}>
                   <a
                     href={link.href}
                     onClick={() => setOpen(false)}
-                    className="block border-b border-line py-3 font-body text-base text-ink last:border-b-0 hover:text-brand-green-700 focus-visible:outline-2"
+                    {...stylex.props(
+                      styles.mobileNavLink,
+                      idx === links.length - 1 && styles.mobileNavLinkLast,
+                    )}
                   >
                     {link.label}
                   </a>
@@ -337,91 +2840,58 @@ function MobileNav() {
     </div>
   );
 }
-
 function NavBar() {
   const { scrollYProgress } = useScroll();
   const reduce = useReducedMotion();
-
   return (
-    <header className="sticky top-0 z-50 border-b border-line bg-paper/95 backdrop-blur-md">
-      <div className="mx-auto max-w-[1480px]">
+    <header {...stylex.props(styles.header)}>
+      <div {...stylex.props(styles.container)}>
         {/* Micro-strip */}
-        <div className="hidden items-center justify-between border-b border-line px-6 py-1.5 md:flex">
-          <span className="flex items-center gap-2 font-tech text-[11px] uppercase tracking-[0.26em] text-mute-600">
-            <span className="relative flex size-1.5">
-              <span className="absolute inline-flex h-full w-full animate-pulse rounded-full bg-brand-green-500/60 [animation-duration:2.4s] motion-reduce:animate-none" />
-              <span className="relative inline-flex size-1.5 rounded-full bg-brand-green-500" />
+        <div {...stylex.props(styles.microStrip)}>
+          <span {...stylex.props(styles.microStripItem)}>
+            <span {...stylex.props(styles.liveDotOuter)}>
+              <span {...stylex.props(styles.liveDotPing)} />
+              <span {...stylex.props(styles.liveDotInner)} />
             </span>
             Botanical Intelligence Since 1995
           </span>
-          <span className="font-tech text-[11px] uppercase tracking-[0.26em] text-mute-600">
-            ISO 9001 · GMP · HACCP
-          </span>
-          <span className="font-tech text-[11px] uppercase tracking-[0.26em] text-mute-600">
-            {company.hq.coords} — Nanjing HQ
-          </span>
+          <span {...stylex.props(styles.techLabel)}>ISO 9001 · GMP · HACCP</span>
+          <span {...stylex.props(styles.techLabel)}>{company.hq.coords} — Nanjing HQ</span>
         </div>
         {/* Main nav */}
-        <nav
-          aria-label="Main navigation"
-          className="flex items-center justify-between px-5 py-3 md:px-8"
-        >
-          <a
-            href="#top"
-            className="flex items-baseline gap-2.5 transition-opacity duration-300 hover:opacity-75 focus-visible:outline-2"
-            aria-label="Fenchem home"
-          >
-            <span className="font-body text-xl font-bold tracking-[-0.04em] text-brand-green-600">
-              FENCHEM
-            </span>
-            <Leaf
-              aria-hidden
-              className="size-4 self-center text-brand-green-500"
-              strokeWidth={1.5}
-            />
+        <nav aria-label="Main navigation" {...stylex.props(styles.navInner)}>
+          <a href="#top" aria-label="Fenchem home" {...stylex.props(styles.brandLink)}>
+            <span {...stylex.props(styles.brandText)}>FENCHEM</span>
+            <Leaf aria-hidden strokeWidth={1.5} {...stylex.props(styles.brandLeaf)} />
           </a>
-          <div className="hidden items-center gap-7 md:flex">
-            <a
-              href="#industries"
-              className="inline-flex min-h-11 items-center font-body text-sm text-mute-600 transition-colors duration-300 hover:text-brand-green-700 focus-visible:outline-2"
-            >
+          <div {...stylex.props(styles.navDesktopLinks)}>
+            <a href="#industries" {...stylex.props(styles.navLink)}>
               Industries
             </a>
             <PortfolioMenu />
-            <a
-              href="#formulation"
-              className="inline-flex min-h-11 items-center font-body text-sm text-mute-600 transition-colors duration-300 hover:text-brand-green-700 focus-visible:outline-2"
-            >
+            <a href="#formulation" {...stylex.props(styles.navLink)}>
               Formulation
             </a>
-            <a
-              href="#standards"
-              className="inline-flex min-h-11 items-center font-body text-sm text-mute-600 transition-colors duration-300 hover:text-brand-green-700 focus-visible:outline-2"
-            >
+            <a href="#standards" {...stylex.props(styles.navLink)}>
               Standards
             </a>
           </div>
-          <div className="flex items-center gap-2">
+          <div {...stylex.props(styles.navRight)}>
             <MobileNav />
-            <a
-              href="#contact"
-              className="group inline-flex min-h-11 items-center gap-2 rounded-sm bg-brand-green-500 px-5 py-2.5 font-body text-sm font-semibold text-brand-green-950 transition-[background-color,scale] duration-300 active:scale-[0.96] hover:bg-brand-green-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-green-700"
-            >
+            <a href="#contact" {...stylex.props(styles.ctaPrimaryCompact)}>
               Request a Specification
-              <ArrowRight
-                aria-hidden
-                className="size-3.5 transition-transform duration-300 group-hover:translate-x-1"
-              />
+              <ArrowRight aria-hidden size={14} />
             </a>
           </div>
         </nav>
       </div>
-      {/* Progress hairline — user-scroll-driven; suppressed under reduced motion */}
       {!reduce && (
         <m.div
           aria-hidden
-          className="absolute inset-x-0 bottom-0 h-0.5 origin-left bg-brand-green-500"
-          style={{ scaleX: scrollYProgress }}
+          style={{
+            scaleX: scrollYProgress,
+          }}
+          {...stylex.props(styles.progressHairline)}
         />
       )}
     </header>
@@ -438,64 +2908,55 @@ function HeroSection() {
     offset: ["start start", "end start"],
   });
   const imgY = useTransform(scrollYProgress, [0, 1], ["0%", "18%"]);
-
   return (
-    <section id="top" aria-label="Hero" className="relative border-b border-line bg-paper">
-      <div className="mx-auto max-w-[1480px]">
-        <div className="grid min-h-[80vh] lg:grid-cols-12">
+    <section id="top" aria-label="Hero" {...stylex.props(styles.heroSection)}>
+      <div {...stylex.props(styles.container)}>
+        <div {...stylex.props(styles.heroGrid)}>
           {/* Left: Headline block */}
-          <div className="flex flex-col justify-center px-5 py-16 md:px-10 md:py-24 lg:col-span-7 lg:py-32">
+          <div {...stylex.props(styles.heroLeft)}>
             <Reveal>
-              <p className="inline-flex items-center gap-2 rounded-full border border-brand-green-200 bg-brand-green-50 px-4 py-1.5 font-tech text-[11px] uppercase tracking-[0.32em] text-brand-green-700">
-                Botanical Intelligence Since 1995
-              </p>
+              <p {...stylex.props(styles.heroBadge)}>Botanical Intelligence Since 1995</p>
             </Reveal>
             <Reveal delay={STAGGER}>
-              <h1 className="mt-8 font-display text-[clamp(2.6rem,6vw,5.5rem)] font-bold leading-[1.1] md:leading-[1.05] tracking-[-0.04em] text-ink">
+              <h1 {...stylex.props(styles.heroHeading)}>
                 Nurturing Vitality
                 <br />
-                through <span className="text-brand-green-600">Botanical Excellence</span>
+                through <span {...stylex.props(styles.textGreen600)}>Botanical Excellence</span>
               </h1>
             </Reveal>
             <Reveal delay={STAGGER * 2}>
-              <p className="mt-7 max-w-lg text-pretty font-body text-base leading-relaxed text-mute-600 md:text-lg">
+              <p {...stylex.props(styles.heroLead)}>
                 Fenchem converts raw botanical complexity into precisely specified, clinically
                 validated actives — supplied at industrial scale to formulators in more than forty
                 countries.
               </p>
             </Reveal>
-            <Reveal delay={STAGGER * 3} className="mt-9 flex flex-wrap gap-3">
-              <a
-                href="#matrix"
-                className="group inline-flex min-h-11 items-center gap-2.5 rounded-sm bg-brand-green-500 px-7 py-4 font-body text-sm font-semibold text-brand-green-950 transition-[background-color,scale] duration-300 active:scale-[0.96] hover:bg-brand-green-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-green-700"
-              >
-                Explore Portfolio
-                <ArrowRight
-                  aria-hidden
-                  className="size-4 transition-transform duration-300 group-hover:translate-x-1"
-                />
-              </a>
-              <a
-                href="#formulation"
-                className="inline-flex min-h-11 items-center gap-2.5 rounded-sm border border-brand-blue-700 px-7 py-4 font-body text-sm font-semibold text-brand-blue-700 transition-[background-color,scale] duration-300 active:scale-[0.96] hover:bg-brand-blue-50 focus-visible:outline-2"
-              >
-                Build a Formulation
-              </a>
+            <Reveal delay={STAGGER * 3}>
+              <div {...stylex.props(styles.heroActions)}>
+                <a href="#matrix" {...stylex.props(styles.ctaPrimary)}>
+                  Explore Portfolio
+                  <ArrowRight aria-hidden size={16} />
+                </a>
+                <a href="#formulation" {...stylex.props(styles.ctaOutlineBlue)}>
+                  Build a Formulation
+                </a>
+              </div>
             </Reveal>
 
             {/* Stat band */}
             <Reveal delay={STAGGER * 4}>
-              <dl className="mt-14 grid grid-cols-2 gap-px overflow-hidden rounded-sm border border-line bg-line sm:grid-cols-4">
+              <dl {...stylex.props(styles.heroStatGrid)}>
                 {STATS.map((s) => (
-                  <div key={s.unit} className="bg-paper px-4 py-5">
-                    <dt className="font-tech text-[11px] uppercase tracking-[0.24em] text-mute-600">
-                      {s.unit}
-                    </dt>
-                    <dd className="mt-1.5">
-                      <span className="font-display text-3xl font-semibold tracking-[-0.02em] text-brand-green-600 md:text-4xl">
-                        {s.value}
-                      </span>
-                      <p className="mt-1 font-body text-xs text-mute-600">{s.desc}</p>
+                  <div key={s.unit} {...stylex.props(styles.heroStatItem)}>
+                    <dt {...stylex.props(styles.heroStatUnit)}>{s.unit}</dt>
+                    <dd
+                      style={{
+                        margin: 0,
+                        marginTop: 6,
+                      }}
+                    >
+                      <span {...stylex.props(styles.heroStatValue)}>{s.value}</span>
+                      <p {...stylex.props(styles.heroStatDesc)}>{s.desc}</p>
                     </dd>
                   </div>
                 ))}
@@ -504,30 +2965,37 @@ function HeroSection() {
           </div>
 
           {/* Right: botanical image */}
-          <div className="relative overflow-hidden border-t border-line lg:col-span-5 lg:border-l lg:border-t-0">
-            <div ref={imgRef} className="absolute inset-0">
+          <div {...stylex.props(styles.heroRight)}>
+            <div ref={imgRef} {...stylex.props(styles.heroImgContainer)}>
               <m.img
                 src={IMG.hero}
                 alt="Lush green botanical leaves in morning light — representing Fenchem's natural ingredient sourcing"
-                className="h-[116%] w-full object-cover"
-                style={{ y: reduce ? 0 : imgY }}
-                initial={reduce ? false : { scale: 1.06 }}
-                animate={{ scale: 1 }}
-                transition={{ duration: 1.4, ease: EASE }}
+                style={{
+                  y: reduce ? 0 : imgY,
+                }}
+                initial={
+                  reduce
+                    ? false
+                    : {
+                        scale: 1.06,
+                      }
+                }
+                animate={{
+                  scale: 1,
+                }}
+                transition={{
+                  duration: 1.4,
+                  ease: EASE,
+                }}
                 loading="eager"
+                {...stylex.props(styles.heroImg)}
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-brand-green-950/30 via-transparent to-transparent" />
+              <div aria-hidden {...stylex.props(styles.heroImgScrim)} />
             </div>
             {/* Caption badge */}
-            <div className="absolute bottom-4 left-4 right-4">
-              <div className="flex items-center justify-between rounded-sm border border-line bg-paper/95 px-4 py-2.5 backdrop-blur-sm">
-                <span className="font-tech text-[11px] uppercase tracking-[0.2em] text-mute-600">
-                  {company.tagline}
-                </span>
-                <span className="font-tech text-[11px] uppercase tracking-[0.2em] text-brand-green-700">
-                  {company.since}
-                </span>
-              </div>
+            <div {...stylex.props(styles.heroCaptionBadge)}>
+              <span {...stylex.props(styles.techLabel)}>{company.tagline}</span>
+              <span {...stylex.props(styles.eyebrowGreen)}>{company.since}</span>
             </div>
           </div>
         </div>
@@ -539,64 +3007,88 @@ function HeroSection() {
 /* ─────────────────────────────── Ingredient Ticker ─────────────────────────────── */
 
 function TickerSection() {
-  /* WCAG 2.2.2: hover-pause alone is unreachable by keyboard/touch — the
-   * button is the real pause mechanism; hover remains a convenience. */
   const [paused, setPaused] = useState(false);
   const reduce = useReducedMotion();
-
   return (
-    <section
-      aria-label="Ingredient index ticker"
-      className="group relative overflow-hidden border-b border-line bg-brand-green-50 py-3.5"
-    >
-      {/* Edge fades so entries dissolve instead of clipping at the viewport */}
-      <span
-        aria-hidden
-        className="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 bg-gradient-to-r from-brand-green-50 to-transparent"
-      />
-      <span
-        aria-hidden
-        className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 bg-gradient-to-l from-brand-green-50 to-transparent"
-      />
+    <section aria-label="Ingredient index ticker" {...stylex.props(styles.tickerSection)}>
+      <span aria-hidden {...stylex.props(styles.tickerFadeLeft)} />
+      <span aria-hidden {...stylex.props(styles.tickerFadeRight)} />
       <button
         type="button"
         aria-pressed={paused}
         aria-label={paused ? "Resume ingredient ticker" : "Pause ingredient ticker"}
         onClick={() => setPaused((v) => !v)}
-        className="absolute right-2 top-1/2 z-20 inline-flex size-8 -translate-y-1/2 items-center justify-center rounded-full border border-brand-green-200 bg-paper/95 text-brand-green-700 transition-colors duration-200 after:absolute after:-inset-1.5 hover:bg-brand-green-100 focus-visible:outline-2"
+        {...stylex.props(styles.tickerPauseBtn)}
       >
         <AnimatePresence initial={false} mode="popLayout">
           <m.span
             key={paused ? "play" : "pause"}
-            className="inline-flex"
-            initial={{ opacity: 0, scale: 0.25, filter: "blur(4px)" }}
-            animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
-            exit={{ opacity: 0, scale: 0.25, filter: "blur(4px)" }}
-            transition={reduce ? { duration: 0 } : { type: "spring", duration: 0.3, bounce: 0 }}
+            initial={{
+              opacity: 0,
+              scale: 0.25,
+              filter: "blur(4px)",
+            }}
+            animate={{
+              opacity: 1,
+              scale: 1,
+              filter: "blur(0px)",
+            }}
+            exit={{
+              opacity: 0,
+              scale: 0.25,
+              filter: "blur(4px)",
+            }}
+            transition={
+              reduce
+                ? {
+                    duration: 0,
+                  }
+                : {
+                    type: "spring",
+                    duration: 0.3,
+                    bounce: 0,
+                  }
+            }
+            style={{
+              display: "inline-flex",
+            }}
           >
             {paused ? (
-              /* ml-px: a play triangle's visual center sits left of its geometric center */
-              <Play aria-hidden className="ml-px size-3.5" />
+              <Play
+                aria-hidden
+                size={14}
+                style={{
+                  marginLeft: 1,
+                }}
+              />
             ) : (
-              <Pause aria-hidden className="size-3.5" />
+              <Pause aria-hidden size={14} />
             )}
           </m.span>
         </AnimatePresence>
       </button>
       <div
-        className="flex w-max animate-marquee group-hover:[animation-play-state:paused] motion-reduce:animate-none"
-        style={paused ? { animationPlayState: "paused" } : undefined}
+        style={
+          paused
+            ? {
+                animationPlayState: "paused",
+              }
+            : undefined
+        }
+        {...stylex.props(styles.tickerMarqueeTrack)}
       >
         {([0, 1] as const).map((copy) => (
-          <ul key={copy} aria-hidden={copy === 1} className="flex shrink-0 items-center">
+          <ul key={copy} aria-hidden={copy === 1} {...stylex.props(styles.tickerList)}>
             {ingredients.map((ingredient, i) => (
-              <li key={ingredient.name} className="flex items-center gap-8 pr-8">
-                <span className="whitespace-nowrap font-tech text-[11px] uppercase tracking-[0.3em] text-brand-green-700">
-                  <span className="text-brand-green-800">{String(i + 1).padStart(2, "0")}</span>
+              <li key={ingredient.name} {...stylex.props(styles.tickerItem)}>
+                <span {...stylex.props(styles.tickerText)}>
+                  <span {...stylex.props(styles.tickerIndex)}>
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
                   {" — "}
                   {ingredient.name}
                 </span>
-                <span aria-hidden className="size-1.5 rotate-45 bg-brand-green-400" />
+                <span aria-hidden {...stylex.props(styles.tickerDiamond)} />
               </li>
             ))}
           </ul>
@@ -624,16 +3116,13 @@ function SectionHeader({
   aside?: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-col gap-6 border-b border-line px-5 py-14 md:flex-row md:items-end md:justify-between md:px-10 md:py-20">
+    <div {...stylex.props(styles.sectionHeaderRow)}>
       <Reveal>
-        <p className="font-tech text-[11px] uppercase tracking-[0.32em] text-brand-green-700">
+        <p {...stylex.props(styles.eyebrowGreen)}>
           {number} — {label}
         </p>
-        <h2
-          id={id}
-          className="mt-4 text-balance font-display text-4xl font-bold leading-[1.05] tracking-[-0.03em] text-ink md:text-5xl"
-        >
-          {title} <span className="text-brand-green-600">{accent}</span>
+        <h2 id={id} {...stylex.props(styles.sectionHeading)}>
+          {title} <span {...stylex.props(styles.textGreen600)}>{accent}</span>
         </h2>
       </Reveal>
       {aside && <Reveal delay={STAGGER}>{aside}</Reveal>}
@@ -648,9 +3137,9 @@ function IndustriesSection() {
     <section
       id="industries"
       aria-labelledby="industries-heading"
-      className="scroll-mt-28 border-b border-line bg-paper"
+      {...stylex.props(styles.industriesSection)}
     >
-      <div className="mx-auto max-w-[1480px]">
+      <div {...stylex.props(styles.container)}>
         <SectionHeader
           id="industries-heading"
           number="01"
@@ -658,7 +3147,7 @@ function IndustriesSection() {
           title="Built for three"
           accent="industries"
           aside={
-            <p className="max-w-xs text-pretty font-body text-sm leading-relaxed text-mute-600">
+            <p {...stylex.props(styles.sectionAsideLead)}>
               Clinically supported actives engineered for the precise demands of each formulation
               discipline.
             </p>
@@ -671,36 +3160,39 @@ function IndustriesSection() {
               key={industry.title}
               href="#matrix"
               aria-label={`${industry.title} — view in the ingredient matrix`}
-              className="group block border-b border-line transition-colors duration-400 last:border-b-0 hover:bg-brand-green-50 focus-visible:outline-2"
+              {...stylex.props(
+                styles.industryRowLink,
+                i === industries.length - 1 && styles.industryRowLinkLast,
+              )}
             >
-              <Reveal
-                delay={i * STAGGER}
-                className="grid items-center gap-4 px-5 py-10 md:grid-cols-12 md:gap-6 md:px-10 md:py-12"
-              >
-                <div className="md:col-span-1">
-                  <span className="font-tech text-sm tracking-[0.22em] text-brand-green-700">
-                    {String(i + 1).padStart(2, "0")}
-                  </span>
-                </div>
-                <h3 className="font-body text-2xl font-bold tracking-[-0.03em] text-ink transition-colors duration-300 group-hover:text-brand-green-700 md:col-span-4 md:text-3xl">
-                  {industry.title}
-                </h3>
-                <p className="text-pretty font-body text-sm leading-relaxed text-mute-600 md:col-span-5">
-                  {INDUSTRY_COPY[i]}
-                </p>
-                <div className="relative aspect-video overflow-hidden rounded-sm md:col-span-1 md:aspect-square">
-                  <img
-                    src={industry.image.src}
-                    alt={industry.image.alt}
-                    className="h-full w-full object-cover outline outline-1 -outline-offset-1 outline-black/10 transition-transform duration-700 ease-out group-hover:scale-[1.06]"
-                    loading="lazy"
-                  />
-                </div>
-                <div className="flex justify-end md:col-span-1">
-                  <ArrowUpRight
-                    aria-hidden
-                    className="size-5 text-mute-400 transition-[translate,color] duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-brand-green-500"
-                  />
+              <Reveal delay={i * STAGGER}>
+                <div {...stylex.props(styles.industryRowGrid)}>
+                  <div {...stylex.props(styles.industryColIndex)}>
+                    <span {...stylex.props(styles.industryIndexText)}>
+                      {String(i + 1).padStart(2, "0")}
+                    </span>
+                  </div>
+                  <div {...stylex.props(styles.industryColTitle)}>
+                    <h3 {...stylex.props(styles.industryTitle)}>{industry.title}</h3>
+                  </div>
+                  <div {...stylex.props(styles.industryColCopy)}>
+                    <p {...stylex.props(styles.industryCopy)}>{INDUSTRY_COPY[i]}</p>
+                  </div>
+                  <div {...stylex.props(styles.industryColImg)}>
+                    <img
+                      src={industry.image.src}
+                      alt={industry.image.alt}
+                      loading="lazy"
+                      {...stylex.props(styles.industryImg)}
+                    />
+                  </div>
+                  <div {...stylex.props(styles.industryColArrow)}>
+                    <ArrowUpRight
+                      aria-hidden
+                      size={20}
+                      {...stylex.props(styles.industryArrowIcon)}
+                    />
+                  </div>
                 </div>
               </Reveal>
             </a>
@@ -716,21 +3208,16 @@ function IndustriesSection() {
 function DivisionBadge({ ingredient }: { ingredient: Ingredient }) {
   const division = divisionForApplication(ingredient.application);
   return (
-    <span className="absolute right-3 top-3 inline-flex items-center gap-1.5 rounded-sm border border-line bg-paper/95 px-2 py-1 font-tech text-[11px] uppercase tracking-[0.16em] text-ink backdrop-blur-sm">
-      <span aria-hidden className={`size-1.5 rounded-full ${DIVISION_DOT[division]}`} />
+    <span {...stylex.props(styles.divisionBadge)}>
+      <span aria-hidden {...stylex.props(styles.dotBase, styles[DIVISION_DOT_KEYS[division]])} />
       {ingredient.application}
     </span>
   );
 }
-
 function MatrixSection() {
   return (
-    <section
-      id="matrix"
-      aria-labelledby="matrix-heading"
-      className="scroll-mt-28 border-b border-line bg-mute-50"
-    >
-      <div className="mx-auto max-w-[1480px]">
+    <section id="matrix" aria-labelledby="matrix-heading" {...stylex.props(styles.matrixSection)}>
+      <div {...stylex.props(styles.container)}>
         <SectionHeader
           id="matrix-heading"
           number="02"
@@ -738,73 +3225,67 @@ function MatrixSection() {
           title="Ingredient"
           accent="matrix"
           aside={
-            <a
-              href="#contact"
-              className="group inline-flex min-h-11 items-center gap-2 rounded-sm border border-brand-blue-700 px-5 py-3 font-body text-sm font-semibold text-brand-blue-700 transition-[background-color,scale] duration-300 active:scale-[0.96] hover:bg-brand-blue-50 focus-visible:outline-2"
-            >
+            <a href="#contact" {...stylex.props(styles.ctaOutlineBlueCompact)}>
               Request Full Specifications
-              <ArrowRight
-                aria-hidden
-                className="size-3.5 transition-transform duration-300 group-hover:translate-x-1"
-              />
+              <ArrowRight aria-hidden size={14} />
             </a>
           }
         />
 
-        <div className="grid grid-cols-1 gap-px bg-line md:grid-cols-2 lg:grid-cols-3">
+        <div {...stylex.props(styles.matrixGrid)}>
           {getFeaturedIngredients().map((item, i) => (
-            <Reveal key={item.code} delay={(i % 3) * STAGGER} className="group bg-paper">
-              <article>
-                <div className="relative aspect-[4/3] overflow-hidden border-b border-line">
+            <Reveal key={item.code} delay={(i % 3) * STAGGER}>
+              <article {...stylex.props(styles.matrixCardBg)}>
+                <div {...stylex.props(styles.matrixCardImgBox)}>
                   <img
                     src={imgFor(item).src}
                     alt={imgFor(item).alt}
-                    className="h-full w-full object-cover outline outline-1 -outline-offset-1 outline-black/10 transition-transform duration-700 ease-out group-hover:scale-[1.05]"
                     loading="lazy"
+                    {...stylex.props(styles.matrixCardImg)}
                   />
                   <DivisionBadge ingredient={item} />
-                  <div className="absolute inset-0 bg-brand-green-950/0 transition-colors duration-500 group-hover:bg-brand-green-950/10" />
+                  <div aria-hidden {...stylex.props(styles.matrixCardHoverOverlay)} />
                 </div>
-                <div className="px-5 py-7 md:px-7 md:py-8">
-                  <div className="flex items-baseline justify-between">
-                    <span className="font-tech text-[11px] tracking-[0.22em] text-brand-green-700">
+                <div {...stylex.props(styles.matrixCardBody)}>
+                  <div {...stylex.props(styles.matrixCardMeta)}>
+                    <span {...stylex.props(styles.matrixCardIndex)}>
                       {String(i + 1).padStart(2, "0")} —
                     </span>
-                    <span className="font-tech text-[11px] uppercase tracking-[0.22em] text-mute-600">
-                      {item.code}
-                    </span>
+                    <span {...stylex.props(styles.matrixCardCode)}>{item.code}</span>
                   </div>
-                  <h3 className="mt-3 font-body text-xl font-bold tracking-[-0.02em] text-ink transition-colors duration-300 group-hover:text-brand-green-700">
-                    {item.name}
-                  </h3>
-                  <p className="mt-0.5 font-display text-sm italic text-mute-600">{item.latin}</p>
-                  <dl className="mt-5 space-y-2.5 border-t border-line pt-4">
-                    <div className="flex items-baseline justify-between gap-4">
-                      <dt className="font-tech text-[11px] uppercase tracking-[0.2em] text-mute-600">
-                        Purity
-                      </dt>
-                      <dd className="text-right font-tech text-[11px] text-mute-700">
+                  <h3 {...stylex.props(styles.matrixCardTitle)}>{item.name}</h3>
+                  <p {...stylex.props(styles.matrixCardLatin)}>{item.latin}</p>
+                  <dl {...stylex.props(styles.matrixCardDl)}>
+                    <div {...stylex.props(styles.matrixCardDlRow)}>
+                      <dt {...stylex.props(styles.techLabel)}>Purity</dt>
+                      <dd
+                        style={{
+                          margin: 0,
+                          fontFamily: typography.tech,
+                          fontSize: 11,
+                          color: colors.mute700,
+                        }}
+                      >
                         {item.purity}
                       </dd>
                     </div>
-                    <div className="flex items-baseline justify-between gap-4">
-                      <dt className="font-tech text-[11px] uppercase tracking-[0.2em] text-mute-600">
-                        Form
-                      </dt>
-                      <dd className="text-right font-tech text-[11px] text-mute-700">
+                    <div {...stylex.props(styles.matrixCardDlRow)}>
+                      <dt {...stylex.props(styles.techLabel)}>Form</dt>
+                      <dd
+                        style={{
+                          margin: 0,
+                          fontFamily: typography.tech,
+                          fontSize: 11,
+                          color: colors.mute700,
+                        }}
+                      >
                         {item.form}
                       </dd>
                     </div>
                   </dl>
-                  <a
-                    href="#contact"
-                    className="group/spec mt-6 inline-flex min-h-11 items-center gap-2 font-tech text-xs uppercase tracking-[0.24em] text-brand-blue-700 transition-colors duration-300 hover:text-brand-green-700 focus-visible:outline-2"
-                  >
+                  <a href="#contact" {...stylex.props(styles.matrixSpecLink)}>
                     Request Spec
-                    <ArrowUpRight
-                      aria-hidden
-                      className="size-3 transition-transform duration-300 group-hover/spec:-translate-y-0.5 group-hover/spec:translate-x-0.5"
-                    />
+                    <ArrowUpRight aria-hidden size={12} />
                   </a>
                 </div>
               </article>
@@ -818,25 +3299,39 @@ function MatrixSection() {
 
 /* ─────────────────────────────── Product Dossier ─────────────────────────────── */
 
-const DOSSIER = ingredients[0]; // Ashwagandha KSM-66 — the flagship trade-name active.
+const DOSSIER = ingredients[0]; // Ashwagandha KSM-66
 
 function DossierSection() {
   const division = divisionForApplication(DOSSIER.application);
   const specRows = [
-    { label: "Spec Ref", value: DOSSIER.code },
-    { label: "Assay", value: DOSSIER.purity },
-    { label: "Form", value: DOSSIER.form },
-    { label: "Class", value: DOSSIER.category },
-    { label: "Application", value: DOSSIER.useCase },
+    {
+      label: "Spec Ref",
+      value: DOSSIER.code,
+    },
+    {
+      label: "Assay",
+      value: DOSSIER.purity,
+    },
+    {
+      label: "Form",
+      value: DOSSIER.form,
+    },
+    {
+      label: "Class",
+      value: DOSSIER.category,
+    },
+    {
+      label: "Application",
+      value: DOSSIER.useCase,
+    },
   ];
-
   return (
     <section
       id="product"
       aria-labelledby="product-heading"
-      className="scroll-mt-28 border-b border-line bg-paper"
+      {...stylex.props(styles.dossierSection)}
     >
-      <div className="mx-auto max-w-[1480px]">
+      <div {...stylex.props(styles.container)}>
         <SectionHeader
           id="product-heading"
           number="03"
@@ -844,45 +3339,44 @@ function DossierSection() {
           title="One active,"
           accent="documented to the lot"
           aside={
-            <p className="max-w-xs text-pretty font-body text-sm leading-relaxed text-mute-600">
+            <p {...stylex.props(styles.sectionAsideLead)}>
               Every compound in the matrix carries this depth of documentation — {DOSSIER.name}{" "}
               shown as the working example.
             </p>
           }
         />
 
-        <div className="grid lg:grid-cols-12">
+        <div {...stylex.props(styles.dossierGrid)}>
           {/* Image */}
-          <div className="relative min-h-80 overflow-hidden border-b border-line lg:col-span-5 lg:border-b-0 lg:border-r">
+          <div {...stylex.props(styles.dossierImgCol)}>
             <img
               src={imgFor(DOSSIER).src}
               alt={imgFor(DOSSIER).alt}
-              className="absolute inset-0 h-full w-full object-cover outline outline-1 -outline-offset-1 outline-black/10"
               loading="lazy"
+              {...stylex.props(styles.dossierImg)}
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-brand-green-950/25 via-transparent to-transparent" />
-            <span className="absolute left-4 top-4 inline-flex items-center gap-1.5 rounded-sm border border-line bg-paper/95 px-2 py-1 font-tech text-[11px] uppercase tracking-[0.16em] text-ink backdrop-blur-sm">
-              <span aria-hidden className={`size-1.5 rounded-full ${DIVISION_DOT[division]}`} />
+            <div aria-hidden {...stylex.props(styles.dossierImgScrim)} />
+            <span {...stylex.props(styles.dossierBadgeTopLeft)}>
+              <span
+                aria-hidden
+                {...stylex.props(styles.dotBase, styles[DIVISION_DOT_KEYS[division]])}
+              />
               {DOSSIER.application}
             </span>
-            <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between rounded-sm border border-line bg-paper/95 px-4 py-2.5 backdrop-blur-sm">
-              <span className="font-tech text-[11px] uppercase tracking-[0.2em] text-mute-600">
+            <div {...stylex.props(styles.dossierBadgeBottom)}>
+              <span {...stylex.props(styles.techLabel)}>
                 {DOSSIER.category} · {DOSSIER.specification}
               </span>
-              <span className="font-tech text-[11px] uppercase tracking-[0.2em] text-brand-green-700">
-                {DOSSIER.code}
-              </span>
+              <span {...stylex.props(styles.eyebrowGreen)}>{DOSSIER.code}</span>
             </div>
           </div>
 
           {/* Dossier body */}
-          <div className="px-5 py-12 md:px-10 md:py-16 lg:col-span-7">
+          <div {...stylex.props(styles.dossierBodyCol)}>
             <Reveal>
-              <h3 className="font-display text-3xl font-bold tracking-[-0.03em] text-ink md:text-4xl">
-                {DOSSIER.name}
-              </h3>
-              <p className="mt-1 font-display text-base italic text-mute-600">{DOSSIER.latin}</p>
-              <p className="mt-5 max-w-xl text-pretty font-body text-base leading-relaxed text-mute-600">
+              <h3 {...stylex.props(styles.dossierTitle)}>{DOSSIER.name}</h3>
+              <p {...stylex.props(styles.dossierLatin)}>{DOSSIER.latin}</p>
+              <p {...stylex.props(styles.dossierDescription)}>
                 A branded, clinically studied adaptogen standardized by withanolide content.
                 Supplied with full identity, potency and stability documentation — chromatographic
                 panels run on every production batch, third-party verification on request.
@@ -890,48 +3384,31 @@ function DossierSection() {
             </Reveal>
 
             <Reveal delay={STAGGER}>
-              <dl className="mt-8 max-w-xl border-t border-line">
+              <dl {...stylex.props(styles.dossierDl)}>
                 {specRows.map((row) => (
-                  <div
-                    key={row.label}
-                    className="flex items-baseline justify-between gap-6 border-b border-line py-3"
-                  >
-                    <dt className="font-tech text-[11px] uppercase tracking-[0.24em] text-mute-600">
-                      {row.label}
-                    </dt>
-                    <dd className="text-right font-tech text-sm text-ink">{row.value}</dd>
+                  <div key={row.label} {...stylex.props(styles.dossierDlRow)}>
+                    <dt {...stylex.props(styles.techLabel)}>{row.label}</dt>
+                    <dd {...stylex.props(styles.dossierDd)}>{row.value}</dd>
                   </div>
                 ))}
               </dl>
             </Reveal>
 
             <Reveal delay={STAGGER * 2}>
-              <div className="mt-6 flex flex-wrap gap-2">
+              <div {...stylex.props(styles.dossierFormatsRow)}>
                 {["Capsule", "Tablet", "Softgel", "Powder blend"].map((format) => (
-                  <span
-                    key={format}
-                    className="rounded-full border border-brand-green-200 bg-brand-green-50 px-3 py-1 font-body text-xs font-medium text-brand-green-800"
-                  >
+                  <span key={format} {...stylex.props(styles.dossierFormatPill)}>
                     {format}
                   </span>
                 ))}
               </div>
-              <div className="mt-8 flex flex-wrap gap-3">
-                <a
-                  href={createInquiryHref("dossier")}
-                  className="group inline-flex min-h-11 items-center gap-2.5 rounded-sm bg-brand-green-500 px-6 py-3.5 font-body text-sm font-semibold text-brand-green-950 transition-[background-color,scale] duration-300 active:scale-[0.96] hover:bg-brand-green-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-green-700"
-                >
+              <div {...stylex.props(styles.dossierActionsRow)}>
+                <a href={createInquiryHref("dossier")} {...stylex.props(styles.ctaPrimary)}>
                   Request this specification
-                  <ArrowRight
-                    aria-hidden
-                    className="size-4 transition-transform duration-300 group-hover:translate-x-1"
-                  />
+                  <ArrowRight aria-hidden size={16} />
                 </a>
-                <a
-                  href={createInquiryHref("tds")}
-                  className="inline-flex min-h-11 items-center gap-2.5 rounded-sm border border-brand-blue-700 px-6 py-3.5 font-body text-sm font-semibold text-brand-blue-700 transition-[background-color,scale] duration-300 active:scale-[0.96] hover:bg-brand-blue-50 focus-visible:outline-2"
-                >
-                  <FileDown aria-hidden className="size-4" />
+                <a href={createInquiryHref("tds")} {...stylex.props(styles.ctaOutlineBlue)}>
+                  <FileDown aria-hidden size={16} />
                   Technical data sheet
                 </a>
               </div>
@@ -945,16 +3422,6 @@ function DossierSection() {
 
 /* ─────────────────────────────── Formulation Presenter ─────────────────────────────── */
 
-const FORM_OPTIONS = ["Powder", "Beadlet", "Oil suspension", "Granular"] as const;
-
-const CHIP_CLASS = (selected: boolean) =>
-  `min-h-11 rounded-sm border px-4 py-2 font-body text-sm font-medium transition-[background-color,border-color,color,scale] duration-200 active:scale-[0.96] focus-visible:outline-2 ${
-    selected
-      ? "border-brand-green-600 bg-brand-green-500 text-brand-green-950"
-      : "border-line bg-paper text-mute-600 hover:border-brand-green-400 hover:text-ink"
-  }`;
-
-/** Multi-select chip — a genuine toggle, so aria-pressed is the right mapping. */
 function Chip({
   label,
   selected,
@@ -969,17 +3436,12 @@ function Chip({
       type="button"
       aria-pressed={selected}
       onClick={onClick}
-      className={CHIP_CLASS(selected)}
+      {...stylex.props(styles.chipBase, selected ? styles.chipSelected : styles.chipUnselected)}
     >
       {label}
     </button>
   );
 }
-
-/**
- * Single-select chip row — mutually exclusive choice, so it's a radiogroup
- * (roving tabindex, arrow keys move the selection) rather than toggles.
- */
 function RadioChips<T extends string>({
   label,
   options,
@@ -999,10 +3461,8 @@ function RadioChips<T extends string>({
     <div
       role="radiogroup"
       aria-label={label}
-      className="mt-3 flex flex-wrap gap-2"
+      {...stylex.props(styles.chipsWrapRow)}
       onKeyDown={(event) => {
-        /* stopPropagation: the prototype switcher listens for arrow keys at the
-         * document level and would swap variants mid-selection. */
         if (event.key.startsWith("Arrow")) event.stopPropagation();
         if (event.key === "ArrowRight" || event.key === "ArrowDown") {
           event.preventDefault();
@@ -1021,7 +3481,6 @@ function RadioChips<T extends string>({
           aria-checked={value === option}
           tabIndex={value === option ? 0 : -1}
           ref={(node) => {
-            /* Keep focus with the selection as arrow keys move it. */
             if (
               node &&
               value === option &&
@@ -1031,7 +3490,10 @@ function RadioChips<T extends string>({
             }
           }}
           onClick={() => onChange(option)}
-          className={CHIP_CLASS(value === option)}
+          {...stylex.props(
+            styles.chipBase,
+            value === option ? styles.chipSelected : styles.chipUnselected,
+          )}
         >
           {option}
         </button>
@@ -1039,25 +3501,22 @@ function RadioChips<T extends string>({
     </div>
   );
 }
-
 function FormulationSection() {
   const [application, setApplication] = useState<IngredientApplication>("Nutrition");
   const [form, setForm] = useState<(typeof FORM_OPTIONS)[number]>("Beadlet");
   const [regulatory, setRegulatory] = useState<string[]>(["ISO 9001", "GMP"]);
   const matches = getIngredientsByApplication(application);
-
   const toggleRegulatory = (name: string) =>
     setRegulatory((current) =>
       current.includes(name) ? current.filter((c) => c !== name) : [...current, name],
     );
-
   return (
     <section
       id="formulation"
       aria-labelledby="formulation-heading"
-      className="scroll-mt-28 border-b border-line bg-brand-green-50/60"
+      {...stylex.props(styles.formulationSection)}
     >
-      <div className="mx-auto max-w-[1480px]">
+      <div {...stylex.props(styles.container)}>
         <SectionHeader
           id="formulation-heading"
           number="04"
@@ -1065,18 +3524,18 @@ function FormulationSection() {
           title="Your target spec,"
           accent="engineered back to you"
           aside={
-            <p className="max-w-xs text-pretty font-body text-sm leading-relaxed text-mute-600">
+            <p {...stylex.props(styles.sectionAsideLead)}>
               Pick the shape of your formulation — our laboratory returns a validated proposal
               within one business day.
             </p>
           }
         />
 
-        <div className="grid gap-px bg-line lg:grid-cols-12">
+        <div {...stylex.props(styles.formulationGrid)}>
           {/* Pickers */}
-          <div className="bg-paper px-5 py-10 md:px-10 md:py-12 lg:col-span-7">
+          <div {...stylex.props(styles.formulationLeft)}>
             <div>
-              <p id="formulation-application-label" className={TECH_LABEL}>
+              <p id="formulation-application-label" {...stylex.props(styles.techLabel)}>
                 Application
               </p>
               <RadioChips
@@ -1087,8 +3546,12 @@ function FormulationSection() {
               />
             </div>
 
-            <div className="mt-8">
-              <p className={TECH_LABEL}>Delivery form</p>
+            <div
+              style={{
+                marginTop: 32,
+              }}
+            >
+              <p {...stylex.props(styles.techLabel)}>Delivery form</p>
               <RadioChips
                 label="Delivery form"
                 options={FORM_OPTIONS}
@@ -1097,9 +3560,9 @@ function FormulationSection() {
               />
             </div>
 
-            <fieldset className="mt-8">
-              <legend className={TECH_LABEL}>Regulatory map</legend>
-              <div className="mt-3 flex flex-wrap gap-2">
+            <fieldset {...stylex.props(styles.formulationFieldset)}>
+              <legend {...stylex.props(styles.techLabel)}>Regulatory map</legend>
+              <div {...stylex.props(styles.chipsWrapRow)}>
                 {certificationDetails.map((cert) => (
                   <Chip
                     key={cert.name}
@@ -1112,19 +3575,17 @@ function FormulationSection() {
             </fieldset>
 
             {/* Process strip */}
-            <div className="mt-12 border-t border-line pt-8">
-              <p className={TECH_LABEL}>What happens next</p>
-              <ol className="mt-4 grid gap-4 sm:grid-cols-2">
+            <div {...stylex.props(styles.processStripOuter)}>
+              <p {...stylex.props(styles.techLabel)}>What happens next</p>
+              <ol {...stylex.props(styles.processOl)}>
                 {processSteps.map((step, i) => (
-                  <li key={step.title} className="flex gap-3">
-                    <span className="font-tech text-sm tracking-[0.16em] text-brand-green-700">
+                  <li key={step.title} {...stylex.props(styles.processLi)}>
+                    <span {...stylex.props(styles.processIndex)}>
                       {String(i + 1).padStart(2, "0")}
                     </span>
                     <div>
-                      <p className="font-body text-sm font-semibold text-ink">{step.title}</p>
-                      <p className="mt-1 text-pretty font-body text-xs leading-relaxed text-mute-600">
-                        {step.copy}
-                      </p>
+                      <p {...stylex.props(styles.processTitle)}>{step.title}</p>
+                      <p {...stylex.props(styles.processCopy)}>{step.copy}</p>
                     </div>
                   </li>
                 ))}
@@ -1133,18 +3594,13 @@ function FormulationSection() {
           </div>
 
           {/* Live spec sheet */}
-          <div className="bg-brand-green-950 px-5 py-10 md:px-8 md:py-12 lg:col-span-5">
-            <div className="flex items-center justify-between">
-              <span className="font-tech text-[11px] uppercase tracking-[0.28em] text-brand-green-400">
-                Draft Specification
-              </span>
-              <span className="font-tech text-[11px] uppercase tracking-[0.28em] text-brand-green-300 tabular-nums">
-                FN-REQ / 2026
-              </span>
+          <div {...stylex.props(styles.formulationRight)}>
+            <div {...stylex.props(styles.specDraftHeader)}>
+              <span {...stylex.props(styles.specDraftLabel)}>Draft Specification</span>
+              <span {...stylex.props(styles.specDraftCode)}>FN-REQ / 2026</span>
             </div>
-            {/* Live region: chip changes rewrite the draft silently otherwise (WCAG 4.1.3) */}
             <div aria-live="polite">
-              <dl className="mt-6 border-t border-brand-green-800">
+              <dl {...stylex.props(styles.specDraftDl)}>
                 {[
                   ["Application", application],
                   ["Delivery form", form],
@@ -1152,44 +3608,26 @@ function FormulationSection() {
                   ["Matching actives", `${matches.length} of ${ingredients.length} in portfolio`],
                   ["Response", "< 24h with full documentation"],
                 ].map(([label, value]) => (
-                  <div
-                    key={label}
-                    className="flex items-baseline justify-between gap-4 border-b border-brand-green-800 py-3.5"
-                  >
-                    <dt className="font-tech text-[11px] uppercase tracking-[0.24em] text-brand-green-400">
-                      {label}
-                    </dt>
-                    <dd className="text-right font-tech text-sm text-paper tabular-nums">
-                      {value}
-                    </dd>
+                  <div key={label} {...stylex.props(styles.specDraftDlRow)}>
+                    <dt {...stylex.props(styles.specDraftDt)}>{label}</dt>
+                    <dd {...stylex.props(styles.specDraftDd)}>{value}</dd>
                   </div>
                 ))}
               </dl>
-              <ul className="mt-5 space-y-1.5">
+              <ul {...stylex.props(styles.specMatchesList)}>
                 {matches.slice(0, 3).map((item) => (
-                  <li
-                    key={item.code}
-                    className="flex items-center gap-2 font-tech text-[11px] uppercase tracking-[0.18em] text-brand-green-300"
-                  >
-                    <CheckCircle2 aria-hidden className="size-3 text-brand-green-400" />
+                  <li key={item.code} {...stylex.props(styles.specMatchItem)}>
+                    <CheckCircle2 aria-hidden size={12} color={colors.brandGreen400} />
                     {item.name} — {item.purity}
                   </li>
                 ))}
               </ul>
             </div>
-            <a
-              href={createInquiryHref("formulation")}
-              className="group mt-8 inline-flex min-h-11 w-full items-center justify-center gap-2.5 rounded-sm bg-brand-green-500 px-6 py-4 font-body text-sm font-bold text-brand-green-950 transition-[background-color,scale] duration-300 active:scale-[0.96] hover:bg-brand-green-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-green-300"
-            >
+            <a href={createInquiryHref("formulation")} {...stylex.props(styles.specSubmitBtn)}>
               Submit this specification
-              <ArrowRight
-                aria-hidden
-                className="size-4 transition-transform duration-300 group-hover:translate-x-1"
-              />
+              <ArrowRight aria-hidden size={16} />
             </a>
-            <p className="mt-4 text-center font-tech text-[11px] uppercase tracking-[0.24em] text-brand-green-400">
-              Technical dossiers on request
-            </p>
+            <p {...stylex.props(styles.specDossiersRequestNote)}>Technical dossiers on request</p>
           </div>
         </div>
       </div>
@@ -1207,38 +3645,43 @@ function StandardsSection() {
     offset: ["start end", "end start"],
   });
   const imgY = useTransform(scrollYProgress, [0, 1], ["-7%", "7%"]);
-
   return (
     <section
       id="standards"
       aria-labelledby="standards-heading"
-      className="scroll-mt-28 border-b border-line bg-paper"
+      {...stylex.props(styles.standardsSection)}
     >
-      <div className="mx-auto max-w-[1480px]">
-        {/* Origin editorial beat — the pull-quote pacing VariantC proved out */}
-        <div className="grid gap-px border-b border-line bg-line lg:grid-cols-12">
-          <div className="relative min-h-72 overflow-hidden bg-paper lg:col-span-5">
+      <div {...stylex.props(styles.container)}>
+        {/* Origin editorial beat */}
+        <div {...stylex.props(styles.originGrid)}>
+          <div {...stylex.props(styles.originImgCol)}>
             <img
               src={IMG.origin}
               alt="Rows of cultivated green crops on a partner farm at golden hour"
-              className="absolute inset-0 h-full w-full object-cover outline outline-1 -outline-offset-1 outline-black/10"
               loading="lazy"
+              {...stylex.props(styles.originImg)}
             />
           </div>
-          <div className="flex flex-col justify-center bg-paper px-5 py-12 md:px-10 md:py-16 lg:col-span-7">
+          <div {...stylex.props(styles.originTextCol)}>
             <Reveal>
-              <p className="font-tech text-[11px] uppercase tracking-[0.32em] text-brand-green-700">
-                Origin
-              </p>
-              <h2 className="mt-4 text-balance font-display text-3xl font-bold leading-[1.1] tracking-[-0.02em] text-ink md:text-4xl">
-                Grown with <em className="italic text-brand-green-600">patience.</em>
+              <p {...stylex.props(styles.eyebrowGreen)}>Origin</p>
+              <h2 {...stylex.props(styles.originTitle)}>
+                Grown with{" "}
+                <em
+                  style={{
+                    fontStyle: "italic",
+                    color: colors.brandGreen600,
+                  }}
+                >
+                  patience.
+                </em>
               </h2>
-              <p className="mt-5 max-w-xl text-pretty font-body text-base leading-relaxed text-mute-600">
+              <p {...stylex.props(styles.heroLead)}>
                 Our botanicals begin in soil we know by name — a global network of partner farms
                 cultivated over decades, where harvests are timed to the plant, never to the
                 quarter.
               </p>
-              <blockquote className="mt-6 max-w-xl text-pretty border-l-2 border-brand-green-400 pl-5 font-display text-lg italic leading-relaxed text-brand-green-800">
+              <blockquote {...stylex.props(styles.originQuote)}>
                 "Nature holds the keys to human vitality. We simply refuse to lose them in
                 translation."
               </blockquote>
@@ -1253,58 +3696,53 @@ function StandardsSection() {
           title="Science-backed"
           accent="standards"
           aside={
-            <p className="max-w-xs text-pretty font-body text-sm leading-relaxed text-mute-600">
+            <p {...stylex.props(styles.sectionAsideLead)}>
               Every lot. Every market. Every release — documented to your regulatory map.
             </p>
           }
         />
 
-        <div className="grid lg:grid-cols-12">
+        <div {...stylex.props(styles.standardsGrid)}>
           {/* Image */}
-          <div className="relative overflow-hidden border-b border-line lg:col-span-5 lg:border-b-0 lg:border-r">
-            <div ref={imgRef} className="relative min-h-72 lg:min-h-full">
+          <div {...stylex.props(styles.labImgCol)}>
+            <div ref={imgRef} {...stylex.props(styles.labImgContainer)}>
               <m.img
                 src={IMG.lab}
                 alt="Dense botanical foliage awaiting quality-control intake at the Nanjing laboratory"
-                className="h-[480px] w-full object-cover outline outline-1 -outline-offset-1 outline-black/10 lg:absolute lg:inset-0 lg:h-full"
-                style={{ y: reduce ? 0 : imgY }}
+                style={{
+                  y: reduce ? 0 : imgY,
+                }}
                 loading="lazy"
+                {...stylex.props(styles.labImg)}
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-brand-green-950/20 via-transparent to-transparent" />
-              <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between rounded-sm border border-line bg-paper/95 px-4 py-2.5 backdrop-blur-sm">
-                <span className="font-tech text-[11px] uppercase tracking-[0.2em] text-mute-600">
-                  QC Program — Nanjing
-                </span>
-                <span className="font-tech text-[11px] uppercase tracking-[0.2em] text-brand-green-700">
-                  Identity · Potency · Stability
-                </span>
+              <div aria-hidden {...stylex.props(styles.labImgScrim)} />
+              <div {...stylex.props(styles.labCaptionBadge)}>
+                <span {...stylex.props(styles.techLabel)}>QC Program — Nanjing</span>
+                <span {...stylex.props(styles.eyebrowGreen)}>Identity · Potency · Stability</span>
               </div>
             </div>
           </div>
 
           {/* Pillars */}
-          <div className="lg:col-span-7">
+          <div {...stylex.props(styles.pillarsCol)}>
             {pillars.map((pillar, i) => {
               const Icon = PILLAR_ICONS[i];
               return (
-                <Reveal
-                  key={pillar.title}
-                  delay={i * STAGGER}
-                  className={i < pillars.length - 1 ? "border-b border-line" : ""}
-                >
-                  <div className="flex gap-5 px-5 py-10 transition-colors duration-400 hover:bg-brand-green-50 md:gap-8 md:px-10 md:py-12">
-                    <div className="mt-1 flex size-10 shrink-0 items-center justify-center rounded-sm bg-brand-green-100 text-brand-green-700 md:size-12">
-                      <Icon aria-hidden className="size-5 md:size-6" strokeWidth={1.5} />
+                <Reveal key={pillar.title} delay={i * STAGGER}>
+                  <div
+                    {...stylex.props(
+                      styles.pillarInner,
+                      i < pillars.length - 1 && styles.pillarRowBorder,
+                    )}
+                  >
+                    <div {...stylex.props(styles.pillarIconBox)}>
+                      <Icon aria-hidden strokeWidth={1.5} size={24} />
                     </div>
                     <div>
-                      <h3 className="font-body text-xl font-bold tracking-[-0.02em] text-ink md:text-2xl">
-                        {pillar.title}
-                      </h3>
-                      <p className="mt-3 max-w-xl text-pretty font-body text-sm leading-relaxed text-mute-600 md:text-base">
-                        {pillar.copy}
-                      </p>
-                      <div className="mt-4 flex items-center gap-2 font-tech text-[11px] uppercase tracking-[0.2em] text-brand-green-700">
-                        <CheckCircle2 aria-hidden className="size-3.5" />
+                      <h3 {...stylex.props(styles.pillarTitle)}>{pillar.title}</h3>
+                      <p {...stylex.props(styles.pillarCopy)}>{pillar.copy}</p>
+                      <div {...stylex.props(styles.pillarCert)}>
+                        <CheckCircle2 aria-hidden size={14} />
                         ISO 9001 · GMP Certified
                       </div>
                     </div>
@@ -1329,99 +3767,83 @@ function FinaleSection() {
     offset: ["start end", "end start"],
   });
   const bgY = useTransform(scrollYProgress, [0, 1], ["-6%", "6%"]);
-
   return (
     <section
       id="contact"
       ref={ref}
       aria-labelledby="contact-heading"
-      className="relative scroll-mt-28 overflow-hidden bg-brand-green-950"
+      {...stylex.props(styles.finaleSection)}
     >
       <m.div
         aria-hidden
-        className="pointer-events-none absolute inset-0"
-        style={{ y: reduce ? 0 : bgY }}
+        style={{
+          pointerEvents: "none",
+          position: "absolute",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          y: reduce ? 0 : bgY,
+        }}
       >
-        <img
-          src={IMG.heroThumb}
-          alt=""
-          className="h-full w-full object-cover opacity-10"
-          loading="lazy"
-        />
+        <img src={IMG.heroThumb} alt="" loading="lazy" {...stylex.props(styles.finaleThumbImg)} />
       </m.div>
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 bg-gradient-to-br from-brand-green-950/90 via-brand-green-950/70 to-brand-green-900/90"
-      />
+      <div aria-hidden {...stylex.props(styles.finaleScrim)} />
 
-      <div className="relative mx-auto max-w-[1480px]">
-        <div className="px-5 py-24 md:px-10 md:py-32">
-          <Reveal>
-            <p className="font-tech text-[11px] uppercase tracking-[0.32em] text-brand-green-400">
-              06 — Partner with Fenchem
-            </p>
-            <h2
-              id="contact-heading"
-              className="mt-6 max-w-4xl text-balance font-display text-4xl font-bold leading-[1.05] tracking-[-0.03em] text-paper md:text-6xl"
+      <div {...stylex.props(styles.container, styles.finaleInner)}>
+        <Reveal>
+          <p {...stylex.props(styles.eyebrowGreen400)}>06 — Partner with Fenchem</p>
+          <h2 id="contact-heading" {...stylex.props(styles.finaleHeading)}>
+            Your next formulation,{" "}
+            <span
+              style={{
+                color: colors.brandGreen400,
+              }}
             >
-              Your next formulation,{" "}
-              <span className="text-brand-green-400">engineered to specification</span>
-            </h2>
-            <p className="mt-7 max-w-xl text-pretty font-body text-base leading-relaxed text-brand-green-100/70 md:text-lg">
-              Submit a target spec — purity, form, matrix, regulatory map — and our laboratory
-              returns a validated proposal with full documentation within one business day.
-            </p>
-          </Reveal>
+              engineered to specification
+            </span>
+          </h2>
+          <p {...stylex.props(styles.finaleLead)}>
+            Submit a target spec — purity, form, matrix, regulatory map — and our laboratory returns
+            a validated proposal with full documentation within one business day.
+          </p>
+        </Reveal>
 
-          <Reveal delay={STAGGER * 2} className="mt-10 flex flex-wrap gap-4">
-            <a
-              href={createInquiryHref("contact")}
-              className="group inline-flex min-h-11 items-center gap-3 rounded-sm bg-brand-green-500 px-8 py-4 font-body text-sm font-bold text-brand-green-950 shadow-[0_0_40px_oklch(from_var(--color-brand-green-500)_l_c_h_/_0.3)] transition-[background-color,scale,box-shadow] duration-300 active:scale-[0.96] hover:bg-brand-green-400 hover:shadow-[0_0_64px_oklch(from_var(--color-brand-green-500)_l_c_h_/_0.5)] focus-visible:outline-2"
-            >
+        <Reveal delay={STAGGER * 2}>
+          <div {...stylex.props(styles.finaleActions)}>
+            <a href={createInquiryHref("contact")} {...stylex.props(styles.ctaPrimaryDark)}>
               Partner with Fenchem
-              <ArrowRight
-                aria-hidden
-                className="size-4 transition-transform duration-300 group-hover:translate-x-1"
-              />
+              <ArrowRight aria-hidden size={16} />
             </a>
-            <a
-              href="#matrix"
-              className="inline-flex min-h-11 items-center gap-3 rounded-sm border border-brand-green-500/40 px-8 py-4 font-body text-sm font-semibold text-brand-green-200 transition-[background-color,border-color,color,scale] duration-300 active:scale-[0.96] hover:border-brand-green-400 hover:bg-brand-green-900/40 hover:text-paper focus-visible:outline-2"
-            >
+            <a href="#matrix" {...stylex.props(styles.finaleSecondaryBtn)}>
               Explore Portfolio
             </a>
-          </Reveal>
+          </div>
+        </Reveal>
 
-          <Reveal delay={STAGGER * 3}>
-            <p className="mt-10 font-tech text-[11px] uppercase tracking-[0.28em] text-brand-green-400">
-              Response Time &lt; 24h — Technical Dossiers on Request
-            </p>
-          </Reveal>
+        <Reveal delay={STAGGER * 3}>
+          <p {...stylex.props(styles.finaleResponseTime)}>
+            Response Time &lt; 24h — Technical Dossiers on Request
+          </p>
+        </Reveal>
 
-          {/* Office nodes */}
-          <div className="mt-20 border-t border-brand-green-800 pt-14">
-            <Reveal>
-              <p className="font-tech text-[11px] uppercase tracking-[0.3em] text-brand-green-400">
-                6 Global Bases — 40+ Countries Served
-              </p>
-            </Reveal>
-            <div className="mt-8 grid grid-cols-2 gap-px bg-brand-green-800 sm:grid-cols-3 lg:grid-cols-6">
-              {regions.map((region, i) => (
-                <Reveal
-                  key={region.city}
-                  delay={i * (STAGGER * 0.75)}
-                  className="bg-brand-green-950/80"
-                >
-                  <div className="px-4 py-6 transition-colors duration-300 hover:bg-brand-green-900/60">
-                    <p className="font-body text-sm font-semibold text-paper">{region.city}</p>
-                    <p className="mt-0.5 font-body text-xs text-brand-green-300">{region.short}</p>
-                    <p className="mt-2 font-tech text-[11px] tracking-[0.14em] text-brand-green-300 tabular-nums">
-                      {region.coords}
-                    </p>
+        {/* Office nodes */}
+        <div {...stylex.props(styles.officesOuter)}>
+          <Reveal>
+            <p {...stylex.props(styles.eyebrowGreen400)}>6 Global Bases — 40+ Countries Served</p>
+          </Reveal>
+          <div {...stylex.props(styles.officesGrid)}>
+            {regions.map((region, i) => (
+              <Reveal key={region.city} delay={i * (STAGGER * 0.75)}>
+                <div {...stylex.props(styles.officeCardBg)}>
+                  <div {...stylex.props(styles.officeCardInner)}>
+                    <p {...stylex.props(styles.officeCity)}>{region.city}</p>
+                    <p {...stylex.props(styles.officeShort)}>{region.short}</p>
+                    <p {...stylex.props(styles.officeCoords)}>{region.coords}</p>
                   </div>
-                </Reveal>
-              ))}
-            </div>
+                </div>
+              </Reveal>
+            ))}
           </div>
         </div>
       </div>
@@ -1433,31 +3855,24 @@ function FinaleSection() {
 
 function FooterSection() {
   return (
-    <footer className="border-t border-line bg-paper">
-      <div className="mx-auto max-w-[1480px]">
-        <div className="grid gap-12 px-5 py-14 md:grid-cols-12 md:px-10 md:py-16">
+    <footer {...stylex.props(styles.footer)}>
+      <div {...stylex.props(styles.container)}>
+        <div {...stylex.props(styles.footerGrid)}>
           {/* Brand block */}
-          <div className="md:col-span-5">
-            <div className="flex items-center gap-2">
-              <span className="font-body text-2xl font-bold tracking-[-0.04em] text-brand-green-600">
-                FENCHEM
-              </span>
-              <Leaf aria-hidden className="size-5 text-brand-green-500" strokeWidth={1.5} />
+          <div {...stylex.props(styles.footerBrandCol)}>
+            <div {...stylex.props(styles.footerBrandRow)}>
+              <span {...stylex.props(styles.brandText)}>FENCHEM</span>
+              <Leaf aria-hidden strokeWidth={1.5} size={20} color={colors.brandGreen500} />
             </div>
-            <p className="mt-3 font-body text-base font-medium text-brand-green-700">
-              {company.tagline}.
-            </p>
-            <p className="mt-5 font-tech text-[11px] uppercase leading-loose tracking-[0.22em] text-mute-600">
+            <p {...stylex.props(styles.footerBrandTagline)}>{company.tagline}.</p>
+            <p {...stylex.props(styles.footerEst)}>
               ISO 9001 : 2015 · GMP · HACCP
               <br />
               Est. {company.founded} — {company.hq.city}, {company.hq.country}
             </p>
-            <div className="mt-6 flex flex-wrap gap-2">
+            <div {...stylex.props(styles.footerCertsList)}>
               {certifications.map((cert) => (
-                <span
-                  key={cert}
-                  className="rounded-sm border border-brand-blue-200 bg-brand-blue-50 px-2.5 py-1 font-tech text-[11px] uppercase tracking-[0.16em] text-brand-blue-700"
-                >
+                <span key={cert} {...stylex.props(styles.footerCertBadge)}>
                   {cert}
                 </span>
               ))}
@@ -1466,17 +3881,12 @@ function FooterSection() {
 
           {/* Nav columns */}
           {FOOTER_COLS.map((col) => (
-            <div key={col.head} className="md:col-span-2">
-              <p className="font-tech text-[11px] uppercase tracking-[0.3em] text-mute-600">
-                {col.head}
-              </p>
-              <ul className="mt-5 space-y-3">
+            <div key={col.head} {...stylex.props(styles.footerNavCol)}>
+              <p {...stylex.props(styles.techLabel)}>{col.head}</p>
+              <ul {...stylex.props(styles.footerNavList)}>
                 {col.links.map((link) => (
                   <li key={link.label}>
-                    <a
-                      href={link.href}
-                      className="font-body text-sm text-mute-600 underline decoration-line underline-offset-4 transition-colors duration-300 hover:text-brand-green-700 hover:decoration-brand-green-400 focus-visible:outline-2"
-                    >
+                    <a href={link.href} {...stylex.props(styles.footerNavLink)}>
                       {link.label}
                     </a>
                   </li>
@@ -1486,19 +3896,28 @@ function FooterSection() {
           ))}
         </div>
 
-        {/* Wordmark watermark — extrabold: Jakarta loads 300–800; 900 would synthesize */}
-        <p
-          aria-hidden
-          className="select-none overflow-hidden whitespace-nowrap px-5 font-body text-[17vw] font-extrabold leading-[0.78] tracking-[-0.06em] text-brand-green-500/5 md:px-10 min-[1481px]:text-[15rem]"
-        >
+        {/* Wordmark watermark */}
+        <p aria-hidden {...stylex.props(styles.footerWordmark)}>
           FENCHEM
         </p>
 
         {/* Legal strip */}
-        <div className="flex flex-col gap-2 border-t border-line px-5 py-4 font-tech text-[11px] uppercase tracking-[0.2em] text-mute-600 md:flex-row md:items-center md:justify-between md:px-10">
+        <div {...stylex.props(styles.footerLegal)}>
           <span>© 2026 {company.legalName} — All Rights Reserved</span>
-          <span className="tabular-nums">{company.hq.coords} — Nanjing, China</span>
-          <span className="text-brand-green-700">Botanical Intelligence Since 1995</span>
+          <span
+            style={{
+              fontVariantNumeric: "tabular-nums",
+            }}
+          >
+            {company.hq.coords} — Nanjing, China
+          </span>
+          <span
+            style={{
+              color: colors.brandGreen700,
+            }}
+          >
+            Botanical Intelligence Since 1995
+          </span>
         </div>
       </div>
     </footer>
@@ -1507,7 +3926,6 @@ function FooterSection() {
 
 /* ─────────────────────────────── Root export ─────────────────────────────── */
 
-/** Anchor navigation glides instead of jumping; restores on unmount and honors reduced motion. */
 function SmoothScroll() {
   const reduce = useReducedMotion();
   useEffect(() => {
@@ -1521,11 +3939,10 @@ function SmoothScroll() {
   }, [reduce]);
   return null;
 }
-
 export function VariantH() {
   return (
     <LazyMotion features={domAnimation} strict>
-      <div className="bg-paper font-body text-ink antialiased selection:bg-brand-green-200 selection:text-brand-green-900">
+      <div {...stylex.props(styles.root)}>
         <SmoothScroll />
         <NavBar />
         <main>

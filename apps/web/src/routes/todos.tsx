@@ -11,11 +11,70 @@ import {
 } from "@fenchem-lp/ui/components/card";
 import { Checkbox } from "@fenchem-lp/ui/components/checkbox";
 import { Input } from "@fenchem-lp/ui/components/input";
+import { colors, radii } from "@fenchem-lp/ui/tokens.stylex";
+import * as stylex from "@stylexjs/stylex";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation } from "convex/react";
 import { Trash2 } from "lucide-react";
 import { useState, type FormEvent } from "react";
+
+const styles = stylex.create({
+  container: {
+    marginInline: "auto",
+    width: "100%",
+    maxWidth: "28rem",
+    paddingBlock: "2.5rem",
+  },
+  form: {
+    marginBottom: "1.5rem",
+    display: "flex",
+    alignItems: "center",
+    gap: "0.5rem",
+  },
+  empty: {
+    paddingBlock: "1rem",
+    textAlign: "center",
+    color: colors.mutedForeground,
+  },
+  list: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "0.5rem",
+    listStyle: "none",
+    margin: 0,
+    padding: 0,
+  },
+  item: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    borderRadius: radii.md,
+    borderWidth: 1,
+    borderStyle: "solid",
+    borderColor: colors.border,
+    padding: "0.5rem",
+  },
+  itemLeft: {
+    display: "flex",
+    alignItems: "center",
+    gap: "0.5rem",
+  },
+  label: {
+    fontSize: "0.875rem",
+    lineHeight: "1.25rem",
+    color: colors.foreground,
+    cursor: "pointer",
+  },
+  labelCompleted: {
+    color: colors.mutedForeground,
+    textDecoration: "line-through",
+  },
+  trashIcon: {
+    height: "1rem",
+    width: "1rem",
+  },
+});
 
 export const Route = createFileRoute("/todos")({
   component: TodosRoute,
@@ -61,14 +120,14 @@ function TodosRoute() {
   };
 
   return (
-    <div className="mx-auto w-full max-w-md py-10">
+    <div {...stylex.props(styles.container)}>
       <Card>
         <CardHeader>
           <CardTitle>Todo List (Convex)</CardTitle>
           <CardDescription>Manage your tasks efficiently</CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleAddTodo} className="mb-6 flex items-center space-x-2">
+          <form onSubmit={handleAddTodo} {...stylex.props(styles.form)}>
             <Input
               value={newTodoText}
               onChange={(e) => setNewTodoText(e.target.value)}
@@ -80,15 +139,12 @@ function TodosRoute() {
           </form>
 
           {!todos || todos.length === 0 ? (
-            <p className="py-4 text-center">No todos yet. Add one above!</p>
+            <p {...stylex.props(styles.empty)}>No todos yet. Add one above!</p>
           ) : (
-            <ul className="space-y-2">
+            <ul {...stylex.props(styles.list)}>
               {todos.map((todo: Doc<"todos">) => (
-                <li
-                  key={todo._id}
-                  className="flex items-center justify-between rounded-md border p-2"
-                >
-                  <div className="flex items-center space-x-2">
+                <li key={todo._id} {...stylex.props(styles.item)}>
+                  <div {...stylex.props(styles.itemLeft)}>
                     <Checkbox
                       checked={todo.completed}
                       onCheckedChange={() => handleToggleTodo(todo._id, todo.completed)}
@@ -96,7 +152,7 @@ function TodosRoute() {
                     />
                     <label
                       htmlFor={`todo-${todo._id}`}
-                      className={`${todo.completed ? "text-muted-foreground line-through" : ""}`}
+                      {...stylex.props(styles.label, todo.completed && styles.labelCompleted)}
                     >
                       {todo.text}
                     </label>
@@ -107,7 +163,7 @@ function TodosRoute() {
                     onClick={() => handleDeleteTodo(todo._id)}
                     aria-label="Delete todo"
                   >
-                    <Trash2 className="h-4 w-4" />
+                    <Trash2 {...stylex.props(styles.trashIcon)} />
                   </Button>
                 </li>
               ))}

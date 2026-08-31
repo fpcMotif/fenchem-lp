@@ -18,13 +18,15 @@ export default defineConfig({
     trace: "retain-on-failure",
   },
   webServer: {
-    command: `bun run dev:bare -- --host ${host}`,
+    command: `bun run serve -- --host ${host} --port ${port}`,
     url: baseURL,
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
     env: {
       NO_PROXY: "localhost,127.0.0.1,::1",
       no_proxy: "localhost,127.0.0.1,::1",
+      VITE_CONVEX_URL: "https://placeholder.convex.cloud",
+      VITE_CONVEX_SITE_URL: "https://placeholder.convex.site",
     },
   },
   projects: [

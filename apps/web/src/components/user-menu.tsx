@@ -9,10 +9,18 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@fenchem-lp/ui/components/dropdown-menu";
+import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import { convexQuery } from "@convex-dev/react-query";
+import * as stylex from "@stylexjs/stylex";
 import { useQuery } from "@tanstack/react-query";
 
 import { authClient } from "@/lib/auth-client";
+
+const styles = stylex.create({
+  content: {
+    backgroundColor: colors.card,
+  },
+});
 
 export default function UserMenu() {
   const { data: user } = useQuery(convexQuery(api.auth.getCurrentUser, {}));
@@ -20,7 +28,7 @@ export default function UserMenu() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger render={<Button variant="outline" />}>{user?.name}</DropdownMenuTrigger>
-      <DropdownMenuContent className="bg-card">
+      <DropdownMenuContent sx={styles.content}>
         <DropdownMenuGroup>
           <DropdownMenuLabel>My Account</DropdownMenuLabel>
           <DropdownMenuSeparator />

@@ -1,12 +1,59 @@
 import { Button } from "@fenchem-lp/ui/components/button";
 import { Input } from "@fenchem-lp/ui/components/input";
 import { Label } from "@fenchem-lp/ui/components/label";
+import { colors } from "@fenchem-lp/ui/tokens.stylex";
+import * as stylex from "@stylexjs/stylex";
 import { useForm } from "@tanstack/react-form";
 import { useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 import z from "zod";
 
 import { authClient } from "@/lib/auth-client";
+
+const styles = stylex.create({
+  container: {
+    marginInline: "auto",
+    width: "100%",
+    marginTop: "2.5rem",
+    maxWidth: "28rem",
+    padding: "1.5rem",
+  },
+  title: {
+    marginBottom: "1.5rem",
+    textAlign: "center",
+    fontSize: "1.875rem",
+    lineHeight: "2.25rem",
+    fontWeight: 700,
+  },
+  form: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "1rem",
+  },
+  fieldGroup: {
+    display: "flex",
+    flexDirection: "column",
+    gap: "0.5rem",
+  },
+  errorText: {
+    color: colors.destructive,
+    fontSize: "0.875rem",
+    lineHeight: "1.25rem",
+  },
+  submitButton: {
+    width: "100%",
+  },
+  switchContainer: {
+    marginTop: "1rem",
+    textAlign: "center",
+  },
+  switchButton: {
+    color: {
+      default: colors.brandBlue600,
+      ":hover": colors.brandBlue800,
+    },
+  },
+});
 
 export default function SignUpForm({ onSwitchToSignIn }: { onSwitchToSignIn: () => void }) {
   const navigate = useNavigate({
@@ -49,14 +96,14 @@ export default function SignUpForm({ onSwitchToSignIn }: { onSwitchToSignIn: () 
   });
 
   return (
-    <div className="mx-auto w-full mt-10 max-w-md p-6">
-      <h1 className="mb-6 text-center text-3xl font-bold">Create Account</h1>
+    <div {...stylex.props(styles.container)}>
+      <h1 {...stylex.props(styles.title)}>Create Account</h1>
 
       <form
         action={() => {
           void form.handleSubmit();
         }}
-        className="space-y-4"
+        {...stylex.props(styles.form)}
       >
         <div>
           <form.Field name="name">
@@ -64,7 +111,7 @@ export default function SignUpForm({ onSwitchToSignIn }: { onSwitchToSignIn: () 
               const error = field.state.meta.errors[0]?.message;
               const errorId = `${field.name}-error`;
               return (
-                <div className="space-y-2">
+                <div {...stylex.props(styles.fieldGroup)}>
                   <Label htmlFor={field.name}>Name</Label>
                   <Input
                     id={field.name}
@@ -78,7 +125,7 @@ export default function SignUpForm({ onSwitchToSignIn }: { onSwitchToSignIn: () 
                     onChange={(e) => field.handleChange(e.target.value)}
                   />
                   {error ? (
-                    <p id={errorId} role="alert" className="text-destructive">
+                    <p id={errorId} role="alert" {...stylex.props(styles.errorText)}>
                       {error}
                     </p>
                   ) : null}
@@ -94,7 +141,7 @@ export default function SignUpForm({ onSwitchToSignIn }: { onSwitchToSignIn: () 
               const error = field.state.meta.errors[0]?.message;
               const errorId = `${field.name}-error`;
               return (
-                <div className="space-y-2">
+                <div {...stylex.props(styles.fieldGroup)}>
                   <Label htmlFor={field.name}>Email</Label>
                   <Input
                     id={field.name}
@@ -109,7 +156,7 @@ export default function SignUpForm({ onSwitchToSignIn }: { onSwitchToSignIn: () 
                     onChange={(e) => field.handleChange(e.target.value)}
                   />
                   {error ? (
-                    <p id={errorId} role="alert" className="text-destructive">
+                    <p id={errorId} role="alert" {...stylex.props(styles.errorText)}>
                       {error}
                     </p>
                   ) : null}
@@ -125,7 +172,7 @@ export default function SignUpForm({ onSwitchToSignIn }: { onSwitchToSignIn: () 
               const error = field.state.meta.errors[0]?.message;
               const errorId = `${field.name}-error`;
               return (
-                <div className="space-y-2">
+                <div {...stylex.props(styles.fieldGroup)}>
                   <Label htmlFor={field.name}>Password</Label>
                   <Input
                     id={field.name}
@@ -140,7 +187,7 @@ export default function SignUpForm({ onSwitchToSignIn }: { onSwitchToSignIn: () 
                     onChange={(e) => field.handleChange(e.target.value)}
                   />
                   {error ? (
-                    <p id={errorId} role="alert" className="text-destructive">
+                    <p id={errorId} role="alert" {...stylex.props(styles.errorText)}>
                       {error}
                     </p>
                   ) : null}
@@ -154,19 +201,15 @@ export default function SignUpForm({ onSwitchToSignIn }: { onSwitchToSignIn: () 
           selector={(state) => ({ canSubmit: state.canSubmit, isSubmitting: state.isSubmitting })}
         >
           {({ canSubmit, isSubmitting }) => (
-            <Button type="submit" className="w-full" disabled={!canSubmit || isSubmitting}>
+            <Button type="submit" sx={styles.submitButton} disabled={!canSubmit || isSubmitting}>
               {isSubmitting ? "Submitting..." : "Sign Up"}
             </Button>
           )}
         </form.Subscribe>
       </form>
 
-      <div className="mt-4 text-center">
-        <Button
-          variant="link"
-          onClick={onSwitchToSignIn}
-          className="text-indigo-600 hover:text-indigo-800"
-        >
+      <div {...stylex.props(styles.switchContainer)}>
+        <Button variant="link" onClick={onSwitchToSignIn} sx={styles.switchButton}>
           Already have an account? Sign In
         </Button>
       </div>

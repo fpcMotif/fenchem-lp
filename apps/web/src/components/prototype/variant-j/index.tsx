@@ -1,3 +1,5 @@
+import { colors, typography } from "@fenchem-lp/ui/tokens.stylex";
+import * as stylex from "@stylexjs/stylex";
 import { MotionRoot } from "./motion";
 import { DossierSection } from "./sections/dossier";
 import { FinaleSection } from "./sections/finale";
@@ -18,10 +20,26 @@ import { TickerSection } from "./sections/ticker";
  * dark → light → dark page arc: C/F's cinematic hero opens, H's white spec
  * ledger carries the middle, the deep-green finale closes.
  */
+
+const styles = stylex.create({
+  root: {
+    position: "relative",
+    backgroundColor: colors.paper,
+    fontFamily: typography.body,
+    color: colors.ink,
+    WebkitFontSmoothing: "antialiased",
+    MozOsxFontSmoothing: "grayscale",
+    "::selection": {
+      backgroundColor: colors.brandGreen200,
+      color: colors.brandGreen900,
+    },
+  },
+});
+
 export function VariantJ() {
   return (
     <MotionRoot>
-      <div className="relative bg-paper font-body text-ink antialiased selection:bg-brand-green-200 selection:text-brand-green-900">
+      <div {...stylex.props(styles.root)}>
         <NavBar />
         <main>
           <HeroSection />
