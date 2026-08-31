@@ -48,3 +48,17 @@ This document logs build performance, bundle asset sizes, and runtime cold-start
 - `dashboard-*.js`: 1.10 kB (raw) / 0.61 kB (gzip)
 - `routes-*.js`: 0.77 kB (raw) / 0.48 kB (gzip)
 - `label-*.js`: 0.45 kB (raw) / 0.35 kB (gzip)
+
+---
+
+## Browser Runtime Cold-Start & Paint Performance (Production Preview Server)
+
+Captured via `scripts/measure-page-speed.ts` (Playwright / Navigation Timing & Paint Timing API, 5-run median):
+
+| Metric | StyleX Production Build (Median) |
+|---|---|
+| **Time to First Byte (TTFB)** | 3.9 ms |
+| **First Contentful Paint (FCP)** | 724.0 ms |
+| **DOM Interactive** | 716.4 ms |
+| **DOM Complete** | 2017.0 ms |
+| **Total Page Load (Load Event)** | 2020.2 ms |
