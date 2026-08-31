@@ -1,0 +1,100 @@
+[
+  {
+    "date": "2026-08-31T08:43:14.474Z",
+    "stack": "tailwind",
+    "git": {
+      "commit": "2ec7f83",
+      "branch": "main",
+      "dirty": true
+    },
+    "node": "v26.3.0",
+    "platform": "win32/x64",
+    "build": {
+      "full": {
+        "target": "full",
+        "tool": "wall-clock",
+        "runs": 1,
+        "warmup": 0,
+        "mean_ms": 6840.3232,
+        "median_ms": 6840.3232,
+        "min_ms": 6840.3232,
+        "max_ms": 6840.3232,
+        "stddev_ms": 0
+      },
+      "web": {
+        "target": "web",
+        "tool": "hyperfine",
+        "runs": 5,
+        "warmup": 1,
+        "mean_ms": 7307.073916,
+        "median_ms": 7360.757056,
+        "min_ms": 6935.524356,
+        "max_ms": 7517.284056,
+        "stddev_ms": 238.66727991677666
+      }
+    },
+    "assets": {
+      "dir": "C:\\Users\\fenchem\\fenchem-lp\\apps\\web\\dist\\client",
+      "buckets": {
+        "css": {
+          "raw": 156088,
+          "gzip": 22007,
+          "count": 1
+        },
+        "js": {
+          "raw": 2149130,
+          "gzip": 578735,
+          "count": 9
+        },
+        "other": {
+          "raw": 91,
+          "gzip": 122,
+          "count": 2
+        }
+      },
+      "total": {
+        "raw": 2305309,
+        "gzip": 600864,
+        "count": 12
+      }
+    },
+    "coldstart": {
+      "runs": 5,
+      "url": "http://localhost:4173/",
+      "ttfb_ms": 22.600000023841858,
+      "fcp_ms": 1036,
+      "lcp_ms": 1600,
+      "cls": 0.0024800801012251107,
+      "samples": {
+        "ttfb": [
+          2530,
+          22.600000023841858,
+          24.80000001192093,
+          19.19999998807907,
+          21.80000001192093
+        ],
+        "fcp": [
+          3708,
+          1036,
+          940,
+          1144,
+          996
+        ],
+        "lcp": [
+          4268,
+          1768,
+          1400,
+          1600,
+          1328
+        ],
+        "cls": [
+          0.0024800801012251107,
+          0.0024800801012251107,
+          0.0024800801012251107,
+          0.0024800801012251107,
+          0.0024800801012251107
+        ]
+      }
+    }
+  }
+]

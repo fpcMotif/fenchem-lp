@@ -20,6 +20,7 @@ import {
   AUTH_TOKEN_BUDGET_MS,
   AUTH_ROUNDTRIP_BUDGET_MS,
 } from "@/lib/deployment-mode";
+import { PERF_DEBUG_SCRIPT } from "@/lib/perf-debug";
 
 import Header from "../components/header";
 
@@ -98,6 +99,8 @@ function RootDocument() {
     <html lang="en" className="dark">
       <head>
         <HeadContent />
+        {/* eslint-disable-next-line react/no-danger -- static inline script, see perf-debug.ts */}
+        <script dangerouslySetInnerHTML={{ __html: PERF_DEBUG_SCRIPT }} />
       </head>
       <body>
         {pathname === "/" ? (
