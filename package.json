@@ -39,7 +39,11 @@
     "dev:setup": "vp run --filter @fenchem-lp/backend dev:setup",
     "deploy": "vp run --filter @fenchem-lp/infra deploy",
     "destroy": "vp run --filter @fenchem-lp/infra destroy",
-    "doctor": "react-doctor"
+    "doctor": "react-doctor",
+    "perf": "node perf/run.mjs",
+    "perf:build": "node perf/measure-build.mjs",
+    "perf:assets": "node perf/measure-assets.mjs",
+    "perf:coldstart": "node perf/measure-coldstart.mjs"
   },
   "dependencies": {
     "@fenchem-lp/env": "workspace:*",
