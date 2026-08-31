@@ -10,7 +10,9 @@ describe("home route", () => {
   });
 
   test("validates the variant search param and defaults to the production candidate", () => {
-    const validate = Route.options.validateSearch as (search: Record<string, unknown>) => {
+    const validate = Route.options.validateSearch as (
+      search: Record<string, string | number | undefined>,
+    ) => {
       variant: string;
     };
 
@@ -19,9 +21,8 @@ describe("home route", () => {
     expect(validate({ variant: "k" })).toEqual({ variant: "k" });
     expect(validate({ variant: "v" })).toEqual({ variant: "v" });
     expect(validate({ variant: "z" })).toEqual({ variant: DEFAULT_VARIANT });
-    expect(validate({ variant: 42 })).toEqual({ variant: DEFAULT_VARIANT });
+    expect(validate({ variant: 42 as unknown as string })).toEqual({ variant: DEFAULT_VARIANT });
   });
-
   test("renders the active variant and prototype switcher", () => {
     const Component = Route.options.component as React.ComponentType;
     vi.spyOn(Route, "useSearch").mockReturnValue({ variant: "d" } as never);

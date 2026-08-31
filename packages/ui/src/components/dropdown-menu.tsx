@@ -214,15 +214,27 @@ export const menuStyles = stylex.create({
   },
 });
 
-function DropdownMenu({ ...props }: MenuPrimitive.Root.Props) {
+export interface DropdownMenuProps extends MenuPrimitive.Root.Props {
+  sx?: StyleXStyles;
+}
+
+function DropdownMenu({ _sx, ...props }: DropdownMenuProps & { _sx?: StyleXStyles }) {
   return <MenuPrimitive.Root data-slot="dropdown-menu" {...props} />;
 }
 
-function DropdownMenuPortal({ ...props }: MenuPrimitive.Portal.Props) {
+export interface DropdownMenuPortalProps extends MenuPrimitive.Portal.Props {
+  sx?: StyleXStyles;
+}
+
+function DropdownMenuPortal({ _sx, ...props }: DropdownMenuPortalProps & { _sx?: StyleXStyles }) {
   return <MenuPrimitive.Portal data-slot="dropdown-menu-portal" {...props} />;
 }
 
-function DropdownMenuTrigger({ ...props }: MenuPrimitive.Trigger.Props) {
+export interface DropdownMenuTriggerProps extends MenuPrimitive.Trigger.Props {
+  sx?: StyleXStyles;
+}
+
+function DropdownMenuTrigger({ _sx, ...props }: DropdownMenuTriggerProps & { _sx?: StyleXStyles }) {
   return <MenuPrimitive.Trigger data-slot="dropdown-menu-trigger" {...props} />;
 }
 
@@ -268,7 +280,11 @@ function DropdownMenuContent({
   );
 }
 
-function DropdownMenuGroup({ ...props }: MenuPrimitive.Group.Props) {
+export interface DropdownMenuGroupProps extends MenuPrimitive.Group.Props {
+  sx?: StyleXStyles;
+}
+
+function DropdownMenuGroup({ _sx, ...props }: DropdownMenuGroupProps & { _sx?: StyleXStyles }) {
   return <MenuPrimitive.Group data-slot="dropdown-menu-group" {...props} />;
 }
 
@@ -318,7 +334,11 @@ function DropdownMenuItem({ inset, variant = "default", sx, ...props }: Dropdown
   );
 }
 
-function DropdownMenuSub({ ...props }: MenuPrimitive.SubmenuRoot.Props) {
+export interface DropdownMenuSubProps extends MenuPrimitive.SubmenuRoot.Props {
+  sx?: StyleXStyles;
+}
+
+function DropdownMenuSub({ _sx, ...props }: DropdownMenuSubProps & { _sx?: StyleXStyles }) {
   return <MenuPrimitive.SubmenuRoot data-slot="dropdown-menu-sub" {...props} />;
 }
 
@@ -424,7 +444,14 @@ function DropdownMenuCheckboxItem({
   );
 }
 
-function DropdownMenuRadioGroup({ ...props }: MenuPrimitive.RadioGroup.Props) {
+export interface DropdownMenuRadioGroupProps extends MenuPrimitive.RadioGroup.Props {
+  sx?: StyleXStyles;
+}
+
+function DropdownMenuRadioGroup({
+  _sx,
+  ...props
+}: DropdownMenuRadioGroupProps & { _sx?: StyleXStyles }) {
   return <MenuPrimitive.RadioGroup data-slot="dropdown-menu-radio-group" {...props} />;
 }
 

@@ -75,8 +75,10 @@ export function PrototypeSwitcher({ current }: { current: VariantKey }) {
   const step = useCallback(
     (dir: 1 | -1) => {
       const i = VARIANTS.findIndex((v) => v.key === current);
-      const next = VARIANTS[(i + dir + VARIANTS.length) % VARIANTS.length].key;
-      navigate({ search: { variant: next }, replace: true });
+      const nextEntry = VARIANTS[(i + dir + VARIANTS.length) % VARIANTS.length];
+      if (nextEntry) {
+        void navigate({ search: { variant: nextEntry.key }, replace: true });
+      }
     },
     [current, navigate],
   );

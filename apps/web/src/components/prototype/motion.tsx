@@ -128,7 +128,7 @@ type EyebrowProps = {
   sx?: StyleXStyles;
   style?: StyleXStyles;
   /** StyleX style or legacy accent string / token */
-  accent?: StyleXStyles | keyof typeof accentMap | string;
+  accent?: StyleXStyles | keyof typeof accentMap;
 };
 
 /** Static uppercase micro-label above a section heading. */

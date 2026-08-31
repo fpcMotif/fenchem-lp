@@ -19,7 +19,7 @@ import {
  */
 
 export const Route = createFileRoute("/")({
-  validateSearch: (search: Record<string, unknown>): { variant: VariantKey } => {
+  validateSearch: (search: Record<string, string | undefined>): { variant: VariantKey } => {
     const v = search.variant;
     return {
       variant: VARIANT_KEYS.includes(v as VariantKey) ? (v as VariantKey) : DEFAULT_VARIANT,

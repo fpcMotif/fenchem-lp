@@ -29,12 +29,15 @@ This document logs build performance, bundle asset sizes, and runtime cold-start
 ## Detailed Asset Breakdown (Optimized StyleX Build with Code-Splitting)
 
 ### CSS Assets (1 file)
+
 - `index-*.css`: 96.77 kB (raw) / 20.04 kB (gzip) — **-36.5% raw / -8.4% gzip vs Tailwind baseline**
 
 ### Initial Client Entry Chunk (Root Page "/")
+
 - **Initial Client JS (`index-*.js`)**: **`766.64 kB (raw) / 214.80 kB (gzip)`** — **-56.7% initial JS gzip vs Tailwind baseline (`496.82 kB`)**!
 
 ### Dynamic On-Demand Prototype Variant Chunks
+
 - `variant-c-*.js`: 12.92 kB (raw) / 4.48 kB (gzip)
 - `variant-f-*.js`: 16.05 kB (raw) / 5.15 kB (gzip)
 - `variant-a-*.js`: 17.39 kB (raw) / 5.24 kB (gzip)

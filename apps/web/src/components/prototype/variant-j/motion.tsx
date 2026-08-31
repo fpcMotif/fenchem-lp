@@ -44,7 +44,9 @@ export function MotionRoot({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (reduced) return;
     const lenis = new Lenis({ autoRaf: false });
-    lenis.on("scroll", ScrollTrigger.update);
+    lenis.on("scroll", () => {
+      ScrollTrigger.update();
+    });
     const raf = (time: number) => lenis.raf(time * 1000);
     gsap.ticker.add(raf);
     gsap.ticker.lagSmoothing(0);
