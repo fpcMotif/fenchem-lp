@@ -6,7 +6,9 @@ import * as stylex from "@stylexjs/stylex";
 import { useForm } from "@tanstack/react-form";
 import { useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
-import z from "zod";
+// zod/mini, not classic zod: this file ships to the browser, and the full
+// schema engine was ~250 kB of client JS. Issues still carry .message.
+import * as z from "zod/mini";
 
 import { authClient } from "@/lib/auth-client";
 
@@ -87,7 +89,7 @@ export default function SignInForm({ onSwitchToSignUp }: { onSwitchToSignUp: () 
     validators: {
       onSubmit: z.object({
         email: z.email("Invalid email address"),
-        password: z.string().min(8, "Password must be at least 8 characters"),
+        password: z.string().check(z.minLength(8, "Password must be at least 8 characters")),
       }),
     },
   });
