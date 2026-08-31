@@ -55,10 +55,10 @@ This document logs build performance, bundle asset sizes, and runtime cold-start
 
 Captured via `scripts/measure-page-speed.ts` (Playwright / Navigation Timing & Paint Timing API, 5-run median):
 
-| Metric | StyleX Production Build (Median) |
-|---|---|
-| **Time to First Byte (TTFB)** | 3.9 ms |
-| **First Contentful Paint (FCP)** | 724.0 ms |
-| **DOM Interactive** | 716.4 ms |
-| **DOM Complete** | 2017.0 ms |
-| **Total Page Load (Load Event)** | 2020.2 ms |
+| Metric                           | StyleX Production Build (Median) |
+| -------------------------------- | -------------------------------- |
+| **Time to First Byte (TTFB)**    | 3.9 ms                           |
+| **First Contentful Paint (FCP)** | 724.0 ms                         |
+| **DOM Interactive**              | 716.4 ms                         |
+| **DOM Complete**                 | 2017.0 ms                        |
+| **Total Page Load (Load Event)** | 2020.2 ms                        |

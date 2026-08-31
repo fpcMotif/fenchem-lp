@@ -1,3 +1,4 @@
+/// <reference lib="dom" />
 import { chromium } from "@playwright/test";
 
 interface PageMetrics {
@@ -28,18 +29,19 @@ async function measureRun(url: string): Promise<PageMetrics> {
   await page.goto(url, { waitUntil: "networkidle" });
 
   const metrics = await page.evaluate(() => {
-    const perf = (globalThis as unknown as { performance: Performance }).performance;
-    const navEntries = perf?.getEntriesByType ? perf.getEntriesByType("navigation") : [];
-    const nav = navEntries.length > 0 ? (navEntries[0] as unknown as Record<string, number>) : null;
-    const paintEntries = perf?.getEntriesByType ? perf.getEntriesByType("paint") : [];
-    const fcpEntry = paintEntries.find((e: unknown) => typeof e === "object" && e !== null && "name" in e && e.name === "first-contentful-paint") as { startTime: number } | undefined;
+    const navEntries = performance.getEntriesByType
+      ? performance.getEntriesByType("navigation")
+      : [];
+    const nav = navEntries.length > 0 ? (navEntries[0] as PerformanceNavigationTiming) : null;
+    const paintEntries = performance.getEntriesByType ? performance.getEntriesByType("paint") : [];
+    const fcpEntry = paintEntries.find((e) => e.name === "first-contentful-paint");
 
     return {
-      ttfb: nav && typeof nav.responseStart === "number" && typeof nav.requestStart === "number" ? nav.responseStart - nav.requestStart : 0,
-      fcp: fcpEntry && typeof fcpEntry.startTime === "number" ? fcpEntry.startTime : 0,
-      domInteractive: nav && typeof nav.domInteractive === "number" ? nav.domInteractive : 0,
-      domComplete: nav && typeof nav.domComplete === "number" ? nav.domComplete : 0,
-      loadEvent: nav && typeof nav.loadEventEnd === "number" ? nav.loadEventEnd : 0,
+      ttfb: nav ? nav.responseStart - nav.requestStart : 0,
+      fcp: fcpEntry ? fcpEntry.startTime : 0,
+      domInteractive: nav ? nav.domInteractive : 0,
+      domComplete: nav ? nav.domComplete : 0,
+      loadEvent: nav ? nav.loadEventEnd : 0,
     };
   });
 

@@ -85,6 +85,14 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
         rel: "stylesheet",
         href: appCss,
       },
+      ...(import.meta.env.DEV
+        ? [
+            {
+              rel: "stylesheet",
+              href: "/virtual:stylex.css",
+            },
+          ]
+        : []),
     ],
   }),
 
