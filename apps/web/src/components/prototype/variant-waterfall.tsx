@@ -14,7 +14,23 @@
  *  10. High-Converting Finale & Enterprise Footer
  */
 import { useEffect, useRef, useState } from "react";
-import * as THREE from "three";
+// Named imports, not `import * as THREE`: the namespace import defeats
+// tree-shaking and drags the whole three.js build into this lazy chunk.
+import {
+  AdditiveBlending,
+  BufferAttribute,
+  BufferGeometry,
+  Color,
+  CylinderGeometry,
+  FogExp2,
+  Mesh,
+  MeshBasicMaterial,
+  PerspectiveCamera,
+  Points,
+  PointsMaterial,
+  Scene,
+  WebGLRenderer,
+} from "three";
 import { AnimatePresence, LazyMotion, domAnimation, m } from "motion/react";
 import {
   ArrowRight,
@@ -2146,14 +2162,14 @@ function WaterfallHeroCanvas({
     const container = containerRef.current;
     const width = container.clientWidth || window.innerWidth;
     const height = container.clientHeight || window.innerHeight;
-    const scene = new THREE.Scene();
-    scene.fog = new THREE.FogExp2(0x0d140a, 0.025);
-    const camera = new THREE.PerspectiveCamera(60, width / height, 0.1, 1000);
+    const scene = new Scene();
+    scene.fog = new FogExp2(0x0d140a, 0.025);
+    const camera = new PerspectiveCamera(60, width / height, 0.1, 1000);
     camera.position.set(0, 4, 18);
     camera.lookAt(0, 1, 0);
-    let renderer: THREE.WebGLRenderer;
+    let renderer: WebGLRenderer;
     try {
-      renderer = new THREE.WebGLRenderer({
+      renderer = new WebGLRenderer({
         canvas,
         antialias: false,
         alpha: true,
@@ -2190,15 +2206,15 @@ function WaterfallHeroCanvas({
       colorMixes[i] = Math.random();
       sizes[i] = Math.random() * 3.5 + 1.5;
     }
-    const geometry = new THREE.BufferGeometry();
-    geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
-    geometry.setAttribute("color", new THREE.BufferAttribute(colorsArr, 3));
-    geometry.setAttribute("size", new THREE.BufferAttribute(sizes, 1));
+    const geometry = new BufferGeometry();
+    geometry.setAttribute("position", new BufferAttribute(positions, 3));
+    geometry.setAttribute("color", new BufferAttribute(colorsArr, 3));
+    geometry.setAttribute("size", new BufferAttribute(sizes, 1));
     geometry.setDrawRange(0, configRef.current.particleCount);
     const recolor = (hue: number) => {
-      const colorBase = new THREE.Color(`hsl(${hue}, 85%, 65%)`);
-      const colorFoam = new THREE.Color(0xf2fae8);
-      const colorDeep = new THREE.Color(`hsl(${hue + 14}, 75%, 32%)`);
+      const colorBase = new Color(`hsl(${hue}, 85%, 65%)`);
+      const colorFoam = new Color(0xf2fae8);
+      const colorDeep = new Color(`hsl(${hue + 14}, 75%, 32%)`);
       for (let i = 0; i < count; i++) {
         const i3 = i * 3;
         const mix = colorMixes[i];
@@ -2210,24 +2226,24 @@ function WaterfallHeroCanvas({
       geometry.attributes.color.needsUpdate = true;
     };
     recolor(configRef.current.hue);
-    const material = new THREE.PointsMaterial({
+    const material = new PointsMaterial({
       size: 0.18,
       vertexColors: true,
       transparent: true,
       opacity: 0.85,
-      blending: THREE.AdditiveBlending,
+      blending: AdditiveBlending,
       depthWrite: false,
     });
-    const particleSystem = new THREE.Points(geometry, material);
+    const particleSystem = new Points(geometry, material);
     scene.add(particleSystem);
-    const basinGeo = new THREE.CylinderGeometry(10, 10, 0.4, 32);
-    const basinMat = new THREE.MeshBasicMaterial({
+    const basinGeo = new CylinderGeometry(10, 10, 0.4, 32);
+    const basinMat = new MeshBasicMaterial({
       color: 0x2f4a15,
       transparent: true,
       opacity: 0.6,
       wireframe: true,
     });
-    const basinMesh = new THREE.Mesh(basinGeo, basinMat);
+    const basinMesh = new Mesh(basinGeo, basinMat);
     basinMesh.position.y = basinY;
     scene.add(basinMesh);
     let mouseX = 0;

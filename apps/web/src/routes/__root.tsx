@@ -11,8 +11,8 @@ import {
   useRouteContext,
   useRouterState,
 } from "@tanstack/react-router";
-import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import { createServerFn } from "@tanstack/react-start";
+import { lazy, Suspense } from "react";
 
 import { authClient } from "@/lib/auth-client";
 import { getToken } from "@/lib/auth-server";
@@ -26,6 +26,16 @@ import { PERF_DEBUG_SCRIPT } from "@/lib/perf-debug";
 import Header from "../components/header";
 
 import appCss from "../index.css?url";
+
+// Dev-only: the static import shipped the devtools event glue in the
+// production bundle; a DEV-gated lazy import lets the whole package drop out.
+const TanStackRouterDevtools = import.meta.env.DEV
+  ? lazy(() =>
+      import("@tanstack/react-router-devtools").then((m) => ({
+        default: m.TanStackRouterDevtools,
+      })),
+    )
+  : null;
 
 // Landing page preview: no real Convex deployment exists; the .env URLs are placeholders.
 // When detected, skip all Convex/auth wiring so the landing page never waits on
@@ -132,7 +142,11 @@ function RootDocument() {
           </div>
         )}
         <Toaster richColors />
-        {pathname === "/" ? null : <TanStackRouterDevtools position="bottom-left" />}
+        {pathname === "/" || TanStackRouterDevtools === null ? null : (
+          <Suspense fallback={null}>
+            <TanStackRouterDevtools position="bottom-left" />
+          </Suspense>
+        )}
         <Scripts />
       </body>
     </html>
