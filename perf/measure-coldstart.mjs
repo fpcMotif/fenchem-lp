@@ -169,7 +169,7 @@ export async function measureColdstart({ runs = 7, port = 4173, url } = {}) {
 
   if (!isDeployed) {
     console.log(`\n→ starting production preview server (\`vp preview\`) on :${port}`);
-    server = spawn("bun", ["run", "serve"], {
+    server = spawn("bunx", ["vp", "preview", "--outDir", "dist/client", "--port", String(port)], {
       cwd: WEB_DIR,
       stdio: "pipe",
       detached: process.platform !== "win32",

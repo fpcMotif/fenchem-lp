@@ -168,7 +168,7 @@ const auditStyles = stylex.create({
   },
 });
 
-function StyleAuditComponent() {
+export function StyleAuditComponent() {
   const [checked, setChecked] = React.useState(true);
   const [radioVal, setRadioVal] = React.useState("option1");
 

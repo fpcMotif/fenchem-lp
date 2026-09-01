@@ -1,0 +1,25 @@
+{
+  "total_client_bytes": {
+    "raw_max": 3000000,
+    "gzip_max": 800000,
+    "brotli_max": 700000
+  },
+  "max_single_chunk_bytes": {
+    "raw_max": 1000000,
+    "gzip_max": 350000,
+    "brotli_max": 300000
+  },
+  "profiler_bytes": {
+    "raw_max": 150000,
+    "gzip_max": 50000,
+    "brotli_max": 40000
+  },
+  "phases_duration_ms": {
+    "dependency_graph": 15000,
+    "style_compilation": 15000,
+    "server_output": 25000,
+    "client_output": 25000,
+    "asset_write": 10000,
+    "total": 60000
+  }
+}

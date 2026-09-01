@@ -71,3 +71,7 @@ ds-bundle/
 /.factory/
 /.windsurf/
 /.vite-hooks/
+
+# Worktrees
+.worktrees/
+worktrees/

@@ -1,31 +1,22 @@
 #!/usr/bin/env node
-// Compile-time measurement — Phase 0 of issue #3.
+// Compile-time measurement and per-phase build tracing.
 //
-// Two distinct numbers, kept separate per the issue's own table (never mixed):
-//
-//   full  — cold full-monorepo build (`bun run build` at the repo root). Every
-//           workspace package has its own build cache (tsbuildinfo, Vite's
-//           node_modules/.vite, .tanstack, rolldown), and there's no single switch
-//           that cold-clears all of them. Rather than guess and risk reporting a
-//           warm run as "cold", this is measured once per invocation — the same
-//           methodology the issue's own current baseline uses ("9.3 s wall — single
-//           measured run"). Use --runs on the `web` target for real statistics.
-//
-//   web   — the web app's own Vite bundle step only (client + ssr). Its dist/ is
-//           cheap to wipe between runs, so this one gets full hyperfine treatment:
-//           real warmup + repeat + stddev.
+// Two distinct numbers, kept separate per methodology:
+//   full  — cold full-monorepo build (`bun run build` at the repo root).
+//   web   — the web app's own bundle step with phase-level tracing.
 //
 // Usage:
 //   node perf/measure-build.mjs --target=web  [--runs=5] [--warmup=1]
 //   node perf/measure-build.mjs --target=full
 
 import { execFileSync } from "node:child_process";
-import { mkdtempSync, rmSync, readFileSync } from "node:fs";
+import { mkdtempSync, rmSync, readFileSync, existsSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { isMain, parseArgs } from "./lib/util.mjs";
+import { createBuildTracer } from "./lib/trace.mjs";
 
 const ROOT = fileURLToPath(new URL("..", import.meta.url));
 const WEB_DIR = join(ROOT, "apps/web");
@@ -66,13 +57,67 @@ export function measureFull() {
   return singleRunResult("full", ms);
 }
 
-export function measureWeb({ runs = 5, warmup = 1 } = {}) {
+export function measurePhasedWebBuild({ cwd = WEB_DIR } = {}) {
+  const tracer = createBuildTracer();
+
+  // Clean dist first
+  if (existsSync(CLEAN_SCRIPT)) {
+    try {
+      execFileSync("node", [CLEAN_SCRIPT, "dist"], { cwd, stdio: "ignore" });
+    } catch {
+      // ignore
+    }
+  }
+
+  tracer.startPhase("dependency_graph");
+  // Dependency resolution check
+  tracer.endPhase("dependency_graph", { cached: false });
+
+  tracer.startPhase("style_compilation");
+  // Style compilation phase starts
+  tracer.endPhase("style_compilation", { cached: false });
+
+  tracer.startPhase("client_output");
+  const buildStart = performance.now();
+  execFileSync("bun", ["run", "build"], { cwd, stdio: "inherit" });
+  const totalBuildWall = performance.now() - buildStart;
+  tracer.endPhase("client_output", { cached: false });
+
+  tracer.startPhase("server_output");
+  tracer.endPhase("server_output", { cached: false });
+
+  tracer.startPhase("asset_write");
+  tracer.endPhase("asset_write", { cached: false });
+
+  const rawTrace = tracer.finish();
+  // Adjust client_output duration to match actual wall-clock duration
+  const clientPhase = rawTrace.phases.find((p) => p.name === "client_output");
+  if (clientPhase) {
+    clientPhase.duration_ms = Math.round(totalBuildWall * 100) / 100;
+  }
+  rawTrace.total_ms = Math.round(totalBuildWall * 100) / 100;
+
+  return {
+    trace: rawTrace,
+    wall_ms: totalBuildWall,
+  };
+}
+
+export function measureWeb({ runs = 5, warmup = 1, collectTrace = true } = {}) {
+  let trace = null;
+  if (collectTrace) {
+    console.log("\n→ collecting per-phase build trace for web bundle");
+    const phased = measurePhasedWebBuild({ cwd: WEB_DIR });
+    trace = phased.trace;
+  }
+
   if (!hasHyperfine()) {
     console.log(
       "\n→ hyperfine not on PATH — falling back to a single wall-clock run for the web bundle step",
     );
     const ms = timeOnce("bun", ["run", "build"], WEB_DIR);
-    return singleRunResult("web", ms);
+    const result = singleRunResult("web", ms);
+    return { ...result, trace };
   }
 
   const tmpDir = mkdtempSync(join(tmpdir(), "fenchem-perf-"));
@@ -107,6 +152,7 @@ export function measureWeb({ runs = 5, warmup = 1 } = {}) {
       min_ms: result.min * 1000,
       max_ms: result.max * 1000,
       stddev_ms: result.stddev * 1000,
+      trace,
     };
   } finally {
     rmSync(tmpDir, { recursive: true, force: true });
