@@ -1,9 +1,37 @@
+import { colors } from "@fenchem-lp/ui/tokens.stylex";
+import * as stylex from "@stylexjs/stylex";
 import { Loader2 } from "lucide-react";
+
+const spin = stylex.keyframes({
+  from: {
+    transform: "rotate(0deg)",
+  },
+  to: {
+    transform: "rotate(360deg)",
+  },
+});
+
+const styles = stylex.create({
+  container: {
+    display: "flex",
+    height: "100%",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingTop: "2rem",
+  },
+  spinner: {
+    animationName: spin,
+    animationDuration: "1s",
+    animationTimingFunction: "linear",
+    animationIterationCount: "infinite",
+    color: colors.foreground,
+  },
+});
 
 export default function Loader() {
   return (
-    <div className="flex h-full items-center justify-center pt-8">
-      <Loader2 className="animate-spin" />
+    <div {...stylex.props(styles.container)}>
+      <Loader2 {...stylex.props(styles.spinner)} />
     </div>
   );
 }

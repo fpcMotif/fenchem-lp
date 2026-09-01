@@ -1,31 +1,10 @@
-import type { ComponentType } from "react";
-
-import { VariantA } from "./variant-a";
-import { VariantB } from "./variant-b";
-import { VariantC } from "./variant-c";
-import { VariantD } from "./variant-d";
-import { VariantE } from "./variant-e";
-import { VariantF } from "./variant-f";
-import { VariantG } from "./variant-g";
-import { VariantH } from "./variant-h";
-import { VariantI } from "./variant-i";
-import { VariantJ } from "./variant-j/index";
-import { VariantK } from "./variant-k";
-import { VariantV } from "./variant-v";
-import { VariantWaterfall } from "./variant-waterfall";
+import { lazy, type ComponentType } from "react";
 
 /*
  * PROTOTYPE — single source of truth for the Fenchem landing variants.
- * One ordered registry replaces the four scattered declarations that used to
- * drift apart: the route's VARIANT_KEYS + render ladder, and the switcher's
- * ORDER + VARIANT_NAMES. The route maps over it to render; the switcher reads
- * it for the arrow-key order + labels; VariantKey derives from its keys.
- *
- * Array order IS the switcher order: each original sits beside its brand twin
- * (A↔D, B↔E, C↔F) so ←/→ toggles a pair; G (hybrid, no twin) trails.
- * `twinOf` makes the A↔D / B↔E / C↔F pairing data instead of a comment.
- * V is H's vivid duotone twin (←/→ toggles H↔V).
- * Delete this file (and the losing variants) once a direction wins.
+ * Code-split with React.lazy so heavy prototype dependencies (Three.js for
+ * Waterfall, GSAP for Variant J, and individual prototype stylesheets)
+ * are loaded strictly on-demand per active variant, minimizing initial JS bundle.
  */
 
 type VariantEntry = {
@@ -37,19 +16,77 @@ type VariantEntry = {
 };
 
 export const VARIANTS = [
-  { key: "a", Component: VariantA, name: "Botanical Editorial · original" },
-  { key: "d", Component: VariantD, name: "Botanical Editorial · brand", twinOf: "a" },
-  { key: "b", Component: VariantB, name: "Innovation Lab · original" },
-  { key: "e", Component: VariantE, name: "Innovation Lab · brand", twinOf: "b" },
-  { key: "c", Component: VariantC, name: "Deep Forest · original" },
-  { key: "f", Component: VariantF, name: "Deep Green · brand", twinOf: "c" },
-  { key: "g", Component: VariantG, name: "Hybrid · brand" },
-  { key: "h", Component: VariantH, name: "Production · recommended" },
-  { key: "i", Component: VariantI, name: "Market Portal · Seppic-style" },
-  { key: "j", Component: VariantJ, name: "Greenhouse Ledger · motion" },
-  { key: "k", Component: VariantK, name: "Color Block · campaign" },
-  { key: "v", Component: VariantV, name: "Production · vivid", twinOf: "h" },
-  { key: "w", Component: VariantWaterfall, name: "Three.js Waterfall Fountain" },
+  {
+    key: "a",
+    Component: lazy(() => import("./variant-a").then((m) => ({ default: m.VariantA }))),
+    name: "Botanical Editorial · original",
+  },
+  {
+    key: "d",
+    Component: lazy(() => import("./variant-d").then((m) => ({ default: m.VariantD }))),
+    name: "Botanical Editorial · brand",
+    twinOf: "a",
+  },
+  {
+    key: "b",
+    Component: lazy(() => import("./variant-b").then((m) => ({ default: m.VariantB }))),
+    name: "Innovation Lab · original",
+  },
+  {
+    key: "e",
+    Component: lazy(() => import("./variant-e").then((m) => ({ default: m.VariantE }))),
+    name: "Innovation Lab · brand",
+    twinOf: "b",
+  },
+  {
+    key: "c",
+    Component: lazy(() => import("./variant-c").then((m) => ({ default: m.VariantC }))),
+    name: "Deep Forest · original",
+  },
+  {
+    key: "f",
+    Component: lazy(() => import("./variant-f").then((m) => ({ default: m.VariantF }))),
+    name: "Deep Green · brand",
+    twinOf: "c",
+  },
+  {
+    key: "g",
+    Component: lazy(() => import("./variant-g").then((m) => ({ default: m.VariantG }))),
+    name: "Hybrid · brand",
+  },
+  {
+    key: "h",
+    Component: lazy(() => import("./variant-h").then((m) => ({ default: m.VariantH }))),
+    name: "Production · recommended",
+  },
+  {
+    key: "i",
+    Component: lazy(() => import("./variant-i").then((m) => ({ default: m.VariantI }))),
+    name: "Market Portal · Seppic-style",
+  },
+  {
+    key: "j",
+    Component: lazy(() => import("./variant-j/index").then((m) => ({ default: m.VariantJ }))),
+    name: "Greenhouse Ledger · motion",
+  },
+  {
+    key: "k",
+    Component: lazy(() => import("./variant-k").then((m) => ({ default: m.VariantK }))),
+    name: "Color Block · campaign",
+  },
+  {
+    key: "v",
+    Component: lazy(() => import("./variant-v").then((m) => ({ default: m.VariantV }))),
+    name: "Production · vivid",
+    twinOf: "h",
+  },
+  {
+    key: "w",
+    Component: lazy(() =>
+      import("./variant-waterfall").then((m) => ({ default: m.VariantWaterfall })),
+    ),
+    name: "Three.js Waterfall Fountain",
+  },
 ] as const satisfies readonly VariantEntry[];
 
 export type VariantKey = (typeof VARIANTS)[number]["key"];

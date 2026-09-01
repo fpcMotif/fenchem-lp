@@ -4,19 +4,21 @@
  * micro-labels, grayscale ingredient matrix, marquee ticker.
  * Base layout mined from reference/innovation_home.html.
  */
-import { useRef } from "react";
-import type { ReactNode } from "react";
-import { LazyMotion, domAnimation, m, useScroll, useTransform } from "motion/react";
-import { ArrowRight, ArrowUpRight, Plus } from "lucide-react";
-import { Reveal } from "@/components/prototype/motion";
-import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 import {
-  ingredients,
   getFeaturedIngredients,
   industries,
+  ingredients,
   pillars,
   regions,
 } from "@/components/landing/landing-content";
+import { Reveal } from "@/components/prototype/motion";
+import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
+import { breakpoints, colors, radii, typography } from "@fenchem-lp/ui/tokens.stylex";
+import * as stylex from "@stylexjs/stylex";
+import { ArrowRight, ArrowUpRight, Plus } from "lucide-react";
+import { domAnimation, LazyMotion, m, useScroll, useTransform } from "motion/react";
+import type { ReactNode } from "react";
+import { useRef } from "react";
 
 const IMG = {
   glassware:
@@ -132,6 +134,1273 @@ const FOOTER_COLS = [
   },
 ] as const;
 
+const pingAnim = stylex.keyframes({
+  "75%, 100%": {
+    transform: "scale(2)",
+    opacity: 0,
+  },
+});
+
+const marqueeAnim = stylex.keyframes({
+  "0%": {
+    transform: "translateX(0)",
+  },
+  "100%": {
+    transform: "translateX(-50%)",
+  },
+});
+
+const styles = stylex.create({
+  root: {
+    backgroundColor: "#ffffff",
+    fontFamily: typography.body,
+    color: colors.bark,
+    WebkitFontSmoothing: "antialiased",
+  },
+  stickyHeader: {
+    position: "sticky",
+    top: 0,
+    zIndex: 50,
+    borderBottomWidth: "1px",
+    borderBottomStyle: "solid",
+    borderBottomColor: colors.pebble,
+    backgroundColor: "color-mix(in oklab, #ffffff 90%, transparent)",
+    backdropFilter: "blur(12px)",
+    WebkitBackdropFilter: "blur(12px)",
+  },
+  frameContainer: {
+    marginInline: "auto",
+    maxWidth: "1480px",
+    borderLeftColor: colors.pebble,
+    borderRightColor: colors.pebble,
+    "@media (min-width: 1481px)": {
+      borderLeftWidth: "1px",
+      borderLeftStyle: "solid",
+      borderRightWidth: "1px",
+      borderRightStyle: "solid",
+    },
+  },
+  microLabelStrip: {
+    display: { default: "none", [breakpoints.md]: "flex" },
+    alignItems: "center",
+    justifyContent: "space-between",
+    borderBottomWidth: "1px",
+    borderBottomStyle: "solid",
+    borderBottomColor: colors.pebble,
+    paddingInline: { default: "1.25rem", [breakpoints.md]: "2.5rem" },
+    paddingBlock: "0.5rem",
+  },
+  microLabelItem: {
+    display: "flex",
+    alignItems: "center",
+    gap: "0.5rem",
+    fontFamily: typography.tech,
+    fontSize: "10px",
+    textTransform: "uppercase",
+    letterSpacing: "0.25em",
+    color: "color-mix(in oklab, var(--color-bark) 60%, transparent)",
+  },
+  pingWrapper: {
+    position: "relative",
+    display: "flex",
+    width: "0.375rem",
+    height: "0.375rem",
+  },
+  pingRing: {
+    position: "absolute",
+    display: "inline-flex",
+    height: "100%",
+    width: "100%",
+    borderRadius: radii.full,
+    backgroundColor: "color-mix(in oklab, var(--color-moss) 60%, transparent)",
+    animationName: {
+      default: pingAnim,
+      [breakpoints.motionReduce]: "none",
+    },
+    animationDuration: "1s",
+    animationIterationCount: "infinite",
+  },
+  pingDot: {
+    position: "relative",
+    display: "inline-flex",
+    width: "0.375rem",
+    height: "0.375rem",
+    borderRadius: radii.full,
+    backgroundColor: colors.moss,
+  },
+  navRow: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingInline: { default: "1.25rem", [breakpoints.md]: "2.5rem" },
+    paddingBlock: "1rem",
+  },
+  brandBtn: {
+    display: "flex",
+    alignItems: "baseline",
+    gap: "0.75rem",
+    borderWidth: 0,
+    backgroundColor: "transparent",
+    cursor: "pointer",
+    padding: 0,
+    transitionProperty: "opacity",
+    transitionDuration: "300ms",
+    ":hover": {
+      opacity: 0.7,
+    },
+  },
+  brandLogoText: {
+    fontFamily: typography.body,
+    fontSize: "1.25rem",
+    fontWeight: 700,
+    letterSpacing: "-0.04em",
+    color: colors.forest,
+  },
+  brandSubtitle: {
+    display: { default: "none", [breakpoints.sm]: "inline" },
+    fontFamily: typography.tech,
+    fontSize: "9px",
+    textTransform: "uppercase",
+    letterSpacing: "0.3em",
+    color: "color-mix(in oklab, var(--color-bark) 60%, transparent)",
+  },
+  navLinksWrapper: {
+    display: { default: "none", [breakpoints.md]: "flex" },
+    alignItems: "center",
+    gap: "2rem",
+  },
+  navLink: {
+    fontFamily: typography.tech,
+    fontSize: "11px",
+    textTransform: "uppercase",
+    letterSpacing: "0.22em",
+    color: {
+      default: "color-mix(in oklab, var(--color-bark) 60%, transparent)",
+      ":hover": colors.forest,
+    },
+    transitionProperty: "color",
+    transitionDuration: "300ms",
+    textDecoration: "none",
+  },
+  navLinkNum: {
+    marginRight: "0.375rem",
+    color: colors.moss,
+  },
+  navCta: {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "0.625rem",
+    backgroundColor: {
+      default: colors.forest,
+      ":hover": colors.fern,
+    },
+    paddingInline: "1.25rem",
+    paddingBlock: "0.625rem",
+    fontFamily: typography.tech,
+    fontSize: "10px",
+    textTransform: "uppercase",
+    letterSpacing: "0.22em",
+    color: colors.cream,
+    transitionProperty: "background-color",
+    transitionDuration: "300ms",
+    textDecoration: "none",
+  },
+  scrollBar: {
+    position: "absolute",
+    insetInline: 0,
+    bottom: 0,
+    height: "2px",
+    transformOrigin: "left",
+    backgroundColor: colors.moss,
+  },
+  // Hero
+  heroSection: {
+    position: "relative",
+    borderBottomWidth: "1px",
+    borderBottomStyle: "solid",
+    borderBottomColor: colors.pebble,
+  },
+  heroGridBg: {
+    pointerEvents: "none",
+    position: "absolute",
+    inset: 0,
+    backgroundImage:
+      "linear-gradient(to right, color-mix(in oklab, var(--color-forest) 3.5%, transparent) 1px, transparent 1px), linear-gradient(to bottom, color-mix(in oklab, var(--color-forest) 3.5%, transparent) 1px, transparent 1px)",
+    backgroundSize: "56px 56px",
+  },
+  plusTopLeft: {
+    position: "absolute",
+    left: "1rem",
+    top: "1rem",
+    width: "1rem",
+    height: "1rem",
+    color: "color-mix(in oklab, var(--color-bark) 20%, transparent)",
+  },
+  plusBottomRight: {
+    position: "absolute",
+    bottom: "1rem",
+    right: "1rem",
+    display: { default: "none", [breakpoints.lg]: "block" },
+    width: "1rem",
+    height: "1rem",
+    color: "color-mix(in oklab, var(--color-bark) 20%, transparent)",
+  },
+  heroGrid: {
+    position: "relative",
+    display: "grid",
+    gridTemplateColumns: { default: "1fr", [breakpoints.lg]: "repeat(12, 1fr)" },
+  },
+  heroLeft: {
+    paddingInline: { default: "1.25rem", [breakpoints.md]: "2.5rem" },
+    paddingBlock: { default: "4rem", [breakpoints.md]: "6rem", [breakpoints.lg]: "7rem" },
+    gridColumn: { default: "auto", [breakpoints.lg]: "span 8" },
+  },
+  heroStatusBadge: {
+    display: "inline-flex",
+    width: "fit-content",
+    alignItems: "center",
+    gap: "0.625rem",
+    borderWidth: "1px",
+    borderStyle: "solid",
+    borderColor: colors.pebble,
+    backgroundColor: "#ffffff",
+    paddingInline: "0.875rem",
+    paddingBlock: "0.5rem",
+  },
+  heroStatusPingWrap: {
+    position: "relative",
+    display: "flex",
+    width: "0.5rem",
+    height: "0.5rem",
+  },
+  heroStatusPingRing: {
+    position: "absolute",
+    display: "inline-flex",
+    height: "100%",
+    width: "100%",
+    borderRadius: radii.full,
+    backgroundColor: "color-mix(in oklab, var(--color-moss) 50%, transparent)",
+    animationName: {
+      default: pingAnim,
+      [breakpoints.motionReduce]: "none",
+    },
+    animationDuration: "1s",
+    animationIterationCount: "infinite",
+  },
+  heroStatusPingDot: {
+    position: "relative",
+    display: "inline-flex",
+    width: "0.5rem",
+    height: "0.5rem",
+    borderRadius: radii.full,
+    backgroundColor: colors.moss,
+  },
+  heroStatusText: {
+    fontFamily: typography.tech,
+    fontSize: "10px",
+    textTransform: "uppercase",
+    letterSpacing: "0.3em",
+    color: "color-mix(in oklab, var(--color-bark) 60%, transparent)",
+  },
+  heroHeadline: {
+    marginTop: "2.5rem",
+    fontFamily: typography.body,
+    fontSize: "clamp(2.7rem, 6.4vw, 6rem)",
+    fontWeight: 600,
+    lineHeight: 0.98,
+    letterSpacing: "-0.04em",
+    color: colors.bark,
+  },
+  heroHeadlineItalic: {
+    marginTop: "0.5rem",
+    display: "block",
+    fontFamily: typography.display,
+    fontWeight: 300,
+    fontStyle: "italic",
+    lineHeight: 1.05,
+    letterSpacing: "-0.01em",
+    color: colors.moss,
+  },
+  heroDesc: {
+    marginTop: "2rem",
+    maxWidth: "36rem",
+    fontSize: { default: "1rem", [breakpoints.md]: "1.125rem" },
+    lineHeight: 1.625,
+    color: "color-mix(in oklab, var(--color-bark) 60%, transparent)",
+  },
+  heroCtas: {
+    marginTop: "2.5rem",
+    display: "flex",
+    flexWrap: "wrap",
+    gap: { default: "0.75rem", [breakpoints.md]: "1rem" },
+  },
+  heroPrimaryCta: {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "0.75rem",
+    backgroundColor: {
+      default: colors.forest,
+      ":hover": colors.fern,
+    },
+    paddingInline: "1.75rem",
+    paddingBlock: "1rem",
+    fontFamily: typography.tech,
+    fontSize: "11px",
+    textTransform: "uppercase",
+    letterSpacing: "0.22em",
+    color: colors.cream,
+    transitionProperty: "background-color",
+    transitionDuration: "300ms",
+    textDecoration: "none",
+  },
+  heroOutlineCta: {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "0.75rem",
+    borderWidth: "1px",
+    borderStyle: "solid",
+    borderColor: {
+      default: "color-mix(in oklab, var(--color-bark) 20%, transparent)",
+      ":hover": colors.forest,
+    },
+    paddingInline: "1.75rem",
+    paddingBlock: "1rem",
+    fontFamily: typography.tech,
+    fontSize: "11px",
+    textTransform: "uppercase",
+    letterSpacing: "0.22em",
+    color: {
+      default: "color-mix(in oklab, var(--color-bark) 70%, transparent)",
+      ":hover": colors.forest,
+    },
+    backgroundColor: {
+      default: "transparent",
+      ":hover": "color-mix(in oklab, var(--color-mint) 20%, transparent)",
+    },
+    transitionProperty: "border-color, background-color, color",
+    transitionDuration: "300ms",
+    textDecoration: "none",
+  },
+  iconSm: {
+    width: "0.875rem",
+    height: "0.875rem",
+  },
+  heroRightRail: {
+    display: "flex",
+    flexDirection: "column",
+    borderTopWidth: { default: "1px", [breakpoints.lg]: 0 },
+    borderLeftWidth: { default: 0, [breakpoints.lg]: "1px" },
+    borderTopStyle: "solid",
+    borderLeftStyle: "solid",
+    borderTopColor: colors.pebble,
+    borderLeftColor: colors.pebble,
+    gridColumn: { default: "auto", [breakpoints.lg]: "span 4" },
+  },
+  heroRailContent: {
+    display: "flex",
+    height: "100%",
+    flexDirection: "column",
+  },
+  heroMetaDl: {
+    borderBottomWidth: "1px",
+    borderBottomStyle: "solid",
+    borderBottomColor: colors.pebble,
+  },
+  heroMetaRow: {
+    display: "flex",
+    alignItems: "baseline",
+    justifyContent: "space-between",
+    paddingInline: { default: "1.25rem", [breakpoints.md]: "2rem" },
+    paddingBlock: "1rem",
+    borderBottomWidth: "1px",
+    borderBottomStyle: "solid",
+    borderBottomColor: colors.pebble,
+  },
+  heroMetaDt: {
+    fontFamily: typography.tech,
+    fontSize: "10px",
+    textTransform: "uppercase",
+    letterSpacing: "0.22em",
+    color: "color-mix(in oklab, var(--color-bark) 60%, transparent)",
+  },
+  heroMetaDd: {
+    fontFamily: typography.tech,
+    fontSize: "11px",
+    textTransform: "uppercase",
+    letterSpacing: "0.18em",
+    color: "color-mix(in oklab, var(--color-bark) 80%, transparent)",
+  },
+  heroMetaDdActive: {
+    display: "flex",
+    alignItems: "center",
+    gap: "0.5rem",
+    fontFamily: typography.tech,
+    fontSize: "11px",
+    textTransform: "uppercase",
+    letterSpacing: "0.18em",
+    color: colors.moss,
+  },
+  heroMetaStatusDot: {
+    width: "0.375rem",
+    height: "0.375rem",
+    borderRadius: radii.full,
+    backgroundColor: colors.moss,
+  },
+  heroLabImgWrapper: {
+    position: "relative",
+    minHeight: { default: "16rem", [breakpoints.lg]: "18rem" },
+    flex: 1,
+    overflow: "hidden",
+  },
+  heroLabImg: {
+    position: "absolute",
+    inset: 0,
+    height: "100%",
+    width: "100%",
+    objectFit: "cover",
+    filter: {
+      default: "grayscale(100%)",
+      ":hover": "grayscale(0%)",
+    },
+    transform: {
+      default: "scale(1)",
+      ":hover": "scale(1.03)",
+    },
+    transitionProperty: "transform, filter",
+    transitionDuration: "700ms",
+    transitionTimingFunction: "ease-out",
+  },
+  figOverlay: {
+    position: "absolute",
+    insetInline: 0,
+    bottom: 0,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    borderTopWidth: "1px",
+    borderTopStyle: "solid",
+    borderTopColor: colors.pebble,
+    backgroundColor: "color-mix(in oklab, #ffffff 90%, transparent)",
+    paddingInline: "1rem",
+    paddingBlock: "0.625rem",
+    backdropFilter: "blur(4px)",
+    WebkitBackdropFilter: "blur(4px)",
+  },
+  figText: {
+    fontFamily: typography.tech,
+    fontSize: "10px",
+    textTransform: "uppercase",
+    letterSpacing: "0.22em",
+    color: "color-mix(in oklab, var(--color-bark) 70%, transparent)",
+  },
+  figCode: {
+    fontFamily: typography.tech,
+    fontSize: "10px",
+    letterSpacing: "0.22em",
+    color: colors.moss,
+  },
+  // Ticker
+  tickerSection: {
+    overflow: "hidden",
+    borderBottomWidth: "1px",
+    borderBottomStyle: "solid",
+    borderBottomColor: colors.pebble,
+    paddingBlock: { default: "1rem", [breakpoints.md]: "1.25rem" },
+  },
+  tickerTrack: {
+    display: "flex",
+    width: "max-content",
+    animationName: {
+      default: marqueeAnim,
+      [breakpoints.motionReduce]: "none",
+    },
+    animationDuration: "35s",
+    animationTimingFunction: "linear",
+    animationIterationCount: "infinite",
+  },
+  tickerList: {
+    display: "flex",
+    flexShrink: 0,
+    alignItems: "center",
+    listStyleType: "none",
+    padding: 0,
+    margin: 0,
+  },
+  tickerItem: {
+    display: "flex",
+    alignItems: "center",
+    gap: { default: "2rem", [breakpoints.md]: "3rem" },
+    paddingRight: { default: "2rem", [breakpoints.md]: "3rem" },
+  },
+  tickerText: {
+    whiteSpace: "nowrap",
+    fontFamily: typography.tech,
+    fontSize: { default: "11px", [breakpoints.md]: "12px" },
+    textTransform: "uppercase",
+    letterSpacing: "0.3em",
+    color: "color-mix(in oklab, var(--color-bark) 70%, transparent)",
+  },
+  tickerIndex: {
+    color: colors.moss,
+  },
+  tickerDiamond: {
+    width: "0.375rem",
+    height: "0.375rem",
+    transform: "rotate(45deg)",
+    backgroundColor: colors.mint,
+  },
+  // Stat band
+  statBandGrid: {
+    display: "grid",
+    gridTemplateColumns: {
+      default: "repeat(2, 1fr)",
+      [breakpoints.lg]: "repeat(4, 1fr)",
+    },
+    gap: "1px",
+    borderBottomWidth: "1px",
+    borderBottomStyle: "solid",
+    borderBottomColor: colors.pebble,
+    backgroundColor: colors.pebble,
+  },
+  statBandCardBg: {
+    backgroundColor: "#ffffff",
+  },
+  statBandCell: {
+    height: "100%",
+    paddingInline: { default: "1.25rem", [breakpoints.md]: "2rem" },
+    paddingBlock: { default: "2.25rem", [breakpoints.md]: "3rem" },
+    backgroundColor: {
+      default: "transparent",
+      ":hover": "color-mix(in oklab, var(--color-mint) 20%, transparent)",
+    },
+    transitionProperty: "background-color",
+    transitionDuration: "500ms",
+  },
+  statBandLabel: {
+    fontFamily: typography.tech,
+    fontSize: "10px",
+    textTransform: "uppercase",
+    letterSpacing: "0.28em",
+    color: "color-mix(in oklab, var(--color-bark) 70%, transparent)",
+  },
+  statBandValWrap: {
+    marginTop: "1.25rem",
+    display: "flex",
+    flexWrap: "wrap",
+    alignItems: "baseline",
+    columnGap: "0.625rem",
+  },
+  statBandValue: {
+    fontFamily: typography.body,
+    fontSize: { default: "2.25rem", [breakpoints.md]: "3.75rem" },
+    fontWeight: 600,
+    letterSpacing: "-0.04em",
+    color: colors.forest,
+  },
+  statBandUnit: {
+    fontFamily: typography.display,
+    fontSize: { default: "1.125rem", [breakpoints.md]: "1.5rem" },
+    fontWeight: 300,
+    fontStyle: "italic",
+    color: colors.moss,
+  },
+  statBandDesc: {
+    marginTop: "1rem",
+    fontSize: "0.875rem",
+    lineHeight: 1.625,
+    color: "color-mix(in oklab, var(--color-bark) 70%, transparent)",
+  },
+  // Section Head
+  sectionHeadWrap: {
+    display: "flex",
+    flexDirection: { default: "column", [breakpoints.md]: "row" },
+    gap: "2rem",
+    borderBottomWidth: "1px",
+    borderBottomStyle: "solid",
+    borderBottomColor: colors.pebble,
+    paddingInline: { default: "1.25rem", [breakpoints.md]: "2.5rem" },
+    paddingBlock: { default: "3.5rem", [breakpoints.md]: "5rem" },
+    alignItems: { default: "stretch", [breakpoints.md]: "flex-end" },
+    justifyContent: { default: "flex-start", [breakpoints.md]: "space-between" },
+  },
+  sectionHeadCode: {
+    fontFamily: typography.tech,
+    fontSize: "11px",
+    textTransform: "uppercase",
+    letterSpacing: "0.28em",
+    color: colors.moss,
+  },
+  sectionHeadTitle: {
+    marginTop: "1.25rem",
+    fontFamily: typography.body,
+    fontSize: { default: "2.25rem", [breakpoints.md]: "3rem" },
+    fontWeight: 600,
+    lineHeight: 1.02,
+    letterSpacing: "-0.03em",
+    color: colors.bark,
+  },
+  sectionHeadItalic: {
+    fontFamily: typography.display,
+    fontWeight: 300,
+    fontStyle: "italic",
+    letterSpacing: "-0.01em",
+    color: colors.moss,
+  },
+  // Matrix
+  matrixSection: {
+    borderBottomWidth: "1px",
+    borderBottomStyle: "solid",
+    borderBottomColor: colors.pebble,
+  },
+  matrixSpecsBtn: {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "0.625rem",
+    borderWidth: "1px",
+    borderStyle: "solid",
+    borderColor: {
+      default: colors.pebble,
+      ":hover": colors.forest,
+    },
+    paddingInline: "1.25rem",
+    paddingBlock: "0.75rem",
+    fontFamily: typography.tech,
+    fontSize: "10px",
+    textTransform: "uppercase",
+    letterSpacing: "0.26em",
+    color: {
+      default: "color-mix(in oklab, var(--color-bark) 70%, transparent)",
+      ":hover": colors.forest,
+    },
+    transitionProperty: "border-color, color",
+    transitionDuration: "300ms",
+    textDecoration: "none",
+  },
+  matrixGrid: {
+    display: "grid",
+    gridTemplateColumns: {
+      default: "1fr",
+      [breakpoints.md]: "repeat(2, 1fr)",
+      [breakpoints.lg]: "repeat(3, 1fr)",
+    },
+    gap: "1px",
+    backgroundColor: colors.pebble,
+  },
+  matrixCardBg: {
+    backgroundColor: "#ffffff",
+  },
+  matrixImgContainer: {
+    position: "relative",
+    aspectRatio: "4 / 3",
+    overflow: "hidden",
+    borderBottomWidth: "1px",
+    borderBottomStyle: "solid",
+    borderBottomColor: colors.pebble,
+  },
+  matrixImg: {
+    height: "100%",
+    width: "100%",
+    objectFit: "cover",
+    filter: {
+      default: "grayscale(100%)",
+      ":hover": "grayscale(0%)",
+    },
+    transform: {
+      default: "scale(1)",
+      ":hover": "scale(1.04)",
+    },
+    transitionProperty: "transform, filter",
+    transitionDuration: "700ms",
+    transitionTimingFunction: "ease-out",
+  },
+  matrixCategoryBadge: {
+    position: "absolute",
+    right: "1rem",
+    top: "1rem",
+    borderWidth: "1px",
+    borderStyle: "solid",
+    borderColor: colors.pebble,
+    backgroundColor: "color-mix(in oklab, #ffffff 90%, transparent)",
+    paddingInline: "0.5rem",
+    paddingBlock: "0.25rem",
+    fontFamily: typography.tech,
+    fontSize: "9px",
+    textTransform: "uppercase",
+    letterSpacing: "0.2em",
+    color: "color-mix(in oklab, var(--color-bark) 70%, transparent)",
+    backdropFilter: "blur(4px)",
+    WebkitBackdropFilter: "blur(4px)",
+  },
+  matrixCardContent: {
+    paddingInline: { default: "1.25rem", [breakpoints.md]: "1.75rem" },
+    paddingBlock: { default: "1.75rem", [breakpoints.md]: "2rem" },
+  },
+  matrixCardHeader: {
+    display: "flex",
+    alignItems: "baseline",
+    justifyContent: "space-between",
+  },
+  matrixCardNum: {
+    fontFamily: typography.tech,
+    fontSize: "11px",
+    letterSpacing: "0.22em",
+    color: colors.moss,
+  },
+  matrixCardCode: {
+    fontFamily: typography.tech,
+    fontSize: "10px",
+    textTransform: "uppercase",
+    letterSpacing: "0.22em",
+    color: "color-mix(in oklab, var(--color-bark) 60%, transparent)",
+  },
+  matrixCardTitle: {
+    marginTop: "0.75rem",
+    fontFamily: typography.body,
+    fontSize: "1.25rem",
+    fontWeight: 600,
+    letterSpacing: "-0.02em",
+    color: {
+      default: colors.bark,
+      ":hover": colors.forest,
+    },
+    transitionProperty: "color",
+    transitionDuration: "300ms",
+  },
+  matrixCardDl: {
+    marginTop: "1.25rem",
+    borderTopWidth: "1px",
+    borderTopStyle: "solid",
+    borderTopColor: colors.pebble,
+    paddingTop: "1rem",
+    display: "flex",
+    flexDirection: "column",
+    gap: "0.625rem",
+  },
+  matrixCardDlRow: {
+    display: "flex",
+    alignItems: "baseline",
+    justifyContent: "space-between",
+    gap: "1rem",
+  },
+  matrixCardDt: {
+    fontFamily: typography.tech,
+    fontSize: "10px",
+    textTransform: "uppercase",
+    letterSpacing: "0.2em",
+    color: "color-mix(in oklab, var(--color-bark) 60%, transparent)",
+  },
+  matrixCardDd: {
+    textAlign: "right",
+    fontFamily: typography.tech,
+    fontSize: "11px",
+    color: "color-mix(in oklab, var(--color-bark) 70%, transparent)",
+  },
+  matrixRequestSpecLink: {
+    marginTop: "1.5rem",
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "0.5rem",
+    fontFamily: typography.tech,
+    fontSize: "10px",
+    textTransform: "uppercase",
+    letterSpacing: "0.24em",
+    color: {
+      default: "color-mix(in oklab, var(--color-bark) 60%, transparent)",
+      ":hover": colors.forest,
+    },
+    transitionProperty: "color",
+    transitionDuration: "300ms",
+    textDecoration: "none",
+  },
+  iconXs: {
+    width: "0.75rem",
+    height: "0.75rem",
+  },
+  // Protocol
+  protocolSection: {
+    borderBottomWidth: "1px",
+    borderBottomStyle: "solid",
+    borderBottomColor: colors.pebble,
+  },
+  protocolSubtitle: {
+    maxWidth: "20rem",
+    fontFamily: typography.tech,
+    fontSize: "10px",
+    textTransform: "uppercase",
+    lineHeight: 1.625,
+    letterSpacing: "0.2em",
+    color: "color-mix(in oklab, var(--color-bark) 60%, transparent)",
+  },
+  protocolGrid: {
+    display: "grid",
+    gridTemplateColumns: { default: "1fr", [breakpoints.lg]: "repeat(12, 1fr)" },
+  },
+  protocolFigCol: {
+    paddingInline: { default: "1.25rem", [breakpoints.md]: "2.5rem" },
+    paddingBlock: { default: "3rem", [breakpoints.lg]: "4rem" },
+    gridColumn: { default: "auto", [breakpoints.lg]: "span 5" },
+  },
+  protocolPillarsCol: {
+    borderTopWidth: { default: "1px", [breakpoints.lg]: 0 },
+    borderLeftWidth: { default: 0, [breakpoints.lg]: "1px" },
+    borderTopStyle: "solid",
+    borderLeftStyle: "solid",
+    borderTopColor: colors.pebble,
+    borderLeftColor: colors.pebble,
+    gridColumn: { default: "auto", [breakpoints.lg]: "span 7" },
+  },
+  protocolFigureContainer: {
+    position: "relative",
+    overflow: "hidden",
+    borderWidth: "1px",
+    borderStyle: "solid",
+    borderColor: colors.pebble,
+  },
+  protocolFigureImg: {
+    height: { default: "380px", [breakpoints.md]: "480px" },
+    width: "100%",
+    objectFit: "cover",
+    filter: {
+      default: "grayscale(100%)",
+      ":hover": "grayscale(0%)",
+    },
+    transitionProperty: "filter",
+    transitionDuration: "700ms",
+  },
+  protocolBorderB: {
+    borderBottomWidth: "1px",
+    borderBottomStyle: "solid",
+    borderBottomColor: colors.pebble,
+  },
+  protocolRowGrid: {
+    display: "grid",
+    gap: "1rem",
+    paddingInline: { default: "1.25rem", [breakpoints.md]: "2.5rem" },
+    paddingBlock: { default: "2.5rem", [breakpoints.md]: "3rem" },
+    backgroundColor: {
+      default: "transparent",
+      ":hover": "color-mix(in oklab, var(--color-mint) 20%, transparent)",
+    },
+    transitionProperty: "background-color",
+    transitionDuration: "500ms",
+    gridTemplateColumns: { default: "1fr", [breakpoints.md]: "repeat(12, 1fr)" },
+  },
+  protocolStepNum: {
+    fontFamily: typography.tech,
+    fontSize: "0.875rem",
+    letterSpacing: "0.22em",
+    color: colors.moss,
+    gridColumn: { default: "auto", [breakpoints.md]: "span 2" },
+  },
+  protocolRowBody: {
+    gridColumn: { default: "auto", [breakpoints.md]: "span 10" },
+  },
+  protocolRowHeader: {
+    display: "flex",
+    flexWrap: "wrap",
+    alignItems: "baseline",
+    justifyContent: "space-between",
+    columnGap: "1.5rem",
+    rowGap: "0.5rem",
+  },
+  protocolRowTitle: {
+    fontFamily: typography.body,
+    fontSize: { default: "1.5rem", [breakpoints.md]: "1.875rem" },
+    fontWeight: 600,
+    letterSpacing: "-0.02em",
+    color: colors.bark,
+  },
+  protocolRowTag: {
+    fontFamily: typography.tech,
+    fontSize: "10px",
+    textTransform: "uppercase",
+    letterSpacing: "0.22em",
+    color: "color-mix(in oklab, var(--color-bark) 70%, transparent)",
+  },
+  protocolRowDesc: {
+    marginTop: "1rem",
+    maxWidth: "36rem",
+    fontSize: { default: "0.875rem", [breakpoints.md]: "1rem" },
+    lineHeight: 1.625,
+    color: "color-mix(in oklab, var(--color-bark) 70%, transparent)",
+  },
+  // Domains
+  domainsSection: {
+    borderBottomWidth: "1px",
+    borderBottomStyle: "solid",
+    borderBottomColor: colors.pebble,
+  },
+  domainRowLink: {
+    display: "block",
+    borderBottomWidth: "1px",
+    borderBottomStyle: "solid",
+    borderBottomColor: colors.pebble,
+    backgroundColor: {
+      default: "transparent",
+      ":hover": "color-mix(in oklab, var(--color-mint) 20%, transparent)",
+    },
+    transitionProperty: "background-color",
+    transitionDuration: "500ms",
+    textDecoration: "none",
+    color: "inherit",
+  },
+  domainRowLinkLast: {
+    borderBottomWidth: 0,
+  },
+  domainRowInner: {
+    display: "grid",
+    alignItems: "center",
+    gap: "0.75rem",
+    paddingInline: { default: "1.25rem", [breakpoints.md]: "2.5rem" },
+    paddingBlock: { default: "2.25rem", [breakpoints.md]: "3rem" },
+    gridTemplateColumns: { default: "1fr", [breakpoints.md]: "repeat(12, 1fr)" },
+  },
+  domainMetaCol: {
+    gridColumn: { default: "auto", [breakpoints.md]: "span 2" },
+  },
+  domainCode: {
+    fontFamily: typography.tech,
+    fontSize: "11px",
+    letterSpacing: "0.22em",
+    color: colors.moss,
+  },
+  domainCat: {
+    marginTop: "0.25rem",
+    fontFamily: typography.tech,
+    fontSize: "10px",
+    textTransform: "uppercase",
+    letterSpacing: "0.22em",
+    color: "color-mix(in oklab, var(--color-bark) 70%, transparent)",
+  },
+  domainTitleCol: {
+    gridColumn: { default: "auto", [breakpoints.md]: "span 5" },
+    fontFamily: typography.body,
+    fontSize: { default: "1.5rem", [breakpoints.md]: "2.25rem" },
+    fontWeight: 600,
+    letterSpacing: "-0.03em",
+    color: {
+      default: colors.bark,
+      ":hover": colors.forest,
+    },
+    transitionProperty: "color",
+    transitionDuration: "300ms",
+  },
+  domainDescCol: {
+    gridColumn: { default: "auto", [breakpoints.md]: "span 4" },
+    fontSize: "0.875rem",
+    lineHeight: 1.625,
+    color: "color-mix(in oklab, var(--color-bark) 70%, transparent)",
+  },
+  domainArrowCol: {
+    display: "flex",
+    justifyContent: { default: "flex-start", [breakpoints.md]: "flex-end" },
+    gridColumn: { default: "auto", [breakpoints.md]: "span 1" },
+  },
+  domainArrowIcon: {
+    width: "1.5rem",
+    height: "1.5rem",
+    color: "color-mix(in oklab, var(--color-bark) 30%, transparent)",
+    transitionProperty: "transform, color",
+    transitionDuration: "300ms",
+  },
+  // CTA Network
+  ctaNetworkSection: {
+    backgroundColor: colors.forest,
+    color: colors.cream,
+  },
+  ctaTopBlock: {
+    borderBottomWidth: "1px",
+    borderBottomStyle: "solid",
+    borderBottomColor: "color-mix(in oklab, var(--color-cream) 10%, transparent)",
+    paddingInline: { default: "1.25rem", [breakpoints.md]: "2.5rem" },
+    paddingBlock: { default: "5rem", [breakpoints.md]: "7rem" },
+  },
+  ctaTopEyebrow: {
+    fontFamily: typography.tech,
+    fontSize: "11px",
+    textTransform: "uppercase",
+    letterSpacing: "0.28em",
+    color: "color-mix(in oklab, var(--color-mint) 80%, transparent)",
+  },
+  ctaTopHeading: {
+    marginTop: "1.5rem",
+    maxWidth: "56rem",
+    fontFamily: typography.body,
+    fontSize: { default: "2.25rem", [breakpoints.md]: "3.75rem" },
+    fontWeight: 600,
+    lineHeight: 1.02,
+    letterSpacing: "-0.03em",
+  },
+  ctaTopItalic: {
+    fontFamily: typography.display,
+    fontWeight: 300,
+    fontStyle: "italic",
+    letterSpacing: "-0.01em",
+    color: colors.mint,
+  },
+  ctaTopDesc: {
+    marginTop: "1.75rem",
+    maxWidth: "36rem",
+    fontSize: { default: "0.875rem", [breakpoints.md]: "1rem" },
+    lineHeight: 1.625,
+    color: "color-mix(in oklab, var(--color-cream) 70%, transparent)",
+  },
+  ctaTopBtnRow: {
+    marginTop: "2.5rem",
+    display: "flex",
+    flexWrap: "wrap",
+    gap: { default: "0.75rem", [breakpoints.md]: "1rem" },
+  },
+  ctaPartnerBtn: {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "0.75rem",
+    backgroundColor: {
+      default: colors.mint,
+      ":hover": colors.mist,
+    },
+    paddingInline: "1.75rem",
+    paddingBlock: "1rem",
+    fontFamily: typography.tech,
+    fontSize: "11px",
+    textTransform: "uppercase",
+    letterSpacing: "0.22em",
+    color: colors.forest,
+    transitionProperty: "background-color",
+    transitionDuration: "300ms",
+    borderWidth: 0,
+    cursor: "pointer",
+  },
+  ctaExploreBtn: {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "0.75rem",
+    borderWidth: "1px",
+    borderStyle: "solid",
+    borderColor: "color-mix(in oklab, var(--color-cream) 30%, transparent)",
+    paddingInline: "1.75rem",
+    paddingBlock: "1rem",
+    fontFamily: typography.tech,
+    fontSize: "11px",
+    textTransform: "uppercase",
+    letterSpacing: "0.22em",
+    color: {
+      default: "color-mix(in oklab, var(--color-cream) 90%, transparent)",
+      ":hover": colors.cream,
+    },
+    backgroundColor: {
+      default: "transparent",
+      ":hover": "color-mix(in oklab, var(--color-cream) 10%, transparent)",
+    },
+    transitionProperty: "border-color, background-color, color",
+    transitionDuration: "300ms",
+    textDecoration: "none",
+  },
+  ctaResponseTime: {
+    marginTop: "2.5rem",
+    fontFamily: typography.tech,
+    fontSize: "10px",
+    textTransform: "uppercase",
+    letterSpacing: "0.28em",
+    color: "color-mix(in oklab, var(--color-cream) 60%, transparent)",
+  },
+  networkHeaderRow: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    borderBottomWidth: "1px",
+    borderBottomStyle: "solid",
+    borderBottomColor: "color-mix(in oklab, var(--color-cream) 10%, transparent)",
+    paddingInline: { default: "1.25rem", [breakpoints.md]: "2.5rem" },
+    paddingBlock: "1.25rem",
+  },
+  networkHeaderTag: {
+    fontFamily: typography.tech,
+    fontSize: "10px",
+    textTransform: "uppercase",
+    letterSpacing: "0.26em",
+    color: "color-mix(in oklab, var(--color-mint) 70%, transparent)",
+  },
+  networkHeaderLatLong: {
+    display: { default: "none", [breakpoints.md]: "block" },
+    fontFamily: typography.tech,
+    fontSize: "10px",
+    textTransform: "uppercase",
+    letterSpacing: "0.26em",
+    color: "color-mix(in oklab, var(--color-cream) 60%, transparent)",
+  },
+  networkGrid: {
+    display: "grid",
+    gridTemplateColumns: {
+      default: "1fr",
+      [breakpoints.sm]: "repeat(2, 1fr)",
+      [breakpoints.lg]: "repeat(3, 1fr)",
+    },
+    gap: "1px",
+    backgroundColor: "color-mix(in oklab, var(--color-cream) 10%, transparent)",
+  },
+  networkCellBg: {
+    backgroundColor: colors.forest,
+  },
+  networkCell: {
+    height: "100%",
+    paddingInline: { default: "1.25rem", [breakpoints.md]: "2rem" },
+    paddingBlock: { default: "1.75rem", [breakpoints.md]: "2.25rem" },
+    backgroundColor: {
+      default: "transparent",
+      ":hover": colors.fern,
+    },
+    transitionProperty: "background-color",
+    transitionDuration: "500ms",
+  },
+  networkCellMeta: {
+    display: "flex",
+    alignItems: "baseline",
+    justifyContent: "space-between",
+    fontFamily: typography.tech,
+    fontSize: "10px",
+    textTransform: "uppercase",
+    letterSpacing: "0.2em",
+    color: "color-mix(in oklab, var(--color-mint) 70%, transparent)",
+  },
+  networkCellCoords: {
+    color: "color-mix(in oklab, var(--color-cream) 60%, transparent)",
+  },
+  networkCity: {
+    marginTop: "1rem",
+    fontFamily: typography.body,
+    fontSize: "1.25rem",
+    fontWeight: 600,
+    letterSpacing: "-0.02em",
+    color: colors.cream,
+  },
+  networkRole: {
+    marginTop: "0.25rem",
+    fontSize: "0.875rem",
+    color: "color-mix(in oklab, var(--color-cream) 60%, transparent)",
+  },
+  // Footer
+  footer: {
+    borderTopWidth: "1px",
+    borderTopStyle: "solid",
+    borderTopColor: colors.pebble,
+    backgroundColor: "#ffffff",
+  },
+  footerGrid: {
+    display: "grid",
+    gap: "3rem",
+    paddingInline: { default: "1.25rem", [breakpoints.md]: "2.5rem" },
+    paddingBlock: { default: "3.5rem", [breakpoints.md]: "4rem" },
+    gridTemplateColumns: { default: "1fr", [breakpoints.md]: "repeat(12, 1fr)" },
+  },
+  footerBrandCol: {
+    gridColumn: { default: "auto", [breakpoints.md]: "span 5" },
+  },
+  footerBrandBtn: {
+    borderWidth: 0,
+    backgroundColor: "transparent",
+    fontFamily: typography.body,
+    fontSize: "1.5rem",
+    fontWeight: 700,
+    letterSpacing: "-0.04em",
+    color: colors.forest,
+    cursor: "pointer",
+    padding: 0,
+    transitionProperty: "opacity",
+    transitionDuration: "300ms",
+    ":hover": {
+      opacity: 0.7,
+    },
+  },
+  footerTagline: {
+    marginTop: "1rem",
+    maxWidth: "20rem",
+    fontFamily: typography.display,
+    fontSize: "1.125rem",
+    fontWeight: 300,
+    fontStyle: "italic",
+    color: colors.moss,
+  },
+  footerCertText: {
+    marginTop: "1.5rem",
+    fontFamily: typography.tech,
+    fontSize: "10px",
+    textTransform: "uppercase",
+    lineHeight: 2,
+    letterSpacing: "0.22em",
+    color: "color-mix(in oklab, var(--color-bark) 60%, transparent)",
+  },
+  footerNavCol: {
+    gridColumn: { default: "auto", [breakpoints.md]: "span 2" },
+  },
+  footerColHead: {
+    fontFamily: typography.tech,
+    fontSize: "10px",
+    textTransform: "uppercase",
+    letterSpacing: "0.28em",
+    color: "color-mix(in oklab, var(--color-bark) 60%, transparent)",
+  },
+  footerLinksList: {
+    marginTop: "1.25rem",
+    display: "flex",
+    flexDirection: "column",
+    gap: "0.75rem",
+    listStyleType: "none",
+    padding: 0,
+    margin: 0,
+  },
+  footerLinkA: {
+    fontSize: "0.875rem",
+    color: {
+      default: "color-mix(in oklab, var(--color-bark) 70%, transparent)",
+      ":hover": colors.forest,
+    },
+    textDecorationLine: "underline",
+    textDecorationColor: {
+      default: colors.pebble,
+      ":hover": colors.moss,
+    },
+    textUnderlineOffset: "4px",
+    transitionProperty: "color, text-decoration-color",
+    transitionDuration: "300ms",
+  },
+  footerWatermark: {
+    userSelect: "none",
+    overflow: "hidden",
+    whiteSpace: "nowrap",
+    paddingInline: { default: "1.25rem", [breakpoints.md]: "2.5rem" },
+    fontFamily: typography.body,
+    fontSize: "17vw",
+    "@media (min-width: 1481px)": {
+      fontSize: "15rem",
+    },
+    fontWeight: 700,
+    lineHeight: 0.78,
+    letterSpacing: "-0.06em",
+    color: "color-mix(in oklab, var(--color-forest) 5%, transparent)",
+  },
+  footerBottomBar: {
+    display: "flex",
+    flexDirection: { default: "column", [breakpoints.md]: "row" },
+    gap: "0.5rem",
+    borderTopWidth: "1px",
+    borderTopStyle: "solid",
+    borderTopColor: colors.pebble,
+    paddingInline: { default: "1.25rem", [breakpoints.md]: "2.5rem" },
+    paddingBlock: "1rem",
+    fontFamily: typography.tech,
+    fontSize: "10px",
+    textTransform: "uppercase",
+    letterSpacing: "0.22em",
+    color: "color-mix(in oklab, var(--color-bark) 60%, transparent)",
+    alignItems: { default: "stretch", [breakpoints.md]: "center" },
+    justifyContent: { default: "flex-start", [breakpoints.md]: "space-between" },
+  },
+  textMoss: {
+    color: colors.moss,
+  },
+});
+
 /* Section header: mono code / big sans title with one serif italic word */
 function SectionHead({
   code,
@@ -145,14 +1414,11 @@ function SectionHead({
   right?: ReactNode;
 }) {
   return (
-    <div className="flex flex-col gap-8 border-b border-pebble px-5 py-14 md:flex-row md:items-end md:justify-between md:px-10 md:py-20">
+    <div {...stylex.props(styles.sectionHeadWrap)}>
       <Reveal>
-        <p className="font-tech text-[11px] uppercase tracking-[0.28em] text-moss">{code}</p>
-        <h2 className="mt-5 font-body text-4xl font-semibold leading-[1.02] tracking-[-0.03em] text-bark md:text-5xl">
-          {title}{" "}
-          <span className="font-display font-light italic tracking-[-0.01em] text-moss">
-            {italic}
-          </span>
+        <p {...stylex.props(styles.sectionHeadCode)}>{code}</p>
+        <h2 {...stylex.props(styles.sectionHeadTitle)}>
+          {title} <span {...stylex.props(styles.sectionHeadItalic)}>{italic}</span>
         </h2>
       </Reveal>
       {right ? <Reveal delay={0.15}>{right}</Reveal> : null}
@@ -170,19 +1436,17 @@ function ProtocolFigure() {
   });
   const y = useTransform(scrollYProgress, [0, 1], ["-7%", "7%"]);
   return (
-    <div ref={ref} className="group relative overflow-hidden border border-pebble">
+    <div ref={ref} {...stylex.props(styles.protocolFigureContainer)}>
       <m.img
         src={IMG.microscope}
         alt="Analyst working at a microscope inside the Fenchem laboratory"
-        className="h-[380px] w-full object-cover grayscale transition-[filter] duration-700 group-hover:grayscale-0 md:h-[480px]"
+        {...stylex.props(styles.protocolFigureImg)}
         style={{ y: reduce ? "0%" : y, scale: 1.16 }}
         loading="lazy"
       />
-      <div className="absolute inset-x-0 bottom-0 flex items-center justify-between border-t border-pebble bg-white/90 px-4 py-2.5 backdrop-blur-sm">
-        <span className="font-tech text-[10px] uppercase tracking-[0.22em] text-bark/70">
-          FIG. 02 — ANALYTICAL LAB, NANJING
-        </span>
-        <span className="font-tech text-[10px] tracking-[0.22em] text-moss">HPLC-7</span>
+      <div {...stylex.props(styles.figOverlay)}>
+        <span {...stylex.props(styles.figText)}>FIG. 02 — ANALYTICAL LAB, NANJING</span>
+        <span {...stylex.props(styles.figCode)}>HPLC-7</span>
       </div>
     </div>
   );
@@ -191,100 +1455,75 @@ function ProtocolFigure() {
 /* ===== Hero section ===== */
 function HeroSection() {
   return (
-    <section className="relative border-b border-pebble">
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,oklch(from_var(--color-forest)_l_c_h_/_0.035)_1px,transparent_1px),linear-gradient(to_bottom,oklch(from_var(--color-forest)_l_c_h_/_0.035)_1px,transparent_1px)] bg-[size:56px_56px]"
-      />
-      <Plus aria-hidden strokeWidth={1} className="absolute left-4 top-4 size-4 text-bark/20" />
-      <Plus
-        aria-hidden
-        strokeWidth={1}
-        className="absolute bottom-4 right-4 hidden size-4 text-bark/20 lg:block"
-      />
-      <div className="relative grid lg:grid-cols-12">
+    <section {...stylex.props(styles.heroSection)}>
+      <div aria-hidden {...stylex.props(styles.heroGridBg)} />
+      <Plus aria-hidden strokeWidth={1} {...stylex.props(styles.plusTopLeft)} />
+      <Plus aria-hidden strokeWidth={1} {...stylex.props(styles.plusBottomRight)} />
+      <div {...stylex.props(styles.heroGrid)}>
         {/* Left: headline block */}
-        <div className="px-5 py-16 md:px-10 md:py-24 lg:col-span-8 lg:py-28">
+        <div {...stylex.props(styles.heroLeft)}>
           <Reveal>
-            <span className="inline-flex w-fit items-center gap-2.5 border border-pebble bg-white px-3.5 py-2">
-              <span className="relative flex size-2">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-moss/50 motion-reduce:animate-none" />
-                <span className="relative inline-flex size-2 rounded-full bg-moss" />
+            <span {...stylex.props(styles.heroStatusBadge)}>
+              <span {...stylex.props(styles.heroStatusPingWrap)}>
+                <span {...stylex.props(styles.heroStatusPingRing)} />
+                <span {...stylex.props(styles.heroStatusPingDot)} />
               </span>
-              <span className="font-tech text-[10px] uppercase tracking-[0.3em] text-bark/60">
+              <span {...stylex.props(styles.heroStatusText)}>
                 System Active — Botanical Intelligence Since 1995
               </span>
             </span>
           </Reveal>
           <Reveal delay={0.1}>
-            <h1 className="mt-10 font-body text-[clamp(2.7rem,6.4vw,6rem)] font-semibold leading-[0.98] tracking-[-0.04em] text-bark">
+            <h1 {...stylex.props(styles.heroHeadline)}>
               Engineering high-performance botanical ingredients
-              <span className="mt-2 block font-display font-light italic leading-[1.05] tracking-[-0.01em] text-moss">
-                for a synthesized world.
-              </span>
+              <span {...stylex.props(styles.heroHeadlineItalic)}>for a synthesized world.</span>
             </h1>
           </Reveal>
           <Reveal delay={0.2}>
-            <p className="mt-8 max-w-xl text-base leading-relaxed text-bark/60 md:text-lg">
+            <p {...stylex.props(styles.heroDesc)}>
               Fenchem converts raw botanical complexity into precisely specified, clinically
               validated actives — supplied at industrial scale to formulators in more than forty
               countries.
             </p>
           </Reveal>
-          <Reveal delay={0.3} className="mt-10 flex flex-wrap gap-3 md:gap-4">
-            <a
-              href="#matrix"
-              className="group inline-flex items-center gap-3 bg-forest px-7 py-4 font-tech text-[11px] uppercase tracking-[0.22em] text-cream transition-colors duration-300 hover:bg-fern"
-            >
+          <Reveal delay={0.3} sx={styles.heroCtas}>
+            <a href="#matrix" {...stylex.props(styles.heroPrimaryCta)}>
               Explore Portfolio
-              <ArrowRight className="size-3.5 transition-transform duration-300 group-hover:translate-x-1" />
+              <ArrowRight {...stylex.props(styles.iconSm)} />
             </a>
-            <a
-              href="#contact"
-              className="inline-flex items-center gap-3 border border-bark/20 px-7 py-4 font-tech text-[11px] uppercase tracking-[0.22em] text-bark/70 transition-colors duration-300 hover:border-forest hover:bg-mint/20 hover:text-forest"
-            >
+            <a href="#contact" {...stylex.props(styles.heroOutlineCta)}>
               Request a Specification
             </a>
           </Reveal>
         </div>
         {/* Right: mono metadata rail */}
-        <aside className="flex flex-col border-t border-pebble lg:col-span-4 lg:border-l lg:border-t-0">
-          <Reveal delay={0.25} className="flex h-full flex-col">
-            <dl className="divide-y divide-pebble border-b border-pebble">
+        <aside {...stylex.props(styles.heroRightRail)}>
+          <Reveal delay={0.25} sx={styles.heroRailContent}>
+            <dl {...stylex.props(styles.heroMetaDl)}>
               {HERO_META.map((row) => (
-                <div key={row.k} className="flex items-baseline justify-between px-5 py-4 md:px-8">
-                  <dt className="font-tech text-[10px] uppercase tracking-[0.22em] text-bark/60">
-                    {row.k}
-                  </dt>
-                  <dd className="font-tech text-[11px] uppercase tracking-[0.18em] text-bark/80">
-                    {row.v}
-                  </dd>
+                <div key={row.k} {...stylex.props(styles.heroMetaRow)}>
+                  <dt {...stylex.props(styles.heroMetaDt)}>{row.k}</dt>
+                  <dd {...stylex.props(styles.heroMetaDd)}>{row.v}</dd>
                 </div>
               ))}
-              <div className="flex items-baseline justify-between px-5 py-4 md:px-8">
-                <dt className="font-tech text-[10px] uppercase tracking-[0.22em] text-bark/60">
-                  STATUS
-                </dt>
-                <dd className="flex items-center gap-2 font-tech text-[11px] uppercase tracking-[0.18em] text-moss">
-                  <span className="size-1.5 rounded-full bg-moss" />
+              <div {...stylex.props(styles.heroMetaRow)}>
+                <dt {...stylex.props(styles.heroMetaDt)}>STATUS</dt>
+                <dd {...stylex.props(styles.heroMetaDdActive)}>
+                  <span {...stylex.props(styles.heroMetaStatusDot)} />
                   OPERATIONAL
                 </dd>
               </div>
             </dl>
-            <div className="group relative min-h-64 flex-1 overflow-hidden lg:min-h-72">
+            <div {...stylex.props(styles.heroLabImgWrapper)}>
               <img
                 src={IMG.glassware}
                 alt="Laboratory glassware during botanical extraction work"
-                className="absolute inset-0 h-full w-full object-cover grayscale transition-[scale,filter] duration-700 ease-out group-hover:scale-[1.03] group-hover:grayscale-0"
+                {...stylex.props(styles.heroLabImg)}
                 loading="lazy"
               />
-              <div className="absolute inset-x-0 bottom-0 flex items-center justify-between border-t border-pebble bg-white/90 px-4 py-2.5 backdrop-blur-sm">
-                <span className="font-tech text-[10px] uppercase tracking-[0.22em] text-bark/70">
-                  FIG. 01 — EXTRACTION LAB
-                </span>
-                <span className="font-tech text-[10px] tracking-[0.22em] text-moss">
-                  BATCH 2026.06
-                </span>
+              <div {...stylex.props(styles.figOverlay)}>
+                <span {...stylex.props(styles.figText)}>FIG. 01 — EXTRACTION LAB</span>
+                <span {...stylex.props(styles.figCode)}>BATCH 2026.06</span>
               </div>
             </div>
           </Reveal>
@@ -297,21 +1536,20 @@ function HeroSection() {
 /* ===== Ingredient ticker ===== */
 function TickerSection() {
   return (
-    <section
-      aria-label="Live ingredient index"
-      className="overflow-hidden border-b border-pebble py-4 md:py-5"
-    >
-      <div className="flex w-max animate-marquee motion-reduce:animate-none">
+    <section aria-label="Live ingredient index" {...stylex.props(styles.tickerSection)}>
+      <div {...stylex.props(styles.tickerTrack)}>
         {[0, 1].map((copy) => (
-          <ul key={copy} aria-hidden={copy === 1} className="flex shrink-0 items-center">
+          <ul key={copy} aria-hidden={copy === 1} {...stylex.props(styles.tickerList)}>
             {ingredients.map((ingredient, i) => (
-              <li key={ingredient.name} className="flex items-center gap-8 pr-8 md:gap-12 md:pr-12">
-                <span className="whitespace-nowrap font-tech text-[11px] uppercase tracking-[0.3em] text-bark/70 md:text-xs">
-                  <span className="text-moss">{String(i + 1).padStart(2, "0")}</span>
+              <li key={ingredient.name} {...stylex.props(styles.tickerItem)}>
+                <span {...stylex.props(styles.tickerText)}>
+                  <span {...stylex.props(styles.tickerIndex)}>
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
                   {" — "}
                   {ingredient.name}
                 </span>
-                <span aria-hidden className="size-1.5 rotate-45 bg-mint" />
+                <span aria-hidden {...stylex.props(styles.tickerDiamond)} />
               </li>
             ))}
           </ul>
@@ -324,25 +1562,16 @@ function TickerSection() {
 /* ===== Stat band ===== */
 function StatBand() {
   return (
-    <section
-      aria-label="Company metrics"
-      className="grid grid-cols-2 gap-px border-b border-pebble bg-pebble lg:grid-cols-4"
-    >
+    <section aria-label="Company metrics" {...stylex.props(styles.statBandGrid)}>
       {STATS.map((s, i) => (
-        <Reveal key={s.label} delay={i * 0.08} className="bg-white">
-          <div className="h-full px-5 py-9 transition-colors duration-500 hover:bg-mint/20 md:px-8 md:py-12">
-            <p className="font-tech text-[10px] uppercase tracking-[0.28em] text-bark/70">
-              {s.label}
-            </p>
-            <div className="mt-5 flex flex-wrap items-baseline gap-x-2.5">
-              <span className="font-body text-4xl font-semibold tracking-[-0.04em] text-forest md:text-6xl">
-                {s.value}
-              </span>
-              <span className="font-display text-lg font-light italic text-moss md:text-2xl">
-                {s.unit}
-              </span>
+        <Reveal key={s.label} delay={i * 0.08} sx={styles.statBandCardBg}>
+          <div {...stylex.props(styles.statBandCell)}>
+            <p {...stylex.props(styles.statBandLabel)}>{s.label}</p>
+            <div {...stylex.props(styles.statBandValWrap)}>
+              <span {...stylex.props(styles.statBandValue)}>{s.value}</span>
+              <span {...stylex.props(styles.statBandUnit)}>{s.unit}</span>
             </div>
-            <p className="mt-4 text-sm leading-relaxed text-bark/70">{s.desc}</p>
+            <p {...stylex.props(styles.statBandDesc)}>{s.desc}</p>
           </div>
         </Reveal>
       ))}
@@ -353,73 +1582,55 @@ function StatBand() {
 /* ===== Ingredient Matrix ===== */
 function MatrixSection() {
   return (
-    <section id="matrix" className="border-b border-pebble">
+    <section id="matrix" {...stylex.props(styles.matrixSection)}>
       <SectionHead
         code="SYS.CAT_01 // ACTIVE COMPOUNDS"
         title="Ingredient"
         italic="matrix."
         right={
-          <a
-            href="#contact"
-            className="group inline-flex items-center gap-2.5 border border-pebble px-5 py-3 font-tech text-[10px] uppercase tracking-[0.26em] text-bark/70 transition-colors duration-300 hover:border-forest hover:text-forest"
-          >
+          <a href="#contact" {...stylex.props(styles.matrixSpecsBtn)}>
             View Full Specs
-            <ArrowRight className="size-3 transition-transform duration-300 group-hover:translate-x-1" />
+            <ArrowRight {...stylex.props(styles.iconXs)} />
           </a>
         }
       />
-      <div className="grid grid-cols-1 gap-px bg-pebble md:grid-cols-2 lg:grid-cols-3">
+      <div {...stylex.props(styles.matrixGrid)}>
         {getFeaturedIngredients().map((item, i) => (
-          <Reveal key={item.code} delay={(i % 3) * 0.08} className="group bg-white">
-            <div className="relative aspect-[4/3] overflow-hidden border-b border-pebble">
+          <Reveal key={item.code} delay={(i % 3) * 0.08} sx={styles.matrixCardBg}>
+            <div {...stylex.props(styles.matrixImgContainer)}>
               <img
                 src={item.image.src}
                 alt={item.image.alt}
-                className="h-full w-full object-cover grayscale transition-[scale,filter] duration-700 ease-out group-hover:scale-[1.04] group-hover:grayscale-0"
+                {...stylex.props(styles.matrixImg)}
                 loading="lazy"
               />
-              <span className="absolute right-4 top-4 border border-pebble bg-white/90 px-2 py-1 font-tech text-[9px] uppercase tracking-[0.2em] text-bark/70 backdrop-blur-sm">
-                {item.category}
-              </span>
+              <span {...stylex.props(styles.matrixCategoryBadge)}>{item.category}</span>
             </div>
-            <div className="px-5 py-7 md:px-7 md:py-8">
-              <div className="flex items-baseline justify-between">
-                <span className="font-tech text-[11px] tracking-[0.22em] text-moss">
+            <div {...stylex.props(styles.matrixCardContent)}>
+              <div {...stylex.props(styles.matrixCardHeader)}>
+                <span {...stylex.props(styles.matrixCardNum)}>
                   {String(i + 1).padStart(2, "0")} —
                 </span>
-                <span className="font-tech text-[10px] uppercase tracking-[0.22em] text-bark/60">
-                  {item.code}
-                </span>
+                <span {...stylex.props(styles.matrixCardCode)}>{item.code}</span>
               </div>
-              <h3 className="mt-3 font-body text-xl font-semibold tracking-[-0.02em] text-bark transition-colors duration-300 group-hover:text-forest">
-                {item.name}
-              </h3>
-              <dl className="mt-5 space-y-2.5 border-t border-pebble pt-4">
-                <div className="flex items-baseline justify-between gap-4">
-                  <dt className="font-tech text-[10px] uppercase tracking-[0.2em] text-bark/60">
-                    Purity
-                  </dt>
-                  <dd className="text-right font-tech text-[11px] text-bark/70">{item.purity}</dd>
+              <h3 {...stylex.props(styles.matrixCardTitle)}>{item.name}</h3>
+              <dl {...stylex.props(styles.matrixCardDl)}>
+                <div {...stylex.props(styles.matrixCardDlRow)}>
+                  <dt {...stylex.props(styles.matrixCardDt)}>Purity</dt>
+                  <dd {...stylex.props(styles.matrixCardDd)}>{item.purity}</dd>
                 </div>
-                <div className="flex items-baseline justify-between gap-4">
-                  <dt className="font-tech text-[10px] uppercase tracking-[0.2em] text-bark/60">
-                    Form
-                  </dt>
-                  <dd className="text-right font-tech text-[11px] text-bark/70">{item.form}</dd>
+                <div {...stylex.props(styles.matrixCardDlRow)}>
+                  <dt {...stylex.props(styles.matrixCardDt)}>Form</dt>
+                  <dd {...stylex.props(styles.matrixCardDd)}>{item.form}</dd>
                 </div>
-                <div className="flex items-baseline justify-between gap-4">
-                  <dt className="font-tech text-[10px] uppercase tracking-[0.2em] text-bark/60">
-                    Application
-                  </dt>
-                  <dd className="text-right font-tech text-[11px] text-bark/70">{item.useCase}</dd>
+                <div {...stylex.props(styles.matrixCardDlRow)}>
+                  <dt {...stylex.props(styles.matrixCardDt)}>Application</dt>
+                  <dd {...stylex.props(styles.matrixCardDd)}>{item.useCase}</dd>
                 </div>
               </dl>
-              <a
-                href="#contact"
-                className="group/spec mt-6 inline-flex items-center gap-2 font-tech text-[10px] uppercase tracking-[0.24em] text-bark/60 transition-colors duration-300 hover:text-forest"
-              >
+              <a href="#contact" {...stylex.props(styles.matrixRequestSpecLink)}>
                 Request Spec
-                <ArrowUpRight className="size-3 transition-transform duration-300 group-hover/spec:-translate-y-0.5 group-hover/spec:translate-x-0.5" />
+                <ArrowUpRight {...stylex.props(styles.iconXs)} />
               </a>
             </div>
           </Reveal>
@@ -432,46 +1643,38 @@ function MatrixSection() {
 /* ===== Operating Protocol ===== */
 function ProtocolSection() {
   return (
-    <section id="protocol" className="border-b border-pebble">
+    <section id="protocol" {...stylex.props(styles.protocolSection)}>
       <SectionHead
         code="SYS.METHOD // 02"
         title="Operating"
         italic="protocol."
         right={
-          <p className="max-w-xs font-tech text-[10px] uppercase leading-relaxed tracking-[0.2em] text-bark/60">
+          <p {...stylex.props(styles.protocolSubtitle)}>
             Rooted in nature, refined by science — every lot, every market, every release.
           </p>
         }
       />
-      <div className="grid lg:grid-cols-12">
-        <div className="px-5 py-12 md:px-10 lg:col-span-5 lg:py-16">
+      <div {...stylex.props(styles.protocolGrid)}>
+        <div {...stylex.props(styles.protocolFigCol)}>
           <Reveal>
             <ProtocolFigure />
           </Reveal>
         </div>
-        <div className="border-t border-pebble lg:col-span-7 lg:border-l lg:border-t-0">
+        <div {...stylex.props(styles.protocolPillarsCol)}>
           {pillars.map((pillar, i) => (
             <Reveal
               key={pillar.title}
               delay={i * 0.08}
-              className={i < pillars.length - 1 ? "border-b border-pebble" : ""}
+              sx={i < pillars.length - 1 ? styles.protocolBorderB : undefined}
             >
-              <div className="grid gap-4 px-5 py-10 transition-colors duration-500 hover:bg-mint/20 md:grid-cols-12 md:gap-6 md:px-10 md:py-12">
-                <span className="font-tech text-sm tracking-[0.22em] text-moss md:col-span-2">
-                  {PROTOCOL_DETAIL[i].step} —
-                </span>
-                <div className="md:col-span-10">
-                  <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
-                    <h3 className="font-body text-2xl font-semibold tracking-[-0.02em] text-bark md:text-3xl">
-                      {pillar.title}
-                    </h3>
-                    <span className="font-tech text-[10px] uppercase tracking-[0.22em] text-bark/70">
-                      {PROTOCOL_DETAIL[i].tag}
-                    </span>
+              <div {...stylex.props(styles.protocolRowGrid)}>
+                <span {...stylex.props(styles.protocolStepNum)}>{PROTOCOL_DETAIL[i].step} —</span>
+                <div {...stylex.props(styles.protocolRowBody)}>
+                  <div {...stylex.props(styles.protocolRowHeader)}>
+                    <h3 {...stylex.props(styles.protocolRowTitle)}>{pillar.title}</h3>
+                    <span {...stylex.props(styles.protocolRowTag)}>{PROTOCOL_DETAIL[i].tag}</span>
                   </div>
-                  <p className="mt-4 max-w-xl text-sm leading-relaxed text-bark/70 md:text-base">
-                    {PROTOCOL_DETAIL[i].desc}
-                  </p>
+                  <p {...stylex.props(styles.protocolRowDesc)}>{PROTOCOL_DETAIL[i].desc}</p>
                 </div>
               </div>
             </Reveal>
@@ -485,43 +1688,35 @@ function ProtocolSection() {
 /* ===== Application Domains ===== */
 function DomainsSection() {
   return (
-    <section id="domains" className="border-b border-pebble">
+    <section id="domains" {...stylex.props(styles.domainsSection)}>
       <SectionHead
         code="SYS.CAT_02 // APPLICATION DOMAINS"
         title="Built for three"
         italic="industries."
       />
       <div>
-        {industries.map((industry, i) => (
-          <a
-            key={industry.title}
-            href="#contact"
-            className="group block border-b border-pebble transition-colors duration-500 last:border-b-0 hover:bg-mint/20"
-          >
-            <Reveal
-              delay={i * 0.06}
-              className="grid items-center gap-3 px-5 py-9 md:grid-cols-12 md:gap-6 md:px-10 md:py-12"
+        {industries.map((industry, i) => {
+          const isLast = i === industries.length - 1;
+          return (
+            <a
+              key={industry.title}
+              href="#contact"
+              {...stylex.props(styles.domainRowLink, isLast && styles.domainRowLinkLast)}
             >
-              <div className="md:col-span-2">
-                <p className="font-tech text-[11px] tracking-[0.22em] text-moss">
-                  {DOMAIN_DETAIL[i].code}
-                </p>
-                <p className="mt-1 font-tech text-[10px] uppercase tracking-[0.22em] text-bark/70">
-                  {DOMAIN_DETAIL[i].cat}
-                </p>
-              </div>
-              <h3 className="font-body text-2xl font-semibold tracking-[-0.03em] text-bark transition-colors duration-300 group-hover:text-forest md:col-span-5 md:text-4xl">
-                {industry.title}
-              </h3>
-              <p className="text-sm leading-relaxed text-bark/70 md:col-span-4">
-                {DOMAIN_DETAIL[i].desc}
-              </p>
-              <div className="flex md:col-span-1 md:justify-end">
-                <ArrowUpRight className="size-6 text-bark/30 transition-[translate,color] duration-300 group-hover:-translate-y-1 group-hover:translate-x-1 group-hover:text-forest" />
-              </div>
-            </Reveal>
-          </a>
-        ))}
+              <Reveal delay={i * 0.06} sx={styles.domainRowInner}>
+                <div {...stylex.props(styles.domainMetaCol)}>
+                  <p {...stylex.props(styles.domainCode)}>{DOMAIN_DETAIL[i].code}</p>
+                  <p {...stylex.props(styles.domainCat)}>{DOMAIN_DETAIL[i].cat}</p>
+                </div>
+                <h3 {...stylex.props(styles.domainTitleCol)}>{industry.title}</h3>
+                <p {...stylex.props(styles.domainDescCol)}>{DOMAIN_DETAIL[i].desc}</p>
+                <div {...stylex.props(styles.domainArrowCol)}>
+                  <ArrowUpRight {...stylex.props(styles.domainArrowIcon)} />
+                </div>
+              </Reveal>
+            </a>
+          );
+        })}
       </div>
     </section>
   );
@@ -530,65 +1725,49 @@ function DomainsSection() {
 /* ===== CTA + Global Network ===== */
 function CtaNetworkSection() {
   return (
-    <section id="contact" className="bg-forest text-cream">
-      <div className="border-b border-cream/10 px-5 py-20 md:px-10 md:py-28">
+    <section id="contact" {...stylex.props(styles.ctaNetworkSection)}>
+      <div {...stylex.props(styles.ctaTopBlock)}>
         <Reveal>
-          <p className="font-tech text-[11px] uppercase tracking-[0.28em] text-mint/80">
-            SYS.CONTACT // OPEN CHANNEL
-          </p>
-          <h2 className="mt-6 max-w-4xl font-body text-4xl font-semibold leading-[1.02] tracking-[-0.03em] md:text-6xl">
+          <p {...stylex.props(styles.ctaTopEyebrow)}>SYS.CONTACT // OPEN CHANNEL</p>
+          <h2 {...stylex.props(styles.ctaTopHeading)}>
             Your next formulation,{" "}
-            <span className="font-display font-light italic tracking-[-0.01em] text-mint">
-              engineered to specification.
-            </span>
+            <span {...stylex.props(styles.ctaTopItalic)}>engineered to specification.</span>
           </h2>
-          <p className="mt-7 max-w-xl text-sm leading-relaxed text-cream/70 md:text-base">
+          <p {...stylex.props(styles.ctaTopDesc)}>
             Submit a target spec — purity, form, matrix, regulatory map — and our laboratory returns
             a validated proposal with full documentation within one business day.
           </p>
         </Reveal>
-        <Reveal delay={0.15} className="mt-10 flex flex-wrap gap-3 md:gap-4">
-          <button
-            type="button"
-            className="group inline-flex items-center gap-3 bg-mint px-7 py-4 font-tech text-[11px] uppercase tracking-[0.22em] text-forest transition-colors duration-300 hover:bg-mist"
-          >
+        <Reveal delay={0.15} sx={styles.ctaTopBtnRow}>
+          <button type="button" {...stylex.props(styles.ctaPartnerBtn)}>
             Partner with Fenchem
-            <ArrowRight className="size-3.5 transition-transform duration-300 group-hover:translate-x-1" />
+            <ArrowRight {...stylex.props(styles.iconSm)} />
           </button>
-          <a
-            href="#matrix"
-            className="inline-flex items-center gap-3 border border-cream/30 px-7 py-4 font-tech text-[11px] uppercase tracking-[0.22em] text-cream/90 transition-colors duration-300 hover:border-cream hover:bg-cream/10 hover:text-cream"
-          >
+          <a href="#matrix" {...stylex.props(styles.ctaExploreBtn)}>
             Explore Portfolio
           </a>
         </Reveal>
         <Reveal delay={0.25}>
-          <p className="mt-10 font-tech text-[10px] uppercase tracking-[0.28em] text-cream/60">
+          <p {...stylex.props(styles.ctaResponseTime)}>
             RESPONSE.TIME &lt; 24H — TECHNICAL DOSSIERS ON REQUEST
           </p>
         </Reveal>
       </div>
       <div id="network">
-        <div className="flex items-center justify-between border-b border-cream/10 px-5 py-5 md:px-10">
-          <span className="font-tech text-[10px] uppercase tracking-[0.26em] text-mint/70">
-            SYS.NET // 6 ACTIVE NODES
-          </span>
-          <span className="hidden font-tech text-[10px] uppercase tracking-[0.26em] text-cream/60 md:block">
-            LAT/LONG VERIFIED — 2026.06
-          </span>
+        <div {...stylex.props(styles.networkHeaderRow)}>
+          <span {...stylex.props(styles.networkHeaderTag)}>SYS.NET // 6 ACTIVE NODES</span>
+          <span {...stylex.props(styles.networkHeaderLatLong)}>LAT/LONG VERIFIED — 2026.06</span>
         </div>
-        <div className="grid grid-cols-1 gap-px bg-cream/10 sm:grid-cols-2 lg:grid-cols-3">
+        <div {...stylex.props(styles.networkGrid)}>
           {regions.map((region, i) => (
-            <Reveal key={region.city} delay={(i % 3) * 0.08} className="bg-forest">
-              <div className="h-full px-5 py-7 transition-colors duration-500 hover:bg-fern md:px-8 md:py-9">
-                <div className="flex items-baseline justify-between font-tech text-[10px] uppercase tracking-[0.2em] text-mint/70">
+            <Reveal key={region.city} delay={(i % 3) * 0.08} sx={styles.networkCellBg}>
+              <div {...stylex.props(styles.networkCell)}>
+                <div {...stylex.props(styles.networkCellMeta)}>
                   <span>{`NODE ${String(i + 1).padStart(2, "0")}`}</span>
-                  <span className="text-cream/60">{region.coords}</span>
+                  <span {...stylex.props(styles.networkCellCoords)}>{region.coords}</span>
                 </div>
-                <p className="mt-4 font-body text-xl font-semibold tracking-[-0.02em] text-cream">
-                  {region.city}
-                </p>
-                <p className="mt-1 text-sm text-cream/60">{region.role}</p>
+                <p {...stylex.props(styles.networkCity)}>{region.city}</p>
+                <p {...stylex.props(styles.networkRole)}>{region.role}</p>
               </div>
             </Reveal>
           ))}
@@ -601,36 +1780,26 @@ function CtaNetworkSection() {
 /* ===== Footer ===== */
 function FooterSection() {
   return (
-    <footer className="border-t border-pebble bg-white">
-      <div className="grid gap-12 px-5 py-14 md:grid-cols-12 md:px-10 md:py-16">
-        <div className="md:col-span-5">
-          <button
-            type="button"
-            className="font-body text-2xl font-bold tracking-[-0.04em] text-forest transition-opacity duration-300 hover:opacity-70"
-          >
+    <footer {...stylex.props(styles.footer)}>
+      <div {...stylex.props(styles.footerGrid)}>
+        <div {...stylex.props(styles.footerBrandCol)}>
+          <button type="button" {...stylex.props(styles.footerBrandBtn)}>
             FENCHEM
           </button>
-          <p className="mt-4 max-w-xs font-display text-lg font-light italic text-moss">
-            Rooted in nature, refined by science.
-          </p>
-          <p className="mt-6 font-tech text-[10px] uppercase leading-loose tracking-[0.22em] text-bark/60">
+          <p {...stylex.props(styles.footerTagline)}>Rooted in nature, refined by science.</p>
+          <p {...stylex.props(styles.footerCertText)}>
             ISO 9001 : 2015 / GMP / HACCP
             <br />
             EST. 1995 — NANJING, CHINA
           </p>
         </div>
         {FOOTER_COLS.map((col) => (
-          <div key={col.head} className="md:col-span-2">
-            <p className="font-tech text-[10px] uppercase tracking-[0.28em] text-bark/60">
-              {col.head}
-            </p>
-            <ul className="mt-5 space-y-3">
+          <div key={col.head} {...stylex.props(styles.footerNavCol)}>
+            <p {...stylex.props(styles.footerColHead)}>{col.head}</p>
+            <ul {...stylex.props(styles.footerLinksList)}>
               {col.links.map((link) => (
                 <li key={link.label}>
-                  <a
-                    href={link.href}
-                    className="text-sm text-bark/70 underline decoration-pebble underline-offset-4 transition-colors duration-300 hover:text-forest hover:decoration-moss"
-                  >
+                  <a href={link.href} {...stylex.props(styles.footerLinkA)}>
                     {link.label}
                   </a>
                 </li>
@@ -638,18 +1807,14 @@ function FooterSection() {
             </ul>
           </div>
         ))}
-        <div className="md:col-span-1" />
       </div>
-      <p
-        aria-hidden
-        className="select-none overflow-hidden whitespace-nowrap px-5 font-body text-[17vw] font-bold leading-[0.78] tracking-[-0.06em] text-forest/5 md:px-10 min-[1481px]:text-[15rem]"
-      >
+      <p aria-hidden {...stylex.props(styles.footerWatermark)}>
         FENCHEM
       </p>
-      <div className="flex flex-col gap-2 border-t border-pebble px-5 py-4 font-tech text-[10px] uppercase tracking-[0.22em] text-bark/60 md:flex-row md:items-center md:justify-between md:px-10">
+      <div {...stylex.props(styles.footerBottomBar)}>
         <span>© 2026 Fenchem — All Rights Reserved</span>
         <span>N 32.06 / E 118.79 — Nanjing</span>
-        <span className="text-moss">SYS.EOF // END OF SPEC</span>
+        <span {...stylex.props(styles.textMoss)}>SYS.EOF // END OF SPEC</span>
       </div>
     </footer>
   );
@@ -660,70 +1825,54 @@ export function VariantB() {
 
   return (
     <LazyMotion features={domAnimation} strict>
-      <div className="bg-white font-body text-bark antialiased selection:bg-mint selection:text-forest">
+      <div {...stylex.props(styles.root)}>
         {/* ===== Sticky top bar ===== */}
-        <header className="sticky top-0 z-50 border-b border-pebble bg-white/90 backdrop-blur-md">
-          <div className="mx-auto max-w-[1480px] border-pebble min-[1481px]:border-x">
+        <header {...stylex.props(styles.stickyHeader)}>
+          <div {...stylex.props(styles.frameContainer)}>
             {/* Micro-label strip */}
-            <div className="hidden items-center justify-between border-b border-pebble px-5 py-2 md:flex md:px-10">
-              <span className="flex items-center gap-2 font-tech text-[10px] uppercase tracking-[0.25em] text-bark/60">
-                <span className="relative flex size-1.5">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-moss/60 motion-reduce:animate-none" />
-                  <span className="relative inline-flex size-1.5 rounded-full bg-moss" />
+            <div {...stylex.props(styles.microLabelStrip)}>
+              <span {...stylex.props(styles.microLabelItem)}>
+                <span {...stylex.props(styles.pingWrapper)}>
+                  <span {...stylex.props(styles.pingRing)} />
+                  <span {...stylex.props(styles.pingDot)} />
                 </span>
                 SYS.ACTIVE — INGREDIENT ENGINEERING
               </span>
-              <span className="font-tech text-[10px] uppercase tracking-[0.25em] text-bark/60">
-                N 32.06 / E 118.79 — NANJING HQ
-              </span>
-              <span className="font-tech text-[10px] uppercase tracking-[0.25em] text-bark/60">
-                ISO 9001 : 2015 / GMP
-              </span>
+              <span {...stylex.props(styles.microLabelItem)}>N 32.06 / E 118.79 — NANJING HQ</span>
+              <span {...stylex.props(styles.microLabelItem)}>ISO 9001 : 2015 / GMP</span>
             </div>
             {/* Nav row */}
-            <nav className="flex items-center justify-between px-5 py-4 md:px-10">
-              <button
-                type="button"
-                className="flex items-baseline gap-3 transition-opacity duration-300 hover:opacity-70"
-              >
-                <span className="font-body text-xl font-bold tracking-[-0.04em] text-forest">
-                  FENCHEM
-                </span>
-                <span className="hidden font-tech text-[9px] uppercase tracking-[0.3em] text-bark/60 sm:inline">
-                  Innovation Lab
-                </span>
+            <nav {...stylex.props(styles.navRow)}>
+              <button type="button" {...stylex.props(styles.brandBtn)}>
+                <span {...stylex.props(styles.brandLogoText)}>FENCHEM</span>
+                <span {...stylex.props(styles.brandSubtitle)}>Innovation Lab</span>
               </button>
-              <div className="hidden items-center gap-8 md:flex">
+              <div {...stylex.props(styles.navLinksWrapper)}>
                 {NAV_LINKS.map((link, i) => (
-                  <a
-                    key={link.href}
-                    href={link.href}
-                    className="font-tech text-[11px] uppercase tracking-[0.22em] text-bark/60 transition-colors duration-300 hover:text-forest"
-                  >
-                    <span className="mr-1.5 text-moss">{String(i + 1).padStart(2, "0")}</span>
+                  <a key={link.href} href={link.href} {...stylex.props(styles.navLink)}>
+                    <span {...stylex.props(styles.navLinkNum)}>
+                      {String(i + 1).padStart(2, "0")}
+                    </span>
                     {link.label}
                   </a>
                 ))}
               </div>
-              <a
-                href="#contact"
-                className="group inline-flex items-center gap-2.5 bg-forest px-5 py-2.5 font-tech text-[10px] uppercase tracking-[0.22em] text-cream transition-colors duration-300 hover:bg-fern"
-              >
+              <a href="#contact" {...stylex.props(styles.navCta)}>
                 Request a Specification
-                <ArrowRight className="size-3 transition-transform duration-300 group-hover:translate-x-1" />
+                <ArrowRight {...stylex.props(styles.iconXs)} />
               </a>
             </nav>
           </div>
           {/* Scroll progress hairline */}
           <m.div
             aria-hidden
-            className="absolute inset-x-0 bottom-0 h-0.5 origin-left bg-moss"
+            {...stylex.props(styles.scrollBar)}
             style={{ scaleX: scrollYProgress }}
           />
         </header>
 
         {/* ===== Framed sheet ===== */}
-        <div className="mx-auto max-w-[1480px] border-pebble min-[1481px]:border-x">
+        <div {...stylex.props(styles.frameContainer)}>
           <main>
             <HeroSection />
             <TickerSection />

@@ -1,3 +1,5 @@
+import { colors, radii, typography } from "@fenchem-lp/ui/tokens.stylex";
+import * as stylex from "@stylexjs/stylex";
 import gsap from "gsap";
 import { Pause, Play } from "lucide-react";
 import { useRef, useState } from "react";
@@ -17,6 +19,120 @@ import { marquee, useReducedMotionFlag, useSectionAnimation } from "../motion";
  * is keyboard reachable. Under reduced motion nothing moves and no control
  * is offered; the row simply sits there as a static index.
  */
+
+const styles = stylex.create({
+  section: {
+    position: "relative",
+    overflow: "hidden",
+    borderTopWidth: 1,
+    borderBottomWidth: 1,
+    borderTopStyle: "solid",
+    borderBottomStyle: "solid",
+    borderColor: "color-mix(in oklch, var(--color-cream) 10%, transparent)",
+    backgroundColor: colors.bark,
+    paddingBlock: "1rem",
+  },
+  leftFade: {
+    pointerEvents: "none",
+    position: "absolute",
+    insetBlock: 0,
+    left: 0,
+    zIndex: 10,
+    width: "3.5rem",
+    backgroundImage: "linear-gradient(to right, var(--color-bark), transparent)",
+  },
+  rightFade: {
+    pointerEvents: "none",
+    position: "absolute",
+    insetBlock: 0,
+    right: 0,
+    zIndex: 10,
+    width: "5rem",
+    backgroundImage: "linear-gradient(to left, var(--color-bark), transparent)",
+  },
+  trackWrap: {
+    overflow: "hidden",
+  },
+  track: {
+    display: "flex",
+    width: "max-content",
+    willChange: "transform",
+  },
+  list: {
+    display: "flex",
+    flexShrink: 0,
+    alignItems: "center",
+    listStyle: "none",
+    margin: 0,
+    padding: 0,
+  },
+  item: {
+    display: "flex",
+    alignItems: "center",
+  },
+  text: {
+    whiteSpace: "nowrap",
+    fontFamily: typography.tech,
+    fontSize: "11px",
+    textTransform: "uppercase",
+    letterSpacing: "0.26em",
+  },
+  index: {
+    color: colors.brandGreen400,
+  },
+  name: {
+    paddingLeft: "0.75rem",
+    color: "color-mix(in oklch, var(--color-cream) 60%, transparent)",
+  },
+  diamond: {
+    marginInline: "1.75rem",
+    width: 5,
+    height: 5,
+    transform: "rotate(45deg)",
+    backgroundColor: "color-mix(in oklch, var(--color-cream) 25%, transparent)",
+  },
+  toggleButton: {
+    position: "absolute",
+    top: "50%",
+    right: "0.75rem",
+    zIndex: 20,
+    display: "inline-flex",
+    width: "1.75rem",
+    height: "1.75rem",
+    transform: "translateY(-50%)",
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: radii.full,
+    borderWidth: 1,
+    borderStyle: "solid",
+    borderColor: {
+      default: "color-mix(in oklch, var(--color-cream) 20%, transparent)",
+      ":hover": "color-mix(in oklch, var(--color-cream) 40%, transparent)",
+    },
+    backgroundColor: colors.bark,
+    color: {
+      default: "color-mix(in oklch, var(--color-cream) 70%, transparent)",
+      ":hover": colors.cream,
+    },
+    transition: "border-color 200ms ease, color 200ms ease",
+    cursor: "pointer",
+    outline: {
+      ":focus-visible": `2px solid ${colors.brandGreen300}`,
+    },
+    outlineOffset: {
+      ":focus-visible": 2,
+    },
+  },
+  playIcon: {
+    marginLeft: 1,
+    width: "0.75rem",
+    height: "0.75rem",
+  },
+  pauseIcon: {
+    width: "0.75rem",
+    height: "0.75rem",
+  },
+});
 
 /** Track content is rendered twice; marquee() loops the first copy out. */
 const TRACK_COPIES = [0, 1] as const;
@@ -39,34 +155,23 @@ export function TickerSection() {
   };
 
   return (
-    <section
-      ref={ref}
-      id="ticker"
-      aria-label="Ingredient index"
-      className="relative overflow-hidden border-cream/10 border-t border-b bg-bark py-4"
-    >
-      <span
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-y-0 left-0 z-10 w-14 bg-gradient-to-r from-bark to-transparent"
-      />
-      <span
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-y-0 right-0 z-10 w-20 bg-gradient-to-l from-bark to-transparent"
-      />
+    <section ref={ref} id="ticker" aria-label="Ingredient index" {...stylex.props(styles.section)}>
+      <span aria-hidden="true" {...stylex.props(styles.leftFade)} />
+      <span aria-hidden="true" {...stylex.props(styles.rightFade)} />
 
-      <div className="overflow-hidden">
-        <div data-ticker-track className="flex w-max will-change-transform">
+      <div {...stylex.props(styles.trackWrap)}>
+        <div data-ticker-track {...stylex.props(styles.track)}>
           {TRACK_COPIES.map((copy) => (
-            <ul key={copy} aria-hidden={copy === 1} className="flex shrink-0 items-center">
+            <ul key={copy} aria-hidden={copy === 1} {...stylex.props(styles.list)}>
               {ingredients.map((ingredient, index) => (
-                <li key={ingredient.code} className="flex items-center">
-                  <span className="whitespace-nowrap font-tech text-[11px] uppercase tracking-[0.26em]">
-                    <span className="text-brand-green-400">
+                <li key={ingredient.code} {...stylex.props(styles.item)}>
+                  <span {...stylex.props(styles.text)}>
+                    <span {...stylex.props(styles.index)}>
                       {String(index + 1).padStart(2, "0")}
                     </span>
-                    <span className="pl-3 text-cream/60">{ingredient.name}</span>
+                    <span {...stylex.props(styles.name)}>{ingredient.name}</span>
                   </span>
-                  <span aria-hidden="true" className="mx-7 size-[5px] rotate-45 bg-cream/25" />
+                  <span aria-hidden="true" {...stylex.props(styles.diamond)} />
                 </li>
               ))}
             </ul>
@@ -80,13 +185,12 @@ export function TickerSection() {
           onClick={togglePaused}
           aria-pressed={paused}
           aria-label={paused ? "Resume the ingredient ticker" : "Pause the ingredient ticker"}
-          className="absolute top-1/2 right-3 z-20 inline-flex size-7 -translate-y-1/2 items-center justify-center rounded-full border border-cream/20 bg-bark text-cream/70 transition-colors hover:border-cream/40 hover:text-cream focus-visible:outline-2 focus-visible:outline-brand-green-300"
+          {...stylex.props(styles.toggleButton)}
         >
           {paused ? (
-            /* ml-px: a play triangle reads centered slightly right of its box */
-            <Play aria-hidden="true" className="ml-px size-3" />
+            <Play aria-hidden="true" {...stylex.props(styles.playIcon)} />
           ) : (
-            <Pause aria-hidden="true" className="size-3" />
+            <Pause aria-hidden="true" {...stylex.props(styles.pauseIcon)} />
           )}
         </button>
       )}

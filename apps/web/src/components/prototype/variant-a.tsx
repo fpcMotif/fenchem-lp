@@ -1,18 +1,20 @@
+import {
+  certifications,
+  industries,
+  ingredients,
+  pillars,
+  regions,
+  stats,
+} from "@/components/landing/landing-content";
+import { Eyebrow, Intro, Reveal } from "@/components/prototype/motion";
+import { EASE } from "@/components/prototype/motion-constants";
+import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
+import { breakpoints, colors, radii, shadows, typography } from "@fenchem-lp/ui/tokens.stylex";
+import * as stylex from "@stylexjs/stylex";
 import { ArrowUpRight, FlaskConical, Globe, Leaf, Sprout } from "lucide-react";
-import { LazyMotion, domAnimation, m, useScroll, useTransform } from "motion/react";
+import { domAnimation, LazyMotion, m, useScroll, useTransform } from "motion/react";
 import type { MotionValue } from "motion/react";
 import { useRef } from "react";
-import { EASE } from "@/components/prototype/motion-constants";
-import { Eyebrow, Intro, Reveal } from "@/components/prototype/motion";
-import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
-import {
-  industries,
-  stats,
-  pillars,
-  ingredients,
-  certifications,
-  regions,
-} from "@/components/landing/landing-content";
 
 /*
  * PROTOTYPE — Variant A: "Botanical Editorial"
@@ -29,13 +31,998 @@ const NAV_LINKS = [
   { label: "Quality", href: "#quality" },
 ] as const;
 
-const INDUSTRY_LAYOUT = [
-  { offset: "", aspect: "aspect-[3/4]" },
-  { offset: "md:mt-16 lg:mt-24", aspect: "aspect-[4/5]" },
-  { offset: "md:mt-8 lg:mt-12", aspect: "aspect-[3/4]" },
-] as const;
-
 const PILLAR_ICONS = [Sprout, FlaskConical, Globe] as const;
+
+const styles = stylex.create({
+  main: {
+    overflowX: "clip",
+    backgroundColor: colors.cream,
+    fontFamily: typography.body,
+    color: colors.bark,
+    WebkitFontSmoothing: "antialiased",
+  },
+  container: {
+    marginInline: "auto",
+    maxWidth: "1280px",
+    paddingInline: {
+      default: "1.5rem",
+      [breakpoints.md]: "3rem",
+      [breakpoints.lg]: "4rem",
+    },
+  },
+  // Nav
+  nav: {
+    position: "fixed",
+    left: { default: "1rem", [breakpoints.md]: 0 },
+    right: { default: "1rem", [breakpoints.md]: 0 },
+    top: { default: "1rem", [breakpoints.md]: "1.5rem" },
+    zIndex: 50,
+  },
+  navInner: {
+    marginInline: "auto",
+    display: "flex",
+    maxWidth: "920px",
+    alignItems: "center",
+    justifyContent: "space-between",
+    borderRadius: radii.full,
+    borderWidth: "1px",
+    borderStyle: "solid",
+    borderColor: "color-mix(in oklab, var(--color-pebble) 70%, transparent)",
+    backgroundColor: "color-mix(in oklab, var(--color-cream) 80%, transparent)",
+    paddingBlock: "0.5rem",
+    paddingLeft: "1.5rem",
+    paddingRight: "0.5rem",
+    boxShadow: shadows.ambient,
+    backdropFilter: "blur(12px)",
+    WebkitBackdropFilter: "blur(12px)",
+  },
+  navLogo: {
+    fontFamily: typography.display,
+    fontSize: "1.5rem",
+    lineHeight: "2rem",
+    fontWeight: 500,
+    letterSpacing: "-0.025em",
+    color: {
+      default: colors.forest,
+      ":hover": colors.fern,
+    },
+    transitionProperty: "color",
+    transitionDuration: "300ms",
+    textDecoration: "none",
+  },
+  navLinks: {
+    display: {
+      default: "none",
+      [breakpoints.md]: "flex",
+    },
+    alignItems: "center",
+    gap: "1.75rem",
+  },
+  navLink: {
+    fontFamily: typography.body,
+    fontSize: "0.875rem",
+    lineHeight: "1.25rem",
+    color: {
+      default: "color-mix(in oklab, var(--color-bark) 65%, transparent)",
+      ":hover": colors.forest,
+    },
+    transitionProperty: "color",
+    transitionDuration: "300ms",
+    textDecoration: "none",
+  },
+  navCta: {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "0.375rem",
+    borderRadius: radii.full,
+    backgroundColor: {
+      default: colors.forest,
+      ":hover": colors.fern,
+    },
+    paddingInline: "1.25rem",
+    paddingBlock: "0.625rem",
+    fontFamily: typography.body,
+    fontSize: "0.875rem",
+    lineHeight: "1.25rem",
+    fontWeight: 600,
+    color: colors.cream,
+    boxShadow: shadows.lift,
+    transitionProperty: "background-color, transform",
+    transitionDuration: "300ms",
+    transform: {
+      default: "translateY(0)",
+      ":hover": "translateY(-2px)",
+    },
+    textDecoration: "none",
+  },
+  // Hero
+  hero: {
+    position: "relative",
+    paddingBottom: { default: "6rem", [breakpoints.md]: "9rem" },
+    paddingTop: { default: "9rem", [breakpoints.md]: "12rem" },
+  },
+  heroGrid: {
+    display: "grid",
+    gridTemplateColumns: {
+      default: "1fr",
+      [breakpoints.lg]: "repeat(12, 1fr)",
+    },
+    alignItems: "center",
+    gap: {
+      default: "4rem",
+      [breakpoints.lg]: "2rem",
+    },
+  },
+  heroColLeft: {
+    gridColumn: {
+      default: "auto",
+      [breakpoints.lg]: "span 7",
+    },
+  },
+  heroColRight: {
+    gridColumn: {
+      default: "auto",
+      [breakpoints.lg]: "span 5",
+    },
+  },
+  heroBadge: {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "0.5rem",
+    borderRadius: radii.full,
+    backgroundColor: colors.mint,
+    paddingInline: "1rem",
+    paddingBlock: "0.375rem",
+    fontFamily: typography.tech,
+    fontSize: { default: "10px", [breakpoints.md]: "11px" },
+    textTransform: "uppercase",
+    letterSpacing: "0.25em",
+    color: colors.fern,
+  },
+  heroIcon: {
+    width: "0.875rem",
+    height: "0.875rem",
+  },
+  heroTitle: {
+    marginTop: "2rem",
+    fontFamily: typography.display,
+    fontSize: "clamp(3.25rem, 7.5vw, 6.5rem)",
+    fontWeight: 300,
+    lineHeight: 1.02,
+    letterSpacing: "-0.025em",
+    color: colors.forest,
+  },
+  italicMoss: {
+    fontStyle: "italic",
+    color: colors.moss,
+  },
+  heroDesc: {
+    marginTop: "2rem",
+    maxWidth: "36rem",
+    fontSize: { default: "1.125rem", [breakpoints.md]: "1.25rem" },
+    lineHeight: 1.625,
+    color: "color-mix(in oklab, var(--color-bark) 65%, transparent)",
+  },
+  heroActions: {
+    marginTop: "2.5rem",
+    display: "flex",
+    flexWrap: "wrap",
+    alignItems: "center",
+    gap: "1rem",
+  },
+  primaryBtn: {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "0.5rem",
+    borderRadius: radii.full,
+    backgroundColor: {
+      default: colors.forest,
+      ":hover": colors.fern,
+    },
+    paddingInline: "2rem",
+    paddingBlock: "1rem",
+    fontFamily: typography.body,
+    fontSize: "0.875rem",
+    fontWeight: 600,
+    letterSpacing: "0.025em",
+    color: colors.cream,
+    boxShadow: {
+      default: shadows.lift,
+      ":hover": shadows.ambient,
+    },
+    transitionProperty: "background-color, transform, box-shadow",
+    transitionDuration: "300ms",
+    transform: {
+      default: "translateY(0)",
+      ":hover": "translateY(-2px)",
+    },
+    textDecoration: "none",
+    borderWidth: 0,
+    cursor: "pointer",
+  },
+  outlineBtn: {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "0.5rem",
+    borderRadius: radii.full,
+    borderWidth: "1px",
+    borderStyle: "solid",
+    borderColor: {
+      default: "color-mix(in oklab, var(--color-moss) 40%, transparent)",
+      ":hover": colors.moss,
+    },
+    backgroundColor: {
+      default: "transparent",
+      ":hover": "color-mix(in oklab, var(--color-mint) 40%, transparent)",
+    },
+    paddingInline: "2rem",
+    paddingBlock: "1rem",
+    fontFamily: typography.body,
+    fontSize: "0.875rem",
+    fontWeight: 600,
+    letterSpacing: "0.025em",
+    color: colors.forest,
+    transitionProperty: "border-color, background-color",
+    transitionDuration: "300ms",
+    textDecoration: "none",
+  },
+  btnIcon: {
+    width: "1rem",
+    height: "1rem",
+  },
+  heroImageWrapper: {
+    position: "relative",
+    marginInline: "auto",
+    width: "100%",
+    maxWidth: "540px",
+  },
+  heroGlowBlob: {
+    position: "absolute",
+    inset: "-1.25rem",
+    transform: "rotate(6deg)",
+    backgroundColor: "color-mix(in oklab, var(--color-mint) 70%, transparent)",
+    filter: "blur(40px)",
+    borderRadius: "42% 58% 62% 38% / 47% 59% 41% 53%",
+  },
+  heroBlobContainer: {
+    position: "relative",
+  },
+  heroImageMask: {
+    overflow: "hidden",
+    boxShadow: shadows.ambient,
+    borderRadius: "58% 42% 38% 62% / 53% 41% 59% 47%",
+  },
+  heroImage: {
+    aspectRatio: "4 / 5",
+    width: "100%",
+    objectFit: "cover",
+    display: "block",
+  },
+  heroFloatingTag: {
+    position: "absolute",
+    right: { default: 0, [breakpoints.md]: "-1rem" },
+    top: { default: "2rem", [breakpoints.md]: "3rem" },
+    borderRadius: radii.full,
+    backgroundColor: "color-mix(in oklab, var(--color-cream) 90%, transparent)",
+    paddingInline: "1rem",
+    paddingBlock: "0.5rem",
+    fontFamily: typography.tech,
+    fontSize: "10px",
+    textTransform: "uppercase",
+    letterSpacing: "0.25em",
+    color: colors.fern,
+    boxShadow: shadows.lift,
+    backdropFilter: "blur(8px)",
+    WebkitBackdropFilter: "blur(8px)",
+  },
+  heroFloatingCard: {
+    position: "absolute",
+    bottom: { default: "-1.5rem", [breakpoints.md]: "-2rem" },
+    left: { default: 0, [breakpoints.md]: "-2rem" },
+    maxWidth: "220px",
+    borderRadius: "24px",
+    backgroundColor: "#ffffff",
+    padding: "1.5rem",
+    boxShadow: shadows.ambient,
+  },
+  heroFloatingCardLabel: {
+    fontFamily: typography.tech,
+    fontSize: "10px",
+    textTransform: "uppercase",
+    letterSpacing: "0.25em",
+    color: colors.moss,
+  },
+  heroFloatingCardValue: {
+    marginTop: "0.5rem",
+    fontFamily: typography.display,
+    fontSize: "2.25rem",
+    lineHeight: "2.5rem",
+    fontWeight: 300,
+    color: colors.forest,
+  },
+  heroFloatingCardDesc: {
+    marginTop: "0.25rem",
+    fontSize: "0.75rem",
+    lineHeight: "1rem",
+    color: "color-mix(in oklab, var(--color-bark) 65%, transparent)",
+  },
+  // Industries
+  industriesSection: {
+    scrollMarginTop: "7rem",
+    paddingBlock: { default: "7rem", [breakpoints.md]: "10rem" },
+  },
+  industriesHeader: {
+    display: "flex",
+    flexDirection: { default: "column", [breakpoints.md]: "row" },
+    gap: "2rem",
+    alignItems: { default: "stretch", [breakpoints.md]: "flex-end" },
+    justifyContent: { default: "flex-start", [breakpoints.md]: "space-between" },
+  },
+  sectionHeading: {
+    marginTop: "1.25rem",
+    fontFamily: typography.display,
+    fontSize: {
+      default: "2.25rem",
+      [breakpoints.md]: "3rem",
+      [breakpoints.lg]: "3.75rem",
+    },
+    fontWeight: 300,
+    letterSpacing: "-0.025em",
+    color: colors.forest,
+    lineHeight: 1.1,
+  },
+  industriesSubtext: {
+    maxWidth: "24rem",
+    fontSize: "1rem",
+    lineHeight: 1.625,
+    color: "color-mix(in oklab, var(--color-bark) 65%, transparent)",
+  },
+  industriesGrid: {
+    marginTop: { default: "4rem", [breakpoints.md]: "6rem" },
+    display: "grid",
+    gridTemplateColumns: {
+      default: "1fr",
+      [breakpoints.md]: "repeat(3, 1fr)",
+    },
+    gap: {
+      default: "3rem",
+      [breakpoints.md]: "2rem",
+      [breakpoints.lg]: "2.5rem",
+    },
+  },
+  industryOffset0: {},
+  industryOffset1: {
+    marginTop: { default: 0, [breakpoints.md]: "4rem", [breakpoints.lg]: "6rem" },
+  },
+  industryOffset2: {
+    marginTop: { default: 0, [breakpoints.md]: "2rem", [breakpoints.lg]: "3rem" },
+  },
+  industryCardLink: {
+    display: "block",
+    textDecoration: "none",
+    color: "inherit",
+  },
+  industryImageWrap34: {
+    overflow: "hidden",
+    borderRadius: "24px",
+    boxShadow: {
+      default: shadows.lift,
+      ":hover": shadows.ambient,
+    },
+    aspectRatio: "3 / 4",
+    transitionProperty: "box-shadow",
+    transitionDuration: "500ms",
+  },
+  industryImageWrap45: {
+    overflow: "hidden",
+    borderRadius: "24px",
+    boxShadow: {
+      default: shadows.lift,
+      ":hover": shadows.ambient,
+    },
+    aspectRatio: "4 / 5",
+    transitionProperty: "box-shadow",
+    transitionDuration: "500ms",
+  },
+  industryImage: {
+    height: "100%",
+    width: "100%",
+    objectFit: "cover",
+    transitionProperty: "transform",
+    transitionDuration: "700ms",
+    transitionTimingFunction: "ease-out",
+  },
+  industryMeta: {
+    marginTop: "1.75rem",
+    display: "flex",
+    alignItems: "baseline",
+    gap: "1rem",
+  },
+  industryNumber: {
+    fontFamily: typography.tech,
+    fontSize: "0.75rem",
+    letterSpacing: "0.2em",
+    color: colors.moss,
+  },
+  industryTitle: {
+    fontFamily: typography.display,
+    fontSize: { default: "1.5rem", [breakpoints.md]: "1.65rem" },
+    fontWeight: 500,
+    letterSpacing: "-0.025em",
+    color: colors.forest,
+  },
+  industryCopy: {
+    marginTop: "0.75rem",
+    fontSize: "0.875rem",
+    lineHeight: 1.625,
+    color: "color-mix(in oklab, var(--color-bark) 65%, transparent)",
+  },
+  industryAction: {
+    marginTop: "1.25rem",
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "0.5rem",
+    fontFamily: typography.body,
+    fontSize: "0.875rem",
+    fontWeight: 600,
+    color: {
+      default: colors.fern,
+      ":hover": colors.forest,
+    },
+    transitionProperty: "color",
+    transitionDuration: "300ms",
+  },
+  // Science
+  scienceSection: {
+    scrollMarginTop: "7rem",
+    backgroundColor: colors.parchment,
+    paddingBlock: { default: "7rem", [breakpoints.md]: "10rem" },
+  },
+  scienceGrid: {
+    display: "grid",
+    gridTemplateColumns: {
+      default: "1fr",
+      [breakpoints.lg]: "repeat(2, 1fr)",
+    },
+    alignItems: "center",
+    gap: {
+      default: "5rem",
+      [breakpoints.lg]: "6rem",
+    },
+  },
+  scienceImageWrapper: {
+    position: "relative",
+  },
+  scienceGlow: {
+    position: "absolute",
+    left: "-3rem",
+    top: "-3rem",
+    height: "16rem",
+    width: "16rem",
+    borderRadius: radii.full,
+    backgroundColor: "color-mix(in oklab, var(--color-mist) 80%, transparent)",
+    filter: "blur(48px)",
+  },
+  sciencePrimaryImgContainer: {
+    position: "relative",
+    overflow: "hidden",
+    borderRadius: "28px",
+    boxShadow: shadows.ambient,
+  },
+  sciencePrimaryImg: {
+    aspectRatio: "4 / 5",
+    width: "100%",
+    objectFit: "cover",
+    display: "block",
+  },
+  scienceFloatingImgContainer: {
+    position: "absolute",
+    bottom: "-2.5rem",
+    right: { default: "0.5rem", [breakpoints.md]: "-2.5rem" },
+    width: { default: "10rem", [breakpoints.md]: "14rem" },
+    transform: {
+      default: "rotate(2deg)",
+      ":hover": "rotate(0deg)",
+    },
+    overflow: "hidden",
+    borderRadius: "20px",
+    borderWidth: "6px",
+    borderStyle: "solid",
+    borderColor: colors.cream,
+    boxShadow: shadows.ambient,
+    transitionProperty: "transform",
+    transitionDuration: "500ms",
+  },
+  scienceFloatingImg: {
+    aspectRatio: "4 / 3",
+    width: "100%",
+    objectFit: "cover",
+    display: "block",
+  },
+  scienceHeading: {
+    marginTop: "1.25rem",
+    fontFamily: typography.display,
+    fontSize: {
+      default: "2.25rem",
+      [breakpoints.md]: "3rem",
+      [breakpoints.lg]: "3.75rem",
+    },
+    fontWeight: 300,
+    lineHeight: 1.08,
+    letterSpacing: "-0.025em",
+    color: colors.forest,
+  },
+  scienceCopy: {
+    marginTop: "2rem",
+    maxWidth: "36rem",
+    fontSize: "1.125rem",
+    lineHeight: 1.625,
+    color: "color-mix(in oklab, var(--color-bark) 65%, transparent)",
+  },
+  statsGrid: {
+    marginTop: "3rem",
+    display: "grid",
+    gridTemplateColumns: {
+      default: "1fr",
+      [breakpoints.sm]: "repeat(2, 1fr)",
+    },
+    gap: "1rem",
+  },
+  statCard: {
+    height: "100%",
+    borderRadius: "20px",
+    borderWidth: "1px",
+    borderStyle: "solid",
+    borderColor: {
+      default: colors.pebble,
+      ":hover": colors.mint,
+    },
+    backgroundColor: {
+      default: "color-mix(in oklab, #ffffff 70%, transparent)",
+      ":hover": "color-mix(in oklab, var(--color-mint) 30%, transparent)",
+    },
+    paddingInline: "1.5rem",
+    paddingBlock: "1.25rem",
+    boxShadow: shadows.lift,
+    transitionProperty: "border-color, background-color",
+    transitionDuration: "300ms",
+  },
+  statValue: {
+    fontFamily: typography.display,
+    fontSize: { default: "1.875rem", [breakpoints.md]: "2.25rem" },
+    fontWeight: 300,
+    color: colors.forest,
+  },
+  statLabel: {
+    marginTop: "0.375rem",
+    fontSize: { default: "0.75rem", [breakpoints.md]: "0.875rem" },
+    lineHeight: 1.625,
+    color: "color-mix(in oklab, var(--color-bark) 65%, transparent)",
+  },
+  pillarsWrap: {
+    marginTop: { default: "6rem", [breakpoints.md]: "8rem" },
+    borderTopWidth: "1px",
+    borderTopStyle: "solid",
+    borderTopColor: colors.pebble,
+    paddingTop: { default: "4rem", [breakpoints.md]: "5rem" },
+  },
+  pillarsGrid: {
+    display: "grid",
+    gridTemplateColumns: {
+      default: "1fr",
+      [breakpoints.md]: "repeat(3, 1fr)",
+    },
+    gap: {
+      default: "3rem",
+      [breakpoints.md]: "2.5rem",
+    },
+  },
+  pillarIconBox: {
+    display: "flex",
+    height: "3rem",
+    width: "3rem",
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: radii.full,
+    backgroundColor: {
+      default: colors.mint,
+      ":hover": colors.mist,
+    },
+    color: colors.fern,
+    transitionProperty: "background-color",
+    transitionDuration: "300ms",
+  },
+  pillarIcon: {
+    width: "1.25rem",
+    height: "1.25rem",
+  },
+  pillarTitle: {
+    marginTop: "1.5rem",
+    fontFamily: typography.display,
+    fontSize: "1.5rem",
+    fontWeight: 500,
+    letterSpacing: "-0.025em",
+    color: colors.forest,
+  },
+  pillarCopy: {
+    marginTop: "0.75rem",
+    maxWidth: "20rem",
+    fontSize: "0.875rem",
+    lineHeight: 1.625,
+    color: "color-mix(in oklab, var(--color-bark) 65%, transparent)",
+  },
+  // Ingredients
+  ingredientsSection: {
+    scrollMarginTop: "7rem",
+    paddingBlock: { default: "7rem", [breakpoints.md]: "10rem" },
+  },
+  ingredientsContainer: {
+    marginInline: "auto",
+    maxWidth: "1080px",
+    paddingInline: { default: "1.5rem", [breakpoints.md]: "3rem" },
+    textAlign: "center",
+  },
+  ingredientsHeading: {
+    marginInline: "auto",
+    marginTop: "1.25rem",
+    maxWidth: "48rem",
+    fontFamily: typography.display,
+    fontSize: {
+      default: "2.25rem",
+      [breakpoints.md]: "3rem",
+      [breakpoints.lg]: "3.75rem",
+    },
+    fontWeight: 300,
+    letterSpacing: "-0.025em",
+    color: colors.forest,
+  },
+  ingredientsSubtext: {
+    marginInline: "auto",
+    marginTop: "1.75rem",
+    maxWidth: "36rem",
+    fontSize: { default: "1rem", [breakpoints.md]: "1.125rem" },
+    lineHeight: 1.625,
+    color: "color-mix(in oklab, var(--color-bark) 65%, transparent)",
+  },
+  ingredientsChipsWrap: {
+    marginTop: "3.5rem",
+    display: "flex",
+    flexWrap: "wrap",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: { default: "0.75rem", [breakpoints.md]: "1rem" },
+  },
+  ingredientChip: {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "0.625rem",
+    borderRadius: radii.full,
+    backgroundColor: {
+      default: colors.mint,
+      ":hover": colors.mist,
+    },
+    paddingInline: "1.5rem",
+    paddingBlock: "0.75rem",
+    fontFamily: typography.body,
+    fontSize: "0.875rem",
+    fontWeight: 500,
+    color: colors.fern,
+    boxShadow: {
+      default: "none",
+      ":hover": shadows.lift,
+    },
+    transform: {
+      default: "translateY(0)",
+      ":hover": "translateY(-2px)",
+    },
+    transitionProperty: "background-color, transform, box-shadow",
+    transitionDuration: "300ms",
+    textDecoration: "none",
+  },
+  chipLeafIcon: {
+    width: "0.875rem",
+    height: "0.875rem",
+    color: colors.moss,
+  },
+  ingredientsBottomCta: {
+    marginTop: "3rem",
+  },
+  textLink: {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "0.5rem",
+    fontFamily: typography.body,
+    fontSize: "0.875rem",
+    fontWeight: 600,
+    color: {
+      default: colors.fern,
+      ":hover": colors.forest,
+    },
+    transitionProperty: "color",
+    transitionDuration: "300ms",
+    textDecoration: "none",
+  },
+  // Quality
+  qualitySection: {
+    scrollMarginTop: "7rem",
+  },
+  qualityStrip: {
+    display: "flex",
+    flexDirection: { default: "column", [breakpoints.md]: "row" },
+    alignItems: "center",
+    gap: "1.5rem",
+    borderTopWidth: "1px",
+    borderTopStyle: "solid",
+    borderTopColor: colors.pebble,
+    borderBottomWidth: "1px",
+    borderBottomStyle: "solid",
+    borderBottomColor: colors.pebble,
+    paddingBlock: { default: "2.5rem", [breakpoints.md]: "3rem" },
+    justifyContent: { default: "flex-start", [breakpoints.md]: "space-between" },
+  },
+  qualityLabel: {
+    fontFamily: typography.tech,
+    fontSize: { default: "10px", [breakpoints.md]: "11px" },
+    textTransform: "uppercase",
+    letterSpacing: "0.3em",
+    color: "color-mix(in oklab, var(--color-bark) 65%, transparent)",
+  },
+  qualityList: {
+    display: "flex",
+    flexWrap: "wrap",
+    alignItems: "center",
+    justifyContent: "center",
+    columnGap: "2rem",
+    rowGap: "0.75rem",
+    listStyleType: "none",
+    padding: 0,
+    margin: 0,
+  },
+  qualityItem: {
+    fontFamily: typography.tech,
+    fontSize: "0.75rem",
+    textTransform: "uppercase",
+    letterSpacing: "0.2em",
+    color: {
+      default: colors.moss,
+      ":hover": colors.forest,
+    },
+    transitionProperty: "color",
+    transitionDuration: "300ms",
+  },
+  // CTA
+  ctaSection: {
+    scrollMarginTop: "7rem",
+    paddingBlock: { default: "7rem", [breakpoints.md]: "10rem" },
+  },
+  ctaCard: {
+    position: "relative",
+    overflow: "hidden",
+    borderRadius: "40px",
+    backgroundColor: colors.stone,
+    paddingInline: { default: "1.5rem", [breakpoints.md]: "5rem" },
+    paddingBlock: { default: "5rem", [breakpoints.md]: "7rem" },
+    textAlign: "center",
+  },
+  ctaGlow1: {
+    position: "absolute",
+    left: "-6rem",
+    top: "-6rem",
+    height: "18rem",
+    width: "18rem",
+    borderRadius: radii.full,
+    backgroundColor: "color-mix(in oklab, var(--color-mint) 60%, transparent)",
+    filter: "blur(48px)",
+  },
+  ctaGlow2: {
+    position: "absolute",
+    bottom: "-8rem",
+    right: "-4rem",
+    height: "20rem",
+    width: "20rem",
+    borderRadius: radii.full,
+    backgroundColor: "color-mix(in oklab, var(--color-mist) 70%, transparent)",
+    filter: "blur(48px)",
+  },
+  ctaHeading: {
+    marginInline: "auto",
+    marginTop: "1.5rem",
+    maxWidth: "48rem",
+    fontFamily: typography.display,
+    fontSize: { default: "2.25rem", [breakpoints.md]: "3.75rem" },
+    fontWeight: 300,
+    lineHeight: 1.08,
+    letterSpacing: "-0.025em",
+    color: colors.forest,
+  },
+  ctaCopy: {
+    marginInline: "auto",
+    marginTop: "1.75rem",
+    maxWidth: "36rem",
+    fontSize: { default: "1rem", [breakpoints.md]: "1.125rem" },
+    lineHeight: 1.625,
+    color: "color-mix(in oklab, var(--color-bark) 65%, transparent)",
+  },
+  ctaButtons: {
+    marginTop: "2.5rem",
+    display: "flex",
+    flexWrap: "wrap",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: "1rem",
+  },
+  ctaPrimaryBtn: {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "0.5rem",
+    borderRadius: radii.full,
+    backgroundColor: {
+      default: colors.forest,
+      ":hover": colors.fern,
+    },
+    paddingInline: "2.25rem",
+    paddingBlock: "1rem",
+    fontFamily: typography.body,
+    fontSize: "0.875rem",
+    fontWeight: 600,
+    letterSpacing: "0.025em",
+    color: colors.cream,
+    boxShadow: {
+      default: shadows.lift,
+      ":hover": shadows.ambient,
+    },
+    transitionProperty: "background-color, transform, box-shadow",
+    transitionDuration: "300ms",
+    transform: {
+      default: "translateY(0)",
+      ":hover": "translateY(-2px)",
+    },
+    borderWidth: 0,
+    cursor: "pointer",
+  },
+  ctaOutlineBtn: {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "0.5rem",
+    borderRadius: radii.full,
+    borderWidth: "1px",
+    borderStyle: "solid",
+    borderColor: {
+      default: "color-mix(in oklab, var(--color-moss) 40%, transparent)",
+      ":hover": colors.moss,
+    },
+    paddingInline: "2.25rem",
+    paddingBlock: "1rem",
+    fontFamily: typography.body,
+    fontSize: "0.875rem",
+    fontWeight: 600,
+    letterSpacing: "0.025em",
+    color: colors.forest,
+    transitionProperty: "border-color, background-color",
+    transitionDuration: "300ms",
+    textDecoration: "none",
+    backgroundColor: {
+      default: "transparent",
+      ":hover": "color-mix(in oklab, var(--color-mint) 40%, transparent)",
+    },
+  },
+  // Footer
+  footer: {
+    backgroundColor: colors.forest,
+    color: colors.cream,
+  },
+  footerInner: {
+    marginInline: "auto",
+    maxWidth: "1280px",
+    paddingInline: {
+      default: "1.5rem",
+      [breakpoints.md]: "3rem",
+      [breakpoints.lg]: "4rem",
+    },
+    paddingTop: { default: "5rem", [breakpoints.md]: "7rem" },
+    paddingBottom: "2.5rem",
+  },
+  footerEyebrow: {
+    fontFamily: typography.tech,
+    fontSize: { default: "10px", [breakpoints.md]: "11px" },
+    textTransform: "uppercase",
+    letterSpacing: "0.3em",
+    color: "color-mix(in oklab, var(--color-mist) 70%, transparent)",
+  },
+  footerLogoText: {
+    marginTop: "1.5rem",
+    fontFamily: typography.display,
+    fontSize: "clamp(4rem, 13vw, 10rem)",
+    fontWeight: 300,
+    lineHeight: 0.95,
+    letterSpacing: "-0.025em",
+  },
+  footerDot: {
+    color: colors.mint,
+  },
+  footerGrid: {
+    marginTop: "4rem",
+    display: "grid",
+    gridTemplateColumns: {
+      default: "1fr",
+      [breakpoints.md]: "repeat(3, 1fr)",
+    },
+    gap: {
+      default: "3rem",
+      [breakpoints.md]: "2.5rem",
+    },
+  },
+  footerAboutText: {
+    maxWidth: "20rem",
+    fontSize: "0.875rem",
+    lineHeight: 1.625,
+    color: "color-mix(in oklab, var(--color-mist) 70%, transparent)",
+  },
+  footerColHeader: {
+    fontFamily: typography.tech,
+    fontSize: "10px",
+    textTransform: "uppercase",
+    letterSpacing: "0.25em",
+    color: "color-mix(in oklab, var(--color-mist) 60%, transparent)",
+  },
+  footerColList: {
+    marginTop: "1.25rem",
+    display: "flex",
+    flexDirection: "column",
+    gap: "0.75rem",
+    listStyleType: "none",
+    padding: 0,
+    margin: 0,
+  },
+  footerLink: {
+    fontSize: "0.875rem",
+    color: {
+      default: "color-mix(in oklab, var(--color-mist) 70%, transparent)",
+      ":hover": colors.mint,
+    },
+    transitionProperty: "color",
+    transitionDuration: "300ms",
+    textDecoration: "none",
+    borderWidth: 0,
+    backgroundColor: "transparent",
+    cursor: "pointer",
+    padding: 0,
+  },
+  footerRegionItem: {
+    fontSize: "0.875rem",
+    color: "color-mix(in oklab, var(--color-mist) 70%, transparent)",
+  },
+  footerBottom: {
+    marginTop: "4rem",
+    display: "flex",
+    flexDirection: { default: "column", [breakpoints.md]: "row" },
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: "1rem",
+    borderTopWidth: "1px",
+    borderTopStyle: "solid",
+    borderTopColor: "color-mix(in oklab, var(--color-cream) 10%, transparent)",
+    paddingTop: "2rem",
+  },
+  footerCopyright: {
+    fontSize: "0.75rem",
+    color: "color-mix(in oklab, var(--color-mist) 70%, transparent)",
+  },
+  footerLegalLinks: {
+    display: "flex",
+    alignItems: "center",
+    gap: "2rem",
+  },
+  textCenter: {
+    textAlign: "center",
+  },
+  relative: {
+    position: "relative",
+  },
+  maxWidthXl: {
+    maxWidth: "36rem",
+  },
+});
 
 function NavBar() {
   const reduce = useReducedMotion();
@@ -44,30 +1031,20 @@ function NavBar() {
       initial={reduce ? { opacity: 0 } : { opacity: 0, y: -16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.7, ease: EASE }}
-      className="fixed inset-x-4 top-4 z-50 md:inset-x-0 md:top-6"
+      {...stylex.props(styles.nav)}
     >
-      <div className="mx-auto flex max-w-[920px] items-center justify-between rounded-full border border-pebble/70 bg-cream/80 py-2 pl-6 pr-2 shadow-ambient backdrop-blur-md">
-        <a
-          href="#top"
-          className="font-display text-2xl font-medium tracking-tight text-forest transition-colors duration-300 hover:text-fern"
-        >
+      <div {...stylex.props(styles.navInner)}>
+        <a href="#top" {...stylex.props(styles.navLogo)}>
           Fenchem
         </a>
-        <div className="hidden items-center gap-7 md:flex">
+        <div {...stylex.props(styles.navLinks)}>
           {NAV_LINKS.map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
-              className="font-body text-sm text-bark/65 transition-colors duration-300 hover:text-forest"
-            >
+            <a key={link.href} href={link.href} {...stylex.props(styles.navLink)}>
               {link.label}
             </a>
           ))}
         </div>
-        <a
-          href="#contact"
-          className="inline-flex items-center gap-1.5 rounded-full bg-forest px-5 py-2.5 font-body text-sm font-semibold text-cream shadow-lift transition-[background-color,translate] duration-300 hover:-translate-y-0.5 hover:bg-fern"
-        >
+        <a href="#contact" {...stylex.props(styles.navCta)}>
           Partner with Us
         </a>
       </div>
@@ -83,77 +1060,61 @@ type HeroSectionProps = {
 function HeroSection({ heroRef, blobY }: HeroSectionProps) {
   const reduce = useReducedMotion();
   return (
-    <header id="top" ref={heroRef} className="relative pb-24 pt-36 md:pb-36 md:pt-48">
-      <div className="mx-auto grid max-w-[1280px] grid-cols-1 items-center gap-16 px-6 md:px-12 lg:grid-cols-12 lg:gap-8 lg:px-16">
-        <div className="lg:col-span-7">
+    <header id="top" ref={heroRef} {...stylex.props(styles.hero)}>
+      <div {...stylex.props(styles.container, styles.heroGrid)}>
+        <div {...stylex.props(styles.heroColLeft)}>
           <Intro delay={0.05}>
-            <span className="inline-flex items-center gap-2 rounded-full bg-mint px-4 py-1.5 font-tech text-[10px] uppercase tracking-[0.25em] text-fern md:text-[11px]">
-              <Leaf className="h-3.5 w-3.5" aria-hidden />
+            <span {...stylex.props(styles.heroBadge)}>
+              <Leaf {...stylex.props(styles.heroIcon)} aria-hidden />
               Botanical Intelligence Since 1995
             </span>
           </Intro>
           <Intro delay={0.18}>
-            <h1 className="mt-8 font-display text-[clamp(3.25rem,7.5vw,6.5rem)] font-light leading-[1.02] tracking-[-0.025em] text-forest">
-              Nurturing <em className="italic text-moss">Vitality</em> through Botanical Excellence
+            <h1 {...stylex.props(styles.heroTitle)}>
+              Nurturing <em {...stylex.props(styles.italicMoss)}>Vitality</em> through Botanical
+              Excellence
             </h1>
           </Intro>
           <Intro delay={0.32}>
-            <p className="mt-8 max-w-xl text-lg leading-relaxed text-bark/65 md:text-xl">
+            <p {...stylex.props(styles.heroDesc)}>
               Premium botanical and functional ingredients for nutrition, food and personal care —
               bridging ancient plant wisdom with modern scientific precision.
             </p>
           </Intro>
-          <Intro delay={0.46} className="mt-10 flex flex-wrap items-center gap-4">
-            <a
-              href="#ingredients"
-              className="inline-flex items-center gap-2 rounded-full bg-forest px-8 py-4 font-body text-sm font-semibold tracking-wide text-cream shadow-lift transition-[background-color,translate,box-shadow] duration-300 hover:-translate-y-0.5 hover:bg-fern hover:shadow-ambient"
-            >
+          <Intro delay={0.46} sx={styles.heroActions}>
+            <a href="#ingredients" {...stylex.props(styles.primaryBtn)}>
               Explore Portfolio
-              <ArrowUpRight className="h-4 w-4" aria-hidden />
+              <ArrowUpRight {...stylex.props(styles.btnIcon)} aria-hidden />
             </a>
-            <a
-              href="#contact"
-              className="inline-flex items-center gap-2 rounded-full border border-moss/40 px-8 py-4 font-body text-sm font-semibold tracking-wide text-forest transition-colors duration-300 hover:border-moss hover:bg-mint/40"
-            >
+            <a href="#contact" {...stylex.props(styles.outlineBtn)}>
               Request a Specification
             </a>
           </Intro>
         </div>
 
-        <Intro delay={0.3} className="lg:col-span-5">
-          <div className="relative mx-auto w-full max-w-[540px]">
-            <div
-              aria-hidden
-              className="absolute -inset-5 rotate-6 bg-mint/70 blur-2xl"
-              style={{ borderRadius: "42% 58% 62% 38% / 47% 59% 41% 53%" }}
-            />
-            <m.div style={{ y: reduce ? 0 : blobY }} className="relative">
-              <div
-                className="overflow-hidden shadow-ambient"
-                style={{ borderRadius: "58% 42% 38% 62% / 53% 41% 59% 47%" }}
-              >
+        <Intro delay={0.3} sx={styles.heroColRight}>
+          <div {...stylex.props(styles.heroImageWrapper)}>
+            <div aria-hidden {...stylex.props(styles.heroGlowBlob)} />
+            <m.div style={{ y: reduce ? 0 : blobY }} {...stylex.props(styles.heroBlobContainer)}>
+              <div {...stylex.props(styles.heroImageMask)}>
                 <img
                   src="https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?auto=format&fit=crop&w=1200&q=80"
                   alt="Macro photograph of a green leaf with morning dew"
-                  className="aspect-[4/5] w-full object-cover"
+                  {...stylex.props(styles.heroImage)}
                   loading="eager"
                 />
               </div>
-              <span className="absolute right-0 top-8 rounded-full bg-cream/90 px-4 py-2 font-tech text-[10px] uppercase tracking-[0.25em] text-fern shadow-lift backdrop-blur md:-right-4 md:top-12">
-                ISO · GMP Certified
-              </span>
+              <span {...stylex.props(styles.heroFloatingTag)}>ISO · GMP Certified</span>
               <m.div
                 animate={reduce ? undefined : { y: [0, -8, 0] }}
                 transition={
                   reduce ? undefined : { duration: 6, repeat: Infinity, ease: "easeInOut" }
                 }
-                className="absolute -bottom-6 left-0 max-w-[220px] rounded-[24px] bg-white p-6 shadow-ambient md:-bottom-8 md:-left-8"
+                {...stylex.props(styles.heroFloatingCard)}
               >
-                <p className="font-tech text-[10px] uppercase tracking-[0.25em] text-moss">
-                  Extraction Yield
-                </p>
-                <p className="mt-2 font-display text-4xl font-light text-forest">98%</p>
-                <p className="mt-1 text-xs leading-relaxed text-bark/65">
+                <p {...stylex.props(styles.heroFloatingCardLabel)}>Extraction Yield</p>
+                <p {...stylex.props(styles.heroFloatingCardValue)}>98%</p>
+                <p {...stylex.props(styles.heroFloatingCardDesc)}>
                   Bio-active retention across our extraction process.
                 </p>
               </m.div>
@@ -166,50 +1127,50 @@ function HeroSection({ heroRef, blobY }: HeroSectionProps) {
 }
 
 function IndustriesSection() {
+  const offsetStyles = [styles.industryOffset0, styles.industryOffset1, styles.industryOffset2];
+  const aspectStyles = [
+    styles.industryImageWrap34,
+    styles.industryImageWrap45,
+    styles.industryImageWrap34,
+  ];
+
   return (
-    <section id="industries" className="scroll-mt-28 py-28 md:py-40">
-      <div className="mx-auto max-w-[1280px] px-6 md:px-12 lg:px-16">
-        <Reveal className="flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
-          <div className="max-w-xl">
+    <section id="industries" {...stylex.props(styles.industriesSection)}>
+      <div {...stylex.props(styles.container)}>
+        <Reveal sx={styles.industriesHeader}>
+          <div {...stylex.props(styles.maxWidthXl)}>
             <Eyebrow accent="text-moss">Where our ingredients work</Eyebrow>
-            <h2 className="mt-5 font-display text-4xl font-light tracking-tight text-forest md:text-5xl lg:text-6xl">
-              Purity across <em className="italic text-moss">industries</em>
+            <h2 {...stylex.props(styles.sectionHeading)}>
+              Purity across <em {...stylex.props(styles.italicMoss)}>industries</em>
             </h2>
           </div>
-          <p className="max-w-sm text-base leading-relaxed text-bark/65">
+          <p {...stylex.props(styles.industriesSubtext)}>
             Crafted to meet the rigorous demands of global leaders in health, wellness and beauty.
           </p>
         </Reveal>
 
-        <div className="mt-16 grid grid-cols-1 gap-12 md:mt-24 md:grid-cols-3 md:gap-8 lg:gap-10">
+        <div {...stylex.props(styles.industriesGrid)}>
           {industries.map((industry, i) => (
-            <Reveal key={industry.title} delay={i * 0.12} className={INDUSTRY_LAYOUT[i].offset}>
-              <a href="#ingredients" className="group block">
-                <div
-                  className={`overflow-hidden rounded-[24px] shadow-lift transition-shadow duration-500 group-hover:shadow-ambient ${INDUSTRY_LAYOUT[i].aspect}`}
-                >
+            <Reveal key={industry.title} delay={i * 0.12} sx={offsetStyles[i]}>
+              <a href="#ingredients" {...stylex.props(styles.industryCardLink)}>
+                <div {...stylex.props(aspectStyles[i])}>
                   <img
                     src={industry.image.src}
                     alt={industry.image.alt}
-                    className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                    {...stylex.props(styles.industryImage)}
                     loading="lazy"
                   />
                 </div>
-                <div className="mt-7 flex items-baseline gap-4">
-                  <span className="font-tech text-xs tracking-[0.2em] text-moss">
+                <div {...stylex.props(styles.industryMeta)}>
+                  <span {...stylex.props(styles.industryNumber)}>
                     {String(i + 1).padStart(2, "0")}
                   </span>
-                  <h3 className="font-display text-2xl font-medium tracking-tight text-forest md:text-[1.65rem]">
-                    {industry.title}
-                  </h3>
+                  <h3 {...stylex.props(styles.industryTitle)}>{industry.title}</h3>
                 </div>
-                <p className="mt-3 text-sm leading-relaxed text-bark/65">{industry.copy}</p>
-                <span className="mt-5 inline-flex items-center gap-2 font-body text-sm font-semibold text-fern transition-colors duration-300 group-hover:text-forest">
+                <p {...stylex.props(styles.industryCopy)}>{industry.copy}</p>
+                <span {...stylex.props(styles.industryAction)}>
                   Explore applications
-                  <ArrowUpRight
-                    className="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
-                    aria-hidden
-                  />
+                  <ArrowUpRight {...stylex.props(styles.btnIcon)} aria-hidden />
                 </span>
               </a>
             </Reveal>
@@ -222,28 +1183,25 @@ function IndustriesSection() {
 
 function ScienceSection() {
   return (
-    <section id="science" className="scroll-mt-28 bg-parchment py-28 md:py-40">
-      <div className="mx-auto max-w-[1280px] px-6 md:px-12 lg:px-16">
-        <div className="grid grid-cols-1 items-center gap-20 lg:grid-cols-2 lg:gap-24">
+    <section id="science" {...stylex.props(styles.scienceSection)}>
+      <div {...stylex.props(styles.container)}>
+        <div {...stylex.props(styles.scienceGrid)}>
           <Reveal>
-            <div className="relative">
-              <div
-                aria-hidden
-                className="absolute -left-12 -top-12 h-64 w-64 rounded-full bg-mist/80 blur-3xl"
-              />
-              <div className="relative overflow-hidden rounded-[28px] shadow-ambient">
+            <div {...stylex.props(styles.scienceImageWrapper)}>
+              <div aria-hidden {...stylex.props(styles.scienceGlow)} />
+              <div {...stylex.props(styles.sciencePrimaryImgContainer)}>
                 <img
                   src="https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=1000&q=80"
                   alt="Tall forest path with sunlight filtering through the canopy"
-                  className="aspect-[4/5] w-full object-cover"
+                  {...stylex.props(styles.sciencePrimaryImg)}
                   loading="lazy"
                 />
               </div>
-              <div className="absolute -bottom-10 right-2 w-40 rotate-2 overflow-hidden rounded-[20px] border-[6px] border-cream shadow-ambient transition-transform duration-500 hover:rotate-0 md:-right-10 md:w-56">
+              <div {...stylex.props(styles.scienceFloatingImgContainer)}>
                 <img
                   src="https://images.unsplash.com/photo-1466781783364-36c955e42a7f?auto=format&fit=crop&w=640&q=80"
                   alt="Laboratory glassware during botanical analysis"
-                  className="aspect-[4/3] w-full object-cover"
+                  {...stylex.props(styles.scienceFloatingImg)}
                   loading="lazy"
                 />
               </div>
@@ -253,27 +1211,23 @@ function ScienceSection() {
           <div>
             <Reveal>
               <Eyebrow accent="text-moss">The Fenchem legacy</Eyebrow>
-              <h2 className="mt-5 font-display text-4xl font-light leading-[1.08] tracking-tight text-forest md:text-5xl lg:text-6xl">
+              <h2 {...stylex.props(styles.scienceHeading)}>
                 Rooted in Nature,
                 <br />
-                <em className="italic text-moss">Refined by Science.</em>
+                <em {...stylex.props(styles.italicMoss)}>Refined by Science.</em>
               </h2>
-              <p className="mt-8 max-w-xl text-lg leading-relaxed text-bark/65">
+              <p {...stylex.props(styles.scienceCopy)}>
                 Our journey began with a simple belief: that nature holds the keys to human
                 vitality. Today we manage a global network of sustainable farms and advanced
                 laboratories to bring those keys to our partners, lot after lot.
               </p>
             </Reveal>
-            <div className="mt-12 grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div {...stylex.props(styles.statsGrid)}>
               {stats.map((stat, i) => (
                 <Reveal key={stat.value} delay={i * 0.08}>
-                  <div className="h-full rounded-[20px] border border-pebble bg-white/70 px-6 py-5 shadow-lift transition-colors duration-300 hover:border-mint hover:bg-mint/30">
-                    <span className="font-display text-3xl font-light text-forest md:text-4xl">
-                      {stat.value}
-                    </span>
-                    <p className="mt-1.5 text-xs leading-relaxed text-bark/65 md:text-sm">
-                      {stat.label}
-                    </p>
+                  <div {...stylex.props(styles.statCard)}>
+                    <span {...stylex.props(styles.statValue)}>{stat.value}</span>
+                    <p {...stylex.props(styles.statLabel)}>{stat.label}</p>
                   </div>
                 </Reveal>
               ))}
@@ -282,22 +1236,18 @@ function ScienceSection() {
         </div>
 
         {/* Pillars */}
-        <div className="mt-24 border-t border-pebble pt-16 md:mt-32 md:pt-20">
-          <div className="grid grid-cols-1 gap-12 md:grid-cols-3 md:gap-10">
+        <div {...stylex.props(styles.pillarsWrap)}>
+          <div {...stylex.props(styles.pillarsGrid)}>
             {pillars.map((pillar, i) => {
               const Icon = PILLAR_ICONS[i];
               return (
                 <Reveal key={pillar.title} delay={i * 0.12}>
-                  <div className="group">
-                    <span className="flex h-12 w-12 items-center justify-center rounded-full bg-mint text-fern transition-colors duration-300 group-hover:bg-mist">
-                      <Icon className="h-5 w-5" aria-hidden />
+                  <div>
+                    <span {...stylex.props(styles.pillarIconBox)}>
+                      <Icon {...stylex.props(styles.pillarIcon)} aria-hidden />
                     </span>
-                    <h3 className="mt-6 font-display text-2xl font-medium tracking-tight text-forest">
-                      {pillar.title}
-                    </h3>
-                    <p className="mt-3 max-w-xs text-sm leading-relaxed text-bark/65">
-                      {pillar.copy}
-                    </p>
+                    <h3 {...stylex.props(styles.pillarTitle)}>{pillar.title}</h3>
+                    <p {...stylex.props(styles.pillarCopy)}>{pillar.copy}</p>
                   </div>
                 </Reveal>
               );
@@ -311,48 +1261,32 @@ function ScienceSection() {
 
 function IngredientsSection() {
   return (
-    <section id="ingredients" className="scroll-mt-28 py-28 md:py-40">
-      <div className="mx-auto max-w-[1080px] px-6 text-center md:px-12">
+    <section id="ingredients" {...stylex.props(styles.ingredientsSection)}>
+      <div {...stylex.props(styles.ingredientsContainer)}>
         <Reveal>
-          <Eyebrow accent="text-moss" className="text-center">
+          <Eyebrow accent="text-moss" sx={styles.textCenter}>
             The portfolio
           </Eyebrow>
-          <h2 className="mx-auto mt-5 max-w-3xl font-display text-4xl font-light tracking-tight text-forest md:text-5xl lg:text-6xl">
-            A <em className="italic text-moss">living library</em> of botanical actives
+          <h2 {...stylex.props(styles.ingredientsHeading)}>
+            A <em {...stylex.props(styles.italicMoss)}>living library</em> of botanical actives
           </h2>
-          <p className="mx-auto mt-7 max-w-xl text-base leading-relaxed text-bark/65 md:text-lg">
+          <p {...stylex.props(styles.ingredientsSubtext)}>
             Standardized extracts and functional ingredients, each backed by full identity, potency
             and stability documentation.
           </p>
         </Reveal>
-        <Reveal
-          delay={0.15}
-          className="mt-14 flex flex-wrap items-center justify-center gap-3 md:gap-4"
-        >
+        <Reveal delay={0.15} sx={styles.ingredientsChipsWrap}>
           {ingredients.map((ingredient) => (
-            <a
-              key={ingredient.name}
-              href="#contact"
-              className="group inline-flex items-center gap-2.5 rounded-full bg-mint px-6 py-3 font-body text-sm font-medium text-fern transition-[background-color,translate,box-shadow] duration-300 hover:-translate-y-0.5 hover:bg-mist hover:shadow-lift"
-            >
-              <Leaf
-                className="h-3.5 w-3.5 text-moss transition-transform duration-300 group-hover:rotate-12"
-                aria-hidden
-              />
+            <a key={ingredient.name} href="#contact" {...stylex.props(styles.ingredientChip)}>
+              <Leaf {...stylex.props(styles.chipLeafIcon)} aria-hidden />
               {ingredient.name}
             </a>
           ))}
         </Reveal>
-        <Reveal delay={0.3} className="mt-12">
-          <a
-            href="#contact"
-            className="group inline-flex items-center gap-2 font-body text-sm font-semibold text-fern transition-colors duration-300 hover:text-forest"
-          >
+        <Reveal delay={0.3} sx={styles.ingredientsBottomCta}>
+          <a href="#contact" {...stylex.props(styles.textLink)}>
             Request a Specification
-            <ArrowUpRight
-              className="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
-              aria-hidden
-            />
+            <ArrowUpRight {...stylex.props(styles.btnIcon)} aria-hidden />
           </a>
         </Reveal>
       </div>
@@ -362,19 +1296,14 @@ function IngredientsSection() {
 
 function QualitySection() {
   return (
-    <section id="quality" className="scroll-mt-28">
-      <div className="mx-auto max-w-[1280px] px-6 md:px-12 lg:px-16">
+    <section id="quality" {...stylex.props(styles.qualitySection)}>
+      <div {...stylex.props(styles.container)}>
         <Reveal>
-          <div className="flex flex-col items-center gap-6 border-y border-pebble py-10 md:flex-row md:justify-between md:py-12">
-            <p className="font-tech text-[10px] uppercase tracking-[0.3em] text-bark/65 md:text-[11px]">
-              Certified quality systems
-            </p>
-            <ul className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3">
+          <div {...stylex.props(styles.qualityStrip)}>
+            <p {...stylex.props(styles.qualityLabel)}>Certified quality systems</p>
+            <ul {...stylex.props(styles.qualityList)}>
               {certifications.map((cert) => (
-                <li
-                  key={cert}
-                  className="font-tech text-xs uppercase tracking-[0.2em] text-moss transition-colors duration-300 hover:text-forest"
-                >
+                <li key={cert} {...stylex.props(styles.qualityItem)}>
                   {cert}
                 </li>
               ))}
@@ -388,41 +1317,30 @@ function QualitySection() {
 
 function CtaSection() {
   return (
-    <section id="contact" className="scroll-mt-28 py-28 md:py-40">
-      <div className="mx-auto max-w-[1280px] px-6 md:px-12 lg:px-16">
+    <section id="contact" {...stylex.props(styles.ctaSection)}>
+      <div {...stylex.props(styles.container)}>
         <Reveal>
-          <div className="relative overflow-hidden rounded-[40px] bg-stone px-6 py-20 text-center md:px-20 md:py-28">
-            <div
-              aria-hidden
-              className="absolute -left-24 -top-24 h-72 w-72 rounded-full bg-mint/60 blur-3xl"
-            />
-            <div
-              aria-hidden
-              className="absolute -bottom-32 -right-16 h-80 w-80 rounded-full bg-mist/70 blur-3xl"
-            />
-            <div className="relative">
-              <Eyebrow accent="text-moss" className="text-center">
+          <div {...stylex.props(styles.ctaCard)}>
+            <div aria-hidden {...stylex.props(styles.ctaGlow1)} />
+            <div aria-hidden {...stylex.props(styles.ctaGlow2)} />
+            <div {...stylex.props(styles.relative)}>
+              <Eyebrow accent="text-moss" sx={styles.textCenter}>
                 Start the conversation
               </Eyebrow>
-              <h2 className="mx-auto mt-6 max-w-3xl font-display text-4xl font-light leading-[1.08] tracking-tight text-forest md:text-6xl">
-                Let&rsquo;s formulate <em className="italic text-moss">what&rsquo;s next.</em>
+              <h2 {...stylex.props(styles.ctaHeading)}>
+                Let&rsquo;s formulate{" "}
+                <em {...stylex.props(styles.italicMoss)}>what&rsquo;s next.</em>
               </h2>
-              <p className="mx-auto mt-7 max-w-xl text-base leading-relaxed text-bark/65 md:text-lg">
+              <p {...stylex.props(styles.ctaCopy)}>
                 From first sample to full-scale supply — tell us what you&rsquo;re building and our
                 technical team will respond within one business day.
               </p>
-              <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
-                <button
-                  type="button"
-                  className="inline-flex items-center gap-2 rounded-full bg-forest px-9 py-4 font-body text-sm font-semibold tracking-wide text-cream shadow-lift transition-[background-color,translate,box-shadow] duration-300 hover:-translate-y-0.5 hover:bg-fern hover:shadow-ambient"
-                >
+              <div {...stylex.props(styles.ctaButtons)}>
+                <button type="button" {...stylex.props(styles.ctaPrimaryBtn)}>
                   Partner with Fenchem
-                  <ArrowUpRight className="h-4 w-4" aria-hidden />
+                  <ArrowUpRight {...stylex.props(styles.btnIcon)} aria-hidden />
                 </button>
-                <a
-                  href="#ingredients"
-                  className="inline-flex items-center gap-2 rounded-full border border-moss/40 px-9 py-4 font-body text-sm font-semibold tracking-wide text-forest transition-colors duration-300 hover:border-moss hover:bg-mint/40"
-                >
+                <a href="#ingredients" {...stylex.props(styles.ctaOutlineBtn)}>
                   Explore Portfolio
                 </a>
               </div>
@@ -436,74 +1354,58 @@ function CtaSection() {
 
 function FooterSection() {
   return (
-    <footer className="bg-forest text-cream">
-      <div className="mx-auto max-w-[1280px] px-6 pb-10 pt-20 md:px-12 md:pt-28 lg:px-16">
+    <footer {...stylex.props(styles.footer)}>
+      <div {...stylex.props(styles.footerInner)}>
         <Reveal>
-          <p className="font-tech text-[10px] uppercase tracking-[0.3em] text-mist/70 md:text-[11px]">
-            Rooted in Nature, Refined by Science
-          </p>
-          <p className="mt-6 font-display text-[clamp(4rem,13vw,10rem)] font-light leading-[0.95] tracking-tight">
-            Fenchem<span className="text-mint">.</span>
+          <p {...stylex.props(styles.footerEyebrow)}>Rooted in Nature, Refined by Science</p>
+          <p {...stylex.props(styles.footerLogoText)}>
+            Fenchem<span {...stylex.props(styles.footerDot)}>.</span>
           </p>
         </Reveal>
-        <div className="mt-16 grid grid-cols-1 gap-12 md:grid-cols-3 md:gap-10">
+        <div {...stylex.props(styles.footerGrid)}>
           <Reveal>
-            <p className="max-w-xs text-sm leading-relaxed text-mist/70">
+            <p {...stylex.props(styles.footerAboutText)}>
               A global B2B supplier of botanical and functional ingredients for nutrition, food
               &amp; beverage and personal care — since 1995.
             </p>
           </Reveal>
           <Reveal delay={0.08}>
-            <p className="font-tech text-[10px] uppercase tracking-[0.25em] text-mist/60">
-              Explore
-            </p>
-            <ul className="mt-5 space-y-3">
+            <p {...stylex.props(styles.footerColHeader)}>Explore</p>
+            <ul {...stylex.props(styles.footerColList)}>
               {NAV_LINKS.map((link) => (
                 <li key={link.href}>
-                  <a
-                    href={link.href}
-                    className="text-sm text-mist/70 transition-colors duration-300 hover:text-mint"
-                  >
+                  <a href={link.href} {...stylex.props(styles.footerLink)}>
                     {link.label}
                   </a>
                 </li>
               ))}
               <li>
-                <a
-                  href="#contact"
-                  className="text-sm text-mist/70 transition-colors duration-300 hover:text-mint"
-                >
+                <a href="#contact" {...stylex.props(styles.footerLink)}>
                   Partner with Us
                 </a>
               </li>
             </ul>
           </Reveal>
           <Reveal delay={0.16}>
-            <p className="font-tech text-[10px] uppercase tracking-[0.25em] text-mist/60">
-              Global bases
-            </p>
-            <ul className="mt-5 space-y-3">
+            <p {...stylex.props(styles.footerColHeader)}>Global bases</p>
+            <ul {...stylex.props(styles.footerColList)}>
               {regions.map((region) => (
-                <li key={region.city} className="text-sm text-mist/70">
+                <li key={region.city} {...stylex.props(styles.footerRegionItem)}>
                   {`${region.city}, ${region.country}${region.city === "Nanjing" ? " — HQ" : ""}`}
                 </li>
               ))}
             </ul>
           </Reveal>
         </div>
-        <div className="mt-16 flex flex-col items-center justify-between gap-4 border-t border-cream/10 pt-8 md:flex-row">
-          <p className="text-xs text-mist/70">© 2026 Fenchem Biotek Ltd. All rights reserved.</p>
-          <div className="flex items-center gap-8">
-            <button
-              type="button"
-              className="text-xs text-mist/70 transition-colors duration-300 hover:text-mint"
-            >
+        <div {...stylex.props(styles.footerBottom)}>
+          <p {...stylex.props(styles.footerCopyright)}>
+            © 2026 Fenchem Biotek Ltd. All rights reserved.
+          </p>
+          <div {...stylex.props(styles.footerLegalLinks)}>
+            <button type="button" {...stylex.props(styles.footerLink)}>
               Privacy Policy
             </button>
-            <button
-              type="button"
-              className="text-xs text-mist/70 transition-colors duration-300 hover:text-mint"
-            >
+            <button type="button" {...stylex.props(styles.footerLink)}>
               Terms of Service
             </button>
           </div>
@@ -523,7 +1425,7 @@ export function VariantA() {
 
   return (
     <LazyMotion features={domAnimation} strict>
-      <main className="overflow-x-clip bg-cream font-body text-bark antialiased selection:bg-mint selection:text-forest">
+      <main {...stylex.props(styles.main)}>
         <NavBar />
         <HeroSection heroRef={heroRef} blobY={blobY} />
         <IndustriesSection />

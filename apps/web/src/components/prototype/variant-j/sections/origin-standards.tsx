@@ -1,8 +1,11 @@
+import { breakpoints, colors, radii, typography } from "@fenchem-lp/ui/tokens.stylex";
+import * as stylex from "@stylexjs/stylex";
 import gsap from "gsap";
 import { FlaskConical, Globe, Sprout } from "lucide-react";
 import { certifications, pillars } from "@/components/landing/landing-content";
-import { IMAGES, ORIGIN_QUOTE, TECH_LABEL_DARK } from "../content";
+import { IMAGES, ORIGIN_QUOTE } from "../content";
 import { drawRule, riseIn, settleImage, useSectionAnimation } from "../motion";
+import { sharedStyles } from "../styles";
 
 /*
  * Variant I — the editorial dark beat: origin pull-quote, then the quality
@@ -12,6 +15,174 @@ import { drawRule, riseIn, settleImage, useSectionAnimation } from "../motion";
  * Everything below the quote is the shared germination voice: the canopy
  * band settles, the pillars rise, the certification rule draws itself in.
  */
+
+const styles = stylex.create({
+  section: {
+    scrollMarginTop: "7rem",
+    backgroundColor: colors.bark,
+    paddingBlock: "8rem",
+    color: colors.cream,
+  },
+  container: {
+    marginInline: "auto",
+    maxWidth: "72rem",
+    paddingInline: "1.5rem",
+  },
+  quoteWrap: {
+    marginInline: "auto",
+    maxWidth: "56rem",
+    textAlign: "center",
+  },
+  blockquote: {
+    marginTop: "2.5rem",
+    marginInline: 0,
+  },
+  quoteText: {
+    fontFamily: typography.display,
+    fontWeight: 300,
+    fontSize: {
+      default: "2.25rem",
+      [breakpoints.md]: "3.75rem",
+    },
+    lineHeight: 1.15,
+    letterSpacing: "-0.02em",
+  },
+  quoteLine: {
+    display: "block",
+    willChange: "transform",
+  },
+  quoteLineLast: {
+    display: "block",
+    fontStyle: "italic",
+    color: colors.mist,
+    willChange: "transform",
+  },
+  quoteAttribution: {
+    marginTop: "2.5rem",
+    fontFamily: typography.tech,
+    fontSize: "11px",
+    color: "color-mix(in oklch, var(--color-cream) 50%, transparent)",
+    textTransform: "uppercase",
+    letterSpacing: "0.26em",
+  },
+  canopyFrame: {
+    marginTop: "6rem",
+    aspectRatio: "21/9",
+    overflow: "hidden",
+    borderRadius: "24px",
+  },
+  canopyImg: {
+    height: "100%",
+    width: "100%",
+    objectFit: "cover",
+  },
+  standardsHead: {
+    marginTop: "5rem",
+    display: "grid",
+    gap: {
+      default: "1.5rem",
+      [breakpoints.md]: "3rem",
+    },
+    gridTemplateColumns: {
+      default: "1fr",
+      [breakpoints.md]: "repeat(2, 1fr)",
+    },
+    alignItems: {
+      [breakpoints.md]: "end",
+    },
+  },
+  standardsTitle: {
+    fontFamily: typography.display,
+    fontWeight: 300,
+    fontSize: {
+      default: "1.875rem",
+      [breakpoints.md]: "2.25rem",
+    },
+    lineHeight: 1.15,
+    letterSpacing: "-0.02em",
+  },
+  standardsTitleAccent: {
+    color: colors.brandGreen400,
+  },
+  standardsIntro: {
+    maxWidth: "28rem",
+    color: "color-mix(in oklch, var(--color-cream) 60%, transparent)",
+    fontSize: "0.875rem",
+    lineHeight: 1.625,
+  },
+  pillarsGrid: {
+    marginTop: "3.5rem",
+    display: "grid",
+    gap: {
+      default: "3rem",
+      [breakpoints.md]: "2.5rem",
+    },
+    gridTemplateColumns: {
+      default: "1fr",
+      [breakpoints.md]: "repeat(3, 1fr)",
+    },
+  },
+  iconWrap: {
+    display: "flex",
+    width: "2.5rem",
+    height: "2.5rem",
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: radii.lg,
+    backgroundColor: colors.brandGreen900,
+  },
+  icon: {
+    width: "1rem",
+    height: "1rem",
+    color: colors.brandGreen300,
+  },
+  pillarTitle: {
+    marginTop: "1.25rem",
+    fontFamily: typography.display,
+    fontSize: "1.25rem",
+    letterSpacing: "-0.025em",
+  },
+  pillarCopy: {
+    marginTop: "0.75rem",
+    color: "color-mix(in oklch, var(--color-cream) 60%, transparent)",
+    fontSize: "0.875rem",
+    lineHeight: 1.625,
+  },
+  certStrip: {
+    marginTop: "5rem",
+  },
+  certRow: {
+    marginTop: "1.5rem",
+    display: "flex",
+    flexWrap: "wrap",
+    alignItems: "baseline",
+    justifyContent: "space-between",
+    columnGap: "2rem",
+    rowGap: "0.75rem",
+  },
+  certTitle: {
+    fontFamily: typography.tech,
+    fontSize: "11px",
+    color: "color-mix(in oklch, var(--color-cream) 50%, transparent)",
+    textTransform: "uppercase",
+    letterSpacing: "0.26em",
+  },
+  certList: {
+    display: "flex",
+    flexWrap: "wrap",
+    alignItems: "baseline",
+    columnGap: "1.5rem",
+    rowGap: "0.5rem",
+    fontFamily: typography.tech,
+    fontSize: "11px",
+    color: "color-mix(in oklch, var(--color-cream) 50%, transparent)",
+    textTransform: "uppercase",
+    letterSpacing: "0.26em",
+    listStyle: "none",
+    margin: 0,
+    padding: 0,
+  },
+});
 
 const PILLAR_ICONS = [Sprout, FlaskConical, Globe] as const;
 
@@ -43,97 +214,81 @@ export function OriginStandardsSection() {
       ref={ref}
       id="quality"
       aria-labelledby="quality-heading"
-      className="scroll-mt-28 bg-bark py-32 text-cream"
+      {...stylex.props(styles.section)}
     >
-      <div className="mx-auto max-w-6xl px-6">
+      <div {...stylex.props(styles.container)}>
         {/* Origin — the pull-quote, inked in line by line on scroll */}
-        <div className="mx-auto max-w-4xl text-center">
-          <p data-quote-eyebrow className={TECH_LABEL_DARK}>
+        <div {...stylex.props(styles.quoteWrap)}>
+          <p data-quote-eyebrow {...stylex.props(sharedStyles.techLabelDark)}>
             {ORIGIN_QUOTE.eyebrow}
           </p>
-          <blockquote data-quote className="mt-10">
-            <p className="font-display font-light text-4xl leading-[1.15] tracking-[-0.02em] md:text-6xl">
+          <blockquote data-quote {...stylex.props(styles.blockquote)}>
+            <p {...stylex.props(styles.quoteText)}>
               {ORIGIN_QUOTE.lines.map((line, index) => (
                 <span
                   key={line}
                   data-quote-line
-                  className={
+                  {...stylex.props(
                     index === ORIGIN_QUOTE.lines.length - 1
-                      ? "block italic text-mist will-change-transform"
-                      : "block will-change-transform"
-                  }
+                      ? styles.quoteLineLast
+                      : styles.quoteLine,
+                  )}
                 >
                   {line}
                 </span>
               ))}
             </p>
-            <footer
-              data-quote-attribution
-              className="mt-10 font-tech text-[11px] text-cream/50 uppercase tracking-[0.26em]"
-            >
+            <footer data-quote-attribution {...stylex.props(styles.quoteAttribution)}>
               {ORIGIN_QUOTE.attribution}
             </footer>
           </blockquote>
         </div>
 
         {/* The canopy the record starts under */}
-        <div className="mt-24 aspect-[21/9] overflow-hidden rounded-[24px]">
+        <div {...stylex.props(styles.canopyFrame)}>
           <img
             data-standards-img
             src={IMAGES.standards.src}
             alt={IMAGES.standards.alt}
-            className="h-full w-full object-cover"
+            {...stylex.props(styles.canopyImg)}
             loading="lazy"
           />
         </div>
 
         {/* Standards — the three pillars of the quality program */}
-        <div data-standards-head className="mt-20 grid gap-6 md:grid-cols-2 md:items-end md:gap-12">
-          <h2
-            id="quality-heading"
-            className="font-display font-light text-3xl leading-[1.15] tracking-[-0.02em] md:text-4xl"
-          >
-            Science-backed <span className="text-brand-green-400">standards.</span>
+        <div data-standards-head {...stylex.props(styles.standardsHead)}>
+          <h2 id="quality-heading" {...stylex.props(styles.standardsTitle)}>
+            Science-backed <span {...stylex.props(styles.standardsTitleAccent)}>standards.</span>
           </h2>
-          <p className="max-w-md text-cream/60 text-sm leading-relaxed">
+          <p {...stylex.props(styles.standardsIntro)}>
             Every lot. Every market. Every release — documented to your regulatory map before you
             ask for it.
           </p>
         </div>
 
-        <div className="mt-14 grid gap-12 md:grid-cols-3 md:gap-10">
+        <div {...stylex.props(styles.pillarsGrid)}>
           {pillars.map((pillar, index) => {
             const Icon = PILLAR_ICONS[index];
             return (
               <div key={pillar.title} data-pillar>
-                <span className="flex size-10 items-center justify-center rounded-lg bg-brand-green-900">
-                  <Icon
-                    aria-hidden="true"
-                    className="size-4 text-brand-green-300"
-                    strokeWidth={1.5}
-                  />
+                <span {...stylex.props(styles.iconWrap)}>
+                  <Icon aria-hidden="true" {...stylex.props(styles.icon)} strokeWidth={1.5} />
                 </span>
-                <h3 className="mt-5 font-display text-xl tracking-tight">{pillar.title}</h3>
-                <p className="mt-3 text-cream/60 text-sm leading-relaxed">{pillar.copy}</p>
+                <h3 {...stylex.props(styles.pillarTitle)}>{pillar.title}</h3>
+                <p {...stylex.props(styles.pillarCopy)}>{pillar.copy}</p>
               </div>
             );
           })}
         </div>
 
         {/* Certification ledger strip */}
-        <div className="mt-20">
-          <div data-cert-rule className="block h-px origin-left bg-cream/15" />
-          <div className="mt-6 flex flex-wrap items-baseline justify-between gap-x-8 gap-y-3">
-            <p
-              data-cert-line
-              className="font-tech text-[11px] text-cream/50 uppercase tracking-[0.26em]"
-            >
+        <div {...stylex.props(styles.certStrip)}>
+          <div data-cert-rule {...stylex.props(sharedStyles.ruleLineDark)} />
+          <div {...stylex.props(styles.certRow)}>
+            <p data-cert-line {...stylex.props(styles.certTitle)}>
               Certified quality systems
             </p>
-            <ul
-              data-cert-line
-              className="flex flex-wrap items-baseline gap-x-6 gap-y-2 font-tech text-[11px] text-cream/50 uppercase tracking-[0.26em]"
-            >
+            <ul data-cert-line {...stylex.props(styles.certList)}>
               {certifications.map((certification) => (
                 <li key={certification}>{certification}</li>
               ))}

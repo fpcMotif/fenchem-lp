@@ -66,7 +66,7 @@ that owns every stable domain fact the landing surface renders (ingredients,
 industries, pillars, stats, certifications, regions, company facts). Every
 variant (A–G) and the folded-in `LandingPage` render _through_ it; only
 per-variant **prose** (headlines, eyebrows, bespoke section copy) and
-presentation (Tailwind classes, motion, icons, layout) stay local.
+presentation (StyleX styles, motion, icons, layout) stay local.
 _Avoid_: "the data file", "constants" — it is an interface, not a dumping ground.
 
 **Featured ingredient**:

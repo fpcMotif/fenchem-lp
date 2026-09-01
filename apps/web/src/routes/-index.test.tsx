@@ -1,4 +1,4 @@
-import { render } from "@testing-library/react";
+import { render, waitFor } from "@testing-library/react";
 import { describe, expect, test, vi } from "vitest";
 
 import { DEFAULT_VARIANT } from "@/components/prototype/variants";
@@ -10,7 +10,9 @@ describe("home route", () => {
   });
 
   test("validates the variant search param and defaults to the production candidate", () => {
-    const validate = Route.options.validateSearch as (search: Record<string, unknown>) => {
+    const validate = Route.options.validateSearch as (
+      search: Record<string, string | number | undefined>,
+    ) => {
       variant: string;
     };
 
@@ -19,9 +21,8 @@ describe("home route", () => {
     expect(validate({ variant: "k" })).toEqual({ variant: "k" });
     expect(validate({ variant: "v" })).toEqual({ variant: "v" });
     expect(validate({ variant: "z" })).toEqual({ variant: DEFAULT_VARIANT });
-    expect(validate({ variant: 42 })).toEqual({ variant: DEFAULT_VARIANT });
+    expect(validate({ variant: 42 as unknown as string })).toEqual({ variant: DEFAULT_VARIANT });
   });
-
   test("renders the active variant and prototype switcher", () => {
     const Component = Route.options.component as React.ComponentType;
     vi.spyOn(Route, "useSearch").mockReturnValue({ variant: "d" } as never);
@@ -30,54 +31,65 @@ describe("home route", () => {
     expect(container).toBeTruthy();
   });
 
-  test("renders the vivid production variant (k)", () => {
+  test("renders the vivid production variant (k)", async () => {
     const Component = Route.options.component as React.ComponentType;
     vi.spyOn(Route, "useSearch").mockReturnValue({ variant: "k" } as never);
 
     const { container } = render(<Component />);
-    expect(container.textContent).toContain("FENCHEM");
+    await waitFor(() => {
+      expect(container.textContent).toContain("FENCHEM");
+    });
   });
 
-  test("renders the vivid duotone variant (v)", () => {
+  test("renders the vivid duotone variant (v)", async () => {
     const Component = Route.options.component as React.ComponentType;
     vi.spyOn(Route, "useSearch").mockReturnValue({ variant: "v" } as never);
 
     const { container } = render(<Component />);
-    expect(container.textContent).toContain("FENCHEM");
+    await waitFor(() => {
+      expect(container.textContent).toContain("FENCHEM");
+    });
   });
 
-  test("renders production variant (h)", () => {
+  test("renders production variant (h)", async () => {
     const Component = Route.options.component as React.ComponentType;
     vi.spyOn(Route, "useSearch").mockReturnValue({ variant: "h" } as never);
 
     const { container } = render(<Component />);
-    expect(container.textContent).toContain("FENCHEM");
+    await waitFor(() => {
+      expect(container.textContent).toContain("FENCHEM");
+    });
   });
 
-  test("renders portal variant (i)", () => {
+  test("renders portal variant (i)", async () => {
     const Component = Route.options.component as React.ComponentType;
     vi.spyOn(Route, "useSearch").mockReturnValue({ variant: "i" } as never);
 
     const { container } = render(<Component />);
-    expect(container.textContent).toContain("FENCHEM");
+    await waitFor(() => {
+      expect(container.textContent).toContain("FENCHEM");
+    });
   });
 
-  test("renders greenhouse ledger variant (j)", () => {
+  test("renders greenhouse ledger variant (j)", async () => {
     const Component = Route.options.component as React.ComponentType;
     vi.spyOn(Route, "useSearch").mockReturnValue({ variant: "j" } as never);
 
     const { container } = render(<Component />);
-    expect(container).toBeTruthy();
+    await waitFor(() => {
+      expect(container).toBeTruthy();
+    });
   });
 
-  test("renders the waterfall fountain variant (w)", () => {
+  test("renders the waterfall fountain variant (w)", async () => {
     const Component = Route.options.component as React.ComponentType;
     vi.spyOn(Route, "useSearch").mockReturnValue({ variant: "w" } as never);
 
     const { container } = render(<Component />);
-    expect(container.textContent).toContain("FENCHEM");
+    await waitFor(() => {
+      expect(container.textContent).toContain("FENCHEM");
+    });
   });
-
   test("handles variant without matching component", () => {
     const Component = Route.options.component as React.ComponentType;
     vi.spyOn(Route, "useSearch").mockReturnValue({ variant: "unknown" } as never);

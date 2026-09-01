@@ -1,7 +1,10 @@
+import { colors, typography } from "@fenchem-lp/ui/tokens.stylex";
+import * as stylex from "@stylexjs/stylex";
 import gsap from "gsap";
 import { ChevronDown } from "lucide-react";
-import { HERO, IMAGES, TECH_LABEL_DARK } from "../content";
+import { HERO, IMAGES } from "../content";
 import { EASE_OUT, SplitWords, useSectionAnimation } from "../motion";
+import { sharedStyles } from "../styles";
 
 /*
  * Variant I — cinematic hero. Full-viewport botanical photograph under a
@@ -10,6 +13,104 @@ import { EASE_OUT, SplitWords, useSectionAnimation } from "../motion";
  * The SSR frame is complete: image, scrim, and copy are all visible
  * without JavaScript.
  */
+
+const styles = stylex.create({
+  section: {
+    position: "relative",
+    display: "flex",
+    minHeight: "100svh",
+    alignItems: "center",
+    justifyContent: "center",
+    overflow: "hidden",
+    backgroundColor: colors.bark,
+  },
+  imgWrap: {
+    position: "absolute",
+    inset: 0,
+    willChange: "transform",
+  },
+  img: {
+    height: "100%",
+    width: "100%",
+    transform: "scale(1.1)",
+    objectFit: "cover",
+  },
+  scrim: {
+    position: "absolute",
+    inset: 0,
+    backgroundImage:
+      "linear-gradient(to bottom, color-mix(in oklch, var(--color-bark) 80%, transparent), color-mix(in oklch, var(--color-forest) 40%, transparent), var(--color-bark))",
+  },
+  deepen: {
+    position: "absolute",
+    inset: 0,
+    backgroundColor: colors.bark,
+    opacity: 0,
+  },
+  content: {
+    position: "relative",
+    zIndex: 10,
+    maxWidth: "64rem",
+    paddingInline: "1.5rem",
+    paddingTop: "6rem",
+    paddingBottom: "4rem",
+    textAlign: "center",
+    marginInline: "auto",
+  },
+  heading: {
+    marginInline: "auto",
+    marginTop: "2rem",
+    fontFamily: typography.display,
+    fontWeight: 300,
+    fontSize: "clamp(3rem, 8.5vw, 7rem)",
+    color: colors.cream,
+    lineHeight: 1.04,
+    letterSpacing: "-0.02em",
+  },
+  headingItalic: {
+    fontStyle: "italic",
+    color: colors.mist,
+  },
+  lede: {
+    marginInline: "auto",
+    marginTop: "2rem",
+    maxWidth: "36rem",
+    color: "color-mix(in oklch, var(--color-cream) 75%, transparent)",
+    fontSize: "1.125rem",
+    lineHeight: 1.625,
+  },
+  ctas: {
+    marginTop: "2.5rem",
+    display: "flex",
+    flexWrap: "wrap",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: "1rem",
+  },
+  scrollButton: {
+    position: "absolute",
+    bottom: "1.5rem",
+    left: "50%",
+    zIndex: 10,
+    transform: "translateX(-50%)",
+    color: {
+      default: "color-mix(in oklch, var(--color-cream) 60%, transparent)",
+      ":hover": colors.cream,
+    },
+    transition: "color 200ms ease",
+    outline: {
+      ":focus-visible": `2px solid ${colors.brandGreen300}`,
+    },
+    outlineOffset: {
+      ":focus-visible": 2,
+    },
+  },
+  chevronIcon: {
+    width: "1.25rem",
+    height: "1.25rem",
+  },
+});
+
 export function HeroSection() {
   const ref = useSectionAnimation<HTMLElement>((root) => {
     const tl = gsap.timeline({ defaults: { ease: EASE_OUT } });
@@ -19,7 +120,7 @@ export function HeroSection() {
       0.15,
     )
       .from(
-        root.querySelectorAll(".vi-word-inner"),
+        root.querySelectorAll("[data-word-inner], .vi-word-inner"),
         { yPercent: 112, duration: 1, stagger: 0.055 },
         0.3,
       )
@@ -43,52 +144,39 @@ export function HeroSection() {
   });
 
   return (
-    <section
-      ref={ref}
-      id="top"
-      className="relative flex min-h-svh items-center justify-center overflow-hidden bg-bark"
-    >
-      <div data-hero-img className="absolute inset-0 will-change-transform">
+    <section ref={ref} id="top" {...stylex.props(styles.section)}>
+      <div data-hero-img {...stylex.props(styles.imgWrap)}>
         <img
           src={IMAGES.hero.src}
           alt={IMAGES.hero.alt}
-          className="h-full w-full scale-110 object-cover"
+          {...stylex.props(styles.img)}
           loading="eager"
           fetchPriority="high"
         />
       </div>
-      <div
-        aria-hidden="true"
-        className="absolute inset-0 bg-gradient-to-b from-bark/80 via-forest/40 to-bark"
-      />
-      <div aria-hidden="true" data-hero-deepen className="absolute inset-0 bg-bark opacity-0" />
+      <div aria-hidden="true" {...stylex.props(styles.scrim)} />
+      <div aria-hidden="true" data-hero-deepen {...stylex.props(styles.deepen)} />
 
-      <div className="relative z-10 max-w-5xl px-6 pt-24 pb-16 text-center">
-        <p data-hero-eyebrow className={TECH_LABEL_DARK}>
+      <div {...stylex.props(styles.content)}>
+        <p data-hero-eyebrow {...stylex.props(sharedStyles.techLabelDark)}>
           {HERO.eyebrow}
         </p>
-        <h1 className="mx-auto mt-8 font-display font-light text-[clamp(3rem,8.5vw,7rem)] text-cream leading-[1.04] tracking-[-0.02em]">
+        <h1 {...stylex.props(styles.heading)}>
           <SplitWords
             segments={[
               { text: "Rooted in Nature," },
-              { text: "Refined by Science.", className: "italic text-mist" },
+              { text: "Refined by Science.", sx: styles.headingItalic },
             ]}
           />
         </h1>
-        <p data-hero-lede className="mx-auto mt-8 max-w-xl text-cream/75 text-lg leading-relaxed">
+        <p data-hero-lede {...stylex.props(styles.lede)}>
           {HERO.lede}
         </p>
-        <div data-hero-ctas className="mt-10 flex flex-wrap items-center justify-center gap-4">
-          <a
-            href="#ingredients"
-            className="rounded-full bg-brand-green-500 px-7 py-3.5 font-semibold text-brand-green-950 text-sm transition-colors hover:bg-brand-green-400 focus-visible:outline-2 focus-visible:outline-cream"
-          >
+        <div data-hero-ctas {...stylex.props(styles.ctas)}>
+          <a href="#ingredients" {...stylex.props(sharedStyles.primaryCta)}>
             {HERO.primaryCta}
           </a>
-          <a
-            href="#global-supply"
-            className="rounded-full border border-cream/30 px-7 py-3.5 font-semibold text-cream text-sm transition-colors hover:border-cream/70 hover:bg-cream/10 focus-visible:outline-2 focus-visible:outline-brand-green-300"
-          >
+          <a href="#global-supply" {...stylex.props(sharedStyles.secondaryCta)}>
             {HERO.secondaryCta}
           </a>
         </div>
@@ -98,9 +186,9 @@ export function HeroSection() {
         data-hero-scroll
         href="#ticker"
         aria-label="Scroll to content"
-        className="absolute bottom-6 left-1/2 z-10 -translate-x-1/2 text-cream/60 transition-colors hover:text-cream focus-visible:outline-2 focus-visible:outline-brand-green-300"
+        {...stylex.props(styles.scrollButton)}
       >
-        <ChevronDown aria-hidden="true" className="size-5" />
+        <ChevronDown aria-hidden="true" {...stylex.props(styles.chevronIcon)} />
       </a>
     </section>
   );

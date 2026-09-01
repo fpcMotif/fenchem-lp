@@ -1,3 +1,5 @@
+import { radii, typography } from "@fenchem-lp/ui/tokens.stylex";
+import * as stylex from "@stylexjs/stylex";
 import { useNavigate } from "@tanstack/react-router";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useCallback, useEffect } from "react";
@@ -13,14 +15,70 @@ import { VARIANTS, type VariantKey } from "./variants";
  * Delete this file (and the losing variants) once a direction wins.
  */
 
+const styles = stylex.create({
+  container: {
+    position: "fixed",
+    bottom: "1.25rem",
+    left: "50%",
+    transform: "translateX(-50%)",
+    zIndex: 9999,
+    display: "flex",
+    alignItems: "center",
+    gap: "0.25rem",
+    borderRadius: radii.full,
+    borderWidth: "1px",
+    borderStyle: "solid",
+    borderColor: "rgba(255, 255, 255, 0.15)",
+    backgroundColor: "rgba(9, 9, 11, 0.9)",
+    paddingInline: "0.5rem",
+    paddingBlock: "0.375rem",
+    fontFamily: typography.tech,
+    color: "#ffffff",
+    fontSize: "0.75rem",
+    lineHeight: "1rem",
+    boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
+    backdropFilter: "blur(8px)",
+    WebkitBackdropFilter: "blur(8px)",
+  },
+  button: {
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: radii.full,
+    padding: "0.375rem",
+    borderWidth: 0,
+    backgroundColor: "transparent",
+    color: "#ffffff",
+    cursor: "pointer",
+    transitionProperty: "background-color",
+    transitionDuration: "150ms",
+    transitionTimingFunction: "ease",
+    ":hover": {
+      backgroundColor: "rgba(255, 255, 255, 0.15)",
+    },
+  },
+  label: {
+    minWidth: "16rem",
+    userSelect: "none",
+    textAlign: "center",
+    letterSpacing: "0.025em",
+  },
+  icon: {
+    width: "1rem",
+    height: "1rem",
+  },
+});
+
 export function PrototypeSwitcher({ current }: { current: VariantKey }) {
   const navigate = useNavigate({ from: "/" });
 
   const step = useCallback(
     (dir: 1 | -1) => {
       const i = VARIANTS.findIndex((v) => v.key === current);
-      const next = VARIANTS[(i + dir + VARIANTS.length) % VARIANTS.length].key;
-      navigate({ search: { variant: next }, replace: true });
+      const nextEntry = VARIANTS[(i + dir + VARIANTS.length) % VARIANTS.length];
+      if (nextEntry) {
+        void navigate({ search: { variant: nextEntry.key }, replace: true });
+      }
     },
     [current, navigate],
   );
@@ -44,25 +102,25 @@ export function PrototypeSwitcher({ current }: { current: VariantKey }) {
   const name = VARIANTS.find((v) => v.key === current)?.name ?? "";
 
   return (
-    <div className="-translate-x-1/2 fixed bottom-5 left-1/2 z-[9999] flex items-center gap-1 rounded-full border border-white/15 bg-zinc-950/90 px-2 py-1.5 font-mono text-white text-xs shadow-2xl backdrop-blur">
+    <div {...stylex.props(styles.container)}>
       <button
         type="button"
         onClick={() => step(-1)}
         aria-label="Previous variant"
-        className="rounded-full p-1.5 transition-colors hover:bg-white/15"
+        {...stylex.props(styles.button)}
       >
-        <ChevronLeft className="h-4 w-4" />
+        <ChevronLeft {...stylex.props(styles.icon)} />
       </button>
-      <span className="min-w-64 select-none text-center tracking-wide">
+      <span {...stylex.props(styles.label)}>
         {current.toUpperCase()} — {name}
       </span>
       <button
         type="button"
         onClick={() => step(1)}
         aria-label="Next variant"
-        className="rounded-full p-1.5 transition-colors hover:bg-white/15"
+        {...stylex.props(styles.button)}
       >
-        <ChevronRight className="h-4 w-4" />
+        <ChevronRight {...stylex.props(styles.icon)} />
       </button>
     </div>
   );

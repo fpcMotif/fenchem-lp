@@ -1,7 +1,9 @@
+import { breakpoints, colors, radii, typography } from "@fenchem-lp/ui/tokens.stylex";
+import * as stylex from "@stylexjs/stylex";
 import { ArrowRight } from "lucide-react";
 import { createInquiryHref, regions } from "@/components/landing/landing-content";
-import { TECH_LABEL_DARK } from "../content";
-import { SplitWords, drawRule, revealWords, riseIn, useSectionAnimation } from "../motion";
+import { drawRule, revealWords, riseIn, SplitWords, useSectionAnimation } from "../motion";
+import { sharedStyles } from "../styles";
 
 /*
  * Variant J — deep-green finale. The page arc closes where the hero opened:
@@ -10,6 +12,174 @@ import { SplitWords, drawRule, revealWords, riseIn, useSectionAnimation } from "
  * event), and the six global bases land underneath as a ledger of office
  * nodes ruled off by a hairline that draws itself in.
  */
+
+const styles = stylex.create({
+  section: {
+    position: "relative",
+    scrollMarginTop: "6rem",
+    overflow: "hidden",
+    backgroundColor: colors.brandGreen950,
+    paddingBlock: "8rem",
+    color: colors.paper,
+  },
+  glow: {
+    pointerEvents: "none",
+    position: "absolute",
+    top: "33.333%",
+    left: "50%",
+    width: "720px",
+    height: "720px",
+    maxWidth: "100%",
+    transform: "translate(-50%, -50%)",
+    backgroundImage:
+      "radial-gradient(closest-side, color-mix(in oklch, var(--color-brand-green-500) 25%, transparent), transparent)",
+    filter: "blur(40px)",
+  },
+  content: {
+    position: "relative",
+    marginInline: "auto",
+    maxWidth: "64rem",
+    paddingInline: "1.5rem",
+    textAlign: "center",
+  },
+  heading: {
+    marginInline: "auto",
+    marginTop: "2rem",
+    maxWidth: "48rem",
+    fontFamily: typography.display,
+    fontWeight: 300,
+    fontSize: {
+      default: "3rem",
+      [breakpoints.md]: "4.5rem",
+    },
+    lineHeight: 1.05,
+    letterSpacing: "-0.02em",
+    color: colors.paper,
+  },
+  headingItalic: {
+    fontStyle: "italic",
+    color: colors.brandGreen300,
+  },
+  lede: {
+    marginInline: "auto",
+    marginTop: "2rem",
+    maxWidth: "36rem",
+    fontSize: "1.125rem",
+    color: "color-mix(in oklch, var(--color-paper) 70%, transparent)",
+    lineHeight: 1.625,
+  },
+  ctas: {
+    marginTop: "2.5rem",
+    display: "flex",
+    flexWrap: "wrap",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: "1rem",
+  },
+  primaryCta: {
+    display: "inline-flex",
+    minHeight: "2.75rem",
+    alignItems: "center",
+    gap: "0.625rem",
+    borderRadius: radii.full,
+    backgroundColor: {
+      default: colors.brandGreen500,
+      ":hover": colors.brandGreen400,
+    },
+    paddingInline: "2rem",
+    paddingBlock: "0.875rem",
+    fontWeight: 600,
+    color: colors.brandGreen950,
+    fontSize: "0.875rem",
+    textDecoration: "none",
+    transition: "background-color 200ms ease",
+    outline: {
+      ":focus-visible": `2px solid ${colors.paper}`,
+    },
+    outlineOffset: {
+      ":focus-visible": 2,
+    },
+  },
+  secondaryCta: {
+    display: "inline-flex",
+    minHeight: "2.75rem",
+    alignItems: "center",
+    borderRadius: radii.full,
+    borderWidth: 1,
+    borderStyle: "solid",
+    borderColor: "color-mix(in oklch, var(--color-paper) 30%, transparent)",
+    paddingInline: "2rem",
+    paddingBlock: "0.875rem",
+    fontWeight: 600,
+    color: colors.paper,
+    fontSize: "0.875rem",
+    textDecoration: "none",
+    backgroundColor: {
+      default: "transparent",
+      ":hover": "color-mix(in oklch, var(--color-paper) 10%, transparent)",
+    },
+    transition: "background-color 200ms ease",
+    outline: {
+      ":focus-visible": `2px solid ${colors.brandGreen300}`,
+    },
+    outlineOffset: {
+      ":focus-visible": 2,
+    },
+  },
+  ctaIcon: {
+    width: "1rem",
+    height: "1rem",
+    transition: "transform 300ms ease",
+  },
+  responseTime: {
+    marginTop: "2.5rem",
+  },
+  basesWrap: {
+    position: "relative",
+    marginInline: "auto",
+    marginTop: "6rem",
+    maxWidth: "64rem",
+    paddingInline: "1.5rem",
+  },
+  basesRule: {
+    display: "block",
+    height: 1,
+    width: "100%",
+    transformOrigin: "left",
+    backgroundColor: colors.brandGreen800,
+  },
+  basesTitle: {
+    marginTop: "2.5rem",
+    textAlign: "center",
+  },
+  basesGrid: {
+    marginTop: "2.5rem",
+    display: "grid",
+    gridTemplateColumns: {
+      default: "repeat(2, 1fr)",
+      [breakpoints.sm]: "repeat(3, 1fr)",
+      [breakpoints.lg]: "repeat(6, 1fr)",
+    },
+    columnGap: "1.5rem",
+    rowGap: "2.5rem",
+    listStyle: "none",
+    marginInline: 0,
+    padding: 0,
+  },
+  baseItem: {
+    textAlign: "center",
+  },
+  city: {
+    fontFamily: typography.display,
+    fontSize: "1.125rem",
+    color: colors.paper,
+    lineHeight: 1.25,
+  },
+  country: {
+    marginTop: "0.5rem",
+  },
+});
+
 export function FinaleSection() {
   const ref = useSectionAnimation<HTMLElement>((root) => {
     revealWords(root, "[data-finale-heading]");
@@ -23,77 +193,54 @@ export function FinaleSection() {
       ref={ref}
       id="global-supply"
       aria-labelledby="finale-heading"
-      className="relative scroll-mt-24 overflow-hidden bg-brand-green-950 py-32 text-paper"
+      {...stylex.props(styles.section)}
     >
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute top-1/3 left-1/2 size-[720px] max-w-full -translate-x-1/2 -translate-y-1/2 bg-[radial-gradient(closest-side,oklch(from_var(--color-brand-green-500)_l_c_h_/_0.25),transparent)] blur-2xl"
-      />
+      <div aria-hidden="true" {...stylex.props(styles.glow)} />
 
-      <div className="relative mx-auto max-w-5xl px-6 text-center">
-        <p data-finale-rise className={TECH_LABEL_DARK}>
+      <div {...stylex.props(styles.content)}>
+        <p data-finale-rise {...stylex.props(sharedStyles.techLabelDark)}>
           Partner with Fenchem
         </p>
 
-        <h2
-          id="finale-heading"
-          data-finale-heading
-          className="mx-auto mt-8 max-w-3xl font-display font-light text-5xl leading-[1.05] tracking-[-0.02em] text-paper md:text-7xl"
-        >
+        <h2 id="finale-heading" data-finale-heading {...stylex.props(styles.heading)}>
           <SplitWords
             segments={[
               { text: "Your next formulation," },
-              { text: "engineered to specification.", className: "italic text-brand-green-300" },
+              { text: "engineered to specification.", sx: styles.headingItalic },
             ]}
           />
         </h2>
 
-        <p data-finale-rise className="mx-auto mt-8 max-w-xl text-lg text-paper/70 leading-relaxed">
+        <p data-finale-rise {...stylex.props(styles.lede)}>
           Submit a target spec — purity, form, matrix, regulatory map — and our laboratory returns a
           validated proposal with full documentation within one business day.
         </p>
 
-        <div data-finale-rise className="mt-10 flex flex-wrap items-center justify-center gap-4">
-          <a
-            href={createInquiryHref("contact")}
-            className="group inline-flex min-h-11 items-center gap-2.5 rounded-full bg-brand-green-500 px-8 py-3.5 font-semibold text-brand-green-950 text-sm transition-colors hover:bg-brand-green-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-paper"
-          >
+        <div data-finale-rise {...stylex.props(styles.ctas)}>
+          <a href={createInquiryHref("contact")} {...stylex.props(styles.primaryCta)}>
             Request a Specification
-            <ArrowRight
-              aria-hidden="true"
-              className="size-4 transition-transform duration-300 group-hover:translate-x-1"
-            />
+            <ArrowRight aria-hidden="true" {...stylex.props(styles.ctaIcon)} />
           </a>
-          <a
-            href="#ingredients"
-            className="inline-flex min-h-11 items-center rounded-full border border-paper/30 px-8 py-3.5 font-semibold text-paper text-sm transition-colors hover:bg-paper/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-green-300"
-          >
+          <a href="#ingredients" {...stylex.props(styles.secondaryCta)}>
             Explore the Portfolio
           </a>
         </div>
 
-        <p data-finale-rise className={`mt-10 ${TECH_LABEL_DARK}`}>
+        <p data-finale-rise {...stylex.props(sharedStyles.techLabelDark, styles.responseTime)}>
           Response time under 24h — technical dossiers on request
         </p>
       </div>
 
-      <div className="relative mx-auto mt-24 max-w-5xl px-6">
-        <div
-          aria-hidden="true"
-          data-finale-rule
-          className="block h-px w-full origin-left bg-brand-green-800"
-        />
-        <h3 id="finale-bases" className={`mt-10 text-center ${TECH_LABEL_DARK}`}>
+      <div {...stylex.props(styles.basesWrap)}>
+        <div aria-hidden="true" data-finale-rule {...stylex.props(styles.basesRule)} />
+        <h3 id="finale-bases" {...stylex.props(sharedStyles.techLabelDark, styles.basesTitle)}>
           6 Global Bases — 40+ Countries Served
         </h3>
-        <ul
-          aria-labelledby="finale-bases"
-          className="mt-10 grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3 lg:grid-cols-6"
-        >
+        <ul aria-labelledby="finale-bases" {...stylex.props(styles.basesGrid)}>
           {regions.map((region) => (
-            <li key={region.city} data-finale-node className="text-center">
-              <p className="font-display text-lg text-paper leading-tight">{region.city}</p>
-              <p className={`mt-2 ${TECH_LABEL_DARK}`}>{region.country}</p>
+            <li key={region.city} data-finale-node {...stylex.props(styles.baseItem)}>
+              <p {...stylex.props(styles.city)}>{region.city}</p>
+              <p {...stylex.props(sharedStyles.techLabelDark, styles.country)}>{region.country}</p>
             </li>
           ))}
         </ul>

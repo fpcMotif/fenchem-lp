@@ -1,18 +1,33 @@
-import { cn } from "@fenchem-lp/ui/lib/utils";
+import * as stylex from "@stylexjs/stylex";
+import type { StyleXStyles } from "@stylexjs/stylex";
 import * as React from "react";
 
-function Label({ className, htmlFor, ...props }: React.ComponentProps<"label">) {
-  return (
-    <label
-      data-slot="label"
-      htmlFor={htmlFor}
-      className={cn(
-        "flex items-center gap-2 text-xs leading-none select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50",
-        className,
-      )}
-      {...props}
-    />
-  );
+const labelStyles = stylex.create({
+  base: {
+    display: "flex",
+    alignItems: "center",
+    gap: "0.5rem",
+    fontSize: "0.75rem",
+    lineHeight: 1,
+    userSelect: "none",
+    fontWeight: 500,
+  },
+  disabled: {
+    pointerEvents: "none",
+    opacity: 0.5,
+    cursor: "not-allowed",
+  },
+});
+
+export interface LabelProps extends Omit<React.ComponentProps<"label">, "className"> {
+  sx?: StyleXStyles;
+  disabled?: boolean;
 }
 
-export { Label };
+function Label({ sx, disabled, htmlFor, ...props }: LabelProps) {
+  const styleProps = stylex.props(labelStyles.base, disabled && labelStyles.disabled, sx);
+
+  return <label data-slot="label" htmlFor={htmlFor} {...styleProps} {...props} />;
+}
+
+export { Label, labelStyles };

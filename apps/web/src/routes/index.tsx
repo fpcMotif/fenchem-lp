@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { Suspense } from "react";
 
 import { PrototypeSwitcher } from "@/components/prototype/prototype-switcher";
 import {
@@ -18,7 +19,7 @@ import {
  */
 
 export const Route = createFileRoute("/")({
-  validateSearch: (search: Record<string, unknown>): { variant: VariantKey } => {
+  validateSearch: (search: Record<string, string | undefined>): { variant: VariantKey } => {
     const v = search.variant;
     return {
       variant: VARIANT_KEYS.includes(v as VariantKey) ? (v as VariantKey) : DEFAULT_VARIANT,
@@ -32,7 +33,7 @@ function HomeComponent() {
   const Active = VARIANTS.find((v) => v.key === variant)?.Component;
   return (
     <>
-      {Active ? <Active /> : null}
+      <Suspense fallback={null}>{Active ? <Active /> : null}</Suspense>
       <PrototypeSwitcher current={variant} />
     </>
   );

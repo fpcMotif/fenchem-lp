@@ -12,17 +12,13 @@ No provider or wrapper is required — components render standalone. Mount
 Fonts load through `styles.css` (Google Fonts): **Newsreader** (serif display),
 **Plus Jakarta Sans** (UI/body), **JetBrains Mono** (technical micro-labels).
 
-## Styling idiom — Tailwind utilities, but ONLY the shipped vocabulary
+## Styling idiom — StyleX with typed design tokens
 
-`styles.css` is a compiled Tailwind 4 sheet: it contains exactly the utility
-classes the Fenchem app uses, not the full framework. A class outside that set
-silently does nothing. Two safe paths:
+Styles are authored using **StyleX** (`stylex.create` and `{...stylex.props(...)}` or `sx` prop on UI components) with tokens imported from `@fenchem-lp/ui/tokens.stylex` (`colors`, `radii`, `typography`, `shadows`, `breakpoints`).
 
-1. Reuse the classes the landing variants use (read any `Variant*.jsx`'s
-   source patterns via its `.prompt.md`); layout basics (`flex`, `grid`,
-   `gap-*`, `px-*`, `py-*`, `rounded-full`, `max-w-*`) are all present.
-2. For anything else, use inline styles with the token vars:
-   `style={{ background: "var(--color-forest)", fontFamily: "Newsreader, serif" }}`.
+1. Use `stylex.create` for component and section styles.
+2. Reference typed tokens (`colors.brandGreen500`, `colors.paper`, `typography.display`, etc.) instead of hardcoded hex values or utility strings.
+3. UI primitives accept a typed `sx?: StyleXStyles` prop for deterministic last-wins merging.
 
 ### Token vocabulary (CSS custom properties, all defined in styles.css)
 
