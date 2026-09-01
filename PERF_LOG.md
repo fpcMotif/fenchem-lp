@@ -2,6 +2,24 @@
 
 This document logs build performance, bundle asset sizes, and runtime cold-start metrics across every phase of the StyleX migration for `fenchem-lp`.
 
+## Phase 8: Zod Upgrade (4.4.3 → 4.5.4) & `z.compile()` Rejection
+
+Measured against baseline [`7c5e7f1`](https://github.com/fpcMotif/fenchem-lp/commit/7c5e7f112e500486b1c26fa167bd3c51e842f03e) via `perf/measure-assets.mjs` protocol (three clean `rm -rf apps/web/dist && bun run build` runs, raw bytes + `gzipSync`). Decision record: [ADR-0004](docs/adr/0004-zod-upgrade-and-compile-rejection.md).
+
+| State                          | Client zod chunk<br/>raw / gzip | Client JS total<br/>raw / gzip | Server zod chunk<br/>raw / gzip | Server JS total<br/>raw / gzip |
+| ------------------------------ | ------------------------------- | ------------------------------ | ------------------------------- | ------------------------------ |
+| **A** · zod 4.4.3 _(baseline)_ | 77.93 kB / **19.79 kB**         | 1914.88 kB / **556.12 kB**     | 159.67 kB / **30.46 kB**        | 4233.51 kB / **940.60 kB**     |
+| **B** · zod 4.5.4              | 81.41 kB / **20.76 kB**         | 1918.36 kB / **557.11 kB**     | 167.28 kB / **32.61 kB**        | 4241.11 kB / **942.75 kB**     |
+| **C** · 4.5.4 + `z.compile()`  | 113.49 kB / **28.93 kB**        | 1950.44 kB / **565.26 kB**     | 231.65 kB / **46.19 kB**        | 4305.49 kB / **956.33 kB**     |
+
+| Delta               | Client zod chunk                         | Client JS total               | Server zod chunk                | Server JS total                |
+| ------------------- | ---------------------------------------- | ----------------------------- | ------------------------------- | ------------------------------ |
+| **A → B** (upgrade) | +3.48 kB raw / **+0.97 kB gz (+4.9%)**   | +3.48 / **+0.99 gz (+0.18%)** | +7.61 / **+2.15 gz (+7.1%)**    | +7.60 / **+2.15 gz (+0.23%)**  |
+| **B → C** (compile) | +32.08 kB raw / **+8.17 kB gz (+39.4%)** | +32.08 / **+8.15 gz (+1.5%)** | +64.37 / **+13.58 gz (+41.6%)** | +64.38 / **+13.58 gz (+1.4%)** |
+| **A → C** (both)    | +35.56 kB raw / **+9.14 kB gz (+46.2%)** | +35.56 / **+9.14 gz (+1.6%)** | +71.98 / **+15.73 gz (+51.6%)** | +71.98 / **+15.73 gz (+1.7%)** |
+
+Takeaway: Zod 4.5.4 introduces a minor bundle size regression (**+0.99 kB gz client, +2.15 kB gz server**) because additions outweigh locale tree-shaking improvements; the return is runtime-focused (9x reduction in per-schema heap, ~7.5x faster `.safeParse()` failures across all workspace packages). `z.compile()` was rejected as it adds **+8.17 kB gz (+39.4%)** to the client auth chunk for two flat forms, while failing on Cloudflare Workers SSR with `EvalError` (dynamic code generation disallowed in workerd). The landing page entry chunk continues to ship **zero Zod code**.
+
 ## Phase 7: Babel → Rust/SWC StyleX Compiler (`@stylexswc/unplugin@0.18.5`)
 
 Same protocol and machine as the phases below; compared against Phase 6 (final Babel-based StyleX build). Decision record: [ADR-0003](docs/adr/0003-stylex-swc-compiler.md).
