@@ -43,7 +43,8 @@
     "perf": "node perf/run.mjs",
     "perf:build": "node perf/measure-build.mjs",
     "perf:assets": "node perf/measure-assets.mjs",
-    "perf:coldstart": "node perf/measure-coldstart.mjs"
+    "perf:coldstart": "node perf/measure-coldstart.mjs",
+    "perf:budget": "node perf/check-budget.mjs"
   },
   "dependencies": {
     "@fenchem-lp/env": "workspace:*",

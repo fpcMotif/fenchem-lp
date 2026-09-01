@@ -16,6 +16,9 @@ export default defineConfig({
   use: {
     baseURL,
     trace: "retain-on-failure",
+    launchOptions: {
+      args: ["--no-proxy-server", "--proxy-bypass-list=<-loopback>"],
+    },
   },
   webServer: {
     command: `bun run serve -- --host ${host} --port ${port}`,

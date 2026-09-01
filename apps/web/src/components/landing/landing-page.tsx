@@ -1148,7 +1148,7 @@ function Hero() {
       <div {...stylex.props(styles.heroStatsBar)}>
         <dl {...stylex.props(styles.statsGrid)}>
           {[
-            ["30+", "years of ingredient expertise"],
+            ["25+", "years of ingredient expertise"],
             ["40+", "countries supported"],
             ["ISO/GMP", "audited quality systems"],
           ].map(([value, label], index) => (

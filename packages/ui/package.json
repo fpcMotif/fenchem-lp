@@ -9,7 +9,8 @@
     "./tokens": "./src/tokens.stylex.ts",
     "./lib/*": "./src/lib/*.ts",
     "./components/*": "./src/components/*.tsx",
-    "./hooks/*": "./src/hooks/*.ts"
+    "./hooks/*": "./src/hooks/*.ts",
+    "./profiler": "./src/profiler/index.ts"
   },
   "scripts": {
     "check-types": "tsc --noEmit"
@@ -21,6 +22,7 @@
     "next-themes": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
+    "react-scan": "^0.5.7",
     "sonner": "^2.0.5"
   },
   "devDependencies": {
