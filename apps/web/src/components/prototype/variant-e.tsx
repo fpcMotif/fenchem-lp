@@ -1102,6 +1102,16 @@ const styles = stylex.create({
     borderBottomStyle: "solid",
     borderBottomColor: colors.line,
   },
+  protocolAside: {
+    maxWidth: "20rem",
+    fontFamily: typography.tech,
+    fontSize: "12px",
+    textTransform: "uppercase",
+    lineHeight: 1.625,
+    letterSpacing: "0.2em",
+    color: colors.mute600,
+    margin: 0,
+  },
   protocolGrid: {
     display: "grid",
     gridTemplateColumns: {
@@ -2150,18 +2160,7 @@ function ProtocolSection() {
         title="Operating"
         sub="protocol."
         right={
-          <p
-            style={{
-              maxWidth: "20rem",
-              fontFamily: typography.tech,
-              fontSize: "10px",
-              textTransform: "uppercase",
-              lineHeight: 1.625,
-              letterSpacing: "0.2em",
-              color: colors.mute600,
-              margin: 0,
-            }}
-          >
+          <p {...stylex.props(styles.protocolAside)}>
             Rooted in nature, refined by science — every lot, every market, every release.
           </p>
         }

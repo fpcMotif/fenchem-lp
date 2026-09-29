@@ -37,7 +37,7 @@ export const IMAGES = {
  * Per-ingredient imagery overrides, carried over from variant-h's curation:
  * the upstream registry still points three codes at off-direction stock.
  */
-export const IMAGE_OVERRIDES: Record<string, { src: string; alt: string }> = {
+const IMAGE_OVERRIDES: Record<string, { src: string; alt: string }> = {
   "FN-014": {
     src: "https://images.unsplash.com/photo-1569936906148-06de87cb0681?auto=format&fit=crop&w=900&q=80",
     alt: "Hands holding soil and a young seedling — the root origin of Ashwagandha KSM-66",
@@ -60,7 +60,7 @@ export const imgFor = (item: Ingredient): { src: string; alt: string } =>
  * is the capsule-pile stock the design review excludes — roots and soil
  * (already in the approved pool) tell the same story on-direction.
  */
-export const INDUSTRY_IMAGES: Record<string, { src: string; alt: string }> = {
+const INDUSTRY_IMAGES: Record<string, { src: string; alt: string }> = {
   "Nutrition & Supplements": {
     src: "https://images.unsplash.com/photo-1569936906148-06de87cb0681?auto=format&fit=crop&w=640&q=80",
     alt: "Hands holding soil and a young seedling — raw botanical origin of nutritional actives",

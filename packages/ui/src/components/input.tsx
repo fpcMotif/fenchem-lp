@@ -73,4 +73,4 @@ function Input({ sx, type, "aria-invalid": ariaInvalid, ...props }: InputProps) 
   );
 }
 
-export { Input, inputStyles };
+export { Input };

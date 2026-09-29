@@ -8,7 +8,7 @@ const pulse = stylex.keyframes({
   "50%": { opacity: 0.5 },
 });
 
-export const skeletonStyles = stylex.create({
+const skeletonStyles = stylex.create({
   base: {
     backgroundColor: colors.muted,
     borderRadius: radii.none,
