@@ -34,7 +34,6 @@ import {
   useSyncExternalStore,
   useState,
   type CSSProperties,
-  type KeyboardEvent,
   type ReactNode,
   type RefObject,
 } from "react";
@@ -44,8 +43,10 @@ import { EASE, STAGGER } from "@/components/prototype/motion-constants";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
 import { LINKEDIN_PATHS, LOGO_PATHS, WECHAT_PATHS, type VectorPath } from "../variant-o/vectors";
-import { INTRO_REVEAL_MS, IntroOverlay, introStyles, useIntro } from "./intro";
-import { DepthPhoto, glyphRise, screenWaterline } from "./depth-photo";
+import { IntroOverlay } from "./intro";
+import { INTRO_REVEAL_MS, introStyles, useIntro } from "./intro-reveal";
+import { DepthPhoto } from "./depth-photo";
+import { glyphRise, screenWaterline } from "./depth-photo-math";
 import { LiquidImage } from "./liquid-hero";
 import {
   ABOUT,
@@ -1422,15 +1423,17 @@ function VectorArt({
   );
 }
 
+function subscribeToScroll(onChange: () => void) {
+  window.addEventListener("scroll", onChange, { passive: true });
+  return () => window.removeEventListener("scroll", onChange);
+}
+
 function useScrolledPastTop() {
-  const [scrolled, setScrolled] = useState(false);
-  useEffect(() => {
-    const update = () => setScrolled(window.scrollY > 8);
-    update();
-    window.addEventListener("scroll", update, { passive: true });
-    return () => window.removeEventListener("scroll", update);
-  }, []);
-  return scrolled;
+  return useSyncExternalStore(
+    subscribeToScroll,
+    () => window.scrollY > 8,
+    () => false,
+  );
 }
 
 function useActiveSection(ids: readonly string[]) {
@@ -1462,15 +1465,17 @@ function SiteHeader() {
   const reduce = useReducedMotion();
   const scrolled = useScrolledPastTop();
   const activeId = useActiveSection(NAV_SECTION_IDS);
-  const closeOnEscape = (event: KeyboardEvent<HTMLElement>) => {
-    if (event.key === "Escape" && menuOpen) setMenuOpen(false);
-  };
+  useEffect(() => {
+    if (!menuOpen) return;
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setMenuOpen(false);
+    };
+    document.addEventListener("keydown", closeOnEscape);
+    return () => document.removeEventListener("keydown", closeOnEscape);
+  }, [menuOpen]);
   const isActive = (href: string) => href.slice(1) === activeId;
   return (
-    <header
-      onKeyDown={closeOnEscape}
-      {...stylex.props(styles.header, (scrolled || menuOpen) && styles.headerSolid)}
-    >
+    <header {...stylex.props(styles.header, (scrolled || menuOpen) && styles.headerSolid)}>
       <div {...stylex.props(styles.shell, styles.headerInner, styles.headerEnter)}>
         <a href="#top" aria-label="FENCHEM 泛成 首页" {...stylex.props(styles.logoLink)}>
           <LogoMark />
@@ -1906,29 +1911,34 @@ function CountUp({ value }: { value: string }) {
   );
 }
 
+const subscribeToNothing = () => () => {};
+
+function useHydrated() {
+  return useSyncExternalStore(
+    subscribeToNothing,
+    () => true,
+    () => false,
+  );
+}
+
 function useCountUp(value: string, run: boolean) {
   const reduce = useReducedMotion();
+  const hydrated = useHydrated();
   const target = Number(value.replace(/[^\d]/g, ""));
-  const [display, setDisplay] = useState(value);
-  const [armed, setArmed] = useState(false);
+  const [count, setCount] = useState(0);
+  const counting = hydrated && !reduce && Number.isFinite(target);
 
   useEffect(() => {
-    if (reduce || !Number.isFinite(target)) return;
-    setArmed(true);
-    setDisplay(NUMBER_FORMAT.format(0));
-  }, [reduce, target]);
-
-  useEffect(() => {
-    if (!run || !armed) return;
+    if (!run || !counting) return;
     const controls = animate(0, target, {
       duration: 1.6,
       ease: [0.16, 1, 0.3, 1],
-      onUpdate: (latest) => setDisplay(NUMBER_FORMAT.format(Math.round(latest))),
+      onUpdate: (latest) => setCount(Math.round(latest)),
     });
     return () => controls.stop();
-  }, [run, armed, target]);
+  }, [run, counting, target]);
 
-  return display;
+  return counting ? NUMBER_FORMAT.format(count) : value;
 }
 
 function StatItem({ stat, index }: { stat: (typeof STATS)[number]; index: number }) {

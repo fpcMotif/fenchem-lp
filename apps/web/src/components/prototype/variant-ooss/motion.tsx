@@ -5,9 +5,9 @@ import { useRef, useSyncExternalStore, type ReactNode, type RefObject } from "re
 
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
+import { EASE_OUT } from "./motion-constants";
 import { ease, media } from "./tokens.stylex";
 
-export const EASE_OUT: [number, number, number, number] = [0.16, 1, 0.3, 1];
 export const REVEAL_MARGIN = "0px 0px 0px 0px";
 const STAGGER_MS = 60;
 const MAX_STAGGER_INDEX = 3;
@@ -17,7 +17,7 @@ const MASK_SECONDS = 0.7;
 const REVEAL_RISE_PX = 16;
 const MASK_HIDDEN = "120%";
 
-export const staggerMs = (index: number) => Math.min(index, MAX_STAGGER_INDEX) * STAGGER_MS;
+const staggerMs = (index: number) => Math.min(index, MAX_STAGGER_INDEX) * STAGGER_MS;
 
 const PIN_QUERY = "(min-width: 768px) and (prefers-reduced-motion: no-preference)";
 

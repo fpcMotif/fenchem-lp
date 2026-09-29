@@ -24,7 +24,7 @@
  * interactive, hairline structure, division colors as wayfinding dots, one
  * gradient (the finale glow), Reveal + EASE + STAGGER only.
  */
-import { useEffect, useId, useState } from "react";
+import { useEffect, useId, useState, useSyncExternalStore } from "react";
 import { AnimatePresence, LazyMotion, domAnimation, m } from "motion/react";
 import { ArrowRight, ArrowUpRight, Leaf, Menu, X } from "lucide-react";
 import * as stylex from "@stylexjs/stylex";
@@ -1644,8 +1644,9 @@ function WorldMap() {
   );
 }
 
+const REGION_HALVES = [regions.slice(0, 3), regions.slice(3)];
+
 function GlobalChapter() {
-  const halves = [regions.slice(0, 3), regions.slice(3)];
   return (
     <section
       id="global-supply"
@@ -1668,7 +1669,7 @@ function GlobalChapter() {
               }
             />
             <div {...stylex.props(styles.diptych, styles.diptychTight)}>
-              {halves.map((half, h) => (
+              {REGION_HALVES.map((half, h) => (
                 <Reveal key={h} delay={STAGGER * h} sx={h === 0 ? styles.leaf : styles.leafRight}>
                   <ul
                     aria-label={`Regions ${h + 1}`}
@@ -1753,7 +1754,11 @@ function FinaleSection() {
 
 /* ─────────────────────────────── Colophon ─────────────────────────────── */
 
+const subscribeToNothing = () => () => {};
+const getCurrentYear = () => new Date().getFullYear();
+
 function Colophon() {
+  const year = useSyncExternalStore(subscribeToNothing, getCurrentYear, getCurrentYear);
   return (
     <footer {...stylex.props(styles.footer)}>
       <div {...stylex.props(styles.container)}>
@@ -1803,7 +1808,7 @@ function Colophon() {
         </div>
         <div {...stylex.props(styles.footerBottom)}>
           <span>
-            © {new Date().getFullYear()} {company.legalName}
+            © {year} {company.legalName}
           </span>
           <span>Edition X · Folio</span>
         </div>

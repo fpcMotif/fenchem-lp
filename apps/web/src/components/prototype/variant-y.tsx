@@ -27,7 +27,7 @@
  * colors as wayfinding dots, hairline structure, Intro/Reveal + EASE + STAGGER.
  * Landing principle 6 (the globe is the centerpiece proof) is spent first.
  */
-import { useEffect, useId, useState } from "react";
+import { useEffect, useId, useState, useSyncExternalStore } from "react";
 import {
   AnimatePresence,
   LazyMotion,
@@ -2108,7 +2108,11 @@ function FinaleSection() {
 
 /* ─────────────────────────────── Footer ─────────────────────────────── */
 
+const subscribeToNothing = () => () => {};
+const getCurrentYear = () => new Date().getFullYear();
+
 function FooterSection() {
+  const year = useSyncExternalStore(subscribeToNothing, getCurrentYear, getCurrentYear);
   return (
     <footer {...stylex.props(styles.footer)}>
       <div {...stylex.props(styles.container)}>
@@ -2162,7 +2166,7 @@ function FooterSection() {
         </div>
         <div {...stylex.props(styles.footerBottom)}>
           <span>
-            © {new Date().getFullYear()} {company.legalName}
+            © {year} {company.legalName}
           </span>
           <span>Edition Y · seed {SEED_SHORT}</span>
         </div>

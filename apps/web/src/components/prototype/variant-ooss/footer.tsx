@@ -7,9 +7,9 @@ import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
 import { LINKEDIN_PATHS, LOGO_PATHS, WECHAT_PATHS, type VectorPath } from "../variant-o/vectors";
 import { COPYRIGHT, CTA, FOOTER_COLUMNS } from "./content";
+import { layout } from "./layout";
 import { Reveal } from "./motion";
 import { color, ease, font, layout as layoutTokens, media } from "./tokens.stylex";
-import { layout } from "./ui";
 
 const HEADLINE = "告诉我们您的配方需求。";
 const BAND_IMAGE = "/prototype/official-site/campus-lake.webp";

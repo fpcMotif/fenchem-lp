@@ -31,7 +31,6 @@ import {
   useState,
   useSyncExternalStore,
   type CSSProperties,
-  type KeyboardEvent,
   type MouseEvent,
   type ReactNode,
 } from "react";
@@ -1812,15 +1811,17 @@ function VectorArt({
   );
 }
 
+function subscribeScroll(onChange: () => void) {
+  window.addEventListener("scroll", onChange, { passive: true });
+  return () => window.removeEventListener("scroll", onChange);
+}
+
 function useScrolledPastTop() {
-  const [scrolled, setScrolled] = useState(false);
-  useEffect(() => {
-    const update = () => setScrolled(window.scrollY > 8);
-    update();
-    window.addEventListener("scroll", update, { passive: true });
-    return () => window.removeEventListener("scroll", update);
-  }, []);
-  return scrolled;
+  return useSyncExternalStore(
+    subscribeScroll,
+    () => window.scrollY > 8,
+    () => false,
+  );
 }
 
 function useActiveSection(ids: readonly string[]) {
@@ -1852,15 +1853,17 @@ function SiteHeader() {
   const reduce = useReducedMotion();
   const scrolled = useScrolledPastTop();
   const activeId = useActiveSection(NAV_SECTION_IDS);
-  const closeOnEscape = (event: KeyboardEvent<HTMLElement>) => {
-    if (event.key === "Escape" && menuOpen) setMenuOpen(false);
-  };
+  useEffect(() => {
+    if (!menuOpen) return;
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setMenuOpen(false);
+    };
+    document.addEventListener("keydown", closeOnEscape);
+    return () => document.removeEventListener("keydown", closeOnEscape);
+  }, [menuOpen]);
   const isActive = (href: string) => href.slice(1) === activeId;
   return (
-    <header
-      onKeyDown={closeOnEscape}
-      {...stylex.props(styles.header, (scrolled || menuOpen) && styles.headerSolid)}
-    >
+    <header {...stylex.props(styles.header, (scrolled || menuOpen) && styles.headerSolid)}>
       <div {...stylex.props(styles.shell, styles.headerInner, styles.headerEnter)}>
         <a href="#top" aria-label="FENCHEM 泛成 首页" {...stylex.props(styles.logoLink)}>
           <LogoMark />

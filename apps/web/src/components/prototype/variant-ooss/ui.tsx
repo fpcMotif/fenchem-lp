@@ -6,45 +6,6 @@ import type { ReactNode } from "react";
 import { MaskLine, Reveal } from "./motion";
 import { color, ease, font, layout as layoutTokens, media } from "./tokens.stylex";
 
-export const layout = stylex.create({
-  shell: {
-    width: "100%",
-    maxWidth: layoutTokens.shellMax,
-    marginInline: "auto",
-    boxSizing: "border-box",
-  },
-  inset: {
-    paddingInline: {
-      default: layoutTokens.insetMobile,
-      [media.tablet]: layoutTokens.insetTablet,
-      [media.desktop]: layoutTokens.insetDesktop,
-    },
-  },
-  grid12: {
-    display: { default: "block", [media.tabletUp]: "grid" },
-    gridTemplateColumns: "repeat(12, minmax(0, 1fr))",
-    columnGap: layoutTokens.gutter,
-  },
-  section: {
-    paddingBlock: {
-      default: layoutTokens.sectionPadMobile,
-      [media.tablet]: layoutTokens.sectionPadTablet,
-      [media.desktop]: layoutTokens.sectionPadDesktop,
-    },
-  },
-  visuallyHidden: {
-    position: "absolute",
-    width: 1,
-    height: 1,
-    padding: 0,
-    margin: -1,
-    overflow: "hidden",
-    clip: "rect(0, 0, 0, 0)",
-    whiteSpace: "nowrap",
-    borderWidth: 0,
-  },
-});
-
 const styles = stylex.create({
   button: {
     display: "inline-flex",
@@ -121,19 +82,6 @@ const styles = stylex.create({
     transitionTimingFunction: ease.out,
   },
 
-  eyebrow: {
-    margin: 0,
-    fontFamily: font.display,
-    fontSize: 13,
-    fontWeight: 600,
-    lineHeight: 1.4,
-    fontVariantNumeric: "tabular-nums",
-    color: color.inkMuted,
-  },
-  eyebrowDark: {
-    color: color.white70,
-  },
-
   header: {
     display: "grid",
     gridTemplateColumns: {
@@ -206,22 +154,6 @@ export function SectionTitle({
     <h2 id={id} {...stylex.props(styles.title, tone === "dark" && styles.titleDark, sx)}>
       <MaskLine index={index}>{children}</MaskLine>
     </h2>
-  );
-}
-
-export function Eyebrow({
-  label,
-  tone = "light",
-  sx,
-}: {
-  number?: string;
-  label?: string;
-  tone?: Tone;
-  sx?: StyleXStyles;
-}) {
-  if (!label) return null;
-  return (
-    <p {...stylex.props(styles.eyebrow, tone === "dark" && styles.eyebrowDark, sx)}>{label}</p>
   );
 }
 

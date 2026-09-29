@@ -25,7 +25,7 @@
  * gradient (the finale glow), Intro/Reveal + EASE + STAGGER only. Corners are
  * sharp (radii.none) except pill chips.
  */
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState, useSyncExternalStore } from "react";
 import {
   AnimatePresence,
   LazyMotion,
@@ -1129,11 +1129,6 @@ const styles = stylex.create({
     backgroundColor: colors.paper,
     transitionProperty: "background-color",
     transitionDuration: "240ms",
-    outline: {
-      default: "none",
-      ":focus-visible": `2px solid ${colors.brandGreen700}`,
-    },
-    outlineOffset: -2,
   },
   stairRowActive: {
     backgroundColor: colors.brandGreen50,
@@ -1980,11 +1975,8 @@ function GlobalSection() {
             {regions.map((region, i) => (
               <li
                 key={region.city}
-                tabIndex={0}
                 onPointerEnter={() => setActive(i)}
                 onPointerLeave={() => setActive(null)}
-                onFocus={() => setActive(i)}
-                onBlur={() => setActive(null)}
                 aria-label={`${region.city}, ${region.country}: ${region.role}`}
                 {...stylex.props(
                   styles.stairRow,
@@ -2058,7 +2050,11 @@ function FinaleSection() {
 
 /* ─────────────────────────────── Footer ─────────────────────────────── */
 
+const subscribeToNothing = () => () => {};
+const getCurrentYear = () => new Date().getFullYear();
+
 function FooterSection() {
+  const year = useSyncExternalStore(subscribeToNothing, getCurrentYear, getCurrentYear);
   return (
     <footer {...stylex.props(styles.footer)}>
       <div {...stylex.props(styles.container)}>
@@ -2113,7 +2109,7 @@ function FooterSection() {
         </div>
         <div {...stylex.props(styles.footerBottom)}>
           <span>
-            © {new Date().getFullYear()} {company.legalName}
+            © {year} {company.legalName}
           </span>
           <span>Edition T · seed {SEED_SHORT}</span>
         </div>

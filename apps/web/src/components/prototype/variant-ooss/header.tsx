@@ -1,15 +1,15 @@
 import * as stylex from "@stylexjs/stylex";
 import { Menu, Search, X } from "lucide-react";
 import { AnimatePresence, m } from "motion/react";
-import { useEffect, useId, useState, type KeyboardEvent } from "react";
+import { useEffect, useId, useState, useSyncExternalStore } from "react";
 
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
 import { LOGO_PATHS } from "../variant-o/vectors";
 import { NAV_ITEMS, SECTION_IDS } from "./content";
-import { EASE_OUT } from "./motion";
+import { layout } from "./layout";
+import { EASE_OUT } from "./motion-constants";
 import { color, ease, font, layout as layoutTokens, media } from "./tokens.stylex";
-import { layout } from "./ui";
 
 const SPY_LINE = 0.4;
 const SOLID_PROGRESS = 0.02;
@@ -41,31 +41,40 @@ function readActiveId(): string | null {
   return current && NAV_IDS.includes(current) ? current : null;
 }
 
+const INITIAL_HEADER_STATE: HeaderState = { solid: false, activeId: "top" };
+
+function createHeaderStore() {
+  let snapshot = INITIAL_HEADER_STATE;
+  return {
+    getSnapshot: () => snapshot,
+    subscribe: (onChange: () => void) => {
+      let frame = 0;
+      const update = () => {
+        frame = 0;
+        const solid = readSolid();
+        const activeId = readActiveId();
+        if (snapshot.solid === solid && snapshot.activeId === activeId) return;
+        snapshot = { solid, activeId };
+        onChange();
+      };
+      const schedule = () => {
+        if (!frame) frame = requestAnimationFrame(update);
+      };
+      update();
+      window.addEventListener("scroll", schedule, { passive: true });
+      window.addEventListener("resize", schedule);
+      return () => {
+        if (frame) cancelAnimationFrame(frame);
+        window.removeEventListener("scroll", schedule);
+        window.removeEventListener("resize", schedule);
+      };
+    },
+  };
+}
+
 function useHeaderState(): HeaderState {
-  const [state, setState] = useState<HeaderState>({ solid: false, activeId: "top" });
-  useEffect(() => {
-    let frame = 0;
-    const update = () => {
-      frame = 0;
-      const solid = readSolid();
-      const activeId = readActiveId();
-      setState((previous) =>
-        previous.solid === solid && previous.activeId === activeId ? previous : { solid, activeId },
-      );
-    };
-    const schedule = () => {
-      if (!frame) frame = requestAnimationFrame(update);
-    };
-    update();
-    window.addEventListener("scroll", schedule, { passive: true });
-    window.addEventListener("resize", schedule);
-    return () => {
-      if (frame) cancelAnimationFrame(frame);
-      window.removeEventListener("scroll", schedule);
-      window.removeEventListener("resize", schedule);
-    };
-  }, []);
-  return state;
+  const [store] = useState(createHeaderStore);
+  return useSyncExternalStore(store.subscribe, store.getSnapshot, () => INITIAL_HEADER_STATE);
 }
 
 const fadeIn = stylex.keyframes({
@@ -309,15 +318,17 @@ export function SiteHeader({ introStarted }: { introStarted: boolean }) {
   const reduce = useReducedMotion();
   const { solid, activeId } = useHeaderState();
   const onLight = menuOpen || solid;
-  const closeOnEscape = (event: KeyboardEvent<HTMLElement>) => {
-    if (event.key === "Escape" && menuOpen) setMenuOpen(false);
-  };
+  useEffect(() => {
+    if (!menuOpen) return;
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setMenuOpen(false);
+    };
+    document.addEventListener("keydown", closeOnEscape);
+    return () => document.removeEventListener("keydown", closeOnEscape);
+  }, [menuOpen]);
   const isActive = (href: string) => href.slice(1) === activeId;
   return (
-    <header
-      onKeyDown={closeOnEscape}
-      {...stylex.props(styles.header, onLight ? styles.headerSolid : styles.headerHero)}
-    >
+    <header {...stylex.props(styles.header, onLight ? styles.headerSolid : styles.headerHero)}>
       <div
         {...stylex.props(layout.shell, layout.inset, styles.inner, introStarted && styles.innerIn)}
       >

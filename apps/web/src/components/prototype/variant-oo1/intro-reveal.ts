@@ -17,7 +17,7 @@ const styles = stylex.create({
   pageReveal: {
     animationName: { default: circleReveal, [breakpoints.motionReduce]: "none" },
     animationDuration: "1100ms",
-    animationDelay: "200ms",
+    animationDelay: "500ms",
     animationTimingFunction: REVEAL_EASE,
     animationFillMode: "backwards",
   },

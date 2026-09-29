@@ -2,6 +2,8 @@ import { breakpoints } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 import { useEffect, useState } from "react";
 
+import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
+
 export const INTRO_REVEAL_MS = 500;
 
 const REVEAL_EASE = "cubic-bezier(0.77, 0, 0.175, 1)";
@@ -26,13 +28,12 @@ export const introStyles = { pageReveal: styles.pageReveal };
 export type IntroState = "play" | "skip";
 
 export function useIntro(): IntroState {
-  const [state, setState] = useState<IntroState>("play");
+  const reduce = useReducedMotion();
+  const [skipped, setSkipped] = useState(false);
+  if (reduce && !skipped) setSkipped(true);
   useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      setState("skip");
-      return;
-    }
-    const skip = () => setState("skip");
+    if (reduce) return;
+    const skip = () => setSkipped(true);
     const events = ["keydown", "pointerdown", "wheel", "touchmove"] as const;
     const finished = window.setTimeout(() => {
       for (const name of events) window.removeEventListener(name, skip);
@@ -42,6 +43,6 @@ export function useIntro(): IntroState {
       window.clearTimeout(finished);
       for (const name of events) window.removeEventListener(name, skip);
     };
-  }, []);
-  return state;
+  }, [reduce]);
+  return skipped ? "skip" : "play";
 }

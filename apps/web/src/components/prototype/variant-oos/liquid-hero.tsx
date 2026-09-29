@@ -194,11 +194,5 @@ export function LiquidImage({ src, sx }: { src: string; sx?: StyleXStyles }) {
     };
   }, [src, reduce]);
 
-  return (
-    <canvas
-      ref={canvasRef}
-      aria-hidden="true"
-      {...stylex.props(styles.canvas, ready && styles.ready, sx)}
-    />
-  );
+  return <canvas ref={canvasRef} {...stylex.props(styles.canvas, ready && styles.ready, sx)} />;
 }

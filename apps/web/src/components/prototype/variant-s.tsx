@@ -16,7 +16,7 @@
  * contact plate all obey. Type: display serif (italic once), a neutral grotesk,
  * and black tabular mono for every value. One green (950). Square corners.
  */
-import { useEffect, useId, useState } from "react";
+import { useEffect, useId, useState, useSyncExternalStore } from "react";
 import { AnimatePresence, LazyMotion, domAnimation, m, useScroll } from "motion/react";
 import { ArrowRight, ArrowUp, Menu, X } from "lucide-react";
 import * as stylex from "@stylexjs/stylex";
@@ -659,6 +659,19 @@ const styles = stylex.create({
     marginBottom: 28,
   },
 
+  tableBlock: {
+    display: "block",
+  },
+  tableContents: {
+    display: "contents",
+  },
+  tableCell: {
+    display: "block",
+    padding: 0,
+    fontWeight: "inherit",
+    textAlign: "inherit",
+  },
+
   /* Periodic index: a fixed module */
   indexTable: {
     display: "grid",
@@ -673,6 +686,9 @@ const styles = stylex.create({
     borderLeftStyle: "solid",
     borderTopColor: colors.line,
     borderLeftColor: colors.line,
+    listStyle: "none",
+    margin: 0,
+    padding: 0,
   },
   tile: {
     display: "grid",
@@ -1390,7 +1406,11 @@ function SpecimenTile({ ingredient }: { ingredient: Ingredient }) {
   const invert = look.dark === true;
   const white = look.white === true;
   return (
-    <article aria-label={`${ingredient.name}, ${ingredient.latin}`} {...stylex.props(styles.tile)}>
+    <li
+      aria-label={`${ingredient.name}, ${ingredient.latin}`}
+      {...stylex.props(styles.tile)}
+      style={{ textWrap: "wrap" }}
+    >
       <div
         style={{ backgroundColor: look.colour }}
         {...stylex.props(styles.tileField, white && styles.whiteField)}
@@ -1416,7 +1436,7 @@ function SpecimenTile({ ingredient }: { ingredient: Ingredient }) {
         <span {...stylex.props(styles.data)}>{ingredient.form}</span>
         <span {...stylex.props(styles.data, styles.dataSoft)}>{look.label}</span>
       </div>
-    </article>
+    </li>
   );
 }
 
@@ -1432,15 +1452,11 @@ function IndexSection() {
           Periodic index: eight actives, one specification each.
         </SectionHead>
         <Reveal>
-          <div
-            role="list"
-            aria-label="Periodic index of actives"
-            {...stylex.props(styles.indexTable)}
-          >
+          <ul aria-label="Periodic index of actives" {...stylex.props(styles.indexTable)}>
             {INDEX_ORDER.map((ingredient) => (
               <SpecimenTile key={ingredient.code} ingredient={ingredient} />
             ))}
-          </div>
+          </ul>
         </Reveal>
       </div>
     </section>
@@ -1469,80 +1485,108 @@ function CertificateSection() {
               <h3 {...stylex.props(styles.display, styles.running)}>Certificate of analysis</h3>
               <span {...stylex.props(styles.data)}>{CERTIFICATE.number}</span>
             </div>
-            <div role="table" aria-label="Lot identity">
-              <div role="row" {...stylex.props(styles.certRow)}>
-                <span role="cell" {...stylex.props(styles.certCell, styles.certLabel)}>
-                  Product
-                </span>
-                <span role="cell" {...stylex.props(styles.certCell, styles.data)}>
-                  {CERTIFICATE.grade}
-                </span>
-                <span role="cell" {...stylex.props(styles.certCell, styles.certLabel)}>
-                  Source
-                </span>
-                <span role="cell" {...stylex.props(styles.certCell, styles.data)}>
-                  {HERO_SPECIMEN.latin}
-                </span>
-              </div>
-              <div role="row" {...stylex.props(styles.certRow)}>
-                <span role="cell" {...stylex.props(styles.certCell, styles.certLabel)}>
-                  Spec reference
-                </span>
-                <span role="cell" {...stylex.props(styles.certCell, styles.data)}>
-                  {HERO_SPECIMEN.code}
-                </span>
-                <span role="cell" {...stylex.props(styles.certCell, styles.certLabel)}>
-                  Lot
-                </span>
-                <span role="cell" {...stylex.props(styles.certCell, styles.data)}>
-                  {CERTIFICATE.lot}
-                </span>
-              </div>
-            </div>
-            <div role="table" aria-label="Tests">
-              <div role="row" {...stylex.props(styles.certRow, styles.certRowHead)}>
-                <span role="columnheader" {...stylex.props(styles.certCell, styles.certLabel)}>
-                  Test
-                </span>
-                <span role="columnheader" {...stylex.props(styles.certCell, styles.certLabel)}>
-                  Method
-                </span>
-                <span
-                  role="columnheader"
-                  {...stylex.props(styles.certCell, styles.certLabel, styles.certNumeric)}
-                >
-                  Specification
-                </span>
-                <span
-                  role="columnheader"
-                  {...stylex.props(styles.certCell, styles.certLabel, styles.certNumeric)}
-                >
-                  Result
-                </span>
-              </div>
-              {CERTIFICATE.tests.map((row) => (
-                <div key={row.test} role="row" {...stylex.props(styles.certRow)}>
-                  <span role="cell" {...stylex.props(styles.certCell)}>
-                    {row.test}
-                  </span>
-                  <span role="cell" {...stylex.props(styles.certCell, styles.data)}>
-                    {row.method}
-                  </span>
-                  <span
-                    role="cell"
-                    {...stylex.props(styles.certCell, styles.data, styles.certNumeric)}
+            <table aria-label="Lot identity" {...stylex.props(styles.tableBlock)}>
+              <tbody {...stylex.props(styles.tableBlock)}>
+                <tr {...stylex.props(styles.certRow)}>
+                  <td {...stylex.props(styles.tableCell, styles.certCell, styles.certLabel)}>
+                    Product
+                  </td>
+                  <td {...stylex.props(styles.tableCell, styles.certCell, styles.data)}>
+                    {CERTIFICATE.grade}
+                  </td>
+                  <td {...stylex.props(styles.tableCell, styles.certCell, styles.certLabel)}>
+                    Source
+                  </td>
+                  <td {...stylex.props(styles.tableCell, styles.certCell, styles.data)}>
+                    {HERO_SPECIMEN.latin}
+                  </td>
+                </tr>
+                <tr {...stylex.props(styles.certRow)}>
+                  <td {...stylex.props(styles.tableCell, styles.certCell, styles.certLabel)}>
+                    Spec reference
+                  </td>
+                  <td {...stylex.props(styles.tableCell, styles.certCell, styles.data)}>
+                    {HERO_SPECIMEN.code}
+                  </td>
+                  <td {...stylex.props(styles.tableCell, styles.certCell, styles.certLabel)}>
+                    Lot
+                  </td>
+                  <td {...stylex.props(styles.tableCell, styles.certCell, styles.data)}>
+                    {CERTIFICATE.lot}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <table aria-label="Tests" {...stylex.props(styles.tableBlock)}>
+              <thead {...stylex.props(styles.tableBlock)}>
+                <tr {...stylex.props(styles.certRow, styles.certRowHead)}>
+                  <th
+                    scope="col"
+                    {...stylex.props(styles.tableCell, styles.certCell, styles.certLabel)}
                   >
-                    {row.specification}
-                  </span>
-                  <span
-                    role="cell"
-                    {...stylex.props(styles.certCell, styles.data, styles.certResult)}
+                    Test
+                  </th>
+                  <th
+                    scope="col"
+                    {...stylex.props(styles.tableCell, styles.certCell, styles.certLabel)}
                   >
-                    {row.result}
-                  </span>
-                </div>
-              ))}
-            </div>
+                    Method
+                  </th>
+                  <th
+                    scope="col"
+                    {...stylex.props(
+                      styles.tableCell,
+                      styles.certCell,
+                      styles.certLabel,
+                      styles.certNumeric,
+                    )}
+                  >
+                    Specification
+                  </th>
+                  <th
+                    scope="col"
+                    {...stylex.props(
+                      styles.tableCell,
+                      styles.certCell,
+                      styles.certLabel,
+                      styles.certNumeric,
+                    )}
+                  >
+                    Result
+                  </th>
+                </tr>
+              </thead>
+              <tbody {...stylex.props(styles.tableBlock)}>
+                {CERTIFICATE.tests.map((row) => (
+                  <tr key={row.test} {...stylex.props(styles.certRow)}>
+                    <td {...stylex.props(styles.tableCell, styles.certCell)}>{row.test}</td>
+                    <td {...stylex.props(styles.tableCell, styles.certCell, styles.data)}>
+                      {row.method}
+                    </td>
+                    <td
+                      {...stylex.props(
+                        styles.tableCell,
+                        styles.certCell,
+                        styles.data,
+                        styles.certNumeric,
+                      )}
+                    >
+                      {row.specification}
+                    </td>
+                    <td
+                      {...stylex.props(
+                        styles.tableCell,
+                        styles.certCell,
+                        styles.data,
+                        styles.certResult,
+                      )}
+                    >
+                      {row.result}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
             <div {...stylex.props(styles.certDocs)}>
               <span {...stylex.props(styles.certCell, styles.certLabel)}>Document set</span>
               <span {...stylex.props(styles.certCell)}>{TRAVELS_WITH_LOT.join(", ")}.</span>
@@ -1572,10 +1616,11 @@ const AXIS_TICKS = [0, 6, 12, 18, 24];
 
 const hh = (hour: number) => `${String(hour).padStart(2, "0")}:00`;
 
+const tickStyle = (tick: number) =>
+  tick === 0 ? styles.tickFirst : tick === 24 ? styles.tickLast : styles.tickMid;
+
 function BasesSection() {
   const rows = BASE_ROWS.map((row) => ({ ...row, ...workdayUtc(row.offset) }));
-  const tickStyle = (tick: number) =>
-    tick === 0 ? styles.tickFirst : tick === 24 ? styles.tickLast : styles.tickMid;
   const covered = coverage(rows);
   const hours = covered.reduce((sum, span) => sum + (span.end - span.start), 0);
   const gaps: { start: number; end: number }[] = [];
@@ -1602,104 +1647,120 @@ function BasesSection() {
           </h2>
         </Reveal>
         <Reveal>
-          <div
-            role="table"
+          <table
             aria-label="Working hours of each base, shown in UTC"
             {...stylex.props(styles.chart)}
           >
-            <span role="columnheader" {...stylex.props(styles.small, styles.chartHeadCell)}>
-              Base
-            </span>
-            <div role="columnheader" aria-label="Hours in UTC" {...stylex.props(styles.chartAxis)}>
-              {AXIS_TICKS.map((tick) => (
-                <span
-                  key={tick}
-                  style={{ left: `${(tick / 24) * 100}%` }}
-                  {...stylex.props(styles.chartTick, tickStyle(tick))}
+            <thead {...stylex.props(styles.tableContents)}>
+              <tr {...stylex.props(styles.tableContents)}>
+                <th
+                  scope="col"
+                  {...stylex.props(styles.tableCell, styles.small, styles.chartHeadCell)}
                 >
-                  {String(tick).padStart(2, "0")}
-                  {tick === 0 ? " UTC" : ""}
-                </span>
-              ))}
-            </div>
-            <span
-              role="columnheader"
-              {...stylex.props(styles.small, styles.chartHeadCell)}
-              style={{ justifyContent: "flex-end", paddingRight: 0, paddingLeft: 24 }}
-            >
-              Offset
-            </span>
-
-            <div role="row" style={{ display: "contents" }}>
-              <div role="rowheader" {...stylex.props(styles.chartLabel, styles.chartCoverRow)}>
-                <p {...stylex.props(styles.baseCity)}>Coverage, {hours} h</p>
-                <p {...stylex.props(styles.baseRole)}>
-                  Unstaffed {hh(covered[covered.length - 1]?.end ?? 0)} –{" "}
-                  {hh(covered[0]?.start ?? 0)} UTC
-                </p>
-              </div>
-              <div
-                role="cell"
-                aria-label={`${hours} hours covered`}
-                {...stylex.props(styles.chartTrack, styles.chartCoverRow)}
-              >
-                {covered.map((span) => (
-                  <span
-                    key={span.start}
-                    aria-hidden
-                    style={{
-                      left: `${(span.start / 24) * 100}%`,
-                      width: `${((span.end - span.start) / 24) * 100}%`,
-                    }}
-                    {...stylex.props(styles.chartCover)}
-                  />
-                ))}
-                {gaps.map((gap) => (
-                  <span
-                    key={gap.start}
-                    aria-hidden
-                    style={{
-                      left: `${(gap.start / 24) * 100}%`,
-                      width: `${((gap.end - gap.start) / 24) * 100}%`,
-                    }}
-                    {...stylex.props(styles.chartGap)}
-                  />
-                ))}
-              </div>
-              <span
-                role="cell"
-                {...stylex.props(styles.data, styles.chartUtc, styles.chartCoverRow)}
-              />
-            </div>
-
-            {rows.map(({ offset, base, start, end }) => (
-              <div key={base.city} role="row" style={{ display: "contents" }}>
-                <div role="rowheader" {...stylex.props(styles.chartLabel)}>
-                  <p {...stylex.props(styles.baseCity)}>{base.city}</p>
+                  Base
+                </th>
+                <th
+                  scope="col"
+                  aria-label="Hours in UTC"
+                  {...stylex.props(styles.tableCell, styles.chartAxis)}
+                >
+                  {AXIS_TICKS.map((tick) => (
+                    <span
+                      key={tick}
+                      style={{ left: `${(tick / 24) * 100}%` }}
+                      {...stylex.props(styles.chartTick, tickStyle(tick))}
+                    >
+                      {String(tick).padStart(2, "0")}
+                      {tick === 0 ? " UTC" : ""}
+                    </span>
+                  ))}
+                </th>
+                <th
+                  scope="col"
+                  {...stylex.props(styles.tableCell, styles.small, styles.chartHeadCell)}
+                  style={{ justifyContent: "flex-end", paddingRight: 0, paddingLeft: 24 }}
+                >
+                  Offset
+                </th>
+              </tr>
+            </thead>
+            <tbody {...stylex.props(styles.tableContents)}>
+              <tr {...stylex.props(styles.tableContents)}>
+                <th
+                  scope="row"
+                  {...stylex.props(styles.tableCell, styles.chartLabel, styles.chartCoverRow)}
+                >
+                  <p {...stylex.props(styles.baseCity)}>Coverage, {hours} h</p>
                   <p {...stylex.props(styles.baseRole)}>
-                    {base.country}, {base.role}
+                    Unstaffed {hh(covered[covered.length - 1]?.end ?? 0)} –{" "}
+                    {hh(covered[0]?.start ?? 0)} UTC
                   </p>
-                </div>
-                <div
-                  role="cell"
-                  aria-label={`${hh(start)} to ${hh(end)} UTC`}
-                  {...stylex.props(styles.chartTrack)}
+                </th>
+                <td
+                  aria-label={`${hours} hours covered`}
+                  {...stylex.props(styles.tableCell, styles.chartTrack, styles.chartCoverRow)}
                 >
-                  <span
-                    aria-hidden
-                    style={{
-                      left: `${(start / 24) * 100}%`,
-                      width: `${((end - start) / 24) * 100}%`,
-                    }}
-                    {...stylex.props(styles.chartBar)}
-                  />
-                </div>
-                <span role="cell" {...stylex.props(styles.data, styles.chartUtc)}>
-                  {utcLabel(offset)}
-                </span>
-              </div>
-            ))}
-          </div>
+                  {covered.map((span) => (
+                    <span
+                      key={span.start}
+                      aria-hidden
+                      style={{
+                        left: `${(span.start / 24) * 100}%`,
+                        width: `${((span.end - span.start) / 24) * 100}%`,
+                      }}
+                      {...stylex.props(styles.chartCover)}
+                    />
+                  ))}
+                  {gaps.map((gap) => (
+                    <span
+                      key={gap.start}
+                      aria-hidden
+                      style={{
+                        left: `${(gap.start / 24) * 100}%`,
+                        width: `${((gap.end - gap.start) / 24) * 100}%`,
+                      }}
+                      {...stylex.props(styles.chartGap)}
+                    />
+                  ))}
+                </td>
+                <td
+                  {...stylex.props(
+                    styles.tableCell,
+                    styles.data,
+                    styles.chartUtc,
+                    styles.chartCoverRow,
+                  )}
+                />
+              </tr>
+
+              {rows.map(({ offset, base, start, end }) => (
+                <tr key={base.city} {...stylex.props(styles.tableContents)}>
+                  <th scope="row" {...stylex.props(styles.tableCell, styles.chartLabel)}>
+                    <p {...stylex.props(styles.baseCity)}>{base.city}</p>
+                    <p {...stylex.props(styles.baseRole)}>
+                      {base.country}, {base.role}
+                    </p>
+                  </th>
+                  <td
+                    aria-label={`${hh(start)} to ${hh(end)} UTC`}
+                    {...stylex.props(styles.tableCell, styles.chartTrack)}
+                  >
+                    <span
+                      aria-hidden
+                      style={{
+                        left: `${(start / 24) * 100}%`,
+                        width: `${((end - start) / 24) * 100}%`,
+                      }}
+                      {...stylex.props(styles.chartBar)}
+                    />
+                  </td>
+                  <td {...stylex.props(styles.tableCell, styles.data, styles.chartUtc)}>
+                    {utcLabel(offset)}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
           <p {...stylex.props(styles.small, styles.chartNote)}>
             Each bar is a base's working day, {hh(WORKDAY.start)} – {hh(WORKDAY.end)} local, drawn
             in UTC. Documentation, compliance and lead times are handled local to the buyer.
@@ -1768,7 +1829,11 @@ function FinaleSection() {
 
 /* ─────────────────────────────── Footer ─────────────────────────────── */
 
+const subscribeToNothing = () => () => {};
+const getCurrentYear = () => new Date().getFullYear();
+
 function FooterSection() {
+  const year = useSyncExternalStore(subscribeToNothing, getCurrentYear, getCurrentYear);
   return (
     <footer {...stylex.props(styles.footer)}>
       <div {...stylex.props(styles.container)}>
@@ -1796,8 +1861,7 @@ function FooterSection() {
         </div>
         <div {...stylex.props(styles.footerBottom)}>
           <span>
-            © {new Date().getFullYear()} {company.legalName} {company.hq.city}, {company.hq.country}
-            .
+            © {year} {company.legalName} {company.hq.city}, {company.hq.country}.
           </span>
           <a href="#top" {...stylex.props(styles.topLink)}>
             Back to top

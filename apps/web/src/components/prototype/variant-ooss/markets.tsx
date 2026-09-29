@@ -3,9 +3,10 @@ import { m, useMotionValueEvent, type MotionValue } from "motion/react";
 import { useEffect, useId, useRef, useState, type RefObject } from "react";
 
 import { PRODUCTS, PRODUCTS_INTRO } from "./content";
+import { layout } from "./layout";
 import { Reveal, usePinEnabled, usePinProgress } from "./motion";
 import { color, ease, font, layout as layoutTokens, media } from "./tokens.stylex";
-import { SectionTitle, TextLink, layout } from "./ui";
+import { SectionTitle, TextLink } from "./ui";
 
 type Product = (typeof PRODUCTS)[number];
 
@@ -414,7 +415,7 @@ function Grain() {
 
 function TagList({ tags }: { tags: Product["tags"] }) {
   return (
-    <ul role="list" {...stylex.props(styles.tags)}>
+    <ul {...stylex.props(styles.tags)}>
       {tags.map((tag) => (
         <li key={tag} {...stylex.props(styles.tag)}>
           {tag}
@@ -503,7 +504,7 @@ function PinnedStage({
         <MarketsHeader />
         <div {...stylex.props(layout.grid12, styles.body)}>
           <Reveal index={3} sx={styles.rail}>
-            <ul aria-label="产品类别" role="list" {...stylex.props(styles.nameList)}>
+            <ul aria-label="产品类别" {...stylex.props(styles.nameList)}>
               {PRODUCTS.map((product, index) => {
                 const isActive = index === active;
                 return (
@@ -581,7 +582,7 @@ function StackedList() {
       <div {...stylex.props(styles.stackedHeader)}>
         <MarketsHeader />
       </div>
-      <ul id="product-list" role="list" {...stylex.props(styles.rows)}>
+      <ul id="product-list" {...stylex.props(styles.rows)}>
         {PRODUCTS.map((product, index) => (
           <Reveal key={product.title} as="li" index={index} sx={styles.row}>
             <div {...stylex.props(styles.frame)}>

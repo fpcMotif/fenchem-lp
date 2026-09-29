@@ -19,20 +19,19 @@ import {
   MotionConfig,
   domAnimation,
   m,
-  useMotionValueEvent,
   useScroll,
   useTransform,
   type MotionValue,
 } from "motion/react";
 import {
   Fragment,
+  useCallback,
   useEffect,
   useId,
   useRef,
   useState,
   useSyncExternalStore,
   type CSSProperties,
-  type KeyboardEvent,
   type ReactNode,
   type RefObject,
 } from "react";
@@ -1777,12 +1776,14 @@ function buildRoute(root: HTMLElement): Route | null {
 
 function useRoute(rootRef: RefObject<HTMLDivElement | null>, enabled: boolean) {
   const [route, setRoute] = useState<Route | null>(null);
+  const [wasEnabled, setWasEnabled] = useState(enabled);
+  if (wasEnabled !== enabled) {
+    setWasEnabled(enabled);
+    if (!enabled) setRoute(null);
+  }
   useEffect(() => {
     const root = rootRef.current;
-    if (!root || !enabled) {
-      setRoute(null);
-      return;
-    }
+    if (!root || !enabled) return;
     let frame = 0;
     const measure = () => {
       frame = 0;
@@ -1956,15 +1957,17 @@ function VectorArt({
   );
 }
 
+function subscribeScroll(onChange: () => void) {
+  window.addEventListener("scroll", onChange, { passive: true });
+  return () => window.removeEventListener("scroll", onChange);
+}
+
 function useScrolledPastTop() {
-  const [scrolled, setScrolled] = useState(false);
-  useEffect(() => {
-    const update = () => setScrolled(window.scrollY > 8);
-    update();
-    window.addEventListener("scroll", update, { passive: true });
-    return () => window.removeEventListener("scroll", update);
-  }, []);
-  return scrolled;
+  return useSyncExternalStore(
+    subscribeScroll,
+    () => window.scrollY > 8,
+    () => false,
+  );
 }
 
 function useActiveSection(ids: readonly string[]) {
@@ -1996,15 +1999,17 @@ function SiteHeader() {
   const reduce = useReducedMotion();
   const scrolled = useScrolledPastTop();
   const activeId = useActiveSection(NAV_SECTION_IDS);
-  const closeOnEscape = (event: KeyboardEvent<HTMLElement>) => {
-    if (event.key === "Escape" && menuOpen) setMenuOpen(false);
-  };
+  useEffect(() => {
+    if (!menuOpen) return;
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setMenuOpen(false);
+    };
+    document.addEventListener("keydown", closeOnEscape);
+    return () => document.removeEventListener("keydown", closeOnEscape);
+  }, [menuOpen]);
   const isActive = (href: string) => href.slice(1) === activeId;
   return (
-    <header
-      onKeyDown={closeOnEscape}
-      {...stylex.props(styles.header, (scrolled || menuOpen) && styles.headerSolid)}
-    >
+    <header {...stylex.props(styles.header, (scrolled || menuOpen) && styles.headerSolid)}>
       <div {...stylex.props(styles.shell, styles.headerInner, styles.headerEnter)}>
         <a href="#top" aria-label="FENCHEM 泛成 首页" {...stylex.props(styles.logoLink)}>
           <LogoMark />
@@ -2379,18 +2384,19 @@ function Journey() {
   const pen = useTransform(scrollY, (value) =>
     route ? value + route.viewport * PEN - route.top : -1,
   );
-  const [reached, setReached] = useState(0);
-  useMotionValueEvent(scrollY, "change", (value) => {
-    if (!route) return;
-    const at = value + route.viewport * PEN - route.top;
-    const next = route.stations.filter((y) => at >= y).length;
-    setReached((previous) => (previous === next ? previous : next));
-  });
-  useEffect(() => {
-    if (!route) return;
-    const at = scrollY.get() + route.viewport * PEN - route.top;
-    setReached(route.stations.filter((y) => at >= y).length);
-  }, [route, scrollY]);
+  const subscribeScrollY = useCallback(
+    (onChange: () => void) => scrollY.on("change", onChange),
+    [scrollY],
+  );
+  const reached = useSyncExternalStore(
+    subscribeScrollY,
+    () => {
+      if (!route) return 0;
+      const at = scrollY.get() + route.viewport * PEN - route.top;
+      return route.stations.filter((y) => at >= y).length;
+    },
+    () => 0,
+  );
   return (
     <div ref={rootRef} {...stylex.props(styles.journey)}>
       <Hero />

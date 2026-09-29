@@ -5,24 +5,8 @@ import { useEffect, useRef, useState, type RefObject } from "react";
 
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
+import { GLYPH_SWEEP, PHOTO_INSET } from "./depth-photo-math";
 import { COVER_UV, createFullscreenProgram, loadTexture, sizeCanvas } from "./webgl";
-
-const PHOTO_INSET = 0.95;
-
-export const GLYPH_SWEEP = 0.35;
-
-export const glyphRise = (rise: number, x: number) =>
-  Math.min(1, Math.max(0, rise * (1 + GLYPH_SWEEP) - x * GLYPH_SWEEP));
-
-export function screenWaterline(
-  waterline: number,
-  width: number,
-  height: number,
-  imageAspect: number,
-) {
-  const scaleY = Math.min(1, imageAspect / (width / height));
-  return (waterline - 0.5) / (scaleY * PHOTO_INSET) + 0.5;
-}
 
 const FRAGMENT = `
 precision highp float;
@@ -155,6 +139,9 @@ const styles = stylex.create({
   ready: {
     opacity: 1,
   },
+  contents: {
+    display: "contents",
+  },
 });
 
 function paintGlyphs(
@@ -259,7 +246,7 @@ export function DepthPhoto({
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    const host = canvas?.parentElement?.parentElement;
+    const host = canvas?.parentElement?.parentElement?.parentElement;
     if (!canvas || !host) return;
     const gl = canvas.getContext("webgl", { antialias: false, premultipliedAlpha: false });
     if (!gl) return;
@@ -464,10 +451,8 @@ export function DepthPhoto({
   }, [src, depthSrc, progress, waterline, glyphRoot, rise, reduce]);
 
   return (
-    <canvas
-      ref={canvasRef}
-      aria-hidden="true"
-      {...stylex.props(styles.canvas, ready && styles.ready, sx)}
-    />
+    <div aria-hidden="true" {...stylex.props(styles.contents)}>
+      <canvas ref={canvasRef} {...stylex.props(styles.canvas, ready && styles.ready, sx)} />
+    </div>
   );
 }

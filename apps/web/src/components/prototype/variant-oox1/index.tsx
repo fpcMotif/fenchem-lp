@@ -31,7 +31,6 @@ import {
   useState,
   useSyncExternalStore,
   type CSSProperties,
-  type KeyboardEvent,
   type MouseEvent,
   type ReactNode,
 } from "react";
@@ -120,7 +119,9 @@ const CLOSING_LEAD = HEADLINE_CLOSING.slice(0, CLOSING_BREAK);
 const CLOSING_WORD = HEADLINE_CLOSING.slice(CLOSING_BREAK + 1).replace(/\.$/, "");
 
 const MIRRORED_MARKETS = [...MARKETS].reverse();
-const MARQUEE_LOOP = [...MARQUEE, ...MARQUEE];
+const MARQUEE_LOOP = ["first", "second"].flatMap((pass) =>
+  MARQUEE.map((item) => ({ ...item, id: `${pass}-${item.label}` })),
+);
 
 const STRENGTH_ICONS: Record<StrengthIcon, LucideIcon> = {
   globe: Globe,
@@ -1976,15 +1977,17 @@ function VectorArt({
   );
 }
 
+function subscribeScroll(onChange: () => void) {
+  window.addEventListener("scroll", onChange, { passive: true });
+  return () => window.removeEventListener("scroll", onChange);
+}
+
 function useScrolledPastTop() {
-  const [scrolled, setScrolled] = useState(false);
-  useEffect(() => {
-    const update = () => setScrolled(window.scrollY > 8);
-    update();
-    window.addEventListener("scroll", update, { passive: true });
-    return () => window.removeEventListener("scroll", update);
-  }, []);
-  return scrolled;
+  return useSyncExternalStore(
+    subscribeScroll,
+    () => window.scrollY > 8,
+    () => false,
+  );
 }
 
 function useActiveSection(ids: readonly string[]) {
@@ -2016,15 +2019,17 @@ function SiteHeader() {
   const reduce = useReducedMotion();
   const scrolled = useScrolledPastTop();
   const activeId = useActiveSection(NAV_SECTION_IDS);
-  const closeOnEscape = (event: KeyboardEvent<HTMLElement>) => {
-    if (event.key === "Escape" && menuOpen) setMenuOpen(false);
-  };
+  useEffect(() => {
+    if (!menuOpen) return;
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setMenuOpen(false);
+    };
+    document.addEventListener("keydown", closeOnEscape);
+    return () => document.removeEventListener("keydown", closeOnEscape);
+  }, [menuOpen]);
   const isActive = (href: string) => href.slice(1) === activeId;
   return (
-    <header
-      onKeyDown={closeOnEscape}
-      {...stylex.props(styles.header, (scrolled || menuOpen) && styles.headerSolid)}
-    >
+    <header {...stylex.props(styles.header, (scrolled || menuOpen) && styles.headerSolid)}>
       <div {...stylex.props(styles.shell, styles.headerInner, styles.headerEnter)}>
         <a href="#top" aria-label="FENCHEM 泛成 首页" {...stylex.props(styles.logoLink)}>
           <LogoMark />
@@ -2640,16 +2645,16 @@ function FigureLoop() {
   return (
     <div aria-hidden="true" {...stylex.props(styles.marquee)}>
       <div {...stylex.props(styles.marqueeRow)}>
-        {MARQUEE_LOOP.map((item, index) => (
-          <span key={index} {...stylex.props(styles.marqueeItem)}>
+        {MARQUEE_LOOP.map((item) => (
+          <span key={item.id} {...stylex.props(styles.marqueeItem)}>
             <span {...stylex.props(styles.marqueeFigure)}>{item.figure}</span>
             <span {...stylex.props(styles.marqueeLabel)}>{item.label}</span>
           </span>
         ))}
       </div>
       <div {...stylex.props(styles.marqueeRow, styles.marqueeRowReverse)}>
-        {MARQUEE_LOOP.map((item, index) => (
-          <span key={index} {...stylex.props(styles.marqueeItem)}>
+        {MARQUEE_LOOP.map((item) => (
+          <span key={item.id} {...stylex.props(styles.marqueeItem)}>
             <span {...stylex.props(styles.marqueeFigure, styles.marqueeFigureOutline)}>
               {item.figure}
             </span>

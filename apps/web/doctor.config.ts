@@ -9,6 +9,10 @@ export default {
         files: ["src/components/prototype/motion.tsx"],
         rules: ["react-doctor/no-multi-comp"],
       },
+      {
+        files: ["src/components/prototype/variant-ooss/motion.tsx"],
+        rules: ["react-doctor/no-multi-comp"],
+      },
     ],
   },
 } satisfies ReactDoctorConfig;

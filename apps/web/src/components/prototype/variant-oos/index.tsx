@@ -30,8 +30,8 @@ import {
   useId,
   useRef,
   useState,
+  useSyncExternalStore,
   type CSSProperties,
-  type KeyboardEvent,
   type ReactNode,
 } from "react";
 import { preinit } from "react-dom";
@@ -192,7 +192,10 @@ const fadeIn = stylex.keyframes({
   "100%": { opacity: 1 },
 });
 
-const DIGIT_CELLS = Array.from({ length: 20 }, (_, index) => index % 10);
+const DIGIT_CELLS = Array.from({ length: 20 }, (_, index) => ({
+  id: `cell-${index}`,
+  digit: index % 10,
+}));
 const DIGIT_STAGGER = 0.09;
 const STAT_STAGGER = 0.2;
 
@@ -1405,15 +1408,17 @@ function VectorArt({
   );
 }
 
+function subscribeToScroll(onChange: () => void) {
+  window.addEventListener("scroll", onChange, { passive: true });
+  return () => window.removeEventListener("scroll", onChange);
+}
+
 function useScrolledPastTop() {
-  const [scrolled, setScrolled] = useState(false);
-  useEffect(() => {
-    const update = () => setScrolled(window.scrollY > 8);
-    update();
-    window.addEventListener("scroll", update, { passive: true });
-    return () => window.removeEventListener("scroll", update);
-  }, []);
-  return scrolled;
+  return useSyncExternalStore(
+    subscribeToScroll,
+    () => window.scrollY > 8,
+    () => false,
+  );
 }
 
 function useActiveSection(ids: readonly string[]) {
@@ -1445,15 +1450,17 @@ function SiteHeader() {
   const reduce = useReducedMotion();
   const scrolled = useScrolledPastTop();
   const activeId = useActiveSection(NAV_SECTION_IDS);
-  const closeOnEscape = (event: KeyboardEvent<HTMLElement>) => {
-    if (event.key === "Escape" && menuOpen) setMenuOpen(false);
-  };
+  useEffect(() => {
+    if (!menuOpen) return;
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setMenuOpen(false);
+    };
+    document.addEventListener("keydown", closeOnEscape);
+    return () => document.removeEventListener("keydown", closeOnEscape);
+  }, [menuOpen]);
   const isActive = (href: string) => href.slice(1) === activeId;
   return (
-    <header
-      onKeyDown={closeOnEscape}
-      {...stylex.props(styles.header, (scrolled || menuOpen) && styles.headerSolid)}
-    >
+    <header {...stylex.props(styles.header, (scrolled || menuOpen) && styles.headerSolid)}>
       <div {...stylex.props(styles.shell, styles.headerInner)}>
         <a href="#top" aria-label="FENCHEM 泛成 首页" {...stylex.props(styles.logoLink)}>
           <LogoMark />
@@ -1741,9 +1748,9 @@ function DigitWheel({ digit, delay }: { digit: number; delay: number }) {
         viewport={{ once: true, margin: "-60px" }}
         transition={{ duration: reduce ? 0 : 1.6, delay: reduce ? 0 : delay, ease: EASE }}
       >
-        {DIGIT_CELLS.map((cell, index) => (
-          <span key={index} {...stylex.props(styles.wheelCell)}>
-            {cell}
+        {DIGIT_CELLS.map((cell) => (
+          <span key={cell.id} {...stylex.props(styles.wheelCell)}>
+            {cell.digit}
           </span>
         ))}
       </m.span>
@@ -1751,22 +1758,29 @@ function DigitWheel({ digit, delay }: { digit: number; delay: number }) {
   );
 }
 
+function odometerSlots(value: string) {
+  const seen = new Map<string, number>();
+  return value.split("").map((character, position) => {
+    const occurrence = seen.get(character) ?? 0;
+    seen.set(character, occurrence + 1);
+    return { id: `${character}-${occurrence}`, character, position };
+  });
+}
+
 function Odometer({ value, offset }: { value: string; offset: number }) {
   return (
     <span aria-hidden="true" {...stylex.props(styles.statValue)}>
-      {value
-        .split("")
-        .map((character, index) =>
-          /\d/.test(character) ? (
-            <DigitWheel
-              key={index}
-              digit={Number(character)}
-              delay={offset + index * DIGIT_STAGGER}
-            />
-          ) : (
-            <span key={index}>{character}</span>
-          ),
-        )}
+      {odometerSlots(value).map((slot) =>
+        /\d/.test(slot.character) ? (
+          <DigitWheel
+            key={slot.id}
+            digit={Number(slot.character)}
+            delay={offset + slot.position * DIGIT_STAGGER}
+          />
+        ) : (
+          <span key={slot.id}>{slot.character}</span>
+        ),
+      )}
     </span>
   );
 }

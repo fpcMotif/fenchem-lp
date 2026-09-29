@@ -1,9 +1,10 @@
 import * as stylex from "@stylexjs/stylex";
 import { ArrowRight } from "lucide-react";
 
+import { layout } from "./layout";
 import { Reveal } from "./motion";
 import { color, ease, font, layout as layoutTokens, media } from "./tokens.stylex";
-import { SectionHeader, TextLink, layout } from "./ui";
+import { SectionHeader, TextLink } from "./ui";
 
 const HOVER_MS = "150ms";
 const EVENTS_HREF = "#news";

@@ -5,15 +5,10 @@ import { useEffect, useRef, useState } from "react";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
 import { ABOUT_STATEMENT, ABOUT_SUPPORT, HERO } from "./content";
-import { LiquidImage } from "./liquid-hero";
-import {
-  EASE_OUT,
-  LoadFade,
-  MaskLine,
-  REVEAL_MARGIN,
-  usePinEnabled,
-  usePinProgress,
-} from "./motion";
+import { layout } from "./layout";
+import { LiquidImage, type LiquidImageHandle } from "./liquid-hero";
+import { LoadFade, MaskLine, REVEAL_MARGIN, usePinEnabled, usePinProgress } from "./motion";
+import { EASE_OUT } from "./motion-constants";
 import {
   color,
   ease,
@@ -22,7 +17,7 @@ import {
   layout as layoutTokens,
   media,
 } from "./tokens.stylex";
-import { Button, TextLink, layout } from "./ui";
+import { Button, TextLink } from "./ui";
 
 const CARD_TOP_PX = 96;
 const CARD_BOTTOM_PERCENT = 38;
@@ -302,8 +297,8 @@ export function Hero({ ready, onReady }: HeroProps) {
   const imageRef = useRef<HTMLImageElement>(null);
   const statementRef = useRef<HTMLDivElement>(null);
   const pinned = usePinEnabled();
+  const waterRef = useRef<LiquidImageHandle>(null);
   const [copyGone, setCopyGone] = useState(false);
-  const [waterPaused, setWaterPaused] = useState(false);
   const statementSeen = useInView(statementRef, { once: true, margin: REVEAL_MARGIN });
   const pin = usePinProgress(sectionRef);
   const frame = useTransform(pin, [0, CARD_END, 1], [0, 1, 1]);
@@ -321,8 +316,12 @@ export function Hero({ ready, onReady }: HeroProps) {
   );
   useMotionValueEvent(pin, "change", (value) => {
     setCopyGone(value >= COPY_FADE_END);
-    setWaterPaused(value >= CARD_END);
+    waterRef.current?.setPaused(pinned && value >= CARD_END);
   });
+
+  useEffect(() => {
+    waterRef.current?.setPaused(pinned && pin.get() >= CARD_END);
+  }, [pinned, pin]);
 
   useEffect(() => {
     const image = imageRef.current;
@@ -374,7 +373,7 @@ export function Hero({ ready, onReady }: HeroProps) {
                   src={HERO.image}
                   focus={PHOTO_FOCUS}
                   hostRef={photoAreaRef}
-                  paused={pinned && waterPaused}
+                  ref={waterRef}
                 />
               </div>
             </m.div>

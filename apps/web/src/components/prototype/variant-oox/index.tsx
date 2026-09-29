@@ -34,7 +34,6 @@ import {
   useState,
   useSyncExternalStore,
   type CSSProperties,
-  type KeyboardEvent,
   type MouseEvent,
   type ReactNode,
 } from "react";
@@ -123,7 +122,10 @@ const CLOSING_LEAD = HEADLINE_CLOSING.slice(0, CLOSING_BREAK);
 const CLOSING_WORD = HEADLINE_CLOSING.slice(CLOSING_BREAK + 1).replace(/\.$/, "");
 
 const ABOUT_PHRASES = ABOUT.body.split(/(?<=[，。、])/);
-const DIGIT_CELLS = Array.from({ length: 20 }, (_, index) => index % 10);
+const DIGIT_CELLS = Array.from({ length: 20 }, (_, position) => ({
+  id: `cell-${position}`,
+  digit: position % 10,
+}));
 const RING_RADIUS = 62;
 const RING_LENGTH = Math.round(2 * Math.PI * RING_RADIUS);
 
@@ -2102,15 +2104,17 @@ function VectorArt({
   );
 }
 
+function subscribeScroll(onChange: () => void) {
+  window.addEventListener("scroll", onChange, { passive: true });
+  return () => window.removeEventListener("scroll", onChange);
+}
+
 function useScrolledPastTop() {
-  const [scrolled, setScrolled] = useState(false);
-  useEffect(() => {
-    const update = () => setScrolled(window.scrollY > 8);
-    update();
-    window.addEventListener("scroll", update, { passive: true });
-    return () => window.removeEventListener("scroll", update);
-  }, []);
-  return scrolled;
+  return useSyncExternalStore(
+    subscribeScroll,
+    () => window.scrollY > 8,
+    () => false,
+  );
 }
 
 function useActiveSection(ids: readonly string[]) {
@@ -2142,15 +2146,17 @@ function SiteHeader() {
   const reduce = useReducedMotion();
   const scrolled = useScrolledPastTop();
   const activeId = useActiveSection(NAV_SECTION_IDS);
-  const closeOnEscape = (event: KeyboardEvent<HTMLElement>) => {
-    if (event.key === "Escape" && menuOpen) setMenuOpen(false);
-  };
+  useEffect(() => {
+    if (!menuOpen) return;
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setMenuOpen(false);
+    };
+    document.addEventListener("keydown", closeOnEscape);
+    return () => document.removeEventListener("keydown", closeOnEscape);
+  }, [menuOpen]);
   const isActive = (href: string) => href.slice(1) === activeId;
   return (
-    <header
-      onKeyDown={closeOnEscape}
-      {...stylex.props(styles.header, (scrolled || menuOpen) && styles.headerSolid)}
-    >
+    <header {...stylex.props(styles.header, (scrolled || menuOpen) && styles.headerSolid)}>
       <div {...stylex.props(styles.shell, styles.headerInner, styles.headerEnter)}>
         <a href="#top" aria-label="FENCHEM 泛成 首页" {...stylex.props(styles.logoLink)}>
           <LogoMark />
@@ -2832,9 +2838,9 @@ function DigitWheel({ digit, delay }: { digit: number; delay: number }) {
         viewport={{ once: true, margin: "-60px" }}
         transition={{ duration: reduce ? 0 : 1.6, delay: reduce ? 0 : delay, ease: EASE }}
       >
-        {DIGIT_CELLS.map((cell, index) => (
-          <span key={index} {...stylex.props(styles.wheelCell)}>
-            {cell}
+        {DIGIT_CELLS.map((cell) => (
+          <span key={cell.id} {...stylex.props(styles.wheelCell)}>
+            {cell.digit}
           </span>
         ))}
       </m.span>
@@ -2847,11 +2853,16 @@ function Odometer({ value, offset }: { value: string; offset: number }) {
     <span aria-hidden="true" {...stylex.props(styles.statValue)}>
       {value
         .split("")
-        .map((character, index) =>
-          /\d/.test(character) ? (
-            <DigitWheel key={index} digit={Number(character)} delay={offset + index * 0.09} />
+        .map((character, position) => ({ id: `${position}-${character}`, character, position }))
+        .map((cell) =>
+          /\d/.test(cell.character) ? (
+            <DigitWheel
+              key={cell.id}
+              digit={Number(cell.character)}
+              delay={offset + cell.position * 0.09}
+            />
           ) : (
-            <span key={index}>{character}</span>
+            <span key={cell.id}>{cell.character}</span>
           ),
         )}
     </span>

@@ -1,9 +1,10 @@
 import * as stylex from "@stylexjs/stylex";
 
 import { CAMPUS, STATS } from "./content";
+import { layout } from "./layout";
 import { Reveal } from "./motion";
 import { color, font, layout as layoutTokens, media } from "./tokens.stylex";
-import { SectionTitle, layout } from "./ui";
+import { SectionTitle } from "./ui";
 
 const styles = stylex.create({
   grid: {

@@ -31,7 +31,7 @@
  * It exists so the two systems can be compared side by side on the same
  * content seam. Plus Jakarta Sans stands in for Noto Sans SC per ADR-0002.
  */
-import { useEffect, useId, useState } from "react";
+import { useEffect, useId, useState, useSyncExternalStore } from "react";
 import { AnimatePresence, LazyMotion, domAnimation, m } from "motion/react";
 import { ArrowRight, ArrowUpRight, ChevronsUpDown, Menu, X } from "lucide-react";
 import * as stylex from "@stylexjs/stylex";
@@ -1598,7 +1598,11 @@ function ContactSection() {
 
 /* ─────────────────────────────── Footer ─────────────────────────────── */
 
+const subscribeToNothing = () => () => {};
+const getCurrentYear = () => new Date().getFullYear();
+
 function FooterSection() {
+  const year = useSyncExternalStore(subscribeToNothing, getCurrentYear, getCurrentYear);
   return (
     <footer {...stylex.props(styles.footer)}>
       <div {...stylex.props(styles.container)}>
@@ -1649,7 +1653,7 @@ function FooterSection() {
         </div>
         <div {...stylex.props(styles.footerBottom)}>
           <span {...stylex.props(styles.mono)}>
-            © {new Date().getFullYear()} {company.legalName}
+            © {year} {company.legalName}
           </span>
           <span {...stylex.props(styles.mono)}>Edition U · Q1 ledger</span>
         </div>

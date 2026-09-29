@@ -18,7 +18,15 @@
  * every rule inside a section is bound to the container.
  * Middot only inside a physical-form value ("Root extract · powder").
  */
-import { Fragment, useState, type FormEvent, type MouseEvent, type ReactNode } from "react";
+import {
+  Fragment,
+  useReducer,
+  useState,
+  useSyncExternalStore,
+  type FormEvent,
+  type MouseEvent,
+  type ReactNode,
+} from "react";
 import { AnimatePresence, LazyMotion, domAnimation, m } from "motion/react";
 import { Check, Menu, Search, X } from "lucide-react";
 import * as stylex from "@stylexjs/stylex";
@@ -1356,22 +1364,23 @@ function MobileNav() {
 
 /* ─────────────────────────────── Certificate of analysis ─────────────────────────────── */
 
+const CERTIFICATE_IDENTITY: readonly { term: string; value: ReactNode }[] = [
+  {
+    term: "Product",
+    value: <span {...stylex.props(styles.certValue)}>{dossierActive.name} root extract</span>,
+  },
+  {
+    term: "Source",
+    value: (
+      <span {...stylex.props(styles.certValue, styles.species, styles.speciesMd)}>
+        {dossierActive.latin}
+      </span>
+    ),
+  },
+  { term: "Lot", value: <span {...stylex.props(styles.mono)}>{DOSSIER_LOT}</span> },
+];
+
 function Certificate() {
-  const identity: readonly { term: string; value: ReactNode }[] = [
-    {
-      term: "Product",
-      value: <span {...stylex.props(styles.certValue)}>{dossierActive.name} root extract</span>,
-    },
-    {
-      term: "Source",
-      value: (
-        <span {...stylex.props(styles.certValue, styles.species, styles.speciesMd)}>
-          {dossierActive.latin}
-        </span>
-      ),
-    },
-    { term: "Lot", value: <span {...stylex.props(styles.mono)}>{DOSSIER_LOT}</span> },
-  ];
   const lastTest = CERTIFICATE_TESTS.length - 1;
   return (
     <figure
@@ -1382,10 +1391,13 @@ function Certificate() {
         <p {...stylex.props(styles.certCode)}>{dossierActive.code}</p>
       </div>
       <dl {...stylex.props(styles.certIdentity)}>
-        {identity.map((row, i) => (
+        {CERTIFICATE_IDENTITY.map((row, i) => (
           <div
             key={row.term}
-            {...stylex.props(styles.certIdRow, i === identity.length - 1 && styles.certIdRowLast)}
+            {...stylex.props(
+              styles.certIdRow,
+              i === CERTIFICATE_IDENTITY.length - 1 && styles.certIdRowLast,
+            )}
           >
             <dt {...stylex.props(styles.certTerm)}>{row.term}</dt>
             <dd {...stylex.props(styles.certValue)}>{row.value}</dd>
@@ -1748,14 +1760,34 @@ function OptionButton({
   );
 }
 
+interface FormulationBrief {
+  app: IngredientApplication;
+  format: (typeof FORMATS)[number];
+  certification: (typeof CERTIFICATION_SETS)[number];
+  name: string;
+  org: string;
+  email: string;
+}
+
+const INITIAL_BRIEF: FormulationBrief = {
+  app: "Nutrition",
+  format: "Beadlet",
+  certification: "ISO 9001 + GMP",
+  name: "",
+  org: "",
+  email: "",
+};
+
+const briefReducer = (brief: FormulationBrief, change: Partial<FormulationBrief>) => ({
+  ...brief,
+  ...change,
+});
+
 function FormulationSection() {
-  const [app, setApp] = useState<IngredientApplication>("Nutrition");
-  const [format, setFormat] = useState<(typeof FORMATS)[number]>("Beadlet");
-  const [certification, setCertification] =
-    useState<(typeof CERTIFICATION_SETS)[number]>("ISO 9001 + GMP");
-  const [name, setName] = useState("");
-  const [org, setOrg] = useState("");
-  const [email, setEmail] = useState("");
+  const [{ app, format, certification, name, org, email }, changeBrief] = useReducer(
+    briefReducer,
+    INITIAL_BRIEF,
+  );
   const matching = getIngredientsByApplication(app);
 
   const submit = (event: FormEvent<HTMLFormElement>) => {
@@ -1800,7 +1832,7 @@ function FormulationSection() {
                     key={opt}
                     label={opt}
                     active={app === opt}
-                    onSelect={() => setApp(opt)}
+                    onSelect={() => changeBrief({ app: opt })}
                   />
                 ))}
               </div>
@@ -1813,7 +1845,7 @@ function FormulationSection() {
                     key={opt}
                     label={opt}
                     active={format === opt}
-                    onSelect={() => setFormat(opt)}
+                    onSelect={() => changeBrief({ format: opt })}
                   />
                 ))}
               </div>
@@ -1826,7 +1858,7 @@ function FormulationSection() {
                     key={opt}
                     label={opt}
                     active={certification === opt}
-                    onSelect={() => setCertification(opt)}
+                    onSelect={() => changeBrief({ certification: opt })}
                   />
                 ))}
               </div>
@@ -1842,7 +1874,7 @@ function FormulationSection() {
                     autoComplete="name"
                     required
                     value={name}
-                    onChange={(e) => setName(e.target.value)}
+                    onChange={(e) => changeBrief({ name: e.target.value })}
                     {...stylex.props(styles.input)}
                   />
                 </label>
@@ -1854,7 +1886,7 @@ function FormulationSection() {
                     autoComplete="organization"
                     required
                     value={org}
-                    onChange={(e) => setOrg(e.target.value)}
+                    onChange={(e) => changeBrief({ org: e.target.value })}
                     {...stylex.props(styles.input)}
                   />
                 </label>
@@ -1866,7 +1898,7 @@ function FormulationSection() {
                     autoComplete="email"
                     required
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={(e) => changeBrief({ email: e.target.value })}
                     {...stylex.props(styles.input)}
                   />
                 </label>
@@ -1969,8 +2001,12 @@ function FooterRow({
   );
 }
 
+const subscribeToNothing = () => () => {};
+const getCurrentYear = () => new Date().getFullYear();
+
 function Footer() {
   const documentHref = createInquiryHref("quality");
+  const year = useSyncExternalStore(subscribeToNothing, getCurrentYear, getCurrentYear);
   return (
     <footer {...stylex.props(styles.footer)}>
       <div {...stylex.props(styles.container)}>
@@ -2009,7 +2045,7 @@ function Footer() {
           />
         </dl>
         <p {...stylex.props(styles.footerLegal)}>
-          © {new Date().getFullYear()} {company.legalName} {company.hq.city}, {company.hq.country}.
+          © {year} {company.legalName} {company.hq.city}, {company.hq.country}.
         </p>
       </div>
     </footer>

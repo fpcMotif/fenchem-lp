@@ -1,11 +1,12 @@
 import * as stylex from "@stylexjs/stylex";
 import { useInView } from "motion/react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore, type RefObject } from "react";
 
 import { GLOBAL_INTRO, IMAGES, OFFICE_COLUMNS } from "./content";
+import { layout } from "./layout";
 import { Reveal } from "./motion";
 import { color, font, layout as layoutTokens, media } from "./tokens.stylex";
-import { SectionTitle, layout } from "./ui";
+import { SectionTitle } from "./ui";
 
 const MAP_WIDTH = 1222;
 const MAP_HEIGHT = 641;
@@ -363,6 +364,7 @@ const styles = stylex.create({
   },
   mapBox: {
     position: "relative",
+    margin: 0,
     width: "100%",
     maxWidth: { default: "none", [media.tablet]: 900 },
     aspectRatio: "1222 / 641",
@@ -626,19 +628,33 @@ function stateOf(region: number, active: number | null): MarkerState {
   return region === active ? "on" : "off";
 }
 
-function WorldMap({ active }: { active: number | null }) {
-  const boxRef = useRef<HTMLDivElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [width, setWidth] = useState(0);
-  const drawn = useInView(boxRef, { once: true, amount: 0.4 });
+function createWidthStore(ref: RefObject<HTMLElement | null>) {
+  let width = 0;
+  return {
+    getSnapshot: () => width,
+    subscribe: (onChange: () => void) => {
+      const element = ref.current;
+      if (!element) return () => undefined;
+      const observer = new ResizeObserver(() => {
+        width = element.clientWidth;
+        onChange();
+      });
+      observer.observe(element);
+      return () => observer.disconnect();
+    },
+  };
+}
 
-  useEffect(() => {
-    const box = boxRef.current;
-    if (!box) return;
-    const observer = new ResizeObserver(() => setWidth(box.clientWidth));
-    observer.observe(box);
-    return () => observer.disconnect();
-  }, []);
+function useElementWidth(ref: RefObject<HTMLElement | null>): number {
+  const [store] = useState(() => createWidthStore(ref));
+  return useSyncExternalStore(store.subscribe, store.getSnapshot, () => 0);
+}
+
+function WorldMap({ active }: { active: number | null }) {
+  const boxRef = useRef<HTMLElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const width = useElementWidth(boxRef);
+  const drawn = useInView(boxRef, { once: true, amount: 0.4 });
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -659,8 +675,13 @@ function WorldMap({ active }: { active: number | null }) {
   );
 
   return (
-    <div ref={boxRef} role="img" aria-label={IMAGES.officeMap.alt} {...stylex.props(styles.mapBox)}>
-      <canvas ref={canvasRef} aria-hidden="true" {...stylex.props(styles.landMap)} />
+    <figure
+      ref={boxRef}
+      role="img"
+      aria-label={IMAGES.officeMap.alt}
+      {...stylex.props(styles.mapBox)}
+    >
+      <canvas ref={canvasRef} {...stylex.props(styles.landMap)} />
       {width > 0 ? (
         <svg
           aria-hidden="true"
@@ -695,7 +716,7 @@ function WorldMap({ active }: { active: number | null }) {
           />
         ))}
       </div>
-    </div>
+    </figure>
   );
 }
 

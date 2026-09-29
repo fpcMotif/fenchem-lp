@@ -1,6 +1,6 @@
 import * as stylex from "@stylexjs/stylex";
 import type { StyleXStyles } from "@stylexjs/stylex";
-import { useEffect, useRef, useState, type RefObject } from "react";
+import { useEffect, useImperativeHandle, useRef, useState, type Ref, type RefObject } from "react";
 
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
@@ -98,26 +98,35 @@ const styles = stylex.create({
   },
 });
 
+export type LiquidImageHandle = { setPaused: (paused: boolean) => void };
+
 type LiquidImageProps = {
   src: string;
   focus: readonly [number, number];
   hostRef: RefObject<HTMLElement | null>;
-  paused?: boolean;
+  ref?: Ref<LiquidImageHandle>;
   sx?: StyleXStyles;
 };
 
-export function LiquidImage({ src, focus, hostRef, paused = false, sx }: LiquidImageProps) {
+export function LiquidImage({ src, focus, hostRef, ref, sx }: LiquidImageProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const pausedRef = useRef(paused);
+  const pausedRef = useRef(false);
   const kickRef = useRef<() => void>(() => undefined);
   const [ready, setReady] = useState(false);
   const reduce = useReducedMotion();
   const [focusX, focusY] = focus;
 
-  useEffect(() => {
-    pausedRef.current = paused;
-    if (!paused) kickRef.current();
-  }, [paused]);
+  useImperativeHandle(
+    ref,
+    () => ({
+      setPaused(paused) {
+        const resumed = pausedRef.current && !paused;
+        pausedRef.current = paused;
+        if (resumed) kickRef.current();
+      },
+    }),
+    [],
+  );
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -230,11 +239,5 @@ export function LiquidImage({ src, focus, hostRef, paused = false, sx }: LiquidI
     };
   }, [src, reduce, hostRef, focusX, focusY]);
 
-  return (
-    <canvas
-      ref={canvasRef}
-      aria-hidden="true"
-      {...stylex.props(styles.canvas, ready && styles.ready, sx)}
-    />
-  );
+  return <canvas ref={canvasRef} {...stylex.props(styles.canvas, ready && styles.ready, sx)} />;
 }
