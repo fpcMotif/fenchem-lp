@@ -13,7 +13,7 @@
  *   9. Quality Standards, Certifications & 6 Global Bases
  *  10. High-Converting Finale & Enterprise Footer
  */
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 // Named imports, not `import * as THREE`: the namespace import defeats
 // tree-shaking and drags the whole three.js build into this lazy chunk.
 import {
@@ -473,6 +473,13 @@ const styles = stylex.create({
     justifyContent: "center",
     overflow: "hidden",
     paddingTop: 80,
+  },
+  canvasLayer: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
   },
   canvas: {
     position: "absolute",
@@ -2025,35 +2032,35 @@ function PortfolioMenu() {
     </div>
   );
 }
+const MOBILE_NAV_LINKS = [
+  {
+    label: "Industries",
+    href: "#industries",
+  },
+  {
+    label: "Portfolio",
+    href: "#matrix",
+  },
+  {
+    label: "Dossier",
+    href: "#dossier",
+  },
+  {
+    label: "Formulation",
+    href: "#formulation",
+  },
+  {
+    label: "Standards",
+    href: "#standards",
+  },
+  {
+    label: "Contact",
+    href: "#contact",
+  },
+] as const;
 function MobileNav() {
   const [open, setOpen] = useState(false);
   const reduce = useReducedMotion();
-  const links = [
-    {
-      label: "Industries",
-      href: "#industries",
-    },
-    {
-      label: "Portfolio",
-      href: "#matrix",
-    },
-    {
-      label: "Dossier",
-      href: "#dossier",
-    },
-    {
-      label: "Formulation",
-      href: "#formulation",
-    },
-    {
-      label: "Standards",
-      href: "#standards",
-    },
-    {
-      label: "Contact",
-      href: "#contact",
-    },
-  ];
   return (
     <div {...stylex.props(styles.mobileNavWrapper)}>
       <button
@@ -2115,7 +2122,7 @@ function MobileNav() {
             {...stylex.props(styles.mobileMenuPopover)}
           >
             <ul {...stylex.props(styles.mobileMenuList)}>
-              {links.map((link) => (
+              {MOBILE_NAV_LINKS.map((link) => (
                 <li key={link.href}>
                   <a
                     href={link.href}
@@ -2136,22 +2143,11 @@ function MobileNav() {
 
 /* ─────────────────────────────── Three.js Waterfall Hero ─────────────────────────────── */
 
-function WaterfallHeroCanvas({
-  config,
-  statsRef,
-  preset,
-  applyPreset,
-}: {
-  config: SimulationConfig;
-  statsRef: SimStatsRef;
-  preset: PresetName;
-  applyPreset: (p: PresetName) => void;
-}) {
+function useWaterfallScene(config: SimulationConfig, statsRef: SimStatsRef, onFailure: () => void) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const configRef = useRef(config);
   const applyLookRef = useRef<(cfg: SimulationConfig) => void>(() => {});
-  const [failed, setFailed] = useState(false);
   useEffect(() => {
     configRef.current = config;
     applyLookRef.current(config);
@@ -2178,7 +2174,7 @@ function WaterfallHeroCanvas({
       renderer.setSize(width, height);
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
     } catch {
-      setFailed(true);
+      onFailure();
       return;
     }
     const count = MAX_PARTICLES;
@@ -2377,7 +2373,7 @@ function WaterfallHeroCanvas({
     const onContextLost = (event: Event) => {
       event.preventDefault();
       stop();
-      setFailed(true);
+      onFailure();
     };
     canvas.addEventListener("webglcontextlost", onContextLost);
     return () => {
@@ -2393,14 +2389,28 @@ function WaterfallHeroCanvas({
       basinMat.dispose();
       renderer.dispose();
     };
-  }, [statsRef]);
+  }, [statsRef, onFailure]);
+  return { containerRef, canvasRef };
+}
+function WaterfallHeroCanvas({
+  config,
+  statsRef,
+  preset,
+  applyPreset,
+}: {
+  config: SimulationConfig;
+  statsRef: SimStatsRef;
+  preset: PresetName;
+  applyPreset: (p: PresetName) => void;
+}) {
+  const [failed, setFailed] = useState(false);
+  const markFailed = useCallback(() => setFailed(true), []);
+  const { containerRef, canvasRef } = useWaterfallScene(config, statsRef, markFailed);
   return (
     <section ref={containerRef} {...stylex.props(styles.heroSection)}>
-      <canvas
-        ref={canvasRef}
-        aria-hidden
-        {...stylex.props(styles.canvas, failed && styles.canvasHidden)}
-      />
+      <div aria-hidden {...stylex.props(styles.canvasLayer)}>
+        <canvas ref={canvasRef} {...stylex.props(styles.canvas, failed && styles.canvasHidden)} />
+      </div>
       {failed && <div aria-hidden {...stylex.props(styles.heroFallbackBg)} />}
       <div aria-hidden {...stylex.props(styles.heroGradientOverlay1)} />
       <div aria-hidden {...stylex.props(styles.heroGradientOverlay2)} />
@@ -3095,7 +3105,10 @@ function StandardsSection() {
 
 /* ─────────────────────────────── Finale & Footer ─────────────────────────────── */
 
+const subscribeToNothing = () => () => {};
+const getCurrentYear = () => new Date().getFullYear();
 function FinaleSection() {
+  const currentYear = useSyncExternalStore(subscribeToNothing, getCurrentYear, getCurrentYear);
   return (
     <footer id="contact" {...stylex.props(styles.finaleFooter)}>
       <div {...stylex.props(styles.finaleInner)}>
@@ -3121,7 +3134,7 @@ function FinaleSection() {
 
         <div {...stylex.props(styles.finaleBottomBar)}>
           <span>
-            © {new Date().getFullYear()} {company.name} — Botanical Intelligence Since 1995.
+            © {currentYear} {company.name} — Botanical Intelligence Since 1995.
           </span>
           <div {...stylex.props(styles.footerLinksRow)}>
             <a href="#industries" {...stylex.props(styles.footerLink)}>

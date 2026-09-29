@@ -2756,27 +2756,28 @@ function PortfolioMenu() {
     </div>
   );
 }
+const MOBILE_NAV_LINKS = [
+  {
+    label: "Industries",
+    href: "#industries",
+  },
+  {
+    label: "Portfolio",
+    href: "#matrix",
+  },
+  {
+    label: "Formulation",
+    href: "#formulation",
+  },
+  {
+    label: "Standards",
+    href: "#standards",
+  },
+];
+
 function MobileNav() {
   const [open, setOpen] = useState(false);
   const reduce = useReducedMotion();
-  const links = [
-    {
-      label: "Industries",
-      href: "#industries",
-    },
-    {
-      label: "Portfolio",
-      href: "#matrix",
-    },
-    {
-      label: "Formulation",
-      href: "#formulation",
-    },
-    {
-      label: "Standards",
-      href: "#standards",
-    },
-  ];
   return (
     <div {...stylex.props(styles.mobileNavWrapper)}>
       <button
@@ -2859,14 +2860,14 @@ function MobileNav() {
             {...stylex.props(styles.mobileMenuPopover)}
           >
             <ul {...stylex.props(styles.mobileMenuList)}>
-              {links.map((link, idx) => (
+              {MOBILE_NAV_LINKS.map((link, idx) => (
                 <li key={link.href}>
                   <a
                     href={link.href}
                     onClick={() => setOpen(false)}
                     {...stylex.props(
                       styles.mobileNavLink,
-                      idx === links.length - 1 && styles.mobileNavLinkLast,
+                      idx === MOBILE_NAV_LINKS.length - 1 && styles.mobileNavLinkLast,
                     )}
                   >
                     {link.label}
@@ -3310,7 +3311,7 @@ function MatrixSection() {
                           style={{
                             margin: 0,
                             fontFamily: typography.tech,
-                            fontSize: 11,
+                            fontSize: 12,
                             color: colors.mute700,
                           }}
                         >
@@ -3323,7 +3324,7 @@ function MatrixSection() {
                           style={{
                             margin: 0,
                             fontFamily: typography.tech,
-                            fontSize: 11,
+                            fontSize: 12,
                             color: colors.mute700,
                           }}
                         >
@@ -3350,30 +3351,31 @@ function MatrixSection() {
 
 const DOSSIER = ingredients[0]; // Ashwagandha KSM-66
 
+const SPEC_ROWS = [
+  {
+    label: "Spec Ref",
+    value: DOSSIER.code,
+  },
+  {
+    label: "Assay",
+    value: DOSSIER.purity,
+  },
+  {
+    label: "Form",
+    value: DOSSIER.form,
+  },
+  {
+    label: "Class",
+    value: DOSSIER.category,
+  },
+  {
+    label: "Application",
+    value: DOSSIER.useCase,
+  },
+];
+
 function DossierSection() {
   const division = divisionForApplication(DOSSIER.application);
-  const specRows = [
-    {
-      label: "Spec Ref",
-      value: DOSSIER.code,
-    },
-    {
-      label: "Assay",
-      value: DOSSIER.purity,
-    },
-    {
-      label: "Form",
-      value: DOSSIER.form,
-    },
-    {
-      label: "Class",
-      value: DOSSIER.category,
-    },
-    {
-      label: "Application",
-      value: DOSSIER.useCase,
-    },
-  ];
   return (
     <section
       id="product"
@@ -3434,7 +3436,7 @@ function DossierSection() {
 
             <Reveal delay={STAGGER}>
               <dl {...stylex.props(styles.dossierDl)}>
-                {specRows.map((row) => (
+                {SPEC_ROWS.map((row) => (
                   <div key={row.label} {...stylex.props(styles.dossierDlRow)}>
                     <dt {...stylex.props(styles.techLabel)}>{row.label}</dt>
                     <dd {...stylex.props(styles.dossierDd)}>{row.value}</dd>
@@ -3507,21 +3509,7 @@ function RadioChips<T extends string>({
     onChange(next);
   };
   return (
-    <div
-      role="radiogroup"
-      aria-label={label}
-      {...stylex.props(styles.chipsWrapRow)}
-      onKeyDown={(event) => {
-        if (event.key.startsWith("Arrow")) event.stopPropagation();
-        if (event.key === "ArrowRight" || event.key === "ArrowDown") {
-          event.preventDefault();
-          move(1);
-        } else if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
-          event.preventDefault();
-          move(-1);
-        }
-      }}
-    >
+    <div role="radiogroup" aria-label={label} {...stylex.props(styles.chipsWrapRow)}>
       {options.map((option) => (
         <button
           key={option}
@@ -3539,6 +3527,16 @@ function RadioChips<T extends string>({
             }
           }}
           onClick={() => onChange(option)}
+          onKeyDown={(event) => {
+            if (event.key.startsWith("Arrow")) event.stopPropagation();
+            if (event.key === "ArrowRight" || event.key === "ArrowDown") {
+              event.preventDefault();
+              move(1);
+            } else if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
+              event.preventDefault();
+              move(-1);
+            }
+          }}
           {...stylex.props(
             styles.chipBase,
             value === option ? styles.chipSelected : styles.chipUnselected,

@@ -47,7 +47,7 @@ const slideInFromRight = stylex.keyframes({
   "100%": { transform: "translateX(0)" },
 });
 
-export const menuStyles = stylex.create({
+const menuStyles = stylex.create({
   positioner: {
     zIndex: 50,
     outline: "none",

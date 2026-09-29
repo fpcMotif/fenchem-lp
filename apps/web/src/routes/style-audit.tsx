@@ -210,6 +210,25 @@ function StyleAuditComponent() {
   );
 }
 
+const BUTTON_VARIANTS = [
+  "default",
+  "outline",
+  "secondary",
+  "ghost",
+  "destructive",
+  "link",
+] as const;
+const BUTTON_SIZES = [
+  "xs",
+  "sm",
+  "default",
+  "lg",
+  "icon-xs",
+  "icon-sm",
+  "icon",
+  "icon-lg",
+] as const;
+
 function ComponentMatrix({
   checked,
   setChecked,
@@ -221,16 +240,13 @@ function ComponentMatrix({
   radioVal: string;
   setRadioVal: (v: string) => void;
 }) {
-  const variants = ["default", "outline", "secondary", "ghost", "destructive", "link"] as const;
-  const sizes = ["xs", "sm", "default", "lg", "icon-xs", "icon-sm", "icon", "icon-lg"] as const;
-
   return (
     <div {...stylex.props(auditStyles.section)}>
       {/* Buttons */}
       <section {...stylex.props(auditStyles.section)}>
         <h3 {...stylex.props(auditStyles.sectionTitle)}>1. Buttons</h3>
         <div {...stylex.props(auditStyles.flexRow)}>
-          {variants.map((v) => (
+          {BUTTON_VARIANTS.map((v) => (
             <Button key={v} variant={v} id={`btn-variant-${v}`}>
               {v.toUpperCase()}
             </Button>
@@ -246,7 +262,7 @@ function ComponentMatrix({
         </div>
 
         <div {...stylex.props(auditStyles.flexRow)}>
-          {sizes.map((s) => (
+          {BUTTON_SIZES.map((s) => (
             <Button key={s} size={s} variant="outline" id={`btn-size-${s}`}>
               {s.includes("icon") ? <Plus size={16} /> : s}
             </Button>

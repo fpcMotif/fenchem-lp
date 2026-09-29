@@ -129,8 +129,7 @@ function RootDocument() {
     <html lang="en" className="dark">
       <head>
         <HeadContent />
-        {/* eslint-disable-next-line react/no-danger -- static inline script, see perf-debug.ts */}
-        <script dangerouslySetInnerHTML={{ __html: PERF_DEBUG_SCRIPT }} />
+        <script>{PERF_DEBUG_SCRIPT}</script>
       </head>
       <body>
         {pathname === "/" ? (

@@ -929,6 +929,7 @@ const styles = stylex.create({
   },
   matrixStrip: {
     marginTop: 40,
+    fontStyle: "normal",
     display: "flex",
     gap: 20,
     overflowX: "auto",
@@ -1708,16 +1709,14 @@ function MatrixSection() {
 
         {/* Horizontal strip — tabbable so keyboard users can scroll the overflow */}
         <Reveal delay={STAGGER * 2}>
-          <div
-            role="group"
+          <address
             aria-label="Featured ingredients — scrolls horizontally"
-            tabIndex={0}
             {...stylex.props(styles.matrixStrip)}
           >
             {getFeaturedIngredients().map((item, i) => (
               <MatrixCard key={item.code} item={item} index={i} />
             ))}
-          </div>
+          </address>
         </Reveal>
       </div>
     </section>

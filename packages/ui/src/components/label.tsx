@@ -30,4 +30,4 @@ function Label({ sx, disabled, htmlFor, ...props }: LabelProps) {
   return <label data-slot="label" htmlFor={htmlFor} {...styleProps} {...props} />;
 }
 
-export { Label, labelStyles };
+export { Label };

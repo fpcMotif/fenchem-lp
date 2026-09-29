@@ -4,14 +4,7 @@ import * as stylex from "@stylexjs/stylex";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Lenis from "lenis";
-import {
-  createContext,
-  useContext,
-  useEffect,
-  useRef,
-  type ReactNode,
-  type RefObject,
-} from "react";
+import { createContext, use, useEffect, useRef, type ReactNode, type RefObject } from "react";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
 /*
@@ -29,12 +22,12 @@ if (typeof window !== "undefined") {
 }
 
 export const EASE_OUT = "power3.out";
-export const EASE_SETTLE = "power2.inOut";
+const EASE_SETTLE = "power2.inOut";
 
 const ReducedMotionContext = createContext(false);
 
 export function useReducedMotionFlag(): boolean {
-  return useContext(ReducedMotionContext);
+  return use(ReducedMotionContext);
 }
 
 /** Page root: owns the sole Lenis instance and the ScrollTrigger wiring. */

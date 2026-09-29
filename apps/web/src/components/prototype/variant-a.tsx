@@ -1126,14 +1126,14 @@ function HeroSection({ heroRef, blobY }: HeroSectionProps) {
   );
 }
 
-function IndustriesSection() {
-  const offsetStyles = [styles.industryOffset0, styles.industryOffset1, styles.industryOffset2];
-  const aspectStyles = [
-    styles.industryImageWrap34,
-    styles.industryImageWrap45,
-    styles.industryImageWrap34,
-  ];
+const INDUSTRY_OFFSETS = [styles.industryOffset0, styles.industryOffset1, styles.industryOffset2];
+const INDUSTRY_ASPECTS = [
+  styles.industryImageWrap34,
+  styles.industryImageWrap45,
+  styles.industryImageWrap34,
+];
 
+function IndustriesSection() {
   return (
     <section id="industries" {...stylex.props(styles.industriesSection)}>
       <div {...stylex.props(styles.container)}>
@@ -1151,9 +1151,9 @@ function IndustriesSection() {
 
         <div {...stylex.props(styles.industriesGrid)}>
           {industries.map((industry, i) => (
-            <Reveal key={industry.title} delay={i * 0.12} sx={offsetStyles[i]}>
+            <Reveal key={industry.title} delay={i * 0.12} sx={INDUSTRY_OFFSETS[i]}>
               <a href="#ingredients" {...stylex.props(styles.industryCardLink)}>
-                <div {...stylex.props(aspectStyles[i])}>
+                <div {...stylex.props(INDUSTRY_ASPECTS[i])}>
                   <img
                     src={industry.image.src}
                     alt={industry.image.alt}

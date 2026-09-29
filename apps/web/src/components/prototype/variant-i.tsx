@@ -1818,11 +1818,7 @@ function IngredientSearch() {
   const matches = trimmed ? searchIngredients(trimmed) : [];
   return (
     <div {...stylex.props(styles.searchCard)}>
-      <form
-        role="search"
-        onSubmit={(event) => event.preventDefault()}
-        {...stylex.props(styles.searchForm)}
-      >
+      <search {...stylex.props(styles.searchForm)}>
         <label
           htmlFor="ingredient-search"
           {...stylex.props(styles.techLabelLight, styles.searchLabel)}
@@ -1841,7 +1837,7 @@ function IngredientSearch() {
             {...stylex.props(styles.searchInput)}
           />
         </div>
-      </form>
+      </search>
 
       {/* Result count — live region so filtering is announced, not silent. */}
       <p aria-live="polite" {...stylex.props(styles.searchCountRow)}>

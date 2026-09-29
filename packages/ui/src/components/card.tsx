@@ -3,7 +3,7 @@ import * as stylex from "@stylexjs/stylex";
 import type { StyleXStyles } from "@stylexjs/stylex";
 import * as React from "react";
 
-export const cardStyles = stylex.create({
+const cardStyles = stylex.create({
   card: {
     display: "flex",
     flexDirection: "column",

@@ -1799,21 +1799,22 @@ function HeroSection({ heroRef, blobY }: HeroSectionProps) {
 
 /* ─── Industries ─────────────────────────────────────────────── */
 
+const INDUSTRY_LAYOUTS = [
+  {
+    offset: styles.offset0,
+    aspect: styles.industryImgWrapperAspect34,
+  },
+  {
+    offset: styles.offset1,
+    aspect: styles.industryImgWrapperAspect45,
+  },
+  {
+    offset: styles.offset2,
+    aspect: styles.industryImgWrapperAspect34,
+  },
+];
+
 function IndustriesSection() {
-  const layoutStyles = [
-    {
-      offset: styles.offset0,
-      aspect: styles.industryImgWrapperAspect34,
-    },
-    {
-      offset: styles.offset1,
-      aspect: styles.industryImgWrapperAspect45,
-    },
-    {
-      offset: styles.offset2,
-      aspect: styles.industryImgWrapperAspect34,
-    },
-  ];
   return (
     <section id="industries" {...stylex.props(styles.section)}>
       <div {...stylex.props(styles.container)}>
@@ -1838,9 +1839,9 @@ function IndustriesSection() {
         <div {...stylex.props(styles.industriesGrid)}>
           {industries.map((industry, i) => (
             <Reveal key={industry.title} delay={i * 0.12}>
-              <div {...stylex.props(layoutStyles[i].offset)}>
+              <div {...stylex.props(INDUSTRY_LAYOUTS[i].offset)}>
                 <a href="#ingredients" {...stylex.props(styles.industryCard)}>
-                  <div {...stylex.props(styles.industryImgWrapper, layoutStyles[i].aspect)}>
+                  <div {...stylex.props(styles.industryImgWrapper, INDUSTRY_LAYOUTS[i].aspect)}>
                     <img
                       src={industry.image.src}
                       alt={industry.image.alt}
@@ -1877,13 +1878,14 @@ function IndustriesSection() {
 
 /* ─── Science / Split Section ────────────────────────────────── */
 
+const STAT_VAL_STYLES = [
+  styles.statValGreen,
+  styles.statValBlue,
+  styles.statValGreen,
+  styles.statValBlue,
+];
+
 function ScienceSection() {
-  const statValStyles = [
-    styles.statValGreen,
-    styles.statValBlue,
-    styles.statValGreen,
-    styles.statValBlue,
-  ];
   return (
     <section id="science" {...stylex.props(styles.section)}>
       {/* Subtle full-width tint band */}
@@ -1938,7 +1940,7 @@ function ScienceSection() {
               {stats.map((stat, i) => (
                 <Reveal key={stat.value} delay={i * 0.08}>
                   <div {...stylex.props(styles.statCard)}>
-                    <span {...stylex.props(statValStyles[i])}>{stat.value}</span>
+                    <span {...stylex.props(STAT_VAL_STYLES[i])}>{stat.value}</span>
                     <p {...stylex.props(styles.statLabel)}>{stat.label}</p>
                   </div>
                 </Reveal>
@@ -1988,27 +1990,28 @@ function ScienceSection() {
 
 /* ─── Ingredients ────────────────────────────────────────────── */
 
+const MARQUEE_IMAGES = [
+  "photo-1416879595882-3373a0480b5b",
+  "photo-1466781783364-36c955e42a7f",
+  "photo-1576086213369-97a306d36557",
+  "photo-1559757148-5c350d0d3c56",
+  "photo-1512069772995-ec65ed45afd6",
+  "photo-1501004318641-b39e6451bec6",
+  "photo-1416879595882-3373a0480b5b",
+  "photo-1466781783364-36c955e42a7f",
+  "photo-1576086213369-97a306d36557",
+  "photo-1559757148-5c350d0d3c56",
+  "photo-1512069772995-ec65ed45afd6",
+  "photo-1501004318641-b39e6451bec6",
+];
+
 function IngredientsSection() {
-  const marqueeImages = [
-    "photo-1416879595882-3373a0480b5b",
-    "photo-1466781783364-36c955e42a7f",
-    "photo-1576086213369-97a306d36557",
-    "photo-1559757148-5c350d0d3c56",
-    "photo-1512069772995-ec65ed45afd6",
-    "photo-1501004318641-b39e6451bec6",
-    "photo-1416879595882-3373a0480b5b",
-    "photo-1466781783364-36c955e42a7f",
-    "photo-1576086213369-97a306d36557",
-    "photo-1559757148-5c350d0d3c56",
-    "photo-1512069772995-ec65ed45afd6",
-    "photo-1501004318641-b39e6451bec6",
-  ];
   return (
     <section id="ingredients" {...stylex.props(styles.section)}>
       {/* Ingredient image marquee strip */}
       <div aria-hidden {...stylex.props(styles.marqueeWrapper)}>
         <div {...stylex.props(styles.marqueeTrack)}>
-          {marqueeImages.map((id, idx) => (
+          {MARQUEE_IMAGES.map((id, idx) => (
             <div key={`${id}-${idx}`} {...stylex.props(styles.marqueeItem)}>
               <img
                 src={`https://images.unsplash.com/${id}?auto=format&fit=crop&w=320&q=70`}
