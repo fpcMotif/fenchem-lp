@@ -2,7 +2,7 @@ import { breakpoints, colors, radii, typography } from "@fenchem-lp/ui/tokens.st
 import * as stylex from "@stylexjs/stylex";
 import { ArrowRight } from "lucide-react";
 import { createInquiryHref, regions } from "@/components/landing/landing-content";
-import { drawRule, revealWords, riseIn, SplitWords, useSectionAnimation } from "../motion";
+import { SplitWords, useSectionAnimation } from "../motion";
 import { sharedStyles } from "../styles";
 
 /*
@@ -181,7 +181,7 @@ const styles = stylex.create({
 });
 
 export function FinaleSection() {
-  const ref = useSectionAnimation<HTMLElement>((root) => {
+  const ref = useSectionAnimation<HTMLElement>((root, { revealWords, riseIn, drawRule }) => {
     revealWords(root, "[data-finale-heading]");
     riseIn(root, "[data-finale-rise]", { stagger: 0.1, delay: 0.2 });
     drawRule(root, "[data-finale-rule]");

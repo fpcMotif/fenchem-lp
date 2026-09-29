@@ -3,14 +3,7 @@ import * as stylex from "@stylexjs/stylex";
 import { ArrowRight, FileDown } from "lucide-react";
 import { createInquiryHref, ingredients } from "@/components/landing/landing-content";
 import { IMAGES } from "../content";
-import {
-  drawRule,
-  revealWords,
-  riseIn,
-  settleImage,
-  SplitWords,
-  useSectionAnimation,
-} from "../motion";
+import { SplitWords, useSectionAnimation } from "../motion";
 import { sharedStyles } from "../styles";
 
 /*
@@ -241,17 +234,19 @@ const SPEC_ROWS = [
 const FORMATS = ["Capsule", "Tablet", "Softgel", "Powder blend"];
 
 export function DossierSection() {
-  const ref = useSectionAnimation<HTMLElement>((root) => {
-    settleImage(root, "[data-dossier-img]");
-    riseIn(root, "[data-dossier-caption]", { delay: 0.15 });
-    riseIn(root, "[data-dossier-eyebrow]");
-    revealWords(root, "[data-dossier-heading]", { delay: 0.1 });
-    riseIn(root, "[data-dossier-intro]", { delay: 0.35 });
-    drawRule(root, "[data-dossier-rule]", { stagger: 0.06 });
-    riseIn(root, "[data-dossier-row]", { stagger: 0.06 });
-    riseIn(root, "[data-dossier-chip]", { stagger: 0.05 });
-    riseIn(root, "[data-dossier-ctas]");
-  });
+  const ref = useSectionAnimation<HTMLElement>(
+    (root, { settleImage, riseIn, revealWords, drawRule }) => {
+      settleImage(root, "[data-dossier-img]");
+      riseIn(root, "[data-dossier-caption]", { delay: 0.15 });
+      riseIn(root, "[data-dossier-eyebrow]");
+      revealWords(root, "[data-dossier-heading]", { delay: 0.1 });
+      riseIn(root, "[data-dossier-intro]", { delay: 0.35 });
+      drawRule(root, "[data-dossier-rule]", { stagger: 0.06 });
+      riseIn(root, "[data-dossier-row]", { stagger: 0.06 });
+      riseIn(root, "[data-dossier-chip]", { stagger: 0.05 });
+      riseIn(root, "[data-dossier-ctas]");
+    },
+  );
 
   return (
     <section

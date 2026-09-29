@@ -8,7 +8,7 @@ import {
   ingredients,
   type IngredientApplication,
 } from "@/components/landing/landing-content";
-import { drawRule, revealWords, riseIn, SplitWords, useSectionAnimation } from "../motion";
+import { SplitWords, useSectionAnimation } from "../motion";
 import { sharedStyles } from "../styles";
 
 /*
@@ -324,7 +324,7 @@ export function PresenterSection() {
   const [standard, setStandard] = useState<(typeof STANDARDS)[number]>("ISO 9001 + GMP");
   const matches = getIngredientsByApplication(application);
   const shortlist = matches.slice(0, 3);
-  const ref = useSectionAnimation<HTMLElement>((root) => {
+  const ref = useSectionAnimation<HTMLElement>((root, { revealWords, riseIn, drawRule }) => {
     revealWords(root, "[data-vj-heading]");
     riseIn(root, "[data-vj-intro]", {
       stagger: 0.1,

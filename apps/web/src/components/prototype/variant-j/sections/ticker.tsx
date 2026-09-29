@@ -4,7 +4,7 @@ import gsap from "gsap";
 import { Pause, Play } from "lucide-react";
 import { useRef, useState } from "react";
 import { ingredients } from "@/components/landing/landing-content";
-import { marquee, useReducedMotionFlag, useSectionAnimation } from "../motion";
+import { useReducedMotionFlag, useSectionAnimation } from "../motion";
 
 /*
  * Variant J — ingredient index ticker. A thin dark band that carries the
@@ -142,7 +142,7 @@ export function TickerSection() {
   const loop = useRef<gsap.core.Tween | null>(null);
   const [paused, setPaused] = useState(false);
 
-  const ref = useSectionAnimation<HTMLElement>((root) => {
+  const ref = useSectionAnimation<HTMLElement>((root, { marquee }) => {
     marquee(root, "[data-ticker-track]", 36);
     const track = root.querySelector<HTMLElement>("[data-ticker-track]");
     loop.current = track ? (gsap.getTweensOf(track)[0] ?? null) : null;

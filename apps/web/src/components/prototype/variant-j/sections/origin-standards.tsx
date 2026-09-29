@@ -4,7 +4,7 @@ import gsap from "gsap";
 import { FlaskConical, Globe, Sprout } from "lucide-react";
 import { certifications, pillars } from "@/components/landing/landing-content";
 import { IMAGES, ORIGIN_QUOTE } from "../content";
-import { drawRule, riseIn, settleImage, useSectionAnimation } from "../motion";
+import { useSectionAnimation } from "../motion";
 import { sharedStyles } from "../styles";
 
 /*
@@ -187,7 +187,7 @@ const styles = stylex.create({
 const PILLAR_ICONS = [Sprout, FlaskConical, Globe] as const;
 
 export function OriginStandardsSection() {
-  const ref = useSectionAnimation<HTMLElement>((root) => {
+  const ref = useSectionAnimation<HTMLElement>((root, { riseIn, settleImage, drawRule }) => {
     const lines = root.querySelectorAll("[data-quote-line]");
     const quote = root.querySelector("[data-quote]");
     if (lines.length && quote) {

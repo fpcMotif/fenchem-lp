@@ -65,14 +65,14 @@ export function MotionRoot({ children }: { children: ReactNode }) {
  * under reduced motion — the SSR markup already shows the final state.
  */
 export function useSectionAnimation<T extends HTMLElement = HTMLElement>(
-  build: (root: T) => void,
+  build: (root: T, reveals: SectionReveals) => void,
 ): RefObject<T | null> {
   const ref = useRef<T>(null);
   const reduced = useReducedMotionFlag();
   useGSAP(
     () => {
       if (reduced || !ref.current) return;
-      build(ref.current);
+      build(ref.current, SECTION_REVEALS);
     },
     /* revertOnUpdate: the reduce flag settles one render after hydration, so
      * the tweens a non-reduce first pass created must revert when it flips. */
@@ -91,7 +91,7 @@ type TriggerOptions = {
 const START = "top 78%";
 
 /** Word-by-word rise for a SplitWords heading. `sel` targets the heading. */
-export function revealWords(root: HTMLElement, sel: string, options: TriggerOptions = {}) {
+function revealWords(root: HTMLElement, sel: string, options: TriggerOptions = {}) {
   const targets = root.querySelectorAll(`${sel} [data-word-inner], ${sel} .vi-word-inner`);
   if (!targets.length) return;
   gsap.from(targets, {
@@ -109,7 +109,7 @@ export function revealWords(root: HTMLElement, sel: string, options: TriggerOpti
 }
 
 /** Masked rise-and-fade for copy, chips, cards. Staggers over all matches. */
-export function riseIn(
+function riseIn(
   root: HTMLElement,
   sel: string,
   options: TriggerOptions & { stagger?: number } = {},
@@ -128,7 +128,7 @@ export function riseIn(
 }
 
 /** Images settle from a gentle overscale as they enter. */
-export function settleImage(root: HTMLElement, sel: string, options: TriggerOptions = {}) {
+function settleImage(root: HTMLElement, sel: string, options: TriggerOptions = {}) {
   const targets = gsap.utils.toArray<HTMLElement>(sel, root);
   if (!targets.length) return;
   for (const target of targets) {
@@ -143,7 +143,7 @@ export function settleImage(root: HTMLElement, sel: string, options: TriggerOpti
 }
 
 /** Ledger hairlines draw themselves in, left to right. */
-export function drawRule(
+function drawRule(
   root: HTMLElement,
   sel: string,
   options: TriggerOptions & { stagger?: number } = {},
@@ -165,11 +165,14 @@ export function drawRule(
  * Continuous marquee. The track must contain its content TWICE; the tween
  * loops the first copy out of view. Returns nothing; cleaned up by scope.
  */
-export function marquee(root: HTMLElement, trackSel: string, durationSeconds = 32) {
+function marquee(root: HTMLElement, trackSel: string, durationSeconds = 32) {
   const track = root.querySelector<HTMLElement>(trackSel);
   if (!track) return undefined;
   return gsap.to(track, { xPercent: -50, duration: durationSeconds, ease: "none", repeat: -1 });
 }
+
+const SECTION_REVEALS = { revealWords, riseIn, settleImage, drawRule, marquee };
+type SectionReveals = typeof SECTION_REVEALS;
 
 /* ── Accessible word splitting ─────────────────────────────────────────── */
 

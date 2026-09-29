@@ -10,7 +10,7 @@ import {
   ingredients,
 } from "@/components/landing/landing-content";
 import { imgFor } from "../content";
-import { drawRule, revealWords, riseIn, SplitWords, useSectionAnimation } from "../motion";
+import { SplitWords, useSectionAnimation } from "../motion";
 import { sharedStyles } from "../styles";
 
 /*
@@ -284,7 +284,7 @@ function LedgerRow({ label, value }: { label: string; value: string }) {
 }
 
 export function MatrixSection() {
-  const ref = useSectionAnimation<HTMLElement>((root) => {
+  const ref = useSectionAnimation<HTMLElement>((root, { revealWords, riseIn, drawRule }) => {
     revealWords(root, "[data-matrix-heading]");
     riseIn(root, "[data-matrix-eyebrow]", { delay: 0.1 });
     riseIn(root, "[data-matrix-aside]", { delay: 0.25 });

@@ -8,7 +8,7 @@ import {
   regions,
   toAnchor,
 } from "@/components/landing/landing-content";
-import { drawRule, riseIn, useSectionAnimation } from "../motion";
+import { useSectionAnimation } from "../motion";
 import { sharedStyles } from "../styles";
 
 /*
@@ -252,7 +252,7 @@ const styles = stylex.create({
 });
 
 export function FooterSection() {
-  const ref = useSectionAnimation<HTMLElement>((root) => {
+  const ref = useSectionAnimation<HTMLElement>((root, { riseIn, drawRule }) => {
     riseIn(root, "[data-footer-chip]", { stagger: 0.05, start: "top 94%" });
     drawRule(root, "[data-rule-top]", { start: "top 96%" });
     riseIn(root, "[data-footer-col]", { stagger: 0.1, start: "top 90%" });

@@ -3,14 +3,7 @@ import * as stylex from "@stylexjs/stylex";
 import { ArrowUpRight } from "lucide-react";
 import { industries } from "@/components/landing/landing-content";
 import { imgForIndustry, INDUSTRY_COPY } from "../content";
-import {
-  drawRule,
-  revealWords,
-  riseIn,
-  settleImage,
-  SplitWords,
-  useSectionAnimation,
-} from "../motion";
+import { SplitWords, useSectionAnimation } from "../motion";
 import { sharedStyles } from "../styles";
 
 /*
@@ -203,13 +196,15 @@ const styles = stylex.create({
 });
 
 export function IndustriesSection() {
-  const ref = useSectionAnimation<HTMLElement>((root) => {
-    riseIn(root, "[data-ind-eyebrow], [data-ind-intro]", { stagger: 0.12 });
-    revealWords(root, "[data-ind-heading]", { delay: 0.08 });
-    drawRule(root, "[data-ind-rule]", { stagger: 0.12 });
-    riseIn(root, "[data-ind-row]", { stagger: 0.12, delay: 0.14 });
-    settleImage(root, "[data-ind-thumb]");
-  });
+  const ref = useSectionAnimation<HTMLElement>(
+    (root, { riseIn, revealWords, drawRule, settleImage }) => {
+      riseIn(root, "[data-ind-eyebrow], [data-ind-intro]", { stagger: 0.12 });
+      revealWords(root, "[data-ind-heading]", { delay: 0.08 });
+      drawRule(root, "[data-ind-rule]", { stagger: 0.12 });
+      riseIn(root, "[data-ind-row]", { stagger: 0.12, delay: 0.14 });
+      settleImage(root, "[data-ind-thumb]");
+    },
+  );
 
   return (
     <section
