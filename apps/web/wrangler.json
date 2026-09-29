@@ -1,0 +1,18 @@
+{
+  "$schema": "../../node_modules/wrangler/config-schema.json",
+  "name": "fenchem-lp",
+  "main": "dist/server/index.js",
+  "compatibility_date": "2026-03-10",
+  "compatibility_flags": ["nodejs_compat", "nodejs_compat_populate_process_env"],
+  "assets": {
+    "directory": "dist/client",
+    "binding": "ASSETS",
+    "not_found_handling": "none",
+    "html_handling": "auto-trailing-slash",
+    "run_worker_first": false
+  },
+  "vars": {
+    "VITE_CONVEX_URL": "https://placeholder.convex.cloud",
+    "VITE_CONVEX_SITE_URL": "https://placeholder.convex.site"
+  }
+}
