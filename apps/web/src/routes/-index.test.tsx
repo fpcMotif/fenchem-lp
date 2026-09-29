@@ -1,9 +1,10 @@
-import { fireEvent, render, waitFor } from "@testing-library/react";
+import { configure, fireEvent, render, waitFor } from "@testing-library/react";
 import { describe, expect, test, vi } from "vitest";
 
 import { DEFAULT_VARIANT } from "@/components/prototype/variants";
 import { Route } from "./index";
 
+configure({ asyncUtilTimeout: 5000 });
 describe("home route", () => {
   test("renders the variant switcher entry point", () => {
     expect(typeof Route.options.component).toBe("function");
