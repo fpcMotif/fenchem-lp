@@ -13,12 +13,12 @@ import type { Industry, Ingredient } from "@/components/landing/landing-content"
 export const IMAGES = {
   /** Hero — hands cupping soil and a seedling (Unsplash photo-1542601906990). */
   hero: {
-    src: "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=2000&q=80",
+    src: "https://images.unsplash.com/photo-1569936906148-06de87cb0681?auto=format&fit=crop&w=2000&q=80",
     alt: "Hands cupping dark soil around a young seedling",
   },
   /** Origin chapter — eucalyptus branch against soft light (photo-1416879595882). */
   origin: {
-    src: "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?auto=format&fit=crop&w=1400&q=80",
+    src: "https://images.unsplash.com/photo-1530013526807-2ec93afddab9?auto=format&fit=crop&w=1400&q=80",
     alt: "Eucalyptus branches in soft natural light",
   },
   /** Standards — dense leaf canopy, near-dark (photo-1441974231531). */
@@ -39,11 +39,11 @@ export const IMAGES = {
  */
 export const IMAGE_OVERRIDES: Record<string, { src: string; alt: string }> = {
   "FN-014": {
-    src: "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=900&q=80",
+    src: "https://images.unsplash.com/photo-1569936906148-06de87cb0681?auto=format&fit=crop&w=900&q=80",
     alt: "Hands holding soil and a young seedling — the root origin of Ashwagandha KSM-66",
   },
   "FN-052": {
-    src: "https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&w=900&q=80",
+    src: "https://images.unsplash.com/photo-1615485500834-bc10199bc727?auto=format&fit=crop&w=900&q=80",
     alt: "Fresh food bowl with vibrant natural ingredients — curcumin as clean-label color",
   },
   "FN-068": {
@@ -62,7 +62,7 @@ export const imgFor = (item: Ingredient): { src: string; alt: string } =>
  */
 export const INDUSTRY_IMAGES: Record<string, { src: string; alt: string }> = {
   "Nutrition & Supplements": {
-    src: "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=640&q=80",
+    src: "https://images.unsplash.com/photo-1569936906148-06de87cb0681?auto=format&fit=crop&w=640&q=80",
     alt: "Hands holding soil and a young seedling — raw botanical origin of nutritional actives",
   },
 };

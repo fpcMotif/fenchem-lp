@@ -76,12 +76,12 @@ import {
 /* ─────────────────────────────── Constants ─────────────────────────────── */
 
 const IMG = {
-  hero: "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?auto=format&fit=crop&w=1600&q=80",
+  hero: "https://images.unsplash.com/photo-1530013526807-2ec93afddab9?auto=format&fit=crop&w=1600&q=80",
   heroThumb:
-    "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?auto=format&fit=crop&w=900&q=80",
-  lab: "https://images.unsplash.com/photo-1532634922-8fe0b757fb13?auto=format&fit=crop&w=1400&q=80",
+    "https://images.unsplash.com/photo-1530013526807-2ec93afddab9?auto=format&fit=crop&w=900&q=80",
+  lab: "https://images.unsplash.com/photo-1602928321679-560bb453f190?auto=format&fit=crop&w=1400&q=80",
   origin:
-    "https://images.unsplash.com/photo-1466692476868-aef1dfb1e735?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1630095829654-b734f5cb2b25?auto=format&fit=crop&w=1200&q=80",
 } as const;
 const IMAGE_OVERRIDES: Record<
   string,
@@ -91,11 +91,11 @@ const IMAGE_OVERRIDES: Record<
   }
 > = {
   "FN-014": {
-    src: "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=900&q=80",
+    src: "https://images.unsplash.com/photo-1569936906148-06de87cb0681?auto=format&fit=crop&w=900&q=80",
     alt: "Hands holding soil and a young seedling — the root origin of Ashwagandha KSM-66",
   },
   "FN-052": {
-    src: "https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&w=900&q=80",
+    src: "https://images.unsplash.com/photo-1615485500834-bc10199bc727?auto=format&fit=crop&w=900&q=80",
     alt: "Fresh food bowl with vibrant natural ingredients — curcumin as clean-label color",
   },
   "FN-068": {

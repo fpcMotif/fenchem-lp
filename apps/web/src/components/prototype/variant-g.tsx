@@ -35,10 +35,10 @@ import {
 /* ─────────────────────────────── Constants ─────────────────────────────── */
 
 const IMG = {
-  hero: "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?auto=format&fit=crop&w=1600&q=80",
+  hero: "https://images.unsplash.com/photo-1530013526807-2ec93afddab9?auto=format&fit=crop&w=1600&q=80",
   heroThumb:
-    "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?auto=format&fit=crop&w=900&q=80",
-  lab: "https://images.unsplash.com/photo-1576086213369-97a306d36557?auto=format&fit=crop&w=1400&q=80",
+    "https://images.unsplash.com/photo-1530013526807-2ec93afddab9?auto=format&fit=crop&w=900&q=80",
+  lab: "https://images.unsplash.com/photo-1601961545517-59307b1fbac3?auto=format&fit=crop&w=1400&q=80",
 } as const;
 const NAV_LINKS = [
   {

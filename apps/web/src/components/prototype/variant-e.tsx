@@ -25,9 +25,9 @@ import {
 
 const IMG = {
   glassware:
-    "https://images.unsplash.com/photo-1466781783364-36c955e42a7f?auto=format&fit=crop&w=1000&q=80",
+    "https://images.unsplash.com/photo-1741513599050-487ccfb86275?auto=format&fit=crop&w=1000&q=80",
   microscope:
-    "https://images.unsplash.com/photo-1576086213369-97a306d36557?auto=format&fit=crop&w=1400&q=80",
+    "https://images.unsplash.com/photo-1601961545517-59307b1fbac3?auto=format&fit=crop&w=1400&q=80",
 } as const;
 const NAV_LINKS = [
   {

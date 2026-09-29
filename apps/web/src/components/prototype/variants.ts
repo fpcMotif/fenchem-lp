@@ -81,6 +81,91 @@ export const VARIANTS = [
     twinOf: "h",
   },
   {
+    key: "s",
+    Component: lazy(() => import("./variant-s").then((m) => ({ default: m.VariantS }))),
+    name: "Strontium · periodic index",
+    twinOf: "v",
+  },
+  {
+    key: "t",
+    Component: lazy(() => import("./variant-t").then((m) => ({ default: m.VariantT }))),
+    name: "Chevron · kinetic poster",
+  },
+  {
+    key: "u",
+    Component: lazy(() => import("./variant-u").then((m) => ({ default: m.VariantU }))),
+    name: "Ledger · Stitch corporate",
+  },
+  {
+    key: "x",
+    Component: lazy(() => import("./variant-x").then((m) => ({ default: m.VariantX }))),
+    name: "Folio · magazine spread",
+  },
+  {
+    key: "y",
+    Component: lazy(() => import("./variant-y").then((m) => ({ default: m.VariantY }))),
+    name: "Atlas · dark globe hero",
+  },
+  {
+    key: "o",
+    Component: lazy(() => import("./variant-o/index").then((m) => ({ default: m.VariantO }))),
+    name: "Official site · Figma 官网设计",
+  },
+  {
+    key: "oo",
+    Component: lazy(() => import("./variant-oo/index").then((m) => ({ default: m.VariantOO }))),
+    name: "Official site · refined",
+    twinOf: "o",
+  },
+  {
+    key: "oo1",
+    Component: lazy(() => import("./variant-oo1/index").then((m) => ({ default: m.VariantOO1 }))),
+    name: "Official site · candidate 1",
+    twinOf: "o",
+  },
+  {
+    key: "oo2",
+    Component: lazy(() => import("./variant-oo2/index").then((m) => ({ default: m.VariantOO2 }))),
+    name: "Official site · candidate 2",
+    twinOf: "o",
+  },
+  {
+    key: "oos",
+    Component: lazy(() => import("./variant-oos/index").then((m) => ({ default: m.VariantOOS }))),
+    name: "Official site · O campus",
+    twinOf: "o",
+  },
+  {
+    key: "ooss",
+    Component: lazy(() => import("./variant-ooss/index").then((m) => ({ default: m.VariantOOSS }))),
+    name: "Official site · O campus polish",
+    twinOf: "o",
+  },
+  {
+    key: "oox",
+    Component: lazy(() => import("./variant-oox/index").then((m) => ({ default: m.VariantOOX }))),
+    name: "Official site · Crosscut markets",
+    twinOf: "oos",
+  },
+  {
+    key: "oox1",
+    Component: lazy(() => import("./variant-oox1/index").then((m) => ({ default: m.VariantOOX1 }))),
+    name: "Official site · Deck markets",
+    twinOf: "oos",
+  },
+  {
+    key: "oox2",
+    Component: lazy(() => import("./variant-oox2/index").then((m) => ({ default: m.VariantOOX2 }))),
+    name: "Official site · Fork markets",
+    twinOf: "oos",
+  },
+  {
+    key: "oox3",
+    Component: lazy(() => import("./variant-oox3/index").then((m) => ({ default: m.VariantOOX3 }))),
+    name: "Official site · Aperture markets",
+    twinOf: "oos",
+  },
+  {
     key: "w",
     Component: lazy(() =>
       import("./variant-waterfall").then((m) => ({ default: m.VariantWaterfall })),
@@ -93,4 +178,4 @@ export type VariantKey = (typeof VARIANTS)[number]["key"];
 
 export const VARIANT_KEYS: readonly VariantKey[] = VARIANTS.map((v) => v.key);
 
-export const DEFAULT_VARIANT: VariantKey = "v";
+export const DEFAULT_VARIANT: VariantKey = "s";

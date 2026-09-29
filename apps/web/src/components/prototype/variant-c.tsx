@@ -737,7 +737,7 @@ function HeroHeader({ reduce }: { reduce: boolean | null }) {
     <header id="top" ref={heroRef} {...stylex.props(styles.heroHeader)}>
       <m.div style={{ y: reduce ? 0 : heroY }} {...stylex.props(styles.heroBgDiv)}>
         <img
-          src={img("photo-1542601906990-b4d3fb778b09", 2000)}
+          src={img("photo-1569936906148-06de87cb0681", 2000)}
           alt="Sunlight breaking through a deep forest canopy"
           {...stylex.props(styles.heroBgImg)}
           loading="eager"
@@ -828,7 +828,7 @@ function OriginChapter() {
       <div {...stylex.props(styles.chapterGrid)}>
         <Reveal>
           <ChapterImage
-            src={img("photo-1466781783364-36c955e42a7f", 1200)}
+            src={img("photo-1741513599050-487ccfb86275", 1200)}
             alt="Dense green foliage in soft light"
           />
         </Reveal>
@@ -876,7 +876,7 @@ function ScienceChapter() {
         </div>
         <Reveal sx={styles.scienceImgCol}>
           <ChapterImage
-            src={img("photo-1576086213369-97a306d36557", 1200)}
+            src={img("photo-1601961545517-59307b1fbac3", 1200)}
             alt="Biotech laboratory with microscope under red light"
           />
         </Reveal>

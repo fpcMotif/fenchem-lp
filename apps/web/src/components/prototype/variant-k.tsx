@@ -63,19 +63,19 @@ import {
 /* Verified-rendering Unsplash assets, reused from variant-h / landing-content. */
 const IMG = {
   heroLeaves: {
-    src: "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?auto=format&fit=crop&w=1200&q=80",
+    src: "https://images.unsplash.com/photo-1530013526807-2ec93afddab9?auto=format&fit=crop&w=1200&q=80",
     alt: "Lush green botanical leaves in morning light — Fenchem's raw-material sourcing",
   },
   heroCare: {
-    src: "https://images.unsplash.com/photo-1556228578-8c89e6adf883?auto=format&fit=crop&w=900&q=80",
+    src: "https://images.unsplash.com/photo-1679394270597-e90694d70350?auto=format&fit=crop&w=900&q=80",
     alt: "Minimal skincare bottle in warm natural light — the Personal Care division",
   },
   bandNutrition: {
-    src: "https://images.unsplash.com/photo-1512069772995-ec65ed45afd6?auto=format&fit=crop&w=1200&q=80",
+    src: "https://images.unsplash.com/photo-1569936906148-06de87cb0681?auto=format&fit=crop&w=1200&q=80",
     alt: "Dried botanical roots and herbs arranged for extraction",
   },
   bandFood: {
-    src: "https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&w=1200&q=80",
+    src: "https://images.unsplash.com/photo-1615485500834-bc10199bc727?auto=format&fit=crop&w=1200&q=80",
     alt: "Fresh food bowl with greens, grains, and natural color sources in daylight",
   },
   bandCare: {

@@ -70,6 +70,7 @@ type RevealProps = {
   duration?: number;
   /** Root margin for triggering. Defaults to "-80px". */
   margin?: `${number}px` | `${number}%`;
+  scale?: number;
 };
 
 /** Scroll-triggered reveal for below-the-fold content. Fires once. */
@@ -81,14 +82,15 @@ export function Reveal({
   y = 32,
   duration = 0.8,
   margin = "-80px",
+  scale = 1,
 }: RevealProps) {
   const reduce = useReducedMotion();
   const styleProps = stylex.props(sx, style);
   return (
     <m.div
       {...styleProps}
-      initial={reduce ? { opacity: 0 } : { opacity: 0, y }}
-      whileInView={{ opacity: 1, y: 0 }}
+      initial={reduce ? { opacity: 0 } : { opacity: 0, y, scale }}
+      whileInView={{ opacity: 1, y: 0, scale: 1 }}
       viewport={{ once: true, margin }}
       transition={{ duration: reduce ? 0 : duration, delay: reduce ? 0 : delay, ease: EASE }}
     >
@@ -105,17 +107,18 @@ type IntroProps = {
   delay?: number;
   /** Entrance travel in px. Ignored under reduced motion. */
   y?: number;
+  scale?: number;
 };
 
 /** Mount-time entrance for above-the-fold hero content. */
-export function Intro({ children, sx, style, delay = 0, y = 28 }: IntroProps) {
+export function Intro({ children, sx, style, delay = 0, y = 28, scale = 1 }: IntroProps) {
   const reduce = useReducedMotion();
   const styleProps = stylex.props(sx, style);
   return (
     <m.div
       {...styleProps}
-      initial={reduce ? { opacity: 0 } : { opacity: 0, y }}
-      animate={{ opacity: 1, y: 0 }}
+      initial={reduce ? { opacity: 0 } : { opacity: 0, y, scale }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ duration: reduce ? 0 : 0.9, delay: reduce ? 0 : delay, ease: EASE }}
     >
       {children}

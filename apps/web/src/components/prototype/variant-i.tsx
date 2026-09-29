@@ -60,9 +60,9 @@ import {
 /* ─────────────────────────────── Constants ─────────────────────────────── */
 
 const IMG = {
-  hero: "https://images.unsplash.com/photo-1416879595882-3373a0480b5b?auto=format&fit=crop&w=1600&q=80",
+  hero: "https://images.unsplash.com/photo-1530013526807-2ec93afddab9?auto=format&fit=crop&w=1600&q=80",
   origin:
-    "https://images.unsplash.com/photo-1466692476868-aef1dfb1e735?auto=format&fit=crop&w=1200&q=80",
+    "https://images.unsplash.com/photo-1630095829654-b734f5cb2b25?auto=format&fit=crop&w=1200&q=80",
 } as const;
 const STATS = [
   {

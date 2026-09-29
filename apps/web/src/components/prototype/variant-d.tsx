@@ -1897,7 +1897,7 @@ function ScienceSection() {
               <div aria-hidden {...stylex.props(styles.scienceGlow)} />
               <div {...stylex.props(styles.sciencePrimaryImgContainer)}>
                 <img
-                  src="https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=1000&q=80"
+                  src="https://images.unsplash.com/photo-1569936906148-06de87cb0681?auto=format&fit=crop&w=1000&q=80"
                   alt="Sunlight filtering through a lush forest canopy representing nature and botanical sourcing"
                   loading="lazy"
                   {...stylex.props(styles.sciencePrimaryImg)}
@@ -1909,7 +1909,7 @@ function ScienceSection() {
               {/* Tilted inset second image */}
               <div {...stylex.props(styles.scienceSecondaryImgContainer)}>
                 <img
-                  src="https://images.unsplash.com/photo-1532634922-8fe0b757fb13?auto=format&fit=crop&w=640&q=80"
+                  src="https://images.unsplash.com/photo-1602928321679-560bb453f190?auto=format&fit=crop&w=640&q=80"
                   alt="Scientific laboratory glassware used during botanical extract analysis"
                   loading="lazy"
                   {...stylex.props(styles.scienceSecondaryImg)}
@@ -1990,17 +1990,17 @@ function ScienceSection() {
 
 function IngredientsSection() {
   const marqueeImages = [
-    "photo-1416879595882-3373a0480b5b",
-    "photo-1466781783364-36c955e42a7f",
-    "photo-1576086213369-97a306d36557",
+    "photo-1530013526807-2ec93afddab9",
+    "photo-1741513599050-487ccfb86275",
+    "photo-1601961545517-59307b1fbac3",
     "photo-1559757148-5c350d0d3c56",
-    "photo-1512069772995-ec65ed45afd6",
+    "photo-1569936906148-06de87cb0681",
     "photo-1501004318641-b39e6451bec6",
-    "photo-1416879595882-3373a0480b5b",
-    "photo-1466781783364-36c955e42a7f",
-    "photo-1576086213369-97a306d36557",
+    "photo-1530013526807-2ec93afddab9",
+    "photo-1741513599050-487ccfb86275",
+    "photo-1601961545517-59307b1fbac3",
     "photo-1559757148-5c350d0d3c56",
-    "photo-1512069772995-ec65ed45afd6",
+    "photo-1569936906148-06de87cb0681",
     "photo-1501004318641-b39e6451bec6",
   ];
   return (

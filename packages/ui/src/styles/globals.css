@@ -77,13 +77,19 @@
   }
 }
 
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-  border-width: 0;
-  border-style: solid;
-  border-color: var(--border);
+/*
+ * Layered so StyleX rules (emitted inside @layer priority1…9, declared later)
+ * can set border-width. Unlayered, this reset beat every StyleX border.
+ */
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+    border-width: 0;
+    border-style: solid;
+    border-color: var(--border);
+  }
 }
 
 html {

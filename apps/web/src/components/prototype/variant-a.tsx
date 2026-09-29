@@ -1199,7 +1199,7 @@ function ScienceSection() {
               </div>
               <div {...stylex.props(styles.scienceFloatingImgContainer)}>
                 <img
-                  src="https://images.unsplash.com/photo-1466781783364-36c955e42a7f?auto=format&fit=crop&w=640&q=80"
+                  src="https://images.unsplash.com/photo-1741513599050-487ccfb86275?auto=format&fit=crop&w=640&q=80"
                   alt="Laboratory glassware during botanical analysis"
                   {...stylex.props(styles.scienceFloatingImg)}
                   loading="lazy"
