@@ -6,9 +6,7 @@ import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import viteReact from "@vitejs/plugin-react";
 import alchemy from "alchemy/cloudflare/tanstack-start";
 import { defineConfig } from "vite-plus";
-const alchemyConfigPath = fileURLToPath(
-  new URL("./.alchemy/local/wrangler.jsonc", import.meta.url),
-);
+const alchemyConfigPath = fileURLToPath(new URL("./wrangler.json", import.meta.url));
 const shouldUseAlchemy = existsSync(alchemyConfigPath);
 const cloudflareWorkersShimPath = fileURLToPath(
   new URL("../../packages/env/src/cloudflare-local.ts", import.meta.url),

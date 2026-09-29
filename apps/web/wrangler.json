@@ -1,7 +1,7 @@
 {
   "$schema": "../../node_modules/wrangler/config-schema.json",
   "name": "fenchem-lp-web-martinfan",
-  "main": "dist/server/index.js",
+  "main": "@tanstack/react-start/server-entry",
   "compatibility_date": "2026-03-10",
   "compatibility_flags": ["nodejs_compat", "nodejs_compat_populate_process_env"],
   "assets": {
