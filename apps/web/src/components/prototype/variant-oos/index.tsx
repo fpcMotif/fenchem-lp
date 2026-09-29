@@ -19,10 +19,13 @@ import {
   MotionConfig,
   domAnimation,
   m,
+  useInView,
   useScroll,
   useTransform,
+  type MotionValue,
 } from "motion/react";
 import {
+  Fragment,
   useEffect,
   useId,
   useRef,
@@ -33,8 +36,7 @@ import {
 } from "react";
 import { preinit } from "react-dom";
 
-import { Reveal } from "@/components/prototype/motion";
-import { EASE, STAGGER } from "@/components/prototype/motion-constants";
+import { EASE } from "@/components/prototype/motion-constants";
 import { HeroGradeFilter } from "@/components/prototype/hero-grade";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
@@ -69,6 +71,9 @@ const GOOGLE_FONTS =
 const INK = "#1a1a1a";
 const BODY_TEXT = "#4d4d4d";
 const TINT = "#e6ecf7";
+const OOX_WORD_ON_TINT = "#d7e1f1";
+const WORD_ON_TINT = `color-mix(in srgb, ${OOX_WORD_ON_TINT} 80%, ${TINT})`;
+const DISPLAY_FONT = '"Inter Tight", "Helvetica Neue", Arial, sans-serif';
 const SURFACE = "#f6f6f6";
 const PANEL_ALT = "#e8e8e8";
 const FOOTER_BLUE = "#294f92";
@@ -87,11 +92,28 @@ const INSET_118 = "min(118px, 8.194vw)";
 const NAV_SECTION_IDS = NAV_ITEMS.map((item) => item.href.slice(1));
 const HEADER_HEIGHT = 80;
 
-const ZOOM_FROM_SCALE = 0.96;
-const SETTLED = "translateY(0px) scale(1)";
-const zoomFrom = (y: number, scale: number) => `translateY(${y}px) scale(${scale})`;
+const ABOUT_CHARS = ABOUT.lines.join("").length;
+const ABOUT_INK_LINES = (() => {
+  let inked = 0;
+  return ABOUT.lines.map((line) =>
+    line.split(/(?<=[，。、])/).map((text) => {
+      const start = inked / ABOUT_CHARS;
+      inked += text.length;
+      return { text, range: [start, inked / ABOUT_CHARS] as [number, number] };
+    }),
+  );
+})();
+
+const RISE_EASE: [number, number, number, number] = [0.16, 1, 0.3, 1];
+const RISE_STAGGER = 0.06;
+const RISE_MAX_STEPS = 3;
+const riseDelay = (index: number) => Math.min(index, RISE_MAX_STEPS) * RISE_STAGGER;
 
 const BLOOM_EASE = "cubic-bezier(0.16, 1, 0.3, 1)";
+const LINE_RISE_EASE = "cubic-bezier(0.2, 0.7, 0, 1)";
+const MAP_PIN_STAGGER_MS = 40;
+const MAP_SWEEP_MS = 1200;
+const MAP_SWEEP_EASE = "cubic-bezier(0.33, 1, 0.68, 1)";
 const [HEADLINE_OPENING, HEADLINE_CLOSING] = HERO.headline;
 const [OPENING_BEFORE, OPENING_AFTER] = HEADLINE_OPENING.split(HERO.accent);
 const CLOSING_BREAK = HEADLINE_CLOSING.lastIndexOf(" ");
@@ -103,45 +125,49 @@ const revealZoom = stylex.keyframes({
   "100%": { scale: "1" },
 });
 
-const headerDrop = stylex.keyframes({
-  "0%": { opacity: 0, translate: "0px -14px" },
-  "100%": { opacity: 1, translate: "0px 0px" },
-});
-
 const pinPulse = stylex.keyframes({
   "0%": { scale: "0.2", opacity: 0.85 },
   "100%": { scale: "2.4", opacity: 0 },
 });
 
+const mapSweep = stylex.keyframes({
+  "0%": { maskPosition: "100% 0%" },
+  "100%": { maskPosition: "0% 0%" },
+});
+
+const mapSlideIn = stylex.keyframes({
+  "0%": { translate: "-120px 0px" },
+  "100%": { translate: "0px 0px" },
+});
+
+const slideFromLeft = stylex.keyframes({
+  "0%": { opacity: 0, translate: "-80px 0px" },
+  "100%": { opacity: 1, translate: "0px 0px" },
+});
+
 const introAfter = (ms: number) => `calc(var(--oo-intro, 0ms) + ${ms}ms)`;
 
-const textBloom = stylex.keyframes({
-  "0%": { scale: "0.88", filter: "blur(10px)", opacity: 0 },
-  "35%": { filter: "blur(5px)", opacity: 1 },
-  "60%": { scale: "1.012", filter: "blur(1.5px)" },
-  "82%": { scale: "1.003", filter: "blur(0.4px)" },
-  "100%": { scale: "1", filter: "blur(0px)", opacity: 1 },
+const lineRise = stylex.keyframes({
+  "0%": { translate: "0px 100%", clipPath: "inset(-0.4em -0.4em 100% -0.4em)" },
+  "100%": { translate: "0px 0px", clipPath: "inset(-0.4em -0.4em -0.4em -0.4em)" },
 });
 
-const logoBlurIn = stylex.keyframes({
-  "0%": { filter: "blur(6px)" },
-  "100%": { filter: "blur(0px)" },
+const logoPartRise = stylex.keyframes({
+  "0%": { opacity: 0, scale: "0.9" },
+  "100%": { opacity: 1, scale: "1" },
 });
 
-const logoPartBloom = stylex.keyframes({
-  "0%": { scale: "0.5", opacity: 0 },
-  "55%": { opacity: 1 },
-  "100%": { scale: "1", opacity: 1 },
-});
+const LOGO_SWEEP_MS_PER_UNIT = 1.5;
+const logoPartDelay = (d: string) => {
+  const startX = Number(/^M(-?[\d.]+)/.exec(d)?.[1] ?? 0);
+  return `${Math.round(startX * LOGO_SWEEP_MS_PER_UNIT)}ms`;
+};
+
+const CRACK_GAP = "0.035em 0em";
 
 const crackOpen = stylex.keyframes({
   "0%": { translate: "0em 0em" },
-  "100%": { translate: "0.015em 0.08em" },
-});
-
-const dotSettle = stylex.keyframes({
-  "0%": { translate: "0em 0em" },
-  "100%": { translate: "0em 0.08em" },
+  "100%": { translate: CRACK_GAP },
 });
 
 const dotBounce = stylex.keyframes({
@@ -166,10 +192,9 @@ const fadeIn = stylex.keyframes({
   "100%": { opacity: 1 },
 });
 
-const logoPartDelay = (d: string) => {
-  const startX = Number(/^M(-?[\d.]+)/.exec(d)?.[1] ?? 0);
-  return introAfter(Math.round(250 + startX * 4));
-};
+const DIGIT_CELLS = Array.from({ length: 20 }, (_, index) => index % 10);
+const DIGIT_STAGGER = 0.09;
+const STAT_STAGGER = 0.2;
 
 const STRENGTH_ICONS: Record<StrengthIcon, LucideIcon> = {
   globe: Globe,
@@ -297,8 +322,7 @@ const styles = stylex.create({
     color: colors.brandBlue700,
   },
   buttonHero: { width: 144, height: 48 },
-  buttonCompact: { minWidth: 96, height: 44, paddingInline: 24 },
-  buttonSmall: { minWidth: 96, height: 40, paddingInline: 24 },
+  buttonCompact: { minWidth: 96, height: 48, paddingInline: 24 },
   buttonWide: { width: 160, height: 48 },
 
   header: {
@@ -312,9 +336,9 @@ const styles = stylex.create({
     transitionTimingFunction: "ease",
   },
   headerSolid: {
-    backgroundColor: "rgba(255, 255, 255, 0.88)",
-    backdropFilter: "blur(12px)",
-    boxShadow: "0 1px 0 0 rgba(0, 0, 0, 0.06)",
+    backgroundColor: "rgba(255, 255, 255, 0.94)",
+    backdropFilter: "blur(20px)",
+    boxShadow: "0 1px 0 0 rgba(26, 26, 26, 0.08)",
   },
   headerInner: {
     display: "flex",
@@ -332,32 +356,18 @@ const styles = stylex.create({
     outlineColor: colors.brandBlue700,
     outlineOffset: 4,
   },
-  headerEnter: {
-    animationName: { default: headerDrop, [breakpoints.motionReduce]: fadeIn },
-    animationDuration: { default: "800ms", [breakpoints.motionReduce]: "300ms" },
-    animationDelay: "calc(var(--oo-intro, 0ms) + 200ms)",
-    animationTimingFunction: EASE_OUT_CSS,
-    animationFillMode: "both",
-  },
-  logoAssemble: {
-    animationName: { default: logoBlurIn, [breakpoints.motionReduce]: "none" },
-    animationDuration: "1100ms",
-    animationDelay: "calc(var(--oo-intro, 0ms) + 250ms)",
-    animationTimingFunction: EASE_OUT_CSS,
-    animationFillMode: "both",
-  },
-  logoPart: {
-    transformBox: "fill-box",
-    transformOrigin: "50% 50%",
-    animationName: { default: logoPartBloom, [breakpoints.motionReduce]: fadeIn },
-    animationDuration: { default: "1100ms", [breakpoints.motionReduce]: "300ms" },
-    animationTimingFunction: EASE_OUT_CSS,
-    animationFillMode: "both",
-  },
   logo: {
     display: "block",
     width: 161,
     height: 52,
+  },
+  logoPart: {
+    transformBox: "fill-box",
+    transformOrigin: "50% 50%",
+    animationName: { default: logoPartRise, [breakpoints.motionReduce]: fadeIn },
+    animationDuration: { default: "280ms", [breakpoints.motionReduce]: "200ms" },
+    animationTimingFunction: EASE_OUT_CSS,
+    animationFillMode: "both",
   },
   nav: {
     display: { default: "none", [DESKTOP]: "flex" },
@@ -404,6 +414,7 @@ const styles = stylex.create({
   searchPill: {
     display: { default: "none", [breakpoints.md]: "flex" },
     alignItems: "center",
+    gap: 8,
     width: 170,
     height: 38,
     paddingInline: 16,
@@ -422,6 +433,12 @@ const styles = stylex.create({
     outlineWidth: 2,
     outlineColor: colors.brandBlue700,
     outlineOffset: 2,
+  },
+  searchPlaceholder: {
+    fontFamily: "inherit",
+    fontSize: 14,
+    lineHeight: 1.2,
+    color: BODY_TEXT,
   },
   langButton: {
     paddingBlock: 10,
@@ -520,23 +537,25 @@ const styles = stylex.create({
     position: "absolute",
     inset: 0,
   },
-  heroBloom: {
-    transformOrigin: "0% 50%",
-    animationName: { default: textBloom, [breakpoints.motionReduce]: fadeIn },
-    animationDuration: { default: "1400ms", [breakpoints.motionReduce]: "400ms" },
-    animationTimingFunction: BLOOM_EASE,
+  heroRise: {
+    animationName: { default: lineRise, [breakpoints.motionReduce]: fadeIn },
+    animationDuration: { default: "600ms", [breakpoints.motionReduce]: "300ms" },
+    animationTimingFunction: LINE_RISE_EASE,
     animationFillMode: "both",
   },
-  heroPhrase: {
-    display: "inline-block",
+  heroFade: {
+    animationName: fadeIn,
+    animationDuration: { default: "400ms", [breakpoints.motionReduce]: "300ms" },
+    animationTimingFunction: EASE_OUT_CSS,
+    animationFillMode: "both",
   },
   heroPeriodSeat: {
     display: "inline-block",
     marginInlineStart: "0.04em",
-    translate: "0em 0.08em",
-    animationName: { default: dotSettle, [breakpoints.motionReduce]: "none" },
+    translate: CRACK_GAP,
+    animationName: { default: crackOpen, [breakpoints.motionReduce]: "none" },
     animationDuration: "900ms",
-    animationDelay: "calc(var(--oo-intro, 0ms) + 1700ms)",
+    animationDelay: "calc(var(--oo-intro, 0ms) + 920ms)",
     animationTimingFunction: "cubic-bezier(0.2, 1.4, 0.4, 1)",
     animationFillMode: "both",
   },
@@ -549,7 +568,7 @@ const styles = stylex.create({
     transformOrigin: "50% 100%",
     animationName: { default: dotBounce, [breakpoints.motionReduce]: fadeIn },
     animationDuration: { default: "1000ms", [breakpoints.motionReduce]: "400ms" },
-    animationDelay: "calc(var(--oo-intro, 0ms) + 1300ms)",
+    animationDelay: "calc(var(--oo-intro, 0ms) + 520ms)",
     animationTimingFunction: "linear",
     animationFillMode: "both",
   },
@@ -599,7 +618,7 @@ const styles = stylex.create({
   },
   heroHeadline: {
     display: "block",
-    fontFamily: '"Inter Tight", "Helvetica Neue", Arial, sans-serif',
+    fontFamily: DISPLAY_FONT,
     fontWeight: 800,
   },
   heroLead: {
@@ -650,10 +669,10 @@ const styles = stylex.create({
     top: 0,
     left: 0,
     clipPath: "polygon(42.7% -20%, 105% -20%, 105% 120%, 34.3% 120%)",
-    translate: "0.015em 0.08em",
+    translate: CRACK_GAP,
     animationName: { default: crackOpen, [breakpoints.motionReduce]: "none" },
     animationDuration: "900ms",
-    animationDelay: "calc(var(--oo-intro, 0ms) + 1700ms)",
+    animationDelay: "calc(var(--oo-intro, 0ms) + 920ms)",
     animationTimingFunction: "cubic-bezier(0.2, 1.4, 0.4, 1)",
     animationFillMode: "both",
   },
@@ -667,6 +686,7 @@ const styles = stylex.create({
   },
   ctaRow: {
     display: "flex",
+    gap: 12,
     paddingTop: 8,
   },
 
@@ -693,6 +713,11 @@ const styles = stylex.create({
     lineHeight: 1.8,
     color: INK,
     textAlign: "center",
+  },
+  inkPhrase: {
+    transitionProperty: "opacity",
+    transitionDuration: "120ms",
+    transitionTimingFunction: "linear",
   },
 
   campusFrame: {
@@ -731,13 +756,31 @@ const styles = stylex.create({
   },
   statFigure: {
     display: "flex",
-    alignItems: "flex-start",
+    alignItems: "baseline",
     gap: 2,
     margin: 0,
+    fontFamily: DISPLAY_FONT,
   },
   statValue: {
+    display: "inline-flex",
     fontSize: 60,
-    lineHeight: 1.2,
+    fontWeight: 500,
+    lineHeight: 1.1,
+    letterSpacing: "-0.03em",
+    fontVariantNumeric: "tabular-nums",
+  },
+  wheel: {
+    display: "inline-block",
+    overflow: "hidden",
+    height: "1.1em",
+  },
+  wheelColumn: {
+    display: "flex",
+    flexDirection: "column",
+  },
+  wheelCell: {
+    display: "block",
+    height: "1.1em",
   },
   visuallyHidden: {
     position: "absolute",
@@ -752,7 +795,9 @@ const styles = stylex.create({
   },
   statUnit: {
     fontSize: 32,
+    fontWeight: 500,
     lineHeight: 1.2,
+    color: colors.brandBlue700,
   },
   statDivider: {
     display: { default: "none", [breakpoints.md]: "block" },
@@ -896,41 +941,9 @@ const styles = stylex.create({
     scrollMarginTop: HEADER_HEIGHT + 24,
   },
   productCard: {
-    position: "relative",
     display: "flex",
     flexDirection: "column",
-    zIndex: { default: 0, ":hover": 1 },
-  },
-  productTilt: {
-    position: "relative",
-    display: "flex",
-    flexDirection: "column",
-    flexGrow: 1,
     overflow: "hidden",
-    transitionProperty: "transform, box-shadow",
-    transitionDuration: "450ms",
-    transitionTimingFunction: EASE_OUT_CSS,
-    boxShadow: {
-      default: "0 0 0 rgba(7, 67, 174, 0)",
-      [stylex.when.ancestor(":hover")]: {
-        default: "0 0 0 rgba(7, 67, 174, 0)",
-        [HOVER_MOTION]: "0 24px 48px -20px rgba(7, 67, 174, 0.35)",
-      },
-    },
-  },
-  productGlare: {
-    position: "absolute",
-    inset: 0,
-    pointerEvents: "none",
-    backgroundImage:
-      "radial-gradient(circle at var(--glare-x, 50%) var(--glare-y, 30%), rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0) 55%)",
-    opacity: {
-      default: 0,
-      [stylex.when.ancestor(":hover")]: { default: 0, [HOVER_MOTION]: 1 },
-    },
-    transitionProperty: "opacity",
-    transitionDuration: "300ms",
-    transitionTimingFunction: "ease",
   },
   productImageFrame: {
     overflow: "hidden",
@@ -941,10 +954,7 @@ const styles = stylex.create({
     width: "100%",
     height: "100%",
     objectFit: "cover",
-    transform: {
-      default: null,
-      [stylex.when.ancestor(":hover")]: { default: null, [HOVER_MOTION]: "scale(1.04)" },
-    },
+    transform: { default: null, ":hover": { default: null, [HOVER_MOTION]: "scale(1.04)" } },
     transitionProperty: "transform",
     transitionDuration: "600ms",
     transitionTimingFunction: EASE_OUT_CSS,
@@ -1029,10 +1039,11 @@ const styles = stylex.create({
     borderColor: colors.brandBlue700,
     opacity: 0,
     pointerEvents: "none",
+  },
+  mapRingPulse: {
     animationName: { default: pinPulse, [breakpoints.motionReduce]: "none" },
-    animationDuration: "2800ms",
+    animationDuration: "1600ms",
     animationTimingFunction: EASE_OUT_CSS,
-    animationIterationCount: "infinite",
   },
   mapRingAt: (left: string, top: string, delay: string) => ({
     left,
@@ -1043,6 +1054,42 @@ const styles = stylex.create({
     display: "block",
     width: "100%",
     height: "auto",
+  },
+  mapWrapEnter: {
+    translate: { default: "-120px 0px", [breakpoints.motionReduce]: null },
+  },
+  mapWrapEnterRun: {
+    animationName: { default: mapSlideIn, [breakpoints.motionReduce]: "none" },
+    animationDuration: `${MAP_SWEEP_MS}ms`,
+    animationTimingFunction: MAP_SWEEP_EASE,
+    animationFillMode: "both",
+  },
+  mapSweep: {
+    maskImage: {
+      default: "linear-gradient(to right, #000 43.5%, transparent 56.5%)",
+      [breakpoints.motionReduce]: "none",
+    },
+    maskSize: "230% 100%",
+    maskRepeat: "no-repeat",
+    maskPosition: "100% 0%",
+    opacity: { default: null, [breakpoints.motionReduce]: 0 },
+  },
+  mapSweepRun: {
+    animationName: { default: mapSweep, [breakpoints.motionReduce]: fadeIn },
+    animationDuration: { default: `${MAP_SWEEP_MS}ms`, [breakpoints.motionReduce]: "300ms" },
+    animationTimingFunction: MAP_SWEEP_EASE,
+    animationFillMode: "both",
+  },
+  globalCopyEnter: {
+    opacity: 0,
+    translate: { default: "-80px 0px", [breakpoints.motionReduce]: null },
+  },
+  globalCopyEnterRun: {
+    animationName: { default: slideFromLeft, [breakpoints.motionReduce]: fadeIn },
+    animationDuration: { default: "700ms", [breakpoints.motionReduce]: "300ms" },
+    animationDelay: { default: `${MAP_SWEEP_MS / 2}ms`, [breakpoints.motionReduce]: "0ms" },
+    animationTimingFunction: EASE_OUT_CSS,
+    animationFillMode: "both",
   },
   globalCopy: {
     display: "flex",
@@ -1172,12 +1219,32 @@ const styles = stylex.create({
   },
 
   cta: {
+    position: "relative",
     display: "flex",
     justifyContent: "center",
-    paddingBlock: { default: 80, [DESKTOP]: 112 },
+    overflow: "clip",
+    paddingTop: { default: 80, [DESKTOP]: 128 },
+    paddingBottom: { default: 120, [DESKTOP]: 220 },
     backgroundColor: TINT,
   },
+  ctaWord: {
+    position: "absolute",
+    left: "50%",
+    bottom: 0,
+    fontFamily: DISPLAY_FONT,
+    fontSize: { default: "30vw", [DESKTOP]: "min(360px, 25vw)" },
+    fontWeight: 800,
+    lineHeight: 0.74,
+    letterSpacing: "-0.06em",
+    textTransform: "uppercase",
+    whiteSpace: "nowrap",
+    color: WORD_ON_TINT,
+    translate: "-50% 22%",
+    pointerEvents: "none",
+    userSelect: "none",
+  },
   ctaInner: {
+    position: "relative",
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
@@ -1271,8 +1338,8 @@ const styles = stylex.create({
   },
   socialLink: {
     display: "block",
-    width: 20,
-    height: 20,
+    width: 32,
+    height: 32,
     padding: 6,
     margin: -6,
     opacity: { default: 0.65, ":hover": 1 },
@@ -1298,31 +1365,22 @@ const TONE_STYLES: Record<StrengthTone, StyleXStyles> = {
   cream: styles.toneCream,
 };
 
-type ZoomProps = {
+type RiseProps = {
   children: ReactNode;
   sx?: StyleXStyles;
   style?: StyleXStyles;
   delay?: number;
-  y?: number;
-  scale?: number;
 };
 
-function ZoomReveal({
-  children,
-  sx,
-  style,
-  delay = 0,
-  y = 24,
-  scale = ZOOM_FROM_SCALE,
-}: ZoomProps) {
+function RiseReveal({ children, sx, style, delay = 0 }: RiseProps) {
   const reduce = useReducedMotion();
   return (
     <m.div
       {...stylex.props(sx, style)}
-      initial={{ opacity: 0, transform: zoomFrom(y, scale) }}
-      whileInView={{ opacity: 1, transform: SETTLED }}
-      viewport={{ once: true, margin: "-80px" }}
-      transition={{ duration: reduce ? 0.2 : 0.8, delay: reduce ? 0 : delay, ease: EASE }}
+      initial={{ opacity: 0, transform: "translateY(16px)" }}
+      whileInView={{ opacity: 1, transform: "translateY(0px)" }}
+      viewport={{ once: true, margin: "0px 0px -10% 0px" }}
+      transition={{ duration: reduce ? 0.2 : 0.45, delay: reduce ? 0 : delay, ease: RISE_EASE }}
     >
       {children}
     </m.div>
@@ -1359,18 +1417,18 @@ function useScrolledPastTop() {
 }
 
 function useActiveSection(ids: readonly string[]) {
-  const [active, setActive] = useState(ids[0]);
+  const [active, setActive] = useState<string | undefined>(ids[0]);
   useEffect(() => {
-    const ratios = new Map<string, number>();
+    const crossing = new Set<string>();
     const observer = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
-          ratios.set(entry.target.id, entry.isIntersecting ? entry.intersectionRatio : 0);
+          if (entry.isIntersecting) crossing.add(entry.target.id);
+          else crossing.delete(entry.target.id);
         }
-        const next = ids.find((id) => (ratios.get(id) ?? 0) > 0);
-        if (next) setActive(next);
+        setActive(ids.find((id) => crossing.has(id)));
       },
-      { rootMargin: "-45% 0px -50% 0px", threshold: [0, 0.01] },
+      { rootMargin: "-40% 0px -59% 0px" },
     );
     for (const id of ids) {
       const section = document.getElementById(id);
@@ -1396,7 +1454,7 @@ function SiteHeader() {
       onKeyDown={closeOnEscape}
       {...stylex.props(styles.header, (scrolled || menuOpen) && styles.headerSolid)}
     >
-      <div {...stylex.props(styles.shell, styles.headerInner, styles.headerEnter)}>
+      <div {...stylex.props(styles.shell, styles.headerInner)}>
         <a href="#top" aria-label="FENCHEM 泛成 首页" {...stylex.props(styles.logoLink)}>
           <LogoMark />
         </a>
@@ -1413,8 +1471,9 @@ function SiteHeader() {
           ))}
         </nav>
         <div {...stylex.props(styles.headerActions)}>
-          <button type="button" aria-label="AI 搜索" {...stylex.props(styles.searchPill)}>
+          <button type="button" {...stylex.props(styles.searchPill)}>
             <Search size={16} strokeWidth={2} absoluteStrokeWidth aria-hidden="true" />
+            <span {...stylex.props(styles.searchPlaceholder)}>AI 搜索</span>
           </button>
           <button type="button" aria-label="CN，切换语言" {...stylex.props(styles.langButton)}>
             CN
@@ -1470,12 +1529,7 @@ function SiteHeader() {
 
 function LogoMark() {
   return (
-    <svg
-      viewBox="0 0 161 52"
-      aria-hidden="true"
-      focusable="false"
-      {...stylex.props(styles.logo, styles.logoAssemble)}
-    >
+    <svg viewBox="0 0 161 52" aria-hidden="true" focusable="false" {...stylex.props(styles.logo)}>
       {LOGO_PATHS.map((path) => (
         <path
           key={path.d}
@@ -1525,8 +1579,8 @@ function Hero() {
               <span
                 {...stylex.props(
                   styles.heroLead,
-                  styles.heroBloom,
-                  styles.enterDelay(introAfter(300)),
+                  styles.heroRise,
+                  styles.enterDelay(introAfter(0)),
                 )}
               >
                 {OPENING_BEFORE}
@@ -1536,8 +1590,8 @@ function Hero() {
               <span
                 {...stylex.props(
                   styles.heroLead,
-                  styles.heroBloom,
-                  styles.enterDelay(introAfter(400)),
+                  styles.heroRise,
+                  styles.enterDelay(introAfter(80)),
                 )}
               >
                 {CLOSING_LEAD}
@@ -1546,8 +1600,8 @@ function Hero() {
                 <span
                   {...stylex.props(
                     styles.heroBreak,
-                    styles.heroBloom,
-                    styles.enterDelay(introAfter(500)),
+                    styles.heroRise,
+                    styles.enterDelay(introAfter(160)),
                   )}
                 >
                   <span {...stylex.props(styles.heroBreakInk, styles.heroBreakHead)}>
@@ -1569,15 +1623,15 @@ function Hero() {
             <span
               {...stylex.props(
                 styles.heroSubtitle,
-                styles.heroBloom,
-                styles.enterDelay(introAfter(600)),
+                styles.heroRise,
+                styles.enterDelay(introAfter(240)),
               )}
             >
               {HERO.title}
             </span>
           </h1>
         </div>
-        <div {...stylex.props(styles.ctaRow, styles.heroBloom, styles.enterDelay(introAfter(760)))}>
+        <div {...stylex.props(styles.ctaRow, styles.heroFade, styles.enterDelay(introAfter(600)))}>
           <a
             href={HERO.primary.href}
             {...stylex.props(styles.button, styles.buttonPrimary, styles.buttonHero)}
@@ -1596,23 +1650,48 @@ function Hero() {
   );
 }
 
+function InkPhrase({
+  progress,
+  range,
+  children,
+}: {
+  progress: MotionValue<number>;
+  range: [number, number];
+  children: ReactNode;
+}) {
+  const reduce = useReducedMotion();
+  const opacity = useTransform(progress, range, [0.16, 1]);
+  return (
+    <m.span {...stylex.props(styles.inkPhrase)} style={reduce ? undefined : { opacity }}>
+      {children}
+    </m.span>
+  );
+}
+
 function About() {
+  const textRef = useRef<HTMLParagraphElement>(null);
+  const { scrollYProgress } = useScroll({ target: textRef, offset: ["start 0.85", "end 0.45"] });
   return (
     <section
       id="about"
       aria-labelledby="oo-about-title"
       {...stylex.props(styles.about, styles.inset124, styles.anchor)}
     >
-      <ZoomReveal sx={styles.aboutInner}>
+      <RiseReveal sx={styles.aboutInner}>
         <h2 id="oo-about-title" {...stylex.props(styles.sectionTitle)}>
           {ABOUT.title}
         </h2>
-        <p {...stylex.props(styles.aboutBody)}>
-          {ABOUT.lines[0]}
-          <br />
-          {ABOUT.lines[1]}
-          <br />
-          {ABOUT.lines[2]}
+        <p ref={textRef} {...stylex.props(styles.aboutBody)}>
+          {ABOUT_INK_LINES.map((segments, lineIndex) => (
+            <Fragment key={segments[0].text}>
+              {lineIndex > 0 ? <br /> : null}
+              {segments.map((segment) => (
+                <InkPhrase key={segment.text} progress={scrollYProgress} range={segment.range}>
+                  {segment.text}
+                </InkPhrase>
+              ))}
+            </Fragment>
+          ))}
         </p>
         <a
           href={ABOUT.cta.href}
@@ -1620,7 +1699,7 @@ function About() {
         >
           {ABOUT.cta.label}
         </a>
-      </ZoomReveal>
+      </RiseReveal>
     </section>
   );
 }
@@ -1651,18 +1730,67 @@ function Campus() {
   );
 }
 
+function DigitWheel({ digit, delay }: { digit: number; delay: number }) {
+  const reduce = useReducedMotion();
+  return (
+    <span {...stylex.props(styles.wheel)}>
+      <m.span
+        {...stylex.props(styles.wheelColumn)}
+        initial={{ transform: "translateY(0%)" }}
+        whileInView={{ transform: `translateY(${-(10 + digit) * 5}%)` }}
+        viewport={{ once: true, margin: "-60px" }}
+        transition={{ duration: reduce ? 0 : 1.6, delay: reduce ? 0 : delay, ease: EASE }}
+      >
+        {DIGIT_CELLS.map((cell, index) => (
+          <span key={index} {...stylex.props(styles.wheelCell)}>
+            {cell}
+          </span>
+        ))}
+      </m.span>
+    </span>
+  );
+}
+
+function Odometer({ value, offset }: { value: string; offset: number }) {
+  return (
+    <span aria-hidden="true" {...stylex.props(styles.statValue)}>
+      {value
+        .split("")
+        .map((character, index) =>
+          /\d/.test(character) ? (
+            <DigitWheel
+              key={index}
+              digit={Number(character)}
+              delay={offset + index * DIGIT_STAGGER}
+            />
+          ) : (
+            <span key={index}>{character}</span>
+          ),
+        )}
+    </span>
+  );
+}
+
 function StatItem({ stat, index }: { stat: (typeof STATS)[number]; index: number }) {
   return (
     <>
       {index > 0 ? <span aria-hidden="true" {...stylex.props(styles.statDivider)} /> : null}
-      <Reveal delay={index * STAGGER} scale={0.88} sx={styles.stat}>
+      <RiseReveal delay={riseDelay(index)} sx={styles.stat}>
         <p {...stylex.props(styles.statText)}>{stat.label}</p>
         <p {...stylex.props(styles.statFigure)}>
-          <span {...stylex.props(styles.statValue)}>{stat.value}</span>
-          {stat.unit ? <span {...stylex.props(styles.statUnit)}>{stat.unit}</span> : null}
+          <Odometer value={stat.value} offset={index * STAT_STAGGER} />
+          {stat.unit ? (
+            <span aria-hidden="true" {...stylex.props(styles.statUnit)}>
+              {stat.unit}
+            </span>
+          ) : null}
+          <span {...stylex.props(styles.visuallyHidden)}>
+            {stat.value}
+            {stat.unit ?? ""}
+          </span>
         </p>
         <p {...stylex.props(styles.statText)}>{stat.caption}</p>
-      </Reveal>
+      </RiseReveal>
     </>
   );
 }
@@ -1691,17 +1819,17 @@ function Strengths() {
       aria-labelledby="oo-strengths-title"
       {...stylex.props(styles.strengths, styles.inset120, styles.anchor)}
     >
-      <ZoomReveal sx={styles.introBlock}>
+      <RiseReveal sx={styles.introBlock}>
         <h2 id="oo-strengths-title" {...stylex.props(styles.sectionTitle)}>
           {STRENGTHS_INTRO.title}
         </h2>
         <p {...stylex.props(styles.sectionLead)}>{STRENGTHS_INTRO.lead}</p>
-      </ZoomReveal>
+      </RiseReveal>
       <div {...stylex.props(styles.strengthGrid)}>
         {STRENGTHS.map((strength, index) => (
-          <ZoomReveal
+          <RiseReveal
             key={strength.title}
-            delay={index * STAGGER}
+            delay={riseDelay(index)}
             sx={[styles.strengthCard, stylex.defaultMarker()]}
             style={TONE_STYLES[strength.tone]}
           >
@@ -1730,88 +1858,40 @@ function Strengths() {
                 </a>
               ) : null}
             </div>
-          </ZoomReveal>
+          </RiseReveal>
         ))}
       </div>
     </section>
   );
 }
 
-function useTilt<T extends HTMLElement>() {
-  const ref = useRef<T>(null);
-  const reduce = useReducedMotion();
-  useEffect(() => {
-    const card = ref.current;
-    if (!card || reduce) return;
-    if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
-    const image = card.querySelector("img");
-    let frame = 0;
-    let rotateX = 0;
-    let rotateY = 0;
-    const apply = () => {
-      frame = 0;
-      card.style.transform = `perspective(900px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
-      if (image) image.style.translate = `${rotateY * -1.4}px ${rotateX * 1.4}px`;
-    };
-    const onMove = (event: PointerEvent) => {
-      const rect = card.getBoundingClientRect();
-      const x = (event.clientX - rect.left) / rect.width;
-      const y = (event.clientY - rect.top) / rect.height;
-      rotateY = (x - 0.5) * 9;
-      rotateX = (0.5 - y) * 7;
-      card.style.setProperty("--glare-x", `${Math.round(x * 100)}%`);
-      card.style.setProperty("--glare-y", `${Math.round(y * 100)}%`);
-      if (!frame) frame = requestAnimationFrame(apply);
-    };
-    const onLeave = () => {
-      rotateX = 0;
-      rotateY = 0;
-      if (!frame) frame = requestAnimationFrame(apply);
-    };
-    card.addEventListener("pointermove", onMove);
-    card.addEventListener("pointerleave", onLeave);
-    return () => {
-      if (frame) cancelAnimationFrame(frame);
-      card.removeEventListener("pointermove", onMove);
-      card.removeEventListener("pointerleave", onLeave);
-      card.style.transform = "";
-      if (image) image.style.translate = "";
-    };
-  }, [reduce]);
-  return ref;
-}
-
 function ProductCard({ product, index }: { product: (typeof PRODUCTS)[number]; index: number }) {
-  const tiltRef = useTilt<HTMLDivElement>();
   return (
-    <ZoomReveal delay={index * STAGGER} sx={[styles.productCard, stylex.defaultMarker()]}>
-      <div ref={tiltRef} {...stylex.props(styles.productTilt)}>
-        <div {...stylex.props(styles.productImageFrame)}>
-          <img
-            src={product.image}
-            alt={product.title}
-            loading="lazy"
-            decoding="async"
-            {...stylex.props(styles.productImage)}
-          />
-        </div>
-        <div {...stylex.props(styles.productPanel, index % 2 === 1 && styles.productPanelAlt)}>
-          <div {...stylex.props(styles.productTitleBlock)}>
-            <h3 {...stylex.props(styles.productTitle)}>{product.title}</h3>
-            <hr {...stylex.props(styles.rule)} />
-            <p {...stylex.props(styles.mutedText)}>{product.description}</p>
-          </div>
-          <ul {...stylex.props(styles.list)}>
-            {product.tags.map((tag) => (
-              <li key={tag} {...stylex.props(styles.mutedText)}>
-                {tag}
-              </li>
-            ))}
-          </ul>
-        </div>
-        <span aria-hidden="true" {...stylex.props(styles.productGlare)} />
+    <RiseReveal delay={riseDelay(index)} sx={styles.productCard}>
+      <div {...stylex.props(styles.productImageFrame)}>
+        <img
+          src={product.image}
+          alt={product.title}
+          loading="lazy"
+          decoding="async"
+          {...stylex.props(styles.productImage)}
+        />
       </div>
-    </ZoomReveal>
+      <div {...stylex.props(styles.productPanel, index % 2 === 1 && styles.productPanelAlt)}>
+        <div {...stylex.props(styles.productTitleBlock)}>
+          <h3 {...stylex.props(styles.productTitle)}>{product.title}</h3>
+          <hr {...stylex.props(styles.rule)} />
+          <p {...stylex.props(styles.mutedText)}>{product.description}</p>
+        </div>
+        <ul {...stylex.props(styles.list)}>
+          {product.tags.map((tag) => (
+            <li key={tag} {...stylex.props(styles.mutedText)}>
+              {tag}
+            </li>
+          ))}
+        </ul>
+      </div>
+    </RiseReveal>
   );
 }
 
@@ -1822,20 +1902,20 @@ function Products() {
       aria-labelledby="oo-products-title"
       {...stylex.props(styles.products, styles.inset120, styles.anchor)}
     >
-      <ZoomReveal sx={styles.introBlock}>
+      <RiseReveal sx={styles.introBlock}>
         <h2 id="oo-products-title" {...stylex.props(styles.sectionTitle)}>
           {PRODUCTS_INTRO.title}
         </h2>
         <p {...stylex.props(styles.sectionLead)}>{PRODUCTS_INTRO.lead}</p>
-      </ZoomReveal>
-      <ZoomReveal delay={0.1} sx={styles.productsCta}>
+      </RiseReveal>
+      <RiseReveal delay={riseDelay(1)} sx={styles.productsCta}>
         <a
           href={PRODUCTS_INTRO.cta.href}
-          {...stylex.props(styles.button, styles.buttonPrimary, styles.buttonSmall)}
+          {...stylex.props(styles.button, styles.buttonPrimary, styles.buttonCompact)}
         >
           {PRODUCTS_INTRO.cta.label}
         </a>
-      </ZoomReveal>
+      </RiseReveal>
       <div id="product-list" {...stylex.props(styles.productGrid)}>
         {PRODUCTS.map((product, index) => (
           <ProductCard key={product.title} product={product} index={index} />
@@ -1846,11 +1926,19 @@ function Products() {
 }
 
 function Offices() {
+  const rowRef = useRef<HTMLDivElement>(null);
+  const rowInView = useInView(rowRef, { once: true, amount: 0.5 });
   return (
     <section id="offices" aria-labelledby="oo-offices-title" {...stylex.props(styles.anchor)}>
       <div {...stylex.props(styles.globalBand)}>
-        <ZoomReveal sx={styles.globalRow}>
-          <div {...stylex.props(styles.mapWrap)}>
+        <div ref={rowRef} {...stylex.props(styles.globalRow)}>
+          <div
+            {...stylex.props(
+              styles.mapWrap,
+              styles.mapWrapEnter,
+              rowInView && styles.mapWrapEnterRun,
+            )}
+          >
             <img
               src={IMAGES.officeMap.src}
               alt={IMAGES.officeMap.alt}
@@ -1858,7 +1946,7 @@ function Offices() {
               height={321}
               loading="lazy"
               decoding="async"
-              {...stylex.props(styles.mapImage)}
+              {...stylex.props(styles.mapImage, styles.mapSweep, rowInView && styles.mapSweepRun)}
             />
             {OFFICE_MAP_PINS.map((pin, index) => (
               <span
@@ -1866,23 +1954,34 @@ function Offices() {
                 aria-hidden="true"
                 {...stylex.props(
                   styles.mapRing,
-                  styles.mapRingAt(`${pin.left}%`, `${pin.top}%`, `${(index * 370) % 2800}ms`),
+                  rowInView && styles.mapRingPulse,
+                  styles.mapRingAt(
+                    `${pin.left}%`,
+                    `${pin.top}%`,
+                    `${MAP_SWEEP_MS / 4 + index * MAP_PIN_STAGGER_MS}ms`,
+                  ),
                 )}
               />
             ))}
           </div>
-          <div {...stylex.props(styles.globalCopy)}>
+          <div
+            {...stylex.props(
+              styles.globalCopy,
+              styles.globalCopyEnter,
+              rowInView && styles.globalCopyEnterRun,
+            )}
+          >
             <h2 id="oo-offices-title" {...stylex.props(styles.sectionTitle)}>
               {GLOBAL_INTRO.title}
             </h2>
             <p {...stylex.props(styles.sectionLead)}>{GLOBAL_INTRO.lead}</p>
           </div>
-        </ZoomReveal>
+        </div>
       </div>
       <div {...stylex.props(styles.officesBand)}>
         <div {...stylex.props(styles.shell, styles.inset120, styles.regions)}>
           {OFFICE_COLUMNS.map((column, index) => (
-            <ZoomReveal key={column[0].region} delay={index * STAGGER} sx={styles.officeColumn}>
+            <RiseReveal key={column[0].region} delay={riseDelay(index)} sx={styles.officeColumn}>
               {column.map((group) => (
                 <div key={group.region} {...stylex.props(styles.officeGroup)}>
                   <h3 {...stylex.props(styles.regionHeader)}>{group.region}</h3>
@@ -1895,7 +1994,7 @@ function Offices() {
                   </ul>
                 </div>
               ))}
-            </ZoomReveal>
+            </RiseReveal>
           ))}
         </div>
       </div>
@@ -1977,21 +2076,21 @@ function News() {
       {...stylex.props(styles.news, styles.anchor)}
     >
       <div {...stylex.props(styles.shell, styles.inset120, styles.newsInner)}>
-        <ZoomReveal>
+        <RiseReveal>
           <h2 id="oo-news-title" {...stylex.props(styles.sectionTitle)}>
             {NEWS_TITLE}
           </h2>
-        </ZoomReveal>
+        </RiseReveal>
         <ul {...stylex.props(styles.accordion)}>
           {NEWS.map((item, index) => (
             <li key={item.title}>
-              <ZoomReveal delay={index * STAGGER} sx={styles.newsItem}>
+              <RiseReveal delay={riseDelay(index)} sx={styles.newsItem}>
                 <NewsItem
                   item={item}
                   open={openIndex === index}
                   onToggle={() => setOpenIndex(openIndex === index ? null : index)}
                 />
-              </ZoomReveal>
+              </RiseReveal>
             </li>
           ))}
         </ul>
@@ -2007,7 +2106,10 @@ function ContactCta() {
       aria-labelledby="oo-contact-title"
       {...stylex.props(styles.cta, styles.inset124, styles.anchor)}
     >
-      <ZoomReveal sx={styles.ctaInner}>
+      <span aria-hidden="true" lang="en" {...stylex.props(styles.ctaWord)}>
+        Fenchem
+      </span>
+      <RiseReveal sx={styles.ctaInner}>
         <h2 id="oo-contact-title" {...stylex.props(styles.sectionTitle)}>
           {CTA.title}
         </h2>
@@ -2017,7 +2119,7 @@ function ContactCta() {
         >
           {CTA.action.label}
         </a>
-      </ZoomReveal>
+      </RiseReveal>
     </section>
   );
 }
@@ -2090,11 +2192,11 @@ export function VariantOOS() {
     <LazyMotion features={domAnimation} strict>
       <MotionConfig reducedMotion="user">
         <div lang="zh-CN" {...stylex.props(styles.root)} style={introVars}>
+          <a href="#main-content" {...stylex.props(styles.skipLink)}>
+            跳到主要内容
+          </a>
+          <SiteHeader />
           <div {...stylex.props(styles.page, intro === "play" && introStyles.pageReveal)}>
-            <a href="#main-content" {...stylex.props(styles.skipLink)}>
-              跳到主要内容
-            </a>
-            <SiteHeader />
             <main id="main-content" tabIndex={-1} {...stylex.props(styles.mainTarget)}>
               <Hero />
               <About />

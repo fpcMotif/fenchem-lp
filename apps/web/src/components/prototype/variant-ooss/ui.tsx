@@ -74,8 +74,18 @@ const styles = stylex.create({
   buttonOnDark: {
     color: color.paper,
   },
+  buttonWhite: {
+    backgroundColor: { default: color.paper, ":hover": color.paperHover },
+  },
+  buttonLarge: {
+    height: 56,
+    paddingInline: 32,
+  },
   buttonLabel: {
     color: color.paper,
+  },
+  buttonLabelWhite: {
+    color: color.deep,
   },
   textLink: {
     display: "inline-flex",
@@ -112,27 +122,16 @@ const styles = stylex.create({
   },
 
   eyebrow: {
-    display: "flex",
-    alignItems: "center",
-    gap: 12,
     margin: 0,
     fontFamily: font.display,
     fontSize: 13,
     fontWeight: 600,
     lineHeight: 1.4,
-    letterSpacing: "0.08em",
-    textTransform: "uppercase",
     fontVariantNumeric: "tabular-nums",
     color: color.inkMuted,
   },
   eyebrowDark: {
     color: color.white70,
-  },
-  eyebrowMark: {
-    flexShrink: 0,
-    width: 2,
-    height: 12,
-    backgroundColor: color.green,
   },
 
   header: {
@@ -144,25 +143,27 @@ const styles = stylex.create({
     columnGap: layoutTokens.gutter,
     rowGap: 20,
   },
-  headerEyebrow: {
-    gridColumn: "1 / -1",
-  },
   title: {
-    gridColumn: {
-      default: "1 / -1",
-      [media.tablet]: "1 / span 10",
-      [media.desktop]: "1 / span 7",
-    },
     margin: 0,
     fontFamily: font.cjk,
     fontSize: { default: 30, [media.tablet]: 40, [media.desktop]: 52 },
     fontWeight: 700,
     lineHeight: 1.15,
-    letterSpacing: "-0.01em",
+    letterSpacing: 0,
     color: color.ink,
   },
   titleDark: {
     color: color.paper,
+  },
+  titlePlace: {
+    gridColumn: {
+      default: "1 / -1",
+      [media.tablet]: "1 / span 10",
+      [media.desktop]: "1 / span 7",
+    },
+  },
+  titleBaseline: {
+    alignSelf: { default: null, [media.desktop]: "last baseline" },
   },
   lead: {
     gridColumn: {
@@ -180,37 +181,54 @@ const styles = stylex.create({
   },
   action: {
     gridColumn: { default: "1 / -1", [media.desktop]: "9 / -1" },
-    gridRow: { default: "auto", [media.desktop]: "2 / span 2" },
+    gridRow: { default: "auto", [media.desktop]: "1" },
     justifySelf: { default: "start", [media.desktop]: "end" },
-    alignSelf: "end",
+    alignSelf: { default: "start", [media.desktop]: "last baseline" },
   },
 });
 
 type Tone = "light" | "dark";
 
+export function SectionTitle({
+  id,
+  children,
+  tone = "light",
+  index = 1,
+  sx,
+}: {
+  id: string;
+  children: ReactNode;
+  tone?: Tone;
+  index?: number;
+  sx?: StyleXStyles;
+}) {
+  return (
+    <h2 id={id} {...stylex.props(styles.title, tone === "dark" && styles.titleDark, sx)}>
+      <MaskLine index={index}>{children}</MaskLine>
+    </h2>
+  );
+}
+
 export function Eyebrow({
-  number,
   label,
   tone = "light",
   sx,
 }: {
-  number: string;
-  label: string;
+  number?: string;
+  label?: string;
   tone?: Tone;
   sx?: StyleXStyles;
 }) {
+  if (!label) return null;
   return (
-    <p {...stylex.props(styles.eyebrow, tone === "dark" && styles.eyebrowDark, sx)}>
-      <span aria-hidden="true" {...stylex.props(styles.eyebrowMark)} />
-      <span>{`${number} — ${label}`}</span>
-    </p>
+    <p {...stylex.props(styles.eyebrow, tone === "dark" && styles.eyebrowDark, sx)}>{label}</p>
   );
 }
 
 type SectionHeaderProps = {
   id: string;
-  number: string;
-  label: string;
+  number?: string;
+  label?: string;
   title: string;
   lead?: string;
   action?: ReactNode;
@@ -218,32 +236,24 @@ type SectionHeaderProps = {
   sx?: StyleXStyles;
 };
 
-export function SectionHeader({
-  id,
-  number,
-  label,
-  title,
-  lead,
-  action,
-  tone = "light",
-  sx,
-}: SectionHeaderProps) {
+export function SectionHeader({ id, title, lead, action, tone = "light", sx }: SectionHeaderProps) {
   const dark = tone === "dark";
   return (
     <div {...stylex.props(styles.header, sx)}>
-      <Reveal sx={styles.headerEyebrow}>
-        <Eyebrow number={number} label={label} tone={tone} />
-      </Reveal>
-      <h2 id={id} {...stylex.props(styles.title, dark && styles.titleDark)}>
-        <MaskLine index={1}>{title}</MaskLine>
-      </h2>
+      <SectionTitle
+        id={id}
+        tone={tone}
+        sx={[styles.titlePlace, action ? styles.titleBaseline : null]}
+      >
+        {title}
+      </SectionTitle>
       {lead ? (
-        <Reveal as="p" index={2} sx={[styles.lead, dark && styles.leadDark]}>
+        <Reveal as="p" index={1} sx={[styles.lead, dark && styles.leadDark]}>
           {lead}
         </Reveal>
       ) : null}
       {action ? (
-        <Reveal index={3} sx={styles.action}>
+        <Reveal index={1} sx={styles.action}>
           {action}
         </Reveal>
       ) : null}
@@ -255,13 +265,34 @@ type ButtonProps = {
   href: string;
   children: ReactNode;
   onDark?: boolean;
+  tone?: "royal" | "white";
+  size?: "regular" | "large";
   sx?: StyleXStyles;
 };
 
-export function Button({ href, children, onDark = false, sx }: ButtonProps) {
+export function Button({
+  href,
+  children,
+  onDark = false,
+  tone = "royal",
+  size = "regular",
+  sx,
+}: ButtonProps) {
+  const white = tone === "white";
   return (
-    <a href={href} {...stylex.props(styles.button, onDark && styles.buttonOnDark, sx)}>
-      <span {...stylex.props(styles.buttonLabel)}>{children}</span>
+    <a
+      href={href}
+      {...stylex.props(
+        styles.button,
+        onDark && styles.buttonOnDark,
+        white && styles.buttonWhite,
+        size === "large" && styles.buttonLarge,
+        sx,
+      )}
+    >
+      <span {...stylex.props(styles.buttonLabel, white && styles.buttonLabelWhite)}>
+        {children}
+      </span>
     </a>
   );
 }

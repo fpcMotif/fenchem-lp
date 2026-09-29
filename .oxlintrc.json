@@ -43,5 +43,5 @@
   "env": {
     "builtin": true
   },
-  "ignorePatterns": [".agents/**", ".claude/**"]
+  "ignorePatterns": [".agents/**", ".claude/**", "docs/**", "apps/web/public/**"]
 }

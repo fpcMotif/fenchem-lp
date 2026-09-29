@@ -1,5 +1,6 @@
 import {
   ABOUT as FIGMA_ABOUT,
+  CTA as FIGMA_CTA,
   HERO as FIGMA_HERO,
   PRODUCTS_INTRO as FIGMA_PRODUCTS_INTRO,
   STRENGTHS as FIGMA_STRENGTHS,
@@ -7,7 +8,6 @@ import {
 
 export {
   COPYRIGHT,
-  CTA,
   GLOBAL_INTRO,
   IMAGES,
   NAV_ITEMS,
@@ -38,14 +38,27 @@ export const ABOUT = {
   cta: { label: "更多", href: "#campus" },
 } as const;
 
+export const CTA = {
+  ...FIGMA_CTA,
+  title: "一起开启下一个突破",
+} as const;
+
 export const PRODUCTS_INTRO = {
   ...FIGMA_PRODUCTS_INTRO,
   cta: { label: "查看全部产品", href: "#product-list" },
 } as const;
 
-export const STRENGTHS = FIGMA_STRENGTHS.map((strength) =>
-  strength.link ? { ...strength, link: `了解${strength.title}` } : strength,
-);
+const STRENGTH_DESCRIPTIONS = new Map([
+  ["稳定供应保障", "本地仓储与高效交付"],
+  ["解决方案创新", "应用研发与技术支持"],
+  ["长期合作伙伴", "帮客户打造差异化产品"],
+]);
+
+export const STRENGTHS = FIGMA_STRENGTHS.map((strength) => ({
+  ...strength,
+  description: strength.description ?? STRENGTH_DESCRIPTIONS.get(strength.title) ?? null,
+  link: strength.link ? `了解${strength.title}` : null,
+}));
 
 const PENDING_DETAILS = ["[日期 · 地点待补充]", "[活动介绍待补充]"] as const;
 

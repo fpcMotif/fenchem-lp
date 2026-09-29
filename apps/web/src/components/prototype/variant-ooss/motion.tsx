@@ -1,29 +1,21 @@
 import * as stylex from "@stylexjs/stylex";
 import type { StyleXStyles } from "@stylexjs/stylex";
 import { m, useInView, useScroll, type MotionValue } from "motion/react";
-import {
-  useEffect,
-  useRef,
-  useState,
-  useSyncExternalStore,
-  type ReactNode,
-  type RefObject,
-} from "react";
+import { useRef, useSyncExternalStore, type ReactNode, type RefObject } from "react";
 
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
 import { ease, media } from "./tokens.stylex";
 
 export const EASE_OUT: [number, number, number, number] = [0.16, 1, 0.3, 1];
-export const REVEAL_MARGIN = "0px 0px -10% 0px";
+export const REVEAL_MARGIN = "0px 0px 0px 0px";
 const STAGGER_MS = 60;
 const MAX_STAGGER_INDEX = 3;
 
-const REVEAL_SECONDS = 0.45;
-const MASK_SECONDS = 0.6;
+const REVEAL_SECONDS = 0.6;
+const MASK_SECONDS = 0.7;
 const REVEAL_RISE_PX = 16;
 const MASK_HIDDEN = "120%";
-const COUNT_UP_MS = 900;
 
 export const staggerMs = (index: number) => Math.min(index, MAX_STAGGER_INDEX) * STAGGER_MS;
 
@@ -54,7 +46,7 @@ const maskRise = stylex.keyframes({
 });
 
 const fadeRise = stylex.keyframes({
-  "0%": { opacity: 0, transform: "translateY(16px)" },
+  "0%": { opacity: 0, transform: "translateY(12px)" },
   "100%": { opacity: 1, transform: "translateY(0px)" },
 });
 
@@ -68,6 +60,9 @@ const styles = stylex.create({
   maskInner: {
     display: "block",
   },
+  maskLoadWaiting: {
+    transform: { default: "translateY(120%)", [media.motionReduce]: "none" },
+  },
   maskLoad: {
     animationName: { default: maskRise, [media.motionReduce]: "none" },
     animationTimingFunction: ease.out,
@@ -77,6 +72,9 @@ const styles = stylex.create({
     animationDelay: `${delayMs}ms`,
     animationDuration: `${durationMs}ms`,
   }),
+  loadFadeWaiting: {
+    opacity: { default: 0, [media.motionReduce]: 1 },
+  },
   loadFade: {
     animationName: { default: fadeRise, [media.motionReduce]: "none" },
     animationTimingFunction: ease.out,
@@ -122,6 +120,7 @@ type MaskLineProps = {
   children: ReactNode;
   sx?: StyleXStyles;
   when?: "view" | "load";
+  start?: boolean;
   index?: number;
   delay?: number;
   duration?: number;
@@ -131,6 +130,7 @@ export function MaskLine({
   children,
   sx,
   when = "view",
+  start = true,
   index = 0,
   delay = 0,
   duration = MASK_SECONDS * 1000,
@@ -144,8 +144,8 @@ export function MaskLine({
         <span
           {...stylex.props(
             styles.maskInner,
-            styles.maskLoad,
-            styles.maskLoadAt(delay + staggerMs(index), duration),
+            start ? styles.maskLoad : styles.maskLoadWaiting,
+            start && styles.maskLoadAt(delay + staggerMs(index), duration),
           )}
         >
           {children}
@@ -175,6 +175,7 @@ type LoadFadeProps = {
   children: ReactNode;
   sx?: StyleXStyles;
   as?: "div" | "p";
+  start?: boolean;
   delay?: number;
   duration?: number;
 };
@@ -183,43 +184,14 @@ export function LoadFade({
   children,
   sx,
   as = "div",
+  start = true,
   delay = 0,
   duration = REVEAL_SECONDS * 1000,
 }: LoadFadeProps) {
-  const props = stylex.props(styles.loadFade, styles.loadFadeAt(delay, duration), sx);
+  const props = stylex.props(
+    start ? styles.loadFade : styles.loadFadeWaiting,
+    start && styles.loadFadeAt(delay, duration),
+    sx,
+  );
   return as === "p" ? <p {...props}>{children}</p> : <div {...props}>{children}</div>;
-}
-
-const easeOutExpo = (t: number) => (t >= 1 ? 1 : 1 - 2 ** (-10 * t));
-
-export const formatCount = (value: number) => Math.round(value).toLocaleString("en-US");
-
-export function useCountUp<T extends HTMLElement = HTMLElement>(
-  target: number,
-  duration = COUNT_UP_MS,
-) {
-  const ref = useRef<T>(null);
-  const reduce = useReducedMotion();
-  const seen = useInView(ref, { once: true, amount: 0.5 });
-  const [value, setValue] = useState(target);
-  useEffect(() => {
-    if (reduce) {
-      setValue(target);
-      return;
-    }
-    if (!seen) {
-      setValue(0);
-      return;
-    }
-    let frame = 0;
-    const start = performance.now();
-    const tick = (now: number) => {
-      const progress = Math.min(1, (now - start) / duration);
-      setValue(target * easeOutExpo(progress));
-      if (progress < 1) frame = requestAnimationFrame(tick);
-    };
-    frame = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(frame);
-  }, [reduce, seen, target, duration]);
-  return { ref, value };
 }

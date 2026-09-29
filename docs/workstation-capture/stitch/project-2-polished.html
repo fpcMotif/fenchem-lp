@@ -1,0 +1,1276 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FENCHEM 泛成 · 全球功能性原料与创新解决方案</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Plus Jakarta Sans, Noto Sans SC, JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              brand: {
+                blue: "#0743AE",
+                "blue-hover": "#06358c",
+                "blue-dark": "#042259",
+                "navy-ground": "#06132B",
+                "navy-card": "#0B1B3D",
+                green: "#64A733",
+                "eco-bright": "#9FE870",
+                "eco-dim": "#4b8224",
+              },
+            },
+            fontFamily: {
+              sans: ['"Plus Jakarta Sans"', '"Noto Sans SC"', "sans-serif"],
+              mono: ['"JetBrains Mono"', "monospace"],
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      /* Technical Grid Lines & Precision Utilities */
+      .hairline-grid-dark {
+        background-size: 40px 40px;
+        background-image:
+          linear-gradient(to right, rgba(159, 232, 112, 0.05) 1px, transparent 1px),
+          linear-gradient(to bottom, rgba(159, 232, 112, 0.05) 1px, transparent 1px);
+      }
+      .dot-pattern-dark {
+        background-image: radial-gradient(rgba(159, 232, 112, 0.15) 1px, transparent 1px);
+        background-size: 24px 24px;
+      }
+      .ticker-container {
+        display: flex;
+        overflow: hidden;
+        width: 100%;
+      }
+      .ticker-track {
+        display: flex;
+        width: max-content;
+        animation: ticker 25s linear infinite;
+        will-change: transform;
+      }
+      .ticker-track:hover {
+        animation-play-state: paused;
+      }
+      @keyframes ticker {
+        0% {
+          transform: translateX(0);
+        }
+        100% {
+          transform: translateX(-50%);
+        }
+      }
+      /* Tabular Numeral Support */
+      .tabular {
+        font-variant-numeric: tabular-nums;
+      }
+      /* Smooth Accordion */
+      details > summary::-webkit-details-marker {
+        display: none;
+      }
+
+      .glass-panel {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+    </style>
+  </head>
+  <body
+    class="bg-[#F8FAFC] text-slate-900 font-sans antialiased selection:bg-[#0743AE] selection:text-white"
+  >
+    <!-- 1. Sticky Header & Frosted Navigation -->
+    <header
+      class="sticky top-0 z-50 w-full bg-white/85 backdrop-blur-md border-b border-slate-200 transition-all"
+    >
+      <div
+        class="max-w-[1360px] mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between"
+      >
+        <!-- Brand Logo & Beaker Mark -->
+        <a href="#" class="flex items-center gap-3.5 group">
+          <div
+            class="w-10 h-10 rounded-lg bg-[#0743AE] text-white flex items-center justify-center font-mono font-bold text-lg shadow-sm border border-blue-600/30 group-hover:bg-[#06358c] transition-colors"
+          >
+            <svg
+              class="w-5 h-5 text-[#9FE870]"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M4.5 3h15M6 3v16a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V3M6 14h12M9 9h4" />
+            </svg>
+          </div>
+          <div class="flex flex-col">
+            <div class="flex items-center gap-1.5">
+              <span class="text-xl font-extrabold tracking-tight text-[#0743AE] font-mono"
+                >FENCHEM</span
+              >
+              <span
+                class="text-xs px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 font-mono font-semibold border border-emerald-200"
+                >SINCE 1995</span
+              >
+            </div>
+            <span class="text-[11px] tracking-wider text-slate-500 font-medium -mt-0.5"
+              >泛成生物 · 全球功能性原料系统集成</span
+            >
+          </div>
+        </a>
+
+        <!-- Frosted Pill Navigation -->
+        <nav
+          class="hidden md:flex items-center p-1.5 rounded-full bg-white border border-slate-200 shadow-sm"
+        >
+          <a
+            href="#home"
+            class="px-4 py-1.5 rounded-full text-sm font-semibold bg-[#0743AE] text-white shadow-sm transition-all"
+            >首页</a
+          >
+          <a
+            href="#about"
+            class="px-4 py-1.5 rounded-full text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors"
+            >关于我们</a
+          >
+          <a
+            href="#advantages"
+            class="px-4 py-1.5 rounded-full text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors"
+            >核心优势</a
+          >
+          <a
+            href="#divisions"
+            class="px-4 py-1.5 rounded-full text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors"
+            >产品与应用</a
+          >
+          <a
+            href="#network"
+            class="px-4 py-1.5 rounded-full text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors"
+            >全球网络</a
+          >
+          <a
+            href="#news"
+            class="px-4 py-1.5 rounded-full text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors"
+            >新闻动态</a
+          >
+        </nav>
+
+        <!-- Right Action Utilities & CTA -->
+        <div class="flex items-center gap-3">
+          <!-- Quick Search Pill with Cmd+Q -->
+          <button
+            class="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-full bg-white border border-slate-200 text-slate-500 text-sm hover:border-slate-300 transition-colors"
+          >
+            <svg
+              class="w-4 h-4 text-slate-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              ></path>
+            </svg>
+            <span class="text-slate-400">检索配方 / CAS号</span>
+            <kbd
+              class="px-1.5 py-0.5 text-[10px] font-mono bg-slate-100 rounded text-slate-500 border border-slate-200"
+              >⌘Q</kbd
+            >
+          </button>
+
+          <!-- Primary Filled Brand Blue CTA -->
+          <a
+            href="#contact"
+            class="inline-flex items-center gap-1.5 px-4 sm:px-5 py-2 rounded-full bg-[#0743AE] hover:bg-[#06358c] text-white text-sm font-semibold tracking-wide shadow-sm hover:shadow transition-all border border-blue-700/40"
+          >
+            <span>联系我们</span>
+            <svg
+              class="w-4 h-4"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+            >
+              <path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M12 5l7 7-7 7" />
+            </svg>
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <!-- 2. Hero Section (Gradient & Glassmorphism) -->
+    <section
+      id="home"
+      class="relative overflow-hidden bg-gradient-to-br from-[#06132B] via-[#0743AE] to-[#042259] pt-16 pb-20 lg:pt-24 lg:pb-32 min-h-[600px] lg:min-h-[700px] flex items-center"
+    >
+      <!-- Floating Background Elements -->
+      <div class="absolute inset-0 overflow-hidden pointer-events-none">
+        <div
+          class="absolute w-[600px] h-[600px] bg-[#9FE870]/10 rounded-full blur-[100px] -top-32 -left-32 animate-[pulse_6s_ease-in-out_infinite]"
+        ></div>
+        <div
+          class="absolute w-[800px] h-[800px] bg-[#042259]/60 rounded-full blur-[120px] bottom-0 right-0"
+        ></div>
+      </div>
+
+      <div class="max-w-[1360px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
+        <!-- Laboratory Geolocation & Heritage Eyebrow Badge -->
+        <div
+          class="inline-flex items-center gap-2.5 px-3 py-1.5 rounded-full bg-white/10 border border-white/20 text-blue-50 text-xs font-mono mb-10 shadow-sm backdrop-blur-sm"
+        >
+          <span class="inline-block w-2 h-2 rounded-full bg-[#9FE870] animate-pulse"></span>
+          <span class="font-semibold tracking-wide">NANJING HQ</span>
+          <span class="text-white/30 font-sans">|</span>
+          <span class="font-sans font-medium">FENCHEM 泛成 · 始于 1995</span>
+        </div>
+
+        <!-- Main Scientific Value Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+          <div class="lg:col-span-7">
+            <h1
+              class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-[1.15] mb-8"
+            >
+              链接全球优质原料<br />
+              <span class="text-[#9FE870]">打造创新解决方案</span>
+            </h1>
+
+            <p
+              class="text-base sm:text-lg text-blue-100 leading-relaxed mb-10 max-w-2xl font-light"
+            >
+              依托全球化原料整合能力、前沿应用研发中心与覆盖全球的仓储交付网络，持续为人类营养、功能性食品、个人护理与宠物健康行业提供稳定、透明、符合国际药典级标准的高品质原料支持。
+            </p>
+
+            <!-- CTAs -->
+            <div class="flex flex-wrap items-center gap-5">
+              <a
+                href="#divisions"
+                class="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full bg-[#9FE870] hover:bg-[#8BD660] text-[#06132B] text-base font-bold shadow-lg hover:shadow-xl transition-all"
+              >
+                <span>探索产品方案</span>
+                <span class="font-mono">→</span>
+              </a>
+              <a
+                href="#about"
+                class="inline-flex items-center justify-center px-7 py-3.5 rounded-full bg-white/10 hover:bg-white/20 text-white text-base font-semibold border border-white/20 backdrop-blur-sm transition-all"
+              >
+                了解泛成实力
+              </a>
+            </div>
+          </div>
+
+          <!-- Clean Stats Grid in Frosted Glass -->
+          <div class="lg:col-span-5">
+            <div class="glass-panel rounded-2xl p-8 shadow-2xl relative overflow-hidden">
+              <div
+                class="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl pointer-events-none"
+              ></div>
+
+              <div class="flex flex-col gap-6">
+                <!-- Stat 1 -->
+                <div class="flex items-center gap-5 pb-6 border-b border-white/10">
+                  <div
+                    class="w-14 h-14 rounded-xl bg-white/10 flex items-center justify-center text-[#9FE870] border border-white/5"
+                  >
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="1.5"
+                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
+                  </div>
+                  <div>
+                    <div
+                      class="text-3xl font-extrabold text-white font-mono tabular tracking-tight"
+                    >
+                      1995
+                    </div>
+                    <div class="text-sm text-blue-200 mt-1">深耕行业三十余载</div>
+                  </div>
+                </div>
+
+                <!-- Stat 2 -->
+                <div class="flex items-center gap-5 pb-6 border-b border-white/10">
+                  <div
+                    class="w-14 h-14 rounded-xl bg-white/10 flex items-center justify-center text-[#9FE870] border border-white/5"
+                  >
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="1.5"
+                        d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
+                  </div>
+                  <div>
+                    <div
+                      class="text-3xl font-extrabold text-white font-mono tabular tracking-tight"
+                    >
+                      100<span class="text-[#9FE870]">+</span>
+                    </div>
+                    <div class="text-sm text-blue-200 mt-1">服务国家与地区</div>
+                  </div>
+                </div>
+
+                <!-- Stat 3 -->
+                <div class="flex items-center gap-5">
+                  <div
+                    class="w-14 h-14 rounded-xl bg-white/10 flex items-center justify-center text-[#9FE870] border border-white/5"
+                  >
+                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="1.5"
+                        d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+                      />
+                    </svg>
+                  </div>
+                  <div>
+                    <div
+                      class="text-3xl font-extrabold text-white font-mono tabular tracking-tight"
+                    >
+                      16
+                    </div>
+                    <div class="text-sm text-blue-200 mt-1">全球本土分支体系</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. Global Audited Standards Proof Bar (Ticker) -->
+    <section class="bg-[#041d4d] text-white border-y border-blue-900/50 py-4 overflow-hidden">
+      <div class="max-w-[1360px] mx-auto px-4 sm:px-6 lg:px-8 flex items-center gap-6">
+        <!-- Static Label -->
+        <div
+          class="flex-shrink-0 flex items-center gap-2 pr-6 border-r border-blue-800/50 hidden md:flex"
+        >
+          <span class="w-2 h-2 rounded-full bg-[#9FE870] animate-pulse"></span>
+          <span class="font-mono text-xs font-bold tracking-wider text-blue-200 uppercase"
+            >GLOBAL STANDARDS</span
+          >
+        </div>
+
+        <!-- Marquee Ticker -->
+        <div class="ticker-container">
+          <div class="ticker-track text-sm font-mono font-medium gap-6">
+            <!-- Group 1 -->
+            <div class="flex items-center gap-6">
+              <div
+                class="px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-blue-100 flex items-center gap-2 whitespace-nowrap"
+              >
+                <span class="w-1.5 h-1.5 rounded-full bg-[#9FE870]"></span>
+                <span>ISO 9001:2015 QUALITY CERTIFIED</span>
+              </div>
+              <div
+                class="px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-blue-100 flex items-center gap-2 whitespace-nowrap"
+              >
+                <span class="w-1.5 h-1.5 rounded-full bg-[#9FE870]"></span>
+                <span>FSSC 22000 FOOD SAFETY AUDIT</span>
+              </div>
+              <div
+                class="px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-blue-100 flex items-center gap-2 whitespace-nowrap"
+              >
+                <span class="w-1.5 h-1.5 rounded-full bg-[#9FE870]"></span>
+                <span>cGMP AUDITED MANUFACTURING</span>
+              </div>
+              <div
+                class="px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-blue-100 flex items-center gap-2 whitespace-nowrap"
+              >
+                <span class="w-1.5 h-1.5 rounded-full bg-[#9FE870]"></span>
+                <span>HACCP COMPLIANT SYSTEM</span>
+              </div>
+              <div
+                class="px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-blue-100 flex items-center gap-2 whitespace-nowrap"
+              >
+                <span class="w-1.5 h-1.5 rounded-full bg-[#9FE870]"></span>
+                <span>HALAL (MUI) GLOBAL CERTIFIED</span>
+              </div>
+              <div
+                class="px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-blue-100 flex items-center gap-2 whitespace-nowrap"
+              >
+                <span class="w-1.5 h-1.5 rounded-full bg-[#9FE870]"></span>
+                <span>KOSHER (OU) COMPLIANCE</span>
+              </div>
+            </div>
+            <!-- Group 2 (Duplicate for smooth loop) -->
+            <div class="flex items-center gap-6">
+              <div
+                class="px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-blue-100 flex items-center gap-2 whitespace-nowrap"
+              >
+                <span class="w-1.5 h-1.5 rounded-full bg-[#9FE870]"></span>
+                <span>ISO 9001:2015 QUALITY CERTIFIED</span>
+              </div>
+              <div
+                class="px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-blue-100 flex items-center gap-2 whitespace-nowrap"
+              >
+                <span class="w-1.5 h-1.5 rounded-full bg-[#9FE870]"></span>
+                <span>FSSC 22000 FOOD SAFETY AUDIT</span>
+              </div>
+              <div
+                class="px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-blue-100 flex items-center gap-2 whitespace-nowrap"
+              >
+                <span class="w-1.5 h-1.5 rounded-full bg-[#9FE870]"></span>
+                <span>cGMP AUDITED MANUFACTURING</span>
+              </div>
+              <div
+                class="px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-blue-100 flex items-center gap-2 whitespace-nowrap"
+              >
+                <span class="w-1.5 h-1.5 rounded-full bg-[#9FE870]"></span>
+                <span>HACCP COMPLIANT SYSTEM</span>
+              </div>
+              <div
+                class="px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-blue-100 flex items-center gap-2 whitespace-nowrap"
+              >
+                <span class="w-1.5 h-1.5 rounded-full bg-[#9FE870]"></span>
+                <span>HALAL (MUI) GLOBAL CERTIFIED</span>
+              </div>
+              <div
+                class="px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-blue-100 flex items-center gap-2 whitespace-nowrap"
+              >
+                <span class="w-1.5 h-1.5 rounded-full bg-[#9FE870]"></span>
+                <span>KOSHER (OU) COMPLIANCE</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. About Section (Clean White) -->
+    <section id="about" class="bg-white py-24 lg:py-32">
+      <div class="max-w-[1360px] mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- Eyebrow & Headline -->
+        <div class="max-w-3xl mb-16">
+          <div
+            class="inline-flex items-center gap-2 text-[#0743AE] font-mono text-sm font-bold uppercase tracking-wider mb-4"
+          >
+            <span class="w-1.5 h-1.5 rounded-full bg-[#0743AE]"></span>
+            ABOUT FENCHEM
+          </div>
+          <h2
+            class="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-slate-900 mb-6"
+          >
+            三十年专研，做全球品牌信赖的原料基石
+          </h2>
+          <p class="text-slate-600 text-base sm:text-lg leading-relaxed">
+            FENCHEM 泛成创立于 1995
+            年，总部设立于南京。公司始终立足于生命健康与精细化学品产业链前沿，建设有现代化制造基地、分析检测中心及遍布北美、欧洲、南美、东南亚的仓储物流基地，构建了从原产地溯源、质量可追溯到终端应用方案的全链路服务体系。
+          </p>
+        </div>
+
+        <!-- Sub-Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+          <!-- Card 01 -->
+          <div
+            class="bg-slate-50 border border-slate-200 rounded-2xl p-8 hover:shadow-lg transition-shadow"
+          >
+            <div class="flex items-center justify-between mb-6">
+              <span
+                class="font-mono text-sm font-bold text-[#0743AE] px-3 py-1.5 rounded-full bg-blue-50 border border-blue-100"
+                >01 / GLOBAL DISTRIBUTION</span
+              >
+            </div>
+            <h3 class="text-2xl font-bold text-slate-900 mb-4">全球布局 · 本地仓储与合规支持</h3>
+            <p class="text-slate-600 text-base leading-relaxed mb-8">
+              在美国、德国、荷兰、英国、巴西、南非等地设立全资子公司和现货仓储。熟悉
+              FDA、EFSA、REACH
+              等国际严苛监管准入条例，提供即时通关、原厂本地现货调拨及门到门技术资料对接。
+            </p>
+            <div
+              class="pt-6 border-t border-slate-200 flex items-center justify-between font-mono text-sm"
+            >
+              <span class="text-slate-500">READY STOCK HUBS: 16 CITIES</span>
+              <span class="text-[#0743AE] font-semibold">48H DISPATCH</span>
+            </div>
+          </div>
+
+          <!-- Card 02 -->
+          <div
+            class="bg-slate-50 border border-slate-200 rounded-2xl p-8 hover:shadow-lg transition-shadow"
+          >
+            <div class="flex items-center justify-between mb-6">
+              <span
+                class="font-mono text-sm font-bold text-[#0743AE] px-3 py-1.5 rounded-full bg-blue-50 border border-blue-100"
+                >02 / R&D INNOVATION</span
+              >
+            </div>
+            <h3 class="text-2xl font-bold text-slate-900 mb-4">应用研发 · 配方开发与稳定性测试</h3>
+            <p class="text-slate-600 text-base leading-relaxed mb-8">
+              配备先进制剂实验室、HPLC/GC-MS
+              分析仪器，提供感官改良、活性包埋、相容性测试与货架期加速稳定性试验。不仅交付高纯度单体原料，更输出成型产品配方解决方案与技术支持。
+            </p>
+            <div
+              class="pt-6 border-t border-slate-200 flex items-center justify-between font-mono text-sm"
+            >
+              <span class="text-slate-500">INSTRUMENTS: AGILENT HPLC / GC-MS</span>
+              <span class="text-[#0743AE] font-semibold">TURNKEY FORMULA</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Certification Banner -->
+        <div
+          class="p-6 rounded-2xl bg-[#06132B] text-white flex flex-col sm:flex-row items-center justify-between gap-6 shadow-xl"
+        >
+          <div class="flex items-center gap-4">
+            <div class="w-10 h-10 rounded-full bg-[#0743AE] flex items-center justify-center">
+              <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M5 13l4 4L19 7"
+                />
+              </svg>
+            </div>
+            <div>
+              <div class="text-lg font-bold">100% 批次留样检测 · COA 随货同附</div>
+              <div class="text-sm text-blue-200/80 font-mono mt-1">
+                RETENTION SAMPLE ARCHIVE FOR 36 MONTHS
+              </div>
+            </div>
+          </div>
+          <div class="flex items-center gap-3 font-mono text-sm">
+            <span class="px-3 py-1.5 rounded-lg bg-white/10 border border-white/20"
+              >HEAVY METALS &lt; 0.1ppm</span
+            >
+            <span class="px-3 py-1.5 rounded-lg bg-white/10 border border-white/20"
+              >MICROBIAL USP SPEC</span
+            >
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. Core Advantages -->
+    <section id="advantages" class="bg-[#F8FAFC] py-24 lg:py-32 border-y border-slate-200">
+      <div class="max-w-[1360px] mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="mb-16">
+          <div class="text-sm font-mono font-bold tracking-wider text-[#0743AE] uppercase mb-4">
+            SYSTEMIC CAPABILITY
+          </div>
+          <h2 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tight">
+            科学工程化优势 · 以严苛规格定义信赖
+          </h2>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <!-- Advantage 01 -->
+          <div
+            class="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all"
+          >
+            <div
+              class="w-12 h-12 rounded-xl bg-blue-50 text-[#0743AE] flex items-center justify-center mb-6"
+            >
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold text-slate-900 mb-3">全球资源整合</h3>
+            <p class="text-base text-slate-600 leading-relaxed mb-6">
+              从原产地农场种植基地、深海发酵源头到高精纯化车间，实施驻厂级品质督导，确保原料生物利用度与批次均一性。
+            </p>
+            <div
+              class="font-mono text-sm text-[#0743AE] font-semibold bg-blue-50/50 px-3 py-2 rounded-lg border border-blue-100"
+            >
+              ORIGIN TRACEABILITY
+            </div>
+          </div>
+
+          <!-- Advantage 02 -->
+          <div
+            class="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all"
+          >
+            <div
+              class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-6"
+            >
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                />
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold text-slate-900 mb-3">稳定供应保障</h3>
+            <p class="text-base text-slate-600 leading-relaxed mb-6">
+              常备跨洲级安全库存防线，规避国际海运波动与原材料周期性断供风险，为全球标杆药企及消费品牌筑牢交付底线。
+            </p>
+            <div
+              class="font-mono text-sm text-emerald-700 font-semibold bg-emerald-50/50 px-3 py-2 rounded-lg border border-emerald-100"
+            >
+              SAFETY STOCK 99.8%
+            </div>
+          </div>
+
+          <!-- Advantage 03 -->
+          <div
+            class="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all"
+          >
+            <div
+              class="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center mb-6"
+            >
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"
+                />
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold text-slate-900 mb-3">解决方案创新</h3>
+            <p class="text-base text-slate-600 leading-relaxed mb-6">
+              协同南京研发中心与国际高校专家智库，攻克活性成分透皮吸收、不良口感掩蔽、耐温耐酸等工业级应用技术瓶颈。
+            </p>
+            <div
+              class="font-mono text-sm text-amber-700 font-semibold bg-amber-50/50 px-3 py-2 rounded-lg border border-amber-100"
+            >
+              R&D FORMULATION
+            </div>
+          </div>
+
+          <!-- Advantage 04 -->
+          <div
+            class="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all"
+          >
+            <div
+              class="w-12 h-12 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center mb-6"
+            >
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                />
+              </svg>
+            </div>
+            <h3 class="text-xl font-bold text-slate-900 mb-3">长期战略伙伴</h3>
+            <p class="text-base text-slate-600 leading-relaxed mb-6">
+              30 年行业积淀与声誉，持续向全球 500
+              强营养及个护巨头提供合规准入咨询、定制化包装与长期锁价长协机制。
+            </p>
+            <div
+              class="font-mono text-sm text-purple-700 font-semibold bg-purple-50/50 px-3 py-2 rounded-lg border border-purple-100"
+            >
+              STRATEGIC TRUST
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. Core Product Divisions -->
+    <section id="divisions" class="bg-white py-24 lg:py-32">
+      <div class="max-w-[1360px] mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="mb-16">
+          <div class="text-sm font-mono font-bold text-[#0743AE] uppercase mb-4">
+            PRODUCT & APPLICATION MATRIX
+          </div>
+          <h2 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tight">
+            四大核心业务板块
+          </h2>
+        </div>
+
+        <!-- 4 Cards Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <!-- Division 1: Nutrition -->
+          <div
+            class="bg-[#F8FAFC] border border-slate-200 rounded-2xl overflow-hidden flex flex-col hover:border-[#F59E0B]/50 hover:shadow-xl transition-all group"
+          >
+            <div class="p-8 flex-1">
+              <div class="flex flex-col mb-8">
+                <div
+                  class="w-14 h-14 rounded-full bg-white shadow-sm flex items-center justify-center mb-6 group-hover:scale-110 transition-transform"
+                >
+                  <span class="w-4 h-4 rounded-full bg-[#F59E0B]"></span>
+                </div>
+                <h3 class="text-2xl font-bold text-slate-900 mb-2">人类营养健康</h3>
+                <div class="font-mono text-sm text-slate-500">NUTRITION</div>
+              </div>
+
+              <div class="p-4 bg-white rounded-xl border border-slate-100 mb-6 shadow-sm">
+                <div
+                  class="flex justify-between items-center text-[#F59E0B] font-mono text-sm font-bold mb-2"
+                >
+                  <span>SPEC: ACTIVE</span>
+                  <span class="px-2 py-1 bg-amber-50 rounded">HPLC ≥ 95%</span>
+                </div>
+                <p class="text-sm text-slate-600 font-sans leading-relaxed">
+                  药用级标准纯度，针对靶向吸收与活性保持优化。
+                </p>
+              </div>
+
+              <div class="space-y-3">
+                <div class="text-base font-semibold text-slate-900">核心应用：</div>
+                <div class="flex flex-wrap gap-2 text-sm text-slate-700">
+                  <span class="px-3 py-1.5 rounded-full bg-white border border-slate-200 shadow-sm"
+                    >肠道微生态</span
+                  >
+                  <span class="px-3 py-1.5 rounded-full bg-white border border-slate-200 shadow-sm"
+                    >女性活力</span
+                  >
+                  <span class="px-3 py-1.5 rounded-full bg-white border border-slate-200 shadow-sm"
+                    >情绪认知</span
+                  >
+                  <span class="px-3 py-1.5 rounded-full bg-white border border-slate-200 shadow-sm"
+                    >体重管理</span
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Division 2: Food -->
+          <div
+            class="bg-[#F8FAFC] border border-slate-200 rounded-2xl overflow-hidden flex flex-col hover:border-[#E48336]/50 hover:shadow-xl transition-all group"
+          >
+            <div class="p-8 flex-1">
+              <div class="flex flex-col mb-8">
+                <div
+                  class="w-14 h-14 rounded-full bg-white shadow-sm flex items-center justify-center mb-6 group-hover:scale-110 transition-transform"
+                >
+                  <span class="w-4 h-4 rounded-full bg-[#E48336]"></span>
+                </div>
+                <h3 class="text-2xl font-bold text-slate-900 mb-2">功能性食品</h3>
+                <div class="font-mono text-sm text-slate-500">FOOD SCIENCE</div>
+              </div>
+
+              <div class="p-4 bg-white rounded-xl border border-slate-100 mb-6 shadow-sm">
+                <div
+                  class="flex justify-between items-center text-[#E48336] font-mono text-sm font-bold mb-2"
+                >
+                  <span>SPEC: CLEAN</span>
+                  <span class="px-2 py-1 bg-orange-50 rounded">THERMAL 140°C</span>
+                </div>
+                <p class="text-sm text-slate-600 font-sans leading-relaxed">
+                  高热加工耐受，符合 Clean Label 清洁标签倡议。
+                </p>
+              </div>
+
+              <div class="space-y-3">
+                <div class="text-base font-semibold text-slate-900">核心应用：</div>
+                <div class="flex flex-wrap gap-2 text-sm text-slate-700">
+                  <span class="px-3 py-1.5 rounded-full bg-white border border-slate-200 shadow-sm"
+                    >膳食纤维</span
+                  >
+                  <span class="px-3 py-1.5 rounded-full bg-white border border-slate-200 shadow-sm"
+                    >植物胶体</span
+                  >
+                  <span class="px-3 py-1.5 rounded-full bg-white border border-slate-200 shadow-sm"
+                    >天然色素</span
+                  >
+                  <span class="px-3 py-1.5 rounded-full bg-white border border-slate-200 shadow-sm"
+                    >减糖基料</span
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Division 3: Cosmetics -->
+          <div
+            class="bg-[#F8FAFC] border border-slate-200 rounded-2xl overflow-hidden flex flex-col hover:border-[#A05EB5]/50 hover:shadow-xl transition-all group"
+          >
+            <div class="p-8 flex-1">
+              <div class="flex flex-col mb-8">
+                <div
+                  class="w-14 h-14 rounded-full bg-white shadow-sm flex items-center justify-center mb-6 group-hover:scale-110 transition-transform"
+                >
+                  <span class="w-4 h-4 rounded-full bg-[#A05EB5]"></span>
+                </div>
+                <h3 class="text-2xl font-bold text-slate-900 mb-2">个人护理原料</h3>
+                <div class="font-mono text-sm text-slate-500">COSMETICS</div>
+              </div>
+
+              <div class="p-4 bg-white rounded-xl border border-slate-100 mb-6 shadow-sm">
+                <div
+                  class="flex justify-between items-center text-[#A05EB5] font-mono text-sm font-bold mb-2"
+                >
+                  <span>SPEC: BIO-FERM</span>
+                  <span class="px-2 py-1 bg-purple-50 rounded">PURITY ≥ 98%</span>
+                </div>
+                <p class="text-sm text-slate-600 font-sans leading-relaxed">
+                  生物发酵衍生基底，亲肤屏障修护与透皮促渗。
+                </p>
+              </div>
+
+              <div class="space-y-3">
+                <div class="text-base font-semibold text-slate-900">核心应用：</div>
+                <div class="flex flex-wrap gap-2 text-sm text-slate-700">
+                  <span class="px-3 py-1.5 rounded-full bg-white border border-slate-200 shadow-sm"
+                    >透明质酸</span
+                  >
+                  <span class="px-3 py-1.5 rounded-full bg-white border border-slate-200 shadow-sm"
+                    >红没药醇</span
+                  >
+                  <span class="px-3 py-1.5 rounded-full bg-white border border-slate-200 shadow-sm"
+                    >特种植物油</span
+                  >
+                  <span class="px-3 py-1.5 rounded-full bg-white border border-slate-200 shadow-sm"
+                    >抗衰多肽</span
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Division 4: Pet/Feed -->
+          <div
+            class="bg-[#F8FAFC] border border-slate-200 rounded-2xl overflow-hidden flex flex-col hover:border-[#64A733]/50 hover:shadow-xl transition-all group"
+          >
+            <div class="p-8 flex-1">
+              <div class="flex flex-col mb-8">
+                <div
+                  class="w-14 h-14 rounded-full bg-white shadow-sm flex items-center justify-center mb-6 group-hover:scale-110 transition-transform"
+                >
+                  <span class="w-4 h-4 rounded-full bg-[#64A733]"></span>
+                </div>
+                <h3 class="text-2xl font-bold text-slate-900 mb-2">宠物营养</h3>
+                <div class="font-mono text-sm text-slate-500">PET CARE</div>
+              </div>
+
+              <div class="p-4 bg-white rounded-xl border border-slate-100 mb-6 shadow-sm">
+                <div
+                  class="flex justify-between items-center text-[#64A733] font-mono text-sm font-bold mb-2"
+                >
+                  <span>SPEC: ANIMAL</span>
+                  <span class="px-2 py-1 bg-emerald-50 rounded">AAFCO STD</span>
+                </div>
+                <p class="text-sm text-slate-600 font-sans leading-relaxed">
+                  符合欧美宠物营养标准体系，高适口性与免疫支持。
+                </p>
+              </div>
+
+              <div class="space-y-3">
+                <div class="text-base font-semibold text-slate-900">核心应用：</div>
+                <div class="flex flex-wrap gap-2 text-sm text-slate-700">
+                  <span class="px-3 py-1.5 rounded-full bg-white border border-slate-200 shadow-sm"
+                    >美毛胜肽</span
+                  >
+                  <span class="px-3 py-1.5 rounded-full bg-white border border-slate-200 shadow-sm"
+                    >硫酸软骨素</span
+                  >
+                  <span class="px-3 py-1.5 rounded-full bg-white border border-slate-200 shadow-sm"
+                    >免疫球蛋白</span
+                  >
+                  <span class="px-3 py-1.5 rounded-full bg-white border border-slate-200 shadow-sm"
+                    >关节健康</span
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7. Global Network (Card Grid, No SVG Map) -->
+    <section id="network" class="bg-[#F8FAFC] py-24 lg:py-32 border-y border-slate-200">
+      <div class="max-w-[1360px] mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="mb-16 flex flex-col md:flex-row md:items-end justify-between">
+          <div>
+            <div class="text-sm font-mono font-bold text-[#0743AE] uppercase mb-4">
+              GLOBAL WAREHOUSING & PRESENCE
+            </div>
+            <h2
+              class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tight"
+            >
+              全球 16 处办事机构与仓储网络
+            </h2>
+          </div>
+          <div
+            class="mt-6 md:mt-0 px-4 py-2 bg-white rounded-lg border border-slate-200 font-mono text-sm text-slate-500 shadow-sm"
+          >
+            ORIGIN: NANJING (N 32.06° / E 118.79°)
+          </div>
+        </div>
+
+        <!-- 4 Regional Hubs Detail Cards (Clean Grid) -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div
+            class="p-8 rounded-2xl border border-slate-200 bg-white hover:shadow-xl transition-shadow border-l-[6px] border-l-[#0743AE]"
+          >
+            <div class="flex items-center justify-between font-mono text-sm mb-4">
+              <span class="font-bold text-[#0743AE]">ASIA PACIFIC</span>
+              <span class="text-slate-400">HQ HUB</span>
+            </div>
+            <div class="text-xl font-bold text-slate-900 mb-2">亚太及中国总部</div>
+            <p class="text-sm text-slate-500 font-mono mb-6 pb-6 border-b border-slate-100">
+              NANJING · SHANGHAI · TOKYO
+            </p>
+            <div class="text-base text-slate-600 leading-relaxed">
+              35,000 m² 综合研发基地与中心仓储，辐射中日韩及东南亚市场。
+            </div>
+          </div>
+
+          <div
+            class="p-8 rounded-2xl border border-slate-200 bg-white hover:shadow-xl transition-shadow border-l-[6px] border-l-[#0743AE]"
+          >
+            <div class="flex items-center justify-between font-mono text-sm mb-4">
+              <span class="font-bold text-[#0743AE]">EUROPE</span>
+              <span class="text-slate-400">EU REACH HUB</span>
+            </div>
+            <div class="text-xl font-bold text-slate-900 mb-2">欧洲运营中心</div>
+            <p class="text-sm text-slate-500 font-mono mb-6 pb-6 border-b border-slate-100">
+              ROTTERDAM · COLOGNE · LONDON
+            </p>
+            <div class="text-base text-slate-600 leading-relaxed">
+              鹿特丹保税主仓，欧共体全项合规登记与 48 小时公路干线交付。
+            </div>
+          </div>
+
+          <div
+            class="p-8 rounded-2xl border border-slate-200 bg-white hover:shadow-xl transition-shadow border-l-[6px] border-l-[#0743AE]"
+          >
+            <div class="flex items-center justify-between font-mono text-sm mb-4">
+              <span class="font-bold text-[#0743AE]">NORTH AMERICA</span>
+              <span class="text-slate-400">FDA REGISTERED</span>
+            </div>
+            <div class="text-xl font-bold text-slate-900 mb-2">北美运营中心</div>
+            <p class="text-sm text-slate-500 font-mono mb-6 pb-6 border-b border-slate-100">
+              CHICAGO · LOS ANGELES
+            </p>
+            <div class="text-base text-slate-600 leading-relaxed">
+              东西海岸双核心现货储备，cGMP 审计合格本地化仓储设施。
+            </div>
+          </div>
+
+          <div
+            class="p-8 rounded-2xl border border-slate-200 bg-white hover:shadow-xl transition-shadow border-l-[6px] border-l-[#0743AE]"
+          >
+            <div class="flex items-center justify-between font-mono text-sm mb-4">
+              <span class="font-bold text-[#0743AE]">LATAM & AFRICA</span>
+              <span class="text-slate-400">EMERGING HUBS</span>
+            </div>
+            <div class="text-xl font-bold text-slate-900 mb-2">拉美与非洲分支</div>
+            <p class="text-sm text-slate-500 font-mono mb-6 pb-6 border-b border-slate-100">
+              SÃO PAULO · JOHANNESBURG
+            </p>
+            <div class="text-base text-slate-600 leading-relaxed">
+              提供本地本币结算、清关技术文书支持及定制化区域配方调整。
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8. News & Exhibitions Accordion -->
+    <section id="news" class="bg-white py-24 lg:py-32">
+      <div class="max-w-[1360px] mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="mb-16">
+          <div class="text-sm font-mono font-bold tracking-wider text-[#0743AE] uppercase mb-4">
+            GLOBAL INDUSTRY AGENDA
+          </div>
+          <h2 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tight">
+            新闻动态与全球展会日历
+          </h2>
+        </div>
+
+        <div class="border-t border-slate-200 divide-y divide-slate-200">
+          <!-- Accordion Item 1 -->
+          <details class="group py-6 transition-colors hover:bg-slate-50/50 px-4 rounded-lg" open>
+            <summary class="flex items-center justify-between cursor-pointer list-none">
+              <div class="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-8">
+                <span class="text-sm text-slate-400 font-mono w-32">2026.09.23–09.24</span>
+                <span
+                  class="text-sm px-3 py-1 rounded-full bg-purple-50 text-purple-700 font-bold border border-purple-200 w-fit"
+                  >COSMETICS</span
+                >
+                <span class="font-sans font-bold text-slate-900 text-lg"
+                  >In-cosmetics Latin America 2026 · 圣保罗</span
+                >
+              </div>
+              <div class="text-slate-400 group-open:rotate-180 transition-transform duration-200">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M19 9l-7 7-7-7"
+                  />
+                </svg>
+              </div>
+            </summary>
+            <div class="pt-6 sm:pl-48 text-base text-slate-600 font-sans leading-relaxed">
+              FENCHEM 将携最新生物发酵级透明质酸、特种植物精粹与天然活性屏障修复剂亮相展台（Booth
+              #D42）。现场将发布《2026 拉美个护绿色配方技术白皮书》。
+            </div>
+          </details>
+
+          <!-- Accordion Item 2 -->
+          <details class="group py-6 transition-colors hover:bg-slate-50/50 px-4 rounded-lg">
+            <summary class="flex items-center justify-between cursor-pointer list-none">
+              <div class="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-8">
+                <span class="text-sm text-slate-400 font-mono w-32">2026.10.15–10.18</span>
+                <span
+                  class="text-sm px-3 py-1 rounded-full bg-blue-50 text-blue-700 font-bold border border-blue-200 w-fit"
+                  >CONGRESS</span
+                >
+                <span class="font-sans font-bold text-slate-900 text-lg"
+                  >IFSCC Congress 2026 国际化妆品技术者联盟大会</span
+                >
+              </div>
+              <div class="text-slate-400 group-open:rotate-180 transition-transform duration-200">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M19 9l-7 7-7-7"
+                  />
+                </svg>
+              </div>
+            </summary>
+            <div class="pt-6 sm:pl-48 text-base text-slate-600 font-sans leading-relaxed">
+              泛成科研团队将发表关于“天然多肽在表皮渗透动力学中的模型研究”的主题报告，展示与国内外顶尖实验室联合研发的突破性活性物稳定递送体系。
+            </div>
+          </details>
+
+          <!-- Accordion Item 3 -->
+          <details class="group py-6 transition-colors hover:bg-slate-50/50 px-4 rounded-lg">
+            <summary class="flex items-center justify-between cursor-pointer list-none">
+              <div class="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-8">
+                <span class="text-sm text-slate-400 font-mono w-32">2026.07.12–07.14</span>
+                <span
+                  class="text-sm px-3 py-1 rounded-full bg-amber-50 text-amber-700 font-bold border border-amber-200 w-fit"
+                  >NUTRITION</span
+                >
+                <span class="font-sans font-bold text-slate-900 text-lg"
+                  >Naturally Kiawah 全球天然健康产业峰会</span
+                >
+              </div>
+              <div class="text-slate-400 group-open:rotate-180 transition-transform duration-200">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M19 9l-7 7-7-7"
+                  />
+                </svg>
+              </div>
+            </summary>
+            <div class="pt-6 sm:pl-48 text-base text-slate-600 font-sans leading-relaxed">
+              聚焦膳食补充剂与健康老龄化趋势，FENCHEM 全面展示高生物利用度微囊叶黄素、天然维生素 E
+              及植物磷脂酰丝氨酸解决方案。
+            </div>
+          </details>
+
+          <!-- Accordion Item 4 -->
+          <details class="group py-6 transition-colors hover:bg-slate-50/50 px-4 rounded-lg">
+            <summary class="flex items-center justify-between cursor-pointer list-none">
+              <div class="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-8">
+                <span class="text-sm text-slate-400 font-mono w-32">2026.04.14–04.16</span>
+                <span
+                  class="text-sm px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 font-bold border border-emerald-200 w-fit"
+                  >EXPO</span
+                >
+                <span class="font-sans font-bold text-slate-900 text-lg"
+                  >In-cosmetics Global 2026 · 巴黎</span
+                >
+              </div>
+              <div class="text-slate-400 group-open:rotate-180 transition-transform duration-200">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M19 9l-7 7-7-7"
+                  />
+                </svg>
+              </div>
+            </summary>
+            <div class="pt-6 sm:pl-48 text-base text-slate-600 font-sans leading-relaxed">
+              欧洲市场年度最大盛会。展位设于巴黎凡尔赛门展馆 1
+              号馆，泛成欧洲全资子公司团队全面驻场，提供现场技术配方体验与即时合规答疑。
+            </div>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <!-- 9. Upgraded High-End CTA Section -->
+    <section
+      id="contact"
+      class="relative py-28 lg:py-40 bg-gradient-to-b from-[#0743AE] to-[#042259] text-white overflow-hidden dot-pattern-dark"
+    >
+      <div class="max-w-[1360px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+        <!-- Headline -->
+        <h2
+          class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white mb-8 relative inline-block"
+        >
+          <span class="absolute inset-0 blur-2xl bg-white/10 rounded-full"></span>
+          <span class="relative">开启更具竞争力的产品创新</span>
+        </h2>
+
+        <!-- Description -->
+        <p
+          class="text-blue-100 text-lg sm:text-xl max-w-3xl mx-auto leading-relaxed mb-12 font-light"
+        >
+          无论是寻求高纯度单体原料现货供应、定制技术规格，还是联合开发下一代功效配方，FENCHEM
+          全球资深工程师团队随时为您提供专业支持。
+        </p>
+
+        <!-- Action Buttons -->
+        <div class="flex flex-wrap items-center justify-center gap-6">
+          <a
+            href="mailto:info@fenchem.com"
+            class="px-8 py-4 rounded-full bg-white text-[#0743AE] hover:bg-blue-50 text-base font-bold shadow-xl hover:shadow-2xl transition-all"
+          >
+            索取样品与报价单
+          </a>
+          <a
+            href="tel:+862584218888"
+            class="px-8 py-4 rounded-full bg-white/10 hover:bg-white/20 text-white text-base font-semibold backdrop-blur-md border border-white/20 transition-all"
+          >
+            致电总部顾问 (+86 25 8421 8888)
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- 10. Clean Engineering Footer -->
+    <footer class="bg-[#042259] text-slate-300 font-sans py-24">
+      <div class="max-w-[1360px] mx-auto px-4 sm:px-6 lg:px-8">
+        <!-- 5-Column Engineering Layout -->
+        <div
+          class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 pb-16 border-b border-slate-700"
+        >
+          <!-- Column 1: Brand & HQ Coordinates -->
+          <div class="lg:col-span-2">
+            <div class="flex items-center gap-3 mb-6">
+              <div
+                class="w-10 h-10 rounded-lg bg-[#0743AE] text-white flex items-center justify-center font-mono font-bold text-lg"
+              >
+                FC
+              </div>
+              <span class="text-2xl font-extrabold text-white tracking-tight">FENCHEM 泛成</span>
+            </div>
+            <p class="text-base text-slate-400 leading-relaxed mb-8 max-w-sm">
+              创立于 1995
+              年的高端功能性原料综合解决方案供应商。立足生命科学，以严苛实验标准链接全球品牌。
+            </p>
+            <div class="font-mono text-sm text-slate-400 space-y-2">
+              <div>HQ: 江苏省南京市玄武区苏宁大道 1-1 号</div>
+              <div>EMAIL: info@fenchem.com</div>
+              <div>TEL: +86 25 8421 8888</div>
+            </div>
+          </div>
+
+          <!-- Column 2: Product Divisions -->
+          <div>
+            <div
+              class="text-sm font-bold text-white uppercase tracking-wider mb-6 border-l-4 border-l-[#0743AE] pl-3"
+            >
+              核心业务
+            </div>
+            <ul class="space-y-4 text-sm text-slate-400">
+              <li>
+                <a href="#divisions" class="hover:text-white transition-colors">人类营养健康</a>
+              </li>
+              <li>
+                <a href="#divisions" class="hover:text-white transition-colors">功能性食品</a>
+              </li>
+              <li>
+                <a href="#divisions" class="hover:text-white transition-colors">个人护理原料</a>
+              </li>
+              <li>
+                <a href="#divisions" class="hover:text-white transition-colors">宠物与动物营养</a>
+              </li>
+              <li>
+                <a href="#divisions" class="hover:text-white transition-colors">精细化工中间体</a>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Column 3: Quality & Audit -->
+          <div>
+            <div
+              class="text-sm font-bold text-white uppercase tracking-wider mb-6 border-l-4 border-l-[#0743AE] pl-3"
+            >
+              品质与合规
+            </div>
+            <ul class="space-y-4 text-sm text-slate-400 font-mono">
+              <li><a href="#about" class="hover:text-white transition-colors">ISO 9001:2015</a></li>
+              <li><a href="#about" class="hover:text-white transition-colors">FSSC 22000</a></li>
+              <li><a href="#about" class="hover:text-white transition-colors">cGMP AUDITED</a></li>
+              <li>
+                <a href="#about" class="hover:text-white transition-colors">HALAL & KOSHER</a>
+              </li>
+              <li>
+                <a href="#about" class="hover:text-white transition-colors">COA VALIDATION</a>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Column 4: Global Footprint -->
+          <div>
+            <div
+              class="text-sm font-bold text-white uppercase tracking-wider mb-6 border-l-4 border-l-[#0743AE] pl-3"
+            >
+              全球网络
+            </div>
+            <ul class="space-y-4 text-sm text-slate-400 font-mono">
+              <li>
+                <a href="#network" class="hover:text-white transition-colors">NANJING (HQ)</a>
+              </li>
+              <li>
+                <a href="#network" class="hover:text-white transition-colors">CHICAGO / LA</a>
+              </li>
+              <li>
+                <a href="#network" class="hover:text-white transition-colors">ROTTERDAM / DE</a>
+              </li>
+              <li><a href="#network" class="hover:text-white transition-colors">SÃO PAULO</a></li>
+              <li>
+                <a href="#network" class="hover:text-white transition-colors">JOHANNESBURG</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Copyright and Bottom Disclaimer -->
+        <div
+          class="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-mono text-slate-500"
+        >
+          <div>© 1995–2026 FENCHEM BIOTECH CO., LTD. ALL RIGHTS RESERVED.</div>
+          <div class="flex items-center gap-6">
+            <a href="#" class="hover:text-slate-400 transition-colors">PRIVACY POLICY</a>
+            <a href="#" class="hover:text-slate-400 transition-colors">TERMS OF COMPLIANCE</a>
+            <span class="font-sans">苏ICP备05008888号</span>
+          </div>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

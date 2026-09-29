@@ -1,206 +1,179 @@
 import * as stylex from "@stylexjs/stylex";
-import { Plus } from "lucide-react";
-import { AnimatePresence, m } from "motion/react";
-import { useId, useState } from "react";
+import { ArrowRight } from "lucide-react";
 
-import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
+import { Reveal } from "./motion";
+import { color, ease, font, layout as layoutTokens, media } from "./tokens.stylex";
+import { SectionHeader, TextLink, layout } from "./ui";
 
-import { NEWS, NEWS_TITLE } from "./content";
-import { EASE_OUT, Reveal } from "./motion";
-import { color, media } from "./tokens.stylex";
-import { layout } from "./ui";
+const HOVER_MS = "150ms";
+const EVENTS_HREF = "#news";
 
-const HEADER_HEIGHT = 80;
+const FEATURED = {
+  title: "In-cosmetics® 拉丁美洲展",
+  meta: "2026.09.23–24 · 巴西 圣保罗",
+  body: "欢迎参加 2026 年 In-cosmetics® 拉丁美洲展",
+} as const;
 
-const INK = "#1a1a1a";
-const BODY_TEXT = "#4d4d4d";
-const SURFACE = "#f6f6f6";
+const UPCOMING = [
+  { title: "IFSCC 大会 2026", year: "2026" },
+  { title: "Naturally Kiawah 研讨会 2026", year: "2026" },
+  { title: "In-cosmetics® Global 2026", year: "2026" },
+] as const;
 
 const styles = stylex.create({
-  anchor: {
-    scrollMarginTop: HEADER_HEIGHT,
+  section: {
+    backgroundColor: color.paper,
+    fontFamily: font.display,
+    paddingBlock: {
+      default: layoutTokens.sectionPadMobile,
+      [media.tablet]: layoutTokens.sectionPadTablet,
+      [media.desktop]: 128,
+    },
   },
-  sectionTitle: {
+  list: {
     margin: 0,
-    fontSize: { default: 26, [media.tablet]: 32, [media.desktop]: 40 },
-    fontWeight: 700,
-    lineHeight: 1.2,
-    color: INK,
-    textWrap: "balance",
-  },
-  mutedText: {
-    margin: 0,
-    fontSize: 16,
-    lineHeight: 1.2,
-    color: BODY_TEXT,
-    textWrap: "pretty",
-  },
-  news: {
-    paddingTop: 48,
-    paddingBottom: { default: 72, [media.desktop]: 96 },
-    backgroundColor: "#ffffff",
-  },
-  newsInner: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 32,
-  },
-  accordion: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 12,
-    margin: 0,
+    marginTop: { default: 32, [media.tablet]: 48, [media.desktop]: 56 },
     padding: 0,
     listStyleType: "none",
+    borderTopWidth: 1,
+    borderTopStyle: "solid",
+    borderTopColor: color.rule,
   },
-  newsItem: {
-    paddingBottom: 12,
-    backgroundColor: SURFACE,
+  item: {
+    borderBottomWidth: 1,
+    borderBottomStyle: "solid",
+    borderBottomColor: color.rule,
   },
-  newsHeading: {
-    margin: 0,
-  },
-  newsTrigger: {
+  row: {
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",
-    gap: 16,
-    width: "100%",
-    paddingTop: 24,
-    paddingInline: 24,
-    paddingBottom: 12,
-    borderWidth: 0,
-    backgroundColor: "transparent",
-    fontFamily: "inherit",
-    fontSize: 16,
-    fontWeight: 700,
-    lineHeight: 1.2,
-    textAlign: "start",
-    color: { default: INK, ":hover": color.royal },
-    cursor: "pointer",
+    columnGap: 24,
+    color: { default: color.ink, ":hover": color.royal, ":focus-visible": color.royal },
+    textDecoration: "none",
     transitionProperty: "color",
-    transitionDuration: "150ms",
-    transitionTimingFunction: "ease",
-    outlineStyle: { default: "none", ":focus-visible": "solid" },
-    outlineWidth: 2,
-    outlineColor: color.royal,
-    outlineOffset: -2,
+    transitionDuration: HOVER_MS,
+    transitionTimingFunction: ease.out,
   },
-  newsIconSlot: {
-    position: "relative",
-    flexShrink: 0,
-    width: 16,
-    height: 16,
+  rowFeatured: {
+    paddingBlock: { default: 32, [media.tablet]: 40, [media.desktop]: 48 },
   },
-  newsIconLayer: {
-    position: "absolute",
-    inset: 0,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
+  rowCompact: {
+    paddingBlock: { default: 20, [media.tabletUp]: 24 },
   },
-  newsPanel: {
-    overflow: "hidden",
-  },
-  newsPanelInner: {
+  featuredText: {
     display: "flex",
     flexDirection: "column",
-    gap: 12,
-    paddingInline: 24,
-    paddingBottom: 12,
+    rowGap: 12,
+    minWidth: 0,
+  },
+  meta: {
+    margin: 0,
+    fontSize: 14,
+    fontWeight: 400,
+    lineHeight: 1.5,
+    fontVariantNumeric: "tabular-nums",
+    color: color.inkMuted,
+  },
+  featuredTitle: {
+    margin: 0,
+    fontSize: { default: 24, [media.tablet]: 28, [media.desktop]: 32 },
+    fontWeight: 700,
+    lineHeight: 1.3,
+    color: "inherit",
+  },
+  featuredBody: {
+    margin: 0,
+    fontSize: 16,
+    fontWeight: 400,
+    lineHeight: 1.6,
+    color: color.inkMuted,
+  },
+  compactTitle: {
+    margin: 0,
+    minWidth: 0,
+    fontSize: { default: 18, [media.tabletUp]: 20 },
+    fontWeight: 700,
+    lineHeight: 1.4,
+    color: "inherit",
+  },
+  tail: {
+    display: "flex",
+    alignItems: "center",
+    flexShrink: 0,
+    columnGap: 16,
+  },
+  arrow: {
+    flexShrink: 0,
+    opacity: {
+      default: 1,
+      [media.hoverMotion]: 0,
+      [stylex.when.ancestor(":hover")]: { default: null, [media.hoverMotion]: 1 },
+      [stylex.when.ancestor(":focus-visible")]: { default: null, [media.hoverMotion]: 1 },
+    },
+    transform: {
+      default: null,
+      [media.hoverMotion]: "translateX(-8px)",
+      [stylex.when.ancestor(":hover")]: { default: null, [media.hoverMotion]: "translateX(0)" },
+      [stylex.when.ancestor(":focus-visible")]: {
+        default: null,
+        [media.hoverMotion]: "translateX(0)",
+      },
+    },
+    transitionProperty: "opacity, transform",
+    transitionDuration: HOVER_MS,
+    transitionTimingFunction: ease.out,
   },
 });
 
-function AccordionIcon({ open }: { open: boolean }) {
-  const reduce = useReducedMotion();
+function RowArrow() {
   return (
-    <span aria-hidden="true" {...stylex.props(styles.newsIconSlot)}>
-      <m.span
-        {...stylex.props(styles.newsIconLayer)}
-        animate={{ rotate: open ? 45 : 0 }}
-        transition={reduce ? { duration: 0 } : { type: "spring", duration: 0.3, bounce: 0 }}
-      >
-        <Plus size={16} strokeWidth={2} absoluteStrokeWidth />
-      </m.span>
-    </span>
-  );
-}
-
-function NewsItem({
-  item,
-  open,
-  onToggle,
-}: {
-  item: (typeof NEWS)[number];
-  open: boolean;
-  onToggle: () => void;
-}) {
-  const reduce = useReducedMotion();
-  const panelId = useId();
-  return (
-    <>
-      <h3 {...stylex.props(styles.newsHeading)}>
-        <button
-          type="button"
-          aria-expanded={open}
-          aria-controls={panelId}
-          onClick={onToggle}
-          {...stylex.props(styles.newsTrigger)}
-        >
-          <span>{item.title}</span>
-          <AccordionIcon open={open} />
-        </button>
-      </h3>
-      <AnimatePresence initial={false}>
-        {open ? (
-          <m.div
-            key="panel"
-            id={panelId}
-            {...stylex.props(styles.newsPanel)}
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: reduce ? 0 : 0.25, ease: EASE_OUT }}
-          >
-            <div {...stylex.props(styles.newsPanelInner)}>
-              {item.details.map((detail) => (
-                <p key={detail} {...stylex.props(styles.mutedText)}>
-                  {detail}
-                </p>
-              ))}
-            </div>
-          </m.div>
-        ) : null}
-      </AnimatePresence>
-    </>
+    <ArrowRight
+      size={20}
+      strokeWidth={2}
+      absoluteStrokeWidth
+      aria-hidden="true"
+      {...stylex.props(styles.arrow)}
+    />
   );
 }
 
 export function News() {
-  const [openIndex, setOpenIndex] = useState<number | null>(0);
   return (
-    <section
-      id="news"
-      aria-labelledby="oo-news-title"
-      {...stylex.props(styles.news, styles.anchor)}
-    >
-      <div {...stylex.props(layout.shell, layout.inset, styles.newsInner)}>
-        <Reveal>
-          <h2 id="oo-news-title" {...stylex.props(styles.sectionTitle)}>
-            {NEWS_TITLE}
-          </h2>
-        </Reveal>
-        <ul {...stylex.props(styles.accordion)}>
-          {NEWS.map((item, index) => (
-            <li key={item.title}>
-              <Reveal index={index} sx={styles.newsItem}>
-                <NewsItem
-                  item={item}
-                  open={openIndex === index}
-                  onToggle={() => setOpenIndex(openIndex === index ? null : index)}
-                />
-              </Reveal>
-            </li>
+    <section id="news" aria-labelledby="oo-news-title" {...stylex.props(styles.section)}>
+      <div {...stylex.props(layout.shell, layout.inset)}>
+        <SectionHeader
+          id="oo-news-title"
+          title="新闻资讯"
+          action={<TextLink href={EVENTS_HREF}>全部资讯</TextLink>}
+        />
+        <ul {...stylex.props(styles.list)}>
+          <Reveal as="li" sx={styles.item}>
+            <a
+              href={EVENTS_HREF}
+              {...stylex.props(styles.row, styles.rowFeatured, stylex.defaultMarker())}
+            >
+              <div {...stylex.props(styles.featuredText)}>
+                <p {...stylex.props(styles.meta)}>{FEATURED.meta}</p>
+                <h3 {...stylex.props(styles.featuredTitle)}>{FEATURED.title}</h3>
+                <p {...stylex.props(styles.featuredBody)}>{FEATURED.body}</p>
+              </div>
+              <RowArrow />
+            </a>
+          </Reveal>
+          {UPCOMING.map((event, index) => (
+            <Reveal key={event.title} as="li" index={index + 1} sx={styles.item}>
+              <a
+                href={EVENTS_HREF}
+                {...stylex.props(styles.row, styles.rowCompact, stylex.defaultMarker())}
+              >
+                <h3 {...stylex.props(styles.compactTitle)}>{event.title}</h3>
+                <div {...stylex.props(styles.tail)}>
+                  <p {...stylex.props(styles.meta)}>{event.year}</p>
+                  <RowArrow />
+                </div>
+              </a>
+            </Reveal>
           ))}
         </ul>
       </div>

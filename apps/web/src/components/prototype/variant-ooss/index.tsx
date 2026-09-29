@@ -1,30 +1,29 @@
 import * as stylex from "@stylexjs/stylex";
 import { LazyMotion, MotionConfig, domAnimation } from "motion/react";
-import { useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { preinit, preload } from "react-dom";
 
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
-import { About } from "./about";
+import { Campus } from "./about";
 import { HERO } from "./content";
-import { SiteFooter } from "./footer";
+import { ContactBand, SiteFooter } from "./footer";
 import { SiteHeader } from "./header";
 import { Hero } from "./hero";
 import { Markets } from "./markets";
 import { Network } from "./network";
 import { News } from "./news";
-import { Strengths } from "./strengths";
 import { color, font } from "./tokens.stylex";
 
 const GOOGLE_FONTS =
-  "https://fonts.googleapis.com/css2?family=Inter+Tight:wght@600;700&family=Noto+Sans+SC:wght@400;700&display=swap";
+  "https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;600;700&family=Noto+Sans+SC:wght@400;700&display=swap";
 
 const styles = stylex.create({
   root: {
     position: "relative",
     backgroundColor: color.paper,
     color: color.ink,
-    fontFamily: font.cjk,
+    fontFamily: font.display,
     WebkitFontSmoothing: "antialiased",
     MozOsxFontSmoothing: "grayscale",
     "::selection": {
@@ -59,6 +58,8 @@ export function VariantOOSS() {
   preinit(GOOGLE_FONTS, { as: "style" });
   preload(HERO.image, { as: "image", fetchPriority: "high" });
   const reduce = useReducedMotion();
+  const [introStarted, setIntroStarted] = useState(false);
+  const startIntro = useCallback(() => setIntroStarted(true), []);
   useEffect(() => {
     if (reduce) return;
     const root = document.documentElement;
@@ -76,14 +77,14 @@ export function VariantOOSS() {
             <a href="#main-content" {...stylex.props(styles.skipLink)}>
               跳到主要内容
             </a>
-            <SiteHeader />
+            <SiteHeader introStarted={introStarted} />
             <main id="main-content" tabIndex={-1} {...stylex.props(styles.mainTarget)}>
-              <Hero />
-              <About />
-              <Strengths />
+              <Hero ready={introStarted} onReady={startIntro} />
+              <Campus />
               <Markets />
               <Network />
               <News />
+              <ContactBand />
             </main>
             <SiteFooter />
           </div>

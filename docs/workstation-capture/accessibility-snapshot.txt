@@ -1,0 +1,264 @@
+- generic [ref=e1] clickable [onclick]
+  - banner
+    - link "FENCHEM" [ref=e4]
+      - image "FENCHEM"
+    - navigation
+      - StaticText "首页"
+      - StaticText "关于我们"
+      - StaticText "产品与应用"
+      - StaticText "研发与生产"
+      - StaticText "职业发展"
+      - StaticText "联系我们"
+    - StaticText "AI 搜索"
+    - button [ref=e5]
+    - StaticText "CN"
+  - main
+    - main
+      - generic
+        - image "泛成生物"
+        - heading "链接全球优质原料，打造创新解决方案。" [level=2, ref=e18]
+        - paragraph
+          - StaticText "通过全球化资源、创新能力与稳定供应链，赋能营养健康、食品、个人护理及宠物健康客户。"
+        - button "了解产品" [ref=e19]
+        - button "联系我们" [ref=e20]
+      - generic
+        - heading "关于泛成" [level=2, ref=e21]
+        - paragraph
+          - StaticText "南京泛成国际控股有限公司是行业内领先的原料供应商，凭借现代化生产基地和专业研发能力、遍布全球的分公司网络，为客户提供一站式定制化解决方案。我们经过三十多年的发展和经验积累，已成为全球范围内同行业中最具影响力的公司之一。"
+        - button "更多" [ref=e22]
+        - paragraph
+          - StaticText "公司历史"
+        - paragraph
+          - StaticText "30+"
+        - paragraph
+          - StaticText "三十余年行业积淀"
+        - paragraph
+          - StaticText "全球分公司"
+        - paragraph
+          - StaticText "16"
+        - paragraph
+          - StaticText "全球16家分支机构"
+        - paragraph
+          - StaticText "生产基地"
+        - paragraph
+          - StaticText "35,000m²"
+        - paragraph
+          - StaticText "制造与解决方案"
+      - generic
+        - heading "为什么选择泛成" [level=2, ref=e23]
+        - paragraph
+          - StaticText "我们整合全球资源、供应保障、解决方案创新与本地化服务，帮助客户将创意转化为市场成功。"
+        - generic [ref=e24] clickable [cursor:pointer]
+          - generic
+            - image
+            - heading "全球资源整合" [level=3, ref=e48]
+            - paragraph
+              - StaticText "汇聚全球优质原料资源"
+            - link "了解更多 →" [ref=e49]
+              - StaticText "了解更多"
+              - StaticText "→"
+        - generic [ref=e25] clickable [cursor:pointer]
+          - generic
+            - image
+            - heading "稳定供应保障" [level=3, ref=e50]
+            - paragraph
+              - StaticText "本地仓储与高效交付"
+            - link "了解更多 →" [ref=e51]
+              - StaticText "了解更多"
+              - StaticText "→"
+        - generic [ref=e26] clickable [cursor:pointer]
+          - generic
+            - image
+            - heading "解决方案创新" [level=3, ref=e52]
+            - paragraph
+              - StaticText "应用研发与技术支持"
+            - link "了解更多 →" [ref=e53]
+              - StaticText "了解更多"
+              - StaticText "→"
+        - generic [ref=e27] clickable [cursor:pointer]
+          - generic
+            - image
+            - heading "长期合作伙伴" [level=3, ref=e54]
+            - paragraph
+              - StaticText "帮客户打造差异化产品"
+            - link "了解更多 →" [ref=e55]
+              - StaticText "了解更多"
+              - StaticText "→"
+      - generic
+        - heading "产品与应用方案" [level=2, ref=e28]
+        - paragraph
+          - StaticText "从个人护理到人类营养、宠物健康与食品原料，泛成以稳定的品质与专业的应用支持，赋能未来健康生活。"
+        - button "更多" [ref=e29]
+        - image "人类营养健康"
+        - heading "人类营养健康" [level=3, ref=e30]
+        - paragraph
+          - StaticText "基于科学证据的健康营养方案"
+        - list
+          - listitem [level=1]
+            - StaticText "肠道健康"
+          - listitem [level=1]
+            - StaticText "女性健康"
+          - listitem [level=1]
+            - StaticText "情绪健康"
+          - listitem [level=1]
+            - StaticText "体重管理"
+        - image "功能性食品"
+        - heading "功能性食品" [level=3, ref=e31]
+        - paragraph
+          - StaticText "面向现代生活方式的功能方案"
+        - list
+          - listitem [level=1]
+            - StaticText "膳食纤维"
+          - listitem [level=1]
+            - StaticText "亲水胶体"
+          - listitem [level=1]
+            - StaticText "天然色素"
+        - image "个人护理"
+        - heading "个人护理" [level=3, ref=e32]
+        - paragraph
+          - StaticText "天然来源活性成分方案"
+        - list
+          - listitem [level=1]
+            - StaticText "植物油脂"
+          - listitem [level=1]
+            - StaticText "活性物"
+        - image "宠物健康"
+        - heading "宠物健康" [level=3, ref=e33]
+        - paragraph
+          - StaticText "全面宠物营养方案"
+        - list
+          - listitem [level=1]
+            - StaticText "美毛护肤与肠胃修复"
+          - listitem [level=1]
+            - StaticText "毛发顺滑与骨骼保健"
+          - listitem [level=1]
+            - StaticText "肠道养护"
+          - listitem [level=1]
+            - StaticText "关节健康"
+      - generic
+        - image "全球分公司地图"
+        - heading "全球分公司" [level=2, ref=e47]
+        - paragraph
+          - StaticText "遍布全球的分公司网络，"
+          - LineBreak "\n"
+          - StaticText "让优质原料触手可及。"
+        - heading "亚洲" [level=3, ref=e34]
+        - list
+          - listitem [level=1]
+            - StaticText "南京，中国"
+          - listitem [level=1]
+            - StaticText "东京，日本"
+          - listitem [level=1]
+            - StaticText "曼谷，泰国"
+          - listitem [level=1]
+            - StaticText "吉隆坡，马来西亚"
+          - listitem [level=1]
+            - StaticText "孟买，印度"
+          - listitem [level=1]
+            - StaticText "雅加达，印度尼西亚"
+        - heading "欧洲" [level=3, ref=e35]
+        - list
+          - listitem [level=1]
+            - StaticText "科隆，德国"
+          - listitem [level=1]
+            - StaticText "曼彻斯特，英国"
+          - listitem [level=1]
+            - StaticText "克拉科夫，波兰"
+          - listitem [level=1]
+            - StaticText "斯特拉瓦，捷克"
+        - heading "北美洲" [level=3, ref=e36]
+        - list
+          - listitem [level=1]
+            - StaticText "奇诺，加利福尼亚州"
+          - listitem [level=1]
+            - StaticText "格莱姆斯，爱荷华州"
+          - listitem [level=1]
+            - StaticText "劳雷尔山，新泽西州"
+        - heading "非洲" [level=3, ref=e37]
+        - list
+          - listitem [level=1]
+            - StaticText "约翰内斯堡，南非"
+        - heading "南美洲" [level=3, ref=e38]
+        - list
+          - listitem [level=1]
+            - StaticText "圣保罗，巴西"
+          - listitem [level=1]
+            - StaticText "库里蒂巴，巴西"
+      - generic
+        - heading "新闻资讯" [level=2, ref=e39]
+        - button "1. In-cosmetics® 拉丁美洲展 −" [ref=e40]
+          - StaticText "1"
+          - StaticText ". "
+          - StaticText "In-cosmetics® 拉丁美洲展"
+          - StaticText "−"
+        - paragraph
+          - StaticText "2026 年 9 月 23 – 24 日 · 巴西 圣保罗"
+          - LineBreak "\n"
+          - StaticText "欢迎参加 2026 年 In-cosmetics® 拉丁美洲展！"
+        - button "2. IFSCC 大会 2026 +" [ref=e41]
+          - StaticText "2"
+          - StaticText ". "
+          - StaticText "IFSCC 大会 2026"
+          - StaticText "+"
+        - button "3. Naturally Kiawah 研讨会 2026 +" [ref=e42]
+          - StaticText "3"
+          - StaticText ". "
+          - StaticText "Naturally Kiawah 研讨会 2026"
+          - StaticText "+"
+        - button "4. In-cosmetics® Global 2026 +" [ref=e43]
+          - StaticText "4"
+          - StaticText ". "
+          - StaticText "In-cosmetics® Global 2026"
+          - StaticText "+"
+        - button "5. PCHi 2026 个人护理品行业峰会 +" [ref=e44]
+          - StaticText "5"
+          - StaticText ". "
+          - StaticText "PCHi 2026 个人护理品行业峰会"
+          - StaticText "+"
+      - generic
+        - heading "更多合作机会" [level=2, ref=e45]
+        - button "联系我们" [ref=e46]
+  - contentinfo
+    - image "FENCHEM泛成"
+    - paragraph
+      - StaticText "公司"
+    - list
+      - listitem [level=1]
+        - link "关于我们" [ref=e9]
+      - listitem [level=1]
+        - link "产品与应用" [ref=e10]
+      - listitem [level=1]
+        - link "研发与生产" [ref=e11]
+      - listitem [level=1]
+        - link "职业发展" [ref=e12]
+    - paragraph
+      - StaticText "资源"
+    - list
+      - listitem [level=1]
+        - link "技术资讯" [ref=e13]
+      - listitem [level=1]
+        - link "资源下载" [ref=e14]
+      - listitem [level=1]
+        - link "常见问题" [ref=e15]
+    - paragraph
+      - StaticText "法律"
+    - list
+      - listitem [level=1]
+        - link [ref=e16]
+      - listitem [level=1]
+        - link "Privacy Statement" [ref=e17]
+    - StaticText "© "
+    - StaticText "2026"
+    - StaticText "FENCHEM 泛成"
+    - StaticText ". All rights reserved."
+    - link "LinkedIn" [ref=e6]
+      - image
+    - link "WeChat" [ref=e7]
+      - image
+  - region "Notifications alt+T" [ref=e2]
+- generic
+  - button "Open search" [ref=e8]
+    - generic
+      - image
+      - StaticText "AI 智能搜索"
+      - StaticText "⌘Q"

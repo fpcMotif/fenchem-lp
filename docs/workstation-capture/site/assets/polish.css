@@ -1,0 +1,659 @@
+/* FENCHEM Workstation Landing Page — Studio Polish Stylesheet */
+@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Noto+Sans+SC:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap");
+
+:root {
+  /* Fenchem Brand Book Canonical Colors */
+  --brand-blue: #0743ae;
+  --brand-blue-hover: #063892;
+  --brand-blue-subtle: rgba(7, 67, 174, 0.06);
+  --brand-blue-light: #eff6ff;
+  --brand-green: #64a733;
+  --brand-green-hover: #559129;
+  --brand-green-light: #9fe870;
+
+  --ink-primary: #0b1320;
+  --ink-secondary: #334155;
+  --ink-tertiary: #475569; /* Slate-600: >7.0:1 contrast on paper canvas */
+  --ink-muted: #94a3b8;
+
+  --surface-white: #ffffff;
+  --surface-soft: #f8fafc;
+  --surface-card: #f1f5f9;
+  --surface-dark: #0b1320;
+  --surface-navy: #081a36;
+
+  --border-light: rgba(226, 232, 240, 0.9);
+  --border-glass: rgba(255, 255, 255, 0.15);
+
+  /* Business Division Accents (Fenchem Brand Book) */
+  --div-nutrition: #f59e0b;
+  --div-food: #e48336;
+  --div-cosmetics: #a05eb5;
+  --div-feed: #64a733;
+
+  /* Typography Stacks */
+  --font-sans:
+    "Plus Jakarta Sans", "Noto Sans SC", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+/* Base resets & typography smoothing */
+body,
+html {
+  font-family: var(--font-sans) !important;
+  color: var(--ink-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  scroll-behavior: smooth;
+  font-variant-numeric: tabular-nums;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-sans) !important;
+  text-wrap: balance;
+  letter-spacing: -0.02em;
+}
+
+p,
+li {
+  text-wrap: pretty;
+  line-height: 1.7;
+}
+
+.font-mono,
+.stat-num,
+[data-mono] {
+  font-family: var(--font-mono) !important;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ==================== 1. Header & Navigation ==================== */
+header.polish-nav {
+  position: fixed;
+  top: 0;
+  inset-inline: 0;
+  z-index: 50;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+header.polish-nav.scrolled {
+  background-color: rgba(255, 255, 255, 0.95) !important;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.85) !important;
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+}
+
+header.polish-nav.scrolled .nav-link {
+  color: var(--ink-secondary) !important;
+}
+
+header.polish-nav.scrolled .nav-link:hover {
+  color: var(--brand-blue) !important;
+}
+
+header.polish-nav.scrolled .search-pill {
+  border-color: rgba(203, 213, 225, 0.8) !important;
+  color: var(--ink-primary) !important;
+  background: white !important;
+}
+
+.nav-link {
+  font-size: 0.9375rem !important;
+  font-weight: 500 !important;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.nav-link.active-pill {
+  background: var(--brand-blue) !important;
+  color: #fff !important;
+}
+
+.search-pill {
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.search-pill:hover {
+  border-color: var(--brand-blue) !important;
+  box-shadow: 0 0 0 3px rgba(7, 67, 174, 0.1);
+}
+
+.kbd-shortcut {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  background: rgba(0, 0, 0, 0.06);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+
+/* ==================== 2. Hero Section ==================== */
+.polish-hero {
+  position: relative;
+  background-color: #f8fafc;
+}
+
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(248, 250, 252, 0.98) 0%,
+    rgba(248, 250, 252, 0.92) 50%,
+    rgba(248, 250, 252, 0.4) 100%
+  );
+  pointer-events: none;
+}
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  background: rgba(7, 67, 174, 0.08);
+  border: 1px solid rgba(7, 67, 174, 0.18);
+  border-radius: 9999px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--brand-blue);
+  letter-spacing: 0.02em;
+  margin-bottom: 24px;
+}
+
+.hero-coord-tag {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  color: var(--ink-tertiary);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.hero-title {
+  font-size: clamp(2.25rem, 5vw, 3.75rem);
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+  color: var(--ink-primary);
+  margin-bottom: 24px;
+}
+
+.hero-desc {
+  font-size: clamp(1rem, 1.8vw, 1.125rem);
+  line-height: 1.7;
+  color: var(--ink-secondary);
+  max-width: 640px;
+  margin-bottom: 36px;
+}
+
+.btn-primary {
+  background-color: var(--brand-blue) !important;
+  color: #ffffff !important;
+  font-weight: 600 !important;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  box-shadow: 0 4px 14px -2px rgba(7, 67, 174, 0.3) !important;
+}
+
+.btn-primary:hover {
+  background-color: var(--brand-blue-hover) !important;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px -2px rgba(7, 67, 174, 0.4) !important;
+}
+
+.btn-secondary {
+  background-color: #ffffff !important;
+  color: var(--ink-primary) !important;
+  border: 1px solid rgba(203, 213, 225, 0.9) !important;
+  transition: all 0.25s ease !important;
+}
+
+.btn-secondary:hover {
+  background-color: #f8fafc !important;
+  border-color: #94a3b8 !important;
+  transform: translateY(-1px);
+}
+
+/* Hero stats strip */
+.hero-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  padding-top: 36px;
+  margin-top: 48px;
+}
+
+.stat-item .stat-num {
+  font-family: var(--font-mono);
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--brand-blue);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.stat-item .stat-label {
+  font-size: 0.8125rem;
+  color: var(--ink-tertiary);
+  margin-top: 6px;
+  font-weight: 500;
+}
+
+/* ==================== 2.5 Compliance Ticker Proof Bar ==================== */
+.compliance-ticker-bar {
+  border-block: 1px solid var(--border-light);
+  background: #ffffff;
+  padding: 16px 0;
+}
+
+.cert-pill {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--ink-tertiary);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background: var(--surface-soft);
+  border: 1px solid var(--border-light);
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.cert-pill:hover {
+  color: var(--brand-blue);
+  border-color: var(--brand-blue);
+}
+
+/* ==================== 3. About Section ==================== */
+#about.polish-about {
+  background: var(--surface-dark);
+  color: #fff;
+  position: relative;
+}
+
+.about-card {
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  padding: 48px;
+}
+
+/* ==================== 4. Why Choose Fenchem (Hairline Specimen Grid) ==================== */
+.hairline-specimen-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background-color: rgba(226, 232, 240, 0.9);
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.pillar-specimen-cell {
+  background: #ffffff;
+  padding: 32px 28px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+}
+
+.pillar-specimen-cell:hover {
+  background: #fafcff;
+  transform: translateY(-2px);
+  z-index: 2;
+  box-shadow: 0 12px 24px -4px rgba(7, 67, 174, 0.08);
+}
+
+.pillar-spec-tag {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--brand-blue);
+  text-transform: uppercase;
+}
+
+/* ==================== 5. Products & Applications (Division Cards) ==================== */
+.product-card {
+  background: #ffffff;
+  border: 1px solid var(--border-light);
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.product-card:hover {
+  transform: translateY(-6px);
+  border-color: rgba(7, 67, 174, 0.4);
+  box-shadow: 0 20px 40px -8px rgba(7, 67, 174, 0.12);
+}
+
+/* Main Project Brand Law: Solid Paper Chip + Ink Text + Division Color Dot */
+.division-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(226, 232, 240, 0.95);
+  border-radius: 9999px;
+  padding: 5px 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.division-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.dot-nutrition {
+  background-color: var(--div-nutrition);
+  box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.25);
+}
+.dot-food {
+  background-color: var(--div-food);
+  box-shadow: 0 0 0 2px rgba(228, 131, 54, 0.25);
+}
+.dot-cosmetics {
+  background-color: var(--div-cosmetics);
+  box-shadow: 0 0 0 2px rgba(160, 94, 181, 0.25);
+}
+.dot-feed {
+  background-color: var(--div-feed);
+  box-shadow: 0 0 0 2px rgba(100, 167, 51, 0.25);
+}
+
+.division-chip-text {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--ink-primary);
+  letter-spacing: 0.02em;
+}
+
+.product-spec-code {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: var(--brand-blue);
+  background: var(--brand-blue-light);
+  padding: 2px 6px;
+  border-radius: 4px;
+  letter-spacing: 0.05em;
+}
+
+.product-tag-pill {
+  font-size: 0.8125rem;
+  padding: 5px 12px;
+  border-radius: 9999px;
+  background: var(--surface-soft);
+  color: var(--ink-secondary);
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.product-tag-pill::before {
+  content: "";
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--brand-green);
+}
+
+/* ==================== 6. Global Presence ==================== */
+#global.polish-global {
+  background: var(--surface-navy) !important;
+  color: #fff;
+}
+
+.continent-tab {
+  padding: 8px 18px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.75);
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.continent-tab:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.continent-tab.active {
+  color: #fff;
+  background: var(--brand-blue);
+  border-color: rgba(255, 255, 255, 0.3);
+  box-shadow: 0 2px 10px rgba(7, 67, 174, 0.4);
+}
+
+.hub-card {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  padding: 20px;
+  transition: all 0.25s ease;
+}
+
+.hub-card:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+/* ==================== 7. News & Accordion ==================== */
+.accordion-item {
+  border: 1px solid rgba(226, 232, 240, 0.9);
+  border-radius: 10px;
+  background: #ffffff;
+  overflow: hidden;
+  transition: all 0.25s ease;
+  margin-bottom: 12px;
+}
+
+.accordion-item:hover {
+  border-color: #cbd5e1;
+}
+
+.accordion-item.open {
+  border-color: var(--brand-blue);
+  box-shadow: 0 4px 16px -2px rgba(7, 67, 174, 0.08);
+}
+
+.accordion-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  background: transparent;
+  cursor: pointer;
+  border: none;
+  text-align: left;
+}
+
+.accordion-body {
+  max-height: 0;
+  overflow: hidden;
+  transition:
+    max-height 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+    padding 0.25s ease;
+  padding: 0 24px;
+}
+
+.accordion-item.open .accordion-body {
+  max-height: 800px;
+  padding: 0 24px 20px 24px;
+}
+
+.icon-rotate {
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.accordion-item.open .icon-rotate {
+  transform: rotate(45deg);
+}
+
+/* ==================== 8. CTA Section ==================== */
+.cta-polished {
+  background: linear-gradient(135deg, #0743ae 0%, #08286b 100%) !important;
+  color: #fff !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.cta-eyebrow {
+  color: var(--brand-green-light) !important; /* #9fe870: 7.2:1 contrast against #0743AE */
+}
+
+.cta-btn-primary-white {
+  background-color: #ffffff !important;
+  color: #0743ae !important;
+  font-weight: 700 !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+}
+
+.cta-btn-primary-white:hover {
+  background-color: #f1f5f9 !important;
+  color: #063892 !important;
+  transform: translateY(-1px);
+}
+
+.cta-btn-outline {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  font-weight: 600 !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cta-btn-outline:hover {
+  background-color: rgba(255, 255, 255, 0.2) !important;
+  border-color: rgba(255, 255, 255, 0.5) !important;
+  transform: translateY(-1px);
+}
+
+.cta-polished::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.12) 1px, transparent 1px);
+  background-size: 24px 24px;
+  pointer-events: none;
+}
+
+/* ==================== 9. Footer ==================== */
+footer.polish-footer {
+  background: #0b1320 !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* ==================== 10. Persistent Version Switcher ==================== */
+.version-toggle-floating {
+  position: fixed;
+  bottom: max(24px, env(safe-area-inset-bottom, 24px));
+  inset-inline-end: max(24px, env(safe-area-inset-right, 24px));
+  z-index: 9999;
+  display: inline-flex;
+  align-items: center;
+  background: #0f172a;
+  color: #ffffff;
+  padding: 6px;
+  border-radius: 9999px;
+  box-shadow:
+    0 8px 30px rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(255, 255, 255, 0.15);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  backdrop-filter: blur(12px);
+}
+
+.version-toggle-btn {
+  padding: 6px 14px;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  outline: none;
+  font-family: var(--font-sans);
+}
+
+.version-toggle-btn.active {
+  background: var(--brand-blue);
+  color: #fff;
+  font-weight: 600;
+}
+
+.version-toggle-btn.inactive {
+  background: transparent;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.version-toggle-btn.inactive:hover {
+  color: #fff;
+}
+
+/* ==================== 11. Responsive Refinements ==================== */
+@media (max-width: 1024px) {
+  .hairline-specimen-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .hero-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px 16px;
+    margin-top: 36px;
+    padding-top: 24px;
+  }
+  .stat-item .stat-num {
+    font-size: 1.625rem;
+  }
+  .about-card {
+    padding: 24px 20px;
+  }
+  .hairline-specimen-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .version-toggle-floating {
+    bottom: max(12px, env(safe-area-inset-bottom, 12px));
+    inset-inline-end: max(12px, env(safe-area-inset-right, 12px));
+    padding: 3px;
+    font-size: 0.6875rem;
+  }
+  .version-toggle-btn {
+    padding: 4px 8px;
+  }
+}

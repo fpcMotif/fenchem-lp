@@ -12,14 +12,23 @@ import { color, ease, font, layout as layoutTokens, media } from "./tokens.style
 import { layout } from "./ui";
 
 const SPY_LINE = 0.4;
-const SOLID_EDGE_PX = 40;
+const SOLID_PROGRESS = 0.02;
+const HEADER_HEIGHT_PX = 80;
 const NAV_IDS: readonly string[] = NAV_ITEMS.map((item) => item.href.slice(1));
 
 type HeaderState = { solid: boolean; activeId: string | null };
 
-function readHeaderState(): HeaderState {
-  const about = document.getElementById("about");
-  const solid = about ? about.getBoundingClientRect().top <= SOLID_EDGE_PX : false;
+function readSolid(): boolean {
+  const hero = document.getElementById("top");
+  if (!hero) return true;
+  const rect = hero.getBoundingClientRect();
+  const travel = rect.height - window.innerHeight;
+  if (travel > 1) return -rect.top / travel > SOLID_PROGRESS;
+  const photo = hero.querySelector("[data-hero-photo]");
+  return (photo ?? hero).getBoundingClientRect().bottom <= HEADER_HEIGHT_PX;
+}
+
+function readActiveId(): string | null {
   const atBottom = window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 2;
   let current: string | null = null;
   for (const id of SECTION_IDS) {
@@ -29,7 +38,7 @@ function readHeaderState(): HeaderState {
     }
   }
   if (atBottom) current = SECTION_IDS[SECTION_IDS.length - 1] ?? current;
-  return { solid, activeId: current && NAV_IDS.includes(current) ? current : null };
+  return current && NAV_IDS.includes(current) ? current : null;
 }
 
 function useHeaderState(): HeaderState {
@@ -38,9 +47,10 @@ function useHeaderState(): HeaderState {
     let frame = 0;
     const update = () => {
       frame = 0;
-      const next = readHeaderState();
+      const solid = readSolid();
+      const activeId = readActiveId();
       setState((previous) =>
-        previous.solid === next.solid && previous.activeId === next.activeId ? previous : next,
+        previous.solid === solid && previous.activeId === activeId ? previous : { solid, activeId },
       );
     };
     const schedule = () => {
@@ -58,35 +68,40 @@ function useHeaderState(): HeaderState {
   return state;
 }
 
+const fadeIn = stylex.keyframes({
+  "0%": { opacity: 0 },
+  "100%": { opacity: 1 },
+});
+
+const SWITCH_MS = "180ms";
+const SWITCH_PROPERTIES = "background-color, border-bottom-color, color";
+
 const styles = stylex.create({
   header: {
     position: "fixed",
     top: 0,
     insetInline: 0,
     zIndex: 20,
+    boxSizing: "border-box",
     height: layoutTokens.headerHeight,
-    color: color.paper,
-    transitionProperty: "color",
-    transitionDuration: { default: ease.fade, [media.motionReduce]: "0ms" },
+    borderBottomWidth: 1,
+    borderBottomStyle: "solid",
+    transitionProperty: SWITCH_PROPERTIES,
     transitionTimingFunction: "ease",
+  },
+  headerHero: {
+    backgroundColor: "transparent",
+    borderBottomColor: "transparent",
+    color: color.paper,
+    transitionDuration: { default: `${SWITCH_MS}, ${SWITCH_MS}, 0ms`, [media.motionReduce]: "0ms" },
+    transitionDelay: { default: `0ms, 0ms, ${SWITCH_MS}`, [media.motionReduce]: "0ms" },
   },
   headerSolid: {
+    backgroundColor: color.paper,
+    borderBottomColor: color.headerRule,
     color: color.ink,
-  },
-  backdrop: {
-    position: "absolute",
-    inset: 0,
-    backgroundColor: color.headerSolid,
-    backdropFilter: "blur(20px)",
-    boxShadow: `0 1px 0 0 ${color.hairline}`,
-    opacity: 0,
-    pointerEvents: "none",
-    transitionProperty: "opacity",
-    transitionDuration: { default: ease.fade, [media.motionReduce]: "0ms" },
-    transitionTimingFunction: "ease",
-  },
-  backdropOn: {
-    opacity: 1,
+    transitionDuration: { default: `${SWITCH_MS}, ${SWITCH_MS}, 0ms`, [media.motionReduce]: "0ms" },
+    transitionDelay: "0ms",
   },
   inner: {
     position: "relative",
@@ -94,6 +109,14 @@ const styles = stylex.create({
     alignItems: "center",
     justifyContent: "space-between",
     height: "100%",
+    opacity: { default: 0, [media.motionReduce]: 1 },
+  },
+  innerIn: {
+    animationName: { default: fadeIn, [media.motionReduce]: "none" },
+    animationDuration: "400ms",
+    animationDelay: "700ms",
+    animationTimingFunction: ease.out,
+    animationFillMode: "both",
   },
   logoLink: {
     display: "block",
@@ -107,13 +130,16 @@ const styles = stylex.create({
     width: 161,
     height: 52,
   },
-  logoPath: {
-    transitionProperty: "fill",
-    transitionDuration: { default: ease.fade, [media.motionReduce]: "0ms" },
-    transitionTimingFunction: "ease",
-  },
-  logoPathWhite: {
+  logoPathHero: {
     fill: "currentColor",
+    transitionProperty: "fill",
+    transitionDuration: "0ms",
+    transitionDelay: { default: SWITCH_MS, [media.motionReduce]: "0ms" },
+  },
+  logoPathSolid: {
+    transitionProperty: "fill",
+    transitionDuration: "0ms",
+    transitionDelay: "0ms",
   },
   nav: {
     display: { default: "none", [media.desktop]: "flex" },
@@ -145,7 +171,7 @@ const styles = stylex.create({
   navHoverSolid: {
     color: { default: "inherit", ":hover": color.royal },
   },
-  navActive: {
+  navActiveHero: {
     "::after": {
       content: '""',
       position: "absolute",
@@ -153,6 +179,9 @@ const styles = stylex.create({
       bottom: 2,
       height: 2,
       backgroundColor: color.paper,
+      transitionProperty: "background-color",
+      transitionDuration: "0ms",
+      transitionDelay: { default: SWITCH_MS, [media.motionReduce]: "0ms" },
     },
   },
   navActiveSolid: {
@@ -163,6 +192,9 @@ const styles = stylex.create({
       bottom: 2,
       height: 2,
       backgroundColor: color.royal,
+      transitionProperty: "background-color",
+      transitionDuration: "0ms",
+      transitionDelay: "0ms",
     },
   },
   actions: {
@@ -256,7 +288,7 @@ const styles = stylex.create({
   },
 });
 
-function LogoMark({ overHero }: { overHero: boolean }) {
+function LogoMark({ white }: { white: boolean }) {
   return (
     <svg viewBox="0 0 161 52" aria-hidden="true" focusable="false" {...stylex.props(styles.logo)}>
       {LOGO_PATHS.map((path) => (
@@ -264,19 +296,19 @@ function LogoMark({ overHero }: { overHero: boolean }) {
           key={path.d}
           d={path.d}
           fill={path.fill}
-          {...stylex.props(styles.logoPath, overHero && styles.logoPathWhite)}
+          {...stylex.props(white ? styles.logoPathHero : styles.logoPathSolid)}
         />
       ))}
     </svg>
   );
 }
 
-export function SiteHeader() {
+export function SiteHeader({ introStarted }: { introStarted: boolean }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuId = useId();
   const reduce = useReducedMotion();
   const { solid, activeId } = useHeaderState();
-  const showSolid = solid || menuOpen;
+  const onLight = menuOpen || solid;
   const closeOnEscape = (event: KeyboardEvent<HTMLElement>) => {
     if (event.key === "Escape" && menuOpen) setMenuOpen(false);
   };
@@ -284,12 +316,13 @@ export function SiteHeader() {
   return (
     <header
       onKeyDown={closeOnEscape}
-      {...stylex.props(styles.header, showSolid && styles.headerSolid)}
+      {...stylex.props(styles.header, onLight ? styles.headerSolid : styles.headerHero)}
     >
-      <div aria-hidden="true" {...stylex.props(styles.backdrop, showSolid && styles.backdropOn)} />
-      <div {...stylex.props(layout.shell, layout.inset, styles.inner)}>
+      <div
+        {...stylex.props(layout.shell, layout.inset, styles.inner, introStarted && styles.innerIn)}
+      >
         <a href="#top" aria-label="FENCHEM 泛成 首页" {...stylex.props(styles.logoLink)}>
-          <LogoMark overHero={!showSolid} />
+          <LogoMark white={!onLight} />
         </a>
         <nav aria-label="主导航" {...stylex.props(styles.nav)}>
           {NAV_ITEMS.map((item) => (
@@ -299,8 +332,8 @@ export function SiteHeader() {
               aria-current={isActive(item.href) ? "location" : undefined}
               {...stylex.props(
                 styles.navLink,
-                showSolid ? styles.navHoverSolid : styles.navHoverHero,
-                isActive(item.href) && (showSolid ? styles.navActiveSolid : styles.navActive),
+                onLight ? styles.navHoverSolid : styles.navHoverHero,
+                isActive(item.href) && (onLight ? styles.navActiveSolid : styles.navActiveHero),
               )}
             >
               {item.label}
@@ -311,8 +344,8 @@ export function SiteHeader() {
           <button type="button" aria-label="搜索" {...stylex.props(styles.iconButton)}>
             <Search size={18} strokeWidth={2} absoluteStrokeWidth aria-hidden="true" />
           </button>
-          <button type="button" aria-label="CN，切换语言" {...stylex.props(styles.langButton)}>
-            CN
+          <button type="button" aria-label="切换到英文" {...stylex.props(styles.langButton)}>
+            EN
           </button>
           <button
             type="button"

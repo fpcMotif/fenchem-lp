@@ -11,19 +11,21 @@ export const color = stylex.defineConsts({
   green: "#64a233",
   surface: "#f3f4f6",
   paper: "#ffffff",
+  paperHover: "#e8eefa",
   rule: "rgba(13, 26, 51, 0.12)",
   ruleStrong: "rgba(13, 26, 51, 0.15)",
   hairline: "rgba(13, 26, 51, 0.08)",
-  headerSolid: "rgba(255, 255, 255, 0.94)",
+  headerRule: "#e6e8ec",
+  scrim: "rgba(4, 20, 60, 0.6)",
+  scrimClear: "rgba(4, 20, 60, 0)",
   white90: "rgba(255, 255, 255, 0.9)",
   white80: "rgba(255, 255, 255, 0.8)",
   white70: "rgba(255, 255, 255, 0.7)",
   white60: "rgba(255, 255, 255, 0.6)",
+  white55: "rgba(255, 255, 255, 0.55)",
   white35: "rgba(255, 255, 255, 0.35)",
   white25: "rgba(255, 255, 255, 0.25)",
   white15: "rgba(255, 255, 255, 0.15)",
-  scrimBottom: "rgba(6, 22, 56, 0.55)",
-  scrimTop: "rgba(6, 22, 56, 0.38)",
   selectionBg: "#cfdcf5",
   selectionInk: "#06245e",
 });
@@ -42,7 +44,7 @@ export const layout = stylex.defineConsts({
   gutter: "24px",
   sectionPadMobile: "72px",
   sectionPadTablet: "96px",
-  sectionPadDesktop: "160px",
+  sectionPadDesktop: "128px",
   headerHeight: "80px",
 });
 
@@ -61,10 +63,20 @@ export const media = stylex.defineConsts({
   motionReduce: "@media (prefers-reduced-motion: reduce)",
   motionOk: "@media (prefers-reduced-motion: no-preference)",
   pin: "@media (min-width: 768px) and (prefers-reduced-motion: no-preference)",
+  pinNarrow:
+    "@media (min-width: 768px) and (max-width: 1023.98px) and (prefers-reduced-motion: no-preference)",
+  pinWide: "@media (min-width: 1024px) and (prefers-reduced-motion: no-preference)",
+  pinTablet:
+    "@media (min-width: 768px) and (max-width: 1279.98px) and (prefers-reduced-motion: no-preference)",
+  pinDesktop: "@media (min-width: 1280px) and (prefers-reduced-motion: no-preference)",
+  reduceTabletUp: "@media (min-width: 768px) and (prefers-reduced-motion: reduce)",
+  reduceTablet:
+    "@media (min-width: 768px) and (max-width: 1279.98px) and (prefers-reduced-motion: reduce)",
+  reduceDesktop: "@media (min-width: 1280px) and (prefers-reduced-motion: reduce)",
 });
 
 export const hero = stylex.defineConsts({
   stage: "100svh",
-  height: "230svh",
-  overlap: "-100svh",
+  height: "300svh",
+  aboutAnchor: "150svh",
 });
