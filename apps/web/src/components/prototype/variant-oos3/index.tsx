@@ -30,6 +30,7 @@ import {
   useId,
   useRef,
   useState,
+  useSyncExternalStore,
   type CSSProperties,
   type KeyboardEvent,
   type ReactNode,
@@ -109,6 +110,30 @@ const CLIP_TO = { top: 0, side: 0, bottom: 0, radius: 0 };
 const lerp = (from: number, to: number, t: number) => from + (to - from) * t;
 const clamp01 = (t: number) => Math.min(1, Math.max(0, t));
 const revealProgress = (progress: number) => 1 - (1 - clamp01(progress)) ** 3;
+
+const QUADRANT_QUERY = "(min-width: 768px) and (prefers-reduced-motion: no-preference)";
+const QUADRANT_DIRECTIONS = [
+  [-1, -1],
+  [1, -1],
+  [-1, 1],
+  [1, 1],
+] as const;
+const RING_RADIUS = 62;
+const RING_LENGTH = Math.round(2 * Math.PI * RING_RADIUS);
+
+const subscribeQuadrants = (onChange: () => void) => {
+  const media = window.matchMedia(QUADRANT_QUERY);
+  media.addEventListener("change", onChange);
+  return () => media.removeEventListener("change", onChange);
+};
+
+function useQuadrantMotion() {
+  return useSyncExternalStore(
+    subscribeQuadrants,
+    () => window.matchMedia(QUADRANT_QUERY).matches,
+    () => false,
+  );
+}
 
 const RISE_EASE: [number, number, number, number] = [0.16, 1, 0.3, 1];
 const RISE_STAGGER = 0.06;
@@ -819,11 +844,12 @@ const styles = stylex.create({
   },
 
   strengths: {
+    overflowX: "clip",
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    gap: 48,
-    paddingBlock: { default: 72, [DESKTOP]: 96 },
+    gap: { default: 48, [DESKTOP]: 72 },
+    paddingBlock: { default: 72, [DESKTOP]: 144 },
     backgroundColor: colors.paper,
   },
   introBlock: {
@@ -833,28 +859,36 @@ const styles = stylex.create({
     gap: 16,
     maxWidth: 768,
   },
-  strengthGrid: {
+  quadrants: {
+    position: "relative",
     display: "grid",
     gridTemplateColumns: {
       default: "minmax(0, 1fr)",
-      [TABLET]: "repeat(2, minmax(0, 1fr))",
-      [DESKTOP]: "repeat(4, minmax(0, 1fr))",
+      [breakpoints.md]: "repeat(2, minmax(0, 1fr))",
     },
+    gap: 2,
     width: "100%",
     maxWidth: 1200,
   },
-  strengthCard: {
+  quadrant: {
     position: "relative",
     isolation: "isolate",
     overflow: "hidden",
     display: "flex",
     flexDirection: "column",
-    minHeight: 164,
-    paddingTop: 105,
-    paddingBottom: 18,
-    paddingInlineStart: 32,
-    paddingInlineEnd: 27,
+    justifyContent: "space-between",
+    gap: 48,
+    minHeight: { default: 200, [breakpoints.md]: 280 },
+    padding: { default: 24, [DESKTOP]: 40 },
     boxSizing: "border-box",
+    color: INK,
+  },
+  quadrantUpper: {
+    flexDirection: { default: "column", [breakpoints.md]: "column-reverse" },
+  },
+  quadrantRight: {
+    alignItems: { default: "stretch", [breakpoints.md]: "flex-end" },
+    textAlign: { default: "start", [breakpoints.md]: "end" },
   },
   toneBlue: { backgroundColor: "#4668a5", color: "#e6ecf7" },
   toneGray: { backgroundColor: "#e3e3e3", color: "#f1f1f1" },
@@ -882,43 +916,42 @@ const styles = stylex.create({
     left,
     top,
   }),
-  strengthText: {
+  quadrantText: {
     position: "relative",
     display: "flex",
-    flexWrap: "wrap",
-    alignItems: "flex-end",
+    flexDirection: "column",
     justifyContent: "space-between",
-    columnGap: 12,
-    rowGap: 8,
+    alignItems: "inherit",
+    gap: 32,
+    flexGrow: 1,
     color: INK,
   },
-  strengthTextInverse: {
+  quadrantInverse: {
     color: "#ffffff",
   },
-  strengthCopy: {
+  quadrantCopy: {
     display: "flex",
     flexDirection: "column",
     gap: 8,
   },
-  strengthTitle: {
+  quadrantTitle: {
     margin: 0,
-    fontSize: 16,
+    fontSize: { default: 20, [DESKTOP]: 24 },
     fontWeight: 700,
     lineHeight: 1.2,
-    whiteSpace: "nowrap",
   },
-  strengthSmall: {
+  quadrantSmall: {
     margin: 0,
-    fontSize: 13,
-    lineHeight: 1.3,
+    fontSize: 14,
+    lineHeight: 1.4,
   },
-  strengthLink: {
+  quadrantLink: {
     display: "inline-flex",
     alignItems: "center",
     gap: 5,
     paddingBlock: 8,
     marginBlock: -8,
-    fontSize: 13,
+    fontSize: 14,
     lineHeight: 1.3,
     color: "inherit",
     whiteSpace: "nowrap",
@@ -927,6 +960,36 @@ const styles = stylex.create({
     outlineWidth: 2,
     outlineColor: "currentColor",
     outlineOffset: -2,
+  },
+  badge: {
+    display: { default: "none", [breakpoints.md]: "block" },
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    zIndex: 1,
+    width: 160,
+    height: 160,
+    marginTop: -80,
+    marginLeft: -80,
+    borderRadius: "50%",
+    backgroundColor: colors.paper,
+    boxShadow: "0 0 0 1px rgba(26, 26, 26, 0.08), 0 18px 40px -18px rgba(7, 67, 174, 0.35)",
+    pointerEvents: "none",
+  },
+  badgeSvg: {
+    display: "block",
+    width: "100%",
+    height: "100%",
+  },
+  badgeText: {
+    fontFamily: DISPLAY_FONT,
+    fontSize: 10.5,
+    fontWeight: 500,
+    letterSpacing: "0.12em",
+    fill: INK,
+  },
+  badgeCross: {
+    color: FOOTER_BLUE,
   },
 
   products: {
@@ -1772,6 +1835,7 @@ function Campus() {
     }
     return lerp(1.22, 1, revealProgress(maxProgressRef.current));
   });
+
   return (
     <section id="campus" aria-label="研发与生产" {...stylex.props(styles.anchor)}>
       <div ref={stageRef} {...stylex.props(styles.campusStage)}>
@@ -1880,54 +1944,101 @@ function IconPattern({ icon }: { icon: StrengthIcon }) {
   );
 }
 
+function Quadrant({
+  strength,
+  index,
+  apart,
+}: {
+  strength: (typeof STRENGTHS)[number];
+  index: number;
+  apart: MotionValue<number>;
+}) {
+  const [dx, dy] = QUADRANT_DIRECTIONS[index];
+  const x = useTransform(apart, (value) => value * dx * 56);
+  const y = useTransform(apart, (value) => value * dy * 40);
+  const inverse = strength.tone === "blue";
+  const right = dx === 1;
+  return (
+    <m.article
+      aria-labelledby={`oos1-strength-${index}`}
+      {...stylex.props(
+        styles.quadrant,
+        TONE_STYLES[strength.tone],
+        dy === -1 && styles.quadrantUpper,
+        right && styles.quadrantRight,
+        stylex.defaultMarker(),
+      )}
+      style={{ x, y }}
+    >
+      <IconPattern icon={strength.icon} />
+      <div {...stylex.props(styles.quadrantText, inverse && styles.quadrantInverse)}>
+        <div {...stylex.props(styles.quadrantCopy)}>
+          <h3 id={`oos1-strength-${index}`} {...stylex.props(styles.quadrantTitle)}>
+            {strength.title}
+          </h3>
+          {strength.description ? (
+            <p {...stylex.props(styles.quadrantSmall)}>{strength.description}</p>
+          ) : null}
+        </div>
+        {strength.link ? (
+          <a href="#offices" {...stylex.props(styles.quadrantLink)}>
+            {strength.link}
+            <ArrowUpRight size={12} strokeWidth={1.5} absoluteStrokeWidth aria-hidden="true" />
+          </a>
+        ) : null}
+      </div>
+    </m.article>
+  );
+}
+
 function Strengths() {
+  const gridRef = useRef<HTMLDivElement>(null);
+  const converge = useQuadrantMotion();
+  const { scrollYProgress: approach } = useScroll({
+    target: gridRef,
+    offset: ["start end", "center 0.6"],
+  });
+  const { scrollYProgress: pass } = useScroll({
+    target: gridRef,
+    offset: ["start end", "end start"],
+  });
+  const apart = useTransform(approach, (value) => (converge ? 1 - value : 0));
+  const rotate = useTransform(pass, [0, 1], [0, 180]);
   return (
     <section
       id="strengths"
-      aria-labelledby="oo-strengths-title"
+      aria-labelledby="oos1-strengths-title"
       {...stylex.props(styles.strengths, styles.inset120, styles.anchor)}
     >
       <RiseReveal sx={styles.introBlock}>
-        <h2 id="oo-strengths-title" {...stylex.props(styles.sectionTitle)}>
+        <h2 id="oos1-strengths-title" {...stylex.props(styles.sectionTitle)}>
           {STRENGTHS_INTRO.title}
         </h2>
         <p {...stylex.props(styles.sectionLead)}>{STRENGTHS_INTRO.lead}</p>
       </RiseReveal>
-      <div {...stylex.props(styles.strengthGrid)}>
+      <div ref={gridRef} {...stylex.props(styles.quadrants)}>
         {STRENGTHS.map((strength, index) => (
-          <RiseReveal
-            key={strength.title}
-            delay={riseDelay(index)}
-            sx={[styles.strengthCard, stylex.defaultMarker()]}
-            style={TONE_STYLES[strength.tone]}
-          >
-            <IconPattern icon={strength.icon} />
-            <div
-              {...stylex.props(
-                styles.strengthText,
-                strength.tone === "blue" && styles.strengthTextInverse,
-              )}
-            >
-              <div {...stylex.props(styles.strengthCopy)}>
-                <h3 {...stylex.props(styles.strengthTitle)}>{strength.title}</h3>
-                {strength.description ? (
-                  <p {...stylex.props(styles.strengthSmall)}>{strength.description}</p>
-                ) : null}
-              </div>
-              {strength.link ? (
-                <a href="#offices" {...stylex.props(styles.strengthLink)}>
-                  {strength.link}
-                  <ArrowUpRight
-                    size={12}
-                    strokeWidth={1.5}
-                    absoluteStrokeWidth
-                    aria-hidden="true"
-                  />
-                </a>
-              ) : null}
-            </div>
-          </RiseReveal>
+          <Quadrant key={strength.title} strength={strength} index={index} apart={apart} />
         ))}
+        <m.div aria-hidden="true" {...stylex.props(styles.badge)} style={{ rotate }}>
+          <svg viewBox="0 0 160 160" {...stylex.props(styles.badgeSvg)}>
+            <defs>
+              <path
+                id="oos1-badge-ring"
+                d={`M80,80 m-${RING_RADIUS},0 a${RING_RADIUS},${RING_RADIUS} 0 1,1 ${RING_RADIUS * 2},0 a${RING_RADIUS},${RING_RADIUS} 0 1,1 -${RING_RADIUS * 2},0`}
+              />
+            </defs>
+            <text {...stylex.props(styles.badgeText)}>
+              <textPath href="#oos1-badge-ring" textLength={RING_LENGTH} lengthAdjust="spacing">
+                WHY FENCHEM · 为什么选择泛成 · WHY FENCHEM · 为什么选择泛成 ·
+              </textPath>
+            </text>
+            <g {...stylex.props(styles.badgeCross)} stroke="currentColor" strokeWidth="1">
+              <line x1="80" y1="56" x2="80" y2="104" />
+              <line x1="56" y1="80" x2="104" y2="80" />
+            </g>
+          </svg>
+        </m.div>
       </div>
     </section>
   );
@@ -2240,7 +2351,7 @@ function SiteFooter() {
   );
 }
 
-export function VariantOOS() {
+export function VariantOOS3() {
   preinit(GOOGLE_FONTS, { as: "style" });
   const reduce = useReducedMotion();
   const intro = useIntro();

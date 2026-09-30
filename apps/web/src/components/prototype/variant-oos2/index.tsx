@@ -2240,7 +2240,7 @@ function SiteFooter() {
   );
 }
 
-export function VariantOOS() {
+export function VariantOOS2() {
   preinit(GOOGLE_FONTS, { as: "style" });
   const reduce = useReducedMotion();
   const intro = useIntro();

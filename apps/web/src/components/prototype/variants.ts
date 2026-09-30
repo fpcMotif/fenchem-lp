@@ -136,6 +136,24 @@ export const VARIANTS = [
     twinOf: "o",
   },
   {
+    key: "oos1",
+    Component: lazy(() => import("./variant-oos1/index").then((m) => ({ default: m.VariantOOS1 }))),
+    name: "Official site · O campus quadrants",
+    twinOf: "oos",
+  },
+  {
+    key: "oos2",
+    Component: lazy(() => import("./variant-oos2/index").then((m) => ({ default: m.VariantOOS2 }))),
+    name: "Official site · O campus keep-open",
+    twinOf: "oos",
+  },
+  {
+    key: "oos3",
+    Component: lazy(() => import("./variant-oos3/index").then((m) => ({ default: m.VariantOOS3 }))),
+    name: "Official site · O campus quadrants keep-open",
+    twinOf: "oos1",
+  },
+  {
     key: "ooss",
     Component: lazy(() => import("./variant-ooss/index").then((m) => ({ default: m.VariantOOSS }))),
     name: "Official site · O campus polish",
