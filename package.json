@@ -60,7 +60,6 @@
     "@playwright/test": "^1.60.0",
     "@types/node": "^26.4.0",
     "@vitest/coverage-v8": "^4.1.8",
-    "lefthook": "^2.1.9",
     "lightningcss": "^1.33.0",
     "oxfmt": "^0.53.0",
     "oxlint": "^1.68.0",
