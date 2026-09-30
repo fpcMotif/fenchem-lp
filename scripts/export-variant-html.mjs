@@ -306,9 +306,7 @@ async function main() {
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 ${snap.links.map((h) => `    <link rel="stylesheet" href="${h}" />`).join("\n")}
 ${preloadHero ? `    <link rel="preload" as="image" href="${preloadHero}" />` : ""}
-    <style>
-${css}
-    </style>
+    <link rel="stylesheet" href="styles.css" />
   </head>
   <body class="${snap.bodyClass}">
 ${body}
@@ -320,8 +318,9 @@ ${runtime}
 </html>
 `;
     fs.writeFileSync(path.join(outDir, "index.html"), html);
+    fs.writeFileSync(path.join(outDir, "styles.css"), css);
     console.log(
-      `  wrote ${path.relative(repo, outDir)}/index.html (${(html.length / 1024).toFixed(0)} KB), ${fs.readdirSync(assetsDir).length} assets`,
+      `  wrote ${path.relative(repo, outDir)}/index.html (${(html.length / 1024).toFixed(0)} KB), styles.css (${(css.length / 1024).toFixed(0)} KB), ${fs.readdirSync(assetsDir).length} assets`,
     );
   }
   await browser.close();

@@ -44,6 +44,7 @@ import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 import { LINKEDIN_PATHS, LOGO_PATHS, WECHAT_PATHS, type VectorPath } from "../variant-o/vectors";
 import { INTRO_REVEAL_MS, introStyles, useIntro } from "./intro";
 import { LiquidImage } from "./liquid-hero";
+import { AboutView } from "./about-view";
 import {
   ABOUT,
   COPYRIGHT,
@@ -1548,7 +1549,13 @@ function useActiveSection(ids: readonly string[]) {
   return active;
 }
 
-function SiteHeader() {
+function SiteHeader({
+  currentView,
+  onNavigate,
+}: {
+  currentView?: "home" | "about";
+  onNavigate?: (view: "home" | "about", targetId?: string) => void;
+}) {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuId = useId();
   const reduce = useReducedMotion();
@@ -1557,14 +1564,56 @@ function SiteHeader() {
   const closeOnEscape = (event: KeyboardEvent<HTMLElement>) => {
     if (event.key === "Escape" && menuOpen) setMenuOpen(false);
   };
-  const isActive = (href: string) => href.slice(1) === activeId;
+  const isActive = (href: string) => {
+    if (href === "#about") {
+      return currentView === "about";
+    }
+    if (currentView === "about") {
+      return false;
+    }
+    return href.slice(1) === activeId;
+  };
+
+  const handleItemClick = (event: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    if (!onNavigate) return;
+    if (href === "#about") {
+      event.preventDefault();
+      onNavigate("about", "about-top");
+      setMenuOpen(false);
+      return;
+    }
+    if (href === "#top") {
+      if (currentView === "about") {
+        event.preventDefault();
+        onNavigate("home", "top");
+      }
+      setMenuOpen(false);
+      return;
+    }
+    if (currentView === "about") {
+      event.preventDefault();
+      onNavigate("home", href.slice(1));
+      setMenuOpen(false);
+    }
+  };
+
   return (
     <header
       onKeyDown={closeOnEscape}
       {...stylex.props(styles.header, (scrolled || menuOpen) && styles.headerSolid)}
     >
       <div {...stylex.props(styles.shell, styles.headerInner)}>
-        <a href="#top" aria-label="FENCHEM 泛成 首页" {...stylex.props(styles.logoLink)}>
+        <a
+          href="#top"
+          aria-label="FENCHEM 泛成 首页"
+          onClick={(event) => {
+            if (currentView === "about" && onNavigate) {
+              event.preventDefault();
+              onNavigate("home", "top");
+            }
+          }}
+          {...stylex.props(styles.logoLink)}
+        >
           <LogoMark />
         </a>
         <nav aria-label="主导航" {...stylex.props(styles.nav)}>
@@ -1573,6 +1622,7 @@ function SiteHeader() {
               key={item.href}
               href={item.href}
               aria-current={isActive(item.href) ? "location" : undefined}
+              onClick={(event) => handleItemClick(event, item.href)}
               {...stylex.props(styles.navLink, isActive(item.href) && styles.navLinkActive)}
             >
               {item.label}
@@ -1621,7 +1671,7 @@ function SiteHeader() {
                   <a
                     href={item.href}
                     aria-current={isActive(item.href) ? "location" : undefined}
-                    onClick={() => setMenuOpen(false)}
+                    onClick={(event) => handleItemClick(event, item.href)}
                     {...stylex.props(styles.menuLink, isActive(item.href) && styles.menuLinkActive)}
                   >
                     {item.label}
@@ -1777,7 +1827,7 @@ function InkPhrase({
   );
 }
 
-function About() {
+function About({ onOpenAboutPage }: { onOpenAboutPage?: () => void }) {
   const textRef = useRef<HTMLParagraphElement>(null);
   const { scrollYProgress } = useScroll({ target: textRef, offset: ["start 0.85", "end 0.45"] });
   return (
@@ -1802,12 +1852,30 @@ function About() {
             </Fragment>
           ))}
         </p>
-        <a
-          href={ABOUT.cta.href}
-          {...stylex.props(styles.button, styles.buttonPrimary, styles.buttonCompact)}
-        >
-          {ABOUT.cta.label}
-        </a>
+        <div style={{ display: "flex", gap: 12, flexWrap: "wrap", justifyContent: "center" }}>
+          {onOpenAboutPage ? (
+            <button
+              type="button"
+              onClick={onOpenAboutPage}
+              {...stylex.props(styles.button, styles.buttonPrimary, styles.buttonCompact)}
+            >
+              了解泛成详情 · 关于我们
+            </button>
+          ) : (
+            <a
+              href={ABOUT.cta.href}
+              {...stylex.props(styles.button, styles.buttonPrimary, styles.buttonCompact)}
+            >
+              {ABOUT.cta.label}
+            </a>
+          )}
+          <a
+            href="#products"
+            {...stylex.props(styles.button, styles.buttonSecondary, styles.buttonCompact)}
+          >
+            探索四大核心业务
+          </a>
+        </div>
       </RiseReveal>
     </section>
   );
@@ -2303,7 +2371,11 @@ function ContactCta() {
   );
 }
 
-function SiteFooter() {
+function SiteFooter({
+  onNavigate,
+}: {
+  onNavigate?: (view: "home" | "about", targetId?: string) => void;
+}) {
   return (
     <footer {...stylex.props(styles.footer)}>
       <div {...stylex.props(styles.shell, styles.inset120, styles.footerInner)}>
@@ -2324,7 +2396,16 @@ function SiteFooter() {
                 <ul {...stylex.props(styles.footerLinks)}>
                   {column.links.map((link) => (
                     <li key={link}>
-                      <a href="#top" {...stylex.props(styles.footerLink)}>
+                      <a
+                        href={link === "关于我们" ? "#about-top" : "#top"}
+                        onClick={(event) => {
+                          if (link === "关于我们" && onNavigate) {
+                            event.preventDefault();
+                            onNavigate("about", "about-top");
+                          }
+                        }}
+                        {...stylex.props(styles.footerLink)}
+                      >
                         {link}
                       </a>
                     </li>
@@ -2367,6 +2448,48 @@ export function VariantOOS1() {
       root.style.scrollBehavior = previous;
     };
   }, [reduce]);
+
+  const [view, setView] = useState<"home" | "about">(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("page") === "about" || window.location.hash === "#about-page") {
+        return "about";
+      }
+    }
+    return "home";
+  });
+
+  const handleNavigate = (targetView: "home" | "about", targetId?: string) => {
+    setView(targetView);
+    if (typeof window !== "undefined") {
+      const url = new URL(window.location.href);
+      if (targetView === "about") {
+        url.searchParams.set("page", "about");
+      } else {
+        url.searchParams.delete("page");
+      }
+      url.hash = targetId ? `#${targetId}` : "";
+      window.history.pushState({}, "", url.toString());
+      if (targetId) {
+        setTimeout(() => {
+          const el = document.getElementById(targetId);
+          if (el) el.scrollIntoView({ behavior: "smooth" });
+        }, 60);
+      } else {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+    }
+  };
+
+  useEffect(() => {
+    const onPopState = () => {
+      const params = new URLSearchParams(window.location.search);
+      setView(params.get("page") === "about" ? "about" : "home");
+    };
+    window.addEventListener("popstate", onPopState);
+    return () => window.removeEventListener("popstate", onPopState);
+  }, []);
+
   return (
     <LazyMotion features={domAnimation} strict>
       <MotionConfig reducedMotion="user">
@@ -2374,19 +2497,25 @@ export function VariantOOS1() {
           <a href="#main-content" {...stylex.props(styles.skipLink)}>
             跳到主要内容
           </a>
-          <SiteHeader />
+          <SiteHeader currentView={view} onNavigate={handleNavigate} />
           <div {...stylex.props(styles.page, intro === "play" && introStyles.pageReveal)}>
             <main id="main-content" tabIndex={-1} {...stylex.props(styles.mainTarget)}>
-              <Hero />
-              <About />
-              <Campus />
-              <Strengths />
-              <Products />
-              <Offices />
-              <News />
-              <ContactCta />
+              {view === "about" ? (
+                <AboutView onNavigateHome={(target) => handleNavigate("home", target)} />
+              ) : (
+                <>
+                  <Hero />
+                  <About onOpenAboutPage={() => handleNavigate("about", "about-top")} />
+                  <Campus />
+                  <Strengths />
+                  <Products />
+                  <Offices />
+                  <News />
+                  <ContactCta />
+                </>
+              )}
             </main>
-            <SiteFooter />
+            <SiteFooter onNavigate={handleNavigate} />
           </div>
         </div>
       </MotionConfig>
