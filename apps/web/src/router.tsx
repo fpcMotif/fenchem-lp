@@ -9,10 +9,6 @@ import { routeTree } from "./routeTree.gen";
 
 export function getRouter() {
   const convexUrl = env.VITE_CONVEX_URL;
-  if (!convexUrl) {
-    throw new Error("VITE_CONVEX_URL is not set");
-  }
-
   const convexQueryClient = new ConvexQueryClient(convexUrl);
 
   const queryClient: QueryClient = new QueryClient({
