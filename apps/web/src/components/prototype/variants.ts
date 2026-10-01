@@ -142,6 +142,86 @@ export const VARIANTS = [
     twinOf: "oos",
   },
   {
+    key: "oos1a",
+    Component: lazy(() =>
+      import("./variant-oos1/abouts/oos1a/index").then((m) => ({ default: m.VariantOOS1A })),
+    ),
+    name: "O campus about · Lattice / misregistered",
+    twinOf: "oos1",
+  },
+  {
+    key: "oos1b",
+    Component: lazy(() =>
+      import("./variant-oos1/abouts/oos1b/index").then((m) => ({ default: m.VariantOOS1B })),
+    ),
+    name: "O campus about · Axis / mirror fold",
+    twinOf: "oos1",
+  },
+  {
+    key: "oos1c",
+    Component: lazy(() =>
+      import("./variant-oos1/abouts/oos1c/index").then((m) => ({ default: m.VariantOOS1C })),
+    ),
+    name: "O campus about · Panorama / seam",
+    twinOf: "oos1",
+  },
+  {
+    key: "oos1d",
+    Component: lazy(() =>
+      import("./variant-oos1/abouts/oos1d/index").then((m) => ({ default: m.VariantOOS1D })),
+    ),
+    name: "O campus about · Phi / off-by-one",
+    twinOf: "oos1",
+  },
+  {
+    key: "oos1e",
+    Component: lazy(() =>
+      import("./variant-oos1/abouts/oos1e/index").then((m) => ({ default: m.VariantOOS1E })),
+    ),
+    name: "O campus about · Dossier / overprint",
+    twinOf: "oos1",
+  },
+  {
+    key: "oos1f",
+    Component: lazy(() =>
+      import("./variant-oos1/abouts/oos1f/index").then((m) => ({ default: m.VariantOOS1F })),
+    ),
+    name: "O campus about · Strand / twist",
+    twinOf: "oos1",
+  },
+  {
+    key: "oos1g",
+    Component: lazy(() =>
+      import("./variant-oos1/abouts/oos1g/index").then((m) => ({ default: m.VariantOOS1G })),
+    ),
+    name: "O campus about · Bisect / crosshair",
+    twinOf: "oos1",
+  },
+  {
+    key: "oos1h",
+    Component: lazy(() =>
+      import("./variant-oos1/abouts/oos1h/index").then((m) => ({ default: m.VariantOOS1H })),
+    ),
+    name: "O campus about · Odometer / ticks",
+    twinOf: "oos1",
+  },
+  {
+    key: "oos1i",
+    Component: lazy(() =>
+      import("./variant-oos1/abouts/oos1i/index").then((m) => ({ default: m.VariantOOS1I })),
+    ),
+    name: "O campus about · Shear / diagonal wipe",
+    twinOf: "oos1",
+  },
+  {
+    key: "oos1j",
+    Component: lazy(() =>
+      import("./variant-oos1/abouts/oos1j/index").then((m) => ({ default: m.VariantOOS1J })),
+    ),
+    name: "O campus about · Monument / crop",
+    twinOf: "oos1",
+  },
+  {
     key: "oos2",
     Component: lazy(() => import("./variant-oos2/index").then((m) => ({ default: m.VariantOOS2 }))),
     name: "Official site · O campus keep-open",

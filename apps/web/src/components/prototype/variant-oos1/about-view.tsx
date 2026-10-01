@@ -1,29 +1,35 @@
 import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 import {
-  ArrowLeft,
   ArrowRight,
   Award,
   Building2,
-  CheckCircle2,
+  ChevronDown,
+  ChevronLeft,
   ChevronRight,
-  Compass,
+  Factory,
   Leaf,
-  Lightbulb,
-  Network,
-  ShieldCheck,
-  Sparkles,
+  Recycle,
+  X,
 } from "lucide-react";
-import { useState } from "react";
+import { animate, m, useInView, useScroll, useTransform } from "motion/react";
+import { type ReactNode, useEffect, useId, useRef, useState } from "react";
+
+import { EASE } from "@/components/prototype/motion-constants";
+import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
 import {
+  ABOUT_BANNER,
+  ABOUT_CAMPUS,
   ABOUT_CSR,
   ABOUT_CULTURE,
   ABOUT_HERO,
   ABOUT_HONORS,
-  ABOUT_STATS,
+  ABOUT_MOMENT,
   ABOUT_STRUCTURE,
 } from "./about-data";
+import { CTA, STATS } from "./content";
+import { useActiveSection } from "./use-active-section";
 
 const INK = "#1a1a1a";
 const BODY_TEXT = "#4d4d4d";
@@ -31,17 +37,76 @@ const TINT = "#e6ecf7";
 const OOX_WORD_ON_TINT = "#d7e1f1";
 const WORD_ON_TINT = `color-mix(in srgb, ${OOX_WORD_ON_TINT} 80%, ${TINT})`;
 const DISPLAY_FONT = '"Inter Tight", "Helvetica Neue", Arial, sans-serif';
+const SERIF_ACCENT = '"Instrument Serif", Georgia, serif';
 const SURFACE = "#f6f6f6";
+const PAPER_WARM = "#faf8f4";
 const FOOTER_BLUE = "#294f92";
+const CSR_ACCENT = "#8cd6a3";
+const NAVY_SCRIM = "rgba(6, 28, 66, 0.78)";
+const PHOTO_OUTLINE = "rgba(0, 0, 0, 0.1)";
+const HAIRLINE = "rgba(26, 26, 26, 0.1)";
+const BRANCH_LINE = "rgba(41, 79, 146, 0.28)";
+const GRAIN = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`;
 const TABLET = "@media (min-width: 768px) and (max-width: 1279.98px)";
 const DESKTOP = breakpoints.xl;
-const EASE_OUT_CSS = "cubic-bezier(0.22, 1, 0.36, 1)";
+const SM_BELOW_DESKTOP = "@media (min-width: 640px) and (max-width: 1279.98px)";
+const SM_BELOW_LG = "@media (min-width: 640px) and (max-width: 1023.98px)";
 const HOVER_MOTION =
   "@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)";
+const EASE_OUT_CSS = "cubic-bezier(0.22, 1, 0.36, 1)";
 
-const INSET_120 = "min(120px, 8.333vw)";
 const INSET_124 = "min(124px, 8.611vw)";
 const HEADER_HEIGHT = 80;
+const SUB_BAR_HEIGHT = 56;
+const REVEAL_STEP_MS = 70;
+const REVEAL_MAX_STEPS = 5;
+const COUNT_UP_SECONDS = 1.6;
+
+const SECTION_IDS = ABOUT_HERO.navChips.map((chip) => chip.id);
+
+const revealDelay = (index: number) => Math.min(index, REVEAL_MAX_STEPS) * REVEAL_STEP_MS;
+const easeOutCubic = (t: number) => 1 - (1 - Math.min(1, Math.max(0, t))) ** 3;
+
+const LEVEL_LABEL = {
+  national: "国家级",
+  provincial: "江苏省级",
+  municipal: "南京市级",
+} as const;
+
+const CSR_ICONS = {
+  factory: Factory,
+  recycle: Recycle,
+  leaf: Leaf,
+} as const;
+
+const bannerSettle = stylex.keyframes({
+  "0%": { scale: "1.08" },
+  "100%": { scale: "1" },
+});
+
+const scrollCue = stylex.keyframes({
+  "0%": { transform: "translateY(-100%)" },
+  "100%": { transform: "translateY(200%)" },
+});
+
+const fadeIn = stylex.keyframes({
+  "0%": { opacity: 0 },
+  "100%": { opacity: 1 },
+});
+
+const fadeRise = stylex.keyframes({
+  "0%": { opacity: 0, transform: "translateY(8px)" },
+  "100%": { opacity: 1, transform: "none" },
+});
+
+const zoomIn = stylex.keyframes({
+  "0%": { opacity: 0, transform: "scale(0.96)" },
+  "100%": { opacity: 1, transform: "none" },
+});
+
+const dynamic = stylex.create({
+  delay: (ms: number) => ({ transitionDelay: `${ms}ms` }),
+});
 
 const styles = stylex.create({
   root: {
@@ -55,14 +120,165 @@ const styles = stylex.create({
     marginInline: "auto",
     boxSizing: "border-box",
   },
-  inset120: {
-    paddingInline: { default: 16, [TABLET]: 40, [DESKTOP]: INSET_120 },
-  },
   inset124: {
     paddingInline: { default: 16, [TABLET]: 40, [DESKTOP]: INSET_124 },
   },
   anchor: {
-    scrollMarginTop: HEADER_HEIGHT + 32,
+    scrollMarginTop: HEADER_HEIGHT + SUB_BAR_HEIGHT + 24,
+  },
+  srOnly: {
+    position: "absolute",
+    width: 1,
+    height: 1,
+    overflow: "hidden",
+    clipPath: "inset(50%)",
+    whiteSpace: "nowrap",
+  },
+  focusRing: {
+    outlineStyle: { default: "none", ":focus-visible": "solid" },
+    outlineWidth: 2,
+    outlineColor: colors.brandBlue700,
+    outlineOffset: 2,
+  },
+  reveal: {
+    opacity: 0,
+    transform: { default: null, [breakpoints.motionOk]: "translateY(18px)" },
+    transitionProperty: "opacity, transform",
+    transitionDuration: "900ms",
+    transitionTimingFunction: EASE_OUT_CSS,
+  },
+  revealShown: {
+    opacity: 1,
+    transform: "none",
+  },
+  grain: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    width: "100%",
+    height: "100%",
+    backgroundImage: GRAIN,
+    opacity: 0.14,
+    mixBlendMode: "overlay",
+    pointerEvents: "none",
+  },
+  behind: {
+    zIndex: -1,
+  },
+  fill: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    display: "block",
+    width: "100%",
+    height: "100%",
+    objectFit: "cover",
+  },
+  photoOutline: {
+    outlineWidth: 1,
+    outlineStyle: "solid",
+    outlineColor: PHOTO_OUTLINE,
+    outlineOffset: -1,
+  },
+
+  banner: {
+    position: "relative",
+    overflow: "hidden",
+    display: "flex",
+    alignItems: "flex-end",
+    height: { default: 480, [TABLET]: 580, [DESKTOP]: "clamp(580px, 80svh, 720px)" },
+    backgroundColor: "#0b2a5c",
+    color: colors.paper,
+  },
+  bannerImage: {
+    animationName: { default: null, [breakpoints.motionOk]: bannerSettle },
+    animationDuration: "1800ms",
+    animationDelay: "200ms",
+    animationTimingFunction: EASE_OUT_CSS,
+    animationFillMode: "both",
+    objectPosition: "center 58%",
+  },
+  bannerScrim: {
+    backgroundImage: `linear-gradient(to bottom, rgba(255, 255, 255, 0.6) 0px, rgba(255, 255, 255, 0) 160px), linear-gradient(to top, ${NAVY_SCRIM} 0%, rgba(6, 28, 66, 0.34) 42%, rgba(6, 28, 66, 0) 66%)`,
+    pointerEvents: "none",
+  },
+  bannerContent: {
+    position: "relative",
+    display: "flex",
+    alignItems: "flex-end",
+    justifyContent: "space-between",
+    gap: 40,
+    paddingBottom: { default: 44, [TABLET]: 60, [DESKTOP]: 80 },
+  },
+  bannerText: {
+    display: "flex",
+    flexDirection: "column",
+    gap: 18,
+  },
+  bannerTitle: {
+    margin: 0,
+    fontSize: { default: 40, [TABLET]: 56, [DESKTOP]: 72 },
+    fontWeight: 800,
+    lineHeight: 1.1,
+    letterSpacing: "0.06em",
+    textShadow: "0 2px 24px rgba(6, 28, 66, 0.35)",
+  },
+  bannerTagline: {
+    margin: 0,
+    fontFamily: SERIF_ACCENT,
+    fontStyle: "italic",
+    fontSize: { default: 22, [TABLET]: 26, [DESKTOP]: 30 },
+    fontWeight: 400,
+    lineHeight: 1.2,
+    color: "rgba(255, 255, 255, 0.94)",
+  },
+  bannerLead: {
+    margin: 0,
+    maxWidth: 640,
+    fontSize: { default: 15, [DESKTOP]: 17 },
+    lineHeight: 1.8,
+    letterSpacing: "0.08em",
+    color: "rgba(255, 255, 255, 0.84)",
+    textWrap: "pretty",
+  },
+  bannerMeta: {
+    display: { default: "none", [breakpoints.md]: "flex" },
+    flexDirection: "column",
+    alignItems: "flex-end",
+    gap: 14,
+    flexShrink: 0,
+    fontFamily: DISPLAY_FONT,
+    fontSize: 11,
+    fontWeight: 500,
+    letterSpacing: "0.22em",
+    textTransform: "uppercase",
+    color: "rgba(255, 255, 255, 0.78)",
+  },
+  bannerMetaRule: {
+    width: 40,
+    height: 1,
+    backgroundColor: "rgba(255, 255, 255, 0.5)",
+  },
+  scrollTrack: {
+    position: "relative",
+    overflow: "hidden",
+    width: 1,
+    height: 56,
+    marginTop: 10,
+    marginInlineEnd: 4,
+    backgroundColor: "rgba(255, 255, 255, 0.25)",
+  },
+  scrollThumb: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    width: "100%",
+    height: "40%",
+    backgroundColor: colors.paper,
+    animationName: { default: null, [breakpoints.motionOk]: scrollCue },
+    animationDuration: "2400ms",
+    animationTimingFunction: "cubic-bezier(0.65, 0, 0.35, 1)",
+    animationIterationCount: "infinite",
   },
 
   subBar: {
@@ -75,25 +291,28 @@ const styles = stylex.create({
   },
   subBarInner: {
     display: "flex",
-    flexDirection: { default: "column", [breakpoints.md]: "row" },
-    alignItems: { default: "flex-start", [breakpoints.md]: "center" },
+    alignItems: "center",
     justifyContent: "space-between",
-    gap: 12,
-    minHeight: 56,
-    paddingBlock: { default: 10, [breakpoints.md]: 0 },
+    gap: 24,
+    height: SUB_BAR_HEIGHT,
   },
   breadcrumb: {
-    display: "flex",
+    display: { default: "none", [breakpoints.lg]: "flex" },
     alignItems: "center",
     gap: 8,
+    flexShrink: 0,
     fontSize: 14,
+    letterSpacing: "0.04em",
     color: BODY_TEXT,
   },
   breadcrumbLink: {
-    color: BODY_TEXT,
-    textDecoration: "none",
+    padding: 0,
+    borderWidth: 0,
+    backgroundColor: "transparent",
+    fontSize: "inherit",
+    letterSpacing: "inherit",
+    color: { default: BODY_TEXT, ":hover": colors.brandBlue700 },
     cursor: "pointer",
-    ":hover": { color: colors.brandBlue700 },
   },
   breadcrumbCurrent: {
     color: INK,
@@ -102,677 +321,757 @@ const styles = stylex.create({
   chipList: {
     display: "flex",
     alignItems: "center",
+    justifyContent: { default: "flex-start", [breakpoints.lg]: "flex-end" },
     gap: 8,
+    flexGrow: 1,
+    minWidth: 0,
+    paddingBlock: 4,
     overflowX: "auto",
-    width: { default: "100%", [breakpoints.md]: "auto" },
-    paddingBottom: { default: 4, [breakpoints.md]: 0 },
+    scrollbarWidth: "none",
   },
   chip: {
     display: "inline-flex",
     alignItems: "center",
+    flexShrink: 0,
     height: 32,
-    paddingInline: 14,
+    paddingInline: 15,
     borderRadius: 16,
-    backgroundColor: SURFACE,
+    backgroundColor: { default: SURFACE, ":hover": TINT },
     fontSize: 13,
     fontWeight: 500,
-    color: INK,
+    letterSpacing: "0.06em",
+    color: { default: INK, ":hover": colors.brandBlue700 },
     textDecoration: "none",
     whiteSpace: "nowrap",
     transitionProperty: "background-color, color",
     transitionDuration: "160ms",
     transitionTimingFunction: EASE_OUT_CSS,
-    ":hover": {
-      backgroundColor: TINT,
-      color: colors.brandBlue700,
-    },
   },
-
-  heroBanner: {
-    position: "relative",
-    overflow: "hidden",
-    paddingTop: { default: 56, [DESKTOP]: 88 },
-    paddingBottom: { default: 56, [DESKTOP]: 80 },
-    backgroundColor: colors.paper,
-  },
-  heroGrid: {
-    display: "grid",
-    gridTemplateColumns: { default: "1fr", [DESKTOP]: "1.15fr 0.85fr" },
-    gap: { default: 40, [DESKTOP]: 64 },
-    alignItems: "center",
-  },
-  heroText: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 20,
-  },
-  kicker: {
-    display: "inline-flex",
-    alignItems: "center",
-    gap: 8,
-    fontSize: 13,
-    fontWeight: 700,
-    letterSpacing: "0.12em",
-    textTransform: "uppercase",
-    color: colors.brandBlue700,
-  },
-  kickerDot: {
-    width: 6,
-    height: 6,
-    borderRadius: "50%",
-    backgroundColor: colors.brandBlue700,
-  },
-  heroTitle: {
-    margin: 0,
-    fontSize: { default: 30, [TABLET]: 38, [DESKTOP]: 46 },
-    fontWeight: 800,
-    lineHeight: 1.15,
-    letterSpacing: "-0.02em",
-    color: INK,
-  },
-  heroEnglishTitle: {
-    fontFamily: DISPLAY_FONT,
-    fontSize: { default: 16, [DESKTOP]: 18 },
-    fontWeight: 500,
-    color: BODY_TEXT,
-    letterSpacing: "0.02em",
-  },
-  heroLead: {
-    margin: 0,
-    fontSize: { default: 16, [DESKTOP]: 17 },
-    lineHeight: 1.8,
-    color: INK,
-    textWrap: "pretty",
-  },
-  heroSublead: {
-    margin: 0,
-    fontSize: 15,
-    lineHeight: 1.75,
-    color: BODY_TEXT,
-    textWrap: "pretty",
-  },
-  highlightList: {
-    display: "grid",
-    gridTemplateColumns: { default: "1fr", [breakpoints.sm]: "repeat(2, 1fr)" },
-    gap: 12,
-    paddingTop: 8,
-  },
-  highlightItem: {
-    display: "flex",
-    alignItems: "center",
-    gap: 10,
-    padding: "10px 14px",
-    borderRadius: 8,
-    backgroundColor: SURFACE,
-    fontSize: 14,
-    fontWeight: 600,
-    color: INK,
-  },
-  highlightIcon: {
-    color: colors.brandBlue700,
-    flexShrink: 0,
-  },
-  heroImageFrame: {
-    position: "relative",
-    overflow: "hidden",
-    borderRadius: 16,
-    aspectRatio: { default: "16 / 10", [DESKTOP]: "4 / 3" },
-    boxShadow: "0 12px 36px -12px rgba(7, 67, 174, 0.16)",
-  },
-  heroImage: {
-    display: "block",
-    width: "100%",
-    height: "100%",
-    objectFit: "cover",
-    transform: { default: null, ":hover": { default: null, [HOVER_MOTION]: "scale(1.03)" } },
-    transitionProperty: "transform",
-    transitionDuration: "700ms",
-    transitionTimingFunction: EASE_OUT_CSS,
-  },
-  heroImageCaption: {
-    position: "absolute",
-    bottom: 0,
-    insetInline: 0,
-    padding: "16px 20px",
-    background: "linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0) 100%)",
-    color: colors.paper,
-    fontSize: 13,
-    fontWeight: 500,
-  },
-
-  statsSection: {
-    paddingBlock: { default: 48, [DESKTOP]: 64 },
-    backgroundColor: SURFACE,
-    boxShadow: "inset 0 1px 0 0 rgba(0,0,0,0.04), inset 0 -1px 0 0 rgba(0,0,0,0.04)",
-  },
-  statsBand: {
-    display: "flex",
-    flexDirection: { default: "column", [breakpoints.md]: "row" },
-    alignItems: { default: "stretch", [breakpoints.md]: "center" },
-    gap: { default: 32, [breakpoints.md]: 16 },
-  },
-  stat: {
-    flexGrow: 1,
-    flexBasis: 0,
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    gap: 8,
-    textAlign: "center",
-  },
-  statFigure: {
-    display: "flex",
-    alignItems: "baseline",
-    gap: 2,
-    margin: 0,
-    fontFamily: DISPLAY_FONT,
-  },
-  statValue: {
-    display: "inline-flex",
-    fontSize: { default: 48, [DESKTOP]: 60 },
-    fontWeight: 600,
-    lineHeight: 1.1,
-    letterSpacing: "-0.03em",
-    color: INK,
-  },
-  statUnit: {
-    fontSize: 32,
-    fontWeight: 600,
-    lineHeight: 1.2,
-    color: colors.brandBlue700,
-  },
-  statText: {
-    margin: 0,
-    fontSize: 15,
-    fontWeight: 500,
-    lineHeight: 1.3,
-    color: BODY_TEXT,
-  },
-  statDivider: {
-    display: { default: "none", [breakpoints.md]: "block" },
-    flexShrink: 0,
-    width: 1,
-    height: 60,
-    backgroundColor: "rgba(0,0,0,0.12)",
-  },
-  wheel: {
-    display: "inline-block",
-    overflow: "hidden",
-    height: "1.1em",
-  },
-  wheelColumn: {
-    display: "flex",
-    flexDirection: "column",
-  },
-  wheelCell: {
-    display: "block",
-    height: "1.1em",
+  chipActive: {
+    backgroundColor: { default: colors.brandBlue700, ":hover": colors.brandBlue800 },
+    color: { default: colors.paper, ":hover": colors.paper },
   },
 
   sectionHeader: {
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    gap: 12,
-    maxWidth: 768,
+    gap: 16,
+    maxWidth: 760,
     marginInline: "auto",
-    textAlign: "center",
     marginBottom: { default: 40, [DESKTOP]: 64 },
+    textAlign: "center",
   },
   sectionTitle: {
     margin: 0,
-    fontSize: { default: 28, [TABLET]: 34, [DESKTOP]: 40 },
+    fontSize: { default: 26, [TABLET]: 32, [DESKTOP]: 40 },
     fontWeight: 700,
     lineHeight: 1.2,
     color: INK,
-  },
-  sectionLead: {
-    margin: 0,
-    fontSize: { default: 15, [DESKTOP]: 17 },
-    lineHeight: 1.7,
-    color: BODY_TEXT,
+    textWrap: "balance",
   },
 
-  cultureSection: {
-    paddingBlock: { default: 64, [DESKTOP]: 104 },
+  profileSection: {
+    paddingBlock: { default: 72, [DESKTOP]: 128 },
     backgroundColor: colors.paper,
   },
-  cultureGrid: {
+  profileGrid: {
     display: "grid",
-    gridTemplateColumns: { default: "1fr", [breakpoints.md]: "repeat(3, 1fr)" },
-    gap: 24,
+    gridTemplateColumns: { default: "1fr", [DESKTOP]: "minmax(0, 1fr) minmax(0, 1fr)" },
+    gap: { default: 40, [DESKTOP]: 96 },
+    alignItems: "center",
   },
-  cultureCard: {
-    position: "relative",
+  profileText: {
     display: "flex",
     flexDirection: "column",
-    justifyContent: "space-between",
-    gap: 28,
-    minHeight: { default: 320, [DESKTOP]: 380 },
-    padding: { default: 28, [DESKTOP]: 36 },
-    boxSizing: "border-box",
-    borderRadius: 16,
-    transitionProperty: "transform, box-shadow",
-    transitionDuration: "250ms",
-    transitionTimingFunction: EASE_OUT_CSS,
-    ":hover": {
-      transform: { default: null, [HOVER_MOTION]: "translateY(-4px)" },
-      boxShadow: "0 16px 40px -12px rgba(7, 67, 174, 0.15)",
-    },
+    gap: 32,
   },
-  cultureBlue: {
-    backgroundColor: "#294f92",
-    color: "#ffffff",
+  profileTitle: {
+    margin: 0,
+    fontSize: { default: 26, [TABLET]: 32, [DESKTOP]: 38 },
+    fontWeight: 800,
+    lineHeight: 1.3,
+    letterSpacing: "0.02em",
+    color: INK,
+    textWrap: "balance",
   },
-  cultureCream: {
-    backgroundColor: "#f5edd8",
+  profileEnglish: {
+    marginTop: 10,
+    fontFamily: DISPLAY_FONT,
+    fontSize: { default: 15, [DESKTOP]: 17 },
+    fontWeight: 500,
+    letterSpacing: "0.02em",
+    color: BODY_TEXT,
+  },
+  profileLead: {
+    margin: 0,
+    maxWidth: 560,
+    fontSize: { default: 16, [DESKTOP]: 17 },
+    lineHeight: 2,
+    letterSpacing: "0.04em",
     color: INK,
   },
-  cultureGreen: {
-    backgroundColor: "#4f7a55",
-    color: "#ffffff",
-  },
-  cultureTop: {
+  network: {
     display: "flex",
-    alignItems: "flex-start",
-    justifyContent: "space-between",
-    gap: 16,
+    flexDirection: "column",
+    gap: 14,
   },
-  cultureIndex: {
+  networkLabel: {
+    margin: 0,
+    fontSize: 14,
+    fontWeight: 600,
+    letterSpacing: "0.06em",
+    color: BODY_TEXT,
+  },
+  countryList: {
+    display: "flex",
+    flexWrap: "wrap",
+    alignItems: "center",
+    gap: 8,
+    maxWidth: 560,
+    margin: 0,
+    padding: 0,
+    listStyle: "none",
+  },
+  countryTag: {
+    paddingBlock: 6,
+    paddingInline: 14,
+    borderRadius: 999,
+    backgroundColor: SURFACE,
+    fontSize: 13,
+    fontWeight: 500,
+    letterSpacing: "0.06em",
+    color: INK,
+  },
+  countryMore: {
+    fontSize: 13,
+    letterSpacing: "0.06em",
+    color: BODY_TEXT,
+  },
+  profileFigure: {
+    position: "relative",
+    overflow: "hidden",
+    margin: 0,
+    borderRadius: 16,
+    aspectRatio: { default: "4 / 3", [DESKTOP]: "5 / 4" },
+    boxShadow: "0 24px 48px -24px rgba(7, 67, 174, 0.28)",
+  },
+  photoTag: {
+    position: "absolute",
+    insetInlineStart: 16,
+    bottom: 16,
+    paddingBlock: 6,
+    paddingInline: 14,
+    borderRadius: 999,
+    backgroundColor: "rgba(255, 255, 255, 0.9)",
+    backdropFilter: "blur(8px)",
+    fontSize: 13,
+    fontWeight: 600,
+    letterSpacing: "0.08em",
+    color: INK,
+  },
+
+  moment: {
+    position: "relative",
+    height: { default: 560, [TABLET]: 680, [DESKTOP]: "min(92svh, 860px)" },
+    backgroundColor: colors.paper,
+  },
+  momentFrame: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    display: "flex",
+    alignItems: "flex-end",
+    width: "100%",
+    height: "100%",
+    overflow: "hidden",
+    backgroundColor: "#0b2a5c",
+    color: colors.paper,
+  },
+  momentScrim: {
+    backgroundImage: {
+      default:
+        "linear-gradient(to top, rgba(6, 28, 66, 0.9) 0%, rgba(6, 28, 66, 0.62) 58%, rgba(6, 28, 66, 0) 88%)",
+      [breakpoints.md]:
+        "linear-gradient(to top, rgba(6, 28, 66, 0.82) 0%, rgba(6, 28, 66, 0.36) 42%, rgba(6, 28, 66, 0) 68%)",
+    },
+    pointerEvents: "none",
+  },
+  momentCaption: {
+    position: "absolute",
+    top: { default: 24, [DESKTOP]: 40 },
+    insetInlineStart: { default: 16, [TABLET]: 40, [DESKTOP]: INSET_124 },
+    fontSize: 12,
+    fontWeight: 500,
+    letterSpacing: "0.16em",
+    color: "rgba(255, 255, 255, 0.86)",
+    textShadow: "0 1px 12px rgba(0, 0, 0, 0.35)",
+  },
+  momentStats: {
+    position: "relative",
+    display: "grid",
+    gridTemplateColumns: { default: "1fr", [breakpoints.md]: "repeat(3, minmax(0, 1fr))" },
+    paddingBottom: { default: 32, [TABLET]: 56, [DESKTOP]: 80 },
+  },
+  momentStat: {
+    display: "flex",
+    flexDirection: { default: "row", [breakpoints.md]: "column" },
+    alignItems: { default: "baseline", [breakpoints.md]: "center" },
+    justifyContent: { default: "space-between", [breakpoints.md]: "flex-start" },
+    gap: { default: 16, [breakpoints.md]: 10 },
+    paddingBlock: { default: 14, [breakpoints.md]: 0 },
+    borderTopWidth: { default: 1, [breakpoints.md]: 0 },
+    borderInlineStartWidth: 0,
+    borderStyle: "solid",
+    borderColor: "rgba(255, 255, 255, 0.2)",
+  },
+  momentStatDivided: {
+    borderInlineStartWidth: { default: 0, [breakpoints.md]: 1 },
+  },
+  statFigure: {
+    display: "flex",
+    alignItems: "baseline",
+    gap: 4,
     fontFamily: DISPLAY_FONT,
-    fontSize: 44,
-    fontWeight: 700,
-    lineHeight: 1,
-    letterSpacing: "-0.04em",
-    opacity: 0.35,
   },
-  cultureIconPill: {
+  statValue: {
+    fontSize: { default: 40, [TABLET]: 56, [DESKTOP]: 72 },
+    fontWeight: 600,
+    lineHeight: 1,
+    letterSpacing: "-0.03em",
+    fontVariantNumeric: "tabular-nums",
+  },
+  statUnit: {
+    fontSize: { default: 20, [DESKTOP]: 28 },
+    fontWeight: 600,
+    color: CSR_ACCENT,
+  },
+  statText: {
+    margin: 0,
+    fontSize: 14,
+    letterSpacing: "0.1em",
+    color: "rgba(255, 255, 255, 0.82)",
+  },
+
+  campusSection: {
+    paddingBlock: { default: 72, [DESKTOP]: 128 },
+    backgroundColor: colors.paper,
+  },
+  campusGrid: {
+    display: "grid",
+    gridTemplateColumns: {
+      default: "repeat(2, minmax(0, 1fr))",
+      [breakpoints.md]: "repeat(4, minmax(0, 1fr))",
+    },
+    gridAutoRows: { default: 150, [SM_BELOW_DESKTOP]: 200, [DESKTOP]: 250 },
+    gap: { default: 8, [breakpoints.md]: 16 },
+  },
+  campusTile: {
+    position: "relative",
+    overflow: "hidden",
+    margin: 0,
+    borderRadius: 12,
+    backgroundColor: "#dfe5ee",
+  },
+  tileFeature: {
+    gridColumn: "span 2",
+    gridRow: "span 2",
+  },
+  tileWide: {
+    gridColumn: "span 2",
+  },
+  tileButton: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    width: "100%",
+    height: "100%",
+    padding: 0,
+    borderWidth: 0,
+    backgroundColor: "transparent",
+    cursor: "zoom-in",
+    transform: {
+      default: null,
+      ":hover": { default: null, [HOVER_MOTION]: "scale(1.04)" },
+      ":active": { default: null, [breakpoints.motionOk]: "scale(0.99)" },
+    },
+    transitionProperty: "transform",
+    transitionDuration: "700ms",
+    transitionTimingFunction: EASE_OUT_CSS,
+    outlineStyle: { default: "none", ":focus-visible": "solid" },
+    outlineWidth: 3,
+    outlineColor: colors.paper,
+    outlineOffset: -6,
+  },
+  campusCaption: {
+    position: "absolute",
+    left: 0,
+    bottom: 0,
+    width: "100%",
+    boxSizing: "border-box",
+    padding: { default: "36px 12px 12px", [breakpoints.md]: "56px 20px 18px" },
+    backgroundImage: "linear-gradient(to top, rgba(6, 28, 66, 0.62), rgba(6, 28, 66, 0))",
+    fontSize: { default: 13, [breakpoints.md]: 15 },
+    fontWeight: 600,
+    letterSpacing: "0.08em",
+    color: colors.paper,
+    pointerEvents: "none",
+  },
+
+  lightbox: {
+    position: "fixed",
+    top: 0,
+    left: 0,
+    width: "100vw",
+    height: "100dvh",
+    maxWidth: "none",
+    maxHeight: "none",
+    margin: 0,
+    padding: 0,
+    borderWidth: 0,
+    backgroundColor: "rgba(6, 12, 24, 0.94)",
+    color: colors.paper,
+    animationName: fadeIn,
+    animationDuration: "240ms",
+    animationTimingFunction: EASE_OUT_CSS,
+    "::backdrop": { backgroundColor: "transparent" },
+  },
+  lightboxStage: {
+    position: "absolute",
+    top: 0,
+    left: 0,
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    width: 44,
-    height: 44,
-    borderRadius: "50%",
-    backgroundColor: "rgba(255, 255, 255, 0.2)",
-    color: "inherit",
+    width: "100%",
+    height: "100%",
+    boxSizing: "border-box",
+    padding: { default: "64px 12px", [breakpoints.md]: "72px 104px" },
   },
-  cultureBody: {
+  lightboxFigure: {
     display: "flex",
     flexDirection: "column",
-    gap: 12,
-  },
-  cultureCardTitle: {
+    alignItems: "center",
+    gap: 16,
     margin: 0,
+    maxWidth: "100%",
+    animationTimingFunction: EASE_OUT_CSS,
+  },
+  lightboxFigureOpen: {
+    animationName: { default: fadeIn, [breakpoints.motionOk]: zoomIn },
+    animationDuration: "260ms",
+  },
+  lightboxFigureStep: {
+    animationName: fadeIn,
+    animationDuration: "180ms",
+  },
+  lightboxImage: {
+    display: "block",
+    maxWidth: "min(1400px, 100%)",
+    maxHeight: "calc(100dvh - 200px)",
+    width: "auto",
+    height: "auto",
+    borderRadius: 8,
+  },
+  lightboxCaption: {
+    fontSize: 15,
+    letterSpacing: "0.1em",
+    color: "rgba(255, 255, 255, 0.86)",
+  },
+  lightboxButton: {
+    position: "absolute",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    width: 48,
+    height: 48,
+    padding: 0,
+    borderWidth: 0,
+    borderRadius: "50%",
+    backgroundColor: { default: "rgba(255, 255, 255, 0.1)", ":hover": "rgba(255, 255, 255, 0.2)" },
+    color: colors.paper,
+    cursor: "pointer",
+    transform: {
+      default: null,
+      ":active": { default: null, [breakpoints.motionOk]: "scale(0.96)" },
+    },
+    transitionProperty: "background-color, transform",
+    transitionDuration: "160ms",
+    transitionTimingFunction: EASE_OUT_CSS,
+    outlineStyle: { default: "none", ":focus-visible": "solid" },
+    outlineWidth: 2,
+    outlineColor: colors.paper,
+    outlineOffset: 2,
+  },
+  lightboxPrev: {
+    top: "50%",
+    insetInlineStart: { default: 12, [breakpoints.md]: 32 },
+    marginTop: -24,
+  },
+  lightboxNext: {
+    top: "50%",
+    insetInlineEnd: { default: 12, [breakpoints.md]: 32 },
+    marginTop: -24,
+  },
+  lightboxClose: {
+    top: { default: 12, [breakpoints.md]: 24 },
+    insetInlineEnd: { default: 12, [breakpoints.md]: 32 },
+  },
+
+  cultureSection: {
+    paddingBlock: { default: 72, [DESKTOP]: 128 },
+    backgroundColor: PAPER_WARM,
+  },
+  cultureGrid: {
+    display: "grid",
+    gridTemplateColumns: { default: "1fr", [breakpoints.md]: "repeat(3, minmax(0, 1fr))" },
+    maxWidth: 1120,
+    marginInline: "auto",
+  },
+  cultureValue: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    height: "100%",
+    boxSizing: "border-box",
+    paddingBlock: { default: 44, [breakpoints.md]: 8 },
+    paddingInline: { default: 8, [TABLET]: 24, [DESKTOP]: 48 },
+    textAlign: "center",
+    borderStyle: "solid",
+    borderColor: HAIRLINE,
+    borderWidth: 0,
+  },
+  cultureValueDivided: {
+    borderTopWidth: { default: 1, [breakpoints.md]: 0 },
+    borderInlineStartWidth: { default: 0, [breakpoints.md]: 1 },
+  },
+  cultureGlyph: {
+    marginBottom: { default: 24, [DESKTOP]: 32 },
+    fontSize: { default: 96, [DESKTOP]: 128 },
+    fontWeight: 700,
+    lineHeight: 1,
+  },
+  glyphBlue: { color: "#d9e2f2" },
+  glyphSand: { color: "#ebdfc4" },
+  glyphGreen: { color: "#d6e6ca" },
+  cultureTitle: {
+    margin: 0,
+    marginBottom: 16,
     fontSize: { default: 22, [DESKTOP]: 24 },
     fontWeight: 700,
-    lineHeight: 1.25,
-  },
-  cultureCardEnglish: {
-    fontFamily: DISPLAY_FONT,
-    fontSize: 12,
-    fontWeight: 600,
-    letterSpacing: "0.12em",
-    textTransform: "uppercase",
-    opacity: 0.75,
+    lineHeight: 1.3,
+    letterSpacing: "0.14em",
+    marginInlineEnd: "-0.14em",
+    color: INK,
   },
   cultureDesc: {
     margin: 0,
+    maxWidth: "19em",
     fontSize: 15,
-    lineHeight: 1.7,
-    opacity: 0.9,
-  },
-  cultureTagRow: {
-    display: "flex",
-    flexWrap: "wrap",
-    gap: 8,
-    paddingTop: 8,
-  },
-  cultureTag: {
-    display: "inline-flex",
-    padding: "4px 10px",
-    borderRadius: 4,
-    fontSize: 12,
-    fontWeight: 500,
-    backgroundColor: "rgba(0, 0, 0, 0.08)",
-  },
-  cultureTagInverse: {
-    backgroundColor: "rgba(255, 255, 255, 0.18)",
-    color: "#ffffff",
+    lineHeight: 2,
+    letterSpacing: "0.04em",
+    color: BODY_TEXT,
+    textWrap: "pretty",
   },
 
   csrSection: {
-    paddingBlock: { default: 64, [DESKTOP]: 104 },
-    backgroundColor: "#0d2b24",
-    color: "#ffffff",
-  },
-  csrGrid: {
-    display: "grid",
-    gridTemplateColumns: { default: "1fr", [DESKTOP]: "0.9fr 1.1fr" },
-    gap: { default: 40, [DESKTOP]: 64 },
-    alignItems: "center",
-  },
-  csrVisual: {
-    position: "relative",
-    display: "flex",
-    flexDirection: "column",
-    gap: 16,
-  },
-  csrImageFrame: {
     position: "relative",
     overflow: "hidden",
-    borderRadius: 16,
-    aspectRatio: "16 / 10",
-    boxShadow: "0 20px 48px -12px rgba(0, 0, 0, 0.4)",
+    isolation: "isolate",
+    paddingTop: { default: 260, [TABLET]: 340, [DESKTOP]: 420 },
+    paddingBottom: { default: 64, [DESKTOP]: 104 },
+    backgroundColor: "#0a2a26",
+    color: "#ffffff",
+  },
+  csrMedia: {
+    position: "absolute",
+    zIndex: -2,
+    top: "-8%",
+    left: 0,
+    width: "100%",
+    height: "116%",
   },
   csrImage: {
     display: "block",
     width: "100%",
     height: "100%",
     objectFit: "cover",
+    objectPosition: "center 40%",
   },
-  csrVisualTag: {
-    display: "inline-flex",
-    alignItems: "center",
-    gap: 8,
-    fontSize: 13,
-    color: "#8cd6a3",
-    fontWeight: 500,
+  csrScrim: {
+    zIndex: -1,
+    backgroundImage:
+      "linear-gradient(to top, rgba(6, 30, 27, 0.97) 0%, rgba(6, 30, 27, 0.86) 36%, rgba(6, 30, 27, 0.32) 64%, rgba(6, 30, 27, 0.05) 100%), linear-gradient(to right, rgba(6, 30, 27, 0.5), rgba(6, 30, 27, 0) 64%)",
+    pointerEvents: "none",
   },
-  csrContent: {
+  csrInner: {
     display: "flex",
     flexDirection: "column",
-    gap: 24,
+    gap: { default: 48, [DESKTOP]: 88 },
   },
-  csrTitleBlock: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 12,
+  csrHead: {
+    display: "grid",
+    gridTemplateColumns: { default: "1fr", [DESKTOP]: "minmax(0, 1.2fr) minmax(0, 0.8fr)" },
+    gap: { default: 24, [DESKTOP]: 80 },
+    alignItems: "end",
   },
   csrTitle: {
     margin: 0,
-    fontSize: { default: 28, [TABLET]: 34, [DESKTOP]: 40 },
-    fontWeight: 700,
-    lineHeight: 1.2,
-    color: "#ffffff",
-  },
-  csrSlogan: {
-    margin: 0,
-    fontSize: { default: 18, [DESKTOP]: 20 },
+    marginBottom: 20,
+    fontSize: 18,
     fontWeight: 600,
-    color: "#8cd6a3",
+    letterSpacing: "0.12em",
+    color: CSR_ACCENT,
+  },
+  csrStatement: {
+    margin: 0,
+    fontSize: { default: 28, [TABLET]: 40, [DESKTOP]: 52 },
+    fontWeight: 700,
+    lineHeight: 1.4,
+    letterSpacing: "0.04em",
+  },
+  csrStatementLine: {
+    display: "block",
   },
   csrDesc: {
     margin: 0,
+    maxWidth: "28em",
     fontSize: 15,
-    lineHeight: 1.8,
-    color: "#d0e3d7",
+    lineHeight: 2,
+    letterSpacing: "0.04em",
+    color: "rgba(255, 255, 255, 0.78)",
   },
-  csrPillarList: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 16,
-    paddingTop: 8,
-  },
-  csrPillarCard: {
-    display: "flex",
-    alignItems: "flex-start",
-    gap: 16,
-    padding: 16,
-    borderRadius: 12,
-    backgroundColor: "rgba(255, 255, 255, 0.08)",
-    borderWidth: 1,
-    borderStyle: "solid",
-    borderColor: "rgba(255, 255, 255, 0.12)",
-  },
-  csrPillarNum: {
-    fontFamily: DISPLAY_FONT,
-    fontSize: 18,
-    fontWeight: 700,
-    color: "#8cd6a3",
-    flexShrink: 0,
-    lineHeight: 1.2,
-    paddingTop: 2,
-  },
-  csrPillarBody: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 4,
-  },
-  csrPillarTitle: {
+  csrOutcomes: {
+    display: "grid",
+    gridTemplateColumns: { default: "1fr", [breakpoints.md]: "repeat(3, minmax(0, 1fr))" },
+    columnGap: 40,
     margin: 0,
-    fontSize: 16,
+    padding: 0,
+    listStyle: "none",
+  },
+  csrOutcome: {
+    display: "flex",
+    alignItems: "center",
+    gap: 14,
+    paddingBlock: { default: 18, [breakpoints.md]: 24 },
+    borderTopWidth: 1,
+    borderTopStyle: "solid",
+    borderTopColor: "rgba(255, 255, 255, 0.22)",
+    fontSize: { default: 17, [DESKTOP]: 20 },
     fontWeight: 600,
-    color: "#ffffff",
+    letterSpacing: "0.08em",
   },
-  csrPillarDesc: {
-    margin: 0,
-    fontSize: 14,
-    lineHeight: 1.6,
-    color: "#d0e3d7",
+  csrOutcomeIcon: {
+    flexShrink: 0,
+    color: CSR_ACCENT,
   },
 
   honorsSection: {
-    paddingBlock: { default: 64, [DESKTOP]: 104 },
+    paddingBlock: { default: 72, [DESKTOP]: 128 },
     backgroundColor: SURFACE,
   },
   honorsGrid: {
     display: "grid",
     gridTemplateColumns: {
       default: "1fr",
-      [breakpoints.sm]: "repeat(2, 1fr)",
-      [DESKTOP]: "repeat(4, 1fr)",
+      [SM_BELOW_LG]: "repeat(2, minmax(0, 1fr))",
+      [breakpoints.lg]: "repeat(4, minmax(0, 1fr))",
     },
-    gap: 20,
+    gap: { default: 12, [breakpoints.md]: 20 },
   },
   honorCard: {
     display: "flex",
     flexDirection: "column",
-    overflow: "hidden",
+    alignItems: "center",
+    gap: 12,
+    height: "100%",
+    boxSizing: "border-box",
+    padding: { default: "28px 20px", [DESKTOP]: "40px 24px 36px" },
     borderRadius: 12,
     backgroundColor: colors.paper,
-    borderWidth: 1,
-    borderStyle: "solid",
-    borderColor: "rgba(0, 0, 0, 0.06)",
-    transitionProperty: "transform, box-shadow",
-    transitionDuration: "250ms",
-    transitionTimingFunction: EASE_OUT_CSS,
-    ":hover": {
-      transform: { default: null, [HOVER_MOTION]: "translateY(-4px)" },
-      boxShadow: "0 12px 28px -8px rgba(7, 67, 174, 0.12)",
-    },
+    textAlign: "center",
+    boxShadow: "0 0 0 1px rgba(0, 0, 0, 0.05), 0 16px 32px -24px rgba(7, 67, 174, 0.3)",
   },
-  honorImageWrap: {
-    position: "relative",
-    overflow: "hidden",
-    aspectRatio: "3 / 2",
-    backgroundColor: "#f0f2f5",
-  },
-  honorImage: {
-    display: "block",
-    width: "100%",
-    height: "100%",
-    objectFit: "cover",
-  },
-  honorBody: {
+  honorEmblem: {
     display: "flex",
-    flexDirection: "column",
-    gap: 8,
-    padding: 16,
-    flexGrow: 1,
-  },
-  honorTier: {
-    display: "inline-flex",
-    alignSelf: "flex-start",
-    padding: "3px 8px",
-    borderRadius: 4,
-    fontSize: 11,
-    fontWeight: 600,
-    letterSpacing: "0.04em",
+    alignItems: "center",
+    justifyContent: "center",
+    width: 52,
+    height: 52,
+    marginBottom: 12,
+    borderRadius: "50%",
     backgroundColor: TINT,
+    color: colors.brandBlue700,
+    boxShadow: `0 0 0 5px ${colors.paper}, 0 0 0 6px rgba(7, 67, 174, 0.16)`,
+  },
+  honorEmblemNational: {
+    backgroundColor: colors.brandBlue700,
+    color: colors.paper,
+  },
+  honorLevel: {
+    fontSize: 12,
+    fontWeight: 600,
+    letterSpacing: "0.14em",
     color: colors.brandBlue700,
   },
   honorTitle: {
     margin: 0,
-    fontSize: 16,
+    fontSize: 17,
     fontWeight: 700,
-    lineHeight: 1.3,
-    color: INK,
-  },
-  honorSubtitle: {
-    fontFamily: DISPLAY_FONT,
-    fontSize: 11,
-    fontWeight: 500,
+    lineHeight: 1.5,
     letterSpacing: "0.06em",
-    color: BODY_TEXT,
-  },
-  honorDesc: {
-    margin: 0,
-    fontSize: 13,
-    lineHeight: 1.55,
-    color: BODY_TEXT,
-    marginTop: "auto",
-    paddingTop: 8,
+    color: INK,
+    textWrap: "balance",
   },
 
   structureSection: {
-    paddingBlock: { default: 64, [DESKTOP]: 104 },
+    paddingBlock: { default: 72, [DESKTOP]: 128 },
     backgroundColor: colors.paper,
   },
   holdingCard: {
     display: "flex",
-    flexDirection: { default: "column", [breakpoints.md]: "row" },
-    alignItems: { default: "flex-start", [breakpoints.md]: "center" },
-    justifyContent: "space-between",
-    gap: 20,
-    padding: { default: 24, [DESKTOP]: 32 },
+    flexDirection: "column",
+    gap: 10,
+    padding: { default: 28, [DESKTOP]: 40 },
     borderRadius: 16,
     backgroundColor: FOOTER_BLUE,
+    backgroundImage:
+      "radial-gradient(70% 140% at 100% 0%, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 60%)",
     color: colors.paper,
-    boxShadow: "0 12px 32px -10px rgba(41, 79, 146, 0.3)",
-    marginBottom: 32,
-  },
-  holdingMain: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 8,
+    boxShadow: "0 16px 40px -16px rgba(41, 79, 146, 0.4)",
   },
   holdingBadge: {
-    display: "inline-flex",
     alignSelf: "flex-start",
-    padding: "4px 10px",
+    paddingBlock: 4,
+    paddingInline: 10,
     borderRadius: 4,
     backgroundColor: "rgba(255, 255, 255, 0.18)",
     fontSize: 12,
     fontWeight: 600,
-    letterSpacing: "0.06em",
+    letterSpacing: "0.08em",
   },
   holdingTitle: {
     margin: 0,
     fontSize: { default: 22, [DESKTOP]: 28 },
     fontWeight: 800,
-    lineHeight: 1.2,
+    lineHeight: 1.3,
+    letterSpacing: "0.04em",
   },
   holdingEnglish: {
     fontFamily: DISPLAY_FONT,
     fontSize: 14,
     fontWeight: 500,
+    letterSpacing: "0.02em",
     opacity: 0.8,
   },
-  holdingSummary: {
-    margin: 0,
-    maxWidth: 420,
-    fontSize: 14,
-    lineHeight: 1.6,
-    opacity: 0.9,
-  },
-  subsidiaryGrid: {
-    display: "grid",
-    gridTemplateColumns: {
-      default: "1fr",
-      [breakpoints.md]: "repeat(2, 1fr)",
-      [DESKTOP]: "repeat(3, 1fr)",
-    },
-    gap: 20,
-  },
-  subsidiaryCard: {
+  branchList: {
     display: "flex",
     flexDirection: "column",
-    justifyContent: "space-between",
-    gap: 16,
-    padding: 24,
+    gap: 12,
+    margin: 0,
+    paddingTop: 24,
+    paddingBottom: 0,
+    paddingInlineStart: { default: 28, [breakpoints.md]: 56 },
+    paddingInlineEnd: 0,
+    listStyle: "none",
+  },
+  branchItem: {
+    position: "relative",
+  },
+  branchTrunk: {
+    position: "absolute",
+    insetInlineStart: { default: -17, [breakpoints.md]: -29 },
+    top: -12,
+    bottom: 0,
+    width: 2,
+    backgroundColor: BRANCH_LINE,
+  },
+  branchTrunkFirst: {
+    top: -24,
+  },
+  branchTrunkLast: {
+    bottom: "50%",
+  },
+  branchTick: {
+    position: "absolute",
+    insetInlineStart: { default: -17, [breakpoints.md]: -29 },
+    top: "50%",
+    width: { default: 17, [breakpoints.md]: 29 },
+    height: 2,
+    backgroundColor: BRANCH_LINE,
+  },
+  branchNode: {
+    position: "absolute",
+    zIndex: 1,
+    insetInlineStart: -4,
+    top: "50%",
+    width: 8,
+    height: 8,
+    marginTop: -3,
+    boxSizing: "border-box",
+    borderRadius: "50%",
+    borderWidth: 2,
+    borderStyle: "solid",
+    borderColor: FOOTER_BLUE,
+    backgroundColor: colors.paper,
+  },
+  branchCard: {
+    display: "flex",
+    flexDirection: { default: "column", [breakpoints.md]: "row" },
+    alignItems: { default: "flex-start", [breakpoints.md]: "center" },
+    gap: { default: 6, [breakpoints.md]: 20 },
+    padding: { default: "16px 20px", [breakpoints.md]: "20px 28px" },
     borderRadius: 12,
     backgroundColor: SURFACE,
-    borderWidth: 1,
-    borderStyle: "solid",
-    borderColor: "rgba(0,0,0,0.06)",
-    transitionProperty: "transform, border-color, background-color",
-    transitionDuration: "200ms",
-    transitionTimingFunction: EASE_OUT_CSS,
-    ":hover": {
-      backgroundColor: colors.paper,
-      borderColor: colors.brandBlue700,
-      transform: { default: null, [HOVER_MOTION]: "translateY(-3px)" },
-    },
   },
-  subBadge: {
+  branchBadge: {
+    flexShrink: 0,
     fontSize: 12,
     fontWeight: 600,
+    letterSpacing: "0.06em",
     color: colors.brandBlue700,
   },
-  subTitleBlock: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 4,
-  },
-  subTitle: {
+  branchName: {
     margin: 0,
     fontSize: 17,
     fontWeight: 700,
-    lineHeight: 1.3,
+    lineHeight: 1.4,
+    letterSpacing: "0.04em",
     color: INK,
   },
-  subEnglish: {
+  branchEnglish: {
+    marginInlineStart: { default: 0, [breakpoints.md]: "auto" },
     fontFamily: DISPLAY_FONT,
-    fontSize: 12,
-    fontWeight: 500,
-    color: BODY_TEXT,
-  },
-  subFocusPill: {
-    display: "inline-flex",
-    alignSelf: "flex-start",
-    padding: "3px 8px",
-    borderRadius: 4,
-    backgroundColor: TINT,
-    fontSize: 12,
-    fontWeight: 600,
-    color: colors.brandBlue700,
-  },
-  subDesc: {
-    margin: 0,
     fontSize: 13,
-    lineHeight: 1.6,
+    fontWeight: 500,
+    letterSpacing: "0.02em",
     color: BODY_TEXT,
   },
-
-  diagramTriggerWrap: {
+  diagramToggleWrap: {
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    gap: 16,
-    marginTop: 40,
-    paddingTop: 32,
-    borderTopWidth: 1,
-    borderTopStyle: "solid",
-    borderTopColor: "rgba(0,0,0,0.08)",
+    gap: 28,
+    marginTop: 56,
+  },
+  toggleIcon: {
+    transitionProperty: "transform",
+    transitionDuration: "200ms",
+    transitionTimingFunction: EASE_OUT_CSS,
+  },
+  toggleIconOpen: {
+    transform: "rotate(180deg)",
   },
   diagramFrame: {
-    position: "relative",
     width: "100%",
     maxWidth: 960,
     overflow: "hidden",
     borderRadius: 16,
     backgroundColor: SURFACE,
-    boxShadow: "0 8px 30px rgba(0,0,0,0.06)",
+    boxShadow: "0 8px 30px rgba(0, 0, 0, 0.06)",
+    animationName: { default: fadeIn, [breakpoints.motionOk]: fadeRise },
+    animationDuration: "260ms",
+    animationTimingFunction: EASE_OUT_CSS,
   },
   diagramImg: {
     display: "block",
@@ -783,8 +1082,8 @@ const styles = stylex.create({
   ctaBanner: {
     position: "relative",
     overflow: "hidden",
-    paddingTop: { default: 72, [DESKTOP]: 104 },
-    paddingBottom: { default: 80, [DESKTOP]: 120 },
+    paddingTop: { default: 80, [DESKTOP]: 120 },
+    paddingBottom: { default: 96, [DESKTOP]: 144 },
     backgroundColor: TINT,
   },
   ctaWord: {
@@ -809,22 +1108,9 @@ const styles = stylex.create({
     flexDirection: "column",
     alignItems: "center",
     textAlign: "center",
-    gap: 24,
-    maxWidth: 680,
+    gap: 32,
+    maxWidth: 720,
     marginInline: "auto",
-  },
-  ctaTitle: {
-    margin: 0,
-    fontSize: { default: 28, [TABLET]: 36, [DESKTOP]: 42 },
-    fontWeight: 800,
-    lineHeight: 1.2,
-    color: INK,
-  },
-  ctaText: {
-    margin: 0,
-    fontSize: { default: 15, [DESKTOP]: 17 },
-    lineHeight: 1.7,
-    color: BODY_TEXT,
   },
   buttonGroup: {
     display: "flex",
@@ -832,145 +1118,526 @@ const styles = stylex.create({
     justifyContent: "center",
     flexWrap: "wrap",
     gap: 16,
-    paddingTop: 8,
+  },
+  button: {
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    height: 48,
+    paddingInline: 28,
+    borderWidth: 0,
+    borderRadius: 0,
+    fontSize: 16,
+    fontWeight: 500,
+    letterSpacing: "0.06em",
+    textDecoration: "none",
+    cursor: "pointer",
+    transform: {
+      default: null,
+      ":active": { default: null, [breakpoints.motionOk]: "scale(0.96)" },
+    },
+    transitionProperty: "background-color, color, transform",
+    transitionDuration: "160ms",
+    transitionTimingFunction: EASE_OUT_CSS,
   },
   buttonPrimary: {
-    display: "inline-flex",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 8,
-    height: 48,
-    paddingInline: 28,
-    borderRadius: 0,
     backgroundColor: { default: colors.brandBlue700, ":hover": colors.brandBlue800 },
     color: colors.paper,
-    fontSize: 16,
-    fontWeight: 500,
-    textDecoration: "none",
-    cursor: "pointer",
-    transitionProperty: "background-color",
-    transitionDuration: "160ms",
-    transitionTimingFunction: EASE_OUT_CSS,
   },
   buttonSecondary: {
-    display: "inline-flex",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 8,
-    height: 48,
-    paddingInline: 28,
-    borderRadius: 0,
     backgroundColor: { default: colors.paper, ":hover": SURFACE },
     color: colors.brandBlue700,
-    fontSize: 16,
-    fontWeight: 500,
-    textDecoration: "none",
-    cursor: "pointer",
-    transitionProperty: "background-color",
-    transitionDuration: "160ms",
-    transitionTimingFunction: EASE_OUT_CSS,
+  },
+  buttonOutline: {
+    backgroundColor: { default: "transparent", ":hover": TINT },
+    boxShadow: `inset 0 0 0 1px ${colors.brandBlue700}`,
+    color: colors.brandBlue700,
   },
 });
 
+const GLYPH_TONES = {
+  blue: styles.glyphBlue,
+  sand: styles.glyphSand,
+  green: styles.glyphGreen,
+} as const;
+
+function Reveal({
+  children,
+  step = 0,
+  sx,
+  as: Tag = "div",
+}: {
+  children: ReactNode;
+  step?: number;
+  sx?: stylex.StyleXStyles;
+  as?: "div" | "li" | "figure";
+}) {
+  const ref = useRef<HTMLDivElement & HTMLLIElement>(null);
+  const shown = useInView(ref, { once: true, margin: "0px 0px -12% 0px" });
+  return (
+    <Tag
+      ref={ref}
+      {...stylex.props(
+        styles.reveal,
+        shown && styles.revealShown,
+        dynamic.delay(revealDelay(step)),
+        sx,
+      )}
+    >
+      {children}
+    </Tag>
+  );
+}
+
+function SectionHeader({ title, titleId }: { title: string; titleId: string }) {
+  return (
+    <Reveal sx={styles.sectionHeader}>
+      <h2 id={titleId} {...stylex.props(styles.sectionTitle)}>
+        {title}
+      </h2>
+    </Reveal>
+  );
+}
+
+function CountUp({ value }: { value: string }) {
+  const target = Number(value.replaceAll(",", ""));
+  const ref = useRef<HTMLSpanElement>(null);
+  const inView = useInView(ref, { once: true, margin: "0px 0px -10% 0px" });
+  const reduce = useReducedMotion();
+  const [display, setDisplay] = useState(target);
+
+  useEffect(() => {
+    if (reduce) {
+      setDisplay(target);
+      return;
+    }
+    if (!inView) {
+      setDisplay(0);
+      return;
+    }
+    const controls = animate(0, target, {
+      duration: COUNT_UP_SECONDS,
+      ease: EASE,
+      onUpdate: (latest) => setDisplay(Math.round(latest)),
+    });
+    return () => controls.stop();
+  }, [inView, reduce, target]);
+
+  return (
+    <span ref={ref} {...stylex.props(styles.statValue)}>
+      <span aria-hidden="true">{display.toLocaleString("en-US")}</span>
+      <span {...stylex.props(styles.srOnly)}>{value}</span>
+    </span>
+  );
+}
+
+function CampusMoment() {
+  const sectionRef = useRef<HTMLElement>(null);
+  const reduce = useReducedMotion();
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start end", "start 0.2"],
+  });
+  const clipPath = useTransform(scrollYProgress, (progress) => {
+    const rest = 1 - easeOutCubic(progress);
+    return `inset(${10 * rest}% ${6 * rest}% ${10 * rest}% ${6 * rest}% round ${32 * rest}px)`;
+  });
+  const scale = useTransform(scrollYProgress, [0, 1], [1.15, 1]);
+
+  return (
+    <section
+      ref={sectionRef}
+      id="about-stats"
+      aria-label="泛成发展数据"
+      {...stylex.props(styles.moment)}
+    >
+      <m.div {...stylex.props(styles.momentFrame)} style={reduce ? undefined : { clipPath }}>
+        <m.img
+          src={ABOUT_MOMENT.image}
+          alt={ABOUT_MOMENT.alt}
+          loading="lazy"
+          decoding="async"
+          {...stylex.props(styles.fill)}
+          style={reduce ? undefined : { scale }}
+        />
+        <div aria-hidden="true" {...stylex.props(styles.fill, styles.momentScrim)} />
+        <span {...stylex.props(styles.momentCaption)}>{ABOUT_MOMENT.caption}</span>
+        <div {...stylex.props(styles.shell, styles.inset124, styles.momentStats)}>
+          {STATS.map((stat, idx) => (
+            <div
+              key={stat.label}
+              {...stylex.props(styles.momentStat, idx > 0 && styles.momentStatDivided)}
+            >
+              <div {...stylex.props(styles.statFigure)}>
+                <CountUp value={stat.value} />
+                {stat.unit ? <span {...stylex.props(styles.statUnit)}>{stat.unit}</span> : null}
+              </div>
+              <p {...stylex.props(styles.statText)}>{stat.caption}</p>
+            </div>
+          ))}
+        </div>
+      </m.div>
+    </section>
+  );
+}
+
+function Lightbox({
+  index,
+  stepped,
+  onClose,
+  onStep,
+}: {
+  index: number | null;
+  stepped: boolean;
+  onClose: () => void;
+  onStep: (delta: number) => void;
+}) {
+  const dialogRef = useRef<HTMLDialogElement>(null);
+  const photos = ABOUT_CAMPUS.photos;
+  const photo = index === null ? null : photos[index];
+
+  useEffect(() => {
+    const dialog = dialogRef.current;
+    if (!dialog) return;
+    if (index !== null && !dialog.open) dialog.showModal();
+    if (index === null && dialog.open) dialog.close();
+  }, [index]);
+
+  useEffect(() => {
+    if (index === null) return;
+    for (const delta of [1, -1]) {
+      const neighbor = new Image();
+      neighbor.src = photos[(index + delta + photos.length) % photos.length].large;
+    }
+  }, [index, photos]);
+
+  return (
+    <dialog
+      ref={dialogRef}
+      aria-label="园区照片"
+      onClose={onClose}
+      onKeyDown={(event) => {
+        if (event.key !== "ArrowRight" && event.key !== "ArrowLeft") return;
+        event.preventDefault();
+        event.stopPropagation();
+        onStep(event.key === "ArrowRight" ? 1 : -1);
+      }}
+      {...stylex.props(styles.lightbox)}
+    >
+      {photo ? (
+        <>
+          <div
+            onClick={(event) => {
+              if (event.target === event.currentTarget) onClose();
+            }}
+            {...stylex.props(styles.lightboxStage)}
+          >
+            <figure
+              key={photo.id}
+              {...stylex.props(
+                styles.lightboxFigure,
+                stepped ? styles.lightboxFigureStep : styles.lightboxFigureOpen,
+              )}
+            >
+              <img src={photo.large} alt={photo.alt} {...stylex.props(styles.lightboxImage)} />
+              <figcaption {...stylex.props(styles.lightboxCaption)}>{photo.caption}</figcaption>
+            </figure>
+          </div>
+          <button
+            type="button"
+            aria-label="上一张"
+            onClick={() => onStep(-1)}
+            {...stylex.props(styles.lightboxButton, styles.lightboxPrev)}
+          >
+            <ChevronLeft size={22} aria-hidden="true" />
+          </button>
+          <button
+            type="button"
+            aria-label="下一张"
+            onClick={() => onStep(1)}
+            {...stylex.props(styles.lightboxButton, styles.lightboxNext)}
+          >
+            <ChevronRight size={22} aria-hidden="true" />
+          </button>
+          <button
+            type="button"
+            aria-label="关闭"
+            onClick={onClose}
+            {...stylex.props(styles.lightboxButton, styles.lightboxClose)}
+          >
+            <X size={22} aria-hidden="true" />
+          </button>
+        </>
+      ) : null}
+    </dialog>
+  );
+}
+
+function CampusGallery() {
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const [stepped, setStepped] = useState(false);
+  const count = ABOUT_CAMPUS.photos.length;
+
+  return (
+    <section
+      id="about-campus"
+      aria-labelledby="about-campus-title"
+      {...stylex.props(styles.campusSection, styles.anchor)}
+    >
+      <div {...stylex.props(styles.shell, styles.inset124)}>
+        <SectionHeader title={ABOUT_CAMPUS.title} titleId="about-campus-title" />
+        <div {...stylex.props(styles.campusGrid)}>
+          {ABOUT_CAMPUS.photos.map((photo, idx) => (
+            <Reveal
+              key={photo.id}
+              as="figure"
+              step={idx}
+              sx={[
+                styles.campusTile,
+                styles.photoOutline,
+                photo.span === "feature" && styles.tileFeature,
+                photo.span === "wide" && styles.tileWide,
+              ]}
+            >
+              <button
+                type="button"
+                aria-label={`查看大图：${photo.caption}`}
+                onClick={() => {
+                  setStepped(false);
+                  setOpenIndex(idx);
+                }}
+                {...stylex.props(styles.tileButton)}
+              >
+                <img
+                  src={photo.src}
+                  alt={photo.alt}
+                  loading="lazy"
+                  decoding="async"
+                  {...stylex.props(styles.fill)}
+                />
+              </button>
+              <figcaption {...stylex.props(styles.campusCaption)}>{photo.caption}</figcaption>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+      <Lightbox
+        index={openIndex}
+        stepped={stepped}
+        onClose={() => setOpenIndex(null)}
+        onStep={(delta) => {
+          setStepped(true);
+          setOpenIndex((current) => (current === null ? null : (current + delta + count) % count));
+        }}
+      />
+    </section>
+  );
+}
+
+function CsrSection() {
+  const sectionRef = useRef<HTMLElement>(null);
+  const reduce = useReducedMotion();
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start end", "end start"],
+  });
+  const drift = useTransform(scrollYProgress, [0, 1], ["-6%", "6%"]);
+  const [statementLead, statementClose] = ABOUT_CSR.statement;
+
+  return (
+    <section
+      ref={sectionRef}
+      id="about-csr"
+      aria-labelledby="about-csr-title"
+      {...stylex.props(styles.csrSection, styles.anchor)}
+    >
+      <m.div {...stylex.props(styles.csrMedia)} style={reduce ? undefined : { y: drift }}>
+        <img
+          src={ABOUT_CSR.image}
+          alt={ABOUT_CSR.imageAlt}
+          loading="lazy"
+          decoding="async"
+          {...stylex.props(styles.csrImage)}
+        />
+      </m.div>
+      <div aria-hidden="true" {...stylex.props(styles.fill, styles.csrScrim)} />
+      <div aria-hidden="true" {...stylex.props(styles.grain, styles.behind)} />
+      <div {...stylex.props(styles.shell, styles.inset124, styles.csrInner)}>
+        <Reveal sx={styles.csrHead}>
+          <div>
+            <h2 id="about-csr-title" {...stylex.props(styles.csrTitle)}>
+              {ABOUT_CSR.title}
+            </h2>
+            <p {...stylex.props(styles.csrStatement)}>
+              <span {...stylex.props(styles.csrStatementLine)}>{statementLead}</span>
+              <span {...stylex.props(styles.csrStatementLine)}>{statementClose}</span>
+            </p>
+          </div>
+          <p {...stylex.props(styles.csrDesc)}>{ABOUT_CSR.desc}</p>
+        </Reveal>
+        <ul {...stylex.props(styles.csrOutcomes)}>
+          {ABOUT_CSR.outcomes.map((outcome, idx) => {
+            const Icon = CSR_ICONS[outcome.icon];
+            return (
+              <Reveal key={outcome.title} as="li" step={idx} sx={styles.csrOutcome}>
+                <Icon
+                  size={22}
+                  strokeWidth={1.75}
+                  aria-hidden="true"
+                  {...stylex.props(styles.csrOutcomeIcon)}
+                />
+                {outcome.title}
+              </Reveal>
+            );
+          })}
+        </ul>
+      </div>
+    </section>
+  );
+}
+
+function SubNav({ onNavigateHome }: { onNavigateHome: (hash?: string) => void }) {
+  const active = useActiveSection(SECTION_IDS);
+  const chipListRef = useRef<HTMLElement>(null);
+  const reduce = useReducedMotion();
+
+  useEffect(() => {
+    const list = chipListRef.current;
+    const chip = active ? list?.querySelector<HTMLElement>(`[href="#${active}"]`) : null;
+    if (!list || !chip) return;
+    const listBox = list.getBoundingClientRect();
+    const chipBox = chip.getBoundingClientRect();
+    if (chipBox.left < listBox.left || chipBox.right > listBox.right) {
+      list.scrollBy({
+        left: chipBox.left - listBox.left - 16,
+        behavior: reduce ? "auto" : "smooth",
+      });
+    }
+  }, [active, reduce]);
+
+  return (
+    <div {...stylex.props(styles.subBar)}>
+      <div {...stylex.props(styles.shell, styles.inset124, styles.subBarInner)}>
+        <nav aria-label="面包屑导航" {...stylex.props(styles.breadcrumb)}>
+          <button
+            type="button"
+            onClick={() => onNavigateHome("top")}
+            {...stylex.props(styles.breadcrumbLink, styles.focusRing)}
+          >
+            首页
+          </button>
+          <ChevronRight size={14} aria-hidden="true" />
+          <span aria-current="page" {...stylex.props(styles.breadcrumbCurrent)}>
+            关于我们
+          </span>
+        </nav>
+        <nav aria-label="本页导航" ref={chipListRef} {...stylex.props(styles.chipList)}>
+          {ABOUT_HERO.navChips.map((chip) => (
+            <a
+              key={chip.id}
+              href={`#${chip.id}`}
+              aria-current={active === chip.id ? "location" : undefined}
+              {...stylex.props(
+                styles.chip,
+                active === chip.id && styles.chipActive,
+                styles.focusRing,
+              )}
+            >
+              {chip.label}
+            </a>
+          ))}
+        </nav>
+      </div>
+    </div>
+  );
+}
+
 export function AboutView({ onNavigateHome }: { onNavigateHome: (hash?: string) => void }) {
-  const [showDiagram, setShowDiagram] = useState(true);
+  const [showDiagram, setShowDiagram] = useState(false);
+  const diagramId = useId();
 
   return (
     <div id="about-top" {...stylex.props(styles.root)}>
-      <nav aria-label="页面局部导航" {...stylex.props(styles.subBar)}>
-        <div {...stylex.props(styles.shell, styles.inset124, styles.subBarInner)}>
-          <div {...stylex.props(styles.breadcrumb)}>
-            <button
-              type="button"
-              onClick={() => onNavigateHome("top")}
-              {...stylex.props(styles.breadcrumbLink)}
-            >
-              首页
-            </button>
-            <ChevronRight size={14} aria-hidden="true" />
-            <span {...stylex.props(styles.breadcrumbCurrent)}>关于我们</span>
+      <section aria-labelledby="about-banner-title" {...stylex.props(styles.banner)}>
+        <img
+          src={ABOUT_BANNER.image}
+          alt={ABOUT_BANNER.alt}
+          fetchPriority="high"
+          decoding="async"
+          {...stylex.props(styles.fill, styles.bannerImage)}
+        />
+        <div aria-hidden="true" {...stylex.props(styles.fill, styles.bannerScrim)} />
+        <div aria-hidden="true" {...stylex.props(styles.grain)} />
+        <div {...stylex.props(styles.shell, styles.inset124, styles.bannerContent)}>
+          <div {...stylex.props(styles.bannerText)}>
+            <h1 id="about-banner-title" {...stylex.props(styles.bannerTitle)}>
+              {ABOUT_BANNER.title}
+            </h1>
+            <p lang="en" {...stylex.props(styles.bannerTagline)}>
+              {ABOUT_BANNER.tagline}
+            </p>
+            <p {...stylex.props(styles.bannerLead)}>{ABOUT_BANNER.lead}</p>
           </div>
-          <div {...stylex.props(styles.chipList)}>
-            {ABOUT_HERO.navChips.map((chip) => (
-              <a key={chip.href} href={chip.href} {...stylex.props(styles.chip)}>
-                {chip.label}
-              </a>
-            ))}
-            <button
-              type="button"
-              onClick={() => onNavigateHome("top")}
-              {...stylex.props(styles.chip)}
-            >
-              <ArrowLeft size={14} style={{ marginRight: 4 }} aria-hidden="true" />
-              返回首页
-            </button>
+          <div lang="en" {...stylex.props(styles.bannerMeta)}>
+            <span>{ABOUT_BANNER.established}</span>
+            <span aria-hidden="true" {...stylex.props(styles.bannerMetaRule)} />
+            <span>{ABOUT_BANNER.place}</span>
+            <span aria-hidden="true" {...stylex.props(styles.scrollTrack)}>
+              <span {...stylex.props(styles.scrollThumb)} />
+            </span>
           </div>
         </div>
-      </nav>
+      </section>
+
+      <SubNav onNavigateHome={onNavigateHome} />
 
       <section
         id="about-profile"
         aria-labelledby="about-profile-title"
-        {...stylex.props(styles.heroBanner, styles.anchor)}
+        {...stylex.props(styles.profileSection, styles.anchor)}
       >
-        <div {...stylex.props(styles.shell, styles.inset124, styles.heroGrid)}>
-          <div {...stylex.props(styles.heroText)}>
-            <div {...stylex.props(styles.kicker)}>
-              <span {...stylex.props(styles.kickerDot)} />
-              {ABOUT_HERO.kicker}
-            </div>
+        <div {...stylex.props(styles.shell, styles.inset124, styles.profileGrid)}>
+          <Reveal sx={styles.profileText}>
             <div>
-              <h1 id="about-profile-title" {...stylex.props(styles.heroTitle)}>
+              <h2 id="about-profile-title" {...stylex.props(styles.profileTitle)}>
                 {ABOUT_HERO.title}
-              </h1>
-              <div {...stylex.props(styles.heroEnglishTitle)}>{ABOUT_HERO.englishTitle}</div>
+              </h2>
+              <div lang="en" {...stylex.props(styles.profileEnglish)}>
+                {ABOUT_HERO.englishTitle}
+              </div>
             </div>
-            <p {...stylex.props(styles.heroLead)}>{ABOUT_HERO.lead}</p>
-            <p {...stylex.props(styles.heroSublead)}>{ABOUT_HERO.sublead}</p>
-            <div {...stylex.props(styles.highlightList)}>
-              {ABOUT_HERO.highlights.map((item) => (
-                <div key={item} {...stylex.props(styles.highlightItem)}>
-                  <CheckCircle2 size={16} {...stylex.props(styles.highlightIcon)} />
-                  <span>{item}</span>
-                </div>
-              ))}
+            <p {...stylex.props(styles.profileLead)}>{ABOUT_HERO.lead}</p>
+            <div {...stylex.props(styles.network)}>
+              <p {...stylex.props(styles.networkLabel)}>{ABOUT_HERO.networkLabel}</p>
+              <ul {...stylex.props(styles.countryList)}>
+                {ABOUT_HERO.countries.map((country) => (
+                  <li key={country} {...stylex.props(styles.countryTag)}>
+                    {country}
+                  </li>
+                ))}
+                <li {...stylex.props(styles.countryMore)}>等地</li>
+              </ul>
             </div>
-          </div>
-          <div {...stylex.props(styles.heroImageFrame)}>
-            <img
-              src={ABOUT_HERO.lobbyImage}
-              alt="南京泛成国际控股有限公司总部园区现代研发与行政中心"
-              loading="eager"
-              decoding="async"
-              {...stylex.props(styles.heroImage)}
-            />
-            <div {...stylex.props(styles.heroImageCaption)}>
-              泛成南京溧水产业基地 · 现代化智能园区与研发展厅
-            </div>
-          </div>
+          </Reveal>
+          <Reveal step={2}>
+            <figure {...stylex.props(styles.profileFigure, styles.photoOutline)}>
+              <img
+                src={ABOUT_HERO.lobbyImage}
+                alt="泛成总部大堂，弧形吊顶与大理石地面"
+                loading="lazy"
+                decoding="async"
+                {...stylex.props(styles.fill)}
+              />
+              <figcaption {...stylex.props(styles.photoTag)}>{ABOUT_HERO.lobbyCaption}</figcaption>
+            </figure>
+          </Reveal>
         </div>
       </section>
 
-      <section
-        id="about-stats"
-        aria-label="泛成发展关键数据"
-        {...stylex.props(styles.statsSection, styles.anchor)}
-      >
-        <div {...stylex.props(styles.shell, styles.inset124, styles.statsBand)}>
-          {ABOUT_STATS.map((stat, idx) => (
-            <div key={stat.label} style={{ display: "contents" }}>
-              {idx > 0 && <span aria-hidden="true" {...stylex.props(styles.statDivider)} />}
-              <div {...stylex.props(styles.stat)}>
-                <div {...stylex.props(styles.statFigure)}>
-                  <span {...stylex.props(styles.statValue)}>{stat.value}</span>
-                  <span {...stylex.props(styles.statUnit)}>{stat.unit}</span>
-                </div>
-                <p {...stylex.props(styles.statText)}>{stat.label}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
+      <CampusMoment />
+
+      <CampusGallery />
 
       <section
         id="about-culture"
@@ -978,116 +1645,29 @@ export function AboutView({ onNavigateHome }: { onNavigateHome: (hash?: string) 
         {...stylex.props(styles.cultureSection, styles.anchor)}
       >
         <div {...stylex.props(styles.shell, styles.inset124)}>
-          <div {...stylex.props(styles.sectionHeader)}>
-            <div {...stylex.props(styles.kicker)}>
-              <Compass size={14} aria-hidden="true" />
-              {ABOUT_CULTURE.kicker}
-            </div>
-            <h2 id="about-culture-title" {...stylex.props(styles.sectionTitle)}>
-              {ABOUT_CULTURE.title}
-            </h2>
-            <p {...stylex.props(styles.sectionLead)}>{ABOUT_CULTURE.slogan}</p>
-          </div>
+          <SectionHeader title={ABOUT_CULTURE.title} titleId="about-culture-title" />
           <div {...stylex.props(styles.cultureGrid)}>
-            {ABOUT_CULTURE.cards.map((card) => {
-              const isBlue = card.tone === "blue";
-              const isGreen = card.tone === "green";
-              const toneStyle = isBlue
-                ? styles.cultureBlue
-                : isGreen
-                  ? styles.cultureGreen
-                  : styles.cultureCream;
-              return (
-                <article key={card.index} {...stylex.props(styles.cultureCard, toneStyle)}>
-                  <div {...stylex.props(styles.cultureTop)}>
-                    <span {...stylex.props(styles.cultureIndex)}>{card.index}</span>
-                    <div {...stylex.props(styles.cultureIconPill)}>
-                      {isBlue ? (
-                        <ShieldCheck size={22} aria-hidden="true" />
-                      ) : isGreen ? (
-                        <Lightbulb size={22} aria-hidden="true" />
-                      ) : (
-                        <Sparkles size={22} aria-hidden="true" />
-                      )}
-                    </div>
-                  </div>
-                  <div {...stylex.props(styles.cultureBody)}>
-                    <div>
-                      <h3 {...stylex.props(styles.cultureCardTitle)}>{card.title}</h3>
-                      <div {...stylex.props(styles.cultureCardEnglish)}>{card.english}</div>
-                    </div>
-                    <p {...stylex.props(styles.cultureDesc)}>{card.desc}</p>
-                  </div>
-                  <div {...stylex.props(styles.cultureTagRow)}>
-                    {card.tags.map((tag) => (
-                      <span
-                        key={tag}
-                        {...stylex.props(
-                          styles.cultureTag,
-                          (isBlue || isGreen) && styles.cultureTagInverse,
-                        )}
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                </article>
-              );
-            })}
+            {ABOUT_CULTURE.values.map((value, idx) => (
+              <Reveal
+                key={value.title}
+                step={idx}
+                sx={[styles.cultureValue, idx > 0 && styles.cultureValueDivided]}
+              >
+                <span
+                  aria-hidden="true"
+                  {...stylex.props(styles.cultureGlyph, GLYPH_TONES[value.tone])}
+                >
+                  {value.glyph}
+                </span>
+                <h3 {...stylex.props(styles.cultureTitle)}>{value.title}</h3>
+                <p {...stylex.props(styles.cultureDesc)}>{value.desc}</p>
+              </Reveal>
+            ))}
           </div>
         </div>
       </section>
 
-      <section
-        id="about-csr"
-        aria-labelledby="about-csr-title"
-        {...stylex.props(styles.csrSection, styles.anchor)}
-      >
-        <div {...stylex.props(styles.shell, styles.inset124, styles.csrGrid)}>
-          <div {...stylex.props(styles.csrVisual)}>
-            <div {...stylex.props(styles.csrImageFrame)}>
-              <img
-                src={ABOUT_CSR.image}
-                alt="生态林海与地球绿色生命体系"
-                loading="lazy"
-                decoding="async"
-                {...stylex.props(styles.csrImage)}
-              />
-            </div>
-            <div {...stylex.props(styles.csrVisualTag)}>
-              <Leaf size={16} aria-hidden="true" />
-              <span>践行碳达峰·碳中和目标 · 守护全球生态家园</span>
-            </div>
-          </div>
-          <div {...stylex.props(styles.csrContent)}>
-            <div {...stylex.props(styles.csrTitleBlock)}>
-              <div
-                {...stylex.props(styles.kicker)}
-                style={{ color: "#8cd6a3", letterSpacing: "0.14em" }}
-              >
-                <Leaf size={14} aria-hidden="true" />
-                {ABOUT_CSR.kicker}
-              </div>
-              <h2 id="about-csr-title" {...stylex.props(styles.csrTitle)}>
-                {ABOUT_CSR.title}
-              </h2>
-              <div {...stylex.props(styles.csrSlogan)}>{ABOUT_CSR.slogan}</div>
-            </div>
-            <p {...stylex.props(styles.csrDesc)}>{ABOUT_CSR.desc}</p>
-            <div {...stylex.props(styles.csrPillarList)}>
-              {ABOUT_CSR.pillars.map((pillar) => (
-                <div key={pillar.num} {...stylex.props(styles.csrPillarCard)}>
-                  <span {...stylex.props(styles.csrPillarNum)}>{pillar.num}</span>
-                  <div {...stylex.props(styles.csrPillarBody)}>
-                    <h3 {...stylex.props(styles.csrPillarTitle)}>{pillar.title}</h3>
-                    <p {...stylex.props(styles.csrPillarDesc)}>{pillar.desc}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
+      <CsrSection />
 
       <section
         id="about-honor"
@@ -1095,37 +1675,24 @@ export function AboutView({ onNavigateHome }: { onNavigateHome: (hash?: string) 
         {...stylex.props(styles.honorsSection, styles.anchor)}
       >
         <div {...stylex.props(styles.shell, styles.inset124)}>
-          <div {...stylex.props(styles.sectionHeader)}>
-            <div {...stylex.props(styles.kicker)}>
-              <Award size={14} aria-hidden="true" />
-              {ABOUT_HONORS.kicker}
-            </div>
-            <h2 id="about-honor-title" {...stylex.props(styles.sectionTitle)}>
-              {ABOUT_HONORS.title}
-            </h2>
-            <p {...stylex.props(styles.sectionLead)}>{ABOUT_HONORS.lead}</p>
-          </div>
+          <SectionHeader title={ABOUT_HONORS.title} titleId="about-honor-title" />
           <div {...stylex.props(styles.honorsGrid)}>
-            {ABOUT_HONORS.items.map((honor) => (
-              <article key={honor.id} {...stylex.props(styles.honorCard)}>
-                <div {...stylex.props(styles.honorImageWrap)}>
-                  <img
-                    src={honor.image}
-                    alt={honor.title}
-                    loading="lazy"
-                    decoding="async"
-                    {...stylex.props(styles.honorImage)}
-                  />
-                </div>
-                <div {...stylex.props(styles.honorBody)}>
-                  <span {...stylex.props(styles.honorTier)}>{honor.tier}</span>
-                  <div>
-                    <h3 {...stylex.props(styles.honorTitle)}>{honor.title}</h3>
-                    <div {...stylex.props(styles.honorSubtitle)}>{honor.subtitle}</div>
-                  </div>
-                  <p {...stylex.props(styles.honorDesc)}>{honor.desc}</p>
-                </div>
-              </article>
+            {ABOUT_HONORS.items.map((honor, idx) => (
+              <Reveal key={honor.id} step={idx % 4}>
+                <article {...stylex.props(styles.honorCard)}>
+                  <span
+                    aria-hidden="true"
+                    {...stylex.props(
+                      styles.honorEmblem,
+                      honor.level === "national" && styles.honorEmblemNational,
+                    )}
+                  >
+                    <Award size={24} strokeWidth={1.5} />
+                  </span>
+                  <span {...stylex.props(styles.honorLevel)}>{LEVEL_LABEL[honor.level]}</span>
+                  <h3 {...stylex.props(styles.honorTitle)}>{honor.title}</h3>
+                </article>
+              </Reveal>
             ))}
           </div>
         </div>
@@ -1137,62 +1704,67 @@ export function AboutView({ onNavigateHome }: { onNavigateHome: (hash?: string) 
         {...stylex.props(styles.structureSection, styles.anchor)}
       >
         <div {...stylex.props(styles.shell, styles.inset124)}>
-          <div {...stylex.props(styles.sectionHeader)}>
-            <div {...stylex.props(styles.kicker)}>
-              <Network size={14} aria-hidden="true" />
-              {ABOUT_STRUCTURE.kicker}
-            </div>
-            <h2 id="about-structure-title" {...stylex.props(styles.sectionTitle)}>
-              {ABOUT_STRUCTURE.title}
-            </h2>
-            <p {...stylex.props(styles.sectionLead)}>{ABOUT_STRUCTURE.lead}</p>
-          </div>
+          <SectionHeader title={ABOUT_STRUCTURE.title} titleId="about-structure-title" />
 
-          <div {...stylex.props(styles.holdingCard)}>
-            <div {...stylex.props(styles.holdingMain)}>
-              <span {...stylex.props(styles.holdingBadge)}>{ABOUT_STRUCTURE.holding.badge}</span>
-              <h3 {...stylex.props(styles.holdingTitle)}>{ABOUT_STRUCTURE.holding.name}</h3>
-              <div {...stylex.props(styles.holdingEnglish)}>{ABOUT_STRUCTURE.holding.english}</div>
+          <Reveal sx={styles.holdingCard}>
+            <span {...stylex.props(styles.holdingBadge)}>{ABOUT_STRUCTURE.holding.badge}</span>
+            <h3 {...stylex.props(styles.holdingTitle)}>{ABOUT_STRUCTURE.holding.name}</h3>
+            <div lang="en" {...stylex.props(styles.holdingEnglish)}>
+              {ABOUT_STRUCTURE.holding.english}
             </div>
-            <p {...stylex.props(styles.holdingSummary)}>{ABOUT_STRUCTURE.holding.summary}</p>
-          </div>
+          </Reveal>
 
-          <div {...stylex.props(styles.subsidiaryGrid)}>
-            {ABOUT_STRUCTURE.subsidiaries.map((sub) => (
-              <article key={sub.id} {...stylex.props(styles.subsidiaryCard)}>
-                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                  <span {...stylex.props(styles.subBadge)}>{sub.badge}</span>
-                  <div {...stylex.props(styles.subTitleBlock)}>
-                    <h4 {...stylex.props(styles.subTitle)}>{sub.name}</h4>
-                    <span {...stylex.props(styles.subEnglish)}>{sub.english}</span>
-                  </div>
-                  <span {...stylex.props(styles.subFocusPill)}>{sub.focus}</span>
+          <ul aria-label={ABOUT_STRUCTURE.subsidiaryBadge} {...stylex.props(styles.branchList)}>
+            {ABOUT_STRUCTURE.subsidiaries.map((sub, idx, all) => (
+              <Reveal key={sub.id} as="li" step={idx} sx={styles.branchItem}>
+                <span
+                  aria-hidden="true"
+                  {...stylex.props(
+                    styles.branchTrunk,
+                    idx === 0 && styles.branchTrunkFirst,
+                    idx === all.length - 1 && styles.branchTrunkLast,
+                  )}
+                />
+                <span aria-hidden="true" {...stylex.props(styles.branchTick)} />
+                <span aria-hidden="true" {...stylex.props(styles.branchNode)} />
+                <div {...stylex.props(styles.branchCard)}>
+                  <span {...stylex.props(styles.branchBadge)}>
+                    {ABOUT_STRUCTURE.subsidiaryBadge}
+                  </span>
+                  <h4 {...stylex.props(styles.branchName)}>{sub.name}</h4>
+                  <span lang="en" {...stylex.props(styles.branchEnglish)}>
+                    {sub.english}
+                  </span>
                 </div>
-                <p {...stylex.props(styles.subDesc)}>{sub.desc}</p>
-              </article>
+              </Reveal>
             ))}
-          </div>
+          </ul>
 
-          <div {...stylex.props(styles.diagramTriggerWrap)}>
+          <div {...stylex.props(styles.diagramToggleWrap)}>
             <button
               type="button"
+              aria-expanded={showDiagram}
+              aria-controls={diagramId}
               onClick={() => setShowDiagram((prev) => !prev)}
-              {...stylex.props(styles.buttonSecondary)}
+              {...stylex.props(styles.button, styles.buttonOutline, styles.focusRing)}
             >
               <Building2 size={16} aria-hidden="true" />
-              <span>{showDiagram ? "收起官方架构拓扑图" : "查看官方组织架构拓扑图"}</span>
+              <span>{showDiagram ? "收起组织架构图" : "查看官方组织架构图"}</span>
+              <ChevronDown
+                size={16}
+                aria-hidden="true"
+                {...stylex.props(styles.toggleIcon, showDiagram && styles.toggleIconOpen)}
+              />
             </button>
-            {showDiagram && (
-              <div {...stylex.props(styles.diagramFrame)}>
-                <img
-                  src={ABOUT_STRUCTURE.chartImage}
-                  alt="南京泛成国际控股有限公司官方组织架构图"
-                  loading="lazy"
-                  decoding="async"
-                  {...stylex.props(styles.diagramImg)}
-                />
-              </div>
-            )}
+            <div id={diagramId} hidden={!showDiagram} {...stylex.props(styles.diagramFrame)}>
+              <img
+                src={ABOUT_STRUCTURE.chartImage}
+                alt="南京泛成国际控股有限公司官方组织架构图"
+                loading="lazy"
+                decoding="async"
+                {...stylex.props(styles.diagramImg)}
+              />
+            </div>
           </div>
         </div>
       </section>
@@ -1201,31 +1773,28 @@ export function AboutView({ onNavigateHome }: { onNavigateHome: (hash?: string) 
         <span aria-hidden="true" lang="en" {...stylex.props(styles.ctaWord)}>
           FENCHEM
         </span>
-        <div {...stylex.props(styles.shell, styles.inset124, styles.ctaInner)}>
-          <h2 id="about-cta-title" {...stylex.props(styles.ctaTitle)}>
-            与泛成携手 · 赋能全球营养与健康
+        <Reveal sx={[styles.shell, styles.inset124, styles.ctaInner]}>
+          <h2 id="about-cta-title" {...stylex.props(styles.sectionTitle)}>
+            {CTA.title}
           </h2>
-          <p {...stylex.props(styles.ctaText)}>
-            三十载行业积淀，全球13+分支网络随时响应您的原料咨询、定制生产与配方技术需求。
-          </p>
           <div {...stylex.props(styles.buttonGroup)}>
             <button
               type="button"
               onClick={() => onNavigateHome("contact")}
-              {...stylex.props(styles.buttonPrimary)}
+              {...stylex.props(styles.button, styles.buttonPrimary, styles.focusRing)}
             >
-              <span>联系我们</span>
+              <span>{CTA.action.label}</span>
               <ArrowRight size={16} aria-hidden="true" />
             </button>
             <button
               type="button"
               onClick={() => onNavigateHome("products")}
-              {...stylex.props(styles.buttonSecondary)}
+              {...stylex.props(styles.button, styles.buttonSecondary, styles.focusRing)}
             >
-              <span>浏览核心产品与市场</span>
+              <span>产品与应用</span>
             </button>
           </div>
-        </div>
+        </Reveal>
       </section>
     </div>
   );

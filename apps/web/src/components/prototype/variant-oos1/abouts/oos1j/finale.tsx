@@ -1,0 +1,75 @@
+import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
+import * as stylex from "@stylexjs/stylex";
+import { ArrowRight } from "lucide-react";
+
+import { CTA } from "../../content";
+import { Monument, Reveal } from "./parts";
+import { base, btn } from "./shared";
+import { hue, size } from "./theme.stylex";
+
+const styles = stylex.create({
+  finale: {
+    overflow: "clip",
+    paddingTop: size.bandY,
+    paddingBottom: "calc(8vw + 56px)",
+    backgroundColor: colors.paper,
+  },
+  monument: {
+    left: "-0.03em",
+    bottom: "-0.42em",
+    fontSize: "20vw",
+  },
+  inner: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "flex-start",
+    gap: { default: 32, [breakpoints.lg]: 48 },
+  },
+  title: {
+    margin: 0,
+    fontSize: "clamp(36px, 5.6vw, 80px)",
+    fontWeight: 500,
+    lineHeight: 1.2,
+    letterSpacing: "0.03em",
+    color: hue.ink,
+    textWrap: "balance",
+  },
+  buttons: {
+    display: "flex",
+    flexWrap: "wrap",
+    alignItems: "center",
+    gap: 16,
+  },
+});
+
+export function Finale({ onNavigateHome }: { onNavigateHome: (hash?: string) => void }) {
+  return (
+    <section aria-labelledby="about-cta-title" {...stylex.props(base.section, styles.finale)}>
+      <Monument text="Fenchem" sx={styles.monument} />
+      <div {...stylex.props(base.shell, styles.inner)}>
+        <Reveal>
+          <h2 id="about-cta-title" {...stylex.props(styles.title)}>
+            {CTA.title}
+          </h2>
+        </Reveal>
+        <Reveal step={1} sx={styles.buttons}>
+          <button
+            type="button"
+            onClick={() => onNavigateHome("contact")}
+            {...stylex.props(btn.base, btn.accent, base.focus)}
+          >
+            <span>{CTA.action.label}</span>
+            <ArrowRight size={16} aria-hidden="true" />
+          </button>
+          <button
+            type="button"
+            onClick={() => onNavigateHome("products")}
+            {...stylex.props(btn.base, btn.outline, base.focus)}
+          >
+            <span>产品与应用</span>
+          </button>
+        </Reveal>
+      </div>
+    </section>
+  );
+}

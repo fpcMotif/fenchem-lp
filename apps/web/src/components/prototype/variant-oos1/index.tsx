@@ -1,6 +1,7 @@
 import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 import type { StyleXStyles } from "@stylexjs/stylex";
+import { useSearch } from "@tanstack/react-router";
 import {
   ArrowUpRight,
   Globe,
@@ -31,6 +32,7 @@ import {
   useRef,
   useState,
   useSyncExternalStore,
+  type ComponentType,
   type CSSProperties,
   type KeyboardEvent,
   type ReactNode,
@@ -45,6 +47,7 @@ import { LINKEDIN_PATHS, LOGO_PATHS, WECHAT_PATHS, type VectorPath } from "../va
 import { INTRO_REVEAL_MS, introStyles, useIntro } from "./intro";
 import { LiquidImage } from "./liquid-hero";
 import { AboutView } from "./about-view";
+import { useActiveSection } from "./use-active-section";
 import {
   ABOUT,
   COPYRIGHT,
@@ -1526,29 +1529,6 @@ function useScrolledPastTop() {
   return scrolled;
 }
 
-function useActiveSection(ids: readonly string[]) {
-  const [active, setActive] = useState<string | undefined>(ids[0]);
-  useEffect(() => {
-    const crossing = new Set<string>();
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) crossing.add(entry.target.id);
-          else crossing.delete(entry.target.id);
-        }
-        setActive(ids.find((id) => crossing.has(id)));
-      },
-      { rootMargin: "-40% 0px -59% 0px" },
-    );
-    for (const id of ids) {
-      const section = document.getElementById(id);
-      if (section) observer.observe(section);
-    }
-    return () => observer.disconnect();
-  }, [ids]);
-  return active;
-}
-
 function SiteHeader({
   currentView,
   onNavigate,
@@ -2432,7 +2412,20 @@ function SiteFooter({
   );
 }
 
-export function VariantOOS1() {
+type View = "home" | "about";
+
+export type AboutPageProps = { onNavigateHome: (hash?: string) => void };
+
+const viewFromPage = (page: unknown, startView: View): View =>
+  page === "about" || page === "home" ? page : startView;
+
+export function VariantOOS1({
+  AboutPage = AboutView,
+  startView = "home",
+}: {
+  AboutPage?: ComponentType<AboutPageProps>;
+  startView?: View;
+}) {
   preinit(GOOGLE_FONTS, { as: "style" });
   const reduce = useReducedMotion();
   const intro = useIntro();
@@ -2449,24 +2442,17 @@ export function VariantOOS1() {
     };
   }, [reduce]);
 
-  const [view, setView] = useState<"home" | "about">(() => {
-    if (typeof window !== "undefined") {
-      const params = new URLSearchParams(window.location.search);
-      if (params.get("page") === "about" || window.location.hash === "#about-page") {
-        return "about";
-      }
-    }
-    return "home";
-  });
+  const { page } = useSearch({ strict: false });
+  const [view, setView] = useState<View>(viewFromPage(page, startView));
 
-  const handleNavigate = (targetView: "home" | "about", targetId?: string) => {
+  const handleNavigate = (targetView: View, targetId?: string) => {
     setView(targetView);
     if (typeof window !== "undefined") {
       const url = new URL(window.location.href);
-      if (targetView === "about") {
-        url.searchParams.set("page", "about");
-      } else {
+      if (targetView === startView) {
         url.searchParams.delete("page");
+      } else {
+        url.searchParams.set("page", targetView);
       }
       url.hash = targetId ? `#${targetId}` : "";
       window.history.pushState({}, "", url.toString());
@@ -2484,11 +2470,11 @@ export function VariantOOS1() {
   useEffect(() => {
     const onPopState = () => {
       const params = new URLSearchParams(window.location.search);
-      setView(params.get("page") === "about" ? "about" : "home");
+      setView(viewFromPage(params.get("page"), startView));
     };
     window.addEventListener("popstate", onPopState);
     return () => window.removeEventListener("popstate", onPopState);
-  }, []);
+  }, [startView]);
 
   return (
     <LazyMotion features={domAnimation} strict>
@@ -2501,7 +2487,7 @@ export function VariantOOS1() {
           <div {...stylex.props(styles.page, intro === "play" && introStyles.pageReveal)}>
             <main id="main-content" tabIndex={-1} {...stylex.props(styles.mainTarget)}>
               {view === "about" ? (
-                <AboutView onNavigateHome={(target) => handleNavigate("home", target)} />
+                <AboutPage onNavigateHome={(target) => handleNavigate("home", target)} />
               ) : (
                 <>
                   <Hero />
