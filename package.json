@@ -35,6 +35,7 @@
     "test:e2e": "vp run --filter web test:e2e",
     "staged": "vp staged",
     "dev:web": "vp run --filter web dev",
+    "dev:web:portless": "vp run --filter web dev:portless",
     "dev:server": "vp run --filter @fenchem-lp/backend dev",
     "dev:setup": "vp run --filter @fenchem-lp/backend dev:setup",
     "deploy": "vp run --filter @fenchem-lp/infra deploy",

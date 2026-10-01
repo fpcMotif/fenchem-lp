@@ -19,7 +19,9 @@ const cloudflareWorkersAlias: Record<string, string> = shouldUseAlchemy
 
 export default defineConfig({
   server: {
-    port: 3001,
+    port: process.env.PORT ? parseInt(process.env.PORT, 10) : 3001,
+    host: true,
+    allowedHosts: [".localhost", "localhost", "127.0.0.1"],
   },
   resolve: {
     tsconfigPaths: true,
