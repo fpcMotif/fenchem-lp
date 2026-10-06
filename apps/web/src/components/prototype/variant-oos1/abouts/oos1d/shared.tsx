@@ -112,11 +112,19 @@ export const ui = stylex.create({
     backgroundColor: tone.tint,
   },
   caption: {
-    marginTop: 12,
+    marginTop: 14,
     fontSize: step.label,
     fontWeight: 400,
-    letterSpacing: "0.04em",
-    color: tone.body,
+    letterSpacing: "0.08em",
+    color: tone.quiet,
+  },
+  label: {
+    margin: 0,
+    fontSize: step.label,
+    fontWeight: 400,
+    lineHeight: 1.5,
+    letterSpacing: "0.12em",
+    color: tone.quiet,
   },
   button: {
     display: "inline-flex",

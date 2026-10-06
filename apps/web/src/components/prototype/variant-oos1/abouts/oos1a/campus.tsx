@@ -13,9 +13,9 @@ import { Frame, SectionName, shared } from "./parts";
 type PhotoId = (typeof ABOUT_CAMPUS.photos)[number]["id"];
 
 const COUNT = ABOUT_CAMPUS.photos.length;
-const START_BASE = 0.04;
-const START_STEP = 0.11;
-const WINDOW = 0.26;
+const START_BASE = 0.18;
+const START_STEP = 0.08;
+const WINDOW = 0.28;
 const RISE_PX = 18;
 const DESKTOP_QUERY = "(min-width: 1024px)";
 
@@ -213,7 +213,7 @@ export function Campus() {
   const pinned = usePinned();
   const { scrollYProgress } = useScroll({
     target: trackRef,
-    offset: ["start 132px", "end end"],
+    offset: ["start end", "end end"],
   });
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const [stepped, setStepped] = useState(false);

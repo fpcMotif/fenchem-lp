@@ -100,31 +100,31 @@ const styles = stylex.create({
     lineHeight: 1.25,
     color: color.body,
   },
-  lower: {
+  lead: {
     display: "flex",
     flexDirection: "column",
-    gap: 20,
-  },
-  lead: {
+    gap: 4,
     margin: 0,
-    maxWidth: "30em",
     fontSize: { default: 15, [media.lgUp]: 16 },
-    lineHeight: 1.95,
+    lineHeight: 1.9,
     letterSpacing: "0.06em",
     color: color.body,
-    textWrap: "pretty",
+  },
+  leadYear: {
+    color: color.muted,
   },
   stamp: {
     top: { default: 296, [media.md]: 436, [media.lgUp]: "auto" },
     right: { default: 20, [media.md]: 36, [media.lgUp]: "auto" },
-    bottom: { default: "auto", [media.lgUp]: "22%" },
-    left: { default: "auto", [media.lgUp]: "calc(41.667% - 84px)" },
+    bottom: { default: "auto", [media.lgUp]: "20%" },
+    left: { default: "auto", [media.lgUp]: "calc(41.667% - 40px)" },
     zIndex: 1,
     width: { default: 104, [media.md]: 140, [media.lgUp]: 168 },
   },
 });
 
 export function Cover({ onNavigateHome }: { onNavigateHome: (hash?: string) => void }) {
+  const [leadYear, leadFocus] = ABOUT_BANNER.lead.split(" · ");
   return (
     <section aria-labelledby="about-banner-title" {...stylex.props(styles.cover)}>
       <div {...stylex.props(styles.photo)}>
@@ -159,12 +159,13 @@ export function Cover({ onNavigateHome }: { onNavigateHome: (hash?: string) => v
             {ABOUT_BANNER.tagline}
           </p>
         </div>
-        <div {...stylex.props(styles.lower)}>
-          <p {...stylex.props(styles.lead)}>{ABOUT_BANNER.lead}</p>
-          <p lang="en" {...stylex.props(base.quiet)}>
-            {ABOUT_BANNER.established} · {ABOUT_BANNER.place}
-          </p>
-        </div>
+        <p {...stylex.props(styles.lead)}>
+          <span {...stylex.props(base.balance, styles.leadYear)}>
+            {leadYear}
+            <span {...stylex.props(base.srOnly)}>，</span>
+          </span>
+          <span {...stylex.props(base.balance)}>{leadFocus}</span>
+        </p>
       </div>
       <Stamp kind="year" ring="FENCHEM · EST. 1995 · NANJING · " tilt={-9} sx={styles.stamp} />
     </section>

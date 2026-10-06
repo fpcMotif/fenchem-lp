@@ -93,7 +93,7 @@ const styles = stylex.create({
     lineHeight: 1.9,
     letterSpacing: "0.06em",
     color: tone.body,
-    textWrap: "pretty",
+    textWrap: "balance",
   },
   figure: {
     position: "relative",
@@ -273,11 +273,11 @@ function SubNav({
               <a
                 key={chip.id}
                 href={`#${chip.id}`}
-                aria-label={chip.label}
                 aria-current={isActive ? "location" : undefined}
                 {...stylex.props(styles.chip)}
               >
                 <span lang="en">{NAV_ENGLISH[chip.id]}</span>
+                <span {...stylex.props(ui.srOnly)}> {chip.label}</span>
                 <span
                   aria-hidden="true"
                   {...stylex.props(styles.chipMark, isActive && styles.chipMarkActive)}

@@ -11,58 +11,59 @@ const LEVEL_LABEL = {
   municipal: "南京市级",
 } as const;
 
+const LEVELS = ["national", "provincial", "municipal"] as const;
+
 const s = stylex.create({
+  group: {
+    alignItems: "baseline",
+    rowGap: { default: 12, [breakpoints.lg]: 0 },
+  },
+  level: {
+    paddingTop: { default: 28, [breakpoints.lg]: 0 },
+  },
   list: {
-    gridColumn: { default: "auto", [breakpoints.lg]: 2 },
     margin: 0,
     padding: 0,
     listStyle: "none",
+  },
+  listLast: {
     borderBottomWidth: 1,
     borderBottomStyle: "solid",
     borderBottomColor: tone.hairline,
   },
   row: {
-    display: "flex",
-    alignItems: "baseline",
-    justifyContent: "space-between",
-    gap: 24,
-    paddingBlock: { default: 20, [breakpoints.xl]: 24 },
+    paddingBlock: { default: 18, [breakpoints.xl]: 24 },
     borderTopWidth: 1,
     borderTopStyle: "solid",
     borderTopColor: tone.hairline,
-  },
-  title: {
-    margin: 0,
-    fontSize: { default: step.body, [breakpoints.md]: step.lead },
-    fontWeight: 500,
-    lineHeight: 1.5,
-    letterSpacing: "0.04em",
-    color: tone.ink,
-  },
-  level: {
-    flexShrink: 0,
-    fontSize: step.label,
+    fontSize: { default: step.body, [breakpoints.md]: "19px" },
     fontWeight: 400,
-    letterSpacing: "0.04em",
-    color: tone.body,
+    lineHeight: 1.6,
+    letterSpacing: "0.06em",
+    color: tone.ink,
   },
 });
 
 export function Honors() {
   const chip = ABOUT_HERO.navChips[4];
+  const lastLevel = LEVELS.length - 1;
 
   return (
     <Section id={chip.id} label={ABOUT_HONORS.title} background={ui.onPage}>
-      <div {...stylex.props(ui.phi)}>
-        <ul {...stylex.props(s.list)}>
-          {ABOUT_HONORS.items.map((honor, idx) => (
-            <Reveal key={honor.id} as="li" step={idx % 4} sx={s.row}>
-              <h3 {...stylex.props(s.title)}>{honor.title}</h3>
-              <span {...stylex.props(s.level)}>{LEVEL_LABEL[honor.level]}</span>
-            </Reveal>
-          ))}
-        </ul>
-      </div>
+      {LEVELS.map((level, levelIdx) => (
+        <div key={level} {...stylex.props(ui.phi, s.group)}>
+          <h3 {...stylex.props(ui.label, levelIdx > 0 && s.level)}>{LEVEL_LABEL[level]}</h3>
+          <ul {...stylex.props(ui.main, s.list, levelIdx === lastLevel && s.listLast)}>
+            {ABOUT_HONORS.items
+              .filter((honor) => honor.level === level)
+              .map((honor, idx) => (
+                <Reveal key={honor.id} as="li" step={idx % 4} sx={s.row}>
+                  {honor.title}
+                </Reveal>
+              ))}
+          </ul>
+        </div>
+      ))}
     </Section>
   );
 }

@@ -13,12 +13,7 @@ const fadeRise = stylex.keyframes({
 
 const s = stylex.create({
   label: {
-    margin: 0,
-    marginBottom: 12,
-    fontSize: step.label,
-    fontWeight: 400,
-    letterSpacing: "0.04em",
-    color: tone.body,
+    marginBottom: { default: 16, [breakpoints.xl]: 20 },
   },
   holdingName: {
     margin: 0,
@@ -30,10 +25,10 @@ const s = stylex.create({
     textWrap: "balance",
   },
   holdingEnglish: {
-    marginTop: 12,
+    marginTop: 16,
     fontSize: step.body,
     fontWeight: 400,
-    letterSpacing: "0.02em",
+    letterSpacing: "0.04em",
     color: tone.body,
   },
   list: {
@@ -49,32 +44,32 @@ const s = stylex.create({
     flexDirection: { default: "column", [breakpoints.md]: "row" },
     alignItems: { default: "flex-start", [breakpoints.md]: "baseline" },
     justifyContent: "space-between",
-    gap: { default: 4, [breakpoints.md]: 24 },
-    paddingBlock: { default: 20, [breakpoints.xl]: 24 },
+    gap: { default: 6, [breakpoints.md]: 24 },
+    paddingBlock: { default: 18, [breakpoints.xl]: 24 },
     borderTopWidth: 1,
     borderTopStyle: "solid",
     borderTopColor: tone.hairline,
   },
   name: {
     margin: 0,
-    fontSize: { default: step.body, [breakpoints.md]: step.lead },
-    fontWeight: 500,
-    lineHeight: 1.5,
-    letterSpacing: "0.04em",
+    fontSize: { default: step.body, [breakpoints.md]: "19px" },
+    fontWeight: 400,
+    lineHeight: 1.6,
+    letterSpacing: "0.06em",
     color: tone.ink,
   },
   english: {
     fontSize: step.label,
     fontWeight: 400,
-    letterSpacing: "0.02em",
-    color: tone.body,
+    letterSpacing: "0.04em",
+    color: tone.quiet,
   },
   toggleWrap: {
     display: "flex",
     flexDirection: "column",
     alignItems: "flex-start",
     gap: 24,
-    marginTop: 32,
+    marginTop: { default: 32, [breakpoints.xl]: 40 },
   },
   diagram: {
     width: "100%",
@@ -99,7 +94,7 @@ export function Structure() {
       <div {...stylex.props(ui.phi)}>
         <div {...stylex.props(ui.asideCol)}>
           <Reveal>
-            <p {...stylex.props(s.label)}>{ABOUT_STRUCTURE.holding.badge}</p>
+            <p {...stylex.props(ui.label, s.label)}>{ABOUT_STRUCTURE.holding.badge}</p>
             <h3 {...stylex.props(s.holdingName)}>{ABOUT_STRUCTURE.holding.name}</h3>
             <div lang="en" {...stylex.props(s.holdingEnglish)}>
               {ABOUT_STRUCTURE.holding.english}
@@ -107,7 +102,7 @@ export function Structure() {
           </Reveal>
         </div>
         <div {...stylex.props(ui.main)}>
-          <p {...stylex.props(s.label)}>{ABOUT_STRUCTURE.subsidiaryBadge}</p>
+          <p {...stylex.props(ui.label, s.label)}>{ABOUT_STRUCTURE.subsidiaryBadge}</p>
           <ul aria-label={ABOUT_STRUCTURE.subsidiaryBadge} {...stylex.props(s.list)}>
             {ABOUT_STRUCTURE.subsidiaries.map((sub, idx) => (
               <Reveal key={sub.id} as="li" step={idx} sx={s.row}>

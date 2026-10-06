@@ -1,130 +1,159 @@
-import { breakpoints } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 
 import { ABOUT_CSR } from "../../about-data";
-import { Fold, s } from "./shared";
-import { palette } from "./tokens.stylex";
+import { Bevel, Mat, ROMAN, SectionHead, Tag, bevel, stepIn, ui, useArrived } from "./shared";
+import { bp, face, space, tone } from "./tokens.stylex";
 
 const styles = stylex.create({
-  spread: {
+  plate: {
     display: "grid",
-    gridTemplateColumns: {
-      default: "minmax(0, 1fr)",
-      [breakpoints.lg]: "repeat(2, minmax(0, 1fr))",
-    },
-    alignItems: "end",
-    rowGap: 28,
+    gridTemplateColumns: "minmax(0, 1fr)",
+  },
+  photo: {
+    position: "relative",
+    gridArea: "1 / 1",
+    aspectRatio: { default: "4 / 3", [bp.tablet]: "16 / 9", [bp.desktop]: "2400 / 1100" },
+    overflow: "hidden",
+    backgroundColor: tone.whisper,
+  },
+  image: {
+    objectPosition: "50% 60%",
+  },
+  window: {
+    position: "relative",
+    gridArea: { default: "2 / 1", [bp.desktop]: "1 / 1" },
+    justifySelf: { default: "stretch", [bp.desktop]: "end" },
+    alignSelf: { default: "stretch", [bp.desktop]: "end" },
+    width: { default: "auto", [bp.desktop]: "42%" },
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "flex-end",
+    boxSizing: "border-box",
+    margin: { default: 0, [bp.desktop]: space.mat },
+    marginTop: { default: 12, [bp.tablet]: 16, [bp.desktop]: space.mat },
+    padding: { default: "28px 20px 24px", [bp.tablet]: "36px 32px 32px", [bp.desktop]: "40px" },
+    backgroundColor: tone.page,
   },
   statement: {
     margin: 0,
-    paddingInlineEnd: { default: 0, [breakpoints.lg]: 48 },
-    fontSize: { default: 28, [breakpoints.md]: 40, [breakpoints.lg]: "min(2.9vw, 44px)" },
-    fontWeight: 500,
-    lineHeight: 1.4,
-    letterSpacing: "0.02em",
-    textAlign: { default: "start", [breakpoints.lg]: "end" },
-    color: palette.ink,
+    fontFamily: face.sans,
+    fontSize: { default: 20, [bp.tablet]: 28, [bp.laptop]: 22, [bp.wide]: 32 },
+    fontWeight: 400,
+    lineHeight: 1.5,
+    letterSpacing: "0.04em",
+    color: tone.navy,
   },
-  statementLine: {
+  line: {
     display: "block",
   },
   desc: {
-    maxWidth: "30em",
     margin: 0,
-    paddingInlineStart: { default: 0, [breakpoints.lg]: 48 },
-    fontSize: { default: 15, [breakpoints.lg]: 16 },
-    fontWeight: 400,
-    lineHeight: 2,
-    letterSpacing: "0.04em",
-    color: palette.body,
+    marginTop: { default: 16, [bp.desktop]: 22 },
+    maxWidth: { default: "26em", [bp.desktop]: "17em" },
+    fontFamily: face.sans,
+    fontSize: { default: 16, [bp.tablet]: 17, [bp.desktop]: 18 },
+    lineHeight: 1.8,
+    color: tone.ink,
     textWrap: "pretty",
-  },
-  figure: {
-    margin: 0,
-    marginTop: { default: 48, [breakpoints.lg]: 96 },
-  },
-  frame: {
-    position: "relative",
-    overflow: "hidden",
-    aspectRatio: { default: "4 / 3", [breakpoints.md]: "21 / 9" },
-    backgroundColor: palette.page,
-  },
-  image: {
-    objectPosition: "50% 56%",
   },
   outcomes: {
     display: "grid",
-    gridTemplateColumns: {
-      default: "minmax(0, 1fr)",
-      [breakpoints.md]: "repeat(3, minmax(0, 1fr))",
-    },
+    gridTemplateColumns: { default: "minmax(0, 1fr)", [bp.upTablet]: "repeat(3, minmax(0, 1fr))" },
+    rowGap: 10,
     margin: 0,
-    marginTop: { default: 40, [breakpoints.lg]: 72 },
     padding: 0,
-    listStyle: "none",
-    borderTopWidth: 1,
-    borderTopStyle: "solid",
-    borderTopColor: palette.hairline,
+    listStyleType: "none",
   },
   outcome: {
-    alignItems: "center",
-    justifyContent: "center",
-    flexDirection: "row",
-    gap: 12,
-    paddingBlock: { default: 20, [breakpoints.lg]: 32 },
-    fontSize: { default: 18, [breakpoints.lg]: 20 },
-    fontWeight: 500,
-    letterSpacing: "0.08em",
-    color: palette.ink,
+    display: "flex",
+    alignItems: "baseline",
+    gap: 14,
+    paddingInlineStart: { default: 0, [bp.upTablet]: 20 },
+    borderInlineStartWidth: { default: 0, [bp.upTablet]: 1 },
+    borderInlineStartStyle: "solid",
+    borderInlineStartColor: tone.rule,
   },
-  dot: {
-    flexShrink: 0,
-    width: 6,
-    height: 6,
-    borderRadius: "50%",
-    backgroundColor: palette.mint,
+  outcomeFirst: {
+    paddingInlineStart: 0,
+    borderInlineStartWidth: 0,
+  },
+  numeral: {
+    minWidth: 22,
+    fontFamily: face.latin,
+    fontSize: 12,
+    fontWeight: 500,
+    letterSpacing: "0.06em",
+    color: tone.navy,
+  },
+  outcomeTitle: {
+    fontFamily: face.sans,
+    fontSize: { default: 16, [bp.desktop]: 19 },
+    fontWeight: 500,
+    letterSpacing: "0.06em",
+    color: tone.ink,
   },
 });
 
 export function Csr() {
+  const [ref, arrived] = useArrived<HTMLDivElement>();
   return (
-    <section id="about-csr" aria-label="社会责任" {...stylex.props(s.section, s.bandPaper)}>
-      <div {...stylex.props(s.shell)}>
-        <div {...stylex.props(styles.spread)}>
-          <Fold side="rise">
-            <h2 {...stylex.props(styles.statement)}>
-              {ABOUT_CSR.statement.map((line) => (
-                <span key={line} {...stylex.props(styles.statementLine)}>
-                  {line}
-                </span>
+    <section
+      id="about-csr"
+      aria-labelledby="oos1b-csr"
+      {...stylex.props(ui.anchor, ui.section, ui.shell)}
+    >
+      <SectionHead
+        id="oos1b-csr"
+        index={4}
+        eyebrow="Responsibility"
+        title={ABOUT_CSR.title}
+        note="Ecology and demand, kept in balance."
+      />
+      <div ref={ref} {...stylex.props(...stepIn(arrived, 0))}>
+        <Mat
+          raised
+          foot={
+            <ul {...stylex.props(styles.outcomes)}>
+              {ABOUT_CSR.outcomes.map((outcome, index) => (
+                <li
+                  key={outcome.title}
+                  {...stylex.props(styles.outcome, index === 0 && styles.outcomeFirst)}
+                >
+                  <span lang="en" {...stylex.props(styles.numeral)}>
+                    {ROMAN[index].toLowerCase()}
+                  </span>
+                  <span {...stylex.props(styles.outcomeTitle)}>{outcome.title}</span>
+                </li>
               ))}
-            </h2>
-          </Fold>
-          <Fold side="rise" step={1}>
-            <p {...stylex.props(styles.desc)}>{ABOUT_CSR.desc}</p>
-          </Fold>
-        </div>
-        <Fold side="rise">
-          <figure {...stylex.props(styles.figure)}>
-            <div {...stylex.props(styles.frame)}>
-              <img
-                src={ABOUT_CSR.image}
-                alt={ABOUT_CSR.imageAlt}
-                loading="lazy"
-                decoding="async"
-                {...stylex.props(s.fill, styles.image)}
-              />
+            </ul>
+          }
+        >
+          <Tag numeral="I" />
+          <Bevel>
+            <div {...stylex.props(styles.plate)}>
+              <div {...stylex.props(styles.photo)}>
+                <img
+                  src={ABOUT_CSR.image}
+                  alt={ABOUT_CSR.imageAlt}
+                  loading="lazy"
+                  decoding="async"
+                  {...stylex.props(ui.fill, styles.image)}
+                />
+              </div>
+              <div {...stylex.props(styles.window, bevel.edge, ...stepIn(arrived, 2))}>
+                <Tag numeral="II" />
+                <p {...stylex.props(styles.statement)}>
+                  {ABOUT_CSR.statement.map((line) => (
+                    <span key={line} {...stylex.props(styles.line)}>
+                      {line}
+                    </span>
+                  ))}
+                </p>
+                <p {...stylex.props(styles.desc)}>{ABOUT_CSR.desc}</p>
+              </div>
             </div>
-          </figure>
-        </Fold>
-        <ul {...stylex.props(styles.outcomes)}>
-          {ABOUT_CSR.outcomes.map((outcome, idx) => (
-            <Fold key={outcome.title} as="li" step={idx} innerSx={styles.outcome}>
-              <span aria-hidden="true" {...stylex.props(styles.dot)} />
-              <span>{outcome.title}</span>
-            </Fold>
-          ))}
-        </ul>
+          </Bevel>
+        </Mat>
       </div>
     </section>
   );

@@ -3,6 +3,8 @@ import * as stylex from "@stylexjs/stylex";
 export const tone = stylex.defineConsts({
   ink: "#1a1a1a",
   body: "#4d4d4d",
+  muted: "#6b7079",
+  drift: "rgba(26, 26, 26, 0.46)",
   page: "#f3f5fa",
   navy: "#0b2a5c",
   glyphBlue: "#d9e2f2",
@@ -12,6 +14,7 @@ export const tone = stylex.defineConsts({
   seam: "rgba(26, 26, 26, 0.32)",
   onNavy: "rgba(255, 255, 255, 0.78)",
   onNavyMuted: "rgba(255, 255, 255, 0.64)",
+  onNavyFaint: "rgba(255, 255, 255, 0.52)",
   onNavyLine: "rgba(255, 255, 255, 0.2)",
   placeholder: "#e8ecf3",
 });
@@ -39,8 +42,8 @@ export const mq = stylex.defineConsts({
 
 export const stage = stylex.defineConsts({
   height: "max(600px, calc(100svh - 128px))",
-  row: "max(440px, calc(100svh - 264px))",
-  photo: "calc(max(440px, calc(100svh - 264px)) - 56px)",
+  row: "max(420px, calc(100svh - 296px))",
+  photo: "calc(max(420px, calc(100svh - 296px)) - 56px)",
 });
 
 export const ease = stylex.defineConsts({

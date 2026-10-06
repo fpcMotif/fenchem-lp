@@ -38,10 +38,10 @@ const styles = stylex.create({
   stat: {
     display: "flex",
     flexDirection: "column",
-    gap: 12,
+    gap: 16,
   },
   label: {
-    color: color.onNavyMuted,
+    color: color.onNavyQuiet,
   },
   figure: {
     display: "flex",
@@ -64,13 +64,14 @@ const styles = stylex.create({
   caption: {
     margin: 0,
     fontSize: 15,
-    letterSpacing: "0.1em",
-    color: color.onNavy,
+    lineHeight: 1.7,
+    letterSpacing: "0.08em",
+    color: color.onNavyMuted,
   },
   photoCaption: {
     position: "relative",
     margin: 0,
-    color: color.onNavyMuted,
+    color: color.onNavyQuiet,
   },
 });
 

@@ -18,12 +18,11 @@ const styles = stylex.create({
   },
   lead: {
     margin: 0,
-    maxWidth: "34em",
+    maxWidth: "30em",
     fontSize: { default: 16, [media.lgUp]: 17 },
-    lineHeight: 2,
+    lineHeight: 1.95,
     letterSpacing: "0.04em",
     color: color.ink,
-    textWrap: "pretty",
   },
   more: {
     display: "inline-flex",
@@ -76,7 +75,7 @@ const styles = stylex.create({
   },
   desc: {
     margin: 0,
-    marginTop: 8,
+    marginTop: 10,
     fontSize: 14,
     lineHeight: 1.8,
     letterSpacing: "0.04em",
@@ -84,16 +83,17 @@ const styles = stylex.create({
   },
   tags: {
     margin: 0,
-    marginTop: 4,
+    marginTop: 12,
     padding: 0,
     listStyle: "none",
     display: "flex",
     flexWrap: "wrap",
-    columnGap: 10,
-    rowGap: 2,
+    columnGap: 16,
+    rowGap: 4,
     fontSize: 13,
-    letterSpacing: "0.04em",
-    color: color.body,
+    lineHeight: 1.7,
+    letterSpacing: "0.06em",
+    color: color.muted,
   },
   overlay: {
     position: "absolute",
@@ -116,7 +116,9 @@ export function ProductsSheet({ onNavigateHome }: { onNavigateHome: (hash?: stri
   return (
     <Sheet def={PRODUCTS_SHEET}>
       <Reveal sx={styles.intro}>
-        <p {...stylex.props(styles.lead)}>{PRODUCTS_INTRO.lead}</p>
+        <p {...stylex.props(styles.lead)}>
+          <span {...stylex.props(base.balance)}>{PRODUCTS_INTRO.lead}</span>
+        </p>
         <button
           type="button"
           onClick={() => onNavigateHome("products")}

@@ -44,8 +44,12 @@ export const base = stylex.create({
     fontSize: 13,
     fontWeight: 400,
     lineHeight: 1.7,
-    letterSpacing: "0.05em",
-    color: color.body,
+    letterSpacing: "0.1em",
+    color: color.muted,
+  },
+  balance: {
+    display: "block",
+    textWrap: "balance",
   },
   reveal: {
     opacity: { default: 0, [breakpoints.motionReduce]: 1 },

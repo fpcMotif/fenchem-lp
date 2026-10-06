@@ -1,202 +1,203 @@
-import { breakpoints } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 
 import { ABOUT_HERO } from "../../about-data";
-import { Fold, s } from "./shared";
-import { fonts, palette } from "./tokens.stylex";
+import { ROOMS_IN_WALKING_ORDER } from "./journey";
+import { Bevel, Mat, SectionHead, Tag, stepIn, ui, useArrived } from "./shared";
+import { bp, face, space, tone } from "./tokens.stylex";
 
-const HALF = Math.ceil(ABOUT_HERO.countries.length / 2);
-const NAME_GLYPHS = Array.from(ABOUT_HERO.title);
-const NAME_SPLIT = Math.ceil(NAME_GLYPHS.length / 2);
-
-const dynamic = stylex.create({
-  rows: (count: number) => ({ gridTemplateRows: `repeat(${count}, auto)` }),
-});
+const LOBBY = ROOMS_IN_WALKING_ORDER[0].plate;
 
 const styles = stylex.create({
-  spread: {
-    display: "grid",
-    gridTemplateColumns: {
-      default: "minmax(0, 1fr)",
-      [breakpoints.lg]: "repeat(2, minmax(0, 1fr))",
-    },
-    alignItems: "start",
-    rowGap: 28,
+  nameRow: {
+    display: "flex",
+    flexDirection: { default: "column", [bp.desktop]: "row" },
+    alignItems: { default: "flex-start", [bp.desktop]: "baseline" },
+    justifyContent: "space-between",
+    gap: { default: 6, [bp.desktop]: 32 },
+    paddingTop: { default: 10, [bp.upTablet]: 14 },
   },
-  name: {
+  company: {
     margin: 0,
-    paddingInlineEnd: { default: 0, [breakpoints.lg]: 48 },
-    fontSize: {
-      default: 34,
-      [breakpoints.md]: "min(5.6vw, 48px)",
-      [breakpoints.lg]: "min(5vw, 72px)",
-    },
+    fontFamily: face.sans,
+    fontSize: { default: 24, [bp.tablet]: 32, [bp.laptop]: 34, [bp.wide]: 40 },
     fontWeight: 500,
     lineHeight: 1.25,
-    letterSpacing: "0.02em",
-    textAlign: { default: "center", [breakpoints.lg]: "end" },
-    color: palette.ink,
-  },
-  nameLine: {
-    display: "block",
-  },
-  copy: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 20,
-    paddingInlineStart: { default: 0, [breakpoints.lg]: 48 },
-    textAlign: { default: "center", [breakpoints.lg]: "start" },
+    letterSpacing: "0.04em",
+    color: tone.ink,
   },
   english: {
     margin: 0,
-    fontSize: 14,
-    fontWeight: 400,
-    letterSpacing: "0.02em",
-    color: palette.quiet,
+    fontSize: { default: 19, [bp.tablet]: 24, [bp.desktop]: 28 },
+    lineHeight: 1.2,
+    color: tone.navy,
+  },
+  inner: {
+    display: "grid",
+    gridTemplateColumns: {
+      default: "minmax(0, 1fr)",
+      [bp.desktop]: "minmax(0, 5fr) minmax(0, 7fr)",
+    },
+    columnGap: `calc(${space.mat} * 1.5)`,
+    rowGap: 28,
+    paddingTop: { default: 24, [bp.upTablet]: space.mat },
+  },
+  leadColumn: {
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "space-between",
+    gap: 28,
   },
   lead: {
-    maxWidth: "34em",
     margin: 0,
-    marginInline: { default: "auto", [breakpoints.lg]: 0 },
-    fontSize: { default: 16, [breakpoints.lg]: 17 },
-    fontWeight: 400,
-    lineHeight: 2,
-    letterSpacing: "0.04em",
-    color: palette.body,
+    fontFamily: face.sans,
+    fontSize: { default: 17, [bp.tablet]: 19, [bp.desktop]: 20 },
+    lineHeight: 1.9,
+    color: tone.ink,
     textWrap: "pretty",
   },
+  founded: {
+    display: "flex",
+    alignItems: "baseline",
+    gap: 14,
+    margin: 0,
+  },
+  year: {
+    fontSize: { default: 64, [bp.tablet]: 88, [bp.desktop]: 112 },
+    lineHeight: 0.8,
+    color: tone.navy,
+    fontVariantNumeric: "lining-nums",
+  },
+  foundedLabel: {
+    fontFamily: face.sans,
+    fontSize: { default: 14, [bp.desktop]: 15 },
+    letterSpacing: "0.08em",
+    color: tone.body,
+  },
+  photo: {
+    position: "relative",
+    aspectRatio: "3 / 2",
+    overflow: "hidden",
+    backgroundColor: tone.whisper,
+  },
+  caption: {
+    display: "flex",
+    alignItems: "baseline",
+    gap: 12,
+    margin: 0,
+    marginTop: { default: 12, [bp.upTablet]: 16 },
+  },
+  captionText: {
+    fontFamily: face.sans,
+    fontSize: 15,
+    fontWeight: 500,
+    letterSpacing: "0.06em",
+    color: tone.ink,
+  },
+  captionEnglish: {
+    fontSize: 19,
+  },
   network: {
-    marginTop: { default: 56, [breakpoints.lg]: 96 },
+    display: "flex",
+    flexWrap: "wrap",
+    alignItems: "baseline",
+    columnGap: 20,
+    rowGap: 8,
   },
   networkLabel: {
     margin: 0,
-    marginBottom: 12,
-    textAlign: "center",
+    fontFamily: face.sans,
+    fontSize: { default: 15, [bp.desktop]: 17 },
+    fontWeight: 500,
+    color: tone.ink,
   },
-  ledgerWrap: {
-    position: "relative",
+  countries: {
     display: "flex",
-    flexDirection: "column",
-    maxWidth: 760,
-    marginInline: "auto",
-  },
-  ledger: {
-    display: "grid",
-    gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
-    gridAutoFlow: "column",
-    columnGap: { default: 28, [breakpoints.md]: 64 },
+    flexWrap: "wrap",
+    columnGap: { default: 12, [bp.desktop]: 18 },
+    rowGap: 4,
     margin: 0,
     padding: 0,
-    listStyle: "none",
-  },
-  row: {
-    flexDirection: "row",
-    alignItems: "baseline",
-    paddingBlock: { default: 14, [breakpoints.md]: 18 },
-    borderBottomWidth: 1,
-    borderBottomStyle: "solid",
-    borderBottomColor: palette.hairline,
-  },
-  rowStart: { justifyContent: "flex-end" },
-  rowEnd: { justifyContent: "flex-start" },
-  country: {
-    fontFamily: fonts.cjk,
-    fontSize: { default: 17, [breakpoints.md]: 20 },
-    fontWeight: 500,
-    letterSpacing: "0.06em",
-    color: palette.ink,
-  },
-  more: {
-    alignSelf: { default: "flex-end", [breakpoints.xl]: "auto" },
-    marginTop: { default: 14, [breakpoints.xl]: 0 },
-    position: { default: "static", [breakpoints.xl]: "absolute" },
-    insetInlineStart: { default: "auto", [breakpoints.xl]: "calc(100% + 24px)" },
-    bottom: { default: "auto", [breakpoints.xl]: 14 },
-    fontSize: 15,
-    fontWeight: 400,
-    letterSpacing: "0.08em",
-    whiteSpace: "nowrap",
-    color: palette.quiet,
-  },
-  figure: {
-    width: "100%",
-    maxWidth: 1120,
-    margin: 0,
-    marginInline: "auto",
-    marginTop: { default: 56, [breakpoints.lg]: 96 },
-  },
-  frame: {
-    position: "relative",
-    overflow: "hidden",
-    aspectRatio: { default: "4 / 3", [breakpoints.lg]: "16 / 8" },
-    backgroundColor: palette.page,
-  },
-  figcaption: {
-    marginTop: 14,
-    textAlign: "center",
+    listStyleType: "none",
+    fontFamily: face.sans,
+    fontSize: { default: 15, [bp.desktop]: 17 },
+    lineHeight: 1.6,
+    color: tone.body,
   },
 });
 
 export function Profile() {
+  const [ref, arrived] = useArrived<HTMLDivElement>();
   return (
-    <section id="about-profile" aria-label="企业概况" {...stylex.props(s.section, s.bandPaper)}>
-      <div {...stylex.props(s.shell)}>
-        <div {...stylex.props(styles.spread)}>
-          <Fold side="rise">
-            <h2 {...stylex.props(styles.name)}>
-              <span {...stylex.props(styles.nameLine)}>
-                {NAME_GLYPHS.slice(0, NAME_SPLIT).join("")}
-              </span>
-              <span {...stylex.props(styles.nameLine)}>
-                {NAME_GLYPHS.slice(NAME_SPLIT).join("")}
-              </span>
-            </h2>
-          </Fold>
-          <Fold side="rise" step={1}>
-            <div {...stylex.props(styles.copy)}>
-              <p lang="en" {...stylex.props(styles.english)}>
+    <section
+      id="about-profile"
+      aria-labelledby="oos1b-profile"
+      {...stylex.props(ui.anchor, ui.section, ui.shell)}
+    >
+      <SectionHead
+        id="oos1b-profile"
+        index={1}
+        eyebrow="Profile"
+        title="企业概况"
+        note="Thirty years of ingredients, from Nanjing."
+      />
+      <div ref={ref} {...stylex.props(...stepIn(arrived, 0))}>
+        <Mat
+          raised
+          head={
+            <div {...stylex.props(styles.nameRow)}>
+              <Tag numeral="I" />
+              <h3 {...stylex.props(styles.company)}>{ABOUT_HERO.title}</h3>
+              <p lang="en" {...stylex.props(ui.serif, styles.english)}>
                 {ABOUT_HERO.englishTitle}
               </p>
-              <p {...stylex.props(styles.lead)}>{ABOUT_HERO.lead}</p>
             </div>
-          </Fold>
-        </div>
-
-        <div {...stylex.props(styles.network)}>
-          <p {...stylex.props(s.caption, styles.networkLabel)}>{ABOUT_HERO.networkLabel}</p>
-          <div {...stylex.props(styles.ledgerWrap)}>
-            <ul {...stylex.props(styles.ledger, dynamic.rows(HALF))}>
-              {ABOUT_HERO.countries.map((country, idx) => (
-                <Fold
-                  key={country}
-                  as="li"
-                  step={idx % HALF}
-                  innerSx={[styles.row, idx < HALF ? styles.rowStart : styles.rowEnd]}
-                >
-                  <span {...stylex.props(styles.country)}>{country}</span>
-                </Fold>
-              ))}
-            </ul>
-            <span {...stylex.props(styles.more)}>等地</span>
-          </div>
-        </div>
-
-        <Fold side="rise">
-          <figure {...stylex.props(styles.figure)}>
-            <div {...stylex.props(styles.frame)}>
-              <img
-                src={ABOUT_HERO.lobbyImage}
-                alt="泛成总部大堂，弧形吊顶与大理石地面"
-                loading="lazy"
-                decoding="async"
-                {...stylex.props(s.fill)}
-              />
+          }
+          foot={
+            <div {...stylex.props(styles.network)}>
+              <p {...stylex.props(styles.networkLabel)}>{ABOUT_HERO.networkLabel}</p>
+              <ul {...stylex.props(styles.countries)}>
+                {ABOUT_HERO.countries.map((country) => (
+                  <li key={country}>{country}</li>
+                ))}
+              </ul>
             </div>
-            <figcaption {...stylex.props(s.caption, styles.figcaption)}>
-              {ABOUT_HERO.lobbyCaption}
-            </figcaption>
-          </figure>
-        </Fold>
+          }
+        >
+          <Bevel>
+            <Mat bare layout={styles.inner}>
+              <Tag numeral="II" />
+              <div {...stylex.props(styles.leadColumn, ...stepIn(arrived, 1))}>
+                <p {...stylex.props(styles.lead)}>{ABOUT_HERO.lead}</p>
+                <p {...stylex.props(styles.founded)}>
+                  <span lang="en" {...stylex.props(ui.serif, styles.year)}>
+                    1995
+                  </span>
+                  <span {...stylex.props(styles.foundedLabel)}>创立于南京</span>
+                </p>
+              </div>
+              <figure {...stylex.props(ui.reset, ...stepIn(arrived, 2))}>
+                <Bevel>
+                  <div {...stylex.props(styles.photo)}>
+                    <img
+                      src={LOBBY.large}
+                      alt={ABOUT_HERO.lobbyCaption}
+                      loading="lazy"
+                      decoding="async"
+                      {...stylex.props(ui.fill)}
+                    />
+                  </div>
+                  <Tag numeral="III" />
+                </Bevel>
+                <figcaption {...stylex.props(styles.caption)}>
+                  <span {...stylex.props(styles.captionText)}>{ABOUT_HERO.lobbyCaption}</span>
+                  <span lang="en" {...stylex.props(ui.serif, styles.captionEnglish)}>
+                    {LOBBY.english}
+                  </span>
+                </figcaption>
+              </figure>
+            </Mat>
+          </Bevel>
+        </Mat>
       </div>
     </section>
   );

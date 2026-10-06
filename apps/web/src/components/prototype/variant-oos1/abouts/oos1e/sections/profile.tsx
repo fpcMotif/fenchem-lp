@@ -1,6 +1,6 @@
 import * as stylex from "@stylexjs/stylex";
 
-import { ABOUT_BANNER, ABOUT_HERO } from "../../../about-data";
+import { ABOUT_HERO } from "../../../about-data";
 import { Sheet } from "../sheet";
 import { base, Reveal } from "../shared";
 import { PROFILE_SHEET } from "../sheets";
@@ -20,7 +20,7 @@ const styles = stylex.create({
   text: {
     display: "flex",
     flexDirection: "column",
-    gap: { default: 36, [media.lgUp]: 48 },
+    gap: { default: 40, [media.lgUp]: 56 },
   },
   name: {
     margin: 0,
@@ -33,7 +33,7 @@ const styles = stylex.create({
   },
   english: {
     margin: 0,
-    marginTop: 12,
+    marginTop: { default: 12, [media.lgUp]: 16 },
     fontFamily: font.serif,
     fontStyle: "italic",
     fontSize: { default: 20, [media.lgUp]: 24 },
@@ -42,57 +42,37 @@ const styles = stylex.create({
   },
   lead: {
     margin: 0,
-    maxWidth: "34em",
+    maxWidth: "32em",
     fontSize: { default: 16, [media.lgUp]: 17 },
-    lineHeight: 2.05,
+    lineHeight: 1.95,
     letterSpacing: "0.04em",
-    color: color.ink,
-    textWrap: "pretty",
-  },
-  facts: {
-    display: "flex",
-    flexWrap: "wrap",
-    columnGap: 64,
-    rowGap: 24,
-    margin: 0,
-  },
-  fact: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 4,
-    margin: 0,
-  },
-  factValue: {
-    margin: 0,
-    fontFamily: font.display,
-    fontSize: { default: 40, [media.lgUp]: 56 },
-    fontWeight: 500,
-    lineHeight: 1.1,
-    letterSpacing: "-0.02em",
-    fontVariantNumeric: "tabular-nums",
     color: color.ink,
   },
   network: {
     display: "flex",
     flexDirection: "column",
-    gap: 10,
+    gap: 16,
+    paddingTop: { default: 28, [media.lgUp]: 32 },
+    borderTopWidth: 1,
+    borderTopStyle: "solid",
+    borderTopColor: color.hairline,
   },
   countries: {
     display: "flex",
     flexWrap: "wrap",
-    columnGap: 14,
-    rowGap: 6,
-    maxWidth: "34em",
+    columnGap: { default: 20, [media.lgUp]: 26 },
+    rowGap: 8,
+    maxWidth: "32em",
     margin: 0,
     padding: 0,
     listStyle: "none",
-    fontSize: 16,
+    fontSize: { default: 15, [media.lgUp]: 16 },
+    lineHeight: 1.7,
     letterSpacing: "0.06em",
-    color: color.ink,
-  },
-  separator: {
-    marginInlineStart: 14,
     color: color.body,
+  },
+  more: {
+    color: color.muted,
   },
   figure: {
     display: "flex",
@@ -121,36 +101,17 @@ export function ProfileSheet() {
             </p>
           </Reveal>
           <Reveal step={1}>
-            <p {...stylex.props(styles.lead)}>{ABOUT_HERO.lead}</p>
+            <p {...stylex.props(styles.lead)}>
+              <span {...stylex.props(base.balance)}>{ABOUT_HERO.lead}</span>
+            </p>
           </Reveal>
-          <Reveal step={2}>
-            <dl {...stylex.props(styles.facts)}>
-              <div {...stylex.props(styles.fact)}>
-                <dt {...stylex.props(base.quiet)}>成立</dt>
-                <dd lang="en" {...stylex.props(styles.factValue)}>
-                  {ABOUT_BANNER.established.replace("Est. ", "")}
-                </dd>
-              </div>
-              <div {...stylex.props(styles.fact)}>
-                <dt {...stylex.props(base.quiet)}>所在地</dt>
-                <dd lang="en" {...stylex.props(styles.factValue)}>
-                  {ABOUT_BANNER.place}
-                </dd>
-              </div>
-            </dl>
-          </Reveal>
-          <Reveal step={3} sx={styles.network}>
+          <Reveal step={2} sx={styles.network}>
             <p {...stylex.props(base.quiet)}>{ABOUT_HERO.networkLabel}</p>
             <ul {...stylex.props(styles.countries)}>
               {ABOUT_HERO.countries.map((country) => (
-                <li key={country}>
-                  {country}
-                  <span aria-hidden="true" {...stylex.props(styles.separator)}>
-                    ·
-                  </span>
-                </li>
+                <li key={country}>{country}</li>
               ))}
-              <li>等地</li>
+              <li {...stylex.props(styles.more)}>等地</li>
             </ul>
           </Reveal>
         </div>

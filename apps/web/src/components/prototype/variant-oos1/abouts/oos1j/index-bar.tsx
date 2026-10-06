@@ -1,6 +1,7 @@
-import { breakpoints } from "@fenchem-lp/ui/tokens.stylex";
+import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { useEffect, useRef } from "react";
+import { m, useScroll } from "motion/react";
+import { useEffect, useRef, useState } from "react";
 
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
@@ -55,6 +56,7 @@ const styles = stylex.create({
     cursor: "pointer",
   },
   list: {
+    position: "relative",
     display: "flex",
     alignItems: "stretch",
     justifyContent: { default: "flex-start", [breakpoints.lg]: "flex-end" },
@@ -65,7 +67,6 @@ const styles = stylex.create({
     scrollbarWidth: "none",
   },
   link: {
-    position: "relative",
     display: "inline-flex",
     alignItems: "center",
     flexShrink: 0,
@@ -74,28 +75,55 @@ const styles = stylex.create({
     whiteSpace: "nowrap",
     color: { default: hue.body, ":hover": hue.ink },
   },
+  linkOn: {
+    color: hue.ink,
+  },
   marker: {
     position: "absolute",
-    left: { default: 12, [breakpoints.lg]: 18 },
-    right: { default: 12, [breakpoints.lg]: 18 },
+    left: 0,
     bottom: 14,
+    width: 1,
     height: 1,
     backgroundColor: hue.ink,
     transformOrigin: "left center",
-    transform: "scaleX(0)",
-    transitionProperty: "transform",
-    transitionDuration: "400ms",
+    opacity: 0,
+    pointerEvents: "none",
+    transitionProperty: "transform, opacity",
+    transitionDuration: "560ms",
     transitionTimingFunction: size.ease,
   },
   markerOn: {
-    transform: "scaleX(1)",
+    opacity: 1,
+  },
+  markerAt: (left: number, width: number) => ({
+    transform: `translateX(${left}px) scaleX(${width})`,
+  }),
+  progress: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: 0,
+    height: 1,
+    backgroundColor: colors.brandBlue700,
+    transformOrigin: "left center",
+    pointerEvents: "none",
   },
 });
+
+type MarkerBox = { left: number; width: number };
+
+function measureMarker(list: HTMLElement, label: HTMLElement): MarkerBox {
+  const listBox = list.getBoundingClientRect();
+  const labelBox = label.getBoundingClientRect();
+  return { left: labelBox.left - listBox.left + list.scrollLeft, width: labelBox.width };
+}
 
 export function IndexBar({ onNavigateHome }: { onNavigateHome: (hash?: string) => void }) {
   const active = useActiveSection(SECTION_IDS);
   const listRef = useRef<HTMLElement>(null);
   const reduce = useReducedMotion();
+  const [marker, setMarker] = useState<MarkerBox | null>(null);
+  const { scrollYProgress } = useScroll();
 
   useEffect(() => {
     const list = listRef.current;
@@ -111,17 +139,32 @@ export function IndexBar({ onNavigateHome }: { onNavigateHome: (hash?: string) =
     }
   }, [active, reduce]);
 
+  useEffect(() => {
+    const list = listRef.current;
+    const label = active
+      ? list?.querySelector<HTMLElement>(`[href="#${active}"] > [lang="en"]`)
+      : null;
+    if (!list || !label) return;
+    const place = () => setMarker(measureMarker(list, label));
+    place();
+    window.addEventListener("resize", place);
+    return () => window.removeEventListener("resize", place);
+  }, [active]);
+
   return (
     <div {...stylex.props(styles.bar)}>
       <div {...stylex.props(base.shell, styles.inner)}>
         <nav aria-label="面包屑导航" lang="en" {...stylex.props(ty.quiet, styles.breadcrumb)}>
           <button
             type="button"
-            aria-label="首页"
             onClick={() => onNavigateHome("top")}
             {...stylex.props(styles.crumbLink, base.focus)}
           >
             Home
+            <span lang="zh-CN" {...stylex.props(base.srOnly)}>
+              {" "}
+              首页
+            </span>
           </button>
           <span aria-hidden="true">/</span>
           <span aria-current="page">About</span>
@@ -131,19 +174,33 @@ export function IndexBar({ onNavigateHome }: { onNavigateHome: (hash?: string) =
             <a
               key={chip.id}
               href={`#${chip.id}`}
-              aria-label={chip.label}
               aria-current={active === chip.id ? "location" : undefined}
-              {...stylex.props(ty.quiet, styles.link, base.focus)}
+              {...stylex.props(
+                ty.quiet,
+                styles.link,
+                active === chip.id && styles.linkOn,
+                base.focus,
+              )}
             >
               <span lang="en">{NAV_LABELS[chip.id]}</span>
-              <span
-                aria-hidden="true"
-                {...stylex.props(styles.marker, active === chip.id && styles.markerOn)}
-              />
+              <span {...stylex.props(base.srOnly)}> {chip.label}</span>
             </a>
           ))}
+          <span
+            aria-hidden="true"
+            {...stylex.props(
+              styles.marker,
+              active !== undefined && marker !== null && styles.markerOn,
+              marker !== null && styles.markerAt(marker.left, marker.width),
+            )}
+          />
         </nav>
       </div>
+      <m.span
+        aria-hidden="true"
+        {...stylex.props(styles.progress)}
+        style={{ scaleX: scrollYProgress }}
+      />
     </div>
   );
 }

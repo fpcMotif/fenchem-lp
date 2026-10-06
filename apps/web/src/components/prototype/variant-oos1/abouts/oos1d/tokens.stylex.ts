@@ -3,6 +3,7 @@ import * as stylex from "@stylexjs/stylex";
 export const tone = stylex.defineConsts({
   ink: "#1a1a1a",
   body: "#4d4d4d",
+  quiet: "#6b7079",
   tint: "#e6ecf7",
   page: "#f3f5fa",
   navy: "#0b2a5c",

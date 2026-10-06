@@ -15,6 +15,7 @@ const PACE = 0.85;
 const LEAD_IN = "max(6vw, 56px)";
 const TAIL = "max(6vw, 72px)";
 const SPRING = { stiffness: 120, damping: 28, mass: 0.6, restDelta: 0.0004 } as const;
+const LAST_COUNTRY = ABOUT_HERO.countries.length - 1;
 
 type Metrics = {
   runwayHeight: number;
@@ -79,7 +80,7 @@ const styles = stylex.create({
     display: { default: "none", [mq.pin]: "block" },
     position: "relative",
     flexShrink: 0,
-    height: 88,
+    height: 64,
   },
   stripTrain: {
     position: "absolute",
@@ -95,19 +96,19 @@ const styles = stylex.create({
   phrase: {
     display: "inline-flex",
     alignItems: "center",
-    paddingInline: 24,
-    fontFamily: face.latin,
-    fontSize: 56,
-    fontWeight: 500,
+    paddingInline: 44,
+    fontFamily: face.serif,
+    fontStyle: "italic",
+    fontSize: 30,
+    fontWeight: 400,
     lineHeight: 1,
-    letterSpacing: "-0.03em",
-    textTransform: "uppercase",
+    letterSpacing: "0.01em",
     whiteSpace: "nowrap",
-    color: tone.ink,
+    color: tone.drift,
   },
   join: {
     display: "flex",
-    color: tone.ink,
+    color: tone.seam,
   },
   view: {
     position: "relative",
@@ -153,68 +154,72 @@ const styles = stylex.create({
     display: "flex",
     flexDirection: "column",
     justifyContent: "center",
-    gap: { default: 24, [mq.pin]: "clamp(18px, 3.4vh, 32px)" },
+    gap: { default: 28, [mq.pin]: "clamp(24px, 4.4vh, 40px)" },
     width: {
       default: "100%",
       [mq.snap]: "min(86vw, 480px)",
-      [mq.pin]: "clamp(460px, 34vw, 540px)",
+      [mq.pin]: "clamp(480px, 38vw, 580px)",
     },
     height: { default: "auto", [mq.pin]: stage.row },
   },
   profileTitle: {
     margin: 0,
-    fontSize: { default: 30, [mq.mid]: 36, [mq.pin]: "clamp(30px, min(3vw, 5vh), 44px)" },
+    fontSize: { default: 28, [mq.mid]: 34, [mq.pin]: "clamp(28px, min(2.7vw, 4.6vh), 40px)" },
     fontWeight: 500,
-    lineHeight: 1.28,
-    letterSpacing: "0.02em",
+    lineHeight: 1.32,
+    letterSpacing: "0.04em",
     color: tone.ink,
     textWrap: "balance",
   },
   profileEnglish: {
-    marginTop: 10,
-    fontSize: 14,
+    marginTop: 14,
+    fontSize: 13,
     fontWeight: 400,
-    letterSpacing: "0.02em",
-    color: tone.body,
+    letterSpacing: "0.04em",
+    color: tone.muted,
   },
   profileLead: {
     margin: 0,
-    fontSize: { default: 16, [mq.pin]: "clamp(14px, 2vh, 16px)" },
+    maxWidth: "33em",
+    fontSize: { default: 16, [mq.pin]: "clamp(15px, 2vh, 16px)" },
     fontWeight: 400,
-    lineHeight: 1.9,
+    lineHeight: 1.95,
     letterSpacing: "0.04em",
     color: tone.ink,
     textWrap: "pretty",
   },
   network: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 8,
+    margin: 0,
+    paddingTop: { default: 20, [mq.pin]: "clamp(16px, 2.6vh, 24px)" },
+    borderTopWidth: 1,
+    borderTopStyle: "solid",
+    borderTopColor: tone.hairline,
+    fontSize: 14,
+    fontWeight: 400,
+    lineHeight: 1.95,
+    letterSpacing: "0.04em",
+    color: tone.muted,
+    textWrap: "pretty",
+  },
+  networkLead: {
+    color: tone.body,
+  },
+  place: {
+    whiteSpace: "nowrap",
   },
   quiet: {
     margin: 0,
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: 400,
+    lineHeight: 1.5,
     letterSpacing: "0.06em",
-    color: tone.body,
-  },
-  countries: {
-    display: "flex",
-    flexWrap: "wrap",
-    gap: "4px 16px",
-    margin: 0,
-    padding: 0,
-    listStyle: "none",
-    fontSize: 14,
-    fontWeight: 400,
-    letterSpacing: "0.06em",
-    color: tone.ink,
+    color: tone.muted,
   },
   photo: {
     display: "flex",
     flexDirection: "column",
     justifyContent: "center",
-    gap: 12,
+    gap: 14,
     margin: 0,
     height: { default: "auto", [mq.pin]: stage.row },
   },
@@ -301,19 +306,22 @@ const styles = stylex.create({
     display: "flex",
     alignItems: "baseline",
     flexWrap: "wrap",
-    gap: "2px 12px",
+    gap: "2px 14px",
     inlineSize: { default: "auto", [mq.pin]: 0 },
     minInlineSize: { default: 0, [mq.pin]: "100%" },
     fontSize: 12,
     fontWeight: 400,
-    letterSpacing: "0.06em",
+    letterSpacing: "0.08em",
     color: tone.body,
+  },
+  noteEnglish: {
+    color: tone.muted,
   },
   stats: {
     display: "flex",
     flexDirection: "column",
     justifyContent: "center",
-    gap: 28,
+    gap: { default: 28, [mq.pin]: "clamp(24px, 4vh, 36px)" },
     width: {
       default: "100%",
       [mq.snap]: "min(92vw, 520px)",
@@ -346,7 +354,7 @@ const styles = stylex.create({
   stat: {
     display: "flex",
     flexDirection: "column",
-    gap: 6,
+    gap: 10,
     paddingInlineEnd: 12,
   },
   statDivided: {
@@ -377,25 +385,28 @@ const styles = stylex.create({
   culture: {
     display: { default: "grid", [mq.snap]: "flex" },
     gridTemplateColumns: { default: "1fr", [mq.pin]: "repeat(3, minmax(0, 1fr))" },
+    gridTemplateRows: { default: "none", [mq.pin]: "1fr auto auto auto 1fr" },
+    rowGap: { default: 0, [mq.pin]: 22 },
     margin: 0,
     padding: 0,
     listStyle: "none",
     width: {
       default: "100%",
       [mq.snap]: "max-content",
-      [mq.pin]: "clamp(720px, 54vw, 880px)",
+      [mq.pin]: "clamp(900px, 70vw, 1080px)",
     },
     height: { default: "auto", [mq.pin]: stage.row },
   },
   value: {
-    display: "flex",
+    display: { default: "flex", [mq.pin]: "grid" },
     flexDirection: "column",
     flexShrink: 0,
-    justifyContent: { default: "flex-start", [mq.pin]: "center" },
-    gap: 16,
+    gap: 18,
+    gridRow: { default: "auto", [mq.pin]: "1 / -1" },
+    gridTemplateRows: { default: "none", [mq.pin]: "subgrid" },
     boxSizing: "border-box",
-    width: { default: "auto", [mq.snap]: "min(72vw, 280px)" },
-    padding: { default: "28px 0", [mq.snap]: "0 24px", [mq.pin]: "0 32px" },
+    width: { default: "auto", [mq.snap]: "min(78vw, 300px)" },
+    padding: { default: "32px 0", [mq.snap]: "0 28px", [mq.pin]: "0 44px" },
     borderTopWidth: { default: 1, [mq.snap]: 0, [mq.pin]: 0 },
     borderTopStyle: "solid",
     borderTopColor: tone.hairline,
@@ -409,7 +420,8 @@ const styles = stylex.create({
     paddingInlineStart: 0,
   },
   glyph: {
-    fontSize: { default: 88, [mq.pin]: "clamp(88px, 14vh, 128px)" },
+    gridRow: { default: "auto", [mq.pin]: "2" },
+    fontSize: { default: 80, [mq.pin]: "clamp(80px, 12vh, 112px)" },
     fontWeight: 500,
     lineHeight: 1,
     userSelect: "none",
@@ -418,18 +430,22 @@ const styles = stylex.create({
   glyphSand: { color: tone.glyphSand },
   glyphGreen: { color: tone.glyphGreen },
   valueTitle: {
+    gridRow: { default: "auto", [mq.pin]: "3" },
     margin: 0,
-    fontSize: 22,
+    fontSize: { default: 20, [mq.pin]: 22 },
     fontWeight: 500,
     lineHeight: 1.3,
     letterSpacing: "0.08em",
     color: tone.ink,
   },
   valueDesc: {
+    gridRow: { default: "auto", [mq.pin]: "4" },
+    alignSelf: "start",
     margin: 0,
-    fontSize: 14,
+    maxWidth: "19em",
+    fontSize: 15,
     fontWeight: 400,
-    lineHeight: 1.9,
+    lineHeight: 1.95,
     letterSpacing: "0.04em",
     color: tone.body,
     textWrap: "pretty",
@@ -487,7 +503,9 @@ function PhotoNote({ en, cn }: { en: string; cn: string }) {
   return (
     <figcaption {...stylex.props(styles.note)}>
       <span>{cn}</span>
-      <span lang="en">{en}</span>
+      <span lang="en" {...stylex.props(styles.noteEnglish)}>
+        {en}
+      </span>
     </figcaption>
   );
 }
@@ -624,19 +642,16 @@ export function Panorama({
             style={pinned ? { x: stripX } : undefined}
           >
             {Array.from({ length: STRIP_LOOPS }, (_, loop) =>
-              STRIP_PHRASES.map((phrase, index) => {
-                const order = loop * STRIP_PHRASES.length + index;
-                return (
-                  <Fragment key={`${loop}-${phrase}`}>
-                    <span lang="en" {...stylex.props(styles.phrase, shiftFor(order + 1))}>
-                      {phrase}
-                    </span>
-                    <span {...stylex.props(styles.join)}>
-                      <Cross />
-                    </span>
-                  </Fragment>
-                );
-              }),
+              STRIP_PHRASES.map((phrase) => (
+                <Fragment key={`${loop}-${phrase}`}>
+                  <span lang="en" {...stylex.props(styles.phrase)}>
+                    {phrase}
+                  </span>
+                  <span {...stylex.props(styles.join)}>
+                    <Cross />
+                  </span>
+                </Fragment>
+              )),
             )}
           </m.div>
         </div>
@@ -662,15 +677,15 @@ export function Panorama({
                   </div>
                 </div>
                 <p {...stylex.props(styles.profileLead)}>{ABOUT_HERO.lead}</p>
-                <div {...stylex.props(styles.network)}>
-                  <p {...stylex.props(styles.quiet)}>{ABOUT_HERO.networkLabel}</p>
-                  <ul {...stylex.props(styles.countries)}>
-                    {ABOUT_HERO.countries.map((country) => (
-                      <li key={country}>{country}</li>
-                    ))}
-                    <li>等地</li>
-                  </ul>
-                </div>
+                <p {...stylex.props(styles.network)}>
+                  <span {...stylex.props(styles.networkLead)}>{ABOUT_HERO.networkLabel}</span>
+                  {ABOUT_HERO.countries.map((country, index) => (
+                    <span key={country} {...stylex.props(styles.place)}>
+                      {country}
+                      {index < LAST_COUNTRY ? "、" : "等地。"}
+                    </span>
+                  ))}
+                </p>
               </div>
 
               <Seam />

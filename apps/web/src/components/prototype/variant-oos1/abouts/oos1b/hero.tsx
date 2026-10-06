@@ -1,201 +1,185 @@
-import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 
 import { ABOUT_BANNER } from "../../about-data";
-import { Fold, s } from "./shared";
-import { fonts, layout, media, palette } from "./tokens.stylex";
+import { ROOMS_IN_WALKING_ORDER } from "./journey";
+import { MiniPlate } from "./mini-plate";
+import { Bevel, Mat, Tag, srOnly, ui } from "./shared";
+import { bp, face, motion, tone } from "./tokens.stylex";
 
-const unfold = stylex.keyframes({
-  "0%": { clipPath: "inset(0 50% 0 50%)" },
-  "100%": { clipPath: "inset(0 0 0 0)" },
+const LOBBY = ROOMS_IN_WALKING_ORDER[0].plate;
+const RECEPTION = ROOMS_IN_WALKING_ORDER[1].plate;
+
+const introAt = (order: number) => `calc(var(--oo-intro, 0ms) + ${order * 160}ms)`;
+
+const lineIn = stylex.keyframes({
+  "0%": { opacity: 0 },
+  "100%": { opacity: 1 },
 });
 
-const riseIn = stylex.keyframes({
-  "0%": { opacity: 0, transform: "translateY(20px)" },
+const doorIn = stylex.keyframes({
+  "0%": { opacity: 0, transform: "scale(0.86)" },
   "100%": { opacity: 1, transform: "none" },
 });
 
 const styles = stylex.create({
-  section: {
-    paddingTop: { default: 112, [breakpoints.lg]: 128 },
-    paddingBottom: { default: 44, [breakpoints.lg]: 72 },
+  hero: {
+    paddingTop: { default: 28, [bp.tablet]: 36, [bp.desktop]: 36 },
   },
-  head: {
-    position: "relative",
-    paddingBottom: { default: 40, [breakpoints.lg]: 64 },
-    "::before": {
-      content: { default: "none", [breakpoints.lg]: '""' },
-      position: "absolute",
-      top: 0,
-      bottom: 0,
-      left: "50%",
-      width: 1,
-      backgroundColor: palette.hairline,
-    },
-  },
-  crumbs: {
-    display: "grid",
-    gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
-    marginBottom: { default: 28, [breakpoints.lg]: 36 },
-    fontFamily: fonts.cjk,
-    fontSize: 13,
-    fontWeight: 400,
-    letterSpacing: "0.04em",
-    color: palette.quiet,
-  },
-  crumbHome: {
-    justifySelf: "end",
-    paddingBlock: 0,
-    paddingInlineStart: 0,
-    paddingInlineEnd: 14,
-    borderWidth: 0,
-    backgroundColor: "transparent",
-    font: "inherit",
-    letterSpacing: "inherit",
-    color: { default: "inherit", ":hover": palette.ink },
-    cursor: "pointer",
-  },
-  crumbCurrent: {
-    justifySelf: "start",
-    paddingInlineStart: 14,
-  },
-  title: {
-    display: "grid",
-    gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
-    margin: 0,
-    fontFamily: fonts.cjk,
-    fontSize: {
-      default: 76,
-      [breakpoints.md]: "min(15vw, 150px)",
-      [breakpoints.lg]: "min(14.4vw, 224px)",
-    },
-    fontWeight: 900,
-    lineHeight: 1.04,
-    color: palette.ink,
-  },
-  titleStart: {
-    display: "block",
-    justifySelf: "end",
-    paddingInlineEnd: "0.07em",
-  },
-  titleEnd: {
-    display: "block",
-    justifySelf: "start",
-    paddingInlineStart: "0.07em",
-  },
-  spread: {
-    display: "grid",
-    gridTemplateColumns: {
-      default: "minmax(0, 1fr)",
-      [breakpoints.lg]: "repeat(2, minmax(0, 1fr))",
-    },
-    alignItems: "start",
-    rowGap: 20,
-    marginTop: { default: 24, [breakpoints.lg]: 32 },
-    textAlign: { default: "center", [breakpoints.lg]: "start" },
-  },
-  tagline: {
-    gridColumn: { default: 1, [breakpoints.lg]: 2 },
-    gridRow: 1,
-    margin: 0,
-    paddingInlineStart: { default: 0, [breakpoints.lg]: 32 },
-    fontFamily: fonts.serif,
-    fontStyle: "italic",
-    fontSize: { default: 26, [breakpoints.md]: 30, [breakpoints.lg]: 36 },
-    fontWeight: 400,
-    lineHeight: 1.2,
-    color: colors.brandBlue700,
-    textWrap: "balance",
-  },
-  lead: {
-    gridColumn: 1,
-    gridRow: { default: 2, [breakpoints.lg]: 1 },
-    justifySelf: { default: "center", [breakpoints.lg]: "end" },
-    maxWidth: "24em",
-    margin: 0,
-    paddingInlineEnd: { default: 0, [breakpoints.lg]: 32 },
-    fontSize: { default: 15, [breakpoints.lg]: 16 },
-    fontWeight: 400,
-    lineHeight: 1.9,
-    letterSpacing: "0.06em",
-    textAlign: { default: "center", [breakpoints.lg]: "end" },
-    color: palette.body,
-    textWrap: "pretty",
-  },
-  stage: {
-    maxWidth: 1536,
-    marginInline: "auto",
-    paddingInline: { default: 16, [breakpoints.md]: 40, [breakpoints.lg]: 48 },
-    boxSizing: "border-box",
-  },
-  figure: {
-    position: "relative",
-    overflow: "hidden",
-    margin: 0,
-    aspectRatio: { default: "4 / 3", [breakpoints.md]: "16 / 8", [breakpoints.lg]: "21 / 9" },
-    backgroundColor: palette.tint,
-    animationName: { default: null, [media.fold]: unfold, [media.fade]: riseIn },
-    animationDuration: "1000ms",
-    animationDelay: "500ms",
-    animationTimingFunction: layout.ease,
+  introAnim: {
+    animationName: { default: lineIn, [bp.motionReduce]: "none" },
+    animationDuration: "900ms",
+    animationTimingFunction: motion.ease,
     animationFillMode: "both",
   },
-  image: {
-    objectPosition: "center 60%",
+  introDelay: (animationDelay: string) => ({ animationDelay }),
+  titleRow: {
+    display: "flex",
+    flexWrap: "wrap",
+    alignItems: "baseline",
+    justifyContent: "space-between",
+    columnGap: 32,
+    rowGap: { default: 8, [bp.upTablet]: 12 },
+    marginBottom: { default: 24, [bp.tablet]: 28, [bp.desktop]: 32 },
+  },
+  title: {
+    margin: 0,
+    fontFamily: face.sans,
+    fontSize: { default: 56, [bp.tablet]: 80, [bp.laptop]: 96, [bp.wide]: 116 },
+    fontWeight: 500,
+    lineHeight: 1,
+    letterSpacing: "0.06em",
+    color: tone.ink,
+  },
+  tagline: {
+    margin: 0,
+    fontSize: { default: 24, [bp.tablet]: 30, [bp.laptop]: 34, [bp.wide]: 42 },
+    lineHeight: 1.1,
+    color: tone.navy,
+  },
+  photo: {
+    position: "relative",
+    overflow: "hidden",
+    aspectRatio: { default: "4 / 5", [bp.tablet]: "4 / 3", [bp.desktop]: "2400 / 1150" },
+    backgroundColor: tone.whisper,
+  },
+  banner: {
+    objectPosition: "51% 50%",
+  },
+  door: {
+    position: "absolute",
+    display: "block",
+    top: { default: "43.6%", [bp.upTablet]: "42.2%" },
+    left: { default: "34.6%", [bp.tablet]: "39.9%", [bp.desktop]: "43.5%" },
+    width: { default: "36%", [bp.tablet]: "23.5%", [bp.desktop]: "15%" },
+    outlineWidth: 1,
+    outlineStyle: "solid",
+    outlineColor: { default: tone.ruleStrong, ":hover": tone.navy },
+    outlineOffset: { default: 3, [bp.desktop]: 4 },
+    boxShadow: { default: "none", ":focus-visible": "0 0 0 6px #ffffff, 0 0 0 8px #0743a9" },
+    cursor: "zoom-in",
+    transformOrigin: "50% 100%",
+    animationName: { default: doorIn, [bp.motionReduce]: "none" },
+    animationDuration: "1100ms",
+    animationDelay: "calc(var(--oo-intro, 0ms) + 620ms)",
+    animationTimingFunction: motion.ease,
+    animationFillMode: "both",
+  },
+  doorPhoto: {
+    transform: {
+      default: "none",
+      [stylex.when.ancestor(":hover")]: { default: "none", [bp.hoverMotion]: "scale(1.05)" },
+    },
+    transitionProperty: "transform",
+    transitionDuration: "800ms",
+    transitionTimingFunction: motion.ease,
+  },
+  speck: {
+    position: "absolute",
+    display: "block",
+    left: "39.45%",
+    top: "55.2%",
+    width: "21.9%",
+  },
+  doorTag: {
+    position: "absolute",
+    top: { default: -14, [bp.desktop]: -15 },
+    left: -4,
+  },
+  foot: {
+    display: "flex",
+    flexDirection: { default: "column", [bp.desktop]: "row" },
+    alignItems: { default: "flex-start", [bp.desktop]: "baseline" },
+    justifyContent: "space-between",
+    gap: { default: 10, [bp.desktop]: 32 },
+  },
+  lead: {
+    margin: 0,
+    maxWidth: "34em",
+    fontFamily: face.sans,
+    fontSize: { default: 16, [bp.tablet]: 18, [bp.desktop]: 19 },
+    lineHeight: 1.7,
+    color: tone.ink,
+    textWrap: "pretty",
+  },
+  meta: {
+    margin: 0,
+    flexShrink: 0,
+    fontFamily: face.latin,
+    fontSize: 12,
+    fontWeight: 500,
+    letterSpacing: "0.08em",
+    textTransform: "uppercase",
+    color: tone.navy,
   },
 });
 
-export function Hero({ onNavigateHome }: { onNavigateHome: (hash?: string) => void }) {
-  const glyphs = Array.from(ABOUT_BANNER.title);
-  const half = Math.ceil(glyphs.length / 2);
+export function Hero() {
   return (
-    <section
-      aria-labelledby="about-banner-title"
-      {...stylex.props(s.section, s.bandPage, styles.section)}
-    >
-      <div {...stylex.props(s.shell)}>
-        <div {...stylex.props(styles.head)}>
-          <nav aria-label="面包屑导航" {...stylex.props(styles.crumbs)}>
-            <button
-              type="button"
-              lang="en"
-              aria-label="首页"
-              onClick={() => onNavigateHome("top")}
-              {...stylex.props(styles.crumbHome, s.focusRing)}
-            >
-              Home
-            </button>
-            <span lang="en" aria-current="page" {...stylex.props(styles.crumbCurrent)}>
-              About
-            </span>
-          </nav>
-          <h1 id="about-banner-title" {...stylex.props(styles.title)}>
-            <span {...stylex.props(s.srOnly)}>{ABOUT_BANNER.title}</span>
-            <Fold as="span" side="left" sx={styles.titleStart}>
-              <span aria-hidden="true">{glyphs.slice(0, half).join("")}</span>
-            </Fold>
-            <Fold as="span" side="right" sx={styles.titleEnd}>
-              <span aria-hidden="true">{glyphs.slice(half).join("")}</span>
-            </Fold>
-          </h1>
-          <div {...stylex.props(styles.spread)}>
-            <p lang="en" {...stylex.props(styles.tagline)}>
-              {ABOUT_BANNER.tagline}
-            </p>
-            <p {...stylex.props(styles.lead)}>{ABOUT_BANNER.lead}</p>
-          </div>
-        </div>
+    <section aria-labelledby="oos1b-title" {...stylex.props(ui.shell, styles.hero)}>
+      <div {...stylex.props(styles.titleRow, styles.introAnim, styles.introDelay(introAt(0)))}>
+        <h1 id="oos1b-title" {...stylex.props(styles.title)}>
+          {ABOUT_BANNER.title}
+        </h1>
+        <p lang="en" {...stylex.props(ui.serif, styles.tagline)}>
+          {ABOUT_BANNER.tagline}
+        </p>
       </div>
-      <div {...stylex.props(styles.stage)}>
-        <figure {...stylex.props(styles.figure)}>
-          <img
-            src={ABOUT_BANNER.image}
-            alt={ABOUT_BANNER.alt}
-            fetchPriority="high"
-            decoding="async"
-            {...stylex.props(s.fill, styles.image)}
-          />
-        </figure>
+
+      <div {...stylex.props(styles.introAnim, styles.introDelay(introAt(1)))}>
+        <Mat
+          raised
+          foot={
+            <div {...stylex.props(styles.foot)}>
+              <p {...stylex.props(styles.lead)}>{ABOUT_BANNER.lead}</p>
+              <p lang="en" {...stylex.props(styles.meta)}>
+                {ABOUT_BANNER.established} · {ABOUT_BANNER.place}
+              </p>
+            </div>
+          }
+        >
+          <Bevel>
+            <div {...stylex.props(styles.photo)}>
+              <img
+                src={ABOUT_BANNER.image}
+                alt={ABOUT_BANNER.alt}
+                fetchPriority="high"
+                decoding="async"
+                {...stylex.props(ui.fill, styles.banner)}
+              />
+              <a href="#about-campus" {...stylex.props(styles.door, stylex.defaultMarker())}>
+                <span {...srOnly}>进入园区：{LOBBY.caption}</span>
+                <MiniPlate plate={LOBBY} photoStyle={styles.doorPhoto}>
+                  <span {...stylex.props(styles.speck)}>
+                    <MiniPlate plate={RECEPTION} />
+                  </span>
+                </MiniPlate>
+                <span {...stylex.props(styles.doorTag)}>
+                  <Tag numeral={LOBBY.numeral} pinned={false} />
+                </span>
+              </a>
+            </div>
+          </Bevel>
+        </Mat>
       </div>
     </section>
   );

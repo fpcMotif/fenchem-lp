@@ -71,13 +71,13 @@ const styles = stylex.create({
     listStyle: "none",
   },
   outcome: {
-    paddingBlock: { default: 16, [mq.xl]: 22 },
+    paddingBlock: { default: 18, [mq.xl]: 26 },
     borderTopWidth: 1,
     borderTopStyle: "solid",
     borderTopColor: tone.hairline,
-    fontSize: { default: 20, [mq.xl]: 24 },
+    fontSize: { default: 19, [mq.xl]: 22 },
     fontWeight: 400,
-    letterSpacing: "0.08em",
+    letterSpacing: "0.1em",
     color: tone.ink,
   },
 
@@ -94,13 +94,16 @@ const styles = stylex.create({
   },
   productsLead: {
     margin: 0,
-    maxWidth: "26em",
-    fontSize: { default: 20, [mq.tablet]: 24, [mq.xl]: 30 },
+    maxWidth: "28em",
+    fontSize: { default: 20, [mq.tablet]: 24, [mq.xl]: 28 },
     fontWeight: 400,
-    lineHeight: 1.65,
+    lineHeight: 1.7,
     letterSpacing: "0.04em",
     color: tone.ink,
     textWrap: "pretty",
+  },
+  clause: {
+    display: "inline-block",
   },
   productList: {
     display: "grid",
@@ -177,25 +180,32 @@ const styles = stylex.create({
     lineHeight: 1.8,
     letterSpacing: "0.04em",
     color: tone.body,
+    textWrap: "pretty",
   },
   tags: {
     display: "flex",
     flexWrap: "wrap",
-    gap: "2px 12px",
+    gap: "6px 18px",
     margin: 0,
-    padding: 0,
+    marginTop: 4,
+    paddingTop: 14,
+    paddingInline: 0,
+    paddingBottom: 0,
+    borderTopWidth: 1,
+    borderTopStyle: "solid",
+    borderTopColor: tone.hairline,
     listStyle: "none",
     fontSize: 12,
     fontWeight: 400,
-    letterSpacing: "0.06em",
-    color: tone.body,
+    lineHeight: 1.6,
+    letterSpacing: "0.08em",
+    color: tone.muted,
   },
 
   cta: {
     display: "flex",
     flexDirection: "column",
     justifyContent: "center",
-    minHeight: { default: "auto", [mq.lg]: "calc(100svh + 72px)" },
     backgroundColor: tone.page,
   },
   ctaInner: {
@@ -222,6 +232,8 @@ const styles = stylex.create({
 });
 
 const PRODUCT_SHIFT = [styles.shiftA, styles.shiftB, styles.shiftC, styles.shiftD] as const;
+
+const LEAD_CLAUSES = PRODUCTS_INTRO.lead.split(/(?<=，)/);
 
 export function CsrSection() {
   const [statementLead, statementClose] = ABOUT_CSR.statement;
@@ -284,7 +296,13 @@ export function ProductsSection({ onNavigateHome }: { onNavigateHome: (hash?: st
       </h2>
       <div {...stylex.props(ui.shell, ui.inset)}>
         <Reveal sx={styles.productsHead}>
-          <p {...stylex.props(styles.productsLead)}>{PRODUCTS_INTRO.lead}</p>
+          <p {...stylex.props(styles.productsLead)}>
+            {LEAD_CLAUSES.map((clause) => (
+              <span key={clause} {...stylex.props(styles.clause)}>
+                {clause}
+              </span>
+            ))}
+          </p>
           <button
             type="button"
             onClick={() => onNavigateHome("products")}

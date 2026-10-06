@@ -37,11 +37,8 @@ export const GROUPS = [
   { id: "about-culture", label: ABOUT_HERO.navChips[2].label },
 ] as const;
 
-const [taglineLead, taglineClose] = ABOUT_BANNER.tagline.split(", ");
-
 export const STRIP_PHRASES = [
-  `${taglineLead},`,
-  taglineClose,
+  ABOUT_BANNER.tagline,
   ABOUT_HERO.englishTitle,
   ABOUT_BANNER.established,
   ABOUT_BANNER.place,

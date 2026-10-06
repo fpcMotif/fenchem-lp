@@ -30,99 +30,114 @@ const styles = stylex.create({
   },
   level: {
     display: "grid",
-    gridTemplateColumns: { default: "1fr", [mq.lg]: "180px minmax(0, 1fr)" },
-    gap: { default: 16, [mq.lg]: 32 },
-    paddingBlock: { default: 28, [mq.xl]: 40 },
+    gridTemplateColumns: { default: "1fr", [mq.lg]: "200px minmax(0, 1fr)" },
+    gap: { default: 20, [mq.lg]: 40 },
+    paddingBlock: { default: 32, [mq.xl]: 48 },
     borderTopWidth: 1,
     borderTopStyle: "solid",
     borderTopColor: tone.onNavyLine,
   },
   levelLabel: {
     margin: 0,
+    paddingTop: { default: 0, [mq.lg]: 8 },
     fontSize: 12,
     fontWeight: 400,
-    letterSpacing: "0.1em",
-    color: tone.onNavyMuted,
+    letterSpacing: "0.24em",
+    color: tone.onNavyFaint,
   },
   honorList: {
     display: "grid",
     gridTemplateColumns: {
       default: "1fr",
-      [mq.sm]: "repeat(auto-fill, minmax(200px, 1fr))",
+      [mq.sm]: "repeat(2, minmax(0, 1fr))",
     },
-    gap: { default: "20px 24px", [mq.xl]: "32px 40px" },
+    gap: { default: "18px 32px", [mq.xl]: "28px 56px" },
     margin: 0,
     padding: 0,
     listStyle: "none",
   },
   honor: {
-    fontSize: { default: 20, [mq.xl]: 22 },
-    fontWeight: 500,
-    lineHeight: 1.5,
-    letterSpacing: "0.06em",
+    fontSize: { default: 18, [mq.md]: 20 },
+    fontWeight: 400,
+    lineHeight: 1.6,
+    letterSpacing: "0.08em",
+    color: tone.onNavy,
     textWrap: "balance",
   },
   honorLead: {
     gridColumn: "1 / -1",
-    fontSize: { default: 32, [mq.tablet]: 40, [mq.xl]: 56 },
+    fontSize: { default: 28, [mq.tablet]: 34, [mq.xl]: 44 },
+    fontWeight: 500,
     lineHeight: 1.3,
-    letterSpacing: "0.08em",
+    letterSpacing: "0.1em",
+    color: colors.paper,
+  },
+  structure: {
+    display: "grid",
+    gridTemplateColumns: { default: "1fr", [mq.lg]: "minmax(0, 0.42fr) minmax(0, 0.58fr)" },
+    columnGap: { default: 0, [mq.lg]: 64, [mq.xl]: 96 },
+    rowGap: { default: 40, [mq.xl]: 56 },
+    alignItems: "start",
   },
   holding: {
     display: "flex",
     flexDirection: "column",
-    gap: 10,
-    marginBottom: { default: 40, [mq.xl]: 64 },
+    gap: 14,
   },
   holdingLabel: {
     margin: 0,
     fontSize: 12,
     fontWeight: 400,
-    letterSpacing: "0.1em",
-    color: tone.onNavyMuted,
+    letterSpacing: "0.24em",
+    color: tone.onNavyFaint,
   },
   holdingName: {
     margin: 0,
-    fontSize: { default: 28, [mq.tablet]: 36, [mq.xl]: 44 },
+    fontSize: { default: 28, [mq.tablet]: 34, [mq.xl]: 40 },
     fontWeight: 500,
-    lineHeight: 1.3,
-    letterSpacing: "0.04em",
+    lineHeight: 1.35,
+    letterSpacing: "0.06em",
+    textWrap: "balance",
   },
   holdingEnglish: {
     fontSize: 14,
     fontWeight: 400,
-    letterSpacing: "0.02em",
-    color: tone.onNavy,
+    letterSpacing: "0.03em",
+    color: tone.onNavyMuted,
   },
   subs: {
-    display: "grid",
-    gridTemplateColumns: { default: "1fr", [mq.lg]: "repeat(5, minmax(0, 1fr))" },
-    gap: { default: 0, [mq.lg]: 24 },
     margin: 0,
     padding: 0,
     listStyle: "none",
+    borderBottomWidth: 1,
+    borderBottomStyle: "solid",
+    borderBottomColor: tone.onNavyLine,
   },
   sub: {
     display: "flex",
-    flexDirection: "column",
-    gap: 6,
-    paddingBlock: 20,
+    flexDirection: { default: "column", [mq.sm]: "row" },
+    alignItems: { default: "flex-start", [mq.sm]: "baseline" },
+    justifyContent: "space-between",
+    gap: { default: 6, [mq.sm]: 24 },
+    paddingBlock: { default: 18, [mq.xl]: 22 },
     borderTopWidth: 1,
     borderTopStyle: "solid",
     borderTopColor: tone.onNavyLine,
   },
   subName: {
     margin: 0,
-    fontSize: 17,
-    fontWeight: 500,
+    fontSize: { default: 16, [mq.md]: 18 },
+    fontWeight: 400,
     lineHeight: 1.5,
-    letterSpacing: "0.04em",
+    letterSpacing: "0.06em",
+    color: tone.onNavy,
   },
   subEnglish: {
+    flexShrink: 0,
     fontSize: 13,
     fontWeight: 400,
-    letterSpacing: "0.02em",
-    color: tone.onNavyMuted,
+    letterSpacing: "0.03em",
+    color: tone.onNavyFaint,
   },
   toggleWrap: {
     display: "flex",
@@ -156,6 +171,7 @@ const styles = stylex.create({
 export function NavyBand() {
   const [showDiagram, setShowDiagram] = useState(false);
   const diagramId = useId();
+  const subsLabelId = useId();
 
   return (
     <div {...stylex.props(styles.band)}>
@@ -195,24 +211,31 @@ export function NavyBand() {
         <h2 id="about-structure-title" {...stylex.props(ui.srOnly)}>
           {ABOUT_STRUCTURE.title}
         </h2>
-        <Reveal sx={styles.holding}>
-          <p {...stylex.props(styles.holdingLabel)}>{ABOUT_STRUCTURE.holding.badge}</p>
-          <h3 {...stylex.props(styles.holdingName)}>{ABOUT_STRUCTURE.holding.name}</h3>
-          <div lang="en" {...stylex.props(styles.holdingEnglish)}>
-            {ABOUT_STRUCTURE.holding.english}
-          </div>
-        </Reveal>
+        <div {...stylex.props(styles.structure)}>
+          <Reveal sx={styles.holding}>
+            <p {...stylex.props(styles.holdingLabel)}>{ABOUT_STRUCTURE.holding.badge}</p>
+            <h3 {...stylex.props(styles.holdingName)}>{ABOUT_STRUCTURE.holding.name}</h3>
+            <div lang="en" {...stylex.props(styles.holdingEnglish)}>
+              {ABOUT_STRUCTURE.holding.english}
+            </div>
+          </Reveal>
 
-        <ul aria-label={ABOUT_STRUCTURE.subsidiaryBadge} {...stylex.props(styles.subs)}>
-          {ABOUT_STRUCTURE.subsidiaries.map((sub, index) => (
-            <Reveal key={sub.id} as="li" step={index} sx={styles.sub}>
-              <h4 {...stylex.props(styles.subName)}>{sub.name}</h4>
-              <span lang="en" {...stylex.props(styles.subEnglish)}>
-                {sub.english}
-              </span>
-            </Reveal>
-          ))}
-        </ul>
+          <div {...stylex.props(styles.holding)}>
+            <p id={subsLabelId} {...stylex.props(styles.holdingLabel)}>
+              {ABOUT_STRUCTURE.subsidiaryBadge}
+            </p>
+            <ul aria-labelledby={subsLabelId} {...stylex.props(styles.subs)}>
+              {ABOUT_STRUCTURE.subsidiaries.map((sub, index) => (
+                <Reveal key={sub.id} as="li" step={index} sx={styles.sub}>
+                  <h4 {...stylex.props(styles.subName)}>{sub.name}</h4>
+                  <span lang="en" {...stylex.props(styles.subEnglish)}>
+                    {sub.english}
+                  </span>
+                </Reveal>
+              ))}
+            </ul>
+          </div>
+        </div>
 
         <div {...stylex.props(styles.toggleWrap)}>
           <button

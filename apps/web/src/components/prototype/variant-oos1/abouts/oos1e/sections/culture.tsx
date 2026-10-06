@@ -2,7 +2,7 @@ import * as stylex from "@stylexjs/stylex";
 
 import { ABOUT_CULTURE } from "../../../about-data";
 import { Sheet } from "../sheet";
-import { Reveal } from "../shared";
+import { base, Reveal } from "../shared";
 import { CULTURE_SHEET } from "../sheets";
 import { color, font, media } from "../tokens.stylex";
 
@@ -22,9 +22,10 @@ const styles = stylex.create({
   value: {
     display: "flex",
     flexDirection: "column",
-    gap: 20,
+    gap: 18,
   },
   glyph: {
+    marginBottom: { default: 8, [media.lgUp]: 14 },
     fontFamily: font.cjk,
     fontSize: { default: 96, [media.lgUp]: 120 },
     fontWeight: 500,
@@ -44,12 +45,11 @@ const styles = stylex.create({
   },
   desc: {
     margin: 0,
-    maxWidth: "21em",
+    maxWidth: "22em",
     fontSize: 15,
-    lineHeight: 2.05,
+    lineHeight: 1.95,
     letterSpacing: "0.04em",
     color: color.body,
-    textWrap: "pretty",
   },
 });
 
@@ -69,7 +69,9 @@ export function CultureSheet() {
               {value.glyph}
             </span>
             <h3 {...stylex.props(styles.title)}>{value.title}</h3>
-            <p {...stylex.props(styles.desc)}>{value.desc}</p>
+            <p {...stylex.props(styles.desc)}>
+              <span {...stylex.props(base.balance)}>{value.desc}</span>
+            </p>
           </Reveal>
         ))}
       </ul>

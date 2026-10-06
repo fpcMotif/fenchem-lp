@@ -189,7 +189,6 @@ export function Rail({ progress, active }: { progress: MotionValue<number>; acti
             <a
               key={stop.id}
               href={`#${stop.id}`}
-              aria-label={stop.name}
               aria-current={active === position ? "location" : undefined}
               {...stylex.props(styles.stop, styles.stopAt(stop.at), shared.focusRing)}
             >
@@ -203,6 +202,7 @@ export function Rail({ progress, active }: { progress: MotionValue<number>; acti
               >
                 {stop.label}
               </span>
+              <span {...stylex.props(shared.srOnly)}> {stop.name}</span>
             </a>
           ))}
         </div>
@@ -244,7 +244,6 @@ export function TopBar({ progress, active }: { progress: MotionValue<number>; ac
             <a
               key={stop.id}
               href={`#${stop.id}`}
-              aria-label={stop.name}
               aria-current={active === position ? "location" : undefined}
               {...stylex.props(
                 styles.chip,
@@ -253,6 +252,7 @@ export function TopBar({ progress, active }: { progress: MotionValue<number>; ac
               )}
             >
               <span lang="en">{stop.label}</span>
+              <span {...stylex.props(shared.srOnly)}> {stop.name}</span>
             </a>
           ))}
         </nav>

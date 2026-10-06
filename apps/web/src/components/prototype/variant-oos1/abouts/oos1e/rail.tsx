@@ -5,6 +5,7 @@ import { useEffect, useRef } from "react";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
 import { ABOUT_HERO } from "../../about-data";
+import { base } from "./shared";
 import { NAV_ENGLISH, SHEETS } from "./sheets";
 import { color, font, media, metric } from "./tokens.stylex";
 
@@ -28,7 +29,7 @@ const styles = stylex.create({
   list: {
     display: "flex",
     alignItems: "center",
-    gap: { default: 28, [media.lgUp]: 40 },
+    gap: { default: 28, [media.lgUp]: 44 },
     boxSizing: "border-box",
     height: "100%",
     margin: 0,
@@ -50,8 +51,8 @@ const styles = stylex.create({
     fontFamily: font.cjk,
     fontSize: 13,
     fontWeight: 400,
-    letterSpacing: "0.06em",
-    color: { default: color.body, ":hover": color.ink },
+    letterSpacing: "0.08em",
+    color: { default: color.muted, ":hover": color.ink },
     textDecoration: "none",
     whiteSpace: "nowrap",
     outlineStyle: { default: "none", ":focus-visible": "solid" },
@@ -111,11 +112,11 @@ export function Rail({ reachedIndex }: { reachedIndex: number }) {
             <li key={chip.id} {...stylex.props(styles.item)}>
               <a
                 href={`#${chip.id}`}
-                aria-label={chip.label}
                 aria-current={activeNav === chip.id ? "location" : undefined}
                 {...stylex.props(styles.link, activeNav === chip.id && styles.linkActive)}
               >
                 <span lang="en">{NAV_ENGLISH[chip.id]}</span>
+                <span {...stylex.props(base.srOnly)}> {chip.label}</span>
               </a>
             </li>
           ))}

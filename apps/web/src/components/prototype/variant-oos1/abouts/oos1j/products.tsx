@@ -4,9 +4,9 @@ import { ArrowRight } from "lucide-react";
 import { useId } from "react";
 
 import { PRODUCTS, PRODUCTS_INTRO } from "../../content";
-import { Reveal, SectionName } from "./parts";
+import { Reveal, SectionName, useInViewOnce, wipe } from "./parts";
 import { base, ty } from "./shared";
-import { hue } from "./theme.stylex";
+import { hue, size } from "./theme.stylex";
 
 const styles = stylex.create({
   products: {
@@ -69,8 +69,19 @@ const styles = stylex.create({
     position: "relative",
     aspectRatio: "4 / 5",
     overflow: "clip",
-    marginBottom: 6,
+    marginBottom: 10,
     backgroundColor: hue.tint,
+  },
+  zoom: {
+    position: "absolute",
+    inset: 0,
+    transform: {
+      default: null,
+      [stylex.when.ancestor(":hover")]: { default: null, [breakpoints.motionOk]: "scale(1.05)" },
+    },
+    transitionProperty: "transform",
+    transitionDuration: "1400ms",
+    transitionTimingFunction: size.ease,
   },
   cover: {
     position: "absolute",
@@ -88,23 +99,57 @@ const styles = stylex.create({
     outlineColor: hue.ink,
   },
   title: {
+    alignSelf: "flex-start",
     margin: 0,
     fontSize: 22,
     fontWeight: 500,
     lineHeight: 1.4,
     letterSpacing: "0.06em",
     color: hue.ink,
+    backgroundImage: "linear-gradient(currentColor, currentColor)",
+    backgroundRepeat: "no-repeat",
+    backgroundPosition: "0 100%",
+    backgroundSize: { default: "0% 1px", [stylex.when.ancestor(":hover")]: "100% 1px" },
+    transitionProperty: "background-size",
+    transitionDuration: "700ms",
+    transitionTimingFunction: size.ease,
   },
   tags: {
     display: "flex",
     flexWrap: "wrap",
-    columnGap: 14,
-    rowGap: 4,
+    columnGap: 18,
+    rowGap: 6,
     margin: 0,
-    padding: 0,
+    marginTop: 4,
+    paddingTop: 14,
+    paddingInline: 0,
+    paddingBottom: 0,
+    borderTopWidth: 1,
+    borderTopStyle: "solid",
+    borderTopColor: hue.hairline,
     listStyle: "none",
   },
+  tag: {
+    color: hue.quiet,
+  },
 });
+
+function ProductPhoto({ src, index }: { src: string; index: number }) {
+  const [ref, shown] = useInViewOnce<HTMLDivElement>();
+  return (
+    <div ref={ref} {...stylex.props(styles.photo)}>
+      <div {...stylex.props(styles.zoom)}>
+        <img
+          src={src}
+          alt=""
+          loading="lazy"
+          decoding="async"
+          {...stylex.props(base.fill, wipe.hidden, shown && wipe.shown, wipe.delay(index * 110))}
+        />
+      </div>
+    </div>
+  );
+}
 
 export function Products({ onNavigateHome }: { onNavigateHome: (hash?: string) => void }) {
   const titleId = useId();
@@ -129,23 +174,20 @@ export function Products({ onNavigateHome }: { onNavigateHome: (hash?: string) =
         </Reveal>
         <ul {...stylex.props(styles.grid)}>
           {PRODUCTS.map((product, idx) => (
-            <Reveal key={product.title} as="li" step={idx} sx={styles.tile}>
-              <div {...stylex.props(styles.photo)}>
-                <img
-                  src={product.image}
-                  alt=""
-                  loading="lazy"
-                  decoding="async"
-                  {...stylex.props(base.fill)}
-                />
-              </div>
+            <Reveal
+              key={product.title}
+              as="li"
+              step={idx}
+              sx={[styles.tile, stylex.defaultMarker()]}
+            >
+              <ProductPhoto src={product.image} index={idx} />
               <h3 id={`${titleId}-${idx}`} {...stylex.props(styles.title)}>
                 {product.title}
               </h3>
               <p {...stylex.props(ty.quiet)}>{product.description}</p>
               <ul {...stylex.props(styles.tags)}>
                 {product.tags.map((tag) => (
-                  <li key={tag} {...stylex.props(ty.quiet)}>
+                  <li key={tag} {...stylex.props(ty.quiet, styles.tag)}>
                     {tag}
                   </li>
                 ))}

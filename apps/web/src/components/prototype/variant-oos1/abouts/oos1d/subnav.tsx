@@ -122,11 +122,14 @@ export function SubNav({ onNavigateHome }: { onNavigateHome: (hash?: string) => 
         <nav aria-label="面包屑导航" lang="en" {...stylex.props(s.crumb)}>
           <button
             type="button"
-            aria-label="首页"
             onClick={() => onNavigateHome("top")}
             {...stylex.props(s.crumbLink, ui.focusRing)}
           >
             Home
+            <span lang="zh-CN" {...stylex.props(ui.srOnly)}>
+              {" "}
+              首页
+            </span>
           </button>
           <span aria-hidden="true" {...stylex.props(s.crumbSep)}>
             /
@@ -142,11 +145,11 @@ export function SubNav({ onNavigateHome }: { onNavigateHome: (hash?: string) => 
               <a
                 key={item.id}
                 href={`#${item.id}`}
-                aria-label={item.label}
                 aria-current={isActive ? "location" : undefined}
                 {...stylex.props(s.tab, isActive && s.tabActive, ui.focusRing)}
               >
                 <span lang="en">{item.english}</span>
+                <span {...stylex.props(ui.srOnly)}> {item.label}</span>
                 <span
                   aria-hidden="true"
                   {...stylex.props(s.tabMark, isActive && s.tabMarkActive)}

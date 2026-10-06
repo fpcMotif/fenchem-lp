@@ -2,7 +2,7 @@ import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 
 import { ABOUT_HERO } from "../../about-data";
-import { Reveal } from "./parts";
+import { CountUp, CropMarks, DriftImage, Reveal, useInViewOnce } from "./parts";
 import { base, ty } from "./shared";
 import { font, hue, size } from "./theme.stylex";
 
@@ -35,14 +35,14 @@ const styles = stylex.create({
     margin: 0,
     marginInlineEnd: { default: 0, [breakpoints.xl]: BLEED_END },
   },
-  photo: {
+  photoWrap: {
     position: "relative",
+  },
+  photo: {
     aspectRatio: { default: "4 / 4.6", [breakpoints.lg]: "4 / 5" },
-    overflow: "clip",
-    backgroundColor: hue.tint,
   },
   caption: {
-    marginTop: 12,
+    marginTop: 18,
   },
   network: {
     display: "grid",
@@ -86,12 +86,26 @@ const styles = stylex.create({
     letterSpacing: "0.04em",
     color: hue.ink,
   },
+  country: {
+    opacity: { default: 1, [breakpoints.motionOk]: 0 },
+    transform: { default: null, [breakpoints.motionOk]: "translateY(14px)" },
+    transitionProperty: "opacity, transform",
+    transitionDuration: "700ms",
+    transitionTimingFunction: size.ease,
+  },
+  countryShown: {
+    opacity: 1,
+    transform: "none",
+  },
+  countryDelay: (index: number) => ({ transitionDelay: `${160 + index * 55}ms` }),
   more: {
-    color: hue.body,
+    color: hue.quiet,
   },
 });
 
 export function Profile() {
+  const [countriesRef, countriesShown] = useInViewOnce<HTMLUListElement>();
+  const places = [...ABOUT_HERO.countries, "等地"];
   return (
     <section
       id="about-profile"
@@ -107,37 +121,44 @@ export function Profile() {
             </p>
             <p {...stylex.props(ty.body)}>{ABOUT_HERO.lead}</p>
           </Reveal>
-          <Reveal step={1}>
-            <figure {...stylex.props(styles.figure)}>
-              <div {...stylex.props(styles.photo)}>
-                <img
-                  src={ABOUT_HERO.lobbyImage}
-                  alt="泛成总部大堂，弧形吊顶与大理石地面"
-                  loading="lazy"
-                  decoding="async"
-                  {...stylex.props(base.fill)}
-                />
-              </div>
-              <figcaption {...stylex.props(ty.quiet, styles.caption)}>
-                {ABOUT_HERO.lobbyCaption}
-              </figcaption>
-            </figure>
-          </Reveal>
+          <figure {...stylex.props(styles.figure)}>
+            <div {...stylex.props(styles.photoWrap)}>
+              <DriftImage
+                src={ABOUT_HERO.lobbyImage}
+                alt="泛成总部大堂，弧形吊顶与大理石地面"
+                frame={styles.photo}
+                wipeDelay={120}
+              />
+              <CropMarks delay={900} />
+            </div>
+            <figcaption {...stylex.props(ty.quiet, styles.caption)}>
+              {ABOUT_HERO.lobbyCaption}
+            </figcaption>
+          </figure>
         </div>
         <Reveal sx={styles.network}>
           <div {...stylex.props(styles.count)}>
             {NETWORK_COUNT ? (
-              <span aria-hidden="true" {...stylex.props(styles.countNum)}>
-                {NETWORK_COUNT}
+              <span aria-hidden="true">
+                <CountUp value={NETWORK_COUNT} sx={styles.countNum} />
               </span>
             ) : null}
             <p {...stylex.props(ty.quiet)}>{ABOUT_HERO.networkLabel}</p>
           </div>
-          <ul {...stylex.props(styles.countries)}>
-            {ABOUT_HERO.countries.map((country) => (
-              <li key={country}>{country}</li>
+          <ul ref={countriesRef} {...stylex.props(styles.countries)}>
+            {places.map((place, index) => (
+              <li
+                key={place}
+                {...stylex.props(
+                  styles.country,
+                  countriesShown && styles.countryShown,
+                  styles.countryDelay(index),
+                  index === places.length - 1 && styles.more,
+                )}
+              >
+                {place}
+              </li>
             ))}
-            <li {...stylex.props(styles.more)}>等地</li>
           </ul>
         </Reveal>
       </div>

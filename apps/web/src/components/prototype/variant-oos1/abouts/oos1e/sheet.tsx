@@ -1,6 +1,14 @@
 import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { type CSSProperties, createContext, type ReactNode, useContext } from "react";
+import { m, useScroll, useTransform } from "motion/react";
+import {
+  type CSSProperties,
+  createContext,
+  type ReactNode,
+  type RefObject,
+  useContext,
+  useRef,
+} from "react";
 
 import { useBoxHeight } from "./hooks";
 import { base } from "./shared";
@@ -18,6 +26,9 @@ const styles = stylex.create({
   },
   slotOverlap: {
     marginTop: { default: 0, [media.stack]: "-100svh" },
+  },
+  slotLast: {
+    minHeight: { default: null, [media.stack]: "100svh" },
   },
   runway: {
     display: { default: "none", [media.stack]: "block" },
@@ -70,6 +81,27 @@ const SHEET_TONES = {
   navy: styles.toneNavy,
 } as const;
 
+const COVERED_RANGE = [0.25, 0.75];
+const COVERED_OPACITY = [1, 0.16];
+
+function CoveredBody({
+  runwayRef,
+  stacked,
+  children,
+}: {
+  runwayRef: RefObject<HTMLDivElement | null>;
+  stacked: boolean;
+  children: ReactNode;
+}) {
+  const { scrollYProgress } = useScroll({ target: runwayRef, offset: ["start end", "end end"] });
+  const opacity = useTransform(scrollYProgress, COVERED_RANGE, COVERED_OPACITY);
+  return (
+    <m.div style={stacked ? { opacity } : undefined} {...stylex.props(styles.body)}>
+      {children}
+    </m.div>
+  );
+}
+
 export function Sheet({
   def,
   headingId,
@@ -83,31 +115,45 @@ export function Sheet({
 }) {
   const { reachedIndex, stacked } = useContext(StackContext);
   const [ref, height] = useBoxHeight<HTMLDivElement>();
+  const runwayRef = useRef<HTMLDivElement>(null);
   const nameId = headingId ?? `${def.id}-name`;
   const vars = { "--oos1e-h": `${height}px` } as CSSProperties;
+  const content = (
+    <>
+      {headingId ? null : (
+        <h2 id={nameId} {...stylex.props(base.srOnly)}>
+          {def.name}
+        </h2>
+      )}
+      {children}
+    </>
+  );
 
   return (
     <section
       id={def.id}
       aria-labelledby={nameId}
       style={vars}
-      {...stylex.props(styles.slot, def.index > 0 && styles.slotOverlap)}
+      {...stylex.props(
+        styles.slot,
+        def.index > 0 && styles.slotOverlap,
+        !runway && styles.slotLast,
+      )}
     >
       <div
         ref={ref}
         inert={stacked && reachedIndex > def.index}
         {...stylex.props(styles.sheet, SHEET_TONES[def.tone])}
       >
-        <div {...stylex.props(styles.body)}>
-          {headingId ? null : (
-            <h2 id={nameId} {...stylex.props(base.srOnly)}>
-              {def.name}
-            </h2>
-          )}
-          {children}
-        </div>
+        {runway ? (
+          <CoveredBody runwayRef={runwayRef} stacked={stacked}>
+            {content}
+          </CoveredBody>
+        ) : (
+          <div {...stylex.props(styles.body)}>{content}</div>
+        )}
       </div>
-      {runway ? <div aria-hidden="true" {...stylex.props(styles.runway)} /> : null}
+      {runway ? <div ref={runwayRef} aria-hidden="true" {...stylex.props(styles.runway)} /> : null}
     </section>
   );
 }

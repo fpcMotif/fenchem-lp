@@ -153,11 +153,11 @@ export function SubNav({ onNavigateHome }: { onNavigateHome: (hash?: string) => 
             <a
               key={link.id}
               href={`#${link.id}`}
-              aria-label={link.label}
               aria-current={active === link.id ? "location" : undefined}
               {...stylex.props(S.tab, active === link.id && S.tabActive, base.focusRing)}
             >
               <span lang="en">{ENGLISH[link.id]}</span>
+              <span {...stylex.props(base.srOnly)}> {link.label}</span>
               <span
                 aria-hidden="true"
                 {...stylex.props(S.tick, active === link.id && S.tickActive)}

@@ -154,7 +154,7 @@ export const VARIANTS = [
     Component: lazy(() =>
       import("./variant-oos1/abouts/oos1b/index").then((m) => ({ default: m.VariantOOS1B })),
     ),
-    name: "O campus about · Axis / mirror fold",
+    name: "O campus about · Portal / pull back",
     twinOf: "oos1",
   },
   {
@@ -219,6 +219,134 @@ export const VARIANTS = [
       import("./variant-oos1/abouts/oos1j/index").then((m) => ({ default: m.VariantOOS1J })),
     ),
     name: "O campus about · Monument / crop",
+    twinOf: "oos1",
+  },
+  {
+    key: "oos1k",
+    Component: lazy(() =>
+      import("./variant-oos1/abouts/oos1k/index").then((m) => ({ default: m.VariantOOS1K })),
+    ),
+    name: "O campus about · Constellation / nova",
+    twinOf: "oos1",
+  },
+  {
+    key: "oos1l",
+    Component: lazy(() =>
+      import("./variant-oos1/abouts/oos1l/index").then((m) => ({ default: m.VariantOOS1L })),
+    ),
+    name: "O campus about · Sentence / full stop",
+    twinOf: "oos1",
+  },
+  {
+    key: "oos1m",
+    Component: lazy(() =>
+      import("./variant-oos1/abouts/oos1m/index").then((m) => ({ default: m.VariantOOS1M })),
+    ),
+    name: "O campus about · Axonometric / lifted plate",
+    twinOf: "oos1",
+  },
+  {
+    key: "oos1n",
+    Component: lazy(() =>
+      import("./variant-oos1/abouts/oos1n/index").then((m) => ({ default: m.VariantOOS1N })),
+    ),
+    name: "O campus about · Vessel / spill",
+    twinOf: "oos1",
+  },
+  {
+    key: "oos1o",
+    Component: lazy(() =>
+      import("./variant-oos1/abouts/oos1o/index").then((m) => ({ default: m.VariantOOS1O })),
+    ),
+    name: "O campus about · Growth rings / open ring",
+    twinOf: "oos1",
+  },
+  {
+    key: "oos1p",
+    Component: lazy(() =>
+      import("./variant-oos1/abouts/oos1p/index").then((m) => ({ default: m.VariantOOS1P })),
+    ),
+    name: "O campus about · Chronophotograph / reverse trail",
+    twinOf: "oos1",
+  },
+  {
+    key: "oos1q",
+    Component: lazy(() =>
+      import("./variant-oos1/abouts/oos1q/index").then((m) => ({ default: m.VariantOOS1Q })),
+    ),
+    name: "O campus about · Haiku / kigo",
+    twinOf: "oos1",
+  },
+  {
+    key: "oos1r",
+    Component: lazy(() =>
+      import("./variant-oos1/abouts/oos1r/index").then((m) => ({ default: m.VariantOOS1R })),
+    ),
+    name: "O campus about · Scale / miniature",
+    twinOf: "oos1",
+  },
+  {
+    key: "oos1s",
+    Component: lazy(() =>
+      import("./variant-oos1/abouts/oos1s/index").then((m) => ({ default: m.VariantOOS1S })),
+    ),
+    name: "O campus about · Letterbox / closing shot",
+    twinOf: "oos1",
+  },
+  {
+    key: "oos1t",
+    Component: lazy(() =>
+      import("./variant-oos1/abouts/oos1t/index").then((m) => ({ default: m.VariantOOS1T })),
+    ),
+    name: "O campus about · Sundial / against the light",
+    twinOf: "oos1",
+  },
+  {
+    key: "oos1u",
+    Component: lazy(() =>
+      import("./variant-oos1/abouts/oos1u/index").then((m) => ({ default: m.VariantOOS1U })),
+    ),
+    name: "O campus about · Weave / indigo thread",
+    twinOf: "oos1",
+  },
+  {
+    key: "oos1v",
+    Component: lazy(() =>
+      import("./variant-oos1/abouts/oos1v/index").then((m) => ({ default: m.VariantOOS1V })),
+    ),
+    name: "O campus about · Cyanotype / sun print",
+    twinOf: "oos1",
+  },
+  {
+    key: "oos1w",
+    Component: lazy(() =>
+      import("./variant-oos1/abouts/oos1w/index").then((m) => ({ default: m.VariantOOS1W })),
+    ),
+    name: "O campus about · Elution / past the front",
+    twinOf: "oos1",
+  },
+  {
+    key: "oos1x",
+    Component: lazy(() =>
+      import("./variant-oos1/abouts/oos1x/index").then((m) => ({ default: m.VariantOOS1X })),
+    ),
+    name: "O campus about · Counterpoise / still point",
+    twinOf: "oos1",
+  },
+  {
+    key: "oos1y",
+    Component: lazy(() =>
+      import("./variant-oos1/abouts/oos1y/index").then((m) => ({ default: m.VariantOOS1Y })),
+    ),
+    name: "O campus about · Glass / etched",
+    twinOf: "oos1",
+  },
+  {
+    key: "oos1z",
+    Component: lazy(() =>
+      import("./variant-oos1/abouts/oos1z/index").then((m) => ({ default: m.VariantOOS1Z })),
+    ),
+    name: "O campus about · Corridor / facing frame",
     twinOf: "oos1",
   },
   {

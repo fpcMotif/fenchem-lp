@@ -24,23 +24,19 @@ const styles = stylex.create({
   },
   statement: {
     margin: 0,
-    fontSize: { default: 28, [media.md]: 38, [media.xlUp]: 44 },
+    fontSize: { default: 24, [media.md]: 36, [media.lgUp]: 38, [media.xlUp]: 44 },
     fontWeight: 500,
     lineHeight: 1.5,
     letterSpacing: "0.04em",
     color: color.ink,
   },
-  line: {
-    display: "block",
-  },
   desc: {
     margin: 0,
-    maxWidth: "34em",
+    maxWidth: "27em",
     fontSize: 15,
-    lineHeight: 2.05,
+    lineHeight: 1.95,
     letterSpacing: "0.04em",
     color: color.body,
-    textWrap: "pretty",
   },
   outcomes: {
     display: "flex",
@@ -77,12 +73,14 @@ export function CsrSheet() {
         <div {...stylex.props(styles.text)}>
           <Reveal>
             <p {...stylex.props(styles.statement)}>
-              <span {...stylex.props(styles.line)}>{statementLead}</span>
-              <span {...stylex.props(styles.line)}>{statementClose}</span>
+              <span {...stylex.props(base.balance)}>{statementLead}</span>
+              <span {...stylex.props(base.balance)}>{statementClose}</span>
             </p>
           </Reveal>
           <Reveal step={1}>
-            <p {...stylex.props(styles.desc)}>{ABOUT_CSR.desc}</p>
+            <p {...stylex.props(styles.desc)}>
+              <span {...stylex.props(base.balance)}>{ABOUT_CSR.desc}</span>
+            </p>
           </Reveal>
           <Reveal step={2}>
             <ul {...stylex.props(styles.outcomes)}>

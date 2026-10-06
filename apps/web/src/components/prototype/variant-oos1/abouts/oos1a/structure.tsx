@@ -96,7 +96,7 @@ const styles = stylex.create({
     boxSizing: "border-box",
     padding: { default: 8, [breakpoints.md]: 16 },
     backgroundColor: colors.paper,
-    animationName: fadeIn,
+    animationName: { default: null, [breakpoints.motionOk]: fadeIn },
     animationDuration: "400ms",
     animationTimingFunction: ease.out,
   },

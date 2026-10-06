@@ -6,7 +6,7 @@ import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
 import { ABOUT_HERO } from "../../about-data";
 import { useActiveSection } from "../../use-active-section";
-import { Shell } from "./layout";
+import { Shell, srOnly } from "./layout";
 import { color, ease, font } from "./palette.stylex";
 
 const SECTION_IDS = ABOUT_HERO.navChips.map((chip) => chip.id);
@@ -179,12 +179,11 @@ export function SubNav({ onNavigateHome }: { onNavigateHome: (hash?: string) => 
             <a
               key={chip.id}
               href={`#${chip.id}`}
-              lang="en"
-              aria-label={chip.label}
               aria-current={active === chip.id ? "location" : undefined}
               {...stylex.props(styles.tab, active === chip.id && styles.tabActive)}
             >
-              {ENGLISH_LABELS[chip.id]}
+              <span lang="en">{ENGLISH_LABELS[chip.id]}</span>
+              <span {...stylex.props(srOnly)}> {chip.label}</span>
               <Braid shown={active === chip.id} />
             </a>
           ))}

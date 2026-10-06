@@ -32,7 +32,7 @@ const s = stylex.create({
       [breakpoints.lg]: "minmax(0, 61.8fr) minmax(0, 38.2fr)",
     },
     columnGap: { default: 0, [breakpoints.lg]: 48, [breakpoints.xl]: 80 },
-    rowGap: 8,
+    rowGap: 20,
     alignItems: "end",
     marginBottom: { default: 32, [breakpoints.xl]: 48 },
   },
@@ -94,13 +94,19 @@ const s = stylex.create({
     display: "block",
   },
   lead: {
+    display: "flex",
+    flexDirection: "column",
+    gap: 6,
     margin: 0,
-    maxWidth: "26em",
     fontSize: step.body,
-    lineHeight: 2,
+    lineHeight: 1.9,
     letterSpacing: "0.06em",
     color: tone.body,
-    textWrap: "pretty",
+  },
+  leadMeta: {
+    fontSize: step.label,
+    letterSpacing: "0.12em",
+    color: tone.quiet,
   },
   figure: {
     margin: 0,
@@ -119,6 +125,7 @@ const s = stylex.create({
 export function Hero() {
   const [estLabel, estYear] = ABOUT_BANNER.established.split(" ");
   const [taglineLead, taglineClose] = ABOUT_BANNER.tagline.split(", ");
+  const [leadMeta, leadClose] = ABOUT_BANNER.lead.split(" · ");
 
   return (
     <section aria-labelledby="about-banner-title" {...stylex.props(s.hero, ui.onPage)}>
@@ -138,7 +145,11 @@ export function Hero() {
               <span {...stylex.props(s.taglineLine)}>{taglineLead},</span>
               <span {...stylex.props(s.taglineLine)}>{taglineClose}</span>
             </p>
-            <p {...stylex.props(s.lead)}>{ABOUT_BANNER.lead}</p>
+            <p {...stylex.props(s.lead)}>
+              <span {...stylex.props(s.leadMeta)}>{leadMeta}</span>
+              <span {...stylex.props(ui.srOnly)}> · </span>
+              <span>{leadClose}</span>
+            </p>
           </div>
           <figure {...stylex.props(s.figure, s.enter, dynamic.delay(700))}>
             <div {...stylex.props(s.frame)}>

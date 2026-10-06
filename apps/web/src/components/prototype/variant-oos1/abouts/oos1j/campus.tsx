@@ -1,14 +1,17 @@
 import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { useState } from "react";
+import { m, useInView } from "motion/react";
+import { useRef, useState } from "react";
 
 import { ABOUT_CAMPUS } from "../../about-data";
 import { Lightbox } from "./lightbox";
-import { Reveal, SectionName } from "./parts";
+import { CropMarks, Reveal, SectionName, useDrift, wipe } from "./parts";
 import { base, ty } from "./shared";
-import { hue } from "./theme.stylex";
+import { font, hue, size } from "./theme.stylex";
 
 const PHOTO_COUNT = ABOUT_CAMPUS.photos.length;
+
+type Photo = (typeof ABOUT_CAMPUS.photos)[number];
 
 const styles = stylex.create({
   campus: {
@@ -21,7 +24,7 @@ const styles = stylex.create({
       [breakpoints.lg]: "repeat(3, minmax(0, 1fr))",
     },
     columnGap: { default: 12, [breakpoints.lg]: 24 },
-    rowGap: { default: 28, [breakpoints.lg]: 48 },
+    rowGap: { default: 28, [breakpoints.lg]: 56 },
     margin: 0,
     padding: 0,
     listStyle: "none",
@@ -32,6 +35,9 @@ const styles = stylex.create({
   figure: {
     margin: 0,
   },
+  frameWrap: {
+    position: "relative",
+  },
   frame: {
     position: "relative",
     overflow: "clip",
@@ -40,6 +46,26 @@ const styles = stylex.create({
   },
   frameLead: {
     aspectRatio: { default: "4 / 3", [breakpoints.lg]: "21 / 9" },
+  },
+  zoom: {
+    position: "absolute",
+    inset: 0,
+    transform: {
+      default: null,
+      [stylex.when.ancestor(":hover")]: { default: null, [breakpoints.motionOk]: "scale(1.045)" },
+    },
+    transitionProperty: "transform",
+    transitionDuration: "1400ms",
+    transitionTimingFunction: size.ease,
+  },
+  image: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    display: "block",
+    width: "100%",
+    height: "100%",
+    objectFit: "cover",
   },
   open: {
     position: "absolute",
@@ -57,9 +83,67 @@ const styles = stylex.create({
     outlineOffset: -7,
   },
   caption: {
-    marginTop: 12,
+    display: "flex",
+    alignItems: "baseline",
+    gap: 14,
+    marginTop: 14,
+    color: { default: hue.body, [stylex.when.ancestor(":hover")]: hue.ink },
+    transitionProperty: "color",
+    transitionDuration: "400ms",
+  },
+  numeral: {
+    fontFamily: font.display,
+    fontSize: 11,
+    fontVariantNumeric: "tabular-nums",
+    letterSpacing: "0.14em",
+    color: hue.quiet,
   },
 });
+
+function Tile({ photo, index, onOpen }: { photo: Photo; index: number; onOpen: () => void }) {
+  const frameRef = useRef<HTMLDivElement>(null);
+  const isLead = index === 0;
+  const drift = useDrift(frameRef, isLead ? 6 : 0);
+  const shown = useInView(frameRef, { once: true, margin: "0px 0px -8% 0px" });
+  return (
+    <Reveal as="li" step={index % 3} sx={[isLead && styles.lead, stylex.defaultMarker()]}>
+      <figure {...stylex.props(styles.figure)}>
+        <div {...stylex.props(styles.frameWrap)}>
+          <div ref={frameRef} {...stylex.props(styles.frame, isLead && styles.frameLead)}>
+            <div {...stylex.props(styles.zoom)}>
+              <m.img
+                src={photo.src}
+                alt={photo.alt}
+                loading="lazy"
+                decoding="async"
+                {...stylex.props(
+                  styles.image,
+                  wipe.hidden,
+                  shown && wipe.shown,
+                  wipe.delay((index % 3) * 120 + 80),
+                )}
+                style={isLead ? drift : undefined}
+              />
+            </div>
+            <button
+              type="button"
+              aria-label={`查看大图：${photo.caption}`}
+              onClick={onOpen}
+              {...stylex.props(styles.open)}
+            />
+          </div>
+          <CropMarks hover />
+        </div>
+        <figcaption {...stylex.props(ty.quiet, styles.caption)}>
+          <span aria-hidden="true" lang="en" {...stylex.props(styles.numeral)}>
+            {String(index + 1).padStart(2, "0")}
+          </span>
+          <span>{photo.caption}</span>
+        </figcaption>
+      </figure>
+    </Reveal>
+  );
+}
 
 export function Campus() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
@@ -74,27 +158,7 @@ export function Campus() {
       <div {...stylex.props(base.shell)}>
         <ul {...stylex.props(styles.grid)}>
           {ABOUT_CAMPUS.photos.map((photo, idx) => (
-            <Reveal key={photo.id} as="li" step={idx % 3} sx={idx === 0 ? styles.lead : undefined}>
-              <figure {...stylex.props(styles.figure)}>
-                <div {...stylex.props(styles.frame, idx === 0 && styles.frameLead)}>
-                  <button
-                    type="button"
-                    aria-label={`查看大图：${photo.caption}`}
-                    onClick={() => setOpenIndex(idx)}
-                    {...stylex.props(styles.open)}
-                  >
-                    <img
-                      src={photo.src}
-                      alt={photo.alt}
-                      loading="lazy"
-                      decoding="async"
-                      {...stylex.props(base.fill)}
-                    />
-                  </button>
-                </div>
-                <figcaption {...stylex.props(ty.quiet, styles.caption)}>{photo.caption}</figcaption>
-              </figure>
-            </Reveal>
+            <Tile key={photo.id} photo={photo} index={idx} onOpen={() => setOpenIndex(idx)} />
           ))}
         </ul>
       </div>

@@ -2,9 +2,9 @@ import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 
 import { ABOUT_CSR } from "../../about-data";
-import { Reveal, SectionName } from "./parts";
+import { CropMarks, DriftImage, Reveal, RiseLines, SectionName, useInViewOnce } from "./parts";
 import { base, ty } from "./shared";
-import { hue } from "./theme.stylex";
+import { font, hue, size } from "./theme.stylex";
 
 const styles = stylex.create({
   csr: {
@@ -33,34 +33,57 @@ const styles = stylex.create({
     letterSpacing: "0.03em",
     color: hue.ink,
   },
-  statementLine: {
-    display: "block",
-  },
   outcomes: {
     margin: 0,
     padding: 0,
     listStyle: "none",
   },
   outcome: {
-    paddingBlock: 18,
-    borderTopWidth: 1,
-    borderTopStyle: "solid",
-    borderTopColor: hue.hairline,
+    position: "relative",
+    display: "flex",
+    alignItems: "baseline",
+    justifyContent: "space-between",
+    gap: 24,
+    paddingBlock: 20,
     fontSize: 18,
     fontWeight: 400,
     letterSpacing: "0.06em",
     color: hue.ink,
   },
-  photo: {
+  outcomeRule: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 1,
+    backgroundColor: hue.hairline,
+    transformOrigin: "left center",
+    transform: { default: null, [breakpoints.motionOk]: "scaleX(0)" },
+    transitionProperty: "transform",
+    transitionDuration: "1200ms",
+    transitionTimingFunction: size.ease,
+  },
+  outcomeRuleShown: {
+    transform: "none",
+  },
+  outcomeDelay: (index: number) => ({ transitionDelay: `${300 + index * 140}ms` }),
+  numeral: {
+    fontFamily: font.display,
+    fontSize: 11,
+    fontVariantNumeric: "tabular-nums",
+    letterSpacing: "0.14em",
+    color: hue.quiet,
+  },
+  photoWrap: {
     position: "relative",
+  },
+  photo: {
     aspectRatio: { default: "4 / 3", [breakpoints.lg]: "4 / 5" },
-    overflow: "clip",
-    backgroundColor: hue.tint,
   },
 });
 
 export function Csr() {
-  const [lead, close] = ABOUT_CSR.statement;
+  const [textRef, textShown] = useInViewOnce<HTMLDivElement>();
   return (
     <section
       id="about-csr"
@@ -69,31 +92,41 @@ export function Csr() {
     >
       <SectionName id="about-csr-title">社会责任</SectionName>
       <div {...stylex.props(base.shell, styles.grid)}>
-        <Reveal sx={styles.text}>
+        <div ref={textRef} {...stylex.props(styles.text)}>
           <p {...stylex.props(styles.statement)}>
-            <span {...stylex.props(styles.statementLine)}>{lead}</span>
-            <span {...stylex.props(styles.statementLine)}>{close}</span>
+            <RiseLines lines={ABOUT_CSR.statement} play={textShown} />
           </p>
-          <p {...stylex.props(ty.body)}>{ABOUT_CSR.desc}</p>
+          <Reveal step={2}>
+            <p {...stylex.props(ty.body)}>{ABOUT_CSR.desc}</p>
+          </Reveal>
           <ul {...stylex.props(styles.outcomes)}>
-            {ABOUT_CSR.outcomes.map((outcome) => (
+            {ABOUT_CSR.outcomes.map((outcome, index) => (
               <li key={outcome.title} {...stylex.props(styles.outcome)}>
-                {outcome.title}
+                <span
+                  aria-hidden="true"
+                  {...stylex.props(
+                    styles.outcomeRule,
+                    textShown && styles.outcomeRuleShown,
+                    styles.outcomeDelay(index),
+                  )}
+                />
+                <span>{outcome.title}</span>
+                <span aria-hidden="true" lang="en" {...stylex.props(styles.numeral)}>
+                  {String(index + 1).padStart(2, "0")}
+                </span>
               </li>
             ))}
           </ul>
-        </Reveal>
-        <Reveal step={1}>
-          <div {...stylex.props(styles.photo)}>
-            <img
-              src={ABOUT_CSR.image}
-              alt={ABOUT_CSR.imageAlt}
-              loading="lazy"
-              decoding="async"
-              {...stylex.props(base.fill)}
-            />
-          </div>
-        </Reveal>
+        </div>
+        <div {...stylex.props(styles.photoWrap)}>
+          <DriftImage
+            src={ABOUT_CSR.image}
+            alt={ABOUT_CSR.imageAlt}
+            frame={styles.photo}
+            wipeDelay={200}
+          />
+          <CropMarks delay={900} />
+        </div>
       </div>
     </section>
   );

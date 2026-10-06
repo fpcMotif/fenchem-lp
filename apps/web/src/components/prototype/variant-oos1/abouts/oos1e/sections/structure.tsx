@@ -24,14 +24,17 @@ const styles = stylex.create({
       [media.lgUp]: "minmax(0, 0.9fr) minmax(0, 1.1fr)",
     },
     columnGap: 96,
-    rowGap: 56,
-    alignItems: "center",
+    rowGap: 64,
+    alignItems: "start",
   },
   holding: {
     display: "flex",
     flexDirection: "column",
     alignItems: "flex-start",
-    gap: 14,
+    gap: 16,
+  },
+  holdingBadge: {
+    marginBottom: 4,
   },
   holdingName: {
     maxWidth: "9em",
@@ -53,7 +56,7 @@ const styles = stylex.create({
   branches: {
     display: "flex",
     flexDirection: "column",
-    gap: 12,
+    gap: 20,
   },
   branchList: {
     margin: 0,
@@ -124,7 +127,9 @@ export function StructureSheet() {
     <Sheet def={STRUCTURE_SHEET}>
       <div {...stylex.props(styles.chart)}>
         <Reveal sx={styles.holding}>
-          <span {...stylex.props(base.quiet)}>{ABOUT_STRUCTURE.holding.badge}</span>
+          <span {...stylex.props(base.quiet, styles.holdingBadge)}>
+            {ABOUT_STRUCTURE.holding.badge}
+          </span>
           <h3 {...stylex.props(styles.holdingName)}>{ABOUT_STRUCTURE.holding.name}</h3>
           <div lang="en" {...stylex.props(styles.holdingEnglish)}>
             {ABOUT_STRUCTURE.holding.english}

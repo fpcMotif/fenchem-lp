@@ -62,6 +62,8 @@ const styles = stylex.create({
   },
 });
 
+export const srOnly = styles.srOnly;
+
 export function Section({
   id,
   name,

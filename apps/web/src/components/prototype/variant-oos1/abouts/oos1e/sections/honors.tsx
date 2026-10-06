@@ -68,7 +68,7 @@ const styles = stylex.create({
   },
   stamp: {
     top: "50%",
-    left: "calc(100% - 22px)",
+    left: { default: "calc(100% + 14px)", [media.lgUp]: "calc(100% + 20px)" },
     width: { default: 76, [media.lgUp]: 92 },
     marginTop: { default: -38, [media.lgUp]: -46 },
   },

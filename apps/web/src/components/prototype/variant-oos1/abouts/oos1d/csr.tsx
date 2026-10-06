@@ -20,12 +20,7 @@ const s = stylex.create({
   },
   statement: {
     margin: 0,
-    fontSize: {
-      default: step.title,
-      [breakpoints.md]: step.display,
-      [breakpoints.lg]: step.title,
-      [breakpoints.xl]: step.display,
-    },
+    fontSize: { default: step.title, [breakpoints.xl]: "32px" },
     fontWeight: 500,
     lineHeight: 1.5,
     letterSpacing: "0.04em",

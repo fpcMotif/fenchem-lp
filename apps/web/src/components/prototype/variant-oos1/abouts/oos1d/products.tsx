@@ -16,10 +16,12 @@ const s = stylex.create({
     margin: 0,
     maxWidth: "28em",
     fontSize: step.body,
-    lineHeight: 2,
+    lineHeight: 1.95,
     letterSpacing: "0.06em",
     color: tone.ink,
-    textWrap: "pretty",
+  },
+  clause: {
+    display: "inline-block",
   },
   grid: {
     display: "grid",
@@ -35,11 +37,11 @@ const s = stylex.create({
   },
   frame: {
     aspectRatio: "4 / 3",
-    marginBottom: 20,
+    marginBottom: 24,
   },
   name: {
     margin: 0,
-    marginBottom: 8,
+    marginBottom: 10,
     fontSize: step.lead,
     fontWeight: 500,
     lineHeight: 1.4,
@@ -48,7 +50,7 @@ const s = stylex.create({
   },
   desc: {
     margin: 0,
-    fontSize: step.body,
+    fontSize: { default: "15px", [breakpoints.xl]: step.body },
     lineHeight: 1.8,
     letterSpacing: "0.04em",
     color: tone.body,
@@ -56,15 +58,21 @@ const s = stylex.create({
   tags: {
     display: "flex",
     flexWrap: "wrap",
-    columnGap: 16,
-    rowGap: 4,
+    columnGap: 20,
+    rowGap: 6,
     margin: 0,
-    marginTop: 12,
-    padding: 0,
+    marginTop: 18,
+    paddingTop: 16,
+    paddingInline: 0,
+    paddingBottom: 0,
     listStyle: "none",
+    borderTopWidth: 1,
+    borderTopStyle: "solid",
+    borderTopColor: tone.hairline,
     fontSize: step.label,
-    letterSpacing: "0.04em",
-    color: tone.body,
+    lineHeight: 1.7,
+    letterSpacing: "0.08em",
+    color: tone.quiet,
   },
 });
 
@@ -74,7 +82,13 @@ export function Products({ onNavigateHome }: { onNavigateHome: (hash?: string) =
       <div {...stylex.props(ui.phi)}>
         <div {...stylex.props(ui.asideCol)}>
           <Reveal sx={s.lead}>
-            <p {...stylex.props(s.leadText)}>{PRODUCTS_INTRO.lead}</p>
+            <p {...stylex.props(s.leadText)}>
+              {PRODUCTS_INTRO.lead.split(/(?<=，)/).map((clause) => (
+                <span key={clause} {...stylex.props(s.clause)}>
+                  {clause}
+                </span>
+              ))}
+            </p>
             <button
               type="button"
               onClick={() => onNavigateHome("products")}

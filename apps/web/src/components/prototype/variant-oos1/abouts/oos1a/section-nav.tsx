@@ -168,10 +168,12 @@ export function SectionNav({ onNavigateHome }: { onNavigateHome: (hash?: string)
               {...stylex.props(styles.crumbLink, shared.focusRing)}
             >
               <ChevronLeft size={14} aria-hidden="true" />
-              <span>首页</span>
+              <span lang="en">Home</span>
+              <span {...stylex.props(shared.srOnly)}> 首页</span>
             </button>
             <span aria-current="page" {...stylex.props(styles.crumbCurrent)}>
-              关于我们
+              <span lang="en">About</span>
+              <span {...stylex.props(shared.srOnly)}> 关于我们</span>
             </span>
           </nav>
           <ul ref={listRef} aria-label="本页导航" {...stylex.props(styles.list)}>
@@ -181,7 +183,6 @@ export function SectionNav({ onNavigateHome }: { onNavigateHome: (hash?: string)
                 <li key={chip.id} {...stylex.props(styles.item)}>
                   <a
                     href={`#${chip.id}`}
-                    aria-label={`${ENGLISH[chip.id]} ${chip.label}`}
                     aria-current={on ? "location" : undefined}
                     {...stylex.props(styles.link, shared.focusRing)}
                   >
@@ -196,6 +197,7 @@ export function SectionNav({ onNavigateHome }: { onNavigateHome: (hash?: string)
                         {...stylex.props(styles.markBlue, on && styles.markOn)}
                       />
                     </span>
+                    <span {...stylex.props(shared.srOnly)}> {chip.label}</span>
                   </a>
                 </li>
               );

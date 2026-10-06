@@ -106,21 +106,23 @@ body {
   color: var(--foreground);
 }
 
-h1,
-h2,
-h3 {
-  text-wrap: balance;
-}
+@layer base {
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
 
-p,
-li,
-figcaption {
-  text-wrap: pretty;
-}
+  p,
+  li,
+  figcaption {
+    text-wrap: pretty;
+  }
 
-:where(a, button, [role="button"], input, select, textarea):focus-visible {
-  outline: 2px solid currentColor;
-  outline-offset: 4px;
+  :where(a, button, [role="button"], input, select, textarea):focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 4px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

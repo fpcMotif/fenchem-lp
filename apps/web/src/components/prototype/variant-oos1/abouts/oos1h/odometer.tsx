@@ -24,9 +24,9 @@ const ROLL_CELLS: readonly Cell[] = Array.from({ length: 22 }, (_, n) => ({
 }));
 const WRAP_CELLS: readonly Cell[] = ROLL_CELLS.slice(0, 11);
 
-const OVERSHOOT_CELLS = 1.4;
-const ROLL_SECONDS = 1.25;
-const DIGIT_STAGGER = 0.11;
+const OVERSHOOT_CELLS = 0.5;
+const ROLL_SECONDS = 0.9;
+const DIGIT_STAGGER = 0.06;
 const ROLL_EASE: [number, number, number, number] = [0.5, 0, 0.1, 1];
 const CARRY_YEARS = 0.5;
 const YEAR_FIRST = 1995;
@@ -105,11 +105,12 @@ function RollDigit({
       return;
     }
     if (!inView) {
-      cell.set(0);
+      cell.set(end);
       return;
     }
     let cancelled = false;
     let settle: AnimationPlaybackControls | undefined;
+    cell.set(target);
     const roll = animate(cell, end + OVERSHOOT_CELLS, {
       duration: ROLL_SECONDS,
       delay,
@@ -117,14 +118,14 @@ function RollDigit({
     });
     void roll.then(() => {
       if (cancelled) return;
-      settle = animate(cell, end, { type: "spring", stiffness: 240, damping: 12, mass: 0.9 });
+      settle = animate(cell, end, { type: "spring", stiffness: 260, damping: 22, mass: 0.9 });
     });
     return () => {
       cancelled = true;
       roll.stop();
       settle?.stop();
     };
-  }, [cell, delay, end, inView, reduce]);
+  }, [cell, delay, end, inView, reduce, target]);
 
   return <DigitColumn cell={cell} cells={ROLL_CELLS} />;
 }

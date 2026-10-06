@@ -1,188 +1,69 @@
-import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 import { useState } from "react";
 
 import { ABOUT_CAMPUS } from "../../about-data";
-import { type CampusPhoto, Lightbox } from "./lightbox";
-import { Fold, s } from "./shared";
-import { palette } from "./tokens.stylex";
+import { INDEX_PLATES_VISITED_THEN_UNVISITED, ROOMS_IN_WALKING_ORDER } from "./journey";
+import { Lightbox } from "./lightbox";
+import { NestedSequence } from "./nested-sequence";
+import { PlateIndex } from "./plate-index";
+import { PortalStage } from "./portal-stage";
+import { SectionHead, srOnly, ui, useMediaQuery } from "./shared";
 
-const photos = ABOUT_CAMPUS.photos;
-const SEQUENCE: readonly CampusPhoto[] = [
-  photos[0],
-  photos[1],
-  photos[4],
-  photos[2],
-  photos[3],
-  photos[5],
-  photos[6],
-];
-const PAIRS = [
-  [1, 2],
-  [3, 4],
-  [5, 6],
-] as const;
-
-const styles = stylex.create({
-  gallery: {
-    display: "flex",
-    flexDirection: "column",
-    gap: { default: 36, [breakpoints.lg]: 72 },
-  },
-  featureWrap: {
-    width: "100%",
-    maxWidth: 940,
-    marginInline: "auto",
-  },
-  pair: {
-    display: "grid",
-    gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
-    alignItems: "start",
-    columnGap: { default: 12, [breakpoints.md]: 40 },
-  },
-  figureReset: {
-    margin: 0,
-  },
-  tile: {
-    gap: 12,
-  },
-  frame: {
-    position: "relative",
-    overflow: "hidden",
-    backgroundColor: palette.page,
-  },
-  ratioFeature: {
-    aspectRatio: { default: "4 / 3", [breakpoints.md]: "16 / 9.4" },
-  },
-  ratioPair: {
-    aspectRatio: { default: "4 / 5", [breakpoints.md]: "4 / 3" },
-  },
-  open: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    width: "100%",
-    height: "100%",
-    padding: 0,
-    borderWidth: 0,
-    backgroundColor: "transparent",
-    cursor: "zoom-in",
-    outlineStyle: { default: "none", ":focus-visible": "solid" },
-    outlineWidth: 3,
-    outlineColor: colors.paper,
-    outlineOffset: -6,
-  },
-  captionStart: { textAlign: "end" },
-  captionEnd: { textAlign: "start" },
-  captionMid: { textAlign: "center" },
-});
-
-function Tile({
-  photo,
-  index,
-  side,
-  step,
-  ratio,
-  onOpen,
-}: {
-  photo: CampusPhoto;
-  index: number;
-  side: "left" | "right" | "rise";
-  step: number;
-  ratio: stylex.StyleXStyles;
-  onOpen: (index: number) => void;
-}) {
-  const captionSx =
-    side === "left"
-      ? styles.captionStart
-      : side === "right"
-        ? styles.captionEnd
-        : styles.captionMid;
-  return (
-    <Fold as="figure" side={side} step={step} sx={styles.figureReset} innerSx={styles.tile}>
-      <div {...stylex.props(styles.frame, ratio)}>
-        <button
-          type="button"
-          aria-label={`查看大图：${photo.caption}`}
-          onClick={() => onOpen(index)}
-          {...stylex.props(styles.open)}
-        >
-          <img
-            src={photo.src}
-            alt={photo.alt}
-            loading="lazy"
-            decoding="async"
-            {...stylex.props(s.fill)}
-          />
-        </button>
-      </div>
-      <figcaption {...stylex.props(s.caption, captionSx)}>{photo.caption}</figcaption>
-    </Fold>
-  );
-}
+const PORTAL_QUERY = "(min-width: 1024px) and (prefers-reduced-motion: no-preference)";
+const WALK = ROOMS_IN_WALKING_ORDER.map((room) => room.plate.caption).join("、");
 
 export function Campus() {
+  const portal = useMediaQuery(PORTAL_QUERY);
   const [openIndex, setOpenIndex] = useState<number | null>(null);
-  const count = SEQUENCE.length;
-  const feature = SEQUENCE[0];
+  const [stepped, setStepped] = useState(false);
+  const plates = INDEX_PLATES_VISITED_THEN_UNVISITED;
 
   return (
     <section
       id="about-campus"
-      aria-labelledby="about-campus-title"
-      {...stylex.props(s.section, s.bandPaper)}
+      aria-labelledby="oos1b-campus"
+      {...stylex.props(ui.anchor, ui.section)}
     >
-      <h2 id="about-campus-title" {...stylex.props(s.srOnly)}>
-        {ABOUT_CAMPUS.title}
-      </h2>
-      <div {...stylex.props(s.shell)}>
-        <div {...stylex.props(styles.gallery)}>
-          {feature ? (
-            <div {...stylex.props(styles.featureWrap)}>
-              <Tile
-                photo={feature}
-                index={0}
-                side="rise"
-                step={0}
-                ratio={styles.ratioFeature}
-                onOpen={setOpenIndex}
-              />
-            </div>
-          ) : null}
-          {PAIRS.map(([startIndex, endIndex]) => {
-            const start = SEQUENCE[startIndex];
-            const end = SEQUENCE[endIndex];
-            if (!start || !end) return null;
-            return (
-              <div key={start.id} {...stylex.props(styles.pair)}>
-                <Tile
-                  photo={start}
-                  index={startIndex}
-                  side="left"
-                  step={0}
-                  ratio={styles.ratioPair}
-                  onOpen={setOpenIndex}
-                />
-                <Tile
-                  photo={end}
-                  index={endIndex}
-                  side="right"
-                  step={0}
-                  ratio={styles.ratioPair}
-                  onOpen={setOpenIndex}
-                />
-              </div>
-            );
-          })}
-        </div>
+      <div {...stylex.props(ui.shell)}>
+        <SectionHead
+          id="oos1b-campus"
+          index={2}
+          eyebrow="Campus"
+          title={ABOUT_CAMPUS.title}
+          note="Each photograph is a doorway into the next."
+        />
+        <p {...srOnly}>依次走过{WALK}，最后从高处回望总部园区。</p>
       </div>
+
+      {portal ? (
+        <PortalStage />
+      ) : (
+        <div {...stylex.props(ui.shell)}>
+          <NestedSequence />
+        </div>
+      )}
+
+      <div {...stylex.props(ui.shell)}>
+        <PlateIndex
+          plates={plates}
+          onOpen={(index) => {
+            setStepped(false);
+            setOpenIndex(index);
+          }}
+        />
+      </div>
+
       <Lightbox
-        photos={SEQUENCE}
+        plates={plates}
         index={openIndex}
+        stepped={stepped}
         onClose={() => setOpenIndex(null)}
-        onStep={(delta) =>
-          setOpenIndex((current) => (current === null ? null : (current + delta + count) % count))
-        }
+        onStep={(delta) => {
+          setStepped(true);
+          setOpenIndex((current) =>
+            current === null ? null : (current + delta + plates.length) % plates.length,
+          );
+        }}
       />
     </section>
   );
