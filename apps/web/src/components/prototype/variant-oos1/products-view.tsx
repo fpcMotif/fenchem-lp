@@ -277,88 +277,81 @@ const styles = stylex.create({
     fontSize: 13,
     color: BODY_TEXT,
   },
-  accordionList: {
+  accordion: {
     display: "flex",
     flexDirection: "column",
-    gap: 14,
+    gap: 12,
+    margin: 0,
+    padding: 0,
+    listStyleType: "none",
   },
-  accordionItem: {
-    borderRadius: 12,
+  newsItem: {
+    paddingBottom: 12,
     backgroundColor: SURFACE,
-    overflow: "hidden",
-    transitionProperty: "background-color, box-shadow",
-    transitionDuration: "200ms",
   },
-  accordionItemOpen: {
-    backgroundColor: "#f4f5f8",
-    boxShadow: "0 4px 18px -4px rgba(0, 0, 0, 0.05)",
+  newsHeading: {
+    margin: 0,
   },
-  trigger: {
-    appearance: "none",
-    width: "100%",
-    border: "none",
-    background: "transparent",
-    paddingBlock: { default: 20, [DESKTOP]: 24 },
-    paddingInline: { default: 22, [DESKTOP]: 32 },
+  newsTrigger: {
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",
     gap: 16,
-    cursor: "pointer",
-    textAlign: "start",
+    width: "100%",
+    paddingTop: 24,
+    paddingInline: 24,
+    paddingBottom: 12,
+    borderWidth: 0,
+    backgroundColor: "transparent",
     fontFamily: "inherit",
-    color: INK,
+    fontSize: 16,
+    fontWeight: 700,
+    lineHeight: 1.2,
+    textAlign: "start",
+    color: { default: INK, ":hover": colors.brandBlue700 },
+    cursor: "pointer",
+    transitionProperty: "color",
+    transitionDuration: "150ms",
+    transitionTimingFunction: "ease",
     outlineStyle: { default: "none", ":focus-visible": "solid" },
     outlineWidth: 2,
     outlineColor: colors.brandBlue700,
     outlineOffset: -2,
   },
-  triggerTitle: {
+  newsIconSlot: {
+    position: "relative",
+    flexShrink: 0,
+    width: 16,
+    height: 16,
+  },
+  newsIconLayer: {
+    position: "absolute",
+    inset: 0,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  newsPanel: {
+    overflow: "hidden",
+  },
+  newsPanelInner: {
+    display: "flex",
+    flexDirection: "column",
+    gap: 12,
+    paddingInline: 24,
+    paddingBottom: 12,
+  },
+  mutedText: {
     margin: 0,
-    fontSize: { default: 15, [TABLET]: 16, [DESKTOP]: 17 },
-    fontWeight: 600,
-    lineHeight: 1.45,
-    letterSpacing: "0.01em",
-    color: INK,
+    fontSize: 14,
+    lineHeight: 1.7,
+    letterSpacing: "0.02em",
+    color: BODY_TEXT,
   },
   triggerNumber: {
     marginInlineEnd: 8,
-    fontWeight: 600,
+    fontWeight: 700,
     color: INK,
-  },
-  iconSlot: {
-    flexShrink: 0,
-    display: "inline-flex",
-    alignItems: "center",
-    justifyContent: "center",
-    width: 28,
-    height: 28,
-    borderRadius: "50%",
-    backgroundColor: "rgba(0, 0, 0, 0.04)",
-    color: colors.brandBlue700,
-  },
-  iconLayer: {
-    display: "inline-flex",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-
-  panel: {
-    overflow: "hidden",
-  },
-  panelInner: {
-    paddingInline: { default: 22, [DESKTOP]: 32 },
-    paddingBottom: { default: 24, [DESKTOP]: 28 },
-    paddingTop: 4,
-    borderTopWidth: 1,
-    borderTopStyle: "solid",
-    borderTopColor: "rgba(0, 0, 0, 0.05)",
-  },
-  panelLead: {
-    margin: 0,
-    fontSize: 14,
-    lineHeight: 1.75,
-    color: BODY_TEXT,
   },
   metaGrid: {
     display: "grid",
@@ -404,9 +397,9 @@ const styles = stylex.create({
 function AccordionIcon({ open }: { open: boolean }) {
   const reduce = useReducedMotion();
   return (
-    <span aria-hidden="true" {...stylex.props(styles.iconSlot)}>
+    <span aria-hidden="true" {...stylex.props(styles.newsIconSlot)}>
       <m.span
-        {...stylex.props(styles.iconLayer)}
+        {...stylex.props(styles.newsIconLayer)}
         animate={{ rotate: open ? 45 : 0 }}
         transition={reduce ? { duration: 0 } : { type: "spring", duration: 0.3, bounce: 0 }}
       >
@@ -431,16 +424,16 @@ function CatalogAccordionItem({
   const panelId = useId();
 
   return (
-    <div {...stylex.props(styles.accordionItem, open && styles.accordionItemOpen)}>
-      <h3>
+    <>
+      <h3 {...stylex.props(styles.newsHeading)}>
         <button
           type="button"
           aria-expanded={open}
           aria-controls={panelId}
           onClick={onToggle}
-          {...stylex.props(styles.trigger)}
+          {...stylex.props(styles.newsTrigger)}
         >
-          <span {...stylex.props(styles.triggerTitle)}>
+          <span>
             <span {...stylex.props(styles.triggerNumber)}>{index + 1}.</span>
             {item.title}
           </span>
@@ -452,14 +445,14 @@ function CatalogAccordionItem({
           <m.div
             key="panel"
             id={panelId}
-            {...stylex.props(styles.panel)}
+            {...stylex.props(styles.newsPanel)}
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: reduce ? 0 : 0.25, ease: EASE }}
           >
-            <div {...stylex.props(styles.panelInner)}>
-              <p {...stylex.props(styles.panelLead)}>{item.features}</p>
+            <div {...stylex.props(styles.newsPanelInner)}>
+              <p {...stylex.props(styles.mutedText)}>{item.features}</p>
               <div {...stylex.props(styles.metaGrid)}>
                 <div {...stylex.props(styles.metaField)}>
                   <span {...stylex.props(styles.metaLabel)}>INCI 名称</span>
@@ -482,7 +475,7 @@ function CatalogAccordionItem({
           </m.div>
         )}
       </AnimatePresence>
-    </div>
+    </>
   );
 }
 
@@ -501,16 +494,16 @@ function SolutionAccordionItem({
   const panelId = useId();
 
   return (
-    <div {...stylex.props(styles.accordionItem, open && styles.accordionItemOpen)}>
-      <h3>
+    <>
+      <h3 {...stylex.props(styles.newsHeading)}>
         <button
           type="button"
           aria-expanded={open}
           aria-controls={panelId}
           onClick={onToggle}
-          {...stylex.props(styles.trigger)}
+          {...stylex.props(styles.newsTrigger)}
         >
-          <span {...stylex.props(styles.triggerTitle)}>
+          <span>
             <span {...stylex.props(styles.triggerNumber)}>{index + 1}.</span>
             {item.title}
           </span>
@@ -522,14 +515,14 @@ function SolutionAccordionItem({
           <m.div
             key="panel"
             id={panelId}
-            {...stylex.props(styles.panel)}
+            {...stylex.props(styles.newsPanel)}
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: reduce ? 0 : 0.25, ease: EASE }}
           >
-            <div {...stylex.props(styles.panelInner)}>
-              <p {...stylex.props(styles.panelLead)}>{item.overview}</p>
+            <div {...stylex.props(styles.newsPanelInner)}>
+              <p {...stylex.props(styles.mutedText)}>{item.overview}</p>
               <div {...stylex.props(styles.metaGrid)}>
                 <div {...stylex.props(styles.metaField)}>
                   <span {...stylex.props(styles.metaLabel)}>核心功能</span>
@@ -558,7 +551,7 @@ function SolutionAccordionItem({
           </m.div>
         )}
       </AnimatePresence>
-    </div>
+    </>
   );
 }
 
@@ -680,17 +673,18 @@ export function ProductsView({
         <h2 id="catalog-title" {...stylex.props(styles.sectionTitle)}>
           产品目录
         </h2>
-        <div role="region" aria-label="原料产品目录列表" {...stylex.props(styles.accordionList)}>
+        <ul role="region" aria-label="原料产品目录列表" {...stylex.props(styles.accordion)}>
           {CATALOG_ITEMS.slice(0, 5).map((item, index) => (
-            <CatalogAccordionItem
-              key={item.id}
-              item={item}
-              index={index}
-              open={openCatalogIndex === index}
-              onToggle={() => toggleCatalog(index)}
-            />
+            <li key={item.id} {...stylex.props(styles.newsItem)}>
+              <CatalogAccordionItem
+                item={item}
+                index={index}
+                open={openCatalogIndex === index}
+                onToggle={() => toggleCatalog(index)}
+              />
+            </li>
           ))}
-        </div>
+        </ul>
       </section>
 
       {}
@@ -702,17 +696,18 @@ export function ProductsView({
         <h2 id="solutions-title" {...stylex.props(styles.sectionTitle)}>
           应用方案
         </h2>
-        <div role="region" aria-label="配方应用方案列表" {...stylex.props(styles.accordionList)}>
+        <ul role="region" aria-label="配方应用方案列表" {...stylex.props(styles.accordion)}>
           {SOLUTION_ITEMS.slice(0, 5).map((item, index) => (
-            <SolutionAccordionItem
-              key={item.id}
-              item={item}
-              index={index}
-              open={openSolutionIndex === index}
-              onToggle={() => toggleSolution(index)}
-            />
+            <li key={item.id} {...stylex.props(styles.newsItem)}>
+              <SolutionAccordionItem
+                item={item}
+                index={index}
+                open={openSolutionIndex === index}
+                onToggle={() => toggleSolution(index)}
+              />
+            </li>
           ))}
-        </div>
+        </ul>
       </section>
     </div>
   );
