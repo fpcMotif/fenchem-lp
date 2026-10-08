@@ -43,7 +43,7 @@ const EASE_OUT_CSS = "cubic-bezier(0.22, 1, 0.36, 1)";
 
 const INSET_124 = "min(124px, 8.611vw)";
 const HEADER_HEIGHT = 80;
-const SUB_BAR_HEIGHT = 56;
+const SUB_BAR_HEIGHT = 64;
 const REVEAL_STEP_MS = 70;
 const REVEAL_MAX_STEPS = 5;
 const COUNT_UP_SECONDS = 1.6;
@@ -259,7 +259,7 @@ const styles = stylex.create({
   subBar: {
     position: "sticky",
     top: HEADER_HEIGHT,
-    zIndex: 1,
+    zIndex: 30,
     backgroundColor: "rgba(255, 255, 255, 0.95)",
     backdropFilter: "blur(16px)",
     boxShadow: "0 1px 0 0 rgba(26, 26, 26, 0.08)",
@@ -272,11 +272,11 @@ const styles = stylex.create({
     height: SUB_BAR_HEIGHT,
   },
   breadcrumb: {
-    display: { default: "none", [breakpoints.lg]: "flex" },
+    display: "flex",
     alignItems: "center",
     gap: 8,
     flexShrink: 0,
-    fontSize: 14,
+    fontSize: 13,
     letterSpacing: "0.04em",
     color: BODY_TEXT,
   },
@@ -297,7 +297,7 @@ const styles = stylex.create({
     display: "flex",
     alignItems: "center",
     justifyContent: { default: "flex-start", [breakpoints.lg]: "flex-end" },
-    gap: 8,
+    gap: 12,
     flexGrow: 1,
     minWidth: 0,
     paddingBlock: 4,
@@ -308,23 +308,28 @@ const styles = stylex.create({
     display: "inline-flex",
     alignItems: "center",
     flexShrink: 0,
-    height: 32,
-    paddingInline: 15,
-    borderRadius: 16,
-    backgroundColor: { default: SURFACE, ":hover": TINT },
+    height: 36,
+    paddingInline: 18,
+    borderRadius: 999,
+    backgroundColor: { default: "#f3f4f6", ":hover": "#e5e7eb" },
     fontSize: 13,
     fontWeight: 500,
-    letterSpacing: "0.06em",
+    letterSpacing: "0.04em",
     color: { default: INK, ":hover": colors.brandBlue700 },
     textDecoration: "none",
     whiteSpace: "nowrap",
-    transitionProperty: "background-color, color",
+    transitionProperty: "background-color, color, transform, box-shadow",
     transitionDuration: "160ms",
     transitionTimingFunction: EASE_OUT_CSS,
+    outlineStyle: { default: "none", ":focus-visible": "solid" },
+    outlineWidth: 2,
+    outlineColor: colors.brandBlue700,
+    outlineOffset: 2,
   },
   chipActive: {
     backgroundColor: { default: colors.brandBlue700, ":hover": colors.brandBlue800 },
     color: { default: colors.paper, ":hover": colors.paper },
+    boxShadow: "0 4px 12px -2px rgba(29, 78, 216, 0.32)",
   },
 
   sectionHeader: {

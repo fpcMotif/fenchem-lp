@@ -90,78 +90,88 @@ const styles = stylex.create({
     pointerEvents: "none",
   },
 
-  breadcrumbBar: {
-    paddingTop: 24,
-    paddingBottom: 8,
+  subBar: {
+    position: "sticky",
+    top: 80,
+    zIndex: 30,
+    backgroundColor: "rgba(255, 255, 255, 0.95)",
+    backdropFilter: "blur(16px)",
+    boxShadow: "0 1px 0 0 rgba(26, 26, 26, 0.08)",
+  },
+  subBarInner: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 24,
+    height: 64,
   },
   breadcrumb: {
     display: "flex",
     alignItems: "center",
     gap: 8,
+    flexShrink: 0,
     fontSize: 13,
-    color: MUTED_LABEL,
+    letterSpacing: "0.04em",
+    color: BODY_TEXT,
   },
   breadcrumbLink: {
-    background: "none",
-    border: "none",
     padding: 0,
-    margin: 0,
-    color: MUTED_LABEL,
+    borderWidth: 0,
+    backgroundColor: "transparent",
+    fontSize: "inherit",
+    letterSpacing: "inherit",
+    color: { default: BODY_TEXT, ":hover": colors.brandBlue700 },
     cursor: "pointer",
-    fontSize: 13,
-    fontFamily: "inherit",
-    textDecoration: "none",
     outlineStyle: { default: "none", ":focus-visible": "solid" },
     outlineWidth: 2,
     outlineColor: colors.brandBlue700,
     outlineOffset: 2,
     borderRadius: 4,
-    ":hover": {
-      color: INK,
-    },
   },
   breadcrumbCurrent: {
     color: INK,
     fontWeight: 500,
   },
-
-  tabsSection: {
-    paddingTop: { default: 28, [DESKTOP]: 40 },
-    paddingBottom: { default: 24, [DESKTOP]: 32 },
-  },
-  tabsRow: {
+  chipList: {
     display: "flex",
-    flexWrap: "wrap",
-    justifyContent: { default: "flex-start", [LG]: "flex-end" },
+    alignItems: "center",
+    justifyContent: { default: "flex-start", [breakpoints.lg]: "flex-end" },
     gap: 12,
+    flexGrow: 1,
+    minWidth: 0,
+    paddingBlock: 4,
+    overflowX: "auto",
+    scrollbarWidth: "none",
   },
-  tabButton: {
+  chip: {
     appearance: "none",
     border: "none",
+    display: "inline-flex",
+    alignItems: "center",
+    flexShrink: 0,
+    height: 36,
+    paddingInline: 18,
     borderRadius: 999,
-    paddingBlock: { default: 8, [DESKTOP]: 9 },
-    paddingInline: { default: 20, [DESKTOP]: 24 },
-    fontSize: { default: 13, [DESKTOP]: 14 },
+    backgroundColor: { default: "#f3f4f6", ":hover": "#e5e7eb" },
+    fontSize: 13,
     fontWeight: 500,
+    letterSpacing: "0.04em",
+    color: { default: INK, ":hover": colors.brandBlue700 },
     cursor: "pointer",
+    whiteSpace: "nowrap",
     transitionProperty: "background-color, color, transform, box-shadow",
-    transitionDuration: "180ms",
+    transitionDuration: "160ms",
     transitionTimingFunction: "ease-out",
     outlineStyle: { default: "none", ":focus-visible": "solid" },
     outlineWidth: 2,
     outlineColor: colors.brandBlue700,
     outlineOffset: 2,
   },
-  tabActive: {
+  chipActive: {
     backgroundColor: { default: colors.brandBlue700, ":hover": colors.brandBlue800 },
-    color: colors.paper,
-    boxShadow: "0 4px 14px -3px rgba(29, 78, 216, 0.35)",
+    color: { default: colors.paper, ":hover": colors.paper },
+    boxShadow: "0 4px 12px -2px rgba(29, 78, 216, 0.32)",
   },
-  tabInactive: {
-    backgroundColor: { default: SURFACE, ":hover": TINT },
-    color: { default: INK, ":hover": colors.brandBlue700 },
-  },
-
   spotlightSection: {
     paddingTop: { default: 32, [DESKTOP]: 48 },
     paddingBottom: { default: 64, [DESKTOP]: 96 },
@@ -587,50 +597,40 @@ export function ProductsView({
         </figure>
       </section>
 
-      {}
-      <div {...stylex.props(styles.shell, styles.inset, styles.breadcrumbBar)}>
-        <nav aria-label="面包屑导航" {...stylex.props(styles.breadcrumb)}>
-          <button
-            type="button"
-            onClick={() => onNavigateHome("top")}
-            {...stylex.props(styles.breadcrumbLink)}
-          >
-            首页
-          </button>
-          <ChevronRight size={13} aria-hidden="true" />
-          <span aria-current="page" {...stylex.props(styles.breadcrumbCurrent)}>
-            产品与应用
-          </span>
-        </nav>
-      </div>
-
-      {}
-      <section
-        aria-label="核心业务品类"
-        {...stylex.props(styles.shell, styles.inset, styles.tabsSection)}
-      >
-        <div role="tablist" aria-label="品类切换" {...stylex.props(styles.tabsRow)}>
-          {CATEGORIES.map((cat) => {
-            const isActive = activeTab === cat.id;
-            return (
-              <button
-                key={cat.id}
-                role="tab"
-                type="button"
-                aria-selected={isActive}
-                onClick={() => setActiveTab(cat.id)}
-                {...stylex.props(
-                  styles.tabButton,
-                  isActive ? styles.tabActive : styles.tabInactive,
-                )}
-              >
-                {cat.label}
-              </button>
-            );
-          })}
+      <div {...stylex.props(styles.subBar)}>
+        <div {...stylex.props(styles.shell, styles.inset, styles.subBarInner)}>
+          <nav aria-label="面包屑导航" {...stylex.props(styles.breadcrumb)}>
+            <button
+              type="button"
+              onClick={() => onNavigateHome("top")}
+              {...stylex.props(styles.breadcrumbLink)}
+            >
+              首页
+            </button>
+            <ChevronRight size={13} aria-hidden="true" />
+            <span aria-current="page" {...stylex.props(styles.breadcrumbCurrent)}>
+              产品与应用
+            </span>
+          </nav>
+          <div role="tablist" aria-label="品类切换" {...stylex.props(styles.chipList)}>
+            {CATEGORIES.map((cat) => {
+              const isActive = activeTab === cat.id;
+              return (
+                <button
+                  key={cat.id}
+                  role="tab"
+                  type="button"
+                  aria-selected={isActive}
+                  onClick={() => setActiveTab(cat.id)}
+                  {...stylex.props(styles.chip, isActive && styles.chipActive)}
+                >
+                  {cat.label}
+                </button>
+              );
+            })}
+          </div>
         </div>
-      </section>
-
+      </div>
       {}
       <section
         aria-labelledby="spotlight-title"
