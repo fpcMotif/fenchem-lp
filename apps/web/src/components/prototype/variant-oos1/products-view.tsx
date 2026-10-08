@@ -202,30 +202,78 @@ const styles = stylex.create({
     color: MUTED_LABEL,
     letterSpacing: "0.03em",
   },
-  spotlightItem: {
-    marginTop: 24,
+  spotlightList: {
+    display: "flex",
+    flexDirection: "column",
+    gap: 8,
+    marginTop: 20,
+  },
+  spotlightItemBtn: {
+    appearance: "none",
+    width: "100%",
+    border: "none",
+    backgroundColor: { default: "transparent", ":hover": "#f7f7f9" },
+    borderRadius: 10,
+    paddingBlock: 10,
+    paddingInline: 14,
+    textAlign: "start",
+    cursor: "pointer",
+    fontFamily: "inherit",
+    transitionProperty: "background-color, transform",
+    transitionDuration: "160ms",
+    outlineStyle: { default: "none", ":focus-visible": "solid" },
+    outlineWidth: 2,
+    outlineColor: colors.brandBlue700,
+    outlineOffset: 1,
+  },
+  spotlightItemBtnActive: {
+    backgroundColor: TINT,
+  },
+  spotlightItemHeader: {
+    display: "flex",
+    alignItems: "baseline",
+    gap: 8,
+    flexWrap: "wrap",
+  },
+  spotlightItemNum: {
+    fontSize: 12,
+    fontWeight: 700,
+    color: MUTED_LABEL,
+    fontFamily: DISPLAY_FONT,
+  },
+  spotlightItemNumActive: {
+    color: colors.brandBlue700,
   },
   spotlightItemName: {
     margin: 0,
-    fontSize: { default: 15, [DESKTOP]: 16 },
+    fontSize: 15,
     fontWeight: 700,
     color: INK,
     letterSpacing: "0.01em",
-    fontFamily: DISPLAY_FONT,
+  },
+  spotlightItemNameActive: {
+    color: colors.brandBlue700,
+  },
+  spotlightItemEn: {
+    fontSize: 12,
+    color: MUTED_LABEL,
+    letterSpacing: "0.02em",
   },
   spotlightItemDesc: {
     margin: 0,
-    marginTop: 6,
-    fontSize: { default: 13, [DESKTOP]: 14 },
-    lineHeight: 1.7,
+    marginTop: 4,
+    fontSize: 13,
+    lineHeight: 1.6,
     color: BODY_TEXT,
-    maxWidth: 440,
+  },
+  spotlightItemDescActive: {
+    color: INK,
   },
   spotlightCardsWrap: {
     display: "grid",
     gridTemplateColumns: {
       default: "repeat(2, minmax(0, 1fr))",
-      [breakpoints.sm]: "repeat(4, minmax(0, 1fr))",
+      [breakpoints.sm]: "repeat(3, minmax(0, 1fr))",
     },
     gap: 12,
   },
@@ -234,22 +282,65 @@ const styles = stylex.create({
     margin: 0,
     borderRadius: 12,
     overflow: "hidden",
-    aspectRatio: "93 / 105",
+    aspectRatio: "1 / 1",
     backgroundColor: SURFACE,
     boxShadow: "0 2px 8px -2px rgba(0, 0, 0, 0.06)",
-    transitionProperty: "transform, box-shadow",
-    transitionDuration: "240ms",
+    cursor: "pointer",
+    transitionProperty: "transform, box-shadow, outline-color",
+    transitionDuration: "200ms",
     transitionTimingFunction: "ease-out",
+    outlineStyle: "solid",
+    outlineWidth: 2,
+    outlineColor: "transparent",
+    outlineOffset: 2,
     ":hover": {
       transform: "translateY(-3px)",
-      boxShadow: "0 10px 24px -4px rgba(0, 0, 0, 0.14)",
+      boxShadow: "0 8px 20px -4px rgba(0, 0, 0, 0.12)",
     },
+  },
+  cardFigureActive: {
+    transform: "translateY(-3px)",
+    outlineColor: colors.brandBlue700,
+    boxShadow: "0 8px 24px -2px rgba(29, 78, 216, 0.32)",
   },
   cardImg: {
     display: "block",
     width: "100%",
     height: "100%",
     objectFit: "cover",
+  },
+  cardCaption: {
+    position: "absolute",
+    insetInline: 8,
+    insetBlockEnd: 8,
+    display: "flex",
+    alignItems: "center",
+    gap: 6,
+    paddingBlock: 4,
+    paddingInline: 8,
+    borderRadius: 6,
+    backgroundColor: "rgba(255, 255, 255, 0.92)",
+    backdropFilter: "blur(6px)",
+    fontSize: 11,
+    fontWeight: 600,
+    color: INK,
+    letterSpacing: "0.02em",
+    pointerEvents: "none",
+    transitionProperty: "background-color, color",
+    transitionDuration: "180ms",
+  },
+  cardCaptionActive: {
+    backgroundColor: colors.brandBlue700,
+    color: colors.paper,
+  },
+  cardNum: {
+    fontSize: 10,
+    opacity: 0.75,
+  },
+  cardName: {
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+    whiteSpace: "nowrap",
   },
 
   section: {
@@ -581,9 +672,9 @@ export function ProductsView({
   sx?: StyleXStyles;
 }) {
   const [activeTab, setActiveTab] = useState<string>("personal-care");
+  const [activeProductIndex, setActiveProductIndex] = useState<number>(0);
   const [openCatalogIndex, setOpenCatalogIndex] = useState<number | null>(0);
   const [openSolutionIndex, setOpenSolutionIndex] = useState<number | null>(0);
-
   const toggleCatalog = (index: number) => {
     setOpenCatalogIndex((prev) => (prev === index ? null : index));
   };
@@ -653,26 +744,85 @@ export function ProductsView({
               {FEATURED_PRODUCT.brand}
             </h2>
             <p {...stylex.props(styles.spotlightTagline)}>{FEATURED_PRODUCT.tagline}</p>
-            {FEATURED_PRODUCT.products.map((prod) => (
-              <div key={prod.name} {...stylex.props(styles.spotlightItem)}>
-                <h3 {...stylex.props(styles.spotlightItemName)}>{prod.name}</h3>
-                <p {...stylex.props(styles.spotlightItemDesc)}>{prod.desc}</p>
-              </div>
-            ))}
+            <div role="tablist" aria-label="核心特色原料" {...stylex.props(styles.spotlightList)}>
+              {FEATURED_PRODUCT.items.map((item, idx) => {
+                const isSelected = activeProductIndex === idx;
+                return (
+                  <button
+                    key={item.id}
+                    type="button"
+                    role="tab"
+                    aria-selected={isSelected}
+                    onClick={() => setActiveProductIndex(idx)}
+                    onMouseEnter={() => setActiveProductIndex(idx)}
+                    {...stylex.props(
+                      styles.spotlightItemBtn,
+                      isSelected && styles.spotlightItemBtnActive,
+                    )}
+                  >
+                    <div {...stylex.props(styles.spotlightItemHeader)}>
+                      <span
+                        {...stylex.props(
+                          styles.spotlightItemNum,
+                          isSelected && styles.spotlightItemNumActive,
+                        )}
+                      >
+                        0{idx + 1}
+                      </span>
+                      <h3
+                        {...stylex.props(
+                          styles.spotlightItemName,
+                          isSelected && styles.spotlightItemNameActive,
+                        )}
+                      >
+                        {item.name}
+                      </h3>
+                      <span {...stylex.props(styles.spotlightItemEn)}>({item.englishName})</span>
+                    </div>
+                    <p
+                      {...stylex.props(
+                        styles.spotlightItemDesc,
+                        isSelected && styles.spotlightItemDescActive,
+                      )}
+                    >
+                      {item.desc}
+                    </p>
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
-          <div {...stylex.props(styles.spotlightCardsWrap)}>
-            {FEATURED_PRODUCT.cards.map((card, idx) => (
-              <figure key={card.src} {...stylex.props(styles.cardFigure)}>
-                <img
-                  src={card.src}
-                  alt={card.alt}
-                  loading={idx < 4 ? "eager" : "lazy"}
-                  decoding="async"
-                  {...stylex.props(styles.cardImg)}
-                />
-              </figure>
-            ))}
+          <div
+            role="region"
+            aria-label="6款核心油脂原料图卡"
+            {...stylex.props(styles.spotlightCardsWrap)}
+          >
+            {FEATURED_PRODUCT.items.map((item, idx) => {
+              const isSelected = activeProductIndex === idx;
+              return (
+                <figure
+                  key={item.id}
+                  onClick={() => setActiveProductIndex(idx)}
+                  onMouseEnter={() => setActiveProductIndex(idx)}
+                  {...stylex.props(styles.cardFigure, isSelected && styles.cardFigureActive)}
+                >
+                  <img
+                    src={item.cardImage}
+                    alt={item.cardAlt}
+                    loading={idx < 3 ? "eager" : "lazy"}
+                    decoding="async"
+                    {...stylex.props(styles.cardImg)}
+                  />
+                  <figcaption
+                    {...stylex.props(styles.cardCaption, isSelected && styles.cardCaptionActive)}
+                  >
+                    <span {...stylex.props(styles.cardNum)}>0{idx + 1}</span>
+                    <span {...stylex.props(styles.cardName)}>{item.name}</span>
+                  </figcaption>
+                </figure>
+              );
+            })}
           </div>
         </div>
       </section>

@@ -3,19 +3,19 @@ export interface Category {
   label: string;
 }
 
-export interface ArtworkCard {
-  src: string;
-  alt: string;
+export interface FeaturedItem {
+  id: string;
+  name: string;
+  englishName: string;
+  desc: string;
+  cardImage: string;
+  cardAlt: string;
 }
 
 export interface FeaturedProduct {
   brand: string;
   tagline: string;
-  products: {
-    name: string;
-    desc: string;
-  }[];
-  cards: ArtworkCard[];
+  items: FeaturedItem[];
   bannerImage: string;
 }
 
@@ -47,31 +47,61 @@ export const CATEGORIES: Category[] = [
   { id: "pet-health", label: "宠物健康" },
 ];
 
-export const FEATURED_CARDS: ArtworkCard[] = [
-  { src: "/products/card-1.png", alt: "天然流体油脂微观羽翼水彩肌理" },
-  { src: "/products/card-2.png", alt: "金黄粉润凝胶光感双重植物油滴" },
-  { src: "/products/card-3.png", alt: "巴西莓富含花青素的深紫超级浆果" },
-  { src: "/products/card-4.png", alt: "鳄梨新鲜剖面与丰富不饱和脂肪酸" },
-  { src: "/products/card-5.png", alt: "天然纯白银莲花草本活性植物花卉" },
-  { src: "/products/card-6.png", alt: "梦幻浅紫蔚蓝流体配方艺术笔触" },
-  { src: "/products/card-7.png", alt: "亚马逊巴西坚果堆叠饱满天然果核" },
-  { src: "/products/card-8.png", alt: "粉桃色丝滑质感油画肌理延展" },
+export const FEATURED_ITEMS: FeaturedItem[] = [
+  {
+    id: "shea-oil",
+    name: "液态乳木果油",
+    englishName: "OLVE'Care™ Shea Oil",
+    desc: "更加全能，突破形态界限，高流动性和铺展性，无需担心高添加量下的结晶问题。",
+    cardImage: "/products/card-1.png",
+    cardAlt: "OLVE'Care™ Shea Oil 液态乳木果油脂流体肌理",
+  },
+  {
+    id: "shea-butter",
+    name: "精制乳木果油",
+    englishName: "OLVE'Care™ Shea Butter",
+    desc: "经典固态版，肤感丝滑丰厚，提供持久封闭锁水与深层滋养屏障。",
+    cardImage: "/products/card-6.png",
+    cardAlt: "OLVE'Care™ Shea Butter 丝滑黄油质地延展",
+  },
+  {
+    id: "acai-oil",
+    name: "巴西莓油",
+    englishName: "Amazon Açai Berry Oil",
+    desc: "冷榨深绿色纯净油体，花青素与多酚含量极高，抗氧化抗糖化，弹润活肤。",
+    cardImage: "/products/card-3.png",
+    cardAlt: "亚马逊深紫巴西莓超级果实多酚油脂",
+  },
+  {
+    id: "avocado-oil",
+    name: "优质鳄梨油",
+    englishName: "Virgin Avocado Oil",
+    desc: "鲜切牛油果冷榨，富含 ω-9 与高含量不皂化物，抗炎修护，强韧屏障。",
+    cardImage: "/products/card-4.png",
+    cardAlt: "鲜切绿皮鳄梨剖面丰富天然单不饱和脂肪酸",
+  },
+  {
+    id: "brazil-nut-oil",
+    name: "巴西坚果油",
+    englishName: "Wild Brazil Nut Oil",
+    desc: "富含天然微量元素硒、维生素 E 与不饱和脂肪酸，赋予毛鳞片镜面光泽。",
+    cardImage: "/products/card-7.png",
+    cardAlt: "亚马逊巴西坚果天然原料果核与滋养油脂",
+  },
+  {
+    id: "plant-squalane",
+    name: "高纯植物角鲨烷",
+    englishName: "Pure Plant Squalane",
+    desc: "100% 植物橄榄来源，极致亲肤丝滑透气无黏腻，与皮肤脂质膜完美相融。",
+    cardImage: "/products/card-2.png",
+    cardAlt: "植物角鲨烷双重光感晶莹凝胶油滴",
+  },
 ];
 
 export const FEATURED_PRODUCT: FeaturedProduct = {
-  brand: "OLVE'Care™ Shea",
-  tagline: "天然全形态乳木果油脂，适配任何配方剂型",
-  products: [
-    {
-      name: "OLVE' Care™ Shea Oil",
-      desc: "更加全能，突破形态界限，高流动性和铺展性，无需担心高添加量下的结晶问题。",
-    },
-    {
-      name: "OLVE' Care™ Shea butter",
-      desc: "经典固态版，肤感丝滑丰厚",
-    },
-  ],
-  cards: FEATURED_CARDS,
+  brand: "OLVE'Care™ & 天然植物油脂",
+  tagline: "天然全形态原料油脂矩阵，1:1 适配专业研发与定制配方",
+  items: FEATURED_ITEMS,
   bannerImage: "/products/banner.png",
 };
 
