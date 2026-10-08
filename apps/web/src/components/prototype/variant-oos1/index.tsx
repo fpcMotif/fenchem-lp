@@ -47,6 +47,7 @@ import { LINKEDIN_PATHS, LOGO_PATHS, WECHAT_PATHS, type VectorPath } from "../va
 import { INTRO_REVEAL_MS, introStyles, useIntro } from "./intro";
 import { LiquidImage } from "./liquid-hero";
 import { AboutView } from "./about-view";
+import { ProductsView } from "./products-view";
 import { useActiveSection } from "./use-active-section";
 import {
   ABOUT,
@@ -1529,12 +1530,16 @@ function useScrolledPastTop() {
   return scrolled;
 }
 
+export type View = "home" | "about" | "products";
+export type AboutPageProps = { onNavigateHome: (hash?: string) => void };
+export type SubPageProps = AboutPageProps;
+
 function SiteHeader({
   currentView,
   onNavigate,
 }: {
-  currentView?: "home" | "about";
-  onNavigate?: (view: "home" | "about", targetId?: string) => void;
+  currentView?: View;
+  onNavigate?: (view: View, targetId?: string) => void;
 }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuId = useId();
@@ -1548,7 +1553,10 @@ function SiteHeader({
     if (href === "#about") {
       return currentView === "about";
     }
-    if (currentView === "about") {
+    if (href === "#products") {
+      return currentView === "products";
+    }
+    if (currentView !== "home") {
       return false;
     }
     return href.slice(1) === activeId;
@@ -1562,21 +1570,26 @@ function SiteHeader({
       setMenuOpen(false);
       return;
     }
+    if (href === "#products") {
+      event.preventDefault();
+      onNavigate("products", "products-top");
+      setMenuOpen(false);
+      return;
+    }
     if (href === "#top") {
-      if (currentView === "about") {
+      if (currentView !== "home") {
         event.preventDefault();
         onNavigate("home", "top");
       }
       setMenuOpen(false);
       return;
     }
-    if (currentView === "about") {
+    if (currentView !== "home") {
       event.preventDefault();
       onNavigate("home", href.slice(1));
       setMenuOpen(false);
     }
   };
-
   return (
     <header
       onKeyDown={closeOnEscape}
@@ -1587,7 +1600,7 @@ function SiteHeader({
           href="#top"
           aria-label="FENCHEM 泛成 首页"
           onClick={(event) => {
-            if (currentView === "about" && onNavigate) {
+            if (currentView !== "home" && onNavigate) {
               event.preventDefault();
               onNavigate("home", "top");
             }
@@ -2122,7 +2135,7 @@ function ProductCard({ product, index }: { product: (typeof PRODUCTS)[number]; i
   );
 }
 
-function Products() {
+function Products({ onOpenProductsPage }: { onOpenProductsPage?: () => void }) {
   return (
     <section
       id="products"
@@ -2137,7 +2150,13 @@ function Products() {
       </RiseReveal>
       <RiseReveal delay={riseDelay(1)} sx={styles.productsCta}>
         <a
-          href={PRODUCTS_INTRO.cta.href}
+          href="#products-top"
+          onClick={(event) => {
+            if (onOpenProductsPage) {
+              event.preventDefault();
+              onOpenProductsPage();
+            }
+          }}
           {...stylex.props(styles.button, styles.buttonPrimary, styles.buttonCompact)}
         >
           {PRODUCTS_INTRO.cta.label}
@@ -2351,11 +2370,7 @@ function ContactCta() {
   );
 }
 
-function SiteFooter({
-  onNavigate,
-}: {
-  onNavigate?: (view: "home" | "about", targetId?: string) => void;
-}) {
+function SiteFooter({ onNavigate }: { onNavigate?: (view: View, targetId?: string) => void }) {
   return (
     <footer {...stylex.props(styles.footer)}>
       <div {...stylex.props(styles.shell, styles.inset120, styles.footerInner)}>
@@ -2377,11 +2392,20 @@ function SiteFooter({
                   {column.links.map((link) => (
                     <li key={link}>
                       <a
-                        href={link === "关于我们" ? "#about-top" : "#top"}
+                        href={
+                          link === "关于我们"
+                            ? "#about-top"
+                            : link === "产品与应用"
+                              ? "#products-top"
+                              : "#top"
+                        }
                         onClick={(event) => {
                           if (link === "关于我们" && onNavigate) {
                             event.preventDefault();
                             onNavigate("about", "about-top");
+                          } else if (link === "产品与应用" && onNavigate) {
+                            event.preventDefault();
+                            onNavigate("products", "products-top");
                           }
                         }}
                         {...stylex.props(styles.footerLink)}
@@ -2412,18 +2436,20 @@ function SiteFooter({
   );
 }
 
-type View = "home" | "about";
-
-export type AboutPageProps = { onNavigateHome: (hash?: string) => void };
-
 const viewFromPage = (page: unknown, startView: View): View =>
-  page === "about" || page === "home" ? page : startView;
+  page === "about" || page === "home"
+    ? page
+    : page === "products" || page === "produces"
+      ? "products"
+      : startView;
 
 export function VariantOOS1({
   AboutPage = AboutView,
+  ProductsPage = ProductsView,
   startView = "home",
 }: {
-  AboutPage?: ComponentType<AboutPageProps>;
+  AboutPage?: ComponentType<SubPageProps>;
+  ProductsPage?: ComponentType<SubPageProps>;
   startView?: View;
 }) {
   preinit(GOOGLE_FONTS, { as: "style" });
@@ -2487,14 +2513,20 @@ export function VariantOOS1({
           <div {...stylex.props(styles.page, intro === "play" && introStyles.pageReveal)}>
             <main id="main-content" tabIndex={-1} {...stylex.props(styles.mainTarget)}>
               {view === "about" ? (
-                <AboutPage onNavigateHome={(target) => handleNavigate("home", target)} />
+                <AboutPage
+                  onNavigateHome={(target) =>
+                    handleNavigate(target === "products" ? "products" : "home", target)
+                  }
+                />
+              ) : view === "products" ? (
+                <ProductsPage onNavigateHome={(target) => handleNavigate("home", target)} />
               ) : (
                 <>
                   <Hero />
                   <About onOpenAboutPage={() => handleNavigate("about", "about-top")} />
                   <Campus />
                   <Strengths />
-                  <Products />
+                  <Products onOpenProductsPage={() => handleNavigate("products", "products-top")} />
                   <Offices />
                   <News />
                   <ContactCta />

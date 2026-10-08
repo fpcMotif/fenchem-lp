@@ -9,7 +9,7 @@
     "catalog": {
       "dotenv": "^17.2.2",
       "zod": "^4.5.4",
-      "typescript": "^6",
+      "typescript": "^7.1.0-dev.20261007.1",
       "next-themes": "^0.4.6",
       "react": "^19.2.6",
       "react-dom": "^19.2.6",
@@ -25,8 +25,9 @@
   "scripts": {
     "dev": "vp run -r dev",
     "build": "vp run -r build",
-    "check-types": "vp run -r check-types",
-    "check": "oxlint && oxfmt --write && bun scripts/check-stylex-types.ts",
+    "check-types": "bun check -p packages/ui && bun check -p apps/web",
+    "typecheck": "bun check -p packages/ui && bun check -p apps/web",
+    "check:lint": "oxlint && oxfmt --write && bun scripts/check-stylex-types.ts",
     "check:stylex": "bun scripts/check-stylex-types.ts",
     "lint": "vp lint",
     "format": "vp fmt",

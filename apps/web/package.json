@@ -3,6 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "check-types": "bun check",
     "build": "vp build",
     "serve": "vp preview",
     "dev": "vp dev",

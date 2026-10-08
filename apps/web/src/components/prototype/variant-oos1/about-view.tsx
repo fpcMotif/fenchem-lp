@@ -1,19 +1,8 @@
 import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import {
-  ArrowRight,
-  Award,
-  Building2,
-  ChevronDown,
-  ChevronLeft,
-  ChevronRight,
-  Factory,
-  Leaf,
-  Recycle,
-  X,
-} from "lucide-react";
+import { ArrowRight, ChevronLeft, ChevronRight, Factory, Leaf, Recycle, X } from "lucide-react";
 import { animate, m, useInView, useScroll, useTransform } from "motion/react";
-import { type ReactNode, useEffect, useId, useRef, useState } from "react";
+import { type ReactNode, useEffect, useRef, useState } from "react";
 
 import { EASE } from "@/components/prototype/motion-constants";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
@@ -24,12 +13,12 @@ import {
   ABOUT_CSR,
   ABOUT_CULTURE,
   ABOUT_HERO,
-  ABOUT_HONORS,
   ABOUT_MOMENT,
-  ABOUT_STRUCTURE,
 } from "./about-data";
 import { CTA, STATS } from "./content";
 import { useActiveSection } from "./use-active-section";
+import { Profile as ProfileOOS1G } from "./abouts/oos1g/profile";
+import { NavyBand } from "./abouts/oos1c/navy-band";
 
 const INK = "#1a1a1a";
 const BODY_TEXT = "#4d4d4d";
@@ -40,17 +29,14 @@ const DISPLAY_FONT = '"Inter Tight", "Helvetica Neue", Arial, sans-serif';
 const SERIF_ACCENT = '"Instrument Serif", Georgia, serif';
 const SURFACE = "#f6f6f6";
 const PAPER_WARM = "#faf8f4";
-const FOOTER_BLUE = "#294f92";
 const CSR_ACCENT = "#8cd6a3";
 const NAVY_SCRIM = "rgba(6, 28, 66, 0.78)";
 const PHOTO_OUTLINE = "rgba(0, 0, 0, 0.1)";
 const HAIRLINE = "rgba(26, 26, 26, 0.1)";
-const BRANCH_LINE = "rgba(41, 79, 146, 0.28)";
 const GRAIN = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`;
 const TABLET = "@media (min-width: 768px) and (max-width: 1279.98px)";
 const DESKTOP = breakpoints.xl;
 const SM_BELOW_DESKTOP = "@media (min-width: 640px) and (max-width: 1279.98px)";
-const SM_BELOW_LG = "@media (min-width: 640px) and (max-width: 1023.98px)";
 const HOVER_MOTION =
   "@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)";
 const EASE_OUT_CSS = "cubic-bezier(0.22, 1, 0.36, 1)";
@@ -66,12 +52,6 @@ const SECTION_IDS = ABOUT_HERO.navChips.map((chip) => chip.id);
 
 const revealDelay = (index: number) => Math.min(index, REVEAL_MAX_STEPS) * REVEAL_STEP_MS;
 const easeOutCubic = (t: number) => 1 - (1 - Math.min(1, Math.max(0, t))) ** 3;
-
-const LEVEL_LABEL = {
-  national: "国家级",
-  provincial: "江苏省级",
-  municipal: "南京市级",
-} as const;
 
 const CSR_ICONS = {
   factory: Factory,
@@ -92,11 +72,6 @@ const scrollCue = stylex.keyframes({
 const fadeIn = stylex.keyframes({
   "0%": { opacity: 0 },
   "100%": { opacity: 1 },
-});
-
-const fadeRise = stylex.keyframes({
-  "0%": { opacity: 0, transform: "translateY(8px)" },
-  "100%": { opacity: 1, transform: "none" },
 });
 
 const zoomIn = stylex.keyframes({
@@ -369,106 +344,6 @@ const styles = stylex.create({
     lineHeight: 1.2,
     color: INK,
     textWrap: "balance",
-  },
-
-  profileSection: {
-    paddingBlock: { default: 72, [DESKTOP]: 128 },
-    backgroundColor: colors.paper,
-  },
-  profileGrid: {
-    display: "grid",
-    gridTemplateColumns: { default: "1fr", [DESKTOP]: "minmax(0, 1fr) minmax(0, 1fr)" },
-    gap: { default: 40, [DESKTOP]: 96 },
-    alignItems: "center",
-  },
-  profileText: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 32,
-  },
-  profileTitle: {
-    margin: 0,
-    fontSize: { default: 26, [TABLET]: 32, [DESKTOP]: 38 },
-    fontWeight: 800,
-    lineHeight: 1.3,
-    letterSpacing: "0.02em",
-    color: INK,
-    textWrap: "balance",
-  },
-  profileEnglish: {
-    marginTop: 10,
-    fontFamily: DISPLAY_FONT,
-    fontSize: { default: 15, [DESKTOP]: 17 },
-    fontWeight: 500,
-    letterSpacing: "0.02em",
-    color: BODY_TEXT,
-  },
-  profileLead: {
-    margin: 0,
-    maxWidth: 560,
-    fontSize: { default: 16, [DESKTOP]: 17 },
-    lineHeight: 2,
-    letterSpacing: "0.04em",
-    color: INK,
-  },
-  network: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 14,
-  },
-  networkLabel: {
-    margin: 0,
-    fontSize: 14,
-    fontWeight: 600,
-    letterSpacing: "0.06em",
-    color: BODY_TEXT,
-  },
-  countryList: {
-    display: "flex",
-    flexWrap: "wrap",
-    alignItems: "center",
-    gap: 8,
-    maxWidth: 560,
-    margin: 0,
-    padding: 0,
-    listStyle: "none",
-  },
-  countryTag: {
-    paddingBlock: 6,
-    paddingInline: 14,
-    borderRadius: 999,
-    backgroundColor: SURFACE,
-    fontSize: 13,
-    fontWeight: 500,
-    letterSpacing: "0.06em",
-    color: INK,
-  },
-  countryMore: {
-    fontSize: 13,
-    letterSpacing: "0.06em",
-    color: BODY_TEXT,
-  },
-  profileFigure: {
-    position: "relative",
-    overflow: "hidden",
-    margin: 0,
-    borderRadius: 16,
-    aspectRatio: { default: "4 / 3", [DESKTOP]: "5 / 4" },
-    boxShadow: "0 24px 48px -24px rgba(7, 67, 174, 0.28)",
-  },
-  photoTag: {
-    position: "absolute",
-    insetInlineStart: 16,
-    bottom: 16,
-    paddingBlock: 6,
-    paddingInline: 14,
-    borderRadius: 999,
-    backgroundColor: "rgba(255, 255, 255, 0.9)",
-    backdropFilter: "blur(8px)",
-    fontSize: 13,
-    fontWeight: 600,
-    letterSpacing: "0.08em",
-    color: INK,
   },
 
   moment: {
@@ -866,219 +741,6 @@ const styles = stylex.create({
     color: CSR_ACCENT,
   },
 
-  honorsSection: {
-    paddingBlock: { default: 72, [DESKTOP]: 128 },
-    backgroundColor: SURFACE,
-  },
-  honorsGrid: {
-    display: "grid",
-    gridTemplateColumns: {
-      default: "1fr",
-      [SM_BELOW_LG]: "repeat(2, minmax(0, 1fr))",
-      [breakpoints.lg]: "repeat(4, minmax(0, 1fr))",
-    },
-    gap: { default: 12, [breakpoints.md]: 20 },
-  },
-  honorCard: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    gap: 12,
-    height: "100%",
-    boxSizing: "border-box",
-    padding: { default: "28px 20px", [DESKTOP]: "40px 24px 36px" },
-    borderRadius: 12,
-    backgroundColor: colors.paper,
-    textAlign: "center",
-    boxShadow: "0 0 0 1px rgba(0, 0, 0, 0.05), 0 16px 32px -24px rgba(7, 67, 174, 0.3)",
-  },
-  honorEmblem: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    width: 52,
-    height: 52,
-    marginBottom: 12,
-    borderRadius: "50%",
-    backgroundColor: TINT,
-    color: colors.brandBlue700,
-    boxShadow: `0 0 0 5px ${colors.paper}, 0 0 0 6px rgba(7, 67, 174, 0.16)`,
-  },
-  honorEmblemNational: {
-    backgroundColor: colors.brandBlue700,
-    color: colors.paper,
-  },
-  honorLevel: {
-    fontSize: 12,
-    fontWeight: 600,
-    letterSpacing: "0.14em",
-    color: colors.brandBlue700,
-  },
-  honorTitle: {
-    margin: 0,
-    fontSize: 17,
-    fontWeight: 700,
-    lineHeight: 1.5,
-    letterSpacing: "0.06em",
-    color: INK,
-    textWrap: "balance",
-  },
-
-  structureSection: {
-    paddingBlock: { default: 72, [DESKTOP]: 128 },
-    backgroundColor: colors.paper,
-  },
-  holdingCard: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 10,
-    padding: { default: 28, [DESKTOP]: 40 },
-    borderRadius: 16,
-    backgroundColor: FOOTER_BLUE,
-    backgroundImage:
-      "radial-gradient(70% 140% at 100% 0%, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 60%)",
-    color: colors.paper,
-    boxShadow: "0 16px 40px -16px rgba(41, 79, 146, 0.4)",
-  },
-  holdingBadge: {
-    alignSelf: "flex-start",
-    paddingBlock: 4,
-    paddingInline: 10,
-    borderRadius: 4,
-    backgroundColor: "rgba(255, 255, 255, 0.18)",
-    fontSize: 12,
-    fontWeight: 600,
-    letterSpacing: "0.08em",
-  },
-  holdingTitle: {
-    margin: 0,
-    fontSize: { default: 22, [DESKTOP]: 28 },
-    fontWeight: 800,
-    lineHeight: 1.3,
-    letterSpacing: "0.04em",
-  },
-  holdingEnglish: {
-    fontFamily: DISPLAY_FONT,
-    fontSize: 14,
-    fontWeight: 500,
-    letterSpacing: "0.02em",
-    opacity: 0.8,
-  },
-  branchList: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 12,
-    margin: 0,
-    paddingTop: 24,
-    paddingBottom: 0,
-    paddingInlineStart: { default: 28, [breakpoints.md]: 56 },
-    paddingInlineEnd: 0,
-    listStyle: "none",
-  },
-  branchItem: {
-    position: "relative",
-  },
-  branchTrunk: {
-    position: "absolute",
-    insetInlineStart: { default: -17, [breakpoints.md]: -29 },
-    top: -12,
-    bottom: 0,
-    width: 2,
-    backgroundColor: BRANCH_LINE,
-  },
-  branchTrunkFirst: {
-    top: -24,
-  },
-  branchTrunkLast: {
-    bottom: "50%",
-  },
-  branchTick: {
-    position: "absolute",
-    insetInlineStart: { default: -17, [breakpoints.md]: -29 },
-    top: "50%",
-    width: { default: 17, [breakpoints.md]: 29 },
-    height: 2,
-    backgroundColor: BRANCH_LINE,
-  },
-  branchNode: {
-    position: "absolute",
-    zIndex: 1,
-    insetInlineStart: -4,
-    top: "50%",
-    width: 8,
-    height: 8,
-    marginTop: -3,
-    boxSizing: "border-box",
-    borderRadius: "50%",
-    borderWidth: 2,
-    borderStyle: "solid",
-    borderColor: FOOTER_BLUE,
-    backgroundColor: colors.paper,
-  },
-  branchCard: {
-    display: "flex",
-    flexDirection: { default: "column", [breakpoints.md]: "row" },
-    alignItems: { default: "flex-start", [breakpoints.md]: "center" },
-    gap: { default: 6, [breakpoints.md]: 20 },
-    padding: { default: "16px 20px", [breakpoints.md]: "20px 28px" },
-    borderRadius: 12,
-    backgroundColor: SURFACE,
-  },
-  branchBadge: {
-    flexShrink: 0,
-    fontSize: 12,
-    fontWeight: 600,
-    letterSpacing: "0.06em",
-    color: colors.brandBlue700,
-  },
-  branchName: {
-    margin: 0,
-    fontSize: 17,
-    fontWeight: 700,
-    lineHeight: 1.4,
-    letterSpacing: "0.04em",
-    color: INK,
-  },
-  branchEnglish: {
-    marginInlineStart: { default: 0, [breakpoints.md]: "auto" },
-    fontFamily: DISPLAY_FONT,
-    fontSize: 13,
-    fontWeight: 500,
-    letterSpacing: "0.02em",
-    color: BODY_TEXT,
-  },
-  diagramToggleWrap: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    gap: 28,
-    marginTop: 56,
-  },
-  toggleIcon: {
-    transitionProperty: "transform",
-    transitionDuration: "200ms",
-    transitionTimingFunction: EASE_OUT_CSS,
-  },
-  toggleIconOpen: {
-    transform: "rotate(180deg)",
-  },
-  diagramFrame: {
-    width: "100%",
-    maxWidth: 960,
-    overflow: "hidden",
-    borderRadius: 16,
-    backgroundColor: SURFACE,
-    boxShadow: "0 8px 30px rgba(0, 0, 0, 0.06)",
-    animationName: { default: fadeIn, [breakpoints.motionOk]: fadeRise },
-    animationDuration: "260ms",
-    animationTimingFunction: EASE_OUT_CSS,
-  },
-  diagramImg: {
-    display: "block",
-    width: "100%",
-    height: "auto",
-  },
-
   ctaBanner: {
     position: "relative",
     overflow: "hidden",
@@ -1147,11 +809,6 @@ const styles = stylex.create({
   },
   buttonSecondary: {
     backgroundColor: { default: colors.paper, ":hover": SURFACE },
-    color: colors.brandBlue700,
-  },
-  buttonOutline: {
-    backgroundColor: { default: "transparent", ":hover": TINT },
-    boxShadow: `inset 0 0 0 1px ${colors.brandBlue700}`,
     color: colors.brandBlue700,
   },
 });
@@ -1554,9 +1211,6 @@ function SubNav({ onNavigateHome }: { onNavigateHome: (hash?: string) => void })
 }
 
 export function AboutView({ onNavigateHome }: { onNavigateHome: (hash?: string) => void }) {
-  const [showDiagram, setShowDiagram] = useState(false);
-  const diagramId = useId();
-
   return (
     <div id="about-top" {...stylex.props(styles.root)}>
       <section aria-labelledby="about-banner-title" {...stylex.props(styles.banner)}>
@@ -1592,48 +1246,7 @@ export function AboutView({ onNavigateHome }: { onNavigateHome: (hash?: string) 
 
       <SubNav onNavigateHome={onNavigateHome} />
 
-      <section
-        id="about-profile"
-        aria-labelledby="about-profile-title"
-        {...stylex.props(styles.profileSection, styles.anchor)}
-      >
-        <div {...stylex.props(styles.shell, styles.inset124, styles.profileGrid)}>
-          <Reveal sx={styles.profileText}>
-            <div>
-              <h2 id="about-profile-title" {...stylex.props(styles.profileTitle)}>
-                {ABOUT_HERO.title}
-              </h2>
-              <div lang="en" {...stylex.props(styles.profileEnglish)}>
-                {ABOUT_HERO.englishTitle}
-              </div>
-            </div>
-            <p {...stylex.props(styles.profileLead)}>{ABOUT_HERO.lead}</p>
-            <div {...stylex.props(styles.network)}>
-              <p {...stylex.props(styles.networkLabel)}>{ABOUT_HERO.networkLabel}</p>
-              <ul {...stylex.props(styles.countryList)}>
-                {ABOUT_HERO.countries.map((country) => (
-                  <li key={country} {...stylex.props(styles.countryTag)}>
-                    {country}
-                  </li>
-                ))}
-                <li {...stylex.props(styles.countryMore)}>等地</li>
-              </ul>
-            </div>
-          </Reveal>
-          <Reveal step={2}>
-            <figure {...stylex.props(styles.profileFigure, styles.photoOutline)}>
-              <img
-                src={ABOUT_HERO.lobbyImage}
-                alt="泛成总部大堂，弧形吊顶与大理石地面"
-                loading="lazy"
-                decoding="async"
-                {...stylex.props(styles.fill)}
-              />
-              <figcaption {...stylex.props(styles.photoTag)}>{ABOUT_HERO.lobbyCaption}</figcaption>
-            </figure>
-          </Reveal>
-        </div>
-      </section>
+      <ProfileOOS1G />
 
       <CampusMoment />
 
@@ -1669,105 +1282,7 @@ export function AboutView({ onNavigateHome }: { onNavigateHome: (hash?: string) 
 
       <CsrSection />
 
-      <section
-        id="about-honor"
-        aria-labelledby="about-honor-title"
-        {...stylex.props(styles.honorsSection, styles.anchor)}
-      >
-        <div {...stylex.props(styles.shell, styles.inset124)}>
-          <SectionHeader title={ABOUT_HONORS.title} titleId="about-honor-title" />
-          <div {...stylex.props(styles.honorsGrid)}>
-            {ABOUT_HONORS.items.map((honor, idx) => (
-              <Reveal key={honor.id} step={idx % 4}>
-                <article {...stylex.props(styles.honorCard)}>
-                  <span
-                    aria-hidden="true"
-                    {...stylex.props(
-                      styles.honorEmblem,
-                      honor.level === "national" && styles.honorEmblemNational,
-                    )}
-                  >
-                    <Award size={24} strokeWidth={1.5} />
-                  </span>
-                  <span {...stylex.props(styles.honorLevel)}>{LEVEL_LABEL[honor.level]}</span>
-                  <h3 {...stylex.props(styles.honorTitle)}>{honor.title}</h3>
-                </article>
-              </Reveal>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section
-        id="about-structure"
-        aria-labelledby="about-structure-title"
-        {...stylex.props(styles.structureSection, styles.anchor)}
-      >
-        <div {...stylex.props(styles.shell, styles.inset124)}>
-          <SectionHeader title={ABOUT_STRUCTURE.title} titleId="about-structure-title" />
-
-          <Reveal sx={styles.holdingCard}>
-            <span {...stylex.props(styles.holdingBadge)}>{ABOUT_STRUCTURE.holding.badge}</span>
-            <h3 {...stylex.props(styles.holdingTitle)}>{ABOUT_STRUCTURE.holding.name}</h3>
-            <div lang="en" {...stylex.props(styles.holdingEnglish)}>
-              {ABOUT_STRUCTURE.holding.english}
-            </div>
-          </Reveal>
-
-          <ul aria-label={ABOUT_STRUCTURE.subsidiaryBadge} {...stylex.props(styles.branchList)}>
-            {ABOUT_STRUCTURE.subsidiaries.map((sub, idx, all) => (
-              <Reveal key={sub.id} as="li" step={idx} sx={styles.branchItem}>
-                <span
-                  aria-hidden="true"
-                  {...stylex.props(
-                    styles.branchTrunk,
-                    idx === 0 && styles.branchTrunkFirst,
-                    idx === all.length - 1 && styles.branchTrunkLast,
-                  )}
-                />
-                <span aria-hidden="true" {...stylex.props(styles.branchTick)} />
-                <span aria-hidden="true" {...stylex.props(styles.branchNode)} />
-                <div {...stylex.props(styles.branchCard)}>
-                  <span {...stylex.props(styles.branchBadge)}>
-                    {ABOUT_STRUCTURE.subsidiaryBadge}
-                  </span>
-                  <h4 {...stylex.props(styles.branchName)}>{sub.name}</h4>
-                  <span lang="en" {...stylex.props(styles.branchEnglish)}>
-                    {sub.english}
-                  </span>
-                </div>
-              </Reveal>
-            ))}
-          </ul>
-
-          <div {...stylex.props(styles.diagramToggleWrap)}>
-            <button
-              type="button"
-              aria-expanded={showDiagram}
-              aria-controls={diagramId}
-              onClick={() => setShowDiagram((prev) => !prev)}
-              {...stylex.props(styles.button, styles.buttonOutline, styles.focusRing)}
-            >
-              <Building2 size={16} aria-hidden="true" />
-              <span>{showDiagram ? "收起组织架构图" : "查看官方组织架构图"}</span>
-              <ChevronDown
-                size={16}
-                aria-hidden="true"
-                {...stylex.props(styles.toggleIcon, showDiagram && styles.toggleIconOpen)}
-              />
-            </button>
-            <div id={diagramId} hidden={!showDiagram} {...stylex.props(styles.diagramFrame)}>
-              <img
-                src={ABOUT_STRUCTURE.chartImage}
-                alt="南京泛成国际控股有限公司官方组织架构图"
-                loading="lazy"
-                decoding="async"
-                {...stylex.props(styles.diagramImg)}
-              />
-            </div>
-          </div>
-        </div>
-      </section>
+      <NavyBand />
 
       <section aria-labelledby="about-cta-title" {...stylex.props(styles.ctaBanner)}>
         <span aria-hidden="true" lang="en" {...stylex.props(styles.ctaWord)}>
