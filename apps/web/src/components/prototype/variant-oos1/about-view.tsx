@@ -480,8 +480,8 @@ const styles = stylex.create({
   },
   campusCaption: {
     position: "absolute",
-    left: 0,
-    bottom: 0,
+    insetInlineStart: 0,
+    insetBlockEnd: 0,
     width: "100%",
     boxSizing: "border-box",
     padding: { default: "36px 12px 12px", [breakpoints.md]: "56px 20px 18px" },

@@ -19,7 +19,7 @@ import {
 
 const INK = "#1a1a1a";
 const BODY_TEXT = "#4d4d4d";
-const MUTED_LABEL = "#71717a";
+const MUTED_LABEL = "#52525b";
 const SURFACE = "#f6f7f9";
 const TAB_ACTIVE_BG = "#584a75";
 const TAB_INACTIVE_BG = "#edeef2";
@@ -84,9 +84,8 @@ const styles = stylex.create({
   },
   bannerScrim: {
     position: "absolute",
-    left: 0,
-    right: 0,
-    bottom: 0,
+    insetInline: 0,
+    insetBlockEnd: 0,
     height: "28%",
     backgroundImage:
       "linear-gradient(to top, rgba(255, 255, 255, 0.45) 0%, rgba(255, 255, 255, 0) 100%)",
@@ -114,6 +113,11 @@ const styles = stylex.create({
     fontSize: 13,
     fontFamily: "inherit",
     textDecoration: "none",
+    outlineStyle: { default: "none", ":focus-visible": "solid" },
+    outlineWidth: 2,
+    outlineColor: TAB_ACTIVE_BG,
+    outlineOffset: 2,
+    borderRadius: 4,
     ":hover": {
       color: INK,
     },
@@ -142,9 +146,13 @@ const styles = stylex.create({
     fontSize: { default: 13, [DESKTOP]: 14 },
     fontWeight: 500,
     cursor: "pointer",
-    transitionProperty: "background-color, color, transform",
+    transitionProperty: "background-color, color, transform, box-shadow",
     transitionDuration: "180ms",
     transitionTimingFunction: "ease-out",
+    outlineStyle: { default: "none", ":focus-visible": "solid" },
+    outlineWidth: 2,
+    outlineColor: TAB_ACTIVE_BG,
+    outlineOffset: 2,
   },
   tabActive: {
     backgroundColor: TAB_ACTIVE_BG,
@@ -223,14 +231,14 @@ const styles = stylex.create({
   },
 
   section: {
-    paddingTop: { default: 48, [DESKTOP]: 64 },
-    paddingBottom: { default: 64, [DESKTOP]: 96 },
+    paddingTop: { default: 56, [TABLET]: 72, [DESKTOP]: 88 },
+    paddingBottom: { default: 56, [TABLET]: 72, [DESKTOP]: 88 },
     scrollMarginTop: 96,
   },
   sectionDivider: {
     borderTopWidth: 1,
     borderTopStyle: "solid",
-    borderTopColor: "rgba(0, 0, 0, 0.08)",
+    borderTopColor: "rgba(0, 0, 0, 0.05)",
   },
   sectionTitle: {
     margin: 0,
@@ -239,6 +247,30 @@ const styles = stylex.create({
     fontWeight: 700,
     letterSpacing: "0.02em",
     color: INK,
+  },
+  categoryBanner: {
+    display: "flex",
+    alignItems: "center",
+    gap: 12,
+    marginBottom: 24,
+    paddingBlock: 10,
+    paddingInline: 16,
+    borderRadius: 10,
+    backgroundColor: "#f5f3f7",
+  },
+  categoryPill: {
+    fontSize: 12,
+    fontWeight: 600,
+    letterSpacing: "0.04em",
+    color: TAB_ACTIVE_BG,
+    backgroundColor: "rgba(88, 74, 117, 0.12)",
+    paddingBlock: 3,
+    paddingInline: 10,
+    borderRadius: 999,
+  },
+  categoryDesc: {
+    fontSize: 13,
+    color: BODY_TEXT,
   },
   accordionList: {
     display: "flex",
@@ -271,6 +303,10 @@ const styles = stylex.create({
     textAlign: "start",
     fontFamily: "inherit",
     color: INK,
+    outlineStyle: { default: "none", ":focus-visible": "solid" },
+    outlineWidth: 2,
+    outlineColor: TAB_ACTIVE_BG,
+    outlineOffset: -2,
   },
   triggerTitle: {
     margin: 0,
@@ -631,12 +667,21 @@ export function ProductsView({
         </div>
       </section>
 
-      {}
       <section
         id="products-catalog"
         aria-labelledby="catalog-title"
         {...stylex.props(styles.shell, styles.inset, styles.section, styles.sectionDivider)}
       >
+        <div {...stylex.props(styles.categoryBanner)}>
+          <span {...stylex.props(styles.categoryPill)}>
+            {CATEGORIES.find((c) => c.id === activeTab)?.label}
+          </span>
+          <span {...stylex.props(styles.categoryDesc)}>
+            {activeTab === "personal-care"
+              ? "精选个人护理全形态天然油脂与经典功效配方方案"
+              : `${CATEGORIES.find((c) => c.id === activeTab)?.label}核心原料与应用定制方案`}
+          </span>
+        </div>
         <h2 id="catalog-title" {...stylex.props(styles.sectionTitle)}>
           产品目录
         </h2>
