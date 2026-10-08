@@ -24,6 +24,9 @@ const styles = stylex.create({
     zIndex: 9999,
     display: "flex",
     alignItems: "center",
+    flexWrap: "wrap",
+    width: "max-content",
+    maxWidth: "calc(100vw - 2rem)",
     gap: "0.25rem",
     borderRadius: radii.full,
     borderWidth: "1px",
@@ -58,7 +61,9 @@ const styles = stylex.create({
     },
   },
   label: {
-    minWidth: "16rem",
+    flex: 1,
+    minWidth: 0,
+    maxWidth: "24rem",
     userSelect: "none",
     textAlign: "center",
     letterSpacing: "0.025em",
@@ -67,26 +72,51 @@ const styles = stylex.create({
     width: "1rem",
     height: "1rem",
   },
+  comparison: {
+    flexBasis: "100%",
+    minWidth: 0,
+    padding: "0.375rem",
+    borderRadius: radii.full,
+    color: "#ffffff",
+    backgroundColor: "#18181b",
+    font: "inherit",
+  },
 });
 
-export function PrototypeSwitcher({ current }: { current: VariantKey }) {
+const PRODUCT_VARIANTS = VARIANTS.filter((variant) => /^oos1p[a-t]$/.test(variant.key));
+
+export function PrototypeSwitcher({
+  current,
+  compare,
+}: {
+  current: VariantKey;
+  compare?: "baseline" | "catalog" | "solutions";
+}) {
   const navigate = useNavigate({ from: "/" });
+  const isProductVariant = PRODUCT_VARIANTS.some((variant) => variant.key === current);
 
   const step = useCallback(
     (dir: 1 | -1) => {
-      const i = VARIANTS.findIndex((v) => v.key === current);
-      const nextEntry = VARIANTS[(i + dir + VARIANTS.length) % VARIANTS.length];
+      const variants = compare && isProductVariant ? PRODUCT_VARIANTS : VARIANTS;
+      const i = variants.findIndex((v) => v.key === current);
+      const nextEntry = variants[(i + dir + variants.length) % variants.length];
       if (nextEntry) {
-        void navigate({ search: { variant: nextEntry.key }, replace: true });
+        void navigate({ search: { variant: nextEntry.key, compare }, replace: true });
       }
     },
-    [current, navigate],
+    [current, compare, isProductVariant, navigate],
   );
 
   useEffect(() => {
+    if (import.meta.env.PROD) return;
     const onKey = (e: KeyboardEvent) => {
+      if (e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
       const t = e.target as HTMLElement | null;
-      if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.isContentEditable)) {
+      if (
+        t &&
+        (t.isContentEditable ||
+          t.closest("input, textarea, select, button, a, [contenteditable], [role], [tabindex]"))
+      ) {
         return;
       }
       if (e.key === "ArrowLeft") step(-1);
@@ -122,6 +152,32 @@ export function PrototypeSwitcher({ current }: { current: VariantKey }) {
       >
         <ChevronRight {...stylex.props(styles.icon)} />
       </button>
+      {isProductVariant && (
+        <select
+          aria-label="Product comparison"
+          value={compare ?? "combined"}
+          onChange={(event) => {
+            const value = event.target.value;
+            void navigate({
+              search: (previous) => ({
+                ...previous,
+                compare:
+                  value === "baseline" || value === "catalog" || value === "solutions"
+                    ? value
+                    : undefined,
+              }),
+              replace: true,
+              resetScroll: false,
+            });
+          }}
+          {...stylex.props(styles.comparison)}
+        >
+          <option value="combined">Combined design</option>
+          <option value="baseline">OOS1 baseline</option>
+          <option value="catalog">Catalog only · baseline solutions</option>
+          <option value="solutions">Solutions only · baseline catalog</option>
+        </select>
+      )}
     </div>
   );
 }

@@ -21,23 +21,29 @@ import {
 export const Route = createFileRoute("/")({
   validateSearch: (
     search: Record<string, string | undefined>,
-  ): { variant: VariantKey; page?: string } => {
+  ): { variant: VariantKey; page?: string; compare?: "baseline" | "catalog" | "solutions" } => {
     const v = search.variant;
     return {
       variant: VARIANT_KEYS.includes(v as VariantKey) ? (v as VariantKey) : DEFAULT_VARIANT,
       page: search.page,
+      compare:
+        search.compare === "baseline" ||
+        search.compare === "catalog" ||
+        search.compare === "solutions"
+          ? search.compare
+          : undefined,
     };
   },
   component: HomeComponent,
 });
 
 function HomeComponent() {
-  const { variant } = Route.useSearch();
+  const { variant, compare } = Route.useSearch();
   const Active = VARIANTS.find((v) => v.key === variant)?.Component;
   return (
     <>
       <Suspense fallback={null}>{Active ? <Active /> : null}</Suspense>
-      <PrototypeSwitcher current={variant} />
+      <PrototypeSwitcher current={variant} compare={compare} />
     </>
   );
 }

@@ -43,6 +43,9 @@ export const CTA = {
   title: "一起开启下一个突破",
 } as const;
 
+export const PRODUCTS_CTA_SUBTITLE =
+  "需要样品、技术资料或定制配方？我们的应用团队随时为您提供支持。";
+
 export const PRODUCTS_INTRO = {
   ...FIGMA_PRODUCTS_INTRO,
   cta: { label: "查看全部产品", href: "#product-list" },

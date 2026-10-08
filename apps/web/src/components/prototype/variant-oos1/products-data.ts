@@ -22,22 +22,27 @@ export interface FeaturedProduct {
 export interface CatalogItem {
   id: string;
   title: string;
-  category: string;
   inci: string;
   features: string;
-  applications: string;
-  origin: string;
+}
+
+export interface CatalogGroup {
+  id: string;
+  label: string;
+  intro?: string;
+  items: CatalogItem[];
 }
 
 export interface SolutionItem {
   id: string;
   title: string;
   subtitle: string;
-  overview: string;
+  overview: string[];
   functions: string[];
   keyIngredients: string[];
-  texture: string;
-  applications: string;
+  challenges: string[];
+  texture: string[];
+  applications: string[];
 }
 
 export const CATEGORIES: Category[] = [
@@ -52,15 +57,15 @@ export const FEATURED_ITEMS: FeaturedItem[] = [
     id: "shea-oil",
     name: "液态乳木果油",
     englishName: "OLVE'Care™ Shea Oil",
-    desc: "更加全能，突破形态界限，高流动性和铺展性，无需担心高添加量下的结晶问题。",
+    desc: "更加全能，突破形态界限。高流动性和铺展性，无需担心高添加量下的结晶问题。",
     cardImage: "/products/card-1.png",
     cardAlt: "OLVE'Care™ Shea Oil 液态乳木果油脂流体肌理",
   },
   {
     id: "shea-butter",
     name: "精制乳木果油",
-    englishName: "OLVE'Care™ Shea Butter",
-    desc: "经典固态版，肤感丝滑丰厚，提供持久封闭锁水与深层滋养屏障。",
+    englishName: "OLVE'Care™ Shea butter",
+    desc: "经典固态版，肤感丝滑丰厚",
     cardImage: "/products/card-6.png",
     cardAlt: "OLVE'Care™ Shea Butter 丝滑黄油质地延展",
   },
@@ -99,242 +104,542 @@ export const FEATURED_ITEMS: FeaturedItem[] = [
 ];
 
 export const FEATURED_PRODUCT: FeaturedProduct = {
-  brand: "OLVE'Care™ & 天然植物油脂",
-  tagline: "天然全形态原料油脂矩阵，1:1 适配专业研发与定制配方",
+  brand: "OLVE'Care™ Shea",
+  tagline: "天然全形态乳木果油脂，适配任何配方剂型",
   items: FEATURED_ITEMS,
   bannerImage: "/products/banner.png",
 };
 
-export const CATALOG_ITEMS: CatalogItem[] = [
+export const CATALOG_GROUPS: CatalogGroup[] = [
   {
-    id: "murumuru",
-    title: "木鲁星果棕籽脂 (Astrocaryum Murumuru Seed Butter)",
-    category: "巴西拉美天然植物油脂",
-    inci: "木鲁星果棕（ASTROCARYUM MURUMURU）籽脂",
-    features:
-      "亚马逊雨林来源，中短链脂肪酸丰富，熔点接近肤温，质地较乳木果油偏硬，具有天然硅感，气息怡人。",
-    applications: "护肤霜膏、唇部护理、发膜、天然护发素",
-    origin: "巴西亚马逊雨林可持续采集",
+    id: "brazil",
+    label: "巴西拉美天然植物油脂",
+    items: [
+      {
+        id: "brazil-01",
+        title: "木鲁星果棕籽脂",
+        inci: "木鲁星果棕（ASTROCARYUM MURUMURU）籽脂",
+        features:
+          "亚马逊雨林来源，中短链脂肪酸丰富，熔点接近肤温，质地较乳木果油偏硬，具有天然硅感，气息怡人。",
+      },
+      {
+        id: "brazil-02",
+        title: "大花可可树籽脂",
+        inci: "大花可可树（THEOBROMA GRANDIFLORUM）籽脂",
+        features: "源自亚马逊古布阿苏种子，硬脂酸、油酸含量高，触肤即融，赋予产品丝滑融化质感。",
+      },
+      {
+        id: "brazil-03",
+        title: "科拜巴脂",
+        inci: "古巴香胶树（COPAIFERA OFFICINALIS）树脂",
+        features:
+          "亚马逊香脂树树脂，深棕色精油，含 β-石竹烯等成分，具备抗菌抗炎、促进肌肤愈合的作用。",
+      },
+      {
+        id: "brazil-04",
+        title: "绿咖啡豆油",
+        inci: "小果咖啡（COFFEA ARABICA）籽油",
+        features:
+          "取自未烘焙咖啡豆，棕绿色液体，含咖啡因、黄酮与植物甾醇，带天然咖啡香，兼具抗氧化力。",
+      },
+      {
+        id: "brazil-05",
+        title: "红木籽油",
+        inci: "红木（BIXA ORELLANA）籽提取物 & 向日葵（HELIANTHUS ANNUUS）籽油",
+        features:
+          "橙红色油状液体，肤感滋润厚实。胭脂树种子提取物富含类胡萝卜素，是天然着色剂的不二之选。",
+      },
+      {
+        id: "brazil-06",
+        title: "巴西莓油",
+        inci: "蔬食埃塔棕（EUTERPE OLERACEA）果油",
+        features: "源自巴西莓，深绿色油体，多酚含量高，抗氧化力强，可抗糖化、保护肌肤弹性蛋白。",
+      },
+      {
+        id: "brazil-07",
+        title: "星果棕果油",
+        inci: "星果棕（ASTROCARYUM VULGARE）果油",
+        features:
+          "俗称Tucumã Oil，橙红色油状至半固体，富含 ω-3 与胡萝卜素，可抵御紫外线、修护顺滑发丝。",
+      },
+      {
+        id: "brazil-08",
+        title: "巴巴苏籽油",
+        inci: "巴巴苏（ORBIGNYA OLEIFERA）籽油",
+        features: "类白至淡黄色油体，富含月桂酸与维 E，清爽易吸收，适配全发质的头发护理配方。",
+      },
+      {
+        id: "brazil-09",
+        title: "巴西坚果油",
+        inci: "巴西果（BERTHOLLETIA EXCELSA）籽油",
+        features:
+          "外观呈淡黄色透明液体，带有天然坚果香气，富含ω-6和ω-9脂肪酸以及维生素E，具有卓越的修护、抗氧化特性，赋予头发闪亮光泽。",
+      },
+      {
+        id: "brazil-10",
+        title: "巴卡斯籽油",
+        inci: "大裂叶五桤木（PENTACLETHRA MACROLOBA）籽油",
+        features: "富含维 A/E，可紧致肌肤、促进细胞更新，抚平发丝毛躁，能作为硅油的天然替代品。",
+      },
+      {
+        id: "brazil-11",
+        title: "安德罗巴油",
+        inci: "苦油树（CARAPA GUAIANENSIS）籽油",
+        features: "亚马逊经典药用油，金黄色液体，可平衡头皮油脂、去屑，兼具抗炎、肌肤修护功效。",
+      },
+      {
+        id: "brazil-12",
+        title: "巴西棕榈蜡",
+        inci: "巴西棕榈树（COPERNICIA CERIFERA）蜡",
+        features: "提取自巴西棕榈树叶，高硬度高熔点，光泽防潮性佳，适配发蜡、口红、眉笔等彩妆。",
+      },
+    ],
   },
   {
-    id: "cupuacu",
-    title: "大花可可树籽脂 (Cupuaçu Butter)",
-    category: "巴西拉美天然植物油脂",
-    inci: "大花可可树（THEOBROMA GRANDIFLORUM）籽脂",
-    features:
-      "源自亚马逊古布阿苏种子，硬脂酸、油酸含量高，触肤即融，赋予产品丝滑融化质感与极强锁水力。",
-    applications: "润肤乳、身体霜、彩妆打底、急救修护膏",
-    origin: "巴西热带雨林野生原产地",
+    id: "mediterranean",
+    label: "地中海天然植物油脂",
+    items: [
+      {
+        id: "mediterranean-01",
+        title: "精制乳木果油 (Shea Butter)",
+        inci: "牛油果树（BUTYROSPERMUM PARKII）果脂",
+        features: "常温乳白色固态，丝滑黄油质地，不皂化物含量高，适配高保湿封闭配方，具多重认证。",
+      },
+      {
+        id: "mediterranean-02",
+        title: "液态乳木果油 (Shea Oil)",
+        inci: "牛油果树（BUTYROSPERMUM PARKII）果脂",
+        features:
+          "常温液态，流动性铺展性佳，不皂化物含量更高，投料便捷，适配多类配方，无结晶风险。",
+      },
+      {
+        id: "mediterranean-03",
+        title: "霍霍巴油 (金色/无色)",
+        inci: "霍霍巴（SIMMONDSIA CHINENSIS）籽油",
+        features: "以色列产地，天然液态蜡，氧化稳定强，结构近似人体皮脂，亲肤易渗透、不油腻。",
+      },
+      {
+        id: "mediterranean-04",
+        title: "橄榄角鲨烷",
+        inci: "角鲨烷",
+        features:
+          "100% 植物来源，无色无味，极致亲肤无油腻感，兼容性佳，适配护肤、护发及全品类彩妆。",
+      },
+      {
+        id: "mediterranean-05",
+        title: "甜杏仁油",
+        inci: "甜扁桃（PRUNUS AMYGDALUS DULCIS）油",
+        features:
+          "淡黄色透明油体，经典基础护理油，肤感滋润，与各类植物油配伍性好，适配多种护肤配方。",
+      },
+      {
+        id: "mediterranean-06",
+        title: "橄榄油",
+        inci: "油橄榄（OLEA EUROPAEA）果油",
+        features: "高油酸占比，淡黄色油体，亲肤滋润，是通用基础油，适配护肤、卸妆等多类护理产品。",
+      },
+      {
+        id: "mediterranean-07",
+        title: "葡萄籽油",
+        inci: "葡萄（VITIS VINIFERA）籽油",
+        features:
+          "富含多不饱和脂肪酸，质地轻薄易铺展，吸收佳、抗氧化强，适配油性、敏感肌及按摩护理。",
+      },
+      {
+        id: "mediterranean-08",
+        title: "太阳花油",
+        inci: "向日葵（HELIANTHUS ANNUUS）籽油",
+        features: "高油酸亚油酸含量，亲肤滋润，肤感比甜杏仁油更清爽，丝滑柔润，是常用基础油脂。",
+      },
+      {
+        id: "mediterranean-09",
+        title: "澳洲坚果油",
+        inci: "全缘叶澳洲坚果（MACADAMIA INTEGRIFOLIA）籽油",
+        features: "富含 ω-7 与维 E，深层保湿滋养，温和低刺激，适配干性、敏感性肌肤护理。",
+      },
+      {
+        id: "mediterranean-10",
+        title: "摩洛哥坚果油/阿甘油",
+        inci: "刺阿干树（ARGANIA SPINOSA）仁油",
+        features: "含角鲨烯，油酸亚油酸比例优，渗透快不闷肤，修护屏障，改善发丝干枯分叉。",
+      },
+      {
+        id: "mediterranean-11",
+        title: "鳄梨油",
+        inci: "鳄梨（PERSEA GRATISSIMA）油",
+        features:
+          "提取自牛油果，富含 ω-9 与高含量不皂化物，抗炎修护力强，可强韧肌肤屏障、深层滋养。",
+      },
+      {
+        id: "mediterranean-12",
+        title: "芒果籽脂",
+        inci: "芒果（MANGIFERA INDICA）籽脂",
+        features: "常温淡黄色固体脂，触肤即化、延展性佳，肤感丝绒柔滑，比乳木果、可可脂更清爽。",
+      },
+      {
+        id: "mediterranean-13",
+        title: "玫瑰果油",
+        inci: "狗牙蔷薇（ROSA CANINA）果油",
+        features:
+          "淡黄色透明油体，带淡草本香，富含不饱和脂肪酸与多维活性，抗炎修护，促进肌肤新生。",
+      },
+      {
+        id: "mediterranean-14",
+        title: "西班牙鼠尾草油 (奇亚籽油)",
+        inci: "西班牙鼠尾草（SALVIA HISPANICA）籽油",
+        features: "富含多不饱和脂肪酸，质地轻盈顺滑，适配油性肌，可修护屏障、舒缓抗炎。",
+      },
+      {
+        id: "mediterranean-15",
+        title: "蓖麻籽油",
+        inci: "蓖麻（RICINUS COMMUNIS）籽油",
+        features: "厚重黏稠油体，富含蓖麻酸，封闭成膜性强，提升彩妆持妆力，适配毛发、唇部护理。",
+      },
+    ],
   },
   {
-    id: "copaiba",
-    title: "科拜巴脂 (Copaiba Balsam)",
-    category: "巴西拉美天然植物油脂",
-    inci: "古巴香胶树（COPAIFERA OFFICINALIS）树脂",
-    features:
-      "亚马逊香脂树树脂，深棕色精油，含 β-石竹烯等成分，具备天然抗菌抗炎、促进肌肤微损伤愈合功效。",
-    applications: "舒缓修护精华、痘肌调理油、头皮抗炎护理",
-    origin: "亚马逊原始雨林传统采集",
+    id: "south-africa",
+    label: "南非天然植物油脂",
+    intro:
+      "古老的非洲大陆盛产最坚韧的植物，将滋养的能量封存在珍贵的果实与种核之中。我们坚持与当地社区合作，承诺以公平贸易和可持续的方式手工采集野生果实。让南非旷野的蓬勃生命力触手可及，为您带来肌肤与感官的纯粹觉醒。",
+    items: [
+      {
+        id: "south-africa-01",
+        title: "有机猴面包树籽油",
+        inci: "猴面包树（ADANSONIA DIGITATA）籽油",
+        features: "非洲来源，含均衡脂肪酸与维 E、黄酮，保湿锁水、抗炎舒缓，改善发丝强韧度与光泽。",
+      },
+      {
+        id: "south-africa-02",
+        title: "有机马鲁拉油",
+        inci: "伯尔硬胡桃（SCLEROCARYA BIRREA）籽油",
+        features:
+          "高油酸含量，渗透力强、吸收快，肤感丝滑，兼具抗氧化、保湿修护功效，护肤护发通用。",
+      },
+      {
+        id: "south-africa-03",
+        title: "有机海檀木籽油",
+        inci: "海檀木（XIMENIA AMERICANA）籽油",
+        features: "淡黄色油体，质地偏稠带拉丝感，富含多种脂肪酸与西门尼酸，肤感丰厚、修护力强。",
+      },
+      {
+        id: "south-africa-04",
+        title: "可可籽脂",
+        inci: "可可（THEOBROMA CACAO）籽脂",
+        features: "淡黄色油体，质地偏稠带拉丝感，富含多种脂肪酸与西门尼酸，肤感丰厚、修护力强。",
+      },
+    ],
   },
   {
-    id: "green-coffee",
-    title: "绿咖啡豆油 (Green Coffee Bean Oil)",
-    category: "高活性天然植物油",
-    inci: "小果咖啡（COFFEA ARABICA）籽油",
-    features:
-      "取自未烘焙生咖啡豆冷榨，棕绿色澄清液体，富含咖啡因、多酚黄酮与植物甾醇，带天然咖啡香，兼具强抗氧化力。",
-    applications: "眼部紧致精华、消肿紧致身体油、抗光老化精华",
-    origin: "拉美高山庄园冷榨",
+    id: "north-america",
+    label: "北美天然植物油脂",
+    intro:
+      "北美大陆以其丰沛的生命力，在每一粒种籽中馈赠以卓效的滋润与焕活之力，赋予肌肤天鹅绒般的柔润与静谧光泽。",
+    items: [
+      {
+        id: "north-america-01",
+        title: "白池花籽油",
+        inci: "白池花（LIMNANTHES ALBA）籽油",
+        features:
+          "长链脂肪酸占比 98%+，氧化稳定性优异，肤感丰盈滋润不油腻，色粉分散性好，适配多品类。",
+      },
+      {
+        id: "north-america-02",
+        title: "深海两节荠籽油",
+        inci: "深海两节荠（CRAMBE ABYSSINICA）籽油",
+        features:
+          "又称阿比西尼亚油，长链脂肪酸丰富，氧化热稳定性佳，修护受损发质，天然替代硅油矿物油。",
+      },
+    ],
   },
   {
-    id: "urucum",
-    title: "红木籽油 (Urucum / Annatto Seed Oil)",
-    category: "天然着色与抗氧化油脂",
-    inci: "红木（BIXA ORELLANA）籽提取物 & 向日葵（HELIANTHUS ANNUUS）籽油",
-    features:
-      "橙红色油状液体，肤感滋润厚实。胭脂树种子提取物富含天然类胡萝卜素，是天然暖金着色剂与日晒防护的首选原料。",
-    applications: "美黑修护油、天然着色唇膏、防晒增效护理、抗氧化面油",
-    origin: "热带雨林可持续林农",
+    id: "active",
+    label: "活性物",
+    items: [
+      {
+        id: "active-01",
+        title: "AT Calm-ist",
+        inci: "紫苏（PERILLA OCYMOIDES）叶提取物、金黄洋甘菊（CHRYSANTHELLUM INDICUM）提取物、积雪草（CENTELLA ASIATICA）提取物、欧蒲公英（TARAXACUM OFFICINALE）叶提取物、蜀葵（ALTHAEA ROSEA）花提取物、三七（PANAX NOTOGINSENG）根提取物",
+        features:
+          "六种植物提取物精华，天然抗敏原料。对各种炎症、湿疹、瘙痒、和红肿有显著的效果，有良好的配伍性，可应用于各类个人护理产品。",
+      },
+      {
+        id: "active-02",
+        title: "千日菊提取物",
+        inci: "千日菊（ACMELLA OLERACEA）提取物",
+        features:
+          "拥有油溶性“植物肉毒素”的美誉，即时抗皱、渗透性好，快速消除动态纹，提升紧致度。适用于抗皱抗衰类的高端护肤产品及唇部保养产品。",
+      },
+      {
+        id: "active-03",
+        title: "苯乙基间苯二酚",
+        inci: "苯乙基间苯二酚",
+        features: "俗称“377”，经典酪氨酸酶抑制剂，多通路抑黑提亮，美白效力是曲酸的 22 倍。",
+      },
+      {
+        id: "active-04",
+        title: "4-丁基间苯二酚",
+        inci: "4-丁基间苯二酚",
+        features:
+          "俗称“577”，强效酪氨酸酶抑制剂，阻断黑色素生成，美白效力为 377 的 6 倍、熊果苷 310 倍。",
+      },
+      {
+        id: "active-05",
+        title: "4-己基间苯二酚",
+        inci: "4-己基间苯二酚",
+        features: "抑制酪氨酸酶活性，兼具抗炎抗氧化作用，推荐用量 0.4%，实现美白提亮。",
+      },
+    ],
   },
   {
-    id: "acai",
-    title: "巴西莓油 (Açai Oil)",
-    category: "超级果实多酚油脂",
-    inci: "蔬食埃塔棕（EUTERPE OLERACEA）果油",
-    features:
-      "源自巴西莓冷榨深绿色纯净油体，花青素与多酚含量极高，抗氧化力卓越，可抗糖化反应、多维保护肌肤弹性蛋白。",
-    applications: "抗初老精华油、夜间修护晚霜、高端抗皱乳液",
-    origin: "巴西北部湿地雨林",
-  },
-  {
-    id: "jojoba",
-    title: "霍霍巴油 (Jojoba Oil Golden & Colorless)",
-    category: "经典植物油脂及角鲨烷",
-    inci: "霍霍巴（SIMMONDSIA CHINENSIS）籽油",
-    features:
-      "以色列源头产地，天然长链液态单烯酸蜡酯，氧化稳定性极强，分子结构与人体皮脂高度近似，极速渗透亲肤且不油腻。",
-    applications: "全能面油、卸妆油基底、头皮毛囊净化、婴儿润肤",
-    origin: "以色列生态种植园",
-  },
-  {
-    id: "olive-squalane",
-    title: "橄榄角鲨烷 (Plant Squalane)",
-    category: "高纯度天然润肤烷烃",
-    inci: "角鲨烷 (Squalane)",
-    features:
-      "100% 植物橄榄来源，无色无味高纯度碳氢化合物，极致亲肤无油腻感，与皮肤皮脂膜完美相容，全品类配方兼容性优异。",
-    applications: "高端精华液、修护面霜、全品类粉底彩妆、免洗护发精华",
-    origin: "地中海橄榄物理脱臭提纯",
-  },
-  {
-    id: "brazil-nut",
-    title: "巴西坚果油 (Brazil Nut Oil)",
-    category: "高硒强韧滋养油脂",
-    inci: "巴西果（BERTHOLLETIA EXCELSA）籽油",
-    features:
-      "淡黄色透明液体，带有天然坚果香，富含 ω-6、ω-9 不饱和脂肪酸及天然微量元素硒和维生素 E，赋予毛鳞片镜面光泽。",
-    applications: "干枯发丝修护精油、高光发膜、干性肌肤深层滋养膏",
-    origin: "亚马逊原始雨林野生坚果",
-  },
-  {
-    id: "at-calm-ist",
-    title: "AT Calm-ist™ 植物抗敏剂",
-    category: "专利功效活性提取物",
-    inci: "紫苏叶、金黄洋甘菊、积雪草、欧蒲公英叶、蜀葵花、三七根复合提取物",
-    features:
-      "六种天然道地植物提取物精华协同增效，多通路阻断炎症介质释放，显著缓解各类敏感泛红、刺痛、红肿，配伍性极佳。",
-    applications: "抗敏舒缓特护霜、晒后面膜、屏障急救喷雾、婴童护理",
-    origin: "天然道地药材超声低温萃取",
+    id: "other",
+    label: "其他",
+    items: [
+      {
+        id: "other-01",
+        title: "FM 1618",
+        inci: "鲸蜡硬脂基葡糖苷、鲸蜡硬脂醇",
+        features:
+          "天然非离子 O/W 乳化剂，兼容性广、搭配灵活，绿色温和安全性高，适配各类乳化护肤配方。",
+      },
+      {
+        id: "other-02",
+        title: "GTCC",
+        inci: "辛酸/癸酸甘油三酯",
+        features:
+          "通用化妆品基础油脂，氧化稳定性高，清爽滋润不黏腻，配伍性优异，适配多类护理产品。",
+      },
+      {
+        id: "other-03",
+        title: "FM-DBA",
+        inci: "己二酸二丁酯",
+        features: "合成油脂，对防晒剂、色粉溶解分散力优，铺展性佳，可改善防晒产品黏腻厚重肤感。",
+      },
+      {
+        id: "other-04",
+        title: "玫瑰纯露",
+        inci: "突厥蔷薇（ROSA DAMASCENA）花水",
+        features:
+          "保加利亚大马士革玫瑰来源，食品级，含 0.1% 精油，香气纯正，补水嫩肤，适配爽肤水面膜。",
+      },
+    ],
   },
 ];
 
 export const SOLUTION_ITEMS: SolutionItem[] = [
   {
     id: "clay-mask",
-    title: "滋润清洁泥膜 (Nourishing Clay Mask)",
+    title: "滋润清洁泥膜",
     subtitle: "一款含天然黏土的清洁舒缓涂抹泥膜",
-    overview:
-      "乳化型清洁泥膜，精选 325 目细腻巴西天然高岭黏土为核心吸附粉体，复配多种植物油脂与抗敏因子，深层吸附毛孔污垢同时温和舒缓，杜绝紧绷拔干。",
-    functions: ["毛孔深度吸附清洁", "多重油脂保湿滋养", "舒缓修护敏感泛红"],
-    keyIngredients: [
-      "325目巴西天然黏土",
-      "AT Calm-ist™ 植物抗敏剂",
-      "乳木果油",
-      "白池花籽油",
-      "霍霍巴籽油",
+    overview: [
+      "乳化型清洁泥膜",
+      "325目巴西黏土为核心粉体",
+      "复配多种植物油脂",
+      "清洁同时舒缓，减少拔干紧绷",
     ],
-    texture: "膏状泥质，柔滑易延展，久敷不干裂",
-    applications: "涂抹式清洁面膜、T区毛孔调理泥膜",
+    functions: ["清洁吸附", "保湿滋养", "舒缓修护"],
+    keyIngredients: ["巴西黏土", "AT Calm-ist™ 植物抗敏剂", "乳木果油", "白池花籽油", "霍霍巴籽油"],
+    challenges: ["粉体均匀分散与体系悬浮稳定", "清洁力与保湿舒缓的平衡"],
+    texture: ["膏状泥质", "柔滑易涂抹"],
+    applications: ["涂抹式清洁面膜"],
   },
   {
     id: "rose-mist",
-    title: "舒缓保湿补水喷雾 (Soothing Rose Mist)",
+    title: "舒缓保湿补水喷雾",
     subtitle: "一款含抗敏活性成分的玫瑰纯露保湿喷雾",
-    overview:
-      "以保加利亚大马士革玫瑰纯露为水相基底，气味清甜纯正；融合六重植提抗敏因子 AT Calm-ist™ 协同增效，为敏肌提供即刻镇定舒缓与长效水润。",
-    functions: ["即时补水锁水", "降温舒缓敏感刺激", "强韧肌肤屏障微生态"],
-    keyIngredients: ["大马士革玫瑰纯露", "AT Calm-ist™ 植物抗敏剂", "天然多元醇保湿体系"],
-    texture: "轻薄水雾质地，吸收迅速，肤感清爽不黏腻",
-    applications: "便携保湿喷雾、妆前舒缓水、晒后镇静爽肤水",
+    overview: ["大马士革玫瑰纯露，气味香甜纯正", "六重植提抗敏因子协同增效，保湿舒缓，镇定舒缓"],
+    functions: ["补水保湿", "舒缓镇定"],
+    keyIngredients: ["大马士革玫瑰纯露", "AT Calm-ist™ 植物抗敏剂"],
+    challenges: [],
+    texture: ["水状"],
+    applications: ["保湿抗敏喷雾/水"],
   },
   {
     id: "botanical-lotion",
-    title: "植物精粹身体乳 (Botanical Essence Body Lotion)",
+    title: "植物精粹身体乳",
     subtitle: "一款以多重植物油脂与 4D 玻尿酸为核心的滋润型身体乳",
-    overview:
-      "乳化型多层滋养身体乳，科学配比大花可可树籽脂、鳄梨油、橄榄果渣油与澳洲坚果油四重雨林植物油脂，搭载 4D 多层级透明质酸钠与 VC-IP 提亮分子，深润焕采。",
-    functions: ["多层级立体锁水", "四重植物油脂柔肤滋润", "舒缓修护提亮肤色"],
+    overview: [
+      "乳化型滋润身体乳",
+      "复配四种植物油脂（大花可可脂、鳄梨油、橄榄果渣油、澳洲坚果油）",
+      "4D 多重透明质酸钠体系，多层级保湿",
+      "VC-IP 衍生物提亮，尿囊素舒缓修护",
+    ],
+    functions: ["深层滋润", "多重保湿", "舒缓提亮"],
     keyIngredients: [
       "4D HA 多重透明质酸钠复合物",
       "VC-IP 抗坏血酸四异棕榈酸酯",
-      "大花可可树籽脂",
-      "鳄梨油",
       "FM-AT 尿囊素",
+      "大花可可树籽脂 / 鳄梨油 / 橄榄果渣油 / 澳洲坚果油",
     ],
-    texture: "丝滑轻盈乳液，一抹化水，秒速吸收无黏感",
-    applications: "全身日常滋润护理、秋冬干皮深层润肤",
+    challenges: [
+      "高含量植物油脂的乳化稳定性",
+      "4D 玻尿酸不同分子量层级的均匀分散",
+      "滋润感与质地清爽的平衡",
+      "多元油脂复配体系的肤感协调",
+    ],
+    texture: ["轻盈乳状", "易推开吸收快"],
+    applications: ["身体护理", "日常保湿润肤"],
   },
   {
     id: "hand-cream",
-    title: "滋养保湿护手霜 (Deep Nourishing Hand Cream)",
+    title: "滋养保湿护手霜",
     subtitle: "一款以乳木果油与芒果籽脂为核心的深度滋润型护手霜",
-    overview:
-      "专为手部干燥脱皮研发的高滋养手膜级护手霜，含有 6% 高添加精制乳木果油与 3% 芒果籽脂，协同 4D 玻尿酸长效包裹，密集修护手部微损伤与指缘倒刺。",
-    functions: ["深层修护指缘干裂", "长效防干锁水保护膜", "柔嫩手部粗糙角质"],
-    keyIngredients: ["精制乳木果油 (6%)", "芒果籽脂 (3%)", "白池花籽油", "4D HA 多重透明质酸钠"],
-    texture: "丰厚凝润膏体，触肤即化，润泽不泛油光",
-    applications: "手部密集滋养霜、日夜修护手膜",
+    overview: [
+      "乳化型高滋润护手霜",
+      "高含量乳木果油（6%）+ 芒果籽脂（3%），强化滋润修护",
+      "4D 多重透明质酸钠体系，多层级保湿锁水",
+      "黄原胶复配增稠，膏体细腻稳定",
+    ],
+    functions: ["深度滋养", "持久保湿", "修护干燥"],
+    keyIngredients: [
+      "4D HA 多重透明质酸钠复合物",
+      "乳木果油（6% 高添加）",
+      "芒果籽脂",
+      "白池花籽油",
+    ],
+    challenges: [
+      "高含量固态油脂的乳化与膏体稳定性",
+      "厚重膏体与涂抹延展性的平衡",
+      "4D 玻尿酸在高油相体系中的均匀分散",
+      "滋润感与黏腻感的平衡控制",
+    ],
+    texture: ["厚实膏状", "丰润易推开"],
+    applications: ["手部护理", "干燥肌深度滋养"],
   },
   {
     id: "shea-body-cream",
-    title: "乳木果油身体霜 (20% Shea Intensive Body Butter)",
+    title: "乳木果油身体霜",
     subtitle: "20% 高含量乳木果油的包裹感舒缓身体霜",
-    overview:
-      "高阶敏感肌与重度干皮特护霜，突破性加入 20% 液态乳木果油脂，富含天然三萜类抗炎活性分子，极简配方仅含 8 种 INCI 成分，构筑温和亲肤透气舒缓屏障。",
-    functions: ["20% 高浓缩乳木果油滋养", "包裹舒缓敏感泛红", "重塑干裂受损屏障"],
-    keyIngredients: ["液态乳木果油 (20%)", "天然三萜类活性成分", "极简温和防腐体系"],
-    texture: "黄油凝霜质地，丰润包裹感强，润而不腻",
-    applications: "干痒特护身体霜、干性敏感肌急救面霜",
+    overview: [
+      "高滋润身体霜，添加 20% 液态乳木果油",
+      "包裹感强肤感滋润不腻，为敏感肌提供舒缓防护",
+      "富集三萜类活性分子，具备抗炎舒缓属性",
+      "极简配方，仅 8 种 INCI 成分",
+    ],
+    functions: ["20% 高含量乳木果油", "包裹舒缓敏感肌", "深度滋养柔肤"],
+    keyIngredients: ["液态乳木果油", "三萜类活性物"],
+    challenges: [
+      "20% 高含量油脂的乳化稳定性",
+      "包裹感与黏腻感的平衡",
+      "高活性物的体系兼容性",
+      "极简配方的防腐保障",
+    ],
+    texture: ["丰润乳霜", "肤感细腻滋润"],
+    applications: ["身体护理", "敏感肌滋养舒缓"],
   },
   {
     id: "body-oil",
-    title: "身体护理精华油 (Lightweight Body Oil)",
+    title: "身体护理精华油",
     subtitle: "一款轻质滋养的全油基身体护理精华油",
-    overview:
-      "100% 纯天然全油基配方，以冷榨甜杏仁油为温和基底，复配高渗透角鲨烷、黄金霍霍巴油与天然红没药醇，丝质轻盈流动感，沐浴后锁水亮肤。",
-    functions: ["全油水润锁光", "舒缓改善肌肤粗糙", "轻盈透气无油膜感"],
-    keyIngredients: ["甜杏仁油", "植物角鲨烷", "霍霍巴籽油", "天然红没药醇"],
-    texture: "澄清金黄精油，极佳铺展性，轻薄干爽",
-    applications: "身体润肤油、沐浴后湿发顺滑油、芳疗按摩油",
+    overview: [
+      "全油基身体护理油，以甜杏仁油为基底",
+      "复配角鲨烷、霍霍巴油等润肤油脂",
+      "添加红没药醇舒缓修护",
+      "轻质油感，滋养不黏腻",
+    ],
+    functions: ["柔润滋养", "舒缓修护", "轻薄润肤"],
+    keyIngredients: ["甜杏仁油", "角鲨烷", "霍霍巴油", "红没药醇"],
+    challenges: [
+      "多种油脂的肤感调和",
+      "全油体系的氧化稳定",
+      "滋润度与清爽感的平衡",
+      "香精与油相的兼容稳定",
+    ],
+    texture: ["澄清油状液体", "顺滑易延展"],
+    applications: ["身体护理", "身体精华油、按摩油"],
   },
   {
     id: "whitening-cream",
-    title: "多效滋润美白霜 (Multi-Action Whitening Cream)",
+    title: "多效滋润美白霜",
     subtitle: "4-丁基间苯二酚为核心的多效美白面霜",
-    overview:
-      "以美白黄金成分 4-丁基间苯二酚（577）为核心，复配烟酰胺与 4D 玻尿酸、白池花籽油，阻断酪氨酸酶活性，从根源抑黑褪黄，兼顾高倍保湿与温和修护。",
-    functions: ["根源抑黑匀净肤色", "深层舒缓保湿修护", "淡化色斑暗沉"],
-    keyIngredients: [
-      "4-丁基间苯二酚 (577)",
-      "烟酰胺",
-      "4D HA 透明质酸钠",
-      "白池花籽油",
-      "橄榄角鲨烷",
+    overview: [
+      "乳化型多效美白面霜",
+      "4-丁基间苯二酚为核心美白成分，复配烟酰胺",
+      "4D 玻尿酸多层保湿，乙酰氨基葡萄糖修护",
+      "多种植物油脂润肤，红没药醇舒缓",
     ],
-    texture: "丝绒凝乳面霜，水润好推开，滋润柔滑",
-    applications: "美白祛斑面霜、熬夜焕亮晚霜",
+    functions: ["多效美白提亮", "深层保湿修护", "舒缓润肤"],
+    keyIngredients: [
+      "4-丁基间苯二酚",
+      "烟酰胺",
+      "4D HA 多重透明质酸钠",
+      "乙酰氨基葡萄糖",
+      "泛醇、Ⅲ 型胶原蛋白",
+      "白池花籽油、橄榄角鲨烷",
+      "红没药醇",
+    ],
+    challenges: [
+      "美白活性物的体系兼容与稳定",
+      "4D 玻尿酸在乳化体系中的均匀分散",
+      "多种油脂的乳化稳定",
+      "美白功效与温和性的平衡",
+    ],
+    texture: ["细腻乳霜", "顺滑易推开"],
+    applications: ["面部护理", "美白保湿面霜"],
   },
   {
     id: "shower-oil",
-    title: "柔润温和沐浴油 (50% Avocado Shower Oil)",
+    title: "柔润温和沐浴油",
     subtitle: "50% 高含量鳄梨油的无皂基沐浴油",
-    overview:
-      "采用冷配工艺完整保留植物脂质活性，含有高达 50% 优质鳄梨果油，零皂基温和乳化体系，遇水瞬间乳化为柔滑奶白色牛奶状，洗净多余油脂同时深润角质。",
-    functions: ["以油溶油温和洗净", "洗卸合一无皂基配方", "洗后柔嫩顺滑不拔干"],
-    keyIngredients: ["鳄梨果油 (50%)", "天然胡萝卜提取物", "生育酚 (维生素 E)", "植物甘油润肤体系"],
-    texture: "晶莹琥珀色油体，遇水即乳化为细腻奶液",
-    applications: "干敏肌日常洁肤、秋冬滋润沐浴油",
+    overview: [
+      "50% 高含量鳄梨油沐浴油，遇水转化为乳状",
+      "无皂基配方，温和清洁同时滋养肌肤",
+      "冷工艺制作，保留植物油脂活性",
+    ],
+    functions: ["温和滋养清洁", "无皂基配方", "浴后柔润不紧绷"],
+    keyIngredients: ["鳄梨油", "胡萝卜提取物", "生育酚", "甘油保湿体系"],
+    challenges: ["遇水转乳的质地表现", "冷配工艺的体系均一", "清洁力与滋养力的平衡"],
+    texture: ["油状液体", "遇水乳化呈奶白色"],
+    applications: ["身体清洁", "敏感肌沐浴油"],
   },
   {
     id: "argan-hair-oil",
-    title: "阿甘油护发精华油 (Argan Hair Repair Oil)",
-    subtitle: "一款阿甘油复配植物角鲨烷的修护护发精华油",
-    overview:
-      "精选摩洛哥刺阿干树仁油（阿甘油）与亚麻籽油、植物角鲨烷协同作用，深入毛鳞片间质填补微孔，改善发丝干枯分叉与毛躁静电，赋予发丝闪亮垂顺光泽。",
-    functions: ["修护受损毛鳞片", "抗热抚平毛躁", "轻盈锁光增亮"],
-    keyIngredients: ["摩洛哥阿甘油", "亚麻籽油", "橄榄角鲨烷", "大马士革玫瑰精油调香"],
-    texture: "透明清透精油，轻盈丝滑不黏手",
-    applications: "免洗干湿两用护发油、热工具造型前打底",
+    title: "阿甘油护发精华油",
+    subtitle: "一款阿甘油复配硅油的修护护发精华油",
+    overview: [
+      "硅油基护发精华油，添加阿甘油与亚麻籽油",
+      "修护受损发丝，柔顺毛躁",
+      "角鲨烷滋养发丝，提升光泽",
+      "玫瑰精油调香，使用感愉悦",
+    ],
+    functions: ["修护受损发丝", "柔顺毛躁", "提升发丝光泽"],
+    keyIngredients: ["阿甘油", "亚麻籽油", "橄榄角鲨烷"],
+    challenges: [
+      "植物油与硅油的兼容稳定",
+      "修护力与清爽感的平衡",
+      "精油调香的体系稳定",
+      "全油体系的氧化稳定",
+    ],
+    texture: ["透明油状液体", "轻盈顺滑不黏腻"],
+    applications: ["头发护理", "护发精华油"],
   },
   {
     id: "sunscreen",
-    title: "SPF50+ 高倍户外防晒霜 (SPF50+ PA++++ Shield)",
-    subtitle: "一款物化结合的高倍户外全波段防晒面霜",
-    overview:
-      "SPF50+、PA++++ 最高防护等级，物理微粒二氧化钛与广谱化学防晒剂复配，构筑全波段紫外线防御网络；复配 4D 玻尿酸与尿囊素舒缓防晒泛红，防水抗汗成膜。",
-    functions: ["SPF50+ PA++++ 广谱防护", "防水防汗快速成膜", "高保湿舒缓防光损伤"],
-    keyIngredients: ["微粉化二氧化钛", "双-乙基己氧苯酚甲氧苯基三嗪", "4D HA 透明质酸", "尿囊素"],
-    texture: "轻薄乳霜，成膜快，清透贴肤不搓泥",
-    applications: "户外高倍面部防晒、妆前防晒乳",
+    title: "SPF50 高倍防晒霜",
+    subtitle: "一款物化结合的高倍户外防晒面霜",
+    overview: [
+      "高倍防晒面霜，SPF50+、PA++++ 防护等级",
+      "化学 + 物理防晒剂复配，全波段广谱防护",
+      "4D 玻尿酸保湿，尿囊素舒缓防晒刺激",
+      "防水成膜体系，提升持妆力",
+    ],
+    functions: ["高倍广谱防晒", "防水持妆", "保湿舒缓"],
+    keyIngredients: [
+      "二氧化钛",
+      "亚甲基双-苯并三唑基四甲基丁基苯酚",
+      "对苯二亚甲基二樟脑磺酸",
+      "二乙氨基羟苯甲酰基苯甲酸己酯",
+      "双-乙基己氧苯酚甲氧苯基三嗪",
+      "乙基己基三嗪酮",
+      "4D HA 多重透明质酸钠",
+    ],
+    challenges: [
+      "物理防晒剂的分散与防泛白",
+      "高含量防晒剂的溶解与稳定",
+      "高倍防晒力与清爽肤感的平衡",
+      "防水成膜与配方稳定性",
+    ],
+    texture: ["细腻乳霜", "成膜快，轻微泛白"],
+    applications: ["面部防晒", "高倍户外防护"],
   },
 ];

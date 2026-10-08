@@ -1,28 +1,20 @@
 import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import type { StyleXStyles } from "@stylexjs/stylex";
-import { ChevronRight, Plus } from "lucide-react";
-import { AnimatePresence, m } from "motion/react";
-import { useId, useState } from "react";
+import { useSearch } from "@tanstack/react-router";
+import { ChevronRight } from "lucide-react";
+import { useState, type ComponentType } from "react";
 
-import { EASE } from "@/components/prototype/motion-constants";
-import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
-
-import {
-  CATALOG_ITEMS,
-  CATEGORIES,
-  FEATURED_PRODUCT,
-  SOLUTION_ITEMS,
-  type CatalogItem,
-  type SolutionItem,
-} from "./products-data";
+import { ContactCta } from "./contact-cta";
+import { CTA, PRODUCTS_CTA_SUBTITLE } from "./content";
+import { CATEGORIES, FEATURED_PRODUCT } from "./products-data";
+import { layout, ProductCatalog, ProductSolutions } from "./products-sections";
 
 const INK = "#1a1a1a";
 const BODY_TEXT = "#4d4d4d";
 const MUTED_LABEL = "#52525b";
-const SURFACE = "#f6f6f6";
-const TINT = "#e6ecf7";
-const DISPLAY_FONT = '"Inter Tight", "Helvetica Neue", Arial, sans-serif';
+const PHOTO_OUTLINE = "rgba(0, 0, 0, 0.1)";
+const ACCENT = "#78598d";
+const EASE_OUT_CSS = "cubic-bezier(0.22, 1, 0.36, 1)";
 const BODY_FONT =
   '"Noto Sans SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif';
 
@@ -37,40 +29,22 @@ const styles = stylex.create({
     fontFamily: BODY_FONT,
     minHeight: "100vh",
   },
-  shell: {
-    width: "100%",
-    maxWidth: 1440,
-    marginInline: "auto",
-    boxSizing: "border-box",
-  },
-  inset: {
-    paddingInlineStart: {
-      default: 20,
-      [breakpoints.sm]: 32,
-      [TABLET]: 48,
-      [DESKTOP]: "min(120px, 8.33vw)",
-    },
-    paddingInlineEnd: {
-      default: 20,
-      [breakpoints.sm]: 32,
-      [TABLET]: 48,
-      [DESKTOP]: "min(120px, 8.33vw)",
-    },
-  },
 
   bannerWrap: {
     position: "relative",
     width: "100%",
-    paddingTop: { default: 80, [TABLET]: 80, [DESKTOP]: 80 },
+    display: "flex",
+    alignItems: "flex-end",
+    height: { default: 240, [breakpoints.md]: "clamp(300px, 31vw, 480px)" },
     overflow: "hidden",
-    backgroundColor: "#e8eff4",
+    backgroundColor: "#0b2a5c",
+    color: colors.paper,
   },
   bannerFigure: {
-    position: "relative",
+    position: "absolute",
+    inset: 0,
     width: "100%",
     margin: 0,
-    aspectRatio: { default: "21 / 9", [TABLET]: "21 / 7", [DESKTOP]: "24 / 7" },
-    maxHeight: 460,
     overflow: "hidden",
   },
   bannerImg: {
@@ -80,14 +54,13 @@ const styles = stylex.create({
     objectFit: "cover",
     objectPosition: "center 48%",
   },
-  bannerScrim: {
+  srOnly: {
     position: "absolute",
-    insetInline: 0,
-    insetBlockEnd: 0,
-    height: "28%",
-    backgroundImage:
-      "linear-gradient(to top, rgba(255, 255, 255, 0.45) 0%, rgba(255, 255, 255, 0) 100%)",
-    pointerEvents: "none",
+    width: 1,
+    height: 1,
+    overflow: "hidden",
+    clipPath: "inset(50%)",
+    whiteSpace: "nowrap",
   },
 
   subBar: {
@@ -100,10 +73,12 @@ const styles = stylex.create({
   },
   subBarInner: {
     display: "flex",
-    alignItems: "center",
+    alignItems: { default: "stretch", [breakpoints.md]: "center" },
+    flexDirection: { default: "column", [breakpoints.md]: "row" },
     justifyContent: "space-between",
-    gap: 24,
-    height: 64,
+    gap: { default: 12, [breakpoints.md]: 24 },
+    paddingBlock: { default: 12, [breakpoints.md]: 0 },
+    height: { default: "auto", [breakpoints.md]: 64 },
   },
   breadcrumb: {
     display: "flex",
@@ -115,6 +90,7 @@ const styles = stylex.create({
     color: BODY_TEXT,
   },
   breadcrumbLink: {
+    position: "relative",
     padding: 0,
     borderWidth: 0,
     backgroundColor: "transparent",
@@ -127,27 +103,41 @@ const styles = stylex.create({
     outlineColor: colors.brandBlue700,
     outlineOffset: 2,
     borderRadius: 4,
+    "::before": {
+      content: '""',
+      position: "absolute",
+      insetBlock: -12,
+      insetInline: -8,
+    },
   },
   breadcrumbCurrent: {
     color: INK,
-    fontWeight: 500,
+    fontWeight: 600,
   },
   chipList: {
     display: "flex",
     alignItems: "center",
     justifyContent: { default: "flex-start", [breakpoints.lg]: "flex-end" },
-    gap: 12,
+    gap: { default: 10, [breakpoints.md]: 12 },
     flexGrow: 1,
     minWidth: 0,
+    marginInline: { default: -16, [breakpoints.md]: 0 },
+    paddingInlineStart: { default: 16, [breakpoints.md]: 0 },
+    paddingInlineEnd: { default: 24, [breakpoints.md]: 0 },
     paddingBlock: 4,
     overflowX: "auto",
     scrollbarWidth: "none",
+    maskImage: {
+      default: "linear-gradient(to right, #000 calc(100% - 24px), transparent)",
+      [breakpoints.md]: "none",
+    },
   },
   chip: {
     appearance: "none",
     border: "none",
     display: "inline-flex",
     alignItems: "center",
+    justifyContent: "center",
     flexShrink: 0,
     height: 36,
     paddingInline: 18,
@@ -157,11 +147,22 @@ const styles = stylex.create({
     fontWeight: 500,
     letterSpacing: "0.04em",
     color: { default: INK, ":hover": colors.brandBlue700 },
+    position: "relative",
     cursor: "pointer",
     whiteSpace: "nowrap",
+    transform: {
+      default: null,
+      ":active": { default: null, [breakpoints.motionOk]: "scale(0.96)" },
+    },
+    "::before": {
+      content: '""',
+      position: "absolute",
+      insetBlock: -4,
+      insetInline: 0,
+    },
     transitionProperty: "background-color, color, transform, box-shadow",
     transitionDuration: "160ms",
-    transitionTimingFunction: "ease-out",
+    transitionTimingFunction: EASE_OUT_CSS,
     outlineStyle: { default: "none", ":focus-visible": "solid" },
     outlineWidth: 2,
     outlineColor: colors.brandBlue700,
@@ -173,101 +174,38 @@ const styles = stylex.create({
     boxShadow: "0 4px 12px -2px rgba(29, 78, 216, 0.32)",
   },
   spotlightSection: {
-    paddingTop: { default: 32, [DESKTOP]: 48 },
-    paddingBottom: { default: 64, [DESKTOP]: 96 },
+    paddingTop: { default: 24, [LG]: 16 },
+    paddingBottom: { default: 56, [DESKTOP]: 80 },
   },
   spotlightGrid: {
     display: "grid",
-    gridTemplateColumns: { default: "1fr", [LG]: "minmax(0, 0.85fr) minmax(0, 1.15fr)" },
-    gap: { default: 40, [TABLET]: 56, [DESKTOP]: 80 },
+    gridTemplateColumns: { default: "minmax(0, 1fr)", [LG]: "minmax(0, 0.85fr) minmax(0, 1.15fr)" },
+    gap: { default: 32, [DESKTOP]: 64 },
     alignItems: "center",
   },
   spotlightText: {
     display: "flex",
     flexDirection: "column",
+    alignItems: "stretch",
+    minWidth: 0,
+    textAlign: "start",
   },
   spotlightBrand: {
     margin: 0,
-    fontSize: { default: 32, [TABLET]: 40, [DESKTOP]: 48 },
-    fontWeight: 700,
-    lineHeight: 1.15,
-    letterSpacing: "-0.01em",
-    color: INK,
-    fontFamily: DISPLAY_FONT,
+    fontSize: { default: 36, [TABLET]: 44, [DESKTOP]: 52 },
+    fontWeight: 400,
+    lineHeight: 1.1,
+    textWrap: "balance",
+    color: ACCENT,
   },
   spotlightTagline: {
     margin: 0,
-    marginTop: 10,
-    fontSize: { default: 14, [DESKTOP]: 15 },
+    marginTop: 6,
+    lineHeight: 1.6,
+    fontSize: { default: 15, [DESKTOP]: 17 },
+    fontWeight: 700,
     color: MUTED_LABEL,
     letterSpacing: "0.03em",
-  },
-  spotlightList: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 8,
-    marginTop: 20,
-  },
-  spotlightItemBtn: {
-    appearance: "none",
-    width: "100%",
-    border: "none",
-    backgroundColor: { default: "transparent", ":hover": "#f7f7f9" },
-    borderRadius: 10,
-    paddingBlock: 10,
-    paddingInline: 14,
-    textAlign: "start",
-    cursor: "pointer",
-    fontFamily: "inherit",
-    transitionProperty: "background-color, transform",
-    transitionDuration: "160ms",
-    outlineStyle: { default: "none", ":focus-visible": "solid" },
-    outlineWidth: 2,
-    outlineColor: colors.brandBlue700,
-    outlineOffset: 1,
-  },
-  spotlightItemBtnActive: {
-    backgroundColor: TINT,
-  },
-  spotlightItemHeader: {
-    display: "flex",
-    alignItems: "baseline",
-    gap: 8,
-    flexWrap: "wrap",
-  },
-  spotlightItemNum: {
-    fontSize: 12,
-    fontWeight: 700,
-    color: MUTED_LABEL,
-    fontFamily: DISPLAY_FONT,
-  },
-  spotlightItemNumActive: {
-    color: colors.brandBlue700,
-  },
-  spotlightItemName: {
-    margin: 0,
-    fontSize: 15,
-    fontWeight: 700,
-    color: INK,
-    letterSpacing: "0.01em",
-  },
-  spotlightItemNameActive: {
-    color: colors.brandBlue700,
-  },
-  spotlightItemEn: {
-    fontSize: 12,
-    color: MUTED_LABEL,
-    letterSpacing: "0.02em",
-  },
-  spotlightItemDesc: {
-    margin: 0,
-    marginTop: 4,
-    fontSize: 13,
-    lineHeight: 1.6,
-    color: BODY_TEXT,
-  },
-  spotlightItemDescActive: {
-    color: INK,
   },
   spotlightCardsWrap: {
     display: "grid",
@@ -275,418 +213,110 @@ const styles = stylex.create({
       default: "repeat(2, minmax(0, 1fr))",
       [breakpoints.sm]: "repeat(3, minmax(0, 1fr))",
     },
-    gap: 12,
+    gap: { default: 8, [LG]: 10 },
   },
-  cardFigure: {
-    position: "relative",
-    margin: 0,
-    borderRadius: 12,
+  productCard: {
+    appearance: "none",
+    display: "flex",
+    flexDirection: "column",
+    minWidth: 0,
+    padding: 0,
     overflow: "hidden",
-    aspectRatio: "1 / 1",
-    backgroundColor: SURFACE,
-    boxShadow: "0 2px 8px -2px rgba(0, 0, 0, 0.06)",
+    borderWidth: 0,
+    borderRadius: 0,
+    backgroundColor: "transparent",
+    textAlign: "start",
+    fontFamily: "inherit",
     cursor: "pointer",
-    transitionProperty: "transform, box-shadow, outline-color",
-    transitionDuration: "200ms",
-    transitionTimingFunction: "ease-out",
-    outlineStyle: "solid",
-    outlineWidth: 2,
-    outlineColor: "transparent",
-    outlineOffset: 2,
-    ":hover": {
-      transform: "translateY(-3px)",
-      boxShadow: "0 8px 20px -4px rgba(0, 0, 0, 0.12)",
+    transform: {
+      default: null,
+      ":active": { default: null, [breakpoints.motionOk]: "scale(0.98)" },
     },
+    outlineStyle: "solid",
+    outlineWidth: { default: 1, ":focus-visible": 3 },
+    outlineColor: { default: "transparent", ":focus-visible": colors.brandBlue700 },
+    outlineOffset: { default: 2, ":focus-visible": 4 },
+    transitionProperty: "outline-color, transform",
+    transitionDuration: "160ms",
+    transitionTimingFunction: EASE_OUT_CSS,
   },
-  cardFigureActive: {
-    transform: "translateY(-3px)",
-    outlineColor: colors.brandBlue700,
-    boxShadow: "0 8px 24px -2px rgba(29, 78, 216, 0.32)",
+  productCardActive: {
+    outlineColor: { default: ACCENT, ":focus-visible": colors.brandBlue700 },
   },
   cardImg: {
     display: "block",
     width: "100%",
-    height: "100%",
+    aspectRatio: "8 / 9",
+    borderRadius: 0,
     objectFit: "cover",
+    outlineWidth: 1,
+    outlineStyle: "solid",
+    outlineColor: PHOTO_OUTLINE,
+    outlineOffset: -1,
   },
-  cardCaption: {
-    position: "absolute",
-    insetInline: 8,
-    insetBlockEnd: 8,
-    display: "flex",
-    alignItems: "center",
-    gap: 6,
-    paddingBlock: 4,
-    paddingInline: 8,
-    borderRadius: 6,
-    backgroundColor: "rgba(255, 255, 255, 0.92)",
-    backdropFilter: "blur(6px)",
-    fontSize: 11,
-    fontWeight: 600,
-    color: INK,
-    letterSpacing: "0.02em",
-    pointerEvents: "none",
-    transitionProperty: "background-color, color",
-    transitionDuration: "180ms",
-  },
-  cardCaptionActive: {
-    backgroundColor: colors.brandBlue700,
-    color: colors.paper,
-  },
-  cardNum: {
-    fontSize: 10,
-    opacity: 0.75,
-  },
-  cardName: {
-    overflow: "hidden",
-    textOverflow: "ellipsis",
-    whiteSpace: "nowrap",
-  },
-
-  section: {
-    paddingTop: { default: 56, [TABLET]: 72, [DESKTOP]: 88 },
-    paddingBottom: { default: 56, [TABLET]: 72, [DESKTOP]: 88 },
-    scrollMarginTop: 96,
-  },
-  sectionDivider: {
-    borderTopWidth: 1,
-    borderTopStyle: "solid",
-    borderTopColor: "rgba(0, 0, 0, 0.05)",
-  },
-  sectionTitle: {
-    margin: 0,
-    marginBottom: { default: 28, [DESKTOP]: 36 },
-    fontSize: { default: 26, [TABLET]: 30, [DESKTOP]: 34 },
-    fontWeight: 700,
-    letterSpacing: "0.02em",
-    color: INK,
-  },
-  categoryBanner: {
-    display: "flex",
-    alignItems: "center",
-    gap: 12,
-    marginBottom: 24,
-    paddingBlock: 10,
-    paddingInline: 16,
-    borderRadius: 10,
-    backgroundColor: TINT,
-  },
-  categoryPill: {
-    fontSize: 12,
-    fontWeight: 600,
-    letterSpacing: "0.04em",
-    color: colors.brandBlue700,
-    backgroundColor: colors.paper,
-    boxShadow: "0 1px 3px rgba(0, 0, 0, 0.06)",
-    paddingBlock: 3,
-    paddingInline: 10,
-    borderRadius: 999,
-  },
-  categoryDesc: {
-    fontSize: 13,
-    color: BODY_TEXT,
-  },
-  accordion: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 12,
-    margin: 0,
-    padding: 0,
-    listStyleType: "none",
-  },
-  newsItem: {
-    paddingBottom: 12,
-    backgroundColor: SURFACE,
-  },
-  newsHeading: {
-    margin: 0,
-  },
-  newsTrigger: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: 16,
-    width: "100%",
-    paddingTop: 24,
-    paddingInline: 24,
-    paddingBottom: 12,
-    borderWidth: 0,
-    backgroundColor: "transparent",
-    fontFamily: "inherit",
-    fontSize: 16,
-    fontWeight: 700,
-    lineHeight: 1.2,
-    textAlign: "start",
-    color: { default: INK, ":hover": colors.brandBlue700 },
-    cursor: "pointer",
-    transitionProperty: "color",
-    transitionDuration: "150ms",
-    transitionTimingFunction: "ease",
-    outlineStyle: { default: "none", ":focus-visible": "solid" },
-    outlineWidth: 2,
-    outlineColor: colors.brandBlue700,
-    outlineOffset: -2,
-  },
-  newsIconSlot: {
-    position: "relative",
-    flexShrink: 0,
-    width: 16,
-    height: 16,
-  },
-  newsIconLayer: {
-    position: "absolute",
-    inset: 0,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  newsPanel: {
-    overflow: "hidden",
-  },
-  newsPanelInner: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 12,
-    paddingInline: 24,
-    paddingBottom: 12,
-  },
-  mutedText: {
-    margin: 0,
-    fontSize: 14,
-    lineHeight: 1.7,
-    letterSpacing: "0.02em",
-    color: BODY_TEXT,
-  },
-  triggerNumber: {
-    marginInlineEnd: 8,
-    fontWeight: 700,
-    color: INK,
-  },
-  metaGrid: {
-    display: "grid",
-    gridTemplateColumns: { default: "1fr", [TABLET]: "repeat(2, minmax(0, 1fr))" },
-    gap: 16,
-    marginTop: 16,
-  },
-  metaField: {
+  cardBody: {
     display: "flex",
     flexDirection: "column",
     gap: 4,
   },
-  metaLabel: {
-    fontSize: 12,
-    fontWeight: 600,
-    color: MUTED_LABEL,
-    letterSpacing: "0.04em",
-    textTransform: "uppercase",
+  cardName: {
+    fontSize: { default: 15, [DESKTOP]: 16 },
+    fontWeight: 700,
+    lineHeight: 1.5,
+    color: "inherit",
   },
-  metaValue: {
+  cardDesc: {
     margin: 0,
-    fontSize: 13,
-    lineHeight: 1.6,
-    color: INK,
+    maxWidth: "18em",
+    fontSize: { default: 14, [DESKTOP]: 15 },
+    lineHeight: 1.7,
+    color: BODY_TEXT,
   },
-  tagList: {
+  productList: {
     display: "flex",
-    flexWrap: "wrap",
-    gap: 8,
-    marginTop: 6,
+    flexDirection: "column",
+    gap: 20,
+    marginTop: { default: 24, [DESKTOP]: 32 },
   },
-  tag: {
-    fontSize: 12,
-    paddingBlock: 4,
-    paddingInline: 10,
-    borderRadius: 6,
-    backgroundColor: TINT,
-    color: colors.brandBlue700,
-    fontWeight: 500,
+  productText: {
+    appearance: "none",
+    padding: 0,
+    borderWidth: 0,
+    backgroundColor: "transparent",
+    fontFamily: "inherit",
+    textAlign: "start",
+    cursor: "pointer",
+    color: INK,
+    transitionProperty: "color",
+    transitionDuration: "150ms",
+    transitionTimingFunction: "ease",
+    outlineStyle: { default: "none", ":focus-visible": "solid" },
+    outlineColor: colors.brandBlue700,
+    outlineWidth: 2,
+    outlineOffset: 3,
+  },
+  productTextActive: {
+    color: ACCENT,
   },
 });
 
-function AccordionIcon({ open }: { open: boolean }) {
-  const reduce = useReducedMotion();
-  return (
-    <span aria-hidden="true" {...stylex.props(styles.newsIconSlot)}>
-      <m.span
-        {...stylex.props(styles.newsIconLayer)}
-        animate={{ rotate: open ? 45 : 0 }}
-        transition={reduce ? { duration: 0 } : { type: "spring", duration: 0.3, bounce: 0 }}
-      >
-        <Plus size={16} strokeWidth={2} absoluteStrokeWidth />
-      </m.span>
-    </span>
-  );
-}
-
-function CatalogAccordionItem({
-  item,
-  index,
-  open,
-  onToggle,
-}: {
-  item: CatalogItem;
-  index: number;
-  open: boolean;
-  onToggle: () => void;
-}) {
-  const reduce = useReducedMotion();
-  const panelId = useId();
-
-  return (
-    <>
-      <h3 {...stylex.props(styles.newsHeading)}>
-        <button
-          type="button"
-          aria-expanded={open}
-          aria-controls={panelId}
-          onClick={onToggle}
-          {...stylex.props(styles.newsTrigger)}
-        >
-          <span>
-            <span {...stylex.props(styles.triggerNumber)}>{index + 1}.</span>
-            {item.title}
-          </span>
-          <AccordionIcon open={open} />
-        </button>
-      </h3>
-      <AnimatePresence initial={false}>
-        {open && (
-          <m.div
-            key="panel"
-            id={panelId}
-            {...stylex.props(styles.newsPanel)}
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: reduce ? 0 : 0.25, ease: EASE }}
-          >
-            <div {...stylex.props(styles.newsPanelInner)}>
-              <p {...stylex.props(styles.mutedText)}>{item.features}</p>
-              <div {...stylex.props(styles.metaGrid)}>
-                <div {...stylex.props(styles.metaField)}>
-                  <span {...stylex.props(styles.metaLabel)}>INCI 名称</span>
-                  <p {...stylex.props(styles.metaValue)}>{item.inci}</p>
-                </div>
-                <div {...stylex.props(styles.metaField)}>
-                  <span {...stylex.props(styles.metaLabel)}>原料分类</span>
-                  <p {...stylex.props(styles.metaValue)}>{item.category}</p>
-                </div>
-                <div {...stylex.props(styles.metaField)}>
-                  <span {...stylex.props(styles.metaLabel)}>原产地与工艺</span>
-                  <p {...stylex.props(styles.metaValue)}>{item.origin}</p>
-                </div>
-                <div {...stylex.props(styles.metaField)}>
-                  <span {...stylex.props(styles.metaLabel)}>推荐适用剂型</span>
-                  <p {...stylex.props(styles.metaValue)}>{item.applications}</p>
-                </div>
-              </div>
-            </div>
-          </m.div>
-        )}
-      </AnimatePresence>
-    </>
-  );
-}
-
-function SolutionAccordionItem({
-  item,
-  index,
-  open,
-  onToggle,
-}: {
-  item: SolutionItem;
-  index: number;
-  open: boolean;
-  onToggle: () => void;
-}) {
-  const reduce = useReducedMotion();
-  const panelId = useId();
-
-  return (
-    <>
-      <h3 {...stylex.props(styles.newsHeading)}>
-        <button
-          type="button"
-          aria-expanded={open}
-          aria-controls={panelId}
-          onClick={onToggle}
-          {...stylex.props(styles.newsTrigger)}
-        >
-          <span>
-            <span {...stylex.props(styles.triggerNumber)}>{index + 1}.</span>
-            {item.title}
-          </span>
-          <AccordionIcon open={open} />
-        </button>
-      </h3>
-      <AnimatePresence initial={false}>
-        {open && (
-          <m.div
-            key="panel"
-            id={panelId}
-            {...stylex.props(styles.newsPanel)}
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: reduce ? 0 : 0.25, ease: EASE }}
-          >
-            <div {...stylex.props(styles.newsPanelInner)}>
-              <p {...stylex.props(styles.mutedText)}>{item.overview}</p>
-              <div {...stylex.props(styles.metaGrid)}>
-                <div {...stylex.props(styles.metaField)}>
-                  <span {...stylex.props(styles.metaLabel)}>核心功能</span>
-                  <div {...stylex.props(styles.tagList)}>
-                    {item.functions.map((fn) => (
-                      <span key={fn} {...stylex.props(styles.tag)}>
-                        {fn}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-                <div {...stylex.props(styles.metaField)}>
-                  <span {...stylex.props(styles.metaLabel)}>质地表现</span>
-                  <p {...stylex.props(styles.metaValue)}>{item.texture}</p>
-                </div>
-                <div {...stylex.props(styles.metaField)}>
-                  <span {...stylex.props(styles.metaLabel)}>主要功能性成分</span>
-                  <p {...stylex.props(styles.metaValue)}>{item.keyIngredients.join("、")}</p>
-                </div>
-                <div {...stylex.props(styles.metaField)}>
-                  <span {...stylex.props(styles.metaLabel)}>终端应用方向</span>
-                  <p {...stylex.props(styles.metaValue)}>{item.applications}</p>
-                </div>
-              </div>
-            </div>
-          </m.div>
-        )}
-      </AnimatePresence>
-    </>
-  );
-}
-
 export function ProductsView({
   onNavigateHome,
-  sx,
+  CatalogSection,
+  SolutionsSection,
 }: {
   onNavigateHome: (hash?: string) => void;
-  sx?: StyleXStyles;
+  CatalogSection?: ComponentType;
+  SolutionsSection?: ComponentType;
 }) {
   const [activeTab, setActiveTab] = useState<string>("personal-care");
   const [activeProductIndex, setActiveProductIndex] = useState<number>(0);
-  const [openCatalogIndex, setOpenCatalogIndex] = useState<number | null>(0);
-  const [openSolutionIndex, setOpenSolutionIndex] = useState<number | null>(0);
-  const toggleCatalog = (index: number) => {
-    setOpenCatalogIndex((prev) => (prev === index ? null : index));
-  };
-
-  const toggleSolution = (index: number) => {
-    setOpenSolutionIndex((prev) => (prev === index ? null : index));
-  };
+  const { compare } = useSearch({ strict: false });
 
   return (
-    <div id="products-top" {...stylex.props(styles.root, sx)}>
-      {}
+    <div id="products-top" lang="zh-CN" {...stylex.props(styles.root)}>
       <section aria-label="产品与应用全景横幅" {...stylex.props(styles.bannerWrap)}>
+        <h1 {...stylex.props(styles.srOnly)}>产品与应用</h1>
         <figure {...stylex.props(styles.bannerFigure)}>
           <img
             src={FEATURED_PRODUCT.bannerImage}
@@ -695,12 +325,11 @@ export function ProductsView({
             decoding="async"
             {...stylex.props(styles.bannerImg)}
           />
-          <div aria-hidden="true" {...stylex.props(styles.bannerScrim)} />
         </figure>
       </section>
 
       <div {...stylex.props(styles.subBar)}>
-        <div {...stylex.props(styles.shell, styles.inset, styles.subBarInner)}>
+        <div {...stylex.props(layout.shell, layout.inset, styles.subBarInner)}>
           <nav aria-label="面包屑导航" {...stylex.props(styles.breadcrumb)}>
             <button
               type="button"
@@ -709,20 +338,19 @@ export function ProductsView({
             >
               首页
             </button>
-            <ChevronRight size={13} aria-hidden="true" />
+            <ChevronRight size={13} strokeWidth={1.5} absoluteStrokeWidth aria-hidden="true" />
             <span aria-current="page" {...stylex.props(styles.breadcrumbCurrent)}>
               产品与应用
             </span>
           </nav>
-          <div role="tablist" aria-label="品类切换" {...stylex.props(styles.chipList)}>
+          <div role="group" aria-label="品类切换" {...stylex.props(styles.chipList)}>
             {CATEGORIES.map((cat) => {
               const isActive = activeTab === cat.id;
               return (
                 <button
                   key={cat.id}
-                  role="tab"
                   type="button"
-                  aria-selected={isActive}
+                  aria-pressed={isActive}
                   onClick={() => setActiveTab(cat.id)}
                   {...stylex.props(styles.chip, isActive && styles.chipActive)}
                 >
@@ -733,10 +361,10 @@ export function ProductsView({
           </div>
         </div>
       </div>
-      {}
+
       <section
         aria-labelledby="spotlight-title"
-        {...stylex.props(styles.shell, styles.inset, styles.spotlightSection)}
+        {...stylex.props(layout.shell, layout.inset, styles.spotlightSection)}
       >
         <div {...stylex.props(styles.spotlightGrid)}>
           <div {...stylex.props(styles.spotlightText)}>
@@ -744,143 +372,73 @@ export function ProductsView({
               {FEATURED_PRODUCT.brand}
             </h2>
             <p {...stylex.props(styles.spotlightTagline)}>{FEATURED_PRODUCT.tagline}</p>
-            <div role="tablist" aria-label="核心特色原料" {...stylex.props(styles.spotlightList)}>
-              {FEATURED_PRODUCT.items.map((item, idx) => {
-                const isSelected = activeProductIndex === idx;
-                return (
-                  <button
-                    key={item.id}
-                    type="button"
-                    role="tab"
-                    aria-selected={isSelected}
-                    onClick={() => setActiveProductIndex(idx)}
-                    onMouseEnter={() => setActiveProductIndex(idx)}
-                    {...stylex.props(
-                      styles.spotlightItemBtn,
-                      isSelected && styles.spotlightItemBtnActive,
-                    )}
-                  >
-                    <div {...stylex.props(styles.spotlightItemHeader)}>
-                      <span
-                        {...stylex.props(
-                          styles.spotlightItemNum,
-                          isSelected && styles.spotlightItemNumActive,
-                        )}
-                      >
-                        0{idx + 1}
-                      </span>
-                      <h3
-                        {...stylex.props(
-                          styles.spotlightItemName,
-                          isSelected && styles.spotlightItemNameActive,
-                        )}
-                      >
-                        {item.name}
-                      </h3>
-                      <span {...stylex.props(styles.spotlightItemEn)}>({item.englishName})</span>
-                    </div>
-                    <p
-                      {...stylex.props(
-                        styles.spotlightItemDesc,
-                        isSelected && styles.spotlightItemDescActive,
-                      )}
-                    >
-                      {item.desc}
-                    </p>
-                  </button>
-                );
-              })}
+            <div {...stylex.props(styles.productList)}>
+              {FEATURED_PRODUCT.items.slice(0, 2).map((item, idx) => (
+                <button
+                  key={item.id}
+                  type="button"
+                  aria-pressed={activeProductIndex === idx}
+                  onClick={() => setActiveProductIndex(idx)}
+                  onMouseEnter={() => setActiveProductIndex(idx)}
+                  {...stylex.props(
+                    styles.productText,
+                    activeProductIndex === idx && styles.productTextActive,
+                  )}
+                >
+                  <span {...stylex.props(styles.cardBody)}>
+                    <span {...stylex.props(styles.cardName)}>{item.englishName}</span>
+                    <span {...stylex.props(styles.cardDesc)}>{item.desc}</span>
+                  </span>
+                </button>
+              ))}
             </div>
           </div>
-
           <div
-            role="region"
+            role="group"
             aria-label="6款核心油脂原料图卡"
             {...stylex.props(styles.spotlightCardsWrap)}
           >
-            {FEATURED_PRODUCT.items.map((item, idx) => {
-              const isSelected = activeProductIndex === idx;
-              return (
-                <figure
-                  key={item.id}
-                  onClick={() => setActiveProductIndex(idx)}
-                  onMouseEnter={() => setActiveProductIndex(idx)}
-                  {...stylex.props(styles.cardFigure, isSelected && styles.cardFigureActive)}
-                >
-                  <img
-                    src={item.cardImage}
-                    alt={item.cardAlt}
-                    loading={idx < 3 ? "eager" : "lazy"}
-                    decoding="async"
-                    {...stylex.props(styles.cardImg)}
-                  />
-                  <figcaption
-                    {...stylex.props(styles.cardCaption, isSelected && styles.cardCaptionActive)}
-                  >
-                    <span {...stylex.props(styles.cardNum)}>0{idx + 1}</span>
-                    <span {...stylex.props(styles.cardName)}>{item.name}</span>
-                  </figcaption>
-                </figure>
-              );
-            })}
+            {FEATURED_PRODUCT.items.map((item, idx) => (
+              <button
+                key={item.id}
+                type="button"
+                aria-pressed={activeProductIndex === idx}
+                aria-label={item.name}
+                onClick={() => setActiveProductIndex(idx)}
+                onMouseEnter={() => setActiveProductIndex(idx)}
+                {...stylex.props(
+                  styles.productCard,
+                  activeProductIndex === idx && styles.productCardActive,
+                )}
+              >
+                <img
+                  src={item.cardImage}
+                  alt={item.cardAlt}
+                  loading={idx < 3 ? "eager" : "lazy"}
+                  decoding="async"
+                  {...stylex.props(styles.cardImg)}
+                />
+              </button>
+            ))}
           </div>
         </div>
       </section>
 
-      <section
-        id="products-catalog"
-        aria-labelledby="catalog-title"
-        {...stylex.props(styles.shell, styles.inset, styles.section, styles.sectionDivider)}
-      >
-        <div {...stylex.props(styles.categoryBanner)}>
-          <span {...stylex.props(styles.categoryPill)}>
-            {CATEGORIES.find((c) => c.id === activeTab)?.label}
-          </span>
-          <span {...stylex.props(styles.categoryDesc)}>
-            {activeTab === "personal-care"
-              ? "精选个人护理全形态天然油脂与经典功效配方方案"
-              : `${CATEGORIES.find((c) => c.id === activeTab)?.label}核心原料与应用定制方案`}
-          </span>
-        </div>
-        <h2 id="catalog-title" {...stylex.props(styles.sectionTitle)}>
-          产品目录
-        </h2>
-        <ul role="region" aria-label="原料产品目录列表" {...stylex.props(styles.accordion)}>
-          {CATALOG_ITEMS.slice(0, 5).map((item, index) => (
-            <li key={item.id} {...stylex.props(styles.newsItem)}>
-              <CatalogAccordionItem
-                item={item}
-                index={index}
-                open={openCatalogIndex === index}
-                onToggle={() => toggleCatalog(index)}
-              />
-            </li>
-          ))}
-        </ul>
-      </section>
+      {CatalogSection && compare !== "baseline" && compare !== "solutions" ? (
+        <CatalogSection />
+      ) : (
+        <ProductCatalog categoryId={activeTab} />
+      )}
+      {SolutionsSection && compare !== "baseline" && compare !== "catalog" ? (
+        <SolutionsSection />
+      ) : (
+        <ProductSolutions />
+      )}
 
-      {}
-      <section
-        id="products-solutions"
-        aria-labelledby="solutions-title"
-        {...stylex.props(styles.shell, styles.inset, styles.section, styles.sectionDivider)}
-      >
-        <h2 id="solutions-title" {...stylex.props(styles.sectionTitle)}>
-          应用方案
-        </h2>
-        <ul role="region" aria-label="配方应用方案列表" {...stylex.props(styles.accordion)}>
-          {SOLUTION_ITEMS.slice(0, 5).map((item, index) => (
-            <li key={item.id} {...stylex.props(styles.newsItem)}>
-              <SolutionAccordionItem
-                item={item}
-                index={index}
-                open={openSolutionIndex === index}
-                onToggle={() => toggleSolution(index)}
-              />
-            </li>
-          ))}
-        </ul>
-      </section>
+      <ContactCta
+        subtitle={PRODUCTS_CTA_SUBTITLE}
+        actions={[{ label: CTA.action.label, onClick: () => onNavigateHome("contact") }]}
+      />
     </div>
   );
 }

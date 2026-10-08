@@ -43,8 +43,8 @@ import { HeroGradeFilter } from "@/components/prototype/hero-grade";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
 import { LINKEDIN_PATHS, LOGO_PATHS, WECHAT_PATHS, type VectorPath } from "../variant-o/vectors";
-import { INTRO_REVEAL_MS, introStyles, useIntro } from "../variant-oos/intro";
-import { LiquidImage } from "../variant-oos/liquid-hero";
+import { INTRO_REVEAL_MS, introStyles, useIntro } from "@/components/prototype/shared/intro";
+import { LiquidImage } from "@/components/prototype/shared/campus-liquid-image";
 import {
   ABOUT,
   CAMPUS,

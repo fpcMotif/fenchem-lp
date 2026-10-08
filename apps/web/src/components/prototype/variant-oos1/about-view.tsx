@@ -1,6 +1,6 @@
 import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { ArrowRight, ChevronLeft, ChevronRight, Factory, Leaf, Recycle, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, Factory, Leaf, Recycle, X } from "lucide-react";
 import { animate, m, useInView, useScroll, useTransform } from "motion/react";
 import { type ReactNode, useEffect, useRef, useState } from "react";
 
@@ -11,28 +11,25 @@ import {
   ABOUT_BANNER,
   ABOUT_CAMPUS,
   ABOUT_CSR,
-  ABOUT_CULTURE,
   ABOUT_HERO,
+  ABOUT_HISTORY,
   ABOUT_MOMENT,
 } from "./about-data";
+import { ContactCta } from "./contact-cta";
 import { CTA, STATS } from "./content";
+import { CultureScenes } from "./culture-scenes";
+import { HistoryTimeline } from "./history-timeline";
 import { useActiveSection } from "./use-active-section";
 import { Profile as ProfileOOS1G } from "./abouts/oos1g/profile";
 import { NavyBand } from "./abouts/oos1c/navy-band";
 
 const INK = "#1a1a1a";
 const BODY_TEXT = "#4d4d4d";
-const TINT = "#e6ecf7";
-const OOX_WORD_ON_TINT = "#d7e1f1";
-const WORD_ON_TINT = `color-mix(in srgb, ${OOX_WORD_ON_TINT} 80%, ${TINT})`;
 const DISPLAY_FONT = '"Inter Tight", "Helvetica Neue", Arial, sans-serif';
 const SERIF_ACCENT = '"Instrument Serif", Georgia, serif';
-const SURFACE = "#f6f6f6";
-const PAPER_WARM = "#faf8f4";
 const CSR_ACCENT = "#8cd6a3";
 const NAVY_SCRIM = "rgba(6, 28, 66, 0.78)";
 const PHOTO_OUTLINE = "rgba(0, 0, 0, 0.1)";
-const HAIRLINE = "rgba(26, 26, 26, 0.1)";
 const GRAIN = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`;
 const TABLET = "@media (min-width: 768px) and (max-width: 1279.98px)";
 const DESKTOP = breakpoints.xl;
@@ -48,7 +45,9 @@ const REVEAL_STEP_MS = 70;
 const REVEAL_MAX_STEPS = 5;
 const COUNT_UP_SECONDS = 1.6;
 
-const SECTION_IDS = ABOUT_HERO.navChips.map((chip) => chip.id);
+const [PROFILE_CHIP, ...LATER_CHIPS] = ABOUT_HERO.navChips;
+const NAV_CHIPS = [PROFILE_CHIP, ABOUT_HISTORY.navChip, ...LATER_CHIPS];
+const SECTION_IDS = NAV_CHIPS.map((chip) => chip.id);
 
 const revealDelay = (index: number) => Math.min(index, REVEAL_MAX_STEPS) * REVEAL_STEP_MS;
 const easeOutCubic = (t: number) => 1 - (1 - Math.min(1, Math.max(0, t))) ** 3;
@@ -598,62 +597,6 @@ const styles = stylex.create({
     insetInlineEnd: { default: 12, [breakpoints.md]: 32 },
   },
 
-  cultureSection: {
-    paddingBlock: { default: 72, [DESKTOP]: 128 },
-    backgroundColor: PAPER_WARM,
-  },
-  cultureGrid: {
-    display: "grid",
-    gridTemplateColumns: { default: "1fr", [breakpoints.md]: "repeat(3, minmax(0, 1fr))" },
-    maxWidth: 1120,
-    marginInline: "auto",
-  },
-  cultureValue: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    height: "100%",
-    boxSizing: "border-box",
-    paddingBlock: { default: 44, [breakpoints.md]: 8 },
-    paddingInline: { default: 8, [TABLET]: 24, [DESKTOP]: 48 },
-    textAlign: "center",
-    borderStyle: "solid",
-    borderColor: HAIRLINE,
-    borderWidth: 0,
-  },
-  cultureValueDivided: {
-    borderTopWidth: { default: 1, [breakpoints.md]: 0 },
-    borderInlineStartWidth: { default: 0, [breakpoints.md]: 1 },
-  },
-  cultureGlyph: {
-    marginBottom: { default: 24, [DESKTOP]: 32 },
-    fontSize: { default: 96, [DESKTOP]: 128 },
-    fontWeight: 700,
-    lineHeight: 1,
-  },
-  glyphBlue: { color: "#d9e2f2" },
-  glyphSand: { color: "#ebdfc4" },
-  glyphGreen: { color: "#d6e6ca" },
-  cultureTitle: {
-    margin: 0,
-    marginBottom: 16,
-    fontSize: { default: 22, [DESKTOP]: 24 },
-    fontWeight: 700,
-    lineHeight: 1.3,
-    letterSpacing: "0.14em",
-    marginInlineEnd: "-0.14em",
-    color: INK,
-  },
-  cultureDesc: {
-    margin: 0,
-    maxWidth: "19em",
-    fontSize: 15,
-    lineHeight: 2,
-    letterSpacing: "0.04em",
-    color: BODY_TEXT,
-    textWrap: "pretty",
-  },
-
   csrSection: {
     position: "relative",
     overflow: "hidden",
@@ -745,84 +688,7 @@ const styles = stylex.create({
     flexShrink: 0,
     color: CSR_ACCENT,
   },
-
-  ctaBanner: {
-    position: "relative",
-    overflow: "hidden",
-    paddingTop: { default: 80, [DESKTOP]: 120 },
-    paddingBottom: { default: 96, [DESKTOP]: 144 },
-    backgroundColor: TINT,
-  },
-  ctaWord: {
-    position: "absolute",
-    left: "50%",
-    bottom: 0,
-    fontFamily: DISPLAY_FONT,
-    fontSize: { default: "24vw", [DESKTOP]: "min(280px, 20vw)" },
-    fontWeight: 800,
-    lineHeight: 0.74,
-    letterSpacing: "-0.06em",
-    textTransform: "uppercase",
-    whiteSpace: "nowrap",
-    color: WORD_ON_TINT,
-    translate: "-50% 20%",
-    pointerEvents: "none",
-    userSelect: "none",
-  },
-  ctaInner: {
-    position: "relative",
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    textAlign: "center",
-    gap: 32,
-    maxWidth: 720,
-    marginInline: "auto",
-  },
-  buttonGroup: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    flexWrap: "wrap",
-    gap: 16,
-  },
-  button: {
-    display: "inline-flex",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 8,
-    height: 48,
-    paddingInline: 28,
-    borderWidth: 0,
-    borderRadius: 0,
-    fontSize: 16,
-    fontWeight: 500,
-    letterSpacing: "0.06em",
-    textDecoration: "none",
-    cursor: "pointer",
-    transform: {
-      default: null,
-      ":active": { default: null, [breakpoints.motionOk]: "scale(0.96)" },
-    },
-    transitionProperty: "background-color, color, transform",
-    transitionDuration: "160ms",
-    transitionTimingFunction: EASE_OUT_CSS,
-  },
-  buttonPrimary: {
-    backgroundColor: { default: colors.brandBlue700, ":hover": colors.brandBlue800 },
-    color: colors.paper,
-  },
-  buttonSecondary: {
-    backgroundColor: { default: colors.paper, ":hover": SURFACE },
-    color: colors.brandBlue700,
-  },
 });
-
-const GLYPH_TONES = {
-  blue: styles.glyphBlue,
-  sand: styles.glyphSand,
-  green: styles.glyphGreen,
-} as const;
 
 function Reveal({
   children,
@@ -1195,7 +1061,7 @@ function SubNav({ onNavigateHome }: { onNavigateHome: (hash?: string) => void })
           </span>
         </nav>
         <nav aria-label="本页导航" ref={chipListRef} {...stylex.props(styles.chipList)}>
-          {ABOUT_HERO.navChips.map((chip) => (
+          {NAV_CHIPS.map((chip) => (
             <a
               key={chip.id}
               href={`#${chip.id}`}
@@ -1253,69 +1119,24 @@ export function AboutView({ onNavigateHome }: { onNavigateHome: (hash?: string) 
 
       <ProfileOOS1G />
 
+      <HistoryTimeline stickyTop={HEADER_HEIGHT + SUB_BAR_HEIGHT} sx={styles.anchor} />
+
       <CampusMoment />
 
       <CampusGallery />
 
-      <section
-        id="about-culture"
-        aria-labelledby="about-culture-title"
-        {...stylex.props(styles.cultureSection, styles.anchor)}
-      >
-        <div {...stylex.props(styles.shell, styles.inset124)}>
-          <SectionHeader title={ABOUT_CULTURE.title} titleId="about-culture-title" />
-          <div {...stylex.props(styles.cultureGrid)}>
-            {ABOUT_CULTURE.values.map((value, idx) => (
-              <Reveal
-                key={value.title}
-                step={idx}
-                sx={[styles.cultureValue, idx > 0 && styles.cultureValueDivided]}
-              >
-                <span
-                  aria-hidden="true"
-                  {...stylex.props(styles.cultureGlyph, GLYPH_TONES[value.tone])}
-                >
-                  {value.glyph}
-                </span>
-                <h3 {...stylex.props(styles.cultureTitle)}>{value.title}</h3>
-                <p {...stylex.props(styles.cultureDesc)}>{value.desc}</p>
-              </Reveal>
-            ))}
-          </div>
-        </div>
-      </section>
+      <CultureScenes sx={styles.anchor} />
 
       <CsrSection />
 
       <NavyBand />
 
-      <section aria-labelledby="about-cta-title" {...stylex.props(styles.ctaBanner)}>
-        <span aria-hidden="true" lang="en" {...stylex.props(styles.ctaWord)}>
-          FENCHEM
-        </span>
-        <Reveal sx={[styles.shell, styles.inset124, styles.ctaInner]}>
-          <h2 id="about-cta-title" {...stylex.props(styles.sectionTitle)}>
-            {CTA.title}
-          </h2>
-          <div {...stylex.props(styles.buttonGroup)}>
-            <button
-              type="button"
-              onClick={() => onNavigateHome("contact")}
-              {...stylex.props(styles.button, styles.buttonPrimary, styles.focusRing)}
-            >
-              <span>{CTA.action.label}</span>
-              <ArrowRight size={16} aria-hidden="true" />
-            </button>
-            <button
-              type="button"
-              onClick={() => onNavigateHome("products")}
-              {...stylex.props(styles.button, styles.buttonSecondary, styles.focusRing)}
-            >
-              <span>产品与应用</span>
-            </button>
-          </div>
-        </Reveal>
-      </section>
+      <ContactCta
+        actions={[
+          { label: CTA.action.label, onClick: () => onNavigateHome("contact") },
+          { label: "产品与应用", tone: "secondary", onClick: () => onNavigateHome("products") },
+        ]}
+      />
     </div>
   );
 }

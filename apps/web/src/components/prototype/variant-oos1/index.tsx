@@ -44,15 +44,16 @@ import { HeroGradeFilter } from "@/components/prototype/hero-grade";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
 import { LINKEDIN_PATHS, LOGO_PATHS, WECHAT_PATHS, type VectorPath } from "../variant-o/vectors";
-import { INTRO_REVEAL_MS, introStyles, useIntro } from "./intro";
-import { LiquidImage } from "./liquid-hero";
+import { INTRO_REVEAL_MS, introStyles, useIntro } from "@/components/prototype/shared/intro";
+import { LiquidImage } from "@/components/prototype/shared/campus-liquid-image";
 import { AboutView } from "./about-view";
+import { ContactCta } from "./contact-cta";
 import { ProductsView } from "./products-view";
+import { RiseReveal } from "./rise-reveal";
 import { useActiveSection } from "./use-active-section";
 import {
   ABOUT,
   COPYRIGHT,
-  CTA,
   FOOTER_COLUMNS,
   GLOBAL_INTRO,
   HERO,
@@ -77,8 +78,6 @@ const GOOGLE_FONTS =
 const INK = "#1a1a1a";
 const BODY_TEXT = "#4d4d4d";
 const TINT = "#e6ecf7";
-const OOX_WORD_ON_TINT = "#d7e1f1";
-const WORD_ON_TINT = `color-mix(in srgb, ${OOX_WORD_ON_TINT} 80%, ${TINT})`;
 const DISPLAY_FONT = '"Inter Tight", "Helvetica Neue", Arial, sans-serif';
 const SURFACE = "#f6f6f6";
 const PANEL_ALT = "#e8e8e8";
@@ -140,7 +139,6 @@ function useQuadrantMotion() {
   );
 }
 
-const RISE_EASE: [number, number, number, number] = [0.16, 1, 0.3, 1];
 const RISE_STAGGER = 0.06;
 const RISE_MAX_STEPS = 3;
 const riseDelay = (index: number) => Math.min(index, RISE_MAX_STEPS) * RISE_STAGGER;
@@ -359,7 +357,6 @@ const styles = stylex.create({
   },
   buttonHero: { width: 144, height: 48 },
   buttonCompact: { minWidth: 96, height: 48, paddingInline: 24 },
-  buttonWide: { width: 160, height: 48 },
 
   header: {
     position: "fixed",
@@ -1297,39 +1294,6 @@ const styles = stylex.create({
     paddingBottom: 12,
   },
 
-  cta: {
-    position: "relative",
-    display: "flex",
-    justifyContent: "center",
-    overflow: "clip",
-    paddingTop: { default: 80, [DESKTOP]: 128 },
-    paddingBottom: { default: 120, [DESKTOP]: 220 },
-    backgroundColor: TINT,
-  },
-  ctaWord: {
-    position: "absolute",
-    left: "50%",
-    bottom: 0,
-    fontFamily: DISPLAY_FONT,
-    fontSize: { default: "30vw", [DESKTOP]: "min(360px, 25vw)" },
-    fontWeight: 800,
-    lineHeight: 0.74,
-    letterSpacing: "-0.06em",
-    textTransform: "uppercase",
-    whiteSpace: "nowrap",
-    color: WORD_ON_TINT,
-    translate: "-50% 22%",
-    pointerEvents: "none",
-    userSelect: "none",
-  },
-  ctaInner: {
-    position: "relative",
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    gap: 32,
-  },
-
   footer: {
     paddingTop: 64,
     paddingBottom: 48,
@@ -1473,28 +1437,6 @@ function ZoomReveal({
       whileInView={{ opacity: 1, transform: SETTLED }}
       viewport={{ once: true, margin: "-80px" }}
       transition={{ duration: reduce ? 0.2 : 0.8, delay: reduce ? 0 : delay, ease: EASE }}
-    >
-      {children}
-    </m.div>
-  );
-}
-
-type RiseProps = {
-  children: ReactNode;
-  sx?: StyleXStyles;
-  style?: StyleXStyles;
-  delay?: number;
-};
-
-function RiseReveal({ children, sx, style, delay = 0 }: RiseProps) {
-  const reduce = useReducedMotion();
-  return (
-    <m.div
-      {...stylex.props(sx, style)}
-      initial={{ opacity: 0, transform: "translateY(16px)" }}
-      whileInView={{ opacity: 1, transform: "translateY(0px)" }}
-      viewport={{ once: true, margin: "0px 0px -10% 0px" }}
-      transition={{ duration: reduce ? 0.2 : 0.45, delay: reduce ? 0 : delay, ease: RISE_EASE }}
     >
       {children}
     </m.div>
@@ -2345,31 +2287,6 @@ function News() {
   );
 }
 
-function ContactCta() {
-  return (
-    <section
-      id="contact"
-      aria-labelledby="oo-contact-title"
-      {...stylex.props(styles.cta, styles.inset124, styles.anchor)}
-    >
-      <span aria-hidden="true" lang="en" {...stylex.props(styles.ctaWord)}>
-        Fenchem
-      </span>
-      <RiseReveal sx={styles.ctaInner}>
-        <h2 id="oo-contact-title" {...stylex.props(styles.sectionTitle)}>
-          {CTA.title}
-        </h2>
-        <a
-          href={CTA.action.href}
-          {...stylex.props(styles.button, styles.buttonPrimary, styles.buttonWide)}
-        >
-          {CTA.action.label}
-        </a>
-      </RiseReveal>
-    </section>
-  );
-}
-
 function SiteFooter({ onNavigate }: { onNavigate?: (view: View, targetId?: string) => void }) {
   return (
     <footer {...stylex.props(styles.footer)}>
@@ -2529,7 +2446,7 @@ export function VariantOOS1({
                   <Products onOpenProductsPage={() => handleNavigate("products", "products-top")} />
                   <Offices />
                   <News />
-                  <ContactCta />
+                  <ContactCta id="contact" />
                 </>
               )}
             </main>

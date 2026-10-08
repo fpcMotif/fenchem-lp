@@ -350,6 +350,216 @@ export const VARIANTS = [
     twinOf: "oos1",
   },
   {
+    key: "oos1doubao",
+    Component: lazy(() =>
+      import("./variant-oos1/products/oos1doubao/index").then((m) => ({
+        default: m.VariantOOS1Doubao,
+      })),
+    ),
+    name: "O campus products · Doubao / title banner + underline tabs",
+    twinOf: "oos1",
+  },
+  {
+    key: "oos1pa",
+    Component: lazy(() =>
+      import("./variant-oos1/products/oos1pa/index").then((m) => ({
+        default: m.VariantOOS1PA,
+      })),
+    ),
+    name: "O campus products · Frozen-column table / mini-sheet dialog",
+    twinOf: "oos1",
+  },
+  {
+    key: "oos1pb",
+    Component: lazy(() =>
+      import("./variant-oos1/products/oos1pb/index").then((m) => ({
+        default: m.VariantOOS1PB,
+      })),
+    ),
+    name: "O campus products · Function matrix / tabbed sheet",
+    twinOf: "oos1",
+  },
+  {
+    key: "oos1pc",
+    Component: lazy(() =>
+      import("./variant-oos1/products/oos1pc/index").then((m) => ({
+        default: m.VariantOOS1PC,
+      })),
+    ),
+    name: "O campus products · Region rail tables / ingredient-centre sheet",
+    twinOf: "oos1",
+  },
+  {
+    key: "oos1pd",
+    Component: lazy(() =>
+      import("./variant-oos1/products/oos1pd/index").then((m) => ({
+        default: m.VariantOOS1PD,
+      })),
+    ),
+    name: "O campus products · Numbered catalogue / index + content sheets",
+    twinOf: "oos1",
+  },
+  {
+    key: "oos1pe",
+    Component: lazy(() =>
+      import("./variant-oos1/products/oos1pe/index").then((m) => ({
+        default: m.VariantOOS1PE,
+      })),
+    ),
+    name: "O campus products · Sortable table / sheet contents",
+    twinOf: "oos1",
+  },
+  {
+    key: "oos1pf",
+    Component: lazy(() =>
+      import("./variant-oos1/products/oos1pf/index").then((m) => ({
+        default: m.VariantOOS1PF,
+      })),
+    ),
+    name: "O campus products · Form-grouped table / folder tabs",
+    twinOf: "oos1",
+  },
+  {
+    key: "oos1pg",
+    Component: lazy(() =>
+      import("./variant-oos1/products/oos1pg/index").then((m) => ({
+        default: m.VariantOOS1PG,
+      })),
+    ),
+    name: "O campus products · Table + detail card / two-page sheet",
+    twinOf: "oos1",
+  },
+  {
+    key: "oos1ph",
+    Component: lazy(() =>
+      import("./variant-oos1/products/oos1ph/index").then((m) => ({
+        default: m.VariantOOS1PH,
+      })),
+    ),
+    name: "O campus products · Pivot table / front-back sheet",
+    twinOf: "oos1",
+  },
+  {
+    key: "oos1pi",
+    Component: lazy(() =>
+      import("./variant-oos1/products/oos1pi/index").then((m) => ({
+        default: m.VariantOOS1PI,
+      })),
+    ),
+    name: "O campus products · Region tabs table / card + notes sheets",
+    twinOf: "oos1",
+  },
+  {
+    key: "oos1pj",
+    Component: lazy(() =>
+      import("./variant-oos1/products/oos1pj/index").then((m) => ({
+        default: m.VariantOOS1PJ,
+      })),
+    ),
+    name: "O campus products · Expandable rows / compare sheets",
+    twinOf: "oos1",
+  },
+  {
+    key: "oos1pk",
+    Component: lazy(() =>
+      import("./variant-oos1/products/oos1pk/index").then((m) => ({
+        default: m.VariantOOS1PK,
+      })),
+    ),
+    name: "O campus products · Filter table / stacked sheets",
+    twinOf: "oos1",
+  },
+  {
+    key: "oos1pl",
+    Component: lazy(() =>
+      import("./variant-oos1/products/oos1pl/index").then((m) => ({
+        default: m.VariantOOS1PL,
+      })),
+    ),
+    name: "O campus products · Collapsible groups / scroll-spy sheets",
+    twinOf: "oos1",
+  },
+  {
+    key: "oos1pm",
+    Component: lazy(() =>
+      import("./variant-oos1/products/oos1pm/index").then((m) => ({
+        default: m.VariantOOS1PM,
+      })),
+    ),
+    name: "O campus products · Latin A–Z table / facing sheets",
+    twinOf: "oos1",
+  },
+  {
+    key: "oos1pn",
+    Component: lazy(() =>
+      import("./variant-oos1/products/oos1pn/index").then((m) => ({
+        default: m.VariantOOS1PN,
+      })),
+    ),
+    name: "O campus products · Two-line table / slide-over sheet",
+    twinOf: "oos1",
+  },
+  {
+    key: "oos1po",
+    Component: lazy(() =>
+      import("./variant-oos1/products/oos1po/index").then((m) => ({
+        default: m.VariantOOS1PO,
+      })),
+    ),
+    name: "O campus products · Swatch table / field-grid sheet",
+    twinOf: "oos1",
+  },
+  {
+    key: "oos1pp",
+    Component: lazy(() =>
+      import("./variant-oos1/products/oos1pp/index").then((m) => ({
+        default: m.VariantOOS1PP,
+      })),
+    ),
+    name: "O campus products · Sticky-group ledger / printed datasheet",
+    twinOf: "oos1",
+  },
+  {
+    key: "oos1pq",
+    Component: lazy(() =>
+      import("./variant-oos1/products/oos1pq/index").then((m) => ({
+        default: m.VariantOOS1PQ,
+      })),
+    ),
+    name: "O campus products · Table of tables / sheet carousel",
+    twinOf: "oos1",
+  },
+  {
+    key: "oos1pr",
+    Component: lazy(() =>
+      import("./variant-oos1/products/oos1pr/index").then((m) => ({
+        default: m.VariantOOS1PR,
+      })),
+    ),
+    name: "O campus products · Column toggles / split sheet",
+    twinOf: "oos1",
+  },
+  {
+    key: "oos1ps",
+    Component: lazy(() =>
+      import("./variant-oos1/products/oos1ps/index").then((m) => ({
+        default: m.VariantOOS1PS,
+      })),
+    ),
+    name: "O campus products · Compare-pin table / strip sheets",
+    twinOf: "oos1",
+  },
+  {
+    key: "oos1pt",
+    Component: lazy(() =>
+      import("./variant-oos1/products/oos1pt/index").then((m) => ({
+        default: m.VariantOOS1PT,
+      })),
+    ),
+    name: "O campus products · Rowspan catalogue / key-facts sheet",
+    twinOf: "oos1",
+  },
+  {
     key: "oos2",
     Component: lazy(() => import("./variant-oos2/index").then((m) => ({ default: m.VariantOOS2 }))),
     name: "Official site · O campus keep-open",

@@ -44,9 +44,9 @@ import { HeroGradeFilter } from "@/components/prototype/hero-grade";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
 import { LINKEDIN_PATHS, LOGO_PATHS, WECHAT_PATHS, type VectorPath } from "../variant-o/vectors";
-import { INTRO_REVEAL_MS, introStyles, useIntro } from "./intro";
+import { INTRO_REVEAL_MS, introStyles, useIntro } from "@/components/prototype/shared/intro";
 import { DepthPhoto, glyphRise, screenWaterline } from "./depth-photo";
-import { LiquidImage } from "./liquid-hero";
+import { LiquidImage } from "@/components/prototype/shared/liquid-image";
 import {
   ABOUT,
   COPYRIGHT,

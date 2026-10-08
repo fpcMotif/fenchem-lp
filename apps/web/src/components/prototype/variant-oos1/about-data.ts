@@ -39,6 +39,75 @@ export const ABOUT_HERO = {
   ],
 } as const;
 
+export const ABOUT_HISTORY = {
+  navChip: { label: "发展历程", id: "about-history" },
+  eyebrow: "Milestones",
+  title: "发展历程",
+  caption: "双螺旋每交汇一次，即走过一年",
+  milestones: [
+    {
+      year: 1995,
+      kicker: "Beginning",
+      events: [{ text: "在中国-南京成立总部" }],
+    },
+    {
+      year: 2007,
+      events: [{ entity: "Fenchem Inc.", text: "在美国加利福尼亚州成立" }],
+    },
+    {
+      year: 2009,
+      events: [{ entity: "Fenchem Europe", text: "在捷克共和国斯特拉瓦成立" }],
+    },
+    {
+      year: 2011,
+      events: [
+        { entity: "Fenchem Malaysia", text: "在马来西亚吉隆坡成立" },
+        { text: "启动全球采购" },
+        { text: "建立生产基地和研发中心" },
+      ],
+    },
+    {
+      year: 2012,
+      events: [{ entity: "Fenchem S.A", text: "在南非约翰内斯堡成立" }],
+    },
+    {
+      year: 2013,
+      events: [{ entity: "Fenchem GmbH", text: "在德国科隆成立" }],
+    },
+    {
+      year: 2015,
+      events: [
+        { entity: "Fenchem Thailand", text: "在泰国曼谷成立" },
+        { text: "第二家美国分公司在爱荷华州成立" },
+        { entity: "Fenchem Brazil", text: "在巴西圣保罗成立" },
+      ],
+    },
+    {
+      year: 2021,
+      events: [
+        { text: "泛成荣获国家高新技术企业称号" },
+        { entity: "Fenchem Indonesia", text: "在印度尼西亚雅加达成立" },
+      ],
+    },
+    {
+      year: 2023,
+      events: [
+        { entity: "Fenchem Japan", text: "在日本东京成立" },
+        { entity: "Fenchem Philippines", text: "在菲律宾马尼拉成立" },
+      ],
+    },
+    {
+      year: 2024,
+      events: [
+        { text: "在中国启用新园区和工厂" },
+        { entity: "Fenchem India", text: "在印度孟买成立" },
+        { text: "第三家美国分公司在新泽西州成立" },
+        { entity: "Fenchem UK", text: "在曼彻斯特成立" },
+      ],
+    },
+  ],
+} as const;
+
 export const ABOUT_MOMENT = {
   image: "/prototype/about/about-campus-panorama.webp",
   alt: "泛成总部园区鸟瞰：研发大楼、屋顶花园与大片绿地",

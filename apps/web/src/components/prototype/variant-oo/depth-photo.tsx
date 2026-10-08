@@ -5,7 +5,12 @@ import { useEffect, useRef, useState, type RefObject } from "react";
 
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
-import { COVER_UV, createFullscreenProgram, loadTexture, sizeCanvas } from "./webgl";
+import {
+  COVER_UV,
+  createFullscreenProgram,
+  loadTexture,
+  sizeCanvas,
+} from "@/components/prototype/shared/webgl";
 
 const PHOTO_INSET = 0.95;
 
