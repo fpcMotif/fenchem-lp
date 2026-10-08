@@ -48,14 +48,14 @@ export const CATEGORIES: Category[] = [
 ];
 
 export const FEATURED_CARDS: ArtworkCard[] = [
-  { src: "/products/card-6.png", alt: "天然流体油脂微观艺术笔触" },
+  { src: "/products/card-1.png", alt: "天然流体油脂微观羽翼水彩肌理" },
+  { src: "/products/card-2.png", alt: "金黄粉润凝胶光感双重植物油滴" },
+  { src: "/products/card-3.png", alt: "巴西莓富含花青素的深紫超级浆果" },
   { src: "/products/card-4.png", alt: "鳄梨新鲜剖面与丰富不饱和脂肪酸" },
-  { src: "/products/card-1.png", alt: "天然纯白草本花卉活性植物提取" },
-  { src: "/products/card-3.png", alt: "巴西莓富含多酚的深紫超级浆果" },
-  { src: "/products/card-8.png", alt: "天然乳木果原果与植物活性脂质" },
-  { src: "/products/card-5.png", alt: "天然纯白花卉水彩盛放" },
-  { src: "/products/card-2.png", alt: "金黄粉润霜体质地与亲肤脂质延展" },
-  { src: "/products/card-7.png", alt: "亚马逊巴西坚果与天然原料果核" },
+  { src: "/products/card-5.png", alt: "天然纯白银莲花草本活性植物花卉" },
+  { src: "/products/card-6.png", alt: "梦幻浅紫蔚蓝流体配方艺术笔触" },
+  { src: "/products/card-7.png", alt: "亚马逊巴西坚果堆叠饱满天然果核" },
+  { src: "/products/card-8.png", alt: "粉桃色丝滑质感油画肌理延展" },
 ];
 
 export const FEATURED_PRODUCT: FeaturedProduct = {
