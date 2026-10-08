@@ -222,15 +222,33 @@ const styles = stylex.create({
     maxWidth: 440,
   },
   spotlightCardsWrap: {
-    borderRadius: 16,
-    overflow: "hidden",
-    boxShadow: "0 12px 36px -12px rgba(42, 38, 56, 0.12)",
-    backgroundColor: "#fafafc",
+    display: "grid",
+    gridTemplateColumns: {
+      default: "repeat(2, minmax(0, 1fr))",
+      [breakpoints.sm]: "repeat(4, minmax(0, 1fr))",
+    },
+    gap: 12,
   },
-  spotlightCardsImg: {
+  cardFigure: {
+    position: "relative",
+    margin: 0,
+    borderRadius: 12,
+    overflow: "hidden",
+    aspectRatio: "93 / 105",
+    backgroundColor: SURFACE,
+    boxShadow: "0 2px 8px -2px rgba(0, 0, 0, 0.06)",
+    transitionProperty: "transform, box-shadow",
+    transitionDuration: "240ms",
+    transitionTimingFunction: "ease-out",
+    ":hover": {
+      transform: "translateY(-3px)",
+      boxShadow: "0 10px 24px -4px rgba(0, 0, 0, 0.14)",
+    },
+  },
+  cardImg: {
     display: "block",
     width: "100%",
-    height: "auto",
+    height: "100%",
     objectFit: "cover",
   },
 
@@ -644,13 +662,17 @@ export function ProductsView({
           </div>
 
           <div {...stylex.props(styles.spotlightCardsWrap)}>
-            <img
-              src={FEATURED_PRODUCT.artworkImage}
-              alt="OLVE'Care Shea 纯天然植物原料与质地艺术卡片"
-              loading="lazy"
-              decoding="async"
-              {...stylex.props(styles.spotlightCardsImg)}
-            />
+            {FEATURED_PRODUCT.cards.map((card, idx) => (
+              <figure key={card.src} {...stylex.props(styles.cardFigure)}>
+                <img
+                  src={card.src}
+                  alt={card.alt}
+                  loading={idx < 4 ? "eager" : "lazy"}
+                  decoding="async"
+                  {...stylex.props(styles.cardImg)}
+                />
+              </figure>
+            ))}
           </div>
         </div>
       </section>
