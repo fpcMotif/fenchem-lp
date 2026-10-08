@@ -1,4 +1,4 @@
-import { breakpoints } from "@fenchem-lp/ui/tokens.stylex";
+import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 import type { StyleXStyles } from "@stylexjs/stylex";
 import { ChevronRight, Plus } from "lucide-react";
@@ -20,10 +20,8 @@ import {
 const INK = "#1a1a1a";
 const BODY_TEXT = "#4d4d4d";
 const MUTED_LABEL = "#52525b";
-const SURFACE = "#f6f7f9";
-const TAB_ACTIVE_BG = "#584a75";
-const TAB_INACTIVE_BG = "#edeef2";
-const TAB_INACTIVE_TEXT = "#3f3f46";
+const SURFACE = "#f6f6f6";
+const TINT = "#e6ecf7";
 const DISPLAY_FONT = '"Inter Tight", "Helvetica Neue", Arial, sans-serif';
 const BODY_FONT =
   '"Noto Sans SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif';
@@ -115,7 +113,7 @@ const styles = stylex.create({
     textDecoration: "none",
     outlineStyle: { default: "none", ":focus-visible": "solid" },
     outlineWidth: 2,
-    outlineColor: TAB_ACTIVE_BG,
+    outlineColor: colors.brandBlue700,
     outlineOffset: 2,
     borderRadius: 4,
     ":hover": {
@@ -151,21 +149,17 @@ const styles = stylex.create({
     transitionTimingFunction: "ease-out",
     outlineStyle: { default: "none", ":focus-visible": "solid" },
     outlineWidth: 2,
-    outlineColor: TAB_ACTIVE_BG,
+    outlineColor: colors.brandBlue700,
     outlineOffset: 2,
   },
   tabActive: {
-    backgroundColor: TAB_ACTIVE_BG,
-    color: "#ffffff",
-    boxShadow: "0 4px 14px -3px rgba(88, 74, 117, 0.35)",
+    backgroundColor: { default: colors.brandBlue700, ":hover": colors.brandBlue800 },
+    color: colors.paper,
+    boxShadow: "0 4px 14px -3px rgba(29, 78, 216, 0.35)",
   },
   tabInactive: {
-    backgroundColor: TAB_INACTIVE_BG,
-    color: TAB_INACTIVE_TEXT,
-    ":hover": {
-      backgroundColor: "#e2e4ec",
-      color: INK,
-    },
+    backgroundColor: { default: SURFACE, ":hover": TINT },
+    color: { default: INK, ":hover": colors.brandBlue700 },
   },
 
   spotlightSection: {
@@ -188,7 +182,7 @@ const styles = stylex.create({
     fontWeight: 700,
     lineHeight: 1.15,
     letterSpacing: "-0.01em",
-    color: "#2a2638",
+    color: INK,
     fontFamily: DISPLAY_FONT,
   },
   spotlightTagline: {
@@ -256,14 +250,15 @@ const styles = stylex.create({
     paddingBlock: 10,
     paddingInline: 16,
     borderRadius: 10,
-    backgroundColor: "#f5f3f7",
+    backgroundColor: TINT,
   },
   categoryPill: {
     fontSize: 12,
     fontWeight: 600,
     letterSpacing: "0.04em",
-    color: TAB_ACTIVE_BG,
-    backgroundColor: "rgba(88, 74, 117, 0.12)",
+    color: colors.brandBlue700,
+    backgroundColor: colors.paper,
+    boxShadow: "0 1px 3px rgba(0, 0, 0, 0.06)",
     paddingBlock: 3,
     paddingInline: 10,
     borderRadius: 999,
@@ -305,7 +300,7 @@ const styles = stylex.create({
     color: INK,
     outlineStyle: { default: "none", ":focus-visible": "solid" },
     outlineWidth: 2,
-    outlineColor: TAB_ACTIVE_BG,
+    outlineColor: colors.brandBlue700,
     outlineOffset: -2,
   },
   triggerTitle: {
@@ -330,7 +325,7 @@ const styles = stylex.create({
     height: 28,
     borderRadius: "50%",
     backgroundColor: "rgba(0, 0, 0, 0.04)",
-    color: "#2a2638",
+    color: colors.brandBlue700,
   },
   iconLayer: {
     display: "inline-flex",
@@ -390,8 +385,8 @@ const styles = stylex.create({
     paddingBlock: 4,
     paddingInline: 10,
     borderRadius: 6,
-    backgroundColor: "rgba(88, 74, 117, 0.08)",
-    color: TAB_ACTIVE_BG,
+    backgroundColor: TINT,
+    color: colors.brandBlue700,
     fontWeight: 500,
   },
 });
