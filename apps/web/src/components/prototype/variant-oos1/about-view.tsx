@@ -8,7 +8,8 @@ import { type ReactNode, useEffect, useRef, useState } from "react";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
 import { ABOUT_BANNER, ABOUT_CAMPUS, ABOUT_CSR, ABOUT_HERO, ABOUT_HISTORY } from "./about-data";
-import { CAMPUS_GALLERY, CampusCarousel } from "./campus-carousel";
+import { CampusCarousel } from "./campus-carousel";
+import { CAMPUS_GALLERY } from "./campus-gallery";
 import { ContactCta } from "./contact-cta";
 import { CTA } from "./content";
 import { CultureScenes } from "./culture-scenes";
