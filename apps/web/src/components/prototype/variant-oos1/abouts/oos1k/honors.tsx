@@ -2,7 +2,8 @@ import * as stylex from "@stylexjs/stylex";
 
 import { ABOUT_HONORS } from "../../about-data";
 import type { Magnitude } from "./sky";
-import { ChartHeading, ui, useDusk } from "./shared";
+import { ChartHeading, useDusk } from "./shared";
+import { ui } from "./shared-values";
 import { bp, face, sky } from "./tokens.stylex";
 
 type Level = (typeof ABOUT_HONORS.items)[number]["level"];

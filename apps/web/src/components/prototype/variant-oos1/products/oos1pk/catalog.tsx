@@ -12,7 +12,8 @@ import {
   type FlatItem,
   type FunctionTag,
 } from "../shared/derived";
-import { findRanges, Marked, toTerms, type Range } from "./marked";
+import { Marked } from "./marked";
+import { findRanges, toTerms, type Range } from "./marked-values";
 
 const INK = "#1a1a1a";
 const BODY_TEXT = "#4d4d4d";
@@ -594,8 +595,8 @@ function TableRow({ row, terms }: { row: CatalogRow; terms: string[] }) {
   const inciRanges: Range[] = findRanges(row.inciText, terms);
 
   return (
-    <tr role="row" {...stylex.props(styles.row)}>
-      <th scope="row" role="rowheader" {...stylex.props(styles.cell, styles.nameCell)}>
+    <tr {...stylex.props(styles.row)}>
+      <th scope="row" {...stylex.props(styles.cell, styles.nameCell)}>
         <span {...stylex.props(styles.nameLine)}>
           <span {...stylex.props(styles.number)}>{row.number}</span>
           <span {...stylex.props(styles.names)}>
@@ -610,17 +611,15 @@ function TableRow({ row, terms }: { row: CatalogRow; terms: string[] }) {
           </span>
         </span>
       </th>
-      <td role="cell" {...stylex.props(styles.cell, styles.regionCell)}>
-        {row.region}
-      </td>
-      <td role="cell" {...stylex.props(styles.cell, styles.inciCell)}>
+      <td {...stylex.props(styles.cell, styles.regionCell)}>{row.region}</td>
+      <td {...stylex.props(styles.cell, styles.inciCell)}>
         {row.inci.map((segment) => (
           <span key={segment.start} {...stylex.props(segment.latin && styles.latin)}>
             <Marked text={segment.text} ranges={inciRanges} offset={segment.start} />
           </span>
         ))}
       </td>
-      <td role="cell" {...stylex.props(styles.cell, styles.featuresCell, styles.lastCell)}>
+      <td {...stylex.props(styles.cell, styles.featuresCell, styles.lastCell)}>
         <p {...stylex.props(styles.features)}>
           <Marked text={item.features} ranges={findRanges(item.features, terms)} />
         </p>
@@ -692,7 +691,7 @@ export function Catalog() {
         </header>
 
         <div {...stylex.props(styles.toolbar)}>
-          <div role="search" {...stylex.props(styles.searchField)}>
+          <search {...stylex.props(styles.searchField)}>
             <label htmlFor={searchId} {...stylex.props(styles.srOnly)}>
               搜索原料
             </label>
@@ -726,7 +725,7 @@ export function Catalog() {
                 <X size={16} strokeWidth={1.5} absoluteStrokeWidth aria-hidden="true" />
               </button>
             )}
-          </div>
+          </search>
 
           <div {...stylex.props(styles.regionField)}>
             <label htmlFor={regionId} {...stylex.props(styles.srOnly)}>
@@ -823,37 +822,33 @@ export function Catalog() {
 
         {intro && <p {...stylex.props(styles.intro)}>{intro}</p>}
 
-        <table role="table" aria-labelledby={titleId} {...stylex.props(styles.table)}>
+        <table aria-labelledby={titleId} {...stylex.props(styles.table)}>
           <colgroup>
             <col {...stylex.props(styles.colName)} />
             <col {...stylex.props(styles.colRegion)} />
             <col {...stylex.props(styles.colInci)} />
             <col {...stylex.props(styles.colFeatures)} />
           </colgroup>
-          <thead role="rowgroup" {...stylex.props(styles.thead)}>
-            <tr role="row">
-              <th scope="col" role="columnheader" {...stylex.props(styles.th, styles.thName)}>
+          <thead {...stylex.props(styles.thead)}>
+            <tr>
+              <th scope="col" {...stylex.props(styles.th, styles.thName)}>
                 名称
               </th>
-              <th scope="col" role="columnheader" {...stylex.props(styles.th)}>
+              <th scope="col" {...stylex.props(styles.th)}>
                 产地
               </th>
-              <th scope="col" role="columnheader" {...stylex.props(styles.th)}>
+              <th scope="col" {...stylex.props(styles.th)}>
                 INCI 名称
               </th>
-              <th scope="col" role="columnheader" {...stylex.props(styles.th, styles.lastCell)}>
+              <th scope="col" {...stylex.props(styles.th, styles.lastCell)}>
                 {"特性&应用"}
               </th>
             </tr>
           </thead>
-          <tbody role="rowgroup" {...stylex.props(styles.tbody)}>
+          <tbody {...stylex.props(styles.tbody)}>
             {visible.length === 0 ? (
-              <tr role="row" {...stylex.props(styles.row)}>
-                <td
-                  role="cell"
-                  colSpan={4}
-                  {...stylex.props(styles.cell, styles.lastCell, styles.emptyCell)}
-                >
+              <tr {...stylex.props(styles.row)}>
+                <td colSpan={4} {...stylex.props(styles.cell, styles.lastCell, styles.emptyCell)}>
                   <p {...stylex.props(styles.emptyText)}>没有符合条件的原料</p>
                   <button type="button" onClick={clearAll} {...stylex.props(styles.textButton)}>
                     清除筛选

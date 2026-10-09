@@ -1,3 +1,7 @@
+import { CurrentYear } from "./shared/current-year";
+import { SpecificationMobileMenu } from "./shared/navigation-and-headline";
+import { LayoutGroup } from "motion/react";
+
 /*
  * PROTOTYPE — Variant S: "Strontium · periodic index".
  *
@@ -17,11 +21,11 @@
  * and black tabular mono for every value. One green (950). Square corners.
  */
 import { useEffect, useId, useState } from "react";
-import { AnimatePresence, LazyMotion, domAnimation, m, useScroll } from "motion/react";
+import { LazyMotion, domMax, m, useScroll } from "motion/react";
 import { ArrowRight, ArrowUp, Menu, X } from "lucide-react";
 import * as stylex from "@stylexjs/stylex";
 import { breakpoints, colors, typography } from "@fenchem-lp/ui/tokens.stylex";
-import { EASE, STAGGER } from "@/components/prototype/motion-constants";
+import { STAGGER } from "@/components/prototype/motion-constants";
 import { Reveal } from "@/components/prototype/motion";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 import {
@@ -175,6 +179,9 @@ const MD_ONLY = "@media (min-width: 768px) and (max-width: 1023.98px)";
 const SM_TO_LG = "@media (min-width: 640px) and (max-width: 1023.98px)";
 
 const styles = stylex.create({
+  nativeTable: { display: "block", width: "100%", borderCollapse: "collapse", borderSpacing: 0 },
+  nativeList: { listStyleType: "none", padding: 0, margin: 0 },
+  nativeCell: { fontWeight: "inherit", textAlign: "inherit", padding: 0 },
   root: {
     backgroundColor: colors.paper,
     color: colors.ink,
@@ -1216,44 +1223,20 @@ function NavBar() {
           </div>
         </nav>
       </div>
-      <AnimatePresence initial={false}>
-        {open ? (
-          <m.div
-            id={panelId}
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: reduce ? 0 : 0.36, ease: EASE }}
-            {...stylex.props(styles.mobilePanel)}
-          >
-            <div {...stylex.props(styles.container)}>
-              <ul {...stylex.props(styles.mobileList)}>
-                {NAV.map((link) => (
-                  <li key={link.href}>
-                    <a
-                      href={link.href}
-                      onClick={() => setOpen(false)}
-                      {...stylex.props(styles.mobileLink)}
-                    >
-                      {link.label}
-                    </a>
-                  </li>
-                ))}
-                <li>
-                  <a
-                    href={createInquiryHref("contact")}
-                    onClick={() => setOpen(false)}
-                    {...stylex.props(styles.ctaPrimary)}
-                  >
-                    Request a specification
-                    <ArrowRight aria-hidden size={14} />
-                  </a>
-                </li>
-              </ul>
-            </div>
-          </m.div>
-        ) : null}
-      </AnimatePresence>
+      <SpecificationMobileMenu
+        styles={{
+          mobilePanel: styles.mobilePanel,
+          container: styles.container,
+          mobileList: styles.mobileList,
+          mobileLink: styles.mobileLink,
+          ctaPrimary: styles.ctaPrimary,
+        }}
+        panelId={panelId}
+        open={open}
+        reduce={reduce}
+        links={NAV}
+        setOpen={setOpen}
+      />
       {reduce ? null : (
         <m.div aria-hidden style={{ scaleX: scrollYProgress }} {...stylex.props(styles.progress)} />
       )}
@@ -1390,7 +1373,7 @@ function SpecimenTile({ ingredient }: { ingredient: Ingredient }) {
   const invert = look.dark === true;
   const white = look.white === true;
   return (
-    <article aria-label={`${ingredient.name}, ${ingredient.latin}`} {...stylex.props(styles.tile)}>
+    <li aria-label={`${ingredient.name}, ${ingredient.latin}`} {...stylex.props(styles.tile)}>
       <div
         style={{ backgroundColor: look.colour }}
         {...stylex.props(styles.tileField, white && styles.whiteField)}
@@ -1416,7 +1399,7 @@ function SpecimenTile({ ingredient }: { ingredient: Ingredient }) {
         <span {...stylex.props(styles.data)}>{ingredient.form}</span>
         <span {...stylex.props(styles.data, styles.dataSoft)}>{look.label}</span>
       </div>
-    </article>
+    </li>
   );
 }
 
@@ -1432,15 +1415,14 @@ function IndexSection() {
           Periodic index: eight actives, one specification each.
         </SectionHead>
         <Reveal>
-          <div
-            role="list"
+          <ul
             aria-label="Periodic index of actives"
-            {...stylex.props(styles.indexTable)}
+            {...stylex.props(styles.nativeList, styles.indexTable)}
           >
             {INDEX_ORDER.map((ingredient) => (
               <SpecimenTile key={ingredient.code} ingredient={ingredient} />
             ))}
-          </div>
+          </ul>
         </Reveal>
       </div>
     </section>
@@ -1469,80 +1451,118 @@ function CertificateSection() {
               <h3 {...stylex.props(styles.display, styles.running)}>Certificate of analysis</h3>
               <span {...stylex.props(styles.data)}>{CERTIFICATE.number}</span>
             </div>
-            <div role="table" aria-label="Lot identity">
-              <div role="row" {...stylex.props(styles.certRow)}>
-                <span role="cell" {...stylex.props(styles.certCell, styles.certLabel)}>
-                  Product
-                </span>
-                <span role="cell" {...stylex.props(styles.certCell, styles.data)}>
-                  {CERTIFICATE.grade}
-                </span>
-                <span role="cell" {...stylex.props(styles.certCell, styles.certLabel)}>
-                  Source
-                </span>
-                <span role="cell" {...stylex.props(styles.certCell, styles.data)}>
-                  {HERO_SPECIMEN.latin}
-                </span>
-              </div>
-              <div role="row" {...stylex.props(styles.certRow)}>
-                <span role="cell" {...stylex.props(styles.certCell, styles.certLabel)}>
-                  Spec reference
-                </span>
-                <span role="cell" {...stylex.props(styles.certCell, styles.data)}>
-                  {HERO_SPECIMEN.code}
-                </span>
-                <span role="cell" {...stylex.props(styles.certCell, styles.certLabel)}>
-                  Lot
-                </span>
-                <span role="cell" {...stylex.props(styles.certCell, styles.data)}>
-                  {CERTIFICATE.lot}
-                </span>
-              </div>
-            </div>
-            <div role="table" aria-label="Tests">
-              <div role="row" {...stylex.props(styles.certRow, styles.certRowHead)}>
-                <span role="columnheader" {...stylex.props(styles.certCell, styles.certLabel)}>
-                  Test
-                </span>
-                <span role="columnheader" {...stylex.props(styles.certCell, styles.certLabel)}>
-                  Method
-                </span>
-                <span
-                  role="columnheader"
-                  {...stylex.props(styles.certCell, styles.certLabel, styles.certNumeric)}
-                >
-                  Specification
-                </span>
-                <span
-                  role="columnheader"
-                  {...stylex.props(styles.certCell, styles.certLabel, styles.certNumeric)}
-                >
-                  Result
-                </span>
-              </div>
-              {CERTIFICATE.tests.map((row) => (
-                <div key={row.test} role="row" {...stylex.props(styles.certRow)}>
-                  <span role="cell" {...stylex.props(styles.certCell)}>
-                    {row.test}
-                  </span>
-                  <span role="cell" {...stylex.props(styles.certCell, styles.data)}>
-                    {row.method}
-                  </span>
-                  <span
-                    role="cell"
-                    {...stylex.props(styles.certCell, styles.data, styles.certNumeric)}
+            <table {...stylex.props(styles.nativeTable)} aria-label="Lot identity">
+              <tbody style={{ display: "contents" }}>
+                <tr {...stylex.props(styles.certRow)}>
+                  <th
+                    scope="row"
+                    {...stylex.props(styles.nativeCell, styles.certCell, styles.certLabel)}
                   >
-                    {row.specification}
-                  </span>
-                  <span
-                    role="cell"
-                    {...stylex.props(styles.certCell, styles.data, styles.certResult)}
+                    Product
+                  </th>
+                  <td {...stylex.props(styles.nativeCell, styles.certCell, styles.data)}>
+                    {CERTIFICATE.grade}
+                  </td>
+                  <th
+                    scope="row"
+                    {...stylex.props(styles.nativeCell, styles.certCell, styles.certLabel)}
                   >
-                    {row.result}
-                  </span>
-                </div>
-              ))}
-            </div>
+                    Source
+                  </th>
+                  <td {...stylex.props(styles.nativeCell, styles.certCell, styles.data)}>
+                    {HERO_SPECIMEN.latin}
+                  </td>
+                </tr>
+                <tr {...stylex.props(styles.certRow)}>
+                  <th
+                    scope="row"
+                    {...stylex.props(styles.nativeCell, styles.certCell, styles.certLabel)}
+                  >
+                    Spec reference
+                  </th>
+                  <td {...stylex.props(styles.nativeCell, styles.certCell, styles.data)}>
+                    {HERO_SPECIMEN.code}
+                  </td>
+                  <th
+                    scope="row"
+                    {...stylex.props(styles.nativeCell, styles.certCell, styles.certLabel)}
+                  >
+                    Lot
+                  </th>
+                  <td {...stylex.props(styles.nativeCell, styles.certCell, styles.data)}>
+                    {CERTIFICATE.lot}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <table {...stylex.props(styles.nativeTable)} aria-label="Tests">
+              <tbody style={{ display: "contents" }}>
+                <tr {...stylex.props(styles.certRow, styles.certRowHead)}>
+                  <th
+                    scope="col"
+                    {...stylex.props(styles.nativeCell, styles.certCell, styles.certLabel)}
+                  >
+                    Test
+                  </th>
+                  <th
+                    scope="col"
+                    {...stylex.props(styles.nativeCell, styles.certCell, styles.certLabel)}
+                  >
+                    Method
+                  </th>
+                  <th
+                    scope="col"
+                    {...stylex.props(
+                      styles.nativeCell,
+                      styles.certCell,
+                      styles.certLabel,
+                      styles.certNumeric,
+                    )}
+                  >
+                    Specification
+                  </th>
+                  <th
+                    scope="col"
+                    {...stylex.props(
+                      styles.nativeCell,
+                      styles.certCell,
+                      styles.certLabel,
+                      styles.certNumeric,
+                    )}
+                  >
+                    Result
+                  </th>
+                </tr>
+                {CERTIFICATE.tests.map((row) => (
+                  <tr key={row.test} {...stylex.props(styles.certRow)}>
+                    <td {...stylex.props(styles.nativeCell, styles.certCell)}>{row.test}</td>
+                    <td {...stylex.props(styles.nativeCell, styles.certCell, styles.data)}>
+                      {row.method}
+                    </td>
+                    <td
+                      {...stylex.props(
+                        styles.nativeCell,
+                        styles.certCell,
+                        styles.data,
+                        styles.certNumeric,
+                      )}
+                    >
+                      {row.specification}
+                    </td>
+                    <td
+                      {...stylex.props(
+                        styles.nativeCell,
+                        styles.certCell,
+                        styles.data,
+                        styles.certResult,
+                      )}
+                    >
+                      {row.result}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
             <div {...stylex.props(styles.certDocs)}>
               <span {...stylex.props(styles.certCell, styles.certLabel)}>Document set</span>
               <span {...stylex.props(styles.certCell)}>{TRAVELS_WITH_LOT.join(", ")}.</span>
@@ -1602,104 +1622,119 @@ function BasesSection() {
           </h2>
         </Reveal>
         <Reveal>
-          <div
-            role="table"
+          <table
             aria-label="Working hours of each base, shown in UTC"
-            {...stylex.props(styles.chart)}
+            {...stylex.props(styles.nativeTable, styles.chart)}
           >
-            <span role="columnheader" {...stylex.props(styles.small, styles.chartHeadCell)}>
-              Base
-            </span>
-            <div role="columnheader" aria-label="Hours in UTC" {...stylex.props(styles.chartAxis)}>
-              {AXIS_TICKS.map((tick) => (
-                <span
-                  key={tick}
-                  style={{ left: `${(tick / 24) * 100}%` }}
-                  {...stylex.props(styles.chartTick, tickStyle(tick))}
+            <tbody style={{ display: "contents" }}>
+              <tr style={{ display: "contents" }}>
+                <th
+                  scope="col"
+                  {...stylex.props(styles.nativeCell, styles.small, styles.chartHeadCell)}
                 >
-                  {String(tick).padStart(2, "0")}
-                  {tick === 0 ? " UTC" : ""}
-                </span>
-              ))}
-            </div>
-            <span
-              role="columnheader"
-              {...stylex.props(styles.small, styles.chartHeadCell)}
-              style={{ justifyContent: "flex-end", paddingRight: 0, paddingLeft: 24 }}
-            >
-              Offset
-            </span>
+                  Base
+                </th>
+                <th
+                  scope="col"
+                  aria-label="Hours in UTC"
+                  {...stylex.props(styles.nativeCell, styles.chartAxis)}
+                >
+                  {AXIS_TICKS.map((tick) => (
+                    <span
+                      key={tick}
+                      style={{ left: `${(tick / 24) * 100}%` }}
+                      {...stylex.props(styles.chartTick, tickStyle(tick))}
+                    >
+                      {String(tick).padStart(2, "0")}
+                      {tick === 0 ? " UTC" : ""}
+                    </span>
+                  ))}
+                </th>
+                <th
+                  scope="col"
+                  {...stylex.props(styles.nativeCell, styles.small, styles.chartHeadCell)}
+                  style={{ justifyContent: "flex-end", paddingRight: 0, paddingLeft: 24 }}
+                >
+                  Offset
+                </th>
+              </tr>
 
-            <div role="row" style={{ display: "contents" }}>
-              <div role="rowheader" {...stylex.props(styles.chartLabel, styles.chartCoverRow)}>
-                <p {...stylex.props(styles.baseCity)}>Coverage, {hours} h</p>
-                <p {...stylex.props(styles.baseRole)}>
-                  Unstaffed {hh(covered[covered.length - 1]?.end ?? 0)} –{" "}
-                  {hh(covered[0]?.start ?? 0)} UTC
-                </p>
-              </div>
-              <div
-                role="cell"
-                aria-label={`${hours} hours covered`}
-                {...stylex.props(styles.chartTrack, styles.chartCoverRow)}
-              >
-                {covered.map((span) => (
-                  <span
-                    key={span.start}
-                    aria-hidden
-                    style={{
-                      left: `${(span.start / 24) * 100}%`,
-                      width: `${((span.end - span.start) / 24) * 100}%`,
-                    }}
-                    {...stylex.props(styles.chartCover)}
-                  />
-                ))}
-                {gaps.map((gap) => (
-                  <span
-                    key={gap.start}
-                    aria-hidden
-                    style={{
-                      left: `${(gap.start / 24) * 100}%`,
-                      width: `${((gap.end - gap.start) / 24) * 100}%`,
-                    }}
-                    {...stylex.props(styles.chartGap)}
-                  />
-                ))}
-              </div>
-              <span
-                role="cell"
-                {...stylex.props(styles.data, styles.chartUtc, styles.chartCoverRow)}
-              />
-            </div>
-
-            {rows.map(({ offset, base, start, end }) => (
-              <div key={base.city} role="row" style={{ display: "contents" }}>
-                <div role="rowheader" {...stylex.props(styles.chartLabel)}>
-                  <p {...stylex.props(styles.baseCity)}>{base.city}</p>
+              <tr style={{ display: "contents" }}>
+                <th
+                  scope="row"
+                  {...stylex.props(styles.nativeCell, styles.chartLabel, styles.chartCoverRow)}
+                >
+                  <p {...stylex.props(styles.baseCity)}>Coverage, {hours} h</p>
                   <p {...stylex.props(styles.baseRole)}>
-                    {base.country}, {base.role}
+                    Unstaffed {hh(covered[covered.length - 1]?.end ?? 0)} –{" "}
+                    {hh(covered[0]?.start ?? 0)} UTC
                   </p>
-                </div>
-                <div
-                  role="cell"
-                  aria-label={`${hh(start)} to ${hh(end)} UTC`}
-                  {...stylex.props(styles.chartTrack)}
+                </th>
+                <td
+                  aria-label={`${hours} hours covered`}
+                  {...stylex.props(styles.nativeCell, styles.chartTrack, styles.chartCoverRow)}
                 >
-                  <span
-                    aria-hidden
-                    style={{
-                      left: `${(start / 24) * 100}%`,
-                      width: `${((end - start) / 24) * 100}%`,
-                    }}
-                    {...stylex.props(styles.chartBar)}
-                  />
-                </div>
-                <span role="cell" {...stylex.props(styles.data, styles.chartUtc)}>
-                  {utcLabel(offset)}
-                </span>
-              </div>
-            ))}
-          </div>
+                  {covered.map((span) => (
+                    <span
+                      key={span.start}
+                      aria-hidden
+                      style={{
+                        left: `${(span.start / 24) * 100}%`,
+                        width: `${((span.end - span.start) / 24) * 100}%`,
+                      }}
+                      {...stylex.props(styles.chartCover)}
+                    />
+                  ))}
+                  {gaps.map((gap) => (
+                    <span
+                      key={gap.start}
+                      aria-hidden
+                      style={{
+                        left: `${(gap.start / 24) * 100}%`,
+                        width: `${((gap.end - gap.start) / 24) * 100}%`,
+                      }}
+                      {...stylex.props(styles.chartGap)}
+                    />
+                  ))}
+                </td>
+                <td
+                  {...stylex.props(
+                    styles.nativeCell,
+                    styles.data,
+                    styles.chartUtc,
+                    styles.chartCoverRow,
+                  )}
+                />
+              </tr>
+
+              {rows.map(({ offset, base, start, end }) => (
+                <tr key={base.city} style={{ display: "contents" }}>
+                  <th scope="row" {...stylex.props(styles.nativeCell, styles.chartLabel)}>
+                    <p {...stylex.props(styles.baseCity)}>{base.city}</p>
+                    <p {...stylex.props(styles.baseRole)}>
+                      {base.country}, {base.role}
+                    </p>
+                  </th>
+                  <td
+                    aria-label={`${hh(start)} to ${hh(end)} UTC`}
+                    {...stylex.props(styles.nativeCell, styles.chartTrack)}
+                  >
+                    <span
+                      aria-hidden
+                      style={{
+                        left: `${(start / 24) * 100}%`,
+                        width: `${((end - start) / 24) * 100}%`,
+                      }}
+                      {...stylex.props(styles.chartBar)}
+                    />
+                  </td>
+                  <td {...stylex.props(styles.nativeCell, styles.data, styles.chartUtc)}>
+                    {utcLabel(offset)}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
           <p {...stylex.props(styles.small, styles.chartNote)}>
             Each bar is a base's working day, {hh(WORKDAY.start)} – {hh(WORKDAY.end)} local, drawn
             in UTC. Documentation, compliance and lead times are handled local to the buyer.
@@ -1796,8 +1831,7 @@ function FooterSection() {
         </div>
         <div {...stylex.props(styles.footerBottom)}>
           <span>
-            © {new Date().getFullYear()} {company.legalName} {company.hq.city}, {company.hq.country}
-            .
+            © <CurrentYear /> {company.legalName} {company.hq.city}, {company.hq.country}.
           </span>
           <a href="#top" {...stylex.props(styles.topLink)}>
             Back to top
@@ -1827,19 +1861,21 @@ function SmoothScroll() {
 
 export function VariantS() {
   return (
-    <LazyMotion features={domAnimation} strict>
-      <div {...stylex.props(styles.root)}>
-        <SmoothScroll />
-        <NavBar />
-        <main>
-          <HeroSection />
-          <IndexSection />
-          <CertificateSection />
-          <BasesSection />
-          <FinaleSection />
-        </main>
-        <FooterSection />
-      </div>
+    <LazyMotion features={domMax} strict>
+      <LayoutGroup>
+        <div {...stylex.props(styles.root)}>
+          <SmoothScroll />
+          <NavBar />
+          <main>
+            <HeroSection />
+            <IndexSection />
+            <CertificateSection />
+            <BasesSection />
+            <FinaleSection />
+          </main>
+          <FooterSection />
+        </div>
+      </LayoutGroup>
     </LazyMotion>
   );
 }

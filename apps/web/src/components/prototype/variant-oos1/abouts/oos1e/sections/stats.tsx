@@ -3,7 +3,8 @@ import * as stylex from "@stylexjs/stylex";
 import { ABOUT_MOMENT } from "../../../about-data";
 import { STATS } from "../../../content";
 import { Sheet } from "../sheet";
-import { base, Reveal } from "../shared";
+import { Reveal } from "../shared";
+import { base } from "../shared-values";
 import { STATS_SHEET } from "../sheets";
 import { color, font, media } from "../tokens.stylex";
 

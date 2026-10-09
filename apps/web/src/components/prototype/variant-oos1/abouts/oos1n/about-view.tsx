@@ -10,7 +10,7 @@ import { Honors } from "./honors";
 import { SubNav } from "./nav";
 import { Products } from "./products";
 import { Profile } from "./profile";
-import { ui } from "./shared";
+import { ui } from "./shared-values";
 import { Structure } from "./structure";
 
 export function AboutOOS1N({ onNavigateHome }: AboutPageProps) {

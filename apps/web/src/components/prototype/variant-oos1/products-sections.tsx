@@ -1,12 +1,11 @@
+import { Collapse } from "../shared/collapse";
+import { m } from "motion/react";
+import { Plus } from "lucide-react";
 import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { Plus } from "lucide-react";
-import { AnimatePresence, m } from "motion/react";
 import { useEffect, useId, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
-
 import { EASE } from "@/components/prototype/motion-constants";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
-
 import {
   CATALOG_GROUPS,
   CATEGORIES,
@@ -14,6 +13,7 @@ import {
   type CatalogGroup,
   type SolutionItem,
 } from "./products-data";
+import { layout } from "./products-sections-values";
 
 const INK = "#1a1a1a";
 const BODY_TEXT = "#4d4d4d";
@@ -25,12 +25,12 @@ const TAB_HOVER = "#f8f9fc";
 const ACCENT = colors.brandBlue700;
 const EASE_OUT_CSS = "cubic-bezier(0.22, 1, 0.36, 1)";
 
-const TABLET = "@media (min-width: 768px) and (max-width: 1279.98px)";
-const DESKTOP = breakpoints.xl;
 const MD = breakpoints.md;
 const LG = breakpoints.lg;
+const TABLET = "@media (min-width: 768px) and (max-width: 1279.98px)";
+const DESKTOP = breakpoints.xl;
 const HOVER = "@media (hover: hover) and (pointer: fine)";
-const INSET = "min(120px, 8.333vw)";
+
 const HEADER_HEIGHT = 80;
 const GUTTER = 24;
 const TWELVE = "repeat(12, minmax(0, 1fr))";
@@ -62,18 +62,6 @@ const splitNote = (text: string) => {
 
 const INCI_LATIN = /（[^）]*）/g;
 const NO_BREAK_SPACE = String.fromCharCode(0xa0);
-
-export const layout = stylex.create({
-  shell: {
-    width: "100%",
-    maxWidth: 1440,
-    marginInline: "auto",
-    boxSizing: "border-box",
-  },
-  inset: {
-    paddingInline: { default: 16, [TABLET]: 40, [DESKTOP]: INSET },
-  },
-});
 
 const styles = stylex.create({
   section: {
@@ -598,7 +586,11 @@ function LedgerRow({
   const preview = group.items.map((item) => splitParen(item.title).primary).join("、");
 
   return (
-    <li {...stylex.props(styles.ledgerRow, open && styles.ledgerRowOpen)}>
+    <m.li
+      layout="position"
+      transition={{ duration: 0.26, ease: EASE }}
+      {...stylex.props(styles.ledgerRow, open && styles.ledgerRowOpen)}
+    >
       <h3 {...stylex.props(styles.ledgerHeading)}>
         <button
           type="button"
@@ -623,52 +615,45 @@ function LedgerRow({
           <ToggleIcon open={open} />
         </button>
       </h3>
-      <AnimatePresence initial={false}>
-        {open && (
-          <m.div
-            key="panel"
-            id={panelId}
-            {...stylex.props(styles.ledgerPanelClip)}
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: reduce ? 0 : 0.28, ease: EASE }}
-          >
-            <div {...stylex.props(styles.ledgerGrid, styles.ledgerPanel)}>
-              {group.intro && <p {...stylex.props(styles.ledgerIntro)}>{group.intro}</p>}
-              <div {...stylex.props(styles.materialTable)}>
-                <div aria-hidden="true" {...stylex.props(styles.materialHead)}>
-                  <span {...stylex.props(styles.colMaterialName)}>产品名称</span>
-                  <span {...stylex.props(styles.colMaterialInci)}>INCI 名称</span>
-                  <span {...stylex.props(styles.colMaterialFeatures)}>特性&应用</span>
-                </div>
-                <ul {...stylex.props(styles.materialList)}>
-                  {group.items.map((item) => {
-                    const { primary, secondary } = splitParen(item.title);
-                    return (
-                      <li key={item.id} {...stylex.props(styles.material)}>
-                        <span {...stylex.props(styles.materialName, styles.colMaterialName)}>
-                          {primary}
-                          {secondary && (
-                            <span {...stylex.props(styles.ledgerLatin)}>{secondary}</span>
-                          )}
-                        </span>
-                        <p {...stylex.props(styles.materialInci, styles.colMaterialInci)}>
-                          <Inci text={item.inci} />
-                        </p>
-                        <p {...stylex.props(styles.materialFeatures, styles.colMaterialFeatures)}>
-                          {item.features}
-                        </p>
-                      </li>
-                    );
-                  })}
-                </ul>
-              </div>
+      <Collapse
+        key="panel"
+        id={panelId}
+        {...stylex.props(styles.ledgerPanelClip)}
+        open={open}
+
+        transition={{ duration: reduce ? 0 : 0.28, ease: EASE }}
+      >
+        <div {...stylex.props(styles.ledgerGrid, styles.ledgerPanel)}>
+          {group.intro && <p {...stylex.props(styles.ledgerIntro)}>{group.intro}</p>}
+          <div {...stylex.props(styles.materialTable)}>
+            <div aria-hidden="true" {...stylex.props(styles.materialHead)}>
+              <span {...stylex.props(styles.colMaterialName)}>产品名称</span>
+              <span {...stylex.props(styles.colMaterialInci)}>INCI 名称</span>
+              <span {...stylex.props(styles.colMaterialFeatures)}>特性&应用</span>
             </div>
-          </m.div>
-        )}
-      </AnimatePresence>
-    </li>
+            <ul {...stylex.props(styles.materialList)}>
+              {group.items.map((item) => {
+                const { primary, secondary } = splitParen(item.title);
+                return (
+                  <li key={item.id} {...stylex.props(styles.material)}>
+                    <span {...stylex.props(styles.materialName, styles.colMaterialName)}>
+                      {primary}
+                      {secondary && <span {...stylex.props(styles.ledgerLatin)}>{secondary}</span>}
+                    </span>
+                    <p {...stylex.props(styles.materialInci, styles.colMaterialInci)}>
+                      <Inci text={item.inci} />
+                    </p>
+                    <p {...stylex.props(styles.materialFeatures, styles.colMaterialFeatures)}>
+                      {item.features}
+                    </p>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        </div>
+      </Collapse>
+    </m.li>
   );
 }
 

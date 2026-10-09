@@ -1,7 +1,8 @@
+import { Collapse } from "../../../shared/collapse";
 import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 import { Plus } from "lucide-react";
-import { AnimatePresence, m } from "motion/react";
+import { m } from "motion/react";
 import {
   useId,
   useLayoutEffect,
@@ -300,9 +301,14 @@ function Lines({ lines }: { lines: string[] }) {
   return (
     <ul {...stylex.props(styles.lines)}>
       {lines.map((line) => (
-        <li key={line} {...stylex.props(styles.line)}>
+        <m.li
+          layout="position"
+          transition={{ duration: 0.26, ease: EASE }}
+          key={line}
+          {...stylex.props(styles.line)}
+        >
           {line}
-        </li>
+        </m.li>
       ))}
     </ul>
   );
@@ -312,14 +318,19 @@ function Phrases({ phrases }: { phrases: string[] }) {
   return (
     <ul {...stylex.props(styles.phrases)}>
       {phrases.map((phrase, index) => (
-        <li key={phrase} {...stylex.props(styles.phrase)}>
+        <m.li
+          layout="position"
+          transition={{ duration: 0.26, ease: EASE }}
+          key={phrase}
+          {...stylex.props(styles.phrase)}
+        >
           {index > 0 && (
             <span aria-hidden="true" {...stylex.props(styles.phraseDot)}>
               ·
             </span>
           )}
           {phrase}
-        </li>
+        </m.li>
       ))}
     </ul>
   );
@@ -395,7 +406,11 @@ function SheetStrip({
   const panelId = useId();
 
   return (
-    <li {...stylex.props(styles.strip, open && styles.stripOpen)}>
+    <m.li
+      layout="position"
+      transition={{ duration: 0.26, ease: EASE }}
+      {...stylex.props(styles.strip, open && styles.stripOpen)}
+    >
       <h3 {...stylex.props(styles.heading)}>
         <button
           ref={triggerRef}
@@ -419,24 +434,19 @@ function SheetStrip({
           <ToggleIcon open={open} reduce={reduce} />
         </button>
       </h3>
-      <AnimatePresence initial={false}>
-        {open && (
-          <m.div
-            key="spread"
-            id={panelId}
-            role="region"
-            aria-labelledby={triggerId}
-            initial={{ height: 0 }}
-            animate={{ height: "auto" }}
-            exit={{ height: 0 }}
-            transition={{ duration: reduce ? 0 : OPEN_SECONDS, ease: EASE }}
-            {...stylex.props(styles.clip)}
-          >
-            <Spread item={item} />
-          </m.div>
-        )}
-      </AnimatePresence>
-    </li>
+      <Collapse
+        key="spread"
+        id={panelId}
+        role="region"
+        aria-labelledby={triggerId}
+        open={open}
+
+        transition={{ duration: reduce ? 0 : OPEN_SECONDS, ease: EASE }}
+        {...stylex.props(styles.clip)}
+      >
+        <Spread item={item} />
+      </Collapse>
+    </m.li>
   );
 }
 

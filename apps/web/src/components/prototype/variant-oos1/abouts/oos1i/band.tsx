@@ -4,7 +4,8 @@ import * as stylex from "@stylexjs/stylex";
 import { ABOUT_MOMENT } from "../../about-data";
 import { STATS } from "../../content";
 import { Reveal, ScrollWipe } from "./motion";
-import { Frame, SectionName, base } from "./primitives";
+import { Frame, SectionName } from "./primitives";
+import { base } from "./primitives-values";
 import { font, media, shear, tone } from "./shear.stylex";
 
 const S = stylex.create({

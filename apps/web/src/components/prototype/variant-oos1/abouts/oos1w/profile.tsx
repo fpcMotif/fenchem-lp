@@ -1,7 +1,8 @@
 import * as stylex from "@stylexjs/stylex";
 
 import { ABOUT_HERO } from "../../about-data";
-import { SectionHead, ui } from "./shared";
+import { SectionHead } from "./shared";
+import { ui } from "./shared-values";
 import { bp, face, tone } from "./tokens.stylex";
 
 const PROFILE_LABEL =

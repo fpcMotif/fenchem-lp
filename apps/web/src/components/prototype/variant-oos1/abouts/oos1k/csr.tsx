@@ -1,7 +1,8 @@
 import * as stylex from "@stylexjs/stylex";
 
 import { ABOUT_CSR } from "../../about-data";
-import { ChartHeading, ui, useDusk } from "./shared";
+import { ChartHeading, useDusk } from "./shared";
+import { ui } from "./shared-values";
 import { bp, face, sky } from "./tokens.stylex";
 
 const BELT_RISE = [0, 7, 14] as const;

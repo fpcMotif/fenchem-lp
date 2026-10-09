@@ -132,13 +132,13 @@ export function Profile() {
             <p {...stylex.props(styles.lead)}>{ABOUT_HERO.lead}</p>
             <div {...stylex.props(styles.network)}>
               <p {...stylex.props(styles.networkLabel)}>
-                {ABOUT_HERO.networkLabel.split(NUMBER_RUN).map((part, index) =>
+                {ABOUT_HERO.networkLabel.split(NUMBER_RUN).map((part) =>
                   /^\d+$/.test(part) ? (
-                    <span key={`${part}-${index}`} {...stylex.props(styles.networkFigure)}>
+                    <span key={part} {...stylex.props(styles.networkFigure)}>
                       {part}
                     </span>
                   ) : (
-                    <span key={`${part}-${index}`}>{part.trim()}</span>
+                    <span key={part}>{part.trim()}</span>
                   ),
                 )}
               </p>

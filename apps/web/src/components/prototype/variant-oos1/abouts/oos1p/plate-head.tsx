@@ -2,7 +2,8 @@ import * as stylex from "@stylexjs/stylex";
 
 import { ui } from "./layout";
 import { StrobeText, useEntry } from "./strobe";
-import { ForwardArrow, frameLabel } from "./time-grid";
+import { ForwardArrow } from "./time-grid";
+import { frameLabel } from "./time-grid-values";
 import { bp, face, tone } from "./tokens.stylex";
 
 const styles = stylex.create({

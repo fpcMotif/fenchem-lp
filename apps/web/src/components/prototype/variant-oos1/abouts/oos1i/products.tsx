@@ -3,7 +3,8 @@ import * as stylex from "@stylexjs/stylex";
 
 import { PRODUCTS, PRODUCTS_INTRO } from "../../content";
 import { Reveal } from "./motion";
-import { Section, SectionName, base } from "./primitives";
+import { Section, SectionName } from "./primitives";
+import { base } from "./primitives-values";
 import { font, media, tone } from "./shear.stylex";
 
 const S = stylex.create({

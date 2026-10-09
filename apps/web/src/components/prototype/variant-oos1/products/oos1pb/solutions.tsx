@@ -455,7 +455,7 @@ function Lines({ lines, numbered = false }: { lines: string[]; numbered?: boolea
   return (
     <ul {...stylex.props(styles.lines)}>
       {lines.map((line, index) => (
-        <li key={`${index}-${line}`} {...stylex.props(styles.line)}>
+        <li key={line} {...stylex.props(styles.line)}>
           {numbered && <span {...stylex.props(styles.lineNumber)}>{padIndex(index)}</span>}
           <span>{line}</span>
         </li>

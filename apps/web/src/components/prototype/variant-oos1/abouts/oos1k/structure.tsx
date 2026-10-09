@@ -2,7 +2,8 @@ import * as stylex from "@stylexjs/stylex";
 import { useState } from "react";
 
 import { ABOUT_STRUCTURE } from "../../about-data";
-import { ChartHeading, ui, useDusk } from "./shared";
+import { ChartHeading, useDusk } from "./shared";
+import { ui } from "./shared-values";
 import { bp, face, sky } from "./tokens.stylex";
 
 const WIDTH = 1200;

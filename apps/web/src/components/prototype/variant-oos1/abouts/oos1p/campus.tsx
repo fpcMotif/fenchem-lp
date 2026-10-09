@@ -5,8 +5,10 @@ import { ABOUT_CAMPUS, ABOUT_MOMENT } from "../../about-data";
 import { srOnly, ui } from "./layout";
 import { Lightbox, type LightboxPhoto } from "./lightbox";
 import { PlateHead } from "./plate-head";
-import { StrobeImage, TICK, useEntry } from "./strobe";
-import { ForwardArrow, frameLabel } from "./time-grid";
+import { StrobeImage, useEntry } from "./strobe";
+import { TICK } from "./strobe-values";
+import { ForwardArrow } from "./time-grid";
+import { frameLabel } from "./time-grid-values";
 import { bp, face, tone } from "./tokens.stylex";
 
 type PhotoId = (typeof ABOUT_CAMPUS.photos)[number]["id"];

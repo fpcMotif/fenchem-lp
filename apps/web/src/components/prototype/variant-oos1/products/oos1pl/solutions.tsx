@@ -655,11 +655,15 @@ export function Solutions() {
 
   useEffect(() => {
     const visible = visibleRef.current;
+    const sheetIndexes = new Map<Element, number>();
+    sheetRefs.current.forEach((sheet, index) => {
+      if (sheet && !sheetIndexes.has(sheet)) sheetIndexes.set(sheet, index);
+    });
     const observer = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
-          const index = sheetRefs.current.findIndex((sheet) => sheet === entry.target);
-          if (index === -1) continue;
+          const index = sheetIndexes.get(entry.target);
+          if (index === undefined) continue;
           if (entry.isIntersecting) visible.add(index);
           else visible.delete(index);
         }

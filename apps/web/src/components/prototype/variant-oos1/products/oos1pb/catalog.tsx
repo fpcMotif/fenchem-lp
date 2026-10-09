@@ -1,7 +1,8 @@
+import { Collapse } from "../../../shared/collapse";
 import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 import { Plus, X } from "lucide-react";
-import { AnimatePresence, m } from "motion/react";
+import { m } from "motion/react";
 import { useId, useState, type ReactNode } from "react";
 
 import { EASE } from "@/components/prototype/motion-constants";
@@ -474,7 +475,11 @@ function ItemRows({
 
   return (
     <>
-      <tr {...stylex.props(styles.row, open && styles.rowOpen)}>
+      <m.tr
+        layout="position"
+        transition={{ duration: 0.26, ease: EASE }}
+        {...stylex.props(styles.row, open && styles.rowOpen)}
+      >
         <th scope="row" {...stylex.props(styles.nameCell, open && styles.nameCellOpen)}>
           <button
             type="button"
@@ -520,36 +525,41 @@ function ItemRows({
             )}
           </td>
         ))}
-      </tr>
-      <AnimatePresence initial={false}>
-        {open && (
-          <tr key="detail">
-            <td colSpan={COLUMN_COUNT} {...stylex.props(styles.detailCell)}>
-              <m.div
-                id={detailId}
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: "auto", opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                transition={{ duration: reduce ? 0 : 0.24, ease: EASE }}
-                {...stylex.props(styles.detailClip)}
-              >
-                <dl {...stylex.props(styles.detail)}>
-                  <div {...stylex.props(styles.field)}>
-                    <dt {...stylex.props(styles.fieldLabel)}>INCI 名称</dt>
-                    <dd {...stylex.props(styles.inci)}>
-                      <Inci text={item.inci} />
-                    </dd>
-                  </div>
-                  <div {...stylex.props(styles.field)}>
-                    <dt {...stylex.props(styles.fieldLabel)}>特性&应用</dt>
-                    <dd {...stylex.props(styles.features)}>{item.features}</dd>
-                  </div>
-                </dl>
-              </m.div>
-            </td>
-          </tr>
-        )}
-      </AnimatePresence>
+      </m.tr>
+      <m.tr
+        layout="position"
+        transition={{ duration: 0.26, ease: EASE }}
+        key="detail"
+        aria-hidden={!open}
+        inert={!open}
+      >
+        <td
+          colSpan={COLUMN_COUNT}
+          {...stylex.props(styles.detailCell)}
+          style={{ borderBottomWidth: open ? 1 : 0 }}
+        >
+          <Collapse
+            id={detailId}
+            open={open}
+
+            transition={{ duration: reduce ? 0 : 0.24, ease: EASE }}
+            {...stylex.props(styles.detailClip)}
+          >
+            <dl {...stylex.props(styles.detail)}>
+              <div {...stylex.props(styles.field)}>
+                <dt {...stylex.props(styles.fieldLabel)}>INCI 名称</dt>
+                <dd {...stylex.props(styles.inci)}>
+                  <Inci text={item.inci} />
+                </dd>
+              </div>
+              <div {...stylex.props(styles.field)}>
+                <dt {...stylex.props(styles.fieldLabel)}>特性&应用</dt>
+                <dd {...stylex.props(styles.features)}>{item.features}</dd>
+              </div>
+            </dl>
+          </Collapse>
+        </td>
+      </m.tr>
     </>
   );
 }
@@ -612,7 +622,7 @@ export function Catalog() {
               ))}
             </colgroup>
             <thead>
-              <tr>
+              <m.tr layout="position" transition={{ duration: 0.26, ease: EASE }}>
                 <th scope="col" {...stylex.props(styles.headCell, styles.nameHead)}>
                   名称
                 </th>
@@ -644,7 +654,7 @@ export function Catalog() {
                     </th>
                   );
                 })}
-              </tr>
+              </m.tr>
             </thead>
             {GROUP_ROWS.map(({ group, items }) => {
               const visibleItems = activeTag
@@ -653,8 +663,12 @@ export function Catalog() {
               const matching = visibleItems.length;
               if (matching === 0) return null;
               return (
-                <tbody key={group.id}>
-                  <tr>
+                <m.tbody
+                  layout="position"
+                  transition={{ duration: 0.26, ease: EASE }}
+                  key={group.id}
+                >
+                  <m.tr layout="position" transition={{ duration: 0.26, ease: EASE }}>
                     <th scope="rowgroup" colSpan={COLUMN_COUNT} {...stylex.props(styles.groupCell)}>
                       <span {...stylex.props(styles.groupInner)}>
                         <span {...stylex.props(styles.groupTitle)}>
@@ -671,7 +685,7 @@ export function Catalog() {
                         )}
                       </span>
                     </th>
-                  </tr>
+                  </m.tr>
                   {visibleItems.map((item) => (
                     <ItemRows
                       key={item.id}
@@ -681,7 +695,7 @@ export function Catalog() {
                       onToggle={() => setOpenId((prev) => (prev === item.id ? null : item.id))}
                     />
                   ))}
-                </tbody>
+                </m.tbody>
               );
             })}
           </table>

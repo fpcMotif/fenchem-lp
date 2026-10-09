@@ -15,7 +15,7 @@ import { ProductsSheet } from "./sections/products";
 import { ProfileSheet } from "./sections/profile";
 import { StatsSheet } from "./sections/stats";
 import { StructureSheet } from "./sections/structure";
-import { StackContext } from "./sheet";
+import { StackContext } from "./sheet-values";
 import { SHEET_IDS } from "./sheets";
 import { color, font } from "./tokens.stylex";
 

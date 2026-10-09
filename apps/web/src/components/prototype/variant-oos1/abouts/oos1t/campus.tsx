@@ -2,7 +2,8 @@ import * as stylex from "@stylexjs/stylex";
 import { useState } from "react";
 
 import { ABOUT_CAMPUS } from "../../about-data";
-import { Cast, LIFT } from "./cast";
+import { Cast } from "./cast";
+import { LIFT } from "./cast-values";
 import { SectionHead } from "./head";
 import { Lightbox, type LightboxPhoto } from "./lightbox";
 import { srOnly, ui } from "./shared";

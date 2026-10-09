@@ -1,3 +1,11 @@
+import { ProductionPage } from "./shared/page-shells";
+import {
+  IngredientCardDetails,
+  IngredientDossierDetails,
+} from "./shared/corporate-content-sections";
+import { DivisionBadge } from "./shared/production-navigation";
+import { SectionHeader } from "./shared/production-sections";
+
 /*
  * PROTOTYPE — Variant V: "Production · vivid" — VariantH plus the vivid
  * division color system. Category imagery renders as duotones (grayscale
@@ -21,63 +29,25 @@
  *
  * Section order: unchanged from VariantH.
  */
-import { useEffect, useRef, useState } from "react";
-import {
-  AnimatePresence,
-  LazyMotion,
-  domAnimation,
-  m,
-  useScroll,
-  useTransform,
-} from "motion/react";
-import {
-  ArrowRight,
-  ArrowUpRight,
-  CheckCircle2,
-  ChevronDown,
-  FileDown,
-  FlaskConical,
-  Globe,
-  Leaf,
-  Menu,
-  Pause,
-  Play,
-  Sprout,
-  X,
-} from "lucide-react";
+import { useEffect } from "react";
+
+import { ArrowRight, ArrowUpRight } from "lucide-react";
 import * as stylex from "@stylexjs/stylex";
 import { breakpoints, colors, radii, typography } from "@fenchem-lp/ui/tokens.stylex";
-import { EASE, STAGGER } from "@/components/prototype/motion-constants";
+import { STAGGER } from "@/components/prototype/motion-constants";
 import { Reveal } from "@/components/prototype/motion";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 import {
-  certificationDetails,
-  certifications,
-  company,
-  createInquiryHref,
   divisionForApplication,
   getFeaturedIngredients,
-  getIngredientsByApplication,
   industries,
   ingredients,
-  pillars,
-  processSteps,
-  regions,
   type DivisionKey,
   type Ingredient,
-  type IngredientApplication,
 } from "@/components/landing/landing-content";
 
 /* ─────────────────────────────── Constants ─────────────────────────────── */
 
-const IMG = {
-  hero: "https://images.unsplash.com/photo-1530013526807-2ec93afddab9?auto=format&fit=crop&w=1600&q=80",
-  heroThumb:
-    "https://images.unsplash.com/photo-1530013526807-2ec93afddab9?auto=format&fit=crop&w=900&q=80",
-  lab: "https://images.unsplash.com/photo-1602928321679-560bb453f190?auto=format&fit=crop&w=1400&q=80",
-  origin:
-    "https://images.unsplash.com/photo-1630095829654-b734f5cb2b25?auto=format&fit=crop&w=1200&q=80",
-} as const;
 const IMAGE_OVERRIDES: Record<
   string,
   {
@@ -99,28 +69,7 @@ const IMAGE_OVERRIDES: Record<
   },
 };
 const imgFor = (item: Ingredient) => IMAGE_OVERRIDES[item.code] ?? item.image;
-const STATS = [
-  {
-    value: "30+",
-    unit: "Years",
-    desc: "Botanical expertise since 1995",
-  },
-  {
-    value: "6",
-    unit: "Global Bases",
-    desc: "R&D hubs across three continents",
-  },
-  {
-    value: "ISO/GMP",
-    unit: "Certified",
-    desc: "Audited quality on every lot",
-  },
-  {
-    value: "40+",
-    unit: "Countries",
-    desc: "Regulated markets supplied",
-  },
-] as const;
+
 const INDUSTRY_COPY = [
   "Bioavailable actives standardized for potency, stability and dose accuracy — from Ashwagandha KSM-66 to Coenzyme Q10.",
   "Heat- and pH-stable carotenoids, plant proteins and functional botanicals for clean-label fortification at scale.",
@@ -143,78 +92,6 @@ const INDUSTRY_PANELS = [
     specimen: "Pantone 2583 C · #A05EB5 — Cosmetics Division",
   },
 ] as const;
-const PILLAR_ICONS = [Sprout, FlaskConical, Globe] as const;
-const FOOTER_COLS = [
-  {
-    head: "Portfolio",
-    links: [
-      {
-        label: "Ingredient Matrix",
-        href: "#matrix",
-      },
-      {
-        label: "Product Dossiers",
-        href: "#product",
-      },
-      {
-        label: "Formulation Support",
-        href: "#formulation",
-      },
-      {
-        label: "Nutrition Actives",
-        href: "#matrix",
-      },
-    ],
-  },
-  {
-    head: "Standards",
-    links: [
-      {
-        label: "Quality Charter",
-        href: "#standards",
-      },
-      {
-        label: "Regulatory Dossiers",
-        href: "#contact",
-      },
-      {
-        label: "Sourcing Standards",
-        href: "#standards",
-      },
-      {
-        label: "Ingredient Transparency",
-        href: "#matrix",
-      },
-    ],
-  },
-  {
-    head: "Partner",
-    links: [
-      {
-        label: "Request a Specification",
-        href: "#contact",
-      },
-      {
-        label: "Partner Inquiries",
-        href: "#contact",
-      },
-      {
-        label: "Technical Dossiers",
-        href: "#contact",
-      },
-      {
-        label: "Global Offices",
-        href: "#contact",
-      },
-    ],
-  },
-] as const;
-const MENU_APPLICATIONS: IngredientApplication[] = [
-  "Nutrition",
-  "Food & Beverage",
-  "Personal Care",
-];
-const FORM_OPTIONS = ["Powder", "Beadlet", "Oil suspension", "Granular"] as const;
 
 /* ─────────────────────────────── Styles ─────────────────────────────── */
 
@@ -305,6 +182,7 @@ const styles = stylex.create({
       ":focus-visible": `2px solid ${colors.brandGreen700}`,
     },
     outlineOffset: {
+      default: null,
       ":focus-visible": 2,
     },
   },
@@ -338,6 +216,7 @@ const styles = stylex.create({
       ":focus-visible": `2px solid ${colors.brandGreen700}`,
     },
     outlineOffset: {
+      default: null,
       ":focus-visible": 2,
     },
   },
@@ -1964,6 +1843,7 @@ const styles = stylex.create({
       ":focus-visible": `2px solid ${colors.brandGreen300}`,
     },
     outlineOffset: {
+      default: null,
       ":focus-visible": 2,
     },
   },
@@ -2607,14 +2487,7 @@ const styles = stylex.create({
     },
   },
 });
-const DIVISION_DOT_KEYS: Record<DivisionKey, keyof typeof styles> = {
-  nutrition: "dot_nutrition",
-  food: "dot_food",
-  cosmetics: "dot_cosmetics",
-  chem: "dot_chem",
-  agro: "dot_agro",
-  feed: "dot_feed",
-};
+
 const DIVISION_FIELD_KEYS: Record<DivisionKey, keyof typeof styles> = {
   nutrition: "bg_nutrition",
   food: "bg_food",
@@ -2626,550 +2499,11 @@ const DIVISION_FIELD_KEYS: Record<DivisionKey, keyof typeof styles> = {
 
 /* ─────────────────────────────── Nav + Portfolio menu ─────────────────────────────── */
 
-function PortfolioMenu() {
-  const [open, setOpen] = useState(false);
-  const reduce = useReducedMotion();
-  const rootRef = useRef<HTMLDivElement>(null);
-  const buttonRef = useRef<HTMLButtonElement>(null);
-  useEffect(() => {
-    if (!open) return;
-    const onPointerDown = (event: PointerEvent) => {
-      if (!rootRef.current?.contains(event.target as Node)) setOpen(false);
-    };
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        setOpen(false);
-        buttonRef.current?.focus();
-      }
-    };
-    document.addEventListener("pointerdown", onPointerDown);
-    document.addEventListener("keydown", onKeyDown);
-    return () => {
-      document.removeEventListener("pointerdown", onPointerDown);
-      document.removeEventListener("keydown", onKeyDown);
-    };
-  }, [open]);
-  return (
-    <div
-      ref={rootRef}
-      {...stylex.props(styles.portfolioMenuRoot)}
-      onBlur={(event) => {
-        if (!rootRef.current?.contains(event.relatedTarget as Node)) setOpen(false);
-      }}
-    >
-      <button
-        ref={buttonRef}
-        type="button"
-        aria-expanded={open}
-        aria-controls="portfolio-menu"
-        onClick={() => setOpen((v) => !v)}
-        {...stylex.props(styles.portfolioMenuBtn)}
-      >
-        Portfolio
-        <ChevronDown
-          aria-hidden
-          {...stylex.props(styles.portfolioChevron, open && styles.portfolioChevronOpen)}
-        />
-      </button>
-
-      <AnimatePresence>
-        {open && (
-          <m.div
-            id="portfolio-menu"
-            initial={
-              reduce
-                ? {
-                    opacity: 0,
-                  }
-                : {
-                    opacity: 0,
-                    y: -6,
-                  }
-            }
-            animate={{
-              opacity: 1,
-              y: 0,
-            }}
-            exit={
-              reduce
-                ? {
-                    opacity: 0,
-                  }
-                : {
-                    opacity: 0,
-                    y: -4,
-                  }
-            }
-            transition={{
-              duration: reduce ? 0 : 0.22,
-              ease: EASE,
-            }}
-            style={{
-              x: "-50%",
-            }}
-            {...stylex.props(styles.portfolioPopover)}
-          >
-            <div {...stylex.props(styles.portfolioGrid)}>
-              {MENU_APPLICATIONS.map((application) => {
-                const items = getIngredientsByApplication(application).slice(0, 4);
-                const division = divisionForApplication(application);
-                return (
-                  <div key={application} {...stylex.props(styles.portfolioCol)}>
-                    <p {...stylex.props(styles.portfolioColHeader)}>
-                      <span
-                        aria-hidden
-                        {...stylex.props(styles.dotBase, styles[DIVISION_DOT_KEYS[division]])}
-                      />
-                      {application}
-                    </p>
-                    <ul {...stylex.props(styles.portfolioItemList)}>
-                      {items.map((item) => (
-                        <li key={item.code}>
-                          <a
-                            href="#matrix"
-                            onClick={() => setOpen(false)}
-                            {...stylex.props(styles.portfolioItemLink)}
-                          >
-                            {item.name}
-                          </a>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                );
-              })}
-            </div>
-            <div {...stylex.props(styles.portfolioFooter)}>
-              <span {...stylex.props(styles.techLabel)}>{ingredients.length} active compounds</span>
-              <a
-                href="#formulation"
-                onClick={() => setOpen(false)}
-                {...stylex.props(styles.portfolioFooterLink)}
-              >
-                Build a formulation
-                <ArrowRight aria-hidden size={14} />
-              </a>
-            </div>
-          </m.div>
-        )}
-      </AnimatePresence>
-    </div>
-  );
-}
-const MOBILE_NAV_LINKS = [
-  {
-    label: "Industries",
-    href: "#industries",
-  },
-  {
-    label: "Portfolio",
-    href: "#matrix",
-  },
-  {
-    label: "Formulation",
-    href: "#formulation",
-  },
-  {
-    label: "Standards",
-    href: "#standards",
-  },
-];
-
-function MobileNav() {
-  const [open, setOpen] = useState(false);
-  const reduce = useReducedMotion();
-  return (
-    <div {...stylex.props(styles.mobileNavWrapper)}>
-      <button
-        type="button"
-        aria-expanded={open}
-        aria-controls="mobile-menu"
-        aria-label={open ? "Close menu" : "Open menu"}
-        onClick={() => setOpen((v) => !v)}
-        {...stylex.props(styles.mobileMenuBtn)}
-      >
-        <AnimatePresence initial={false} mode="popLayout">
-          <m.span
-            key={open ? "close" : "open"}
-            initial={{
-              opacity: 0,
-              scale: 0.25,
-              filter: "blur(4px)",
-            }}
-            animate={{
-              opacity: 1,
-              scale: 1,
-              filter: "blur(0px)",
-            }}
-            exit={{
-              opacity: 0,
-              scale: 0.25,
-              filter: "blur(4px)",
-            }}
-            transition={
-              reduce
-                ? {
-                    duration: 0,
-                  }
-                : {
-                    type: "spring",
-                    duration: 0.3,
-                    bounce: 0,
-                  }
-            }
-            style={{
-              display: "inline-flex",
-            }}
-          >
-            {open ? <X aria-hidden size={20} /> : <Menu aria-hidden size={20} />}
-          </m.span>
-        </AnimatePresence>
-      </button>
-      <AnimatePresence>
-        {open && (
-          <m.div
-            id="mobile-menu"
-            initial={
-              reduce
-                ? {
-                    opacity: 0,
-                  }
-                : {
-                    opacity: 0,
-                    y: -6,
-                  }
-            }
-            animate={{
-              opacity: 1,
-              y: 0,
-            }}
-            exit={
-              reduce
-                ? {
-                    opacity: 0,
-                  }
-                : {
-                    opacity: 0,
-                    y: -4,
-                  }
-            }
-            transition={{
-              duration: reduce ? 0 : 0.22,
-              ease: EASE,
-            }}
-            {...stylex.props(styles.mobileMenuPopover)}
-          >
-            <ul {...stylex.props(styles.mobileMenuList)}>
-              {MOBILE_NAV_LINKS.map((link, idx) => (
-                <li key={link.href}>
-                  <a
-                    href={link.href}
-                    onClick={() => setOpen(false)}
-                    {...stylex.props(
-                      styles.mobileNavLink,
-                      idx === MOBILE_NAV_LINKS.length - 1 && styles.mobileNavLinkLast,
-                    )}
-                  >
-                    {link.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </m.div>
-        )}
-      </AnimatePresence>
-    </div>
-  );
-}
-function NavBar() {
-  const { scrollYProgress } = useScroll();
-  const reduce = useReducedMotion();
-  return (
-    <header {...stylex.props(styles.header)}>
-      <div {...stylex.props(styles.container)}>
-        {/* Micro-strip */}
-        <div {...stylex.props(styles.microStrip)}>
-          <span {...stylex.props(styles.microStripItem)}>
-            <span {...stylex.props(styles.liveDotOuter)}>
-              <span {...stylex.props(styles.liveDotPing)} />
-              <span {...stylex.props(styles.liveDotInner)} />
-            </span>
-            Botanical Intelligence Since 1995
-          </span>
-          <span {...stylex.props(styles.techLabel)}>ISO 9001 · GMP · HACCP</span>
-          <span {...stylex.props(styles.techLabel)}>{company.hq.coords} — Nanjing HQ</span>
-        </div>
-        {/* Main nav */}
-        <nav aria-label="Main navigation" {...stylex.props(styles.navInner)}>
-          <a href="#top" aria-label="Fenchem home" {...stylex.props(styles.brandLink)}>
-            <span {...stylex.props(styles.brandText)}>FENCHEM</span>
-            <Leaf aria-hidden strokeWidth={1.5} {...stylex.props(styles.brandLeaf)} />
-          </a>
-          <div {...stylex.props(styles.navDesktopLinks)}>
-            <a href="#industries" {...stylex.props(styles.navLink)}>
-              Industries
-            </a>
-            <PortfolioMenu />
-            <a href="#formulation" {...stylex.props(styles.navLink)}>
-              Formulation
-            </a>
-            <a href="#standards" {...stylex.props(styles.navLink)}>
-              Standards
-            </a>
-          </div>
-          <div {...stylex.props(styles.navRight)}>
-            <MobileNav />
-            <a href="#contact" {...stylex.props(styles.ctaPrimaryCompact)}>
-              Request a Specification
-              <ArrowRight aria-hidden size={14} />
-            </a>
-          </div>
-        </nav>
-      </div>
-      {!reduce && (
-        <m.div
-          aria-hidden
-          style={{
-            scaleX: scrollYProgress,
-          }}
-          {...stylex.props(styles.progressHairline)}
-        />
-      )}
-    </header>
-  );
-}
-
 /* ─────────────────────────────── Hero ─────────────────────────────── */
-
-function HeroSection() {
-  const reduce = useReducedMotion();
-  const imgRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: imgRef,
-    offset: ["start start", "end start"],
-  });
-  const imgY = useTransform(scrollYProgress, [0, 1], ["0%", "18%"]);
-  return (
-    <section id="top" aria-label="Hero" {...stylex.props(styles.heroSection)}>
-      <div {...stylex.props(styles.container)}>
-        <div {...stylex.props(styles.heroGrid)}>
-          {/* Left: Headline block */}
-          <div {...stylex.props(styles.heroLeft)}>
-            <Reveal>
-              <p {...stylex.props(styles.heroBadge)}>Botanical Intelligence Since 1995</p>
-            </Reveal>
-            <Reveal delay={STAGGER}>
-              <h1 {...stylex.props(styles.heroHeading)}>
-                Nurturing Vitality
-                <br />
-                through <span {...stylex.props(styles.textGreen600)}>Botanical Excellence</span>
-              </h1>
-            </Reveal>
-            <Reveal delay={STAGGER * 2}>
-              <p {...stylex.props(styles.heroLead)}>
-                Fenchem converts raw botanical complexity into precisely specified, clinically
-                validated actives — supplied at industrial scale to formulators in more than forty
-                countries.
-              </p>
-            </Reveal>
-            <Reveal delay={STAGGER * 3}>
-              <div {...stylex.props(styles.heroActions)}>
-                <a href="#matrix" {...stylex.props(styles.ctaPrimary)}>
-                  Explore Portfolio
-                  <ArrowRight aria-hidden size={16} />
-                </a>
-                <a href="#formulation" {...stylex.props(styles.ctaOutlineBlue)}>
-                  Build a Formulation
-                </a>
-              </div>
-            </Reveal>
-
-            {/* Stat band */}
-            <Reveal delay={STAGGER * 4}>
-              <dl {...stylex.props(styles.heroStatGrid)}>
-                {STATS.map((s) => (
-                  <div key={s.unit} {...stylex.props(styles.heroStatItem)}>
-                    <dt {...stylex.props(styles.heroStatUnit)}>{s.unit}</dt>
-                    <dd
-                      style={{
-                        margin: 0,
-                        marginTop: 6,
-                      }}
-                    >
-                      <span {...stylex.props(styles.heroStatValue)}>{s.value}</span>
-                      <p {...stylex.props(styles.heroStatDesc)}>{s.desc}</p>
-                    </dd>
-                  </div>
-                ))}
-              </dl>
-            </Reveal>
-          </div>
-
-          {/* Right: botanical image */}
-          <div {...stylex.props(styles.heroRight)}>
-            <div ref={imgRef} {...stylex.props(styles.heroImgContainer)}>
-              <m.img
-                src={IMG.hero}
-                alt="Lush green botanical leaves in morning light — representing Fenchem's natural ingredient sourcing"
-                style={{
-                  y: reduce ? 0 : imgY,
-                }}
-                initial={
-                  reduce
-                    ? false
-                    : {
-                        scale: 1.06,
-                      }
-                }
-                animate={{
-                  scale: 1,
-                }}
-                transition={{
-                  duration: 1.4,
-                  ease: EASE,
-                }}
-                loading="eager"
-                {...stylex.props(styles.heroImg)}
-              />
-              <div aria-hidden {...stylex.props(styles.heroImgScrim)} />
-            </div>
-            {/* Caption badge */}
-            <div {...stylex.props(styles.heroCaptionBadge)}>
-              <span {...stylex.props(styles.techLabel)}>{company.tagline}</span>
-              <span {...stylex.props(styles.eyebrowGreen)}>{company.since}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
 
 /* ─────────────────────────────── Ingredient Ticker ─────────────────────────────── */
 
-function TickerSection() {
-  const [paused, setPaused] = useState(false);
-  const reduce = useReducedMotion();
-  return (
-    <section aria-label="Ingredient index ticker" {...stylex.props(styles.tickerSection)}>
-      <span aria-hidden {...stylex.props(styles.tickerFadeLeft)} />
-      <span aria-hidden {...stylex.props(styles.tickerFadeRight)} />
-      <button
-        type="button"
-        aria-pressed={paused}
-        aria-label={paused ? "Resume ingredient ticker" : "Pause ingredient ticker"}
-        onClick={() => setPaused((v) => !v)}
-        {...stylex.props(styles.tickerPauseBtn)}
-      >
-        <AnimatePresence initial={false} mode="popLayout">
-          <m.span
-            key={paused ? "play" : "pause"}
-            initial={{
-              opacity: 0,
-              scale: 0.25,
-              filter: "blur(4px)",
-            }}
-            animate={{
-              opacity: 1,
-              scale: 1,
-              filter: "blur(0px)",
-            }}
-            exit={{
-              opacity: 0,
-              scale: 0.25,
-              filter: "blur(4px)",
-            }}
-            transition={
-              reduce
-                ? {
-                    duration: 0,
-                  }
-                : {
-                    type: "spring",
-                    duration: 0.3,
-                    bounce: 0,
-                  }
-            }
-            style={{
-              display: "inline-flex",
-            }}
-          >
-            {paused ? (
-              <Play
-                aria-hidden
-                size={14}
-                style={{
-                  marginLeft: 1,
-                }}
-              />
-            ) : (
-              <Pause aria-hidden size={14} />
-            )}
-          </m.span>
-        </AnimatePresence>
-      </button>
-      <div
-        style={
-          paused
-            ? {
-                animationPlayState: "paused",
-              }
-            : undefined
-        }
-        {...stylex.props(styles.tickerMarqueeTrack)}
-      >
-        {([0, 1] as const).map((copy) => (
-          <ul key={copy} aria-hidden={copy === 1} {...stylex.props(styles.tickerList)}>
-            {ingredients.map((ingredient, i) => (
-              <li key={ingredient.name} {...stylex.props(styles.tickerItem)}>
-                <span {...stylex.props(styles.tickerText)}>
-                  <span {...stylex.props(styles.tickerIndex)}>
-                    {String(i + 1).padStart(2, "0")}
-                  </span>
-                  {" — "}
-                  {ingredient.name}
-                </span>
-                <span aria-hidden {...stylex.props(styles.tickerDiamond)} />
-              </li>
-            ))}
-          </ul>
-        ))}
-      </div>
-    </section>
-  );
-}
-
 /* ─────────────────────────────── Section header helper ─────────────────────────────── */
-
-function SectionHeader({
-  id,
-  number,
-  label,
-  title,
-  accent,
-  aside,
-}: {
-  id: string;
-  number: string;
-  label: string;
-  title: string;
-  accent: string;
-  aside?: React.ReactNode;
-}) {
-  return (
-    <div {...stylex.props(styles.sectionHeaderRow)}>
-      <Reveal>
-        <p {...stylex.props(styles.eyebrowGreen)}>
-          {number} — {label}
-        </p>
-        <h2 id={id} {...stylex.props(styles.sectionHeading)}>
-          {title} <span {...stylex.props(styles.textGreen600)}>{accent}</span>
-        </h2>
-      </Reveal>
-      {aside && <Reveal delay={STAGGER}>{aside}</Reveal>}
-    </div>
-  );
-}
 
 /* ─────────────────────────────── Vivid Industries ─────────────────────────────── */
 
@@ -3182,6 +2516,126 @@ function IndustriesSection() {
     >
       <div {...stylex.props(styles.container)}>
         <SectionHeader
+          styles={{
+            container: styles.container,
+            header: styles.header,
+            microStrip: styles.microStrip,
+            navLink: styles.navLink,
+            heroSection: styles.heroSection,
+            heroGrid: styles.heroGrid,
+            heroLeft: styles.heroLeft,
+            heroImg: styles.heroImg,
+            footer: styles.footer,
+            footerGrid: styles.footerGrid,
+            footerBrandCol: styles.footerBrandCol,
+            footerNavCol: styles.footerNavCol,
+            heroStatUnit: styles.heroStatUnit,
+            heroStatDesc: styles.heroStatDesc,
+            heroRight: styles.heroRight,
+            standardsSection: styles.standardsSection,
+            standardsGrid: styles.standardsGrid,
+            finaleSection: styles.finaleSection,
+            finaleSecondaryBtn: styles.finaleSecondaryBtn,
+            footerBrandRow: styles.footerBrandRow,
+            footerWordmark: styles.footerWordmark,
+            footerCertBadge: styles.footerCertBadge,
+            microStripItem: styles.microStripItem,
+            liveDotOuter: styles.liveDotOuter,
+            liveDotPing: styles.liveDotPing,
+            liveDotInner: styles.liveDotInner,
+            techLabel: styles.techLabel,
+            navInner: styles.navInner,
+            brandLink: styles.brandLink,
+            brandText: styles.brandText,
+            brandLeaf: styles.brandLeaf,
+            navDesktopLinks: styles.navDesktopLinks,
+            navRight: styles.navRight,
+            ctaPrimaryCompact: styles.ctaPrimaryCompact,
+            progressHairline: styles.progressHairline,
+            heroBadge: styles.heroBadge,
+            heroHeading: styles.heroHeading,
+            textGreen600: styles.textGreen600,
+            heroLead: styles.heroLead,
+            heroActions: styles.heroActions,
+            ctaPrimary: styles.ctaPrimary,
+            ctaOutlineBlue: styles.ctaOutlineBlue,
+            heroStatGrid: styles.heroStatGrid,
+            heroStatItem: styles.heroStatItem,
+            heroStatValue: styles.heroStatValue,
+            heroImgContainer: styles.heroImgContainer,
+            heroImgScrim: styles.heroImgScrim,
+            heroCaptionBadge: styles.heroCaptionBadge,
+            eyebrowGreen: styles.eyebrowGreen,
+            formulationSection: styles.formulationSection,
+            sectionAsideLead: styles.sectionAsideLead,
+            formulationGrid: styles.formulationGrid,
+            formulationLeft: styles.formulationLeft,
+            formulationFieldset: styles.formulationFieldset,
+            chipsWrapRow: styles.chipsWrapRow,
+            processStripOuter: styles.processStripOuter,
+            processOl: styles.processOl,
+            processLi: styles.processLi,
+            processIndex: styles.processIndex,
+            processTitle: styles.processTitle,
+            processCopy: styles.processCopy,
+            formulationRight: styles.formulationRight,
+            specDraftHeader: styles.specDraftHeader,
+            specDraftLabel: styles.specDraftLabel,
+            specDraftCode: styles.specDraftCode,
+            specDraftDl: styles.specDraftDl,
+            specDraftDlRow: styles.specDraftDlRow,
+            specDraftDt: styles.specDraftDt,
+            specDraftDd: styles.specDraftDd,
+            specMatchesList: styles.specMatchesList,
+            specMatchItem: styles.specMatchItem,
+            specSubmitBtn: styles.specSubmitBtn,
+            specDossiersRequestNote: styles.specDossiersRequestNote,
+            originGrid: styles.originGrid,
+            originImgCol: styles.originImgCol,
+            originImg: styles.originImg,
+            originTextCol: styles.originTextCol,
+            originTitle: styles.originTitle,
+            originQuote: styles.originQuote,
+            labImgCol: styles.labImgCol,
+            labImgContainer: styles.labImgContainer,
+            labImg: styles.labImg,
+            labImgScrim: styles.labImgScrim,
+            labCaptionBadge: styles.labCaptionBadge,
+            pillarsCol: styles.pillarsCol,
+            pillarInner: styles.pillarInner,
+            pillarRowBorder: styles.pillarRowBorder,
+            pillarIconBox: styles.pillarIconBox,
+            pillarTitle: styles.pillarTitle,
+            pillarCopy: styles.pillarCopy,
+            pillarCert: styles.pillarCert,
+            finaleThumbImg: styles.finaleThumbImg,
+            finaleScrim: styles.finaleScrim,
+            finaleInner: styles.finaleInner,
+            eyebrowGreen400: styles.eyebrowGreen400,
+            finaleHeading: styles.finaleHeading,
+            finaleLead: styles.finaleLead,
+            finaleActions: styles.finaleActions,
+            ctaPrimaryDark: styles.ctaPrimaryDark,
+            finaleResponseTime: styles.finaleResponseTime,
+            officesOuter: styles.officesOuter,
+            officesGrid: styles.officesGrid,
+            officeCardBg: styles.officeCardBg,
+            officeCardInner: styles.officeCardInner,
+            officeCity: styles.officeCity,
+            officeShort: styles.officeShort,
+            officeCoords: styles.officeCoords,
+            footerBrandTagline: styles.footerBrandTagline,
+            footerEst: styles.footerEst,
+            footerCertsList: styles.footerCertsList,
+            footerNavList: styles.footerNavList,
+            footerNavLink: styles.footerNavLink,
+            footerLegal: styles.footerLegal,
+            sectionHeaderRow: styles.sectionHeaderRow,
+            sectionHeading: styles.sectionHeading,
+            chipBase: styles.chipBase,
+            chipSelected: styles.chipSelected,
+            chipUnselected: styles.chipUnselected,
+          }}
           id="industries-heading"
           number="01"
           label="Application Domains"
@@ -3252,20 +2706,131 @@ function IndustriesSection() {
 
 /* ─────────────────────────────── Ingredient Matrix ─────────────────────────────── */
 
-function DivisionBadge({ ingredient }: { ingredient: Ingredient }) {
-  const division = divisionForApplication(ingredient.application);
-  return (
-    <span {...stylex.props(styles.divisionBadge)}>
-      <span aria-hidden {...stylex.props(styles.dotBase, styles[DIVISION_DOT_KEYS[division]])} />
-      {ingredient.application}
-    </span>
-  );
-}
 function MatrixSection() {
   return (
     <section id="matrix" aria-labelledby="matrix-heading" {...stylex.props(styles.matrixSection)}>
       <div {...stylex.props(styles.container)}>
         <SectionHeader
+          styles={{
+            container: styles.container,
+            header: styles.header,
+            microStrip: styles.microStrip,
+            navLink: styles.navLink,
+            heroSection: styles.heroSection,
+            heroGrid: styles.heroGrid,
+            heroLeft: styles.heroLeft,
+            heroImg: styles.heroImg,
+            footer: styles.footer,
+            footerGrid: styles.footerGrid,
+            footerBrandCol: styles.footerBrandCol,
+            footerNavCol: styles.footerNavCol,
+            heroStatUnit: styles.heroStatUnit,
+            heroStatDesc: styles.heroStatDesc,
+            heroRight: styles.heroRight,
+            standardsSection: styles.standardsSection,
+            standardsGrid: styles.standardsGrid,
+            finaleSection: styles.finaleSection,
+            finaleSecondaryBtn: styles.finaleSecondaryBtn,
+            footerBrandRow: styles.footerBrandRow,
+            footerWordmark: styles.footerWordmark,
+            footerCertBadge: styles.footerCertBadge,
+            microStripItem: styles.microStripItem,
+            liveDotOuter: styles.liveDotOuter,
+            liveDotPing: styles.liveDotPing,
+            liveDotInner: styles.liveDotInner,
+            techLabel: styles.techLabel,
+            navInner: styles.navInner,
+            brandLink: styles.brandLink,
+            brandText: styles.brandText,
+            brandLeaf: styles.brandLeaf,
+            navDesktopLinks: styles.navDesktopLinks,
+            navRight: styles.navRight,
+            ctaPrimaryCompact: styles.ctaPrimaryCompact,
+            progressHairline: styles.progressHairline,
+            heroBadge: styles.heroBadge,
+            heroHeading: styles.heroHeading,
+            textGreen600: styles.textGreen600,
+            heroLead: styles.heroLead,
+            heroActions: styles.heroActions,
+            ctaPrimary: styles.ctaPrimary,
+            ctaOutlineBlue: styles.ctaOutlineBlue,
+            heroStatGrid: styles.heroStatGrid,
+            heroStatItem: styles.heroStatItem,
+            heroStatValue: styles.heroStatValue,
+            heroImgContainer: styles.heroImgContainer,
+            heroImgScrim: styles.heroImgScrim,
+            heroCaptionBadge: styles.heroCaptionBadge,
+            eyebrowGreen: styles.eyebrowGreen,
+            formulationSection: styles.formulationSection,
+            sectionAsideLead: styles.sectionAsideLead,
+            formulationGrid: styles.formulationGrid,
+            formulationLeft: styles.formulationLeft,
+            formulationFieldset: styles.formulationFieldset,
+            chipsWrapRow: styles.chipsWrapRow,
+            processStripOuter: styles.processStripOuter,
+            processOl: styles.processOl,
+            processLi: styles.processLi,
+            processIndex: styles.processIndex,
+            processTitle: styles.processTitle,
+            processCopy: styles.processCopy,
+            formulationRight: styles.formulationRight,
+            specDraftHeader: styles.specDraftHeader,
+            specDraftLabel: styles.specDraftLabel,
+            specDraftCode: styles.specDraftCode,
+            specDraftDl: styles.specDraftDl,
+            specDraftDlRow: styles.specDraftDlRow,
+            specDraftDt: styles.specDraftDt,
+            specDraftDd: styles.specDraftDd,
+            specMatchesList: styles.specMatchesList,
+            specMatchItem: styles.specMatchItem,
+            specSubmitBtn: styles.specSubmitBtn,
+            specDossiersRequestNote: styles.specDossiersRequestNote,
+            originGrid: styles.originGrid,
+            originImgCol: styles.originImgCol,
+            originImg: styles.originImg,
+            originTextCol: styles.originTextCol,
+            originTitle: styles.originTitle,
+            originQuote: styles.originQuote,
+            labImgCol: styles.labImgCol,
+            labImgContainer: styles.labImgContainer,
+            labImg: styles.labImg,
+            labImgScrim: styles.labImgScrim,
+            labCaptionBadge: styles.labCaptionBadge,
+            pillarsCol: styles.pillarsCol,
+            pillarInner: styles.pillarInner,
+            pillarRowBorder: styles.pillarRowBorder,
+            pillarIconBox: styles.pillarIconBox,
+            pillarTitle: styles.pillarTitle,
+            pillarCopy: styles.pillarCopy,
+            pillarCert: styles.pillarCert,
+            finaleThumbImg: styles.finaleThumbImg,
+            finaleScrim: styles.finaleScrim,
+            finaleInner: styles.finaleInner,
+            eyebrowGreen400: styles.eyebrowGreen400,
+            finaleHeading: styles.finaleHeading,
+            finaleLead: styles.finaleLead,
+            finaleActions: styles.finaleActions,
+            ctaPrimaryDark: styles.ctaPrimaryDark,
+            finaleResponseTime: styles.finaleResponseTime,
+            officesOuter: styles.officesOuter,
+            officesGrid: styles.officesGrid,
+            officeCardBg: styles.officeCardBg,
+            officeCardInner: styles.officeCardInner,
+            officeCity: styles.officeCity,
+            officeShort: styles.officeShort,
+            officeCoords: styles.officeCoords,
+            footerBrandTagline: styles.footerBrandTagline,
+            footerEst: styles.footerEst,
+            footerCertsList: styles.footerCertsList,
+            footerNavList: styles.footerNavList,
+            footerNavLink: styles.footerNavLink,
+            footerLegal: styles.footerLegal,
+            sectionHeaderRow: styles.sectionHeaderRow,
+            sectionHeading: styles.sectionHeading,
+            chipBase: styles.chipBase,
+            chipSelected: styles.chipSelected,
+            chipUnselected: styles.chipUnselected,
+          }}
           id="matrix-heading"
           number="02"
           label="Active Compounds"
@@ -3292,51 +2857,66 @@ function MatrixSection() {
                       loading="lazy"
                       {...stylex.props(styles.matrixCardImg, styles.duotoneImg)}
                     />
-                    <DivisionBadge ingredient={item} />
+                    <DivisionBadge
+                      styles={{
+                        tickerSection: styles.tickerSection,
+                        tickerList: styles.tickerList,
+                        tickerItem: styles.tickerItem,
+                        tickerText: styles.tickerText,
+                        tickerDiamond: styles.tickerDiamond,
+                        techLabel: styles.techLabel,
+                        dotBase: styles.dotBase,
+                        dot_nutrition: styles.dot_nutrition,
+                        dot_food: styles.dot_food,
+                        dot_cosmetics: styles.dot_cosmetics,
+                        dot_chem: styles.dot_chem,
+                        dot_agro: styles.dot_agro,
+                        dot_feed: styles.dot_feed,
+                        portfolioMenuRoot: styles.portfolioMenuRoot,
+                        portfolioMenuBtn: styles.portfolioMenuBtn,
+                        portfolioChevron: styles.portfolioChevron,
+                        portfolioChevronOpen: styles.portfolioChevronOpen,
+                        portfolioPopover: styles.portfolioPopover,
+                        portfolioGrid: styles.portfolioGrid,
+                        portfolioCol: styles.portfolioCol,
+                        portfolioColHeader: styles.portfolioColHeader,
+                        portfolioItemList: styles.portfolioItemList,
+                        portfolioItemLink: styles.portfolioItemLink,
+                        portfolioFooter: styles.portfolioFooter,
+                        portfolioFooterLink: styles.portfolioFooterLink,
+                        mobileNavWrapper: styles.mobileNavWrapper,
+                        mobileMenuBtn: styles.mobileMenuBtn,
+                        mobileMenuPopover: styles.mobileMenuPopover,
+                        mobileMenuList: styles.mobileMenuList,
+                        mobileNavLink: styles.mobileNavLink,
+                        mobileNavLinkLast: styles.mobileNavLinkLast,
+                        tickerFadeLeft: styles.tickerFadeLeft,
+                        tickerFadeRight: styles.tickerFadeRight,
+                        tickerPauseBtn: styles.tickerPauseBtn,
+                        tickerMarqueeTrack: styles.tickerMarqueeTrack,
+                        tickerIndex: styles.tickerIndex,
+                        divisionBadge: styles.divisionBadge,
+                      }}
+                      ingredient={item}
+                    />
                     <div aria-hidden {...stylex.props(styles.matrixCardHoverOverlay)} />
                   </div>
-                  <div {...stylex.props(styles.matrixCardBody)}>
-                    <div {...stylex.props(styles.matrixCardMeta)}>
-                      <span {...stylex.props(styles.matrixCardIndex)}>
-                        {String(i + 1).padStart(2, "0")} —
-                      </span>
-                      <span {...stylex.props(styles.matrixCardCode)}>{item.code}</span>
-                    </div>
-                    <h3 {...stylex.props(styles.matrixCardTitle)}>{item.name}</h3>
-                    <p {...stylex.props(styles.matrixCardLatin)}>{item.latin}</p>
-                    <dl {...stylex.props(styles.matrixCardDl)}>
-                      <div {...stylex.props(styles.matrixCardDlRow)}>
-                        <dt {...stylex.props(styles.techLabel)}>Purity</dt>
-                        <dd
-                          style={{
-                            margin: 0,
-                            fontFamily: typography.tech,
-                            fontSize: 12,
-                            color: colors.mute700,
-                          }}
-                        >
-                          {item.purity}
-                        </dd>
-                      </div>
-                      <div {...stylex.props(styles.matrixCardDlRow)}>
-                        <dt {...stylex.props(styles.techLabel)}>Form</dt>
-                        <dd
-                          style={{
-                            margin: 0,
-                            fontFamily: typography.tech,
-                            fontSize: 12,
-                            color: colors.mute700,
-                          }}
-                        >
-                          {item.form}
-                        </dd>
-                      </div>
-                    </dl>
-                    <a href="#contact" {...stylex.props(styles.matrixSpecLink)}>
-                      Request Spec
-                      <ArrowUpRight aria-hidden size={12} />
-                    </a>
-                  </div>
+                  <IngredientCardDetails
+                    styles={{
+                      matrixCardBody: styles.matrixCardBody,
+                      matrixCardMeta: styles.matrixCardMeta,
+                      matrixCardIndex: styles.matrixCardIndex,
+                      matrixCardCode: styles.matrixCardCode,
+                      matrixCardTitle: styles.matrixCardTitle,
+                      matrixCardLatin: styles.matrixCardLatin,
+                      matrixCardDl: styles.matrixCardDl,
+                      matrixCardDlRow: styles.matrixCardDlRow,
+                      techLabel: styles.techLabel,
+                      matrixSpecLink: styles.matrixSpecLink,
+                    }}
+                    i={i}
+                    item={item}
+                  />
                 </article>
               </Reveal>
             );
@@ -3384,6 +2964,126 @@ function DossierSection() {
     >
       <div {...stylex.props(styles.container)}>
         <SectionHeader
+          styles={{
+            container: styles.container,
+            header: styles.header,
+            microStrip: styles.microStrip,
+            navLink: styles.navLink,
+            heroSection: styles.heroSection,
+            heroGrid: styles.heroGrid,
+            heroLeft: styles.heroLeft,
+            heroImg: styles.heroImg,
+            footer: styles.footer,
+            footerGrid: styles.footerGrid,
+            footerBrandCol: styles.footerBrandCol,
+            footerNavCol: styles.footerNavCol,
+            heroStatUnit: styles.heroStatUnit,
+            heroStatDesc: styles.heroStatDesc,
+            heroRight: styles.heroRight,
+            standardsSection: styles.standardsSection,
+            standardsGrid: styles.standardsGrid,
+            finaleSection: styles.finaleSection,
+            finaleSecondaryBtn: styles.finaleSecondaryBtn,
+            footerBrandRow: styles.footerBrandRow,
+            footerWordmark: styles.footerWordmark,
+            footerCertBadge: styles.footerCertBadge,
+            microStripItem: styles.microStripItem,
+            liveDotOuter: styles.liveDotOuter,
+            liveDotPing: styles.liveDotPing,
+            liveDotInner: styles.liveDotInner,
+            techLabel: styles.techLabel,
+            navInner: styles.navInner,
+            brandLink: styles.brandLink,
+            brandText: styles.brandText,
+            brandLeaf: styles.brandLeaf,
+            navDesktopLinks: styles.navDesktopLinks,
+            navRight: styles.navRight,
+            ctaPrimaryCompact: styles.ctaPrimaryCompact,
+            progressHairline: styles.progressHairline,
+            heroBadge: styles.heroBadge,
+            heroHeading: styles.heroHeading,
+            textGreen600: styles.textGreen600,
+            heroLead: styles.heroLead,
+            heroActions: styles.heroActions,
+            ctaPrimary: styles.ctaPrimary,
+            ctaOutlineBlue: styles.ctaOutlineBlue,
+            heroStatGrid: styles.heroStatGrid,
+            heroStatItem: styles.heroStatItem,
+            heroStatValue: styles.heroStatValue,
+            heroImgContainer: styles.heroImgContainer,
+            heroImgScrim: styles.heroImgScrim,
+            heroCaptionBadge: styles.heroCaptionBadge,
+            eyebrowGreen: styles.eyebrowGreen,
+            formulationSection: styles.formulationSection,
+            sectionAsideLead: styles.sectionAsideLead,
+            formulationGrid: styles.formulationGrid,
+            formulationLeft: styles.formulationLeft,
+            formulationFieldset: styles.formulationFieldset,
+            chipsWrapRow: styles.chipsWrapRow,
+            processStripOuter: styles.processStripOuter,
+            processOl: styles.processOl,
+            processLi: styles.processLi,
+            processIndex: styles.processIndex,
+            processTitle: styles.processTitle,
+            processCopy: styles.processCopy,
+            formulationRight: styles.formulationRight,
+            specDraftHeader: styles.specDraftHeader,
+            specDraftLabel: styles.specDraftLabel,
+            specDraftCode: styles.specDraftCode,
+            specDraftDl: styles.specDraftDl,
+            specDraftDlRow: styles.specDraftDlRow,
+            specDraftDt: styles.specDraftDt,
+            specDraftDd: styles.specDraftDd,
+            specMatchesList: styles.specMatchesList,
+            specMatchItem: styles.specMatchItem,
+            specSubmitBtn: styles.specSubmitBtn,
+            specDossiersRequestNote: styles.specDossiersRequestNote,
+            originGrid: styles.originGrid,
+            originImgCol: styles.originImgCol,
+            originImg: styles.originImg,
+            originTextCol: styles.originTextCol,
+            originTitle: styles.originTitle,
+            originQuote: styles.originQuote,
+            labImgCol: styles.labImgCol,
+            labImgContainer: styles.labImgContainer,
+            labImg: styles.labImg,
+            labImgScrim: styles.labImgScrim,
+            labCaptionBadge: styles.labCaptionBadge,
+            pillarsCol: styles.pillarsCol,
+            pillarInner: styles.pillarInner,
+            pillarRowBorder: styles.pillarRowBorder,
+            pillarIconBox: styles.pillarIconBox,
+            pillarTitle: styles.pillarTitle,
+            pillarCopy: styles.pillarCopy,
+            pillarCert: styles.pillarCert,
+            finaleThumbImg: styles.finaleThumbImg,
+            finaleScrim: styles.finaleScrim,
+            finaleInner: styles.finaleInner,
+            eyebrowGreen400: styles.eyebrowGreen400,
+            finaleHeading: styles.finaleHeading,
+            finaleLead: styles.finaleLead,
+            finaleActions: styles.finaleActions,
+            ctaPrimaryDark: styles.ctaPrimaryDark,
+            finaleResponseTime: styles.finaleResponseTime,
+            officesOuter: styles.officesOuter,
+            officesGrid: styles.officesGrid,
+            officeCardBg: styles.officeCardBg,
+            officeCardInner: styles.officeCardInner,
+            officeCity: styles.officeCity,
+            officeShort: styles.officeShort,
+            officeCoords: styles.officeCoords,
+            footerBrandTagline: styles.footerBrandTagline,
+            footerEst: styles.footerEst,
+            footerCertsList: styles.footerCertsList,
+            footerNavList: styles.footerNavList,
+            footerNavLink: styles.footerNavLink,
+            footerLegal: styles.footerLegal,
+            sectionHeaderRow: styles.sectionHeaderRow,
+            sectionHeading: styles.sectionHeading,
+            chipBase: styles.chipBase,
+            chipSelected: styles.chipSelected,
+            chipUnselected: styles.chipUnselected,
+          }}
           id="product-heading"
           number="03"
           label="Product Dossier"
@@ -3423,48 +3123,25 @@ function DossierSection() {
           </div>
 
           {/* Dossier body */}
-          <div {...stylex.props(styles.dossierBodyCol)}>
-            <Reveal>
-              <h3 {...stylex.props(styles.dossierTitle)}>{DOSSIER.name}</h3>
-              <p {...stylex.props(styles.dossierLatin)}>{DOSSIER.latin}</p>
-              <p {...stylex.props(styles.dossierDescription)}>
-                A branded, clinically studied adaptogen standardized by withanolide content.
-                Supplied with full identity, potency and stability documentation — chromatographic
-                panels run on every production batch, third-party verification on request.
-              </p>
-            </Reveal>
-
-            <Reveal delay={STAGGER}>
-              <dl {...stylex.props(styles.dossierDl)}>
-                {SPEC_ROWS.map((row) => (
-                  <div key={row.label} {...stylex.props(styles.dossierDlRow)}>
-                    <dt {...stylex.props(styles.techLabel)}>{row.label}</dt>
-                    <dd {...stylex.props(styles.dossierDd)}>{row.value}</dd>
-                  </div>
-                ))}
-              </dl>
-            </Reveal>
-
-            <Reveal delay={STAGGER * 2}>
-              <div {...stylex.props(styles.dossierFormatsRow)}>
-                {["Capsule", "Tablet", "Softgel", "Powder blend"].map((format) => (
-                  <span key={format} {...stylex.props(styles.dossierFormatPill)}>
-                    {format}
-                  </span>
-                ))}
-              </div>
-              <div {...stylex.props(styles.dossierActionsRow)}>
-                <a href={createInquiryHref("dossier")} {...stylex.props(styles.ctaPrimary)}>
-                  Request this specification
-                  <ArrowRight aria-hidden size={16} />
-                </a>
-                <a href={createInquiryHref("tds")} {...stylex.props(styles.ctaOutlineBlue)}>
-                  <FileDown aria-hidden size={16} />
-                  Technical data sheet
-                </a>
-              </div>
-            </Reveal>
-          </div>
+          <IngredientDossierDetails
+            styles={{
+              dossierBodyCol: styles.dossierBodyCol,
+              dossierTitle: styles.dossierTitle,
+              dossierLatin: styles.dossierLatin,
+              dossierDescription: styles.dossierDescription,
+              dossierDl: styles.dossierDl,
+              dossierDlRow: styles.dossierDlRow,
+              techLabel: styles.techLabel,
+              dossierDd: styles.dossierDd,
+              dossierFormatsRow: styles.dossierFormatsRow,
+              dossierFormatPill: styles.dossierFormatPill,
+              dossierActionsRow: styles.dossierActionsRow,
+              ctaPrimary: styles.ctaPrimary,
+              ctaOutlineBlue: styles.ctaOutlineBlue,
+            }}
+            DOSSIER={DOSSIER}
+            SPEC_ROWS={SPEC_ROWS}
+          />
         </div>
       </div>
     </section>
@@ -3473,503 +3150,11 @@ function DossierSection() {
 
 /* ─────────────────────────────── Formulation Presenter ─────────────────────────────── */
 
-function Chip({
-  label,
-  selected,
-  onClick,
-}: {
-  label: string;
-  selected: boolean;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      aria-pressed={selected}
-      onClick={onClick}
-      {...stylex.props(styles.chipBase, selected ? styles.chipSelected : styles.chipUnselected)}
-    >
-      {label}
-    </button>
-  );
-}
-function RadioChips<T extends string>({
-  label,
-  options,
-  value,
-  onChange,
-}: {
-  label: string;
-  options: readonly T[];
-  value: T;
-  onChange: (next: T) => void;
-}) {
-  const move = (delta: number) => {
-    const next = options[(options.indexOf(value) + delta + options.length) % options.length];
-    onChange(next);
-  };
-  return (
-    <div role="radiogroup" aria-label={label} {...stylex.props(styles.chipsWrapRow)}>
-      {options.map((option) => (
-        <button
-          key={option}
-          type="button"
-          role="radio"
-          aria-checked={value === option}
-          tabIndex={value === option ? 0 : -1}
-          ref={(node) => {
-            if (
-              node &&
-              value === option &&
-              node.closest('[role="radiogroup"]')?.contains(document.activeElement)
-            ) {
-              node.focus();
-            }
-          }}
-          onClick={() => onChange(option)}
-          onKeyDown={(event) => {
-            if (event.key.startsWith("Arrow")) event.stopPropagation();
-            if (event.key === "ArrowRight" || event.key === "ArrowDown") {
-              event.preventDefault();
-              move(1);
-            } else if (event.key === "ArrowLeft" || event.key === "ArrowUp") {
-              event.preventDefault();
-              move(-1);
-            }
-          }}
-          {...stylex.props(
-            styles.chipBase,
-            value === option ? styles.chipSelected : styles.chipUnselected,
-          )}
-        >
-          {option}
-        </button>
-      ))}
-    </div>
-  );
-}
-function FormulationSection() {
-  const [application, setApplication] = useState<IngredientApplication>("Nutrition");
-  const [form, setForm] = useState<(typeof FORM_OPTIONS)[number]>("Beadlet");
-  const [regulatory, setRegulatory] = useState<string[]>(["ISO 9001", "GMP"]);
-  const matches = getIngredientsByApplication(application);
-  const toggleRegulatory = (name: string) =>
-    setRegulatory((current) =>
-      current.includes(name) ? current.filter((c) => c !== name) : [...current, name],
-    );
-  return (
-    <section
-      id="formulation"
-      aria-labelledby="formulation-heading"
-      {...stylex.props(styles.formulationSection)}
-    >
-      <div {...stylex.props(styles.container)}>
-        <SectionHeader
-          id="formulation-heading"
-          number="04"
-          label="Formulation"
-          title="Your target spec,"
-          accent="engineered back to you"
-          aside={
-            <p {...stylex.props(styles.sectionAsideLead)}>
-              Pick the shape of your formulation — our laboratory returns a validated proposal
-              within one business day.
-            </p>
-          }
-        />
-
-        <div {...stylex.props(styles.formulationGrid)}>
-          {/* Pickers */}
-          <div {...stylex.props(styles.formulationLeft)}>
-            <div>
-              <p id="formulation-application-label" {...stylex.props(styles.techLabel)}>
-                Application
-              </p>
-              <RadioChips
-                label="Application"
-                options={MENU_APPLICATIONS}
-                value={application}
-                onChange={setApplication}
-              />
-            </div>
-
-            <div
-              style={{
-                marginTop: 32,
-              }}
-            >
-              <p {...stylex.props(styles.techLabel)}>Delivery form</p>
-              <RadioChips
-                label="Delivery form"
-                options={FORM_OPTIONS}
-                value={form}
-                onChange={setForm}
-              />
-            </div>
-
-            <fieldset {...stylex.props(styles.formulationFieldset)}>
-              <legend {...stylex.props(styles.techLabel)}>Regulatory map</legend>
-              <div {...stylex.props(styles.chipsWrapRow)}>
-                {certificationDetails.map((cert) => (
-                  <Chip
-                    key={cert.name}
-                    label={cert.name}
-                    selected={regulatory.includes(cert.name)}
-                    onClick={() => toggleRegulatory(cert.name)}
-                  />
-                ))}
-              </div>
-            </fieldset>
-
-            {/* Process strip */}
-            <div {...stylex.props(styles.processStripOuter)}>
-              <p {...stylex.props(styles.techLabel)}>What happens next</p>
-              <ol {...stylex.props(styles.processOl)}>
-                {processSteps.map((step, i) => (
-                  <li key={step.title} {...stylex.props(styles.processLi)}>
-                    <span {...stylex.props(styles.processIndex)}>
-                      {String(i + 1).padStart(2, "0")}
-                    </span>
-                    <div>
-                      <p {...stylex.props(styles.processTitle)}>{step.title}</p>
-                      <p {...stylex.props(styles.processCopy)}>{step.copy}</p>
-                    </div>
-                  </li>
-                ))}
-              </ol>
-            </div>
-          </div>
-
-          {/* Live spec sheet */}
-          <div {...stylex.props(styles.formulationRight)}>
-            <div {...stylex.props(styles.specDraftHeader)}>
-              <span {...stylex.props(styles.specDraftLabel)}>Draft Specification</span>
-              <span {...stylex.props(styles.specDraftCode)}>FN-REQ / 2026</span>
-            </div>
-            <div aria-live="polite">
-              <dl {...stylex.props(styles.specDraftDl)}>
-                {[
-                  ["Application", application],
-                  ["Delivery form", form],
-                  ["Regulatory", regulatory.length ? regulatory.join(" · ") : "—"],
-                  ["Matching actives", `${matches.length} of ${ingredients.length} in portfolio`],
-                  ["Response", "< 24h with full documentation"],
-                ].map(([label, value]) => (
-                  <div key={label} {...stylex.props(styles.specDraftDlRow)}>
-                    <dt {...stylex.props(styles.specDraftDt)}>{label}</dt>
-                    <dd {...stylex.props(styles.specDraftDd)}>{value}</dd>
-                  </div>
-                ))}
-              </dl>
-              <ul {...stylex.props(styles.specMatchesList)}>
-                {matches.slice(0, 3).map((item) => (
-                  <li key={item.code} {...stylex.props(styles.specMatchItem)}>
-                    <CheckCircle2 aria-hidden size={12} color={colors.brandGreen400} />
-                    {item.name} — {item.purity}
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <a href={createInquiryHref("formulation")} {...stylex.props(styles.specSubmitBtn)}>
-              Submit this specification
-              <ArrowRight aria-hidden size={16} />
-            </a>
-            <p {...stylex.props(styles.specDossiersRequestNote)}>Technical dossiers on request</p>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
 /* ─────────────────────────────── Origin + Standards ─────────────────────────────── */
-
-function StandardsSection() {
-  const reduce = useReducedMotion();
-  const imgRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: imgRef,
-    offset: ["start end", "end start"],
-  });
-  const imgY = useTransform(scrollYProgress, [0, 1], ["-7%", "7%"]);
-  return (
-    <section
-      id="standards"
-      aria-labelledby="standards-heading"
-      {...stylex.props(styles.standardsSection)}
-    >
-      <div {...stylex.props(styles.container)}>
-        {/* Origin editorial beat */}
-        <div {...stylex.props(styles.originGrid)}>
-          <div {...stylex.props(styles.originImgCol)}>
-            <img
-              src={IMG.origin}
-              alt="Rows of cultivated green crops on a partner farm at golden hour"
-              loading="lazy"
-              {...stylex.props(styles.originImg)}
-            />
-          </div>
-          <div {...stylex.props(styles.originTextCol)}>
-            <Reveal>
-              <p {...stylex.props(styles.eyebrowGreen)}>Origin</p>
-              <h2 {...stylex.props(styles.originTitle)}>
-                Grown with{" "}
-                <em
-                  style={{
-                    fontStyle: "italic",
-                    color: colors.brandGreen600,
-                  }}
-                >
-                  patience.
-                </em>
-              </h2>
-              <p {...stylex.props(styles.heroLead)}>
-                Our botanicals begin in soil we know by name — a global network of partner farms
-                cultivated over decades, where harvests are timed to the plant, never to the
-                quarter.
-              </p>
-              <blockquote {...stylex.props(styles.originQuote)}>
-                "Nature holds the keys to human vitality. We simply refuse to lose them in
-                translation."
-              </blockquote>
-            </Reveal>
-          </div>
-        </div>
-
-        <SectionHeader
-          id="standards-heading"
-          number="05"
-          label="Quality Infrastructure"
-          title="Science-backed"
-          accent="standards"
-          aside={
-            <p {...stylex.props(styles.sectionAsideLead)}>
-              Every lot. Every market. Every release — documented to your regulatory map.
-            </p>
-          }
-        />
-
-        <div {...stylex.props(styles.standardsGrid)}>
-          {/* Image */}
-          <div {...stylex.props(styles.labImgCol)}>
-            <div ref={imgRef} {...stylex.props(styles.labImgContainer)}>
-              <m.img
-                src={IMG.lab}
-                alt="Dense botanical foliage awaiting quality-control intake at the Nanjing laboratory"
-                style={{
-                  y: reduce ? 0 : imgY,
-                }}
-                loading="lazy"
-                {...stylex.props(styles.labImg)}
-              />
-              <div aria-hidden {...stylex.props(styles.labImgScrim)} />
-              <div {...stylex.props(styles.labCaptionBadge)}>
-                <span {...stylex.props(styles.techLabel)}>QC Program — Nanjing</span>
-                <span {...stylex.props(styles.eyebrowGreen)}>Identity · Potency · Stability</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Pillars */}
-          <div {...stylex.props(styles.pillarsCol)}>
-            {pillars.map((pillar, i) => {
-              const Icon = PILLAR_ICONS[i];
-              return (
-                <Reveal key={pillar.title} delay={i * STAGGER}>
-                  <div
-                    {...stylex.props(
-                      styles.pillarInner,
-                      i < pillars.length - 1 && styles.pillarRowBorder,
-                    )}
-                  >
-                    <div {...stylex.props(styles.pillarIconBox)}>
-                      <Icon aria-hidden strokeWidth={1.5} size={24} />
-                    </div>
-                    <div>
-                      <h3 {...stylex.props(styles.pillarTitle)}>{pillar.title}</h3>
-                      <p {...stylex.props(styles.pillarCopy)}>{pillar.copy}</p>
-                      <div {...stylex.props(styles.pillarCert)}>
-                        <CheckCircle2 aria-hidden size={14} />
-                        ISO 9001 · GMP Certified
-                      </div>
-                    </div>
-                  </div>
-                </Reveal>
-              );
-            })}
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
 
 /* ─────────────────────────────── Deep-Green Finale ─────────────────────────────── */
 
-function FinaleSection() {
-  const reduce = useReducedMotion();
-  const ref = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start end", "end start"],
-  });
-  const bgY = useTransform(scrollYProgress, [0, 1], ["-6%", "6%"]);
-  return (
-    <section
-      id="contact"
-      ref={ref}
-      aria-labelledby="contact-heading"
-      {...stylex.props(styles.finaleSection)}
-    >
-      <m.div
-        aria-hidden
-        style={{
-          pointerEvents: "none",
-          position: "absolute",
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          y: reduce ? 0 : bgY,
-        }}
-      >
-        <img src={IMG.heroThumb} alt="" loading="lazy" {...stylex.props(styles.finaleThumbImg)} />
-      </m.div>
-      <div aria-hidden {...stylex.props(styles.finaleScrim)} />
-
-      <div {...stylex.props(styles.container, styles.finaleInner)}>
-        <Reveal>
-          <p {...stylex.props(styles.eyebrowGreen400)}>06 — Partner with Fenchem</p>
-          <h2 id="contact-heading" {...stylex.props(styles.finaleHeading)}>
-            Your next formulation,{" "}
-            <span
-              style={{
-                color: colors.brandGreen400,
-              }}
-            >
-              engineered to specification
-            </span>
-          </h2>
-          <p {...stylex.props(styles.finaleLead)}>
-            Submit a target spec — purity, form, matrix, regulatory map — and our laboratory returns
-            a validated proposal with full documentation within one business day.
-          </p>
-        </Reveal>
-
-        <Reveal delay={STAGGER * 2}>
-          <div {...stylex.props(styles.finaleActions)}>
-            <a href={createInquiryHref("contact")} {...stylex.props(styles.ctaPrimaryDark)}>
-              Partner with Fenchem
-              <ArrowRight aria-hidden size={16} />
-            </a>
-            <a href="#matrix" {...stylex.props(styles.finaleSecondaryBtn)}>
-              Explore Portfolio
-            </a>
-          </div>
-        </Reveal>
-
-        <Reveal delay={STAGGER * 3}>
-          <p {...stylex.props(styles.finaleResponseTime)}>
-            Response Time &lt; 24h — Technical Dossiers on Request
-          </p>
-        </Reveal>
-
-        {/* Office nodes */}
-        <div {...stylex.props(styles.officesOuter)}>
-          <Reveal>
-            <p {...stylex.props(styles.eyebrowGreen400)}>6 Global Bases — 40+ Countries Served</p>
-          </Reveal>
-          <div {...stylex.props(styles.officesGrid)}>
-            {regions.map((region, i) => (
-              <Reveal key={region.city} delay={i * (STAGGER * 0.75)}>
-                <div {...stylex.props(styles.officeCardBg)}>
-                  <div {...stylex.props(styles.officeCardInner)}>
-                    <p {...stylex.props(styles.officeCity)}>{region.city}</p>
-                    <p {...stylex.props(styles.officeShort)}>{region.short}</p>
-                    <p {...stylex.props(styles.officeCoords)}>{region.coords}</p>
-                  </div>
-                </div>
-              </Reveal>
-            ))}
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
 /* ─────────────────────────────── Footer ─────────────────────────────── */
-
-function FooterSection() {
-  return (
-    <footer {...stylex.props(styles.footer)}>
-      <div {...stylex.props(styles.container)}>
-        <div {...stylex.props(styles.footerGrid)}>
-          {/* Brand block */}
-          <div {...stylex.props(styles.footerBrandCol)}>
-            <div {...stylex.props(styles.footerBrandRow)}>
-              <span {...stylex.props(styles.brandText)}>FENCHEM</span>
-              <Leaf aria-hidden strokeWidth={1.5} size={20} color={colors.brandGreen500} />
-            </div>
-            <p {...stylex.props(styles.footerBrandTagline)}>{company.tagline}.</p>
-            <p {...stylex.props(styles.footerEst)}>
-              ISO 9001 : 2015 · GMP · HACCP
-              <br />
-              Est. {company.founded} — {company.hq.city}, {company.hq.country}
-            </p>
-            <div {...stylex.props(styles.footerCertsList)}>
-              {certifications.map((cert) => (
-                <span key={cert} {...stylex.props(styles.footerCertBadge)}>
-                  {cert}
-                </span>
-              ))}
-            </div>
-          </div>
-
-          {/* Nav columns */}
-          {FOOTER_COLS.map((col) => (
-            <div key={col.head} {...stylex.props(styles.footerNavCol)}>
-              <p {...stylex.props(styles.techLabel)}>{col.head}</p>
-              <ul {...stylex.props(styles.footerNavList)}>
-                {col.links.map((link) => (
-                  <li key={link.label}>
-                    <a href={link.href} {...stylex.props(styles.footerNavLink)}>
-                      {link.label}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
-
-        {/* Wordmark watermark */}
-        <p aria-hidden {...stylex.props(styles.footerWordmark)}>
-          FENCHEM
-        </p>
-
-        {/* Legal strip */}
-        <div {...stylex.props(styles.footerLegal)}>
-          <span>© 2026 {company.legalName} — All Rights Reserved</span>
-          <span
-            style={{
-              fontVariantNumeric: "tabular-nums",
-            }}
-          >
-            {company.hq.coords} — Nanjing, China
-          </span>
-          <span
-            style={{
-              color: colors.brandGreen700,
-            }}
-          >
-            Botanical Intelligence Since 1995
-          </span>
-        </div>
-      </div>
-    </footer>
-  );
-}
 
 /* ─────────────────────────────── Root export ─────────────────────────────── */
 
@@ -3988,22 +3173,177 @@ function SmoothScroll() {
 }
 export function VariantV() {
   return (
-    <LazyMotion features={domAnimation} strict>
-      <div {...stylex.props(styles.root)}>
-        <SmoothScroll />
-        <NavBar />
-        <main>
-          <HeroSection />
-          <TickerSection />
-          <IndustriesSection />
-          <MatrixSection />
-          <DossierSection />
-          <FormulationSection />
-          <StandardsSection />
-          <FinaleSection />
-        </main>
-        <FooterSection />
-      </div>
-    </LazyMotion>
+    <ProductionPage
+      styles={{ root: styles.root }}
+      productionStyles={{
+        container: styles.container,
+        header: styles.header,
+        microStrip: styles.microStrip,
+        navLink: styles.navLink,
+        heroSection: styles.heroSection,
+        heroGrid: styles.heroGrid,
+        heroLeft: styles.heroLeft,
+        heroImg: styles.heroImg,
+        footer: styles.footer,
+        footerGrid: styles.footerGrid,
+        footerBrandCol: styles.footerBrandCol,
+        footerNavCol: styles.footerNavCol,
+        heroStatUnit: styles.heroStatUnit,
+        heroStatDesc: styles.heroStatDesc,
+        heroRight: styles.heroRight,
+        standardsSection: styles.standardsSection,
+        standardsGrid: styles.standardsGrid,
+        finaleSection: styles.finaleSection,
+        finaleSecondaryBtn: styles.finaleSecondaryBtn,
+        footerBrandRow: styles.footerBrandRow,
+        footerWordmark: styles.footerWordmark,
+        footerCertBadge: styles.footerCertBadge,
+        microStripItem: styles.microStripItem,
+        liveDotOuter: styles.liveDotOuter,
+        liveDotPing: styles.liveDotPing,
+        liveDotInner: styles.liveDotInner,
+        techLabel: styles.techLabel,
+        navInner: styles.navInner,
+        brandLink: styles.brandLink,
+        brandText: styles.brandText,
+        brandLeaf: styles.brandLeaf,
+        navDesktopLinks: styles.navDesktopLinks,
+        navRight: styles.navRight,
+        ctaPrimaryCompact: styles.ctaPrimaryCompact,
+        progressHairline: styles.progressHairline,
+        heroBadge: styles.heroBadge,
+        heroHeading: styles.heroHeading,
+        textGreen600: styles.textGreen600,
+        heroLead: styles.heroLead,
+        heroActions: styles.heroActions,
+        ctaPrimary: styles.ctaPrimary,
+        ctaOutlineBlue: styles.ctaOutlineBlue,
+        heroStatGrid: styles.heroStatGrid,
+        heroStatItem: styles.heroStatItem,
+        heroStatValue: styles.heroStatValue,
+        heroImgContainer: styles.heroImgContainer,
+        heroImgScrim: styles.heroImgScrim,
+        heroCaptionBadge: styles.heroCaptionBadge,
+        eyebrowGreen: styles.eyebrowGreen,
+        formulationSection: styles.formulationSection,
+        sectionAsideLead: styles.sectionAsideLead,
+        formulationGrid: styles.formulationGrid,
+        formulationLeft: styles.formulationLeft,
+        formulationFieldset: styles.formulationFieldset,
+        chipsWrapRow: styles.chipsWrapRow,
+        processStripOuter: styles.processStripOuter,
+        processOl: styles.processOl,
+        processLi: styles.processLi,
+        processIndex: styles.processIndex,
+        processTitle: styles.processTitle,
+        processCopy: styles.processCopy,
+        formulationRight: styles.formulationRight,
+        specDraftHeader: styles.specDraftHeader,
+        specDraftLabel: styles.specDraftLabel,
+        specDraftCode: styles.specDraftCode,
+        specDraftDl: styles.specDraftDl,
+        specDraftDlRow: styles.specDraftDlRow,
+        specDraftDt: styles.specDraftDt,
+        specDraftDd: styles.specDraftDd,
+        specMatchesList: styles.specMatchesList,
+        specMatchItem: styles.specMatchItem,
+        specSubmitBtn: styles.specSubmitBtn,
+        specDossiersRequestNote: styles.specDossiersRequestNote,
+        originGrid: styles.originGrid,
+        originImgCol: styles.originImgCol,
+        originImg: styles.originImg,
+        originTextCol: styles.originTextCol,
+        originTitle: styles.originTitle,
+        originQuote: styles.originQuote,
+        labImgCol: styles.labImgCol,
+        labImgContainer: styles.labImgContainer,
+        labImg: styles.labImg,
+        labImgScrim: styles.labImgScrim,
+        labCaptionBadge: styles.labCaptionBadge,
+        pillarsCol: styles.pillarsCol,
+        pillarInner: styles.pillarInner,
+        pillarRowBorder: styles.pillarRowBorder,
+        pillarIconBox: styles.pillarIconBox,
+        pillarTitle: styles.pillarTitle,
+        pillarCopy: styles.pillarCopy,
+        pillarCert: styles.pillarCert,
+        finaleThumbImg: styles.finaleThumbImg,
+        finaleScrim: styles.finaleScrim,
+        finaleInner: styles.finaleInner,
+        eyebrowGreen400: styles.eyebrowGreen400,
+        finaleHeading: styles.finaleHeading,
+        finaleLead: styles.finaleLead,
+        finaleActions: styles.finaleActions,
+        ctaPrimaryDark: styles.ctaPrimaryDark,
+        finaleResponseTime: styles.finaleResponseTime,
+        officesOuter: styles.officesOuter,
+        officesGrid: styles.officesGrid,
+        officeCardBg: styles.officeCardBg,
+        officeCardInner: styles.officeCardInner,
+        officeCity: styles.officeCity,
+        officeShort: styles.officeShort,
+        officeCoords: styles.officeCoords,
+        footerBrandTagline: styles.footerBrandTagline,
+        footerEst: styles.footerEst,
+        footerCertsList: styles.footerCertsList,
+        footerNavList: styles.footerNavList,
+        footerNavLink: styles.footerNavLink,
+        footerLegal: styles.footerLegal,
+        sectionHeaderRow: styles.sectionHeaderRow,
+        sectionHeading: styles.sectionHeading,
+        chipBase: styles.chipBase,
+        chipSelected: styles.chipSelected,
+        chipUnselected: styles.chipUnselected,
+        tickerSection: styles.tickerSection,
+        tickerList: styles.tickerList,
+        tickerItem: styles.tickerItem,
+        tickerText: styles.tickerText,
+        tickerDiamond: styles.tickerDiamond,
+        dotBase: styles.dotBase,
+        dot_nutrition: styles.dot_nutrition,
+        dot_food: styles.dot_food,
+        dot_cosmetics: styles.dot_cosmetics,
+        dot_chem: styles.dot_chem,
+        dot_agro: styles.dot_agro,
+        dot_feed: styles.dot_feed,
+        portfolioMenuRoot: styles.portfolioMenuRoot,
+        portfolioMenuBtn: styles.portfolioMenuBtn,
+        portfolioChevron: styles.portfolioChevron,
+        portfolioChevronOpen: styles.portfolioChevronOpen,
+        portfolioPopover: styles.portfolioPopover,
+        portfolioGrid: styles.portfolioGrid,
+        portfolioCol: styles.portfolioCol,
+        portfolioColHeader: styles.portfolioColHeader,
+        portfolioItemList: styles.portfolioItemList,
+        portfolioItemLink: styles.portfolioItemLink,
+        portfolioFooter: styles.portfolioFooter,
+        portfolioFooterLink: styles.portfolioFooterLink,
+        mobileNavWrapper: styles.mobileNavWrapper,
+        mobileMenuBtn: styles.mobileMenuBtn,
+        mobileMenuPopover: styles.mobileMenuPopover,
+        mobileMenuList: styles.mobileMenuList,
+        mobileNavLink: styles.mobileNavLink,
+        mobileNavLinkLast: styles.mobileNavLinkLast,
+        tickerFadeLeft: styles.tickerFadeLeft,
+        tickerFadeRight: styles.tickerFadeRight,
+        tickerPauseBtn: styles.tickerPauseBtn,
+        tickerMarqueeTrack: styles.tickerMarqueeTrack,
+        tickerIndex: styles.tickerIndex,
+        divisionBadge: styles.divisionBadge,
+      }}
+      SmoothScroll={SmoothScroll}
+      IndustriesSection={IndustriesSection}
+      MatrixSection={MatrixSection}
+      DossierSection={DossierSection}
+    />
   );
 }
+
+const DIVISION_DOT_KEYS: Record<DivisionKey, keyof typeof styles> = {
+  nutrition: "dot_nutrition",
+  food: "dot_food",
+  cosmetics: "dot_cosmetics",
+  chem: "dot_chem",
+  agro: "dot_agro",
+  feed: "dot_feed",
+};

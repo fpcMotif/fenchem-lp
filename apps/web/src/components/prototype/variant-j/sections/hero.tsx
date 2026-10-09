@@ -3,7 +3,8 @@ import * as stylex from "@stylexjs/stylex";
 import gsap from "gsap";
 import { ChevronDown } from "lucide-react";
 import { HERO, IMAGES } from "../content";
-import { EASE_OUT, SplitWords, useSectionAnimation } from "../motion";
+import { SplitWords, useSectionAnimation } from "../motion";
+import { EASE_OUT } from "../motion-values";
 import { sharedStyles } from "../styles";
 
 /*

@@ -6,7 +6,8 @@ import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
 import { ABOUT_HERO } from "../../about-data";
 import { useActiveSection } from "../../use-active-section";
-import { Shell, srOnly } from "./layout";
+import { Shell } from "./layout";
+import { srOnly } from "./layout-values";
 import { color, ease, font } from "./palette.stylex";
 
 const SECTION_IDS = ABOUT_HERO.navChips.map((chip) => chip.id);

@@ -2,7 +2,8 @@ import * as stylex from "@stylexjs/stylex";
 
 import { ABOUT_HONORS } from "../../../about-data";
 import { Sheet } from "../sheet";
-import { base, Reveal } from "../shared";
+import { Reveal } from "../shared";
+import { base } from "../shared-values";
 import { HONORS_SHEET } from "../sheets";
 import { Stamp } from "../stamp";
 import { color, media } from "../tokens.stylex";

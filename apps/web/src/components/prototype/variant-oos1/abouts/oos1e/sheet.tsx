@@ -1,21 +1,13 @@
+import { m } from "motion/react";
 import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { m, useScroll, useTransform } from "motion/react";
-import {
-  type CSSProperties,
-  createContext,
-  type ReactNode,
-  type RefObject,
-  useContext,
-  useRef,
-} from "react";
-
+import { useScroll, useTransform } from "motion/react";
+import { type CSSProperties, type ReactNode, type RefObject, useContext, useRef } from "react";
 import { useBoxHeight } from "./hooks";
-import { base } from "./shared";
+import { base } from "./shared-values";
 import type { SheetDef } from "./sheets";
 import { color, font, media, metric } from "./tokens.stylex";
-
-export const StackContext = createContext({ reachedIndex: -1, stacked: false });
+import { StackContext } from "./sheet-values";
 
 const styles = stylex.create({
   slot: {

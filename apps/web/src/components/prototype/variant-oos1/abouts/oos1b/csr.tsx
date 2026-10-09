@@ -1,7 +1,8 @@
 import * as stylex from "@stylexjs/stylex";
 
 import { ABOUT_CSR } from "../../about-data";
-import { Bevel, Mat, ROMAN, SectionHead, Tag, bevel, stepIn, ui, useArrived } from "./shared";
+import { Bevel, Mat, SectionHead, Tag, useArrived } from "./shared";
+import { ROMAN, bevel, stepIn, ui } from "./shared-values";
 import { bp, face, space, tone } from "./tokens.stylex";
 
 const styles = stylex.create({

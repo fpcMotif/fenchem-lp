@@ -1,8 +1,6 @@
 import * as stylex from "@stylexjs/stylex";
 import type { CSSProperties } from "react";
 
-export const LIFT = { block: 120, stele: 240 } as const;
-
 const SHADE =
   "rgba(11, 42, 92, 0.26), rgba(11, 42, 92, 0.19) 14%, rgba(11, 42, 92, 0.11) 58%, rgba(11, 42, 92, 0.035)";
 const VERTICAL = "matrix(1, 0, calc(var(--ux) * var(--k)), calc(var(--uy) * var(--k)), 0, 0)";

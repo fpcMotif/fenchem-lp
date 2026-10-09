@@ -422,7 +422,6 @@ function ToneCell({ traits }: { traits: ItemTraits }) {
   const reference = traits.color !== null && !traits.colorStated;
   return (
     <td
-      role="cell"
       title={reference ? REFERENCE_NOTE : undefined}
       {...stylex.props(styles.cell, styles.toneCell)}
     >
@@ -440,18 +439,16 @@ function ToneCell({ traits }: { traits: ItemTraits }) {
 
 function ItemRow({ item }: { item: FlatItem }) {
   return (
-    <tr role="row" {...stylex.props(styles.row)}>
+    <tr {...stylex.props(styles.row)}>
       <ToneCell traits={item.traits} />
-      <th role="rowheader" scope="row" {...stylex.props(styles.cell, styles.nameCell)}>
+      <th scope="row" {...stylex.props(styles.cell, styles.nameCell)}>
         <span {...stylex.props(styles.primary)}>{item.primary}</span>
         {item.secondary && <span {...stylex.props(styles.secondary)}>{item.secondary}</span>}
       </th>
-      <td role="cell" {...stylex.props(styles.cell, styles.inciCell)}>
+      <td {...stylex.props(styles.cell, styles.inciCell)}>
         {item.inci.replaceAll("）", GLUED_CLOSE_PAREN)}
       </td>
-      <td role="cell" {...stylex.props(styles.cell, styles.featCell, styles.lastCell)}>
-        {item.features}
-      </td>
+      <td {...stylex.props(styles.cell, styles.featCell, styles.lastCell)}>{item.features}</td>
     </tr>
   );
 }
@@ -501,7 +498,6 @@ export function Catalog() {
           </ul>
         </nav>
         <table
-          role="table"
           aria-labelledby={`${titleId} ${captionId}`}
           aria-describedby={legendId}
           {...stylex.props(styles.table)}
@@ -529,32 +525,28 @@ export function Catalog() {
             <col {...stylex.props(styles.colInci)} />
             <col />
           </colgroup>
-          <thead role="rowgroup" {...stylex.props(styles.head)}>
-            <tr role="row">
-              <th role="columnheader" scope="col" {...stylex.props(styles.headCell)}>
+          <thead {...stylex.props(styles.head)}>
+            <tr>
+              <th scope="col" {...stylex.props(styles.headCell)}>
                 色泽
               </th>
-              <th role="columnheader" scope="col" {...stylex.props(styles.headCell)}>
+              <th scope="col" {...stylex.props(styles.headCell)}>
                 名称
               </th>
-              <th role="columnheader" scope="col" {...stylex.props(styles.headCell)}>
+              <th scope="col" {...stylex.props(styles.headCell)}>
                 INCI 名称
               </th>
-              <th
-                role="columnheader"
-                scope="col"
-                {...stylex.props(styles.headCell, styles.lastCell)}
-              >
+              <th scope="col" {...stylex.props(styles.headCell, styles.lastCell)}>
                 特性&应用
               </th>
             </tr>
           </thead>
           {GROUP_ROWS.map(({ group, items }, index) => (
-            <tbody key={group.id} role="rowgroup" {...stylex.props(styles.group)}>
-              <tr role="row" {...stylex.props(styles.groupRow)}>
+            <tbody key={group.id} {...stylex.props(styles.group)}>
+              <tr {...stylex.props(styles.groupRow)}>
                 <th
                   id={groupHeadId(group.id)}
-                  role="rowheader"
+
                   scope="rowgroup"
                   colSpan={4}
                   tabIndex={-1}

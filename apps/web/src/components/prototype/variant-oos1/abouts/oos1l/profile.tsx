@@ -2,7 +2,8 @@ import * as stylex from "@stylexjs/stylex";
 
 import { ABOUT_HERO } from "../../about-data";
 import { Clause } from "./clause";
-import { SectionLabel, headingId } from "./label";
+import { SectionLabel } from "./label";
+import { headingId } from "./label-values";
 import { SENTENCE } from "./sentence";
 import { ui } from "./shared";
 import { bp, face, tone } from "./tokens.stylex";

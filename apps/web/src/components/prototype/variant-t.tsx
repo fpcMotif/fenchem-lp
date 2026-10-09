@@ -1,3 +1,8 @@
+import { CurrentYear } from "./shared/current-year";
+import { SpecificationNavActions } from "./shared/corporate-content-sections";
+import { LayoutGroup } from "motion/react";
+import { FooterDirectory } from "./shared/footer-directory";
+import { Collapse } from "./shared/collapse";
 /*
  * PROTOTYPE — Variant T: "Chevron · kinetic poster".
  *
@@ -26,15 +31,8 @@
  * sharp (radii.none) except pill chips.
  */
 import { useEffect, useId, useRef, useState } from "react";
-import {
-  AnimatePresence,
-  LazyMotion,
-  domAnimation,
-  m,
-  useScroll,
-  useTransform,
-} from "motion/react";
-import { ArrowRight, ArrowUpRight, ChevronRight, ChevronsDown, Leaf, Menu, X } from "lucide-react";
+import { LazyMotion, domMax, m, useScroll, useTransform } from "motion/react";
+import { ArrowRight, ArrowUpRight, ChevronRight, ChevronsDown, Leaf } from "lucide-react";
 import * as stylex from "@stylexjs/stylex";
 import { breakpoints, colors, radii, typography } from "@fenchem-lp/ui/tokens.stylex";
 import { EASE, STAGGER } from "@/components/prototype/motion-constants";
@@ -1450,66 +1448,54 @@ function NavBar() {
               </a>
             ))}
           </div>
-          <div {...stylex.props(styles.navRight)}>
-            <a
-              href={createInquiryHref("contact")}
-              {...stylex.props(styles.ctaPrimary, styles.ctaCompact, styles.navCta)}
-            >
-              Request a specification
-              <ArrowRight aria-hidden size={14} />
-            </a>
-            <button
-              type="button"
-              aria-expanded={open}
-              aria-controls={panelId}
-              aria-label={open ? "Close menu" : "Open menu"}
-              onClick={() => setOpen((v) => !v)}
-              {...stylex.props(styles.menuButton)}
-            >
-              {open ? <X aria-hidden size={18} /> : <Menu aria-hidden size={18} />}
-            </button>
-          </div>
+          <SpecificationNavActions
+            styles={{
+              navRight: styles.navRight,
+              ctaPrimary: styles.ctaPrimary,
+              ctaCompact: styles.ctaCompact,
+              navCta: styles.navCta,
+              menuButton: styles.menuButton,
+            }}
+            open={open}
+            panelId={panelId}
+            setOpen={setOpen}
+          />
         </nav>
       </div>
-      <AnimatePresence initial={false}>
-        {open ? (
-          <m.div
-            id={panelId}
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: reduce ? 0 : 0.36, ease: EASE }}
-            {...stylex.props(styles.mobilePanel)}
-          >
-            <div {...stylex.props(styles.container)}>
-              <ul {...stylex.props(styles.mobileList)}>
-                {links.map((link) => (
-                  <li key={link.href}>
-                    <a
-                      href={link.href}
-                      onClick={() => setOpen(false)}
-                      {...stylex.props(styles.mobileLink)}
-                    >
-                      <ChevronRight aria-hidden size={18} />
-                      {link.label}
-                    </a>
-                  </li>
-                ))}
-                <li>
-                  <a
-                    href={createInquiryHref("contact")}
-                    onClick={() => setOpen(false)}
-                    {...stylex.props(styles.ctaPrimary)}
-                  >
-                    Request a specification
-                    <ArrowRight aria-hidden size={14} />
-                  </a>
-                </li>
-              </ul>
-            </div>
-          </m.div>
-        ) : null}
-      </AnimatePresence>
+      <Collapse
+        id={panelId}
+        open={open}
+
+        transition={{ duration: reduce ? 0 : 0.36, ease: EASE }}
+        {...stylex.props(styles.mobilePanel)}
+      >
+        <div {...stylex.props(styles.container)}>
+          <ul {...stylex.props(styles.mobileList)}>
+            {links.map((link) => (
+              <li key={link.href}>
+                <a
+                  href={link.href}
+                  onClick={() => setOpen(false)}
+                  {...stylex.props(styles.mobileLink)}
+                >
+                  <ChevronRight aria-hidden size={18} />
+                  {link.label}
+                </a>
+              </li>
+            ))}
+            <li>
+              <a
+                href={createInquiryHref("contact")}
+                onClick={() => setOpen(false)}
+                {...stylex.props(styles.ctaPrimary)}
+              >
+                Request a specification
+                <ArrowRight aria-hidden size={14} />
+              </a>
+            </li>
+          </ul>
+        </div>
+      </Collapse>
       {reduce ? null : (
         <m.div aria-hidden style={{ scaleX: scrollYProgress }} {...stylex.props(styles.progress)} />
       )}
@@ -2062,58 +2048,36 @@ function FooterSection() {
   return (
     <footer {...stylex.props(styles.footer)}>
       <div {...stylex.props(styles.container)}>
-        <div {...stylex.props(styles.footerGrid)}>
-          <div {...stylex.props(styles.footerIntro)}>
-            <a href="#top" aria-label="Fenchem home" {...stylex.props(styles.brand)}>
-              <span {...stylex.props(styles.brandWord)}>FENCHEM</span>
-              <Leaf aria-hidden strokeWidth={1.5} {...stylex.props(styles.brandLeaf)} />
-            </a>
-            <p {...stylex.props(styles.prose)}>{company.tagline}</p>
-            <span {...stylex.props(styles.techLabel)}>
-              {company.since} · {company.hq.city}
-            </span>
-          </div>
-          <div {...stylex.props(styles.footerCol)}>
-            <h3 {...stylex.props(styles.footerHead)}>Divisions</h3>
-            <ul {...stylex.props(styles.footerList)}>
-              {DIVISION_ORDER.map((division) => (
-                <li key={division} {...stylex.props(styles.footerItem)}>
-                  <DivisionDot division={division} />
-                  {DIVISION_LABEL[division]}
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div {...stylex.props(styles.footerCol)}>
-            <h3 {...stylex.props(styles.footerHead)}>Bases</h3>
-            <ul {...stylex.props(styles.footerList)}>
-              {regions.map((region) => (
-                <li key={region.city} {...stylex.props(styles.footerItem)}>
-                  {region.city}
-                  <span {...stylex.props(styles.techLabel)}>{region.short}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div {...stylex.props(styles.footerCol, styles.footerColLast)}>
-            <h3 {...stylex.props(styles.footerHead)}>Contact</h3>
-            <ul {...stylex.props(styles.footerList)}>
-              <li>
-                <a href={`mailto:${company.email}`} {...stylex.props(styles.footerLink)}>
-                  {company.email}
-                </a>
-              </li>
-              <li {...stylex.props(styles.footerItem)}>{company.hq.coords}</li>
-            </ul>
-          </div>
-        </div>
+        <FooterDirectory
+          styles={{
+            footerGrid: styles.footerGrid,
+            footerHead: styles.footerHead,
+            footerList: styles.footerList,
+            footerLink: styles.footerLink,
+            techLabel: styles.techLabel,
+            brandLeaf: styles.brandLeaf,
+            prose: styles.prose,
+            brand: styles.brand,
+            brandWord: styles.brandWord,
+            footerIntro: styles.footerIntro,
+            footerCol: styles.footerCol,
+            footerItem: styles.footerItem,
+            footerColLast: styles.footerColLast,
+          }}
+          divisions={DIVISION_ORDER.map((division) => (
+            <li key={division} {...stylex.props(styles.footerItem)}>
+              <DivisionDot division={division} />
+              {DIVISION_LABEL[division]}
+            </li>
+          ))}
+        />
         <div aria-hidden {...stylex.props(styles.ghostRow)}>
           <span {...stylex.props(styles.ghostWord)}>FENCHEM</span>
           <span {...stylex.props(styles.ghostV)}>V</span>
         </div>
         <div {...stylex.props(styles.footerBottom)}>
           <span>
-            © {new Date().getFullYear()} {company.legalName}
+            © <CurrentYear /> {company.legalName}
           </span>
           <span>Edition T · seed {SEED_SHORT}</span>
         </div>
@@ -2140,22 +2104,24 @@ function SmoothScroll() {
 
 export function VariantT() {
   return (
-    <LazyMotion features={domAnimation} strict>
-      <div {...stylex.props(styles.root)}>
-        <SmoothScroll />
-        <NavBar />
-        <main>
-          <HeroSection />
-          <DivisionMarquee />
-          <IndustriesSection />
-          <PortfolioSection />
-          <StatsBeat />
-          <QualitySection />
-          <GlobalSection />
-          <FinaleSection />
-        </main>
-        <FooterSection />
-      </div>
+    <LazyMotion features={domMax} strict>
+      <LayoutGroup>
+        <div {...stylex.props(styles.root)}>
+          <SmoothScroll />
+          <NavBar />
+          <main>
+            <HeroSection />
+            <DivisionMarquee />
+            <IndustriesSection />
+            <PortfolioSection />
+            <StatsBeat />
+            <QualitySection />
+            <GlobalSection />
+            <FinaleSection />
+          </main>
+          <FooterSection />
+        </div>
+      </LayoutGroup>
     </LazyMotion>
   );
 }

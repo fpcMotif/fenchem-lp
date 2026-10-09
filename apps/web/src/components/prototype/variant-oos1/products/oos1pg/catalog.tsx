@@ -1,3 +1,4 @@
+import { Collapse } from "../../../shared/collapse";
 import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 import { AnimatePresence, m } from "motion/react";
@@ -682,7 +683,7 @@ export function Catalog() {
                 产品目录：{activeFilter.label}，共 {items.length} 款
               </caption>
               <thead>
-                <tr>
+                <m.tr layout="position" transition={{ duration: 0.26, ease: EASE }}>
                   <th scope="col" {...stylex.props(styles.headCell, styles.headName)}>
                     名称
                   </th>
@@ -692,7 +693,7 @@ export function Catalog() {
                   <th scope="col" {...stylex.props(styles.headCell, styles.headOrigin)}>
                     产地
                   </th>
-                </tr>
+                </m.tr>
               </thead>
               <m.tbody
                 key={filterId}
@@ -713,7 +714,9 @@ export function Catalog() {
                       };
                   return (
                     <Fragment key={item.id}>
-                      <tr
+                      <m.tr
+                        layout="position"
+                        transition={{ duration: 0.26, ease: EASE }}
                         {...stylex.props(
                           styles.row,
                           active && styles.rowActive,
@@ -781,32 +784,37 @@ export function Catalog() {
                         >
                           {regionShort(item)}
                         </td>
-                      </tr>
-                      <AnimatePresence initial={false}>
-                        {expanded && (
-                          <tr key="detail">
-                            <td colSpan={3} {...stylex.props(styles.detailCell)}>
-                              <m.div
-                                id={detailId}
-                                initial={{ height: 0, opacity: 0 }}
-                                animate={{ height: "auto", opacity: 1 }}
-                                exit={{ height: 0, opacity: 0 }}
-                                transition={{ duration: reduce ? 0 : 0.26, ease: EASE }}
-                                {...stylex.props(styles.detailClip)}
-                              >
-                                <div {...stylex.props(styles.detailInner)}>
-                                  {item.latin.length > 0 && (
-                                    <p lang="la" {...stylex.props(styles.inlineLatin)}>
-                                      {item.latin.join(", ")}
-                                    </p>
-                                  )}
-                                  <ItemFacts item={item} inline />
-                                </div>
-                              </m.div>
-                            </td>
-                          </tr>
-                        )}
-                      </AnimatePresence>
+                      </m.tr>
+                      <m.tr
+                        layout="position"
+                        transition={{ duration: 0.26, ease: EASE }}
+                        key="detail"
+                        aria-hidden={!expanded}
+                        inert={!expanded}
+                      >
+                        <td
+                          colSpan={3}
+                          {...stylex.props(styles.detailCell)}
+                          style={{ borderBottomWidth: expanded ? 1 : 0 }}
+                        >
+                          <Collapse
+                            id={detailId}
+                            open={expanded}
+
+                            transition={{ duration: reduce ? 0 : 0.26, ease: EASE }}
+                            {...stylex.props(styles.detailClip)}
+                          >
+                            <div {...stylex.props(styles.detailInner)}>
+                              {item.latin.length > 0 && (
+                                <p lang="la" {...stylex.props(styles.inlineLatin)}>
+                                  {item.latin.join(", ")}
+                                </p>
+                              )}
+                              <ItemFacts item={item} inline />
+                            </div>
+                          </Collapse>
+                        </td>
+                      </m.tr>
                     </Fragment>
                   );
                 })}

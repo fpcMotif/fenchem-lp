@@ -7,9 +7,9 @@ import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
 import { LOGO_PATHS } from "../variant-o/vectors";
 import { NAV_ITEMS, SECTION_IDS } from "./content";
-import { EASE_OUT } from "./motion";
+import { EASE_OUT } from "./motion-values";
 import { color, ease, font, layout as layoutTokens, media } from "./tokens.stylex";
-import { layout } from "./ui";
+import { layout } from "./ui-values";
 
 const SPY_LINE = 0.4;
 const SOLID_PROGRESS = 0.02;

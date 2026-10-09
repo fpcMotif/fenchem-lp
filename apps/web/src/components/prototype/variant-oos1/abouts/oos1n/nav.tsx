@@ -1,20 +1,11 @@
 import { breakpoints } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 import { useEffect, useRef } from "react";
-
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
-
-import { ABOUT_HERO } from "../../about-data";
 import { useActiveSection } from "../../use-active-section";
-import { ui } from "./shared";
+import { ui } from "./shared-values";
 import { font, motionCss, step, tone } from "./tokens.stylex";
-
-const NAV_ENGLISH = ["Profile", "Campus", "Culture", "Responsibility", "Honors", "Structure"];
-
-export const NAV_ITEMS = [
-  ...ABOUT_HERO.navChips.map((chip, idx) => ({ ...chip, english: NAV_ENGLISH[idx] })),
-  { label: "产品与应用", id: "about-products", english: "Products" },
-];
+import { NAV_ITEMS } from "./nav-values";
 
 const SECTION_IDS: readonly string[] = NAV_ITEMS.map((item) => item.id);
 

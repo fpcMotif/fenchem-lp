@@ -2,22 +2,16 @@ import * as stylex from "@stylexjs/stylex";
 import type { StyleXStyles } from "@stylexjs/stylex";
 import { m, useInView, useScroll, type MotionValue } from "motion/react";
 import { useRef, useSyncExternalStore, type ReactNode, type RefObject } from "react";
-
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
-
 import { ease, media } from "./tokens.stylex";
+import { EASE_OUT, staggerMs } from "./motion-values";
 
-export const EASE_OUT: [number, number, number, number] = [0.16, 1, 0.3, 1];
 export const REVEAL_MARGIN = "0px 0px 0px 0px";
-const STAGGER_MS = 60;
-const MAX_STAGGER_INDEX = 3;
 
 const REVEAL_SECONDS = 0.6;
 const MASK_SECONDS = 0.7;
 const REVEAL_RISE_PX = 16;
 const MASK_HIDDEN = "120%";
-
-export const staggerMs = (index: number) => Math.min(index, MAX_STAGGER_INDEX) * STAGGER_MS;
 
 const PIN_QUERY = "(min-width: 768px) and (prefers-reduced-motion: no-preference)";
 

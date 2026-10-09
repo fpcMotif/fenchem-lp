@@ -3,17 +3,8 @@ import { m, useTransform, type MotionValue } from "motion/react";
 import { useRef } from "react";
 
 import { ABOUT_CULTURE } from "../../about-data";
-import {
-  Camera,
-  cq,
-  Drawing,
-  easeInOut,
-  GroundPlane,
-  GroundShadow,
-  IsoBox,
-  projectIso,
-  span,
-} from "./iso";
+import { Camera, Drawing, GroundPlane, GroundShadow, IsoBox } from "./iso";
+import { cq, easeInOut, projectIso, span } from "./iso-values";
 import { PlateFace } from "./plate-face";
 import { SheetHeader } from "./sheet-header";
 import { pad2, ui } from "./shared";

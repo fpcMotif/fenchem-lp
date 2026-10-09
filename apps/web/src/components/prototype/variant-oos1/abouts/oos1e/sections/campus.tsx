@@ -5,7 +5,8 @@ import { useState } from "react";
 import { ABOUT_CAMPUS } from "../../../about-data";
 import { Lightbox } from "../lightbox";
 import { Sheet } from "../sheet";
-import { base, Reveal } from "../shared";
+import { Reveal } from "../shared";
+import { base } from "../shared-values";
 import { CAMPUS_SHEET } from "../sheets";
 import { color, font, media } from "../tokens.stylex";
 

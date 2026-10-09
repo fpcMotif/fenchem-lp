@@ -3,7 +3,8 @@ import * as stylex from "@stylexjs/stylex";
 
 import { ABOUT_HERO } from "../../about-data";
 import { fonts, palette } from "./lattice.stylex";
-import { Frame, Reveal, shared } from "./parts";
+import { Frame, Reveal } from "./parts";
+import { shared } from "./parts-values";
 
 const styles = stylex.create({
   section: {

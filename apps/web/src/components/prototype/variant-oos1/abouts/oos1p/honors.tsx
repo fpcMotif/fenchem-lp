@@ -4,7 +4,8 @@ import type { CSSProperties } from "react";
 import { ABOUT_HONORS } from "../../about-data";
 import { ui } from "./layout";
 import { PlateHead } from "./plate-head";
-import { TICK, echoIndexes, strobe, trailOpacity, useEntry, type Phase } from "./strobe";
+import { useEntry, type Phase } from "./strobe";
+import { TICK, echoIndexes, strobe, trailOpacity } from "./strobe-values";
 import { bp, face, tone } from "./tokens.stylex";
 
 type Level = (typeof ABOUT_HONORS.items)[number]["level"];

@@ -2,7 +2,8 @@ import * as stylex from "@stylexjs/stylex";
 import { useState, type ReactNode } from "react";
 
 import { ABOUT_CULTURE } from "../../about-data";
-import { ROMAN, SectionHead, Tag, bevel, stepIn, ui, useArrived } from "./shared";
+import { SectionHead, Tag, useArrived } from "./shared";
+import { ROMAN, bevel, stepIn, ui } from "./shared-values";
 import { bp, face, motion, space, tone } from "./tokens.stylex";
 
 const band = `calc(${space.square} / 6)`;

@@ -2,7 +2,8 @@ import { breakpoints } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 
 import { ABOUT_CAMPUS, ABOUT_CULTURE, ABOUT_HERO } from "../../about-data";
-import { Reveal, ui } from "./shared";
+import { Reveal } from "./shared";
+import { ui } from "./shared-values";
 import { font, range, step, tone } from "./tokens.stylex";
 
 const [FOCUS, PATIENCE, TOGETHER] = ABOUT_CULTURE.values;

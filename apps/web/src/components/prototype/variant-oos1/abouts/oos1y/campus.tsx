@@ -1,32 +1,12 @@
+import { Lightbox } from "./lightbox";
 import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 import { useState } from "react";
-
 import { ABOUT_CAMPUS } from "../../about-data";
-import { Lightbox, type LightboxPhoto } from "./lightbox";
 import { useReveal } from "./reveal";
 import { srOnly, ui } from "./shared";
 import { bp, face, pane, tone } from "./tokens.stylex";
-
-type PhotoId = (typeof ABOUT_CAMPUS.photos)[number]["id"];
-
-const ENGLISH: Record<PhotoId, string> = {
-  aerial: "Headquarters",
-  lab: "Laboratory",
-  showroom: "Showroom",
-  reception: "Reception",
-  lounge: "Lounge",
-  office: "Open office",
-  grounds: "Grounds",
-};
-
-export const CAMPUS_PHOTOS: readonly LightboxPhoto[] = ABOUT_CAMPUS.photos.map((photo) => ({
-  id: photo.id,
-  large: photo.large,
-  alt: photo.alt,
-  caption: photo.caption,
-  english: ENGLISH[photo.id],
-}));
+import { CAMPUS_PHOTOS, ENGLISH } from "./campus-values";
 
 const styles = stylex.create({
   section: {

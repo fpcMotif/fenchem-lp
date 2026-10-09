@@ -1,9 +1,11 @@
+import { LightboxControls } from "../../../shared/lightbox-controls";
+import { LightboxStage } from "../../../shared/lightbox-stage";
 import * as stylex from "@stylexjs/stylex";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { useEffect, useRef } from "react";
 
 import { CAMPUS_CAPTION_EN, CAMPUS_HANG } from "./campus-hang";
-import { shared } from "./cyanotype";
+import { shared } from "./cyanotype-values";
 import { curve, media, tone } from "./tokens.stylex";
 
 const settle = stylex.keyframes({
@@ -61,12 +63,7 @@ export function Lightbox({
     >
       {photo ? (
         <>
-          <div
-            onClick={(event) => {
-              if (event.target === event.currentTarget) onClose();
-            }}
-            {...stylex.props(styles.stage)}
-          >
+          <LightboxStage onClose={onClose} sx={styles.stage}>
             <figure
               key={photo.id}
               {...stylex.props(styles.figure, stepped ? styles.figureStep : styles.figureOpen)}
@@ -81,31 +78,23 @@ export function Lightbox({
                 <span {...stylex.props(shared.srOnly)}> {photo.caption}</span>
               </figcaption>
             </figure>
-          </div>
-          <button
-            type="button"
-            aria-label="上一张"
-            onClick={() => onStep(-1)}
-            {...stylex.props(styles.button, styles.previous)}
-          >
-            <ChevronLeft size={20} strokeWidth={1.5} aria-hidden="true" />
-          </button>
-          <button
-            type="button"
-            aria-label="下一张"
-            onClick={() => onStep(1)}
-            {...stylex.props(styles.button, styles.next)}
-          >
-            <ChevronRight size={20} strokeWidth={1.5} aria-hidden="true" />
-          </button>
-          <button
-            type="button"
-            aria-label="关闭"
-            onClick={onClose}
-            {...stylex.props(styles.button, styles.close)}
-          >
-            <X size={20} strokeWidth={1.5} aria-hidden="true" />
-          </button>
+          </LightboxStage>
+          <LightboxControls
+            onStep={onStep}
+            onClose={onClose}
+            previous={{
+              icon: <ChevronLeft size={20} strokeWidth={1.5} aria-hidden="true" />,
+              sx: [styles.button, styles.previous],
+            }}
+            next={{
+              icon: <ChevronRight size={20} strokeWidth={1.5} aria-hidden="true" />,
+              sx: [styles.button, styles.next],
+            }}
+            close={{
+              icon: <X size={20} strokeWidth={1.5} aria-hidden="true" />,
+              sx: [styles.button, styles.close],
+            }}
+          />
         </>
       ) : null}
     </dialog>

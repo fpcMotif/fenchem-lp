@@ -4,7 +4,8 @@ import type { CSSProperties } from "react";
 import { ABOUT_CULTURE } from "../../about-data";
 import { ui } from "./layout";
 import { PlateHead } from "./plate-head";
-import { TICK, echoIndexes, strobe, trailOpacity, useEntry, type Phase } from "./strobe";
+import { useEntry, type Phase } from "./strobe";
+import { TICK, echoIndexes, strobe, trailOpacity } from "./strobe-values";
 import { bp, face, tone } from "./tokens.stylex";
 
 type Glyph = (typeof ABOUT_CULTURE.values)[number]["glyph"];
@@ -92,7 +93,7 @@ function KeyedTitle({ title, glyph }: { title: string; glyph: string }) {
     index === 0
       ? [part]
       : [
-          <span key={index} {...stylex.props(styles.key)}>
+          <span key={`${glyph}-${part}`} {...stylex.props(styles.key)}>
             {glyph}
           </span>,
           part,

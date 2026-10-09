@@ -5,7 +5,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { GLOBAL_INTRO, IMAGES, OFFICE_COLUMNS } from "./content";
 import { Reveal } from "./motion";
 import { color, font, layout as layoutTokens, media } from "./tokens.stylex";
-import { SectionTitle, layout } from "./ui";
+import { SectionTitle } from "./ui";
+import { layout } from "./ui-values";
 
 const MAP_WIDTH = 1222;
 const MAP_HEIGHT = 641;
@@ -567,6 +568,35 @@ const SIDE_STYLE = {
   s: styles.labelS,
 } as const;
 
+function MarkerLabel({
+  city,
+  drawn,
+  state,
+  delay,
+}: {
+  city: City;
+  drawn: boolean;
+  state: MarkerState;
+  delay: number;
+}) {
+  return (
+    <span
+      {...stylex.props(
+        styles.label,
+        SIDE_STYLE[city.side],
+        styles.labelAt(city.dx, city.dy),
+        city.hq && styles.labelHq,
+        state === "on" && styles.labelOn,
+        styles.reveal,
+        drawn && styles.revealIn,
+        styles.revealAt(delay),
+      )}
+    >
+      {city.hq ? `${city.name} · ${HQ_TAG}` : city.name}
+    </span>
+  );
+}
+
 function Marker({ city, drawn, state }: { city: City; drawn: boolean; state: MarkerState }) {
   const arcDelay = ARC_DELAY.get(city.office) ?? 0;
   const dotDelay = city.hq ? 0 : arcDelay + DOT_POP_AFTER_MS;
@@ -603,20 +633,7 @@ function Marker({ city, drawn, state }: { city: City; drawn: boolean; state: Mar
           styles.dotAt(dotDelay),
         )}
       />
-      <span
-        {...stylex.props(
-          styles.label,
-          SIDE_STYLE[city.side],
-          styles.labelAt(city.dx, city.dy),
-          city.hq && styles.labelHq,
-          state === "on" && styles.labelOn,
-          styles.reveal,
-          drawn && styles.revealIn,
-          styles.revealAt(labelDelay),
-        )}
-      >
-        {city.hq ? `${city.name} · ${HQ_TAG}` : city.name}
-      </span>
+      <MarkerLabel city={city} drawn={drawn} state={state} delay={labelDelay} />
     </span>
   );
 }

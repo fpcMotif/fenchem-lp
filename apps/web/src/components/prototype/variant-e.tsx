@@ -1,3 +1,4 @@
+import { EngineeringStatus } from "./shared/corporate-content-sections";
 import { useRef } from "react";
 import type { ReactNode } from "react";
 import { LazyMotion, domAnimation, m, useScroll, useTransform } from "motion/react";
@@ -2368,17 +2369,18 @@ export function VariantE() {
         <header {...stylex.props(styles.header)}>
           <div {...stylex.props(styles.framedContainer)}>
             {/* Micro-label strip */}
-            <div {...stylex.props(styles.microStrip)}>
-              <span {...stylex.props(styles.microText)}>
-                <span {...stylex.props(styles.pingWrap)}>
-                  <span {...stylex.props(styles.pingOuter)} />
-                  <span {...stylex.props(styles.pingInner)} />
-                </span>
-                SYS.ACTIVE — INGREDIENT ENGINEERING
-              </span>
-              <span {...stylex.props(styles.microText)}>N 32.06 / E 118.79 — NANJING HQ</span>
-              <span {...stylex.props(styles.microText)}>ISO 9001 : 2015 / GMP</span>
-            </div>
+            <EngineeringStatus
+              styles={{
+                microStrip: styles.microStrip,
+                microText: styles.microText,
+                pingWrap: styles.pingWrap,
+                pingOuter: styles.pingOuter,
+                pingInner: styles.pingInner,
+              }}
+              status="SYS.ACTIVE — INGREDIENT ENGINEERING"
+              middle="N 32.06 / E 118.79 — NANJING HQ"
+              last="ISO 9001 : 2015 / GMP"
+            />
             {/* Nav row */}
             <nav aria-label="Main navigation" {...stylex.props(styles.navRow)}>
               <a href="/" {...stylex.props(styles.logoLink)}>

@@ -5,7 +5,7 @@ import { useEffect, useRef } from "react";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
 import { useActiveSection } from "../../use-active-section";
-import { NAV_ITEMS, SECTION_IDS, ui } from "./shared";
+import { NAV_ITEMS, SECTION_IDS, ui } from "./shared-values";
 import { font, motionCss, step, tone } from "./tokens.stylex";
 
 const s = stylex.create({

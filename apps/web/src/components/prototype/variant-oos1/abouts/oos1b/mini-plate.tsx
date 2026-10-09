@@ -2,7 +2,7 @@ import * as stylex from "@stylexjs/stylex";
 import type { ReactNode } from "react";
 
 import type { Plate } from "./journey";
-import { ui } from "./shared";
+import { ui } from "./shared-values";
 import { tone } from "./tokens.stylex";
 
 const styles = stylex.create({

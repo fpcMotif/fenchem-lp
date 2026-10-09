@@ -1,14 +1,10 @@
 import * as stylex from "@stylexjs/stylex";
 import type { StyleXStyles } from "@stylexjs/stylex";
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
-
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
-
 import { ui } from "./layout";
 import { tone } from "./tokens.stylex";
-
-const EXPOSURES_PER_SECOND = 12;
-export const TICK = Math.round(1000 / EXPOSURES_PER_SECOND);
+import { TICK, trailOpacity, echoIndexes, strobe } from "./strobe-values";
 
 export type Phase = "rest" | "armed" | "fire";
 
@@ -54,48 +50,9 @@ function echoOpacity(k: number, count: number) {
   return BRIGHTEST_ECHO * (FAINTEST_ECHO / BRIGHTEST_ECHO) ** ((k - 1) / (count - 1));
 }
 
-const TRAIL_RAMP_CURVE = 1.3;
-
-export function trailOpacity(k: number, count: number, brightest: number) {
-  return brightest * (1 - (k - 1) / count) ** TRAIL_RAMP_CURVE;
-}
-
-export function echoIndexes(count: number) {
-  return Array.from({ length: count }, (_, index) => index + 1);
-}
-
-const pop = stylex.keyframes({
-  "0%": { opacity: 0 },
-  "100%": { opacity: 1 },
-});
-
-const flash = stylex.keyframes({
-  "0%": { opacity: 0 },
-  "0.5%": { opacity: 1 },
-  "99.5%": { opacity: 1 },
-  "100%": { opacity: 0 },
-});
-
 const converge = stylex.keyframes({
   "0%": { transform: "var(--strobe-from)" },
   "100%": { transform: "translate3d(0, 0, 0)" },
-});
-
-export const strobe = stylex.create({
-  hidden: { opacity: 0 },
-  pop: {
-    animationName: pop,
-    animationDuration: "1ms",
-    animationDelay: "var(--pop-at)",
-    animationFillMode: "both",
-  },
-  flash: {
-    animationName: flash,
-    animationDuration: "var(--flash-len)",
-    animationDelay: "var(--flash-at)",
-    animationTimingFunction: "linear",
-    animationFillMode: "both",
-  },
 });
 
 const styles = stylex.create({

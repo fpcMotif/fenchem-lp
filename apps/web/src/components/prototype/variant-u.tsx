@@ -1,3 +1,6 @@
+import { CurrentYear } from "./shared/current-year";
+import { LayoutGroup } from "motion/react";
+import { Collapse } from "./shared/collapse";
 /*
  * PROTOTYPE — Variant U: "Ledger · Stitch corporate".
  *
@@ -32,7 +35,7 @@
  * content seam. Plus Jakarta Sans stands in for Noto Sans SC per ADR-0002.
  */
 import { useEffect, useId, useState } from "react";
-import { AnimatePresence, LazyMotion, domAnimation, m } from "motion/react";
+import { LazyMotion, domMax } from "motion/react";
 import { ArrowRight, ArrowUpRight, ChevronsUpDown, Menu, X } from "lucide-react";
 import * as stylex from "@stylexjs/stylex";
 import { breakpoints, colors, radii, typography } from "@fenchem-lp/ui/tokens.stylex";
@@ -1088,44 +1091,39 @@ function NavBar() {
           </div>
         </nav>
       </div>
-      <AnimatePresence initial={false}>
-        {open ? (
-          <m.div
-            id={panelId}
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: reduce ? 0 : 0.28, ease: EASE }}
-            {...stylex.props(styles.mobilePanel)}
-          >
-            <div {...stylex.props(styles.container)}>
-              <ul {...stylex.props(styles.mobileList)}>
-                {links.map((link) => (
-                  <li key={link.href}>
-                    <a
-                      href={link.href}
-                      onClick={() => setOpen(false)}
-                      {...stylex.props(styles.mobileLink)}
-                    >
-                      {link.label}
-                    </a>
-                  </li>
-                ))}
-                <li {...stylex.props(styles.mobileCtaRow)}>
-                  <a
-                    href={createInquiryHref("contact")}
-                    onClick={() => setOpen(false)}
-                    {...stylex.props(styles.btnPrimary)}
-                  >
-                    Request a specification
-                    <ArrowRight aria-hidden size={14} />
-                  </a>
-                </li>
-              </ul>
-            </div>
-          </m.div>
-        ) : null}
-      </AnimatePresence>
+      <Collapse
+        id={panelId}
+        open={open}
+
+        transition={{ duration: reduce ? 0 : 0.28, ease: EASE }}
+        {...stylex.props(styles.mobilePanel)}
+      >
+        <div {...stylex.props(styles.container)}>
+          <ul {...stylex.props(styles.mobileList)}>
+            {links.map((link) => (
+              <li key={link.href}>
+                <a
+                  href={link.href}
+                  onClick={() => setOpen(false)}
+                  {...stylex.props(styles.mobileLink)}
+                >
+                  {link.label}
+                </a>
+              </li>
+            ))}
+            <li {...stylex.props(styles.mobileCtaRow)}>
+              <a
+                href={createInquiryHref("contact")}
+                onClick={() => setOpen(false)}
+                {...stylex.props(styles.btnPrimary)}
+              >
+                Request a specification
+                <ArrowRight aria-hidden size={14} />
+              </a>
+            </li>
+          </ul>
+        </div>
+      </Collapse>
     </header>
   );
 }
@@ -1649,7 +1647,7 @@ function FooterSection() {
         </div>
         <div {...stylex.props(styles.footerBottom)}>
           <span {...stylex.props(styles.mono)}>
-            © {new Date().getFullYear()} {company.legalName}
+            © <CurrentYear /> {company.legalName}
           </span>
           <span {...stylex.props(styles.mono)}>Edition U · Q1 ledger</span>
         </div>
@@ -1662,21 +1660,23 @@ function FooterSection() {
 
 export function VariantU() {
   return (
-    <LazyMotion features={domAnimation} strict>
-      <div {...stylex.props(styles.root)}>
-        <UtilityStrip />
-        <NavBar />
-        <main>
-          <HeroSection />
-          <KpiBand />
-          <LedgerSection />
-          <IndustriesSection />
-          <QualitySection />
-          <GlobalSection />
-          <ContactSection />
-        </main>
-        <FooterSection />
-      </div>
+    <LazyMotion features={domMax} strict>
+      <LayoutGroup>
+        <div {...stylex.props(styles.root)}>
+          <UtilityStrip />
+          <NavBar />
+          <main>
+            <HeroSection />
+            <KpiBand />
+            <LedgerSection />
+            <IndustriesSection />
+            <QualitySection />
+            <GlobalSection />
+            <ContactSection />
+          </main>
+          <FooterSection />
+        </div>
+      </LayoutGroup>
     </LazyMotion>
   );
 }

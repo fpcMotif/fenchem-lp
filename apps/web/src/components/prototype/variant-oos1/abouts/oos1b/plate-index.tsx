@@ -1,7 +1,7 @@
 import * as stylex from "@stylexjs/stylex";
 
 import type { Plate } from "./journey";
-import { srOnly, ui } from "./shared";
+import { srOnly, ui } from "./shared-values";
 import { bp, face, motion, tone } from "./tokens.stylex";
 
 const styles = stylex.create({

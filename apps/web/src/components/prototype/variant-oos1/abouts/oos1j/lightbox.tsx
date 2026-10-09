@@ -1,3 +1,5 @@
+import { LightboxControls } from "../../../shared/lightbox-controls";
+import { LightboxStage } from "../../../shared/lightbox-stage";
 import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
@@ -143,41 +145,25 @@ export function Lightbox({
     >
       {photo ? (
         <>
-          <div
-            onClick={(event) => {
-              if (event.target === event.currentTarget) onClose();
-            }}
-            {...stylex.props(styles.stage)}
-          >
+          <LightboxStage onClose={onClose} sx={styles.stage}>
             <figure key={photo.id} {...stylex.props(styles.figure)}>
               <img src={photo.large} alt={photo.alt} {...stylex.props(styles.image)} />
               <figcaption {...stylex.props(styles.caption)}>{photo.caption}</figcaption>
             </figure>
-          </div>
-          <button
-            type="button"
-            aria-label="上一张"
-            onClick={() => onStep(-1)}
-            {...stylex.props(styles.button, styles.prev)}
-          >
-            <ChevronLeft size={24} aria-hidden="true" />
-          </button>
-          <button
-            type="button"
-            aria-label="下一张"
-            onClick={() => onStep(1)}
-            {...stylex.props(styles.button, styles.next)}
-          >
-            <ChevronRight size={24} aria-hidden="true" />
-          </button>
-          <button
-            type="button"
-            aria-label="关闭"
-            onClick={onClose}
-            {...stylex.props(styles.button, styles.close)}
-          >
-            <X size={24} aria-hidden="true" />
-          </button>
+          </LightboxStage>
+          <LightboxControls
+            onStep={onStep}
+            onClose={onClose}
+            previous={{
+              icon: <ChevronLeft size={24} aria-hidden="true" />,
+              sx: [styles.button, styles.prev],
+            }}
+            next={{
+              icon: <ChevronRight size={24} aria-hidden="true" />,
+              sx: [styles.button, styles.next],
+            }}
+            close={{ icon: <X size={24} aria-hidden="true" />, sx: [styles.button, styles.close] }}
+          />
         </>
       ) : null}
     </dialog>

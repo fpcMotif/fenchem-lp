@@ -9,7 +9,7 @@ import { Culture } from "./culture";
 import { Honors } from "./honors";
 import { Products } from "./products";
 import { Profile } from "./profile";
-import { ui } from "./shared";
+import { ui } from "./shared-values";
 import { Structure } from "./structure";
 import { SubNav } from "./subnav";
 

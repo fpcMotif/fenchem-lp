@@ -3,7 +3,8 @@ import * as stylex from "@stylexjs/stylex";
 
 import { ABOUT_HONORS } from "../../about-data";
 import { fonts, media, palette } from "./lattice.stylex";
-import { Frame, Reveal, SectionName, shared } from "./parts";
+import { Frame, Reveal, SectionName } from "./parts";
+import { shared } from "./parts-values";
 
 type Level = (typeof ABOUT_HONORS.items)[number]["level"];
 

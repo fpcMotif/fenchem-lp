@@ -1,7 +1,8 @@
+import { Collapse } from "../../../shared/collapse";
 import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 import { ChevronUp, X } from "lucide-react";
-import { AnimatePresence, m } from "motion/react";
+import { m } from "motion/react";
 import { useId, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
 
 import { EASE } from "@/components/prototype/motion-constants";
@@ -662,29 +663,24 @@ export function CompareStrip({
             </button>
           </div>
         </div>
-        <AnimatePresence initial={false}>
-          {expanded && (
-            <m.div
-              key="compare-panel"
-              id={panelId}
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: "auto", opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={transition}
-              {...stylex.props(styles.panelClip)}
-            >
-              <div
-                tabIndex={0}
-                aria-label="对比详情"
-                role="group"
-                {...stylex.props(styles.panelScroll)}
-              >
-                <CompareTable slots={slots} onRemove={remove} />
-                <CompareList items={items} onRemove={remove} />
-              </div>
-            </m.div>
-          )}
-        </AnimatePresence>
+        <Collapse
+          key="compare-panel"
+          id={panelId}
+          open={expanded}
+
+          transition={transition}
+          {...stylex.props(styles.panelClip)}
+        >
+          <div
+            tabIndex={0}
+            aria-label="对比详情"
+            role="group"
+            {...stylex.props(styles.panelScroll)}
+          >
+            <CompareTable slots={slots} onRemove={remove} />
+            <CompareList items={items} onRemove={remove} />
+          </div>
+        </Collapse>
       </div>
     </m.div>
   );

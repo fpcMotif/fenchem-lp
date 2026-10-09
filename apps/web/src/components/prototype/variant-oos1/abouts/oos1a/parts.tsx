@@ -1,9 +1,9 @@
-import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
+import { breakpoints } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 import { useInView } from "motion/react";
 import { type ReactNode, useRef } from "react";
-
-import { ease, fonts, media, metrics, palette } from "./lattice.stylex";
+import { ease, media, palette } from "./lattice.stylex";
+import { shared } from "./parts-values";
 
 type Tone = "light" | "dark";
 type Strength = "full" | "quiet" | "none";
@@ -20,114 +20,6 @@ const MAJOR_LINES = [0, 4, 8, 12, 16] as const;
 const dynamic = stylex.create({
   delay: (ms: number) => ({ transitionDelay: `${ms}ms` }),
   line: (left: string, ms: number) => ({ left, transitionDelay: `${ms}ms` }),
-});
-
-export const shared = stylex.create({
-  anchor: {
-    scrollMarginTop: metrics.anchor,
-  },
-  srOnly: {
-    position: "absolute",
-    width: 1,
-    height: 1,
-    overflow: "hidden",
-    clipPath: "inset(50%)",
-    whiteSpace: "nowrap",
-    fontWeight: 400,
-  },
-  focusRing: {
-    outlineStyle: { default: "none", ":focus-visible": "solid" },
-    outlineWidth: 2,
-    outlineColor: colors.brandBlue700,
-    outlineOffset: 3,
-  },
-  cover: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    display: "block",
-    width: "100%",
-    height: "100%",
-    objectFit: "cover",
-  },
-  sectionPad: {
-    paddingTop: { default: 48, [media.tablet]: 64, [breakpoints.xl]: 72 },
-    paddingBottom: { default: 48, [media.tablet]: 64, [breakpoints.xl]: 72 },
-  },
-  grid16: {
-    display: "grid",
-    gridTemplateColumns: {
-      default: "minmax(0, 1fr)",
-      [breakpoints.lg]: "repeat(16, minmax(0, 1fr))",
-    },
-  },
-  headline: {
-    margin: 0,
-    fontFamily: fonts.cjk,
-    fontSize: { default: 30, [media.tablet]: 44, [breakpoints.xl]: 56 },
-    fontWeight: 500,
-    lineHeight: 1.2,
-    letterSpacing: "0.01em",
-    color: palette.ink,
-    textWrap: "balance",
-  },
-  serifLine: {
-    margin: 0,
-    fontFamily: fonts.serif,
-    fontStyle: "italic",
-    fontWeight: 400,
-    fontSize: { default: 22, [media.tablet]: 28, [breakpoints.xl]: 34 },
-    lineHeight: 1.2,
-    color: palette.body,
-  },
-  body: {
-    margin: 0,
-    maxWidth: "34em",
-    fontFamily: fonts.cjk,
-    fontSize: { default: 16, [breakpoints.xl]: 17 },
-    fontWeight: 400,
-    lineHeight: 1.95,
-    letterSpacing: "0.03em",
-    color: palette.body,
-    textWrap: "pretty",
-  },
-  small: {
-    margin: 0,
-    fontFamily: fonts.cjk,
-    fontSize: 13,
-    fontWeight: 400,
-    lineHeight: 1.6,
-    letterSpacing: "0.04em",
-    color: palette.body,
-  },
-  button: {
-    display: "inline-flex",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 10,
-    height: 48,
-    paddingInline: 28,
-    borderWidth: 0,
-    borderRadius: 0,
-    fontFamily: fonts.cjk,
-    fontSize: 15,
-    fontWeight: 500,
-    letterSpacing: "0.06em",
-    textDecoration: "none",
-    cursor: "pointer",
-    transitionProperty: "background-color, color",
-    transitionDuration: "200ms",
-    transitionTimingFunction: ease.out,
-  },
-  buttonPrimary: {
-    backgroundColor: { default: colors.brandBlue700, ":hover": colors.brandBlue800 },
-    color: colors.paper,
-  },
-  buttonOutline: {
-    backgroundColor: { default: "transparent", ":hover": palette.page },
-    boxShadow: `inset 0 0 0 1px ${palette.ink}`,
-    color: palette.ink,
-  },
 });
 
 const styles = stylex.create({

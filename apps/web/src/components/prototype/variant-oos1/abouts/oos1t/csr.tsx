@@ -2,7 +2,8 @@ import * as stylex from "@stylexjs/stylex";
 import { Factory, Leaf, Recycle } from "lucide-react";
 
 import { ABOUT_CSR } from "../../about-data";
-import { Cast, LIFT } from "./cast";
+import { Cast } from "./cast";
+import { LIFT } from "./cast-values";
 import { SectionHead } from "./head";
 import { ui } from "./shared";
 import { SECTION_HOURS } from "./sun";

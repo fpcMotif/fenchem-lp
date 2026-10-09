@@ -3,7 +3,8 @@ import * as stylex from "@stylexjs/stylex";
 import { CAMPUS, STATS } from "./content";
 import { Reveal } from "./motion";
 import { color, font, layout as layoutTokens, media } from "./tokens.stylex";
-import { SectionTitle, layout } from "./ui";
+import { SectionTitle } from "./ui";
+import { layout } from "./ui-values";
 
 const styles = stylex.create({
   grid: {

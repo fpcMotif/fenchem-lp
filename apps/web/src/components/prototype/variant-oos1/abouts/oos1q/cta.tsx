@@ -2,7 +2,8 @@ import { breakpoints } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 
 import { CTA } from "../../content";
-import { Reveal, ui } from "./shared";
+import { Reveal } from "./shared";
+import { ui } from "./shared-values";
 import { tone } from "./tokens.stylex";
 
 const s = stylex.create({

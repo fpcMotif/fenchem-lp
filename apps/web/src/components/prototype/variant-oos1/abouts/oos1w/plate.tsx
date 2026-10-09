@@ -3,7 +3,8 @@ import type { StyleXStyles } from "@stylexjs/stylex";
 import { m, useTransform, type MotionValue } from "motion/react";
 import type { ReactNode } from "react";
 
-import { BAND_LOOK, PencilRing } from "./band";
+import { PencilRing } from "./band";
+import { BAND_LOOK } from "./band-values";
 import { face, tone } from "./tokens.stylex";
 import type { Development } from "./use-development";
 
@@ -30,6 +31,7 @@ export type PlateGeometry = {
 };
 
 const styles = stylex.create({
+  nativeList: { listStyleType: "none", padding: 0, margin: 0 },
   figure: {
     position: "relative",
     overflow: "hidden",
@@ -270,12 +272,12 @@ function BandNote({
 }) {
   const { y, reveal } = useBandMotion(band, development);
   return (
-    <m.div role="listitem" style={{ y }} {...stylex.props(styles.mover)}>
+    <m.li style={{ y }} {...stylex.props(styles.mover)}>
       <m.div style={{ opacity: reveal }}>
         <span aria-hidden="true" {...stylex.props(styles.leader, geometry.leader)} />
         <div {...stylex.props(styles.annotation, geometry.label)}>{children}</div>
       </m.div>
-    </m.div>
+    </m.li>
   );
 }
 
@@ -410,13 +412,13 @@ export function Plate({
           origin
         </span>
         {noteOverlay}
-        <div role="list" aria-label={listLabel}>
+        <ul {...stylex.props(styles.nativeList)} aria-label={listLabel}>
           {bands.map((band) => (
             <BandNote key={band.id} band={band} development={development} geometry={geometry}>
               {renderLabel(band)}
             </BandNote>
           ))}
-        </div>
+        </ul>
       </div>
     </div>
   );

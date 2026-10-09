@@ -5,7 +5,8 @@ import { useId, useRef } from "react";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
 import { ABOUT_CAMPUS, ABOUT_CULTURE } from "../../about-data";
-import { Reveal, ui } from "./shared";
+import { Reveal } from "./shared";
+import { ui } from "./shared-values";
 import { media, tone } from "./tokens.stylex";
 
 const CANVAS_HEIGHT = 1760;

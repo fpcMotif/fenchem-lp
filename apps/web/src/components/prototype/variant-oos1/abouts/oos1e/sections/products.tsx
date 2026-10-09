@@ -4,7 +4,8 @@ import { ArrowRight } from "lucide-react";
 
 import { PRODUCTS, PRODUCTS_INTRO } from "../../../content";
 import { Sheet } from "../sheet";
-import { base, Reveal } from "../shared";
+import { Reveal } from "../shared";
+import { base } from "../shared-values";
 import { PRODUCTS_SHEET } from "../sheets";
 import { color, font, media } from "../tokens.stylex";
 

@@ -14,7 +14,8 @@ import {
   liftDimension,
   type HeroPartId,
 } from "./hero-geometry";
-import { Camera, cq, Drawing, GroundPlane, GroundShadow, IsoBox } from "./iso";
+import { Camera, Drawing, GroundPlane, GroundShadow, IsoBox } from "./iso";
+import { cq } from "./iso-values";
 import { FlagNote } from "./marks";
 import { PlateFace } from "./plate-face";
 import { ui } from "./shared";

@@ -3,14 +3,8 @@ import * as stylex from "@stylexjs/stylex";
 import { ArrowUpRight } from "lucide-react";
 import { industries } from "@/components/landing/landing-content";
 import { imgForIndustry, INDUSTRY_COPY } from "../content";
-import {
-  drawRule,
-  revealWords,
-  riseIn,
-  settleImage,
-  SplitWords,
-  useSectionAnimation,
-} from "../motion";
+import { SplitWords, useSectionAnimation } from "../motion";
+import { drawRule, revealWords, riseIn, settleImage } from "../motion-values";
 import { sharedStyles } from "../styles";
 
 /*

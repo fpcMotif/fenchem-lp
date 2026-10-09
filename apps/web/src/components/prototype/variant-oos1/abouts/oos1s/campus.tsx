@@ -4,7 +4,8 @@ import { useState } from "react";
 
 import { ABOUT_CAMPUS, ABOUT_HERO } from "../../about-data";
 import { Lightbox } from "./lightbox";
-import { Reveal, Section, ui } from "./shared";
+import { Reveal, Section } from "./shared";
+import { ui } from "./shared-values";
 import { step, tone } from "./tokens.stylex";
 
 type Photo = (typeof ABOUT_CAMPUS.photos)[number];

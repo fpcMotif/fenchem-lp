@@ -3,7 +3,8 @@ import * as stylex from "@stylexjs/stylex";
 import { ABOUT_CSR } from "../../about-data";
 import { ui } from "./layout";
 import { PlateHead } from "./plate-head";
-import { StrobeImage, StrobeText, TICK, useEntry } from "./strobe";
+import { StrobeImage, StrobeText, useEntry } from "./strobe";
+import { TICK } from "./strobe-values";
 import { bp, face, tone } from "./tokens.stylex";
 
 const LINE_GAP = 6 * TICK;

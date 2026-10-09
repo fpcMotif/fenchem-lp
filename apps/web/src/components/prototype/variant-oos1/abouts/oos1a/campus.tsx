@@ -8,7 +8,8 @@ import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 import { ABOUT_CAMPUS } from "../../about-data";
 import { fonts, media, palette } from "./lattice.stylex";
 import { Lightbox } from "./lightbox";
-import { Frame, SectionName, shared } from "./parts";
+import { Frame, SectionName } from "./parts";
+import { shared } from "./parts-values";
 
 type PhotoId = (typeof ABOUT_CAMPUS.photos)[number]["id"];
 

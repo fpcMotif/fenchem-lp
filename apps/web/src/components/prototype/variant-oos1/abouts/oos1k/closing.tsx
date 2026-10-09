@@ -1,7 +1,8 @@
 import * as stylex from "@stylexjs/stylex";
 
 import type { AboutPageProps } from "../../index";
-import { PoleMark, ui } from "./shared";
+import { PoleMark } from "./shared";
+import { ui } from "./shared-values";
 import { bp, chrome, face, sky } from "./tokens.stylex";
 
 const styles = stylex.create({

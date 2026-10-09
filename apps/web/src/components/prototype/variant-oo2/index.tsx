@@ -1,25 +1,36 @@
+import { BloomCorporatePage } from "../shared/page-shells";
+import {
+  BloomHeroCopy,
+  PinnedCampusFrame,
+  StrengthsSection,
+  ZoomingProducts,
+  OfficeMapOverview,
+  CorporateMain,
+} from "../shared/corporate-content-sections";
+import {
+  LakeStatistic,
+  CountedStatistic,
+  TiltedProductCard,
+} from "../shared/corporate-presentations";
+import { BloomHeadline } from "../shared/navigation-and-headline";
+import {
+  CorporateHeader,
+  HeroBackdrop,
+  StrengthDetails,
+  OfficeDirectory,
+  CorporateNews,
+  CorporateFooter,
+} from "../shared/corporate-sections";
+
+import { NewsAccordion } from "../shared/news-accordion";
+
 import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 import type { StyleXStyles } from "@stylexjs/stylex";
-import {
-  ArrowUpRight,
-  Globe,
-  Lightbulb,
-  Menu,
-  Minus,
-  Plus,
-  Search,
-  Shield,
-  Users,
-  X,
-  type LucideIcon,
-} from "lucide-react";
+import { Globe, Lightbulb, Minus, Plus, Shield, Users, type LucideIcon } from "lucide-react";
 import {
   AnimatePresence,
-  LazyMotion,
-  MotionConfig,
   animate,
-  domAnimation,
   m,
   useInView,
   useMotionValueEvent,
@@ -29,12 +40,10 @@ import {
 } from "motion/react";
 import {
   useEffect,
-  useId,
   useRef,
   useSyncExternalStore,
   useState,
   type CSSProperties,
-  type KeyboardEvent,
   type ReactNode,
   type RefObject,
 } from "react";
@@ -44,9 +53,10 @@ import { EASE, STAGGER } from "@/components/prototype/motion-constants";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
 import { LINKEDIN_PATHS, LOGO_PATHS, WECHAT_PATHS, type VectorPath } from "../variant-o/vectors";
-import { INTRO_REVEAL_MS, introStyles, useIntro } from "@/components/prototype/shared/intro";
-import { DepthPhoto, glyphRise, screenWaterline } from "@/components/prototype/shared/depth-photo";
-import { LiquidImage } from "@/components/prototype/shared/liquid-image";
+import { INTRO_REVEAL_MS, useIntro } from "@/components/prototype/shared/intro";
+import { DepthPhoto } from "@/components/prototype/shared/depth-photo";
+import { glyphRise, screenWaterline } from "@/components/prototype/shared/depth-photo-values";
+
 import {
   ABOUT,
   COPYRIGHT,
@@ -1450,124 +1460,32 @@ function VectorArt({
   );
 }
 
-function useScrolledPastTop() {
-  const [scrolled, setScrolled] = useState(false);
-  useEffect(() => {
-    const update = () => setScrolled(window.scrollY > 8);
-    update();
-    window.addEventListener("scroll", update, { passive: true });
-    return () => window.removeEventListener("scroll", update);
-  }, []);
-  return scrolled;
-}
-
-function useActiveSection(ids: readonly string[]) {
-  const [active, setActive] = useState(ids[0]);
-  useEffect(() => {
-    const ratios = new Map<string, number>();
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          ratios.set(entry.target.id, entry.isIntersecting ? entry.intersectionRatio : 0);
-        }
-        const next = ids.find((id) => (ratios.get(id) ?? 0) > 0);
-        if (next) setActive(next);
-      },
-      { rootMargin: "-45% 0px -50% 0px", threshold: [0, 0.01] },
-    );
-    for (const id of ids) {
-      const section = document.getElementById(id);
-      if (section) observer.observe(section);
-    }
-    return () => observer.disconnect();
-  }, [ids]);
-  return active;
-}
-
 function SiteHeader() {
-  const [menuOpen, setMenuOpen] = useState(false);
-  const menuId = useId();
-  const reduce = useReducedMotion();
-  const scrolled = useScrolledPastTop();
-  const activeId = useActiveSection(NAV_SECTION_IDS);
-  const closeOnEscape = (event: KeyboardEvent<HTMLElement>) => {
-    if (event.key === "Escape" && menuOpen) setMenuOpen(false);
-  };
-  const isActive = (href: string) => href.slice(1) === activeId;
   return (
-    <header
-      onKeyDown={closeOnEscape}
-      {...stylex.props(styles.header, (scrolled || menuOpen) && styles.headerSolid)}
-    >
-      <div {...stylex.props(styles.shell, styles.headerInner, styles.headerEnter)}>
-        <a href="#top" aria-label="FENCHEM 泛成 首页" {...stylex.props(styles.logoLink)}>
-          <LogoMark />
-        </a>
-        <nav aria-label="主导航" {...stylex.props(styles.nav)}>
-          {NAV_ITEMS.map((item) => (
-            <a
-              key={item.href}
-              href={item.href}
-              aria-current={isActive(item.href) ? "location" : undefined}
-              {...stylex.props(styles.navLink, isActive(item.href) && styles.navLinkActive)}
-            >
-              {item.label}
-            </a>
-          ))}
-        </nav>
-        <div {...stylex.props(styles.headerActions)}>
-          <button type="button" aria-label="AI 搜索" {...stylex.props(styles.searchPill)}>
-            <Search size={16} strokeWidth={2} absoluteStrokeWidth aria-hidden="true" />
-          </button>
-          <button type="button" aria-label="CN，切换语言" {...stylex.props(styles.langButton)}>
-            CN
-          </button>
-          <button
-            type="button"
-            aria-label={menuOpen ? "关闭菜单" : "打开菜单"}
-            aria-expanded={menuOpen}
-            aria-controls={menuId}
-            onClick={() => setMenuOpen((open) => !open)}
-            {...stylex.props(styles.menuButton)}
-          >
-            {menuOpen ? (
-              <X size={24} strokeWidth={2} absoluteStrokeWidth aria-hidden="true" />
-            ) : (
-              <Menu size={24} strokeWidth={2} absoluteStrokeWidth aria-hidden="true" />
-            )}
-          </button>
-        </div>
-      </div>
-      <AnimatePresence initial={false}>
-        {menuOpen ? (
-          <m.nav
-            key="menu"
-            id={menuId}
-            aria-label="主导航"
-            {...stylex.props(styles.menuPanel)}
-            initial={{ opacity: 0, transform: "translateY(-8px)" }}
-            animate={{ opacity: 1, transform: "translateY(0px)" }}
-            exit={{ opacity: 0, transform: "translateY(-8px)" }}
-            transition={{ duration: reduce ? 0.15 : 0.2, ease: EASE }}
-          >
-            <ul {...stylex.props(styles.menuList)}>
-              {NAV_ITEMS.map((item) => (
-                <li key={item.href}>
-                  <a
-                    href={item.href}
-                    aria-current={isActive(item.href) ? "location" : undefined}
-                    onClick={() => setMenuOpen(false)}
-                    {...stylex.props(styles.menuLink, isActive(item.href) && styles.menuLinkActive)}
-                  >
-                    {item.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </m.nav>
-        ) : null}
-      </AnimatePresence>
-    </header>
+    <CorporateHeader
+      styles={{
+        header: styles.header,
+        logoLink: styles.logoLink,
+        navLink: styles.navLink,
+        menuButton: styles.menuButton,
+        headerSolid: styles.headerSolid,
+        shell: styles.shell,
+        headerInner: styles.headerInner,
+        nav: styles.nav,
+        navLinkActive: styles.navLinkActive,
+        headerActions: styles.headerActions,
+        searchPill: styles.searchPill,
+        langButton: styles.langButton,
+        headerEnter: styles.headerEnter,
+        menuPanel: styles.menuPanel,
+        menuList: styles.menuList,
+        menuLink: styles.menuLink,
+        menuLinkActive: styles.menuLinkActive,
+      }}
+      logo={<LogoMark />}
+      navItems={NAV_ITEMS}
+      sectionIds={NAV_SECTION_IDS}
+    />
   );
 }
 
@@ -1600,100 +1518,65 @@ function Hero() {
   const contentOpacity = useTransform(scrollYProgress, [0, 0.75], [1, 0]);
   return (
     <section ref={heroRef} id="top" aria-labelledby="oo-hero-title" {...stylex.props(styles.hero)}>
-      <m.div
-        aria-hidden="true"
-        {...stylex.props(styles.heroParallax)}
-        style={reduce ? undefined : { y: backdropY }}
-      >
-        <div {...stylex.props(styles.heroBackdrop)}>
-          <img
-            src={IMAGES.hero}
-            alt=""
-            decoding="async"
-            {...stylex.props(styles.heroLayer, styles.heroImage)}
+      <HeroBackdrop
+        styles={{
+          heroBackdrop: styles.heroBackdrop,
+          heroLayer: styles.heroLayer,
+          heroImage: styles.heroImage,
+          heroTintColor: styles.heroTintColor,
+          heroTintScreen: styles.heroTintScreen,
+          heroParallax: styles.heroParallax,
+        }}
+        source={IMAGES.hero}
+        motionStyle={reduce ? undefined : { y: backdropY }}
+      />
+      <BloomHeroCopy
+        styles={{
+          shell: styles.shell,
+          inset120: styles.inset120,
+          heroContent: styles.heroContent,
+          heroCopy: styles.heroCopy,
+          heroTitle: styles.heroTitle,
+          heroSubtitle: styles.heroSubtitle,
+          heroBloom: styles.heroBloom,
+          enterDelay: styles.enterDelay,
+          ctaRow: styles.ctaRow,
+          button: styles.button,
+          buttonPrimary: styles.buttonPrimary,
+          buttonHero: styles.buttonHero,
+          buttonSecondary: styles.buttonSecondary,
+        }}
+        reduce={reduce}
+        contentY={contentY}
+        contentOpacity={contentOpacity}
+        HERO={HERO}
+        introAfter={introAfter}
+        headline={
+          <BloomHeadline
+            styles={{
+              heroHeadline: styles.heroHeadline,
+              heroLead: styles.heroLead,
+              heroBloom: styles.heroBloom,
+              enterDelay: styles.enterDelay,
+              heroAccent: styles.heroAccent,
+              heroBreakLine: styles.heroBreakLine,
+              heroBreak: styles.heroBreak,
+              heroBreakInk: styles.heroBreakInk,
+              heroBreakHead: styles.heroBreakHead,
+              heroBreakTail: styles.heroBreakTail,
+              heroPeriodSeat: styles.heroPeriodSeat,
+              heroPeriod: styles.heroPeriod,
+              visuallyHidden: styles.visuallyHidden,
+            }}
+            OPENING_BEFORE={OPENING_BEFORE}
+            OPENING_AFTER={OPENING_AFTER}
+            CLOSING_LEAD={CLOSING_LEAD}
+            CLOSING_WORD={CLOSING_WORD}
+            HERO={HERO}
+            introAfter={introAfter}
           />
-          <LiquidImage src={IMAGES.hero} sx={styles.heroImage} />
-          <div {...stylex.props(styles.heroLayer, styles.heroTintColor)} />
-          <div {...stylex.props(styles.heroLayer, styles.heroTintScreen)} />
-        </div>
-      </m.div>
-      <m.div
-        {...stylex.props(styles.shell, styles.inset120, styles.heroContent)}
-        style={reduce ? undefined : { y: contentY, opacity: contentOpacity }}
-      >
-        <div {...stylex.props(styles.heroCopy)}>
-          <h1 id="oo-hero-title" {...stylex.props(styles.heroTitle)}>
-            <span lang="en" {...stylex.props(styles.heroHeadline)}>
-              <span
-                {...stylex.props(
-                  styles.heroLead,
-                  styles.heroBloom,
-                  styles.enterDelay(introAfter(300)),
-                )}
-              >
-                {OPENING_BEFORE}
-                <span {...stylex.props(styles.heroAccent)}>{HERO.accent}</span>
-                {OPENING_AFTER}
-              </span>{" "}
-              <span
-                {...stylex.props(
-                  styles.heroLead,
-                  styles.heroBloom,
-                  styles.enterDelay(introAfter(400)),
-                )}
-              >
-                {CLOSING_LEAD}
-              </span>{" "}
-              <span {...stylex.props(styles.heroBreakLine)}>
-                <span
-                  {...stylex.props(
-                    styles.heroBreak,
-                    styles.heroBloom,
-                    styles.enterDelay(introAfter(500)),
-                  )}
-                >
-                  <span {...stylex.props(styles.heroBreakInk, styles.heroBreakHead)}>
-                    {CLOSING_WORD}
-                  </span>
-                  <span
-                    aria-hidden="true"
-                    {...stylex.props(styles.heroBreakInk, styles.heroBreakTail)}
-                  >
-                    {CLOSING_WORD}
-                  </span>
-                </span>
-                <span aria-hidden="true" {...stylex.props(styles.heroPeriodSeat)}>
-                  <span {...stylex.props(styles.heroPeriod)} />
-                </span>
-                <span {...stylex.props(styles.visuallyHidden)}>.</span>
-              </span>
-            </span>{" "}
-            <span
-              {...stylex.props(
-                styles.heroSubtitle,
-                styles.heroBloom,
-                styles.enterDelay(introAfter(600)),
-              )}
-            >
-              {HERO.title}
-            </span>
-          </h1>
-        </div>
-        <div {...stylex.props(styles.ctaRow, styles.heroBloom, styles.enterDelay(introAfter(760)))}>
-          <a
-            href={HERO.primary.href}
-            {...stylex.props(styles.button, styles.buttonPrimary, styles.buttonHero)}
-          >
-            {HERO.primary.label}
-          </a>
-          <a
-            href={HERO.secondary.href}
-            {...stylex.props(styles.button, styles.buttonSecondary, styles.buttonHero)}
-          >
-            {HERO.secondary.label}
-          </a>
-        </div>
-      </m.div>
+        }
+      />
     </section>
   );
 }
@@ -1768,46 +1651,41 @@ function Campus() {
   );
   const rise = useTransform(scrollYProgress, riseProgress);
   return (
-    <section id="campus" aria-label="研发与生产" {...stylex.props(styles.anchor)}>
-      <div ref={trackRef} {...stylex.props(styles.campusTrack)}>
-        <div {...stylex.props(styles.campusSticky)}>
-          <m.div
-            {...stylex.props(styles.campusWindow)}
-            style={pinned ? { clipPath: windowClip } : undefined}
-          >
-            <m.div
-              {...stylex.props(styles.campusStage)}
-              style={pinned ? { scale: photoScale } : undefined}
-            >
-              <img
-                src={CAMPUS_LAKE.src}
-                alt={CAMPUS_LAKE.alt}
-                loading="lazy"
-                decoding="async"
-                {...stylex.props(styles.campusImage)}
-              />
-              <DepthPhoto
-                src={CAMPUS_LAKE.src}
-                depthSrc={CAMPUS_LAKE.depth}
-                waterline={CAMPUS_LAKE.waterline}
-                progress={scrollYProgress}
-                glyphRoot={pinned ? lakeRef : undefined}
-                rise={pinned ? rise : undefined}
-                onGlyphsReady={() => setGlyphsDrawn(true)}
-              />
-              {pinned ? <LakeStats rootRef={lakeRef} rise={rise} drawn={glyphsDrawn} /> : null}
-            </m.div>
-          </m.div>
-        </div>
-      </div>
-      {pinned ? null : (
-        <div {...stylex.props(styles.shell, styles.inset132, styles.statsBand)}>
-          {STATS.map((stat, index) => (
-            <StatItem key={stat.label} stat={stat} index={index} />
-          ))}
-        </div>
-      )}
-    </section>
+    <PinnedCampusFrame
+      styles={{
+        anchor: styles.anchor,
+        campusTrack: styles.campusTrack,
+        campusSticky: styles.campusSticky,
+        campusWindow: styles.campusWindow,
+        campusStage: styles.campusStage,
+        campusImage: styles.campusImage,
+        shell: styles.shell,
+        inset132: styles.inset132,
+        statsBand: styles.statsBand,
+      }}
+      trackRef={trackRef}
+      pinned={pinned}
+      windowClip={windowClip}
+      photoScale={photoScale}
+      CAMPUS_LAKE={CAMPUS_LAKE}
+      lake={
+        <>
+          <DepthPhoto
+            src={CAMPUS_LAKE.src}
+            depthSrc={CAMPUS_LAKE.depth}
+            waterline={CAMPUS_LAKE.waterline}
+            progress={scrollYProgress}
+            glyphRoot={pinned ? lakeRef : undefined}
+            rise={pinned ? rise : undefined}
+            onGlyphsReady={() => setGlyphsDrawn(true)}
+          />
+          {pinned ? <LakeStats rootRef={lakeRef} rise={rise} drawn={glyphsDrawn} /> : null}
+        </>
+      }
+      statistics={STATS.map((stat, index) => (
+        <StatItem key={stat.label} stat={stat} index={index} />
+      ))}
+    />
   );
 }
 
@@ -1880,25 +1758,22 @@ function LakeStat({
   const display = useCountUp(stat.value, surfaced);
 
   return (
-    <div {...stylex.props(styles.lakeStat)}>
-      <m.p {...stylex.props(styles.lakeLabel)} style={{ opacity: surfacing, y: lift }}>
-        {stat.label}
-      </m.p>
-      <m.p
-        data-lake-glyph={display}
-        data-lake-final={stat.value}
-        data-lake-unit={stat.unit ?? ""}
-        {...stylex.props(styles.lakeFigure, drawn && styles.lakeFigureDrawn)}
-        style={{ opacity: surfacing }}
-      >
-        <span aria-hidden="true">{display}</span>
-        <span {...stylex.props(styles.visuallyHidden)}>{stat.value}</span>
-        {stat.unit ? <span {...stylex.props(styles.lakeUnit)}>{stat.unit}</span> : null}
-      </m.p>
-      <m.p {...stylex.props(styles.lakeCaption)} style={{ opacity: surfacing, y: lift }}>
-        {stat.caption}
-      </m.p>
-    </div>
+    <LakeStatistic
+      styles={{
+        lakeStat: styles.lakeStat,
+        lakeLabel: styles.lakeLabel,
+        lakeFigure: styles.lakeFigure,
+        lakeFigureDrawn: styles.lakeFigureDrawn,
+        visuallyHidden: styles.visuallyHidden,
+        lakeUnit: styles.lakeUnit,
+        lakeCaption: styles.lakeCaption,
+      }}
+      stat={stat}
+      surfacing={surfacing}
+      lift={lift}
+      display={display}
+      drawn={drawn}
+    />
   );
 }
 
@@ -1917,44 +1792,49 @@ function CountUp({ value }: { value: string }) {
   );
 }
 
+const subscribeCounterHydration = () => () => {};
+const getCounterHydration = () => true;
+const getServerCounterHydration = () => false;
+
 function useCountUp(value: string, run: boolean) {
   const reduce = useReducedMotion();
+  const hydrated = useSyncExternalStore(
+    subscribeCounterHydration,
+    getCounterHydration,
+    getServerCounterHydration,
+  );
   const target = Number(value.replace(/[^\d]/g, ""));
-  const [display, setDisplay] = useState(value);
-  const [armed, setArmed] = useState(false);
+  const [frame, setFrame] = useState<{ target: number; display: string } | null>(null);
 
   useEffect(() => {
-    if (reduce || !Number.isFinite(target)) return;
-    setArmed(true);
-    setDisplay(NUMBER_FORMAT.format(0));
-  }, [reduce, target]);
-
-  useEffect(() => {
-    if (!run || !armed) return;
+    if (!run || reduce || !Number.isFinite(target)) return;
     const controls = animate(0, target, {
       duration: 1.6,
       ease: [0.16, 1, 0.3, 1],
-      onUpdate: (latest) => setDisplay(NUMBER_FORMAT.format(Math.round(latest))),
+      onUpdate: (latest) => setFrame({ target, display: NUMBER_FORMAT.format(Math.round(latest)) }),
     });
     return () => controls.stop();
-  }, [run, armed, target]);
+  }, [run, reduce, target]);
 
-  return display;
+  if (!hydrated || reduce || !Number.isFinite(target)) return value;
+  return run && frame?.target === target ? frame.display : "0";
 }
 
 function StatItem({ stat, index }: { stat: (typeof STATS)[number]; index: number }) {
   return (
-    <>
-      {index > 0 ? <span aria-hidden="true" {...stylex.props(styles.statDivider)} /> : null}
-      <ZoomReveal delay={index * STAGGER} sx={styles.stat}>
-        <p {...stylex.props(styles.statText)}>{stat.label}</p>
-        <p {...stylex.props(styles.statFigure)}>
-          <CountUp value={stat.value} />
-          {stat.unit ? <span {...stylex.props(styles.statUnit)}>{stat.unit}</span> : null}
-        </p>
-        <p {...stylex.props(styles.statText)}>{stat.caption}</p>
-      </ZoomReveal>
-    </>
+    <CountedStatistic
+      styles={{
+        statDivider: styles.statDivider,
+        stat: styles.stat,
+        statText: styles.statText,
+        statFigure: styles.statFigure,
+        statUnit: styles.statUnit,
+      }}
+      index={index}
+      stat={stat}
+      ZoomReveal={ZoomReveal}
+      CountUp={CountUp}
+    />
   );
 }
 
@@ -1977,54 +1857,40 @@ function IconPattern({ icon }: { icon: StrengthIcon }) {
 
 function Strengths() {
   return (
-    <section
-      id="strengths"
-      aria-labelledby="oo-strengths-title"
-      {...stylex.props(styles.strengths, styles.inset120, styles.anchor)}
-    >
-      <ZoomReveal sx={styles.introBlock}>
-        <h2 id="oo-strengths-title" {...stylex.props(styles.sectionTitle)}>
-          {STRENGTHS_INTRO.title}
-        </h2>
-        <p {...stylex.props(styles.sectionLead)}>{STRENGTHS_INTRO.lead}</p>
-      </ZoomReveal>
-      <div {...stylex.props(styles.strengthGrid)}>
-        {STRENGTHS.map((strength, index) => (
-          <ZoomReveal
-            key={strength.title}
-            delay={index * STAGGER}
-            sx={[styles.strengthCard, stylex.defaultMarker()]}
-            style={TONE_STYLES[strength.tone]}
-          >
-            <IconPattern icon={strength.icon} />
-            <div
-              {...stylex.props(
-                styles.strengthText,
-                strength.tone === "blue" && styles.strengthTextInverse,
-              )}
-            >
-              <div {...stylex.props(styles.strengthCopy)}>
-                <h3 {...stylex.props(styles.strengthTitle)}>{strength.title}</h3>
-                {strength.description ? (
-                  <p {...stylex.props(styles.strengthSmall)}>{strength.description}</p>
-                ) : null}
-              </div>
-              {strength.link ? (
-                <a href="#offices" {...stylex.props(styles.strengthLink)}>
-                  {strength.link}
-                  <ArrowUpRight
-                    size={12}
-                    strokeWidth={1.5}
-                    absoluteStrokeWidth
-                    aria-hidden="true"
-                  />
-                </a>
-              ) : null}
-            </div>
-          </ZoomReveal>
-        ))}
-      </div>
-    </section>
+    <StrengthsSection
+      styles={{
+        strengths: styles.strengths,
+        inset120: styles.inset120,
+        anchor: styles.anchor,
+        introBlock: styles.introBlock,
+        sectionTitle: styles.sectionTitle,
+        sectionLead: styles.sectionLead,
+        strengthGrid: styles.strengthGrid,
+      }}
+      Reveal={ZoomReveal}
+      STRENGTHS_INTRO={STRENGTHS_INTRO}
+      cards={STRENGTHS.map((strength, index) => (
+        <ZoomReveal
+          key={strength.title}
+          delay={index * STAGGER}
+          sx={[styles.strengthCard, stylex.defaultMarker()]}
+          style={TONE_STYLES[strength.tone]}
+        >
+          <IconPattern icon={strength.icon} />
+          <StrengthDetails
+            styles={{
+              strengthText: styles.strengthText,
+              strengthCopy: styles.strengthCopy,
+              strengthTitle: styles.strengthTitle,
+              strengthSmall: styles.strengthSmall,
+              strengthLink: styles.strengthLink,
+              strengthTextInverse: styles.strengthTextInverse,
+            }}
+            strength={strength}
+          />
+        </ZoomReveal>
+      ))}
+    />
   );
 }
 
@@ -2075,121 +1941,93 @@ function useTilt<T extends HTMLElement>() {
 function ProductCard({ product, index }: { product: (typeof PRODUCTS)[number]; index: number }) {
   const tiltRef = useTilt<HTMLDivElement>();
   return (
-    <ZoomReveal delay={index * STAGGER} sx={[styles.productCard, stylex.defaultMarker()]}>
-      <div ref={tiltRef} {...stylex.props(styles.productTilt)}>
-        <div {...stylex.props(styles.productImageFrame)}>
-          <img
-            src={product.image}
-            alt={product.title}
-            loading="lazy"
-            decoding="async"
-            {...stylex.props(styles.productImage)}
-          />
-        </div>
-        <div {...stylex.props(styles.productPanel, index % 2 === 1 && styles.productPanelAlt)}>
-          <div {...stylex.props(styles.productTitleBlock)}>
-            <h3 {...stylex.props(styles.productTitle)}>{product.title}</h3>
-            <hr {...stylex.props(styles.rule)} />
-            <p {...stylex.props(styles.mutedText)}>{product.description}</p>
-          </div>
-          <ul {...stylex.props(styles.list)}>
-            {product.tags.map((tag) => (
-              <li key={tag} {...stylex.props(styles.mutedText)}>
-                {tag}
-              </li>
-            ))}
-          </ul>
-        </div>
-        <span aria-hidden="true" {...stylex.props(styles.productGlare)} />
-      </div>
-    </ZoomReveal>
+    <TiltedProductCard
+      styles={{
+        productCard: styles.productCard,
+        productTilt: styles.productTilt,
+        productImageFrame: styles.productImageFrame,
+        productImage: styles.productImage,
+        productPanel: styles.productPanel,
+        productPanelAlt: styles.productPanelAlt,
+        productGlare: styles.productGlare,
+      }}
+      summaryStyles={{
+        mutedText: styles.mutedText,
+        productTitleBlock: styles.productTitleBlock,
+        productTitle: styles.productTitle,
+        rule: styles.rule,
+        list: styles.list,
+      }}
+      index={index}
+      product={product}
+      ZoomReveal={ZoomReveal}
+      tiltRef={tiltRef}
+    />
   );
 }
 
 function Products() {
   return (
-    <section
-      id="products"
-      aria-labelledby="oo-products-title"
-      {...stylex.props(styles.products, styles.inset120, styles.anchor)}
-    >
-      <ZoomReveal sx={styles.introBlock}>
-        <h2 id="oo-products-title" {...stylex.props(styles.sectionTitle)}>
-          {PRODUCTS_INTRO.title}
-        </h2>
-        <p {...stylex.props(styles.sectionLead)}>{PRODUCTS_INTRO.lead}</p>
-      </ZoomReveal>
-      <ZoomReveal delay={0.1} sx={styles.productsCta}>
-        <a
-          href={PRODUCTS_INTRO.cta.href}
-          {...stylex.props(styles.button, styles.buttonPrimary, styles.buttonSmall)}
-        >
-          {PRODUCTS_INTRO.cta.label}
-        </a>
-      </ZoomReveal>
-      <div id="product-list" {...stylex.props(styles.productGrid)}>
-        {PRODUCTS.map((product, index) => (
-          <ProductCard key={product.title} product={product} index={index} />
-        ))}
-      </div>
-    </section>
+    <ZoomingProducts
+      styles={{
+        products: styles.products,
+        inset120: styles.inset120,
+        anchor: styles.anchor,
+        introBlock: styles.introBlock,
+        sectionTitle: styles.sectionTitle,
+        sectionLead: styles.sectionLead,
+        productsCta: styles.productsCta,
+        button: styles.button,
+        buttonPrimary: styles.buttonPrimary,
+        buttonSmall: styles.buttonSmall,
+        productGrid: styles.productGrid,
+      }}
+      Reveal={ZoomReveal}
+      PRODUCTS_INTRO={PRODUCTS_INTRO}
+      delay={0.1}
+      cards={PRODUCTS.map((product, index) => (
+        <ProductCard key={product.title} product={product} index={index} />
+      ))}
+    />
   );
 }
 
 function Offices() {
   return (
     <section id="offices" aria-labelledby="oo-offices-title" {...stylex.props(styles.anchor)}>
-      <div {...stylex.props(styles.globalBand)}>
-        <ZoomReveal sx={styles.globalRow}>
-          <div {...stylex.props(styles.mapWrap)}>
-            <img
-              src={IMAGES.officeMap.src}
-              alt={IMAGES.officeMap.alt}
-              width={611}
-              height={321}
-              loading="lazy"
-              decoding="async"
-              {...stylex.props(styles.mapImage)}
-            />
-            {OFFICE_MAP_PINS.map((pin, index) => (
-              <span
-                key={`${pin.left}-${pin.top}`}
-                aria-hidden="true"
-                {...stylex.props(
-                  styles.mapRing,
-                  styles.mapRingAt(`${pin.left}%`, `${pin.top}%`, `${(index * 370) % 2800}ms`),
-                )}
-              />
-            ))}
-          </div>
-          <div {...stylex.props(styles.globalCopy)}>
-            <h2 id="oo-offices-title" {...stylex.props(styles.sectionTitle)}>
-              {GLOBAL_INTRO.title}
-            </h2>
-            <p {...stylex.props(styles.sectionLead)}>{GLOBAL_INTRO.lead}</p>
-          </div>
-        </ZoomReveal>
-      </div>
-      <div {...stylex.props(styles.officesBand)}>
-        <div {...stylex.props(styles.shell, styles.inset120, styles.regions)}>
-          {OFFICE_COLUMNS.map((column, index) => (
-            <ZoomReveal key={column[0].region} delay={index * STAGGER} sx={styles.officeColumn}>
-              {column.map((group) => (
-                <div key={group.region} {...stylex.props(styles.officeGroup)}>
-                  <h3 {...stylex.props(styles.regionHeader)}>{group.region}</h3>
-                  <ul {...stylex.props(styles.list, styles.regionBody)}>
-                    {group.offices.map((office) => (
-                      <li key={office} {...stylex.props(styles.mutedText)}>
-                        {office}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
-            </ZoomReveal>
-          ))}
-        </div>
-      </div>
+      <OfficeMapOverview
+        styles={{
+          globalBand: styles.globalBand,
+          globalRow: styles.globalRow,
+          mapWrap: styles.mapWrap,
+          mapImage: styles.mapImage,
+          mapRing: styles.mapRing,
+          mapRingAt: styles.mapRingAt,
+          globalCopy: styles.globalCopy,
+          sectionTitle: styles.sectionTitle,
+          sectionLead: styles.sectionLead,
+        }}
+        ZoomReveal={ZoomReveal}
+        IMAGES={IMAGES}
+        OFFICE_MAP_PINS={OFFICE_MAP_PINS}
+        GLOBAL_INTRO={GLOBAL_INTRO}
+      />
+      <OfficeDirectory
+        styles={{
+          shell: styles.shell,
+          inset120: styles.inset120,
+          mutedText: styles.mutedText,
+          list: styles.list,
+          officesBand: styles.officesBand,
+          regions: styles.regions,
+          officeColumn: styles.officeColumn,
+          officeGroup: styles.officeGroup,
+          regionHeader: styles.regionHeader,
+          regionBody: styles.regionBody,
+        }}
+        columns={OFFICE_COLUMNS}
+        Reveal={ZoomReveal}
+      />
     </section>
   );
 }
@@ -2223,76 +2061,41 @@ function NewsItem({
   open: boolean;
   onToggle: () => void;
 }) {
-  const reduce = useReducedMotion();
-  const panelId = useId();
   return (
-    <>
-      <h3 {...stylex.props(styles.newsHeading)}>
-        <button
-          type="button"
-          aria-expanded={open}
-          aria-controls={panelId}
-          onClick={onToggle}
-          {...stylex.props(styles.newsTrigger)}
-        >
-          <span>{item.title}</span>
-          <AccordionIcon open={open} />
-        </button>
-      </h3>
-      <AnimatePresence initial={false}>
-        {open ? (
-          <m.div
-            key="panel"
-            id={panelId}
-            {...stylex.props(styles.newsPanel)}
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: reduce ? 0 : 0.25, ease: EASE }}
-          >
-            <div {...stylex.props(styles.newsPanelInner)}>
-              {item.details.map((detail) => (
-                <p key={detail} {...stylex.props(styles.mutedText)}>
-                  {detail}
-                </p>
-              ))}
-            </div>
-          </m.div>
-        ) : null}
-      </AnimatePresence>
-    </>
+    <NewsAccordion
+      item={item}
+      open={open}
+      onToggle={onToggle}
+      icon={<AccordionIcon open={open} />}
+      styles={{
+        mutedText: styles.mutedText,
+        newsHeading: styles.newsHeading,
+        newsTrigger: styles.newsTrigger,
+        newsPanel: styles.newsPanel,
+        newsPanelInner: styles.newsPanelInner,
+      }}
+    />
   );
 }
 
 function News() {
-  const [openIndex, setOpenIndex] = useState<number | null>(0);
   return (
-    <section
-      id="news"
-      aria-labelledby="oo-news-title"
-      {...stylex.props(styles.news, styles.anchor)}
-    >
-      <div {...stylex.props(styles.shell, styles.inset120, styles.newsInner)}>
-        <ZoomReveal>
-          <h2 id="oo-news-title" {...stylex.props(styles.sectionTitle)}>
-            {NEWS_TITLE}
-          </h2>
-        </ZoomReveal>
-        <ul {...stylex.props(styles.accordion)}>
-          {NEWS.map((item, index) => (
-            <li key={item.title}>
-              <ZoomReveal delay={index * STAGGER} sx={styles.newsItem}>
-                <NewsItem
-                  item={item}
-                  open={openIndex === index}
-                  onToggle={() => setOpenIndex(openIndex === index ? null : index)}
-                />
-              </ZoomReveal>
-            </li>
-          ))}
-        </ul>
-      </div>
-    </section>
+    <CorporateNews
+      styles={{
+        anchor: styles.anchor,
+        shell: styles.shell,
+        inset120: styles.inset120,
+        sectionTitle: styles.sectionTitle,
+        news: styles.news,
+        newsInner: styles.newsInner,
+        accordion: styles.accordion,
+        newsItem: styles.newsItem,
+      }}
+      title={NEWS_TITLE}
+      items={NEWS}
+      Reveal={ZoomReveal}
+      Item={NewsItem}
+    />
   );
 }
 
@@ -2320,49 +2123,35 @@ function ContactCta() {
 
 function SiteFooter() {
   return (
-    <footer {...stylex.props(styles.footer)}>
-      <div {...stylex.props(styles.shell, styles.inset120, styles.footerInner)}>
-        <div {...stylex.props(styles.footerTop)}>
-          <img
-            src={IMAGES.footerLogo.src}
-            alt={IMAGES.footerLogo.alt}
-            width={225}
-            height={73}
-            loading="lazy"
-            decoding="async"
-            {...stylex.props(styles.footerLogo)}
-          />
-          <nav aria-label="页脚导航" {...stylex.props(styles.footerColumns)}>
-            {FOOTER_COLUMNS.map((column) => (
-              <div key={column.heading} {...stylex.props(styles.footerColumn)}>
-                <h3 {...stylex.props(styles.footerHeading)}>{column.heading}</h3>
-                <ul {...stylex.props(styles.footerLinks)}>
-                  {column.links.map((link) => (
-                    <li key={link}>
-                      <a href="#top" {...stylex.props(styles.footerLink)}>
-                        {link}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </nav>
-        </div>
-        <hr {...stylex.props(styles.footerRule)} />
-        <div {...stylex.props(styles.footerBottom)}>
-          <p {...stylex.props(styles.copyright)}>{COPYRIGHT}</p>
-          <div {...stylex.props(styles.social)}>
-            <a href="#top" aria-label="LinkedIn" {...stylex.props(styles.socialLink)}>
-              <VectorArt paths={LINKEDIN_PATHS} viewBox="0 0 20 20" sx={styles.socialIcon} />
-            </a>
-            <a href="#top" aria-label="微信" {...stylex.props(styles.socialLink)}>
-              <VectorArt paths={WECHAT_PATHS} viewBox="0 0 20 20" sx={styles.socialIcon} />
-            </a>
-          </div>
-        </div>
-      </div>
-    </footer>
+    <CorporateFooter
+      styles={{
+        footer: styles.footer,
+        shell: styles.shell,
+        inset120: styles.inset120,
+        footerInner: styles.footerInner,
+        footerRule: styles.footerRule,
+        footerLogo: styles.footerLogo,
+        footerLink: styles.footerLink,
+        footerTop: styles.footerTop,
+        footerColumns: styles.footerColumns,
+        footerColumn: styles.footerColumn,
+        footerHeading: styles.footerHeading,
+        footerLinks: styles.footerLinks,
+        footerBottom: styles.footerBottom,
+        copyright: styles.copyright,
+        social: styles.social,
+      }}
+      logo={IMAGES.footerLogo}
+      columns={FOOTER_COLUMNS}
+      copyright={COPYRIGHT}
+    >
+      <a href="#top" aria-label="LinkedIn" {...stylex.props(styles.socialLink)}>
+        <VectorArt paths={LINKEDIN_PATHS} viewBox="0 0 20 20" sx={styles.socialIcon} />
+      </a>
+      <a href="#top" aria-label="微信" {...stylex.props(styles.socialLink)}>
+        <VectorArt paths={WECHAT_PATHS} viewBox="0 0 20 20" sx={styles.socialIcon} />
+      </a>
+    </CorporateFooter>
   );
 }
 
@@ -2383,28 +2172,25 @@ export function VariantOO2() {
     };
   }, [reduce]);
   return (
-    <LazyMotion features={domAnimation} strict>
-      <MotionConfig reducedMotion="user">
-        <div lang="zh-CN" {...stylex.props(styles.root)} style={introVars}>
-          <div {...stylex.props(styles.page, intro === "play" && introStyles.pageReveal)}>
-            <a href="#main-content" {...stylex.props(styles.skipLink)}>
-              跳到主要内容
-            </a>
-            <SiteHeader />
-            <main id="main-content" tabIndex={-1} {...stylex.props(styles.mainTarget)}>
-              <Hero />
-              <About />
-              <Campus />
-              <Strengths />
-              <Products />
-              <Offices />
-              <News />
-              <ContactCta />
-            </main>
-            <SiteFooter />
-          </div>
-        </div>
-      </MotionConfig>
-    </LazyMotion>
+    <BloomCorporatePage
+      styles={{ root: styles.root, page: styles.page, skipLink: styles.skipLink }}
+      introVars={introVars}
+      intro={intro}
+      SiteHeader={SiteHeader}
+      main={
+        <CorporateMain
+          styles={{ mainTarget: styles.mainTarget }}
+          Hero={Hero}
+          About={About}
+          Campus={Campus}
+          Strengths={Strengths}
+          Products={Products}
+          Offices={Offices}
+          News={News}
+          ContactCta={ContactCta}
+        />
+      }
+      SiteFooter={SiteFooter}
+    />
   );
 }

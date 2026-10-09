@@ -3,8 +3,9 @@ import * as stylex from "@stylexjs/stylex";
 import { ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react";
 import { AnimatePresence, m, type Variants } from "motion/react";
 import {
-  useId,
+  useCallback,
   useLayoutEffect,
+  useId,
   useRef,
   useState,
   type KeyboardEvent,
@@ -383,18 +384,19 @@ function useElementHeight() {
   const [node, setNode] = useState<HTMLElement | null>(null);
   const [height, setHeight] = useState<number | null>(null);
 
+  const measureRef = useCallback((node: HTMLElement | null) => {
+    setNode(node);
+    setHeight(node?.offsetHeight ?? null);
+  }, []);
+
   useLayoutEffect(() => {
-    if (!node) {
-      setHeight(null);
-      return;
-    }
-    setHeight(node.offsetHeight);
+    if (!node) return;
     const observer = new ResizeObserver(() => setHeight(node.offsetHeight));
     observer.observe(node);
     return () => observer.disconnect();
   }, [node]);
 
-  return [setNode, height] as const;
+  return [measureRef, height] as const;
 }
 
 function Field({ label, children }: { label: string; children: ReactNode }) {
@@ -551,11 +553,13 @@ export function Solutions() {
           <m.div
             {...stylex.props(styles.clip)}
             initial={false}
-            animate={{ height: frameHeight ?? "auto" }}
+            layout={!reduce}
+            style={{ height: frameHeight ?? "auto" }}
             transition={slide}
           >
             <m.div
               ref={setSummaryNode}
+              layout="position"
               inert={isOpen}
               {...stylex.props(styles.summary)}
               initial={false}
@@ -622,6 +626,7 @@ export function Solutions() {
               {isOpen && openIndex !== null && (
                 <m.section
                   key="detail"
+                  layout="position"
                   ref={setDetailNode}
                   aria-labelledby={headingId}
                   onKeyDown={onDetailKeyDown}

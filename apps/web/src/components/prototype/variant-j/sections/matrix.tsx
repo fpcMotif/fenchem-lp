@@ -10,7 +10,8 @@ import {
   ingredients,
 } from "@/components/landing/landing-content";
 import { imgFor } from "../content";
-import { drawRule, revealWords, riseIn, SplitWords, useSectionAnimation } from "../motion";
+import { SplitWords, useSectionAnimation } from "../motion";
+import { drawRule, revealWords, riseIn } from "../motion-values";
 import { sharedStyles } from "../styles";
 
 /*

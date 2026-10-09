@@ -1,5 +1,4 @@
 import * as stylex from "@stylexjs/stylex";
-
 import { ui } from "./layout";
 import { bp, chrome, tone } from "./tokens.stylex";
 
@@ -73,8 +72,4 @@ export function ForwardArrow() {
       <path d="M0 0L5 3L0 6Z" fill="currentColor" />
     </svg>
   );
-}
-
-export function frameLabel(value: number) {
-  return String(value).padStart(2, "0");
 }

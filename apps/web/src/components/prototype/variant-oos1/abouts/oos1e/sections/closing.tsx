@@ -3,7 +3,8 @@ import { ArrowRight } from "lucide-react";
 
 import { CTA } from "../../../content";
 import { Sheet } from "../sheet";
-import { base, Reveal } from "../shared";
+import { Reveal } from "../shared";
+import { base } from "../shared-values";
 import { CLOSING_SHEET } from "../sheets";
 import { color, media } from "../tokens.stylex";
 

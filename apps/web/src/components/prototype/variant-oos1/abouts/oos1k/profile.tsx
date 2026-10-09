@@ -1,7 +1,8 @@
 import * as stylex from "@stylexjs/stylex";
 
 import { ABOUT_HERO } from "../../about-data";
-import { ChartHeading, srOnly, ui, useDusk } from "./shared";
+import { ChartHeading, useDusk } from "./shared";
+import { srOnly, ui } from "./shared-values";
 import { bp, face, sky } from "./tokens.stylex";
 
 type Country = (typeof ABOUT_HERO.countries)[number];

@@ -10,7 +10,8 @@ import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 import { ContactCta } from "../../contact-cta";
 import { CTA, PRODUCTS_CTA_SUBTITLE } from "../../content";
 import { CATEGORIES, FEATURED_PRODUCT } from "../../products-data";
-import { layout, ProductCatalog, ProductSolutions } from "../../products-sections";
+import { ProductCatalog, ProductSolutions } from "../../products-sections";
+import { layout } from "../../products-sections-values";
 
 const INK = "#1a1a1a";
 const BODY_TEXT = "#4d4d4d";

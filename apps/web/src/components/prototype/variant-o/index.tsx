@@ -1,3 +1,6 @@
+import { InsetCorporateFooter } from "../shared/corporate-content-sections";
+
+import { ProductSummary } from "../shared/product-summary";
 import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 import type { StyleXStyles } from "@stylexjs/stylex";
@@ -1075,20 +1078,17 @@ function Products() {
                 {...stylex.props(styles.productImage)}
               />
             </div>
-            <div {...stylex.props(styles.productPanel, index % 2 === 1 && styles.productPanelAlt)}>
-              <div {...stylex.props(styles.productTitleBlock)}>
-                <h3 {...stylex.props(styles.productTitle)}>{product.title}</h3>
-                <hr {...stylex.props(styles.rule)} />
-                <p {...stylex.props(styles.mutedText)}>{product.description}</p>
-              </div>
-              <ul {...stylex.props(styles.list)}>
-                {product.tags.map((tag) => (
-                  <li key={tag} {...stylex.props(styles.mutedText)}>
-                    {tag}
-                  </li>
-                ))}
-              </ul>
-            </div>
+            <ProductSummary
+              product={product}
+              sx={[styles.productPanel, index % 2 === 1 && styles.productPanelAlt]}
+              styles={{
+                mutedText: styles.mutedText,
+                productTitleBlock: styles.productTitleBlock,
+                productTitle: styles.productTitle,
+                rule: styles.rule,
+                list: styles.list,
+              }}
+            />
           </Reveal>
         ))}
       </div>
@@ -1221,49 +1221,39 @@ function ContactCta() {
 
 function SiteFooter() {
   return (
-    <footer {...stylex.props(styles.footer)}>
-      <div {...stylex.props(styles.shell, styles.inset132, styles.footerInner)}>
-        <div {...stylex.props(styles.footerTop)}>
-          <img
-            src={IMAGES.footerLogo.src}
-            alt={IMAGES.footerLogo.alt}
-            width={225}
-            height={73}
-            loading="lazy"
-            decoding="async"
-            {...stylex.props(styles.footerLogo)}
-          />
-          <nav aria-label="页脚导航" {...stylex.props(styles.footerColumns)}>
-            {FOOTER_COLUMNS.map((column) => (
-              <div key={column.heading} {...stylex.props(styles.footerColumn)}>
-                <h3 {...stylex.props(styles.footerHeading)}>{column.heading}</h3>
-                <ul {...stylex.props(styles.footerLinks)}>
-                  {column.links.map((link) => (
-                    <li key={link}>
-                      <a href="#top" {...stylex.props(styles.footerLink)}>
-                        {link}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </nav>
-        </div>
-        <hr {...stylex.props(styles.footerRule)} />
-        <div {...stylex.props(styles.footerBottom)}>
-          <p {...stylex.props(styles.copyright)}>{COPYRIGHT}</p>
-          <div {...stylex.props(styles.social)}>
-            <a href="#top" aria-label="LinkedIn" {...stylex.props(styles.socialLink)}>
-              <VectorArt paths={LINKEDIN_PATHS} viewBox="0 0 20 20" sx={styles.socialIcon} />
-            </a>
-            <a href="#top" aria-label="微信" {...stylex.props(styles.socialLink)}>
-              <VectorArt paths={WECHAT_PATHS} viewBox="0 0 20 20" sx={styles.socialIcon} />
-            </a>
-          </div>
-        </div>
-      </div>
-    </footer>
+    <InsetCorporateFooter
+      styles={{
+        footer: styles.footer,
+        shell: styles.shell,
+        inset132: styles.inset132,
+        footerInner: styles.footerInner,
+        footerRule: styles.footerRule,
+      }}
+      navigationStyles={{
+        footerLogo: styles.footerLogo,
+        footerLink: styles.footerLink,
+        footerTop: styles.footerTop,
+        footerColumns: styles.footerColumns,
+        footerColumn: styles.footerColumn,
+        footerHeading: styles.footerHeading,
+        footerLinks: styles.footerLinks,
+      }}
+      legalStyles={{
+        footerBottom: styles.footerBottom,
+        copyright: styles.copyright,
+        social: styles.social,
+      }}
+      logo={IMAGES.footerLogo}
+      columns={FOOTER_COLUMNS}
+      copyright={COPYRIGHT}
+    >
+      <a href="#top" aria-label="LinkedIn" {...stylex.props(styles.socialLink)}>
+        <VectorArt paths={LINKEDIN_PATHS} viewBox="0 0 20 20" sx={styles.socialIcon} />
+      </a>
+      <a href="#top" aria-label="微信" {...stylex.props(styles.socialLink)}>
+        <VectorArt paths={WECHAT_PATHS} viewBox="0 0 20 20" sx={styles.socialIcon} />
+      </a>
+    </InsetCorporateFooter>
   );
 }
 

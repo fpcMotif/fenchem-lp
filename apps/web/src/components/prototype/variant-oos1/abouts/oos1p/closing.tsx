@@ -8,7 +8,8 @@ import { ABOUT_BANNER } from "../../about-data";
 import type { AboutPageProps } from "../../index";
 import { ui } from "./layout";
 import { PlateHead } from "./plate-head";
-import { TICK, echoIndexes, strobe, trailOpacity, useEntry } from "./strobe";
+import { useEntry } from "./strobe";
+import { TICK, echoIndexes, strobe, trailOpacity } from "./strobe-values";
 import { bp, face, tone } from "./tokens.stylex";
 
 const BACKWARD_ECHOES = 4;

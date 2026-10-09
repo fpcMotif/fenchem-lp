@@ -6,14 +6,8 @@ import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
 import { ABOUT_STATEMENT, ABOUT_SUPPORT, HERO } from "./content";
 import { LiquidImage } from "./liquid-hero";
-import {
-  EASE_OUT,
-  LoadFade,
-  MaskLine,
-  REVEAL_MARGIN,
-  usePinEnabled,
-  usePinProgress,
-} from "./motion";
+import { LoadFade, MaskLine, REVEAL_MARGIN, usePinEnabled, usePinProgress } from "./motion";
+import { EASE_OUT } from "./motion-values";
 import {
   color,
   ease,
@@ -22,7 +16,8 @@ import {
   layout as layoutTokens,
   media,
 } from "./tokens.stylex";
-import { Button, TextLink, layout } from "./ui";
+import { Button, TextLink } from "./ui";
+import { layout } from "./ui-values";
 
 const CARD_TOP_PX = 96;
 const CARD_BOTTOM_PERCENT = 38;
@@ -437,30 +432,52 @@ export function Hero({ ready, onReady }: HeroProps) {
                   </StatementLine>
                 ))}
               </h2>
-              <m.p
-                {...stylex.props(styles.support)}
-                style={pinned ? { opacity: supportOpacity, y: supportY } : undefined}
-                initial={pinned ? false : { opacity: 0, y: SUPPORT_RISE_PX }}
-                animate={
-                  pinned
-                    ? undefined
-                    : {
-                        opacity: statementVisible ? 1 : 0,
-                        y: statementVisible ? 0 : SUPPORT_RISE_PX,
-                      }
-                }
-                transition={{
-                  duration: reduce ? 0 : STATEMENT_RISE_S,
-                  delay: reduce || !statementVisible ? 0 : SUPPORT_DELAY_S,
-                  ease: EASE_OUT,
-                }}
-              >
-                {ABOUT_SUPPORT}
-              </m.p>
+              <HeroSupport
+                pinned={pinned}
+                statementVisible={statementVisible}
+                supportOpacity={supportOpacity}
+                supportY={supportY}
+              />
             </div>
           </div>
         </div>
       </div>
     </section>
+  );
+}
+
+function HeroSupport({
+  pinned,
+  statementVisible,
+  supportOpacity,
+  supportY,
+}: {
+  pinned: boolean;
+  statementVisible: boolean;
+  supportOpacity: MotionValue<number>;
+  supportY: MotionValue<number>;
+}) {
+  const reduce = useReducedMotion();
+  return (
+    <m.p
+      {...stylex.props(styles.support)}
+      style={pinned ? { opacity: supportOpacity, y: supportY } : undefined}
+      initial={pinned ? false : { opacity: 0, y: SUPPORT_RISE_PX }}
+      animate={
+        pinned
+          ? undefined
+          : {
+              opacity: statementVisible ? 1 : 0,
+              y: statementVisible ? 0 : SUPPORT_RISE_PX,
+            }
+      }
+      transition={{
+        duration: reduce ? 0 : STATEMENT_RISE_S,
+        delay: reduce || !statementVisible ? 0 : SUPPORT_DELAY_S,
+        ease: EASE_OUT,
+      }}
+    >
+      {ABOUT_SUPPORT}
+    </m.p>
   );
 }

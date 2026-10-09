@@ -7,7 +7,8 @@ import { Lightbox } from "./lightbox";
 import { NestedSequence } from "./nested-sequence";
 import { PlateIndex } from "./plate-index";
 import { PortalStage } from "./portal-stage";
-import { SectionHead, srOnly, ui, useMediaQuery } from "./shared";
+import { SectionHead, useMediaQuery } from "./shared";
+import { srOnly, ui } from "./shared-values";
 
 const PORTAL_QUERY = "(min-width: 1024px) and (prefers-reduced-motion: no-preference)";
 const WALK = ROOMS_IN_WALKING_ORDER.map((room) => room.plate.caption).join("、");

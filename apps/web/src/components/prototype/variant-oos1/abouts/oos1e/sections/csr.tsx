@@ -2,7 +2,8 @@ import * as stylex from "@stylexjs/stylex";
 
 import { ABOUT_CSR } from "../../../about-data";
 import { Sheet } from "../sheet";
-import { base, Reveal } from "../shared";
+import { Reveal } from "../shared";
+import { base } from "../shared-values";
 import { CSR_SHEET } from "../sheets";
 import { color, media } from "../tokens.stylex";
 

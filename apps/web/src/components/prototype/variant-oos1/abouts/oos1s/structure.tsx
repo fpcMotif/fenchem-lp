@@ -3,7 +3,8 @@ import * as stylex from "@stylexjs/stylex";
 import { useId, useState } from "react";
 
 import { ABOUT_HERO, ABOUT_STRUCTURE } from "../../about-data";
-import { Reveal, Section, ui } from "./shared";
+import { Reveal, Section } from "./shared";
+import { ui } from "./shared-values";
 import { motionCss, step, tone } from "./tokens.stylex";
 
 const fadeRise = stylex.keyframes({

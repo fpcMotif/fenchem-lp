@@ -3,7 +3,8 @@ import { useState } from "react";
 
 import { ABOUT_CAMPUS } from "../../about-data";
 import { Clause } from "./clause";
-import { SectionLabel, headingId } from "./label";
+import { SectionLabel } from "./label";
+import { headingId } from "./label-values";
 import { Lightbox, type LightboxPhoto } from "./lightbox";
 import { SENTENCE } from "./sentence";
 import { srOnly, ui } from "./shared";

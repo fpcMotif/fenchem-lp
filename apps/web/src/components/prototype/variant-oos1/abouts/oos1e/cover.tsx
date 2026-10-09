@@ -3,7 +3,7 @@ import * as stylex from "@stylexjs/stylex";
 import { ChevronRight } from "lucide-react";
 
 import { ABOUT_BANNER } from "../../about-data";
-import { base } from "./shared";
+import { base } from "./shared-values";
 import { Stamp } from "./stamp";
 import { color, font, media } from "./tokens.stylex";
 

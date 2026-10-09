@@ -522,7 +522,8 @@ export function Panorama({
   const trackRef = useRef<HTMLDivElement>(null);
   const stripRef = useRef<HTMLDivElement>(null);
   const metricsRef = useRef<Metrics | null>(null);
-  const [metrics, setMetrics] = useState<Metrics | null>(null);
+  const [measured, setMetrics] = useState<Metrics | null>(null);
+  const metrics = pinned ? measured : null;
 
   const { scrollYProgress } = useScroll({
     target: runwayRef,
@@ -537,7 +538,6 @@ export function Panorama({
   useEffect(() => {
     if (!pinned) {
       metricsRef.current = null;
-      setMetrics(null);
       return;
     }
     const stageNode = stageRef.current;
@@ -663,87 +663,7 @@ export function Panorama({
             {...stylex.props(styles.track)}
             style={pinned ? { x: trackX } : undefined}
           >
-            <section
-              id={pinned ? undefined : GROUPS[0].id}
-              data-group
-              aria-label={GROUPS[0].label}
-              {...stylex.props(styles.group)}
-            >
-              <div data-frame {...stylex.props(styles.frame, styles.profile, shiftFor(0))}>
-                <div>
-                  <h2 {...stylex.props(styles.profileTitle)}>{ABOUT_HERO.title}</h2>
-                  <div lang="en" {...stylex.props(styles.profileEnglish)}>
-                    {ABOUT_HERO.englishTitle}
-                  </div>
-                </div>
-                <p {...stylex.props(styles.profileLead)}>{ABOUT_HERO.lead}</p>
-                <p {...stylex.props(styles.network)}>
-                  <span {...stylex.props(styles.networkLead)}>{ABOUT_HERO.networkLabel}</span>
-                  {ABOUT_HERO.countries.map((country, index) => (
-                    <span key={country} {...stylex.props(styles.place)}>
-                      {country}
-                      {index < LAST_COUNTRY ? "、" : "等地。"}
-                    </span>
-                  ))}
-                </p>
-              </div>
-
-              <Seam />
-
-              <figure
-                data-frame
-                {...stylex.props(styles.frame, styles.photo, SHAPE_FIGURE.portrait, shiftFor(1))}
-              >
-                <div {...stylex.props(styles.media, SHAPE_MEDIA.portrait)}>
-                  <img
-                    src={ABOUT_HERO.lobbyImage}
-                    alt={LOBBY_ALT}
-                    loading="lazy"
-                    decoding="async"
-                    draggable={false}
-                    {...stylex.props(styles.fill)}
-                  />
-                </div>
-                <PhotoNote en="Headquarters Lobby" cn={ABOUT_HERO.lobbyCaption} />
-              </figure>
-
-              <Seam />
-
-              <div data-frame {...stylex.props(styles.frame, styles.stats, shiftFor(2))}>
-                <figure {...stylex.props(styles.statsFigure)}>
-                  <div {...stylex.props(styles.statsMedia)}>
-                    <img
-                      src={ABOUT_MOMENT.image}
-                      alt={ABOUT_MOMENT.alt}
-                      loading="lazy"
-                      decoding="async"
-                      draggable={false}
-                      {...stylex.props(styles.fill)}
-                    />
-                  </div>
-                  <figcaption {...stylex.props(styles.note)}>{ABOUT_MOMENT.caption}</figcaption>
-                </figure>
-                <div {...stylex.props(styles.statsRow)}>
-                  {STATS.map((stat, index) => (
-                    <div
-                      key={stat.label}
-                      {...stylex.props(styles.stat, index > 0 && styles.statDivided)}
-                    >
-                      <div {...stylex.props(styles.statFigure)}>
-                        <span {...stylex.props(styles.statValue)}>{stat.value}</span>
-                        {stat.unit ? (
-                          <span {...stylex.props(styles.statUnit)}>{stat.unit}</span>
-                        ) : null}
-                      </div>
-                      <p {...stylex.props(styles.quiet)}>
-                        <span {...stylex.props(ui.srOnly)}>{stat.label}：</span>
-                        {stat.caption}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </section>
+            <ProfileFrames pinned={pinned} />
 
             <Seam />
 
@@ -829,6 +749,87 @@ export function Panorama({
           <div {...stylex.props(styles.progress)}>
             <m.span {...stylex.props(styles.progressFill)} style={{ scaleX: progress }} />
           </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function ProfileFrames({ pinned }: { pinned: boolean }) {
+  return (
+    <section
+      id={pinned ? undefined : GROUPS[0].id}
+      data-group
+      aria-label={GROUPS[0].label}
+      {...stylex.props(styles.group)}
+    >
+      <div data-frame {...stylex.props(styles.frame, styles.profile, shiftFor(0))}>
+        <div>
+          <h2 {...stylex.props(styles.profileTitle)}>{ABOUT_HERO.title}</h2>
+          <div lang="en" {...stylex.props(styles.profileEnglish)}>
+            {ABOUT_HERO.englishTitle}
+          </div>
+        </div>
+        <p {...stylex.props(styles.profileLead)}>{ABOUT_HERO.lead}</p>
+        <p {...stylex.props(styles.network)}>
+          <span {...stylex.props(styles.networkLead)}>{ABOUT_HERO.networkLabel}</span>
+          {ABOUT_HERO.countries.map((country, index) => (
+            <span key={country} {...stylex.props(styles.place)}>
+              {country}
+              {index < LAST_COUNTRY ? "、" : "等地。"}
+            </span>
+          ))}
+        </p>
+      </div>
+
+      <Seam />
+
+      <figure
+        data-frame
+        {...stylex.props(styles.frame, styles.photo, SHAPE_FIGURE.portrait, shiftFor(1))}
+      >
+        <div {...stylex.props(styles.media, SHAPE_MEDIA.portrait)}>
+          <img
+            src={ABOUT_HERO.lobbyImage}
+            alt={LOBBY_ALT}
+            loading="lazy"
+            decoding="async"
+            draggable={false}
+            {...stylex.props(styles.fill)}
+          />
+        </div>
+        <PhotoNote en="Headquarters Lobby" cn={ABOUT_HERO.lobbyCaption} />
+      </figure>
+
+      <Seam />
+
+      <div data-frame {...stylex.props(styles.frame, styles.stats, shiftFor(2))}>
+        <figure {...stylex.props(styles.statsFigure)}>
+          <div {...stylex.props(styles.statsMedia)}>
+            <img
+              src={ABOUT_MOMENT.image}
+              alt={ABOUT_MOMENT.alt}
+              loading="lazy"
+              decoding="async"
+              draggable={false}
+              {...stylex.props(styles.fill)}
+            />
+          </div>
+          <figcaption {...stylex.props(styles.note)}>{ABOUT_MOMENT.caption}</figcaption>
+        </figure>
+        <div {...stylex.props(styles.statsRow)}>
+          {STATS.map((stat, index) => (
+            <div key={stat.label} {...stylex.props(styles.stat, index > 0 && styles.statDivided)}>
+              <div {...stylex.props(styles.statFigure)}>
+                <span {...stylex.props(styles.statValue)}>{stat.value}</span>
+                {stat.unit ? <span {...stylex.props(styles.statUnit)}>{stat.unit}</span> : null}
+              </div>
+              <p {...stylex.props(styles.quiet)}>
+                <span {...stylex.props(ui.srOnly)}>{stat.label}：</span>
+                {stat.caption}
+              </p>
+            </div>
+          ))}
         </div>
       </div>
     </section>

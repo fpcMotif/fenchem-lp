@@ -1,7 +1,8 @@
 import * as stylex from "@stylexjs/stylex";
 
 import { ABOUT_BANNER, ABOUT_HERO } from "../../about-data";
-import { PoleMark, srOnly, ui } from "./shared";
+import { PoleMark } from "./shared";
+import { srOnly, ui } from "./shared-values";
 import { bp, chrome, face, sky } from "./tokens.stylex";
 
 const NUMERALS = ["I", "II", "III", "IV", "V", "VI"] as const;

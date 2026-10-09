@@ -1,22 +1,17 @@
+import { BloomHeadline } from "../shared/navigation-and-headline";
+import { CorporateHeader, CorporateFooter } from "../shared/corporate-sections";
+import { Flow } from "../shared/flow";
+import { LayoutGroup } from "motion/react";
+
+import { NewsAccordion } from "../shared/news-accordion";
 import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 import type { StyleXStyles } from "@stylexjs/stylex";
+import { CornerDownRight, Globe, Lightbulb, Shield, Users, type LucideIcon } from "lucide-react";
 import {
-  CornerDownRight,
-  Globe,
-  Lightbulb,
-  Menu,
-  Search,
-  Shield,
-  Users,
-  X,
-  type LucideIcon,
-} from "lucide-react";
-import {
-  AnimatePresence,
   LazyMotion,
   MotionConfig,
-  domAnimation,
+  domMax,
   m,
   useMotionValue,
   useMotionValueEvent,
@@ -31,7 +26,6 @@ import {
   useState,
   useSyncExternalStore,
   type CSSProperties,
-  type KeyboardEvent,
   type MouseEvent,
   type ReactNode,
 } from "react";
@@ -1812,124 +1806,32 @@ function VectorArt({
   );
 }
 
-function useScrolledPastTop() {
-  const [scrolled, setScrolled] = useState(false);
-  useEffect(() => {
-    const update = () => setScrolled(window.scrollY > 8);
-    update();
-    window.addEventListener("scroll", update, { passive: true });
-    return () => window.removeEventListener("scroll", update);
-  }, []);
-  return scrolled;
-}
-
-function useActiveSection(ids: readonly string[]) {
-  const [active, setActive] = useState(ids[0]);
-  useEffect(() => {
-    const ratios = new Map<string, number>();
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          ratios.set(entry.target.id, entry.isIntersecting ? entry.intersectionRatio : 0);
-        }
-        const next = ids.find((id) => (ratios.get(id) ?? 0) > 0);
-        if (next) setActive(next);
-      },
-      { rootMargin: "-45% 0px -50% 0px", threshold: [0, 0.01] },
-    );
-    for (const id of ids) {
-      const section = document.getElementById(id);
-      if (section) observer.observe(section);
-    }
-    return () => observer.disconnect();
-  }, [ids]);
-  return active;
-}
-
 function SiteHeader() {
-  const [menuOpen, setMenuOpen] = useState(false);
-  const menuId = useId();
-  const reduce = useReducedMotion();
-  const scrolled = useScrolledPastTop();
-  const activeId = useActiveSection(NAV_SECTION_IDS);
-  const closeOnEscape = (event: KeyboardEvent<HTMLElement>) => {
-    if (event.key === "Escape" && menuOpen) setMenuOpen(false);
-  };
-  const isActive = (href: string) => href.slice(1) === activeId;
   return (
-    <header
-      onKeyDown={closeOnEscape}
-      {...stylex.props(styles.header, (scrolled || menuOpen) && styles.headerSolid)}
-    >
-      <div {...stylex.props(styles.shell, styles.headerInner, styles.headerEnter)}>
-        <a href="#top" aria-label="FENCHEM 泛成 首页" {...stylex.props(styles.logoLink)}>
-          <LogoMark />
-        </a>
-        <nav aria-label="主导航" {...stylex.props(styles.nav)}>
-          {NAV_ITEMS.map((item) => (
-            <a
-              key={item.href}
-              href={item.href}
-              aria-current={isActive(item.href) ? "location" : undefined}
-              {...stylex.props(styles.navLink, isActive(item.href) && styles.navLinkActive)}
-            >
-              {item.label}
-            </a>
-          ))}
-        </nav>
-        <div {...stylex.props(styles.headerActions)}>
-          <button type="button" aria-label="AI 搜索" {...stylex.props(styles.searchPill)}>
-            <Search size={16} strokeWidth={2} absoluteStrokeWidth aria-hidden="true" />
-          </button>
-          <button type="button" aria-label="CN，切换语言" {...stylex.props(styles.langButton)}>
-            CN
-          </button>
-          <button
-            type="button"
-            aria-label={menuOpen ? "关闭菜单" : "打开菜单"}
-            aria-expanded={menuOpen}
-            aria-controls={menuId}
-            onClick={() => setMenuOpen((open) => !open)}
-            {...stylex.props(styles.menuButton)}
-          >
-            {menuOpen ? (
-              <X size={24} strokeWidth={2} absoluteStrokeWidth aria-hidden="true" />
-            ) : (
-              <Menu size={24} strokeWidth={2} absoluteStrokeWidth aria-hidden="true" />
-            )}
-          </button>
-        </div>
-      </div>
-      <AnimatePresence initial={false}>
-        {menuOpen ? (
-          <m.nav
-            key="menu"
-            id={menuId}
-            aria-label="主导航"
-            {...stylex.props(styles.menuPanel)}
-            initial={{ opacity: 0, transform: "translateY(-8px)" }}
-            animate={{ opacity: 1, transform: "translateY(0px)" }}
-            exit={{ opacity: 0, transform: "translateY(-8px)" }}
-            transition={{ duration: reduce ? 0.15 : 0.2, ease: EASE }}
-          >
-            <ul {...stylex.props(styles.menuList)}>
-              {NAV_ITEMS.map((item) => (
-                <li key={item.href}>
-                  <a
-                    href={item.href}
-                    aria-current={isActive(item.href) ? "location" : undefined}
-                    onClick={() => setMenuOpen(false)}
-                    {...stylex.props(styles.menuLink, isActive(item.href) && styles.menuLinkActive)}
-                  >
-                    {item.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </m.nav>
-        ) : null}
-      </AnimatePresence>
-    </header>
+    <CorporateHeader
+      styles={{
+        header: styles.header,
+        logoLink: styles.logoLink,
+        navLink: styles.navLink,
+        menuButton: styles.menuButton,
+        headerSolid: styles.headerSolid,
+        shell: styles.shell,
+        headerInner: styles.headerInner,
+        nav: styles.nav,
+        navLinkActive: styles.navLinkActive,
+        headerActions: styles.headerActions,
+        searchPill: styles.searchPill,
+        langButton: styles.langButton,
+        headerEnter: styles.headerEnter,
+        menuPanel: styles.menuPanel,
+        menuList: styles.menuList,
+        menuLink: styles.menuLink,
+        menuLinkActive: styles.menuLinkActive,
+      }}
+      logo={<LogoMark />}
+      navItems={NAV_ITEMS}
+      sectionIds={NAV_SECTION_IDS}
+    />
   );
 }
 
@@ -2047,51 +1949,29 @@ function Hero() {
       >
         <div {...stylex.props(styles.heroCopy)}>
           <h1 id="oox3-hero-title" {...stylex.props(styles.heroTitle)}>
-            <span lang="en" {...stylex.props(styles.heroHeadline)}>
-              <span
-                {...stylex.props(
-                  styles.heroLead,
-                  styles.heroBloom,
-                  styles.enterDelay(introAfter(300)),
-                )}
-              >
-                {OPENING_BEFORE}
-                <span {...stylex.props(styles.heroAccent)}>{HERO.accent}</span>
-                {OPENING_AFTER}
-              </span>{" "}
-              <span
-                {...stylex.props(
-                  styles.heroLead,
-                  styles.heroBloom,
-                  styles.enterDelay(introAfter(400)),
-                )}
-              >
-                {CLOSING_LEAD}
-              </span>{" "}
-              <span {...stylex.props(styles.heroBreakLine)}>
-                <span
-                  {...stylex.props(
-                    styles.heroBreak,
-                    styles.heroBloom,
-                    styles.enterDelay(introAfter(500)),
-                  )}
-                >
-                  <span {...stylex.props(styles.heroBreakInk, styles.heroBreakHead)}>
-                    {CLOSING_WORD}
-                  </span>
-                  <span
-                    aria-hidden="true"
-                    {...stylex.props(styles.heroBreakInk, styles.heroBreakTail)}
-                  >
-                    {CLOSING_WORD}
-                  </span>
-                </span>
-                <span aria-hidden="true" {...stylex.props(styles.heroPeriodSeat)}>
-                  <span {...stylex.props(styles.heroPeriod)} />
-                </span>
-                <span {...stylex.props(styles.visuallyHidden)}>.</span>
-              </span>
-            </span>{" "}
+            <BloomHeadline
+              styles={{
+                heroHeadline: styles.heroHeadline,
+                heroLead: styles.heroLead,
+                heroBloom: styles.heroBloom,
+                enterDelay: styles.enterDelay,
+                heroAccent: styles.heroAccent,
+                heroBreakLine: styles.heroBreakLine,
+                heroBreak: styles.heroBreak,
+                heroBreakInk: styles.heroBreakInk,
+                heroBreakHead: styles.heroBreakHead,
+                heroBreakTail: styles.heroBreakTail,
+                heroPeriodSeat: styles.heroPeriodSeat,
+                heroPeriod: styles.heroPeriod,
+                visuallyHidden: styles.visuallyHidden,
+              }}
+              OPENING_BEFORE={OPENING_BEFORE}
+              OPENING_AFTER={OPENING_AFTER}
+              CLOSING_LEAD={CLOSING_LEAD}
+              CLOSING_WORD={CLOSING_WORD}
+              HERO={HERO}
+              introAfter={introAfter}
+            />{" "}
             <span
               {...stylex.props(
                 styles.heroSubtitle,
@@ -2544,50 +2424,29 @@ function NewsItem({
   onToggle: () => void;
 }) {
   const reduce = useReducedMotion();
-  const panelId = useId();
   return (
-    <>
-      <h3 {...stylex.props(styles.newsHeading)}>
-        <button
-          type="button"
-          aria-expanded={open}
-          aria-controls={panelId}
-          onClick={onToggle}
-          {...stylex.props(styles.newsTrigger)}
+    <NewsAccordion
+      item={item}
+      open={open}
+      onToggle={onToggle}
+      styles={{
+        mutedText: styles.mutedText,
+        newsHeading: styles.newsHeading,
+        newsTrigger: styles.newsTrigger,
+        newsPanel: styles.newsPanel,
+        newsPanelInner: styles.newsPanelInner,
+      }}
+      icon={
+        <m.span
+          aria-hidden="true"
+          {...stylex.props(styles.newsIconSlot)}
+          animate={{ rotate: open ? 90 : 0 }}
+          transition={reduce ? { duration: 0 } : { type: "spring", duration: 0.35, bounce: 0.2 }}
         >
-          <span>{item.title}</span>
-          <m.span
-            aria-hidden="true"
-            {...stylex.props(styles.newsIconSlot)}
-            animate={{ rotate: open ? 90 : 0 }}
-            transition={reduce ? { duration: 0 } : { type: "spring", duration: 0.35, bounce: 0.2 }}
-          >
-            <CornerDownRight size={18} strokeWidth={1.5} absoluteStrokeWidth />
-          </m.span>
-        </button>
-      </h3>
-      <AnimatePresence initial={false}>
-        {open ? (
-          <m.div
-            key="panel"
-            id={panelId}
-            {...stylex.props(styles.newsPanel)}
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: reduce ? 0 : 0.25, ease: EASE }}
-          >
-            <div {...stylex.props(styles.newsPanelInner)}>
-              {item.details.map((detail) => (
-                <p key={detail} {...stylex.props(styles.mutedText)}>
-                  {detail}
-                </p>
-              ))}
-            </div>
-          </m.div>
-        ) : null}
-      </AnimatePresence>
-    </>
+          <CornerDownRight size={18} strokeWidth={1.5} absoluteStrokeWidth />
+        </m.span>
+      }
+    />
   );
 }
 
@@ -2608,13 +2467,18 @@ function News() {
         </DropIn>
         <ul {...stylex.props(styles.accordion)}>
           {NEWS.map((item, index) => (
-            <li key={item.title} {...stylex.props(styles.newsItem)}>
+            <m.li
+              layout="position"
+              transition={{ duration: 0.25, ease: EASE }}
+              key={item.title}
+              {...stylex.props(styles.newsItem)}
+            >
               <NewsItem
                 item={item}
                 open={openIndex === index}
                 onToggle={() => setOpenIndex(openIndex === index ? null : index)}
               />
-            </li>
+            </m.li>
           ))}
         </ul>
       </div>
@@ -2674,49 +2538,35 @@ function ContactMirror() {
 
 function SiteFooter() {
   return (
-    <footer {...stylex.props(styles.footer)}>
-      <div {...stylex.props(styles.shell, styles.inset120, styles.footerInner)}>
-        <div {...stylex.props(styles.footerTop)}>
-          <img
-            src={IMAGES.footerLogo.src}
-            alt={IMAGES.footerLogo.alt}
-            width={225}
-            height={73}
-            loading="lazy"
-            decoding="async"
-            {...stylex.props(styles.footerLogo)}
-          />
-          <nav aria-label="页脚导航" {...stylex.props(styles.footerColumns)}>
-            {FOOTER_COLUMNS.map((column) => (
-              <div key={column.heading} {...stylex.props(styles.footerColumn)}>
-                <h3 {...stylex.props(styles.footerHeading)}>{column.heading}</h3>
-                <ul {...stylex.props(styles.footerLinks)}>
-                  {column.links.map((link) => (
-                    <li key={link}>
-                      <a href="#top" {...stylex.props(styles.footerLink)}>
-                        {link}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </nav>
-        </div>
-        <hr {...stylex.props(styles.footerRule)} />
-        <div {...stylex.props(styles.footerBottom)}>
-          <p {...stylex.props(styles.copyright)}>{COPYRIGHT}</p>
-          <div {...stylex.props(styles.social)}>
-            <a href="#top" aria-label="LinkedIn" {...stylex.props(styles.socialLink)}>
-              <VectorArt paths={LINKEDIN_PATHS} viewBox="0 0 20 20" sx={styles.socialIcon} />
-            </a>
-            <a href="#top" aria-label="微信" {...stylex.props(styles.socialLink)}>
-              <VectorArt paths={WECHAT_PATHS} viewBox="0 0 20 20" sx={styles.socialIcon} />
-            </a>
-          </div>
-        </div>
-      </div>
-    </footer>
+    <CorporateFooter
+      styles={{
+        footer: styles.footer,
+        shell: styles.shell,
+        inset120: styles.inset120,
+        footerInner: styles.footerInner,
+        footerRule: styles.footerRule,
+        footerLogo: styles.footerLogo,
+        footerLink: styles.footerLink,
+        footerTop: styles.footerTop,
+        footerColumns: styles.footerColumns,
+        footerColumn: styles.footerColumn,
+        footerHeading: styles.footerHeading,
+        footerLinks: styles.footerLinks,
+        footerBottom: styles.footerBottom,
+        copyright: styles.copyright,
+        social: styles.social,
+      }}
+      logo={IMAGES.footerLogo}
+      columns={FOOTER_COLUMNS}
+      copyright={COPYRIGHT}
+    >
+      <a href="#top" aria-label="LinkedIn" {...stylex.props(styles.socialLink)}>
+        <VectorArt paths={LINKEDIN_PATHS} viewBox="0 0 20 20" sx={styles.socialIcon} />
+      </a>
+      <a href="#top" aria-label="微信" {...stylex.props(styles.socialLink)}>
+        <VectorArt paths={WECHAT_PATHS} viewBox="0 0 20 20" sx={styles.socialIcon} />
+      </a>
+    </CorporateFooter>
   );
 }
 
@@ -2737,28 +2587,32 @@ export function VariantOOX3() {
     };
   }, [reduce]);
   return (
-    <LazyMotion features={domAnimation} strict>
-      <MotionConfig reducedMotion="user">
-        <div lang="zh-CN" {...stylex.props(styles.root)} style={introVars}>
-          <div {...stylex.props(styles.page, intro === "play" && introStyles.pageReveal)}>
-            <a href="#main-content" {...stylex.props(styles.skipLink)}>
-              跳到主要内容
-            </a>
-            <SiteHeader />
-            <main id="main-content" tabIndex={-1} {...stylex.props(styles.mainTarget)}>
-              <Hero />
-              <About />
-              <Products />
-              <Strengths />
-              <Campus />
-              <Offices />
-              <News />
-              <ContactMirror />
-            </main>
-            <SiteFooter />
+    <LazyMotion features={domMax} strict>
+      <LayoutGroup>
+        <MotionConfig reducedMotion="user">
+          <div lang="zh-CN" {...stylex.props(styles.root)} style={introVars}>
+            <div {...stylex.props(styles.page, intro === "play" && introStyles.pageReveal)}>
+              <a href="#main-content" {...stylex.props(styles.skipLink)}>
+                跳到主要内容
+              </a>
+              <SiteHeader />
+              <main id="main-content" tabIndex={-1} {...stylex.props(styles.mainTarget)}>
+                <Hero />
+                <About />
+                <Products />
+                <Strengths />
+                <Campus />
+                <Offices />
+                <News />
+                <ContactMirror />
+              </main>
+              <Flow>
+                <SiteFooter />
+              </Flow>
+            </div>
           </div>
-        </div>
-      </MotionConfig>
+        </MotionConfig>
+      </LayoutGroup>
     </LazyMotion>
   );
 }

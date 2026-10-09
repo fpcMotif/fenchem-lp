@@ -3,14 +3,8 @@ import * as stylex from "@stylexjs/stylex";
 import { ArrowRight, FileDown } from "lucide-react";
 import { createInquiryHref, ingredients } from "@/components/landing/landing-content";
 import { IMAGES } from "../content";
-import {
-  drawRule,
-  revealWords,
-  riseIn,
-  settleImage,
-  SplitWords,
-  useSectionAnimation,
-} from "../motion";
+import { SplitWords, useSectionAnimation } from "../motion";
+import { drawRule, revealWords, riseIn, settleImage } from "../motion-values";
 import { sharedStyles } from "../styles";
 
 /*

@@ -1,3 +1,4 @@
+import { LightboxStage } from "../shared/lightbox-stage";
 import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 import { ChevronLeft, ChevronRight, Factory, Leaf, Recycle, X } from "lucide-react";
@@ -736,14 +737,7 @@ function CountUp({ value }: { value: string }) {
   const [display, setDisplay] = useState(target);
 
   useEffect(() => {
-    if (reduce) {
-      setDisplay(target);
-      return;
-    }
-    if (!inView) {
-      setDisplay(0);
-      return;
-    }
+    if (reduce || !inView) return;
     const controls = animate(0, target, {
       duration: COUNT_UP_SECONDS,
       ease: EASE,
@@ -754,7 +748,9 @@ function CountUp({ value }: { value: string }) {
 
   return (
     <span ref={ref} {...stylex.props(styles.statValue)}>
-      <span aria-hidden="true">{display.toLocaleString("en-US")}</span>
+      <span aria-hidden="true">
+        {(reduce ? target : inView ? display : 0).toLocaleString("en-US")}
+      </span>
       <span {...stylex.props(styles.srOnly)}>{value}</span>
     </span>
   );
@@ -855,12 +851,7 @@ function Lightbox({
     >
       {photo ? (
         <>
-          <div
-            onClick={(event) => {
-              if (event.target === event.currentTarget) onClose();
-            }}
-            {...stylex.props(styles.lightboxStage)}
-          >
+          <LightboxStage onClose={onClose} sx={styles.lightboxStage}>
             <figure
               key={photo.id}
               {...stylex.props(
@@ -871,7 +862,7 @@ function Lightbox({
               <img src={photo.large} alt={photo.alt} {...stylex.props(styles.lightboxImage)} />
               <figcaption {...stylex.props(styles.lightboxCaption)}>{photo.caption}</figcaption>
             </figure>
-          </div>
+          </LightboxStage>
           <button
             type="button"
             aria-label="上一张"

@@ -2,7 +2,8 @@ import * as stylex from "@stylexjs/stylex";
 
 import { ABOUT_HERO } from "../../about-data";
 import { ROOMS_IN_WALKING_ORDER } from "./journey";
-import { Bevel, Mat, SectionHead, Tag, stepIn, ui, useArrived } from "./shared";
+import { Bevel, Mat, SectionHead, Tag, useArrived } from "./shared";
+import { stepIn, ui } from "./shared-values";
 import { bp, face, space, tone } from "./tokens.stylex";
 
 const LOBBY = ROOMS_IN_WALKING_ORDER[0].plate;

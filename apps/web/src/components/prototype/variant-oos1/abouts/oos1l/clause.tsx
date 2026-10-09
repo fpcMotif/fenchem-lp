@@ -83,33 +83,37 @@ export function Words({
   light?: StyleXStyles;
   tail?: ReactNode;
 }) {
-  return segments.map((segment, index) => {
-    const pieces = segment.text.split(/(?<=、)/u);
-    const carriesTail = tail != null && index === segments.length - 1;
-    return (
-      <Fragment key={`${index}-${segment.text}`}>
-        {index > 0 ? <wbr /> : null}
-        <span {...stylex.props(segment.heavy ? heavy : light)}>
-          {pieces.map((piece, at) => (
-            <Fragment key={`${at}-${piece}`}>
-              {at > 0 ? <wbr /> : null}
-              {carriesTail && at === pieces.length - 1 ? (
-                <>
-                  {piece.slice(0, -1)}
-                  <span {...stylex.props(styles.tail)}>
-                    {piece.slice(-1)}
-                    {tail}
-                  </span>
-                </>
-              ) : (
-                piece
-              )}
-            </Fragment>
-          ))}
-        </span>
-      </Fragment>
-    );
-  });
+  return (
+    <>
+      {segments.map((segment, index) => {
+        const pieces = segment.text.split(/(?<=、)/u);
+        const carriesTail = tail != null && index === segments.length - 1;
+        return (
+          <Fragment key={segment.text}>
+            {index > 0 ? <wbr /> : null}
+            <span {...stylex.props(segment.heavy ? heavy : light)}>
+              {pieces.map((piece, at) => (
+                <Fragment key={`${at}-${piece}`}>
+                  {at > 0 ? <wbr /> : null}
+                  {carriesTail && at === pieces.length - 1 ? (
+                    <>
+                      {piece.slice(0, -1)}
+                      <span {...stylex.props(styles.tail)}>
+                        {piece.slice(-1)}
+                        {tail}
+                      </span>
+                    </>
+                  ) : (
+                    piece
+                  )}
+                </Fragment>
+              ))}
+            </span>
+          </Fragment>
+        );
+      })}
+    </>
+  );
 }
 
 export function Clause({

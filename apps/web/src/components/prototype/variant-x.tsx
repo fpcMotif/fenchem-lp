@@ -1,3 +1,7 @@
+import { CurrentYear } from "./shared/current-year";
+import { SpecificationMobileMenu } from "./shared/navigation-and-headline";
+import { LayoutGroup } from "motion/react";
+
 /*
  * PROTOTYPE — Variant X: "Folio · magazine spread".
  *
@@ -25,7 +29,7 @@
  * gradient (the finale glow), Reveal + EASE + STAGGER only.
  */
 import { useEffect, useId, useState } from "react";
-import { AnimatePresence, LazyMotion, domAnimation, m } from "motion/react";
+import { LazyMotion, domMax, m } from "motion/react";
 import { ArrowRight, ArrowUpRight, Leaf, Menu, X } from "lucide-react";
 import * as stylex from "@stylexjs/stylex";
 import { breakpoints, colors, radii, typography } from "@fenchem-lp/ui/tokens.stylex";
@@ -1195,44 +1199,20 @@ function Masthead() {
           </span>
         </div>
       </div>
-      <AnimatePresence initial={false}>
-        {open ? (
-          <m.div
-            id={panelId}
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: reduce ? 0 : 0.36, ease: EASE }}
-            {...stylex.props(styles.mobilePanel)}
-          >
-            <div {...stylex.props(styles.container)}>
-              <ul {...stylex.props(styles.mobileList)}>
-                {links.map((link) => (
-                  <li key={link.href}>
-                    <a
-                      href={link.href}
-                      onClick={() => setOpen(false)}
-                      {...stylex.props(styles.mobileLink)}
-                    >
-                      {link.label}
-                    </a>
-                  </li>
-                ))}
-                <li>
-                  <a
-                    href={createInquiryHref("contact")}
-                    onClick={() => setOpen(false)}
-                    {...stylex.props(styles.ctaPrimary)}
-                  >
-                    Request a specification
-                    <ArrowRight aria-hidden size={14} />
-                  </a>
-                </li>
-              </ul>
-            </div>
-          </m.div>
-        ) : null}
-      </AnimatePresence>
+      <SpecificationMobileMenu
+        styles={{
+          mobilePanel: styles.mobilePanel,
+          container: styles.container,
+          mobileList: styles.mobileList,
+          mobileLink: styles.mobileLink,
+          ctaPrimary: styles.ctaPrimary,
+        }}
+        panelId={panelId}
+        open={open}
+        reduce={reduce}
+        links={links}
+        setOpen={setOpen}
+      />
     </header>
   );
 }
@@ -1803,7 +1783,7 @@ function Colophon() {
         </div>
         <div {...stylex.props(styles.footerBottom)}>
           <span>
-            © {new Date().getFullYear()} {company.legalName}
+            © <CurrentYear /> {company.legalName}
           </span>
           <span>Edition X · Folio</span>
         </div>
@@ -1830,21 +1810,23 @@ function SmoothScroll() {
 
 export function VariantX() {
   return (
-    <LazyMotion features={domAnimation} strict>
-      <div {...stylex.props(styles.root)}>
-        <SmoothScroll />
-        <Masthead />
-        <main>
-          <CoverSpread />
-          <IndustriesChapter />
-          <PullQuoteSpread />
-          <PortfolioChapter />
-          <QualityChapter />
-          <GlobalChapter />
-          <FinaleSection />
-        </main>
-        <Colophon />
-      </div>
+    <LazyMotion features={domMax} strict>
+      <LayoutGroup>
+        <div {...stylex.props(styles.root)}>
+          <SmoothScroll />
+          <Masthead />
+          <main>
+            <CoverSpread />
+            <IndustriesChapter />
+            <PullQuoteSpread />
+            <PortfolioChapter />
+            <QualityChapter />
+            <GlobalChapter />
+            <FinaleSection />
+          </main>
+          <Colophon />
+        </div>
+      </LayoutGroup>
     </LazyMotion>
   );
 }

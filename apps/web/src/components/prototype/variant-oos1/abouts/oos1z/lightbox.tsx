@@ -1,3 +1,4 @@
+import { LightboxStage } from "../../../shared/lightbox-stage";
 import * as stylex from "@stylexjs/stylex";
 import { ArrowLeft, ArrowRight, X } from "lucide-react";
 import { useEffect, useRef } from "react";
@@ -169,12 +170,7 @@ export function Lightbox({
     >
       {work ? (
         <>
-          <div
-            onClick={(event) => {
-              if (event.target === event.currentTarget) onClose();
-            }}
-            {...stylex.props(styles.room)}
-          >
+          <LightboxStage onClose={onClose} sx={styles.room}>
             <figure key={stepped ? work.id : "open"} {...stylex.props(styles.figure)}>
               <div {...stylex.props(styles.frame)}>
                 <img src={work.large} alt={work.alt} {...stylex.props(styles.image)} />
@@ -189,7 +185,7 @@ export function Lightbox({
                 </span>
               </figcaption>
             </figure>
-          </div>
+          </LightboxStage>
           <button
             type="button"
             aria-label="上一幅"

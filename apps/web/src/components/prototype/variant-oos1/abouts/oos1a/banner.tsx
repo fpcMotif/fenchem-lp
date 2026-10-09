@@ -3,7 +3,8 @@ import * as stylex from "@stylexjs/stylex";
 
 import { ABOUT_BANNER } from "../../about-data";
 import { ease, fonts, media, palette } from "./lattice.stylex";
-import { Frame, shared } from "./parts";
+import { Frame } from "./parts";
+import { shared } from "./parts-values";
 
 const fadeIn = stylex.keyframes({
   "0%": { opacity: 0 },

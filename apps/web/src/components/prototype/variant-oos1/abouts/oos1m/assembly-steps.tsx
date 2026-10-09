@@ -1,7 +1,7 @@
 import * as stylex from "@stylexjs/stylex";
 import { m, useTransform, type MotionValue } from "motion/react";
 
-import { span } from "./iso";
+import { span } from "./iso-values";
 import { ui } from "./shared";
 import { bp, face, tone } from "./tokens.stylex";
 

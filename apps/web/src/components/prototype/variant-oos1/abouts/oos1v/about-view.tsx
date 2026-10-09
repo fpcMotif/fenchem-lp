@@ -16,7 +16,8 @@ import type { AboutPageProps } from "../../index";
 import { useActiveSection } from "../../use-active-section";
 import { CAMPUS_CAPTION_EN, CAMPUS_HANG, type CampusPhoto } from "./campus-hang";
 import { CultureStory } from "./culture";
-import { BrushCoat, CyanotypeDefs, shared, useDeveloped } from "./cyanotype";
+import { BrushCoat, CyanotypeDefs, useDeveloped } from "./cyanotype";
+import { shared } from "./cyanotype-values";
 import { Lightbox } from "./lightbox";
 import { curve, font, media, tone } from "./tokens.stylex";
 

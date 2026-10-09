@@ -1,9 +1,9 @@
 import * as stylex from "@stylexjs/stylex";
 import type { StyleXStyles } from "@stylexjs/stylex";
-
 import { ABOUT_HERO } from "../../about-data";
 import type { SectionId } from "./sentence";
 import { ui } from "./shared";
+import { headingId } from "./label-values";
 
 const ENGLISH: Partial<Record<SectionId, string>> = {
   "about-profile": "Profile",
@@ -13,8 +13,6 @@ const ENGLISH: Partial<Record<SectionId, string>> = {
   "about-honor": "Honors",
   "about-structure": "Structure",
 };
-
-export const headingId = (section: SectionId) => `${section}-heading`;
 
 export function SectionLabel({ section, sx }: { section: SectionId; sx?: StyleXStyles }) {
   const chip = ABOUT_HERO.navChips.find((item) => item.id === section);

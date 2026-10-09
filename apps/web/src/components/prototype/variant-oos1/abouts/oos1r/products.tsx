@@ -3,7 +3,8 @@ import * as stylex from "@stylexjs/stylex";
 import { ArrowUpRight } from "lucide-react";
 
 import { PRODUCTS, PRODUCTS_INTRO } from "../../content";
-import { Reveal, Section, ui } from "./shared";
+import { Reveal, Section } from "./shared";
+import { ui } from "./shared-values";
 import { band, font, motionCss, step, tone } from "./tokens.stylex";
 
 const s = stylex.create({

@@ -7,7 +7,7 @@ import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
 import { ABOUT_CSR } from "../../about-data";
 import { CTA } from "../../content";
-import { ui } from "./shared";
+import { ui } from "./shared-values";
 import { slit, step, tone } from "./tokens.stylex";
 
 const s = stylex.create({

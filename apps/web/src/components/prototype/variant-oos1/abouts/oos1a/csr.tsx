@@ -3,7 +3,8 @@ import * as stylex from "@stylexjs/stylex";
 
 import { ABOUT_CSR } from "../../about-data";
 import { fonts, media, palette } from "./lattice.stylex";
-import { Frame, Reveal, SectionName, shared } from "./parts";
+import { Frame, Reveal, SectionName } from "./parts";
+import { shared } from "./parts-values";
 
 const styles = stylex.create({
   section: {

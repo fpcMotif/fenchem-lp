@@ -11,7 +11,8 @@ import { useActiveSection } from "../../use-active-section";
 import { CultureStory } from "./culture";
 import { CampusLoom } from "./loom";
 import { Honors, Profile, Responsibility, Structure } from "./sections";
-import { Reveal, ui } from "./shared";
+import { Reveal } from "./shared";
+import { ui } from "./shared-values";
 import { curve, media, tone, type } from "./tokens.stylex";
 
 const HEADER_HEIGHT = 80;

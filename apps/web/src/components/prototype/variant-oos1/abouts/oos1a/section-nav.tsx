@@ -8,7 +8,8 @@ import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 import { ABOUT_HERO } from "../../about-data";
 import { useActiveSection } from "../../use-active-section";
 import { ease, fonts, palette } from "./lattice.stylex";
-import { Frame, shared } from "./parts";
+import { Frame } from "./parts";
+import { shared } from "./parts-values";
 
 type ChipId = (typeof ABOUT_HERO.navChips)[number]["id"];
 

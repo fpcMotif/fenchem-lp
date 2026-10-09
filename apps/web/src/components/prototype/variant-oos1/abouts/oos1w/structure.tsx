@@ -3,8 +3,10 @@ import { m, useTransform, type MotionValue } from "motion/react";
 import { useRef } from "react";
 
 import { ABOUT_STRUCTURE } from "../../about-data";
-import { BAND_LOOK, PencilRing } from "./band";
-import { Rf, SectionHead, ui } from "./shared";
+import { PencilRing } from "./band";
+import { BAND_LOOK } from "./band-values";
+import { Rf, SectionHead } from "./shared";
+import { ui } from "./shared-values";
 import { bp, face, tone } from "./tokens.stylex";
 import { useDevelopment, type Development } from "./use-development";
 

@@ -2,7 +2,7 @@ import * as stylex from "@stylexjs/stylex";
 
 import { PLATES } from "./plates";
 import { Registration } from "./registration";
-import { srOnly, ui } from "./shared";
+import { srOnly, ui } from "./shared-values";
 import { bp, face, sky } from "./tokens.stylex";
 
 const styles = stylex.create({

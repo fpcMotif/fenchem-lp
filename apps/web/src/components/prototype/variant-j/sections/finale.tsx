@@ -2,7 +2,8 @@ import { breakpoints, colors, radii, typography } from "@fenchem-lp/ui/tokens.st
 import * as stylex from "@stylexjs/stylex";
 import { ArrowRight } from "lucide-react";
 import { createInquiryHref, regions } from "@/components/landing/landing-content";
-import { drawRule, revealWords, riseIn, SplitWords, useSectionAnimation } from "../motion";
+import { SplitWords, useSectionAnimation } from "../motion";
+import { drawRule, revealWords, riseIn } from "../motion-values";
 import { sharedStyles } from "../styles";
 
 /*

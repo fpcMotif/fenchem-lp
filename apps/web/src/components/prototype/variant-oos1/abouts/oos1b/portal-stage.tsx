@@ -14,7 +14,8 @@ import {
   type StageLayout,
 } from "./portal-geometry";
 import { DepthGauge } from "./depth-gauge";
-import { Tag, ui } from "./shared";
+import { Tag } from "./shared";
+import { ui } from "./shared-values";
 import { chrome, face, motion, tone } from "./tokens.stylex";
 
 const PLATES = [...ROOMS_IN_WALKING_ORDER.map((room) => room.plate), AERIAL_PLATE];
@@ -225,7 +226,8 @@ function Scene({ layout, progress }: { layout: StageLayout; progress: MotionValu
     };
 
     paint(progress.get());
-    return progress.on("change", paint);
+    const unsubscribe = progress.on("change", paint);
+    return () => unsubscribe();
   }, [layout, progress, gap]);
 
   return (

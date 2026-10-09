@@ -2,7 +2,8 @@ import { breakpoints } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 
 import { ABOUT_CSR, ABOUT_HERO } from "../../about-data";
-import { Reveal, Section, ui } from "./shared";
+import { Reveal, Section } from "./shared";
+import { ui } from "./shared-values";
 import { step, tone } from "./tokens.stylex";
 
 const s = stylex.create({

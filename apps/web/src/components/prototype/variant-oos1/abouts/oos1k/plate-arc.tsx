@@ -11,7 +11,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { type Plate, PLATES } from "./plates";
 import { Registration } from "./registration";
-import { srOnly, ui } from "./shared";
+import { srOnly, ui } from "./shared-values";
 import { bp, chrome, face, sky } from "./tokens.stylex";
 
 const LAST = PLATES.length - 1;

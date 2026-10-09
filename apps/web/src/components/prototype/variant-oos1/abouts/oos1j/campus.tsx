@@ -5,7 +5,8 @@ import { useRef, useState } from "react";
 
 import { ABOUT_CAMPUS } from "../../about-data";
 import { Lightbox } from "./lightbox";
-import { CropMarks, Reveal, SectionName, useDrift, wipe } from "./parts";
+import { CropMarks, Reveal, SectionName, useDrift } from "./parts";
+import { wipe } from "./parts-values";
 import { base, ty } from "./shared";
 import { font, hue, size } from "./theme.stylex";
 

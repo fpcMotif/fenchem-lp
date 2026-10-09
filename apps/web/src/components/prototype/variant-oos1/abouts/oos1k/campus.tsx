@@ -8,7 +8,8 @@ import { Lightbox } from "./lightbox";
 import { PlateArc } from "./plate-arc";
 import { PlateList } from "./plate-list";
 import { PLATES } from "./plates";
-import { ChartHeading, ui } from "./shared";
+import { ChartHeading } from "./shared";
+import { ui } from "./shared-values";
 import { bp } from "./tokens.stylex";
 
 const styles = stylex.create({

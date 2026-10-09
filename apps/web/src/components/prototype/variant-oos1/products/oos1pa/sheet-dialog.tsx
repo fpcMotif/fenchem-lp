@@ -2,15 +2,7 @@ import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { AnimatePresence, m, type Variants } from "motion/react";
-import {
-  useEffect,
-  useId,
-  useRef,
-  type KeyboardEvent,
-  type MouseEvent,
-  type PointerEvent,
-  type ReactNode,
-} from "react";
+import { useEffect, useId, useRef, type KeyboardEvent, type ReactNode } from "react";
 
 import { EASE } from "@/components/prototype/motion-constants";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
@@ -38,6 +30,38 @@ const swap: Variants = {
 
 const styles = stylex.create({
   dialog: {
+    width: "100vw",
+    height: "100dvh",
+    maxWidth: "none",
+    maxHeight: "none",
+    margin: 0,
+    padding: 0,
+    borderWidth: 0,
+    overflow: "hidden",
+    backgroundColor: "transparent",
+    outlineStyle: "none",
+    "::backdrop": {
+      backgroundColor: tone.backdrop,
+      animationName: fadeIn,
+      animationDuration: "260ms",
+      animationTimingFunction: motionCss.out,
+    },
+  },
+  dismiss: {
+    position: "absolute",
+    inset: 0,
+    width: "100%",
+    height: "100%",
+    padding: 0,
+    borderWidth: 0,
+    backgroundColor: "transparent",
+    cursor: "pointer",
+  },
+  frame: {
+    position: "absolute",
+    inset: 0,
+    display: "flex",
+    flexDirection: "column",
     boxSizing: "border-box",
     width: { default: "100%", [media.md]: "min(1120px, calc(100vw - 64px))" },
     height: { default: "100dvh", [media.md]: "min(800px, calc(100dvh - 64px))" },
@@ -57,17 +81,6 @@ const styles = stylex.create({
     animationName: { default: fadeIn, [media.motionOk]: riseIn },
     animationDuration: "260ms",
     animationTimingFunction: motionCss.out,
-    "::backdrop": {
-      backgroundColor: tone.backdrop,
-      animationName: fadeIn,
-      animationDuration: "260ms",
-      animationTimingFunction: motionCss.out,
-    },
-  },
-  frame: {
-    display: "flex",
-    flexDirection: "column",
-    height: "100%",
   },
   head: {
     display: "grid",
@@ -400,7 +413,6 @@ export function SheetDialog({
   const titleId = useId();
   const dialogRef = useRef<HTMLDialogElement>(null);
   const bodyRef = useRef<HTMLDivElement>(null);
-  const pressedBackdrop = useRef(false);
   const isOpen = index !== null;
   const item = index === null ? null : FLAT_FORMULAS[index];
 
@@ -434,15 +446,6 @@ export function SheetDialog({
     onRoute(event.key === "ArrowRight" ? 1 : -1);
   };
 
-  const handlePointerDown = (event: PointerEvent<HTMLDialogElement>) => {
-    pressedBackdrop.current = event.target === event.currentTarget;
-  };
-
-  const handleClick = (event: MouseEvent<HTMLDialogElement>) => {
-    if (pressedBackdrop.current && event.target === event.currentTarget) requestClose();
-    pressedBackdrop.current = false;
-  };
-
   const transition = { duration: reduce ? 0 : 0.2, ease: EASE };
   const previous = item ? FLAT_FORMULAS[(item.index - 1 + COUNT) % COUNT] : null;
   const next = item ? FLAT_FORMULAS[(item.index + 1) % COUNT] : null;
@@ -455,15 +458,20 @@ export function SheetDialog({
       tabIndex={-1}
       onClose={onClose}
       onKeyDown={handleKeyDown}
-      onPointerDown={handlePointerDown}
-      onClick={handleClick}
       {...stylex.props(styles.dialog)}
     >
-      {item && previous && next && (
-        <div {...stylex.props(styles.frame)}>
-          <header {...stylex.props(styles.head)}>
-            <div {...stylex.props(styles.headText)}>
-              <AnimatePresence mode="wait" initial={false} custom={direction}>
+      <button
+        type="button"
+        tabIndex={-1}
+        aria-label="关闭对话框背景"
+        onClick={requestClose}
+        {...stylex.props(styles.dismiss)}
+      />
+      <div {...stylex.props(styles.frame)}>
+        <header {...stylex.props(styles.head)}>
+          <div {...stylex.props(styles.headText)}>
+            <AnimatePresence mode="wait" initial={false} custom={direction}>
+              {item && (
                 <m.div
                   key={item.id}
                   custom={direction}
@@ -479,25 +487,27 @@ export function SheetDialog({
                   </h3>
                   <p {...stylex.props(styles.subtitle)}>{item.subtitle}</p>
                 </m.div>
-              </AnimatePresence>
-            </div>
-            <button
-              type="button"
-              aria-label="关闭"
-              onClick={requestClose}
-              {...stylex.props(styles.close)}
-            >
-              <X size={20} strokeWidth={1.5} absoluteStrokeWidth aria-hidden="true" />
-            </button>
-          </header>
+              )}
+            </AnimatePresence>
+          </div>
+          <button
+            type="button"
+            aria-label="关闭"
+            onClick={requestClose}
+            {...stylex.props(styles.close)}
+          >
+            <X size={20} strokeWidth={1.5} absoluteStrokeWidth aria-hidden="true" />
+          </button>
+        </header>
 
-          <div ref={bodyRef} {...stylex.props(styles.body)}>
-            <AnimatePresence
-              mode="wait"
-              initial={false}
-              custom={direction}
-              onExitComplete={() => bodyRef.current?.scrollTo({ top: 0 })}
-            >
+        <div ref={bodyRef} {...stylex.props(styles.body)}>
+          <AnimatePresence
+            mode="wait"
+            initial={false}
+            custom={direction}
+            onExitComplete={() => bodyRef.current?.scrollTo({ top: 0 })}
+          >
+            {item && (
               <m.div
                 key={item.id}
                 custom={direction}
@@ -519,9 +529,11 @@ export function SheetDialog({
                   <Field label="应用" lines={item.applications} />
                 </Sheet>
               </m.div>
-            </AnimatePresence>
-          </div>
+            )}
+          </AnimatePresence>
+        </div>
 
+        {item && previous && next && (
           <footer {...stylex.props(styles.foot)}>
             <button
               type="button"
@@ -560,11 +572,11 @@ export function SheetDialog({
               />
             </button>
           </footer>
-          <p aria-live="polite" {...stylex.props(styles.visuallyHidden)}>
-            {`${padIndex(item.index)} / ${padIndex(COUNT - 1)} ${item.title}`}
-          </p>
-        </div>
-      )}
+        )}
+        <p aria-live="polite" {...stylex.props(styles.visuallyHidden)}>
+          {item ? `${padIndex(item.index)} / ${padIndex(COUNT - 1)} ${item.title}` : ""}
+        </p>
+      </div>
     </dialog>
   );
 }

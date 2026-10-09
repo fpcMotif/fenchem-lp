@@ -3,7 +3,8 @@ import * as stylex from "@stylexjs/stylex";
 
 import { ABOUT_BANNER } from "../../about-data";
 import { MountWipe } from "./motion";
-import { Frame, base } from "./primitives";
+import { Frame } from "./primitives";
+import { base } from "./primitives-values";
 import { font, layout, media, tone } from "./shear.stylex";
 
 const S = stylex.create({

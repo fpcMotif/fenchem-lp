@@ -7,7 +7,8 @@ import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
 import { ABOUT_CAMPUS, ABOUT_HERO } from "../../about-data";
 import { Lightbox } from "./lightbox";
-import { Section, ui } from "./shared";
+import { Section } from "./shared";
+import { ui } from "./shared-values";
 import { tone } from "./tokens.stylex";
 
 const SPIRAL_PATH =

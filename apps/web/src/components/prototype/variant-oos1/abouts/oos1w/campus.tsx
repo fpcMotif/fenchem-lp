@@ -3,7 +3,8 @@ import { useRef, useState } from "react";
 
 import { ABOUT_CAMPUS } from "../../about-data";
 import { Lightbox, type LightboxPhoto } from "./lightbox";
-import { SectionHead, ui } from "./shared";
+import { SectionHead } from "./shared";
+import { ui } from "./shared-values";
 import { bp, chrome, face, tone } from "./tokens.stylex";
 
 const PANELS = "abcdefg";

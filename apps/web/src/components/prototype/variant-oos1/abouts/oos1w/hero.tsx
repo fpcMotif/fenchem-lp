@@ -2,7 +2,7 @@ import * as stylex from "@stylexjs/stylex";
 
 import { ABOUT_BANNER } from "../../about-data";
 import { MixedSpot } from "./band";
-import { ui } from "./shared";
+import { ui } from "./shared-values";
 import { bp, chrome, face, tone } from "./tokens.stylex";
 
 const apply = stylex.keyframes({

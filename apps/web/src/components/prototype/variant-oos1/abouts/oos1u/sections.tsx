@@ -4,7 +4,8 @@ import { Fragment, useId, useState } from "react";
 
 import { ABOUT_CSR, ABOUT_HERO, ABOUT_HONORS, ABOUT_STRUCTURE } from "../../about-data";
 import { STATS } from "../../content";
-import { Reveal, ui } from "./shared";
+import { Reveal } from "./shared";
+import { ui } from "./shared-values";
 import { curve, media, tone, type } from "./tokens.stylex";
 
 const LEVEL_LABEL = {

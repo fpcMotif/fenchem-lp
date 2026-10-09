@@ -9,7 +9,7 @@ import { LINKEDIN_PATHS, LOGO_PATHS, WECHAT_PATHS, type VectorPath } from "../va
 import { COPYRIGHT, CTA, FOOTER_COLUMNS } from "./content";
 import { Reveal } from "./motion";
 import { color, ease, font, layout as layoutTokens, media } from "./tokens.stylex";
-import { layout } from "./ui";
+import { layout } from "./ui-values";
 
 const HEADLINE = "告诉我们您的配方需求。";
 const BAND_IMAGE = "/prototype/official-site/campus-lake.webp";

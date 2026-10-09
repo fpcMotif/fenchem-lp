@@ -6,7 +6,7 @@ import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
 import { ABOUT_HERO } from "../../about-data";
 import { useActiveSection } from "../../use-active-section";
-import { base } from "./primitives";
+import { base } from "./primitives-values";
 import { ease, font, layout, tone } from "./shear.stylex";
 
 const ENGLISH: Record<string, string> = {

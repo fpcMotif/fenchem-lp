@@ -5,7 +5,8 @@ import { useState } from "react";
 import { ABOUT_CAMPUS } from "../../about-data";
 import { Lightbox } from "./lightbox";
 import { Reveal } from "./motion";
-import { Section, SectionName, base } from "./primitives";
+import { Section, SectionName } from "./primitives";
+import { base } from "./primitives-values";
 import { ease, media, shear, tone } from "./shear.stylex";
 
 const S = stylex.create({

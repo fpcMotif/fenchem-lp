@@ -5,7 +5,8 @@ import { useRef, type ReactNode } from "react";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
 import { AERIAL_PLATE, OFFICE_ON_AERIAL, ROOMS_IN_WALKING_ORDER, type Plate } from "./journey";
-import { Tag, ui } from "./shared";
+import { Tag } from "./shared";
+import { ui } from "./shared-values";
 import { bp, face, space, tone } from "./tokens.stylex";
 
 const OFFICE = ROOMS_IN_WALKING_ORDER[ROOMS_IN_WALKING_ORDER.length - 1].plate;

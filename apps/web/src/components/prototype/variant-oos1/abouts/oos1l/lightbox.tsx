@@ -1,3 +1,5 @@
+import { LightboxControls } from "../../../shared/lightbox-controls";
+import { LightboxStage } from "../../../shared/lightbox-stage";
 import * as stylex from "@stylexjs/stylex";
 import { ArrowLeft, ArrowRight, X } from "lucide-react";
 import { useEffect, useRef } from "react";
@@ -166,14 +168,9 @@ export function Lightbox({
     >
       {photo && index !== null ? (
         <>
-          <div
-            onClick={(event) => {
-              if (event.target === event.currentTarget) onClose();
-            }}
-            {...stylex.props(styles.stage)}
-          >
+          <LightboxStage onClose={onClose} sx={styles.stage}>
             <img key={photo.id} src={photo.large} alt={photo.alt} {...stylex.props(styles.image)} />
-          </div>
+          </LightboxStage>
           <p {...stylex.props(styles.caption)}>
             <span lang="en" {...stylex.props(styles.count)}>
               {String(index + 1).padStart(2, "0")} / {String(photos.length).padStart(2, "0")}
@@ -191,30 +188,22 @@ export function Lightbox({
               />
             </span>
           </p>
-          <button
-            type="button"
-            aria-label="上一张"
-            onClick={() => onStep(-1)}
-            {...stylex.props(styles.button, styles.prev)}
-          >
-            <ArrowLeft size={20} strokeWidth={1.5} aria-hidden="true" />
-          </button>
-          <button
-            type="button"
-            aria-label="下一张"
-            onClick={() => onStep(1)}
-            {...stylex.props(styles.button, styles.next)}
-          >
-            <ArrowRight size={20} strokeWidth={1.5} aria-hidden="true" />
-          </button>
-          <button
-            type="button"
-            aria-label="关闭"
-            onClick={onClose}
-            {...stylex.props(styles.button, styles.close)}
-          >
-            <X size={20} strokeWidth={1.5} aria-hidden="true" />
-          </button>
+          <LightboxControls
+            onStep={onStep}
+            onClose={onClose}
+            previous={{
+              icon: <ArrowLeft size={20} strokeWidth={1.5} aria-hidden="true" />,
+              sx: [styles.button, styles.prev],
+            }}
+            next={{
+              icon: <ArrowRight size={20} strokeWidth={1.5} aria-hidden="true" />,
+              sx: [styles.button, styles.next],
+            }}
+            close={{
+              icon: <X size={20} strokeWidth={1.5} aria-hidden="true" />,
+              sx: [styles.button, styles.close],
+            }}
+          />
         </>
       ) : null}
     </dialog>

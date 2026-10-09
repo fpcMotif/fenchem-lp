@@ -1,4 +1,4 @@
-import { easeInOut, lerp, projectIso, span } from "./iso";
+import { easeInOut, lerp, projectIso, span } from "./iso-values";
 
 export const HERO_SHEET = {
   heightUnits: 800,

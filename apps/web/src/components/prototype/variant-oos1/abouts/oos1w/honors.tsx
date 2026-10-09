@@ -4,7 +4,8 @@ import { useRef } from "react";
 import { ABOUT_HONORS } from "../../about-data";
 import { PinnedSection } from "./pinned-section";
 import { Plate, type PlateBand, type PlateGeometry } from "./plate";
-import { Rf, SectionHead, ui } from "./shared";
+import { Rf, SectionHead } from "./shared";
+import { ui } from "./shared-values";
 import { bp, face, tone } from "./tokens.stylex";
 import { useDevelopment } from "./use-development";
 

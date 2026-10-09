@@ -2,32 +2,14 @@ import * as stylex from "@stylexjs/stylex";
 import type { StyleXStyles } from "@stylexjs/stylex";
 import type { MotionValue } from "motion/react";
 import { useEffect, useRef, useState, type RefObject } from "react";
-
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
-
 import {
   COVER_UV,
   createFullscreenProgram,
   loadTexture,
   sizeCanvas,
 } from "@/components/prototype/shared/webgl";
-
-const PHOTO_INSET = 0.95;
-
-export const GLYPH_SWEEP = 0.35;
-
-export const glyphRise = (rise: number, x: number) =>
-  Math.min(1, Math.max(0, rise * (1 + GLYPH_SWEEP) - x * GLYPH_SWEEP));
-
-export function screenWaterline(
-  waterline: number,
-  width: number,
-  height: number,
-  imageAspect: number,
-) {
-  const scaleY = Math.min(1, imageAspect / (width / height));
-  return (waterline - 0.5) / (scaleY * PHOTO_INSET) + 0.5;
-}
+import { GLYPH_SWEEP, PHOTO_INSET } from "./depth-photo-values";
 
 const FRAGMENT = `
 precision highp float;

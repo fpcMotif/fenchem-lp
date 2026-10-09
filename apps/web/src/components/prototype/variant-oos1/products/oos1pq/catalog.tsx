@@ -242,7 +242,7 @@ function RegionTable({ group, position }: { group: CatalogGroup; position: numbe
   const captionId = useId();
   return (
     <div {...stylex.props(styles.panel, orderStyles.slot(position))}>
-      <table role="table" aria-labelledby={captionId} {...stylex.props(styles.table)}>
+      <table aria-labelledby={captionId} {...stylex.props(styles.table)}>
         <caption {...stylex.props(styles.caption)}>
           <div {...stylex.props(styles.captionRow)}>
             <h3 id={captionId} {...stylex.props(styles.regionName)}>
@@ -256,33 +256,29 @@ function RegionTable({ group, position }: { group: CatalogGroup; position: numbe
           <col {...stylex.props(styles.colName)} />
           <col {...stylex.props(styles.colFeatures)} />
         </colgroup>
-        <thead role="rowgroup" {...stylex.props(styles.thead)}>
-          <tr role="row">
-            <th role="columnheader" scope="col" {...stylex.props(styles.colHead)}>
+        <thead {...stylex.props(styles.thead)}>
+          <tr>
+            <th scope="col" {...stylex.props(styles.colHead)}>
               名称
             </th>
-            <th
-              role="columnheader"
-              scope="col"
-              {...stylex.props(styles.colHead, styles.colHeadLast)}
-            >
+            <th scope="col" {...stylex.props(styles.colHead, styles.colHeadLast)}>
               特性&应用
             </th>
           </tr>
         </thead>
-        <tbody role="rowgroup" {...stylex.props(styles.body)}>
+        <tbody {...stylex.props(styles.body)}>
           {group.items.map((item) => {
             const { primary, secondary } = splitTitle(item.title);
             return (
-              <tr key={item.id} role="row" {...stylex.props(styles.row)}>
-                <th role="rowheader" scope="row" {...stylex.props(styles.nameCell)}>
+              <tr key={item.id} {...stylex.props(styles.row)}>
+                <th scope="row" {...stylex.props(styles.nameCell)}>
                   <span {...stylex.props(styles.primary)}>
                     {primary}
                     {secondary && <span {...stylex.props(styles.secondary)}>{secondary}</span>}
                   </span>
                   <span {...stylex.props(styles.inci)}>{item.inci}</span>
                 </th>
-                <td role="cell" {...stylex.props(styles.featureCell)}>
+                <td {...stylex.props(styles.featureCell)}>
                   <p {...stylex.props(styles.features)}>{item.features}</p>
                 </td>
               </tr>

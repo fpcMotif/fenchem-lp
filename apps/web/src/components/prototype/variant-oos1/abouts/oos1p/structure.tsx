@@ -4,7 +4,8 @@ import type { CSSProperties } from "react";
 import { ABOUT_STRUCTURE } from "../../about-data";
 import { srOnly, ui } from "./layout";
 import { PlateHead } from "./plate-head";
-import { TICK, strobe, useEntry, type Phase } from "./strobe";
+import { useEntry, type Phase } from "./strobe";
+import { TICK, strobe } from "./strobe-values";
 import { bp, face, tone } from "./tokens.stylex";
 
 const LAST_EXPOSURE = ABOUT_STRUCTURE.subsidiaries.length;

@@ -3,7 +3,8 @@ import { useRef } from "react";
 
 import { ABOUT_CULTURE } from "../../about-data";
 import { campusPhoto, type CampusPhoto } from "./campus-hang";
-import { BrushCoat, shared, useDeveloped } from "./cyanotype";
+import { BrushCoat, useDeveloped } from "./cyanotype";
+import { shared } from "./cyanotype-values";
 import { curve, media, tone } from "./tokens.stylex";
 
 type CultureValue = (typeof ABOUT_CULTURE.values)[number];

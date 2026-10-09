@@ -9,7 +9,8 @@ import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
 import { SOLUTION_ITEMS, type SolutionItem } from "../../products-data";
 import { padIndex } from "../shared/derived";
-import { SegmentButton, SegmentTrack, ui } from "./shared";
+import { SegmentButton, SegmentTrack } from "./shared";
+import { ui } from "./shared-values";
 import { chrome, face, media, tone } from "./tokens.stylex";
 
 type FaceId = "front" | "back";

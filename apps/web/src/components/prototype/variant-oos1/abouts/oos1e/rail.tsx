@@ -5,7 +5,7 @@ import { useEffect, useRef } from "react";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
 import { ABOUT_HERO } from "../../about-data";
-import { base } from "./shared";
+import { base } from "./shared-values";
 import { NAV_ENGLISH, SHEETS } from "./sheets";
 import { color, font, media, metric } from "./tokens.stylex";
 

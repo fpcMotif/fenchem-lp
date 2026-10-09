@@ -5,7 +5,8 @@ import { useEffect, useId, useRef, useState, type RefObject } from "react";
 import { PRODUCTS, PRODUCTS_INTRO } from "./content";
 import { Reveal, usePinEnabled, usePinProgress } from "./motion";
 import { color, ease, font, layout as layoutTokens, media } from "./tokens.stylex";
-import { SectionTitle, TextLink, layout } from "./ui";
+import { SectionTitle, TextLink } from "./ui";
+import { layout } from "./ui-values";
 
 type Product = (typeof PRODUCTS)[number];
 

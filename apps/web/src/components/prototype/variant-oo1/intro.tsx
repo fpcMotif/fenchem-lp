@@ -1,68 +1,22 @@
-import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
+import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 import * as stylex from "@stylexjs/stylex";
 import { animate } from "motion/react";
 import { useEffect, useRef, useState } from "react";
+import { styles } from "./intro-values";
 
 export const INTRO_REVEAL_MS = 500;
-
-const EASE_OUT = "cubic-bezier(0.22, 1, 0.36, 1)";
-const REVEAL_EASE = "cubic-bezier(0.77, 0, 0.175, 1)";
-
-const dotPop = stylex.keyframes({
-  "0%": { scale: "0" },
-  "60%": { scale: "1.15" },
-  "100%": { scale: "1" },
-});
 
 const FLIGHT_START_MS = 1100;
 const FLIGHT_SECONDS = 1.35;
 const IMPACT_AT = 0.7;
 
-const circleReveal = stylex.keyframes({
-  "0%": { clipPath: "circle(0px at 50% 50vh)" },
-  "100%": { clipPath: "circle(120vmax at 50% 50vh)" },
-});
-
-const styles = stylex.create({
-  overlay: {
-    position: "fixed",
-    inset: 0,
-    zIndex: 60,
-    display: { default: "block", [breakpoints.motionReduce]: "none" },
-    pointerEvents: "none",
-  },
-  dot: {
-    position: "absolute",
-    top: "calc(50vh - 7px)",
-    left: "calc(50% - 7px)",
-    width: 14,
-    height: 14,
-    borderRadius: "50%",
-    backgroundColor: colors.brandBlue700,
-    animationName: dotPop,
-    animationDuration: "500ms",
-    animationDelay: "100ms",
-    animationTimingFunction: EASE_OUT,
-    animationFillMode: "both",
-  },
-  pageReveal: {
-    animationName: { default: circleReveal, [breakpoints.motionReduce]: "none" },
-    animationDuration: "1100ms",
-    animationDelay: "500ms",
-    animationTimingFunction: REVEAL_EASE,
-    animationFillMode: "backwards",
-  },
-});
-
-export const introStyles = { pageReveal: styles.pageReveal };
-
 export type IntroState = "play" | "skip";
 
 export function useIntro(): IntroState {
+  const reduce = useReducedMotion();
   const [state, setState] = useState<IntroState>("play");
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      setState("skip");
       return;
     }
     const skip = () => setState("skip");
@@ -76,7 +30,7 @@ export function useIntro(): IntroState {
       for (const name of events) window.removeEventListener(name, skip);
     };
   }, []);
-  return state;
+  return reduce ? "skip" : state;
 }
 
 export function IntroOverlay({

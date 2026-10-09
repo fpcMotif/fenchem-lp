@@ -2,18 +2,8 @@ import * as stylex from "@stylexjs/stylex";
 import { m, useTransform, type MotionValue } from "motion/react";
 
 import { ABOUT_STRUCTURE } from "../../about-data";
-import {
-  Camera,
-  cq,
-  Drawing,
-  easeInOut,
-  GroundPlane,
-  GroundShadow,
-  IsoBox,
-  lerp,
-  projectIso,
-  span,
-} from "./iso";
+import { Camera, Drawing, GroundPlane, GroundShadow, IsoBox } from "./iso";
+import { cq, easeInOut, lerp, projectIso, span } from "./iso-values";
 import { pad2, ui } from "./shared";
 import { bp, face } from "./tokens.stylex";
 

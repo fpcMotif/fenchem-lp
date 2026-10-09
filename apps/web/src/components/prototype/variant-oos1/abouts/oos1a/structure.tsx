@@ -5,7 +5,8 @@ import { useId, useState } from "react";
 
 import { ABOUT_STRUCTURE } from "../../about-data";
 import { ease, fonts, palette } from "./lattice.stylex";
-import { Frame, Reveal, SectionName, shared } from "./parts";
+import { Frame, Reveal, SectionName } from "./parts";
+import { shared } from "./parts-values";
 
 const fadeIn = stylex.keyframes({
   "0%": { opacity: 0 },

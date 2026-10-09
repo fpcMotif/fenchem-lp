@@ -1,7 +1,8 @@
+import { Collapse } from "../../../shared/collapse";
 import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 import { ChevronDown, ChevronsDownUp, ChevronsUpDown } from "lucide-react";
-import { AnimatePresence, m } from "motion/react";
+import { m } from "motion/react";
 import { useId, useState, type MouseEvent, type ReactNode } from "react";
 
 import { EASE } from "@/components/prototype/motion-constants";
@@ -459,7 +460,12 @@ function ItemRows({
 
   return (
     <>
-      <tr onClick={toggleFromRow} {...stylex.props(styles.itemRow, stylex.defaultMarker())}>
+      <m.tr
+        layout="position"
+        transition={{ duration: 0.26, ease: EASE }}
+        onClick={toggleFromRow}
+        {...stylex.props(styles.itemRow, stylex.defaultMarker())}
+      >
         <th scope="row" {...stylex.props(styles.cell, styles.nameCell)}>
           <button
             type="button"
@@ -492,47 +498,53 @@ function ItemRows({
         <td {...stylex.props(styles.cell, styles.foldCell)}>
           <span {...stylex.props(styles.foldContent)}>{form ?? <Empty />}</span>
         </td>
-      </tr>
-      <AnimatePresence initial={false}>
-        {open && (
-          <tr key="detail" id={detailId}>
-            <td colSpan={COLUMN_COUNT} {...stylex.props(styles.detailCell)}>
-              <m.div
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: "auto", opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                transition={{ duration: reduce ? 0 : 0.26, ease: EASE }}
-                {...stylex.props(styles.detailClip)}
-              >
-                <dl {...stylex.props(styles.detail)}>
-                  <div {...stylex.props(styles.phonePair)}>
-                    <div {...stylex.props(styles.phonePairField)}>
-                      <dt {...stylex.props(styles.fieldLabel)}>学名</dt>
-                      <dd {...stylex.props(styles.fieldValue)}>
-                        <LatinNames names={item.latin} complete />
-                      </dd>
-                    </div>
-                    <div {...stylex.props(styles.phonePairField)}>
-                      <dt {...stylex.props(styles.fieldLabel)}>形态</dt>
-                      <dd {...stylex.props(styles.fieldValue)}>{form ?? <Empty />}</dd>
-                    </div>
-                  </div>
-                  <div {...stylex.props(styles.field, styles.fieldMeasure, styles.fieldInci)}>
-                    <dt {...stylex.props(styles.fieldLabel)}>INCI 名称</dt>
-                    <dd {...stylex.props(styles.fieldValue, styles.inci)}>
-                      <Inci text={item.inci} />
-                    </dd>
-                  </div>
-                  <div {...stylex.props(styles.field, styles.fieldMeasure, styles.fieldFeatures)}>
-                    <dt {...stylex.props(styles.fieldLabel)}>特性&应用</dt>
-                    <dd {...stylex.props(styles.fieldValue, styles.features)}>{item.features}</dd>
-                  </div>
-                </dl>
-              </m.div>
-            </td>
-          </tr>
-        )}
-      </AnimatePresence>
+      </m.tr>
+      <m.tr
+        layout="position"
+        transition={{ duration: 0.26, ease: EASE }}
+        key="detail"
+        id={detailId}
+        aria-hidden={!open}
+        inert={!open}
+      >
+        <td
+          colSpan={COLUMN_COUNT}
+          {...stylex.props(styles.detailCell)}
+          style={{ borderBottomWidth: open ? 1 : 0 }}
+        >
+          <Collapse
+            open={open}
+
+            transition={{ duration: reduce ? 0 : 0.26, ease: EASE }}
+            {...stylex.props(styles.detailClip)}
+          >
+            <dl {...stylex.props(styles.detail)}>
+              <div {...stylex.props(styles.phonePair)}>
+                <div {...stylex.props(styles.phonePairField)}>
+                  <dt {...stylex.props(styles.fieldLabel)}>学名</dt>
+                  <dd {...stylex.props(styles.fieldValue)}>
+                    <LatinNames names={item.latin} complete />
+                  </dd>
+                </div>
+                <div {...stylex.props(styles.phonePairField)}>
+                  <dt {...stylex.props(styles.fieldLabel)}>形态</dt>
+                  <dd {...stylex.props(styles.fieldValue)}>{form ?? <Empty />}</dd>
+                </div>
+              </div>
+              <div {...stylex.props(styles.field, styles.fieldMeasure, styles.fieldInci)}>
+                <dt {...stylex.props(styles.fieldLabel)}>INCI 名称</dt>
+                <dd {...stylex.props(styles.fieldValue, styles.inci)}>
+                  <Inci text={item.inci} />
+                </dd>
+              </div>
+              <div {...stylex.props(styles.field, styles.fieldMeasure, styles.fieldFeatures)}>
+                <dt {...stylex.props(styles.fieldLabel)}>特性&应用</dt>
+                <dd {...stylex.props(styles.fieldValue, styles.features)}>{item.features}</dd>
+              </div>
+            </dl>
+          </Collapse>
+        </td>
+      </m.tr>
     </>
   );
 }
@@ -591,7 +603,7 @@ export function Catalog() {
             <col {...stylex.props(styles.colForm)} />
           </colgroup>
           <thead>
-            <tr>
+            <m.tr layout="position" transition={{ duration: 0.26, ease: EASE }}>
               <th scope="col" {...stylex.props(styles.headCell, styles.headName)}>
                 名称
               </th>
@@ -604,11 +616,11 @@ export function Catalog() {
               <th scope="col" {...stylex.props(styles.headCell, styles.foldCell)}>
                 <span {...stylex.props(styles.foldContent)}>形态</span>
               </th>
-            </tr>
+            </m.tr>
           </thead>
           {GROUPED.map(({ group, items }, groupIndex) => (
-            <tbody key={group.id}>
-              <tr>
+            <m.tbody layout="position" transition={{ duration: 0.26, ease: EASE }} key={group.id}>
+              <m.tr layout="position" transition={{ duration: 0.26, ease: EASE }}>
                 <th
                   scope="rowgroup"
                   colSpan={COLUMN_COUNT}
@@ -622,7 +634,7 @@ export function Catalog() {
                   </span>
                   {group.intro && <p {...stylex.props(styles.groupIntro)}>{group.intro}</p>}
                 </th>
-              </tr>
+              </m.tr>
               {items.map((item) => (
                 <ItemRows
                   key={item.id}
@@ -631,7 +643,7 @@ export function Catalog() {
                   onToggle={() => toggle(item.id)}
                 />
               ))}
-            </tbody>
+            </m.tbody>
           ))}
         </table>
         <p {...stylex.props(styles.note)}>产地按目录分组标注；形态据原料描述整理。</p>

@@ -8,7 +8,8 @@ import {
   regions,
   toAnchor,
 } from "@/components/landing/landing-content";
-import { drawRule, riseIn, useSectionAnimation } from "../motion";
+import { useSectionAnimation } from "../motion";
+import { drawRule, riseIn } from "../motion-values";
 import { sharedStyles } from "../styles";
 
 /*

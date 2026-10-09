@@ -1,8 +1,10 @@
+import { LightboxControls } from "../../../shared/lightbox-controls";
+import { LightboxStage } from "../../../shared/lightbox-stage";
 import * as stylex from "@stylexjs/stylex";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { useEffect, useRef } from "react";
 
-import { ui } from "./shared";
+import { ui } from "./shared-values";
 import { bp, chrome, face, tone } from "./tokens.stylex";
 
 export type LightboxPhoto = {
@@ -177,12 +179,7 @@ export function Lightbox({
     >
       {photo && index !== null ? (
         <>
-          <div
-            onClick={(event) => {
-              if (event.target === event.currentTarget) onClose();
-            }}
-            {...stylex.props(styles.stage)}
-          >
+          <LightboxStage onClose={onClose} sx={styles.stage}>
             <figure
               key={photo.id}
               {...stylex.props(styles.figure, stepped ? styles.figureStep : styles.figureOpen)}
@@ -198,31 +195,23 @@ export function Lightbox({
                 </span>
               </figcaption>
             </figure>
-          </div>
-          <button
-            type="button"
-            aria-label="上一张"
-            onClick={() => onStep(-1)}
-            {...stylex.props(styles.button, ui.focusRing, styles.prev)}
-          >
-            <ChevronLeft size={20} strokeWidth={1.5} aria-hidden="true" />
-          </button>
-          <button
-            type="button"
-            aria-label="下一张"
-            onClick={() => onStep(1)}
-            {...stylex.props(styles.button, ui.focusRing, styles.next)}
-          >
-            <ChevronRight size={20} strokeWidth={1.5} aria-hidden="true" />
-          </button>
-          <button
-            type="button"
-            aria-label="关闭"
-            onClick={onClose}
-            {...stylex.props(styles.button, ui.focusRing, styles.close)}
-          >
-            <X size={20} strokeWidth={1.5} aria-hidden="true" />
-          </button>
+          </LightboxStage>
+          <LightboxControls
+            onStep={onStep}
+            onClose={onClose}
+            previous={{
+              icon: <ChevronLeft size={20} strokeWidth={1.5} aria-hidden="true" />,
+              sx: [styles.button, ui.focusRing, styles.prev],
+            }}
+            next={{
+              icon: <ChevronRight size={20} strokeWidth={1.5} aria-hidden="true" />,
+              sx: [styles.button, ui.focusRing, styles.next],
+            }}
+            close={{
+              icon: <X size={20} strokeWidth={1.5} aria-hidden="true" />,
+              sx: [styles.button, ui.focusRing, styles.close],
+            }}
+          />
         </>
       ) : null}
     </dialog>

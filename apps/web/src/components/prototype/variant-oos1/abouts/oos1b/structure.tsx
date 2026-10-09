@@ -1,7 +1,8 @@
 import * as stylex from "@stylexjs/stylex";
 
 import { ABOUT_STRUCTURE } from "../../about-data";
-import { Bevel, Mat, ROMAN, SectionHead, Tag, stepIn, ui, useArrived } from "./shared";
+import { Bevel, Mat, SectionHead, Tag, useArrived } from "./shared";
+import { ROMAN, stepIn, ui } from "./shared-values";
 import { bp, face, space, tone } from "./tokens.stylex";
 
 const LEGAL_SUFFIX = /有限公司$/;

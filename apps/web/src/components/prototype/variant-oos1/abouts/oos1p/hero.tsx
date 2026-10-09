@@ -6,8 +6,8 @@ import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
 import { ABOUT_BANNER, ABOUT_HERO } from "../../about-data";
 import { ui } from "./layout";
-import { TICK, echoIndexes, trailOpacity } from "./strobe";
-import { frameLabel } from "./time-grid";
+import { TICK, echoIndexes, trailOpacity } from "./strobe-values";
+import { frameLabel } from "./time-grid-values";
 import { bp, face, tone } from "./tokens.stylex";
 
 const EXPOSURES = 7;

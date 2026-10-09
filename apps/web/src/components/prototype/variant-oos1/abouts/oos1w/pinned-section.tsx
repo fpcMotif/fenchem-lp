@@ -1,7 +1,7 @@
 import * as stylex from "@stylexjs/stylex";
 import type { ReactNode, RefObject } from "react";
 
-import { ui } from "./shared";
+import { ui } from "./shared-values";
 import { bp, chrome } from "./tokens.stylex";
 
 const styles = stylex.create({

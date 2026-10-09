@@ -4,7 +4,8 @@ import { useId, useState } from "react";
 
 import { ABOUT_STRUCTURE } from "../../about-data";
 import { Reveal } from "./motion";
-import { Section, SectionName, base } from "./primitives";
+import { Section, SectionName } from "./primitives";
+import { base } from "./primitives-values";
 import { font, media, tone } from "./shear.stylex";
 
 const S = stylex.create({

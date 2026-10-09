@@ -1,7 +1,9 @@
+import { m } from "motion/react";
+import { Collapse } from "../../../shared/collapse";
 import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 import { ChevronDown } from "lucide-react";
-import { AnimatePresence, m } from "motion/react";
+
 import { useEffect, useId, useRef, useState, type ReactNode, type RefObject } from "react";
 
 import { EASE } from "@/components/prototype/motion-constants";
@@ -369,7 +371,11 @@ function Inci({ text }: { text: string }) {
 
 function ItemRow({ item, index, last }: IndexedItem & { last: boolean }) {
   return (
-    <tr {...stylex.props(styles.itemRow, last && styles.itemRowLast)}>
+    <m.tr
+      layout="position"
+      transition={{ duration: 0.26, ease: EASE }}
+      {...stylex.props(styles.itemRow, last && styles.itemRowLast)}
+    >
       <th scope="row" {...stylex.props(styles.cell, styles.nameCell, last && styles.cellLastRow)}>
         <span {...stylex.props(styles.nameWrap)}>
           <span {...stylex.props(styles.index, styles.numeral)}>{padIndex(index)}</span>
@@ -386,7 +392,7 @@ function ItemRow({ item, index, last }: IndexedItem & { last: boolean }) {
       <td {...stylex.props(styles.cell, styles.featuresCell, last && styles.cellLastRow)}>
         {item.features}
       </td>
-    </tr>
+    </m.tr>
   );
 }
 
@@ -408,8 +414,17 @@ function RegionGroup({ group, rows }: { group: CatalogGroup; rows: IndexedItem[]
   };
 
   return (
-    <tbody ref={bodyRef} {...stylex.props(styles.group)}>
-      <tr {...stylex.props(styles.groupRow)}>
+    <m.tbody
+      layout="position"
+      transition={{ duration: 0.26, ease: EASE }}
+      ref={bodyRef}
+      {...stylex.props(styles.group)}
+    >
+      <m.tr
+        layout="position"
+        transition={{ duration: 0.26, ease: EASE }}
+        {...stylex.props(styles.groupRow)}
+      >
         <th ref={headRef} scope="rowgroup" colSpan={3} {...stylex.props(styles.groupCell)}>
           <div {...stylex.props(styles.groupBar)}>
             <span {...stylex.props(styles.groupLabel)}>{group.label}</span>
@@ -436,33 +451,32 @@ function RegionGroup({ group, rows }: { group: CatalogGroup; rows: IndexedItem[]
             )}
           </div>
         </th>
-      </tr>
+      </m.tr>
       {group.intro && (
-        <tr {...stylex.props(styles.introRow)}>
+        <m.tr
+          layout="position"
+          transition={{ duration: 0.26, ease: EASE }}
+          {...stylex.props(styles.introRow)}
+        >
           <td id={introId} colSpan={3} {...stylex.props(styles.introCell)}>
-            <AnimatePresence initial={false}>
-              {introOpen && (
-                <m.div
-                  key="intro"
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: "auto", opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  transition={{ duration: reduce ? 0 : 0.26, ease: EASE }}
-                  {...stylex.props(styles.introClip)}
-                >
-                  <div {...stylex.props(styles.introInner)}>
-                    <p {...stylex.props(styles.introText)}>{group.intro}</p>
-                  </div>
-                </m.div>
-              )}
-            </AnimatePresence>
+            <Collapse
+              key="intro"
+              open={introOpen}
+
+              transition={{ duration: reduce ? 0 : 0.26, ease: EASE }}
+              {...stylex.props(styles.introClip)}
+            >
+              <div {...stylex.props(styles.introInner)}>
+                <p {...stylex.props(styles.introText)}>{group.intro}</p>
+              </div>
+            </Collapse>
           </td>
-        </tr>
+        </m.tr>
       )}
       {rows.map((row, position) => (
         <ItemRow key={row.item.id} {...row} last={position === rows.length - 1} />
       ))}
-    </tbody>
+    </m.tbody>
   );
 }
 
@@ -529,7 +543,7 @@ export function Catalog() {
             <col {...stylex.props(styles.colFeatures)} />
           </colgroup>
           <thead {...stylex.props(styles.thead)}>
-            <tr>
+            <m.tr layout="position" transition={{ duration: 0.26, ease: EASE }}>
               <th scope="col" {...stylex.props(styles.headCell, styles.headCellName)}>
                 名称
               </th>
@@ -539,7 +553,7 @@ export function Catalog() {
               <th scope="col" {...stylex.props(styles.headCell, styles.headCellLast)}>
                 特性&应用
               </th>
-            </tr>
+            </m.tr>
           </thead>
           {CATALOG_GROUPS.map((group, groupIndex) => (
             <RegionGroup key={group.id} group={group} rows={ROWS_BY_GROUP[groupIndex] ?? []} />

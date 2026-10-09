@@ -7,7 +7,8 @@ import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
 import { CATALOG_GROUPS } from "../../products-data";
 import { FLAT_ITEMS, FUNCTION_TAGS, REGION_META, type FlatItem } from "../shared/derived";
-import { SegmentButton, SegmentTrack, ui } from "./shared";
+import { SegmentButton, SegmentTrack } from "./shared";
+import { ui } from "./shared-values";
 import { chrome, face, media, tone } from "./tokens.stylex";
 
 type PivotId = "region" | "function";

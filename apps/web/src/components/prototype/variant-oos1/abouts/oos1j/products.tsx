@@ -4,7 +4,8 @@ import { ArrowRight } from "lucide-react";
 import { useId } from "react";
 
 import { PRODUCTS, PRODUCTS_INTRO } from "../../content";
-import { Reveal, SectionName, useInViewOnce, wipe } from "./parts";
+import { Reveal, SectionName, useInViewOnce } from "./parts";
+import { wipe } from "./parts-values";
 import { base, ty } from "./shared";
 import { hue, size } from "./theme.stylex";
 

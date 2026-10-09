@@ -259,12 +259,32 @@ export function Pair({
         )}
         style={padding}
       >
-        <m.div {...stylex.props(styles.load)} style={{ y: loadY }}>
-          {loadLine ? <Beam engage={engage} placement={atRest ? "phone" : "always"} /> : null}
-          <FulcrumMark sx={atRest ? undefined : styles.fulcrumWhenStill} />
+        <LoadContent atRest={atRest} loadLine={loadLine} loadY={loadY} engage={engage}>
           {load}
-        </m.div>
+        </LoadContent>
       </div>
     </div>
+  );
+}
+
+function LoadContent({
+  atRest,
+  loadLine,
+  loadY,
+  engage,
+  children,
+}: {
+  atRest: boolean;
+  loadLine: boolean;
+  loadY: MotionValue<number>;
+  engage: MotionValue<number>;
+  children: ReactNode;
+}) {
+  return (
+    <m.div {...stylex.props(styles.load)} style={{ y: loadY }}>
+      {loadLine ? <Beam engage={engage} placement={atRest ? "phone" : "always"} /> : null}
+      <FulcrumMark sx={atRest ? undefined : styles.fulcrumWhenStill} />
+      {children}
+    </m.div>
   );
 }

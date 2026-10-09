@@ -1,3 +1,4 @@
+import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 import { breakpoints } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 import { useEffect, useState } from "react";
@@ -26,10 +27,10 @@ export const introStyles = { pageReveal: styles.pageReveal };
 export type IntroState = "play" | "skip";
 
 export function useIntro(): IntroState {
+  const reduce = useReducedMotion();
   const [state, setState] = useState<IntroState>("play");
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      setState("skip");
       return;
     }
     const skip = () => setState("skip");
@@ -43,5 +44,5 @@ export function useIntro(): IntroState {
       for (const name of events) window.removeEventListener(name, skip);
     };
   }, []);
-  return state;
+  return reduce ? "skip" : state;
 }

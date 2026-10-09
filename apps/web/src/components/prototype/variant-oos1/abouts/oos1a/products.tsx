@@ -4,7 +4,8 @@ import { ArrowRight } from "lucide-react";
 
 import { PRODUCTS, PRODUCTS_INTRO } from "../../content";
 import { fonts, media, palette } from "./lattice.stylex";
-import { Action, Frame, Reveal, SectionName, shared } from "./parts";
+import { Action, Frame, Reveal, SectionName } from "./parts";
+import { shared } from "./parts-values";
 
 const styles = stylex.create({
   section: {

@@ -3,7 +3,8 @@ import * as stylex from "@stylexjs/stylex";
 import { ABOUT_BANNER } from "../../about-data";
 import { ROOMS_IN_WALKING_ORDER } from "./journey";
 import { MiniPlate } from "./mini-plate";
-import { Bevel, Mat, Tag, srOnly, ui } from "./shared";
+import { Bevel, Mat, Tag } from "./shared";
+import { srOnly, ui } from "./shared-values";
 import { bp, face, motion, tone } from "./tokens.stylex";
 
 const LOBBY = ROOMS_IN_WALKING_ORDER[0].plate;

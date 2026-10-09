@@ -1,3 +1,4 @@
+import { EngineeringStatus } from "./shared/corporate-content-sections";
 /*
  * PROTOTYPE — Variant G: "Green-Led Hybrid — Production Candidate"
  * Curates the strongest modules from D/E/F into one coherent page.
@@ -1611,17 +1612,18 @@ function NavBar() {
     <header {...stylex.props(styles.header)}>
       <div {...stylex.props(styles.container1480)}>
         {/* Micro-strip */}
-        <div {...stylex.props(styles.microStrip)}>
-          <span {...stylex.props(styles.microText)}>
-            <span {...stylex.props(styles.pingWrap)}>
-              <span {...stylex.props(styles.pingOuter)} />
-              <span {...stylex.props(styles.pingInner)} />
-            </span>
-            Global Intelligent Research — Botanical Intelligence Since 1995
-          </span>
-          <span {...stylex.props(styles.microText)}>ISO 9001 · GMP · HACCP</span>
-          <span {...stylex.props(styles.microText)}>N 32.06 / E 118.79 — Nanjing HQ</span>
-        </div>
+        <EngineeringStatus
+          styles={{
+            microStrip: styles.microStrip,
+            microText: styles.microText,
+            pingWrap: styles.pingWrap,
+            pingOuter: styles.pingOuter,
+            pingInner: styles.pingInner,
+          }}
+          status="Global Intelligent Research — Botanical Intelligence Since 1995"
+          middle="ISO 9001 · GMP · HACCP"
+          last="N 32.06 / E 118.79 — Nanjing HQ"
+        />
         {/* Main nav */}
         <nav aria-label="Main navigation" {...stylex.props(styles.navRow)}>
           <a href="#top" aria-label="Fenchem home" {...stylex.props(styles.logoLink)}>

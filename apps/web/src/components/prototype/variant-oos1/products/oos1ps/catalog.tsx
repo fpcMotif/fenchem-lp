@@ -397,8 +397,8 @@ function ItemRow({
   onToggle: () => void;
 }) {
   return (
-    <tr role="row" {...stylex.props(styles.itemRow, checked && styles.itemRowSelected)}>
-      <td role="cell" {...stylex.props(styles.cell, styles.checkCell)}>
+    <tr {...stylex.props(styles.itemRow, checked && styles.itemRowSelected)}>
+      <td {...stylex.props(styles.cell, styles.checkCell)}>
         <CompareCheckbox
           item={item}
           inputId={inputId}
@@ -408,16 +408,14 @@ function ItemRow({
           onToggle={onToggle}
         />
       </td>
-      <th scope="row" role="rowheader" {...stylex.props(styles.cell)}>
+      <th scope="row" {...stylex.props(styles.cell)}>
         <span {...stylex.props(styles.namePrimary)}>{item.primary}</span>
         {item.secondary && <span {...stylex.props(styles.nameSecondary)}>{item.secondary}</span>}
       </th>
-      <td role="cell" {...stylex.props(styles.cell, styles.inci)}>
+      <td {...stylex.props(styles.cell, styles.inci)}>
         <Inci text={item.inci} />
       </td>
-      <td role="cell" {...stylex.props(styles.cell, styles.cellLast, styles.features)}>
-        {item.features}
-      </td>
+      <td {...stylex.props(styles.cell, styles.cellLast, styles.features)}>{item.features}</td>
     </tr>
   );
 }
@@ -428,6 +426,7 @@ export function Catalog() {
   const hintId = useId();
   const inputBase = useId();
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const selectedIdSet = new Set(selectedIds);
   const [announcement, setAnnouncement] = useState("");
 
   const inputIdFor = (itemId: string) => `${inputBase}-${itemId}`;
@@ -490,36 +489,31 @@ export function Catalog() {
             勾选最多 {MAX_COMPARE} 款加入对比
           </p>
         </header>
-        <table
-          role="table"
-          aria-labelledby={titleId}
-          aria-describedby={metaId}
-          {...stylex.props(styles.table)}
-        >
+        <table aria-labelledby={titleId} aria-describedby={metaId} {...stylex.props(styles.table)}>
           <colgroup>
             <col {...stylex.props(styles.colCheck)} />
             <col {...stylex.props(styles.colName)} />
             <col {...stylex.props(styles.colInci)} />
             <col />
           </colgroup>
-          <thead role="rowgroup" {...stylex.props(styles.thead)}>
-            <tr role="row">
+          <thead {...stylex.props(styles.thead)}>
+            <tr>
               <th
                 scope="col"
-                role="columnheader"
+
                 {...stylex.props(styles.headCell, styles.headCellFirst)}
               >
                 加入对比
               </th>
-              <th scope="col" role="columnheader" {...stylex.props(styles.headCell)}>
+              <th scope="col" {...stylex.props(styles.headCell)}>
                 名称
               </th>
-              <th scope="col" role="columnheader" {...stylex.props(styles.headCell)}>
+              <th scope="col" {...stylex.props(styles.headCell)}>
                 INCI 名称
               </th>
               <th
                 scope="col"
-                role="columnheader"
+
                 {...stylex.props(styles.headCell, styles.headCellLast)}
               >
                 特性&应用
@@ -529,10 +523,9 @@ export function Catalog() {
           {GROUPS.map(({ group, index, items }) => {
             const first = index === 0;
             return (
-              <tbody key={group.id} role="rowgroup" {...stylex.props(styles.tbody)}>
-                <tr role="row" {...stylex.props(styles.groupRow, first && styles.groupRowFirst)}>
+              <tbody key={group.id} {...stylex.props(styles.tbody)}>
+                <tr {...stylex.props(styles.groupRow, first && styles.groupRowFirst)}>
                   <td
-                    role="cell"
                     {...stylex.props(
                       styles.groupCell,
                       first && styles.groupCellFirst,
@@ -543,7 +536,7 @@ export function Catalog() {
                   </td>
                   <th
                     scope="rowgroup"
-                    role="rowheader"
+
                     colSpan={group.intro ? 1 : 3}
                     {...stylex.props(
                       styles.groupCell,
@@ -556,7 +549,6 @@ export function Catalog() {
                   </th>
                   {group.intro && (
                     <td
-                      role="cell"
                       colSpan={2}
                       {...stylex.props(
                         styles.groupCell,
@@ -569,7 +561,7 @@ export function Catalog() {
                   )}
                 </tr>
                 {items.map((item) => {
-                  const checked = selectedIds.includes(item.id);
+                  const checked = selectedIdSet.has(item.id);
                   return (
                     <ItemRow
                       key={item.id}

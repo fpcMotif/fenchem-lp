@@ -3,7 +3,8 @@ import { ArrowRight } from "lucide-react";
 import { useState } from "react";
 
 import { MixedSpot } from "./band";
-import { SectionHead, ui } from "./shared";
+import { SectionHead } from "./shared";
+import { ui } from "./shared-values";
 import { bp, chrome, face, tone } from "./tokens.stylex";
 
 const styles = stylex.create({

@@ -4,7 +4,8 @@ import gsap from "gsap";
 import { FlaskConical, Globe, Sprout } from "lucide-react";
 import { certifications, pillars } from "@/components/landing/landing-content";
 import { IMAGES, ORIGIN_QUOTE } from "../content";
-import { drawRule, riseIn, settleImage, useSectionAnimation } from "../motion";
+import { useSectionAnimation } from "../motion";
+import { drawRule, riseIn, settleImage } from "../motion-values";
 import { sharedStyles } from "../styles";
 
 /*

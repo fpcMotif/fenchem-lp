@@ -2,7 +2,8 @@ import * as stylex from "@stylexjs/stylex";
 import type { CSSProperties } from "react";
 
 import { ABOUT_CULTURE } from "../../about-data";
-import { Cast, LIFT as LIFTS } from "./cast";
+import { Cast } from "./cast";
+import { LIFT as LIFTS } from "./cast-values";
 import { SectionHead } from "./head";
 import { ui } from "./shared";
 import { SECTION_HOURS } from "./sun";

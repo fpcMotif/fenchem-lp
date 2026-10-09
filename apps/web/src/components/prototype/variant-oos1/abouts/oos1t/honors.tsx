@@ -1,7 +1,8 @@
 import * as stylex from "@stylexjs/stylex";
 
 import { ABOUT_HONORS } from "../../about-data";
-import { Cast, LIFT } from "./cast";
+import { Cast } from "./cast";
+import { LIFT } from "./cast-values";
 import { Phrase } from "./phrase";
 import { SectionHead } from "./head";
 import { ui } from "./shared";

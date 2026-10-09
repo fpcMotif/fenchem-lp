@@ -4,7 +4,8 @@ import gsap from "gsap";
 import { Pause, Play } from "lucide-react";
 import { useRef, useState } from "react";
 import { ingredients } from "@/components/landing/landing-content";
-import { marquee, useReducedMotionFlag, useSectionAnimation } from "../motion";
+import { useReducedMotionFlag, useSectionAnimation } from "../motion";
+import { marquee } from "../motion-values";
 
 /*
  * Variant J — ingredient index ticker. A thin dark band that carries the

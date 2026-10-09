@@ -3,7 +3,8 @@ import * as stylex from "@stylexjs/stylex";
 
 import { ABOUT_HERO } from "../../about-data";
 import { STATS } from "../../content";
-import { Figure, Reveal, ui } from "./shared";
+import { Figure, Reveal } from "./shared";
+import { ui } from "./shared-values";
 import { font, step, tone } from "./tokens.stylex";
 
 const s = stylex.create({

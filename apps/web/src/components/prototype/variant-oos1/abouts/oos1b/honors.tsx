@@ -2,7 +2,8 @@ import * as stylex from "@stylexjs/stylex";
 import type { ReactNode } from "react";
 
 import { ABOUT_HONORS } from "../../about-data";
-import { ROMAN, SectionHead, Tag, bevel, srOnly, stepIn, ui, useArrived } from "./shared";
+import { SectionHead, Tag, useArrived } from "./shared";
+import { ROMAN, bevel, srOnly, stepIn, ui } from "./shared-values";
 import { bp, face, space, tone } from "./tokens.stylex";
 
 type Level = (typeof ABOUT_HONORS.items)[number]["level"];

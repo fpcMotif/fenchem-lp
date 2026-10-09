@@ -1,3 +1,4 @@
+import { LightboxStage } from "../../../shared/lightbox-stage";
 import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
@@ -245,12 +246,7 @@ function Lightbox({
     >
       {photo ? (
         <>
-          <div
-            onClick={(event) => {
-              if (event.target === event.currentTarget) onClose();
-            }}
-            {...stylex.props(styles.stage)}
-          >
+          <LightboxStage onClose={onClose} sx={styles.stage}>
             <figure
               key={photo.id}
               {...stylex.props(
@@ -261,7 +257,7 @@ function Lightbox({
               <img src={photo.large} alt={photo.alt} {...stylex.props(styles.lightImage)} />
               <figcaption {...stylex.props(styles.lightCaption)}>{photo.caption}</figcaption>
             </figure>
-          </div>
+          </LightboxStage>
           <button
             type="button"
             aria-label="上一张"

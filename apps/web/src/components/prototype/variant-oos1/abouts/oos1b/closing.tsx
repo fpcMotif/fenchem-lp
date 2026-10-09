@@ -1,7 +1,8 @@
 import * as stylex from "@stylexjs/stylex";
 import { ArrowRight } from "lucide-react";
 
-import { SectionHead, ui } from "./shared";
+import { SectionHead } from "./shared";
+import { ui } from "./shared-values";
 import { bp, face, motion, space, tone } from "./tokens.stylex";
 
 const styles = stylex.create({

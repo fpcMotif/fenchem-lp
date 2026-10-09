@@ -7,7 +7,8 @@ import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 import { ABOUT_CULTURE } from "../../about-data";
 import { Nova } from "./nova";
 import { chartStars } from "./sky";
-import { ChartHeading, ui } from "./shared";
+import { ChartHeading } from "./shared";
+import { ui } from "./shared-values";
 import { bp, chrome, face, sky } from "./tokens.stylex";
 
 const CHART = 600;

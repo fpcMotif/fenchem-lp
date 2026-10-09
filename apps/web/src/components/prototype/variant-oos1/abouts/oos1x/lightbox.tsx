@@ -1,3 +1,4 @@
+import { LightboxStage } from "../../../shared/lightbox-stage";
 import * as stylex from "@stylexjs/stylex";
 import { ArrowLeft, ArrowRight, X } from "lucide-react";
 import { useEffect, useRef } from "react";
@@ -191,19 +192,14 @@ export function Lightbox({
       {photo && index !== null ? (
         <>
           <div {...stylex.props(styles.layout, ui.shell)}>
-            <div
-              onClick={(event) => {
-                if (event.target === event.currentTarget) onClose();
-              }}
-              {...stylex.props(styles.stage)}
-            >
+            <LightboxStage onClose={onClose} sx={styles.stage}>
               <img
                 key={photo.id}
                 src={photo.large}
                 alt={photo.alt}
                 {...stylex.props(styles.image, stepped ? styles.imageStep : styles.imageOpen)}
               />
-            </div>
+            </LightboxStage>
             <div {...stylex.props(ui.columns, styles.bar)}>
               <p aria-live="polite" {...stylex.props(styles.arm)}>
                 <span aria-hidden="true" {...stylex.props(type.counterweight, styles.count)}>

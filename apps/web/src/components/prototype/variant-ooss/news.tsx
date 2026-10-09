@@ -3,7 +3,8 @@ import { ArrowRight } from "lucide-react";
 
 import { Reveal } from "./motion";
 import { color, ease, font, layout as layoutTokens, media } from "./tokens.stylex";
-import { SectionHeader, TextLink, layout } from "./ui";
+import { SectionHeader, TextLink } from "./ui";
+import { layout } from "./ui-values";
 
 const HOVER_MS = "150ms";
 const EVENTS_HREF = "#news";

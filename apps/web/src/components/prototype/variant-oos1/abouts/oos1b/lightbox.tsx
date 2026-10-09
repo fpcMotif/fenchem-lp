@@ -1,9 +1,12 @@
+import { LightboxControls } from "../../../shared/lightbox-controls";
+import { LightboxStage } from "../../../shared/lightbox-stage";
 import * as stylex from "@stylexjs/stylex";
 import { ArrowLeft, ArrowRight, X } from "lucide-react";
 import { useEffect, useRef } from "react";
 
 import type { Plate } from "./journey";
-import { Tag, ui } from "./shared";
+import { Tag } from "./shared";
+import { ui } from "./shared-values";
 import { bp, face, motion, tone } from "./tokens.stylex";
 
 const fadeIn = stylex.keyframes({
@@ -185,12 +188,7 @@ export function Lightbox({
     >
       {plate && index !== null ? (
         <>
-          <div
-            onClick={(event) => {
-              if (event.target === event.currentTarget) onClose();
-            }}
-            {...stylex.props(styles.stage)}
-          >
+          <LightboxStage onClose={onClose} sx={styles.stage}>
             <figure key={plate.id} {...stylex.props(styles.figure)}>
               <div {...stylex.props(styles.frame, stepped && styles.stepped)}>
                 <Tag numeral={plate.numeral} />
@@ -206,31 +204,23 @@ export function Lightbox({
                 </span>
               </figcaption>
             </figure>
-          </div>
-          <button
-            type="button"
-            aria-label="上一张"
-            onClick={() => onStep(-1)}
-            {...stylex.props(styles.button, ui.focusRing, styles.prev)}
-          >
-            <ArrowLeft size={18} strokeWidth={1.5} aria-hidden="true" />
-          </button>
-          <button
-            type="button"
-            aria-label="下一张"
-            onClick={() => onStep(1)}
-            {...stylex.props(styles.button, ui.focusRing, styles.next)}
-          >
-            <ArrowRight size={18} strokeWidth={1.5} aria-hidden="true" />
-          </button>
-          <button
-            type="button"
-            aria-label="关闭"
-            onClick={onClose}
-            {...stylex.props(styles.button, ui.focusRing, styles.close)}
-          >
-            <X size={18} strokeWidth={1.5} aria-hidden="true" />
-          </button>
+          </LightboxStage>
+          <LightboxControls
+            onStep={onStep}
+            onClose={onClose}
+            previous={{
+              icon: <ArrowLeft size={18} strokeWidth={1.5} aria-hidden="true" />,
+              sx: [styles.button, ui.focusRing, styles.prev],
+            }}
+            next={{
+              icon: <ArrowRight size={18} strokeWidth={1.5} aria-hidden="true" />,
+              sx: [styles.button, ui.focusRing, styles.next],
+            }}
+            close={{
+              icon: <X size={18} strokeWidth={1.5} aria-hidden="true" />,
+              sx: [styles.button, ui.focusRing, styles.close],
+            }}
+          />
         </>
       ) : null}
     </dialog>

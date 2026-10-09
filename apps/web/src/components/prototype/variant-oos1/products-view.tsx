@@ -1,3 +1,4 @@
+import { Flow } from "../shared/flow";
 import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 import { useSearch } from "@tanstack/react-router";
@@ -7,7 +8,8 @@ import { useState, type ComponentType } from "react";
 import { ContactCta } from "./contact-cta";
 import { CTA, PRODUCTS_CTA_SUBTITLE } from "./content";
 import { CATEGORIES, FEATURED_PRODUCT } from "./products-data";
-import { layout, ProductCatalog, ProductSolutions } from "./products-sections";
+import { ProductCatalog, ProductSolutions } from "./products-sections";
+import { layout } from "./products-sections-values";
 
 const INK = "#1a1a1a";
 const BODY_TEXT = "#4d4d4d";
@@ -430,15 +432,21 @@ export function ProductsView({
         <ProductCatalog categoryId={activeTab} />
       )}
       {SolutionsSection && compare !== "baseline" && compare !== "catalog" ? (
-        <SolutionsSection />
+        <Flow>
+          <SolutionsSection />
+        </Flow>
       ) : (
-        <ProductSolutions />
+        <Flow>
+          <ProductSolutions />
+        </Flow>
       )}
 
-      <ContactCta
-        subtitle={PRODUCTS_CTA_SUBTITLE}
-        actions={[{ label: CTA.action.label, onClick: () => onNavigateHome("contact") }]}
-      />
+      <Flow>
+        <ContactCta
+          subtitle={PRODUCTS_CTA_SUBTITLE}
+          actions={[{ label: CTA.action.label, onClick: () => onNavigateHome("contact") }]}
+        />
+      </Flow>
     </div>
   );
 }

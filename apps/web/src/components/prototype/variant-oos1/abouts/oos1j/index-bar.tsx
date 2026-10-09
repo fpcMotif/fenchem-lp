@@ -1,16 +1,14 @@
+import { m } from "motion/react";
 import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { m, useScroll } from "motion/react";
+import { useScroll } from "motion/react";
 import { useEffect, useRef, useState } from "react";
-
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
-
 import { ABOUT_HERO } from "../../about-data";
 import { useActiveSection } from "../../use-active-section";
 import { base, ty } from "./shared";
 import { hue, size } from "./theme.stylex";
-
-export const SECTION_IDS = ABOUT_HERO.navChips.map((chip) => chip.id);
+import { SECTION_IDS } from "./index-bar-values";
 
 const NAV_LABELS: Record<(typeof ABOUT_HERO.navChips)[number]["id"], string> = {
   "about-profile": "Profile",

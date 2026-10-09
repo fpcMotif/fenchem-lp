@@ -1,12 +1,12 @@
+import { m } from "motion/react";
 import { breakpoints } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { animate, m, useInView, useScroll, useTransform, type MotionValue } from "motion/react";
+import { animate, useInView, useScroll, useTransform, type MotionValue } from "motion/react";
 import { useEffect, useRef, type ReactNode, type RefObject } from "react";
-
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
-
 import { base } from "./shared";
 import { font, hue, size } from "./theme.stylex";
+import { wipe } from "./parts-values";
 
 const REVEAL_STEP_MS = 90;
 const REVEAL_MAX_STEPS = 4;
@@ -23,19 +23,6 @@ const reveal = stylex.create({
   shown: {
     opacity: 1,
     transform: "none",
-  },
-  delay: (ms: number) => ({ transitionDelay: `${ms}ms` }),
-});
-
-export const wipe = stylex.create({
-  hidden: {
-    clipPath: { default: null, [breakpoints.motionOk]: "inset(100% 0 0 0)" },
-    transitionProperty: "clip-path",
-    transitionDuration: "1300ms",
-    transitionTimingFunction: size.ease,
-  },
-  shown: {
-    clipPath: "inset(0 0 0 0)",
   },
   delay: (ms: number) => ({ transitionDelay: `${ms}ms` }),
 });
@@ -223,13 +210,17 @@ export function RiseLines({
   play: boolean;
   stagger?: number;
 }) {
-  return text.map((line, index) => (
-    <span key={line} {...stylex.props(lines.mask)}>
-      <span {...stylex.props(lines.line, play && lines.shown, lines.delay(index * stagger))}>
-        {line}
-      </span>
-    </span>
-  ));
+  return (
+    <>
+      {text.map((line, index) => (
+        <span key={line} {...stylex.props(lines.mask)}>
+          <span {...stylex.props(lines.line, play && lines.shown, lines.delay(index * stagger))}>
+            {line}
+          </span>
+        </span>
+      ))}
+    </>
+  );
 }
 
 export function useInViewOnce<T extends Element>() {

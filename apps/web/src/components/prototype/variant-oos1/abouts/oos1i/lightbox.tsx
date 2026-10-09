@@ -1,3 +1,6 @@
+import { CampusLightbox } from "../../../shared/campus-lightbox";
+import { LightboxControls } from "../../../shared/lightbox-controls";
+
 import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
@@ -144,60 +147,24 @@ export function Lightbox({
   }, [index, photos]);
 
   return (
-    <dialog
-      ref={dialogRef}
-      aria-label="园区照片"
+    <CampusLightbox
+      dialogRef={dialogRef}
+      photo={photo}
+      stepped={stepped}
       onClose={onClose}
-      onKeyDown={(event) => {
-        if (event.key !== "ArrowRight" && event.key !== "ArrowLeft") return;
-        event.preventDefault();
-        event.stopPropagation();
-        onStep(event.key === "ArrowRight" ? 1 : -1);
-      }}
-      {...stylex.props(S.dialog)}
+      onStep={onStep}
+      styles={S}
     >
-      {photo ? (
-        <>
-          <div
-            onClick={(event) => {
-              if (event.target === event.currentTarget) onClose();
-            }}
-            {...stylex.props(S.stage)}
-          >
-            <figure
-              key={photo.id}
-              {...stylex.props(S.figure, stepped ? S.figureStep : S.figureOpen)}
-            >
-              <img src={photo.large} alt={photo.alt} {...stylex.props(S.image)} />
-              <figcaption {...stylex.props(S.caption)}>{photo.caption}</figcaption>
-            </figure>
-          </div>
-          <button
-            type="button"
-            aria-label="上一张"
-            onClick={() => onStep(-1)}
-            {...stylex.props(S.button, S.prev)}
-          >
-            <ChevronLeft size={22} aria-hidden="true" />
-          </button>
-          <button
-            type="button"
-            aria-label="下一张"
-            onClick={() => onStep(1)}
-            {...stylex.props(S.button, S.next)}
-          >
-            <ChevronRight size={22} aria-hidden="true" />
-          </button>
-          <button
-            type="button"
-            aria-label="关闭"
-            onClick={onClose}
-            {...stylex.props(S.button, S.close)}
-          >
-            <X size={22} aria-hidden="true" />
-          </button>
-        </>
-      ) : null}
-    </dialog>
+      <LightboxControls
+        onStep={onStep}
+        onClose={onClose}
+        previous={{
+          icon: <ChevronLeft size={22} aria-hidden="true" />,
+          sx: [S.button, S.prev],
+        }}
+        next={{ icon: <ChevronRight size={22} aria-hidden="true" />, sx: [S.button, S.next] }}
+        close={{ icon: <X size={22} aria-hidden="true" />, sx: [S.button, S.close] }}
+      />
+    </CampusLightbox>
   );
 }

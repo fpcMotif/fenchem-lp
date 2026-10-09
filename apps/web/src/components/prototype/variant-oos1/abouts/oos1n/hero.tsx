@@ -2,7 +2,8 @@ import { breakpoints } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 
 import { ABOUT_BANNER } from "../../about-data";
-import { ArchPhoto, ui } from "./shared";
+import { ArchPhoto } from "./shared";
+import { ui } from "./shared-values";
 import { font, motionCss, step, tone } from "./tokens.stylex";
 
 const rise = stylex.keyframes({

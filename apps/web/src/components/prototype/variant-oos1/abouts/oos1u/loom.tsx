@@ -6,7 +6,8 @@ import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
 import { ABOUT_BANNER, ABOUT_CAMPUS } from "../../about-data";
 import { Lightbox } from "./lightbox";
-import { Reveal, ui } from "./shared";
+import { Reveal } from "./shared";
+import { ui } from "./shared-values";
 import { curve, media, tone, type } from "./tokens.stylex";
 
 const WARP = 16;
