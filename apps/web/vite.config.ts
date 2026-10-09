@@ -1,15 +1,10 @@
 import { fileURLToPath } from "node:url";
 
+import { cloudflare } from "@cloudflare/vite-plugin";
 import stylexRs from "@stylexswc/unplugin/vite";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import viteReact from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
-const cloudflareWorkersShimPath = fileURLToPath(
-  new URL("../../packages/env/src/cloudflare-local.ts", import.meta.url),
-);
-const cloudflareWorkersAlias: Record<string, string> = {
-  "cloudflare:workers": cloudflareWorkersShimPath,
-};
 
 export default defineConfig({
   server: {
@@ -19,7 +14,6 @@ export default defineConfig({
   },
   resolve: {
     tsconfigPaths: true,
-    alias: cloudflareWorkersAlias,
   },
   plugins: [
     stylexRs({
@@ -44,6 +38,7 @@ export default defineConfig({
         },
       },
     }),
+    cloudflare({ viteEnvironment: { name: "ssr" } }),
     tanstackStart(),
     viteReact(),
   ],
