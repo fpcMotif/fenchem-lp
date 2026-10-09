@@ -7,9 +7,11 @@ import { media, palette } from "./palette.stylex";
 import { Reveal } from "./reveal";
 
 const LG = breakpoints.lg;
+const INSET_120 = "min(120px, 8.333vw)";
 
 const styles = stylex.create({
   section: {
+    paddingBlock: { default: 72, [breakpoints.xl]: 128 },
     backgroundColor: colors.paper,
   },
   grid: {
@@ -18,8 +20,11 @@ const styles = stylex.create({
   photoCell: {
     boxSizing: "border-box",
     paddingBottom: { default: 32, [LG]: 0 },
-    paddingInlineStart: { default: 0, [LG]: 0 },
+    paddingInlineStart: { default: 0, [LG]: INSET_120 },
     paddingInlineEnd: { default: 0, [LG]: 48 },
+  },
+  textCell: {
+    paddingInlineEnd: { default: 20, [breakpoints.sm]: 28, [media.tablet]: 40, [LG]: INSET_120 },
   },
   photo: {
     position: "relative",
@@ -93,7 +98,7 @@ export function Profile() {
     <section
       id="about-profile"
       aria-label="企业概况"
-      {...stylex.props(styles.section, layout.sectionY, layout.anchor)}
+      {...stylex.props(styles.section, layout.anchor)}
     >
       <div {...stylex.props(layout.shell, layout.split, styles.grid)}>
         <div {...stylex.props(styles.photoCell)}>
@@ -108,7 +113,7 @@ export function Profile() {
             <figcaption {...stylex.props(styles.caption)}>{ABOUT_HERO.lobbyCaption}</figcaption>
           </Reveal>
         </div>
-        <div {...stylex.props(layout.padRight, layout.stack)}>
+        <div {...stylex.props(layout.padRight, layout.stack, styles.textCell)}>
           <Reveal>
             <h2 {...stylex.props(styles.name)}>{ABOUT_HERO.title}</h2>
             <p lang="en" {...stylex.props(styles.english)}>

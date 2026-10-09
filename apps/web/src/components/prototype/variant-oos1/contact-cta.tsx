@@ -12,6 +12,7 @@ const PAPER_HOVER = "#f6f6f6";
 const OOX_WORD_ON_TINT = "#d7e1f1";
 const WORD_ON_TINT = `color-mix(in srgb, ${OOX_WORD_ON_TINT} 80%, ${TINT})`;
 const DISPLAY_FONT = '"Inter Tight", "Helvetica Neue", Arial, sans-serif';
+const WORD_TRACKING = "0.06em";
 const EASE_OUT_CSS = "cubic-bezier(0.22, 1, 0.36, 1)";
 const TABLET = "@media (min-width: 768px) and (max-width: 1279.98px)";
 const DESKTOP = breakpoints.xl;
@@ -43,7 +44,8 @@ const styles = stylex.create({
     fontSize: { default: "30vw", [DESKTOP]: "min(360px, 25vw)" },
     fontWeight: 800,
     lineHeight: 0.74,
-    letterSpacing: "-0.06em",
+    letterSpacing: `-${WORD_TRACKING}`,
+    paddingInlineEnd: WORD_TRACKING,
     textTransform: "uppercase",
     whiteSpace: "nowrap",
     color: WORD_ON_TINT,

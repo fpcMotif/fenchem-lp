@@ -9,14 +9,12 @@
     "dev:setup": "convex dev --configure --until-success"
   },
   "dependencies": {
-    "@convex-dev/better-auth": "catalog:",
-    "better-auth": "catalog:",
     "convex": "catalog:",
     "dotenv": "catalog:"
   },
   "devDependencies": {
     "@fenchem-lp/config": "workspace:*",
-    "@types/node": "^24.3.0",
-    "typescript": "catalog:"
+    "@types/node": "^26.6.4",
+    "typescript": "next"
   }
 }

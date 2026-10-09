@@ -93,6 +93,7 @@ const WORD_ON_PAPER = "#e9eef7";
 const WORD_ON_SURFACE = "#e3e9f3";
 const WORD_ON_TINT = "#d7e1f1";
 const DISPLAY_FONT = '"Inter Tight", "Helvetica Neue", Arial, sans-serif';
+const WORD_TRACKING = "0.06em";
 const SERIF_FONT = '"Instrument Serif", "Times New Roman", serif';
 
 const TABLET = "@media (min-width: 768px) and (max-width: 1279.98px)";
@@ -1753,7 +1754,8 @@ const styles = stylex.create({
     fontSize: { default: "30vw", [DESKTOP]: "min(360px, 25vw)" },
     fontWeight: 800,
     lineHeight: 0.74,
-    letterSpacing: "-0.06em",
+    letterSpacing: `-${WORD_TRACKING}`,
+    paddingInlineEnd: WORD_TRACKING,
     textTransform: "uppercase",
     whiteSpace: "nowrap",
     color: WORD_ON_TINT,

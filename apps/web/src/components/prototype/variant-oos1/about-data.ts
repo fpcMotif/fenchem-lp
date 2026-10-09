@@ -115,6 +115,7 @@ export const ABOUT_MOMENT = {
 } as const;
 
 export const ABOUT_CAMPUS = {
+  eyebrow: "Campus",
   title: "园区环境",
   photos: [
     {
@@ -177,6 +178,7 @@ export const ABOUT_CAMPUS = {
 } as const;
 
 export const ABOUT_CULTURE = {
+  eyebrow: "Culture",
   title: "企业文化",
   values: [
     {
@@ -214,6 +216,7 @@ export const ABOUT_CSR = {
 } as const;
 
 export const ABOUT_HONORS = {
+  eyebrow: "Honors",
   title: "企业荣誉",
   items: [
     { id: "honor-1", title: "国家高新技术企业", level: "national" },
@@ -228,7 +231,8 @@ export const ABOUT_HONORS = {
 } as const;
 
 export const ABOUT_STRUCTURE = {
-  title: "企业结构",
+  eyebrow: "Structure",
+  title: "企业架构",
   chartImage: "/prototype/about/corporate-structure.png",
   holding: {
     badge: "控股公司",

@@ -2,22 +2,15 @@ import { LightboxStage } from "../shared/lightbox-stage";
 import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 import { ChevronLeft, ChevronRight, Factory, Leaf, Recycle, X } from "lucide-react";
-import { animate, m, useInView, useScroll, useTransform } from "motion/react";
+import { m, useInView, useScroll, useTransform } from "motion/react";
 import { type ReactNode, useEffect, useRef, useState } from "react";
 
-import { EASE } from "@/components/prototype/motion-constants";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
-import {
-  ABOUT_BANNER,
-  ABOUT_CAMPUS,
-  ABOUT_CSR,
-  ABOUT_HERO,
-  ABOUT_HISTORY,
-  ABOUT_MOMENT,
-} from "./about-data";
+import { ABOUT_BANNER, ABOUT_CAMPUS, ABOUT_CSR, ABOUT_HERO, ABOUT_HISTORY } from "./about-data";
+import { CAMPUS_GALLERY, CampusCarousel } from "./campus-carousel";
 import { ContactCta } from "./contact-cta";
-import { CTA, STATS } from "./content";
+import { CTA } from "./content";
 import { CultureScenes } from "./culture-scenes";
 import { HistoryTimeline } from "./history-timeline";
 import { useActiveSection } from "./use-active-section";
@@ -30,28 +23,22 @@ const DISPLAY_FONT = '"Inter Tight", "Helvetica Neue", Arial, sans-serif';
 const SERIF_ACCENT = '"Instrument Serif", Georgia, serif';
 const CSR_ACCENT = "#8cd6a3";
 const NAVY_SCRIM = "rgba(6, 28, 66, 0.78)";
-const PHOTO_OUTLINE = "rgba(0, 0, 0, 0.1)";
 const GRAIN = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`;
 const TABLET = "@media (min-width: 768px) and (max-width: 1279.98px)";
 const DESKTOP = breakpoints.xl;
-const SM_BELOW_DESKTOP = "@media (min-width: 640px) and (max-width: 1279.98px)";
-const HOVER_MOTION =
-  "@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)";
 const EASE_OUT_CSS = "cubic-bezier(0.22, 1, 0.36, 1)";
 
-const INSET_124 = "min(124px, 8.611vw)";
+const INSET_120 = "min(120px, 8.333vw)";
 const HEADER_HEIGHT = 80;
 const SUB_BAR_HEIGHT = 64;
 const REVEAL_STEP_MS = 70;
 const REVEAL_MAX_STEPS = 5;
-const COUNT_UP_SECONDS = 1.6;
 
 const [PROFILE_CHIP, ...LATER_CHIPS] = ABOUT_HERO.navChips;
 const NAV_CHIPS = [PROFILE_CHIP, ABOUT_HISTORY.navChip, ...LATER_CHIPS];
 const SECTION_IDS = NAV_CHIPS.map((chip) => chip.id);
 
 const revealDelay = (index: number) => Math.min(index, REVEAL_MAX_STEPS) * REVEAL_STEP_MS;
-const easeOutCubic = (t: number) => 1 - (1 - Math.min(1, Math.max(0, t))) ** 3;
 
 const CSR_ICONS = {
   factory: Factory,
@@ -95,19 +82,11 @@ const styles = stylex.create({
     marginInline: "auto",
     boxSizing: "border-box",
   },
-  inset124: {
-    paddingInline: { default: 16, [TABLET]: 40, [DESKTOP]: INSET_124 },
+  inset120: {
+    paddingInline: { default: 16, [TABLET]: 40, [DESKTOP]: INSET_120 },
   },
   anchor: {
     scrollMarginTop: HEADER_HEIGHT + SUB_BAR_HEIGHT + 24,
-  },
-  srOnly: {
-    position: "absolute",
-    width: 1,
-    height: 1,
-    overflow: "hidden",
-    clipPath: "inset(50%)",
-    whiteSpace: "nowrap",
   },
   focusRing: {
     outlineStyle: { default: "none", ":focus-visible": "solid" },
@@ -149,13 +128,6 @@ const styles = stylex.create({
     height: "100%",
     objectFit: "cover",
   },
-  photoOutline: {
-    outlineWidth: 1,
-    outlineStyle: "solid",
-    outlineColor: PHOTO_OUTLINE,
-    outlineOffset: -1,
-  },
-
   banner: {
     position: "relative",
     overflow: "hidden",
@@ -223,16 +195,16 @@ const styles = stylex.create({
     gap: 14,
     flexShrink: 0,
     fontFamily: DISPLAY_FONT,
-    fontSize: 11,
+    fontSize: 12,
     fontWeight: 500,
     letterSpacing: "0.22em",
     textTransform: "uppercase",
-    color: "rgba(255, 255, 255, 0.78)",
+    color: "rgba(255, 255, 255, 0.92)",
   },
   bannerMetaRule: {
     width: 40,
     height: 1,
-    backgroundColor: "rgba(255, 255, 255, 0.5)",
+    backgroundColor: "rgba(255, 255, 255, 0.72)",
   },
   scrollTrack: {
     position: "relative",
@@ -333,14 +305,17 @@ const styles = stylex.create({
   },
 
   sectionHeader: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    gap: 16,
-    maxWidth: 760,
-    marginInline: "auto",
     marginBottom: { default: 40, [DESKTOP]: 64 },
-    textAlign: "center",
+  },
+  sectionEyebrow: {
+    margin: 0,
+    marginBottom: 12,
+    fontFamily: DISPLAY_FONT,
+    fontSize: 12,
+    fontWeight: 600,
+    letterSpacing: "0.22em",
+    textTransform: "uppercase",
+    color: colors.brandBlue700,
   },
   sectionTitle: {
     margin: 0,
@@ -351,153 +326,10 @@ const styles = stylex.create({
     textWrap: "balance",
   },
 
-  moment: {
-    position: "relative",
-    height: { default: 560, [TABLET]: 680, [DESKTOP]: "min(92svh, 860px)" },
-    backgroundColor: colors.paper,
-  },
-  momentFrame: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    display: "flex",
-    alignItems: "flex-end",
-    width: "100%",
-    height: "100%",
-    overflow: "hidden",
-    backgroundColor: "#0b2a5c",
-    color: colors.paper,
-  },
-  momentScrim: {
-    backgroundImage: {
-      default:
-        "linear-gradient(to top, rgba(6, 28, 66, 0.9) 0%, rgba(6, 28, 66, 0.62) 58%, rgba(6, 28, 66, 0) 88%)",
-      [breakpoints.md]:
-        "linear-gradient(to top, rgba(6, 28, 66, 0.82) 0%, rgba(6, 28, 66, 0.36) 42%, rgba(6, 28, 66, 0) 68%)",
-    },
-    pointerEvents: "none",
-  },
-  momentCaption: {
-    position: "absolute",
-    top: { default: 24, [DESKTOP]: 40 },
-    insetInlineStart: { default: 16, [TABLET]: 40, [DESKTOP]: INSET_124 },
-    fontSize: 12,
-    fontWeight: 500,
-    letterSpacing: "0.16em",
-    color: "rgba(255, 255, 255, 0.86)",
-    textShadow: "0 1px 12px rgba(0, 0, 0, 0.35)",
-  },
-  momentStats: {
-    position: "relative",
-    display: "grid",
-    gridTemplateColumns: { default: "1fr", [breakpoints.md]: "repeat(3, minmax(0, 1fr))" },
-    paddingBottom: { default: 32, [TABLET]: 56, [DESKTOP]: 80 },
-  },
-  momentStat: {
-    display: "flex",
-    flexDirection: { default: "row", [breakpoints.md]: "column" },
-    alignItems: { default: "baseline", [breakpoints.md]: "center" },
-    justifyContent: { default: "space-between", [breakpoints.md]: "flex-start" },
-    gap: { default: 16, [breakpoints.md]: 10 },
-    paddingBlock: { default: 14, [breakpoints.md]: 0 },
-    borderTopWidth: { default: 1, [breakpoints.md]: 0 },
-    borderInlineStartWidth: 0,
-    borderStyle: "solid",
-    borderColor: "rgba(255, 255, 255, 0.2)",
-  },
-  momentStatDivided: {
-    borderInlineStartWidth: { default: 0, [breakpoints.md]: 1 },
-  },
-  statFigure: {
-    display: "flex",
-    alignItems: "baseline",
-    gap: 4,
-    fontFamily: DISPLAY_FONT,
-  },
-  statValue: {
-    fontSize: { default: 40, [TABLET]: 56, [DESKTOP]: 72 },
-    fontWeight: 600,
-    lineHeight: 1,
-    letterSpacing: "-0.03em",
-    fontVariantNumeric: "tabular-nums",
-  },
-  statUnit: {
-    fontSize: { default: 20, [DESKTOP]: 28 },
-    fontWeight: 600,
-    color: CSR_ACCENT,
-  },
-  statText: {
-    margin: 0,
-    fontSize: 14,
-    letterSpacing: "0.1em",
-    color: "rgba(255, 255, 255, 0.82)",
-  },
-
   campusSection: {
     paddingBlock: { default: 72, [DESKTOP]: 128 },
     backgroundColor: colors.paper,
   },
-  campusGrid: {
-    display: "grid",
-    gridTemplateColumns: {
-      default: "repeat(2, minmax(0, 1fr))",
-      [breakpoints.md]: "repeat(4, minmax(0, 1fr))",
-    },
-    gridAutoRows: { default: 150, [SM_BELOW_DESKTOP]: 200, [DESKTOP]: 250 },
-    gap: { default: 8, [breakpoints.md]: 16 },
-  },
-  campusTile: {
-    position: "relative",
-    overflow: "hidden",
-    margin: 0,
-    borderRadius: 12,
-    backgroundColor: "#dfe5ee",
-  },
-  tileFeature: {
-    gridColumn: "span 2",
-    gridRow: "span 2",
-  },
-  tileWide: {
-    gridColumn: "span 2",
-  },
-  tileButton: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    width: "100%",
-    height: "100%",
-    padding: 0,
-    borderWidth: 0,
-    backgroundColor: "transparent",
-    cursor: "zoom-in",
-    transform: {
-      default: null,
-      ":hover": { default: null, [HOVER_MOTION]: "scale(1.04)" },
-      ":active": { default: null, [breakpoints.motionOk]: "scale(0.99)" },
-    },
-    transitionProperty: "transform",
-    transitionDuration: "700ms",
-    transitionTimingFunction: EASE_OUT_CSS,
-    outlineStyle: { default: "none", ":focus-visible": "solid" },
-    outlineWidth: 3,
-    outlineColor: colors.paper,
-    outlineOffset: -6,
-  },
-  campusCaption: {
-    position: "absolute",
-    insetInlineStart: 0,
-    insetBlockEnd: 0,
-    width: "100%",
-    boxSizing: "border-box",
-    padding: { default: "36px 12px 12px", [breakpoints.md]: "56px 20px 18px" },
-    backgroundImage: "linear-gradient(to top, rgba(6, 28, 66, 0.62), rgba(6, 28, 66, 0))",
-    fontSize: { default: 13, [breakpoints.md]: 15 },
-    fontWeight: 600,
-    letterSpacing: "0.08em",
-    color: colors.paper,
-    pointerEvents: "none",
-  },
-
   lightbox: {
     position: "fixed",
     top: 0,
@@ -719,90 +551,24 @@ function Reveal({
   );
 }
 
-function SectionHeader({ title, titleId }: { title: string; titleId: string }) {
+function SectionHeader({
+  eyebrow,
+  title,
+  titleId,
+}: {
+  eyebrow: string;
+  title: string;
+  titleId: string;
+}) {
   return (
     <Reveal sx={styles.sectionHeader}>
+      <p lang="en" {...stylex.props(styles.sectionEyebrow)}>
+        {eyebrow}
+      </p>
       <h2 id={titleId} {...stylex.props(styles.sectionTitle)}>
         {title}
       </h2>
     </Reveal>
-  );
-}
-
-function CountUp({ value }: { value: string }) {
-  const target = Number(value.replaceAll(",", ""));
-  const ref = useRef<HTMLSpanElement>(null);
-  const inView = useInView(ref, { once: true, margin: "0px 0px -10% 0px" });
-  const reduce = useReducedMotion();
-  const [display, setDisplay] = useState(target);
-
-  useEffect(() => {
-    if (reduce || !inView) return;
-    const controls = animate(0, target, {
-      duration: COUNT_UP_SECONDS,
-      ease: EASE,
-      onUpdate: (latest) => setDisplay(Math.round(latest)),
-    });
-    return () => controls.stop();
-  }, [inView, reduce, target]);
-
-  return (
-    <span ref={ref} {...stylex.props(styles.statValue)}>
-      <span aria-hidden="true">
-        {(reduce ? target : inView ? display : 0).toLocaleString("en-US")}
-      </span>
-      <span {...stylex.props(styles.srOnly)}>{value}</span>
-    </span>
-  );
-}
-
-function CampusMoment() {
-  const sectionRef = useRef<HTMLElement>(null);
-  const reduce = useReducedMotion();
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ["start end", "start 0.2"],
-  });
-  const clipPath = useTransform(scrollYProgress, (progress) => {
-    const rest = 1 - easeOutCubic(progress);
-    return `inset(${10 * rest}% ${6 * rest}% ${10 * rest}% ${6 * rest}% round ${32 * rest}px)`;
-  });
-  const scale = useTransform(scrollYProgress, [0, 1], [1.15, 1]);
-
-  return (
-    <section
-      ref={sectionRef}
-      id="about-stats"
-      aria-label="泛成发展数据"
-      {...stylex.props(styles.moment)}
-    >
-      <m.div {...stylex.props(styles.momentFrame)} style={reduce ? undefined : { clipPath }}>
-        <m.img
-          src={ABOUT_MOMENT.image}
-          alt={ABOUT_MOMENT.alt}
-          loading="lazy"
-          decoding="async"
-          {...stylex.props(styles.fill)}
-          style={reduce ? undefined : { scale }}
-        />
-        <div aria-hidden="true" {...stylex.props(styles.fill, styles.momentScrim)} />
-        <span {...stylex.props(styles.momentCaption)}>{ABOUT_MOMENT.caption}</span>
-        <div {...stylex.props(styles.shell, styles.inset124, styles.momentStats)}>
-          {STATS.map((stat, idx) => (
-            <div
-              key={stat.label}
-              {...stylex.props(styles.momentStat, idx > 0 && styles.momentStatDivided)}
-            >
-              <div {...stylex.props(styles.statFigure)}>
-                <CountUp value={stat.value} />
-                {stat.unit ? <span {...stylex.props(styles.statUnit)}>{stat.unit}</span> : null}
-              </div>
-              <p {...stylex.props(styles.statText)}>{stat.caption}</p>
-            </div>
-          ))}
-        </div>
-      </m.div>
-    </section>
   );
 }
 
@@ -818,7 +584,7 @@ function Lightbox({
   onStep: (delta: number) => void;
 }) {
   const dialogRef = useRef<HTMLDialogElement>(null);
-  const photos = ABOUT_CAMPUS.photos;
+  const photos = CAMPUS_GALLERY;
   const photo = index === null ? null : photos[index];
 
   useEffect(() => {
@@ -832,7 +598,7 @@ function Lightbox({
     if (index === null) return;
     for (const delta of [1, -1]) {
       const neighbor = new Image();
-      neighbor.src = photos[(index + delta + photos.length) % photos.length].large;
+      neighbor.src = photos[(index + delta + photos.length) % photos.length].image;
     }
   }, [index, photos]);
 
@@ -859,7 +625,7 @@ function Lightbox({
                 stepped ? styles.lightboxFigureStep : styles.lightboxFigureOpen,
               )}
             >
-              <img src={photo.large} alt={photo.alt} {...stylex.props(styles.lightboxImage)} />
+              <img src={photo.image} alt={photo.alt} {...stylex.props(styles.lightboxImage)} />
               <figcaption {...stylex.props(styles.lightboxCaption)}>{photo.caption}</figcaption>
             </figure>
           </LightboxStage>
@@ -896,7 +662,11 @@ function Lightbox({
 function CampusGallery() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const [stepped, setStepped] = useState(false);
-  const count = ABOUT_CAMPUS.photos.length;
+  const count = CAMPUS_GALLERY.length;
+  const open = (index: number) => {
+    setStepped(false);
+    setOpenIndex(index);
+  };
 
   return (
     <section
@@ -904,43 +674,14 @@ function CampusGallery() {
       aria-labelledby="about-campus-title"
       {...stylex.props(styles.campusSection, styles.anchor)}
     >
-      <div {...stylex.props(styles.shell, styles.inset124)}>
-        <SectionHeader title={ABOUT_CAMPUS.title} titleId="about-campus-title" />
-        <div {...stylex.props(styles.campusGrid)}>
-          {ABOUT_CAMPUS.photos.map((photo, idx) => (
-            <Reveal
-              key={photo.id}
-              as="figure"
-              step={idx}
-              sx={[
-                styles.campusTile,
-                styles.photoOutline,
-                photo.span === "feature" && styles.tileFeature,
-                photo.span === "wide" && styles.tileWide,
-              ]}
-            >
-              <button
-                type="button"
-                aria-label={`查看大图：${photo.caption}`}
-                onClick={() => {
-                  setStepped(false);
-                  setOpenIndex(idx);
-                }}
-                {...stylex.props(styles.tileButton)}
-              >
-                <img
-                  src={photo.src}
-                  alt={photo.alt}
-                  loading="lazy"
-                  decoding="async"
-                  {...stylex.props(styles.fill)}
-                />
-              </button>
-              <figcaption {...stylex.props(styles.campusCaption)}>{photo.caption}</figcaption>
-            </Reveal>
-          ))}
-        </div>
+      <div {...stylex.props(styles.shell, styles.inset120)}>
+        <SectionHeader
+          eyebrow={ABOUT_CAMPUS.eyebrow}
+          title={ABOUT_CAMPUS.title}
+          titleId="about-campus-title"
+        />
       </div>
+      <CampusCarousel paused={openIndex !== null} onOpen={open} />
       <Lightbox
         index={openIndex}
         stepped={stepped}
@@ -982,7 +723,7 @@ function CsrSection() {
       </m.div>
       <div aria-hidden="true" {...stylex.props(styles.fill, styles.csrScrim)} />
       <div aria-hidden="true" {...stylex.props(styles.grain, styles.behind)} />
-      <div {...stylex.props(styles.shell, styles.inset124, styles.csrInner)}>
+      <div {...stylex.props(styles.shell, styles.inset120, styles.csrInner)}>
         <Reveal sx={styles.csrHead}>
           <div>
             <h2 id="about-csr-title" {...stylex.props(styles.csrTitle)}>
@@ -1037,7 +778,7 @@ function SubNav({ onNavigateHome }: { onNavigateHome: (hash?: string) => void })
 
   return (
     <div {...stylex.props(styles.subBar)}>
-      <div {...stylex.props(styles.shell, styles.inset124, styles.subBarInner)}>
+      <div {...stylex.props(styles.shell, styles.inset120, styles.subBarInner)}>
         <nav aria-label="面包屑导航" {...stylex.props(styles.breadcrumb)}>
           <button
             type="button"
@@ -1085,7 +826,7 @@ export function AboutView({ onNavigateHome }: { onNavigateHome: (hash?: string) 
         />
         <div aria-hidden="true" {...stylex.props(styles.fill, styles.bannerScrim)} />
         <div aria-hidden="true" {...stylex.props(styles.grain)} />
-        <div {...stylex.props(styles.shell, styles.inset124, styles.bannerContent)}>
+        <div {...stylex.props(styles.shell, styles.inset120, styles.bannerContent)}>
           <div {...stylex.props(styles.bannerText)}>
             <h1 id="about-banner-title" {...stylex.props(styles.bannerTitle)}>
               {ABOUT_BANNER.title}
@@ -1111,8 +852,6 @@ export function AboutView({ onNavigateHome }: { onNavigateHome: (hash?: string) 
       <ProfileOOS1G />
 
       <HistoryTimeline stickyTop={HEADER_HEIGHT + SUB_BAR_HEIGHT} sx={styles.anchor} />
-
-      <CampusMoment />
 
       <CampusGallery />
 

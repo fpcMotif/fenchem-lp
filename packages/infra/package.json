@@ -12,7 +12,6 @@
   },
   "devDependencies": {
     "@fenchem-lp/config": "workspace:*",
-    "alchemy": "catalog:",
-    "typescript": "catalog:"
+    "typescript": "next"
   }
 }

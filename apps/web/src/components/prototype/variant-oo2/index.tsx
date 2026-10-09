@@ -30,7 +30,6 @@ import type { StyleXStyles } from "@stylexjs/stylex";
 import { Globe, Lightbulb, Minus, Plus, Shield, Users, type LucideIcon } from "lucide-react";
 import {
   AnimatePresence,
-  animate,
   m,
   useInView,
   useMotionValueEvent,
@@ -51,6 +50,7 @@ import { preinit } from "react-dom";
 
 import { EASE, STAGGER } from "@/components/prototype/motion-constants";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
+import { useCountUp } from "@/components/prototype/shared/use-count-up";
 
 import { LINKEDIN_PATHS, LOGO_PATHS, WECHAT_PATHS, type VectorPath } from "../variant-o/vectors";
 import { INTRO_REVEAL_MS, useIntro } from "@/components/prototype/shared/intro";
@@ -1777,8 +1777,6 @@ function LakeStat({
   );
 }
 
-const NUMBER_FORMAT = new Intl.NumberFormat("en-US");
-
 function CountUp({ value }: { value: string }) {
   const ref = useRef<HTMLSpanElement>(null);
   const inView = useInView(ref, { once: true, margin: "-80px" });
@@ -1790,34 +1788,6 @@ function CountUp({ value }: { value: string }) {
       <span {...stylex.props(styles.visuallyHidden)}>{value}</span>
     </span>
   );
-}
-
-const subscribeCounterHydration = () => () => {};
-const getCounterHydration = () => true;
-const getServerCounterHydration = () => false;
-
-function useCountUp(value: string, run: boolean) {
-  const reduce = useReducedMotion();
-  const hydrated = useSyncExternalStore(
-    subscribeCounterHydration,
-    getCounterHydration,
-    getServerCounterHydration,
-  );
-  const target = Number(value.replace(/[^\d]/g, ""));
-  const [frame, setFrame] = useState<{ target: number; display: string } | null>(null);
-
-  useEffect(() => {
-    if (!run || reduce || !Number.isFinite(target)) return;
-    const controls = animate(0, target, {
-      duration: 1.6,
-      ease: [0.16, 1, 0.3, 1],
-      onUpdate: (latest) => setFrame({ target, display: NUMBER_FORMAT.format(Math.round(latest)) }),
-    });
-    return () => controls.stop();
-  }, [run, reduce, target]);
-
-  if (!hydrated || reduce || !Number.isFinite(target)) return value;
-  return run && frame?.target === target ? frame.display : "0";
 }
 
 function StatItem({ stat, index }: { stat: (typeof STATS)[number]; index: number }) {

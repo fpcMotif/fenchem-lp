@@ -1,11 +1,10 @@
 import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { ChevronDown } from "lucide-react";
-import { useId, useState } from "react";
+import { useId } from "react";
 
 import { ABOUT_HONORS, ABOUT_STRUCTURE } from "../../about-data";
 import { Reveal } from "./reveal";
-import { ease, mq, tone } from "./tokens.stylex";
+import { mq, tone } from "./tokens.stylex";
 import { ui } from "./ui";
 
 const LEVELS = [
@@ -14,25 +13,40 @@ const LEVELS = [
   { level: "municipal", label: "南京市级" },
 ] as const;
 
-const fadeIn = stylex.keyframes({
-  "0%": { opacity: 0 },
-  "100%": { opacity: 1 },
-});
-
 const styles = stylex.create({
   band: {
     display: "flex",
     flexDirection: "column",
-    gap: { default: 80, [mq.xl]: 140 },
-    paddingBlock: { default: 72, [mq.md]: 96, [mq.xl]: 120 },
+    gap: { default: 32, [mq.xl]: 40 },
+    paddingBlock: { default: 40, [mq.xl]: 48 },
     backgroundColor: tone.navy,
+    color: colors.paper,
+  },
+  head: {
+    marginBottom: { default: 16, [mq.xl]: 20 },
+  },
+  eyebrow: {
+    margin: 0,
+    marginBottom: 12,
+    fontFamily: '"Inter Tight", "Helvetica Neue", Arial, sans-serif',
+    fontSize: 12,
+    fontWeight: 600,
+    letterSpacing: "0.22em",
+    textTransform: "uppercase",
+    color: tone.onNavyMuted,
+  },
+  title: {
+    margin: 0,
+    fontSize: { default: 26, [mq.tablet]: 32, [mq.xl]: 40 },
+    fontWeight: 700,
+    lineHeight: 1.2,
     color: colors.paper,
   },
   level: {
     display: "grid",
     gridTemplateColumns: { default: "1fr", [mq.lg]: "200px minmax(0, 1fr)" },
-    gap: { default: 20, [mq.lg]: 40 },
-    paddingBlock: { default: 32, [mq.xl]: 48 },
+    gap: { default: 16, [mq.lg]: 40 },
+    paddingBlock: { default: 16, [mq.xl]: 20 },
     borderTopWidth: 1,
     borderTopStyle: "solid",
     borderTopColor: tone.onNavyLine,
@@ -40,10 +54,10 @@ const styles = stylex.create({
   levelLabel: {
     margin: 0,
     paddingTop: { default: 0, [mq.lg]: 8 },
-    fontSize: 12,
-    fontWeight: 400,
-    letterSpacing: "0.24em",
-    color: tone.onNavyFaint,
+    fontSize: 14,
+    fontWeight: 500,
+    letterSpacing: "0.12em",
+    color: tone.onNavyMuted,
   },
   honorList: {
     display: "grid",
@@ -51,7 +65,7 @@ const styles = stylex.create({
       default: "1fr",
       [mq.sm]: "repeat(2, minmax(0, 1fr))",
     },
-    gap: { default: "18px 32px", [mq.xl]: "28px 56px" },
+    gap: { default: "10px 32px", [mq.xl]: "12px 56px" },
     margin: 0,
     padding: 0,
     listStyle: "none",
@@ -86,10 +100,10 @@ const styles = stylex.create({
   },
   holdingLabel: {
     margin: 0,
-    fontSize: 12,
-    fontWeight: 400,
-    letterSpacing: "0.24em",
-    color: tone.onNavyFaint,
+    fontSize: 14,
+    fontWeight: 500,
+    letterSpacing: "0.12em",
+    color: tone.onNavyMuted,
   },
   holdingName: {
     margin: 0,
@@ -119,7 +133,7 @@ const styles = stylex.create({
     alignItems: { default: "flex-start", [mq.sm]: "baseline" },
     justifyContent: "space-between",
     gap: { default: 6, [mq.sm]: 24 },
-    paddingBlock: { default: 18, [mq.xl]: 22 },
+    paddingBlock: 14,
     borderTopWidth: 1,
     borderTopStyle: "solid",
     borderTopColor: tone.onNavyLine,
@@ -139,38 +153,9 @@ const styles = stylex.create({
     letterSpacing: "0.03em",
     color: tone.onNavyFaint,
   },
-  toggleWrap: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "flex-start",
-    gap: 32,
-    marginTop: { default: 40, [mq.xl]: 56 },
-  },
-  toggleIcon: {
-    transitionProperty: "transform",
-    transitionDuration: "200ms",
-    transitionTimingFunction: ease.out,
-  },
-  toggleIconOpen: {
-    transform: "rotate(180deg)",
-  },
-  diagram: {
-    width: "100%",
-    maxWidth: 960,
-    animationName: fadeIn,
-    animationDuration: "400ms",
-    animationTimingFunction: ease.out,
-  },
-  diagramImage: {
-    display: "block",
-    width: "100%",
-    height: "auto",
-  },
 });
 
 export function NavyBand() {
-  const [showDiagram, setShowDiagram] = useState(false);
-  const diagramId = useId();
   const subsLabelId = useId();
 
   return (
@@ -180,9 +165,14 @@ export function NavyBand() {
         aria-labelledby="about-honor-title"
         {...stylex.props(ui.shell, ui.inset, ui.anchor)}
       >
-        <h2 id="about-honor-title" {...stylex.props(ui.srOnly)}>
-          {ABOUT_HONORS.title}
-        </h2>
+        <Reveal sx={styles.head}>
+          <p lang="en" {...stylex.props(styles.eyebrow)}>
+            {ABOUT_HONORS.eyebrow}
+          </p>
+          <h2 id="about-honor-title" {...stylex.props(styles.title)}>
+            {ABOUT_HONORS.title}
+          </h2>
+        </Reveal>
         {LEVELS.map((entry) => {
           const items = ABOUT_HONORS.items.filter((item) => item.level === entry.level);
           return (
@@ -208,9 +198,14 @@ export function NavyBand() {
         aria-labelledby="about-structure-title"
         {...stylex.props(ui.shell, ui.inset, ui.anchor)}
       >
-        <h2 id="about-structure-title" {...stylex.props(ui.srOnly)}>
-          {ABOUT_STRUCTURE.title}
-        </h2>
+        <Reveal sx={styles.head}>
+          <p lang="en" {...stylex.props(styles.eyebrow)}>
+            {ABOUT_STRUCTURE.eyebrow}
+          </p>
+          <h2 id="about-structure-title" {...stylex.props(styles.title)}>
+            {ABOUT_STRUCTURE.title}
+          </h2>
+        </Reveal>
         <div {...stylex.props(styles.structure)}>
           <Reveal sx={styles.holding}>
             <p {...stylex.props(styles.holdingLabel)}>{ABOUT_STRUCTURE.holding.badge}</p>
@@ -234,32 +229,6 @@ export function NavyBand() {
                 </Reveal>
               ))}
             </ul>
-          </div>
-        </div>
-
-        <div {...stylex.props(styles.toggleWrap)}>
-          <button
-            type="button"
-            aria-expanded={showDiagram}
-            aria-controls={diagramId}
-            onClick={() => setShowDiagram((previous) => !previous)}
-            {...stylex.props(ui.textLink, ui.textLinkOnNavy, ui.focusRing, ui.focusRingOnNavy)}
-          >
-            <span>{showDiagram ? "收起组织架构图" : "查看官方组织架构图"}</span>
-            <ChevronDown
-              size={15}
-              aria-hidden="true"
-              {...stylex.props(styles.toggleIcon, showDiagram && styles.toggleIconOpen)}
-            />
-          </button>
-          <div id={diagramId} hidden={!showDiagram} {...stylex.props(styles.diagram)}>
-            <img
-              src={ABOUT_STRUCTURE.chartImage}
-              alt="南京泛成国际控股有限公司官方组织架构图"
-              loading="lazy"
-              decoding="async"
-              {...stylex.props(styles.diagramImage)}
-            />
           </div>
         </div>
       </section>

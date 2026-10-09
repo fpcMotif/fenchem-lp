@@ -1,9 +1,10 @@
 import { Collapse } from "../shared/collapse";
 import { m } from "motion/react";
 import { Plus } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@fenchem-lp/ui/components/tabs";
 import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { useEffect, useId, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
+import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { EASE } from "@/components/prototype/motion-constants";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 import {
@@ -17,12 +18,18 @@ import { layout } from "./products-sections-values";
 
 const INK = "#1a1a1a";
 const BODY_TEXT = "#4d4d4d";
-const MUTED_LABEL = "#66666c";
 const SURFACE = "#f3f5fa";
-const HAIRLINE = "rgba(26, 26, 26, 0.1)";
-const SOFT_RULE = "rgba(26, 26, 26, 0.06)";
-const TAB_HOVER = "#f8f9fc";
+const TINT_INK = "oklch(0.26 0.035 261.5)";
+const TINT_BODY = "oklch(0.44 0.025 261.5)";
+const TINT_MUTED = "oklch(0.52 0.02 261.5)";
+const TINT_RULE = "oklch(0.424 0.18 261.5 / 0.12)";
+const TINT_RULE_SOFT = "oklch(0.424 0.18 261.5 / 0.08)";
+const TINT_FILL = "oklch(0.965 0.009 261.5)";
+const TINT_HEAD = "oklch(0.958 0.011 261.5)";
+const DRAWER_FILL = "oklch(0.955 0.024 261.5)";
+const CARD_SHADOW = "0 1px 2px rgba(7, 67, 174, 0.04), 0 16px 40px -24px rgba(7, 67, 174, 0.18)";
 const ACCENT = colors.brandBlue700;
+const DISPLAY_FONT = '"Inter Tight", "Helvetica Neue", Arial, sans-serif';
 const EASE_OUT_CSS = "cubic-bezier(0.22, 1, 0.36, 1)";
 
 const MD = breakpoints.md;
@@ -35,15 +42,7 @@ const HEADER_HEIGHT = 80;
 const GUTTER = 24;
 const TWELVE = "repeat(12, minmax(0, 1fr))";
 const HEAD_SPACE = { default: 32, [DESKTOP]: 56 } as const;
-const TAB_DROP = 6;
-const LAST_SOLUTION = SOLUTION_ITEMS.length - 1;
-
-const SOLUTION_KEY_STEPS: Partial<Record<string, (index: number) => number>> = {
-  ArrowRight: (index) => (index === LAST_SOLUTION ? 0 : index + 1),
-  ArrowLeft: (index) => (index === 0 ? LAST_SOLUTION : index - 1),
-  Home: () => 0,
-  End: () => LAST_SOLUTION,
-};
+const CARD_RADIUS = { default: 12, [DESKTOP]: 16 } as const;
 
 const padIndex = (index: number) => String(index + 1).padStart(2, "0");
 
@@ -65,8 +64,7 @@ const NO_BREAK_SPACE = String.fromCharCode(0xa0);
 
 const styles = stylex.create({
   section: {
-    paddingTop: { default: 64, [DESKTOP]: 96 },
-    paddingBottom: { default: 72, [DESKTOP]: 112 },
+    paddingBlock: { default: 72, [DESKTOP]: 128 },
     scrollMarginTop: HEADER_HEIGHT,
   },
   bandSurface: {
@@ -75,12 +73,21 @@ const styles = stylex.create({
   sectionHead: {
     marginBottom: HEAD_SPACE,
   },
+  sectionEyebrow: {
+    margin: 0,
+    marginBottom: 12,
+    fontFamily: DISPLAY_FONT,
+    fontSize: 12,
+    fontWeight: 600,
+    letterSpacing: "0.22em",
+    textTransform: "uppercase",
+    color: ACCENT,
+  },
   sectionTitle: {
     margin: 0,
-    fontSize: { default: 26, [TABLET]: 28, [DESKTOP]: 32 },
-    fontWeight: 400,
-    lineHeight: { default: "34px", [TABLET]: "36px", [DESKTOP]: "40px" },
-    letterSpacing: "0.04em",
+    fontSize: { default: 26, [TABLET]: 32, [DESKTOP]: 40 },
+    fontWeight: 700,
+    lineHeight: 1.2,
     textWrap: "balance",
     color: INK,
   },
@@ -94,26 +101,30 @@ const styles = stylex.create({
     textWrap: "pretty",
   },
 
+  ledgerCard: {
+    overflow: "hidden",
+    borderWidth: 1,
+    borderStyle: "solid",
+    borderColor: TINT_RULE,
+    borderRadius: CARD_RADIUS,
+    backgroundColor: colors.paper,
+    boxShadow: CARD_SHADOW,
+  },
   ledgerGrid: {
     display: "grid",
     gridTemplateColumns: { default: "minmax(0, 1fr) 32px", [LG]: TWELVE },
     columnGap: { default: 12, [LG]: GUTTER },
-    paddingInline: { default: 16, [LG]: 20 },
+    paddingInline: { default: 20, [LG]: 32 },
   },
   ledgerHeader: {
     display: { default: "none", [LG]: "grid" },
-    paddingBlock: 14,
-    borderTopWidth: 1,
-    borderTopStyle: "solid",
-    borderTopColor: INK,
-    borderBottomWidth: 1,
-    borderBottomStyle: "solid",
-    borderBottomColor: HAIRLINE,
+    paddingBlock: 16,
+    backgroundColor: TINT_HEAD,
     fontSize: 12,
     fontWeight: 500,
     lineHeight: "16px",
     letterSpacing: "0.08em",
-    color: MUTED_LABEL,
+    color: TINT_MUTED,
   },
   colName: { gridColumn: { default: null, [LG]: "1 / 5" } },
   colPreview: { gridColumn: { default: null, [LG]: "5 / 12" } },
@@ -122,26 +133,18 @@ const styles = stylex.create({
     margin: 0,
     padding: 0,
     listStyleType: "none",
-    borderTopWidth: { default: 1, [LG]: 0 },
-    borderTopStyle: "solid",
-    borderTopColor: INK,
   },
   ledgerRow: {
     position: "relative",
-    borderBottomWidth: 1,
+    borderBottomWidth: { default: 1, ":last-child": 0 },
     borderBottomStyle: "solid",
-    borderBottomColor: HAIRLINE,
+    borderBottomColor: TINT_RULE_SOFT,
+    transitionProperty: "background-color",
+    transitionDuration: { default: "0ms", [breakpoints.motionOk]: "200ms" },
+    transitionTimingFunction: EASE_OUT_CSS,
   },
   ledgerRowOpen: {
-    backgroundColor: colors.paper,
-    "::before": {
-      content: '""',
-      position: "absolute",
-      insetBlock: 0,
-      insetInlineStart: 0,
-      width: 2,
-      backgroundColor: ACCENT,
-    },
+    backgroundColor: DRAWER_FILL,
   },
   ledgerHeading: {
     margin: 0,
@@ -149,23 +152,26 @@ const styles = stylex.create({
   ledgerTrigger: {
     alignItems: "start",
     width: "100%",
-    paddingBlock: 14,
+    paddingBlock: 18,
     borderWidth: 0,
     backgroundColor: {
       default: "transparent",
-      ":hover": { default: null, [HOVER]: colors.paper },
+      ":hover": { default: null, [HOVER]: TINT_FILL },
     },
     fontFamily: "inherit",
     textAlign: "start",
-    color: { default: INK, ":hover": colors.brandBlue700 },
+    color: TINT_INK,
     cursor: "pointer",
-    transitionProperty: "color, background-color",
-    transitionDuration: "150ms",
-    transitionTimingFunction: "ease",
+    transitionProperty: "background-color",
+    transitionDuration: { default: "0ms", [breakpoints.motionOk]: "200ms" },
+    transitionTimingFunction: EASE_OUT_CSS,
     outlineStyle: { default: "none", ":focus-visible": "solid" },
     outlineWidth: 2,
     outlineColor: colors.brandBlue700,
     outlineOffset: -2,
+  },
+  ledgerTriggerOpen: {
+    backgroundColor: "transparent",
   },
   ledgerName: {
     display: "flex",
@@ -181,7 +187,10 @@ const styles = stylex.create({
     lineHeight: "24px",
     fontVariantNumeric: "tabular-nums",
     letterSpacing: "0.04em",
-    color: MUTED_LABEL,
+    color: TINT_MUTED,
+  },
+  ledgerIndexOpen: {
+    color: ACCENT,
   },
   ledgerNames: {
     display: "flex",
@@ -198,21 +207,47 @@ const styles = stylex.create({
   ledgerLatin: {
     fontSize: 13,
     lineHeight: "20px",
-    color: MUTED_LABEL,
-  },
-  ledgerCell: {
-    display: { default: "none", [LG]: "block" },
-    minWidth: 0,
-    fontSize: 14,
-    lineHeight: "24px",
-    color: BODY_TEXT,
-    wordBreak: "keep-all",
+    color: TINT_MUTED,
   },
   ledgerPreview: {
+    display: { default: "none", [LG]: "flex" },
+    alignItems: "center",
+    gap: 6,
+    alignSelf: "center",
     overflow: "hidden",
+    maskImage: "linear-gradient(to right, #000 calc(100% - 56px), transparent)",
+    opacity: 1,
+    transitionProperty: "opacity",
+    transitionDuration: { default: "0ms", [breakpoints.motionOk]: "200ms" },
+    transitionTimingFunction: EASE_OUT_CSS,
+  },
+  ledgerPreviewOpen: {
+    opacity: 0,
+  },
+  chip: {
+    display: "inline-flex",
+    alignItems: "center",
+    flexShrink: 0,
+    height: 26,
+    paddingInline: 10,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderStyle: "solid",
+    borderColor: {
+      default: TINT_RULE,
+      [stylex.when.ancestor(":hover")]: { default: TINT_RULE, [HOVER]: colors.brandBlue300 },
+    },
+    backgroundColor: colors.paper,
+    fontSize: 13,
+    lineHeight: "24px",
+    color: {
+      default: TINT_BODY,
+      [stylex.when.ancestor(":hover")]: { default: TINT_BODY, [HOVER]: ACCENT },
+    },
     whiteSpace: "nowrap",
-    textOverflow: "ellipsis",
-    color: MUTED_LABEL,
+    transitionProperty: "border-color, color",
+    transitionDuration: { default: "0ms", [breakpoints.motionOk]: "200ms" },
+    transitionTimingFunction: EASE_OUT_CSS,
   },
   keepTogether: {
     whiteSpace: "nowrap",
@@ -222,10 +257,26 @@ const styles = stylex.create({
     alignItems: "center",
     justifyContent: "center",
     justifySelf: "end",
-    width: 40,
-    height: 40,
-    marginBlock: -8,
-    marginInlineEnd: -10,
+    width: 32,
+    height: 32,
+    marginBlock: -4,
+    marginInlineEnd: -6,
+    borderRadius: 999,
+    backgroundColor: {
+      default: TINT_FILL,
+      [stylex.when.ancestor(":hover")]: { default: TINT_FILL, [HOVER]: colors.brandBlue100 },
+    },
+    color: {
+      default: TINT_BODY,
+      [stylex.when.ancestor(":hover")]: { default: TINT_BODY, [HOVER]: ACCENT },
+    },
+    transitionProperty: "background-color, color",
+    transitionDuration: { default: "0ms", [breakpoints.motionOk]: "160ms" },
+    transitionTimingFunction: EASE_OUT_CSS,
+  },
+  toggleOpen: {
+    backgroundColor: ACCENT,
+    color: colors.paper,
   },
   toggleGlyph: {
     display: "flex",
@@ -235,8 +286,8 @@ const styles = stylex.create({
   },
   ledgerPanel: {
     rowGap: 20,
-    paddingTop: 8,
-    paddingBottom: 24,
+    paddingTop: 4,
+    paddingBottom: 28,
   },
   ledgerIntro: {
     gridColumn: { default: "1 / -1", [LG]: "1 / 9" },
@@ -244,27 +295,30 @@ const styles = stylex.create({
     paddingInlineStart: { default: 0, [LG]: 38 },
     fontSize: 15,
     lineHeight: "26px",
-    color: BODY_TEXT,
+    color: TINT_BODY,
     textWrap: "pretty",
   },
   materialTable: {
     gridColumn: "1 / -1",
     display: "grid",
     gridTemplateColumns: { default: "minmax(0, 1fr)", [LG]: "subgrid" },
+    marginInlineStart: { default: 0, [LG]: 38 },
+    overflow: "hidden",
+    borderRadius: 10,
+    backgroundColor: colors.paper,
+    boxShadow: "0 1px 2px rgba(7, 67, 174, 0.06)",
   },
   materialHead: {
     display: { default: "none", [LG]: "grid" },
     gridColumn: "1 / -1",
     gridTemplateColumns: "subgrid",
-    paddingBottom: 10,
-    borderBottomWidth: 1,
-    borderBottomStyle: "solid",
-    borderBottomColor: HAIRLINE,
+    paddingBlock: 12,
+    backgroundColor: TINT_HEAD,
     fontSize: 12,
     fontWeight: 500,
     lineHeight: "16px",
     letterSpacing: "0.08em",
-    color: MUTED_LABEL,
+    color: TINT_MUTED,
   },
   materialList: {
     gridColumn: "1 / -1",
@@ -279,17 +333,21 @@ const styles = stylex.create({
     display: "grid",
     gridTemplateColumns: { default: "minmax(0, 1fr)", [LG]: "subgrid" },
     rowGap: 4,
-    paddingBlock: 14,
+    paddingBlock: 16,
+    paddingInline: { default: 16, [LG]: 0 },
     borderTopWidth: { default: 1, ":first-child": 0 },
     borderTopStyle: "solid",
-    borderTopColor: HAIRLINE,
+    borderTopColor: TINT_RULE_SOFT,
   },
   colMaterialName: {
-    gridColumn: { default: null, [LG]: "1 / 4" },
-    paddingInlineStart: { default: 0, [LG]: 38 },
+    gridColumn: { default: null, [LG]: "1 / 5" },
+    paddingInlineStart: { default: 0, [LG]: 20 },
   },
-  colMaterialInci: { gridColumn: { default: null, [LG]: "4 / 7" } },
-  colMaterialFeatures: { gridColumn: { default: null, [LG]: "7 / 12" } },
+  colMaterialInci: { gridColumn: { default: null, [LG]: "5 / 8" } },
+  colMaterialFeatures: {
+    gridColumn: { default: null, [LG]: "8 / 13" },
+    paddingInlineEnd: { default: 0, [LG]: 20 },
+  },
   materialName: {
     display: "flex",
     flexDirection: "column",
@@ -297,105 +355,70 @@ const styles = stylex.create({
     fontWeight: 500,
     lineHeight: "24px",
     letterSpacing: "0.02em",
-    color: INK,
+    color: TINT_INK,
   },
   materialInci: {
     margin: 0,
     fontSize: 13,
     lineHeight: "22px",
-    color: MUTED_LABEL,
+    color: TINT_MUTED,
   },
   materialFeatures: {
     margin: 0,
     marginTop: { default: 4, [LG]: 0 },
     fontSize: 14,
     lineHeight: "24px",
-    color: BODY_TEXT,
+    color: TINT_BODY,
     textWrap: "pretty",
   },
 
-  folder: {
-    position: "relative",
-    isolation: "isolate",
-    "::after": {
-      content: '""',
-      position: "absolute",
-      insetInline: 0,
-      bottom: 0,
-      zIndex: 1,
-      height: 1,
-      backgroundColor: HAIRLINE,
-      pointerEvents: "none",
-    },
-  },
   tabList: {
     position: "relative",
-    display: { default: "flex", [DESKTOP]: "grid" },
-    gridTemplateColumns: { default: null, [DESKTOP]: "repeat(10, minmax(0, 1fr))" },
-    gap: 4,
-    overflowX: "auto",
-    overflowY: "hidden",
+    display: "flex",
+    flexWrap: { default: "nowrap", [DESKTOP]: "wrap" },
+    gap: 8,
+    marginInline: { default: -16, [TABLET]: -40, [DESKTOP]: 0 },
+    paddingInline: { default: 16, [TABLET]: 40, [DESKTOP]: 0 },
+    paddingBlock: 4,
+    scrollPaddingInline: { default: 16, [TABLET]: 40, [DESKTOP]: 0 },
+    overflowX: { default: "auto", [DESKTOP]: "visible" },
     scrollbarWidth: "none",
     overscrollBehaviorX: "contain",
   },
   tab: {
-    position: "relative",
     flexShrink: 0,
-    display: "flex",
-    flexDirection: { default: "row", [DESKTOP]: "column" },
-    alignItems: { default: "center", [DESKTOP]: "flex-start" },
-    gap: { default: 8, [DESKTOP]: 4 },
-    minWidth: 0,
-    height: { default: 48, [DESKTOP]: "auto" },
-    paddingInline: { default: 14, [DESKTOP]: 12 },
-    paddingTop: { default: 0, [DESKTOP]: 12 },
-    paddingBottom: { default: TAB_DROP, [DESKTOP]: 14 + TAB_DROP },
+    display: "inline-flex",
+    alignItems: "center",
+    gap: 8,
+    height: 40,
+    paddingInline: 16,
     boxSizing: "border-box",
-    borderWidth: 1,
-    borderBottomWidth: 0,
-    borderStyle: "solid",
-    borderColor: HAIRLINE,
-    borderTopLeftRadius: 4,
-    borderTopRightRadius: 4,
+    borderWidth: 0,
+    borderRadius: 999,
     backgroundColor: {
-      default: SURFACE,
-      ":hover": { default: SURFACE, [HOVER]: TAB_HOVER },
+      default: TINT_FILL,
+      ":hover": { default: TINT_FILL, [HOVER]: colors.brandBlue100 },
     },
     fontFamily: "inherit",
-    textAlign: "start",
-    color: { default: BODY_TEXT, ":hover": colors.brandBlue700 },
-    cursor: "pointer",
-    transform: {
-      default: `translateY(${TAB_DROP}px)`,
-      ":hover": {
-        default: `translateY(${TAB_DROP}px)`,
-        [HOVER]: `translateY(${TAB_DROP / 2}px)`,
-      },
+    color: {
+      default: TINT_BODY,
+      ":hover": { default: TINT_BODY, [HOVER]: TINT_INK },
     },
-    transitionProperty: "transform, background-color, color",
-    transitionDuration: { default: "0ms", [breakpoints.motionOk]: "200ms" },
+    cursor: "pointer",
+    transform: { default: null, ":active": "scale(0.96)" },
+    transitionProperty: "background-color, color, transform",
+    transitionDuration: { default: "0ms", [breakpoints.motionOk]: "160ms" },
     transitionTimingFunction: EASE_OUT_CSS,
     outlineStyle: { default: "none", ":focus-visible": "solid" },
     outlineWidth: 2,
-    outlineColor: colors.brandBlue700,
-    outlineOffset: -3,
+    outlineColor: ACCENT,
+    outlineOffset: 2,
   },
   tabActive: {
-    zIndex: 2,
-    backgroundColor: { default: colors.paper, ":hover": colors.paper },
-    color: { default: INK, ":hover": INK },
+    backgroundColor: ACCENT,
+    color: colors.paper,
     cursor: "default",
-    transform: { default: "translateY(0)", ":hover": "translateY(0)" },
-    "::before": {
-      content: '""',
-      position: "absolute",
-      top: -1,
-      insetInline: -1,
-      height: 2,
-      borderTopLeftRadius: 4,
-      borderTopRightRadius: 4,
-      backgroundColor: ACCENT,
-    },
+    transform: "none",
   },
   tabNumber: {
     flexShrink: 0,
@@ -404,35 +427,30 @@ const styles = stylex.create({
     lineHeight: "16px",
     letterSpacing: "0.04em",
     fontVariantNumeric: "tabular-nums",
-    color: MUTED_LABEL,
+    color: TINT_MUTED,
   },
   tabNumberActive: {
-    color: ACCENT,
+    color: "rgba(255, 255, 255, 0.72)",
   },
   tabTitle: {
     fontSize: 14,
-    fontWeight: 400,
+    fontWeight: 500,
     lineHeight: "20px",
     letterSpacing: "0.02em",
-    whiteSpace: { default: "nowrap", [DESKTOP]: "normal" },
-    textWrap: "balance",
-  },
-  tabTitleActive: {
-    fontWeight: 500,
-  },
-  titleWord: {
     whiteSpace: "nowrap",
   },
 
   sheet: {
+    marginTop: { default: 16, [DESKTOP]: 24 },
     paddingInline: { default: 20, [MD]: 40, [DESKTOP]: 56 },
     paddingTop: { default: 28, [MD]: 40, [DESKTOP]: 48 },
     paddingBottom: { default: 12, [MD]: 20 },
     borderWidth: 1,
-    borderTopWidth: 0,
     borderStyle: "solid",
-    borderColor: HAIRLINE,
+    borderColor: TINT_RULE,
+    borderRadius: CARD_RADIUS,
     backgroundColor: colors.paper,
+    boxShadow: CARD_SHADOW,
   },
   panels: {
     display: "grid",
@@ -463,7 +481,7 @@ const styles = stylex.create({
     fontWeight: 500,
     lineHeight: 1.35,
     letterSpacing: "0.04em",
-    color: INK,
+    color: TINT_INK,
     textWrap: "balance",
   },
   sheetSubtitle: {
@@ -472,7 +490,7 @@ const styles = stylex.create({
     maxWidth: "40em",
     fontSize: 15,
     lineHeight: 1.6,
-    color: BODY_TEXT,
+    color: TINT_BODY,
     textWrap: "pretty",
   },
   fields: {
@@ -492,7 +510,7 @@ const styles = stylex.create({
     paddingBlock: { default: 16, [MD]: 20 },
     borderTopWidth: 1,
     borderTopStyle: "solid",
-    borderTopColor: SOFT_RULE,
+    borderTopColor: TINT_RULE_SOFT,
   },
   fieldLabel: {
     margin: 0,
@@ -500,14 +518,14 @@ const styles = stylex.create({
     fontWeight: 500,
     lineHeight: "24px",
     letterSpacing: "0.04em",
-    color: MUTED_LABEL,
+    color: TINT_MUTED,
   },
   fieldValue: {
     margin: 0,
     minWidth: 0,
     fontSize: 15,
     lineHeight: "24px",
-    color: INK,
+    color: TINT_INK,
     textWrap: "pretty",
   },
   lines: {
@@ -519,13 +537,13 @@ const styles = stylex.create({
     listStyleType: "none",
   },
   description: {
-    color: BODY_TEXT,
+    color: TINT_BODY,
   },
   strong: {
     fontWeight: 500,
   },
   absent: {
-    color: MUTED_LABEL,
+    color: TINT_MUTED,
   },
   keepWords: {
     wordBreak: "keep-all",
@@ -534,7 +552,7 @@ const styles = stylex.create({
   note: {
     marginInlineStart: 6,
     fontSize: 13,
-    color: MUTED_LABEL,
+    color: TINT_MUTED,
   },
 });
 
@@ -557,14 +575,17 @@ function Inci({ text }: { text: string }) {
 function ToggleIcon({ open }: { open: boolean }) {
   const reduce = useReducedMotion();
   return (
-    <span aria-hidden="true" {...stylex.props(styles.toggle, styles.colToggle)}>
+    <span
+      aria-hidden="true"
+      {...stylex.props(styles.toggle, open && styles.toggleOpen, styles.colToggle)}
+    >
       <m.span
         {...stylex.props(styles.toggleGlyph)}
         initial={false}
         animate={{ rotate: open ? 45 : 0 }}
         transition={reduce ? { duration: 0 } : { type: "spring", duration: 0.3, bounce: 0 }}
       >
-        <Plus size={20} strokeWidth={open ? 1.25 : 1.5} absoluteStrokeWidth />
+        <Plus size={16} strokeWidth={1.5} absoluteStrokeWidth />
       </m.span>
     </span>
   );
@@ -583,7 +604,6 @@ function LedgerRow({
 }) {
   const reduce = useReducedMotion();
   const panelId = useId();
-  const preview = group.items.map((item) => splitParen(item.title).primary).join("、");
 
   return (
     <m.li
@@ -591,16 +611,22 @@ function LedgerRow({
       transition={{ duration: 0.26, ease: EASE }}
       {...stylex.props(styles.ledgerRow, open && styles.ledgerRowOpen)}
     >
-      <h3 {...stylex.props(styles.ledgerHeading)}>
+      <h3 {...stylex.props(styles.ledgerHeading, stylex.defaultMarker())}>
         <button
           type="button"
           aria-expanded={open}
           aria-controls={open ? panelId : undefined}
           onClick={onToggle}
-          {...stylex.props(styles.ledgerGrid, styles.ledgerTrigger)}
+          {...stylex.props(
+            styles.ledgerGrid,
+            styles.ledgerTrigger,
+            open && styles.ledgerTriggerOpen,
+          )}
         >
           <span {...stylex.props(styles.ledgerName, styles.colName)}>
-            <span {...stylex.props(styles.ledgerIndex)}>{padIndex(index)}</span>
+            <span {...stylex.props(styles.ledgerIndex, open && styles.ledgerIndexOpen)}>
+              {padIndex(index)}
+            </span>
             <span {...stylex.props(styles.ledgerNames)}>
               <span {...stylex.props(styles.ledgerPrimary)}>{group.label}</span>
               <span {...stylex.props(styles.ledgerLatin)}>{group.items.length} 款原料</span>
@@ -608,9 +634,17 @@ function LedgerRow({
           </span>
           <span
             aria-hidden="true"
-            {...stylex.props(styles.ledgerCell, styles.ledgerPreview, styles.colPreview)}
+            {...stylex.props(
+              styles.ledgerPreview,
+              open && styles.ledgerPreviewOpen,
+              styles.colPreview,
+            )}
           >
-            {preview}
+            {group.items.map((item) => (
+              <span key={item.id} {...stylex.props(styles.chip)}>
+                {splitParen(item.title).primary}
+              </span>
+            ))}
           </span>
           <ToggleIcon open={open} />
         </button>
@@ -677,21 +711,6 @@ function Descriptions({ lines }: { lines: string[] }) {
   );
 }
 
-function TabTitle({ title }: { title: string }) {
-  const words = title.split(" ");
-  if (words.length === 1) return <>{title}</>;
-  return (
-    <>
-      {words.map((word, index) => (
-        <span key={word}>
-          {index > 0 && " "}
-          <span {...stylex.props(styles.titleWord)}>{word}</span>
-        </span>
-      ))}
-    </>
-  );
-}
-
 function FormulaSheet({ item }: { item: SolutionItem }) {
   return (
     <>
@@ -705,6 +724,9 @@ function FormulaSheet({ item }: { item: SolutionItem }) {
         </Field>
         <Field label="功能">
           <span {...stylex.props(styles.strong)}>{item.functions.join(" · ")}</span>
+        </Field>
+        <Field label="配方挑战">
+          <Descriptions lines={item.challenges} />
         </Field>
         <Field label="功能性成分">
           <ul {...stylex.props(styles.lines)}>
@@ -720,9 +742,6 @@ function FormulaSheet({ item }: { item: SolutionItem }) {
               );
             })}
           </ul>
-        </Field>
-        <Field label="配方挑战">
-          <Descriptions lines={item.challenges} />
         </Field>
         <Field label="质地">{item.texture.join("、")}</Field>
         <Field label="应用">{item.applications.join("、")}</Field>
@@ -743,6 +762,9 @@ export function ProductCatalog({ categoryId }: { categoryId: string }) {
     >
       <div {...stylex.props(layout.shell, layout.inset)}>
         <header {...stylex.props(styles.sectionHead)}>
+          <p lang="en" {...stylex.props(styles.sectionEyebrow)}>
+            Catalog
+          </p>
           <h2 id="catalog-title" {...stylex.props(styles.sectionTitle)}>
             产品目录
           </h2>
@@ -752,21 +774,22 @@ export function ProductCatalog({ categoryId }: { categoryId: string }) {
               : `${categoryLabel}核心原料与应用定制方案`}
           </p>
         </header>
-        <div aria-hidden="true" {...stylex.props(styles.ledgerGrid, styles.ledgerHeader)}>
-          <span {...stylex.props(styles.colName)}>原料分类</span>
-          <span {...stylex.props(styles.colPreview)}>收录原料</span>
+        <div {...stylex.props(styles.ledgerCard)}>
+          <div aria-hidden="true" {...stylex.props(styles.ledgerGrid, styles.ledgerHeader)}>
+            <span {...stylex.props(styles.colName)}>原料分类</span>
+          </div>
+          <ul {...stylex.props(styles.ledger)}>
+            {CATALOG_GROUPS.map((group, index) => (
+              <LedgerRow
+                key={group.id}
+                group={group}
+                index={index}
+                open={openIndex === index}
+                onToggle={() => setOpenIndex((prev) => (prev === index ? null : index))}
+              />
+            ))}
+          </ul>
         </div>
-        <ul {...stylex.props(styles.ledger)}>
-          {CATALOG_GROUPS.map((group, index) => (
-            <LedgerRow
-              key={group.id}
-              group={group}
-              index={index}
-              open={openIndex === index}
-              onToggle={() => setOpenIndex((prev) => (prev === index ? null : index))}
-            />
-          ))}
-        </ul>
       </div>
     </section>
   );
@@ -774,29 +797,16 @@ export function ProductCatalog({ categoryId }: { categoryId: string }) {
 
 export function ProductSolutions() {
   const reduce = useReducedMotion();
-  const baseId = useId();
   const tablistRef = useRef<HTMLDivElement>(null);
-  const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const [activeIndex, setActiveIndex] = useState(0);
-  const panelId = (index: number) => `${baseId}-panel-${index}`;
-  const tabId = (index: number) => `${baseId}-tab-${index}`;
 
   useEffect(() => {
     const tablist = tablistRef.current;
-    const tab = tabRefs.current[activeIndex];
+    const tab = tablist?.querySelector<HTMLElement>('[aria-selected="true"]');
     if (!tablist || !tab || tablist.scrollWidth <= tablist.clientWidth) return;
     const left = tab.offsetLeft - (tablist.clientWidth - tab.offsetWidth) / 2;
     tablist.scrollTo({ left: Math.max(0, left), behavior: reduce ? "auto" : "smooth" });
   }, [activeIndex, reduce]);
-
-  const selectFromKey = (event: KeyboardEvent<HTMLButtonElement>) => {
-    const step = SOLUTION_KEY_STEPS[event.key];
-    if (!step) return;
-    event.preventDefault();
-    const target = step(activeIndex);
-    setActiveIndex(target);
-    tabRefs.current[target]?.focus({ preventScroll: true });
-  };
 
   return (
     <section
@@ -806,66 +816,51 @@ export function ProductSolutions() {
     >
       <div {...stylex.props(layout.shell, layout.inset)}>
         <header {...stylex.props(styles.sectionHead)}>
+          <p lang="en" {...stylex.props(styles.sectionEyebrow)}>
+            Solutions
+          </p>
           <h2 id="solutions-title" {...stylex.props(styles.sectionTitle)}>
             应用方案
           </h2>
         </header>
-        <div {...stylex.props(styles.folder)}>
-          <div
+        <Tabs value={activeIndex} onValueChange={setActiveIndex}>
+          <TabsList
             ref={tablistRef}
-            role="tablist"
+            activateOnFocus
             aria-labelledby="solutions-title"
-            {...stylex.props(styles.tabList)}
+            sx={styles.tabList}
           >
             {SOLUTION_ITEMS.map((item, index) => {
               const isActive = activeIndex === index;
               return (
-                <button
+                <TabsTrigger
                   key={item.id}
-                  ref={(node) => {
-                    tabRefs.current[index] = node;
-                  }}
-                  id={tabId(index)}
-                  type="button"
-                  role="tab"
-                  aria-selected={isActive}
-                  aria-controls={panelId(index)}
-                  tabIndex={isActive ? 0 : -1}
-                  onClick={() => setActiveIndex(index)}
-                  onKeyDown={selectFromKey}
-                  {...stylex.props(styles.tab, isActive && styles.tabActive)}
+                  value={index}
+                  sx={[styles.tab, isActive && styles.tabActive]}
                 >
                   <span {...stylex.props(styles.tabNumber, isActive && styles.tabNumberActive)}>
                     {padIndex(index)}
                   </span>
-                  <span {...stylex.props(styles.tabTitle, isActive && styles.tabTitleActive)}>
-                    <TabTitle title={item.title} />
-                  </span>
-                </button>
+                  <span {...stylex.props(styles.tabTitle)}>{item.title}</span>
+                </TabsTrigger>
               );
             })}
-          </div>
-        </div>
-        <div {...stylex.props(styles.sheet)}>
-          <div {...stylex.props(styles.panels)}>
-            {SOLUTION_ITEMS.map((item, index) => {
-              const isActive = activeIndex === index;
-              return (
-                <div
+          </TabsList>
+          <div {...stylex.props(styles.sheet)}>
+            <div {...stylex.props(styles.panels)}>
+              {SOLUTION_ITEMS.map((item, index) => (
+                <TabsContent
                   key={item.id}
-                  id={panelId(index)}
-                  role="tabpanel"
-                  aria-labelledby={tabId(index)}
-                  tabIndex={isActive ? 0 : -1}
-                  inert={!isActive}
-                  {...stylex.props(styles.panel, !isActive && styles.panelIdle)}
+                  value={index}
+                  keepMounted
+                  sx={[styles.panel, activeIndex !== index && styles.panelIdle]}
                 >
                   <FormulaSheet item={item} />
-                </div>
-              );
-            })}
+                </TabsContent>
+              ))}
+            </div>
           </div>
-        </div>
+        </Tabs>
       </div>
     </section>
   );

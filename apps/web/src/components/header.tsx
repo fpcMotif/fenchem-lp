@@ -38,24 +38,14 @@ const styles = stylex.create({
   },
 });
 
-const links = [
-  { to: "/", label: "Home" },
-  { to: "/dashboard", label: "Dashboard" },
-  { to: "/todos", label: "Todos" },
-] as const;
-
 export default function Header() {
   return (
     <div {...stylex.props(styles.root)}>
       <div {...stylex.props(styles.header)}>
         <nav {...stylex.props(styles.nav)}>
-          {links.map(({ to, label }) => {
-            return (
-              <Link key={to} to={to} {...stylex.props(styles.link)}>
-                {label}
-              </Link>
-            );
-          })}
+          <Link to="/" search={{ variant: "a" }} {...stylex.props(styles.link)}>
+            Home
+          </Link>
         </nav>
         <div {...stylex.props(styles.right)}></div>
       </div>

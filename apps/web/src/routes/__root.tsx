@@ -1,5 +1,4 @@
 import * as stylex from "@stylexjs/stylex";
-import { ConvexBetterAuthProvider } from "@convex-dev/better-auth/react";
 import type { ConvexQueryClient } from "@convex-dev/react-query";
 import { Toaster } from "@fenchem-lp/ui/components/sonner";
 import type { QueryClient } from "@tanstack/react-query";
@@ -8,19 +7,10 @@ import {
   Outlet,
   Scripts,
   createRootRouteWithContext,
-  useRouteContext,
   useRouterState,
 } from "@tanstack/react-router";
-import { createServerFn } from "@tanstack/react-start";
 import { lazy, Suspense } from "react";
 
-import { authClient } from "@/lib/auth-client";
-import { getToken } from "@/lib/auth-server";
-import {
-  deploymentMode,
-  AUTH_TOKEN_BUDGET_MS,
-  AUTH_ROUNDTRIP_BUDGET_MS,
-} from "@/lib/deployment-mode";
 import { PERF_DEBUG_SCRIPT } from "@/lib/perf-debug";
 
 import Header from "../components/header";
@@ -37,21 +27,9 @@ const TanStackRouterDevtools = import.meta.env.DEV
     )
   : null;
 
-// Landing page preview: no real Convex deployment exists; the .env URLs are placeholders.
-// When detected, skip all Convex/auth wiring so the landing page never waits on
-// a dead backend (proxy makes those fetches hang ~30s). Real URLs keep the full path.
-
-const getAuth = createServerFn({ method: "GET" }).handler(async () => {
-  // Landing page preview: no Convex deployment is configured yet; never let auth block rendering.
-  try {
-    return await Promise.race([
-      getToken(),
-      new Promise<null>((resolve) => setTimeout(() => resolve(null), AUTH_TOKEN_BUDGET_MS)),
-    ]);
-  } catch {
-    return null;
-  }
-});
+const Mesurer = import.meta.env.DEV
+  ? lazy(() => import("mesurer").then((m) => ({ default: m.Mesurer })))
+  : null;
 
 export interface RouterAppContext {
   queryClient: QueryClient;
@@ -59,25 +37,6 @@ export interface RouterAppContext {
 }
 
 export const Route = createRootRouteWithContext<RouterAppContext>()({
-  beforeLoad: async (ctx) => {
-    // Landing page preview: placeholder Convex deployment skips the auth round-trip entirely.
-    if (deploymentMode(ctx.context.convexQueryClient.convexClient.url).skipAuth) {
-      return { isAuthenticated: false, token: null };
-    }
-    // Cap the auth round-trip so hydration can never stall on it.
-    const token = await Promise.race([
-      getAuth(),
-      new Promise<null>((resolve) => setTimeout(() => resolve(null), AUTH_ROUNDTRIP_BUDGET_MS)),
-    ]).catch(() => null);
-    if (token) {
-      ctx.context.convexQueryClient.serverHttpClient?.setAuth(token);
-    }
-    return {
-      isAuthenticated: !!token,
-      token,
-    };
-  },
-
   head: () => ({
     meta: [
       {
@@ -122,7 +81,6 @@ const rootStyles = stylex.create({
 });
 
 function RootDocument() {
-  const context = useRouteContext({ from: Route.id });
   // The public landing page on "/" brings its own navigation; hide the app chrome there.
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const appShell = (
@@ -146,22 +104,14 @@ function RootDocument() {
             <TanStackRouterDevtools position="bottom-left" />
           </Suspense>
         )}
+        {Mesurer === null ? null : (
+          <Suspense fallback={null}>
+            <Mesurer />
+          </Suspense>
+        )}
         <Scripts />
       </body>
     </html>
   );
-  // With a placeholder Convex URL, skip ConvexBetterAuthProvider so it
-  // never opens a websocket / session fetch against a dead deployment (30s proxy hangs).
-  if (deploymentMode(context.convexQueryClient.convexClient.url).skipAuth) {
-    return appShell;
-  }
-  return (
-    <ConvexBetterAuthProvider
-      client={context.convexQueryClient.convexClient}
-      authClient={authClient}
-      initialToken={context.token}
-    >
-      {appShell}
-    </ConvexBetterAuthProvider>
-  );
+  return appShell;
 }

@@ -11,7 +11,7 @@ export const ui = stylex.create({
     boxSizing: "border-box",
   },
   inset: {
-    paddingInline: { default: 16, [mq.tablet]: 40, [mq.xl]: "min(124px, 8.611vw)" },
+    paddingInline: { default: 16, [mq.tablet]: 40, [mq.xl]: "min(120px, 8.333vw)" },
   },
   section: {
     paddingBlock: { default: 48, [mq.md]: 64, [mq.xl]: 80 },

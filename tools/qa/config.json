@@ -1,0 +1,26 @@
+{
+  "project": "fenchem-lp",
+  "surface": "web",
+  "choice": "agent-browser for exploration and visible-result smoke; existing regression and rendering suites remain authoritative",
+  "commands": {
+    "dev": {
+      "cwd": "apps/web",
+      "argv": ["bun", "run", "dev"]
+    },
+    "build": {
+      "cwd": "apps/web",
+      "argv": ["bun", "run", "build"]
+    },
+    "test": {
+      "cwd": ".",
+      "argv": ["bun", "run", "test"]
+    },
+    "test:e2e": {
+      "cwd": ".",
+      "argv": ["bun", "run", "test:e2e"]
+    },
+    "harness:check": {
+      "argv": ["bun", "--no-env-file", "tools/qa/self-check.mjs"]
+    }
+  }
+}

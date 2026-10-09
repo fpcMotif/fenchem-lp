@@ -26,7 +26,6 @@ export default defineConfig({
       NO_PROXY: "localhost,127.0.0.1,::1",
       no_proxy: "localhost,127.0.0.1,::1",
       VITE_CONVEX_URL: "https://placeholder.convex.cloud",
-      VITE_CONVEX_SITE_URL: "https://placeholder.convex.site",
     },
   },
   projects: [

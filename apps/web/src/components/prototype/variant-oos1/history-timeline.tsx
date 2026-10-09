@@ -37,6 +37,7 @@ const BODY_TEXT = "#4d4d4d";
 const PAGE = "#f3f5fa";
 const MUTED_INK = "rgba(26, 26, 26, 0.22)";
 const HAIRLINE = "rgba(26, 26, 26, 0.12)";
+const CONTROL_EDGE = "rgba(26, 26, 26, 0.28)";
 const BLUE_TRACK = "rgba(7, 67, 174, 0.16)";
 const GREEN_TRACK = "rgba(100, 167, 51, 0.3)";
 const BLUE_RING = "rgba(7, 67, 174, 0.38)";
@@ -45,7 +46,7 @@ const SERIF_ACCENT = '"Instrument Serif", Georgia, serif';
 const EASE_OUT_CSS = "cubic-bezier(0.22, 1, 0.36, 1)";
 const TABLET = "@media (min-width: 768px) and (max-width: 1279.98px)";
 const DESKTOP = breakpoints.xl;
-const INSET_124 = "min(124px, 8.611vw)";
+const INSET_120 = "min(120px, 8.333vw)";
 const SHELL_EDGE = "max(0px, (100% - 1440px) / 2)";
 const PIN_QUERY = "(min-width: 1024px) and (min-height: 760px)";
 const PIN_SPRING = { stiffness: 260, damping: 40, restDelta: 0.0005 };
@@ -103,7 +104,7 @@ const styles = stylex.create({
     maxWidth: 1440,
     marginInline: "auto",
     boxSizing: "border-box",
-    paddingInline: { default: 16, [TABLET]: 40, [DESKTOP]: INSET_124 },
+    paddingInline: { default: 16, [TABLET]: 40, [DESKTOP]: INSET_120 },
   },
 
   header: {
@@ -174,11 +175,13 @@ const styles = stylex.create({
       "linear-gradient(to right, transparent 0, #000 32px, #000 calc(100% - 32px), transparent 100%)",
   },
   viewportFree: {
+    maskImage:
+      "linear-gradient(to right, transparent 0, #000 32px, #000 calc(100% - 96px), transparent 100%)",
     overflowX: "auto",
     overflowY: "hidden",
     overscrollBehaviorX: "contain",
     scrollSnapType: "x proximity",
-    scrollPaddingInline: { default: 16, [TABLET]: 40, [DESKTOP]: INSET_124 },
+    scrollPaddingInline: { default: 16, [TABLET]: 40, [DESKTOP]: INSET_120 },
     scrollbarWidth: "none",
     outlineStyle: { default: "none", ":focus-visible": "solid" },
     outlineWidth: 2,
@@ -194,7 +197,7 @@ const styles = stylex.create({
     paddingInline: {
       default: `calc(${SHELL_EDGE} + 16px)`,
       [TABLET]: `calc(${SHELL_EDGE} + 40px)`,
-      [DESKTOP]: `calc(${SHELL_EDGE} + ${INSET_124})`,
+      [DESKTOP]: `calc(${SHELL_EDGE} + ${INSET_120})`,
     },
     willChange: "transform",
   },
@@ -418,18 +421,18 @@ const styles = stylex.create({
     display: "flex",
     justifyContent: "flex-end",
     gap: 8,
-    marginTop: { default: 24, [DESKTOP]: 36 },
+    marginTop: { default: 16, [DESKTOP]: 20 },
   },
   controlButton: {
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    width: { default: 44, [breakpoints.lg]: 40 },
-    height: { default: 44, [breakpoints.lg]: 40 },
+    width: 44,
+    height: 44,
     padding: 0,
     borderWidth: 1,
     borderStyle: "solid",
-    borderColor: HAIRLINE,
+    borderColor: CONTROL_EDGE,
     borderRadius: "50%",
     backgroundColor: { default: "transparent", ":hover": colors.paper },
     color: INK,
@@ -688,7 +691,10 @@ export function HistoryTimeline({
   useMotionValueEvent(scrollXProgress, "change", () => {
     if (!pinned) sync();
   });
-  useEffect(sync, [sync]);
+  useEffect(() => {
+    const frame = requestAnimationFrame(sync);
+    return () => cancelAnimationFrame(frame);
+  }, [sync]);
 
   const stepBy = (direction: number) => {
     const viewport = viewportRef.current;

@@ -12,6 +12,6 @@
   "devDependencies": {
     "@fenchem-lp/config": "workspace:*",
     "@fenchem-lp/infra": "workspace:*",
-    "typescript": "catalog:"
+    "typescript": "next"
   }
 }

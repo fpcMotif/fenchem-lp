@@ -177,7 +177,7 @@ const styles = stylex.create({
   },
   spotlightSection: {
     paddingTop: { default: 24, [LG]: 16 },
-    paddingBottom: { default: 56, [DESKTOP]: 80 },
+    paddingBottom: { default: 72, [DESKTOP]: 128 },
   },
   spotlightGrid: {
     display: "grid",
@@ -243,7 +243,9 @@ const styles = stylex.create({
     transitionTimingFunction: EASE_OUT_CSS,
   },
   productCardActive: {
+    outlineWidth: { default: 2, ":focus-visible": 3 },
     outlineColor: { default: ACCENT, ":focus-visible": colors.brandBlue700 },
+    outlineOffset: 4,
   },
   cardImg: {
     display: "block",
