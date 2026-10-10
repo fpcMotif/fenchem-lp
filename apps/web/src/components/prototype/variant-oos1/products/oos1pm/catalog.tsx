@@ -490,7 +490,7 @@ export function Catalog() {
           </p>
         </header>
 
-        <nav aria-label="按学名首字母跳转" {...stylex.props(styles.strip)}>
+        <nav aria-label="Jump to botanical names by first letter" {...stylex.props(styles.strip)}>
           <ul {...stylex.props(styles.stripList)}>
             {STRIP_ENTRIES.map(({ key, filled }) => {
               const isCurrent = current === key;
@@ -499,7 +499,7 @@ export function Catalog() {
                   <button
                     type="button"
                     disabled={!filled}
-                    aria-label={key === NO_LATIN ? NO_LATIN_LABEL : undefined}
+                    aria-label={key === NO_LATIN ? "No botanical name" : undefined}
                     aria-current={isCurrent ? "true" : undefined}
                     onClick={() => jumpTo(key)}
                     {...stylex.props(
