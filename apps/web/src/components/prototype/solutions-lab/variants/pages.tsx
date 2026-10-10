@@ -120,11 +120,14 @@ const styles = stylex.create({
     columnCount: { default: 1, [bp.md]: 2, [bp.xl]: 3 },
     columnGap: 24,
   },
+  tocGroup: {
+    marginTop: { default: 12, ":first-child": 0 },
+  },
   tocHeading: {
     display: "flex",
     alignItems: "baseline",
     gap: 8,
-    marginTop: { default: 12, ":first-child": 0 },
+    marginTop: 0,
     marginBottom: 2,
     paddingInline: 8,
     paddingBlock: 6,
@@ -747,7 +750,7 @@ export function PagesVariant() {
           {...stylex.props(styles.toc)}
         >
           {groups.map((group) => (
-            <section key={group.id} aria-label={group.label}>
+            <section key={group.id} aria-label={group.label} {...stylex.props(styles.tocGroup)}>
               {isAll && (
                 <h4 {...stylex.props(styles.tocHeading)}>
                   {group.label}

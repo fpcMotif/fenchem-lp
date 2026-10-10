@@ -433,7 +433,11 @@ function NameList({
               aria-controls={sheetId}
               onClick={() => onChoose(item.id)}
               onFocus={() => onFocusItem(item.id)}
-              {...stylex.props(styles.name, isSelected && styles.nameSelected, stylex.defaultMarker())}
+              {...stylex.props(
+                styles.name,
+                isSelected && styles.nameSelected,
+                stylex.defaultMarker(),
+              )}
             >
               {isSelected && (
                 <m.span
