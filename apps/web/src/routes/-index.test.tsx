@@ -120,6 +120,10 @@ describe("home route", () => {
 
     const first = getByRole("button", { name: /In-cosmetics® 拉丁美洲展/ });
     const second = getByRole("button", { name: /IFSCC 大会 2026/ });
+    expect(first.getAttribute("aria-expanded")).toBe("false");
+    expect(second.getAttribute("aria-expanded")).toBe("false");
+
+    fireEvent.click(first);
     expect(first.getAttribute("aria-expanded")).toBe("true");
     expect(second.getAttribute("aria-expanded")).toBe("false");
 
