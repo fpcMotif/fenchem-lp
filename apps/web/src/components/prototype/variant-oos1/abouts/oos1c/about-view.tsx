@@ -255,7 +255,7 @@ function SubNav({
   return (
     <div {...stylex.props(styles.subBar)}>
       <div {...stylex.props(ui.shell, ui.inset, styles.subBarInner)}>
-        <nav aria-label="面包屑导航" {...stylex.props(styles.breadcrumb)}>
+        <nav aria-label="Breadcrumb" {...stylex.props(styles.breadcrumb)}>
           <button
             type="button"
             onClick={() => onNavigateHome("top")}
@@ -266,7 +266,7 @@ function SubNav({
           <ChevronRight size={12} aria-hidden="true" />
           <span aria-current="page">关于我们</span>
         </nav>
-        <nav aria-label="本页导航" ref={chipListRef} {...stylex.props(styles.chips)}>
+        <nav aria-label="On this page" ref={chipListRef} {...stylex.props(styles.chips)}>
           {ABOUT_HERO.navChips.map((chip) => {
             const isActive = active === chip.id;
             return (
@@ -277,7 +277,6 @@ function SubNav({
                 {...stylex.props(styles.chip)}
               >
                 <span lang="en">{NAV_ENGLISH[chip.id]}</span>
-                <span {...stylex.props(ui.srOnly)}> {chip.label}</span>
                 <span
                   aria-hidden="true"
                   {...stylex.props(styles.chipMark, isActive && styles.chipMarkActive)}

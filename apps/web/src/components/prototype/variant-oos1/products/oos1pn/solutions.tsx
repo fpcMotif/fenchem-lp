@@ -596,13 +596,13 @@ export function Solutions() {
                         <span {...stylex.props(styles.rowSubtitle)}>{item.subtitle}</span>
                       </span>
                       <span {...stylex.props(styles.rowCell)}>
-                        <span {...stylex.props(styles.srOnly)}>质地</span>
+                        <span {...stylex.props(styles.srOnly)}>Texture</span>
                         {item.texture.map((line) => (
                           <span key={line}>{line}</span>
                         ))}
                       </span>
                       <span {...stylex.props(styles.rowCell)}>
-                        <span {...stylex.props(styles.srOnly)}>应用</span>
+                        <span {...stylex.props(styles.srOnly)}>Applications</span>
                         {item.applications.map((line) => (
                           <span key={line}>{line}</span>
                         ))}
@@ -650,7 +650,11 @@ export function Solutions() {
                       />
                       返回总览
                     </button>
-                    <div role="group" aria-label="切换方案" {...stylex.props(styles.stepper)}>
+                    <div
+                      role="group"
+                      aria-label="Switch solution"
+                      {...stylex.props(styles.stepper)}
+                    >
                       <button
                         type="button"
                         aria-disabled={openIndex === 0}

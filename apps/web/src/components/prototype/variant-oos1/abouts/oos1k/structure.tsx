@@ -226,7 +226,7 @@ function slotPlace(slot: number, row: Row) {
 export function Structure() {
   const [lit, setLit] = useState<string | null>(null);
   const [plotRef, hidden] = useDusk<HTMLDivElement>();
-  const { holding, subsidiaries, subsidiaryBadge } = ABOUT_STRUCTURE;
+  const { holding, subsidiaries, subsidiaryBadge, subsidiaryBadgeEnglish } = ABOUT_STRUCTURE;
 
   return (
     <section
@@ -311,7 +311,7 @@ export function Structure() {
             {holding.english}
           </span>
         </p>
-        <ul aria-label={subsidiaryBadge} {...stylex.props(styles.labels)}>
+        <ul aria-label={subsidiaryBadgeEnglish} {...stylex.props(styles.labels)}>
           {ORBITS.map((orbit) => (
             <li
               key={orbit.id}

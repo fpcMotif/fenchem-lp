@@ -147,12 +147,14 @@ const rise = stylex.create({
 
 export function RiseText({
   text,
+  srText = text,
   play,
   delay = 0,
   stagger = 70,
   charSx,
 }: {
   text: string;
+  srText?: string;
   play: boolean;
   delay?: number;
   stagger?: number;
@@ -160,7 +162,7 @@ export function RiseText({
 }) {
   return (
     <>
-      <span {...stylex.props(base.srOnly)}>{text}</span>
+      <span {...stylex.props(base.srOnly)}>{srText}</span>
       <span aria-hidden="true">
         {Array.from(text).map((char, index) => (
           <span key={`${char}-${index}`} {...stylex.props(rise.mask)}>

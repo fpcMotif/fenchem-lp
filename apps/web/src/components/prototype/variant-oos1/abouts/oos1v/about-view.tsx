@@ -62,7 +62,7 @@ function Banner({ onNavigateHome }: AboutPageProps) {
   return (
     <section aria-labelledby="about-title" {...stylex.props(styles.banner)}>
       <div {...stylex.props(styles.column)}>
-        <nav aria-label="面包屑导航" {...stylex.props(styles.crumbs)}>
+        <nav aria-label="Breadcrumb" {...stylex.props(styles.crumbs)}>
           <a
             href="#top"
             onClick={(event) => {
@@ -72,14 +72,12 @@ function Banner({ onNavigateHome }: AboutPageProps) {
             {...stylex.props(styles.crumbLink, shared.focusRing)}
           >
             <span lang="en">Home</span>
-            <span {...stylex.props(shared.srOnly)}> 首页</span>
           </a>
           <span aria-hidden="true" {...stylex.props(styles.crumbDivider)}>
             /
           </span>
           <span aria-current="page">
             <span lang="en">About</span>
-            <span {...stylex.props(shared.srOnly)}> 关于我们</span>
           </span>
         </nav>
         <div {...stylex.props(styles.titleRow)}>
@@ -134,7 +132,7 @@ function PageNav() {
   }, [active]);
 
   return (
-    <nav aria-label="页面导航" {...stylex.props(styles.pageNav)}>
+    <nav aria-label="On this page" {...stylex.props(styles.pageNav)}>
       <ul ref={listRef} {...stylex.props(styles.navList)}>
         {ABOUT_HERO.navChips.map((chip) => {
           const current = active === chip.id;
@@ -154,7 +152,6 @@ function PageNav() {
                   {...stylex.props(styles.navMark, current && styles.navMarkCurrent)}
                 />
                 <span lang="en">{NAV_EN[chip.id]}</span>
-                <span {...stylex.props(shared.srOnly)}> {chip.label}</span>
               </a>
             </li>
           );
@@ -175,7 +172,7 @@ function Profile() {
       {...stylex.props(styles.section)}
     >
       <h2 id="about-profile-heading" {...stylex.props(shared.srOnly)}>
-        企业概况
+        Profile
       </h2>
       <div {...stylex.props(styles.column, styles.grid)}>
         <div {...stylex.props(styles.profileText)}>
@@ -201,7 +198,7 @@ function Profile() {
           >
             <img
               src={ABOUT_HERO.lobbyImage}
-              alt={ABOUT_HERO.lobbyCaption}
+              alt={ABOUT_HERO.lobbyEnglish}
               loading="lazy"
               decoding="async"
               {...stylex.props(shared.fill, shared.cyanotype)}
@@ -247,7 +244,7 @@ function Campus() {
       {...stylex.props(styles.section)}
     >
       <h2 id="about-campus-heading" {...stylex.props(shared.srOnly)}>
-        {ABOUT_CAMPUS.title}
+        {ABOUT_CAMPUS.eyebrow}
       </h2>
       <ul {...stylex.props(styles.column, styles.grid, styles.campusList)}>
         {CAMPUS_HANG.map((photo, index) => (
@@ -283,7 +280,7 @@ function CampusPrint({ photo, onOpen }: { photo: CampusPhoto; onOpen: () => void
     <figure {...stylex.props(styles.campusFigure)}>
       <button
         type="button"
-        aria-label={`查看大图：${photo.caption}`}
+        aria-label={`View larger: ${photo.english}`}
         onClick={onOpen}
         {...stylex.props(styles.printButton, shared.focusRing)}
       >
@@ -308,7 +305,6 @@ function CampusPrint({ photo, onOpen }: { photo: CampusPhoto; onOpen: () => void
       </button>
       <figcaption {...stylex.props(shared.caption)}>
         <span lang="en">{CAMPUS_CAPTION_EN[photo.id]}</span>
-        <span {...stylex.props(shared.srOnly)}> {photo.caption}</span>
       </figcaption>
     </figure>
   );
@@ -321,7 +317,7 @@ function Responsibility() {
   return (
     <section id="about-csr" aria-labelledby="about-csr-heading" {...stylex.props(styles.section)}>
       <h2 id="about-csr-heading" {...stylex.props(shared.srOnly)}>
-        {ABOUT_CSR.title}
+        Responsibility
       </h2>
       <div {...stylex.props(styles.column, styles.grid)}>
         <h3 {...stylex.props(styles.statement)}>
@@ -382,7 +378,7 @@ function Honors() {
       {...stylex.props(styles.section)}
     >
       <h2 id="about-honor-heading" {...stylex.props(shared.srOnly)}>
-        {ABOUT_HONORS.title}
+        {ABOUT_HONORS.eyebrow}
       </h2>
       <div {...stylex.props(styles.column, styles.grid)}>
         <ul {...stylex.props(styles.honorList)}>
@@ -419,7 +415,7 @@ function Structure() {
       {...stylex.props(styles.section)}
     >
       <h2 id="about-structure-heading" {...stylex.props(shared.srOnly)}>
-        企业架构
+        {ABOUT_STRUCTURE.eyebrow}
       </h2>
       <div {...stylex.props(styles.column, styles.grid)}>
         <div {...stylex.props(styles.holding)}>
@@ -436,7 +432,7 @@ function Structure() {
             {...stylex.props(styles.chartToggle, shared.focusRing)}
           >
             <span lang="en">{chartOpen ? "Hide chart" : "View chart"}</span>
-            <span {...stylex.props(shared.srOnly)}> 企业架构图</span>
+            <span {...stylex.props(shared.srOnly)}> Organizational chart</span>
           </button>
         </div>
         <div {...stylex.props(styles.branches)}>
@@ -455,7 +451,7 @@ function Structure() {
         <figure id={chartId} hidden={!chartOpen} {...stylex.props(styles.chart)}>
           <img
             src={ABOUT_STRUCTURE.chartImage}
-            alt="企业架构图：南京泛成国际控股有限公司及五家全资子公司"
+            alt="Organizational chart: Nanjing Fenchem International Holdings Corporation Limited and its five wholly owned subsidiaries"
             loading="lazy"
             decoding="async"
             {...stylex.props(styles.chartImage, shared.cyanotype)}

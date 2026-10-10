@@ -69,24 +69,24 @@ export function CountUp({ value }: { value: string }) {
   const reduce = useReducedMotion();
 
   useLayoutEffect(() => {
-    const text = ref.current?.firstChild;
-    if (!text) return;
+    const node = ref.current;
+    if (!node) return;
     if (reduce) {
-      text.nodeValue = value;
+      node.textContent = value;
       return;
     }
     if (!inView) {
-      text.nodeValue = "0";
+      node.textContent = "0";
       return;
     }
     const controls = animate(0, target, {
       duration: COUNT_UP_SECONDS,
       ease: EASE,
       onUpdate: (latest) => {
-        text.nodeValue = Math.round(latest).toLocaleString("en-US");
+        node.textContent = Math.round(latest).toLocaleString("en-US");
       },
       onComplete: () => {
-        text.nodeValue = value;
+        node.textContent = value;
       },
     });
     return () => controls.stop();

@@ -108,7 +108,7 @@ const styles = stylex.create({
 
 export function Products({ onNavigateHome }: { onNavigateHome: (hash?: string) => void }) {
   return (
-    <Section id="about-products" name={PRODUCTS_INTRO.title}>
+    <Section id="about-products" name="Products and application solutions">
       <Shell>
         <NodeMarker />
         <Reveal>
@@ -117,7 +117,7 @@ export function Products({ onNavigateHome }: { onNavigateHome: (hash?: string) =
               <li key={product.title} {...stylex.props(styles.card)}>
                 <img
                   src={product.image}
-                  alt={product.title}
+                  alt={product.english}
                   loading="lazy"
                   decoding="async"
                   {...stylex.props(styles.image)}
@@ -135,7 +135,7 @@ export function Products({ onNavigateHome }: { onNavigateHome: (hash?: string) =
                   </a>
                 </h3>
                 <p {...stylex.props(styles.description)}>{product.description}</p>
-                <ul aria-label="应用方向" {...stylex.props(styles.tags)}>
+                <ul aria-label="Application areas" {...stylex.props(styles.tags)}>
                   {product.tags.map((tag) => (
                     <li key={tag}>{tag}</li>
                   ))}

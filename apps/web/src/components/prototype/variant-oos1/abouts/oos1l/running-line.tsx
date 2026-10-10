@@ -116,7 +116,7 @@ export function RunningLine({
   trackRef: Ref<HTMLOListElement>;
 }) {
   return (
-    <nav ref={barRef} aria-label="页内导航" {...stylex.props(styles.bar)}>
+    <nav ref={barRef} aria-label="On this page" {...stylex.props(styles.bar)}>
       <div {...stylex.props(ui.shell, styles.row)}>
         <ol ref={trackRef} {...stylex.props(styles.track)}>
           {UNITS.map((unit) => (

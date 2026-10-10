@@ -101,7 +101,7 @@ export function Structure() {
       {...stylex.props(styles.section, layout.sectionY, layout.anchor)}
     >
       <h2 id="about-structure-title" {...stylex.props(layout.srOnly)}>
-        企业结构
+        Structure
       </h2>
       <div {...stylex.props(layout.shell, layout.split, styles.grid)}>
         <Reveal sx={[layout.padLeft, layout.seam]}>
@@ -144,7 +144,7 @@ export function Structure() {
       >
         <img
           src={ABOUT_STRUCTURE.chartImage}
-          alt="南京泛成国际控股有限公司官方组织架构图"
+          alt="Official organizational chart of Nanjing Fenchem International Holdings Corporation Limited"
           loading="lazy"
           decoding="async"
           {...stylex.props(styles.chart)}

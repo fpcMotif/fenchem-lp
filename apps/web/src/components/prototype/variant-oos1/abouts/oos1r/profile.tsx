@@ -178,7 +178,7 @@ export function Profile() {
   const networkId = useId();
 
   return (
-    <Section id={chip.id} label={chip.label}>
+    <Section id={chip.id} label={chip.english}>
       <div {...stylex.props(s.top)}>
         <Reveal>
           <div {...stylex.props(s.nameRow)}>
@@ -187,7 +187,7 @@ export function Profile() {
               <div {...stylex.props(ui.frame, s.stampFrame)}>
                 <img
                   src={ABOUT_HERO.lobbyImage}
-                  alt={ABOUT_HERO.lobbyCaption}
+                  alt={ABOUT_HERO.lobbyEnglish}
                   loading="lazy"
                   decoding="async"
                   {...stylex.props(ui.fill, s.stampImage)}

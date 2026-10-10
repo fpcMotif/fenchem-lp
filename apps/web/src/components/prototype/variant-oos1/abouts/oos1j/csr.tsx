@@ -90,7 +90,7 @@ export function Csr() {
       aria-labelledby="about-csr-title"
       {...stylex.props(base.section, base.anchor, styles.csr)}
     >
-      <SectionName id="about-csr-title">社会责任</SectionName>
+      <SectionName id="about-csr-title">Responsibility</SectionName>
       <div {...stylex.props(base.shell, styles.grid)}>
         <div ref={textRef} {...stylex.props(styles.text)}>
           <p {...stylex.props(styles.statement)}>

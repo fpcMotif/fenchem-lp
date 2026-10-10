@@ -82,7 +82,7 @@ export function Csr() {
   return (
     <section
       id="about-csr"
-      aria-label={ABOUT_CSR.title}
+      aria-label="Responsibility"
       {...stylex.props(shared.anchor, styles.section)}
     >
       <div {...stylex.props(shared.shell, shared.inset)}>

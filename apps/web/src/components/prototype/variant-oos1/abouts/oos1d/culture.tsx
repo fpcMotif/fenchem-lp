@@ -86,7 +86,7 @@ export function Culture() {
   const lastIndex = ABOUT_CULTURE.values.length - 1;
 
   return (
-    <Section id={chip.id} label={ABOUT_CULTURE.title} background={ui.onPaper}>
+    <Section id={chip.id} label={ABOUT_CULTURE.eyebrow} background={ui.onPaper}>
       <div {...stylex.props(ui.phi)}>
         <div {...stylex.props(ui.asideCol)}>
           <div {...stylex.props(ui.asideSticky)}>

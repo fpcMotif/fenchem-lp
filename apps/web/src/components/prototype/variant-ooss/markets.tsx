@@ -401,7 +401,7 @@ function GradedImage({
   return (
     <img
       src={product.image}
-      alt={`${product.title}应用示意图`}
+      alt={`${product.english} application illustration`}
       loading="lazy"
       decoding="async"
       {...stylex.props(styles.image, GRADE_STYLES[index], settling && styles.imageSettle)}
@@ -504,7 +504,7 @@ function PinnedStage({
         <MarketsHeader />
         <div {...stylex.props(layout.grid12, styles.body)}>
           <Reveal index={3} sx={styles.rail}>
-            <ul aria-label="产品类别" role="list" {...stylex.props(styles.nameList)}>
+            <ul aria-label="Product categories" role="list" {...stylex.props(styles.nameList)}>
               {PRODUCTS.map((product, index) => {
                 const isActive = index === active;
                 return (

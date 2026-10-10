@@ -31,7 +31,7 @@ export function LightboxStage({
       <button
         type="button"
         tabIndex={-1}
-        aria-label="关闭照片"
+        aria-label="Close photo"
         onClick={onClose}
         {...stylex.props(styles.backdrop)}
       />

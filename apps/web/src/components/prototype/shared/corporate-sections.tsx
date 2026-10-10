@@ -9,7 +9,7 @@ import {
   type ReactNode,
   type KeyboardEvent,
 } from "react";
-import { AnimatePresence, m, type MotionStyle } from "motion/react";
+import { AnimatePresence, m, type MotionStyle, type MotionValue } from "motion/react";
 import { ArrowUpRight, Menu, Search, X } from "lucide-react";
 import { EASE, STAGGER } from "../motion-constants";
 import { useReducedMotion } from "../use-reduced-motion";
@@ -93,10 +93,10 @@ export function CorporateHeader({
       {...stylex.props(styles.header, (scrolled || menuOpen) && styles.headerSolid)}
     >
       <div {...stylex.props(styles.shell, styles.headerInner, styles.headerEnter)}>
-        <a href="#top" aria-label="FENCHEM 泛成 首页" {...stylex.props(styles.logoLink)}>
+        <a href="#top" aria-label="FENCHEM home" {...stylex.props(styles.logoLink)}>
           {logo}
         </a>
-        <nav aria-label="主导航" {...stylex.props(styles.nav)}>
+        <nav aria-label="Main" {...stylex.props(styles.nav)}>
           {navItems.map((item) => (
             <a
               key={item.href}
@@ -109,15 +109,19 @@ export function CorporateHeader({
           ))}
         </nav>
         <div {...stylex.props(styles.headerActions)}>
-          <button type="button" aria-label="AI 搜索" {...stylex.props(styles.searchPill)}>
+          <button type="button" aria-label="AI search" {...stylex.props(styles.searchPill)}>
             <Search size={16} strokeWidth={2} absoluteStrokeWidth aria-hidden="true" />
           </button>
-          <button type="button" aria-label="CN，切换语言" {...stylex.props(styles.langButton)}>
+          <button
+            type="button"
+            aria-label="CN, switch language"
+            {...stylex.props(styles.langButton)}
+          >
             CN
           </button>
           <button
             type="button"
-            aria-label={menuOpen ? "关闭菜单" : "打开菜单"}
+            aria-label={menuOpen ? "Close menu" : "Open menu"}
             aria-expanded={menuOpen}
             aria-controls={menuId}
             onClick={() => setMenuOpen((open) => !open)}
@@ -136,7 +140,7 @@ export function CorporateHeader({
           <m.nav
             key="menu"
             id={menuId}
-            aria-label="主导航"
+            aria-label="Main"
             {...stylex.props(styles.menuPanel)}
             initial={{ opacity: 0, transform: "translateY(-8px)" }}
             animate={{ opacity: 1, transform: "translateY(0px)" }}
@@ -167,6 +171,8 @@ export function HeroBackdrop({
   styles,
   source,
   motionStyle,
+  liquidFragment,
+  liquidProgress,
 }: {
   styles: Record<
     | "heroParallax"
@@ -179,6 +185,8 @@ export function HeroBackdrop({
   >;
   source: string;
   motionStyle?: MotionStyle;
+  liquidFragment?: string;
+  liquidProgress?: MotionValue<number>;
 }) {
   return (
     <m.div aria-hidden="true" {...stylex.props(styles.heroParallax)} style={motionStyle}>
@@ -189,7 +197,12 @@ export function HeroBackdrop({
           decoding="async"
           {...stylex.props(styles.heroLayer, styles.heroImage)}
         />
-        <LiquidImage src={source} sx={styles.heroImage} />
+        <LiquidImage
+          src={source}
+          sx={styles.heroImage}
+          fragment={liquidFragment}
+          progress={liquidProgress}
+        />
         <div {...stylex.props(styles.heroLayer, styles.heroTintColor)} />
         <div {...stylex.props(styles.heroLayer, styles.heroTintScreen)} />
       </div>

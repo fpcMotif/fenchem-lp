@@ -86,7 +86,7 @@ const styles = stylex.create({
 export function Csr() {
   const [lead, close] = ABOUT_CSR.statement;
   return (
-    <Section id="about-csr" name={ABOUT_CSR.title}>
+    <Section id="about-csr" name="Responsibility">
       <Shell>
         <NodeMarker />
         <div {...stylex.props(styles.grid)}>

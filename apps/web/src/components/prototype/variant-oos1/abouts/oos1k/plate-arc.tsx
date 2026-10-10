@@ -259,7 +259,7 @@ function ArcPlate({
         {...stylex.props(styles.glass, sized.focus(plate.focus))}
       />
       <span {...srOnly}>
-        Plate {plate.numeral} · {plate.caption}，查看大图
+        Plate {plate.numeral} · {plate.english}, View larger
       </span>
     </m.button>
   );
@@ -353,14 +353,14 @@ export function PlateArc({ onOpen }: { onOpen: (index: number) => void }) {
               <p lang="en" {...stylex.props(styles.english)}>
                 {plate.english}
               </p>
-              <p {...stylex.props(ui.body, styles.note)}>{plate.alt}</p>
+              <p {...stylex.props(ui.body, styles.note)}>{plate.description}</p>
             </div>
-            <ol aria-label="底片目录" {...stylex.props(styles.register)}>
+            <ol aria-label="Film strip index" {...stylex.props(styles.register)}>
               {PLATES.map((item, index) => (
                 <li key={item.id}>
                   <button
                     type="button"
-                    aria-label={`Plate ${item.numeral} · ${item.caption}`}
+                    aria-label={`Plate ${item.numeral} · ${item.english}`}
                     aria-current={index === active ? "true" : undefined}
                     onClick={() => scrollToPlate(index)}
                     {...stylex.props(

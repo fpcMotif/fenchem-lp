@@ -137,7 +137,7 @@ export function Structure() {
       {...stylex.props(shared.anchor, shared.section, styles.section)}
     >
       <h2 id="about-structure-title" {...stylex.props(shared.srOnly)}>
-        {ABOUT_STRUCTURE.title}
+        {ABOUT_STRUCTURE.eyebrow}
       </h2>
       <div {...stylex.props(shared.shell, shared.inset)}>
         <Reveal sx={styles.holding}>
@@ -148,7 +148,10 @@ export function Structure() {
           </div>
         </Reveal>
 
-        <ul aria-label={ABOUT_STRUCTURE.subsidiaryBadge} {...stylex.props(styles.subsidiaries)}>
+        <ul
+          aria-label={ABOUT_STRUCTURE.subsidiaryBadgeEnglish}
+          {...stylex.props(styles.subsidiaries)}
+        >
           {ABOUT_STRUCTURE.subsidiaries.map((sub, position) => (
             <Reveal key={sub.id} as="li" step={position} sx={styles.subsidiary}>
               <h4 {...stylex.props(styles.subsidiaryName)}>{sub.name}</h4>
@@ -177,7 +180,7 @@ export function Structure() {
           <div id={diagramId} hidden={!showDiagram} {...stylex.props(styles.diagram)}>
             <img
               src={ABOUT_STRUCTURE.chartImage}
-              alt="南京泛成国际控股有限公司官方组织架构图"
+              alt="Official organizational chart of Nanjing Fenchem International Holdings Corporation Limited"
               loading="lazy"
               decoding="async"
               {...stylex.props(styles.diagramImage)}

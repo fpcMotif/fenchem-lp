@@ -86,7 +86,7 @@ export function Band() {
   return (
     <section id="about-stats" aria-labelledby="about-stats-title" {...stylex.props(S.band)}>
       <span aria-hidden="true" {...stylex.props(S.bg)} />
-      <SectionName id="about-stats-title">泛成发展数据</SectionName>
+      <SectionName id="about-stats-title">Growth figures</SectionName>
       <ScrollWipe>
         <Frame src={ABOUT_MOMENT.image} alt={ABOUT_MOMENT.alt} ratio="12 / 5" position="50% 38%" />
       </ScrollWipe>

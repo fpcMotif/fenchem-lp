@@ -53,6 +53,10 @@ type Face = "summary" | "process";
 const SUMMARY_LABEL = "概述 · 功能 · 成分";
 const processLabel = (formula: FlatFormula) =>
   formula.challenges.length > 0 ? "配方挑战 · 质地 · 应用" : "质地 · 应用";
+const processLabelEnglish = (formula: FlatFormula) =>
+  formula.challenges.length > 0
+    ? "Formulation challenges · Texture · Applications"
+    : "Texture · Applications";
 
 const WIDE_QUERY = "(min-width: 1024px)";
 const subscribeWide = (onChange: () => void) => {
@@ -383,18 +387,23 @@ const styles = stylex.create({
     display: { default: "none", [LG]: "block" },
   },
   processHeading: {
-    position: { default: "static", [LG]: "absolute" },
-    width: { default: "auto", [LG]: 1 },
-    height: { default: "auto", [LG]: 1 },
+    display: { default: "block", [LG]: "none" },
     margin: 0,
-    overflow: { default: "visible", [LG]: "hidden" },
-    clipPath: { default: "none", [LG]: "inset(50%)" },
-    whiteSpace: { default: "normal", [LG]: "nowrap" },
     fontSize: 13,
     fontWeight: 500,
     lineHeight: "20px",
     letterSpacing: "0.08em",
     color: INK,
+  },
+  processHeadingEn: {
+    display: { default: "none", [LG]: "block" },
+    position: "absolute",
+    width: 1,
+    height: 1,
+    margin: 0,
+    overflow: "hidden",
+    clipPath: "inset(50%)",
+    whiteSpace: "nowrap",
   },
 
   specs: {
@@ -531,6 +540,7 @@ function SheetStack({
   const reduce = useReducedMotion();
   const summaryFront = face === "summary";
   const processName = processLabel(formula);
+  const processEnglish = processLabelEnglish(formula);
   const backLabel = summaryFront ? processName : SUMMARY_LABEL;
   const backPage = summaryFront ? "2 / 2" : "1 / 2";
 
@@ -555,6 +565,7 @@ function SheetStack({
           <SheetHead formula={formula} page="2 / 2" decorative />
         </div>
         <h4 {...stylex.props(styles.processHeading)}>{processName}</h4>
+        <h4 {...stylex.props(styles.processHeadingEn)}>{processEnglish}</h4>
         <dl {...stylex.props(styles.specs, styles.processSpecs)}>
           {formula.challenges.length > 0 && (
             <Spec label="配方挑战">
@@ -640,7 +651,7 @@ export function Solutions() {
           <div
             ref={listRef}
             role="tablist"
-            aria-label="应用方案"
+            aria-label="Application solutions"
             aria-orientation={wide ? "vertical" : "horizontal"}
             {...stylex.props(styles.tablist)}
           >

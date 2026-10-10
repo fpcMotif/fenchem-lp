@@ -125,7 +125,7 @@ function Mark({ exposure, phase }: { exposure: number; phase: Phase }) {
 
 export function Structure() {
   const [rowsRef, phase] = useEntry<HTMLDivElement>();
-  const { holding, subsidiaries, subsidiaryBadge } = ABOUT_STRUCTURE;
+  const { holding, subsidiaries, subsidiaryBadge, subsidiaryBadgeEnglish } = ABOUT_STRUCTURE;
   return (
     <section id="about-structure" aria-labelledby="oos1p-structure" {...stylex.props(ui.plate)}>
       <PlateHead
@@ -152,7 +152,7 @@ export function Structure() {
             </p>
           </div>
 
-          <h3 {...srOnly}>{subsidiaryBadge}</h3>
+          <h3 {...srOnly}>{subsidiaryBadgeEnglish}</h3>
           <ol {...stylex.props(styles.rows, styles.firstSubsidiary)}>
             {subsidiaries.map((subsidiary, index) => (
               <li key={subsidiary.id} {...stylex.props(ui.grid, styles.row)}>

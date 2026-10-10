@@ -168,7 +168,7 @@ export function Hero() {
                 {...stylex.props(ui.fill, styles.banner)}
               />
               <a href="#about-campus" {...stylex.props(styles.door, stylex.defaultMarker())}>
-                <span {...srOnly}>进入园区：{LOBBY.caption}</span>
+                <span {...srOnly}>Enter the campus: {LOBBY.english}</span>
                 <MiniPlate plate={LOBBY} photoStyle={styles.doorPhoto}>
                   <span {...stylex.props(styles.speck)}>
                     <MiniPlate plate={RECEPTION} />

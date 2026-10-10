@@ -380,7 +380,11 @@ function Field({ label, children }: { label: string; children: ReactNode }) {
 function Sheet({ item, index }: { item: SolutionItem; index: number }) {
   const titleId = useId();
   return (
-    <article aria-labelledby={titleId} aria-roledescription="方案" {...stylex.props(styles.sheet)}>
+    <article
+      aria-labelledby={titleId}
+      aria-roledescription="Solution"
+      {...stylex.props(styles.sheet)}
+    >
       <header {...stylex.props(styles.sheetHead)}>
         <span {...stylex.props(styles.sheetNumber)}>{padIndex(index)}</span>
         <h3 id={titleId} {...stylex.props(styles.sheetTitle)}>
@@ -511,7 +515,7 @@ export function Solutions() {
                 <span {...stylex.props(styles.counterTotal)}> / {TOTAL_LABEL}</span>
               </span>
               <span {...stylex.props(styles.srOnly)}>
-                第 {active + 1} 个，共 {COUNT} 个：{current?.title}
+                Solution {active + 1} of {COUNT}: {current?.englishName}
               </span>
             </p>
             <button
@@ -524,7 +528,10 @@ export function Solutions() {
               {...stylex.props(styles.navButton, atStart && styles.navButtonDisabled)}
             >
               <ChevronLeft size={16} strokeWidth={1.5} absoluteStrokeWidth aria-hidden="true" />
-              <span {...stylex.props(styles.navLabel)}>上一个</span>
+              <span aria-hidden="true" {...stylex.props(styles.navLabel)}>
+                上一个
+              </span>
+              <span {...stylex.props(styles.srOnly)}>Previous</span>
             </button>
             <button
               type="button"
@@ -535,7 +542,10 @@ export function Solutions() {
               }}
               {...stylex.props(styles.navButton, atEnd && styles.navButtonDisabled)}
             >
-              <span {...stylex.props(styles.navLabel)}>下一个</span>
+              <span aria-hidden="true" {...stylex.props(styles.navLabel)}>
+                下一个
+              </span>
+              <span {...stylex.props(styles.srOnly)}>Next</span>
               <ChevronRight size={16} strokeWidth={1.5} absoluteStrokeWidth aria-hidden="true" />
             </button>
           </div>
@@ -544,8 +554,8 @@ export function Solutions() {
           ref={trackRef}
           id={trackId}
           role="region"
-          aria-roledescription="轮播"
-          aria-label="应用方案列表，左右方向键切换"
+          aria-roledescription="Carousel"
+          aria-label="Application solution list; use the left and right arrow keys to switch"
           tabIndex={0}
           onScroll={handleScroll}
           onKeyDown={handleKeyDown}
@@ -555,14 +565,14 @@ export function Solutions() {
             <Sheet key={item.id} item={item} index={index} />
           ))}
         </div>
-        <div role="group" aria-label="跳转到方案" {...stylex.props(styles.dots)}>
+        <div role="group" aria-label="Jump to solution" {...stylex.props(styles.dots)}>
           {SOLUTION_ITEMS.map((item, index) => {
             const isCurrent = index === active;
             return (
               <button
                 key={item.id}
                 type="button"
-                aria-label={`${padIndex(index)} ${item.title}`}
+                aria-label={`${padIndex(index)} ${item.englishName}`}
                 aria-current={isCurrent ? "true" : undefined}
                 aria-controls={trackId}
                 onClick={() => goTo(index)}

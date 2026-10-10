@@ -84,7 +84,7 @@ export function Csr() {
   const chip = ABOUT_HERO.navChips[3];
 
   return (
-    <Section id={chip.id} label={ABOUT_CSR.title} background={ui.onNavy}>
+    <Section id={chip.id} label="Responsibility" background={ui.onNavy}>
       <div {...stylex.props(ui.grid)}>
         <Reveal sx={s.statementCell}>
           <h3 {...stylex.props(s.statement)}>

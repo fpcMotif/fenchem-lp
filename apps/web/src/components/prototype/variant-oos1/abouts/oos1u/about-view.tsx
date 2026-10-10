@@ -358,20 +358,18 @@ function SectionBar({ onNavigateHome }: AboutPageProps) {
   return (
     <div {...stylex.props(styles.bar)}>
       <div {...stylex.props(ui.shell, styles.barInner)}>
-        <nav aria-label="面包屑导航" {...stylex.props(styles.crumbs)}>
+        <nav aria-label="Breadcrumb" {...stylex.props(styles.crumbs)}>
           <a href="#top" onClick={goHome} {...stylex.props(styles.crumbLink, styles.navFocus)}>
             <span lang="en">Home</span>
-            <span {...stylex.props(ui.srOnly)}> 首页</span>
           </a>
           <span aria-hidden="true" {...stylex.props(styles.crumbJoin)}>
             /
           </span>
           <span aria-current="page">
             <span lang="en">About</span>
-            <span {...stylex.props(ui.srOnly)}> 关于我们</span>
           </span>
         </nav>
-        <nav aria-label="本页导航" ref={navRef} {...stylex.props(styles.sectionNav)}>
+        <nav aria-label="On this page" ref={navRef} {...stylex.props(styles.sectionNav)}>
           {ABOUT_HERO.navChips.map((chip) => (
             <a
               key={chip.id}
@@ -384,7 +382,6 @@ function SectionBar({ onNavigateHome }: AboutPageProps) {
               )}
             >
               <span lang="en">{NAV_WORDS[chip.id]}</span>
-              <span {...stylex.props(ui.srOnly)}> {chip.label}</span>
             </a>
           ))}
         </nav>

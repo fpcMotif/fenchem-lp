@@ -66,7 +66,7 @@ export function Csr() {
   const [statementLead, statementClose] = ABOUT_CSR.statement;
 
   return (
-    <Section id={chip.id} label={ABOUT_CSR.title} background={s.csr}>
+    <Section id={chip.id} label="Responsibility" background={s.csr}>
       <div {...stylex.props(ui.phi)}>
         <div {...stylex.props(ui.asideCol)}>
           <Figure src={ABOUT_CSR.image} alt={ABOUT_CSR.imageAlt} ratio={s.ratio} />

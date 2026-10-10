@@ -58,9 +58,9 @@ export const CAMPUS = {
   title: "现代化研发与生产基地",
   lead: "依托现代化生产基地与专业研发能力，为客户提供一站式定制化解决方案。",
   spoken: {
-    公司历史: "30 多年",
-    全球分公司: "16 家",
-    生产基地: "35,000 平方米",
+    公司历史: "More than 30 years",
+    全球分公司: "16 offices",
+    生产基地: "35,000 square meters",
   },
 } as const;
 

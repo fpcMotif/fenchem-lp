@@ -193,6 +193,17 @@ const styles = stylex.create({
   colName: { width: { default: "auto", [MD]: "28%" } },
   colOrigin: { width: { default: "auto", [MD]: "12%", [DESKTOP]: "10%" } },
   colFeatures: { width: "auto" },
+  srOnly: {
+    position: "absolute",
+    width: 1,
+    height: 1,
+    margin: -1,
+    padding: 0,
+    overflow: "hidden",
+    clipPath: "inset(50%)",
+    whiteSpace: "nowrap",
+    borderWidth: 0,
+  },
   thead: {
     display: { default: "block", [MD]: "table-header-group" },
     position: { default: "absolute", [MD]: "static" },
@@ -526,16 +537,20 @@ export function Catalog() {
           <thead {...stylex.props(styles.thead)}>
             <tr>
               <th scope="col" {...stylex.props(styles.colHead)}>
-                学名
+                <span aria-hidden="true">学名</span>
+                <span {...stylex.props(styles.srOnly)}>Botanical name</span>
               </th>
               <th scope="col" {...stylex.props(styles.colHead)}>
-                名称
+                <span aria-hidden="true">名称</span>
+                <span {...stylex.props(styles.srOnly)}>Name</span>
               </th>
               <th scope="col" {...stylex.props(styles.colHead)}>
-                产地
+                <span aria-hidden="true">产地</span>
+                <span {...stylex.props(styles.srOnly)}>Origin</span>
               </th>
               <th scope="col" {...stylex.props(styles.colHead, styles.colHeadLast)}>
-                特性&应用
+                <span aria-hidden="true">特性&应用</span>
+                <span {...stylex.props(styles.srOnly)}>Features & applications</span>
               </th>
             </tr>
           </thead>

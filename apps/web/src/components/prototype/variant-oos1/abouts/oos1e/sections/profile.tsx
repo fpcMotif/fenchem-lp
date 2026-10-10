@@ -121,7 +121,7 @@ export function ProfileSheet() {
             <div {...stylex.props(styles.frame)}>
               <img
                 src={ABOUT_HERO.lobbyImage}
-                alt="泛成总部大堂，弧形吊顶与大理石地面"
+                alt="Fenchem headquarters lobby with a curved ceiling and marble floor"
                 loading="lazy"
                 decoding="async"
                 {...stylex.props(base.fill)}

@@ -31,7 +31,7 @@ export {
 
 export const HERO_DECK = {
   label: "四大应用领域",
-  aria: "查看四大应用领域",
+  aria: "View the four application areas",
 } as const;
 
 export const DECK_OPEN = {

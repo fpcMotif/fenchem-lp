@@ -77,7 +77,7 @@ export function Csr() {
   const [lead, tail] = ABOUT_CSR.statement;
   return (
     <Section id="about-csr" labelledBy="about-csr-title" surface="page">
-      <SectionName id="about-csr-title">{ABOUT_CSR.title}</SectionName>
+      <SectionName id="about-csr-title">Responsibility</SectionName>
       <div {...stylex.props(base.shell, base.inset, S.grid)}>
         <Reveal>
           <img

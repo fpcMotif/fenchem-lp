@@ -530,6 +530,11 @@ function FootButton({
   );
 }
 
+function holdSpy(spy: { lockUntil: number; pinned: boolean }) {
+  spy.lockUntil = performance.now() + 1000;
+  spy.pinned = true;
+}
+
 export function Solutions() {
   const reduce = useReducedMotion();
   const wide = useWide();
@@ -568,11 +573,6 @@ export function Solutions() {
     }
     setActiveField(current);
   }, [baseId]);
-
-  const holdSpy = () => {
-    spyRef.current.lockUntil = performance.now() + 1000;
-    spyRef.current.pinned = true;
-  };
 
   useEffect(() => {
     if (!wide) return;
@@ -622,7 +622,7 @@ export function Solutions() {
     if (options.focusTab) tabRefs.current[next]?.focus();
     const layout = layoutRef.current;
     if (options.reveal && layout && layout.getBoundingClientRect().top < HEADER_HEIGHT) {
-      holdSpy();
+      holdSpy(spyRef.current);
       layout.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
     }
   };
@@ -646,7 +646,7 @@ export function Solutions() {
     const node = document.getElementById(fieldId(key));
     if (!node) return;
     setActiveField(key);
-    holdSpy();
+    holdSpy(spyRef.current);
     node.focus({ preventScroll: true });
     node.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
   };
@@ -742,7 +742,7 @@ export function Solutions() {
                   ))}
                 </div>
 
-                <nav aria-label="上一个与下一个方案" {...stylex.props(styles.foot)}>
+                <nav aria-label="Previous and next solutions" {...stylex.props(styles.foot)}>
                   {prevItem && (
                     <FootButton
                       direction="prev"

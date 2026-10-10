@@ -123,7 +123,7 @@ export function Structure() {
   const diagramId = useId();
 
   return (
-    <Section id={chip.id} label={ABOUT_STRUCTURE.title} background={ui.onPaper}>
+    <Section id={chip.id} label={chip.english} background={ui.onPaper}>
       <Reveal sx={s.holding}>
         <p {...stylex.props(ui.label, s.holdingLabel)}>{ABOUT_STRUCTURE.holding.badge}</p>
         <h3 {...stylex.props(s.holdingName)}>{ABOUT_STRUCTURE.holding.name}</h3>
@@ -135,7 +135,7 @@ export function Structure() {
         <span aria-hidden="true" {...stylex.props(s.linkLine)} />
         <p {...stylex.props(ui.label)}>{ABOUT_STRUCTURE.subsidiaryBadge}</p>
       </div>
-      <ul aria-label={ABOUT_STRUCTURE.subsidiaryBadge} {...stylex.props(s.subs)}>
+      <ul aria-label={ABOUT_STRUCTURE.subsidiaryBadgeEnglish} {...stylex.props(s.subs)}>
         {ABOUT_STRUCTURE.subsidiaries.map((sub, idx) => (
           <Reveal key={sub.id} as="li" step={idx} sx={s.sub}>
             <span aria-hidden="true" {...stylex.props(s.tick)} />
@@ -159,7 +159,7 @@ export function Structure() {
         <div id={diagramId} hidden={!showDiagram} {...stylex.props(s.diagram)}>
           <img
             src={ABOUT_STRUCTURE.chartImage}
-            alt="南京泛成国际控股有限公司官方组织架构图"
+            alt="Official organizational chart of Nanjing Fenchem International Holdings Corporation Limited"
             loading="lazy"
             decoding="async"
             {...stylex.props(s.diagramImage)}

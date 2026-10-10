@@ -66,7 +66,7 @@ export const CAMPUS_LAKE = {
   depth: "/prototype/official-site/campus-lake-depth.png",
   waterline: 0.662,
   aspect: 2400 / 1712,
-  alt: "泛成园区建筑与湖面",
+  alt: "Fenchem campus buildings by the lake",
 } as const;
 
 export const OFFICE_MAP_PINS: readonly { left: number; top: number }[] = [

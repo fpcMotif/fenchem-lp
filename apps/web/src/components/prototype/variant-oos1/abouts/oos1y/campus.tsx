@@ -127,7 +127,7 @@ export function CampusWall() {
       {...stylex.props(ui.anchor, styles.section)}
     >
       <h2 id="oos1y-campus" {...srOnly}>
-        园区环境
+        {ABOUT_CAMPUS.eyebrow}
       </h2>
       <ul ref={wallRef} {...stylex.props(styles.wall)}>
         {ABOUT_CAMPUS.photos.map((photo, index) => (
@@ -157,7 +157,7 @@ export function CampusWall() {
               <span {...stylex.props(styles.band)}>
                 <span {...stylex.props(styles.caption)}>
                   <span lang="en">{ENGLISH[photo.id]}</span>
-                  <span {...srOnly}> {photo.caption}，查看大图</span>
+                  <span {...srOnly}> {photo.english}, View larger</span>
                 </span>
               </span>
               <span aria-hidden="true" {...stylex.props(styles.focusFrame)} />

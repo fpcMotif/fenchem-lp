@@ -70,7 +70,7 @@ export function Culture() {
       {...stylex.props(shared.anchor, shared.section, styles.section)}
     >
       <h2 id="about-culture-title" {...stylex.props(shared.srOnly)}>
-        {ABOUT_CULTURE.title}
+        {ABOUT_CULTURE.eyebrow}
       </h2>
       <div {...stylex.props(shared.shell, shared.inset)}>
         <ul {...stylex.props(styles.grid)}>

@@ -104,7 +104,7 @@ export function Structure() {
   const { holding, subsidiaries } = ABOUT_STRUCTURE;
   return (
     <Section id="about-structure" labelledBy="about-structure-title" surface="page">
-      <SectionName id="about-structure-title">{ABOUT_STRUCTURE.title}</SectionName>
+      <SectionName id="about-structure-title">{ABOUT_STRUCTURE.eyebrow}</SectionName>
       <div {...stylex.props(base.shell, base.inset)}>
         <div {...stylex.props(S.grid)}>
           <Reveal sx={S.holding}>
@@ -144,7 +144,7 @@ export function Structure() {
           <div id={diagramId} hidden={!showDiagram} {...stylex.props(S.diagram)}>
             <img
               src={ABOUT_STRUCTURE.chartImage}
-              alt="南京泛成国际控股有限公司官方组织架构图"
+              alt="Official organizational chart of Nanjing Fenchem International Holdings Corporation Limited"
               loading="lazy"
               decoding="async"
               {...stylex.props(S.diagramImage)}

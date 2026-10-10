@@ -3,7 +3,7 @@ import type { PlatePhoto } from "./lightbox";
 
 type PhotoId = (typeof ABOUT_CAMPUS.photos)[number]["id"];
 
-export type Plate = PlatePhoto & { src: string; focus: string };
+export type Plate = PlatePhoto & { src: string; focus: string; description: string };
 
 const ENGLISH: Record<PhotoId, string> = {
   aerial: "Headquarters",
@@ -33,6 +33,7 @@ export const PLATES: readonly Plate[] = ABOUT_CAMPUS.photos.map((photo, index) =
   src: photo.src,
   large: photo.large,
   alt: photo.alt,
+  description: photo.description,
   caption: photo.caption,
   english: ENGLISH[photo.id],
   focus: FOCUS[photo.id],

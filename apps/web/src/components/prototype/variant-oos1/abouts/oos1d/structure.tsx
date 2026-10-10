@@ -91,7 +91,7 @@ export function Structure() {
   const diagramId = useId();
 
   return (
-    <Section id={chip.id} label={ABOUT_STRUCTURE.title} background={ui.onPaper}>
+    <Section id={chip.id} label={ABOUT_STRUCTURE.eyebrow} background={ui.onPaper}>
       <div {...stylex.props(ui.phi)}>
         <div {...stylex.props(ui.asideCol)}>
           <Reveal>
@@ -104,7 +104,7 @@ export function Structure() {
         </div>
         <div {...stylex.props(ui.main)}>
           <p {...stylex.props(ui.label, s.label)}>{ABOUT_STRUCTURE.subsidiaryBadge}</p>
-          <ul aria-label={ABOUT_STRUCTURE.subsidiaryBadge} {...stylex.props(s.list)}>
+          <ul aria-label={ABOUT_STRUCTURE.subsidiaryBadgeEnglish} {...stylex.props(s.list)}>
             {ABOUT_STRUCTURE.subsidiaries.map((sub, idx) => (
               <Reveal key={sub.id} as="li" step={idx} sx={s.row}>
                 <h4 {...stylex.props(s.name)}>{sub.name}</h4>
@@ -127,7 +127,7 @@ export function Structure() {
             <div id={diagramId} hidden={!showDiagram} {...stylex.props(s.diagram)}>
               <img
                 src={ABOUT_STRUCTURE.chartImage}
-                alt="南京泛成国际控股有限公司官方组织架构图"
+                alt="Official organizational chart of Nanjing Fenchem International Holdings Corporation Limited"
                 loading="lazy"
                 decoding="async"
                 {...stylex.props(s.diagramImage)}

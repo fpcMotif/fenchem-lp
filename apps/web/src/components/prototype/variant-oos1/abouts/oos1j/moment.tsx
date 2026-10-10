@@ -115,7 +115,7 @@ export function Moment() {
   return (
     <section
       id="about-stats"
-      aria-label="泛成发展数据"
+      aria-label="Fenchem growth figures"
       {...stylex.props(base.section, styles.moment)}
     >
       <DriftImage

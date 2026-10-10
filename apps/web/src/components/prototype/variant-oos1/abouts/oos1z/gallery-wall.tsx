@@ -129,7 +129,7 @@ export function GalleryWall({ onOpen }: { onOpen: (index: number) => void }) {
                   style={{ aspectRatio: work.aspect }}
                   {...stylex.props(styles.photo)}
                 />
-                <span {...srOnly}>查看大图</span>
+                <span {...srOnly}>View larger</span>
               </button>
             </div>
             <p {...stylex.props(styles.label, onLeft ? styles.labelLeft : styles.labelRight)}>

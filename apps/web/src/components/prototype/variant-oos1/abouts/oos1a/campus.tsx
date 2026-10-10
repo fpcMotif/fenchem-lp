@@ -190,7 +190,7 @@ function CampusCell({
       >
         <button
           type="button"
-          aria-label={`查看大图：${photo.caption}`}
+          aria-label={`View larger: ${photo.english}`}
           onClick={onOpen}
           onFocus={onFocusCell}
           {...stylex.props(styles.hit)}
@@ -232,7 +232,7 @@ export function Campus() {
       aria-labelledby="about-campus-title"
       {...stylex.props(styles.section)}
     >
-      <SectionName id="about-campus-title">园区环境</SectionName>
+      <SectionName id="about-campus-title">{ABOUT_CAMPUS.eyebrow}</SectionName>
       <div ref={trackRef} {...stylex.props(pinned && styles.track)}>
         <div {...stylex.props(pinned && styles.stage)}>
           <Frame
@@ -241,7 +241,7 @@ export function Campus() {
             innerSx={pinned ? styles.stageInner : shared.sectionPad}
           >
             <ul
-              aria-label="园区照片"
+              aria-label="Campus photos"
               {...stylex.props(styles.cells, !pinned && styles.cellsStatic)}
             >
               {ABOUT_CAMPUS.photos.map((photo, index) => (

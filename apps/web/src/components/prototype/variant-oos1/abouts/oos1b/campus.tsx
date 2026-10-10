@@ -11,7 +11,7 @@ import { SectionHead, useMediaQuery } from "./shared";
 import { srOnly, ui } from "./shared-values";
 
 const PORTAL_QUERY = "(min-width: 1024px) and (prefers-reduced-motion: no-preference)";
-const WALK = ROOMS_IN_WALKING_ORDER.map((room) => room.plate.caption).join("、");
+const WALK = ROOMS_IN_WALKING_ORDER.map((room) => room.plate.english).join(", ");
 
 export function Campus() {
   const portal = useMediaQuery(PORTAL_QUERY);
@@ -33,7 +33,9 @@ export function Campus() {
           title={ABOUT_CAMPUS.title}
           note="Each photograph is a doorway into the next."
         />
-        <p {...srOnly}>依次走过{WALK}，最后从高处回望总部园区。</p>
+        <p {...srOnly}>
+          Walk through in order: {WALK}, then look back at the headquarters from above.
+        </p>
       </div>
 
       {portal ? (

@@ -4,5 +4,5 @@ const NAV_ENGLISH = ["Profile", "Campus", "Culture", "Responsibility", "Honors",
 
 export const NAV_ITEMS = [
   ...ABOUT_HERO.navChips.map((chip, idx) => ({ ...chip, english: NAV_ENGLISH[idx] })),
-  { label: "产品与应用", id: "about-products", english: "Products" },
+  { id: "about-products", english: "Products" },
 ];

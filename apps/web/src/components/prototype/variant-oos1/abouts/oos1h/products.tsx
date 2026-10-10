@@ -118,7 +118,7 @@ export function Products({ onNavigateHome }: { onNavigateHome: (hash?: string) =
       {...stylex.props(shared.anchor, shared.section, styles.section)}
     >
       <h2 id="about-products-title" {...stylex.props(shared.srOnly)}>
-        产品与应用
+        Products and applications
       </h2>
       <div {...stylex.props(shared.shell, shared.inset)}>
         <Reveal>
@@ -130,7 +130,7 @@ export function Products({ onNavigateHome }: { onNavigateHome: (hash?: string) =
               <article {...stylex.props(styles.card)}>
                 <img
                   src={product.image}
-                  alt={`${product.title}产品图`}
+                  alt={`${product.english} product image`}
                   loading="lazy"
                   decoding="async"
                   {...stylex.props(styles.image)}
@@ -141,7 +141,7 @@ export function Products({ onNavigateHome }: { onNavigateHome: (hash?: string) =
                   <p {...stylex.props(styles.tags)}>{product.tags.join(" · ")}</p>
                   <button
                     type="button"
-                    aria-label={`了解方案：${product.title}`}
+                    aria-label={`Learn about the solution: ${product.english}`}
                     onClick={() => onNavigateHome("products")}
                     {...stylex.props(styles.more)}
                   >

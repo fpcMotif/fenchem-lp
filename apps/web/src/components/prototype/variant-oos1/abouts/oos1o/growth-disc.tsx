@@ -258,7 +258,8 @@ export function GrowthDisc({ growth }: { growth: MotionValue<number> }) {
         </span>
       </m.p>
       <figcaption {...srOnly}>
-        年轮横截面：自 {ORIGIN_YEAR} 年南京起，每年一圈；{CURRENT_YEAR} 年这一圈尚未闭合，仍在生长。
+        Growth-ring cross-section: one ring per year since {ORIGIN_YEAR} in Nanjing. The{" "}
+        {CURRENT_YEAR} ring is still open.
       </figcaption>
     </figure>
   );

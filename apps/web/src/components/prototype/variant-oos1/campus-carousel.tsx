@@ -310,7 +310,7 @@ export function CampusCarousel({
       ref={regionRef}
       role="region"
       aria-roledescription="carousel"
-      aria-label="园区照片"
+      aria-label="Campus photos"
       tabIndex={-1}
       onKeyDown={onKeyDown}
     >
@@ -333,7 +333,7 @@ export function CampusCarousel({
                 type="button"
                 tabIndex={front ? 0 : -1}
                 inert={placed.opacity === 0}
-                aria-label={front ? `查看大图：${photo.caption}` : `切换到：${photo.caption}`}
+                aria-label={front ? `View larger: ${photo.english}` : `Show: ${photo.english}`}
                 onClick={() => {
                   if (dragged.current) {
                     dragged.current = false;
@@ -374,7 +374,7 @@ export function CampusCarousel({
       <div {...stylex.props(styles.controls)}>
         <button
           type="button"
-          aria-label="上一张"
+          aria-label="Previous photo"
           onClick={() => step(-1)}
           {...stylex.props(styles.navButton)}
         >
@@ -391,7 +391,7 @@ export function CampusCarousel({
         </p>
         <button
           type="button"
-          aria-label="下一张"
+          aria-label="Next photo"
           onClick={() => step(1)}
           {...stylex.props(styles.navButton)}
         >

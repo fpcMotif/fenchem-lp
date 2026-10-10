@@ -55,7 +55,7 @@ const GLYPH_TONES = {
 export function Culture() {
   return (
     <Section id="about-culture" labelledBy="about-culture-title" surface="paper">
-      <SectionName id="about-culture-title">{ABOUT_CULTURE.title}</SectionName>
+      <SectionName id="about-culture-title">{ABOUT_CULTURE.eyebrow}</SectionName>
       <div {...stylex.props(base.shell, base.inset)}>
         <ul {...stylex.props(S.grid)}>
           {ABOUT_CULTURE.values.map((value, index) => (

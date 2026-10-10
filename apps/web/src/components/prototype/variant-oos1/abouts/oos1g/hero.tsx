@@ -250,7 +250,7 @@ export function Hero() {
 
 export function Stats() {
   return (
-    <section aria-label="泛成发展数据" {...stylex.props(styles.stats)}>
+    <section aria-label="Fenchem growth figures" {...stylex.props(styles.stats)}>
       <div {...stylex.props(layout.shell, styles.statsGrid)}>
         {STATS.map((stat, index) => {
           const main = index === 0;

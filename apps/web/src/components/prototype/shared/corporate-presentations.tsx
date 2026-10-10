@@ -118,7 +118,7 @@ export function TiltedProductCard({
     productGlare: StyleXStyles;
   };
   index: number;
-  product: ComponentProps<typeof ProductSummary>["product"] & { image: string };
+  product: ComponentProps<typeof ProductSummary>["product"] & { image: string; english: string };
   ZoomReveal: ComponentType<{ children: ReactNode; delay?: number; sx?: StyleXStyles }>;
   tiltRef: Ref<HTMLDivElement>;
   summaryStyles: ComponentProps<typeof ProductSummary>["styles"];
@@ -129,7 +129,7 @@ export function TiltedProductCard({
         <div {...stylex.props(styles.productImageFrame)}>
           <img
             src={product.image}
-            alt={product.title}
+            alt={product.english}
             loading="lazy"
             decoding="async"
             {...stylex.props(styles.productImage)}
@@ -189,10 +189,10 @@ export function CorporateMenu({
       {...stylex.props(styles.header, (scrolled || menuOpen) && styles.headerSolid)}
     >
       <div {...stylex.props(styles.shell, styles.headerInner)}>
-        <a href="#top" aria-label="FENCHEM 泛成 首页" {...stylex.props(styles.logoLink)}>
+        <a href="#top" aria-label="FENCHEM home" {...stylex.props(styles.logoLink)}>
           <LogoMark />
         </a>
-        <nav aria-label="主导航" {...stylex.props(styles.nav)}>
+        <nav aria-label="Main" {...stylex.props(styles.nav)}>
           {NAV_ITEMS.map((item) => (
             <a
               key={item.href}
@@ -216,7 +216,7 @@ export function CorporateMenu({
           <m.nav
             key="menu"
             id={menuId}
-            aria-label="主导航"
+            aria-label="Main"
             {...stylex.props(styles.menuPanel)}
             initial={{ opacity: 0, transform: "translateY(-8px)" }}
             animate={{ opacity: 1, transform: "translateY(0px)" }}
@@ -258,6 +258,8 @@ export function RisingHero({
   CLOSING_WORD,
   introAfter,
   backdropStyles,
+  backdropFragment,
+  backdropProgress,
 }: {
   styles: {
     hero: StyleXStyles;
@@ -305,6 +307,8 @@ export function RisingHero({
   CLOSING_WORD: string;
   introAfter: (delay: number) => string;
   backdropStyles: ComponentProps<typeof HeroBackdrop>["styles"];
+  backdropFragment?: string;
+  backdropProgress?: MotionValue<number>;
 }) {
   return (
     <section ref={heroRef} id="top" aria-labelledby="oo-hero-title" {...stylex.props(styles.hero)}>
@@ -313,6 +317,8 @@ export function RisingHero({
         styles={backdropStyles}
         source={IMAGES.hero}
         motionStyle={reduce ? undefined : { y: backdropY }}
+        liquidFragment={backdropFragment}
+        liquidProgress={backdropProgress}
       />
       <m.div
         {...stylex.props(styles.shell, styles.inset120, styles.heroContent)}
@@ -494,7 +500,7 @@ export function FramedCampus({
   StatItem: ComponentType<{ stat: CampusStat; index: number }>;
 }) {
   return (
-    <section id="campus" aria-label="研发与生产" {...stylex.props(styles.anchor)}>
+    <section id="campus" aria-label="R&D and production" {...stylex.props(styles.anchor)}>
       <div ref={stageRef} {...stylex.props(styles.campusStage)}>
         <m.div
           {...stylex.props(styles.campusFrame)}

@@ -129,7 +129,7 @@ export function Hero({ onNavigateHome }: { onNavigateHome: (hash?: string) => vo
   return (
     <section aria-labelledby="about-banner-title" {...stylex.props(styles.hero)}>
       <div {...stylex.props(shared.shell, shared.inset)}>
-        <nav aria-label="面包屑导航" {...stylex.props(styles.breadcrumb)}>
+        <nav aria-label="Breadcrumb" {...stylex.props(styles.breadcrumb)}>
           <button
             type="button"
             onClick={() => onNavigateHome("top")}

@@ -166,7 +166,7 @@ export function Lightbox({
   return (
     <dialog
       ref={dialogRef}
-      aria-label="园区照片"
+      aria-label="Campus photos"
       onClose={onClose}
       onKeyDown={(event) => {
         if (event.key !== "ArrowRight" && event.key !== "ArrowLeft") return;
@@ -209,7 +209,7 @@ export function Lightbox({
             }}
           />
           <span {...stylex.props(ui.srOnly)} aria-live="polite">
-            {photo.caption}
+            {photo.english}
           </span>
         </>
       ) : null}

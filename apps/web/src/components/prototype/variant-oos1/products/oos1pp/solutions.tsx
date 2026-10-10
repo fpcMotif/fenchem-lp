@@ -501,7 +501,7 @@ function SheetBody({ item, index }: { item: SolutionItem; index: number }) {
           ) : (
             <span {...stylex.props(styles.none)}>
               <span aria-hidden="true">—</span>
-              <span {...stylex.props(styles.srOnly)}>未提供</span>
+              <span {...stylex.props(styles.srOnly)}>Not provided</span>
             </span>
           )}
         </Field>
@@ -652,7 +652,7 @@ export function Solutions() {
               </div>
             </div>
             <p aria-live="polite" {...stylex.props(styles.srOnly)}>
-              方案 {active + 1} / {TOTAL}：{activeItem.title}
+              Solution {active + 1} of {TOTAL}: {activeItem.englishName}
             </p>
             <div {...stylex.props(styles.pager)}>
               <button
@@ -663,9 +663,12 @@ export function Solutions() {
                 {...stylex.props(styles.step, styles.stepPrev, atStart && styles.stepDisabled)}
               >
                 <ChevronLeft size={16} strokeWidth={1.5} absoluteStrokeWidth aria-hidden="true" />
-                <span {...stylex.props(styles.stepLabel)}>上一个</span>
+                <span aria-hidden="true" {...stylex.props(styles.stepLabel)}>
+                  上一个
+                </span>
+                <span {...stylex.props(styles.srOnly)}>Previous</span>
               </button>
-              <div role="group" aria-label="选择方案" {...stylex.props(styles.dots)}>
+              <div role="group" aria-label="Choose a solution" {...stylex.props(styles.dots)}>
                 {SOLUTION_ITEMS.map((item, index) => {
                   const selected = index === active;
                   return (
@@ -675,7 +678,7 @@ export function Solutions() {
                         dotRefs.current[index] = node;
                       }}
                       type="button"
-                      aria-label={item.title}
+                      aria-label={item.englishName}
                       aria-current={selected ? "true" : undefined}
                       aria-controls={panelId}
                       onClick={() => select(index)}
@@ -691,7 +694,10 @@ export function Solutions() {
                 onClick={() => select(active + 1)}
                 {...stylex.props(styles.step, styles.stepNext, atEnd && styles.stepDisabled)}
               >
-                <span {...stylex.props(styles.stepLabel)}>下一个</span>
+                <span aria-hidden="true" {...stylex.props(styles.stepLabel)}>
+                  下一个
+                </span>
+                <span {...stylex.props(styles.srOnly)}>Next</span>
                 <ChevronRight size={16} strokeWidth={1.5} absoluteStrokeWidth aria-hidden="true" />
               </button>
             </div>

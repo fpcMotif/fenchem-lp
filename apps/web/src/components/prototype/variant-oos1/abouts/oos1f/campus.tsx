@@ -234,7 +234,7 @@ function Lightbox({
   return (
     <dialog
       ref={dialogRef}
-      aria-label="园区照片"
+      aria-label="Campus photos"
       onClose={onClose}
       onKeyDown={(event) => {
         if (event.key !== "ArrowRight" && event.key !== "ArrowLeft") return;
@@ -260,7 +260,7 @@ function Lightbox({
           </LightboxStage>
           <button
             type="button"
-            aria-label="上一张"
+            aria-label="Previous photo"
             onClick={() => onStep(-1)}
             {...stylex.props(styles.lightButton, styles.lightPrev)}
           >
@@ -268,7 +268,7 @@ function Lightbox({
           </button>
           <button
             type="button"
-            aria-label="下一张"
+            aria-label="Next photo"
             onClick={() => onStep(1)}
             {...stylex.props(styles.lightButton, styles.lightNext)}
           >
@@ -276,7 +276,7 @@ function Lightbox({
           </button>
           <button
             type="button"
-            aria-label="关闭"
+            aria-label="Close"
             onClick={onClose}
             {...stylex.props(styles.lightButton, styles.lightClose)}
           >
@@ -294,7 +294,7 @@ export function Campus() {
   const count = gallery.length;
 
   return (
-    <Section id="about-campus" name={ABOUT_CAMPUS.title}>
+    <Section id="about-campus" name={ABOUT_CAMPUS.eyebrow}>
       <Shell>
         <NodeMarker />
         <div {...stylex.props(styles.grid)}>
@@ -302,7 +302,7 @@ export function Campus() {
             <Reveal key={photo.id} as="figure" sx={[styles.figure, PLACEMENT[photo.id][0]]}>
               <button
                 type="button"
-                aria-label={`查看大图：${photo.caption}`}
+                aria-label={`View larger: ${photo.english}`}
                 onClick={() => {
                   setStepped(false);
                   setOpenIndex(position);

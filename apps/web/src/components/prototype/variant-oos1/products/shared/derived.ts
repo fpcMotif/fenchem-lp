@@ -445,32 +445,83 @@ export const FORMULA_TAGS: FormulaTag[] = [
 export interface Ingredient {
   id: string;
   label: string;
+  englishLabel: string;
   catalogId: string | null;
 }
 
 export const INGREDIENTS: Ingredient[] = [
-  { id: "ha4d", label: "4D 玻尿酸", catalogId: null },
-  { id: "squalane", label: "橄榄角鲨烷", catalogId: "mediterranean-04" },
-  { id: "meadowfoam", label: "白池花籽油", catalogId: "north-america-01" },
-  { id: "shea", label: "乳木果油", catalogId: "mediterranean-01" },
-  { id: "shea-oil", label: "液态乳木果油", catalogId: "mediterranean-02" },
-  { id: "calmist", label: "AT Calm-ist™", catalogId: "active-01" },
-  { id: "jojoba", label: "霍霍巴油", catalogId: "mediterranean-03" },
-  { id: "avocado", label: "鳄梨油", catalogId: "mediterranean-11" },
-  { id: "bisabolol", label: "红没药醇", catalogId: null },
-  { id: "allantoin", label: "尿囊素", catalogId: null },
-  { id: "cupuacu", label: "大花可可树籽脂", catalogId: "brazil-02" },
-  { id: "macadamia", label: "澳洲坚果油", catalogId: "mediterranean-09" },
-  { id: "mango", label: "芒果籽脂", catalogId: "mediterranean-12" },
-  { id: "almond", label: "甜杏仁油", catalogId: "mediterranean-05" },
-  { id: "argan", label: "阿甘油", catalogId: "mediterranean-10" },
-  { id: "rose", label: "大马士革玫瑰纯露", catalogId: "other-04" },
-  { id: "butylresorcinol", label: "4-丁基间苯二酚", catalogId: "active-04" },
-  { id: "niacinamide", label: "烟酰胺", catalogId: null },
-  { id: "clay", label: "巴西黏土", catalogId: null },
-  { id: "linseed", label: "亚麻籽油", catalogId: null },
-  { id: "vcip", label: "VC-IP", catalogId: null },
-  { id: "filters", label: "物化防晒剂", catalogId: null },
+  { id: "ha4d", label: "4D 玻尿酸", englishLabel: "4D Hyaluronic Acid", catalogId: null },
+  {
+    id: "squalane",
+    label: "橄榄角鲨烷",
+    englishLabel: "Olive Squalane",
+    catalogId: "mediterranean-04",
+  },
+  {
+    id: "meadowfoam",
+    label: "白池花籽油",
+    englishLabel: "Meadowfoam Seed Oil",
+    catalogId: "north-america-01",
+  },
+  { id: "shea", label: "乳木果油", englishLabel: "Shea Butter", catalogId: "mediterranean-01" },
+  {
+    id: "shea-oil",
+    label: "液态乳木果油",
+    englishLabel: "Liquid Shea Oil",
+    catalogId: "mediterranean-02",
+  },
+  { id: "calmist", label: "AT Calm-ist™", englishLabel: "AT Calm-ist™", catalogId: "active-01" },
+  { id: "jojoba", label: "霍霍巴油", englishLabel: "Jojoba Oil", catalogId: "mediterranean-03" },
+  { id: "avocado", label: "鳄梨油", englishLabel: "Avocado Oil", catalogId: "mediterranean-11" },
+  { id: "bisabolol", label: "红没药醇", englishLabel: "Bisabolol", catalogId: null },
+  { id: "allantoin", label: "尿囊素", englishLabel: "Allantoin", catalogId: null },
+  {
+    id: "cupuacu",
+    label: "大花可可树籽脂",
+    englishLabel: "Cupuaçu Seed Butter",
+    catalogId: "brazil-02",
+  },
+  {
+    id: "macadamia",
+    label: "澳洲坚果油",
+    englishLabel: "Macadamia Nut Oil",
+    catalogId: "mediterranean-09",
+  },
+  {
+    id: "mango",
+    label: "芒果籽脂",
+    englishLabel: "Mango Seed Butter",
+    catalogId: "mediterranean-12",
+  },
+  {
+    id: "almond",
+    label: "甜杏仁油",
+    englishLabel: "Sweet Almond Oil",
+    catalogId: "mediterranean-05",
+  },
+  { id: "argan", label: "阿甘油", englishLabel: "Argan Oil", catalogId: "mediterranean-10" },
+  {
+    id: "rose",
+    label: "大马士革玫瑰纯露",
+    englishLabel: "Damask Rose Hydrosol",
+    catalogId: "other-04",
+  },
+  {
+    id: "butylresorcinol",
+    label: "4-丁基间苯二酚",
+    englishLabel: "4-Butylresorcinol",
+    catalogId: "active-04",
+  },
+  { id: "niacinamide", label: "烟酰胺", englishLabel: "Niacinamide", catalogId: null },
+  { id: "clay", label: "巴西黏土", englishLabel: "Brazilian Clay", catalogId: null },
+  { id: "linseed", label: "亚麻籽油", englishLabel: "Linseed Oil", catalogId: null },
+  { id: "vcip", label: "VC-IP", englishLabel: "VC-IP", catalogId: null },
+  {
+    id: "filters",
+    label: "物化防晒剂",
+    englishLabel: "Mineral and chemical UV filters",
+    catalogId: null,
+  },
 ];
 
 export const INGREDIENT_BY_ID: Record<string, Ingredient> = Object.fromEntries(

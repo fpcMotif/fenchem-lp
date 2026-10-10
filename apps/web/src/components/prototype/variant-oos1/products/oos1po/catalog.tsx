@@ -430,8 +430,8 @@ function ToneCell({ traits }: { traits: ItemTraits }) {
       </span>
       <span {...stylex.props(styles.toneWord)}>
         {traits.colorWord ?? <span aria-hidden="true">—</span>}
-        {traits.colorWord === null && <span {...stylex.props(styles.srOnly)}>未注明</span>}
-        {reference && <span {...stylex.props(styles.srOnly)}>，{REFERENCE_NOTE}</span>}
+        {traits.colorWord === null && <span {...stylex.props(styles.srOnly)}>Not specified</span>}
+        {reference && <span {...stylex.props(styles.srOnly)}>, color is for reference</span>}
       </span>
     </td>
   );
@@ -479,7 +479,7 @@ export function Catalog() {
         <h2 id={titleId} {...stylex.props(styles.title)}>
           产品目录
         </h2>
-        <nav aria-label="按分组跳转" {...stylex.props(styles.jumpNav)}>
+        <nav aria-label="Jump by group" {...stylex.props(styles.jumpNav)}>
           <ul {...stylex.props(styles.jumpList)}>
             {GROUP_ROWS.map(({ group, short, items }) => (
               <li key={group.id} {...stylex.props(styles.jumpItem)}>
@@ -491,7 +491,7 @@ export function Catalog() {
                 >
                   {short}
                   <span {...stylex.props(styles.jumpCount)}>{items.length}</span>
-                  <span {...stylex.props(styles.srOnly)}>款</span>
+                  <span {...stylex.props(styles.srOnly)}> items</span>
                 </button>
               </li>
             ))}
@@ -528,16 +528,20 @@ export function Catalog() {
           <thead {...stylex.props(styles.head)}>
             <tr>
               <th scope="col" {...stylex.props(styles.headCell)}>
-                色泽
+                <span aria-hidden="true">色泽</span>
+                <span {...stylex.props(styles.srOnly)}>Color</span>
               </th>
               <th scope="col" {...stylex.props(styles.headCell)}>
-                名称
+                <span aria-hidden="true">名称</span>
+                <span {...stylex.props(styles.srOnly)}>Name</span>
               </th>
               <th scope="col" {...stylex.props(styles.headCell)}>
-                INCI 名称
+                <span aria-hidden="true">INCI 名称</span>
+                <span {...stylex.props(styles.srOnly)}>INCI name</span>
               </th>
               <th scope="col" {...stylex.props(styles.headCell, styles.lastCell)}>
-                特性&应用
+                <span aria-hidden="true">特性&应用</span>
+                <span {...stylex.props(styles.srOnly)}>Features & applications</span>
               </th>
             </tr>
           </thead>

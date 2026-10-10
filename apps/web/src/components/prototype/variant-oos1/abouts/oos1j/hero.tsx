@@ -190,6 +190,7 @@ export function Hero() {
           <h1 id="about-banner-title" {...stylex.props(styles.title)}>
             <RiseText
               text={ABOUT_BANNER.title}
+              srText="About Fenchem"
               play
               delay={TITLE_DELAY_MS}
               stagger={90}

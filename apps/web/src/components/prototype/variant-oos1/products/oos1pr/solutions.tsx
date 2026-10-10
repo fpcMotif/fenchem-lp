@@ -357,7 +357,7 @@ function FieldRow({ label, values }: { label: string; values: string[] }) {
         ) : (
           <span {...stylex.props(styles.empty)}>
             <span aria-hidden="true">—</span>
-            <span {...stylex.props(styles.srOnly)}>未提供</span>
+            <span {...stylex.props(styles.srOnly)}>Not provided</span>
           </span>
         )}
       </dd>
@@ -419,7 +419,7 @@ export function Solutions() {
         <div {...stylex.props(styles.route)}>
           <button
             type="button"
-            aria-label="上一个"
+            aria-label="Previous"
             aria-controls={sheetId}
             aria-disabled={atStart}
             onClick={() => {
@@ -431,7 +431,7 @@ export function Solutions() {
           </button>
           <div {...stylex.props(styles.selectWrap)}>
             <label htmlFor={selectId} {...stylex.props(styles.srOnly)}>
-              选择应用方案
+              Choose an application solution
             </label>
             <select
               id={selectId}
@@ -456,7 +456,7 @@ export function Solutions() {
           </div>
           <button
             type="button"
-            aria-label="下一个"
+            aria-label="Next"
             aria-controls={sheetId}
             aria-disabled={atEnd}
             onClick={() => {
@@ -469,7 +469,7 @@ export function Solutions() {
           <p aria-live="polite" {...stylex.props(styles.counter)}>
             <span {...stylex.props(styles.counterCurrent)}>{padIndex(activeIndex)}</span>
             {` / ${padIndex(TOTAL - 1)}`}
-            <span {...stylex.props(styles.srOnly)}>{activeItem?.title}</span>
+            <span {...stylex.props(styles.srOnly)}>{activeItem?.englishName}</span>
           </p>
         </div>
 

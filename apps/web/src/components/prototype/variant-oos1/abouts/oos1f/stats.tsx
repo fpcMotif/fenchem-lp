@@ -131,7 +131,7 @@ function CountUp({ value }: { value: string }) {
 
 export function Stats() {
   return (
-    <Section id="about-stats" name="发展数据" band sx={styles.band}>
+    <Section id="about-stats" name="Growth figures" band sx={styles.band}>
       <Shell>
         <NodeMarker />
         <ul {...stylex.props(styles.stats)}>

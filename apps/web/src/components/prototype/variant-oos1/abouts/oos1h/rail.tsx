@@ -179,7 +179,7 @@ const styles = stylex.create({
 export function Rail({ progress, active }: { progress: MotionValue<number>; active: number }) {
   return (
     <div {...stylex.props(styles.column)}>
-      <nav aria-label="本页导航" {...stylex.props(styles.plate)}>
+      <nav aria-label="On this page" {...stylex.props(styles.plate)}>
         <div {...stylex.props(styles.readout)}>
           <YearReadout progress={progress} sx={styles.readoutDigits} />
         </div>
@@ -202,7 +202,6 @@ export function Rail({ progress, active }: { progress: MotionValue<number>; acti
               >
                 {stop.label}
               </span>
-              <span {...stylex.props(shared.srOnly)}> {stop.name}</span>
             </a>
           ))}
         </div>
@@ -239,7 +238,7 @@ export function TopBar({ progress, active }: { progress: MotionValue<number>; ac
             年
           </span>
         </div>
-        <nav aria-label="本页导航" ref={listRef} {...stylex.props(styles.chips)}>
+        <nav aria-label="On this page" ref={listRef} {...stylex.props(styles.chips)}>
           {RAIL_STOPS.map((stop, position) => (
             <a
               key={stop.id}
@@ -252,7 +251,6 @@ export function TopBar({ progress, active }: { progress: MotionValue<number>; ac
               )}
             >
               <span lang="en">{stop.label}</span>
-              <span {...stylex.props(shared.srOnly)}> {stop.name}</span>
             </a>
           ))}
         </nav>

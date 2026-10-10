@@ -840,10 +840,10 @@ function SiteHeader() {
   return (
     <header {...stylex.props(styles.header)}>
       <Intro y={-16} sx={[styles.shell, styles.headerInner]}>
-        <a href="#top" aria-label="FENCHEM 泛成 首页" {...stylex.props(styles.logoLink)}>
+        <a href="#top" aria-label="FENCHEM home" {...stylex.props(styles.logoLink)}>
           <VectorArt paths={LOGO_PATHS} viewBox="0 0 161 52" sx={styles.logo} />
         </a>
-        <nav aria-label="主导航" {...stylex.props(styles.nav)}>
+        <nav aria-label="Main" {...stylex.props(styles.nav)}>
           {NAV_ITEMS.map((item, index) => (
             <a
               key={item.href}
@@ -856,10 +856,10 @@ function SiteHeader() {
           ))}
         </nav>
         <div {...stylex.props(styles.headerActions)}>
-          <button type="button" aria-label="AI 搜索" {...stylex.props(styles.searchPill)}>
+          <button type="button" aria-label="AI search" {...stylex.props(styles.searchPill)}>
             <Search size={16} strokeWidth={2} absoluteStrokeWidth aria-hidden="true" />
           </button>
-          <button type="button" aria-label="切换语言" {...stylex.props(styles.langButton)}>
+          <button type="button" aria-label="Switch language" {...stylex.props(styles.langButton)}>
             CN
           </button>
         </div>
@@ -945,7 +945,7 @@ function About() {
 function Campus() {
   const reduce = useReducedMotion();
   return (
-    <section id="campus" aria-label="研发与生产">
+    <section id="campus" aria-label="R&D and production">
       <div {...stylex.props(styles.campusFrame)}>
         <m.img
           src={IMAGES.campus.src}
@@ -1072,7 +1072,7 @@ function Products() {
             <div {...stylex.props(styles.productImageFrame)}>
               <img
                 src={product.image}
-                alt={product.title}
+                alt={product.english}
                 loading="lazy"
                 decoding="async"
                 {...stylex.props(styles.productImage)}
@@ -1250,7 +1250,7 @@ function SiteFooter() {
       <a href="#top" aria-label="LinkedIn" {...stylex.props(styles.socialLink)}>
         <VectorArt paths={LINKEDIN_PATHS} viewBox="0 0 20 20" sx={styles.socialIcon} />
       </a>
-      <a href="#top" aria-label="微信" {...stylex.props(styles.socialLink)}>
+      <a href="#top" aria-label="WeChat" {...stylex.props(styles.socialLink)}>
         <VectorArt paths={WECHAT_PATHS} viewBox="0 0 20 20" sx={styles.socialIcon} />
       </a>
     </InsetCorporateFooter>

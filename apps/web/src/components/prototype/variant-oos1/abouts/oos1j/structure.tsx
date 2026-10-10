@@ -154,10 +154,10 @@ export function Structure() {
       aria-labelledby="about-structure-title"
       {...stylex.props(base.section, base.anchor, styles.structure)}
     >
-      <SectionName id="about-structure-title">企业架构</SectionName>
+      <SectionName id="about-structure-title">{ABOUT_STRUCTURE.eyebrow}</SectionName>
       <div {...stylex.props(base.shell)}>
         <Reveal sx={styles.holding}>
-          <span {...stylex.props(base.srOnly)}>{ABOUT_STRUCTURE.holding.badge}</span>
+          <span {...stylex.props(base.srOnly)}>{ABOUT_STRUCTURE.holding.badgeEnglish}</span>
           <h3 {...stylex.props(ty.headline)}>{ABOUT_STRUCTURE.holding.name}</h3>
           <p lang="en" {...stylex.props(ty.serif)}>
             {ABOUT_STRUCTURE.holding.english}
@@ -166,7 +166,10 @@ export function Structure() {
         <div ref={treeRef} {...stylex.props(styles.tree)}>
           <span aria-hidden="true" {...stylex.props(styles.trunk, grown && styles.grown)} />
           <span aria-hidden="true" {...stylex.props(styles.bus, grown && styles.grown)} />
-          <ul aria-label={ABOUT_STRUCTURE.subsidiaryBadge} {...stylex.props(styles.subsidiaries)}>
+          <ul
+            aria-label={ABOUT_STRUCTURE.subsidiaryBadgeEnglish}
+            {...stylex.props(styles.subsidiaries)}
+          >
             {ABOUT_STRUCTURE.subsidiaries.map((sub, idx) => {
               const stem = sub.name.endsWith(COMPANY_SUFFIX)
                 ? sub.name.slice(0, -COMPANY_SUFFIX.length)
@@ -209,7 +212,7 @@ export function Structure() {
           <div id={diagramId} hidden={!showDiagram} {...stylex.props(styles.diagram)}>
             <img
               src={ABOUT_STRUCTURE.chartImage}
-              alt="南京泛成国际控股有限公司官方组织架构图"
+              alt="Official organizational chart of Nanjing Fenchem International Holdings Corporation Limited"
               loading="lazy"
               decoding="async"
               {...stylex.props(styles.diagramImage)}

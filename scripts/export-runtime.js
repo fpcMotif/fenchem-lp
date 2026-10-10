@@ -179,7 +179,7 @@
       if (open === menuOpen) return;
       menuOpen = open;
       button.setAttribute("aria-expanded", String(open));
-      button.setAttribute("aria-label", open ? "关闭菜单" : "打开菜单");
+      button.setAttribute("aria-label", open ? "Close menu" : "Open menu");
       button.innerHTML = open ? X.menu.closeIcon : X.menu.openIcon;
       solid();
       const shown = { opacity: 1, transform: "translateY(0px)" };

@@ -4,7 +4,7 @@ function B({ className: a }) {
     className: a,
     children: e.jsx("img", {
       src: "/AppUpload/Image/d23d17a965454ad9acfcba73cb9b6089.png",
-      alt: "全球分公司地图",
+      alt: "Map of Fenchem's global offices",
       className: "w-full h-full object-contain",
     }),
   });
@@ -85,7 +85,7 @@ function k({ onComplete: a }) {
       children: [
         e.jsx("img", {
           src: "/AppUpload/Image/ca8375bebf1a4d6ab634a64e6dcdd68e.png",
-          alt: "FENCHEM 泛成",
+          alt: "FENCHEM",
           className: "h-16 w-auto animate-[preloaderFade_0.6s_ease-out_both]",
         }),
         e.jsx("style", {
@@ -160,7 +160,7 @@ function z() {
         e.jsx(d, {
           children: e.jsx("img", {
             src: "/AppUpload/Image/5d73428d722e4a00927fc9f28a9dd4bc.png",
-            alt: "泛成生物",
+            alt: "FENCHEM",
             className: "w-[154px] h-auto mb-8",
           }),
         }),

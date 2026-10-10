@@ -62,7 +62,7 @@ export function Honors() {
       {...stylex.props(styles.section, layout.sectionY, layout.anchor)}
     >
       <h2 id="about-honor-title" {...stylex.props(layout.srOnly)}>
-        企业荣誉
+        Honors
       </h2>
       <ol {...stylex.props(layout.shell, styles.groups)}>
         {HONORS_BY_LEVEL.map((group, index) => (

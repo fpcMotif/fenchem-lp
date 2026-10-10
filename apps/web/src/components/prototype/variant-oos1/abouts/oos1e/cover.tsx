@@ -138,7 +138,7 @@ export function Cover({ onNavigateHome }: { onNavigateHome: (hash?: string) => v
         <div aria-hidden="true" {...stylex.props(base.fill, styles.scrim)} />
       </div>
       <div {...stylex.props(styles.paper)}>
-        <nav aria-label="面包屑导航" {...stylex.props(styles.breadcrumb)}>
+        <nav aria-label="Breadcrumb" {...stylex.props(styles.breadcrumb)}>
           <button
             type="button"
             onClick={() => onNavigateHome("top")}
@@ -162,7 +162,7 @@ export function Cover({ onNavigateHome }: { onNavigateHome: (hash?: string) => v
         <p {...stylex.props(styles.lead)}>
           <span {...stylex.props(base.balance, styles.leadYear)}>
             {leadYear}
-            <span {...stylex.props(base.srOnly)}>，</span>
+            <span {...stylex.props(base.srOnly)}>, </span>
           </span>
           <span {...stylex.props(base.balance)}>{leadFocus}</span>
         </p>

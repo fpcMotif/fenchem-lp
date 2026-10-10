@@ -148,7 +148,7 @@ export function PlateIndex({
       <div {...stylex.props(styles.head)}>
         <h3 lang="en" {...stylex.props(ui.serif, styles.title)}>
           Index of plates
-          <span {...srOnly}> 园区照片索引</span>
+          <span {...srOnly}> Campus photo index</span>
         </h3>
         <p lang="en" {...stylex.props(ui.serif, styles.hint)}>
           Open any frame
@@ -178,7 +178,7 @@ export function PlateIndex({
                 <span {...stylex.props(styles.label)}>
                   <span {...stylex.props(styles.numeral)}>{plate.numeral}</span>
                   <span {...stylex.props(styles.chinese)}>{plate.caption}</span>
-                  <span {...srOnly}>，{plate.alt}，查看大图</span>
+                  <span {...srOnly}>, {plate.alt}, View larger</span>
                 </span>
               </span>
             </button>

@@ -100,7 +100,7 @@ const s = stylex.create({
 
 export function Products({ onNavigateHome }: { onNavigateHome: (hash?: string) => void }) {
   return (
-    <Section id="about-products" label={PRODUCTS_INTRO.title} background={ui.onPaper}>
+    <Section id="about-products" label="Products and application solutions" background={ui.onPaper}>
       <div {...stylex.props(ui.grid)}>
         <Reveal sx={s.lead}>
           <p {...stylex.props(s.leadText)}>{PRODUCTS_INTRO.lead}</p>
@@ -120,7 +120,7 @@ export function Products({ onNavigateHome }: { onNavigateHome: (hash?: string) =
               <div {...stylex.props(ui.frame, s.frame)}>
                 <img
                   src={product.image}
-                  alt={product.title}
+                  alt={product.english}
                   loading="lazy"
                   decoding="async"
                   {...stylex.props(ui.fill)}

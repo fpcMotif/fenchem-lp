@@ -62,7 +62,7 @@ export function Honors() {
   const chip = ABOUT_HERO.navChips[4];
 
   return (
-    <Section id={chip.id} label={ABOUT_HONORS.title}>
+    <Section id={chip.id} label={chip.english}>
       <ul {...stylex.props(s.groups)}>
         {LEVELS.map(({ level, label }, groupIdx) => {
           const items = ABOUT_HONORS.items.filter((item) => item.level === level);

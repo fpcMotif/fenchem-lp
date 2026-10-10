@@ -202,7 +202,7 @@ export function Honors() {
           bands={BANDS}
           development={development}
           geometry={GEOMETRY}
-          listLabel={ABOUT_HONORS.title}
+          listLabel={ABOUT_HONORS.eyebrow}
           laneLabels={LANES.map((lane) => (
             <span key={lane.level} aria-hidden="true" {...stylex.props(styles.lane)}>
               <span {...stylex.props(styles.code)}>{lane.code}</span>

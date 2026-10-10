@@ -183,14 +183,14 @@ export function Honors() {
           ));
           if (tier.level !== "national") {
             return (
-              <ul key={tier.level} aria-label={tier.label} {...stylex.props(ui.grid, styles.row)}>
+              <ul key={tier.level} aria-label={tier.english} {...stylex.props(ui.grid, styles.row)}>
                 {plaques}
               </ul>
             );
           }
           return (
             <div key={tier.level} {...stylex.props(ui.grid, styles.row)}>
-              <ul aria-label={tier.label} {...stylex.props(styles.single)}>
+              <ul aria-label={tier.english} {...stylex.props(styles.single)}>
                 {plaques}
               </ul>
               <p lang="en" {...stylex.props(styles.noon)}>

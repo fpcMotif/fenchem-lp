@@ -155,7 +155,7 @@ export function Campus() {
                 decoding="async"
                 {...stylex.props(ui.fill, styles.image, positions[photo.id])}
               />
-              <span {...srOnly}>，查看大图</span>
+              <span {...srOnly}>, View larger</span>
             </button>
           }
         >
@@ -164,7 +164,7 @@ export function Campus() {
             {CAMPUS_FRAME[photo.id].english}
           </p>
           <p aria-hidden="true" {...stylex.props(type.body, styles.description)}>
-            {photo.alt}
+            {photo.description}
           </p>
         </Pair>
       ))}

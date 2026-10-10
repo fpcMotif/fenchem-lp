@@ -128,7 +128,7 @@ function Tile({ photo, index, onOpen }: { photo: Photo; index: number; onOpen: (
             </div>
             <button
               type="button"
-              aria-label={`查看大图：${photo.caption}`}
+              aria-label={`View larger: ${photo.english}`}
               onClick={onOpen}
               {...stylex.props(styles.open)}
             />
@@ -155,7 +155,7 @@ export function Campus() {
       aria-labelledby="about-campus-title"
       {...stylex.props(base.section, base.anchor, styles.campus)}
     >
-      <SectionName id="about-campus-title">园区环境</SectionName>
+      <SectionName id="about-campus-title">{ABOUT_CAMPUS.eyebrow}</SectionName>
       <div {...stylex.props(base.shell)}>
         <ul {...stylex.props(styles.grid)}>
           {ABOUT_CAMPUS.photos.map((photo, idx) => (

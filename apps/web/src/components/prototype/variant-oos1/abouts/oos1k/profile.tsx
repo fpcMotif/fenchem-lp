@@ -342,7 +342,8 @@ export function Profile() {
               ))}
             </ol>
             <span {...srOnly}>
-              星图以南京为中心，连接以上 {ABOUT_HERO.countries.length} 个国家。
+              Star chart centered on Nanjing, linking the {ABOUT_HERO.countries.length} countries
+              above.
             </span>
           </div>
         </figure>

@@ -90,12 +90,12 @@ export function CorporateHeaderActions({
         <Search size={16} strokeWidth={2} absoluteStrokeWidth aria-hidden="true" />
         <span {...stylex.props(styles.searchPlaceholder)}>AI 搜索</span>
       </button>
-      <button type="button" aria-label="CN，切换语言" {...stylex.props(styles.langButton)}>
+      <button type="button" aria-label="CN, switch language" {...stylex.props(styles.langButton)}>
         CN
       </button>
       <button
         type="button"
-        aria-label={menuOpen ? "关闭菜单" : "打开菜单"}
+        aria-label={menuOpen ? "Close menu" : "Open menu"}
         aria-expanded={menuOpen}
         aria-controls={menuId}
         onClick={() => setMenuOpen((open) => !open)}

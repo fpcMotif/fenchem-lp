@@ -179,7 +179,7 @@ export function Lightbox({
   return (
     <dialog
       ref={dialogRef}
-      aria-label="园区照片"
+      aria-label="Campus photos"
       onClose={onClose}
       onKeyDown={(event) => {
         if (event.key !== "ArrowRight" && event.key !== "ArrowLeft") return;
@@ -213,14 +213,14 @@ export function Lightbox({
                   {photo.english}
                 </span>
                 <span {...srOnly}>
-                  ，第 {index + 1} 张，共 {photos.length} 张
+                  Photo {index + 1} of {photos.length}
                 </span>
               </p>
               <div {...stylex.props(styles.controls)}>
                 <div {...stylex.props(styles.pager)}>
                   <button
                     type="button"
-                    aria-label="上一张"
+                    aria-label="Previous photo"
                     onClick={() => onStep(-1)}
                     {...stylex.props(styles.button, ui.focusRing)}
                   >
@@ -228,7 +228,7 @@ export function Lightbox({
                   </button>
                   <button
                     type="button"
-                    aria-label="下一张"
+                    aria-label="Next photo"
                     onClick={() => onStep(1)}
                     {...stylex.props(styles.button, ui.focusRing)}
                   >
@@ -240,7 +240,7 @@ export function Lightbox({
           </div>
           <button
             type="button"
-            aria-label="关闭"
+            aria-label="Close"
             ref={closeRef}
             onClick={onClose}
             {...stylex.props(styles.button, styles.close, ui.focusRing)}

@@ -143,7 +143,7 @@ export function Honors() {
         style={{ y: drift }}
         sx={styles.monument}
       />
-      <SectionName id="about-honor-title">企业荣誉</SectionName>
+      <SectionName id="about-honor-title">{ABOUT_HONORS.eyebrow}</SectionName>
       <div {...stylex.props(base.shell)}>
         <ul {...stylex.props(styles.list)}>
           {ABOUT_HONORS.items.map((honor, idx) => (

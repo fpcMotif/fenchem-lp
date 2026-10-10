@@ -120,7 +120,7 @@ export function PlateList({
               <span lang="en" {...stylex.props(styles.english)}>
                 {plate.english}
               </span>
-              <span {...srOnly}>{plate.numeral}，查看大图</span>
+              <span {...srOnly}>{plate.numeral}, View larger</span>
             </span>
           </button>
         </li>

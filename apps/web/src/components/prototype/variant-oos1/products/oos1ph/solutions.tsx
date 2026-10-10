@@ -344,7 +344,7 @@ function SheetFace({
                   <span aria-hidden="true" {...stylex.props(styles.absent)}>
                     —
                   </span>
-                  <span {...stylex.props(ui.srOnly)}>无</span>
+                  <span {...stylex.props(ui.srOnly)}>None</span>
                 </>
               )}
             </dd>
@@ -388,9 +388,9 @@ export function Solutions() {
           </h2>
         </header>
         <div {...stylex.props(styles.layout)}>
-          <div role="group" aria-label="方案切换" {...stylex.props(styles.rail)}>
+          <div role="group" aria-label="Switch solution" {...stylex.props(styles.rail)}>
             <label htmlFor={selectId} {...stylex.props(ui.srOnly)}>
-              选择方案
+              Choose a solution
             </label>
             <div {...stylex.props(styles.selectWrap)}>
               <select
@@ -417,7 +417,7 @@ export function Solutions() {
             <div {...stylex.props(styles.stepper)}>
               <button
                 type="button"
-                aria-label="上一个"
+                aria-label="Previous"
                 aria-controls={stageId}
                 disabled={index === 0}
                 onClick={() => route(index - 1)}
@@ -431,7 +431,7 @@ export function Solutions() {
               </p>
               <button
                 type="button"
-                aria-label="下一个"
+                aria-label="Next"
                 aria-controls={stageId}
                 disabled={index === SOLUTION_ITEMS.length - 1}
                 onClick={() => route(index + 1)}
@@ -441,7 +441,7 @@ export function Solutions() {
               </button>
             </div>
             <p aria-live="polite" {...stylex.props(ui.srOnly)}>
-              {routed ? `${padIndex(index)} / ${TOTAL} ${item.title}` : ""}
+              {routed ? `${padIndex(index)} / ${TOTAL} ${item.englishName}` : ""}
             </p>
           </div>
           <div id={stageId} {...stylex.props(styles.stage)}>
@@ -457,7 +457,7 @@ export function Solutions() {
                 <p {...stylex.props(styles.subtitle)}>{item.subtitle}</p>
               </div>
               <div {...stylex.props(styles.sideToggle)}>
-                <SegmentTrack role="group" aria-label="正反面" stretch>
+                <SegmentTrack role="group" aria-label="Front and back" stretch>
                   {SIDES.map((side) => (
                     <SegmentButton
                       key={side.id}

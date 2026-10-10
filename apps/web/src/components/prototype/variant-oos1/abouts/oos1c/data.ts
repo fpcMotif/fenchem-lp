@@ -1,4 +1,5 @@
 import { ABOUT_BANNER, ABOUT_CAMPUS, ABOUT_HERO } from "../../about-data";
+import { STATS } from "../../content";
 
 export const PHOTO_ENGLISH = {
   aerial: "Headquarters",
@@ -20,7 +21,7 @@ export const PHOTO_SHAPE = {
   grounds: "tall",
 } as const satisfies Record<(typeof ABOUT_CAMPUS.photos)[number]["id"], string>;
 
-export const LOBBY_ALT = "泛成总部大堂，弧形吊顶与大理石地面";
+export const LOBBY_ALT = "Fenchem headquarters lobby with a curved ceiling and marble floor";
 
 export const NAV_ENGLISH: Record<string, string> = {
   "about-profile": "Profile",
@@ -36,6 +37,12 @@ export const GROUPS = [
   { id: "about-campus", label: ABOUT_HERO.navChips[1].label },
   { id: "about-culture", label: ABOUT_HERO.navChips[2].label },
 ] as const;
+
+export const STAT_ENGLISH = {
+  公司历史: "Company history",
+  全球分公司: "Global offices",
+  生产基地: "Production bases",
+} as const satisfies Record<(typeof STATS)[number]["label"], string>;
 
 export const STRIP_PHRASES = [
   ABOUT_BANNER.tagline,

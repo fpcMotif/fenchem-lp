@@ -9,6 +9,12 @@ import { font, mq, ui } from "./theme.stylex";
 
 const STAT_STAGGER_SECONDS = 0.22;
 
+const STAT_ENGLISH: Record<string, string> = {
+  公司历史: "Company history",
+  全球分公司: "Global offices",
+  生产基地: "Production bases",
+};
+
 const styles = stylex.create({
   band: {
     paddingBlock: { default: 80, [breakpoints.xl]: 144 },
@@ -57,7 +63,7 @@ const styles = stylex.create({
 
 export function StatsBand() {
   return (
-    <section id="about-stats" aria-label="发展数据" {...stylex.props(styles.band)}>
+    <section id="about-stats" aria-label="Growth figures" {...stylex.props(styles.band)}>
       <div {...stylex.props(shared.shell, shared.inset)}>
         <ul {...stylex.props(styles.stats)}>
           {STATS.map((stat, position) => (
@@ -67,7 +73,7 @@ export function StatsBand() {
                 {stat.unit ? <span {...stylex.props(styles.unit)}>{stat.unit}</span> : null}
               </div>
               <p {...stylex.props(styles.caption)}>
-                <span {...stylex.props(shared.srOnly)}>{stat.label}：</span>
+                <span {...stylex.props(shared.srOnly)}>{STAT_ENGLISH[stat.label]}:</span>
                 {stat.caption}
               </p>
             </Reveal>

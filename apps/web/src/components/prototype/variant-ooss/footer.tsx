@@ -28,7 +28,7 @@ const LINK_TARGETS: Record<string, string> = {
 
 const SOCIALS = [
   { label: "LinkedIn", paths: LINKEDIN_PATHS, viewBox: "1.67 1.67 16.66 16.66" },
-  { label: "微信", paths: WECHAT_PATHS, viewBox: "1.67 1.335 17.46 17.46" },
+  { label: "WeChat", paths: WECHAT_PATHS, viewBox: "1.67 1.335 17.46 17.46" },
 ] as const;
 
 const styles = stylex.create({
@@ -295,11 +295,11 @@ export function SiteFooter() {
       <div {...stylex.props(layout.shell, layout.inset)}>
         <div {...stylex.props(styles.grid)}>
           <div {...stylex.props(styles.brand)}>
-            <a href="#top" aria-label="FENCHEM 泛成 首页" {...stylex.props(styles.logoLink)}>
+            <a href="#top" aria-label="FENCHEM home" {...stylex.props(styles.logoLink)}>
               <VectorArt paths={LOGO_PATHS} viewBox="0 0 161 52" sx={styles.logo} />
             </a>
           </div>
-          <nav aria-label="页脚导航" {...stylex.props(styles.columns)}>
+          <nav aria-label="Footer" {...stylex.props(styles.columns)}>
             {FOOTER_COLUMNS.map((column) => (
               <div key={column.heading}>
                 <h3 {...stylex.props(styles.columnHeading)}>{column.heading}</h3>

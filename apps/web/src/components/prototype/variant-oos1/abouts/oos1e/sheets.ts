@@ -1,11 +1,9 @@
-import { CTA } from "../../content";
-
 export type SheetTone = "paper" | "warm" | "navy";
 
 export type SheetDef = {
   id: string;
   index: number;
-  name: string;
+  english: string;
   tone: SheetTone;
   nav: string | null;
 };
@@ -22,7 +20,7 @@ export const NAV_ENGLISH = {
 export const PROFILE_SHEET: SheetDef = {
   id: "about-profile",
   index: 0,
-  name: "企业概况",
+  english: "Profile",
   tone: "paper",
   nav: "about-profile",
 };
@@ -30,7 +28,7 @@ export const PROFILE_SHEET: SheetDef = {
 export const STATS_SHEET: SheetDef = {
   id: "about-stats",
   index: 1,
-  name: "发展数据",
+  english: "Growth figures",
   tone: "navy",
   nav: "about-profile",
 };
@@ -38,7 +36,7 @@ export const STATS_SHEET: SheetDef = {
 export const CAMPUS_SHEET: SheetDef = {
   id: "about-campus",
   index: 2,
-  name: "园区环境",
+  english: "Campus",
   tone: "paper",
   nav: "about-campus",
 };
@@ -46,7 +44,7 @@ export const CAMPUS_SHEET: SheetDef = {
 export const CULTURE_SHEET: SheetDef = {
   id: "about-culture",
   index: 3,
-  name: "企业文化",
+  english: "Culture",
   tone: "warm",
   nav: "about-culture",
 };
@@ -54,7 +52,7 @@ export const CULTURE_SHEET: SheetDef = {
 export const CSR_SHEET: SheetDef = {
   id: "about-csr",
   index: 4,
-  name: "社会责任",
+  english: "Responsibility",
   tone: "paper",
   nav: "about-csr",
 };
@@ -62,7 +60,7 @@ export const CSR_SHEET: SheetDef = {
 export const HONORS_SHEET: SheetDef = {
   id: "about-honor",
   index: 5,
-  name: "企业荣誉",
+  english: "Honors",
   tone: "warm",
   nav: "about-honor",
 };
@@ -70,7 +68,7 @@ export const HONORS_SHEET: SheetDef = {
 export const STRUCTURE_SHEET: SheetDef = {
   id: "about-structure",
   index: 6,
-  name: "企业结构",
+  english: "Structure",
   tone: "paper",
   nav: "about-structure",
 };
@@ -78,7 +76,7 @@ export const STRUCTURE_SHEET: SheetDef = {
 export const PRODUCTS_SHEET: SheetDef = {
   id: "about-products",
   index: 7,
-  name: "产品与应用",
+  english: "Products and applications",
   tone: "warm",
   nav: null,
 };
@@ -86,7 +84,7 @@ export const PRODUCTS_SHEET: SheetDef = {
 export const CLOSING_SHEET: SheetDef = {
   id: "about-cta",
   index: 8,
-  name: CTA.title,
+  english: "Open the next breakthrough together",
   tone: "paper",
   nav: null,
 };

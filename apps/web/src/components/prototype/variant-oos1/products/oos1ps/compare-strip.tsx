@@ -449,7 +449,7 @@ function RemoveButton({
   return (
     <button
       type="button"
-      aria-label={`移除 ${item.primary}`}
+      aria-label={`Remove ${item.englishName}`}
       onClick={() => onRemove(item)}
       {...stylex.props(styles.remove, inline && styles.removeInline)}
     >
@@ -466,7 +466,7 @@ function CompareTable({
   onRemove: (item: FlatItem) => void;
 }) {
   return (
-    <table aria-label="对比详情" {...stylex.props(styles.table)}>
+    <table aria-label="Comparison details" {...stylex.props(styles.table)}>
       <colgroup>
         <col {...stylex.props(styles.colLabel)} />
         {slots.map((_, slot) => (
@@ -524,7 +524,7 @@ function CompareList({
   onRemove: (item: FlatItem) => void;
 }) {
   return (
-    <ol aria-label="对比详情" {...stylex.props(styles.list)}>
+    <ol aria-label="Comparison details" {...stylex.props(styles.list)}>
       {items.map((item, index) => (
         <li
           key={item.id}
@@ -588,7 +588,7 @@ export function CompareStrip({
   return (
     <m.div
       role="region"
-      aria-label="原料对比"
+      aria-label="Ingredient comparison"
       onKeyDown={handleKeyDown}
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
@@ -611,12 +611,12 @@ export function CompareStrip({
                 <span aria-hidden="true" {...stylex.props(styles.barLabel)}>
                   对比清单
                 </span>
-                <ul aria-label="已选原料" {...stylex.props(styles.chips)}>
+                <ul aria-label="Selected ingredients" {...stylex.props(styles.chips)}>
                   {items.map((item) => (
                     <li key={item.id} {...stylex.props(styles.chipItem)}>
                       <button
                         type="button"
-                        aria-label={`移除 ${item.primary}`}
+                        aria-label={`Remove ${item.englishName}`}
                         onClick={() => remove(item)}
                         {...stylex.props(styles.chip)}
                       >
@@ -673,7 +673,7 @@ export function CompareStrip({
         >
           <div
             tabIndex={0}
-            aria-label="对比详情"
+            aria-label="Comparison details"
             role="group"
             {...stylex.props(styles.panelScroll)}
           >

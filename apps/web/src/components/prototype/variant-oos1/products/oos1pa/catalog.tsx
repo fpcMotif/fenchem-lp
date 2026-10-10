@@ -424,7 +424,7 @@ export function Catalog() {
           </p>
         </header>
 
-        <nav aria-label="按产地跳转">
+        <nav aria-label="Jump by origin">
           <ul {...stylex.props(styles.jumpList)}>
             {REGIONS.map((region) => (
               <li key={region.group.id}>

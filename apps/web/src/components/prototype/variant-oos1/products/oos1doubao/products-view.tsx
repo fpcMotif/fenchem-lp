@@ -424,13 +424,13 @@ export function ProductsOOS1Doubao({
         <div {...stylex.props(styles.hero)}>
           <img
             src={FEATURED_PRODUCT.bannerImage}
-            alt="泛成生物产品与应用自然原貌全景"
+            alt="Panorama of Fenchem products and applications in their natural form"
             fetchPriority="high"
             decoding="async"
             {...stylex.props(styles.heroImg)}
           />
           <div {...stylex.props(layout.shell, layout.inset, styles.heroContent)}>
-            <nav aria-label="面包屑导航" {...stylex.props(styles.breadcrumb)}>
+            <nav aria-label="Breadcrumb" {...stylex.props(styles.breadcrumb)}>
               <button
                 type="button"
                 onClick={() => onNavigateHome("top")}
@@ -451,7 +451,7 @@ export function ProductsOOS1Doubao({
         <div {...stylex.props(styles.tabBar)}>
           <div
             role="group"
-            aria-label="品类切换"
+            aria-label="Categories"
             {...stylex.props(layout.shell, layout.inset, styles.tabRow)}
           >
             {CATEGORIES.map((cat) => {
@@ -521,7 +521,11 @@ export function ProductsOOS1Doubao({
               </m.div>
             </AnimatePresence>
           </div>
-          <div role="group" aria-label="6款核心油脂原料图卡" {...stylex.props(styles.thumbs)}>
+          <div
+            role="group"
+            aria-label="6 core oil ingredient cards"
+            {...stylex.props(styles.thumbs)}
+          >
             {FEATURED_PRODUCT.items.map((item, idx) => {
               const isActive = activeProductIndex === idx;
               return (

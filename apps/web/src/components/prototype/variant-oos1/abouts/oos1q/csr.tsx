@@ -92,7 +92,7 @@ export function Csr() {
   const leafIndex = ABOUT_CSR.outcomes.findIndex((outcome) => outcome.icon === "leaf");
 
   return (
-    <Section id={chip.id} label={chip.label}>
+    <Section id={chip.id} label={chip.english}>
       <div {...stylex.props(s.stage)}>
         <Figure
           src={ABOUT_CSR.image}

@@ -9,16 +9,17 @@ import { bp, chrome, face, tone } from "./tokens.stylex";
 
 const PANELS = "abcdefg";
 
-const PHOTOS: readonly (LightboxPhoto & { src: string })[] = ABOUT_CAMPUS.photos.map(
-  (photo, index) => ({
+const PHOTOS: readonly (LightboxPhoto & { src: string; english: string; description: string })[] =
+  ABOUT_CAMPUS.photos.map((photo, index) => ({
     id: photo.id,
     src: photo.src,
     large: photo.large,
     alt: photo.alt,
+    description: photo.description,
     caption: photo.caption,
+    english: photo.english,
     panel: PANELS[index] ?? String(index + 1),
-  }),
-);
+  }));
 
 const styles = stylex.create({
   lead: {
@@ -148,7 +149,7 @@ function Panel({
       <button
         ref={(node) => registerTrigger(index, node)}
         type="button"
-        aria-label={`${photo.caption}，查看大图`}
+        aria-label={`${photo.english}, view larger`}
         onClick={() => onOpen(index)}
         {...stylex.props(styles.button, ui.focusRing, stylex.defaultMarker())}
       >
@@ -166,7 +167,7 @@ function Panel({
         </span>
         <span {...stylex.props(styles.caption, lead && styles.captionLead)}>{photo.caption}</span>
         <span aria-hidden="true" {...stylex.props(styles.detail, lead && styles.detailLead)}>
-          {photo.alt}
+          {photo.description}
         </span>
       </figcaption>
     </figure>

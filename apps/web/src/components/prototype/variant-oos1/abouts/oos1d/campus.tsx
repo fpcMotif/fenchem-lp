@@ -175,14 +175,14 @@ export function Campus() {
   const count = photos.length;
 
   return (
-    <Section id={chip.id} label={ABOUT_CAMPUS.title} background={ui.onPage}>
+    <Section id={chip.id} label={ABOUT_CAMPUS.eyebrow} background={ui.onPage}>
       <div {...stylex.props(s.stage)}>
         <div ref={mosaicRef} {...stylex.props(s.mosaic)}>
           {photos.map((photo, idx) => (
             <figure key={photo.id} {...stylex.props(s.tile, TILE_AREA[idx])}>
               <button
                 type="button"
-                aria-label={`查看大图：${photo.caption}`}
+                aria-label={`View larger: ${photo.english}`}
                 onClick={() => {
                   setStepped(false);
                   setOpenIndex(idx);

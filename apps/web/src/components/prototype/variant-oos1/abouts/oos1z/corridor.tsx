@@ -135,7 +135,7 @@ function Caption({
             onClick={() => onOpen(active)}
             {...stylex.props(ui.button, ui.focus, styles.view)}
           >
-            查看<span {...srOnly}>大图：{work.caption}</span>
+            查看<span {...srOnly}>Large view: {work.englishCaption}</span>
             <ArrowUpRight size={14} strokeWidth={1.5} aria-hidden="true" />
           </button>
         ) : null}

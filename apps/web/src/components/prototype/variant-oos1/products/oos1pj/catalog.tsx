@@ -9,7 +9,7 @@ import { EASE } from "@/components/prototype/motion-constants";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
 import { CATALOG_GROUPS } from "../../products-data";
-import { FLAT_ITEMS, FORM_LABEL, REGION_META, type FlatItem } from "../shared/derived";
+import { FLAT_ITEMS, FORM_LABEL, REGION_META, type Form, type FlatItem } from "../shared/derived";
 
 const INK = "#1a1a1a";
 const BODY_TEXT = "#4d4d4d";
@@ -48,6 +48,15 @@ const originOf = (item: FlatItem) => {
 
 const formOf = (item: FlatItem) =>
   item.traits.form === "unspecified" ? null : FORM_LABEL[item.traits.form];
+
+const FORM_ENGLISH: Record<Form, string> = {
+  liquid: "Liquid oil",
+  solid: "Solid butter",
+  wax: "Wax",
+  extract: "Extract / active",
+  water: "Floral water",
+  unspecified: "Not specified",
+};
 
 const visuallyHidden = {
   position: "absolute",
@@ -401,7 +410,7 @@ function Empty() {
       <span aria-hidden="true" {...stylex.props(styles.empty)}>
         —
       </span>
-      <span {...stylex.props(styles.srOnly)}>无</span>
+      <span {...stylex.props(styles.srOnly)}>None</span>
     </>
   );
 }
@@ -433,7 +442,14 @@ function LatinNames({ names, complete }: { names: string[]; complete: boolean })
           {name}
         </span>
       ))}
-      {condensed && <span {...stylex.props(styles.latinMore)}>等 {names.length} 种</span>}
+      {condensed && (
+        <>
+          <span aria-hidden="true" {...stylex.props(styles.latinMore)}>
+            等 {names.length} 种
+          </span>
+          <span {...stylex.props(styles.srOnly)}>and others, {names.length} in total</span>
+        </>
+      )}
     </>
   );
 }
@@ -496,7 +512,16 @@ function ItemRows({
         </td>
         <td {...stylex.props(styles.cell)}>{origin ?? <Empty />}</td>
         <td {...stylex.props(styles.cell, styles.foldCell)}>
-          <span {...stylex.props(styles.foldContent)}>{form ?? <Empty />}</span>
+          <span {...stylex.props(styles.foldContent)}>
+            {form ? (
+              <>
+                <span aria-hidden="true">{form}</span>
+                <span {...stylex.props(styles.srOnly)}>{FORM_ENGLISH[item.traits.form]}</span>
+              </>
+            ) : (
+              <Empty />
+            )}
+          </span>
         </td>
       </m.tr>
       <m.tr
@@ -608,13 +633,19 @@ export function Catalog() {
                 名称
               </th>
               <th scope="col" {...stylex.props(styles.headCell, styles.foldCell)}>
-                <span {...stylex.props(styles.foldContent)}>学名</span>
+                <span {...stylex.props(styles.foldContent)}>
+                  <span aria-hidden="true">学名</span>
+                  <span {...stylex.props(styles.srOnly)}>Botanical name</span>
+                </span>
               </th>
               <th scope="col" {...stylex.props(styles.headCell)}>
                 产地
               </th>
               <th scope="col" {...stylex.props(styles.headCell, styles.foldCell)}>
-                <span {...stylex.props(styles.foldContent)}>形态</span>
+                <span {...stylex.props(styles.foldContent)}>
+                  <span aria-hidden="true">形态</span>
+                  <span {...stylex.props(styles.srOnly)}>Form</span>
+                </span>
               </th>
             </m.tr>
           </thead>

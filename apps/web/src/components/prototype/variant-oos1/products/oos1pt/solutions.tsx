@@ -457,7 +457,7 @@ function Column({
             <span aria-hidden="true" {...stylex.props(styles.dash)}>
               —
             </span>
-            <span {...stylex.props(styles.visuallyHidden)}>未提供</span>
+            <span {...stylex.props(styles.visuallyHidden)}>Not provided</span>
           </>
         )}
       </dd>

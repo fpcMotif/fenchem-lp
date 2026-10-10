@@ -126,7 +126,7 @@ export function Culture() {
       aria-labelledby="about-culture-title"
       {...stylex.props(base.section, base.anchor, styles.culture)}
     >
-      <SectionName id="about-culture-title">企业文化</SectionName>
+      <SectionName id="about-culture-title">{ABOUT_CULTURE.eyebrow}</SectionName>
       <div {...stylex.props(base.shell)}>
         <ul {...stylex.props(styles.values)}>
           {ABOUT_CULTURE.values.map((value, idx) => (

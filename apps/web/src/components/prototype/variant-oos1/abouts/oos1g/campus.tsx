@@ -135,7 +135,7 @@ export function Campus() {
       <figure key={photo.id} {...stylex.props(styles.tile, placementStyle(placement))}>
         <button
           type="button"
-          aria-label={`查看大图：${photo.caption}`}
+          aria-label={`View larger: ${photo.english}`}
           onClick={() => {
             setStepped(false);
             setOpenIndex(index);
@@ -162,7 +162,7 @@ export function Campus() {
       {...stylex.props(styles.section, layout.sectionY, layout.anchor)}
     >
       <h2 id="about-campus-title" {...stylex.props(layout.srOnly)}>
-        园区环境
+        Campus
       </h2>
       <div {...stylex.props(layout.shell, layout.padBoth)}>
         <div {...stylex.props(styles.canvas)}>

@@ -165,7 +165,7 @@ export function Honors() {
                 <span {...stylex.props(styles.level)}>
                   <LevelStack plates={level.plates} />
                   <span {...stylex.props(styles.levelText)}>
-                    <span {...srOnly}>级别：</span>
+                    <span {...srOnly}>Level:</span>
                     {level.label}
                     <span lang="en" {...stylex.props(ui.label)}>
                       {level.english}

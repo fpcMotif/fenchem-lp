@@ -145,12 +145,12 @@ export function Profile() {
   return (
     <section id={chip.id} aria-labelledby="about-profile-name" {...stylex.props(s.section)}>
       <h2 id="about-profile-name" {...stylex.props(ui.srOnly)}>
-        {chip.label}
+        {chip.english}
       </h2>
       <div {...stylex.props(ui.shell, ui.inset, ui.grid, s.copy)}>
         <Figure
           src={ABOUT_HERO.lobbyImage}
-          alt="泛成总部大堂，弧形吊顶与大理石地面"
+          alt="Fenchem headquarters lobby with a curved ceiling and marble floor"
           caption={ABOUT_HERO.lobbyCaption}
           ratio={s.ratio}
           fit={s.lobby}
@@ -179,7 +179,7 @@ export function Profile() {
       </div>
       <div {...stylex.props(s.band)}>
         <div {...stylex.props(ui.shell, ui.inset)}>
-          <h3 {...stylex.props(ui.srOnly)}>泛成发展数据</h3>
+          <h3 {...stylex.props(ui.srOnly)}>Growth figures</h3>
           <ul {...stylex.props(s.stats)}>
             {STATS.map((stat, idx) => (
               <Reveal key={stat.label} as="li" step={idx} sx={[ui.grid, s.stat]}>

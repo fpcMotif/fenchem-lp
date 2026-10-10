@@ -741,7 +741,7 @@ export function Network() {
         </div>
         <WorldMap active={active} />
         <div {...stylex.props(styles.panel)}>
-          <ul aria-label="全球分公司地区" {...stylex.props(styles.regions)}>
+          <ul aria-label="Global office regions" {...stylex.props(styles.regions)}>
             {REGIONS.map((region, index) => (
               <Reveal
                 as="li"

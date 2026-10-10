@@ -102,7 +102,7 @@ export function Dial({ dayOnly = false }: { dayOnly?: boolean }) {
     <svg
       viewBox="-185 -32 370 120"
       role="img"
-      aria-label={`日晷：上午九时至午后一时的时辰线。铭文：${ABOUT_BANNER.tagline}`}
+      aria-label={`Sundial with hour lines from 9 a.m. to 1 p.m. Inscription: ${ABOUT_BANNER.tagline}`}
       {...stylex.props(styles.svg)}
     >
       <defs>

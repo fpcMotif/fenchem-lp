@@ -73,7 +73,7 @@ const S = stylex.create({
 export function Profile() {
   return (
     <Section id="about-profile" labelledBy="about-profile-title" surface="paper" band="above">
-      <SectionName id="about-profile-title">{ABOUT_HERO.navChips[0].label}</SectionName>
+      <SectionName id="about-profile-title">{ABOUT_HERO.navChips[0].english}</SectionName>
       <div {...stylex.props(base.shell, base.inset, S.grid)}>
         <Reveal sx={S.copy}>
           <div>
@@ -96,7 +96,7 @@ export function Profile() {
         <Reveal as="figure" delay={120} sx={S.figure}>
           <img
             src={ABOUT_HERO.lobbyImage}
-            alt="泛成总部大堂，弧形吊顶与大理石地面"
+            alt="Fenchem headquarters lobby with a curved ceiling and marble floor"
             loading="lazy"
             decoding="async"
             {...stylex.props(S.photo)}

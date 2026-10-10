@@ -387,7 +387,7 @@ function Field({ label, lines }: { label: string; lines: string[] }) {
             <span aria-hidden="true" {...stylex.props(styles.empty)}>
               —
             </span>
-            <span {...stylex.props(styles.srOnly)}>无</span>
+            <span {...stylex.props(styles.srOnly)}>None</span>
           </>
         )}
       </dd>
@@ -496,7 +496,7 @@ export function Solutions() {
 
   const selectFromFoot = (index: number) => {
     setActive(index);
-    setAnnouncement(`${padIndex(index)} ${SOLUTION_ITEMS[index]?.title ?? ""}`);
+    setAnnouncement(`${padIndex(index)} ${SOLUTION_ITEMS[index]?.englishName ?? ""}`);
     const paper = paperRef.current;
     if (paper && paper.getBoundingClientRect().top < HEADER_HEIGHT) {
       paper.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });

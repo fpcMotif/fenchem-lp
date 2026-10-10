@@ -256,7 +256,7 @@ export function Campus() {
               />
               <span aria-hidden="true" {...stylex.props(styles.frame)} />
               <span {...srOnly}>
-                查看大图：视图 {view.letter}，{view.caption}
+                View larger: view {view.letter}, {view.english}
               </span>
             </button>
             <div aria-hidden="true" {...stylex.props(styles.caption)}>

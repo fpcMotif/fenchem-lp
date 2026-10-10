@@ -2,16 +2,16 @@ import * as stylex from "@stylexjs/stylex";
 import { useEffect, useRef } from "react";
 
 import { useActiveSection } from "../../use-active-section";
-import { SECTION_IDS, srOnly, ui } from "./shared";
+import { SECTION_IDS, ui } from "./shared";
 import { bp, chrome, face, pane, tone } from "./tokens.stylex";
 
-const ENTRIES: Record<(typeof SECTION_IDS)[number], { en: string; zh: string }> = {
-  "about-profile": { en: "Profile", zh: "企业概况" },
-  "about-campus": { en: "Campus", zh: "园区环境" },
-  "about-culture": { en: "Culture", zh: "企业文化" },
-  "about-csr": { en: "Responsibility", zh: "社会责任" },
-  "about-honor": { en: "Honors", zh: "企业荣誉" },
-  "about-structure": { en: "Structure", zh: "企业架构" },
+const ENTRIES: Record<(typeof SECTION_IDS)[number], string> = {
+  "about-profile": "Profile",
+  "about-campus": "Campus",
+  "about-culture": "Culture",
+  "about-csr": "Responsibility",
+  "about-honor": "Honors",
+  "about-structure": "Structure",
 };
 
 const styles = stylex.create({
@@ -98,7 +98,7 @@ export function IndexBar() {
   }, [active]);
 
   return (
-    <nav aria-label="页内导航" {...stylex.props(styles.bar)}>
+    <nav aria-label="On this page" {...stylex.props(styles.bar)}>
       <div {...stylex.props(ui.shell, styles.row)}>
         <ol ref={listRef} {...stylex.props(styles.list)}>
           {SECTION_IDS.map((id) => (
@@ -108,8 +108,7 @@ export function IndexBar() {
                 aria-current={active === id ? "location" : undefined}
                 {...stylex.props(styles.link)}
               >
-                <span lang="en">{ENTRIES[id].en}</span>
-                <span {...srOnly}> {ENTRIES[id].zh}</span>
+                <span lang="en">{ENTRIES[id]}</span>
                 <span
                   aria-hidden="true"
                   {...stylex.props(styles.marker, active === id && styles.markerOn)}

@@ -156,7 +156,7 @@ export function Closing({ onNavigateHome }: AboutPageProps) {
   );
 
   return (
-    <section ref={sectionRef} aria-label="结语" {...stylex.props(styles.section)}>
+    <section ref={sectionRef} aria-label="Closing" {...stylex.props(styles.section)}>
       <div {...stylex.props(ui.shell)}>
         <div {...stylex.props(styles.coda)}>
           <div {...stylex.props(styles.column)}>
@@ -205,7 +205,7 @@ export function Closing({ onNavigateHome }: AboutPageProps) {
                 />
               </svg>
             </m.div>
-            <span {...srOnly}>。</span>
+            <span {...srOnly}>.</span>
           </div>
         </div>
       </div>

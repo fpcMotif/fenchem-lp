@@ -95,7 +95,7 @@ const s = stylex.create({
 
 export function Products({ onNavigateHome }: { onNavigateHome: (hash?: string) => void }) {
   return (
-    <Section id="about-products" label={PRODUCTS_INTRO.title} background={ui.onPage}>
+    <Section id="about-products" label="Products and application solutions" background={ui.onPage}>
       <Reveal sx={s.intro}>
         <p {...stylex.props(s.lead)}>{PRODUCTS_INTRO.lead}</p>
         <button

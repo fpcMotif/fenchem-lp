@@ -314,7 +314,7 @@ export function PinnedCampusFrame({
   statistics: ReactNode;
 }) {
   return (
-    <section id="campus" aria-label="研发与生产" {...stylex.props(styles.anchor)}>
+    <section id="campus" aria-label="R&D and production" {...stylex.props(styles.anchor)}>
       <div ref={trackRef} {...stylex.props(styles.campusTrack)}>
         <div {...stylex.props(styles.campusSticky)}>
           <m.div

@@ -129,7 +129,7 @@ export function Structure() {
   const { holding, subsidiaries, subsidiaryBadge } = ABOUT_STRUCTURE;
 
   return (
-    <Section id="about-structure" name={ABOUT_STRUCTURE.title}>
+    <Section id="about-structure" name={ABOUT_STRUCTURE.eyebrow}>
       <Shell>
         <NodeMarker />
         <Reveal>
@@ -168,7 +168,7 @@ export function Structure() {
             <div id={chartId} hidden={!showChart} {...stylex.props(styles.frame)}>
               <img
                 src={ABOUT_STRUCTURE.chartImage}
-                alt="南京泛成国际控股有限公司官方组织架构图"
+                alt="Official organizational chart of Nanjing Fenchem International Holdings Corporation Limited"
                 loading="lazy"
                 decoding="async"
                 {...stylex.props(styles.chart)}

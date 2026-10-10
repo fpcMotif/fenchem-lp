@@ -89,7 +89,7 @@ export function Culture() {
   return (
     <section id={chip.id} aria-labelledby={nameId} {...stylex.props(s.anchor)}>
       <h2 id={nameId} {...stylex.props(ui.srOnly)}>
-        {ABOUT_CULTURE.title}
+        {chip.english}
       </h2>
 
       <article aria-labelledby="about-culture-focus" {...stylex.props(s.scene, s.cool)}>
@@ -130,7 +130,7 @@ export function Culture() {
             <div {...stylex.props(s.frame, s.ratioPatience)}>
               <img
                 src="/prototype/official-site/campus-lake.webp"
-                alt="平静的水面倒映着泛成研发大楼"
+                alt="Still water reflecting the Fenchem R&D building"
                 loading="lazy"
                 decoding="async"
                 {...stylex.props(ui.fill, s.patienceImage)}

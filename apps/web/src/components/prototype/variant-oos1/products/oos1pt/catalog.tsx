@@ -140,6 +140,17 @@ const styles = stylex.create({
   colInci: {
     width: { default: "auto", [LG]: "27%" },
   },
+  srOnly: {
+    position: "absolute",
+    width: 1,
+    height: 1,
+    margin: -1,
+    padding: 0,
+    overflow: "hidden",
+    clipPath: "inset(50%)",
+    whiteSpace: "nowrap",
+    borderWidth: 0,
+  },
   thead: {
     display: { default: "block", [LG]: "table-header-group" },
     position: { default: "absolute", [LG]: "static" },
@@ -483,7 +494,7 @@ export function Catalog() {
             </h2>
             <p {...stylex.props(styles.lead)}>精选个人护理全形态天然油脂与经典功效配方方案</p>
           </div>
-          <nav aria-label="产地索引">
+          <nav aria-label="Origin index">
             <ul {...stylex.props(styles.index)}>
               {CATALOG_GROUPS.map((group) => (
                 <li key={group.id}>
@@ -511,16 +522,20 @@ export function Catalog() {
           <thead {...stylex.props(styles.thead)}>
             <tr>
               <th scope="col" {...stylex.props(styles.headCell)}>
-                产地
+                <span aria-hidden="true">产地</span>
+                <span {...stylex.props(styles.srOnly)}>Origin</span>
               </th>
               <th scope="col" {...stylex.props(styles.headCell)}>
-                名称
+                <span aria-hidden="true">名称</span>
+                <span {...stylex.props(styles.srOnly)}>Name</span>
               </th>
               <th scope="col" {...stylex.props(styles.headCell)}>
-                INCI 名称
+                <span aria-hidden="true">INCI 名称</span>
+                <span {...stylex.props(styles.srOnly)}>INCI name</span>
               </th>
               <th scope="col" {...stylex.props(styles.headCell, styles.headCellLast)}>
-                特性&应用
+                <span aria-hidden="true">特性&应用</span>
+                <span {...stylex.props(styles.srOnly)}>Features & applications</span>
               </th>
             </tr>
           </thead>

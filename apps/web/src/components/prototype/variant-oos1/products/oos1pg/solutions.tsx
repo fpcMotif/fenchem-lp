@@ -566,7 +566,7 @@ export function Solutions() {
         <div ref={scrollerRef} {...stylex.props(styles.tabScroller)}>
           <div
             role="tablist"
-            aria-label="应用方案"
+            aria-label="Application solutions"
             onKeyDown={moveTabs}
             {...stylex.props(styles.tablist)}
           >
@@ -623,7 +623,7 @@ export function Solutions() {
                     <h3 {...stylex.props(styles.headTitle)}>{item.title}</h3>
                     <p {...stylex.props(styles.headSubtitle)}>{item.subtitle}</p>
                   </div>
-                  <ol aria-label="方案页面" {...stylex.props(styles.pageIndex)}>
+                  <ol aria-label="Solution pages" {...stylex.props(styles.pageIndex)}>
                     {PAGE_FIELDS.map((_, pageIndex) => {
                       const on = pageIndex === page;
                       return (
@@ -676,7 +676,9 @@ export function Solutions() {
               type="button"
               onClick={goBack}
               disabled={!canGoBack}
-              aria-label={page === 0 && previous ? `上一个方案：${previous.title}` : undefined}
+              aria-label={
+                page === 0 && previous ? `Previous solution: ${previous.englishName}` : undefined
+              }
               {...stylex.props(styles.navButton, styles.navBack, !canGoBack && styles.navDisabled)}
             >
               <ChevronLeft

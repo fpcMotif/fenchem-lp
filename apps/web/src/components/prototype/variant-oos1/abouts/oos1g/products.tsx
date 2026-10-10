@@ -119,7 +119,7 @@ export function Products({ onNavigateHome }: { onNavigateHome: (hash?: string) =
       {...stylex.props(styles.section, layout.sectionY, layout.anchor)}
     >
       <h2 id="about-products-title" {...stylex.props(layout.srOnly)}>
-        产品与应用
+        Products and applications
       </h2>
       <div {...stylex.props(layout.shell, layout.split, styles.grid)}>
         <Reveal sx={[layout.padLeft, layout.seam, styles.intro]}>

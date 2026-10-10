@@ -159,7 +159,7 @@ export function Lightbox({
   return (
     <dialog
       ref={dialogRef}
-      aria-label="园区影像"
+      aria-label="Campus images"
       onClose={onClose}
       onKeyDown={(event) => {
         if (event.key !== "ArrowRight" && event.key !== "ArrowLeft") return;
@@ -188,7 +188,7 @@ export function Lightbox({
           </LightboxStage>
           <button
             type="button"
-            aria-label="上一幅"
+            aria-label="Previous image"
             onClick={() => onStep(-1)}
             {...stylex.props(ui.button, ui.focus, styles.control, styles.prev)}
           >
@@ -196,7 +196,7 @@ export function Lightbox({
           </button>
           <button
             type="button"
-            aria-label="下一幅"
+            aria-label="Next image"
             onClick={() => onStep(1)}
             {...stylex.props(ui.button, ui.focus, styles.control, styles.next)}
           >
@@ -204,7 +204,7 @@ export function Lightbox({
           </button>
           <button
             type="button"
-            aria-label="关闭"
+            aria-label="Close"
             onClick={onClose}
             {...stylex.props(ui.button, ui.focus, styles.control, styles.close)}
           >

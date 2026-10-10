@@ -68,7 +68,7 @@ export function Culture() {
       aria-labelledby="about-culture-title"
       {...stylex.props(styles.section, shared.anchor)}
     >
-      <SectionName id="about-culture-title">企业文化</SectionName>
+      <SectionName id="about-culture-title">{ABOUT_CULTURE.eyebrow}</SectionName>
       <Frame innerSx={shared.sectionPad}>
         <ul {...stylex.props(styles.list)}>
           {ABOUT_CULTURE.values.map((value, index) => (

@@ -693,7 +693,7 @@ export function Catalog() {
         <div {...stylex.props(styles.toolbar)}>
           <search {...stylex.props(styles.searchField)}>
             <label htmlFor={searchId} {...stylex.props(styles.srOnly)}>
-              搜索原料
+              Search ingredients
             </label>
             <Search
               size={18}
@@ -718,7 +718,7 @@ export function Catalog() {
             {query !== "" && (
               <button
                 type="button"
-                aria-label="清除搜索"
+                aria-label="Clear search"
                 onClick={clearQuery}
                 {...stylex.props(styles.searchClear)}
               >
@@ -729,7 +729,7 @@ export function Catalog() {
 
           <div {...stylex.props(styles.regionField)}>
             <label htmlFor={regionId} {...stylex.props(styles.srOnly)}>
-              产地
+              Origin
             </label>
             <select
               id={regionId}
@@ -832,16 +832,20 @@ export function Catalog() {
           <thead {...stylex.props(styles.thead)}>
             <tr>
               <th scope="col" {...stylex.props(styles.th, styles.thName)}>
-                名称
+                <span aria-hidden="true">名称</span>
+                <span {...stylex.props(styles.srOnly)}>Name</span>
               </th>
               <th scope="col" {...stylex.props(styles.th)}>
-                产地
+                <span aria-hidden="true">产地</span>
+                <span {...stylex.props(styles.srOnly)}>Origin</span>
               </th>
               <th scope="col" {...stylex.props(styles.th)}>
-                INCI 名称
+                <span aria-hidden="true">INCI 名称</span>
+                <span {...stylex.props(styles.srOnly)}>INCI name</span>
               </th>
               <th scope="col" {...stylex.props(styles.th, styles.lastCell)}>
-                {"特性&应用"}
+                <span aria-hidden="true">{"特性&应用"}</span>
+                <span {...stylex.props(styles.srOnly)}>Features & applications</span>
               </th>
             </tr>
           </thead>

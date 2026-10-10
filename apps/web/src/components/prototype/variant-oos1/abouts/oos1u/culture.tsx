@@ -339,7 +339,7 @@ export function CultureStory() {
       {...stylex.props(ui.section, ui.anchor, styles.section)}
     >
       <h2 id="about-culture-title" {...stylex.props(ui.srOnly)}>
-        {ABOUT_CULTURE.title}
+        {ABOUT_CULTURE.eyebrow}
       </h2>
       <div {...stylex.props(ui.shell)}>
         <div ref={canvasRef} {...stylex.props(styles.canvas)}>

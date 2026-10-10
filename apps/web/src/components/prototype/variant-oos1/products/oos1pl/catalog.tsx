@@ -139,6 +139,17 @@ const styles = stylex.create({
     clipPath: { default: "inset(50%)", [LG]: "none" },
     whiteSpace: { default: "nowrap", [LG]: "normal" },
   },
+  srOnly: {
+    position: "absolute",
+    width: 1,
+    height: 1,
+    margin: -1,
+    padding: 0,
+    overflow: "hidden",
+    clipPath: "inset(50%)",
+    whiteSpace: "nowrap",
+    borderWidth: 0,
+  },
   columnHead: {
     position: "sticky",
     top: HEADER_HEIGHT,
@@ -615,13 +626,16 @@ export function Catalog() {
             <thead {...stylex.props(styles.thead)}>
               <tr>
                 <th scope="col" {...stylex.props(styles.columnHead, styles.columnHeadFirst)}>
-                  名称
+                  <span aria-hidden="true">名称</span>
+                  <span {...stylex.props(styles.srOnly)}>Name</span>
                 </th>
                 <th scope="col" {...stylex.props(styles.columnHead)}>
-                  INCI 名称
+                  <span aria-hidden="true">INCI 名称</span>
+                  <span {...stylex.props(styles.srOnly)}>INCI name</span>
                 </th>
                 <th scope="col" {...stylex.props(styles.columnHead)}>
-                  特性&amp;应用
+                  <span aria-hidden="true">特性&amp;应用</span>
+                  <span {...stylex.props(styles.srOnly)}>Features & applications</span>
                 </th>
               </tr>
             </thead>

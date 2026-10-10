@@ -160,7 +160,7 @@ export function Products({ onNavigateHome }: { onNavigateHome: (hash?: string) =
       aria-labelledby="about-products-title"
       {...stylex.props(base.section, styles.products)}
     >
-      <SectionName id="about-products-title">产品与应用</SectionName>
+      <SectionName id="about-products-title">Products and applications</SectionName>
       <div {...stylex.props(base.shell)}>
         <Reveal sx={styles.intro}>
           <p {...stylex.props(styles.lead)}>{PRODUCTS_INTRO.lead}</p>

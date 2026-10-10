@@ -164,7 +164,7 @@ function te({ items: s, groups: t, path: o, open: n, onOpenChange: r }) {
               variant: "ghost",
               size: "icon",
               className: "md:hidden",
-              "aria-label": "打开导航菜单",
+              "aria-label": "Open navigation menu",
               children: e.jsx(Y, { className: "size-5" }),
             }),
           }),
@@ -412,7 +412,7 @@ function re() {
                     className: "flex items-center gap-2",
                     children: e.jsx("img", {
                       src: "/AppUpload/Image/ca8375bebf1a4d6ab634a64e6dcdd68e.png",
-                      alt: "FENCHEM泛成",
+                      alt: "FENCHEM",
                       className: "h-[73px] w-auto brightness-0 invert",
                     }),
                   }),

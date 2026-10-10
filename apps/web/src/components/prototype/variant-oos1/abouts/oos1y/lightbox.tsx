@@ -12,7 +12,7 @@ export type LightboxPhoto = {
   id: string;
   large: string;
   alt: string;
-  caption: string;
+  englishCaption: string;
   english: string;
 };
 
@@ -154,7 +154,7 @@ export function Lightbox({
   return (
     <dialog
       ref={dialogRef}
-      aria-label="园区照片"
+      aria-label="Campus photos"
       onClose={onClose}
       onKeyDown={(event) => {
         if (event.key !== "ArrowRight" && event.key !== "ArrowLeft") return;
@@ -174,7 +174,7 @@ export function Lightbox({
               <img src={photo.large} alt={photo.alt} {...stylex.props(styles.image)} />
               <figcaption {...stylex.props(styles.caption)}>
                 <span lang="en">{photo.english}</span>
-                <span {...srOnly}> {photo.caption}</span>
+                <span {...srOnly}> {photo.englishCaption}</span>
               </figcaption>
             </figure>
           </LightboxStage>

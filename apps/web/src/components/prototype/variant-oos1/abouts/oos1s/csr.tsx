@@ -79,7 +79,7 @@ export function Csr() {
   const [statementLead, statementClose] = ABOUT_CSR.statement;
 
   return (
-    <Section id={chip.id} label={ABOUT_CSR.title} background={ui.onPaper}>
+    <Section id={chip.id} label={chip.english} background={ui.onPaper}>
       <div {...stylex.props(s.cols)}>
         <div {...stylex.props(s.copy)}>
           <Reveal>

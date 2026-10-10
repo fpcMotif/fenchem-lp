@@ -7,7 +7,6 @@ import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 import { ABOUT_HERO } from "../../about-data";
 import { useActiveSection } from "../../use-active-section";
 import { Shell } from "./layout";
-import { srOnly } from "./layout-values";
 import { color, ease, font } from "./palette.stylex";
 
 const SECTION_IDS = ABOUT_HERO.navChips.map((chip) => chip.id);
@@ -162,7 +161,7 @@ export function SubNav({ onNavigateHome }: { onNavigateHome: (hash?: string) => 
   return (
     <div {...stylex.props(styles.bar)}>
       <Shell sx={styles.inner}>
-        <nav aria-label="面包屑导航" {...stylex.props(styles.breadcrumb)}>
+        <nav aria-label="Breadcrumb" {...stylex.props(styles.breadcrumb)}>
           <button
             type="button"
             onClick={() => onNavigateHome("top")}
@@ -175,7 +174,7 @@ export function SubNav({ onNavigateHome }: { onNavigateHome: (hash?: string) => 
             关于我们
           </span>
         </nav>
-        <nav aria-label="本页导航" ref={tabsRef} {...stylex.props(styles.tabs)}>
+        <nav aria-label="On this page" ref={tabsRef} {...stylex.props(styles.tabs)}>
           {ABOUT_HERO.navChips.map((chip) => (
             <a
               key={chip.id}
@@ -184,7 +183,6 @@ export function SubNav({ onNavigateHome }: { onNavigateHome: (hash?: string) => 
               {...stylex.props(styles.tab, active === chip.id && styles.tabActive)}
             >
               <span lang="en">{ENGLISH_LABELS[chip.id]}</span>
-              <span {...stylex.props(srOnly)}> {chip.label}</span>
               <Braid shown={active === chip.id} />
             </a>
           ))}

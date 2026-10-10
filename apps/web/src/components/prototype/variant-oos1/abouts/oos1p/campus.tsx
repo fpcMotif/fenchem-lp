@@ -226,7 +226,7 @@ export function Campus() {
                     <span lang="en" {...stylex.props(styles.captionEnglish)}>
                       {ENGLISH[photo.id]}
                     </span>
-                    <span {...srOnly}>，查看大图</span>
+                    <span {...srOnly}>View larger</span>
                   </span>
                 </button>
               </li>

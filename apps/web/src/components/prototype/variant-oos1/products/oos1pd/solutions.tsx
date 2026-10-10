@@ -453,7 +453,7 @@ function Field({ label, lines, last = false }: { label: string; lines: string[];
     value = (
       <span {...stylex.props(styles.empty)}>
         <span aria-hidden="true">—</span>
-        <span {...stylex.props(styles.visuallyHidden)}>无</span>
+        <span {...stylex.props(styles.visuallyHidden)}>None</span>
       </span>
     );
   } else {
@@ -581,7 +581,7 @@ export function Solutions() {
                 <div
                   role="tablist"
                   aria-orientation="vertical"
-                  aria-label="应用方案列表"
+                  aria-label="Application solution list"
                   {...stylex.props(styles.tablist)}
                 >
                   {FLAT_FORMULAS.map((item, index) => {

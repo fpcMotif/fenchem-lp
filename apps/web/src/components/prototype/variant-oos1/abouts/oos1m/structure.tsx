@@ -145,7 +145,7 @@ export function Structure() {
                   </span>
                 </span>
                 <span {...stylex.props(styles.type)}>
-                  <span {...srOnly}>类型：</span>
+                  <span {...srOnly}>Type:</span>
                   {entry.badge}
                 </span>
               </li>

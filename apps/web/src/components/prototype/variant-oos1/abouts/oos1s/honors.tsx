@@ -64,7 +64,7 @@ export function Honors() {
   const lastIndex = LEVELS.length - 1;
 
   return (
-    <Section id={chip.id} label={ABOUT_HONORS.title} background={ui.onPage}>
+    <Section id={chip.id} label={chip.english} background={ui.onPage}>
       <ul {...stylex.props(s.groups)}>
         {LEVELS.map((level, idx) => (
           <Reveal key={level.key} as="li" sx={[s.group, idx === lastIndex && s.groupLast]}>

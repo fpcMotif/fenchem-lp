@@ -167,7 +167,7 @@ export function Lightbox({
   return (
     <dialog
       ref={dialogRef}
-      aria-label="园区照片"
+      aria-label="Campus photos"
       onClose={onClose}
       onKeyDown={(event) => {
         if (event.key !== "ArrowRight" && event.key !== "ArrowLeft") return;
@@ -190,7 +190,7 @@ export function Lightbox({
                   <span lang="en">Fig. 2{photo.panel}</span>
                   <span {...stylex.props(styles.captionText)}>{photo.caption}</span>
                 </span>
-                <span aria-label={`第 ${index + 1} 张，共 ${photos.length} 张`}>
+                <span aria-label={`Photo ${index + 1} of ${photos.length}`}>
                   {String(index + 1).padStart(2, "0")} / {String(photos.length).padStart(2, "0")}
                 </span>
               </figcaption>

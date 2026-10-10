@@ -140,7 +140,7 @@ export function Campus() {
                       decoding="async"
                       {...stylex.props(ui.photo, styles.image, crops[photo.id])}
                     />
-                    <span {...srOnly}>，查看大图</span>
+                    <span {...srOnly}>, View larger</span>
                   </button>
                   <figcaption lang="en" {...stylex.props(ui.note, styles.note)}>
                     <span {...stylex.props(styles.number)}>

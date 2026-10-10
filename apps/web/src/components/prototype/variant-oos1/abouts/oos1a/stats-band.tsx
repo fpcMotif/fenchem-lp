@@ -78,7 +78,7 @@ const COLUMN_STYLES = [styles.one, styles.two, styles.three] as const;
 export function StatsBand() {
   return (
     <section id="about-stats" aria-labelledby="about-stats-title" {...stylex.props(styles.band)}>
-      <SectionName id="about-stats-title">泛成发展数据</SectionName>
+      <SectionName id="about-stats-title">Growth figures</SectionName>
       <Frame lattice="quiet" tone="dark" innerSx={styles.inner}>
         <ul {...stylex.props(styles.list)}>
           {STATS.map((stat, index) => (

@@ -42,13 +42,13 @@ type FieldKey =
   | "applications";
 type Slot = "A" | "B";
 
-const FIELDS: { key: FieldKey; label: string }[] = [
-  { key: "overview", label: "概述" },
-  { key: "functions", label: "功能" },
-  { key: "keyIngredients", label: "功能性成分" },
-  { key: "challenges", label: "配方挑战" },
-  { key: "texture", label: "质地" },
-  { key: "applications", label: "应用" },
+const FIELDS: { key: FieldKey; label: string; english: string }[] = [
+  { key: "overview", label: "概述", english: "Overview" },
+  { key: "functions", label: "功能", english: "Functions" },
+  { key: "keyIngredients", label: "功能性成分", english: "Functional ingredients" },
+  { key: "challenges", label: "配方挑战", english: "Formulation challenges" },
+  { key: "texture", label: "质地", english: "Texture" },
+  { key: "applications", label: "应用", english: "Applications" },
 ];
 
 const reservedHeight = (key: FieldKey) => {
@@ -471,7 +471,7 @@ function Lines({ lines }: { lines: string[] }) {
 
 function SwapButton({ onSwap }: { onSwap: () => void }) {
   return (
-    <button type="button" aria-label="交换" onClick={onSwap} {...stylex.props(styles.swap)}>
+    <button type="button" aria-label="Swap" onClick={onSwap} {...stylex.props(styles.swap)}>
       <ArrowLeftRight size={18} strokeWidth={1.5} absoluteStrokeWidth aria-hidden="true" />
     </button>
   );
@@ -565,11 +565,14 @@ function Sheet({
           transition={timing}
           {...stylex.props(styles.fields)}
         >
-          {FIELDS.map(({ key, label }) => {
+          {FIELDS.map(({ key, label, english }) => {
             const lines = item[key];
             return (
               <div key={key} {...stylex.props(styles.field)}>
-                <dt {...stylex.props(styles.fieldLabel)}>{label}</dt>
+                <dt {...stylex.props(styles.fieldLabel)}>
+                  <span aria-hidden="true">{label}</span>
+                  <span {...stylex.props(styles.srOnly)}>{english}</span>
+                </dt>
                 <dd {...stylex.props(styles.fieldValue, styles.reserve(RESERVED_HEIGHT[key]))}>
                   {lines.length > 0 ? (
                     <Lines lines={lines} />
@@ -578,7 +581,7 @@ function Sheet({
                       <span aria-hidden="true" {...stylex.props(styles.empty)}>
                         —
                       </span>
-                      <span {...stylex.props(styles.srOnly)}>无</span>
+                      <span {...stylex.props(styles.srOnly)}>None</span>
                     </>
                   )}
                 </dd>
@@ -624,7 +627,11 @@ export function Solutions() {
           </p>
         </header>
 
-        <div role="group" aria-label="切换显示的方案" {...stylex.props(styles.phoneBar)}>
+        <div
+          role="group"
+          aria-label="Change the displayed solution"
+          {...stylex.props(styles.phoneBar)}
+        >
           <PhoneToggle
             slot="A"
             title={itemA.title}

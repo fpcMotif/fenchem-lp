@@ -2,9 +2,9 @@ const ASSET_BASE = "/prototype/official-site";
 
 export const IMAGES = {
   hero: `${ASSET_BASE}/hero-background.webp`,
-  campus: { src: `${ASSET_BASE}/campus.webp`, alt: "泛成园区建筑外景" },
-  officeMap: { src: `${ASSET_BASE}/office-map.webp`, alt: "泛成全球分公司分布地图" },
-  footerLogo: { src: `${ASSET_BASE}/fenchem-logo.png`, alt: "FENCHEM 泛成" },
+  campus: { src: `${ASSET_BASE}/campus.webp`, alt: "Exterior of the Fenchem campus buildings" },
+  officeMap: { src: `${ASSET_BASE}/office-map.webp`, alt: "Map of Fenchem's global offices" },
+  footerLogo: { src: `${ASSET_BASE}/fenchem-logo.png`, alt: "FENCHEM" },
 } as const;
 
 export const NAV_ITEMS = [
@@ -71,24 +71,28 @@ export const PRODUCTS_INTRO = {
 export const PRODUCTS = [
   {
     title: "人类营养健康",
+    english: "Human nutrition and health",
     description: "基于科学证据的健康营养方案",
     tags: ["肠道健康", "女性健康", "情绪健康", "体重管理"],
     image: `${ASSET_BASE}/product-human-nutrition.webp`,
   },
   {
     title: "功能性食品",
+    english: "Functional food",
     description: "面向现代生活方式的功能方案",
     tags: ["膳食纤维", "亲水胶体", "天然色素"],
     image: `${ASSET_BASE}/product-functional-food.webp`,
   },
   {
     title: "个人护理",
+    english: "Personal care",
     description: "天然来源活性成分方案",
     tags: ["植物油脂", "活性物"],
     image: `${ASSET_BASE}/product-personal-care.webp`,
   },
   {
     title: "宠物健康",
+    english: "Pet health",
     description: "全面宠物营养方案",
     tags: ["美毛护肤与肠胃修复", "毛发顺滑与骨骼保健", "肠道养护", "关节健康"],
     image: `${ASSET_BASE}/product-pet-health.webp`,

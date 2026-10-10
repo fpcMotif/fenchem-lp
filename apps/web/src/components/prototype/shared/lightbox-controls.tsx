@@ -26,7 +26,7 @@ export function LightboxControls({
       <button
         ref={previousRef}
         type="button"
-        aria-label="上一张"
+        aria-label="Previous photo"
         onClick={() => onStep(-1)}
         {...stylex.props(previous.sx)}
       >
@@ -34,13 +34,13 @@ export function LightboxControls({
       </button>
       <button
         type="button"
-        aria-label="下一张"
+        aria-label="Next photo"
         onClick={() => onStep(1)}
         {...stylex.props(next.sx)}
       >
         {next.icon}
       </button>
-      <button type="button" aria-label="关闭" onClick={onClose} {...stylex.props(close.sx)}>
+      <button type="button" aria-label="Close" onClick={onClose} {...stylex.props(close.sx)}>
         {close.icon}
       </button>
     </>

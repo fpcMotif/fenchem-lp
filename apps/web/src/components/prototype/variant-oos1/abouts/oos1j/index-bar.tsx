@@ -152,22 +152,18 @@ export function IndexBar({ onNavigateHome }: { onNavigateHome: (hash?: string) =
   return (
     <div {...stylex.props(styles.bar)}>
       <div {...stylex.props(base.shell, styles.inner)}>
-        <nav aria-label="面包屑导航" lang="en" {...stylex.props(ty.quiet, styles.breadcrumb)}>
+        <nav aria-label="Breadcrumb" lang="en" {...stylex.props(ty.quiet, styles.breadcrumb)}>
           <button
             type="button"
             onClick={() => onNavigateHome("top")}
             {...stylex.props(styles.crumbLink, base.focus)}
           >
             Home
-            <span lang="zh-CN" {...stylex.props(base.srOnly)}>
-              {" "}
-              首页
-            </span>
           </button>
           <span aria-hidden="true">/</span>
           <span aria-current="page">About</span>
         </nav>
-        <nav aria-label="本页导航" ref={listRef} {...stylex.props(styles.list)}>
+        <nav aria-label="On this page" ref={listRef} {...stylex.props(styles.list)}>
           {ABOUT_HERO.navChips.map((chip) => (
             <a
               key={chip.id}
@@ -181,7 +177,6 @@ export function IndexBar({ onNavigateHome }: { onNavigateHome: (hash?: string) =
               )}
             >
               <span lang="en">{NAV_LABELS[chip.id]}</span>
-              <span {...stylex.props(base.srOnly)}> {chip.label}</span>
             </a>
           ))}
           <span

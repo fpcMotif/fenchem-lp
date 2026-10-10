@@ -118,7 +118,7 @@ export function Structure() {
       aria-labelledby="about-structure-title"
       {...stylex.props(styles.section, shared.anchor)}
     >
-      <SectionName id="about-structure-title">{ABOUT_STRUCTURE.title}</SectionName>
+      <SectionName id="about-structure-title">{ABOUT_STRUCTURE.eyebrow}</SectionName>
       <Frame innerSx={shared.sectionPad}>
         <div {...stylex.props(styles.tree)}>
           <Reveal sx={styles.holding}>
@@ -162,7 +162,7 @@ export function Structure() {
           <div id={diagramId} hidden={!showDiagram} {...stylex.props(styles.diagram)}>
             <img
               src={ABOUT_STRUCTURE.chartImage}
-              alt="南京泛成国际控股有限公司官方组织架构图"
+              alt="Official organizational chart of Nanjing Fenchem International Holdings Corporation Limited"
               loading="lazy"
               decoding="async"
               {...stylex.props(styles.diagramImage)}

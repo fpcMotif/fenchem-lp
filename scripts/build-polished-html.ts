@@ -31,7 +31,7 @@ const polishedHTML = `<!doctype html>
     <header class="polish-nav fixed top-0 inset-x-0 z-50 transition-all duration-300">
       <div class="mx-auto flex h-20 w-full max-w-[1240px] items-center justify-between gap-6 px-6 lg:px-8">
         <a class="flex shrink-0 items-center gap-3" href="/">
-          <img alt="FENCHEM 泛成" class="h-10 w-auto" src="./AppUpload/Image/ca8375bebf1a4d6ab634a64e6dcdd68e.png" />
+          <img alt="FENCHEM" class="h-10 w-auto" src="./AppUpload/Image/ca8375bebf1a4d6ab634a64e6dcdd68e.png" />
         </a>
 
         <nav class="hidden md:flex items-center gap-1 bg-white/85 backdrop-blur-md px-3 py-1.5 rounded-full border border-slate-200/80 shadow-xs">
@@ -298,7 +298,7 @@ const polishedHTML = `<!doctype html>
             <!-- Sector 1: 人类营养健康 (Nutrition) -->
             <div class="product-card">
               <div class="relative h-60 overflow-hidden bg-slate-100">
-                <img src="./AppUpload/Image/d8b476aaddeb4d93af3d3bb9d5de32f6.png" alt="人类营养健康" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105" />
+                <img src="./AppUpload/Image/d8b476aaddeb4d93af3d3bb9d5de32f6.png" alt="Human nutrition and health" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105" />
                 <div class="absolute top-3.5 left-3.5">
                   <div class="division-chip">
                     <span class="division-dot dot-nutrition"></span>
@@ -330,7 +330,7 @@ const polishedHTML = `<!doctype html>
             <!-- Sector 2: 功能性食品 (Food) -->
             <div class="product-card">
               <div class="relative h-60 overflow-hidden bg-slate-100">
-                <img src="./AppUpload/Image/3ef0ce2695d843ff9476399c75207f4b.png" alt="功能性食品" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105" />
+                <img src="./AppUpload/Image/3ef0ce2695d843ff9476399c75207f4b.png" alt="Functional food" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105" />
                 <div class="absolute top-3.5 left-3.5">
                   <div class="division-chip">
                     <span class="division-dot dot-food"></span>
@@ -362,7 +362,7 @@ const polishedHTML = `<!doctype html>
             <!-- Sector 3: 个人护理 (Cosmetics) -->
             <div class="product-card">
               <div class="relative h-60 overflow-hidden bg-slate-100">
-                <img src="./AppUpload/Image/14c79e1e972644a2964af724eb9249ee.png" alt="个人护理" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105" />
+                <img src="./AppUpload/Image/14c79e1e972644a2964af724eb9249ee.png" alt="Personal care" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105" />
                 <div class="absolute top-3.5 left-3.5">
                   <div class="division-chip">
                     <span class="division-dot dot-cosmetics"></span>
@@ -394,7 +394,7 @@ const polishedHTML = `<!doctype html>
             <!-- Sector 4: 宠物健康 (Pet Nutrition) -->
             <div class="product-card">
               <div class="relative h-60 overflow-hidden bg-slate-100">
-                <img src="./AppUpload/Image/614078814e8f4ac5a502f02664dd2f03.png" alt="宠物健康" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105" />
+                <img src="./AppUpload/Image/614078814e8f4ac5a502f02664dd2f03.png" alt="Pet health" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105" />
                 <div class="absolute top-3.5 left-3.5">
                   <div class="division-chip">
                     <span class="division-dot dot-feed"></span>
@@ -455,7 +455,7 @@ const polishedHTML = `<!doctype html>
                 <span>[ MAP PROJECTION · GLOBAL SUPPLY NODES ]</span>
                 <span class="text-[#9FE870]">ORIGIN: NANJING (N 32.06° / E 118.79°)</span>
               </div>
-              <img alt="泛成全球分公司地图" class="w-full h-auto object-contain rounded-lg" src="./AppUpload/Image/d23d17a965454ad9acfcba73cb9b6089.png" />
+              <img alt="Map of Fenchem's global offices" class="w-full h-auto object-contain rounded-lg" src="./AppUpload/Image/d23d17a965454ad9acfcba73cb9b6089.png" />
             </div>
           </div>
 
@@ -647,7 +647,7 @@ const polishedHTML = `<!doctype html>
       <div class="mx-auto w-full max-w-[1240px] px-6 lg:px-8">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 mb-12">
           <div class="lg:col-span-2">
-            <img alt="FENCHEM 泛成" class="h-10 w-auto brightness-0 invert mb-6" src="./AppUpload/Image/ca8375bebf1a4d6ab634a64e6dcdd68e.png" />
+            <img alt="FENCHEM" class="h-10 w-auto brightness-0 invert mb-6" src="./AppUpload/Image/ca8375bebf1a4d6ab634a64e6dcdd68e.png" />
             <p class="text-slate-400 text-xs leading-relaxed max-w-sm mb-4">
               南京泛成国际控股有限公司 · 三十余年专注于高品质功能性原料的研发、生产与全球分销。
             </p>

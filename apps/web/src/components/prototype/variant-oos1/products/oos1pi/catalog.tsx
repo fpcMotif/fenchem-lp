@@ -453,17 +453,21 @@ function TableContent({ tabId, reduce }: { tabId: string; reduce: boolean }) {
       <thead {...stylex.props(styles.thead)}>
         <tr>
           <th scope="col" {...stylex.props(styles.headCell, styles.headCellName)}>
-            名称
+            <span aria-hidden="true">名称</span>
+            <span {...stylex.props(ui.srOnly)}>Name</span>
           </th>
           <th scope="col" {...stylex.props(styles.headCell)}>
-            INCI 名称
+            <span aria-hidden="true">INCI 名称</span>
+            <span {...stylex.props(ui.srOnly)}>INCI name</span>
           </th>
           <th scope="col" {...stylex.props(styles.headCell, !showAll && styles.lastCell)}>
-            特性&应用
+            <span aria-hidden="true">特性&应用</span>
+            <span {...stylex.props(ui.srOnly)}>Features & applications</span>
           </th>
           {showAll && (
             <th scope="col" {...stylex.props(styles.headCell, styles.lastCell)}>
-              产地
+              <span aria-hidden="true">产地</span>
+              <span {...stylex.props(ui.srOnly)}>Origin</span>
             </th>
           )}
         </tr>
@@ -557,7 +561,7 @@ export function Catalog() {
         <div ref={barRef} {...stylex.props(styles.tabBar)}>
           <div
             role="tablist"
-            aria-label="按产区筛选"
+            aria-label="Filter by growing region"
             onKeyDown={onTabKeyDown}
             {...stylex.props(styles.tabList)}
           >

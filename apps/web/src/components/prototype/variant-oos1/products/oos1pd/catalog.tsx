@@ -561,7 +561,7 @@ export function Catalog() {
                           <span aria-hidden="true" {...stylex.props(styles.none)}>
                             —
                           </span>
-                          <span {...stylex.props(styles.visuallyHidden)}>无</span>
+                          <span {...stylex.props(styles.visuallyHidden)}>None</span>
                         </>
                       )}
                     </td>

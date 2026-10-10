@@ -8,9 +8,9 @@ import { mq, tone } from "./tokens.stylex";
 import { ui } from "./ui";
 
 const LEVELS = [
-  { level: "national", label: "国家级" },
-  { level: "provincial", label: "江苏省级" },
-  { level: "municipal", label: "南京市级" },
+  { level: "national", label: "国家级", english: "National" },
+  { level: "provincial", label: "江苏省级", english: "Provincial" },
+  { level: "municipal", label: "南京市级", english: "Municipal" },
 ] as const;
 
 const styles = stylex.create({
@@ -179,7 +179,7 @@ export function NavyBand() {
           return (
             <Reveal key={entry.level} sx={styles.level}>
               <h3 {...stylex.props(styles.levelLabel)}>{entry.label}</h3>
-              <ul aria-label={entry.label} {...stylex.props(styles.honorList)}>
+              <ul aria-label={`${entry.english} honors`} {...stylex.props(styles.honorList)}>
                 {items.map((honor) => (
                   <li
                     key={honor.id}

@@ -427,7 +427,7 @@ function RightPage({ formula }: { formula: FlatFormula }) {
             <span aria-hidden="true" {...stylex.props(styles.nothing)}>
               —
             </span>
-            <span {...stylex.props(styles.srOnly)}>未提供</span>
+            <span {...stylex.props(styles.srOnly)}>Not provided</span>
           </>
         )}
       </Field>
@@ -572,7 +572,7 @@ export function Solutions() {
         <div
           ref={rowRef}
           role="tablist"
-          aria-label="应用方案"
+          aria-label="Application solutions"
           onKeyDown={onTabKeyDown}
           {...stylex.props(styles.tabRow)}
         >
@@ -643,7 +643,7 @@ export function Solutions() {
           </div>
         </div>
 
-        <nav aria-label="方案翻页" {...stylex.props(styles.pager)}>
+        <nav aria-label="Solution pages" {...stylex.props(styles.pager)}>
           <PageButton
             direction="prev"
             target={FLAT_FORMULAS[active - 1]}

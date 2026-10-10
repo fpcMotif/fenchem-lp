@@ -771,7 +771,7 @@ export function HistoryTimeline({
         <div
           ref={viewportRef}
           role={pinned ? undefined : "region"}
-          aria-label={pinned ? undefined : `${ABOUT_HISTORY.title}，可左右滚动`}
+          aria-label={pinned ? undefined : `${ABOUT_HISTORY.eyebrow}, scrolls horizontally`}
           tabIndex={pinned ? undefined : 0}
           {...stylex.props(styles.viewport, pinned ? styles.viewportPinned : styles.viewportFree)}
         >
@@ -864,7 +864,7 @@ export function HistoryTimeline({
           <div {...stylex.props(styles.shell, styles.controls)}>
             <button
               type="button"
-              aria-label="上一段历程"
+              aria-label="Previous milestone"
               disabled={edges.start}
               onClick={() => stepBy(-1)}
               {...stylex.props(styles.controlButton)}
@@ -873,7 +873,7 @@ export function HistoryTimeline({
             </button>
             <button
               type="button"
-              aria-label="下一段历程"
+              aria-label="Next milestone"
               disabled={edges.end}
               onClick={() => stepBy(1)}
               {...stylex.props(styles.controlButton)}

@@ -78,7 +78,7 @@ export function Culture() {
       {...stylex.props(styles.section, layout.sectionY, layout.anchor)}
     >
       <h2 id="about-culture-title" {...stylex.props(layout.srOnly)}>
-        企业文化
+        Culture
       </h2>
       <ol {...stylex.props(layout.shell, styles.list)}>
         {ABOUT_CULTURE.values.map((value, index) => (

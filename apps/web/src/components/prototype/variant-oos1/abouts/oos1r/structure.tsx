@@ -113,7 +113,7 @@ export function Structure() {
   const subsLabelId = useId();
 
   return (
-    <Section id={chip.id} label={ABOUT_STRUCTURE.title}>
+    <Section id={chip.id} label={chip.english}>
       <div {...stylex.props(s.grid)}>
         <Reveal sx={s.holdingCell}>
           <p {...stylex.props(s.label)}>{ABOUT_STRUCTURE.holding.badge}</p>
@@ -152,7 +152,7 @@ export function Structure() {
       <div id={diagramId} hidden={!showDiagram} {...stylex.props(s.diagram)}>
         <img
           src={ABOUT_STRUCTURE.chartImage}
-          alt="南京泛成国际控股有限公司官方组织架构图"
+          alt="Official organizational chart of Nanjing Fenchem International Holdings Corporation Limited"
           loading="lazy"
           decoding="async"
           {...stylex.props(s.diagramImage)}

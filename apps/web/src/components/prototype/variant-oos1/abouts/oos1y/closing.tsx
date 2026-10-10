@@ -289,7 +289,7 @@ export function Closing({ onNavigateHome }: { onNavigateHome: (hash?: string) =>
           {...stylex.props(ui.anchor, styles.section, styles.first, styles.toEnd)}
         >
           <h2 id="oos1y-honor" {...srOnly}>
-            企业荣誉
+            {ABOUT_HONORS.eyebrow}
           </h2>
           <div {...stylex.props(ui.glass, styles.honorsPane)}>
             <Reveal>
@@ -315,7 +315,7 @@ export function Closing({ onNavigateHome }: { onNavigateHome: (hash?: string) =>
           {...stylex.props(ui.anchor, styles.section)}
         >
           <h2 id="oos1y-structure" {...srOnly}>
-            企业架构
+            {ABOUT_STRUCTURE.eyebrow}
           </h2>
           <div {...stylex.props(ui.glass, styles.structurePane)}>
             <Reveal>
@@ -355,7 +355,7 @@ export function Closing({ onNavigateHome }: { onNavigateHome: (hash?: string) =>
                   {...stylex.props(styles.toggleIcon, chartOpen && styles.toggleIconOpen)}
                 />
                 <span lang="en">Official chart</span>
-                <span {...srOnly}> 企业架构图</span>
+                <span {...srOnly}> Organizational chart</span>
               </button>
             </Reveal>
           </div>
@@ -364,7 +364,7 @@ export function Closing({ onNavigateHome }: { onNavigateHome: (hash?: string) =>
           <figure {...stylex.props(ui.glass, styles.chart)}>
             <img
               src={ABOUT_STRUCTURE.chartImage}
-              alt={`企业架构图：${ABOUT_STRUCTURE.holding.name}与五家全资子公司`}
+              alt={`Organizational chart: ${ABOUT_STRUCTURE.holding.english} and its five wholly owned subsidiaries`}
               loading="lazy"
               decoding="async"
               {...stylex.props(styles.chartImage)}

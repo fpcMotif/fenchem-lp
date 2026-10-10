@@ -129,30 +129,22 @@ export function SubNav({ onNavigateHome }: { onNavigateHome: (hash?: string) => 
   return (
     <div {...stylex.props(s.bar)}>
       <div {...stylex.props(ui.shell, ui.inset, s.inner)}>
-        <nav aria-label="面包屑导航" lang="en" {...stylex.props(s.crumb)}>
+        <nav aria-label="Breadcrumb" lang="en" {...stylex.props(s.crumb)}>
           <button
             type="button"
             onClick={() => onNavigateHome("top")}
             {...stylex.props(s.crumbLink, ui.focusRing)}
           >
             Home
-            <span lang="zh-CN" {...stylex.props(ui.srOnly)}>
-              {" "}
-              首页
-            </span>
           </button>
           <span aria-hidden="true" {...stylex.props(s.crumbWide)}>
             /
           </span>
           <span aria-current="page" {...stylex.props(s.crumbWide)}>
             About
-            <span lang="zh-CN" {...stylex.props(ui.srOnly)}>
-              {" "}
-              关于我们
-            </span>
           </span>
         </nav>
-        <nav aria-label="本页导航" ref={tabsRef} {...stylex.props(s.tabs)}>
+        <nav aria-label="On this page" ref={tabsRef} {...stylex.props(s.tabs)}>
           {NAV_ITEMS.map((item) => {
             const isActive = active === item.id;
             return (
@@ -164,7 +156,6 @@ export function SubNav({ onNavigateHome }: { onNavigateHome: (hash?: string) => 
               >
                 <span aria-hidden="true" {...stylex.props(s.tick, isActive && s.tickActive)} />
                 <span lang="en">{item.english}</span>
-                <span {...stylex.props(ui.srOnly)}> {item.label}</span>
               </a>
             );
           })}

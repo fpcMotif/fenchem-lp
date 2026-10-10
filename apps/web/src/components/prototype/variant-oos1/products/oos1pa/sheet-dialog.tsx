@@ -363,7 +363,7 @@ function Field({ label, lines }: { label: string; lines: string[] }) {
             <span aria-hidden="true" {...stylex.props(styles.empty)}>
               —
             </span>
-            <span {...stylex.props(styles.visuallyHidden)}>无</span>
+            <span {...stylex.props(styles.visuallyHidden)}>None</span>
           </>
         )}
       </dd>
@@ -463,7 +463,7 @@ export function SheetDialog({
       <button
         type="button"
         tabIndex={-1}
-        aria-label="关闭对话框背景"
+        aria-label="Close dialog"
         onClick={requestClose}
         {...stylex.props(styles.dismiss)}
       />
@@ -492,7 +492,7 @@ export function SheetDialog({
           </div>
           <button
             type="button"
-            aria-label="关闭"
+            aria-label="Close"
             onClick={requestClose}
             {...stylex.props(styles.close)}
           >
@@ -537,7 +537,7 @@ export function SheetDialog({
           <footer {...stylex.props(styles.foot)}>
             <button
               type="button"
-              aria-label={`上一个：${previous.title}`}
+              aria-label={`Previous: ${previous.englishName}`}
               onClick={() => onRoute(-1)}
               {...stylex.props(styles.navButton, styles.navPrev, stylex.defaultMarker())}
             >
@@ -557,7 +557,7 @@ export function SheetDialog({
             </p>
             <button
               type="button"
-              aria-label={`下一个：${next.title}`}
+              aria-label={`Next: ${next.englishName}`}
               onClick={() => onRoute(1)}
               {...stylex.props(styles.navButton, styles.navNext, stylex.defaultMarker())}
             >
@@ -574,7 +574,7 @@ export function SheetDialog({
           </footer>
         )}
         <p aria-live="polite" {...stylex.props(styles.visuallyHidden)}>
-          {item ? `${padIndex(item.index)} / ${padIndex(COUNT - 1)} ${item.title}` : ""}
+          {item ? `${padIndex(item.index)} / ${padIndex(COUNT - 1)} ${item.englishName}` : ""}
         </p>
       </div>
     </dialog>

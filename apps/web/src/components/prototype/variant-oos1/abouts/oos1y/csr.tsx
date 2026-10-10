@@ -97,7 +97,7 @@ export function CsrPane() {
       {...stylex.props(ui.anchor, styles.section)}
     >
       <h2 id="oos1y-csr" {...srOnly}>
-        社会责任
+        Responsibility
       </h2>
       <div {...stylex.props(styles.photoBox)}>
         <img

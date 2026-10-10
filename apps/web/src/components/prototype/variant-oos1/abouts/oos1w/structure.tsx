@@ -354,7 +354,10 @@ export function Structure() {
                   style={{ opacity: development.marks }}
                   {...stylex.props(styles.pencilFront)}
                 />
-                <ol aria-label={ABOUT_STRUCTURE.subsidiaryBadge} {...stylex.props(styles.lanes)}>
+                <ol
+                  aria-label={ABOUT_STRUCTURE.subsidiaryBadgeEnglish}
+                  {...stylex.props(styles.lanes)}
+                >
                   {ABOUT_STRUCTURE.subsidiaries.map((subsidiary, lane) => (
                     <li
                       key={subsidiary.id}

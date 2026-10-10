@@ -326,14 +326,18 @@ function RegionBlock({ group }: { group: CatalogGroup }) {
           <thead {...stylex.props(styles.thead)}>
             <tr>
               <th scope="col" {...stylex.props(styles.colHead, styles.colHeadName)}>
-                名称
-                <span aria-hidden="true" {...stylex.props(styles.colHeadSlash)}>
-                  /
+                <span aria-hidden="true">
+                  名称
+                  <span aria-hidden="true" {...stylex.props(styles.colHeadSlash)}>
+                    /
+                  </span>
+                  INCI 名称
                 </span>
-                INCI 名称
+                <span {...stylex.props(styles.srOnly)}>Name / INCI name</span>
               </th>
               <th scope="col" {...stylex.props(styles.colHead)}>
-                特性&应用
+                <span aria-hidden="true">特性&应用</span>
+                <span {...stylex.props(styles.srOnly)}>Features & applications</span>
               </th>
             </tr>
           </thead>
@@ -380,7 +384,7 @@ export function Catalog() {
         <h2 id={titleId} {...stylex.props(styles.title)}>
           产品目录
         </h2>
-        <nav aria-label="产品目录分区" {...stylex.props(styles.indexNav)}>
+        <nav aria-label="Catalog sections" {...stylex.props(styles.indexNav)}>
           <ol {...stylex.props(styles.indexList)}>
             {CATALOG_GROUPS.map((group) => (
               <li key={group.id}>
@@ -392,7 +396,7 @@ export function Catalog() {
                   {REGION_META[group.id]?.short ?? group.label}
                   <span {...stylex.props(styles.indexCount)}>
                     {group.items.length}
-                    <span {...stylex.props(styles.srOnly)}>款原料</span>
+                    <span {...stylex.props(styles.srOnly)}> ingredients</span>
                   </span>
                 </a>
               </li>

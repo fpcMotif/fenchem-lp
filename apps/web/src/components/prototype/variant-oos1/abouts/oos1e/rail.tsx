@@ -5,7 +5,6 @@ import { useEffect, useRef } from "react";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
 import { ABOUT_HERO } from "../../about-data";
-import { base } from "./shared-values";
 import { NAV_ENGLISH, SHEETS } from "./sheets";
 import { color, font, media, metric } from "./tokens.stylex";
 
@@ -105,7 +104,7 @@ export function Rail({ reachedIndex }: { reachedIndex: number }) {
   }, [activeNav, reduce]);
 
   return (
-    <nav aria-label="本页导航" {...stylex.props(styles.rail)}>
+    <nav aria-label="On this page" {...stylex.props(styles.rail)}>
       <div {...stylex.props(styles.frame)}>
         <ul ref={listRef} {...stylex.props(styles.list)}>
           {ABOUT_HERO.navChips.map((chip) => (
@@ -116,7 +115,6 @@ export function Rail({ reachedIndex }: { reachedIndex: number }) {
                 {...stylex.props(styles.link, activeNav === chip.id && styles.linkActive)}
               >
                 <span lang="en">{NAV_ENGLISH[chip.id]}</span>
-                <span {...stylex.props(base.srOnly)}> {chip.label}</span>
               </a>
             </li>
           ))}

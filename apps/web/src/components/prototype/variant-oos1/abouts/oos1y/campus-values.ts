@@ -17,6 +17,6 @@ export const CAMPUS_PHOTOS: readonly LightboxPhoto[] = ABOUT_CAMPUS.photos.map((
   id: photo.id,
   large: photo.large,
   alt: photo.alt,
-  caption: photo.caption,
+  englishCaption: photo.english,
   english: ENGLISH[photo.id],
 }));

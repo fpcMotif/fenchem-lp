@@ -71,7 +71,7 @@ export function Culture() {
   const chip = ABOUT_HERO.navChips[2];
 
   return (
-    <Section id={chip.id} label={ABOUT_CULTURE.title} background={ui.onPage}>
+    <Section id={chip.id} label={ABOUT_CULTURE.eyebrow} background={ui.onPage}>
       <ul {...stylex.props(s.list)}>
         {ABOUT_CULTURE.values.map((value) => (
           <Reveal key={value.title} as="li" sx={s.row}>

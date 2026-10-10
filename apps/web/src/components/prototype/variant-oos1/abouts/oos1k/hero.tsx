@@ -178,7 +178,7 @@ export function Hero() {
             </p>
           </div>
 
-          <nav aria-label="星图目录" {...stylex.props(styles.index)}>
+          <nav aria-label="Star chart index" {...stylex.props(styles.index)}>
             <ol {...stylex.props(styles.list)}>
               {ABOUT_HERO.navChips.map((chip, index) => (
                 <li key={chip.id}>
@@ -186,7 +186,7 @@ export function Hero() {
                     <span aria-hidden="true" {...stylex.props(ui.designation, styles.linkNumeral)}>
                       {NUMERALS[index]}
                     </span>
-                    <span {...srOnly}>第 {index + 1} 图 </span>
+                    <span {...srOnly}>Figure {index + 1} </span>
                     {chip.label}
                   </a>
                 </li>

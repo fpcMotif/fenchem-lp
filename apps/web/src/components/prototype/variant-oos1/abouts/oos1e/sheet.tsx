@@ -114,7 +114,7 @@ export function Sheet({
     <>
       {headingId ? null : (
         <h2 id={nameId} {...stylex.props(base.srOnly)}>
-          {def.name}
+          {def.english}
         </h2>
       )}
       {children}

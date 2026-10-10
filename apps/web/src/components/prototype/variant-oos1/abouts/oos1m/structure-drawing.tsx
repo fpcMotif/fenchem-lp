@@ -138,7 +138,7 @@ export function StructureDrawing({ progress }: { progress: MotionValue<number> }
   return (
     <Drawing
       heightUnits={SHEET_HEIGHT}
-      label="总装图：控股公司为顶板，五家全资子公司为其下方的五个模块，完全贴合。"
+      label="General assembly: the holding company forms the top plate, and five wholly owned subsidiaries form the five modules beneath it, fitting flush."
     >
       <Camera>
         <GroundPlane width={LENGTH} depth={DEPTH} centerX={ORIGIN.x} centerY={ORIGIN.y}>

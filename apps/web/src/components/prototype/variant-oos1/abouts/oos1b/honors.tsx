@@ -141,7 +141,7 @@ function Tier({
         ...stepIn(arrived, depth),
       )}
     >
-      <h3 {...srOnly}>{tier.label}荣誉</h3>
+      <h3 {...srOnly}>{tier.english} honors</h3>
       <span aria-hidden="true">
         <Tag numeral={ROMAN[depth]} label={`${tier.english} · ${tier.label}`} />
       </span>

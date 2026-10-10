@@ -135,12 +135,12 @@ export function Profile() {
   const chip = ABOUT_HERO.navChips[0];
 
   return (
-    <Section id={chip.id} label={chip.label} background={ui.onPage}>
+    <Section id={chip.id} label={chip.english} background={ui.onPage}>
       <div {...stylex.props(ui.grid)}>
         <figure {...stylex.props(ui.figure, s.figure)}>
           <ArchPhoto
             src={ABOUT_HERO.lobbyImage}
-            alt="泛成总部大堂：弧形拱顶与公司标识"
+            alt="Fenchem headquarters lobby with a curved vault and the company logo"
             mode="view"
             ratio={s.ratio}
             position={s.photo}

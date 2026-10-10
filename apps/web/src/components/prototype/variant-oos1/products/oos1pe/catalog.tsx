@@ -42,6 +42,7 @@ const SORT_OPTIONS: { key: SortKey; label: string }[] = [
 ];
 
 const SORT_LABEL: Record<SortKey, string> = { region: "产地", name: "名称", form: "形态" };
+const SORT_LABEL_EN: Record<SortKey, string> = { region: "Origin", name: "Name", form: "Form" };
 
 const FORM_ORDER = Object.keys(FORM_LABEL) as Form[];
 const NAME_COLLATOR = new Intl.Collator("zh-Hans-CN");
@@ -455,7 +456,8 @@ function SortHeader({
         {...stylex.props(styles.sortButton, isActive && styles.sortButtonActive)}
       >
         <span>
-          {SORT_LABEL[sortKey]}
+          <span aria-hidden="true">{SORT_LABEL[sortKey]}</span>
+          <span {...stylex.props(styles.srOnly)}>{SORT_LABEL_EN[sortKey]}</span>
           {note && (
             <span aria-hidden="true" {...stylex.props(styles.headerMark)}>
               *
@@ -490,7 +492,9 @@ export function Catalog() {
     setSortKey(key);
     setDirection(nextDirection);
     setSortVersion((version) => version + 1);
-    setAnnouncement(`已按${SORT_LABEL[key]}${nextDirection === "asc" ? "升序" : "降序"}排列`);
+    setAnnouncement(
+      `Sorted by ${SORT_LABEL_EN[key]}, ${nextDirection === "asc" ? "ascending" : "descending"}`,
+    );
   };
 
   const sortByHeader = (key: SortKey) => {
@@ -600,10 +604,12 @@ export function Catalog() {
                   note={{ id: noteId }}
                 />
                 <th scope="col" {...stylex.props(styles.th)}>
-                  INCI 名称
+                  <span aria-hidden="true">INCI 名称</span>
+                  <span {...stylex.props(styles.srOnly)}>INCI name</span>
                 </th>
                 <th scope="col" {...stylex.props(styles.th)}>
-                  特性&应用
+                  <span aria-hidden="true">特性&应用</span>
+                  <span {...stylex.props(styles.srOnly)}>Features & applications</span>
                 </th>
               </tr>
             </thead>

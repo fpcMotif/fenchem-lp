@@ -5,7 +5,7 @@ import { useRef } from "react";
 import { ABOUT_HONORS } from "../../about-data";
 import { polyline } from "./geometry";
 import { SectionHead } from "./section-head";
-import { ui, useSvgId } from "./shared";
+import { srOnly, ui, useSvgId } from "./shared";
 import { bp, chrome, face, tone } from "./tokens.stylex";
 
 type Level = (typeof ABOUT_HONORS.items)[number]["level"];
@@ -268,7 +268,7 @@ export function Honors() {
           {LEVELS.map(({ level, zh, en }) => (
             <div key={level} {...stylex.props(styles.group)}>
               <p {...stylex.props(styles.groupLabel)}>
-                {zh}
+                <span aria-hidden="true">{zh}</span>
                 <span lang="en" {...stylex.props(ui.serif)}>
                   {en}
                 </span>
@@ -277,7 +277,12 @@ export function Honors() {
                 {ABOUT_HONORS.items
                   .filter((item) => item.level === level)
                   .map((item) => (
-                    <li key={item.id}>{item.title}</li>
+                    <li key={item.id}>
+                      <span aria-hidden="true">{item.title}</span>
+                      <span lang="en" {...srOnly}>
+                        {item.english}
+                      </span>
+                    </li>
                   ))}
               </ul>
             </div>

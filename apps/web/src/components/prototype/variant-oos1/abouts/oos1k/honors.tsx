@@ -213,11 +213,11 @@ export function Honors() {
         </div>
 
         <table ref={tableRef} {...stylex.props(styles.table)}>
-          <caption {...stylex.props(ui.srOnly)}>企业荣誉星表，按星等排列</caption>
+          <caption {...stylex.props(ui.srOnly)}>Honors star catalog, sorted by magnitude</caption>
           <thead>
             <tr>
               <th scope="col" {...stylex.props(ui.label, styles.th, styles.dotColumn)}>
-                <span {...stylex.props(ui.srOnly)}>星点</span>
+                <span {...stylex.props(ui.srOnly)}>Star</span>
               </th>
               <th scope="col" lang="en" {...stylex.props(ui.label, styles.th, styles.catalogue)}>
                 Cat. No.

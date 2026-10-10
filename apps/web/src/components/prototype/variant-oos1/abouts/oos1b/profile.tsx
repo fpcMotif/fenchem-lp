@@ -181,7 +181,7 @@ export function Profile() {
                   <div {...stylex.props(styles.photo)}>
                     <img
                       src={LOBBY.large}
-                      alt={ABOUT_HERO.lobbyCaption}
+                      alt={ABOUT_HERO.lobbyEnglish}
                       loading="lazy"
                       decoding="async"
                       {...stylex.props(ui.fill)}

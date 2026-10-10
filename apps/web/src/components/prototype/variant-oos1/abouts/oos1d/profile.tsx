@@ -122,12 +122,12 @@ const s = stylex.create({
 export function Profile() {
   const chip = ABOUT_HERO.navChips[0];
   return (
-    <Section id={chip.id} label={chip.label} background={ui.onPaper}>
+    <Section id={chip.id} label={chip.english} background={ui.onPaper}>
       <div {...stylex.props(ui.phi)}>
         <div {...stylex.props(ui.asideCol)}>
           <Figure
             src={ABOUT_HERO.lobbyImage}
-            alt="泛成总部大堂，弧形吊顶与大理石地面"
+            alt="Fenchem headquarters lobby with a curved ceiling and marble floor"
             caption={ABOUT_HERO.lobbyCaption}
             ratio={s.ratio}
           />
@@ -153,7 +153,7 @@ export function Profile() {
           </Reveal>
         </div>
       </div>
-      <h3 {...stylex.props(ui.srOnly)}>泛成发展数据</h3>
+      <h3 {...stylex.props(ui.srOnly)}>Growth figures</h3>
       <ul {...stylex.props(s.stats)}>
         {STATS.map((stat, idx) => (
           <Reveal key={stat.label} as="li" step={idx} sx={s.stat}>

@@ -97,7 +97,7 @@ export function Profile() {
   return (
     <section
       id="about-profile"
-      aria-label="企业概况"
+      aria-label="Company overview"
       {...stylex.props(styles.section, layout.anchor)}
     >
       <div {...stylex.props(layout.shell, layout.split, styles.grid)}>
@@ -105,7 +105,7 @@ export function Profile() {
           <Reveal as="figure" sx={styles.photo}>
             <img
               src={ABOUT_HERO.lobbyImage}
-              alt="泛成总部大堂，弧形吊顶与大理石地面"
+              alt="Fenchem headquarters lobby with a curved ceiling and marble floor"
               loading="lazy"
               decoding="async"
               {...stylex.props(layout.fill, styles.lobby)}

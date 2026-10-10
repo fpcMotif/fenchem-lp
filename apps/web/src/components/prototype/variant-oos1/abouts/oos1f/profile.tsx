@@ -118,7 +118,7 @@ const styles = stylex.create({
 export function Profile() {
   const countries = [...ABOUT_HERO.countries, "等地"];
   return (
-    <Section id="about-profile" name={ABOUT_HERO.navChips[0].label}>
+    <Section id="about-profile" name={ABOUT_HERO.navChips[0].english}>
       <Shell>
         <NodeMarker />
         <div {...stylex.props(styles.grid)}>
@@ -153,7 +153,7 @@ export function Profile() {
             <figure {...stylex.props(styles.figure)}>
               <img
                 src={ABOUT_HERO.lobbyImage}
-                alt="泛成总部大堂，弧形吊顶与大理石地面"
+                alt="Fenchem headquarters lobby with a curved ceiling and marble floor"
                 loading="lazy"
                 decoding="async"
                 {...stylex.props(styles.image)}

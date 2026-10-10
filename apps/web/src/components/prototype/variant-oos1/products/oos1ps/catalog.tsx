@@ -363,7 +363,7 @@ function CompareCheckbox({
           checked={checked}
           disabled={disabled}
           onChange={onToggle}
-          aria-label={`加入对比：${item.primary}`}
+          aria-label={`Add to comparison: ${item.englishName}`}
           aria-describedby={disabled ? hintId : undefined}
           {...stylex.props(
             styles.checkInput,
@@ -438,7 +438,9 @@ export function Catalog() {
 
   const announce = (lead: string, count: number) => {
     setAnnouncement(
-      count === 0 ? `${lead}，对比清单已清空` : `${lead}，对比清单 ${count} / ${MAX_COMPARE} 款`,
+      count === 0
+        ? `${lead}, comparison list cleared`
+        : `${lead}, comparison list ${count} / ${MAX_COMPARE} items`,
     );
   };
 
@@ -446,26 +448,26 @@ export function Catalog() {
     if (selectedIds.includes(item.id)) {
       const next = selectedIds.filter((id) => id !== item.id);
       setSelectedIds(next);
-      announce(`已移出对比：${item.primary}`, next.length);
+      announce(`Removed from comparison: ${item.englishName}`, next.length);
       return;
     }
     if (full) return;
     const next = [...selectedIds, item.id];
     setSelectedIds(next);
-    announce(`已加入对比：${item.primary}`, next.length);
+    announce(`Added to comparison: ${item.englishName}`, next.length);
   };
 
   const removeItem = (item: FlatItem) => {
     const next = selectedIds.filter((id) => id !== item.id);
     setSelectedIds(next);
-    announce(`已移出对比：${item.primary}`, next.length);
+    announce(`Removed from comparison: ${item.englishName}`, next.length);
     if (next.length === 0) document.getElementById(inputIdFor(item.id))?.focus();
   };
 
   const clearAll = () => {
     const first = selectedIds[0];
     setSelectedIds([]);
-    setAnnouncement("对比清单已清空");
+    setAnnouncement("Comparison list cleared");
     if (first) document.getElementById(inputIdFor(first))?.focus();
   };
 
@@ -503,20 +505,24 @@ export function Catalog() {
 
                 {...stylex.props(styles.headCell, styles.headCellFirst)}
               >
-                加入对比
+                <span aria-hidden="true">加入对比</span>
+                <span {...stylex.props(styles.srOnly)}>Add to comparison</span>
               </th>
               <th scope="col" {...stylex.props(styles.headCell)}>
-                名称
+                <span aria-hidden="true">名称</span>
+                <span {...stylex.props(styles.srOnly)}>Name</span>
               </th>
               <th scope="col" {...stylex.props(styles.headCell)}>
-                INCI 名称
+                <span aria-hidden="true">INCI 名称</span>
+                <span {...stylex.props(styles.srOnly)}>INCI name</span>
               </th>
               <th
                 scope="col"
 
                 {...stylex.props(styles.headCell, styles.headCellLast)}
               >
-                特性&应用
+                <span aria-hidden="true">特性&应用</span>
+                <span {...stylex.props(styles.srOnly)}>Features & applications</span>
               </th>
             </tr>
           </thead>

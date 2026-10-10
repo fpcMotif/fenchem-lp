@@ -59,7 +59,7 @@ const GLYPH_TONES = {
 
 export function Culture() {
   return (
-    <Section id="about-culture" name={ABOUT_CULTURE.title}>
+    <Section id="about-culture" name={ABOUT_CULTURE.eyebrow}>
       <Shell>
         <NodeMarker />
         <Reveal>

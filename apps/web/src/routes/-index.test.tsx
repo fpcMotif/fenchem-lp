@@ -127,11 +127,11 @@ describe("home route", () => {
     expect(second.getAttribute("aria-expanded")).toBe("true");
     expect(first.getAttribute("aria-expanded")).toBe("false");
 
-    const menu = getByRole("button", { name: "打开菜单" });
-    expect(container.querySelectorAll('nav[aria-label="主导航"]')).toHaveLength(1);
+    const menu = getByRole("button", { name: "Open menu" });
+    expect(container.querySelectorAll('nav[aria-label="Main"]')).toHaveLength(1);
     fireEvent.click(menu);
     expect(menu.getAttribute("aria-expanded")).toBe("true");
-    expect(container.querySelectorAll('nav[aria-label="主导航"]')).toHaveLength(2);
+    expect(container.querySelectorAll('nav[aria-label="Main"]')).toHaveLength(2);
     fireEvent.keyDown(menu, { key: "Escape" });
     expect(menu.getAttribute("aria-expanded")).toBe("false");
   });

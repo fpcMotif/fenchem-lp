@@ -54,9 +54,9 @@ const GROUPS_BY_MODE: Record<GroupMode, TableGroup[]> = {
   })).filter((group) => group.rows.length > 0),
 };
 
-const MODES: { id: GroupMode; label: string; attributeHeading: string }[] = [
-  { id: "region", label: "按产地", attributeHeading: "形态" },
-  { id: "form", label: "按形态", attributeHeading: "产地" },
+const MODES: { id: GroupMode; label: string; englishLabel: string; attributeHeading: string }[] = [
+  { id: "region", label: "按产地", englishLabel: "by origin", attributeHeading: "形态" },
+  { id: "form", label: "按形态", englishLabel: "by form", attributeHeading: "产地" },
 ];
 
 const attributeOf = (item: FlatItem, mode: GroupMode) =>
@@ -435,7 +435,7 @@ export function Catalog() {
           <div {...stylex.props(styles.controls)}>
             <div
               role="group"
-              aria-label="分组方式"
+              aria-label="Group by"
               aria-describedby={noteId}
               {...stylex.props(styles.segmented)}
             >
@@ -474,7 +474,9 @@ export function Catalog() {
             exit="gone"
             {...stylex.props(styles.table)}
           >
-            <caption {...stylex.props(styles.srOnly)}>产品目录，{activeMode.label}分组</caption>
+            <caption {...stylex.props(styles.srOnly)}>
+              Product catalog, {activeMode.englishLabel}
+            </caption>
             <colgroup {...stylex.props(styles.colgroup)}>
               <col {...stylex.props(styles.colName)} />
               <col {...stylex.props(styles.colAttribute)} />

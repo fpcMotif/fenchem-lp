@@ -113,7 +113,7 @@ export function Campus() {
       {...stylex.props(shared.anchor, shared.section, styles.section)}
     >
       <h2 id="about-campus-title" {...stylex.props(shared.srOnly)}>
-        {ABOUT_CAMPUS.title}
+        {ABOUT_CAMPUS.eyebrow}
       </h2>
       <div {...stylex.props(shared.shell, shared.inset)}>
         <div {...stylex.props(styles.grid)}>
@@ -127,7 +127,7 @@ export function Campus() {
               <div {...stylex.props(styles.frame)}>
                 <button
                   type="button"
-                  aria-label={`查看大图：${photo.caption}`}
+                  aria-label={`View larger: ${photo.english}`}
                   onClick={() => {
                     setStepped(false);
                     setOpenIndex(position);

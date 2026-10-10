@@ -23,7 +23,7 @@ const ENGLISH_LABEL = {
 
 export const RAIL_STOPS = ABOUT_HERO.navChips.map((chip) => ({
   id: chip.id,
-  name: chip.label,
+  name: chip.english,
   label: ENGLISH_LABEL[chip.id],
   at: STOP_AT[chip.id],
 }));

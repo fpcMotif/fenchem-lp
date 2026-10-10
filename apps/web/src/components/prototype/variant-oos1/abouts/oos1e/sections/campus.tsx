@@ -86,7 +86,7 @@ export function CampusSheet() {
             >
               <button
                 type="button"
-                aria-label={`查看大图：${photo.caption}`}
+                aria-label={`View larger: ${photo.english}`}
                 onClick={() => setOpenIndex(idx)}
                 {...stylex.props(styles.button)}
               >

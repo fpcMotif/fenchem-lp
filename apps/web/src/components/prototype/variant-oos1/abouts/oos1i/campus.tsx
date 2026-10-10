@@ -86,7 +86,7 @@ export function Campus() {
 
   return (
     <Section id="about-campus" labelledBy="about-campus-title" surface="page" band="below">
-      <SectionName id="about-campus-title">{ABOUT_CAMPUS.title}</SectionName>
+      <SectionName id="about-campus-title">{ABOUT_CAMPUS.eyebrow}</SectionName>
       <div {...stylex.props(base.shell, base.inset)}>
         <div {...stylex.props(S.grid)}>
           {ABOUT_CAMPUS.photos.map((photo, index) => (
@@ -99,7 +99,7 @@ export function Campus() {
               <div {...stylex.props(S.holder, photo.span === "feature" && S.holderCut)}>
                 <button
                   type="button"
-                  aria-label={`查看大图：${photo.caption}`}
+                  aria-label={`View larger: ${photo.english}`}
                   onClick={() => {
                     setStepped(false);
                     setOpenIndex(index);

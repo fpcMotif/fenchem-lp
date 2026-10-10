@@ -44,7 +44,7 @@ export function CultureStory() {
       {...stylex.props(styles.section)}
     >
       <h2 id="about-culture-heading" {...stylex.props(shared.srOnly)}>
-        {ABOUT_CULTURE.title}
+        {ABOUT_CULTURE.eyebrow}
       </h2>
       <div {...stylex.props(styles.sheet)}>
         <BrushCoat />

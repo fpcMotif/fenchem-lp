@@ -153,7 +153,7 @@ export function ProductsSheet({ onNavigateHome }: { onNavigateHome: (hash?: stri
               </div>
               <button
                 type="button"
-                aria-label={`查看产品与应用：${product.title}`}
+                aria-label={`View products and applications: ${product.english}`}
                 onClick={() => onNavigateHome("products")}
                 {...stylex.props(styles.overlay)}
               />

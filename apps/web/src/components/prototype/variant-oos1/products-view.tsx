@@ -338,12 +338,15 @@ export function ProductsView({
 
   return (
     <div id="products-top" lang="zh-CN" {...stylex.props(styles.root)}>
-      <section aria-label="产品与应用全景横幅" {...stylex.props(styles.bannerWrap)}>
-        <h1 {...stylex.props(styles.srOnly)}>产品与应用</h1>
+      <section
+        aria-label="Products and applications panorama banner"
+        {...stylex.props(styles.bannerWrap)}
+      >
+        <h1 {...stylex.props(styles.srOnly)}>Products and applications</h1>
         <figure {...stylex.props(styles.bannerFigure)}>
           <img
             src={FEATURED_PRODUCT.bannerImage}
-            alt="泛成生物产品与应用自然原貌全景"
+            alt="Panorama of Fenchem products and applications in their natural form"
             fetchPriority="high"
             decoding="async"
             {...stylex.props(styles.bannerImg)}
@@ -353,7 +356,7 @@ export function ProductsView({
 
       <div {...stylex.props(styles.subBar)}>
         <div {...stylex.props(layout.shell, layout.inset, styles.subBarInner)}>
-          <nav aria-label="面包屑导航" {...stylex.props(styles.breadcrumb)}>
+          <nav aria-label="Breadcrumb" {...stylex.props(styles.breadcrumb)}>
             <button
               type="button"
               onClick={() => onNavigateHome("top")}
@@ -366,7 +369,7 @@ export function ProductsView({
               产品与应用
             </span>
           </nav>
-          <div role="group" aria-label="品类切换" {...stylex.props(styles.chipList)}>
+          <div role="group" aria-label="Categories" {...stylex.props(styles.chipList)}>
             {CATEGORIES.map((cat) => {
               const isActive = activeTab === cat.id;
               return (
@@ -418,7 +421,7 @@ export function ProductsView({
           </div>
           <div
             role="group"
-            aria-label={`${FEATURED_PRODUCT.items.length}款核心油脂原料图卡`}
+            aria-label={`${FEATURED_PRODUCT.items.length} core oil ingredient cards`}
             {...stylex.props(styles.spotlightCardsWrap)}
           >
             {FEATURED_PRODUCT.items.map((item, idx) => (
@@ -426,7 +429,7 @@ export function ProductsView({
                 key={item.id}
                 type="button"
                 aria-pressed={activeProductIndex === idx}
-                aria-label={item.name}
+                aria-label={item.englishName}
                 onClick={() => setActiveProductIndex(idx)}
                 onMouseEnter={() => setActiveProductIndex(idx)}
                 {...stylex.props(

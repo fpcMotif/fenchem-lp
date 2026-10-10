@@ -286,7 +286,7 @@ export function Stage({ onNavigateHome }: { onNavigateHome: (hash?: string) => v
           <div {...stylex.props(ui.shell)}>
             <div {...stylex.props(ui.glass, styles.heroPane)}>
               <div {...stylex.props(styles.etchIn)}>
-                <nav aria-label="面包屑">
+                <nav aria-label="Breadcrumb">
                   <ol {...stylex.props(ui.label, styles.crumbs)}>
                     <li>
                       <a
@@ -298,13 +298,11 @@ export function Stage({ onNavigateHome }: { onNavigateHome: (hash?: string) => v
                         {...stylex.props(styles.crumbLink)}
                       >
                         <span lang="en">Home</span>
-                        <span {...srOnly}> 首页</span>
                       </a>
                     </li>
                     <li aria-hidden="true">/</li>
                     <li aria-current="page">
                       <span lang="en">About</span>
-                      <span {...srOnly}> 关于我们</span>
                     </li>
                   </ol>
                 </nav>
@@ -331,7 +329,7 @@ export function Stage({ onNavigateHome }: { onNavigateHome: (hash?: string) => v
           {...stylex.props(ui.anchor, styles.profile)}
         >
           <h2 id="oos1y-profile" {...srOnly}>
-            企业概况
+            Profile
           </h2>
           <div {...stylex.props(ui.shell)}>
             <div {...stylex.props(styles.composition)}>
@@ -349,14 +347,13 @@ export function Stage({ onNavigateHome }: { onNavigateHome: (hash?: string) => v
               <figure {...stylex.props(styles.lobby)}>
                 <img
                   src={ABOUT_HERO.lobbyImage}
-                  alt={ABOUT_HERO.lobbyCaption}
+                  alt={ABOUT_HERO.lobbyEnglish}
                   loading="lazy"
                   decoding="async"
                   {...stylex.props(ui.fill)}
                 />
                 <figcaption {...stylex.props(ui.glass, ui.label, styles.lobbyTag)}>
                   <span lang="en">Lobby</span>
-                  <span {...srOnly}> {ABOUT_HERO.lobbyCaption}</span>
                 </figcaption>
               </figure>
 

@@ -100,7 +100,7 @@ export function Csr() {
       {...stylex.props(styles.section, layout.anchor)}
     >
       <h2 id="about-csr-title" {...stylex.props(layout.srOnly)}>
-        社会责任
+        Responsibility
       </h2>
       <img
         src={ABOUT_CSR.image}

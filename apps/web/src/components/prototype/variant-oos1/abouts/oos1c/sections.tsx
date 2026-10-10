@@ -245,7 +245,7 @@ export function CsrSection() {
       {...stylex.props(styles.csr, ui.section, ui.anchor)}
     >
       <h2 id="about-csr-title" {...stylex.props(ui.srOnly)}>
-        {ABOUT_CSR.title}
+        Responsibility
       </h2>
       <div {...stylex.props(ui.shell, ui.inset)}>
         <Reveal>
@@ -292,7 +292,7 @@ export function ProductsSection({ onNavigateHome }: { onNavigateHome: (hash?: st
       {...stylex.props(styles.products, ui.section, ui.anchor)}
     >
       <h2 id="about-products-title" {...stylex.props(ui.srOnly)}>
-        {PRODUCTS_INTRO.title}
+        Products and application solutions
       </h2>
       <div {...stylex.props(ui.shell, ui.inset)}>
         <Reveal sx={styles.productsHead}>
@@ -321,7 +321,7 @@ export function ProductsSection({ onNavigateHome }: { onNavigateHome: (hash?: st
               >
                 <img
                   src={product.image}
-                  alt={`${product.title}方案示意`}
+                  alt={`${product.english} solution illustration`}
                   loading="lazy"
                   decoding="async"
                   {...stylex.props(styles.productImage)}
@@ -337,7 +337,7 @@ export function ProductsSection({ onNavigateHome }: { onNavigateHome: (hash?: st
                 </button>
               </h3>
               <p {...stylex.props(styles.productDesc)}>{product.description}</p>
-              <ul aria-label={`${product.title}标签`} {...stylex.props(styles.tags)}>
+              <ul aria-label={`${product.english} tags`} {...stylex.props(styles.tags)}>
                 {product.tags.map((tag) => (
                   <li key={tag}>{tag}</li>
                 ))}

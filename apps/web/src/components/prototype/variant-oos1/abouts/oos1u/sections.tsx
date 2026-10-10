@@ -14,14 +14,21 @@ const LEVEL_LABEL = {
   municipal: "南京市级",
 } as const;
 
+const STAT_ENGLISH: Record<(typeof STATS)[number]["label"], string> = {
+  公司历史: "Company history",
+  全球分公司: "Global offices",
+  生产基地: "Production bases",
+};
+
 const CSR_ICONS = {
   factory: Factory,
   recycle: Recycle,
   leaf: Leaf,
 } as const;
 
-const LOBBY_ALT = "泛成总部大堂，弧形吊顶与大理石地面";
-const CHART_ALT = "南京泛成国际控股有限公司官方组织架构图";
+const LOBBY_ALT = "Fenchem headquarters lobby with a curved ceiling and marble floor";
+const CHART_ALT =
+  "Official organizational chart of Nanjing Fenchem International Holdings Corporation Limited";
 
 const WEFT_SEAMS = 9;
 
@@ -440,7 +447,7 @@ export function Profile() {
       {...stylex.props(ui.section, ui.anchor, styles.profile)}
     >
       <h2 id="about-profile-title" {...stylex.props(ui.srOnly)}>
-        {ABOUT_HERO.navChips[0].label}
+        {ABOUT_HERO.navChips[0].english}
       </h2>
       <div {...stylex.props(ui.shell)}>
         <div {...stylex.props(styles.profileGrid)}>
@@ -487,7 +494,7 @@ export function Profile() {
                 index === STATS.length - 1 && styles.statLast,
               ]}
             >
-              <dt {...stylex.props(ui.srOnly)}>{stat.label}</dt>
+              <dt {...stylex.props(ui.srOnly)}>{STAT_ENGLISH[stat.label]}</dt>
               <dd {...stylex.props(styles.statValue)}>
                 {stat.value}
                 {stat.unit ? <span {...stylex.props(styles.statUnit)}>{stat.unit}</span> : null}
@@ -510,7 +517,7 @@ export function Responsibility() {
       {...stylex.props(ui.section, ui.anchor, styles.csr)}
     >
       <h2 id="about-csr-title" {...stylex.props(ui.srOnly)}>
-        {ABOUT_CSR.title}
+        {ABOUT_HERO.navChips[3].english}
       </h2>
       <div {...stylex.props(ui.shell, styles.csrGrid)}>
         <Reveal as="figure" sx={styles.csrPhoto}>
@@ -564,7 +571,7 @@ export function Honors() {
       {...stylex.props(ui.section, ui.anchor, styles.honors)}
     >
       <h2 id="about-honor-title" {...stylex.props(ui.srOnly)}>
-        {ABOUT_HONORS.title}
+        {ABOUT_HONORS.eyebrow}
       </h2>
       <div {...stylex.props(ui.shell)}>
         <ul {...stylex.props(styles.honorList)}>
@@ -595,7 +602,7 @@ export function Structure() {
       {...stylex.props(ui.section, ui.anchor, styles.structure)}
     >
       <h2 id="about-structure-title" {...stylex.props(ui.srOnly)}>
-        {ABOUT_STRUCTURE.title}
+        {ABOUT_STRUCTURE.eyebrow}
       </h2>
       <div {...stylex.props(ui.shell)}>
         <Reveal sx={styles.holding}>
@@ -609,7 +616,10 @@ export function Structure() {
         <p {...stylex.props(ui.caption, styles.subsidiaryBadge)}>
           {ABOUT_STRUCTURE.subsidiaryBadge}
         </p>
-        <ul aria-label={ABOUT_STRUCTURE.subsidiaryBadge} {...stylex.props(styles.subsidiaries)}>
+        <ul
+          aria-label={ABOUT_STRUCTURE.subsidiaryBadgeEnglish}
+          {...stylex.props(styles.subsidiaries)}
+        >
           {ABOUT_STRUCTURE.subsidiaries.map((sub, index) => (
             <Reveal key={sub.id} as="li" delay={index * 70} sx={styles.subsidiary}>
               <span aria-hidden="true" {...stylex.props(styles.warpEnd)} />

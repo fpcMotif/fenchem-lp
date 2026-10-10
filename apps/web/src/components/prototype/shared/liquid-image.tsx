@@ -1,5 +1,6 @@
 import * as stylex from "@stylexjs/stylex";
 import type { StyleXStyles } from "@stylexjs/stylex";
+import type { MotionValue } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
@@ -88,7 +89,17 @@ const styles = stylex.create({
   },
 });
 
-export function LiquidImage({ src, sx }: { src: string; sx?: StyleXStyles }) {
+export function LiquidImage({
+  src,
+  sx,
+  fragment = FRAGMENT,
+  progress,
+}: {
+  src: string;
+  sx?: StyleXStyles;
+  fragment?: string;
+  progress?: MotionValue<number>;
+}) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [ready, setReady] = useState(false);
   const reduce = useReducedMotion();
@@ -99,7 +110,7 @@ export function LiquidImage({ src, sx }: { src: string; sx?: StyleXStyles }) {
     if (!canvas || !host) return;
     const gl = canvas.getContext("webgl", { antialias: false, premultipliedAlpha: false });
     if (!gl) return;
-    const shader = createFullscreenProgram(gl, FRAGMENT);
+    const shader = createFullscreenProgram(gl, fragment);
     if (!shader) return;
     const { program } = shader;
 
@@ -109,6 +120,7 @@ export function LiquidImage({ src, sx }: { src: string; sx?: StyleXStyles }) {
     const uTime = gl.getUniformLocation(program, "uTime");
     const uPointer = gl.getUniformLocation(program, "uPointer");
     const uPointerAmt = gl.getUniformLocation(program, "uPointerAmt");
+    const uScroll = gl.getUniformLocation(program, "uScroll");
 
     let texture: WebGLTexture | null = null;
     let frame = 0;
@@ -130,6 +142,7 @@ export function LiquidImage({ src, sx }: { src: string; sx?: StyleXStyles }) {
       gl.uniform1f(uTime, reduce ? 12 : (now - start) / 1000);
       gl.uniform2f(uPointer, pointer.x, pointer.y);
       gl.uniform1f(uPointerAmt, reduce ? 0 : pointer.amt);
+      gl.uniform1f(uScroll, progress?.get() ?? 0);
       gl.drawArrays(gl.TRIANGLES, 0, 3);
     };
 
@@ -186,9 +199,11 @@ export function LiquidImage({ src, sx }: { src: string; sx?: StyleXStyles }) {
       if (!document.hidden) kick();
     };
     document.addEventListener("visibilitychange", onVisibilityChange);
+    const stopProgress = progress?.on("change", kick);
 
     return () => {
       disposed = true;
+      stopProgress?.();
       if (frame) cancelAnimationFrame(frame);
       host.removeEventListener("pointermove", onPointerMove);
       host.removeEventListener("pointerleave", onPointerLeave);
@@ -198,7 +213,7 @@ export function LiquidImage({ src, sx }: { src: string; sx?: StyleXStyles }) {
       if (texture) gl.deleteTexture(texture);
       shader.dispose();
     };
-  }, [src, reduce]);
+  }, [src, reduce, fragment, progress]);
 
   return (
     <canvas

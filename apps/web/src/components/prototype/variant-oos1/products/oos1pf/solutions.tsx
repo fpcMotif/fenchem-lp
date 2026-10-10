@@ -393,7 +393,7 @@ function FieldRow({ label, lines }: { label: string; lines: string[] }) {
             <span aria-hidden="true" {...stylex.props(styles.absent)}>
               —
             </span>
-            <span {...stylex.props(styles.srOnly)}>无</span>
+            <span {...stylex.props(styles.srOnly)}>None</span>
           </>
         )}
       </dd>
@@ -537,7 +537,7 @@ export function Solutions() {
               );
             })}
           </div>
-          <nav aria-label="方案翻页" {...stylex.props(styles.foot)}>
+          <nav aria-label="Solution pages" {...stylex.props(styles.foot)}>
             <button
               type="button"
               aria-disabled={previous === null}

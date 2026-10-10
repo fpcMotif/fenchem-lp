@@ -50,7 +50,7 @@ export function Honors() {
   const lastLevel = LEVELS.length - 1;
 
   return (
-    <Section id={chip.id} label={ABOUT_HONORS.title} background={ui.onPage}>
+    <Section id={chip.id} label={ABOUT_HONORS.eyebrow} background={ui.onPage}>
       {LEVELS.map((level, levelIdx) => (
         <div key={level} {...stylex.props(ui.phi, s.group)}>
           <h3 {...stylex.props(ui.label, levelIdx > 0 && s.level)}>{LEVEL_LABEL[level]}</h3>

@@ -20,7 +20,7 @@ const SCENES = [
   {
     lead: "在湖边",
     image: "/prototype/official-site/campus-lake.webp",
-    alt: "湖面与对岸的园区建筑",
+    alt: "Lake with campus buildings on the far shore",
     value: ABOUT_CULTURE.values[1],
   },
   {
@@ -198,7 +198,7 @@ export function CultureStory() {
       {...stylex.props(ui.anchor, styles.section)}
     >
       <h2 id="oos1y-culture" {...srOnly}>
-        企业文化
+        {ABOUT_CULTURE.eyebrow}
       </h2>
       <div {...stylex.props(ui.shell)}>
         <ol ref={listRef} {...stylex.props(styles.scenes)}>

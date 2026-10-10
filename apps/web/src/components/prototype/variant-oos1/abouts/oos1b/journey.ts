@@ -30,7 +30,7 @@ const LOBBY: Plate = {
   numeral: "I",
   src: ABOUT_HERO.lobbyImage,
   large: ABOUT_HERO.lobbyImage,
-  alt: ABOUT_HERO.lobbyCaption,
+  alt: ABOUT_HERO.lobbyEnglish,
   caption: ABOUT_HERO.lobbyCaption,
   english: "Lobby",
   aspect: 1400 / 933,

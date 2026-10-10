@@ -608,7 +608,7 @@ function Lightbox({
   return (
     <dialog
       ref={dialogRef}
-      aria-label="园区照片"
+      aria-label="Campus photos"
       onClose={onClose}
       onKeyDown={(event) => {
         if (event.key !== "ArrowRight" && event.key !== "ArrowLeft") return;
@@ -634,7 +634,7 @@ function Lightbox({
           </LightboxStage>
           <button
             type="button"
-            aria-label="上一张"
+            aria-label="Previous photo"
             onClick={() => onStep(-1)}
             {...stylex.props(styles.lightboxButton, styles.lightboxPrev)}
           >
@@ -642,7 +642,7 @@ function Lightbox({
           </button>
           <button
             type="button"
-            aria-label="下一张"
+            aria-label="Next photo"
             onClick={() => onStep(1)}
             {...stylex.props(styles.lightboxButton, styles.lightboxNext)}
           >
@@ -650,7 +650,7 @@ function Lightbox({
           </button>
           <button
             type="button"
-            aria-label="关闭"
+            aria-label="Close"
             onClick={onClose}
             {...stylex.props(styles.lightboxButton, styles.lightboxClose)}
           >
@@ -784,7 +784,7 @@ function SubNav({ onNavigateHome }: { onNavigateHome: (hash?: string) => void })
   return (
     <div {...stylex.props(styles.subBar)}>
       <div {...stylex.props(styles.shell, styles.inset120, styles.subBarInner)}>
-        <nav aria-label="面包屑导航" {...stylex.props(styles.breadcrumb)}>
+        <nav aria-label="Breadcrumb" {...stylex.props(styles.breadcrumb)}>
           <button
             type="button"
             onClick={() => onNavigateHome("top")}
@@ -797,7 +797,7 @@ function SubNav({ onNavigateHome }: { onNavigateHome: (hash?: string) => void })
             关于我们
           </span>
         </nav>
-        <nav aria-label="本页导航" ref={chipListRef} {...stylex.props(styles.chipList)}>
+        <nav aria-label="On this page" ref={chipListRef} {...stylex.props(styles.chipList)}>
           {NAV_CHIPS.map((chip, index) => (
             <a
               key={chip.id}

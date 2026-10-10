@@ -75,7 +75,7 @@ export function Honors() {
       {...stylex.props(shared.anchor, shared.section, styles.section)}
     >
       <h2 id="about-honor-title" {...stylex.props(shared.srOnly)}>
-        {ABOUT_HONORS.title}
+        {ABOUT_HONORS.eyebrow}
       </h2>
       <div {...stylex.props(shared.shell, shared.inset)}>
         <div {...stylex.props(styles.levels)}>

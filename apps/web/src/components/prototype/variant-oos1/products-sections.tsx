@@ -1,20 +1,21 @@
 import { Collapse } from "../shared/collapse";
 import { m } from "motion/react";
-import { Plus } from "lucide-react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@fenchem-lp/ui/components/tabs";
+import { ChevronLeft, ChevronRight, Plus, Search } from "lucide-react";
 import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { useEffect, useId, useRef, useState, type ReactNode } from "react";
+import { useEffect, useId, useMemo, useRef, useState, type ReactNode } from "react";
 import { EASE } from "@/components/prototype/motion-constants";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 import {
   CATALOG_GROUPS,
   CATEGORIES,
+  SOLUTION_AREAS,
   SOLUTION_ITEMS,
   type CatalogGroup,
   type SolutionItem,
 } from "./products-data";
 import { layout } from "./products-sections-values";
+import { SolutionDialog, type AreaFilter } from "./solution-dialog";
 
 const INK = "#1a1a1a";
 const BODY_TEXT = "#4d4d4d";
@@ -45,6 +46,10 @@ const HEAD_SPACE = { default: 32, [DESKTOP]: 56 } as const;
 const CARD_RADIUS = { default: 12, [DESKTOP]: 16 } as const;
 
 const padIndex = (index: number) => String(index + 1).padStart(2, "0");
+const padCount = (count: number) => String(count).padStart(2, "0");
+
+const orderByArea = (items: SolutionItem[]) =>
+  SOLUTION_AREAS.flatMap((area) => items.filter((item) => item.area === area.id));
 
 const splitParen = (text: string) => {
   const open = text.indexOf(" (");
@@ -61,6 +66,11 @@ const splitNote = (text: string) => {
 
 const INCI_LATIN = /（[^）]*）/g;
 const NO_BREAK_SPACE = String.fromCharCode(0xa0);
+
+const panelIn = stylex.keyframes({
+  "0%": { opacity: 0 },
+  "100%": { opacity: 1 },
+});
 
 const styles = stylex.create({
   section: {
@@ -373,11 +383,19 @@ const styles = stylex.create({
     textWrap: "pretty",
   },
 
-  tabList: {
+  solutionBar: {
+    display: "flex",
+    flexDirection: { default: "column", [DESKTOP]: "row" },
+    alignItems: { default: "stretch", [DESKTOP]: "center" },
+    justifyContent: "space-between",
+    gap: { default: 12, [DESKTOP]: 24 },
+  },
+  areaList: {
     position: "relative",
     display: "flex",
     flexWrap: { default: "nowrap", [DESKTOP]: "wrap" },
     gap: 8,
+    minWidth: 0,
     marginInline: { default: -16, [TABLET]: -40, [DESKTOP]: 0 },
     paddingInline: { default: 16, [TABLET]: 40, [DESKTOP]: 0 },
     paddingBlock: 4,
@@ -386,7 +404,7 @@ const styles = stylex.create({
     scrollbarWidth: "none",
     overscrollBehaviorX: "contain",
   },
-  tab: {
+  area: {
     flexShrink: 0,
     display: "inline-flex",
     alignItems: "center",
@@ -415,13 +433,13 @@ const styles = stylex.create({
     outlineColor: ACCENT,
     outlineOffset: 2,
   },
-  tabActive: {
+  areaActive: {
     backgroundColor: ACCENT,
     color: colors.paper,
     cursor: "default",
     transform: "none",
   },
-  tabNumber: {
+  areaCount: {
     flexShrink: 0,
     fontSize: 12,
     fontWeight: 500,
@@ -430,15 +448,105 @@ const styles = stylex.create({
     fontVariantNumeric: "tabular-nums",
     color: TINT_MUTED,
   },
-  tabNumberActive: {
+  areaCountActive: {
     color: "rgba(255, 255, 255, 0.72)",
   },
-  tabTitle: {
+  areaLabel: {
     fontSize: 14,
     fontWeight: 500,
     lineHeight: "20px",
     letterSpacing: "0.02em",
     whiteSpace: "nowrap",
+  },
+  tools: {
+    display: "flex",
+    alignItems: "center",
+    flexShrink: 0,
+    gap: 8,
+  },
+  finder: {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: 8,
+    height: 40,
+    paddingInlineStart: 14,
+    paddingInlineEnd: 18,
+    marginInlineEnd: { default: "auto", [DESKTOP]: 8 },
+    boxSizing: "border-box",
+    borderWidth: 1,
+    borderStyle: "solid",
+    borderColor: {
+      default: TINT_RULE,
+      ":hover": { default: TINT_RULE, [HOVER]: colors.brandBlue300 },
+    },
+    borderRadius: 999,
+    backgroundColor: colors.paper,
+    fontFamily: "inherit",
+    fontSize: 14,
+    fontWeight: 500,
+    lineHeight: "20px",
+    letterSpacing: "0.02em",
+    color: {
+      default: TINT_INK,
+      ":hover": { default: TINT_INK, [HOVER]: ACCENT },
+    },
+    whiteSpace: "nowrap",
+    cursor: "pointer",
+    transform: { default: null, ":active": "scale(0.97)" },
+    transitionProperty: "border-color, color, transform",
+    transitionDuration: { default: "0ms", [breakpoints.motionOk]: "160ms" },
+    transitionTimingFunction: EASE_OUT_CSS,
+    outlineStyle: { default: "none", ":focus-visible": "solid" },
+    outlineWidth: 2,
+    outlineColor: ACCENT,
+    outlineOffset: 2,
+  },
+  counter: {
+    minWidth: 56,
+    fontSize: 13,
+    fontWeight: 500,
+    lineHeight: "20px",
+    letterSpacing: "0.04em",
+    fontVariantNumeric: "tabular-nums",
+    textAlign: "center",
+    color: TINT_MUTED,
+  },
+  stepButton: {
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    flexShrink: 0,
+    width: 40,
+    height: 40,
+    padding: 0,
+    borderWidth: 0,
+    borderRadius: 999,
+    backgroundColor: {
+      default: TINT_FILL,
+      ":hover": { default: TINT_FILL, [HOVER]: colors.brandBlue100 },
+    },
+    color: TINT_INK,
+    cursor: "pointer",
+    transform: { default: null, ":active": "scale(0.94)" },
+    transitionProperty: "background-color, opacity, transform",
+    transitionDuration: { default: "0ms", [breakpoints.motionOk]: "160ms" },
+    transitionTimingFunction: EASE_OUT_CSS,
+    outlineStyle: { default: "none", ":focus-visible": "solid" },
+    outlineWidth: 2,
+    outlineColor: ACCENT,
+    outlineOffset: 2,
+    ":disabled": { opacity: 0.4, cursor: "default", transform: "none" },
+  },
+  srOnly: {
+    position: "absolute",
+    width: 1,
+    height: 1,
+    padding: 0,
+    margin: -1,
+    overflow: "hidden",
+    clipPath: "inset(50%)",
+    whiteSpace: "nowrap",
+    borderWidth: 0,
   },
 
   sheet: {
@@ -453,28 +561,23 @@ const styles = stylex.create({
     backgroundColor: colors.paper,
     boxShadow: CARD_SHADOW,
   },
-  panels: {
-    display: "grid",
-  },
   panel: {
-    gridArea: "1 / 1",
     minWidth: 0,
-    opacity: 1,
-    transitionProperty: "opacity",
-    transitionDuration: "150ms",
-    transitionTimingFunction: EASE_OUT_CSS,
-    outlineStyle: { default: "none", ":focus-visible": "solid" },
-    outlineWidth: 2,
-    outlineColor: colors.brandBlue700,
-    outlineOffset: 8,
-  },
-  panelIdle: {
-    display: { default: "none", [MD]: "block" },
-    visibility: "hidden",
-    opacity: 0,
+    animationName: { default: "none", [breakpoints.motionOk]: panelIn },
+    animationDuration: "180ms",
+    animationTimingFunction: EASE_OUT_CSS,
   },
   sheetHead: {
     paddingBottom: { default: 20, [MD]: 28 },
+  },
+  sheetArea: {
+    margin: 0,
+    marginBottom: 10,
+    fontSize: 13,
+    fontWeight: 500,
+    lineHeight: "20px",
+    letterSpacing: "0.08em",
+    color: ACCENT,
   },
   sheetTitle: {
     margin: 0,
@@ -716,6 +819,9 @@ function FormulaSheet({ item }: { item: SolutionItem }) {
   return (
     <>
       <header {...stylex.props(styles.sheetHead)}>
+        <p {...stylex.props(styles.sheetArea)}>
+          {SOLUTION_AREAS.find((area) => area.id === item.area)?.label}
+        </p>
         <h3 {...stylex.props(styles.sheetTitle)}>{item.title}</h3>
         <p {...stylex.props(styles.sheetSubtitle)}>{item.subtitle}</p>
       </header>
@@ -798,16 +904,44 @@ export function ProductCatalog({ categoryId }: { categoryId: string }) {
 
 export function ProductSolutions() {
   const reduce = useReducedMotion();
-  const tablistRef = useRef<HTMLDivElement>(null);
-  const [activeIndex, setActiveIndex] = useState(0);
+  const areaListRef = useRef<HTMLDivElement>(null);
+  const solutions = useMemo(() => orderByArea(SOLUTION_ITEMS), []);
+  const [area, setArea] = useState<AreaFilter>("all");
+  const [selectedId, setSelectedId] = useState<string | undefined>(solutions[0]?.id);
+  const [pickerOpen, setPickerOpen] = useState(false);
 
   useEffect(() => {
-    const tablist = tablistRef.current;
-    const tab = tablist?.querySelector<HTMLElement>('[aria-selected="true"]');
-    if (!tablist || !tab || tablist.scrollWidth <= tablist.clientWidth) return;
-    const left = tab.offsetLeft - (tablist.clientWidth - tab.offsetWidth) / 2;
-    tablist.scrollTo({ left: Math.max(0, left), behavior: reduce ? "auto" : "smooth" });
-  }, [activeIndex, reduce]);
+    const list = areaListRef.current;
+    const chip = list?.querySelector<HTMLElement>('[aria-pressed="true"]');
+    if (!list || !chip || list.scrollWidth <= list.clientWidth) return;
+    const left = chip.offsetLeft - (list.clientWidth - chip.offsetWidth) / 2;
+    list.scrollTo({ left: Math.max(0, left), behavior: reduce ? "auto" : "smooth" });
+  }, [area, reduce]);
+
+  const scope = area === "all" ? solutions : solutions.filter((item) => item.area === area);
+  const position = Math.max(
+    0,
+    scope.findIndex((item) => item.id === selectedId),
+  );
+  const selected = scope[position];
+  if (!selected) return null;
+
+  const chooseArea = (next: AreaFilter) => {
+    setArea(next);
+    if (next !== "all" && selected.area !== next) {
+      setSelectedId(solutions.find((item) => item.area === next)?.id);
+    }
+  };
+
+  const areaChips = [{ id: "all" as const, label: "全部" }, ...SOLUTION_AREAS]
+    .map((entry) => ({
+      ...entry,
+      count:
+        entry.id === "all"
+          ? solutions.length
+          : solutions.filter((item) => item.area === entry.id).length,
+    }))
+    .filter((entry) => entry.count > 0);
 
   return (
     <section
@@ -824,44 +958,86 @@ export function ProductSolutions() {
             应用方案
           </h2>
         </header>
-        <Tabs value={activeIndex} onValueChange={setActiveIndex}>
-          <TabsList
-            ref={tablistRef}
-            activateOnFocus
-            aria-labelledby="solutions-title"
-            sx={styles.tabList}
-          >
-            {SOLUTION_ITEMS.map((item, index) => {
-              const isActive = activeIndex === index;
-              return (
-                <TabsTrigger
-                  key={item.id}
-                  value={index}
-                  sx={[styles.tab, isActive && styles.tabActive]}
-                >
-                  <span {...stylex.props(styles.tabNumber, isActive && styles.tabNumberActive)}>
-                    {padIndex(index)}
-                  </span>
-                  <span {...stylex.props(styles.tabTitle)}>{item.title}</span>
-                </TabsTrigger>
-              );
-            })}
-          </TabsList>
-          <div {...stylex.props(styles.sheet)}>
-            <div {...stylex.props(styles.panels)}>
-              {SOLUTION_ITEMS.map((item, index) => (
-                <TabsContent
-                  key={item.id}
-                  value={index}
-                  keepMounted
-                  sx={[styles.panel, activeIndex !== index && styles.panelIdle]}
-                >
-                  <FormulaSheet item={item} />
-                </TabsContent>
-              ))}
+        {solutions.length > 1 && (
+          <div {...stylex.props(styles.solutionBar)}>
+            <div
+              ref={areaListRef}
+              role="group"
+              aria-label="按应用领域筛选"
+              {...stylex.props(styles.areaList)}
+            >
+              {areaChips.map((entry) => {
+                const isActive = area === entry.id;
+                return (
+                  <button
+                    key={entry.id}
+                    type="button"
+                    aria-pressed={isActive}
+                    onClick={() => chooseArea(entry.id)}
+                    {...stylex.props(styles.area, isActive && styles.areaActive)}
+                  >
+                    <span {...stylex.props(styles.areaLabel)}>{entry.label}</span>
+                    <span {...stylex.props(styles.areaCount, isActive && styles.areaCountActive)}>
+                      {entry.count}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+            <div {...stylex.props(styles.tools)}>
+              <button
+                type="button"
+                aria-haspopup="dialog"
+                onClick={() => setPickerOpen(true)}
+                {...stylex.props(styles.finder)}
+              >
+                <Search size={16} strokeWidth={1.75} aria-hidden="true" />
+                选择方案
+              </button>
+              <span aria-hidden="true" {...stylex.props(styles.counter)}>
+                {padCount(position + 1)} / {padCount(scope.length)}
+              </span>
+              <button
+                type="button"
+                aria-label="上一款方案"
+                disabled={position === 0}
+                onClick={() => setSelectedId(scope[position - 1]?.id)}
+                {...stylex.props(styles.stepButton)}
+              >
+                <ChevronLeft size={18} strokeWidth={1.75} aria-hidden="true" />
+              </button>
+              <button
+                type="button"
+                aria-label="下一款方案"
+                disabled={position === scope.length - 1}
+                onClick={() => setSelectedId(scope[position + 1]?.id)}
+                {...stylex.props(styles.stepButton)}
+              >
+                <ChevronRight size={18} strokeWidth={1.75} aria-hidden="true" />
+              </button>
             </div>
           </div>
-        </Tabs>
+        )}
+        <p aria-live="polite" {...stylex.props(styles.srOnly)}>
+          {`${selected.title}，第 ${position + 1} 款，共 ${scope.length} 款`}
+        </p>
+        <div {...stylex.props(styles.sheet)}>
+          <div key={selected.id} {...stylex.props(styles.panel)}>
+            <FormulaSheet item={selected} />
+          </div>
+        </div>
+        {pickerOpen && (
+          <SolutionDialog
+            solutions={solutions}
+            selectedId={selected.id}
+            initialArea={area}
+            onSelect={(id, nextArea) => {
+              setArea(nextArea);
+              setSelectedId(id);
+            }}
+            onClose={() => setPickerOpen(false)}
+          />
+        )}
       </div>
     </section>
   );

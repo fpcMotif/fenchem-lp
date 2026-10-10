@@ -168,11 +168,11 @@ export function PartsList({
               </span>
             </span>
             <span {...stylex.props(styles.qty)}>
-              <span {...srOnly}>数量 </span>1
+              <span {...srOnly}>Count </span>1
             </span>
             {part.id === "rd" ? (
               <span {...stylex.props(styles.seat)}>
-                <span {...srOnly}>装配：抬起 δ，见注 1</span>
+                <span {...srOnly}>Assembly: lift δ, see note 1</span>
                 <span aria-hidden="true" {...stylex.props(styles.lifted)}>
                   +δ
                 </span>
@@ -182,7 +182,7 @@ export function PartsList({
               </span>
             ) : (
               <span lang="en" {...stylex.props(styles.seat)}>
-                <span {...srOnly}>装配：</span>
+                <span {...srOnly}>Assembly:</span>
                 {part.seat}
               </span>
             )}

@@ -488,7 +488,7 @@ function Dash() {
   return (
     <span {...stylex.props(styles.dash)}>
       <span aria-hidden="true">—</span>
-      <span {...stylex.props(styles.srOnly)}>无</span>
+      <span {...stylex.props(styles.srOnly)}>None</span>
     </span>
   );
 }

@@ -19,7 +19,10 @@ const ENGLISH: Record<string, string> = {
   "about-products": "Products",
 };
 
-const LINKS = [...ABOUT_HERO.navChips, { label: "产品与应用", id: "about-products" }] as const;
+const LINKS = [
+  ...ABOUT_HERO.navChips,
+  { english: "Products and applications", id: "about-products" },
+] as const;
 const SECTION_IDS = LINKS.map((link) => link.id);
 
 const S = stylex.create({
@@ -135,7 +138,7 @@ export function SubNav({ onNavigateHome }: { onNavigateHome: (hash?: string) => 
   return (
     <div {...stylex.props(S.bar)}>
       <div {...stylex.props(base.shell, base.inset, S.inner)}>
-        <nav aria-label="面包屑导航" {...stylex.props(S.crumbs)}>
+        <nav aria-label="Breadcrumb" {...stylex.props(S.crumbs)}>
           <button
             type="button"
             onClick={() => onNavigateHome("top")}
@@ -148,7 +151,7 @@ export function SubNav({ onNavigateHome }: { onNavigateHome: (hash?: string) => 
           </span>
           <span aria-current="page">关于我们</span>
         </nav>
-        <nav aria-label="本页导航" ref={tabsRef} {...stylex.props(S.tabs)}>
+        <nav aria-label="On this page" ref={tabsRef} {...stylex.props(S.tabs)}>
           {LINKS.map((link) => (
             <a
               key={link.id}
@@ -157,7 +160,6 @@ export function SubNav({ onNavigateHome }: { onNavigateHome: (hash?: string) => 
               {...stylex.props(S.tab, active === link.id && S.tabActive, base.focusRing)}
             >
               <span lang="en">{ENGLISH[link.id]}</span>
-              <span {...stylex.props(base.srOnly)}> {link.label}</span>
               <span
                 aria-hidden="true"
                 {...stylex.props(S.tick, active === link.id && S.tickActive)}

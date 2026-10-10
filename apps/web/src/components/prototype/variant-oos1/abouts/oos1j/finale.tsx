@@ -61,7 +61,12 @@ export function Finale({ onNavigateHome }: { onNavigateHome: (hash?: string) => 
       <Monument text="Fenchem" style={{ x: slide }} sx={styles.monument} />
       <div {...stylex.props(base.shell, styles.inner)}>
         <h2 ref={titleRef} id="about-cta-title" {...stylex.props(styles.title)}>
-          <RiseText text={CTA.title} play={titleShown} stagger={55} />
+          <RiseText
+            text={CTA.title}
+            srText="Together, open the next breakthrough"
+            play={titleShown}
+            stagger={55}
+          />
         </h2>
         <Reveal step={1} sx={styles.buttons}>
           <button

@@ -2241,7 +2241,7 @@ function Hero() {
           <span aria-hidden="true" {...stylex.props(styles.heroMottoRule)} />
           <p {...stylex.props(styles.verticalLabel, styles.heroMottoText)}>{HERO.motto}</p>
         </div>
-        <nav aria-label="四大应用领域">
+        <nav aria-label="Four application areas">
           <ul {...stylex.props(styles.heroIndex)}>
             {MARKETS.map((market, index) => (
               <li
@@ -2409,7 +2409,7 @@ function MarketPanel({
         <div {...stylex.props(styles.marketFrame)}>
           <m.img
             src={market.image}
-            alt={market.title}
+            alt={market.english}
             loading="lazy"
             decoding="async"
             {...stylex.props(styles.marketImage)}
@@ -2436,7 +2436,7 @@ function MarketPanel({
           {market.pitch}
         </p>
         <p {...stylex.props(styles.marketKicker)}>{market.kicker}</p>
-        <ul aria-label={`${market.title} 细分方向`} {...stylex.props(styles.marketTags)}>
+        <ul aria-label={`${market.english} segments`} {...stylex.props(styles.marketTags)}>
           {market.tags.map((tag) => (
             <li key={tag} {...stylex.props(styles.marketTag)}>
               <Plus
@@ -2542,7 +2542,7 @@ function MarketRun({ crossX }: { crossX: MotionValue<number> }) {
   return (
     <div ref={runRef} id={RUN_ID} {...stylex.props(styles.run)}>
       <div {...stylex.props(styles.runViewport)}>
-        <nav aria-label="产品领域进度" {...stylex.props(styles.rail)}>
+        <nav aria-label="Product area progress" {...stylex.props(styles.rail)}>
           {MARKETS.map((market, index) => (
             <RailItem
               key={market.id}
@@ -2973,7 +2973,7 @@ function ContactCta() {
           <Echo>{CTA.echo}</Echo>
         </div>
         <p {...stylex.props(styles.sectionLead, styles.ctaLead)}>{CTA.lead}</p>
-        <ul aria-label="选择应用领域" {...stylex.props(styles.ctaMarkets)}>
+        <ul aria-label="Choose an application area" {...stylex.props(styles.ctaMarkets)}>
           {MARKETS.map((market, index) => (
             <li key={market.id}>
               <a
@@ -3052,7 +3052,7 @@ function SiteFooter() {
       <a href="#top" aria-label="LinkedIn" {...stylex.props(styles.socialLink)}>
         <VectorArt paths={LINKEDIN_PATHS} viewBox="0 0 20 20" sx={styles.socialIcon} />
       </a>
-      <a href="#top" aria-label="微信" {...stylex.props(styles.socialLink)}>
+      <a href="#top" aria-label="WeChat" {...stylex.props(styles.socialLink)}>
         <VectorArt paths={WECHAT_PATHS} viewBox="0 0 20 20" sx={styles.socialIcon} />
       </a>
     </CorporateFooter>

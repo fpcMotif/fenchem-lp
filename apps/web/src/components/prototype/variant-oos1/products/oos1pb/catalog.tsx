@@ -520,7 +520,7 @@ function ItemRows({
             {hasTag(item, tag) && (
               <>
                 <span aria-hidden="true" {...stylex.props(styles.dot)} />
-                <span {...stylex.props(frame.srOnly)}>有</span>
+                <span {...stylex.props(frame.srOnly)}>Yes</span>
               </>
             )}
           </td>

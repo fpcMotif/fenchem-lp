@@ -56,7 +56,7 @@ const styles = stylex.create({
 
 export function Honors() {
   return (
-    <Section id="about-honor" name={ABOUT_HONORS.title}>
+    <Section id="about-honor" name={ABOUT_HONORS.eyebrow}>
       <Shell>
         <NodeMarker />
         <Reveal sx={styles.tiers}>

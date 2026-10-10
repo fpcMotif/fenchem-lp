@@ -226,22 +226,24 @@ export function SubNav({ onNavigateHome }: { onNavigateHome: (hash?: string) => 
   return (
     <div {...stylex.props(styles.bar)}>
       <div {...stylex.props(layout.shell, styles.barSplit)}>
-        <nav aria-label="面包屑导航" {...stylex.props(styles.barLeft, styles.breadcrumb)}>
+        <nav aria-label="Breadcrumb" {...stylex.props(styles.barLeft, styles.breadcrumb)}>
           <button
             type="button"
             onClick={() => onNavigateHome("top")}
             {...stylex.props(styles.breadcrumbLink, layout.focusRing)}
           >
             <span lang="en">Home</span>
-            <span {...stylex.props(layout.srOnly)}> 首页</span>
           </button>
           <ChevronRight size={14} aria-hidden="true" {...stylex.props(styles.breadcrumbChevron)} />
           <span aria-current="page" {...stylex.props(styles.breadcrumbCurrent)}>
             <span lang="en">About</span>
-            <span {...stylex.props(layout.srOnly)}> 关于我们</span>
           </span>
         </nav>
-        <nav aria-label="本页导航" ref={chipsRef} {...stylex.props(styles.barRight, styles.chips)}>
+        <nav
+          aria-label="On this page"
+          ref={chipsRef}
+          {...stylex.props(styles.barRight, styles.chips)}
+        >
           {ABOUT_HERO.navChips.map((chip) => (
             <a
               key={chip.id}
@@ -254,7 +256,6 @@ export function SubNav({ onNavigateHome }: { onNavigateHome: (hash?: string) => 
               )}
             >
               <span lang="en">{NAV_NAMES[chip.id] ?? chip.id}</span>
-              <span {...stylex.props(layout.srOnly)}> {chip.label}</span>
             </a>
           ))}
         </nav>

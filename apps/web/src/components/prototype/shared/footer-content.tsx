@@ -31,7 +31,7 @@ export function FooterNavigation({
         decoding="async"
         {...stylex.props(styles.footerLogo)}
       />
-      <nav aria-label="页脚导航" {...stylex.props(styles.footerColumns)}>
+      <nav aria-label="Footer" {...stylex.props(styles.footerColumns)}>
         {columns.map((column) => (
           <div key={column.heading} {...stylex.props(styles.footerColumn)}>
             <h3 {...stylex.props(styles.footerHeading)}>{column.heading}</h3>

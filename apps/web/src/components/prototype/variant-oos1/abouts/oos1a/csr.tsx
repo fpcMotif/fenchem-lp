@@ -90,7 +90,7 @@ export function Csr() {
       aria-labelledby="about-csr-title"
       {...stylex.props(styles.section, shared.anchor)}
     >
-      <SectionName id="about-csr-title">{ABOUT_CSR.title}</SectionName>
+      <SectionName id="about-csr-title">Responsibility</SectionName>
       <Frame innerSx={shared.sectionPad}>
         <Reveal as="figure" sx={styles.photo}>
           <img

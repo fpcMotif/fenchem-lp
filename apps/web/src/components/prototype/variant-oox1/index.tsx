@@ -2235,7 +2235,7 @@ function FrameIndex({ mirrored = false }: { mirrored?: boolean }) {
   const items = mirrored ? MIRRORED_MARKETS : MARKETS;
   return (
     <ul
-      aria-label={mirrored ? undefined : "四大应用领域"}
+      aria-label={mirrored ? undefined : "Four application areas"}
       aria-hidden={mirrored ? "true" : undefined}
       {...stylex.props(styles.frameIndex)}
     >
@@ -2343,7 +2343,7 @@ function DeckCard({
           <div {...stylex.props(styles.figureFrame)}>
             <img
               src={market.image}
-              alt={market.title}
+              alt={market.english}
               loading="lazy"
               decoding="async"
               {...stylex.props(styles.figureImage)}
@@ -2364,7 +2364,7 @@ function DeckCard({
             {market.pitch}
           </p>
           <p {...stylex.props(styles.kicker)}>{market.kicker}</p>
-          <ul aria-label={`${market.title} 细分方向`} {...stylex.props(styles.tags)}>
+          <ul aria-label={`${market.english} segments`} {...stylex.props(styles.tags)}>
             {market.tags.map((tag) => (
               <li key={tag} {...stylex.props(styles.tag)}>
                 <Plus
@@ -2677,7 +2677,7 @@ function ContactCta() {
           <Echo>{CONTACT.echo}</Echo>
         </div>
         <p {...stylex.props(styles.sectionLead, styles.ctaLead)}>{CONTACT.lead}</p>
-        <ul aria-label="选择应用领域" {...stylex.props(styles.ctaMarkets)}>
+        <ul aria-label="Choose an application area" {...stylex.props(styles.ctaMarkets)}>
           {MARKETS.map((market, index) => (
             <li key={market.id}>
               <a
@@ -2732,7 +2732,7 @@ function SiteFooter() {
           <a href="#top" aria-label="LinkedIn" {...stylex.props(styles.socialLink)}>
             <VectorArt paths={LINKEDIN_PATHS} viewBox="0 0 20 20" sx={styles.socialIcon} />
           </a>
-          <a href="#top" aria-label="微信" {...stylex.props(styles.socialLink)}>
+          <a href="#top" aria-label="WeChat" {...stylex.props(styles.socialLink)}>
             <VectorArt paths={WECHAT_PATHS} viewBox="0 0 20 20" sx={styles.socialIcon} />
           </a>
         </FooterLegal>

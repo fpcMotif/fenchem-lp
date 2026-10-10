@@ -5,7 +5,16 @@ import { type FocusEvent, Fragment, useCallback, useEffect, useRef, useState } f
 
 import { ABOUT_CAMPUS, ABOUT_CULTURE, ABOUT_HERO, ABOUT_MOMENT } from "../../about-data";
 import { STATS } from "../../content";
-import { GROUPS, LOBBY_ALT, PHOTO_ENGLISH, PHOTO_SHAPE, STRIP_LOOPS, STRIP_PHRASES } from "./data";
+import {
+  GROUPS,
+  LOBBY_ALT,
+  NAV_ENGLISH,
+  PHOTO_ENGLISH,
+  PHOTO_SHAPE,
+  STAT_ENGLISH,
+  STRIP_LOOPS,
+  STRIP_PHRASES,
+} from "./data";
 import { Cross, Seam } from "./seam";
 import { face, mq, stage, tone } from "./tokens.stylex";
 import { ui } from "./ui";
@@ -619,7 +628,7 @@ export function Panorama({
   return (
     <section
       ref={runwayRef}
-      aria-label="泛成全景"
+      aria-label="Fenchem panorama"
       {...stylex.props(styles.runway, pinned && metrics && dyn.runwayHeight(metrics.runwayHeight))}
     >
       {pinned
@@ -674,7 +683,7 @@ export function Panorama({
               {...stylex.props(styles.group)}
             >
               <h2 id="about-campus-title" {...stylex.props(ui.srOnly)}>
-                {ABOUT_CAMPUS.title}
+                {ABOUT_CAMPUS.eyebrow}
               </h2>
               {campus.map((photo, index) => {
                 const shape = PHOTO_SHAPE[photo.id];
@@ -701,7 +710,7 @@ export function Panorama({
                         />
                         <button
                           type="button"
-                          aria-label={`查看大图：${photo.caption}`}
+                          aria-label={`View larger: ${photo.english}`}
                           onClick={() => onOpenPhoto(index)}
                           {...stylex.props(styles.tileButton)}
                         />
@@ -722,7 +731,7 @@ export function Panorama({
               {...stylex.props(styles.group)}
             >
               <h2 id="about-culture-title" {...stylex.props(ui.srOnly)}>
-                {ABOUT_CULTURE.title}
+                {ABOUT_CULTURE.eyebrow}
               </h2>
               <ul data-frame {...stylex.props(styles.frame, styles.culture, shiftFor(10))}>
                 {ABOUT_CULTURE.values.map((value, index) => (
@@ -760,7 +769,7 @@ function ProfileFrames({ pinned }: { pinned: boolean }) {
     <section
       id={pinned ? undefined : GROUPS[0].id}
       data-group
-      aria-label={GROUPS[0].label}
+      aria-label={NAV_ENGLISH[GROUPS[0].id]}
       {...stylex.props(styles.group)}
     >
       <div data-frame {...stylex.props(styles.frame, styles.profile, shiftFor(0))}>
@@ -825,7 +834,7 @@ function ProfileFrames({ pinned }: { pinned: boolean }) {
                 {stat.unit ? <span {...stylex.props(styles.statUnit)}>{stat.unit}</span> : null}
               </div>
               <p {...stylex.props(styles.quiet)}>
-                <span {...stylex.props(ui.srOnly)}>{stat.label}：</span>
+                <span {...stylex.props(ui.srOnly)}>{STAT_ENGLISH[stat.label]}: </span>
                 {stat.caption}
               </p>
             </div>

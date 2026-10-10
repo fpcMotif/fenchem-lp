@@ -146,7 +146,7 @@ export function Culture() {
   const chip = ABOUT_HERO.navChips[2];
 
   return (
-    <Section id={chip.id} label={ABOUT_CULTURE.title}>
+    <Section id={chip.id} label={chip.english}>
       <div {...stylex.props(s.story)}>
         <article>
           <Reveal as="figure" sx={s.vastFigure}>

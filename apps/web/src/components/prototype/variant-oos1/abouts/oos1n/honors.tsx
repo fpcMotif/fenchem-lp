@@ -72,7 +72,7 @@ export function Honors() {
   const last = ABOUT_HONORS.items.length - 1;
 
   return (
-    <Section id={chip.id} label={ABOUT_HONORS.title} background={ui.onPaper}>
+    <Section id={chip.id} label={ABOUT_HONORS.eyebrow} background={ui.onPaper}>
       <ul {...stylex.props(s.list)}>
         {ABOUT_HONORS.items.map((item, idx) => (
           <Reveal

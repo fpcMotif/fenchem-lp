@@ -45,7 +45,6 @@ import { INTRO_REVEAL_MS, introStyles, useIntro } from "@/components/prototype/s
 
 import {
   ABOUT,
-  CAMPUS,
   COPYRIGHT,
   CTA,
   FOOTER_COLUMNS,
@@ -2133,7 +2132,7 @@ function ProductRow({ market, index, lit }: { market: Market; index: number; lit
       <figure data-route={`figure-${index}`} {...stylex.props(styles.figure)}>
         <img
           src={market.image}
-          alt={market.title}
+          alt={market.english}
           loading="lazy"
           decoding="async"
           {...stylex.props(styles.figureImage, lit && styles.figureImageLit)}
@@ -2154,7 +2153,7 @@ function ProductRow({ market, index, lit }: { market: Market; index: number; lit
           {market.pitch}
         </p>
         <p {...stylex.props(styles.rowKicker)}>{market.kicker}</p>
-        <ul aria-label={`${market.title} 细分方向`} {...stylex.props(styles.rowTags)}>
+        <ul aria-label={`${market.english} segments`} {...stylex.props(styles.rowTags)}>
           {market.tags.map((tag, tagIndex) => (
             <Fragment key={tag}>
               {tagIndex > 0 ? (
@@ -2227,7 +2226,7 @@ function ContactCta() {
           {CTA.title}
         </h2>
         <p {...stylex.props(styles.sectionLead)}>{CTA.lead}</p>
-        <ul aria-label="选择应用领域" {...stylex.props(styles.ctaMarkets)}>
+        <ul aria-label="Choose an application area" {...stylex.props(styles.ctaMarkets)}>
           {MARKETS.map((market) => (
             <li key={market.id} {...stylex.props(styles.ctaMarketItem)}>
               <a href={`#oox2-market-${market.id}`} {...stylex.props(styles.ctaMarket)}>
@@ -2339,7 +2338,7 @@ function Strengths() {
 
 function Passage() {
   return (
-    <section aria-label={PASSAGE.motto} {...stylex.props(styles.passage, styles.inset120)}>
+    <section aria-label={PASSAGE.line} {...stylex.props(styles.passage, styles.inset120)}>
       <span aria-hidden="true" {...stylex.props(styles.passageStem)} />
       <FadeReveal>
         <p lang="en" {...stylex.props(styles.passageLine)}>
@@ -2356,7 +2355,7 @@ function Campus() {
   return (
     <section id="campus" aria-labelledby="oox2-campus-title" {...stylex.props(styles.anchor)}>
       <h2 id="oox2-campus-title" {...stylex.props(styles.visuallyHidden)}>
-        {CAMPUS.label}
+        R&amp;D and production
       </h2>
       <div {...stylex.props(styles.campusFrame)}>
         <m.img
@@ -2541,7 +2540,7 @@ function SiteFooter() {
       <a href="#top" aria-label="LinkedIn" {...stylex.props(styles.socialLink)}>
         <VectorArt paths={LINKEDIN_PATHS} viewBox="0 0 20 20" sx={styles.socialIcon} />
       </a>
-      <a href="#top" aria-label="微信" {...stylex.props(styles.socialLink)}>
+      <a href="#top" aria-label="WeChat" {...stylex.props(styles.socialLink)}>
         <VectorArt paths={WECHAT_PATHS} viewBox="0 0 20 20" sx={styles.socialIcon} />
       </a>
     </CorporateFooter>

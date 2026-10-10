@@ -97,7 +97,7 @@ export function Profile() {
               count={4}
               unit="5%"
               src={ABOUT_HERO.lobbyImage}
-              alt={ABOUT_HERO.lobbyCaption}
+              alt={ABOUT_HERO.lobbyEnglish}
               sx={styles.lobby}
               imageSx={styles.lobbyImage}
             />

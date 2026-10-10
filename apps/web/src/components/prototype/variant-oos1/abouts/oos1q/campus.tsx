@@ -110,14 +110,14 @@ export function Campus() {
   const count = photos.length;
 
   return (
-    <Section id={chip.id} label={chip.label} sx={s.afterBand}>
+    <Section id={chip.id} label={chip.english} sx={s.afterBand}>
       <ul {...stylex.props(s.field)}>
         {photos.map((photo, idx) => (
           <Reveal key={photo.id} as="li" sx={[s.item, PLACEMENT[idx]]}>
             <div {...stylex.props(ui.frame, RATIO[idx])}>
               <button
                 type="button"
-                aria-label={`查看大图：${photo.caption}`}
+                aria-label={`View larger: ${photo.english}`}
                 onClick={() => {
                   setStepped(false);
                   setOpenIndex(idx);

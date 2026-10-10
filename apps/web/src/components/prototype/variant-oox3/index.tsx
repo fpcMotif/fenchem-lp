@@ -1997,7 +1997,7 @@ function Hero() {
             {HERO.secondary.label}
           </a>
         </div>
-        <MarketTags label="四大应用领域" hangEnter sx={styles.heroTags} />
+        <MarketTags label="Four application areas" hangEnter sx={styles.heroTags} />
       </m.div>
     </section>
   );
@@ -2119,7 +2119,7 @@ function MarketStage({
         <m.div {...stylex.props(styles.frameWindow)} style={{ clipPath }}>
           <m.img
             src={market.image}
-            alt={market.title}
+            alt={market.english}
             loading="lazy"
             decoding="async"
             {...stylex.props(styles.frameImage)}
@@ -2132,7 +2132,7 @@ function MarketStage({
         style={{ opacity: copyOpacity, pointerEvents: copyEvents, y: endY }}
       >
         <p {...stylex.props(styles.stageKicker)}>{market.kicker}</p>
-        <ul aria-label={`${market.title} 细分方向`} {...stylex.props(styles.stageTags)}>
+        <ul aria-label={`${market.english} segments`} {...stylex.props(styles.stageTags)}>
           {market.tags.map((tag) => (
             <li key={tag} {...stylex.props(styles.stageTag)}>
               <CornerDownRight
@@ -2179,7 +2179,7 @@ function ApertureRun() {
   return (
     <div ref={runRef} id={RUN_ID} {...stylex.props(styles.run)}>
       <div {...stylex.props(styles.runViewport)}>
-        <nav aria-label="产品领域" {...stylex.props(styles.rail)}>
+        <nav aria-label="Product areas" {...stylex.props(styles.rail)}>
           {MARKETS.map((market, index) => (
             <a
               key={market.id}
@@ -2497,7 +2497,7 @@ function ContactMirror() {
         <HeroBackdrop liquid={false} />
       </div>
       <div {...stylex.props(styles.shell, styles.inset120, styles.contactContent)}>
-        <MarketTags label="选择应用领域" sx={styles.contactTags} />
+        <MarketTags label="Choose an application area" sx={styles.contactTags} />
         <DropIn sx={styles.contactCopy}>
           <Hang number={7} mirror>
             {SECTION_LABELS.contact}
@@ -2563,7 +2563,7 @@ function SiteFooter() {
       <a href="#top" aria-label="LinkedIn" {...stylex.props(styles.socialLink)}>
         <VectorArt paths={LINKEDIN_PATHS} viewBox="0 0 20 20" sx={styles.socialIcon} />
       </a>
-      <a href="#top" aria-label="微信" {...stylex.props(styles.socialLink)}>
+      <a href="#top" aria-label="WeChat" {...stylex.props(styles.socialLink)}>
         <VectorArt paths={WECHAT_PATHS} viewBox="0 0 20 20" sx={styles.socialIcon} />
       </a>
     </CorporateFooter>

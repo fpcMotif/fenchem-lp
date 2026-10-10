@@ -57,7 +57,7 @@ export function Honors() {
   const chip = ABOUT_HERO.navChips[4];
 
   return (
-    <Section id={chip.id} label={chip.label}>
+    <Section id={chip.id} label={chip.english}>
       <ul {...stylex.props(s.tiers)}>
         {LEVELS.map((tier, idx) => (
           <Reveal key={tier.level} as="li" step={idx} sx={s.tier}>

@@ -87,7 +87,7 @@ export function Campus() {
   const count = photos.length;
 
   return (
-    <Section id={chip.id} label={ABOUT_CAMPUS.title}>
+    <Section id={chip.id} label={chip.english}>
       <div {...stylex.props(s.grid)}>
         {photos.map((photo, idx) => {
           const place = PLACEMENT[photo.id];
@@ -100,7 +100,7 @@ export function Campus() {
             >
               <button
                 type="button"
-                aria-label={`查看大图：${photo.caption}`}
+                aria-label={`View larger: ${photo.english}`}
                 onClick={() => {
                   setStepped(false);
                   setOpenIndex(idx);

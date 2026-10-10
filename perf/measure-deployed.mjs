@@ -24,5 +24,3 @@ if (isMain(import.meta.url)) {
   const result = await measureColdstart({ url: args.url, runs: args.runs });
   console.log(JSON.stringify(result, null, 2));
 }
-
-export {};

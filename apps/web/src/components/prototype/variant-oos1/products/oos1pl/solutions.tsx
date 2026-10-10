@@ -609,7 +609,7 @@ function JumpBar({ active, onJump }: { active: number; onJump: (index: number) =
             transition={{ duration: reduce ? 0 : 0.18, ease: EASE }}
             {...stylex.props(styles.jumpPanel)}
           >
-            <ol aria-label="应用方案列表" {...stylex.props(styles.jumpList)}>
+            <ol aria-label="Application solution list" {...stylex.props(styles.jumpList)}>
               {SOLUTION_ITEMS.map((item, index) => {
                 const isActive = index === active;
                 return (
@@ -708,7 +708,7 @@ export function Solutions() {
         </header>
         <JumpBar active={active} onJump={jumpTo} />
         <div {...stylex.props(styles.layout)}>
-          <nav aria-label="应用方案目录" {...stylex.props(styles.nav)}>
+          <nav aria-label="Application solution index" {...stylex.props(styles.nav)}>
             <ol {...stylex.props(styles.navList)}>
               {SOLUTION_ITEMS.map((item, index) => {
                 const isActive = index === active;

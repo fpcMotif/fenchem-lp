@@ -583,7 +583,7 @@ export function Solutions() {
           </div>
           <div ref={pickerRef} {...stylex.props(styles.picker)}>
             <label htmlFor={selectId} {...stylex.props(ui.srOnly)}>
-              选择应用方案
+              Choose an application solution
             </label>
             <div {...stylex.props(styles.selectWrap)}>
               <select

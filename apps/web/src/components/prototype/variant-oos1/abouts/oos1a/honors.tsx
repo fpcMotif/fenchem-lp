@@ -81,7 +81,7 @@ export function Honors() {
       aria-labelledby="about-honor-title"
       {...stylex.props(styles.section, shared.anchor)}
     >
-      <SectionName id="about-honor-title">{ABOUT_HONORS.title}</SectionName>
+      <SectionName id="about-honor-title">{ABOUT_HONORS.eyebrow}</SectionName>
       <Frame innerSx={shared.sectionPad}>
         {LEVELS.map(({ level, label }) => {
           const items = ABOUT_HONORS.items.filter((item) => item.level === level);

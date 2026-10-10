@@ -435,7 +435,7 @@ export function Catalog() {
             产品目录
           </h2>
           <div {...stylex.props(styles.controls)}>
-            <SegmentTrack role="tablist" aria-label="分组方式" onKeyDown={onTabKeyDown}>
+            <SegmentTrack role="tablist" aria-label="Group by" onKeyDown={onTabKeyDown}>
               {PIVOTS.map((candidate, index) => {
                 const selected = candidate.id === pivotId;
                 return (

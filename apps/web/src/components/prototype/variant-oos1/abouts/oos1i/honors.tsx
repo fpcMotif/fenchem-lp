@@ -74,7 +74,7 @@ const S = stylex.create({
 export function Honors() {
   return (
     <Section id="about-honor" labelledBy="about-honor-title" surface="paper">
-      <SectionName id="about-honor-title">{ABOUT_HONORS.title}</SectionName>
+      <SectionName id="about-honor-title">{ABOUT_HONORS.eyebrow}</SectionName>
       <div {...stylex.props(base.shell, base.inset)}>
         <ul {...stylex.props(S.groups)}>
           {LEVELS.map((group, groupIndex) => {

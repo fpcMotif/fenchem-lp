@@ -274,7 +274,7 @@ function LoomStage() {
       <div {...stylex.props(styles.pinned)}>
         <div
           role="img"
-          aria-label={`${LAB.alt}，与${GROUNDS.alt}交织成一幅图像`}
+          aria-label={`${LAB.alt}, interwoven with ${GROUNDS.alt} into one image`}
           {...stylex.props(styles.stage)}
         >
           {Array.from({ length: WARP }, (_, index) => (
@@ -310,7 +310,7 @@ export function CampusLoom() {
       {...stylex.props(ui.section, ui.anchor, styles.section)}
     >
       <h2 id="about-campus-title" {...stylex.props(ui.srOnly)}>
-        {ABOUT_CAMPUS.title}
+        {ABOUT_CAMPUS.eyebrow}
       </h2>
       <div {...stylex.props(ui.shell)}>
         <LoomStage />
@@ -319,7 +319,7 @@ export function CampusLoom() {
             <Reveal key={photo.id} as="li" delay={Math.min(index, 4) * 60} sx={styles.fringeItem}>
               <button
                 type="button"
-                aria-label={`查看大图：${photo.caption}`}
+                aria-label={`View larger: ${photo.english}`}
                 onClick={() => {
                   setStepped(false);
                   setOpenIndex(index);

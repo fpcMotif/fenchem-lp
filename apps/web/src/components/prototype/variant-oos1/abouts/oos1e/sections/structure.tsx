@@ -138,7 +138,10 @@ export function StructureSheet() {
         </Reveal>
         <Reveal step={1} sx={styles.branches}>
           <span {...stylex.props(base.quiet)}>{ABOUT_STRUCTURE.subsidiaryBadge}</span>
-          <ul aria-label={ABOUT_STRUCTURE.subsidiaryBadge} {...stylex.props(styles.branchList)}>
+          <ul
+            aria-label={ABOUT_STRUCTURE.subsidiaryBadgeEnglish}
+            {...stylex.props(styles.branchList)}
+          >
             {ABOUT_STRUCTURE.subsidiaries.map((sub) => (
               <li key={sub.id} {...stylex.props(styles.branch)}>
                 <h4 {...stylex.props(styles.branchName)}>{sub.name}</h4>
@@ -168,7 +171,7 @@ export function StructureSheet() {
         <div id={diagramId} hidden={!showDiagram} {...stylex.props(styles.diagram)}>
           <img
             src={ABOUT_STRUCTURE.chartImage}
-            alt="南京泛成国际控股有限公司官方组织架构图"
+            alt="Official organizational chart of Nanjing Fenchem International Holdings Corporation Limited"
             loading="lazy"
             decoding="async"
             {...stylex.props(styles.diagramImage)}

@@ -321,10 +321,10 @@ export function SiteHeader({ introStarted }: { introStarted: boolean }) {
       <div
         {...stylex.props(layout.shell, layout.inset, styles.inner, introStarted && styles.innerIn)}
       >
-        <a href="#top" aria-label="FENCHEM 泛成 首页" {...stylex.props(styles.logoLink)}>
+        <a href="#top" aria-label="FENCHEM home" {...stylex.props(styles.logoLink)}>
           <LogoMark white={!onLight} />
         </a>
-        <nav aria-label="主导航" {...stylex.props(styles.nav)}>
+        <nav aria-label="Main" {...stylex.props(styles.nav)}>
           {NAV_ITEMS.map((item) => (
             <a
               key={item.href}
@@ -341,15 +341,15 @@ export function SiteHeader({ introStarted }: { introStarted: boolean }) {
           ))}
         </nav>
         <div {...stylex.props(styles.actions)}>
-          <button type="button" aria-label="搜索" {...stylex.props(styles.iconButton)}>
+          <button type="button" aria-label="Search" {...stylex.props(styles.iconButton)}>
             <Search size={18} strokeWidth={2} absoluteStrokeWidth aria-hidden="true" />
           </button>
-          <button type="button" aria-label="切换到英文" {...stylex.props(styles.langButton)}>
+          <button type="button" aria-label="Switch to English" {...stylex.props(styles.langButton)}>
             EN
           </button>
           <button
             type="button"
-            aria-label={menuOpen ? "关闭菜单" : "打开菜单"}
+            aria-label={menuOpen ? "Close menu" : "Open menu"}
             aria-expanded={menuOpen}
             aria-controls={menuId}
             onClick={() => setMenuOpen((open) => !open)}
@@ -368,7 +368,7 @@ export function SiteHeader({ introStarted }: { introStarted: boolean }) {
           <m.nav
             key="menu"
             id={menuId}
-            aria-label="主导航"
+            aria-label="Main"
             {...stylex.props(styles.menuPanel)}
             initial={{ opacity: 0, transform: "translateY(-8px)" }}
             animate={{ opacity: 1, transform: "translateY(0px)" }}

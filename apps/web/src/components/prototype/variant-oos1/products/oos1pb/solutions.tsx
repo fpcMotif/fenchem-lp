@@ -668,7 +668,7 @@ export function Solutions() {
             </m.header>
             <div
               role="tablist"
-              aria-label="方案内容"
+              aria-label="Solution content"
               aria-orientation="horizontal"
               onKeyDown={onSectionKeyDown}
               {...stylex.props(styles.sectionTabs)}
@@ -719,7 +719,7 @@ export function Solutions() {
                 <SectionBody item={item} section={section} />
               </m.div>
             </div>
-            <nav aria-label="切换方案" {...stylex.props(styles.pager)}>
+            <nav aria-label="Switch solution" {...stylex.props(styles.pager)}>
               <button
                 type="button"
                 onClick={() => step(-1)}

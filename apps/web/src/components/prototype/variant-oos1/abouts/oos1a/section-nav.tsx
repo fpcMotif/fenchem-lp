@@ -162,7 +162,7 @@ export function SectionNav({ onNavigateHome }: { onNavigateHome: (hash?: string)
     <div {...stylex.props(styles.bar)}>
       <Frame>
         <div {...stylex.props(styles.row)}>
-          <nav aria-label="面包屑导航" {...stylex.props(styles.crumbs)}>
+          <nav aria-label="Breadcrumb" {...stylex.props(styles.crumbs)}>
             <button
               type="button"
               onClick={() => onNavigateHome("top")}
@@ -170,14 +170,12 @@ export function SectionNav({ onNavigateHome }: { onNavigateHome: (hash?: string)
             >
               <ChevronLeft size={14} aria-hidden="true" />
               <span lang="en">Home</span>
-              <span {...stylex.props(shared.srOnly)}> 首页</span>
             </button>
             <span aria-current="page" {...stylex.props(styles.crumbCurrent)}>
               <span lang="en">About</span>
-              <span {...stylex.props(shared.srOnly)}> 关于我们</span>
             </span>
           </nav>
-          <ul ref={listRef} aria-label="本页导航" {...stylex.props(styles.list)}>
+          <ul ref={listRef} aria-label="On this page" {...stylex.props(styles.list)}>
             {ABOUT_HERO.navChips.map((chip) => {
               const on = active === chip.id;
               return (
@@ -198,7 +196,6 @@ export function SectionNav({ onNavigateHome }: { onNavigateHome: (hash?: string)
                         {...stylex.props(styles.markBlue, on && styles.markOn)}
                       />
                     </span>
-                    <span {...stylex.props(shared.srOnly)}> {chip.label}</span>
                   </a>
                 </li>
               );

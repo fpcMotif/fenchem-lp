@@ -346,7 +346,7 @@ export function Campus() {
                     decoding="async"
                     {...stylex.props(ui.fill, styles.image)}
                   />
-                  <span {...srOnly}>查看大图</span>
+                  <span {...srOnly}>View larger</span>
                 </button>
               </li>
             ))}

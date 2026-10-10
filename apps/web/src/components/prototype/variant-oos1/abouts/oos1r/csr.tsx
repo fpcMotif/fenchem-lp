@@ -86,7 +86,7 @@ export function Csr() {
   const [first, second] = ABOUT_CSR.statement;
 
   return (
-    <Section id={chip.id} label={ABOUT_CSR.title}>
+    <Section id={chip.id} label={chip.english}>
       <Reveal>
         <h3 {...stylex.props(s.statement)}>
           <span {...stylex.props(s.line)}>{first}</span>

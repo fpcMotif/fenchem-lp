@@ -137,7 +137,7 @@ const PLACEMENT = [
 
 export function Products({ onNavigateHome }: { onNavigateHome: (hash?: string) => void }) {
   return (
-    <Section id="about-products" label={PRODUCTS_INTRO.title}>
+    <Section id="about-products" label="Products and application solutions">
       <Reveal sx={s.intro}>
         <p {...stylex.props(s.lead)}>{PRODUCTS_INTRO.lead}</p>
         <button
@@ -155,7 +155,7 @@ export function Products({ onNavigateHome }: { onNavigateHome: (hash?: string) =
               <div {...stylex.props(ui.frame, PLACEMENT[idx].frame)}>
                 <img
                   src={product.image}
-                  alt={product.title}
+                  alt={product.english}
                   loading="lazy"
                   decoding="async"
                   {...stylex.props(ui.fill, s.image)}

@@ -151,7 +151,10 @@ function Component({ progress, index }: { progress: MotionValue<number>; index: 
 
   return (
     <li {...stylex.props(styles.component)}>
-      <Drawing heightUnits={SHEET_HEIGHT} label={`分解图：「${value.glyph}」构件抬离其底座`}>
+      <Drawing
+        heightUnits={SHEET_HEIGHT}
+        label={`Exploded view: ${ENGLISH[index]} component lifted off its base`}
+      >
         <Camera>
           <GroundPlane width={TILE} depth={TILE} centerX={ORIGIN.x} centerY={ORIGIN.y}>
             <span {...stylex.props(styles.footprint)} />

@@ -39,6 +39,7 @@ export type Work = {
   large: string;
   alt: string;
   caption: string;
+  englishCaption: string;
   english: string;
   wall: Wall;
   aspect: number;
@@ -51,6 +52,7 @@ export const WORKS: readonly Work[] = ABOUT_CAMPUS.photos.map((photo, index) => 
   large: photo.large,
   alt: photo.alt,
   caption: photo.caption,
+  englishCaption: photo.english,
   english: ENGLISH[photo.id],
   wall: index % 2 === 0 ? "left" : "right",
   aspect: ASPECT[photo.id],

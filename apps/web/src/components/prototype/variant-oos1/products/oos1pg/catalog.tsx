@@ -28,14 +28,16 @@ const ALL = "all";
 interface RegionFilter {
   id: string;
   label: string;
+  englishLabel: string;
   count: number;
 }
 
 const FILTERS: RegionFilter[] = [
-  { id: ALL, label: "全部", count: FLAT_ITEMS.length },
+  { id: ALL, label: "全部", englishLabel: "All", count: FLAT_ITEMS.length },
   ...CATALOG_GROUPS.map((group) => ({
     id: group.id,
     label: REGION_META[group.id]?.short ?? group.label,
+    englishLabel: REGION_META[group.id]?.english ?? group.englishLabel,
     count: group.items.length,
   })),
 ];
@@ -529,7 +531,7 @@ function LatinPreview({ latin }: { latin: string[] }) {
     return (
       <span {...stylex.props(styles.none)}>
         <span aria-hidden="true">—</span>
-        <span {...stylex.props(styles.srOnly)}>无学名</span>
+        <span {...stylex.props(styles.srOnly)}>No botanical name</span>
       </span>
     );
   }
@@ -654,7 +656,7 @@ export function Catalog() {
           产品目录
         </h2>
         <div {...stylex.props(styles.filterScroller)}>
-          <div role="group" aria-label="按产地筛选" {...stylex.props(styles.segmented)}>
+          <div role="group" aria-label="Filter by origin" {...stylex.props(styles.segmented)}>
             {FILTERS.map((filter) => {
               const on = filter.id === filterId;
               return (
@@ -680,7 +682,7 @@ export function Catalog() {
           <div {...stylex.props(styles.tableColumn)}>
             <table id={tableId} {...stylex.props(styles.table)}>
               <caption {...stylex.props(styles.srOnly)}>
-                产品目录：{activeFilter.label}，共 {items.length} 款
+                Product catalog: {activeFilter.englishLabel}, {items.length} items
               </caption>
               <thead>
                 <m.tr layout="position" transition={{ duration: 0.26, ease: EASE }}>
@@ -826,7 +828,7 @@ export function Catalog() {
             <div
               id={cardId}
               role="region"
-              aria-label="原料详情"
+              aria-label="Ingredient details"
               aria-live="polite"
               {...stylex.props(styles.card)}
             >

@@ -295,7 +295,7 @@ export function Culture() {
           bands={BANDS}
           development={development}
           geometry={GEOMETRY}
-          listLabel="企业文化"
+          listLabel={ABOUT_CULTURE.eyebrow}
           renderGlyph={(band) => <span {...stylex.props(styles.glyph)}>{valueOf(band).glyph}</span>}
           renderLabel={(band) => {
             const value = valueOf(band);

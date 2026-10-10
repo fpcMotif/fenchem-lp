@@ -197,7 +197,7 @@ export function HeroDrawing({
   return (
     <Drawing
       heightUnits={HERO_SHEET.heightUnits}
-      label="装配图：研、产、销三块板沿竖轴装配为一体，研发板始终微微抬起，未完全落座。"
+      label="Assembly diagram: the R&D, production, and sales plates join into one unit along a vertical axis. The R&D plate stays slightly raised, not fully seated."
     >
       <Camera y={groundY}>
         <GroundPlane width={PLATE} depth={PLATE} centerX={HERO_SHEET.originX} centerY={0}>

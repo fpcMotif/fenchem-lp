@@ -143,7 +143,7 @@ export function Profile() {
   return (
     <section
       id="about-profile"
-      aria-label="企业概况"
+      aria-label="Company overview"
       {...stylex.props(shared.anchor, styles.section)}
     >
       <div {...stylex.props(shared.shell, shared.inset)}>
@@ -159,7 +159,7 @@ export function Profile() {
             <figure {...stylex.props(styles.figure)}>
               <img
                 src={ABOUT_HERO.lobbyImage}
-                alt="泛成总部大堂，弧形吊顶与大理石地面"
+                alt="Fenchem headquarters lobby with a curved ceiling and marble floor"
                 loading="lazy"
                 decoding="async"
                 {...stylex.props(styles.lobby)}

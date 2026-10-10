@@ -52,6 +52,7 @@ import { INTRO_REVEAL_MS, introStyles, useIntro } from "@/components/prototype/s
 
 import { AboutView } from "./about-view";
 import { ContactCta } from "./contact-cta";
+import { HERO_BLOB_TWIST } from "./hero-blob-twist";
 import { ProductsView } from "./products-view";
 import { RiseReveal } from "./rise-reveal";
 import { useActiveSection } from "./use-active-section";
@@ -147,7 +148,6 @@ const RISE_STAGGER = 0.06;
 const RISE_MAX_STEPS = 3;
 const riseDelay = (index: number) => Math.min(index, RISE_MAX_STEPS) * RISE_STAGGER;
 
-const BLOOM_EASE = "cubic-bezier(0.16, 1, 0.3, 1)";
 const LINE_RISE_EASE = "cubic-bezier(0.2, 0.7, 0, 1)";
 const MAP_PIN_STAGGER_MS = 40;
 const MAP_SWEEP_MS = 1200;
@@ -160,8 +160,11 @@ const CLOSING_LEAD = CLOSING_TEXT.slice(0, Math.max(CLOSING_BREAK, 0));
 const CLOSING_WORD = CLOSING_TEXT.slice(CLOSING_BREAK + 1);
 const CLOSING_CRACKS = /^[A-Za-z]+$/.test(CLOSING_WORD);
 
+const BLOB_SCROLL_END = 0.6;
+const BLOB_SCROLL_REDUCED = 0.3;
+
 const revealZoom = stylex.keyframes({
-  "0%": { scale: "1.22" },
+  "0%": { scale: "1.14" },
   "100%": { scale: "1" },
 });
 
@@ -578,9 +581,9 @@ const styles = stylex.create({
     inset: 0,
     filter: "url(#fenchem-hero-grade)",
     animationName: { default: revealZoom, [breakpoints.motionReduce]: "none" },
-    animationDuration: "2200ms",
+    animationDuration: "2000ms",
     animationDelay: "var(--oo-intro, 0ms)",
-    animationTimingFunction: BLOOM_EASE,
+    animationTimingFunction: EASE_OUT_CSS,
     animationFillMode: "both",
   },
   heroParallax: {
@@ -1604,7 +1607,7 @@ function SiteHeader({
       <div ref={innerRef} {...stylex.props(styles.shell, styles.headerInner)}>
         <a
           href="#top"
-          aria-label="FENCHEM 泛成 首页"
+          aria-label="FENCHEM home"
           onClick={(event) => {
             if (currentView !== "home" && onNavigate) {
               event.preventDefault();
@@ -1617,7 +1620,7 @@ function SiteHeader({
         </a>
         <nav
           ref={navRef}
-          aria-label="主导航"
+          aria-label="Main"
           {...stylex.props(styles.nav, !navFits && styles.navCollapsed)}
         >
           {NAV_ITEMS.map((item) => (
@@ -1650,7 +1653,7 @@ function SiteHeader({
           <m.nav
             key="menu"
             id={menuId}
-            aria-label="主导航"
+            aria-label="Main"
             {...stylex.props(styles.menuPanel)}
             initial={{ opacity: 0, transform: "translateY(-8px)" }}
             animate={{ opacity: 1, transform: "translateY(0px)" }}
@@ -1700,6 +1703,10 @@ function Hero() {
   const backdropY = useTransform(scrollYProgress, [0, 1], ["0%", "18%"]);
   const contentY = useTransform(scrollYProgress, [0, 1], [0, -120]);
   const contentOpacity = useTransform(scrollYProgress, [0, 0.75], [1, 0]);
+  const blobScroll = useTransform(scrollYProgress, (progress) => {
+    const t = clamp01(progress / BLOB_SCROLL_END);
+    return t * t * (3 - 2 * t) * (reduce ? BLOB_SCROLL_REDUCED : 1);
+  });
   return (
     <RisingHero
       styles={{
@@ -1738,6 +1745,8 @@ function Hero() {
         heroTintScreen: styles.heroTintScreen,
         heroParallax: styles.heroParallax,
       }}
+      backdropFragment={HERO_BLOB_TWIST}
+      backdropProgress={blobScroll}
       heroRef={heroRef}
       reduce={reduce}
       backdropY={backdropY}
@@ -2044,7 +2053,7 @@ function ProductCard({ product, index }: { product: (typeof PRODUCTS)[number]; i
         {imageFailed ? null : (
           <img
             src={product.image}
-            alt={product.title}
+            alt={product.english}
             loading="lazy"
             decoding="async"
             onError={() => setImageFailed(true)}
@@ -2227,7 +2236,7 @@ function SiteFooter({ onNavigate }: { onNavigate?: (view: View, targetId?: strin
             decoding="async"
             {...stylex.props(styles.footerLogo)}
           />
-          <nav aria-label="页脚导航" {...stylex.props(styles.footerColumns)}>
+          <nav aria-label="Footer" {...stylex.props(styles.footerColumns)}>
             {FOOTER_COLUMNS.map((column) => (
               <div key={column.heading} {...stylex.props(styles.footerColumn)}>
                 <h3 {...stylex.props(styles.footerHeading)}>{column.heading}</h3>
@@ -2265,7 +2274,7 @@ function SiteFooter({ onNavigate }: { onNavigate?: (view: View, targetId?: strin
           <a href="#top" aria-label="LinkedIn" {...stylex.props(styles.socialLink)}>
             <VectorArt paths={LINKEDIN_PATHS} viewBox="0 0 20 20" sx={styles.socialIcon} />
           </a>
-          <a href="#top" aria-label="微信" {...stylex.props(styles.socialLink)}>
+          <a href="#top" aria-label="WeChat" {...stylex.props(styles.socialLink)}>
             <VectorArt paths={WECHAT_PATHS} viewBox="0 0 20 20" sx={styles.socialIcon} />
           </a>
         </FooterLegal>

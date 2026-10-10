@@ -1817,7 +1817,7 @@ function ProductCard({ product, index }: { product: (typeof PRODUCTS)[number]; i
       <div {...stylex.props(styles.productImageFrame)}>
         <img
           src={product.image}
-          alt={product.title}
+          alt={product.english}
           loading="lazy"
           decoding="async"
           {...stylex.props(styles.productImage)}
@@ -2026,7 +2026,7 @@ function SiteFooter() {
       <a href="#top" aria-label="LinkedIn" {...stylex.props(styles.socialLink)}>
         <VectorArt paths={LINKEDIN_PATHS} viewBox="0 0 20 20" sx={styles.socialIcon} />
       </a>
-      <a href="#top" aria-label="微信" {...stylex.props(styles.socialLink)}>
+      <a href="#top" aria-label="WeChat" {...stylex.props(styles.socialLink)}>
         <VectorArt paths={WECHAT_PATHS} viewBox="0 0 20 20" sx={styles.socialIcon} />
       </a>
     </CorporateFooter>

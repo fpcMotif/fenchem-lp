@@ -202,7 +202,7 @@ export function CorridorPlan({ onOpen }: { onOpen: (index: number) => void }) {
                   {work.number}
                 </span>
                 <span {...stylex.props(styles.caption)}>{work.caption}</span>
-                <span {...srOnly}>，查看大图</span>
+                <span {...srOnly}>, View larger</span>
               </button>
             </li>
           ))}

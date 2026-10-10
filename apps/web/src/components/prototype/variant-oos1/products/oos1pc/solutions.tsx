@@ -732,7 +732,7 @@ export function Solutions() {
               />
             ))}
           </div>
-          <nav aria-label="切换应用方案" {...stylex.props(styles.foot)}>
+          <nav aria-label="Switch application solution" {...stylex.props(styles.foot)}>
             <StepButton
               direction="previous"
               target={activeIndex > 0 ? activeIndex - 1 : null}
