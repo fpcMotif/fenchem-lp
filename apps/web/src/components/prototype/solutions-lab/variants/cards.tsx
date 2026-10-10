@@ -33,7 +33,6 @@ const FALLBACK_WIDTH = 1200;
 const SLIVER = 4;
 const EXPOSE = 30;
 const TAB_HEIGHT = 40;
-const TAB_TUCK = 4;
 const HEADROOM = 8;
 const FRONT_GAP = 8;
 const GROUP_GAP = 10;
@@ -277,6 +276,8 @@ const styles = stylex.create({
     outlineOffset: 2,
   },
   card: {
+    position: "relative",
+    zIndex: 1,
     paddingInline: { default: 20, [bp.md]: 40, [bp.xl]: 56 },
     paddingTop: { default: 24, [bp.md]: 36, [bp.xl]: 44 },
     paddingBottom: { default: 12, [bp.md]: 20, [bp.xl]: 28 },
@@ -290,7 +291,6 @@ const styles = stylex.create({
     borderEndEndRadius: { default: 12, [bp.md]: 14 },
     backgroundColor: tone.paper,
     boxShadow: depth.card,
-    transformOrigin: "50% 0%",
   },
   cardHead: {
     paddingBottom: { default: 20, [bp.md]: 28 },
@@ -577,17 +577,22 @@ export function CardsVariant() {
           <AnimatePresence initial={false} mode="popLayout">
             <m.div
               key={selected.id}
-              initial={{ opacity: 0, y: 8, scale: 1, zIndex: 1 }}
-              animate={{ opacity: 1, y: 0, scale: 1, zIndex: 1 }}
+              initial={{ opacity: 0, y: 8, scale: 1 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{
                 opacity: 0,
                 y: -6,
                 scale: 0.985,
                 zIndex: 0,
-                transition: { duration: reduce ? 0 : 0.2, ease: EASE_OUT },
+                transition: {
+                  duration: reduce ? 0 : 0.2,
+                  ease: EASE_OUT,
+                  zIndex: { duration: 0 },
+                },
               }}
               transition={timing}
               {...stylex.props(styles.card)}
+              style={{ originY: 0 }}
             >
               <IndexCard item={selected} position={position} total={scope.length} />
             </m.div>

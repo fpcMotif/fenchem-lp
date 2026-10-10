@@ -92,6 +92,8 @@ const styles = stylex.create({
     gap: 12,
     flexShrink: 0,
     margin: 0,
+    marginInlineStart: { default: 0, [bp.lg]: -40 },
+    paddingInlineStart: { default: 0, [bp.lg]: 40 },
     paddingTop: { default: 0, [bp.lg]: 4 },
     paddingBottom: { default: 0, [bp.lg]: 10 },
     marginBottom: { default: 0, [bp.lg]: 6 },
@@ -107,7 +109,7 @@ const styles = stylex.create({
     color: tone.tintMuted,
   },
   groupHeadingFollow: {
-    paddingInlineStart: { default: 28, [bp.lg]: 0 },
+    paddingInlineStart: { default: 28, [bp.lg]: 40 },
     borderInlineStartWidth: { default: 1, [bp.lg]: 0 },
     borderInlineStartStyle: "solid",
     borderInlineStartColor: tone.tintRule,
