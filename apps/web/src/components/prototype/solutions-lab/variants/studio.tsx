@@ -148,7 +148,7 @@ const styles = stylex.create({
     overscrollBehavior: "contain",
     scrollbarWidth: { default: "none", [bp.lg]: "thin" },
     scrollPaddingInline: 4,
-    scrollPaddingTop: { default: null, [bp.lg]: 36 },
+    scrollPaddingTop: { default: null, [bp.lg]: 8 },
     borderRadius: { default: 12, [bp.lg]: 0 },
     backgroundColor: { default: tone.tintFill, [bp.lg]: "transparent" },
     maskImage: {
@@ -158,6 +158,7 @@ const styles = stylex.create({
   },
   listGrouped: {
     paddingTop: { default: 4, [bp.lg]: 0 },
+    scrollPaddingTop: { default: null, [bp.lg]: 36 },
   },
   group: {
     display: { default: "contents", [bp.lg]: "block" },

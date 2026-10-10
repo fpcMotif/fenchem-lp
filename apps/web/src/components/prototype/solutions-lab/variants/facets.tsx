@@ -38,6 +38,8 @@ const splitNote = (text: string) => {
 
 type Facet = { label: string; count: number };
 
+type FacetState = { area: AreaFilter; active: string[]; fadeRows: boolean };
+
 const isHit = (fn: string, active: string[]) => active.some((label) => fn.includes(label));
 
 const matchesAny = (item: SolutionItem, active: string[]) =>
@@ -277,7 +279,7 @@ const styles = stylex.create({
     overscrollBehavior: "contain",
     scrollbarWidth: { default: "none", [bp.lg]: "thin" },
     scrollPaddingInline: 4,
-    scrollPaddingTop: { default: null, [bp.lg]: 44 },
+    scrollPaddingTop: { default: null, [bp.lg]: 10 },
     borderRadius: { default: 12, [bp.lg]: 0 },
     backgroundColor: { default: tone.tintFill, [bp.lg]: "transparent" },
     maskImage: {
@@ -287,6 +289,7 @@ const styles = stylex.create({
   },
   listGrouped: {
     paddingTop: { default: 4, [bp.lg]: 0 },
+    scrollPaddingTop: { default: null, [bp.lg]: 44 },
   },
   group: {
     display: { default: "contents", [bp.lg]: "block" },
@@ -601,11 +604,12 @@ export function FacetsVariant() {
   const wide = useSyncExternalStore(subscribeWide, readWide, readWideOnServer);
   const listRef = useRef<HTMLDivElement>(null);
   const facetListRef = useRef<HTMLDivElement>(null);
-  const mountedRef = useRef(false);
-  const [facetState, setFacetState] = useState<{ area: AreaFilter; active: string[] }>({
+  const [facetState, setFacetState] = useState<FacetState>({
     area,
     active: [],
+    fadeRows: false,
   });
+  if (facetState.area !== area) setFacetState({ area, active: [], fadeRows: true });
 
   const facets = useMemo(() => deriveFacets(scope), [scope]);
   const active = facetState.area === area ? facetState.active : [];
@@ -618,10 +622,6 @@ export function FacetsVariant() {
   const grouped = area === "all";
   const currentId = current?.id;
   const activeKey = active.join("|");
-
-  useEffect(() => {
-    mountedRef.current = true;
-  }, []);
 
   useEffect(() => {
     const list = listRef.current;
@@ -645,14 +645,14 @@ export function FacetsVariant() {
     const next = active.includes(label)
       ? active.filter((entry) => entry !== label)
       : [...active, label];
-    setFacetState({ area, active: next });
+    setFacetState({ area, active: next, fadeRows: true });
     const nextVisible = scope.filter((item) => matchesAny(item, next));
     const first = nextVisible[0];
     if (first && !nextVisible.some((item) => item.id === currentId)) select(first.id);
   };
 
   const clearFacets = () => {
-    setFacetState({ area, active: [] });
+    setFacetState({ area, active: [], fadeRows: true });
     facetListRef.current?.querySelector<HTMLElement>("button")?.focus();
   };
 
@@ -746,7 +746,7 @@ export function FacetsVariant() {
                         aria-selected={isSelected}
                         aria-controls={`${uid}-panel`}
                         tabIndex={isSelected ? 0 : -1}
-                        initial={mountedRef.current ? { opacity: 0 } : false}
+                        initial={facetState.fadeRows ? { opacity: 0 } : false}
                         animate={{ opacity: 1 }}
                         transition={{ duration: 0.18, ease: EASE_OUT }}
                         onClick={() => select(item.id)}

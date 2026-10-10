@@ -54,7 +54,6 @@ const findTileVertically = (tiles: HTMLElement[], origin: HTMLElement, down: boo
 type Mode = "single" | "compare";
 type Notice = { key: number; text: string };
 
-const SELECTED_TILE = "0 0 0 1px #1a1a1a, 0 12px 28px -18px rgba(7, 26, 74, 0.35)";
 const MOBILE_EDGES =
   "linear-gradient(to right, transparent, #000 12px, #000 calc(100% - 28px), transparent)";
 
@@ -96,7 +95,6 @@ const styles = stylex.create({
   },
   group: {
     display: { default: "contents", [bp.md]: "block" },
-    marginTop: { default: null, [bp.md]: 0 },
   },
   groupHead: {
     position: { default: "static", [bp.md]: "sticky" },
@@ -110,7 +108,8 @@ const styles = stylex.create({
     margin: 0,
     paddingTop: { default: 0, [bp.md]: 14 },
     paddingBottom: { default: 0, [bp.md]: 10 },
-    paddingInline: { default: 10, [bp.md]: 4 },
+    paddingLeft: { default: 6, [bp.md]: 4 },
+    paddingRight: { default: 6, [bp.md]: 4 },
     backgroundColor: tone.tintFill,
     fontSize: 12,
     fontWeight: 500,
@@ -176,7 +175,7 @@ const styles = stylex.create({
   },
   tileButtonSelected: {
     borderColor: tone.ink,
-    boxShadow: SELECTED_TILE,
+    boxShadow: depth.card,
     cursor: "default",
   },
   tileTop: {
@@ -925,6 +924,7 @@ export function CompareVariant() {
       <div {...stylex.props(styles.tray)}>
         <div
           ref={wellRef}
+          role="group"
           aria-label="应用方案"
           onKeyDown={handleTilesKeyDown}
           {...stylex.props(

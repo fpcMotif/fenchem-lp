@@ -4,36 +4,26 @@ import { useEffect, useLayoutEffect, useRef, useState, type ComponentType } from
 
 import { face, tone } from "./tokens.stylex";
 import { AtlasVariant } from "./variants/atlas";
-import { CardsVariant } from "./variants/cards";
 import { CompareVariant } from "./variants/compare";
-import { DrawerVariant } from "./variants/drawer";
 import { FacetsVariant } from "./variants/facets";
 import { FolderVariant } from "./variants/folder";
 import { GridVariant } from "./variants/grid";
 import { LedgerVariant } from "./variants/ledger";
 import { MarginVariant } from "./variants/margin";
-import { PagesVariant } from "./variants/pages";
-import { PreviewVariant } from "./variants/preview";
 import { RibbonVariant } from "./variants/ribbon";
 import { SpotlightVariant } from "./variants/spotlight";
 import { StudioVariant } from "./variants/studio";
-import { TableVariant } from "./variants/table";
 
 const VARIANTS: { name: string; Component: ComponentType }[] = [
   { name: "Margin", Component: MarginVariant },
   { name: "Ribbon", Component: RibbonVariant },
+  { name: "Folder", Component: FolderVariant },
   { name: "Grid", Component: GridVariant },
-  { name: "Ledger", Component: LedgerVariant },
-  { name: "Table", Component: TableVariant },
   { name: "Atlas", Component: AtlasVariant },
-  { name: "Drawer", Component: DrawerVariant },
-  { name: "Cards", Component: CardsVariant },
+  { name: "Ledger", Component: LedgerVariant },
   { name: "Spotlight", Component: SpotlightVariant },
-  { name: "Pages", Component: PagesVariant },
   { name: "Studio", Component: StudioVariant },
   { name: "Facets", Component: FacetsVariant },
-  { name: "Folder", Component: FolderVariant },
-  { name: "Preview", Component: PreviewVariant },
   { name: "Compare", Component: CompareVariant },
 ];
 
@@ -136,7 +126,7 @@ const PICKER_CSS = `
 
 const styles = stylex.create({
   root: {
-    minHeight: "100dvh",
+    minWidth: 0,
     backgroundColor: tone.paper,
     color: tone.ink,
     fontFamily: face.body,
