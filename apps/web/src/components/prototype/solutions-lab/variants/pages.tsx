@@ -25,7 +25,9 @@ const TRAILING_NOTE = /^(.+?)\s*[（(]([^（）()]+)[）)]$/;
 
 const splitNote = (text: string) => {
   const match = TRAILING_NOTE.exec(text);
-  return match ? { primary: match[1] ?? text, note: match[2] ?? null } : { primary: text, note: null };
+  return match
+    ? { primary: match[1] ?? text, note: match[2] ?? null }
+    : { primary: text, note: null };
 };
 
 const styles = stylex.create({
@@ -730,7 +732,10 @@ export function PagesVariant() {
           {...stylex.props(styles.tocButton, tocOpen && styles.tocButtonOpen)}
         >
           目录
-          <span aria-hidden="true" {...stylex.props(styles.tocChevron, tocOpen && styles.tocChevronOpen)}>
+          <span
+            aria-hidden="true"
+            {...stylex.props(styles.tocChevron, tocOpen && styles.tocChevronOpen)}
+          >
             <ChevronDown size={14} strokeWidth={1.5} absoluteStrokeWidth />
           </span>
         </button>
@@ -769,7 +774,9 @@ export function PagesVariant() {
                         onClick={() => jumpFromToc(index)}
                         {...stylex.props(styles.tocEntry, stylex.defaultMarker())}
                       >
-                        <span {...stylex.props(styles.tocNumber, isCurrent && styles.tocNumberCurrent)}>
+                        <span
+                          {...stylex.props(styles.tocNumber, isCurrent && styles.tocNumberCurrent)}
+                        >
                           {padIndex(index)}
                         </span>
                         <span {...stylex.props(styles.tocName, isCurrent && styles.tocNameCurrent)}>
@@ -850,7 +857,10 @@ export function PagesVariant() {
             )}
           >
             <span {...stylex.props(styles.turnEyebrow)}>
-              <span aria-hidden="true" {...stylex.props(styles.turnGlyph, previous && styles.turnGlyphBack)}>
+              <span
+                aria-hidden="true"
+                {...stylex.props(styles.turnGlyph, previous && styles.turnGlyphBack)}
+              >
                 <ChevronLeft size={14} strokeWidth={1.5} absoluteStrokeWidth />
               </span>
               上一页
@@ -889,7 +899,10 @@ export function PagesVariant() {
                           >
                             <span
                               aria-hidden="true"
-                              {...stylex.props(styles.tickLine, isCurrent && styles.tickLineCurrent)}
+                              {...stylex.props(
+                                styles.tickLine,
+                                isCurrent && styles.tickLineCurrent,
+                              )}
                             />
                             <span aria-hidden="true" {...stylex.props(styles.tip)}>
                               {item.title}
@@ -902,7 +915,10 @@ export function PagesVariant() {
                       <span
                         title={group.label}
                         aria-hidden="true"
-                        {...stylex.props(styles.tickInitial, groupCurrent && styles.tickInitialCurrent)}
+                        {...stylex.props(
+                          styles.tickInitial,
+                          groupCurrent && styles.tickInitialCurrent,
+                        )}
                       >
                         {group.label.slice(0, 1)}
                       </span>
@@ -928,7 +944,10 @@ export function PagesVariant() {
           >
             <span {...stylex.props(styles.turnEyebrow)}>
               下一页
-              <span aria-hidden="true" {...stylex.props(styles.turnGlyph, next && styles.turnGlyphForward)}>
+              <span
+                aria-hidden="true"
+                {...stylex.props(styles.turnGlyph, next && styles.turnGlyphForward)}
+              >
                 <ChevronRight size={14} strokeWidth={1.5} absoluteStrokeWidth />
               </span>
             </span>

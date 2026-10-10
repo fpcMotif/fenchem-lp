@@ -30,7 +30,9 @@ const TRAILING_NOTE = /^(.+?)\s*[（(]([^（）()]+)[）)]$/;
 
 const splitNote = (text: string) => {
   const match = TRAILING_NOTE.exec(text);
-  return match ? { primary: match[1] ?? text, note: match[2] ?? null } : { primary: text, note: null };
+  return match
+    ? { primary: match[1] ?? text, note: match[2] ?? null }
+    : { primary: text, note: null };
 };
 
 const fadeIn = stylex.keyframes({
@@ -625,7 +627,9 @@ export function DrawerVariant() {
     refocusTitle.current = !!bodyRef.current?.contains(document.activeElement);
     select(target.id);
     setViewedId(target.id);
-    setAnnouncement(`${padIndex(position + delta)} / ${padIndex(scope.length - 1)} ${target.title}`);
+    setAnnouncement(
+      `${padIndex(position + delta)} / ${padIndex(scope.length - 1)} ${target.title}`,
+    );
   };
 
   const handleClosed = () => {
@@ -752,7 +756,12 @@ export function DrawerVariant() {
                     onClick={() => step(-1)}
                     {...stylex.props(styles.iconButton, !previous && styles.iconButtonOff)}
                   >
-                    <ChevronLeft size={18} strokeWidth={1.5} absoluteStrokeWidth aria-hidden="true" />
+                    <ChevronLeft
+                      size={18}
+                      strokeWidth={1.5}
+                      absoluteStrokeWidth
+                      aria-hidden="true"
+                    />
                   </button>
                   <button
                     type="button"
@@ -762,7 +771,12 @@ export function DrawerVariant() {
                     onClick={() => step(1)}
                     {...stylex.props(styles.iconButton, !next && styles.iconButtonOff)}
                   >
-                    <ChevronRight size={18} strokeWidth={1.5} absoluteStrokeWidth aria-hidden="true" />
+                    <ChevronRight
+                      size={18}
+                      strokeWidth={1.5}
+                      absoluteStrokeWidth
+                      aria-hidden="true"
+                    />
                   </button>
                   <span aria-hidden="true" {...stylex.props(styles.divider)} />
                   <button

@@ -32,7 +32,9 @@ const TRAILING_NOTE = /^(.+?)\s*[（(]([^（）()]+)[）)]$/;
 
 const splitNote = (text: string) => {
   const match = TRAILING_NOTE.exec(text);
-  return match ? { primary: match[1] ?? text, note: match[2] ?? null } : { primary: text, note: null };
+  return match
+    ? { primary: match[1] ?? text, note: match[2] ?? null }
+    : { primary: text, note: null };
 };
 
 const TAB_STEPS: Record<string, (index: number, count: number) => number> = {
@@ -442,7 +444,8 @@ export function PreviewVariant() {
       rail.scrollTo({ left: Math.max(0, left), behavior });
       return;
     }
-    const visibleTop = rail.scrollTop + (Number.parseFloat(getComputedStyle(rail).scrollPaddingTop) || 0);
+    const visibleTop =
+      rail.scrollTop + (Number.parseFloat(getComputedStyle(rail).scrollPaddingTop) || 0);
     const visibleBottom = rail.scrollTop + rail.clientHeight;
     if (tab.offsetTop >= visibleTop && tab.offsetTop + tab.offsetHeight <= visibleBottom) return;
     const top = tab.offsetTop - (rail.clientHeight - tab.offsetHeight) / 2;
