@@ -13,20 +13,29 @@ type CampusPhoto = {
   focus: string;
 };
 
-const [AERIAL, LAB, SHOWROOM, RECEPTION, LOUNGE, OFFICE, GROUNDS] = ABOUT_CAMPUS.photos;
+const OUTDOOR_IDS: ReadonlySet<string> = new Set(["aerial", "grounds"]);
+const FOCUS_BY_ID: ReadonlyMap<string, string> = new Map([
+  ["lab", "53% 50%"],
+  ["aerial", "50% 45%"],
+  ["grounds", "50% 60%"],
+]);
+const LEAD_IDS: readonly string[] = ["reception", "office", "lab", "lounge", "showroom", "aerial"];
 
-const fromCampus = (
-  photo: (typeof ABOUT_CAMPUS.photos)[number],
-  area: CampusPhoto["area"],
-  focus = "50% 50%",
-): CampusPhoto => ({
+const fromCampus = (photo: (typeof ABOUT_CAMPUS.photos)[number]): CampusPhoto => ({
   id: photo.id,
   image: photo.large,
   alt: photo.alt,
   caption: photo.caption,
-  area,
-  focus,
+  area: OUTDOOR_IDS.has(photo.id) ? OUTDOOR : INDOOR,
+  focus: FOCUS_BY_ID.get(photo.id) ?? "50% 50%",
 });
+
+const LEAD_PHOTOS = LEAD_IDS.flatMap((id) =>
+  ABOUT_CAMPUS.photos.filter((photo) => photo.id === id).map(fromCampus),
+);
+const REMAINING_PHOTOS = ABOUT_CAMPUS.photos
+  .filter((photo) => !LEAD_IDS.includes(photo.id))
+  .map(fromCampus);
 
 export const CAMPUS_GALLERY: readonly CampusPhoto[] = [
   {
@@ -37,12 +46,7 @@ export const CAMPUS_GALLERY: readonly CampusPhoto[] = [
     area: INDOOR,
     focus: "50% 50%",
   },
-  fromCampus(RECEPTION, INDOOR),
-  fromCampus(OFFICE, INDOOR),
-  fromCampus(LAB, INDOOR, "53% 50%"),
-  fromCampus(LOUNGE, INDOOR),
-  fromCampus(SHOWROOM, INDOOR),
-  fromCampus(AERIAL, OUTDOOR, "50% 45%"),
+  ...LEAD_PHOTOS,
   {
     id: "walkway",
     image: ABOUT_BANNER.image,
@@ -67,5 +71,5 @@ export const CAMPUS_GALLERY: readonly CampusPhoto[] = [
     area: OUTDOOR,
     focus: "50% 50%",
   },
-  fromCampus(GROUNDS, OUTDOOR, "50% 60%"),
+  ...REMAINING_PHOTOS,
 ];

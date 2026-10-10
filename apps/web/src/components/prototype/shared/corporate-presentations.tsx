@@ -21,6 +21,7 @@ import { CorporateHeaderActions } from "./navigation-and-headline";
 import { ProductSummary } from "./product-summary";
 import type { STRENGTHS as StrengthItems } from "../variant-oos1/content";
 type Strength = (typeof StrengthItems)[number];
+const HAN_SCRIPT = /\p{Script=Han}/u;
 export function LakeStatistic({
   styles,
   stat,
@@ -319,7 +320,16 @@ export function RisingHero({
       >
         <div {...stylex.props(styles.heroCopy)}>
           <h1 id="oo-hero-title" {...stylex.props(styles.heroTitle)}>
-            <span lang="en" {...stylex.props(styles.heroHeadline)}>
+            <span
+              lang={
+                HAN_SCRIPT.test(
+                  OPENING_BEFORE + HERO.accent + OPENING_AFTER + CLOSING_LEAD + CLOSING_WORD,
+                )
+                  ? undefined
+                  : "en"
+              }
+              {...stylex.props(styles.heroHeadline)}
+            >
               <span
                 {...stylex.props(
                   styles.heroLead,

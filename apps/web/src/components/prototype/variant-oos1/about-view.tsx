@@ -269,7 +269,6 @@ const styles = stylex.create({
   chipList: {
     display: "flex",
     alignItems: "center",
-    justifyContent: { default: "flex-start", [breakpoints.lg]: "flex-end" },
     gap: 12,
     flexGrow: 1,
     minWidth: 0,
@@ -298,6 +297,9 @@ const styles = stylex.create({
     outlineWidth: 2,
     outlineColor: colors.brandBlue700,
     outlineOffset: 2,
+  },
+  chipLead: {
+    marginInlineStart: { default: 0, [breakpoints.lg]: "auto" },
   },
   chipActive: {
     backgroundColor: { default: colors.brandBlue700, ":hover": colors.brandBlue800 },
@@ -704,7 +706,6 @@ function CsrSection() {
     offset: ["start end", "end start"],
   });
   const drift = useTransform(scrollYProgress, [0, 1], ["-6%", "6%"]);
-  const [statementLead, statementClose] = ABOUT_CSR.statement;
 
   return (
     <section
@@ -731,8 +732,11 @@ function CsrSection() {
               {ABOUT_CSR.title}
             </h2>
             <p {...stylex.props(styles.csrStatement)}>
-              <span {...stylex.props(styles.csrStatementLine)}>{statementLead}</span>
-              <span {...stylex.props(styles.csrStatementLine)}>{statementClose}</span>
+              {ABOUT_CSR.statement.map((line) => (
+                <span key={line} {...stylex.props(styles.csrStatementLine)}>
+                  {line}
+                </span>
+              ))}
             </p>
           </div>
           <p {...stylex.props(styles.csrDesc)}>{ABOUT_CSR.desc}</p>
@@ -794,13 +798,14 @@ function SubNav({ onNavigateHome }: { onNavigateHome: (hash?: string) => void })
           </span>
         </nav>
         <nav aria-label="本页导航" ref={chipListRef} {...stylex.props(styles.chipList)}>
-          {NAV_CHIPS.map((chip) => (
+          {NAV_CHIPS.map((chip, index) => (
             <a
               key={chip.id}
               href={`#${chip.id}`}
               aria-current={active === chip.id ? "location" : undefined}
               {...stylex.props(
                 styles.chip,
+                index === 0 && styles.chipLead,
                 active === chip.id && styles.chipActive,
                 styles.focusRing,
               )}

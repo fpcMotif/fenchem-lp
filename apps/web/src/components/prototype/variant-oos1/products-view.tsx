@@ -258,6 +258,9 @@ const styles = stylex.create({
     outlineColor: PHOTO_OUTLINE,
     outlineOffset: -1,
   },
+  cardImgMissing: {
+    backgroundColor: "#f3f4f6",
+  },
   cardBody: {
     display: "flex",
     flexDirection: "column",
@@ -303,6 +306,22 @@ const styles = stylex.create({
     color: ACCENT,
   },
 });
+
+function CardImage({ src, alt, eager }: { src: string; alt: string; eager: boolean }) {
+  const [failed, setFailed] = useState(false);
+  return failed ? (
+    <span aria-hidden="true" {...stylex.props(styles.cardImg, styles.cardImgMissing)} />
+  ) : (
+    <img
+      src={src}
+      alt={alt}
+      loading={eager ? "eager" : "lazy"}
+      decoding="async"
+      onError={() => setFailed(true)}
+      {...stylex.props(styles.cardImg)}
+    />
+  );
+}
 
 export function ProductsView({
   onNavigateHome,
@@ -399,7 +418,7 @@ export function ProductsView({
           </div>
           <div
             role="group"
-            aria-label="6款核心油脂原料图卡"
+            aria-label={`${FEATURED_PRODUCT.items.length}款核心油脂原料图卡`}
             {...stylex.props(styles.spotlightCardsWrap)}
           >
             {FEATURED_PRODUCT.items.map((item, idx) => (
@@ -415,13 +434,7 @@ export function ProductsView({
                   activeProductIndex === idx && styles.productCardActive,
                 )}
               >
-                <img
-                  src={item.cardImage}
-                  alt={item.cardAlt}
-                  loading={idx < 3 ? "eager" : "lazy"}
-                  decoding="async"
-                  {...stylex.props(styles.cardImg)}
-                />
+                <CardImage src={item.cardImage} alt={item.cardAlt} eager={idx < 3} />
               </button>
             ))}
           </div>

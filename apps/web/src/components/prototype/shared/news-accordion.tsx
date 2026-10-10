@@ -6,6 +6,36 @@ import { EASE } from "../motion-constants";
 import { useReducedMotion } from "../use-reduced-motion";
 import { Collapse } from "./collapse";
 
+const URL_PATTERN = /(https?:\/\/\S+)/;
+
+const local = stylex.create({
+  staticTrigger: {
+    cursor: "default",
+    color: "inherit",
+  },
+  link: {
+    color: "inherit",
+    textDecoration: "underline",
+    textUnderlineOffset: "0.2em",
+  },
+});
+
+function DetailText({ text }: { text: string }) {
+  return (
+    <>
+      {text.split(URL_PATTERN).map((part, index) =>
+        index % 2 === 1 ? (
+          <a key={index} href={part} {...stylex.props(local.link)}>
+            {part}
+          </a>
+        ) : (
+          part
+        ),
+      )}
+    </>
+  );
+}
+
 export function NewsAccordion({
   item,
   open,
@@ -24,6 +54,13 @@ export function NewsAccordion({
 }) {
   const panelId = useId();
   const reduce = useReducedMotion();
+  if (item.details.length === 0) {
+    return (
+      <h3 {...stylex.props(styles.newsHeading)}>
+        <span {...stylex.props(styles.newsTrigger, local.staticTrigger)}>{item.title}</span>
+      </h3>
+    );
+  }
   return (
     <>
       <h3 {...stylex.props(styles.newsHeading)}>
@@ -47,7 +84,7 @@ export function NewsAccordion({
         <div {...stylex.props(styles.newsPanelInner)}>
           {item.details.map((detail) => (
             <p key={detail} {...stylex.props(styles.mutedText)}>
-              {detail}
+              <DetailText text={detail} />
             </p>
           ))}
         </div>

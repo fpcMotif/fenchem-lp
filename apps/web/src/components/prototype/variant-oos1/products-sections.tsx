@@ -250,7 +250,8 @@ const styles = stylex.create({
     transitionTimingFunction: EASE_OUT_CSS,
   },
   keepTogether: {
-    whiteSpace: "nowrap",
+    display: "inline-block",
+    maxWidth: "100%",
   },
   toggle: {
     display: "flex",
