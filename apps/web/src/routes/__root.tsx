@@ -27,10 +27,6 @@ const TanStackRouterDevtools = import.meta.env.DEV
     )
   : null;
 
-const Mesurer = import.meta.env.DEV
-  ? lazy(() => import("mesurer").then((m) => ({ default: m.Mesurer })))
-  : null;
-
 export interface RouterAppContext {
   queryClient: QueryClient;
   convexQueryClient: ConvexQueryClient;
@@ -102,11 +98,6 @@ function RootDocument() {
         {pathname === "/" || TanStackRouterDevtools === null ? null : (
           <Suspense fallback={null}>
             <TanStackRouterDevtools position="bottom-left" />
-          </Suspense>
-        )}
-        {Mesurer === null ? null : (
-          <Suspense fallback={null}>
-            <Mesurer />
           </Suspense>
         )}
         <Scripts />
