@@ -52,8 +52,11 @@ import { INTRO_REVEAL_MS, introStyles, useIntro } from "@/components/prototype/s
 
 import { AboutView } from "./about-view";
 import { ContactCta } from "./contact-cta";
+import { ContactView } from "./contact-view";
 import { HERO_BLOB_TWIST } from "./hero-blob-twist";
+import { NewsView } from "./news-view";
 import { ProductsView } from "./products-view";
+import { RdView } from "./rd-view";
 import { RiseReveal } from "./rise-reveal";
 import { useActiveSection } from "./use-active-section";
 import {
@@ -246,12 +249,15 @@ const STRENGTH_ICONS: Record<StrengthIcon, LucideIcon> = {
   users: Users,
 };
 
-const PATTERN_CELLS = Array.from({ length: 15 }, (_, column) =>
-  (column % 2 === 0 ? [0, 65, 130] : [32.5, 97.5]).map((top) => ({
-    left: 3 + column * 32.75,
-    top,
-  })),
-).flat();
+const PATTERN_TILE = {
+  x: 3,
+  width: 65.5,
+  height: 65,
+  cells: [
+    [0, 0],
+    [32.75, 32.5],
+  ],
+} as const;
 
 const styles = stylex.create({
   root: {
@@ -941,11 +947,6 @@ const styles = stylex.create({
     transitionDuration: "250ms",
     transitionTimingFunction: "ease",
   },
-  patternCell: (left: string, top: string) => ({
-    position: "absolute",
-    left,
-    top,
-  }),
   quadrantText: {
     position: "relative",
     display: "flex",
@@ -1536,7 +1537,7 @@ function useNavFits(
   return fits;
 }
 
-export type View = "home" | "about" | "products";
+export type View = "home" | "about" | "products" | "rd" | "news" | "contact";
 export type AboutPageProps = { onNavigateHome: (hash?: string) => void };
 export type SubPageProps = AboutPageProps;
 
@@ -1565,6 +1566,15 @@ function SiteHeader({
     if (href === "#products") {
       return currentView === "products";
     }
+    if (href === "#campus" || href === "#rd") {
+      return currentView === "rd";
+    }
+    if (href === "#news") {
+      return currentView === "news";
+    }
+    if (href === "#contact") {
+      return currentView === "contact";
+    }
     if (currentView !== "home") {
       return false;
     }
@@ -1582,6 +1592,24 @@ function SiteHeader({
     if (href === "#products") {
       event.preventDefault();
       onNavigate("products", "products-top");
+      setMenuOpen(false);
+      return;
+    }
+    if (href === "#campus" || href === "#rd") {
+      event.preventDefault();
+      onNavigate("rd", "rd-top");
+      setMenuOpen(false);
+      return;
+    }
+    if (href === "#news") {
+      event.preventDefault();
+      onNavigate("news", "news-top");
+      setMenuOpen(false);
+      return;
+    }
+    if (href === "#contact") {
+      event.preventDefault();
+      onNavigate("contact", "contact-top");
       setMenuOpen(false);
       return;
     }
@@ -1944,18 +1972,24 @@ function StatItem({ stat, index }: { stat: (typeof STATS)[number]; index: number
 
 function IconPattern({ icon }: { icon: StrengthIcon }) {
   const Icon = STRENGTH_ICONS[icon];
+  const tileId = useId();
   return (
-    <div aria-hidden="true" {...stylex.props(styles.pattern)}>
-      {PATTERN_CELLS.map((cell) => (
-        <Icon
-          key={`${cell.left}-${cell.top}`}
-          size={32}
-          strokeWidth={2}
-          absoluteStrokeWidth
-          {...stylex.props(styles.patternCell(`${cell.left}px`, `${cell.top}px`))}
-        />
-      ))}
-    </div>
+    <svg aria-hidden="true" {...stylex.props(styles.pattern)}>
+      <defs>
+        <pattern
+          id={tileId}
+          x={PATTERN_TILE.x}
+          width={PATTERN_TILE.width}
+          height={PATTERN_TILE.height}
+          patternUnits="userSpaceOnUse"
+        >
+          {PATTERN_TILE.cells.map(([x, y]) => (
+            <Icon key={`${x}-${y}`} x={x} y={y} size={32} strokeWidth={2} absoluteStrokeWidth />
+          ))}
+        </pattern>
+      </defs>
+      <rect width="100%" height="100%" fill={`url(#${tileId})`} />
+    </svg>
   );
 }
 
@@ -1997,7 +2031,7 @@ function Quadrant({
         }}
         inverse={inverse}
         index={index}
-        strength={strength}
+        strength={{ ...strength, link: null }}
         idPrefix="oos1"
       />
     </m.article>
@@ -2283,20 +2317,28 @@ function SiteFooter({ onNavigate }: { onNavigate?: (view: View, targetId?: strin
   );
 }
 
-const viewFromPage = (page: unknown, startView: View): View =>
-  page === "about" || page === "home"
-    ? page
-    : page === "products" || page === "produces"
-      ? "products"
-      : startView;
+const viewFromPage = (page: unknown, startView: View): View => {
+  if (page === "about" || page === "home") return page;
+  if (page === "products" || page === "produces") return "products";
+  if (page === "rd" || page === "manufacturing" || page === "campus") return "rd";
+  if (page === "news" || page === "insights") return "news";
+  if (page === "contact") return "contact";
+  return startView;
+};
 
 export function VariantOOS1({
   AboutPage = AboutView,
   ProductsPage = ProductsView,
+  RdPage = RdView,
+  NewsPage = NewsView,
+  ContactPage = ContactView,
   startView = "home",
 }: {
   AboutPage?: ComponentType<SubPageProps>;
   ProductsPage?: ComponentType<SubPageProps>;
+  RdPage?: ComponentType<SubPageProps>;
+  NewsPage?: ComponentType<SubPageProps>;
+  ContactPage?: ComponentType<SubPageProps>;
   startView?: View;
 }) {
   preinit(GOOGLE_FONTS, { as: "style" });
@@ -2368,6 +2410,20 @@ export function VariantOOS1({
                   />
                 ) : view === "products" ? (
                   <ProductsPage onNavigateHome={(target) => handleNavigate("home", target)} />
+                ) : view === "rd" ? (
+                  <RdPage
+                    onNavigateHome={(target) =>
+                      handleNavigate(target === "contact" ? "contact" : "home", target)
+                    }
+                  />
+                ) : view === "news" ? (
+                  <NewsPage
+                    onNavigateHome={(target) =>
+                      handleNavigate(target === "contact" ? "contact" : "home", target)
+                    }
+                  />
+                ) : view === "contact" ? (
+                  <ContactPage onNavigateHome={(target) => handleNavigate("home", target)} />
                 ) : (
                   <>
                     <Hero />

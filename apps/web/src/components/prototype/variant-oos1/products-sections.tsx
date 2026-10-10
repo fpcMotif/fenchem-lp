@@ -1,9 +1,18 @@
 import { Collapse } from "../shared/collapse";
-import { m } from "motion/react";
-import { ChevronLeft, ChevronRight, Plus, Search } from "lucide-react";
+import { m, useInstantLayoutTransition } from "motion/react";
+import { Plus } from "lucide-react";
 import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { useEffect, useId, useMemo, useRef, useState, type ReactNode } from "react";
+import {
+  useEffect,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+  type KeyboardEvent,
+  type ReactNode,
+} from "react";
+import { flushSync } from "react-dom";
 import { EASE } from "@/components/prototype/motion-constants";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 import {
@@ -12,10 +21,12 @@ import {
   SOLUTION_AREAS,
   SOLUTION_ITEMS,
   type CatalogGroup,
+  type SolutionAreaId,
   type SolutionItem,
 } from "./products-data";
 import { layout } from "./products-sections-values";
-import { SolutionDialog, type AreaFilter } from "./solution-dialog";
+
+type AreaFilter = SolutionAreaId | "all";
 
 const INK = "#1a1a1a";
 const BODY_TEXT = "#4d4d4d";
@@ -31,6 +42,9 @@ const DRAWER_FILL = "oklch(0.955 0.024 261.5)";
 const CARD_SHADOW = "0 1px 2px rgba(7, 67, 174, 0.04), 0 16px 40px -24px rgba(7, 67, 174, 0.18)";
 const ACCENT = colors.brandBlue700;
 const DISPLAY_FONT = '"Inter Tight", "Helvetica Neue", Arial, sans-serif';
+const TAB_FLARE = 12;
+const FLARE_TOP = "radial-gradient(circle at 0 0, transparent 11.5px, #fff 12px)";
+const FLARE_BOTTOM = "radial-gradient(circle at 0 100%, transparent 11.5px, #fff 12px)";
 const EASE_OUT_CSS = "cubic-bezier(0.22, 1, 0.36, 1)";
 
 const MD = breakpoints.md;
@@ -46,7 +60,6 @@ const HEAD_SPACE = { default: 32, [DESKTOP]: 56 } as const;
 const CARD_RADIUS = { default: 12, [DESKTOP]: 16 } as const;
 
 const padIndex = (index: number) => String(index + 1).padStart(2, "0");
-const padCount = (count: number) => String(count).padStart(2, "0");
 
 const orderByArea = (items: SolutionItem[]) =>
   SOLUTION_AREAS.flatMap((area) => items.filter((item) => item.area === area.id));
@@ -62,6 +75,15 @@ const TRAILING_NOTE = /^(.+?)\s*[（(]([^（）()]+)[）)]$/;
 const splitNote = (text: string) => {
   const match = TRAILING_NOTE.exec(text);
   return match ? { primary: match[1], note: match[2] } : { primary: text, note: null };
+};
+
+const TAB_STEPS: Record<string, (index: number, count: number) => number> = {
+  ArrowDown: (index, count) => (index + 1) % count,
+  ArrowRight: (index, count) => (index + 1) % count,
+  ArrowUp: (index, count) => (index - 1 + count) % count,
+  ArrowLeft: (index, count) => (index - 1 + count) % count,
+  Home: () => 0,
+  End: (_, count) => count - 1,
 };
 
 const INCI_LATIN = /（[^）]*）/g;
@@ -383,13 +405,6 @@ const styles = stylex.create({
     textWrap: "pretty",
   },
 
-  solutionBar: {
-    display: "flex",
-    flexDirection: { default: "column", [DESKTOP]: "row" },
-    alignItems: { default: "stretch", [DESKTOP]: "center" },
-    justifyContent: "space-between",
-    gap: { default: 12, [DESKTOP]: 24 },
-  },
   areaList: {
     position: "relative",
     display: "flex",
@@ -458,108 +473,194 @@ const styles = stylex.create({
     letterSpacing: "0.02em",
     whiteSpace: "nowrap",
   },
-  tools: {
-    display: "flex",
-    alignItems: "center",
-    flexShrink: 0,
-    gap: 8,
-  },
-  finder: {
-    display: "inline-flex",
-    alignItems: "center",
-    gap: 8,
-    height: 40,
-    paddingInlineStart: 14,
-    paddingInlineEnd: 18,
-    marginInlineEnd: { default: "auto", [DESKTOP]: 8 },
-    boxSizing: "border-box",
-    borderWidth: 1,
-    borderStyle: "solid",
-    borderColor: {
-      default: TINT_RULE,
-      ":hover": { default: TINT_RULE, [HOVER]: colors.brandBlue300 },
+
+  browser: {
+    display: "grid",
+    gridTemplateColumns: {
+      default: "minmax(0, 1fr)",
+      [LG]: "300px minmax(0, 1fr)",
+      [DESKTOP]: "320px minmax(0, 1fr)",
     },
-    borderRadius: 999,
-    backgroundColor: colors.paper,
-    fontFamily: "inherit",
-    fontSize: 14,
+    rowGap: 12,
+    marginTop: { default: 16, [DESKTOP]: 24 },
+    minHeight: { default: null, [LG]: 600 },
+    overflow: { default: null, [LG]: "hidden" },
+    borderWidth: { default: 0, [LG]: 1 },
+    borderStyle: "solid",
+    borderColor: TINT_RULE,
+    borderRadius: { default: 0, [LG]: 12, [DESKTOP]: 16 },
+    backgroundColor: { default: null, [LG]: colors.paper },
+    boxShadow: { default: null, [LG]: CARD_SHADOW },
+  },
+  railFrame: {
+    position: { default: null, [LG]: "relative" },
+    minWidth: 0,
+    backgroundColor: { default: null, [LG]: TINT_FILL },
+  },
+  rail: {
+    position: { default: "relative", [LG]: "absolute" },
+    inset: { default: null, [LG]: 0 },
+    display: { default: "flex", [LG]: "block" },
+    gap: 2,
+    paddingTop: { default: 4, [LG]: 0 },
+    paddingBottom: { default: 4, [LG]: 20 },
+    paddingInlineStart: { default: 4, [LG]: 12 },
+    paddingInlineEnd: { default: 4, [LG]: 0 },
+    scrollPaddingInline: 4,
+    scrollPaddingTop: { default: null, [LG]: 44 },
+    overflowX: { default: "auto", [LG]: "hidden" },
+    overflowY: { default: "hidden", [LG]: "auto" },
+    scrollbarWidth: "none",
+    overscrollBehaviorX: "contain",
+    borderRadius: { default: 12, [LG]: 0 },
+    backgroundColor: { default: TINT_FILL, [LG]: "transparent" },
+  },
+  railGroup: {
+    display: { default: "contents", [LG]: "block" },
+  },
+  railHeading: {
+    position: "sticky",
+    top: 0,
+    zIndex: 2,
+    display: { default: "none", [LG]: "flex" },
+    justifyContent: "space-between",
+    gap: 12,
+    margin: 0,
+    paddingTop: 16,
+    paddingBottom: 8,
+    paddingInlineStart: 16,
+    paddingInlineEnd: 24,
+    backgroundColor: TINT_FILL,
+    fontSize: 12,
     fontWeight: 500,
     lineHeight: "20px",
+    letterSpacing: "0.08em",
+    color: TINT_MUTED,
+  },
+  railHeadingCount: {
+    fontWeight: 400,
+    letterSpacing: "0.04em",
+    fontVariantNumeric: "tabular-nums",
+  },
+  solutionTab: {
+    position: "relative",
+    display: "grid",
+    gridTemplateColumns: { default: "auto auto", [LG]: "22px minmax(0, 1fr)" },
+    alignItems: "baseline",
+    columnGap: { default: 6, [LG]: 14 },
+    flexShrink: 0,
+    width: { default: null, [LG]: "100%" },
+    paddingBlock: { default: 8, [LG]: 12 },
+    paddingInlineStart: { default: 14, [LG]: 16 },
+    paddingInlineEnd: { default: 16, [LG]: 24 },
+    borderWidth: 0,
+    borderRadius: { default: 9, [LG]: 12 },
+    backgroundColor: "transparent",
+    fontFamily: "inherit",
+    textAlign: "start",
+    cursor: "pointer",
+    outlineStyle: { default: "none", ":focus-visible": "solid" },
+    outlineWidth: 2,
+    outlineColor: ACCENT,
+    outlineOffset: -2,
+  },
+  solutionTabSelected: {
+    cursor: "default",
+  },
+  tabIndicator: {
+    position: "absolute",
+    inset: 0,
+    pointerEvents: "none",
+    borderStartStartRadius: { default: 9, [LG]: 12 },
+    borderEndStartRadius: { default: 9, [LG]: 12 },
+    borderStartEndRadius: { default: 9, [LG]: 0 },
+    borderEndEndRadius: { default: 9, [LG]: 0 },
+    backgroundColor: colors.paper,
+    boxShadow: { default: "0 1px 3px rgba(7, 67, 174, 0.1)", [LG]: "none" },
+    "::before": {
+      content: '""',
+      position: "absolute",
+      right: 0,
+      bottom: "100%",
+      display: { default: "none", [LG]: "block" },
+      width: TAB_FLARE,
+      height: TAB_FLARE,
+      backgroundImage: FLARE_TOP,
+    },
+    "::after": {
+      content: '""',
+      position: "absolute",
+      right: 0,
+      top: "100%",
+      display: { default: "none", [LG]: "block" },
+      width: TAB_FLARE,
+      height: TAB_FLARE,
+      backgroundImage: FLARE_BOTTOM,
+    },
+  },
+  tabIndex: {
+    position: "relative",
+    fontSize: 12,
+    lineHeight: "22px",
+    letterSpacing: "0.04em",
+    fontVariantNumeric: "tabular-nums",
+    color: TINT_MUTED,
+  },
+  tabIndexSelected: {
+    color: TINT_INK,
+  },
+  tabText: {
+    position: "relative",
+    display: "flex",
+    flexDirection: "column",
+    gap: 2,
+    minWidth: 0,
+  },
+  tabTitle: {
+    maxWidth: { default: "16em", [LG]: "none" },
+    overflow: { default: "hidden", [LG]: "visible" },
+    fontSize: { default: 14, [LG]: 15 },
+    fontWeight: 500,
+    lineHeight: "22px",
     letterSpacing: "0.02em",
     color: {
       default: TINT_INK,
-      ":hover": { default: TINT_INK, [HOVER]: ACCENT },
+      [stylex.when.ancestor(":hover")]: { default: TINT_INK, [HOVER]: ACCENT },
     },
-    whiteSpace: "nowrap",
-    cursor: "pointer",
-    transform: { default: null, ":active": "scale(0.97)" },
-    transitionProperty: "border-color, color, transform",
-    transitionDuration: { default: "0ms", [breakpoints.motionOk]: "160ms" },
+    whiteSpace: { default: "nowrap", [LG]: "normal" },
+    textOverflow: "ellipsis",
+    textWrap: "pretty",
+    transitionProperty: "color",
+    transitionDuration: { default: "0ms", [breakpoints.motionOk]: "150ms" },
     transitionTimingFunction: EASE_OUT_CSS,
-    outlineStyle: { default: "none", ":focus-visible": "solid" },
-    outlineWidth: 2,
-    outlineColor: ACCENT,
-    outlineOffset: 2,
   },
-  counter: {
-    minWidth: 56,
-    fontSize: 13,
-    fontWeight: 500,
-    lineHeight: "20px",
-    letterSpacing: "0.04em",
-    fontVariantNumeric: "tabular-nums",
-    textAlign: "center",
-    color: TINT_MUTED,
-  },
-  stepButton: {
-    display: "inline-flex",
-    alignItems: "center",
-    justifyContent: "center",
-    flexShrink: 0,
-    width: 40,
-    height: 40,
-    padding: 0,
-    borderWidth: 0,
-    borderRadius: 999,
-    backgroundColor: {
-      default: TINT_FILL,
-      ":hover": { default: TINT_FILL, [HOVER]: colors.brandBlue100 },
-    },
+  tabTitleSelected: {
     color: TINT_INK,
-    cursor: "pointer",
-    transform: { default: null, ":active": "scale(0.94)" },
-    transitionProperty: "background-color, opacity, transform",
-    transitionDuration: { default: "0ms", [breakpoints.motionOk]: "160ms" },
-    transitionTimingFunction: EASE_OUT_CSS,
-    outlineStyle: { default: "none", ":focus-visible": "solid" },
-    outlineWidth: 2,
-    outlineColor: ACCENT,
-    outlineOffset: 2,
-    ":disabled": { opacity: 0.4, cursor: "default", transform: "none" },
   },
-  srOnly: {
-    position: "absolute",
-    width: 1,
-    height: 1,
-    padding: 0,
-    margin: -1,
+  tabMeta: {
+    display: { default: "none", [LG]: "block" },
     overflow: "hidden",
-    clipPath: "inset(50%)",
+    fontSize: 13,
+    lineHeight: "20px",
+    color: TINT_MUTED,
     whiteSpace: "nowrap",
-    borderWidth: 0,
+    textOverflow: "ellipsis",
   },
-
   sheet: {
-    marginTop: { default: 16, [DESKTOP]: 24 },
-    paddingInline: { default: 20, [MD]: 40, [DESKTOP]: 56 },
-    paddingTop: { default: 28, [MD]: 40, [DESKTOP]: 48 },
+    minWidth: 0,
+    paddingInline: { default: 20, [MD]: 40, [DESKTOP]: 48 },
+    paddingTop: { default: 28, [MD]: 40, [DESKTOP]: 44 },
     paddingBottom: { default: 12, [MD]: 20 },
-    borderWidth: 1,
+    borderWidth: { default: 1, [LG]: 0 },
     borderStyle: "solid",
     borderColor: TINT_RULE,
-    borderRadius: CARD_RADIUS,
+    borderRadius: { default: 12, [LG]: 0 },
     backgroundColor: colors.paper,
-    boxShadow: CARD_SHADOW,
+    boxShadow: { default: CARD_SHADOW, [LG]: "none" },
+    outlineStyle: { default: "none", ":focus-visible": "solid" },
+    outlineWidth: 2,
+    outlineColor: ACCENT,
+    outlineOffset: -2,
   },
   panel: {
     minWidth: 0,
@@ -599,19 +700,23 @@ const styles = stylex.create({
   },
   fields: {
     display: "grid",
-    gridTemplateColumns: { default: "minmax(0, 1fr)", [LG]: "repeat(2, minmax(0, 1fr))" },
-    gridTemplateRows: { default: "none", [LG]: "repeat(3, auto)" },
-    gridAutoFlow: { default: "row", [LG]: "column" },
-    columnGap: { default: 0, [LG]: 48 },
+    gridTemplateColumns: { default: "minmax(0, 1fr)", [DESKTOP]: "repeat(2, minmax(0, 1fr))" },
+    gridTemplateRows: { default: "none", [DESKTOP]: "repeat(3, auto)" },
+    gridAutoFlow: { default: "row", [DESKTOP]: "column" },
+    columnGap: { default: 0, [DESKTOP]: 40 },
     margin: 0,
   },
   field: {
     display: "grid",
-    gridTemplateColumns: { default: "minmax(0, 1fr)", [MD]: "88px minmax(0, 1fr)" },
+    gridTemplateColumns: {
+      default: "minmax(0, 1fr)",
+      [MD]: "88px minmax(0, 1fr)",
+      [DESKTOP]: "minmax(0, 1fr)",
+    },
     alignContent: "start",
     columnGap: 16,
-    rowGap: 6,
-    paddingBlock: { default: 16, [MD]: 20 },
+    rowGap: { default: 6, [DESKTOP]: 4 },
+    paddingBlock: { default: 16, [MD]: 20, [DESKTOP]: 16 },
     borderTopWidth: 1,
     borderTopStyle: "solid",
     borderTopColor: TINT_RULE_SOFT,
@@ -704,7 +809,7 @@ function LedgerRow({
   group: CatalogGroup;
   index: number;
   open: boolean;
-  onToggle: () => void;
+  onToggle: (trigger: HTMLElement) => void;
 }) {
   const reduce = useReducedMotion();
   const panelId = useId();
@@ -720,7 +825,7 @@ function LedgerRow({
           type="button"
           aria-expanded={open}
           aria-controls={open ? panelId : undefined}
-          onClick={onToggle}
+          onClick={(event) => onToggle(event.currentTarget)}
           {...stylex.props(
             styles.ledgerGrid,
             styles.ledgerTrigger,
@@ -858,8 +963,18 @@ function FormulaSheet({ item }: { item: SolutionItem }) {
 }
 
 export function ProductCatalog({ categoryId }: { categoryId: string }) {
-  const [openIndex, setOpenIndex] = useState<number | null>(0);
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const startInstantLayout = useInstantLayoutTransition();
   const categoryLabel = CATEGORIES.find((c) => c.id === categoryId)?.label;
+
+  const toggle = (index: number, trigger: HTMLElement) => {
+    if (openIndex !== null && openIndex < index) {
+      const triggerTop = trigger.getBoundingClientRect().top;
+      startInstantLayout(() => flushSync(() => setOpenIndex(null)));
+      window.scrollBy({ top: trigger.getBoundingClientRect().top - triggerTop, behavior: "instant" });
+    }
+    setOpenIndex(openIndex === index ? null : index);
+  };
 
   return (
     <section
@@ -892,7 +1007,7 @@ export function ProductCatalog({ categoryId }: { categoryId: string }) {
                 group={group}
                 index={index}
                 open={openIndex === index}
-                onToggle={() => setOpenIndex((prev) => (prev === index ? null : index))}
+                onToggle={(trigger) => toggle(index, trigger)}
               />
             ))}
           </ul>
@@ -904,11 +1019,12 @@ export function ProductCatalog({ categoryId }: { categoryId: string }) {
 
 export function ProductSolutions() {
   const reduce = useReducedMotion();
+  const uid = useId();
   const areaListRef = useRef<HTMLDivElement>(null);
+  const railRef = useRef<HTMLDivElement>(null);
   const solutions = useMemo(() => orderByArea(SOLUTION_ITEMS), []);
   const [area, setArea] = useState<AreaFilter>("all");
   const [selectedId, setSelectedId] = useState<string | undefined>(solutions[0]?.id);
-  const [pickerOpen, setPickerOpen] = useState(false);
 
   useEffect(() => {
     const list = areaListRef.current;
@@ -918,6 +1034,23 @@ export function ProductSolutions() {
     list.scrollTo({ left: Math.max(0, left), behavior: reduce ? "auto" : "smooth" });
   }, [area, reduce]);
 
+  useEffect(() => {
+    const rail = railRef.current;
+    const tab = rail?.querySelector<HTMLElement>('[aria-selected="true"]');
+    if (!rail || !tab) return;
+    const behavior = reduce ? "auto" : "smooth";
+    if (rail.scrollWidth > rail.clientWidth) {
+      const left = tab.offsetLeft - (rail.clientWidth - tab.offsetWidth) / 2;
+      rail.scrollTo({ left: Math.max(0, left), behavior });
+      return;
+    }
+    const visibleTop = rail.scrollTop + (Number.parseFloat(getComputedStyle(rail).scrollPaddingTop) || 0);
+    const visibleBottom = rail.scrollTop + rail.clientHeight;
+    if (tab.offsetTop >= visibleTop && tab.offsetTop + tab.offsetHeight <= visibleBottom) return;
+    const top = tab.offsetTop - (rail.clientHeight - tab.offsetHeight) / 2;
+    rail.scrollTo({ top: Math.max(0, top), behavior });
+  }, [area, selectedId, reduce]);
+
   const scope = area === "all" ? solutions : solutions.filter((item) => item.area === area);
   const position = Math.max(
     0,
@@ -926,11 +1059,27 @@ export function ProductSolutions() {
   const selected = scope[position];
   if (!selected) return null;
 
+  const groups = SOLUTION_AREAS.map((entry) => ({
+    ...entry,
+    items: scope.filter((item) => item.area === entry.id),
+  })).filter((group) => group.items.length > 0);
+
   const chooseArea = (next: AreaFilter) => {
     setArea(next);
     if (next !== "all" && selected.area !== next) {
       setSelectedId(solutions.find((item) => item.area === next)?.id);
     }
+  };
+
+  const handleRailKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    const step = TAB_STEPS[event.key];
+    if (!step) return;
+    event.preventDefault();
+    const next = step(position, scope.length);
+    const nextItem = scope[next];
+    if (!nextItem) return;
+    setSelectedId(nextItem.id);
+    event.currentTarget.querySelectorAll<HTMLElement>('[role="tab"]')[next]?.focus();
   };
 
   const areaChips = [{ id: "all" as const, label: "全部" }, ...SOLUTION_AREAS]
@@ -959,85 +1108,107 @@ export function ProductSolutions() {
           </h2>
         </header>
         {solutions.length > 1 && (
-          <div {...stylex.props(styles.solutionBar)}>
-            <div
-              ref={areaListRef}
-              role="group"
-              aria-label="按应用领域筛选"
-              {...stylex.props(styles.areaList)}
-            >
-              {areaChips.map((entry) => {
-                const isActive = area === entry.id;
-                return (
-                  <button
-                    key={entry.id}
-                    type="button"
-                    aria-pressed={isActive}
-                    onClick={() => chooseArea(entry.id)}
-                    {...stylex.props(styles.area, isActive && styles.areaActive)}
-                  >
-                    <span {...stylex.props(styles.areaLabel)}>{entry.label}</span>
-                    <span {...stylex.props(styles.areaCount, isActive && styles.areaCountActive)}>
-                      {entry.count}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-            <div {...stylex.props(styles.tools)}>
-              <button
-                type="button"
-                aria-haspopup="dialog"
-                onClick={() => setPickerOpen(true)}
-                {...stylex.props(styles.finder)}
-              >
-                <Search size={16} strokeWidth={1.75} aria-hidden="true" />
-                选择方案
-              </button>
-              <span aria-hidden="true" {...stylex.props(styles.counter)}>
-                {padCount(position + 1)} / {padCount(scope.length)}
-              </span>
-              <button
-                type="button"
-                aria-label="上一款方案"
-                disabled={position === 0}
-                onClick={() => setSelectedId(scope[position - 1]?.id)}
-                {...stylex.props(styles.stepButton)}
-              >
-                <ChevronLeft size={18} strokeWidth={1.75} aria-hidden="true" />
-              </button>
-              <button
-                type="button"
-                aria-label="下一款方案"
-                disabled={position === scope.length - 1}
-                onClick={() => setSelectedId(scope[position + 1]?.id)}
-                {...stylex.props(styles.stepButton)}
-              >
-                <ChevronRight size={18} strokeWidth={1.75} aria-hidden="true" />
-              </button>
-            </div>
+          <div
+            ref={areaListRef}
+            role="group"
+            aria-label="按应用领域筛选"
+            {...stylex.props(styles.areaList)}
+          >
+            {areaChips.map((entry) => {
+              const isActive = area === entry.id;
+              return (
+                <button
+                  key={entry.id}
+                  type="button"
+                  aria-pressed={isActive}
+                  onClick={() => chooseArea(entry.id)}
+                  {...stylex.props(styles.area, isActive && styles.areaActive)}
+                >
+                  <span {...stylex.props(styles.areaLabel)}>{entry.label}</span>
+                  <span {...stylex.props(styles.areaCount, isActive && styles.areaCountActive)}>
+                    {entry.count}
+                  </span>
+                </button>
+              );
+            })}
           </div>
         )}
-        <p aria-live="polite" {...stylex.props(styles.srOnly)}>
-          {`${selected.title}，第 ${position + 1} 款，共 ${scope.length} 款`}
-        </p>
-        <div {...stylex.props(styles.sheet)}>
-          <div key={selected.id} {...stylex.props(styles.panel)}>
-            <FormulaSheet item={selected} />
+        <div {...stylex.props(styles.browser)}>
+          <div {...stylex.props(styles.railFrame)}>
+            <m.div
+              ref={railRef}
+              layoutScroll
+              role="tablist"
+              aria-label="应用方案"
+              aria-orientation="vertical"
+              onKeyDown={handleRailKeyDown}
+              {...stylex.props(styles.rail)}
+            >
+              {groups.map((group) => (
+                <div key={group.id} {...stylex.props(styles.railGroup)}>
+                  <p aria-hidden="true" {...stylex.props(styles.railHeading)}>
+                    {group.label}
+                    <span {...stylex.props(styles.railHeadingCount)}>
+                      {group.items.length} 款
+                    </span>
+                  </p>
+                  {group.items.map((item) => {
+                    const isSelected = item.id === selected.id;
+                    return (
+                      <button
+                        key={item.id}
+                        type="button"
+                        role="tab"
+                        id={`${uid}-tab-${item.id}`}
+                        aria-selected={isSelected}
+                        aria-controls={`${uid}-panel`}
+                        tabIndex={isSelected ? 0 : -1}
+                        onClick={() => setSelectedId(item.id)}
+                        {...stylex.props(
+                          styles.solutionTab,
+                          isSelected && styles.solutionTabSelected,
+                          stylex.defaultMarker(),
+                        )}
+                      >
+                        {isSelected && (
+                          <m.span
+                            layoutId={`${uid}-solution-tab`}
+                            transition={
+                              reduce ? { duration: 0 } : { type: "spring", duration: 0.32, bounce: 0 }
+                            }
+                            {...stylex.props(styles.tabIndicator)}
+                          />
+                        )}
+                        <span {...stylex.props(styles.tabIndex, isSelected && styles.tabIndexSelected)}>
+                          {padIndex(scope.indexOf(item))}
+                        </span>
+                        <span {...stylex.props(styles.tabText)}>
+                          <span
+                            {...stylex.props(styles.tabTitle, isSelected && styles.tabTitleSelected)}
+                          >
+                            {item.title}
+                          </span>
+                          <span {...stylex.props(styles.tabMeta)}>{item.functions.join(" · ")}</span>
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              ))}
+            </m.div>
+          </div>
+          <div
+            role="tabpanel"
+            id={`${uid}-panel`}
+            aria-labelledby={`${uid}-tab-${selected.id}`}
+            tabIndex={0}
+            {...stylex.props(styles.sheet)}
+          >
+            <div key={selected.id} {...stylex.props(styles.panel)}>
+              <FormulaSheet item={selected} />
+            </div>
           </div>
         </div>
-        {pickerOpen && (
-          <SolutionDialog
-            solutions={solutions}
-            selectedId={selected.id}
-            initialArea={area}
-            onSelect={(id, nextArea) => {
-              setArea(nextArea);
-              setSelectedId(id);
-            }}
-            onClose={() => setPickerOpen(false)}
-          />
-        )}
       </div>
     </section>
   );

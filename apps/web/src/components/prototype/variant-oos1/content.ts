@@ -79,7 +79,10 @@ export const NEWS: readonly { title: string; details: readonly string[] }[] = [
   { title: "5. PCHi 2026 个人护理品行业峰会", details: PENDING_DETAILS },
 ];
 
-type FooterLink = { label: string; page?: "about" | "products" };
+export type FooterLink = {
+  label: string;
+  page?: "about" | "products" | "rd" | "news" | "contact";
+};
 
 export const FOOTER_COLUMNS: readonly { heading: string; links: readonly FooterLink[] }[] = [
   {
@@ -87,12 +90,20 @@ export const FOOTER_COLUMNS: readonly { heading: string; links: readonly FooterL
     links: [
       { label: "关于我们", page: "about" },
       { label: "产品与应用", page: "products" },
-      { label: "研发与生产" },
-      { label: "职业发展" },
+      { label: "研发与生产", page: "rd" },
+      { label: "联系我们", page: "contact" },
     ],
   },
-  { heading: "资源", links: [{ label: "技术资讯" }, { label: "资源下载" }, { label: "常见问题" }] },
-  { heading: "法律", links: [{ label: "隐私声明" }] },
+  {
+    heading: "资讯与资源",
+    links: [
+      { label: "新闻资讯", page: "news" },
+      { label: "技术白皮书", page: "news" },
+      { label: "全球展会日程", page: "news" },
+      { label: "常见解答", page: "contact" },
+    ],
+  },
+  { heading: "法律与合规", links: [{ label: "隐私声明" }, { label: "合规准则", page: "rd" }] },
 ];
 
 export const OFFICE_MAP_PINS: readonly { left: number; top: number }[] = [

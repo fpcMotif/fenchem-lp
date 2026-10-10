@@ -24,6 +24,11 @@ export type ContactCtaAction = {
   tone?: "primary" | "secondary";
 } & ({ href: string; onClick?: never } | { onClick: () => void; href?: never });
 
+export type ContactCtaActions =
+  | readonly []
+  | readonly [ContactCtaAction]
+  | readonly [ContactCtaAction, ContactCtaAction];
+
 const styles = stylex.create({
   section: {
     position: "relative",
@@ -137,7 +142,7 @@ export function ContactCta({
   id?: string;
   title?: string;
   subtitle?: string;
-  actions?: readonly ContactCtaAction[];
+  actions?: ContactCtaActions;
 }) {
   const titleId = useId();
   return (
@@ -152,23 +157,25 @@ export function ContactCta({
           </h2>
           {subtitle && <p {...stylex.props(styles.subtitle)}>{subtitle}</p>}
         </div>
-        <div {...stylex.props(styles.actions)}>
-          {actions.map((action) => {
-            const sx = stylex.props(
-              styles.button,
-              action.tone === "secondary" ? styles.secondary : styles.primary,
-            );
-            return action.href === undefined ? (
-              <button key={action.label} type="button" onClick={action.onClick} {...sx}>
-                {action.label}
-              </button>
-            ) : (
-              <a key={action.label} href={action.href} {...sx}>
-                {action.label}
-              </a>
-            );
-          })}
-        </div>
+        {actions.length > 0 && (
+          <div {...stylex.props(styles.actions)}>
+            {actions.map((action) => {
+              const sx = stylex.props(
+                styles.button,
+                action.tone === "secondary" ? styles.secondary : styles.primary,
+              );
+              return action.href === undefined ? (
+                <button key={action.label} type="button" onClick={action.onClick} {...sx}>
+                  {action.label}
+                </button>
+              ) : (
+                <a key={action.label} href={action.href} {...sx}>
+                  {action.label}
+                </a>
+              );
+            })}
+          </div>
+        )}
       </RiseReveal>
     </section>
   );

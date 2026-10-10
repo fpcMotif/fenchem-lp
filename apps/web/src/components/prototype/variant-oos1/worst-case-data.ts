@@ -542,7 +542,7 @@ const MANY_CULTURE_VALUE = {
   tone: "blue",
 } as const;
 
-const EXTRA_SOLUTIONS: Item<typeof products.SOLUTION_ITEMS>[] = [
+export const EXTRA_SOLUTIONS: products.SolutionItem[] = [
   {
     id: "acai-face-oil",
     area: "face",
