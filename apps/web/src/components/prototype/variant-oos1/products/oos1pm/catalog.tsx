@@ -63,7 +63,10 @@ const buildGroups = (): LetterGroup[] => {
 
 const LETTER_GROUPS = buildGroups();
 const FILLED_KEYS = new Set(LETTER_GROUPS.map((group) => group.key));
-const STRIP_KEYS = [...ALPHABET, NO_LATIN];
+const STRIP_ENTRIES = [...ALPHABET, NO_LATIN].map((key) => ({
+  key,
+  filled: FILLED_KEYS.has(key),
+}));
 
 const originOf = (item: FlatItem) => REGION_META[item.group.id]?.short ?? item.group.label;
 
@@ -398,9 +401,8 @@ function GroupHeading({ group }: { group: LetterGroup }) {
   );
 }
 
-function ItemRow({ item }: { item: FlatItem }) {
+function ItemRow({ item, isPlace }: { item: FlatItem; isPlace: boolean }) {
   const [headword, ...otherLatin] = item.latin;
-  const isPlace = PLACE_GROUPS.has(item.group.id);
   return (
     <tr {...stylex.props(styles.row)}>
       <td {...stylex.props(styles.cell, styles.latinCell, !headword && styles.latinCellEmpty)}>
@@ -490,8 +492,7 @@ export function Catalog() {
 
         <nav aria-label="按学名首字母跳转" {...stylex.props(styles.strip)}>
           <ul {...stylex.props(styles.stripList)}>
-            {STRIP_KEYS.map((key) => {
-              const filled = FILLED_KEYS.has(key);
+            {STRIP_ENTRIES.map(({ key, filled }) => {
               const isCurrent = current === key;
               return (
                 <li key={key}>
@@ -563,7 +564,7 @@ export function Catalog() {
                 </th>
               </tr>
               {group.items.map((item) => (
-                <ItemRow key={item.id} item={item} />
+                <ItemRow key={item.id} item={item} isPlace={PLACE_GROUPS.has(item.group.id)} />
               ))}
             </tbody>
           ))}

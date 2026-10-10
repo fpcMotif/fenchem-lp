@@ -1,8 +1,22 @@
 diff --git a/dist/src-Bf3Dpcuq.js b/dist/src-Bf3Dpcuq.js
-index 71306294aad8362466841f4c168f6c7d1b24f61b..4bc1fdfc91ebd356524014fcfba16df54ca6c07f 100644
+index 71306294aad8362466841f4c168f6c7d1b24f61b..546a882cb73f041b1cade6aebb262966f45cacfa 100644
 --- a/dist/src-Bf3Dpcuq.js
 +++ b/dist/src-Bf3Dpcuq.js
-@@ -644,6 +644,13 @@ const unpluginFactory = (options = {}, meta) => {
+@@ -607,10 +607,11 @@ const unpluginFactory = (options = {}, meta) => {
+ 			},
+ 			async load(id) {
+ 				if (!normalizedOptions.useCssPlaceholder) return null;
+-				if (!id.endsWith(".css")) return null;
++				const cssFilePath = id.replace(/\?transform-only$/, "");
++				if (!cssFilePath.endsWith(".css")) return null;
+ 				let cssContent;
+ 				try {
+-					cssContent = await promises.readFile(id, "utf-8");
++					cssContent = await promises.readFile(cssFilePath, "utf-8");
+ 				} catch (_unused2) {
+ 					return null;
+ 				}
+@@ -644,6 +645,13 @@ const unpluginFactory = (options = {}, meta) => {
  				});
  			},
  			configureServer(server) {
@@ -17,10 +31,24 @@ index 71306294aad8362466841f4c168f6c7d1b24f61b..4bc1fdfc91ebd356524014fcfba16df5
  					clearTimeout(cssRefreshTimer);
  					cssRefreshTimer = null;
 diff --git a/dist/src-CiDXNNyr.cjs b/dist/src-CiDXNNyr.cjs
-index 8f01568e5b5d4b23fc34695976c2eb598d735289..e2da163c4c7631ee3f7c8ea95f3272c8138b0362 100644
+index 8f01568e5b5d4b23fc34695976c2eb598d735289..f1a1f486575525204f8aa6e4d142fe44b6ed2401 100644
 --- a/dist/src-CiDXNNyr.cjs
 +++ b/dist/src-CiDXNNyr.cjs
-@@ -670,6 +670,13 @@ const unpluginFactory = (options = {}, meta) => {
+@@ -633,10 +633,11 @@ const unpluginFactory = (options = {}, meta) => {
+ 			},
+ 			async load(id) {
+ 				if (!normalizedOptions.useCssPlaceholder) return null;
+-				if (!id.endsWith(".css")) return null;
++				const cssFilePath = id.replace(/\?transform-only$/, "");
++				if (!cssFilePath.endsWith(".css")) return null;
+ 				let cssContent;
+ 				try {
+-					cssContent = await node_fs.promises.readFile(id, "utf-8");
++					cssContent = await node_fs.promises.readFile(cssFilePath, "utf-8");
+ 				} catch (_unused2) {
+ 					return null;
+ 				}
+@@ -670,6 +671,13 @@ const unpluginFactory = (options = {}, meta) => {
  				});
  			},
  			configureServer(server) {
