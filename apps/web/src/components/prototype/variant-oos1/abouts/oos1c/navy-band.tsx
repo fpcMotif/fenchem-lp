@@ -175,6 +175,7 @@ export function NavyBand() {
         </Reveal>
         {LEVELS.map((entry) => {
           const items = ABOUT_HONORS.items.filter((item) => item.level === entry.level);
+          if (items.length === 0) return null;
           return (
             <Reveal key={entry.level} sx={styles.level}>
               <h3 {...stylex.props(styles.levelLabel)}>{entry.label}</h3>

@@ -466,6 +466,36 @@ function usePinnable() {
   );
 }
 
+const PINNED_MIN_PADDING = 20;
+
+function useFitsPinned(
+  headerRef: RefObject<HTMLDivElement | null>,
+  viewportRef: RefObject<HTMLDivElement | null>,
+  stickyTop: number,
+) {
+  const [fits, setFits] = useState(true);
+  useEffect(() => {
+    const header = headerRef.current;
+    const viewport = viewportRef.current;
+    if (!header || !viewport) return;
+    const measure = () => {
+      const span = viewport.getBoundingClientRect().bottom - header.getBoundingClientRect().top;
+      const room = window.innerHeight - stickyTop - 2 * PINNED_MIN_PADDING;
+      setFits(span <= room);
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(header);
+    observer.observe(viewport);
+    window.addEventListener("resize", measure);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("resize", measure);
+    };
+  }, [headerRef, viewportRef, stickyTop]);
+  return fits;
+}
+
 function Odometer({ year }: { year: MotionValue<number> }) {
   const [value, setValue] = useState(() => year.get());
   useMotionValueEvent(year, "change", setValue);
@@ -651,7 +681,9 @@ export function HistoryTimeline({
   const trackRef = useRef<HTMLDivElement>(null);
   const helixRowRef = useRef<HTMLDivElement>(null);
   const reduce = useReducedMotion();
-  const pinned = usePinnable() && !reduce;
+  const headerRef = useRef<HTMLDivElement>(null);
+  const fitsPinned = useFitsPinned(headerRef, viewportRef, stickyTop);
+  const pinned = usePinnable() && !reduce && fitsPinned;
   const geometry = useGeometry(trackRef, helixRowRef, viewportRef);
 
   const x = useMotionValue(0);
@@ -723,7 +755,7 @@ export function HistoryTimeline({
           pinned && dynamic.stickyPanel(stickyTop),
         )}
       >
-        <div {...stylex.props(styles.shell, styles.header)}>
+        <div ref={headerRef} {...stylex.props(styles.shell, styles.header)}>
           <RiseReveal>
             <p lang="en" {...stylex.props(styles.eyebrow)}>
               {ABOUT_HISTORY.eyebrow}

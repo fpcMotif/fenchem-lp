@@ -39,6 +39,7 @@ import {
   type CSSProperties,
   type KeyboardEvent,
   type ReactNode,
+  type RefObject,
 } from "react";
 import { preinit } from "react-dom";
 
@@ -81,7 +82,7 @@ const GOOGLE_FONTS =
 const INK = "#1a1a1a";
 const BODY_TEXT = "#4d4d4d";
 const TINT = "#e6ecf7";
-const DISPLAY_FONT = '"Inter Tight", "Helvetica Neue", Arial, sans-serif';
+const DISPLAY_FONT = '"Inter Tight", "Helvetica Neue", Arial, "Noto Sans SC", sans-serif';
 const SURFACE = "#f6f6f6";
 const PANEL_ALT = "#e8e8e8";
 const FOOTER_BLUE = "#294f92";
@@ -153,9 +154,11 @@ const MAP_SWEEP_MS = 1200;
 const MAP_SWEEP_EASE = "cubic-bezier(0.33, 1, 0.68, 1)";
 const [HEADLINE_OPENING, HEADLINE_CLOSING] = HERO.headline;
 const [OPENING_BEFORE, OPENING_AFTER] = HEADLINE_OPENING.split(HERO.accent);
-const CLOSING_BREAK = HEADLINE_CLOSING.lastIndexOf(" ");
-const CLOSING_LEAD = HEADLINE_CLOSING.slice(0, CLOSING_BREAK);
-const CLOSING_WORD = HEADLINE_CLOSING.slice(CLOSING_BREAK + 1).replace(/\.$/, "");
+const CLOSING_TEXT = HEADLINE_CLOSING.replace(/[.。]$/, "");
+const CLOSING_BREAK = CLOSING_TEXT.lastIndexOf(" ");
+const CLOSING_LEAD = CLOSING_TEXT.slice(0, Math.max(CLOSING_BREAK, 0));
+const CLOSING_WORD = CLOSING_TEXT.slice(CLOSING_BREAK + 1);
+const CLOSING_CRACKS = /^[A-Za-z]+$/.test(CLOSING_WORD);
 
 const revealZoom = stylex.keyframes({
   "0%": { scale: "1.22" },
@@ -358,7 +361,7 @@ const styles = stylex.create({
     backgroundColor: { default: colors.paper, ":hover": TINT },
     color: colors.brandBlue700,
   },
-  buttonHero: { width: 144, height: 48 },
+  buttonHero: { minWidth: 144, height: 48, paddingInline: 24 },
   buttonCompact: { minWidth: 96, height: 48, paddingInline: 24 },
 
   header: {
@@ -377,15 +380,17 @@ const styles = stylex.create({
     boxShadow: "0 1px 0 0 rgba(26, 26, 26, 0.08)",
   },
   headerInner: {
-    display: "flex",
-    alignItems: "flex-start",
-    justifyContent: "space-between",
+    display: "grid",
+    gridTemplateColumns: "1fr auto 1fr",
+    alignItems: "start",
     height: 80,
     paddingInlineStart: { default: 16, [TABLET]: 40, [DESKTOP]: INSET_120 },
     paddingInlineEnd: { default: 16, [TABLET]: 40, [DESKTOP]: INSET_118 },
   },
   logoLink: {
     display: "block",
+    gridColumn: "1",
+    justifySelf: "start",
     marginTop: 15,
     outlineStyle: { default: "none", ":focus-visible": "solid" },
     outlineWidth: 2,
@@ -407,10 +412,13 @@ const styles = stylex.create({
   },
   nav: {
     display: { default: "none", [DESKTOP]: "flex" },
+    gridColumn: "2",
+    marginTop: 23,
+  },
+  navCollapsed: {
     position: "absolute",
-    top: 23,
-    left: "50%",
-    transform: "translateX(-50%)",
+    visibility: "hidden",
+    pointerEvents: "none",
   },
   navLink: {
     position: "relative",
@@ -418,6 +426,7 @@ const styles = stylex.create({
     alignItems: "center",
     height: 40,
     paddingInline: 20,
+    whiteSpace: "nowrap",
     fontSize: 16,
     fontWeight: 500,
     lineHeight: 1.2,
@@ -443,6 +452,8 @@ const styles = stylex.create({
   },
   headerActions: {
     display: "flex",
+    gridColumn: "3",
+    justifySelf: "end",
     alignItems: "center",
     gap: 12,
     marginTop: 25,
@@ -514,6 +525,9 @@ const styles = stylex.create({
     outlineWidth: 2,
     outlineColor: colors.brandBlue700,
     outlineOffset: 2,
+  },
+  menuButtonShown: {
+    display: "inline-flex",
   },
   menuPanel: {
     position: "absolute",
@@ -666,8 +680,9 @@ const styles = stylex.create({
     wordSpacing: "0.05em",
   },
   heroAccent: {
-    fontFamily: '"Instrument Serif", "Times New Roman", serif',
+    fontFamily: '"Instrument Serif", "Times New Roman", "Noto Sans SC", serif',
     fontStyle: "italic",
+    fontSynthesis: "none",
     fontWeight: 400,
     fontSize: "1.24em",
     lineHeight: 0.8,
@@ -683,6 +698,9 @@ const styles = stylex.create({
     lineHeight: 1.18,
     letterSpacing: "-0.055em",
     whiteSpace: "nowrap",
+  },
+  heroBreakLineWrap: {
+    whiteSpace: "normal",
   },
   heroBreak: {
     position: "relative",
@@ -712,6 +730,9 @@ const styles = stylex.create({
     animationTimingFunction: "cubic-bezier(0.2, 1.4, 0.4, 1)",
     animationFillMode: "both",
   },
+  heroBreakTailHidden: {
+    display: "none",
+  },
   heroSubtitle: {
     display: "block",
     fontSize: { default: 16, [TABLET]: 18, [DESKTOP]: 20 },
@@ -722,6 +743,7 @@ const styles = stylex.create({
   },
   ctaRow: {
     display: "flex",
+    flexWrap: "wrap",
     gap: 12,
     paddingTop: 8,
   },
@@ -1027,6 +1049,7 @@ const styles = stylex.create({
   productImageFrame: {
     overflow: "hidden",
     aspectRatio: "300 / 327",
+    backgroundColor: TINT,
   },
   productImage: {
     display: "block",
@@ -1295,6 +1318,7 @@ const styles = stylex.create({
     gap: 12,
     paddingInline: 24,
     paddingBottom: 12,
+    overflowWrap: "anywhere",
   },
 
   footer: {
@@ -1475,6 +1499,40 @@ function useScrolledPastTop() {
   return scrolled;
 }
 
+const NAV_CLEARANCE = 12;
+
+function useNavFits(
+  innerRef: RefObject<HTMLDivElement | null>,
+  navRef: RefObject<HTMLElement | null>,
+) {
+  const [fits, setFits] = useState(true);
+  useEffect(() => {
+    const inner = innerRef.current;
+    const nav = navRef.current;
+    if (!inner || !nav) return;
+    const measure = () => {
+      const style = getComputedStyle(inner);
+      const room =
+        inner.clientWidth -
+        parseFloat(style.paddingInlineStart) -
+        parseFloat(style.paddingInlineEnd);
+      const side = Math.max(
+        ...Array.from(inner.children, (child) =>
+          child === nav ? 0 : child.getBoundingClientRect().width,
+        ),
+      );
+      setFits(nav.scrollWidth + 2 * (side + NAV_CLEARANCE) <= room);
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(inner);
+    observer.observe(nav);
+    void document.fonts?.ready.then(measure);
+    return () => observer.disconnect();
+  }, [innerRef, navRef]);
+  return fits;
+}
+
 export type View = "home" | "about" | "products";
 export type AboutPageProps = { onNavigateHome: (hash?: string) => void };
 export type SubPageProps = AboutPageProps;
@@ -1491,6 +1549,9 @@ function SiteHeader({
   const reduce = useReducedMotion();
   const scrolled = useScrolledPastTop();
   const activeId = useActiveSection(NAV_SECTION_IDS);
+  const innerRef = useRef<HTMLDivElement>(null);
+  const navRef = useRef<HTMLElement>(null);
+  const navFits = useNavFits(innerRef, navRef);
   const closeOnEscape = (event: KeyboardEvent<HTMLElement>) => {
     if (event.key === "Escape" && menuOpen) setMenuOpen(false);
   };
@@ -1540,7 +1601,7 @@ function SiteHeader({
       onKeyDown={closeOnEscape}
       {...stylex.props(styles.header, (scrolled || menuOpen) && styles.headerSolid)}
     >
-      <div {...stylex.props(styles.shell, styles.headerInner)}>
+      <div ref={innerRef} {...stylex.props(styles.shell, styles.headerInner)}>
         <a
           href="#top"
           aria-label="FENCHEM 泛成 首页"
@@ -1554,7 +1615,11 @@ function SiteHeader({
         >
           <LogoMark />
         </a>
-        <nav aria-label="主导航" {...stylex.props(styles.nav)}>
+        <nav
+          ref={navRef}
+          aria-label="主导航"
+          {...stylex.props(styles.nav, !navFits && styles.navCollapsed)}
+        >
           {NAV_ITEMS.map((item) => (
             <a
               key={item.href}
@@ -1573,7 +1638,7 @@ function SiteHeader({
             searchPill: styles.searchPill,
             searchPlaceholder: styles.searchPlaceholder,
             langButton: styles.langButton,
-            menuButton: styles.menuButton,
+            menuButton: [styles.menuButton, !navFits && styles.menuButtonShown],
           }}
           menuOpen={menuOpen}
           menuId={menuId}
@@ -1649,11 +1714,11 @@ function Hero() {
         heroRise: styles.heroRise,
         enterDelay: styles.enterDelay,
         heroAccent: styles.heroAccent,
-        heroBreakLine: styles.heroBreakLine,
+        heroBreakLine: [styles.heroBreakLine, !CLOSING_CRACKS && styles.heroBreakLineWrap],
         heroBreak: styles.heroBreak,
         heroBreakInk: styles.heroBreakInk,
-        heroBreakHead: styles.heroBreakHead,
-        heroBreakTail: styles.heroBreakTail,
+        heroBreakHead: CLOSING_CRACKS && styles.heroBreakHead,
+        heroBreakTail: CLOSING_CRACKS ? styles.heroBreakTail : styles.heroBreakTailHidden,
         heroPeriodSeat: styles.heroPeriodSeat,
         heroPeriod: styles.heroPeriod,
         visuallyHidden: styles.visuallyHidden,
@@ -1894,7 +1959,7 @@ function Quadrant({
   index: number;
   apart: MotionValue<number>;
 }) {
-  const [dx, dy] = QUADRANT_DIRECTIONS[index];
+  const [dx, dy] = QUADRANT_DIRECTIONS[index % QUADRANT_DIRECTIONS.length];
   const x = useTransform(apart, (value) => value * dx * 56);
   const y = useTransform(apart, (value) => value * dy * 40);
   const inverse = strength.tone === "blue";
@@ -1972,16 +2037,20 @@ function Strengths() {
 }
 
 function ProductCard({ product, index }: { product: (typeof PRODUCTS)[number]; index: number }) {
+  const [imageFailed, setImageFailed] = useState(false);
   return (
     <RiseReveal delay={riseDelay(index)} sx={styles.productCard}>
       <div {...stylex.props(styles.productImageFrame)}>
-        <img
-          src={product.image}
-          alt={product.title}
-          loading="lazy"
-          decoding="async"
-          {...stylex.props(styles.productImage)}
-        />
+        {imageFailed ? null : (
+          <img
+            src={product.image}
+            alt={product.title}
+            loading="lazy"
+            decoding="async"
+            onError={() => setImageFailed(true)}
+            {...stylex.props(styles.productImage)}
+          />
+        )}
       </div>
       <ProductSummary
         product={product}
@@ -2164,27 +2233,18 @@ function SiteFooter({ onNavigate }: { onNavigate?: (view: View, targetId?: strin
                 <h3 {...stylex.props(styles.footerHeading)}>{column.heading}</h3>
                 <ul {...stylex.props(styles.footerLinks)}>
                   {column.links.map((link) => (
-                    <li key={link}>
+                    <li key={link.label}>
                       <a
-                        href={
-                          link === "关于我们"
-                            ? "#about-top"
-                            : link === "产品与应用"
-                              ? "#products-top"
-                              : "#top"
-                        }
+                        href={link.page ? `#${link.page}-top` : "#top"}
                         onClick={(event) => {
-                          if (link === "关于我们" && onNavigate) {
+                          if (link.page && onNavigate) {
                             event.preventDefault();
-                            onNavigate("about", "about-top");
-                          } else if (link === "产品与应用" && onNavigate) {
-                            event.preventDefault();
-                            onNavigate("products", "products-top");
+                            onNavigate(link.page, `${link.page}-top`);
                           }
                         }}
                         {...stylex.props(styles.footerLink)}
                       >
-                        {link}
+                        {link.label}
                       </a>
                     </li>
                   ))}

@@ -149,9 +149,16 @@ const styles = stylex.create({
   },
 });
 
-const [professional, quiet, together] = ABOUT_CULTURE.values;
-const lab = ABOUT_CAMPUS.photos[1];
-const lounge = ABOUT_CAMPUS.photos[4];
+type CultureValue = (typeof ABOUT_CULTURE.values)[number];
+type CampusShot = (typeof ABOUT_CAMPUS.photos)[number];
+
+const VALUES: readonly CultureValue[] = ABOUT_CULTURE.values;
+const [PROFESSIONAL, QUIET, TOGETHER, ...MORE_VALUES] = VALUES;
+const LAB = ABOUT_CAMPUS.photos.find((photo) => photo.id === "lab");
+const LOUNGE = ABOUT_CAMPUS.photos.find((photo) => photo.id === "lounge");
+const SPARE_PHOTOS = ABOUT_CAMPUS.photos.filter(
+  (photo) => photo.id !== "lab" && photo.id !== "lounge",
+);
 
 function useSceneProgress() {
   const ref = useRef<HTMLElement>(null);
@@ -159,7 +166,7 @@ function useSceneProgress() {
   return [ref, scrollYProgress] as const;
 }
 
-function VastScene() {
+function VastScene({ value }: { value: CultureValue }) {
   const [ref, progress] = useSceneProgress();
   const reduce = useReducedMotion();
   const scale = useTransform(progress, [0, 0.7], [1.18, 1]);
@@ -185,69 +192,73 @@ function VastScene() {
       </RiseReveal>
       <div {...stylex.props(styles.vastText)}>
         <RiseReveal delay={0.15} sx={styles.vastBody}>
-          <h3 {...stylex.props(styles.valueTitle)}>{quiet.title}</h3>
-          <p {...stylex.props(styles.desc)}>{quiet.desc}</p>
+          <h3 {...stylex.props(styles.valueTitle)}>{value.title}</h3>
+          <p {...stylex.props(styles.desc)}>{value.desc}</p>
         </RiseReveal>
       </div>
     </article>
   );
 }
 
-function RoomScene() {
+function RoomScene({ value, photo }: { value: CultureValue; photo?: CampusShot }) {
   const [ref, progress] = useSceneProgress();
   const reduce = useReducedMotion();
   const scale = useTransform(progress, [0, 1], [1, 1.16]);
 
   return (
     <article ref={ref} {...stylex.props(styles.sceneGrid)}>
-      <RiseReveal sx={styles.sceneFigure}>
-        <figure {...stylex.props(styles.figure)}>
-          <div {...stylex.props(styles.frame, styles.sceneFrame)}>
-            <m.img
-              src={lab.src}
-              alt={lab.alt}
-              loading="lazy"
-              decoding="async"
-              {...stylex.props(styles.fill)}
-              style={{ scale: reduce ? 1 : scale }}
-            />
-          </div>
-          <figcaption {...stylex.props(styles.caption)}>{lab.caption}</figcaption>
-        </figure>
-      </RiseReveal>
+      {photo ? (
+        <RiseReveal sx={styles.sceneFigure}>
+          <figure {...stylex.props(styles.figure)}>
+            <div {...stylex.props(styles.frame, styles.sceneFrame)}>
+              <m.img
+                src={photo.src}
+                alt={photo.alt}
+                loading="lazy"
+                decoding="async"
+                {...stylex.props(styles.fill)}
+                style={{ scale: reduce ? 1 : scale }}
+              />
+            </div>
+            <figcaption {...stylex.props(styles.caption)}>{photo.caption}</figcaption>
+          </figure>
+        </RiseReveal>
+      ) : null}
       <RiseReveal delay={0.15} sx={styles.sceneText}>
-        <h3 {...stylex.props(styles.valueTitle)}>{professional.title}</h3>
-        <p {...stylex.props(styles.desc)}>{professional.desc}</p>
+        <h3 {...stylex.props(styles.valueTitle)}>{value.title}</h3>
+        <p {...stylex.props(styles.desc)}>{value.desc}</p>
       </RiseReveal>
     </article>
   );
 }
 
-function HumanScene() {
+function HumanScene({ value, photo }: { value: CultureValue; photo?: CampusShot }) {
   const [ref, progress] = useSceneProgress();
   const reduce = useReducedMotion();
   const scale = useTransform(progress, [0, 0.8], [1.5, HUMAN_ZOOM]);
 
   return (
     <article ref={ref} {...stylex.props(styles.sceneGrid)}>
-      <RiseReveal sx={styles.sceneFigure}>
-        <figure {...stylex.props(styles.figure)}>
-          <div {...stylex.props(styles.frame, styles.sceneFrame)}>
-            <m.img
-              src={lounge.large}
-              alt={lounge.alt}
-              loading="lazy"
-              decoding="async"
-              {...stylex.props(styles.fill, styles.humanImage)}
-              style={{ scale: reduce ? HUMAN_ZOOM : scale }}
-            />
-          </div>
-          <figcaption {...stylex.props(styles.caption)}>{lounge.caption}</figcaption>
-        </figure>
-      </RiseReveal>
+      {photo ? (
+        <RiseReveal sx={styles.sceneFigure}>
+          <figure {...stylex.props(styles.figure)}>
+            <div {...stylex.props(styles.frame, styles.sceneFrame)}>
+              <m.img
+                src={photo.large}
+                alt={photo.alt}
+                loading="lazy"
+                decoding="async"
+                {...stylex.props(styles.fill, styles.humanImage)}
+                style={{ scale: reduce ? HUMAN_ZOOM : scale }}
+              />
+            </div>
+            <figcaption {...stylex.props(styles.caption)}>{photo.caption}</figcaption>
+          </figure>
+        </RiseReveal>
+      ) : null}
       <RiseReveal delay={0.15} sx={styles.sceneText}>
-        <h3 {...stylex.props(styles.valueTitle)}>{together.title}</h3>
-        <p {...stylex.props(styles.desc)}>{together.desc}</p>
+        <h3 {...stylex.props(styles.valueTitle)}>{value.title}</h3>
+        <p {...stylex.props(styles.desc)}>{value.desc}</p>
       </RiseReveal>
     </article>
   );
@@ -280,9 +291,24 @@ export function CultureScenes({ sx }: { sx?: stylex.StyleXStyles }) {
           </h2>
         </RiseReveal>
         <div {...stylex.props(styles.story)}>
-          <VastScene />
-          <RoomScene />
-          <HumanScene />
+          {QUIET ? <VastScene value={QUIET} /> : null}
+          {PROFESSIONAL ? <RoomScene value={PROFESSIONAL} photo={LAB} /> : null}
+          {TOGETHER ? <HumanScene value={TOGETHER} photo={LOUNGE} /> : null}
+          {MORE_VALUES.map((value, index) =>
+            index % 2 === 0 ? (
+              <RoomScene
+                key={value.title}
+                value={value}
+                photo={SPARE_PHOTOS[index % SPARE_PHOTOS.length]}
+              />
+            ) : (
+              <HumanScene
+                key={value.title}
+                value={value}
+                photo={SPARE_PHOTOS[index % SPARE_PHOTOS.length]}
+              />
+            ),
+          )}
         </div>
       </div>
     </m.section>
