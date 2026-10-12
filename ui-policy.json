@@ -1,0 +1,68 @@
+{
+  "fonts": [
+    "Source Han Sans SC",
+    "Noto Sans SC",
+    "Inter Tight",
+    "Inter Variable",
+    "Inter",
+    "Instrument Serif",
+    "JetBrains Mono",
+    "Newsreader",
+    "Plus Jakarta Sans",
+    "system-ui",
+    "-apple-system",
+    "BlinkMacSystemFont",
+    "SF Pro Text",
+    "SF Pro Display"
+  ],
+  "fontSizes": [
+    10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 24, 25, 26, 28, 32, 36, 40, 41, 48, 52, 56,
+    64, 72, 80, 96, 117, 180, 290, 360
+  ],
+  "typeRules": [
+    { "selector": "h1", "sizes": [20, 24, 25, 32, 36, 40, 41, 48, 52, 56, 64, 72, 80, 96] },
+    { "selector": "h2", "sizes": [20, 22, 24, 26, 32, 40] },
+    { "selector": "h3", "sizes": [16, 18, 20, 24] },
+    { "selector": "button, [role=button]", "sizes": [12, 13, 14, 15, 16, 17] }
+  ],
+  "minControlSize": 15,
+  "controlSizeRules": [],
+  "minControlGap": 8,
+  "minControlInset": 8,
+  "controlContainers": ["[data-ui-container]"],
+  "minLayoutGap": 8,
+  "bannedCopy": ["unlock your potential", "seamlessly", "game-changing"],
+  "viewports": [
+    { "width": 390, "height": 844 },
+    { "width": 1440, "height": 900 }
+  ],
+  "colorSchemes": ["light"],
+  "exceptions": [
+    {
+      "selector": "#oo-hero-title, #oo-hero-title *",
+      "rules": ["content-clipping", "font-size", "text-contrast"],
+      "reason": "Intentional artistic diagonal text-break crack effect on hero title"
+    },
+    {
+      "selector": "#contact > span, [aria-hidden=true][lang=en]",
+      "rules": ["content-clipping", "font-size", "font-family", "text-contrast"],
+      "reason": "Decorative oversized background watermark bleeding intentionally outside container"
+    },
+    {
+      "selector": ".proto-picker, .proto-picker *, .state-switcher, .state-switcher *",
+      "rules": [
+        "control-gap",
+        "font-family",
+        "font-size",
+        "icon-button-tooltip",
+        "label-consistency"
+      ],
+      "reason": "Development toolbar / prototype harness switcher"
+    },
+    {
+      "selector": "svg text, svg textPath",
+      "rules": ["font-size", "text-contrast"],
+      "reason": "Curved SVG text path in quadrant graphic"
+    }
+  ]
+}
