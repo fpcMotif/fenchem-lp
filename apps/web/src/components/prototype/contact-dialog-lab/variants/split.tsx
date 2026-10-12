@@ -523,38 +523,6 @@ const styles = stylex.create({
     color: color.ink,
     outlineStyle: "none",
   },
-  doneLead: {
-    margin: 0,
-    fontSize: 14,
-    lineHeight: 1.6,
-    color: color.muted,
-    maxWidth: "26em",
-  },
-  againBtn: {
-    marginTop: 8,
-    paddingBlock: 8,
-    paddingInline: 20,
-    borderRadius: CONTROL_RADIUS,
-    borderWidth: 1,
-    borderStyle: "solid",
-    borderColor: HAIRLINE,
-    backgroundColor: {
-      default: "transparent",
-      ":hover": { default: null, [HOVER]: "#f3f5fa" },
-    },
-    fontFamily: "inherit",
-    fontSize: 14,
-    fontWeight: 500,
-    color: colors.brandBlue700,
-    cursor: "pointer",
-    transform: {
-      default: null,
-      ":active": { default: null, [breakpoints.motionOk]: "scale(0.97)" },
-    },
-    transitionProperty: "background-color, border-color, transform",
-    transitionDuration: "140ms",
-    transitionTimingFunction: ease.out,
-  },
 });
 
 const stagger = (index: number) => [
@@ -857,8 +825,8 @@ export function SplitDialog({ subject, onClose, state = "pristine" }: DialogVari
           {submitted ? (
             <div {...stylex.props(styles.done)}>
               <CheckCircle2
-                size={40}
-                strokeWidth={2.2}
+                size={36}
+                strokeWidth={2.5}
                 nonScalingStroke
                 aria-hidden="true"
                 {...stylex.props(styles.doneIcon, stagger(0))}
@@ -866,19 +834,6 @@ export function SplitDialog({ subject, onClose, state = "pristine" }: DialogVari
               <h3 ref={doneTitleRef} tabIndex={-1} {...stylex.props(styles.doneTitle, stagger(1))}>
                 需求已提交
               </h3>
-              <p {...stylex.props(styles.doneLead, stagger(2))}>
-                专属客户经理与应用工程师将在工作日 24 小时内与您联络确认。
-              </p>
-              <button
-                type="button"
-                onClick={() => {
-                  setSubmitted(false);
-                  setErrors({});
-                }}
-                {...stylex.props(styles.againBtn, labStyles.focusRing, stagger(3))}
-              >
-                再留一条
-              </button>
             </div>
           ) : (
             <form
