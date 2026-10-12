@@ -142,6 +142,4 @@ Resolved (2026-08-28 polish pass, concurrent session): `transition-all` on CTAs
 
 ### Maintenance
 
-Re-run `/interfaces:better-interface` after the three HIGH rows land. CONTEXT.md
-still says default variant is `d` with variants A–G only — update it when the
-variant shake-out settles.
+Re-run `/interfaces:better-interface` after the three HIGH rows land.
