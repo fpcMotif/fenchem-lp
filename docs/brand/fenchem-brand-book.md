@@ -2,7 +2,8 @@
 
 Canonical reference for the Fenchem visual identity, transcribed from the
 official brand-book pages (基础系统 / Basic System) and converted to the tokens
-this codebase uses (Tailwind v4 `@theme`, OKLCH).
+this codebase uses (OKLCH CSS variables in `apps/web/src/index.css`, read by
+StyleX through `packages/ui/src/tokens.stylex.ts`).
 
 > Source of truth is the brand book. The OKLCH column is a faithful conversion of
 > the brand book's sRGB (RGB) values — if a value ever disagrees, the RGB/Pantone
@@ -43,7 +44,7 @@ in tints and neon in shades). Anchor each brand color at its book value and buil
 both directions.
 
 Brand Blue (`#0743AE`, H≈261.5) and Brand Green (`#64A733`, H≈134.7) ramps live
-in `apps/web/src/index.css` under the brand `@theme` block; regenerate with
+in the `:root` block of `apps/web/src/index.css`; regenerate with
 `/tmp/oklch.mjs` (kept out of the repo) if the anchors change.
 
 Neutral ramp: pure neutral (chroma 0), Clean White at the top, Neutral Gray

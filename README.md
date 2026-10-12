@@ -1,15 +1,13 @@
 # fenchem-lp
 
-This project was created with [Better-T-Stack](https://github.com/AmanVarshney01/create-better-t-stack), a modern TypeScript stack that combines React, TanStack Start, Convex, and more.
+This project was created with [Better-T-Stack](https://github.com/AmanVarshney01/create-better-t-stack), a modern TypeScript stack that combines React, TanStack Start, and more.
 
 ## Features
 
 - **TypeScript** - For type safety and improved developer experience
 - **TanStack Start** - SSR framework with TanStack Router
-- **TailwindCSS** - Utility-first CSS for rapid UI development
-- **Shared UI package** - shadcn/ui primitives live in `packages/ui`
-- **Convex** - Reactive backend-as-a-service platform
-- **Authentication** - Better-Auth
+- **StyleX** - Atomic CSS-in-JS, compiled by `@stylexswc/unplugin` (see [ADR-0003](docs/adr/0003-stylex-swc-compiler.md))
+- **Base UI** - Accessible, unstyled primitives behind the shared components in `packages/ui`
 - **Oxlint** - Oxlint + Oxfmt (linting & formatting)
 - **Vite+** - Unified Vite toolchain, workspace task runner, linting, and formatting
 
@@ -21,18 +19,6 @@ First, install the dependencies:
 bun install
 ```
 
-## Convex Setup
-
-This project uses Convex as a backend. You'll need to set up Convex before running the app:
-
-```bash
-bun run dev:setup
-```
-
-Follow the prompts to create a new Convex project and connect it to your application.
-
-Copy environment variables from `packages/backend/.env.local` to `apps/*/.env`.
-
 Then, run the development server:
 
 ```bash
@@ -40,33 +26,25 @@ bun run dev
 ```
 
 Open [http://localhost:3001](http://localhost:3001) in your browser to see the web application.
-Your app will connect to the Convex cloud backend automatically.
 
 ## UI Customization
 
-React web apps in this stack share shadcn/ui primitives through `packages/ui`.
+The shared UI package `packages/ui` holds the design tokens and a small set of components built on Base UI and styled with StyleX.
 
-- Change design tokens and global styles in `packages/ui/src/styles/globals.css`
-- Update shared primitives in `packages/ui/src/components/*`
-- Adjust shadcn aliases or style config in `packages/ui/components.json` and `apps/web/components.json`
+- Change StyleX tokens in `packages/ui/src/tokens.stylex.ts`
+- Change the brand color variables those tokens read in `apps/web/src/index.css`
+- Change base CSS variables and global styles in `packages/ui/src/styles/globals.css`
+- Update shared components in `packages/ui/src/components/*`
 
-### Add more shared components
+### Add a shared component
 
-Run this from the project root to add more primitives to the shared UI package:
-
-```bash
-npx shadcn@latest add accordion dialog popover sheet table -c packages/ui
-```
+Create the component in `packages/ui/src/components/`. Use a `@base-ui/react` primitive for behavior, style it with `stylex.create`, and accept an `sx?: StyleXStyles` prop for caller overrides. `bun run check:stylex` checks that prop.
 
 Import shared components like this:
 
 ```tsx
 import { Button } from "@fenchem-lp/ui/components/button";
 ```
-
-### Add app-specific blocks
-
-If you want to add app-specific blocks instead of shared primitives, run the shadcn CLI from `apps/web`.
 
 ## Deployment (Cloudflare via Alchemy)
 
@@ -79,7 +57,8 @@ For more details, see the guide on [Deploying to Cloudflare with Alchemy](https:
 
 ## Git Hooks and Formatting
 
-- Run checks: `bun run check`
+- Pre-commit hooks run Oxlint and Oxfmt on staged files through `hk` (`hk.pkl`).
+- Run checks: `bun run check:lint` and `bun run check-types`
 
 ## Project Structure
 
@@ -88,8 +67,9 @@ fenchem-lp/
 ├── apps/
 │   ├── web/         # Frontend application (React + TanStack Start)
 ├── packages/
-│   ├── ui/          # Shared shadcn/ui components and styles
-│   ├── backend/     # Convex backend functions and schema
+│   ├── ui/          # Shared tokens and Base UI + StyleX components
+│   ├── infra/       # Alchemy deployment to Cloudflare
+│   ├── config/      # Shared TypeScript config
 ```
 
 ## Available Scripts
@@ -97,9 +77,10 @@ fenchem-lp/
 - `bun run dev`: Start all applications in development mode
 - `bun run build`: Build all applications
 - `bun run dev:web`: Start only the web application
-- `bun run dev:setup`: Setup and configure your Convex project
 - `bun run check-types`: Check TypeScript types across all apps
-- `bun run check`: Run Vite+ format/lint checks and workspace TypeScript checks
+- `bun run check:lint`: Run Oxlint, format with Oxfmt, and run the StyleX check
+- `bun run check:stylex`: Check StyleX usage and that no legacy styling packages are installed
+- `bun run test`: Run the web unit tests
 - `bun run lint`: Run Vite+ lint checks
 - `bun run format`: Run Vite+ formatting
 - `bun run staged`: Run Vite+ checks against staged files

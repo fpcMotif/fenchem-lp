@@ -16,10 +16,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Migrated pre-commit hook runner from `lefthook` to `hk` with automatic `doc-lock` integration.
 - Unified ignore patterns in `.oxfmtrc.json` and `.oxlintrc.json`.
 - Completed StyleX migration across workspace packages and integrated `@stylexswc/unplugin` compiler.
-- Decoupled client runtime environment initialization from external Convex backend variables.
 
 ### Removed
 
 - Removed `.github/workflows/deploy.yml` in favor of native Cloudflare dashboard Git integration.
 - Removed `lefthook` configuration (`lefthook.yml`) and package dependency.
 - Removed unused legacy prototype variants (`variant-w.tsx`, `variant-j.tsx`).
+- Removed the backend package (`packages/backend`) and the runtime environment package (`packages/env`); the site is a static landing page.
