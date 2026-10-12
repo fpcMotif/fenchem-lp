@@ -1,6 +1,6 @@
 import * as stylex from "@stylexjs/stylex";
 import { Check, ChevronDown, ChevronLeft, ChevronRight, ListFilter } from "lucide-react";
-import { useReducedMotion } from "motion/react";
+import { m, useReducedMotion } from "motion/react";
 import {
   useEffect,
   useId,
@@ -25,10 +25,12 @@ const WIDE_QUERY = "(min-width: 1024px)";
 const NO_BREAK_SPACE = String.fromCharCode(0xa0);
 const DOT_SEPARATOR = `${NO_BREAK_SPACE}· `;
 const HOVER_WASH = "oklch(0.26 0.035 261.5 / 0.05)";
+const FOCUS_HALO = "0 0 0 4px rgba(7, 67, 174, 0.16)";
 const TRAILING_NOTE = /^(.+?)\s*[（(]([^（）()]+)[）)]$/;
 const SCROLL_INSET = 12;
 const FADE_EDGE = 40;
 const STRIP_FADE = "linear-gradient(to right, #000 calc(100% - 28px), transparent)";
+const BOTTOM_FADE = `linear-gradient(to bottom, #000 calc(100% - ${FADE_EDGE}px), transparent)`;
 const FILTER_LABEL = "应用领域";
 
 const areaName = (chip: SolutionsBrowser["chips"][number]) =>
@@ -69,6 +71,9 @@ const subscribeWide = (onChange: () => void) => {
 const readWide = () => window.matchMedia(WIDE_QUERY).matches;
 
 const readWideOnServer = () => true;
+
+const hasMoreBelow = (element: HTMLElement) =>
+  element.scrollTop + element.clientHeight < element.scrollHeight - 1;
 
 const fadeIn = stylex.keyframes({
   "0%": { opacity: 0 },
@@ -204,7 +209,7 @@ const styles = stylex.create({
     },
     gridTemplateRows: { default: null, [bp.lg]: "minmax(0, 1fr)" },
     rowGap: 12,
-    height: { default: null, [bp.lg]: 600 },
+    height: { default: null, [bp.lg]: 600, [bp.xl]: 640 },
     marginTop: { default: 16, [bp.xl]: 24 },
     overflow: { default: null, [bp.lg]: "hidden" },
     borderWidth: { default: 0, [bp.lg]: 1 },
@@ -250,10 +255,7 @@ const styles = stylex.create({
     maskImage: { default: STRIP_FADE, [bp.lg]: "none" },
   },
   listMore: {
-    maskImage: {
-      default: STRIP_FADE,
-      [bp.lg]: `linear-gradient(to bottom, #000 calc(100% - ${FADE_EDGE}px), transparent)`,
-    },
+    maskImage: { default: STRIP_FADE, [bp.lg]: BOTTOM_FADE },
   },
   listGrouped: {
     paddingTop: { default: 4, [bp.lg]: 0 },
@@ -313,22 +315,16 @@ const styles = stylex.create({
     outlineColor: tone.accent,
     outlineOffset: -2,
   },
-  tabFocus: {
-    display: { default: "none", [bp.lg]: "block" },
-    position: "absolute",
-    inset: 4,
-    boxSizing: "border-box",
-    borderWidth: 2,
-    borderStyle: "solid",
-    borderColor: tone.accent,
-    borderRadius: 9,
-    opacity: { default: 0, [stylex.when.ancestor(":focus-visible")]: 1 },
-    pointerEvents: "none",
-  },
   tabSelected: {
+    cursor: "default",
+  },
+  selection: {
+    position: "absolute",
+    inset: 0,
+    borderRadius: { default: 8, [bp.lg]: "12px 0 0 12px" },
     backgroundColor: tone.paper,
     boxShadow: { default: depth.lift, [bp.lg]: "none" },
-    cursor: "default",
+    pointerEvents: "none",
     "::before": {
       content: '""',
       display: { default: "none", [bp.lg]: "block" },
@@ -354,7 +350,22 @@ const styles = stylex.create({
       pointerEvents: "none",
     },
   },
+  selectionFrame: {
+    display: { default: "none", [bp.lg]: "block" },
+    position: "absolute",
+    inset: 4,
+    boxSizing: "border-box",
+    borderWidth: 2,
+    borderStyle: "solid",
+    borderColor: tone.accent,
+    borderRadius: 9,
+    boxShadow: { default: "none", [stylex.when.ancestor(":focus-visible")]: FOCUS_HALO },
+    transitionProperty: "box-shadow",
+    transitionDuration: { default: "0ms", [bp.motionOk]: "140ms" },
+    transitionTimingFunction: motion.easeOut,
+  },
   tabIndex: {
+    position: "relative",
     fontFamily: face.display,
     fontSize: { default: 12, [bp.lg]: 13 },
     fontWeight: 500,
@@ -369,17 +380,8 @@ const styles = stylex.create({
   tabIndexSelected: {
     color: tone.accent,
   },
-  tabMarker: {
-    display: { default: "none", [bp.lg]: "block" },
-    position: "absolute",
-    top: 20,
-    bottom: 20,
-    left: 0,
-    width: 3,
-    borderRadius: "0 3px 3px 0",
-    backgroundColor: tone.accent,
-  },
   tabText: {
+    position: "relative",
     display: "flex",
     flexDirection: "column",
     gap: 2,
@@ -430,6 +432,9 @@ const styles = stylex.create({
     outlineWidth: 2,
     outlineColor: tone.accent,
     outlineOffset: -2,
+  },
+  panelMore: {
+    maskImage: { default: null, [bp.lg]: BOTTOM_FADE },
   },
   fade: {
     animationName: { default: "none", [bp.motionOk]: fadeIn },
@@ -811,11 +816,20 @@ export function DropdownVariant() {
   const listRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
   const [listHasMore, setListHasMore] = useState(false);
+  const [panelHasMore, setPanelHasMore] = useState(false);
   const selectedId = selected?.id;
+  const selectionTransition = reduce
+    ? { duration: 0 }
+    : { type: "spring" as const, duration: 0.35, bounce: 0.15 };
 
   const syncListMore = () => {
     const list = listRef.current;
-    if (list) setListHasMore(list.scrollTop + list.clientHeight < list.scrollHeight - 1);
+    if (list) setListHasMore(hasMoreBelow(list));
+  };
+
+  const syncPanelMore = () => {
+    const panel = panelRef.current;
+    if (panel) setPanelHasMore(hasMoreBelow(panel));
   };
 
   useEffect(syncListMore, [area, wide]);
@@ -839,7 +853,8 @@ export function DropdownVariant() {
 
   useEffect(() => {
     panelRef.current?.scrollTo({ top: 0 });
-  }, [selectedId]);
+    syncPanelMore();
+  }, [selectedId, wide]);
 
   const handleListKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
     const step = (wide ? VERTICAL_STEPS : HORIZONTAL_STEPS)[event.key];
@@ -877,8 +892,9 @@ export function DropdownVariant() {
           <div {...stylex.props(styles.paneHead)}>
             <AreaSelect browser={browser} />
           </div>
-          <div
+          <m.div
             ref={listRef}
+            layoutScroll
             role="tablist"
             aria-label="应用方案"
             aria-orientation={wide ? "vertical" : "horizontal"}
@@ -916,9 +932,19 @@ export function DropdownVariant() {
                         stylex.defaultMarker(),
                       )}
                     >
-                      <span aria-hidden="true" {...stylex.props(styles.tabFocus)} />
                       {isSelected && (
-                        <span aria-hidden="true" {...stylex.props(styles.tabMarker)} />
+                        <m.span
+                          layoutId={`${uid}-selection`}
+                          aria-hidden="true"
+                          transition={selectionTransition}
+                          {...stylex.props(styles.selection)}
+                        >
+                          <m.span
+                            layout
+                            transition={selectionTransition}
+                            {...stylex.props(styles.selectionFrame)}
+                          />
+                        </m.span>
                       )}
                       <span
                         {...stylex.props(styles.tabIndex, isSelected && styles.tabIndexSelected)}
@@ -940,7 +966,7 @@ export function DropdownVariant() {
                 })}
               </div>
             ))}
-          </div>
+          </m.div>
         </div>
         <div
           ref={panelRef}
@@ -948,7 +974,8 @@ export function DropdownVariant() {
           id={`${uid}-panel`}
           aria-labelledby={`${uid}-tab-${selected.id}`}
           tabIndex={0}
-          {...stylex.props(styles.panel)}
+          onScroll={wide ? syncPanelMore : undefined}
+          {...stylex.props(styles.panel, wide && panelHasMore && styles.panelMore)}
         >
           <div {...stylex.props(styles.sheetMeta)}>
             <p {...stylex.props(styles.eyebrow)}>
