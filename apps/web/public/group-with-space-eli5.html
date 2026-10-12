@@ -1,0 +1,338 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ELI5: Group with Space, Not Lines</title>
+    <style>
+      :root {
+        --bg: #0b0f19;
+        --card-bg: #141b2d;
+        --text: #f1f5f9;
+        --muted: #94a3b8;
+        --line: rgba(255, 255, 255, 0.12);
+        --accent: #38bdf8;
+        --bad: #f43f5e;
+        --good: #10b981;
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        padding: 40px 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        line-height: 1.5;
+      }
+      .container {
+        max-width: 860px;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 48px;
+      }
+      header {
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .pill {
+        align-self: center;
+        padding: 6px 14px;
+        border-radius: 999px;
+        background: rgba(56, 189, 248, 0.15);
+        color: var(--accent);
+        font-size: 13px;
+        font-weight: 600;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+      }
+      h1 {
+        font-size: 38px;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+      }
+      p.subtitle {
+        font-size: 18px;
+        color: var(--muted);
+        max-width: 580px;
+        margin: 0 auto;
+      }
+
+      /* Card layout */
+      .card {
+        background: var(--card-bg);
+        border: 1px solid var(--line);
+        border-radius: 20px;
+        padding: 32px;
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+      }
+      .card-title {
+        font-size: 22px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      /* Big Picture Comparison */
+      .comparison-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 24px;
+      }
+      .box {
+        border-radius: 16px;
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        position: relative;
+      }
+      .box-bad {
+        background: rgba(244, 63, 94, 0.04);
+        border: 2px dashed rgba(244, 63, 94, 0.3);
+      }
+      .box-good {
+        background: rgba(16, 185, 129, 0.04);
+        border: 2px solid rgba(16, 185, 129, 0.4);
+      }
+      .badge {
+        font-size: 13px;
+        font-weight: 700;
+        padding: 4px 10px;
+        border-radius: 6px;
+        width: fit-content;
+      }
+      .badge-bad {
+        background: var(--bad);
+        color: #fff;
+      }
+      .badge-good {
+        background: var(--good);
+        color: #fff;
+      }
+
+      /* UI Mockups */
+      .ui-mockup {
+        background: #06142c;
+        border-radius: 12px;
+        padding: 20px;
+        color: #fff;
+        font-size: 14px;
+      }
+      .mock-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding-block: 10px;
+      }
+      .has-border {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+      }
+      .mock-clean-list {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+      .mock-clean-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .icon-circle {
+        width: 24px;
+        height: 24px;
+        border-radius: 6px;
+        background: rgba(255, 255, 255, 0.12);
+        display: grid;
+        place-items: center;
+        font-size: 12px;
+      }
+
+      /* Gestalt visual */
+      .dots-row {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        background: #060a12;
+        padding: 32px;
+        border-radius: 14px;
+      }
+      .dot {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        background: var(--accent);
+      }
+      .big-gap {
+        margin-right: 48px;
+      }
+
+      /* The 3 level ladder */
+      .ladder {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 16px;
+      }
+      .ladder-step {
+        background: #090e1a;
+        padding: 20px;
+        border-radius: 14px;
+        border: 1px solid var(--line);
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        text-align: center;
+      }
+      .ladder-rank {
+        font-size: 28px;
+        font-weight: 800;
+        color: var(--accent);
+      }
+      .ladder-title {
+        font-size: 16px;
+        font-weight: 700;
+      }
+      .ladder-desc {
+        font-size: 13px;
+        color: var(--muted);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <span class="pill">Design 101</span>
+        <h1>Group With Space, Not Lines</h1>
+        <p class="subtitle">
+          How your brain sees order without prison bars.
+        </p>
+      </header>
+
+      <!-- Section 1: The Human Brain -->
+      <section class="card">
+        <h2 class="card-title">1. Your eyes group things by distance</h2>
+        <p style="color: var(--muted)">
+          Look at these 6 dots. You don't see 6 random dots. You instantly see <strong>2 groups of 3</strong>.
+          Notice: nobody drew a line between them!
+        </p>
+
+        <div class="dots-row">
+          <div class="dot"></div>
+          <div class="dot"></div>
+          <div class="dot"></div>
+          <div class="dot big-gap"></div>
+          <div class="dot"></div>
+          <div class="dot"></div>
+          <div class="dot"></div>
+        </div>
+
+        <div style="text-align: center; font-size: 14px; color: var(--accent); font-weight: 600;">
+          Distance inside group (8px) &nbsp;&lt;&nbsp; Distance between groups (48px)
+        </div>
+      </section>
+
+      <!-- Section 2: Real Contact Dialog Before vs After -->
+      <section class="card">
+        <h2 class="card-title">2. What we just fixed in our Contact Dialog</h2>
+        <div class="comparison-grid">
+          
+          <!-- Bad -->
+          <div class="box box-bad">
+            <span class="badge badge-bad">Before: Prison Bars</span>
+            <p style="font-size: 13px; color: var(--muted)">Every single item is trapped between hard lines. Your eyes get tired reading lines instead of text.</p>
+            
+            <div class="ui-mockup">
+              <div class="mock-row has-border">
+                <span class="icon-circle">📞</span>
+                <span>025-8421 8888</span>
+              </div>
+              <div class="mock-row has-border">
+                <span class="icon-circle">✉️</span>
+                <span>info@fenchem.com</span>
+              </div>
+              <div class="mock-row has-border">
+                <span class="icon-circle">📍</span>
+                <span>南京市溧水开发区...</span>
+              </div>
+            </div>
+            <p style="font-size: 12px; color: var(--bad); font-weight: 600">❌ 3 items = 3 distracting cut lines</p>
+          </div>
+
+          <!-- Good -->
+          <div class="box box-good">
+            <span class="badge badge-good">After: Grouped by Space</span>
+            <p style="font-size: 13px; color: var(--muted)">No lines at all! Consistent 14px whitespace holds the items together as one clean, elegant card.</p>
+            
+            <div class="ui-mockup">
+              <div class="mock-clean-list">
+                <div class="mock-clean-row">
+                  <span class="icon-circle">📞</span>
+                  <span>025-8421 8888</span>
+                </div>
+                <div class="mock-clean-row">
+                  <span class="icon-circle">✉️</span>
+                  <span>info@fenchem.com</span>
+                </div>
+                <div class="mock-clean-row">
+                  <span class="icon-circle">📍</span>
+                  <span>南京市溧水开发区...</span>
+                </div>
+              </div>
+            </div>
+            <p style="font-size: 12px; color: var(--good); font-weight: 600">✅ Clean whitespace does the work</p>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- Section 3: The 3-Step Ladder -->
+      <section class="card">
+        <h2 class="card-title">3. The 3-Step Ladder of Grouping</h2>
+        <p style="color: var(--muted)">When designing any interface, always try Step 1 first. Never jump straight to lines.</p>
+
+        <div class="ladder">
+          <div class="ladder-step" style="border-color: rgba(16, 185, 129, 0.4)">
+            <span class="ladder-rank">1</span>
+            <span class="ladder-title">Whitespace</span>
+            <span class="ladder-desc">Make gap between groups 2× bigger than gap inside. Zero visual noise.</span>
+          </div>
+
+          <div class="ladder-step">
+            <span class="ladder-rank">2</span>
+            <span class="ladder-title">Background Tint</span>
+            <span class="ladder-desc">If space isn't enough, put one group inside a soft tinted card.</span>
+          </div>
+
+          <div class="ladder-step" style="opacity: 0.7">
+            <span class="ladder-rank">3</span>
+            <span class="ladder-title">Divider Lines</span>
+            <span class="ladder-desc">Last resort only. Use when content would otherwise bleed together.</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 4: Golden Rule -->
+      <section class="card" style="background: linear-gradient(135deg, rgba(56, 189, 248, 0.1), transparent); border-color: rgba(56, 189, 248, 0.3)">
+        <h2 class="card-title">Golden Rule for Beginners</h2>
+        <p style="font-size: 16px; color: #e2e8f0">
+          <strong>"If you can tell they belong together without a line, delete the line."</strong>
+        </p>
+        <p style="font-size: 14px; color: var(--muted)">
+          Lines add visual weight. Whitespace adds breathing room. Great software feels calm because it uses space, not fences.
+        </p>
+      </section>
+    </div>
+  </body>
+</html>

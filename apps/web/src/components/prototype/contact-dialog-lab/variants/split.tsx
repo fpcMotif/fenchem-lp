@@ -98,7 +98,6 @@ const OPTION_RADIUS = 3;
 const HOVER = "@media (hover: hover)";
 const ON_NAVY = "rgba(255, 255, 255, 0.92)";
 const ON_NAVY_MUTED = "rgba(255, 255, 255, 0.58)";
-const NAVY_RULE = "rgba(255, 255, 255, 0.14)";
 const HAIRLINE = "rgba(26, 26, 26, 0.12)";
 const DESKTOP = breakpoints.md;
 const STICKY_FOOTER_ROOM = 176;
@@ -263,10 +262,6 @@ const styles = stylex.create({
     gap: 12,
     margin: 0,
     marginTop: "auto",
-    paddingTop: 18,
-    borderTopWidth: 1,
-    borderTopStyle: "solid",
-    borderTopColor: NAVY_RULE,
   },
   qrHeaderTitle: {
     fontSize: 11,
@@ -284,8 +279,16 @@ const styles = stylex.create({
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
-    gap: 6,
+    gap: 8,
     margin: 0,
+    cursor: "default",
+    transitionProperty: "transform",
+    transitionDuration: "160ms",
+    transitionTimingFunction: ease.out,
+    transform: {
+      default: null,
+      ":hover": { default: null, [HOVER]: "translateY(-2px)" },
+    },
   },
   dualQrImage: {
     boxSizing: "border-box",
@@ -295,13 +298,23 @@ const styles = stylex.create({
     padding: 6,
     borderRadius: CONTROL_RADIUS,
     backgroundColor: colors.paper,
-    boxShadow: "0 0 0 1px rgba(255, 255, 255, 0.08), 0 8px 16px -4px rgba(0, 0, 0, 0.28)",
+    boxShadow: {
+      default: "0 0 0 1px rgba(255, 255, 255, 0.08), 0 4px 12px -2px rgba(0, 0, 0, 0.24)",
+      ":hover": {
+        default: null,
+        [HOVER]: "0 0 0 1px rgba(255, 255, 255, 0.16), 0 10px 24px -4px rgba(0, 0, 0, 0.4)",
+      },
+    },
+    transitionProperty: "box-shadow",
+    transitionDuration: "160ms",
+    transitionTimingFunction: ease.out,
   },
   dualQrCaption: {
     fontSize: 12,
     lineHeight: 1.4,
     color: ON_NAVY_MUTED,
     textAlign: "center",
+    letterSpacing: "0.02em",
   },
 
   main: {
