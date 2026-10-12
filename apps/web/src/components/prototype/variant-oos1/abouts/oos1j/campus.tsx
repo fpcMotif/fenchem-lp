@@ -1,7 +1,9 @@
 import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 import { m, useInView } from "motion/react";
-import { useRef, useState } from "react";
+import { useRef } from "react";
+
+import { useLightbox } from "@/components/prototype/shared/lightbox";
 
 import { ABOUT_CAMPUS } from "../../about-data";
 import { Lightbox } from "./lightbox";
@@ -147,7 +149,7 @@ function Tile({ photo, index, onOpen }: { photo: Photo; index: number; onOpen: (
 }
 
 export function Campus() {
-  const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const lightbox = useLightbox(PHOTO_COUNT);
 
   return (
     <section
@@ -159,19 +161,11 @@ export function Campus() {
       <div {...stylex.props(base.shell)}>
         <ul {...stylex.props(styles.grid)}>
           {ABOUT_CAMPUS.photos.map((photo, idx) => (
-            <Tile key={photo.id} photo={photo} index={idx} onOpen={() => setOpenIndex(idx)} />
+            <Tile key={photo.id} photo={photo} index={idx} onOpen={() => lightbox.open(idx)} />
           ))}
         </ul>
       </div>
-      <Lightbox
-        index={openIndex}
-        onClose={() => setOpenIndex(null)}
-        onStep={(delta) =>
-          setOpenIndex((current) =>
-            current === null ? null : (current + delta + PHOTO_COUNT) % PHOTO_COUNT,
-          )
-        }
-      />
+      <Lightbox lightbox={lightbox} />
     </section>
   );
 }

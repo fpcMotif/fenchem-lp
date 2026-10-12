@@ -1,6 +1,7 @@
 import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { useState } from "react";
+
+import { useLightbox } from "@/components/prototype/shared/lightbox";
 
 import { ABOUT_CAMPUS } from "../../../about-data";
 import { Lightbox } from "../lightbox";
@@ -66,8 +67,7 @@ const styles = stylex.create({
 });
 
 export function CampusSheet() {
-  const [openIndex, setOpenIndex] = useState<number | null>(null);
-  const count = ABOUT_CAMPUS.photos.length;
+  const lightbox = useLightbox(ABOUT_CAMPUS.photos.length);
 
   return (
     <>
@@ -87,7 +87,7 @@ export function CampusSheet() {
               <button
                 type="button"
                 aria-label={`View larger: ${photo.english}`}
-                onClick={() => setOpenIndex(idx)}
+                onClick={() => lightbox.open(idx)}
                 {...stylex.props(styles.button)}
               >
                 <img
@@ -103,13 +103,7 @@ export function CampusSheet() {
           ))}
         </div>
       </Sheet>
-      <Lightbox
-        index={openIndex}
-        onClose={() => setOpenIndex(null)}
-        onStep={(delta) =>
-          setOpenIndex((current) => (current === null ? null : (current + delta + count) % count))
-        }
-      />
+      <Lightbox lightbox={lightbox} />
     </>
   );
 }

@@ -1,6 +1,6 @@
 import * as stylex from "@stylexjs/stylex";
-import { useState } from "react";
 
+import { useLightbox } from "@/components/prototype/shared/lightbox";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
 import { ABOUT_CAMPUS } from "../../about-data";
@@ -32,8 +32,7 @@ const styles = stylex.create({
 
 export function Campus() {
   const reduce = useReducedMotion();
-  const [open, setOpen] = useState<number | null>(null);
-  const count = PLATES.length;
+  const lightbox = useLightbox(PLATES.length);
 
   return (
     <section
@@ -54,17 +53,10 @@ export function Campus() {
         <p {...stylex.props(ui.label, styles.hint)}>点击底片查看大图</p>
       </div>
 
-      {reduce ? null : <PlateArc onOpen={setOpen} />}
-      <PlateList always={reduce} onOpen={setOpen} />
+      {reduce ? null : <PlateArc onOpen={lightbox.open} />}
+      <PlateList always={reduce} onOpen={lightbox.open} />
 
-      <Lightbox
-        photos={PLATES}
-        index={open}
-        onClose={() => setOpen(null)}
-        onStep={(delta) =>
-          setOpen((current) => (current === null ? null : (current + delta + count) % count))
-        }
-      />
+      <Lightbox lightbox={lightbox} photos={PLATES} />
     </section>
   );
 }

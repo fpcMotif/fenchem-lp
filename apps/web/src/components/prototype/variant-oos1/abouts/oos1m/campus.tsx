@@ -1,5 +1,6 @@
 import * as stylex from "@stylexjs/stylex";
-import { useState } from "react";
+
+import { useLightbox } from "@/components/prototype/shared/lightbox";
 
 import { ABOUT_CAMPUS } from "../../about-data";
 import { Lightbox, type LightboxView } from "./lightbox";
@@ -224,8 +225,7 @@ function ViewMarker({ letter }: { letter: string }) {
 }
 
 export function Campus() {
-  const [openIndex, setOpenIndex] = useState<number | null>(null);
-  const count = VIEWS.length;
+  const lightbox = useLightbox(VIEWS.length);
 
   return (
     <section
@@ -244,7 +244,7 @@ export function Campus() {
           <li key={view.id} {...stylex.props(styles.view, stylex.defaultMarker())}>
             <button
               type="button"
-              onClick={() => setOpenIndex(index)}
+              onClick={() => lightbox.open(index)}
               {...stylex.props(styles.photo, ui.focusRing)}
             >
               <img
@@ -284,14 +284,7 @@ export function Campus() {
           </ol>
         </li>
       </ul>
-      <Lightbox
-        views={VIEWS}
-        index={openIndex}
-        onClose={() => setOpenIndex(null)}
-        onStep={(delta) =>
-          setOpenIndex((current) => (current === null ? null : (current + delta + count) % count))
-        }
-      />
+      <Lightbox lightbox={lightbox} views={VIEWS} />
     </section>
   );
 }

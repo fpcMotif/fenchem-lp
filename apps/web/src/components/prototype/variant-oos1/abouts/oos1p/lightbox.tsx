@@ -1,8 +1,8 @@
 import { LightboxControls } from "../../../shared/lightbox-controls";
 import { LightboxStage } from "../../../shared/lightbox-stage";
+import { LightboxDialog, type LightboxState } from "../../../shared/lightbox";
 import * as stylex from "@stylexjs/stylex";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
-import { useEffect, useRef } from "react";
 
 import { ui } from "./layout";
 import { frameLabel } from "./time-grid-values";
@@ -135,48 +135,16 @@ const styles = stylex.create({
 });
 
 export function Lightbox({
+  lightbox,
   photos,
-  index,
-  onClose,
-  onStep,
 }: {
+  lightbox: LightboxState;
   photos: readonly LightboxPhoto[];
-  index: number | null;
-  onClose: () => void;
-  onStep: (delta: number) => void;
 }) {
-  const dialogRef = useRef<HTMLDialogElement>(null);
-  const photo = index === null ? null : photos[index];
-
-  useEffect(() => {
-    const dialog = dialogRef.current;
-    if (!dialog) return;
-    if (index !== null && !dialog.open) dialog.showModal();
-    if (index === null && dialog.open) dialog.close();
-  }, [index]);
-
-  useEffect(() => {
-    if (index === null) return;
-    for (const delta of [1, -1]) {
-      const neighbor = new Image();
-      neighbor.src = photos[(index + delta + photos.length) % photos.length].large;
-    }
-  }, [index, photos]);
-
+  const { close: onClose, step: onStep } = lightbox;
   return (
-    <dialog
-      ref={dialogRef}
-      aria-label="Campus photos"
-      onClose={onClose}
-      onKeyDown={(event) => {
-        if (event.key !== "ArrowRight" && event.key !== "ArrowLeft") return;
-        event.preventDefault();
-        event.stopPropagation();
-        onStep(event.key === "ArrowRight" ? 1 : -1);
-      }}
-      {...stylex.props(styles.dialog)}
-    >
-      {photo && index !== null ? (
+    <LightboxDialog lightbox={lightbox} items={photos} sx={styles.dialog}>
+      {(photo, index) => (
         <>
           <LightboxStage onClose={onClose} sx={styles.stage}>
             <figure key={photo.id} {...stylex.props(styles.figure)}>
@@ -212,7 +180,7 @@ export function Lightbox({
             {photo.english}
           </span>
         </>
-      ) : null}
-    </dialog>
+      )}
+    </LightboxDialog>
   );
 }

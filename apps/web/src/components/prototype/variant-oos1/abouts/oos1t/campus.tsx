@@ -1,5 +1,6 @@
 import * as stylex from "@stylexjs/stylex";
-import { useState } from "react";
+
+import { useLightbox } from "@/components/prototype/shared/lightbox";
 
 import { ABOUT_CAMPUS } from "../../about-data";
 import { Cast } from "./cast";
@@ -107,8 +108,7 @@ const place = stylex.create({
 });
 
 export function Campus() {
-  const [openIndex, setOpenIndex] = useState<number | null>(null);
-  const count = PHOTOS.length;
+  const lightbox = useLightbox(PHOTOS.length);
 
   return (
     <section
@@ -128,7 +128,7 @@ export function Campus() {
           <li key={photo.id} {...stylex.props(place[photo.id])}>
             <button
               type="button"
-              onClick={() => setOpenIndex(index)}
+              onClick={() => lightbox.open(index)}
               {...stylex.props(styles.button, ui.focus)}
             >
               <span {...stylex.props(ui.plate, styles.plate)}>
@@ -154,14 +154,7 @@ export function Campus() {
           </li>
         ))}
       </ul>
-      <Lightbox
-        photos={PHOTOS}
-        index={openIndex}
-        onClose={() => setOpenIndex(null)}
-        onStep={(delta) => {
-          setOpenIndex((current) => (current === null ? null : (current + delta + count) % count));
-        }}
-      />
+      <Lightbox lightbox={lightbox} photos={PHOTOS} />
     </section>
   );
 }

@@ -1,9 +1,9 @@
 import { LightboxControls } from "../../../shared/lightbox-controls";
 import { LightboxStage } from "../../../shared/lightbox-stage";
+import { LightboxDialog, type LightboxState } from "../../../shared/lightbox";
 import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
-import { useEffect, useRef } from "react";
 
 import { ABOUT_CAMPUS } from "../../about-data";
 import { base } from "./shared-values";
@@ -102,48 +102,13 @@ const styles = stylex.create({
   },
 });
 
-export function Lightbox({
-  index,
-  onClose,
-  onStep,
-}: {
-  index: number | null;
-  onClose: () => void;
-  onStep: (delta: number) => void;
-}) {
-  const dialogRef = useRef<HTMLDialogElement>(null);
+export function Lightbox({ lightbox }: { lightbox: LightboxState }) {
+  const { close: onClose, step: onStep } = lightbox;
   const photos = ABOUT_CAMPUS.photos;
-  const photo = index === null ? null : photos[index];
-
-  useEffect(() => {
-    const dialog = dialogRef.current;
-    if (!dialog) return;
-    if (index !== null && !dialog.open) dialog.showModal();
-    if (index === null && dialog.open) dialog.close();
-  }, [index]);
-
-  useEffect(() => {
-    if (index === null) return;
-    for (const delta of [1, -1]) {
-      const neighbor = new Image();
-      neighbor.src = photos[(index + delta + photos.length) % photos.length].large;
-    }
-  }, [index, photos]);
 
   return (
-    <dialog
-      ref={dialogRef}
-      aria-label="Campus photos"
-      onClose={onClose}
-      onKeyDown={(event) => {
-        if (event.key !== "ArrowRight" && event.key !== "ArrowLeft") return;
-        event.preventDefault();
-        event.stopPropagation();
-        onStep(event.key === "ArrowRight" ? 1 : -1);
-      }}
-      {...stylex.props(styles.dialog)}
-    >
-      {photo ? (
+    <LightboxDialog lightbox={lightbox} items={photos} sx={styles.dialog}>
+      {(photo) => (
         <>
           <LightboxStage onClose={onClose} sx={styles.stage}>
             <figure key={photo.id} {...stylex.props(styles.figure)}>
@@ -168,7 +133,7 @@ export function Lightbox({
             }}
           />
         </>
-      ) : null}
-    </dialog>
+      )}
+    </LightboxDialog>
   );
 }

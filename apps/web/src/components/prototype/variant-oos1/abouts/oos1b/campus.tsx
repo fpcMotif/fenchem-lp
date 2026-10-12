@@ -1,5 +1,6 @@
 import * as stylex from "@stylexjs/stylex";
-import { useState } from "react";
+
+import { useLightbox } from "@/components/prototype/shared/lightbox";
 
 import { ABOUT_CAMPUS } from "../../about-data";
 import { INDEX_PLATES_VISITED_THEN_UNVISITED, ROOMS_IN_WALKING_ORDER } from "./journey";
@@ -15,9 +16,8 @@ const WALK = ROOMS_IN_WALKING_ORDER.map((room) => room.plate.english).join(", ")
 
 export function Campus() {
   const portal = useMediaQuery(PORTAL_QUERY);
-  const [openIndex, setOpenIndex] = useState<number | null>(null);
-  const [stepped, setStepped] = useState(false);
   const plates = INDEX_PLATES_VISITED_THEN_UNVISITED;
+  const lightbox = useLightbox(plates.length);
 
   return (
     <section
@@ -47,27 +47,10 @@ export function Campus() {
       )}
 
       <div {...stylex.props(ui.shell)}>
-        <PlateIndex
-          plates={plates}
-          onOpen={(index) => {
-            setStepped(false);
-            setOpenIndex(index);
-          }}
-        />
+        <PlateIndex plates={plates} onOpen={lightbox.open} />
       </div>
 
-      <Lightbox
-        plates={plates}
-        index={openIndex}
-        stepped={stepped}
-        onClose={() => setOpenIndex(null)}
-        onStep={(delta) => {
-          setStepped(true);
-          setOpenIndex((current) =>
-            current === null ? null : (current + delta + plates.length) % plates.length,
-          );
-        }}
-      />
+      <Lightbox lightbox={lightbox} plates={plates} />
     </section>
   );
 }

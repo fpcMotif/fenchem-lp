@@ -1,8 +1,8 @@
 import { LightboxControls } from "../../../shared/lightbox-controls";
 import { LightboxStage } from "../../../shared/lightbox-stage";
+import { LightboxDialog, type LightboxState } from "../../../shared/lightbox";
 import * as stylex from "@stylexjs/stylex";
 import { ArrowLeft, ArrowRight, X } from "lucide-react";
-import { useEffect, useRef } from "react";
 
 import { ui } from "./shared";
 import { bp, chrome, face, tone } from "./tokens.stylex";
@@ -117,57 +117,16 @@ const styles = stylex.create({
 });
 
 export function Lightbox({
+  lightbox,
   views,
-  index,
-  onClose,
-  onStep,
 }: {
+  lightbox: LightboxState;
   views: readonly LightboxView[];
-  index: number | null;
-  onClose: () => void;
-  onStep: (delta: number) => void;
 }) {
-  const dialogRef = useRef<HTMLDialogElement>(null);
-  const openerRef = useRef<HTMLElement | null>(null);
-  const view = index === null ? null : views[index];
-
-  useEffect(() => {
-    const dialog = dialogRef.current;
-    if (!dialog) return;
-    if (index !== null && !dialog.open) {
-      openerRef.current =
-        document.activeElement instanceof HTMLElement ? document.activeElement : null;
-      dialog.showModal();
-    }
-    if (index === null && dialog.open) dialog.close();
-    if (index === null) {
-      openerRef.current?.focus();
-      openerRef.current = null;
-    }
-  }, [index]);
-
-  useEffect(() => {
-    if (index === null) return;
-    for (const delta of [1, -1]) {
-      const neighbor = new Image();
-      neighbor.src = views[(index + delta + views.length) % views.length].large;
-    }
-  }, [index, views]);
-
+  const { close: onClose, step: onStep } = lightbox;
   return (
-    <dialog
-      ref={dialogRef}
-      aria-label="Campus photos"
-      onClose={onClose}
-      onKeyDown={(event) => {
-        if (event.key !== "ArrowRight" && event.key !== "ArrowLeft") return;
-        event.preventDefault();
-        event.stopPropagation();
-        onStep(event.key === "ArrowRight" ? 1 : -1);
-      }}
-      {...stylex.props(styles.dialog)}
-    >
-      {view ? (
+    <LightboxDialog lightbox={lightbox} items={views} sx={styles.dialog}>
+      {(view) => (
         <>
           <LightboxStage onClose={onClose} sx={styles.stage}>
             <figure key={view.id} {...stylex.props(styles.figure)}>
@@ -200,7 +159,7 @@ export function Lightbox({
             }}
           />
         </>
-      ) : null}
-    </dialog>
+      )}
+    </LightboxDialog>
   );
 }

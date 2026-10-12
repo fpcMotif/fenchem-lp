@@ -1,8 +1,8 @@
+import { LightboxDialog, type LightboxState, useLightbox } from "../../../shared/lightbox";
 import { LightboxStage } from "../../../shared/lightbox-stage";
 import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
 
 import { ABOUT_CAMPUS } from "../../about-data";
 import { NodeMarker, Reveal, Section, Shell } from "./layout";
@@ -202,49 +202,11 @@ const PHOTO_ORDER: readonly PhotoId[] = [
 
 const gallery = PHOTO_ORDER.flatMap((id) => ABOUT_CAMPUS.photos.filter((photo) => photo.id === id));
 
-function Lightbox({
-  index,
-  stepped,
-  onClose,
-  onStep,
-}: {
-  index: number | null;
-  stepped: boolean;
-  onClose: () => void;
-  onStep: (delta: number) => void;
-}) {
-  const dialogRef = useRef<HTMLDialogElement>(null);
-  const photo = index === null ? null : gallery[index];
-
-  useEffect(() => {
-    const dialog = dialogRef.current;
-    if (!dialog) return;
-    if (index !== null && !dialog.open) dialog.showModal();
-    if (index === null && dialog.open) dialog.close();
-  }, [index]);
-
-  useEffect(() => {
-    if (index === null) return;
-    for (const delta of [1, -1]) {
-      const neighbor = new Image();
-      neighbor.src = gallery[(index + delta + gallery.length) % gallery.length].large;
-    }
-  }, [index]);
-
+function Lightbox({ lightbox }: { lightbox: LightboxState }) {
+  const { stepped, close: onClose, step: onStep } = lightbox;
   return (
-    <dialog
-      ref={dialogRef}
-      aria-label="Campus photos"
-      onClose={onClose}
-      onKeyDown={(event) => {
-        if (event.key !== "ArrowRight" && event.key !== "ArrowLeft") return;
-        event.preventDefault();
-        event.stopPropagation();
-        onStep(event.key === "ArrowRight" ? 1 : -1);
-      }}
-      {...stylex.props(styles.lightbox)}
-    >
-      {photo ? (
+    <LightboxDialog lightbox={lightbox} items={gallery} sx={styles.lightbox}>
+      {(photo) => (
         <>
           <LightboxStage onClose={onClose} sx={styles.stage}>
             <figure
@@ -283,15 +245,13 @@ function Lightbox({
             <X size={22} aria-hidden="true" />
           </button>
         </>
-      ) : null}
-    </dialog>
+      )}
+    </LightboxDialog>
   );
 }
 
 export function Campus() {
-  const [openIndex, setOpenIndex] = useState<number | null>(null);
-  const [stepped, setStepped] = useState(false);
-  const count = gallery.length;
+  const lightbox = useLightbox(gallery.length);
 
   return (
     <Section id="about-campus" name={ABOUT_CAMPUS.eyebrow}>
@@ -303,10 +263,7 @@ export function Campus() {
               <button
                 type="button"
                 aria-label={`View larger: ${photo.english}`}
-                onClick={() => {
-                  setStepped(false);
-                  setOpenIndex(position);
-                }}
+                onClick={() => lightbox.open(position)}
                 {...stylex.props(styles.button)}
               >
                 <img
@@ -322,15 +279,7 @@ export function Campus() {
           ))}
         </div>
       </Shell>
-      <Lightbox
-        index={openIndex}
-        stepped={stepped}
-        onClose={() => setOpenIndex(null)}
-        onStep={(delta) => {
-          setStepped(true);
-          setOpenIndex((current) => (current === null ? null : (current + delta + count) % count));
-        }}
-      />
+      <Lightbox lightbox={lightbox} />
     </Section>
   );
 }

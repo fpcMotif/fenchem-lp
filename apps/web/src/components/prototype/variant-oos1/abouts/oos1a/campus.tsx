@@ -1,8 +1,9 @@
 import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 import { m, type MotionValue, useScroll, useTransform } from "motion/react";
-import { useRef, useState, useSyncExternalStore } from "react";
+import { useRef, useSyncExternalStore } from "react";
 
+import { useLightbox } from "@/components/prototype/shared/lightbox";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
 import { ABOUT_CAMPUS } from "../../about-data";
@@ -216,8 +217,7 @@ export function Campus() {
     target: trackRef,
     offset: ["start end", "end end"],
   });
-  const [openIndex, setOpenIndex] = useState<number | null>(null);
-  const [stepped, setStepped] = useState(false);
+  const lightbox = useLightbox(COUNT);
 
   const completeAssembly = () => {
     const track = trackRef.current;
@@ -251,10 +251,7 @@ export function Campus() {
                   index={index}
                   progress={scrollYProgress}
                   animated={pinned}
-                  onOpen={() => {
-                    setStepped(false);
-                    setOpenIndex(index);
-                  }}
+                  onOpen={() => lightbox.open(index)}
                   onFocusCell={completeAssembly}
                 />
               ))}
@@ -262,15 +259,7 @@ export function Campus() {
           </Frame>
         </div>
       </div>
-      <Lightbox
-        index={openIndex}
-        stepped={stepped}
-        onClose={() => setOpenIndex(null)}
-        onStep={(delta) => {
-          setStepped(true);
-          setOpenIndex((current) => (current === null ? null : (current + delta + COUNT) % COUNT));
-        }}
-      />
+      <Lightbox lightbox={lightbox} />
     </section>
   );
 }

@@ -1,5 +1,6 @@
 import * as stylex from "@stylexjs/stylex";
-import { useState } from "react";
+
+import { useLightbox } from "@/components/prototype/shared/lightbox";
 
 import { ABOUT_CAMPUS, ABOUT_MOMENT } from "../../about-data";
 import { srOnly, ui } from "./layout";
@@ -178,9 +179,9 @@ const positions = stylex.create({
 });
 
 export function Campus() {
-  const [openIndex, setOpenIndex] = useState<number | null>(null);
   const [studyRef, phase] = useEntry<HTMLUListElement>();
   const count = PHOTOS.length;
+  const lightbox = useLightbox(count);
 
   return (
     <section id="about-campus" aria-labelledby="oos1p-campus" {...stylex.props(ui.plate)}>
@@ -201,7 +202,7 @@ export function Campus() {
               <li key={photo.id} {...stylex.props(styles.cell)}>
                 <button
                   type="button"
-                  onClick={() => setOpenIndex(index)}
+                  onClick={() => lightbox.open(index)}
                   {...stylex.props(styles.button, stylex.defaultMarker())}
                 >
                   <span aria-hidden="true" {...stylex.props(ui.frameNumber, styles.edge)}>
@@ -242,14 +243,7 @@ export function Campus() {
           </ul>
         </div>
       </div>
-      <Lightbox
-        photos={PHOTOS}
-        index={openIndex}
-        onClose={() => setOpenIndex(null)}
-        onStep={(delta) =>
-          setOpenIndex((current) => (current === null ? null : (current + delta + count) % count))
-        }
-      />
+      <Lightbox lightbox={lightbox} photos={PHOTOS} />
     </section>
   );
 }

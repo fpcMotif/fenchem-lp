@@ -1,6 +1,7 @@
 import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { useState } from "react";
+
+import { useLightbox } from "@/components/prototype/shared/lightbox";
 
 import { ABOUT_CAMPUS } from "../../about-data";
 import { Lightbox } from "./lightbox";
@@ -102,9 +103,7 @@ function spanFor(id: string) {
 }
 
 export function Campus() {
-  const [openIndex, setOpenIndex] = useState<number | null>(null);
-  const [stepped, setStepped] = useState(false);
-  const count = PHOTOS.length;
+  const lightbox = useLightbox(PHOTOS.length);
 
   return (
     <section
@@ -128,10 +127,7 @@ export function Campus() {
                 <button
                   type="button"
                   aria-label={`View larger: ${photo.english}`}
-                  onClick={() => {
-                    setStepped(false);
-                    setOpenIndex(position);
-                  }}
+                  onClick={() => lightbox.open(position)}
                   {...stylex.props(styles.button)}
                 >
                   <img
@@ -148,16 +144,7 @@ export function Campus() {
           ))}
         </div>
       </div>
-      <Lightbox
-        photos={PHOTOS}
-        index={openIndex}
-        stepped={stepped}
-        onClose={() => setOpenIndex(null)}
-        onStep={(delta) => {
-          setStepped(true);
-          setOpenIndex((current) => (current === null ? null : (current + delta + count) % count));
-        }}
-      />
+      <Lightbox lightbox={lightbox} photos={PHOTOS} />
     </section>
   );
 }

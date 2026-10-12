@@ -1,8 +1,9 @@
 import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 import { ChevronRight } from "lucide-react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef } from "react";
 
+import { useLightbox } from "@/components/prototype/shared/lightbox";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
 import { ABOUT_BANNER, ABOUT_CAMPUS, ABOUT_HERO } from "../../about-data";
@@ -294,34 +295,18 @@ function SubNav({
 
 export function AboutOOS1C({ onNavigateHome }: AboutPageProps) {
   const pinned = usePinned();
-  const [openIndex, setOpenIndex] = useState<number | null>(null);
-  const [stepped, setStepped] = useState(false);
-  const count = ABOUT_CAMPUS.photos.length;
+  const lightbox = useLightbox(ABOUT_CAMPUS.photos.length);
 
   return (
     <div id="about-top" {...stylex.props(styles.root)}>
       <Banner />
       <SubNav pinned={pinned} onNavigateHome={onNavigateHome} />
-      <Panorama
-        pinned={pinned}
-        onOpenPhoto={(index) => {
-          setStepped(false);
-          setOpenIndex(index);
-        }}
-      />
+      <Panorama pinned={pinned} onOpenPhoto={lightbox.open} />
       <CsrSection />
       <ProductsSection onNavigateHome={onNavigateHome} />
       <NavyBand />
       <ClosingCta onNavigateHome={onNavigateHome} />
-      <Lightbox
-        index={openIndex}
-        stepped={stepped}
-        onClose={() => setOpenIndex(null)}
-        onStep={(delta) => {
-          setStepped(true);
-          setOpenIndex((current) => (current === null ? null : (current + delta + count) % count));
-        }}
-      />
+      <Lightbox lightbox={lightbox} />
     </div>
   );
 }

@@ -1,7 +1,8 @@
 import { Lightbox } from "./lightbox";
 import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { useState } from "react";
+
+import { useLightbox } from "@/components/prototype/shared/lightbox";
 import { ABOUT_CAMPUS } from "../../about-data";
 import { useReveal } from "./reveal";
 import { srOnly, ui } from "./shared";
@@ -115,10 +116,8 @@ const positions = stylex.create({
 });
 
 export function CampusWall() {
-  const [openIndex, setOpenIndex] = useState<number | null>(null);
-  const [stepped, setStepped] = useState(false);
+  const lightbox = useLightbox(CAMPUS_PHOTOS.length);
   const [wallRef, phase] = useReveal<HTMLUListElement>();
-  const count = CAMPUS_PHOTOS.length;
 
   return (
     <section
@@ -141,10 +140,7 @@ export function CampusWall() {
           >
             <button
               type="button"
-              onClick={() => {
-                setStepped(false);
-                setOpenIndex(index);
-              }}
+              onClick={() => lightbox.open(index)}
               {...stylex.props(styles.button, stylex.defaultMarker())}
             >
               <img
@@ -165,16 +161,7 @@ export function CampusWall() {
           </li>
         ))}
       </ul>
-      <Lightbox
-        photos={CAMPUS_PHOTOS}
-        index={openIndex}
-        stepped={stepped}
-        onClose={() => setOpenIndex(null)}
-        onStep={(delta) => {
-          setStepped(true);
-          setOpenIndex((current) => (current === null ? null : (current + delta + count) % count));
-        }}
-      />
+      <Lightbox lightbox={lightbox} photos={CAMPUS_PHOTOS} />
     </section>
   );
 }

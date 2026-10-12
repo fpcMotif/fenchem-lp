@@ -2,6 +2,8 @@ import * as stylex from "@stylexjs/stylex";
 import { ArrowRight } from "lucide-react";
 import { Fragment, useEffect, useId, useRef, useState } from "react";
 
+import { useLightbox } from "@/components/prototype/shared/lightbox";
+
 import {
   ABOUT_BANNER,
   ABOUT_CAMPUS,
@@ -233,9 +235,7 @@ function Profile() {
 }
 
 function Campus() {
-  const [openIndex, setOpenIndex] = useState<number | null>(null);
-  const [stepped, setStepped] = useState(false);
-  const count = CAMPUS_HANG.length;
+  const lightbox = useLightbox(CAMPUS_HANG.length);
 
   return (
     <section
@@ -249,25 +249,11 @@ function Campus() {
       <ul {...stylex.props(styles.column, styles.grid, styles.campusList)}>
         {CAMPUS_HANG.map((photo, index) => (
           <li key={photo.id} {...stylex.props(styles.campusItem, placement[photo.id])}>
-            <CampusPrint
-              photo={photo}
-              onOpen={() => {
-                setStepped(false);
-                setOpenIndex(index);
-              }}
-            />
+            <CampusPrint photo={photo} onOpen={() => lightbox.open(index)} />
           </li>
         ))}
       </ul>
-      <Lightbox
-        index={openIndex}
-        stepped={stepped}
-        onClose={() => setOpenIndex(null)}
-        onStep={(delta) => {
-          setStepped(true);
-          setOpenIndex((current) => (current === null ? null : (current + delta + count) % count));
-        }}
-      />
+      <Lightbox lightbox={lightbox} />
     </section>
   );
 }

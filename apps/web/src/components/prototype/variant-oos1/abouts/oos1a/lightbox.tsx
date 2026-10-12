@@ -1,10 +1,10 @@
-import { CampusLightbox } from "../../../shared/campus-lightbox";
 import { LightboxControls } from "../../../shared/lightbox-controls";
+import { LightboxDialog, type LightboxState } from "../../../shared/lightbox";
+import { LightboxStage } from "../../../shared/lightbox-stage";
 
 import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
-import { useEffect, useRef } from "react";
 
 import { ABOUT_CAMPUS } from "../../about-data";
 import { ease, fonts, palette } from "./lattice.stylex";
@@ -132,66 +132,38 @@ const styles = stylex.create({
   },
 });
 
-export function Lightbox({
-  index,
-  stepped,
-  onClose,
-  onStep,
-}: {
-  index: number | null;
-  stepped: boolean;
-  onClose: () => void;
-  onStep: (delta: number) => void;
-}) {
-  const dialogRef = useRef<HTMLDialogElement>(null);
+export function Lightbox({ lightbox }: { lightbox: LightboxState }) {
+  const { stepped, close: onClose, step: onStep } = lightbox;
   const photos = ABOUT_CAMPUS.photos;
-  const photo = index === null ? null : photos[index];
-
-  useEffect(() => {
-    const dialog = dialogRef.current;
-    if (!dialog) return;
-    if (index !== null && !dialog.open) dialog.showModal();
-    if (index === null && dialog.open) dialog.close();
-  }, [index]);
-
-  useEffect(() => {
-    if (index === null) return;
-    for (const delta of [1, -1]) {
-      const neighbor = new Image();
-      neighbor.src = photos[(index + delta + photos.length) % photos.length].large;
-    }
-  }, [index, photos]);
 
   return (
-    <CampusLightbox
-      dialogRef={dialogRef}
-      photo={photo}
-      stepped={stepped}
-      onClose={onClose}
-      onStep={onStep}
-      styles={{
-        caption: styles.caption,
-        figure: styles.figure,
-        dialog: styles.dialog,
-        stage: styles.stage,
-        figureOpen: styles.figureOpen,
-        figureStep: styles.figureStep,
-        image: styles.image,
-      }}
-    >
-      <LightboxControls
-        onStep={onStep}
-        onClose={onClose}
-        previous={{
-          icon: <ChevronLeft size={22} aria-hidden="true" />,
-          sx: [styles.button, styles.prev],
-        }}
-        next={{
-          icon: <ChevronRight size={22} aria-hidden="true" />,
-          sx: [styles.button, styles.next],
-        }}
-        close={{ icon: <X size={22} aria-hidden="true" />, sx: [styles.button, styles.close] }}
-      />
-    </CampusLightbox>
+    <LightboxDialog lightbox={lightbox} items={photos} sx={styles.dialog}>
+      {(photo) => (
+        <>
+          <LightboxStage onClose={onClose} sx={styles.stage}>
+            <figure
+              key={photo.id}
+              {...stylex.props(styles.figure, stepped ? styles.figureStep : styles.figureOpen)}
+            >
+              <img src={photo.large} alt={photo.alt} {...stylex.props(styles.image)} />
+              <figcaption {...stylex.props(styles.caption)}>{photo.caption}</figcaption>
+            </figure>
+          </LightboxStage>
+          <LightboxControls
+            onStep={onStep}
+            onClose={onClose}
+            previous={{
+              icon: <ChevronLeft size={22} aria-hidden="true" />,
+              sx: [styles.button, styles.prev],
+            }}
+            next={{
+              icon: <ChevronRight size={22} aria-hidden="true" />,
+              sx: [styles.button, styles.next],
+            }}
+            close={{ icon: <X size={22} aria-hidden="true" />, sx: [styles.button, styles.close] }}
+          />
+        </>
+      )}
+    </LightboxDialog>
   );
 }

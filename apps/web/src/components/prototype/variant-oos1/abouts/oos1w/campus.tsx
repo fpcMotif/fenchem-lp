@@ -1,5 +1,7 @@
 import * as stylex from "@stylexjs/stylex";
-import { useRef, useState } from "react";
+import { useRef } from "react";
+
+import { useLightbox } from "@/components/prototype/shared/lightbox";
 
 import { ABOUT_CAMPUS } from "../../about-data";
 import { Lightbox, type LightboxPhoto } from "./lightbox";
@@ -175,21 +177,16 @@ function Panel({
 }
 
 export function Campus() {
-  const [open, setOpen] = useState<number | null>(null);
-  const [stepped, setStepped] = useState(false);
+  const lightbox = useLightbox(PHOTOS.length);
   const triggers = useRef<(HTMLButtonElement | null)[]>([]);
   const [lead, ...series] = PHOTOS;
 
-  const openAt = (index: number) => {
-    setStepped(false);
-    setOpen(index);
-  };
   const registerTrigger = (index: number, node: HTMLButtonElement | null) => {
     triggers.current[index] = node;
   };
   const close = () => {
-    const returnTo = open;
-    setOpen(null);
+    const returnTo = lightbox.index;
+    lightbox.close();
     if (returnTo !== null) triggers.current[returnTo]?.focus();
   };
 
@@ -209,7 +206,13 @@ export function Campus() {
           </div>
 
           <div {...stylex.props(styles.lead)}>
-            <Panel photo={lead} index={0} lead onOpen={openAt} registerTrigger={registerTrigger} />
+            <Panel
+              photo={lead}
+              index={0}
+              lead
+              onOpen={lightbox.open}
+              registerTrigger={registerTrigger}
+            />
           </div>
 
           <ul {...stylex.props(styles.series)}>
@@ -219,7 +222,7 @@ export function Campus() {
                   photo={photo}
                   index={offset + 1}
                   lead={false}
-                  onOpen={openAt}
+                  onOpen={lightbox.open}
                   registerTrigger={registerTrigger}
                 />
               </li>
@@ -228,18 +231,7 @@ export function Campus() {
         </div>
       </div>
 
-      <Lightbox
-        photos={PHOTOS}
-        index={open}
-        stepped={stepped}
-        onClose={close}
-        onStep={(delta) => {
-          setStepped(true);
-          setOpen((current) =>
-            current === null ? current : (current + delta + PHOTOS.length) % PHOTOS.length,
-          );
-        }}
-      />
+      <Lightbox lightbox={{ ...lightbox, close }} photos={PHOTOS} />
     </section>
   );
 }

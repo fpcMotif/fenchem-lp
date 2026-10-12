@@ -1,5 +1,6 @@
 import * as stylex from "@stylexjs/stylex";
-import { useState } from "react";
+
+import { useLightbox } from "@/components/prototype/shared/lightbox";
 
 import { Corridor } from "./corridor";
 import { CorridorPlan } from "./corridor-plan";
@@ -40,12 +41,7 @@ const styles = stylex.create({
 });
 
 export function Campus() {
-  const [openIndex, setOpenIndex] = useState<number | null>(null);
-  const [stepped, setStepped] = useState(false);
-  const open = (index: number) => {
-    setStepped(false);
-    setOpenIndex(index);
-  };
+  const lightbox = useLightbox(WORKS.length);
 
   return (
     <section
@@ -69,21 +65,11 @@ export function Campus() {
             Seven works line the corridor. One, at the end, faces you.
           </p>
         </RoomSign>
-        <CorridorPlan onOpen={open} />
-        <GalleryWall onOpen={open} />
+        <CorridorPlan onOpen={lightbox.open} />
+        <GalleryWall onOpen={lightbox.open} />
       </div>
-      <Corridor onOpen={open} />
-      <Lightbox
-        index={openIndex}
-        stepped={stepped}
-        onClose={() => setOpenIndex(null)}
-        onStep={(delta) => {
-          setStepped(true);
-          setOpenIndex((current) =>
-            current === null ? null : (current + delta + WORKS.length) % WORKS.length,
-          );
-        }}
-      />
+      <Corridor onOpen={lightbox.open} />
+      <Lightbox lightbox={lightbox} />
     </section>
   );
 }

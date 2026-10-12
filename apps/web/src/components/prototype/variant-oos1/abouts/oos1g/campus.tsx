@@ -1,6 +1,7 @@
 import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { useState } from "react";
+
+import { useLightbox } from "@/components/prototype/shared/lightbox";
 
 import { ABOUT_CAMPUS } from "../../about-data";
 import { MOSAIC_FOCUS, MOSAIC_LEFT, MOSAIC_RIGHT } from "./data";
@@ -123,9 +124,7 @@ const PHOTOS = new Map<string, { photo: (typeof ABOUT_CAMPUS.photos)[number]; in
 );
 
 export function Campus() {
-  const [openIndex, setOpenIndex] = useState<number | null>(null);
-  const [stepped, setStepped] = useState(false);
-  const count = ABOUT_CAMPUS.photos.length;
+  const lightbox = useLightbox(ABOUT_CAMPUS.photos.length);
 
   const renderTile = (id: string, placement: Placement) => {
     const entry = PHOTOS.get(id);
@@ -136,10 +135,7 @@ export function Campus() {
         <button
           type="button"
           aria-label={`View larger: ${photo.english}`}
-          onClick={() => {
-            setStepped(false);
-            setOpenIndex(index);
-          }}
+          onClick={() => lightbox.open(index)}
           {...stylex.props(styles.button)}
         >
           <img
@@ -173,15 +169,7 @@ export function Campus() {
         </div>
       </div>
 
-      <Lightbox
-        index={openIndex}
-        stepped={stepped}
-        onClose={() => setOpenIndex(null)}
-        onStep={(delta) => {
-          setStepped(true);
-          setOpenIndex((current) => (current === null ? null : (current + delta + count) % count));
-        }}
-      />
+      <Lightbox lightbox={lightbox} />
     </section>
   );
 }

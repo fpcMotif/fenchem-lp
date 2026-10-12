@@ -1,8 +1,8 @@
 import { LightboxControls } from "../../../shared/lightbox-controls";
 import { LightboxStage } from "../../../shared/lightbox-stage";
+import { LightboxDialog, type LightboxState } from "../../../shared/lightbox";
 import * as stylex from "@stylexjs/stylex";
 import { ArrowLeft, ArrowRight, X } from "lucide-react";
-import { useEffect, useRef } from "react";
 
 import type { Plate } from "./journey";
 import { Tag } from "./shared";
@@ -143,50 +143,16 @@ const styles = stylex.create({
 });
 
 export function Lightbox({
+  lightbox,
   plates,
-  index,
-  stepped,
-  onClose,
-  onStep,
 }: {
+  lightbox: LightboxState;
   plates: readonly Plate[];
-  index: number | null;
-  stepped: boolean;
-  onClose: () => void;
-  onStep: (delta: number) => void;
 }) {
-  const dialogRef = useRef<HTMLDialogElement>(null);
-  const plate = index === null ? null : plates[index];
-
-  useEffect(() => {
-    const dialog = dialogRef.current;
-    if (!dialog) return;
-    if (index !== null && !dialog.open) dialog.showModal();
-    if (index === null && dialog.open) dialog.close();
-  }, [index]);
-
-  useEffect(() => {
-    if (index === null) return;
-    for (const delta of [1, -1]) {
-      const neighbor = new Image();
-      neighbor.src = plates[(index + delta + plates.length) % plates.length].large;
-    }
-  }, [index, plates]);
-
+  const { stepped, close: onClose, step: onStep } = lightbox;
   return (
-    <dialog
-      ref={dialogRef}
-      aria-label="Campus photos"
-      onClose={onClose}
-      onKeyDown={(event) => {
-        if (event.key !== "ArrowRight" && event.key !== "ArrowLeft") return;
-        event.preventDefault();
-        event.stopPropagation();
-        onStep(event.key === "ArrowRight" ? 1 : -1);
-      }}
-      {...stylex.props(styles.dialog)}
-    >
-      {plate && index !== null ? (
+    <LightboxDialog lightbox={lightbox} items={plates} sx={styles.dialog}>
+      {(plate, index) => (
         <>
           <LightboxStage onClose={onClose} sx={styles.stage}>
             <figure key={plate.id} {...stylex.props(styles.figure)}>
@@ -222,7 +188,7 @@ export function Lightbox({
             }}
           />
         </>
-      ) : null}
-    </dialog>
+      )}
+    </LightboxDialog>
   );
 }

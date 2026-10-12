@@ -1,5 +1,6 @@
 import * as stylex from "@stylexjs/stylex";
-import { useState } from "react";
+
+import { useLightbox } from "@/components/prototype/shared/lightbox";
 
 import { ABOUT_CAMPUS } from "../../about-data";
 import { Clause } from "./clause";
@@ -110,8 +111,7 @@ const crops = stylex.create({
 });
 
 export function Campus() {
-  const [open, setOpen] = useState<number | null>(null);
-  const count = PHOTOS.length;
+  const lightbox = useLightbox(PHOTOS.length);
 
   return (
     <section
@@ -130,7 +130,7 @@ export function Campus() {
                 <figure {...stylex.props(styles.figure, large ? styles.large : styles.small)}>
                   <button
                     type="button"
-                    onClick={() => setOpen(index)}
+                    onClick={() => lightbox.open(index)}
                     {...stylex.props(styles.button, large ? styles.largeFrame : styles.smallFrame)}
                   >
                     <img
@@ -154,14 +154,7 @@ export function Campus() {
           })}
         </ol>
       </div>
-      <Lightbox
-        photos={PHOTOS}
-        index={open}
-        onClose={() => setOpen(null)}
-        onStep={(delta) =>
-          setOpen((current) => (current === null ? null : (current + delta + count) % count))
-        }
-      />
+      <Lightbox lightbox={lightbox} photos={PHOTOS} />
     </section>
   );
 }

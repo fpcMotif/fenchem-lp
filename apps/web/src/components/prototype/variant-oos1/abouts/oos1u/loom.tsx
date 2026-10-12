@@ -1,7 +1,8 @@
 import * as stylex from "@stylexjs/stylex";
 import { m, useScroll, useTransform, type MotionValue } from "motion/react";
-import { useRef, useState } from "react";
+import { useRef } from "react";
 
+import { useLightbox } from "@/components/prototype/shared/lightbox";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
 import { ABOUT_BANNER, ABOUT_CAMPUS } from "../../about-data";
@@ -299,9 +300,7 @@ function LoomStage() {
 }
 
 export function CampusLoom() {
-  const [openIndex, setOpenIndex] = useState<number | null>(null);
-  const [stepped, setStepped] = useState(false);
-  const count = ABOUT_CAMPUS.photos.length;
+  const lightbox = useLightbox(ABOUT_CAMPUS.photos.length);
 
   return (
     <section
@@ -320,10 +319,7 @@ export function CampusLoom() {
               <button
                 type="button"
                 aria-label={`View larger: ${photo.english}`}
-                onClick={() => {
-                  setStepped(false);
-                  setOpenIndex(index);
-                }}
+                onClick={() => lightbox.open(index)}
                 {...stylex.props(styles.fringeButton)}
               >
                 <img
@@ -339,15 +335,7 @@ export function CampusLoom() {
           ))}
         </ul>
       </div>
-      <Lightbox
-        index={openIndex}
-        stepped={stepped}
-        onClose={() => setOpenIndex(null)}
-        onStep={(delta) => {
-          setStepped(true);
-          setOpenIndex((current) => (current === null ? null : (current + delta + count) % count));
-        }}
-      />
+      <Lightbox lightbox={lightbox} />
     </section>
   );
 }

@@ -1,6 +1,7 @@
 import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { useState } from "react";
+
+import { useLightbox } from "@/components/prototype/shared/lightbox";
 
 import { ABOUT_CAMPUS } from "../../about-data";
 import { Lightbox } from "./lightbox";
@@ -80,9 +81,7 @@ const S = stylex.create({
 });
 
 export function Campus() {
-  const [openIndex, setOpenIndex] = useState<number | null>(null);
-  const [stepped, setStepped] = useState(false);
-  const count = ABOUT_CAMPUS.photos.length;
+  const lightbox = useLightbox(ABOUT_CAMPUS.photos.length);
 
   return (
     <Section id="about-campus" labelledBy="about-campus-title" surface="page" band="below">
@@ -100,10 +99,7 @@ export function Campus() {
                 <button
                   type="button"
                   aria-label={`View larger: ${photo.english}`}
-                  onClick={() => {
-                    setStepped(false);
-                    setOpenIndex(index);
-                  }}
+                  onClick={() => lightbox.open(index)}
                   {...stylex.props(S.button)}
                 >
                   <img
@@ -120,15 +116,7 @@ export function Campus() {
           ))}
         </div>
       </div>
-      <Lightbox
-        index={openIndex}
-        stepped={stepped}
-        onClose={() => setOpenIndex(null)}
-        onStep={(delta) => {
-          setStepped(true);
-          setOpenIndex((current) => (current === null ? null : (current + delta + count) % count));
-        }}
-      />
+      <Lightbox lightbox={lightbox} />
     </Section>
   );
 }

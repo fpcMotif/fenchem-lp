@@ -1,6 +1,7 @@
 import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { useState } from "react";
+
+import { useLightbox } from "@/components/prototype/shared/lightbox";
 
 import { ABOUT_CAMPUS, ABOUT_HERO } from "../../about-data";
 import { Lightbox } from "./lightbox";
@@ -104,10 +105,8 @@ const RATIO = [s.wide43, s.wide21, s.wide32, s.wide32, s.wide32, s.wide32, s.tal
 
 export function Campus() {
   const chip = ABOUT_HERO.navChips[1];
-  const [openIndex, setOpenIndex] = useState<number | null>(null);
-  const [stepped, setStepped] = useState(false);
   const photos = ABOUT_CAMPUS.photos;
-  const count = photos.length;
+  const lightbox = useLightbox(photos.length);
 
   return (
     <Section id={chip.id} label={chip.english} sx={s.afterBand}>
@@ -118,10 +117,7 @@ export function Campus() {
               <button
                 type="button"
                 aria-label={`View larger: ${photo.english}`}
-                onClick={() => {
-                  setStepped(false);
-                  setOpenIndex(idx);
-                }}
+                onClick={() => lightbox.open(idx)}
                 {...stylex.props(s.tile)}
               >
                 <img
@@ -137,15 +133,7 @@ export function Campus() {
           </Reveal>
         ))}
       </ul>
-      <Lightbox
-        index={openIndex}
-        stepped={stepped}
-        onClose={() => setOpenIndex(null)}
-        onStep={(delta) => {
-          setStepped(true);
-          setOpenIndex((current) => (current === null ? null : (current + delta + count) % count));
-        }}
-      />
+      <Lightbox lightbox={lightbox} />
     </Section>
   );
 }

@@ -1,6 +1,6 @@
 import * as stylex from "@stylexjs/stylex";
 import type { StyleXStyles } from "@stylexjs/stylex";
-import { useEffect, useRef, useState, type ReactNode, type RefObject } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from "react";
 
 export type LightboxState = {
   index: number | null;
@@ -14,19 +14,21 @@ export type LightboxState = {
 export function useLightbox(count: number): LightboxState {
   const [index, setIndex] = useState<number | null>(null);
   const [stepped, setStepped] = useState(false);
-  return {
-    index,
-    stepped,
-    open: (next) => {
-      setStepped(false);
-      setIndex(next);
-    },
-    close: () => setIndex(null),
-    step: (delta) => {
-      setStepped(true);
-      setIndex((current) => (current === null ? null : (current + delta + count) % count));
-    },
-  };
+  const actions = useMemo(
+    () => ({
+      open: (next: number) => {
+        setStepped(false);
+        setIndex(next);
+      },
+      close: () => setIndex(null),
+      step: (delta: number) => {
+        setStepped(true);
+        setIndex((current) => (current === null ? null : (current + delta + count) % count));
+      },
+    }),
+    [count],
+  );
+  return { index, stepped, ...actions };
 }
 
 /** A modal <dialog> that follows `lightbox.index`, steps on arrow keys and preloads both neighbours. */

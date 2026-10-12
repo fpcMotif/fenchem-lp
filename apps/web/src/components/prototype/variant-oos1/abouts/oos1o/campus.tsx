@@ -1,5 +1,7 @@
 import * as stylex from "@stylexjs/stylex";
-import { useState, type CSSProperties } from "react";
+import { type CSSProperties } from "react";
+
+import { useLightbox } from "@/components/prototype/shared/lightbox";
 
 import { ABOUT_CAMPUS } from "../../about-data";
 import { seeded } from "./geometry";
@@ -263,8 +265,7 @@ function sampleVars(sample: (typeof SAMPLES)[number], index: number) {
 }
 
 export function Campus() {
-  const [openIndex, setOpenIndex] = useState<number | null>(null);
-  const count = LIGHTBOX.length;
+  const lightbox = useLightbox(LIGHTBOX.length);
 
   return (
     <section id="about-campus" aria-labelledby="oos1o-campus" {...stylex.props(styles.section)}>
@@ -336,7 +337,7 @@ export function Campus() {
                 </p>
                 <button
                   type="button"
-                  onClick={() => setOpenIndex(index)}
+                  onClick={() => lightbox.open(index)}
                   {...stylex.props(styles.button, ui.focusRing, stylex.defaultMarker())}
                 >
                   <img
@@ -353,14 +354,7 @@ export function Campus() {
           </ol>
         </div>
       </div>
-      <Lightbox
-        photos={LIGHTBOX}
-        index={openIndex}
-        onClose={() => setOpenIndex(null)}
-        onStep={(delta) =>
-          setOpenIndex((current) => (current === null ? null : (current + delta + count) % count))
-        }
-      />
+      <Lightbox lightbox={lightbox} photos={LIGHTBOX} />
     </section>
   );
 }
