@@ -12,6 +12,7 @@ import { LayoutGroup } from "motion/react";
 import { FooterLegal } from "../shared/footer-content";
 import { NewsAccordion } from "../shared/news-accordion";
 import { ProductSummary } from "../shared/product-summary";
+import { SplitDialog } from "../contact-dialog-lab/variants/split";
 import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 import type { StyleXStyles } from "@stylexjs/stylex";
@@ -454,13 +455,62 @@ const styles = stylex.create({
       backgroundColor: "#0743a2",
     },
   },
-  headerActions: {
+  headerActionsWrap: {
     display: "flex",
     gridColumn: "3",
     justifySelf: "end",
     alignItems: "center",
     gap: 12,
     marginTop: 25,
+  },
+  headerContactButton: {
+    display: { default: "none", [breakpoints.sm]: "inline-flex" },
+    alignItems: "center",
+    justifyContent: "center",
+    height: 38,
+    paddingInline: 18,
+    borderRadius: 19,
+    borderWidth: 1,
+    borderStyle: "solid",
+    borderColor: colors.brandBlue700,
+    backgroundColor: {
+      default: "transparent",
+      ":hover": { default: null, [HOVER_MOTION]: colors.brandBlue700 },
+    },
+    color: {
+      default: colors.brandBlue700,
+      ":hover": { default: null, [HOVER_MOTION]: colors.paper },
+    },
+    fontFamily: DISPLAY_FONT,
+    fontSize: 14,
+    fontWeight: 600,
+    cursor: "pointer",
+    transitionProperty: "background-color, color, border-color, transform",
+    transitionDuration: "160ms",
+    transitionTimingFunction: ease.out,
+    ":active": {
+      transform: "scale(0.97)",
+    },
+  },
+  mobileContactButton: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    width: "100%",
+    height: 44,
+    borderRadius: 22,
+    borderWidth: 0,
+    backgroundColor: colors.brandBlue700,
+    color: colors.paper,
+    fontFamily: DISPLAY_FONT,
+    fontSize: 15,
+    fontWeight: 600,
+    cursor: "pointer",
+  },
+  headerActions: {
+    display: "flex",
+    alignItems: "center",
+    gap: 12,
   },
   searchPill: {
     display: { default: "none", [breakpoints.md]: "flex" },
@@ -1540,9 +1590,11 @@ export type SubPageProps = AboutPageProps;
 function SiteHeader({
   currentView,
   onNavigate,
+  onOpenContactDialog,
 }: {
   currentView?: View;
   onNavigate?: (view: View, targetId?: string) => void;
+  onOpenContactDialog?: () => void;
 }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuId = useId();
@@ -1659,18 +1711,29 @@ function SiteHeader({
             </a>
           ))}
         </nav>
-        <CorporateHeaderActions
-          styles={{
-            headerActions: styles.headerActions,
-            searchPill: styles.searchPill,
-            searchPlaceholder: styles.searchPlaceholder,
-            langButton: styles.langButton,
-            menuButton: [styles.menuButton, !navFits && styles.menuButtonShown],
-          }}
-          menuOpen={menuOpen}
-          menuId={menuId}
-          setMenuOpen={setMenuOpen}
-        />
+        <div {...stylex.props(styles.headerActionsWrap)}>
+          {onOpenContactDialog ? (
+            <button
+              type="button"
+              onClick={onOpenContactDialog}
+              {...stylex.props(styles.headerContactButton)}
+            >
+              在线咨询
+            </button>
+          ) : null}
+          <CorporateHeaderActions
+            styles={{
+              headerActions: styles.headerActions,
+              searchPill: styles.searchPill,
+              searchPlaceholder: styles.searchPlaceholder,
+              langButton: styles.langButton,
+              menuButton: [styles.menuButton, !navFits && styles.menuButtonShown],
+            }}
+            menuOpen={menuOpen}
+            menuId={menuId}
+            setMenuOpen={setMenuOpen}
+          />
+        </div>
       </div>
       <AnimatePresence initial={false}>
         {menuOpen ? (
@@ -1697,6 +1760,20 @@ function SiteHeader({
                   </a>
                 </li>
               ))}
+              {onOpenContactDialog ? (
+                <li style={{ padding: "16px 20px 8px" }}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMenuOpen(false);
+                      onOpenContactDialog();
+                    }}
+                    {...stylex.props(styles.mobileContactButton)}
+                  >
+                    在线咨询
+                  </button>
+                </li>
+              ) : null}
             </ul>
           </m.nav>
         ) : null}
@@ -2355,6 +2432,7 @@ export function VariantOOS1({
 
   const { page } = useSearch({ strict: false });
   const [view, setView] = useState<View>(() => viewFromPage(page, startView));
+  const [contactModalOpen, setContactModalOpen] = useState(false);
 
   const handleNavigate = (targetView: View, targetId?: string) => {
     setView(targetView);
@@ -2395,7 +2473,11 @@ export function VariantOOS1({
             <a href="#main-content" {...stylex.props(styles.skipLink)}>
               跳到主要内容
             </a>
-            <SiteHeader currentView={view} onNavigate={handleNavigate} />
+            <SiteHeader
+              currentView={view}
+              onNavigate={handleNavigate}
+              onOpenContactDialog={() => setContactModalOpen(true)}
+            />
             <div {...stylex.props(styles.page, intro === "play" && introStyles.pageReveal)}>
               <main id="main-content" tabIndex={-1} {...stylex.props(styles.mainTarget)}>
                 {view === "about" ? (
@@ -2432,7 +2514,21 @@ export function VariantOOS1({
                     <Offices />
                     <News />
                     <Flow>
-                      <ContactCta id="contact" />
+                      <ContactCta
+                        id="contact"
+                        actions={[
+                          {
+                            label: "立即咨询",
+                            tone: "primary",
+                            onClick: () => setContactModalOpen(true),
+                          },
+                          {
+                            label: "查看联系方式",
+                            tone: "secondary",
+                            onClick: () => handleNavigate("contact", "contact-top"),
+                          },
+                        ]}
+                      />
                     </Flow>
                   </>
                 )}
@@ -2441,6 +2537,12 @@ export function VariantOOS1({
                 <SiteFooter onNavigate={handleNavigate} />
               </Flow>
             </div>
+            {contactModalOpen ? (
+              <SplitDialog
+                subject={null}
+                onClose={() => setContactModalOpen(false)}
+              />
+            ) : null}
           </div>
         </MotionConfig>
       </LayoutGroup>
