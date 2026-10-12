@@ -85,7 +85,8 @@ const GOOGLE_FONTS =
   "https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter+Tight:ital,wght@0,500;0,800;1,500&family=Noto+Sans+SC:wght@400;500;700;900&display=swap";
 
 const TINT = "#e6ecf7";
-const DISPLAY_FONT = '"Inter Tight", "Helvetica Neue", Arial, "Noto Sans SC", sans-serif';
+const DISPLAY_FONT =
+  '"Inter Tight", "Helvetica Neue", Arial, "Source Han Sans SC", "Noto Sans SC", sans-serif';
 const SURFACE = "#f6f6f6";
 const PANEL_ALT = "#e8e8e8";
 const FOOTER_BLUE = "#294f92";
@@ -683,7 +684,8 @@ const styles = stylex.create({
     wordSpacing: "0.05em",
   },
   heroAccent: {
-    fontFamily: '"Instrument Serif", "Times New Roman", "Noto Sans SC", serif',
+    fontFamily:
+      '"Instrument Serif", "Times New Roman", "Source Han Sans SC", "Noto Sans SC", serif',
     fontStyle: "italic",
     fontSynthesis: "none",
     fontWeight: 400,

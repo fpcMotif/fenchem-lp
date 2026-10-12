@@ -23,8 +23,8 @@ export const tone = stylex.defineConsts({
 });
 
 export const face = stylex.defineConsts({
-  sans: '"Noto Sans SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif',
-  numeral: '"Inter Tight", "Noto Sans SC", sans-serif',
+  sans: '"Source Han Sans SC", "Noto Sans SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif',
+  numeral: '"Inter Tight", "Source Han Sans SC", "Noto Sans SC", sans-serif',
 });
 
 export const chrome = stylex.defineConsts({

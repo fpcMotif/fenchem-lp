@@ -226,7 +226,7 @@ export function Honors() {
                 />
                 <text
                   fill={band.color}
-                  fontFamily='"Noto Sans SC", "PingFang SC", sans-serif'
+                  fontFamily='"Source Han Sans SC", "Noto Sans SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif'
                   fontSize={band.size}
                   fontWeight={band.national ? 500 : 400}
                   letterSpacing={band.national ? 1.6 : 1}

@@ -13,8 +13,8 @@ const MUTED = "#6b6b70";
 const STONE = "#f3f3eb";
 const STONE_RULE = "#dcdccf";
 const BODY_FONT =
-  '"Noto Sans SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif';
-const LATIN_FONT = '"Inter Tight", "Noto Sans SC", sans-serif';
+  '"Source Han Sans SC", "Noto Sans SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif';
+const LATIN_FONT = '"Inter Tight", "Source Han Sans SC", "Noto Sans SC", sans-serif';
 
 const TABLET = "@media (min-width: 768px) and (max-width: 1279.98px)";
 const DESKTOP = breakpoints.xl;

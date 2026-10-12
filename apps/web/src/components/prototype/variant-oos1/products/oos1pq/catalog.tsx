@@ -13,9 +13,9 @@ const MOSS_EDGE = "#d4e2ce";
 const MOSS_RULE = "#e4ece0";
 const PAPER = "#ffffff";
 const BODY_FONT =
-  '"Noto Sans SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif';
+  '"Source Han Sans SC", "Noto Sans SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif';
 const NUMERAL_FONT =
-  '"Inter Tight", "Noto Sans SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif';
+  '"Inter Tight", "Source Han Sans SC", "Noto Sans SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif';
 
 const SM = breakpoints.sm;
 const TABLET = "@media (min-width: 768px) and (max-width: 1279.98px)";

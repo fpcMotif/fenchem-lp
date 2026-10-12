@@ -13,8 +13,8 @@ export const tone = stylex.defineConsts({
 
 export const font = stylex.defineConsts({
   cjk: '"Source Han Sans SC", "Noto Sans SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif',
-  serif: '"Instrument Serif", Georgia, serif',
-  latin: '"Inter Tight", "Helvetica Neue", Arial, sans-serif',
+  serif: '"Instrument Serif", Georgia, "Source Han Sans SC", "Noto Sans SC", serif',
+  latin: '"Inter Tight", "Helvetica Neue", Arial, "Source Han Sans SC", "Noto Sans SC", sans-serif',
 });
 
 export const step = stylex.defineConsts({

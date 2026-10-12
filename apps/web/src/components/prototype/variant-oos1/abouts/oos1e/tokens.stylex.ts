@@ -22,7 +22,7 @@ export const font = stylex.defineConsts({
   cjk: '"Source Han Sans SC", "Noto Sans SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif',
   display:
     '"Inter Tight", "Source Han Sans SC", "Noto Sans SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif',
-  serif: '"Instrument Serif", Georgia, serif',
+  serif: '"Instrument Serif", Georgia, "Source Han Sans SC", "Noto Sans SC", serif',
 });
 
 export const media = stylex.defineConsts({

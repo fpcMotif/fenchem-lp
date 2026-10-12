@@ -21,8 +21,9 @@ export const hue = stylex.defineConsts({
 
 export const font = stylex.defineConsts({
   cjk: '"Source Han Sans SC", "Noto Sans SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif',
-  display: '"Inter Tight", "Helvetica Neue", Arial, sans-serif',
-  serif: '"Instrument Serif", Georgia, serif',
+  display:
+    '"Inter Tight", "Helvetica Neue", Arial, "Source Han Sans SC", "Noto Sans SC", sans-serif',
+  serif: '"Instrument Serif", Georgia, "Source Han Sans SC", "Noto Sans SC", serif',
 });
 
 export const media = stylex.defineConsts({

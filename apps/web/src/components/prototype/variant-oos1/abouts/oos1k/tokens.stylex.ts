@@ -27,9 +27,9 @@ export const sky = stylex.defineConsts({
 });
 
 export const face = stylex.defineConsts({
-  sans: '"Noto Sans SC", "Source Han Sans SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif',
-  latin: '"Inter Tight", "Noto Sans SC", system-ui, sans-serif',
-  serif: '"Instrument Serif", "Noto Sans SC", serif',
+  sans: '"Source Han Sans SC", "Noto Sans SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif',
+  latin: '"Inter Tight", "Source Han Sans SC", "Noto Sans SC", system-ui, sans-serif',
+  serif: '"Instrument Serif", "Source Han Sans SC", "Noto Sans SC", serif',
 });
 
 export const chrome = stylex.defineConsts({

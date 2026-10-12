@@ -29,8 +29,8 @@ export const sheetTone = stylex.defineConsts({
 });
 
 export const font = stylex.defineConsts({
-  body: '"Noto Sans SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif',
-  numeral: '"Inter Tight", "Noto Sans SC", sans-serif',
+  body: '"Source Han Sans SC", "Noto Sans SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif',
+  numeral: '"Inter Tight", "Source Han Sans SC", "Noto Sans SC", sans-serif',
 });
 
 export const mq = stylex.defineConsts({

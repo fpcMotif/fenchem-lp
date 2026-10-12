@@ -23,8 +23,9 @@ export const tone = stylex.defineConsts({
 export const face = stylex.defineConsts({
   sans: '"Source Han Sans SC", "Noto Sans SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif',
   etched:
-    '"Noto Sans SC", "Source Han Sans SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif',
-  serif: '"Instrument Serif", Georgia, "Times New Roman", serif',
+    '"Source Han Sans SC", "Noto Sans SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif',
+  serif:
+    '"Instrument Serif", Georgia, "Times New Roman", "Source Han Sans SC", "Noto Sans SC", serif',
 });
 
 export const pane = stylex.defineConsts({

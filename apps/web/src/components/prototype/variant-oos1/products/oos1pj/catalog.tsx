@@ -19,9 +19,10 @@ const PANEL = "#fefaf8";
 const RULE = "#eedcd4";
 const GROUP_RULE = "#d9bfb4";
 const BODY_FONT =
-  '"Noto Sans SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif';
-const SERIF_FONT = '"Instrument Serif", "Times New Roman", serif';
-const NUMERAL_FONT = '"Inter Tight", "Noto Sans SC", sans-serif';
+  '"Source Han Sans SC", "Noto Sans SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif';
+const SERIF_FONT =
+  '"Instrument Serif", "Times New Roman", "Source Han Sans SC", "Noto Sans SC", serif';
+const NUMERAL_FONT = '"Inter Tight", "Source Han Sans SC", "Noto Sans SC", sans-serif';
 
 const TABLET = "@media (min-width: 768px) and (max-width: 1279.98px)";
 const DESKTOP = breakpoints.xl;

@@ -20,8 +20,8 @@ const LEAF_LIGHT = "#f6f9f1";
 const LEAF_RULE = "#d2ddc4";
 const FOCUS = colors.brandBlue700;
 const BODY_FONT =
-  '"Noto Sans SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif';
-const NUMERAL_FONT = '"Inter Tight", "Noto Sans SC", sans-serif';
+  '"Source Han Sans SC", "Noto Sans SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif';
+const NUMERAL_FONT = '"Inter Tight", "Source Han Sans SC", "Noto Sans SC", sans-serif';
 
 const TABLET = "@media (min-width: 768px) and (max-width: 1279.98px)";
 const DESKTOP = breakpoints.xl;

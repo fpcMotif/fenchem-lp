@@ -22,8 +22,9 @@ const ACCENT = colors.brandGreen700;
 const SOFT_RULE = HAIRLINE;
 const EASE_OUT_CSS = "cubic-bezier(0.22, 1, 0.36, 1)";
 const BODY_FONT =
-  '"Noto Sans SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif';
-const SERIF_FONT = '"Instrument Serif", "Times New Roman", serif';
+  '"Source Han Sans SC", "Noto Sans SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif';
+const SERIF_FONT =
+  '"Instrument Serif", "Times New Roman", "Source Han Sans SC", "Noto Sans SC", serif';
 
 const TABLET = "@media (min-width: 768px) and (max-width: 1279.98px)";
 const DESKTOP = breakpoints.xl;

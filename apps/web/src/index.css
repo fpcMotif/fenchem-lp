@@ -102,6 +102,13 @@ html {
   text-size-adjust: 100%;
 }
 
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

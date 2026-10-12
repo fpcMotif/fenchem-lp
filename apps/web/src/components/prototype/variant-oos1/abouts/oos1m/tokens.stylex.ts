@@ -31,9 +31,10 @@ export const tone = stylex.defineConsts({
 });
 
 export const face = stylex.defineConsts({
-  sans: '"Noto Sans SC", "Source Han Sans SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif',
-  latin: '"Inter Tight", "Noto Sans SC", system-ui, sans-serif',
-  serif: '"Instrument Serif", Georgia, "Times New Roman", serif',
+  sans: '"Source Han Sans SC", "Noto Sans SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif',
+  latin: '"Inter Tight", "Source Han Sans SC", "Noto Sans SC", system-ui, sans-serif',
+  serif:
+    '"Instrument Serif", Georgia, "Times New Roman", "Source Han Sans SC", "Noto Sans SC", serif',
 });
 
 export const chrome = stylex.defineConsts({

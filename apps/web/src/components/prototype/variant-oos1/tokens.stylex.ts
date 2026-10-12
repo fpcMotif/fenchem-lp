@@ -8,9 +8,10 @@ export const color = stylex.defineConsts({
 });
 
 export const font = stylex.defineConsts({
-  display: '"Inter Tight", "Helvetica Neue", Arial, sans-serif',
-  serifAccent: '"Instrument Serif", Georgia, serif',
-  body: '"Noto Sans SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif',
+  display:
+    '"Inter Tight", "Helvetica Neue", Arial, "Source Han Sans SC", "Noto Sans SC", sans-serif',
+  serifAccent: '"Instrument Serif", Georgia, "Source Han Sans SC", "Noto Sans SC", serif',
+  body: '"Source Han Sans SC", "Noto Sans SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif',
 });
 
 export const texture = stylex.defineConsts({

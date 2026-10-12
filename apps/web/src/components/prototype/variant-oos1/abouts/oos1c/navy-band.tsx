@@ -28,7 +28,8 @@ const styles = stylex.create({
   eyebrow: {
     margin: 0,
     marginBottom: 12,
-    fontFamily: '"Inter Tight", "Helvetica Neue", Arial, sans-serif',
+    fontFamily:
+      '"Inter Tight", "Helvetica Neue", Arial, "Source Han Sans SC", "Noto Sans SC", sans-serif',
     fontSize: 12,
     fontWeight: 600,
     letterSpacing: "0.22em",

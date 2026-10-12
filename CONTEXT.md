@@ -52,9 +52,11 @@ _Avoid_: calling it "the palette" — that now means the brand book.
 ### Typography
 
 **Source Han Sans (思源黑体)**:
-The brand-book typeface (weights Bold / Regular / Light), used for
-Chinese-language material. On the English site it covers only Chinese glyphs,
-through a local **Noto Sans SC** fallback (ADR-0002).
+The brand-book typeface (weights Bold / Regular / Light), used for Chinese
+text. The **O campus shell** and its about and products variants set all
+Chinese text in it, loaded as **Noto Sans SC** from Google Fonts. On the
+English landing site it covers only Chinese glyphs, through a local Noto Sans
+SC fallback (ADR-0002).
 _Avoid_: Noto (ambiguous).
 
 **English type system**:

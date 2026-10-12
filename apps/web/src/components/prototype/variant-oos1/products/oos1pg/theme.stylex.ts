@@ -17,9 +17,10 @@ export const ui = stylex.defineConsts({
 });
 
 export const font = stylex.defineConsts({
-  body: '"Noto Sans SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif',
-  serif: '"Instrument Serif", "Times New Roman", serif',
-  numeral: '"Inter Tight", "Helvetica Neue", Arial, sans-serif',
+  body: '"Source Han Sans SC", "Noto Sans SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif',
+  serif: '"Instrument Serif", "Times New Roman", "Source Han Sans SC", "Noto Sans SC", serif',
+  numeral:
+    '"Inter Tight", "Helvetica Neue", Arial, "Source Han Sans SC", "Noto Sans SC", sans-serif',
 });
 
 export const mq = stylex.defineConsts({

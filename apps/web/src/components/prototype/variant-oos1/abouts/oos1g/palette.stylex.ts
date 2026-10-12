@@ -14,8 +14,9 @@ export const palette = stylex.defineConsts({
   hairlineOnDark: "rgba(255, 255, 255, 0.22)",
   fontBody:
     '"Source Han Sans SC", "Noto Sans SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif',
-  fontDisplay: '"Inter Tight", "Helvetica Neue", Arial, sans-serif',
-  fontSerif: '"Instrument Serif", Georgia, serif',
+  fontDisplay:
+    '"Inter Tight", "Helvetica Neue", Arial, "Source Han Sans SC", "Noto Sans SC", sans-serif',
+  fontSerif: '"Instrument Serif", Georgia, "Source Han Sans SC", "Noto Sans SC", serif',
   easeOut: "cubic-bezier(0.22, 1, 0.36, 1)",
   headerHeight: "80px",
   barHeight: "48px",
