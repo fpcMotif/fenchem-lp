@@ -121,7 +121,7 @@ const PICKER_CSS = `
   translate: -50% 0;
   z-index: 2147483647;
   display: flex;
-  gap: 2px;
+  gap: 8px;
   max-width: calc(100vw - 32px);
   overflow-x: auto;
   scrollbar-width: none;
