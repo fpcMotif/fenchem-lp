@@ -289,6 +289,7 @@ export const labStyles = stylex.create({
     width: "100%",
     height: 44,
     paddingInline: 12,
+    textOverflow: "ellipsis",
     borderWidth: 1,
     borderStyle: "solid",
     borderColor: {
