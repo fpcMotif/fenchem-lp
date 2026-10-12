@@ -12,7 +12,6 @@
       "next-themes": "latest",
       "react": "latest",
       "react-dom": "latest",
-      "convex": "latest",
       "@types/react": "latest",
       "@types/react-dom": "latest"
     }
@@ -39,8 +38,6 @@
     "staged": "vp staged",
     "dev:web": "vp run --filter web dev",
     "dev:web:portless": "vp run --filter web dev:portless",
-    "dev:server": "vp run --filter @fenchem-lp/backend dev",
-    "dev:setup": "vp run --filter @fenchem-lp/backend dev:setup",
     "deploy": "vp run --filter @fenchem-lp/infra deploy",
     "destroy": "vp run --filter @fenchem-lp/infra destroy",
     "doctor": "react-doctor",
@@ -50,7 +47,6 @@
     "perf:coldstart": "node perf/measure-coldstart.mjs"
   },
   "dependencies": {
-    "@fenchem-lp/env": "workspace:*",
     "@stylexjs/stylex": "^0.19.1",
     "dotenv": "catalog:"
   },

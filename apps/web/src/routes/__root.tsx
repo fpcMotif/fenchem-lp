@@ -1,12 +1,10 @@
 import * as stylex from "@stylexjs/stylex";
-import type { ConvexQueryClient } from "@convex-dev/react-query";
 import { Toaster } from "@fenchem-lp/ui/components/sonner";
-import type { QueryClient } from "@tanstack/react-query";
 import {
   HeadContent,
   Outlet,
   Scripts,
-  createRootRouteWithContext,
+  createRootRoute,
   useRouterState,
 } from "@tanstack/react-router";
 import { lazy, Suspense } from "react";
@@ -27,12 +25,7 @@ const TanStackRouterDevtools = import.meta.env.DEV
     )
   : null;
 
-export interface RouterAppContext {
-  queryClient: QueryClient;
-  convexQueryClient: ConvexQueryClient;
-}
-
-export const Route = createRootRouteWithContext<RouterAppContext>()({
+export const Route = createRootRoute({
   head: () => ({
     meta: [
       {
