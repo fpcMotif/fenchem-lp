@@ -63,7 +63,6 @@ const QR_CODES = [
   },
 ] as const;
 
-
 const MISSING_ERRORS: Record<string, string> = {
   contactName: "请填写联系人姓名",
   company: "请填写公司或机构名称",
@@ -624,7 +623,7 @@ function RequestTypeSelect({
         tabIndex={0}
         aria-haspopup="listbox"
         aria-expanded={open}
-        aria-controls={listId}
+        aria-controls={open ? listId : undefined}
         aria-labelledby={labelId}
         aria-activedescendant={open ? optionId(activeIndex) : undefined}
         onClick={() => (open ? setOpen(false) : openAt(selectedIndex))}
@@ -851,7 +850,9 @@ export function SplitDialog({ subject, onClose, state = "pristine" }: DialogVari
                       name="contactName"
                       required
                       autoComplete="name"
-                      defaultValue={state === "long-text" ? LONG_TEXT_FIXTURE.contactName : undefined}
+                      defaultValue={
+                        state === "long-text" ? LONG_TEXT_FIXTURE.contactName : undefined
+                      }
                       {...stylex.props(
                         labStyles.input,
                         errors.contactName ? labStyles.inputInvalid : null,
