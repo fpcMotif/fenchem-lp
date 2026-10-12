@@ -16,6 +16,7 @@ import { color, ease, font } from "../../variant-oos1/tokens.stylex";
 import {
   COMPANY,
   CONTACT_DETAILS,
+  ContactIcon,
   Field,
   FieldError,
   fieldAria,
@@ -195,17 +196,18 @@ const styles = stylex.create({
   },
   detailRow: {
     display: "grid",
-    gridTemplateColumns: "72px minmax(0, 1fr)",
+    gridTemplateColumns: "20px minmax(0, 1fr)",
     columnGap: 12,
-    alignItems: "baseline",
+    alignItems: "center",
     paddingBlock: 12,
     borderBottomWidth: 1,
     borderBottomStyle: "solid",
     borderBottomColor: NAVY_RULE,
   },
   detailTerm: {
-    fontSize: 12,
-    letterSpacing: "0.04em",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
     color: ON_NAVY_MUTED,
   },
   detailValue: {
@@ -234,6 +236,11 @@ const styles = stylex.create({
     rowGap: 6,
     fontSize: 14,
     fontVariantNumeric: "tabular-nums",
+  },
+  quickLinkItem: {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: 6,
   },
   qr: {
     display: { default: "none", [DESKTOP]: "flex" },
@@ -683,15 +690,26 @@ export function SplitDialog({ subject, onClose }: DialogVariantProps) {
           </div>
           <div {...stylex.props(styles.quickLinks)}>
             {CONTACT_DETAILS.filter((d) => d.href).map((detail) => (
-              <a key={detail.term} href={detail.href!} {...stylex.props(styles.detailLink)}>
-                {detail.value}
+              <a
+                key={detail.term}
+                href={detail.href!}
+                {...stylex.props(styles.detailLink, styles.quickLinkItem)}
+              >
+                <ContactIcon detail={detail} size={14} />
+                <span>{detail.value}</span>
               </a>
             ))}
           </div>
           <dl {...stylex.props(styles.details)}>
             {CONTACT_DETAILS.map((detail) => (
               <div key={detail.term} {...stylex.props(styles.detailRow)}>
-                <dt {...stylex.props(styles.detailTerm)}>{detail.term}</dt>
+                <dt
+                  title={detail.term}
+                  aria-label={detail.term}
+                  {...stylex.props(styles.detailTerm)}
+                >
+                  <ContactIcon detail={detail} size={18} />
+                </dt>
                 <dd {...stylex.props(styles.detailValue)}>
                   {detail.href ? (
                     <a href={detail.href} {...stylex.props(styles.detailLink)}>
