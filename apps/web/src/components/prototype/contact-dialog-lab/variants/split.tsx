@@ -196,9 +196,9 @@ const styles = stylex.create({
   },
   detailRow: {
     display: "grid",
-    gridTemplateColumns: "20px minmax(0, 1fr)",
+    gridTemplateColumns: "18px minmax(0, 1fr)",
     columnGap: 12,
-    alignItems: "center",
+    alignItems: "flex-start",
     paddingBlock: 12,
     borderBottomWidth: 1,
     borderBottomStyle: "solid",
@@ -208,6 +208,8 @@ const styles = stylex.create({
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
+    width: 18,
+    height: 22,
     color: ON_NAVY_MUTED,
   },
   detailValue: {
@@ -708,7 +710,7 @@ export function SplitDialog({ subject, onClose }: DialogVariantProps) {
                   aria-label={detail.term}
                   {...stylex.props(styles.detailTerm)}
                 >
-                  <ContactIcon detail={detail} size={18} />
+                  <ContactIcon detail={detail} size={15} />
                 </dt>
                 <dd {...stylex.props(styles.detailValue)}>
                   {detail.href ? (

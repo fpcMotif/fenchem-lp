@@ -77,10 +77,12 @@ export const SUBJECT_ROUTES: Record<
 
 export function ContactIcon({
   detail,
-  size = 18,
+  size = 15,
+  strokeWidth = 1.75,
 }: {
   detail: { href?: string | null; icon?: string };
   size?: number;
+  strokeWidth?: number;
 }) {
   const icon =
     detail.icon ??
@@ -92,14 +94,14 @@ export function ContactIcon({
 
   switch (icon) {
     case "phone":
-      return <Phone size={size} strokeWidth={2} nonScalingStroke aria-hidden="true" />;
+      return <Phone size={size} strokeWidth={strokeWidth} nonScalingStroke aria-hidden="true" />;
     case "mail":
-      return <Mail size={size} strokeWidth={2} nonScalingStroke aria-hidden="true" />;
+      return <Mail size={size} strokeWidth={strokeWidth} nonScalingStroke aria-hidden="true" />;
     case "clock":
-      return <Clock size={size} strokeWidth={2} nonScalingStroke aria-hidden="true" />;
+      return <Clock size={size} strokeWidth={strokeWidth} nonScalingStroke aria-hidden="true" />;
     case "map-pin":
     default:
-      return <MapPin size={size} strokeWidth={2} nonScalingStroke aria-hidden="true" />;
+      return <MapPin size={size} strokeWidth={strokeWidth} nonScalingStroke aria-hidden="true" />;
   }
 }
 
