@@ -1,6 +1,6 @@
 import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { ArrowRight, Check, CheckCircle2, ChevronDown, LayoutGrid, QrCode, X } from "lucide-react";
+import { ArrowRight, Check, CheckCircle2, ChevronDown, X } from "lucide-react";
 import {
   useEffect,
   useId,
@@ -272,84 +272,10 @@ const styles = stylex.create({
     borderTopStyle: "solid",
     borderTopColor: NAVY_RULE,
   },
-  qrHeader: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: 8,
-  },
   qrHeaderTitle: {
     fontSize: 12,
     letterSpacing: "0.04em",
     color: ON_NAVY_MUTED,
-  },
-  qrPills: {
-    display: "inline-flex",
-    alignItems: "center",
-    gap: 2,
-    padding: 3,
-    borderRadius: 999,
-    backgroundColor: "rgba(255, 255, 255, 0.08)",
-  },
-  qrPill: {
-    padding: "4px 10px",
-    borderRadius: 999,
-    borderWidth: 0,
-    fontFamily: "inherit",
-    fontSize: 12,
-    lineHeight: 1,
-    cursor: "pointer",
-    transitionProperty: "background-color, color",
-    transitionDuration: "150ms",
-    transitionTimingFunction: ease.out,
-  },
-  qrPillActive: {
-    backgroundColor: "rgba(255, 255, 255, 0.18)",
-    color: colors.paper,
-    fontWeight: 600,
-  },
-  qrPillInactive: {
-    backgroundColor: "transparent",
-    color: ON_NAVY_MUTED,
-    fontWeight: 400,
-  },
-  layoutToggle: {
-    display: "inline-flex",
-    alignItems: "center",
-    justifyContent: "center",
-    width: 26,
-    height: 26,
-    padding: 0,
-    borderRadius: 6,
-    borderWidth: 0,
-    backgroundColor: {
-      default: "transparent",
-      ":hover": { default: null, [HOVER]: "rgba(255, 255, 255, 0.1)" },
-    },
-    color: ON_NAVY_MUTED,
-    cursor: "pointer",
-    transitionProperty: "background-color, color",
-    transitionDuration: "150ms",
-  },
-  qr: {
-    display: "flex",
-    alignItems: "center",
-    gap: 16,
-    margin: 0,
-  },
-  qrImage: {
-    boxSizing: "border-box",
-    flexShrink: 0,
-    width: 104,
-    height: 104,
-    padding: 6,
-    borderRadius: CONTROL_RADIUS,
-    backgroundColor: colors.paper,
-  },
-  qrCaption: {
-    fontSize: 13,
-    lineHeight: 1.5,
-    color: ON_NAVY,
   },
   dualQrRow: {
     display: "flex",
@@ -752,8 +678,6 @@ export function SplitDialog({ subject, onClose }: DialogVariantProps) {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const doneTitleRef = useRef<HTMLHeadingElement>(null);
   const active = REQUEST_TYPES.find((type) => type.id === requestType) ?? REQUEST_TYPES[0];
-  const [qrIndex, setQrIndex] = useState(0);
-  const [qrLayout, setQrLayout] = useState<"tabs" | "dual">("tabs");
 
   const handleSubmit = (event: SubmitEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -840,72 +764,21 @@ export function SplitDialog({ subject, onClose }: DialogVariantProps) {
             ))}
           </dl>
           <div {...stylex.props(styles.qrSection)}>
-            <div {...stylex.props(styles.qrHeader)}>
-              {qrLayout === "tabs" ? (
-                <div role="tablist" aria-label="二维码切换" {...stylex.props(styles.qrPills)}>
-                  {QR_CODES.map((qr, index) => (
-                    <button
-                      key={qr.id}
-                      type="button"
-                      role="tab"
-                      aria-selected={qrIndex === index}
-                      onClick={() => setQrIndex(index)}
-                      {...stylex.props(
-                        styles.qrPill,
-                        qrIndex === index ? styles.qrPillActive : styles.qrPillInactive,
-                      )}
-                    >
-                      {qr.label}
-                    </button>
-                  ))}
-                </div>
-              ) : (
-                <span {...stylex.props(styles.qrHeaderTitle)}>扫码关注官方社媒</span>
-              )}
-              <button
-                type="button"
-                aria-label={qrLayout === "tabs" ? "切换为双码并列" : "切换为分段标签"}
-                title={qrLayout === "tabs" ? "切换为双码并列" : "切换为分段标签"}
-                onClick={() => setQrLayout((cur) => (cur === "tabs" ? "dual" : "tabs"))}
-                {...stylex.props(styles.layoutToggle, labStyles.focusRing)}
-              >
-                {qrLayout === "tabs" ? (
-                  <LayoutGrid size={15} strokeWidth={1.75} aria-hidden="true" />
-                ) : (
-                  <QrCode size={15} strokeWidth={1.75} aria-hidden="true" />
-                )}
-              </button>
+            <span {...stylex.props(styles.qrHeaderTitle)}>扫码关注官方社媒</span>
+            <div {...stylex.props(styles.dualQrRow)}>
+              {QR_CODES.map((qr) => (
+                <figure key={qr.id} {...stylex.props(styles.dualQrCard)}>
+                  <img
+                    src={qr.image}
+                    alt={qr.alt}
+                    width={88}
+                    height={88}
+                    {...stylex.props(styles.dualQrImage)}
+                  />
+                  <figcaption {...stylex.props(styles.dualQrCaption)}>{qr.label}</figcaption>
+                </figure>
+              ))}
             </div>
-
-            {qrLayout === "tabs" ? (
-              <figure {...stylex.props(styles.qr)}>
-                <img
-                  src={QR_CODES[qrIndex].image}
-                  alt={QR_CODES[qrIndex].alt}
-                  width={104}
-                  height={104}
-                  {...stylex.props(styles.qrImage)}
-                />
-                <figcaption {...stylex.props(styles.qrCaption)}>
-                  {QR_CODES[qrIndex].caption}
-                </figcaption>
-              </figure>
-            ) : (
-              <div {...stylex.props(styles.dualQrRow)}>
-                {QR_CODES.map((qr) => (
-                  <figure key={qr.id} {...stylex.props(styles.dualQrCard)}>
-                    <img
-                      src={qr.image}
-                      alt={qr.alt}
-                      width={88}
-                      height={88}
-                      {...stylex.props(styles.dualQrImage)}
-                    />
-                    <figcaption {...stylex.props(styles.dualQrCaption)}>{qr.label}</figcaption>
-                  </figure>
-                ))}
-              </div>
-            )}
           </div>
         </aside>
 
