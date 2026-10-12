@@ -1809,7 +1809,7 @@ function InkPhrase({
   children: ReactNode;
 }) {
   const reduce = useReducedMotion();
-  const opacity = useTransform(progress, range, [0.16, 1]);
+  const opacity = useTransform(progress, range, [0.48, 1]);
   return (
     <m.span {...stylex.props(styles.inkPhrase)} style={reduce ? undefined : { opacity }}>
       {children}
