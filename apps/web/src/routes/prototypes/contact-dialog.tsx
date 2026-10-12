@@ -6,14 +6,19 @@ export const Route = createFileRoute("/prototypes/contact-dialog")({
   beforeLoad: () => {
     if (!import.meta.env.DEV) throw notFound();
   },
-  validateSearch: (search: { v?: unknown }): { v?: number } => {
+  validateSearch: (
+    search: { v?: unknown; __state?: unknown },
+  ): { v?: number; __state?: string } => {
     const v = Number(search.v);
-    return { v: Number.isInteger(v) && v > 0 ? v : undefined };
+    return {
+      v: Number.isInteger(v) && v > 0 ? v : undefined,
+      __state: typeof search.__state === "string" ? search.__state : undefined,
+    };
   },
   component: ContactDialogLabRoute,
 });
 
 function ContactDialogLabRoute() {
-  const { v = 1 } = Route.useSearch();
-  return <ContactDialogLab initial={v - 1} />;
+  const { v = 1, __state = "pristine" } = Route.useSearch();
+  return <ContactDialogLab initial={v - 1} state={__state} />;
 }

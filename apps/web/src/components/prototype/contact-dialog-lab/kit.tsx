@@ -32,6 +32,7 @@ export {
 export type DialogVariantProps = {
   subject: InquirySubjectId | null;
   onClose: () => void;
+  state?: string;
 };
 
 const primaryPhone = CONTACT_DETAILS.find((d) => d.href?.startsWith("tel:")) ?? CONTACT_DETAILS[0];

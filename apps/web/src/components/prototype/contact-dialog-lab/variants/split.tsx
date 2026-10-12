@@ -72,6 +72,15 @@ const MISSING_ERRORS: Record<string, string> = {
   message: "请填写需求描述",
   consent: "请勾选同意后再提交",
 };
+const LONG_TEXT_FIXTURE = {
+  contactName: "Wolfeschlegelsteinhausenbergerdorff Jr.",
+  company: "International Botanical Ingredients & Formulation Holdings GmbH & Co. KG",
+  phone: "+86 (025) 8421-8888 ext. 99887766554433221100",
+  email: "very.long.enterprise.procurement.officer@subdomain.fenchem-international-holding.com",
+  message:
+    "We are conducting an extensive high-throughput botanical bioavailability benchmark across multiple functional cosmetics matrices. Need full documentation covering COA, TDS, MSDS, batch stability reports, allergen declarations, and Kosher/Halal certification under accelerated 40°C/75% RH conditions.",
+};
+
 const EMAIL_FORMAT_ERROR = "邮箱格式不正确，请按 name@company.com 的格式填写";
 
 type FormField = HTMLInputElement | HTMLTextAreaElement;
@@ -680,14 +689,18 @@ function RequestTypeSelect({
   );
 }
 
-export function SplitDialog({ subject, onClose }: DialogVariantProps) {
+export function SplitDialog({ subject, onClose, state = "pristine" }: DialogVariantProps) {
   const { closing, requestClose, dialogProps, panelProps } = useLabDialog(onClose);
   const titleId = useId();
-  const [requestType, setRequestType] = useState<RequestTypeId>(
-    subject ? REQUEST_TYPE_FOR_SUBJECT[subject] : "general",
+  const [requestType, setRequestType] = useState<RequestTypeId>(() => {
+    if (state === "technical") return "technical";
+    if (state === "commercial") return "commercial";
+    return subject ? REQUEST_TYPE_FOR_SUBJECT[subject] : "general";
+  });
+  const [submitted, setSubmitted] = useState(() => state === "submitted");
+  const [errors, setErrors] = useState<Record<string, string>>(() =>
+    state === "errors" ? { ...MISSING_ERRORS } : {},
   );
-  const [submitted, setSubmitted] = useState(false);
-  const [errors, setErrors] = useState<Record<string, string>>({});
   const doneTitleRef = useRef<HTMLHeadingElement>(null);
   const active = REQUEST_TYPES.find((type) => type.id === requestType) ?? REQUEST_TYPES[0];
 
@@ -838,7 +851,7 @@ export function SplitDialog({ subject, onClose }: DialogVariantProps) {
                       name="contactName"
                       required
                       autoComplete="name"
-                      {...fieldAria("split-name", errors.contactName)}
+                      defaultValue={state === "long-text" ? LONG_TEXT_FIXTURE.contactName : undefined}
                       {...stylex.props(
                         labStyles.input,
                         errors.contactName ? labStyles.inputInvalid : null,
@@ -851,7 +864,7 @@ export function SplitDialog({ subject, onClose }: DialogVariantProps) {
                       name="company"
                       required
                       autoComplete="organization"
-                      {...fieldAria("split-company", errors.company)}
+                      defaultValue={state === "long-text" ? LONG_TEXT_FIXTURE.company : undefined}
                       {...stylex.props(
                         labStyles.input,
                         errors.company ? labStyles.inputInvalid : null,
@@ -866,6 +879,7 @@ export function SplitDialog({ subject, onClose }: DialogVariantProps) {
                       required
                       autoComplete="tel"
                       inputMode="tel"
+                      defaultValue={state === "long-text" ? LONG_TEXT_FIXTURE.phone : undefined}
                       {...fieldAria("split-phone", errors.phone)}
                       {...stylex.props(
                         labStyles.input,
@@ -882,6 +896,7 @@ export function SplitDialog({ subject, onClose }: DialogVariantProps) {
                       autoComplete="email"
                       spellCheck={false}
                       placeholder="name@company.com"
+                      defaultValue={state === "long-text" ? LONG_TEXT_FIXTURE.email : undefined}
                       {...fieldAria("split-email", errors.email)}
                       {...stylex.props(
                         labStyles.input,
@@ -901,7 +916,7 @@ export function SplitDialog({ subject, onClose }: DialogVariantProps) {
                       name="message"
                       required
                       placeholder={active.placeholder}
-                      {...fieldAria("split-message", errors.message)}
+                      defaultValue={state === "long-text" ? LONG_TEXT_FIXTURE.message : undefined}
                       {...stylex.props(
                         labStyles.input,
                         labStyles.textarea,
@@ -919,6 +934,7 @@ export function SplitDialog({ subject, onClose }: DialogVariantProps) {
                       type="checkbox"
                       name="consent"
                       required
+                      defaultChecked={state === "long-text" ? true : undefined}
                       {...fieldAria("split-consent", errors.consent)}
                       {...stylex.props(labStyles.checkbox)}
                     />

@@ -112,6 +112,46 @@ const PICKER_CSS = `
   bottom: auto;
   top: 24px;
 }
+
+.state-switcher {
+  all: unset;
+  position: fixed;
+  bottom: max(24px, env(safe-area-inset-bottom));
+  left: 50%;
+  translate: -50% 0;
+  z-index: 2147483647;
+  display: flex;
+  gap: 2px;
+  max-width: calc(100vw - 32px);
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding: 4px;
+  border-radius: 999px;
+  background: rgb(20 20 20 / 0.9);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.1), 0 8px 24px rgb(0 0 0 / 0.25);
+  font: 13px/1 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  user-select: none;
+}
+.state-switcher button {
+  all: unset;
+  flex: none;
+  padding: 7px 14px;
+  border-radius: 999px;
+  font: inherit;
+  color: rgb(255 255 255 / 0.6);
+  cursor: pointer;
+}
+.state-switcher button:hover {
+  color: rgb(255 255 255 / 0.85);
+}
+.state-switcher button[aria-pressed="true"] {
+  background: rgb(255 255 255 / 0.14);
+  color: rgb(255 255 255);
+}
+.state-switcher button:focus-visible {
+  outline: 2px solid rgb(255 255 255 / 0.7);
+  outline-offset: 2px;
+}
 `;
 
 const styles = stylex.create({
@@ -122,8 +162,26 @@ const styles = stylex.create({
 
 const clampIndex = (index: number) => Math.min(Math.max(index, 0), VARIANTS.length - 1);
 
-export function ContactDialogLab({ initial }: { initial: number }) {
+const SPLIT_STATES = [
+  { id: "pristine", label: "Pristine" },
+  { id: "technical", label: "Technical" },
+  { id: "errors", label: "Errors" },
+  { id: "submitted", label: "Submitted" },
+  { id: "long-text", label: "Long Text" },
+] as const;
+
+export function ContactDialogLab({
+  initial,
+  state = "pristine",
+}: {
+  initial: number;
+  state?: string;
+}) {
   const [current, setCurrent] = useState(() => clampIndex(initial));
+  const [activeState, setActiveState] = useState(() =>
+    SPLIT_STATES.some((s) => s.id === state) ? state : "pristine",
+  );
+  const [switcherVisible, setSwitcherVisible] = useState(true);
   const [mountKey, setMountKey] = useState(0);
   const [open, setOpen] = useState(true);
   const [subject, setSubject] = useState<InquirySubjectId | null>(null);
@@ -132,7 +190,6 @@ export function ContactDialogLab({ initial }: { initial: number }) {
   const [readyHost, setReadyHost] = useState<HTMLElement | null | undefined>(undefined);
   const highlightRef = useRef<HTMLSpanElement>(null);
   const itemRefs = useRef<(HTMLButtonElement | null)[]>([]);
-
   useEffect(() => {
     const id = setTimeout(() => setMounted(true), 0);
     return () => clearTimeout(id);
@@ -180,17 +237,43 @@ export function ContactDialogLab({ initial }: { initial: number }) {
     window.history.replaceState(window.history.state, "", url);
   };
 
+  const switchState = (nextState: string) => {
+    setActiveState(nextState);
+    const url = new URL(window.location.href);
+    url.searchParams.set("__state", nextState);
+    window.history.replaceState(window.history.state, "", url);
+  };
+
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       const target = event.target as HTMLElement;
       if (/^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName) || target.isContentEditable) return;
       if (event.metaKey || event.ctrlKey || event.altKey) return;
-      const digit = Number.parseInt(event.key, 10);
-      if (digit >= 1 && digit <= VARIANTS.length) setActive(digit - 1);
-      else if (event.key === "ArrowRight") setActive((current + 1) % VARIANTS.length);
-      else if (event.key === "ArrowLeft")
-        setActive((current - 1 + VARIANTS.length) % VARIANTS.length);
-      else if (event.key === "r" || event.key === "R") openDialog(subject);
+
+      if (current === 0) {
+        if (event.key === "h" || event.key === "H") {
+          setSwitcherVisible((v) => !v);
+          return;
+        }
+        const digit = Number.parseInt(event.key, 10);
+        if (digit >= 1 && digit <= SPLIT_STATES.length) {
+          switchState(SPLIT_STATES[digit - 1].id);
+          return;
+        }
+        const currentIndex = SPLIT_STATES.findIndex((s) => s.id === activeState);
+        if (event.key === "ArrowRight") {
+          switchState(SPLIT_STATES[(currentIndex + 1) % SPLIT_STATES.length].id);
+          return;
+        }
+        if (event.key === "ArrowLeft") {
+          switchState(
+            SPLIT_STATES[(currentIndex - 1 + SPLIT_STATES.length) % SPLIT_STATES.length].id,
+          );
+          return;
+        }
+      }
+
+      if (event.key === "r" || event.key === "R") openDialog(subject);
     };
     document.addEventListener("keydown", onKeyDown);
     return () => document.removeEventListener("keydown", onKeyDown);
@@ -258,11 +341,30 @@ export function ContactDialogLab({ initial }: { initial: number }) {
           <PickerHostContext value={setPickerHost}>
             {open ? (
               <Variant
-                key={`${current}-${mountKey}`}
+                key={`${current}-${mountKey}-${activeState}`}
                 subject={subject}
                 onClose={() => setOpen(false)}
+                state={activeState}
               />
             ) : null}
+            {current === 0 && switcherVisible
+              ? createPortal(
+                  <nav className="state-switcher" aria-label="States">
+                    {SPLIT_STATES.map((s) => (
+                      <button
+                        key={s.id}
+                        type="button"
+                        data-state={s.id}
+                        aria-pressed={activeState === s.id ? "true" : "false"}
+                        onClick={() => switchState(s.id)}
+                      >
+                        {s.label}
+                      </button>
+                    ))}
+                  </nav>,
+                  document.body,
+                )
+              : null}
             {createPortal(picker, pickerHost ?? document.body)}
           </PickerHostContext>
         ) : null}
