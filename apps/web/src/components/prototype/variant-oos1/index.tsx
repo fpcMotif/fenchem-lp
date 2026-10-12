@@ -496,7 +496,6 @@ const styles = stylex.create({
     paddingBlock: 10,
     paddingInline: 6,
     marginBlock: -10,
-    marginInline: -6,
     borderWidth: 0,
     backgroundColor: "transparent",
     fontFamily: "inherit",
