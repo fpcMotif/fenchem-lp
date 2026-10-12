@@ -1,6 +1,6 @@
 import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { ArrowRight, Check, CheckCircle2, Clock, Copy, Download, MapPin, Plus } from "lucide-react";
+import { ArrowRight, Check, CheckCircle2, Copy, Download, MapPin, Plus } from "lucide-react";
 import { AnimatePresence, m } from "motion/react";
 import { useEffect, useRef, useState, type ReactNode, type SubmitEvent } from "react";
 import { toast } from "sonner";
@@ -949,7 +949,7 @@ function InquiryFields({
           type="submit"
           {...stylex.props(styles.submit, kitStyles.focusRing, stylex.defaultMarker())}
         >
-          提交咨询
+          提交
           <ArrowRight
             size={18}
             strokeWidth={2}
@@ -1227,16 +1227,6 @@ function Visit() {
                   {...stylex.props(styles.visitFactIcon)}
                 />
                 {VISIT_LOCATION.address}
-              </li>
-              <li {...stylex.props(styles.visitFact)}>
-                <Clock
-                  size={16}
-                  strokeWidth={2}
-                  nonScalingStroke
-                  aria-hidden="true"
-                  {...stylex.props(styles.visitFactIcon)}
-                />
-                {VISIT_LOCATION.hours}
               </li>
             </ul>
             <div {...stylex.props(styles.visitActions)}>

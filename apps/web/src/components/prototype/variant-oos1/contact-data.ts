@@ -8,7 +8,6 @@ export const CONTACT_BANNER = {
 } as const;
 
 const HQ_ADDRESS = "南京市秦淮区洪武路359号财富大厦19层";
-const OFFICE_HOURS = "周一至周五 08:30 – 17:30";
 
 export const CONTACT_NAV_CHIPS = [
   { id: "contact", label: "在线咨询" },
@@ -25,10 +24,8 @@ export const INQUIRY_INTRO = {
 
 export const CONTACT_DETAILS = [
   { term: "咨询专线", value: "025-8421 8888", href: "tel:+862584218888" },
-  { term: "商务报价", value: "sales@fenchem.com", href: "mailto:sales@fenchem.com" },
-  { term: "综合事务", value: "info@fenchem.com", href: "mailto:info@fenchem.com" },
+  { term: "公司邮箱", value: "info@fenchem.com", href: "mailto:info@fenchem.com" },
   { term: "总部地址", value: HQ_ADDRESS, href: null },
-  { term: "工作时间", value: OFFICE_HOURS, href: null },
 ] as const;
 
 export const VISIT_INTRO = {
@@ -41,7 +38,6 @@ export const VISIT_LOCATION = {
   name: "南京泛成国际控股有限公司",
   pinLabel: "泛成总部",
   address: HQ_ADDRESS,
-  hours: OFFICE_HOURS,
 } as const;
 
 export const SERVICE_PROMISES = [
@@ -60,11 +56,6 @@ export const INQUIRY_SUBJECTS = [
     id: "formulation",
     label: "配方与技术支持",
     placeholder: "请描述目标功效、剂型与当前配方遇到的问题，如添加比例、稳定性或感官表现",
-  },
-  {
-    id: "quote",
-    label: "商务报价",
-    placeholder: "请填写品名、规格、预计年用量、包装要求与交付地点",
   },
   {
     id: "visit",
