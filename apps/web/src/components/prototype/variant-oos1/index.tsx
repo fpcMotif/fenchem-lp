@@ -455,62 +455,13 @@ const styles = stylex.create({
       backgroundColor: "#0743a2",
     },
   },
-  headerActionsWrap: {
+  headerActions: {
     display: "flex",
     gridColumn: "3",
     justifySelf: "end",
     alignItems: "center",
     gap: 12,
     marginTop: 25,
-  },
-  headerContactButton: {
-    display: { default: "none", [breakpoints.sm]: "inline-flex" },
-    alignItems: "center",
-    justifyContent: "center",
-    height: 38,
-    paddingInline: 18,
-    borderRadius: 19,
-    borderWidth: 1,
-    borderStyle: "solid",
-    borderColor: colors.brandBlue700,
-    backgroundColor: {
-      default: "transparent",
-      ":hover": { default: null, [HOVER_MOTION]: colors.brandBlue700 },
-    },
-    color: {
-      default: colors.brandBlue700,
-      ":hover": { default: null, [HOVER_MOTION]: colors.paper },
-    },
-    fontFamily: DISPLAY_FONT,
-    fontSize: 14,
-    fontWeight: 600,
-    cursor: "pointer",
-    transitionProperty: "background-color, color, border-color, transform",
-    transitionDuration: "160ms",
-    transitionTimingFunction: ease.out,
-    ":active": {
-      transform: "scale(0.97)",
-    },
-  },
-  mobileContactButton: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    width: "100%",
-    height: 44,
-    borderRadius: 22,
-    borderWidth: 0,
-    backgroundColor: colors.brandBlue700,
-    color: colors.paper,
-    fontFamily: DISPLAY_FONT,
-    fontSize: 15,
-    fontWeight: 600,
-    cursor: "pointer",
-  },
-  headerActions: {
-    display: "flex",
-    alignItems: "center",
-    gap: 12,
   },
   searchPill: {
     display: { default: "none", [breakpoints.md]: "flex" },
@@ -1657,7 +1608,11 @@ function SiteHeader({
     }
     if (href === "#contact") {
       event.preventDefault();
-      onNavigate("contact", "contact-top");
+      if (onOpenContactDialog) {
+        onOpenContactDialog();
+      } else if (onNavigate) {
+        onNavigate("contact", "contact-top");
+      }
       setMenuOpen(false);
       return;
     }
@@ -1711,29 +1666,18 @@ function SiteHeader({
             </a>
           ))}
         </nav>
-        <div {...stylex.props(styles.headerActionsWrap)}>
-          {onOpenContactDialog ? (
-            <button
-              type="button"
-              onClick={onOpenContactDialog}
-              {...stylex.props(styles.headerContactButton)}
-            >
-              在线咨询
-            </button>
-          ) : null}
-          <CorporateHeaderActions
-            styles={{
-              headerActions: styles.headerActions,
-              searchPill: styles.searchPill,
-              searchPlaceholder: styles.searchPlaceholder,
-              langButton: styles.langButton,
-              menuButton: [styles.menuButton, !navFits && styles.menuButtonShown],
-            }}
-            menuOpen={menuOpen}
-            menuId={menuId}
-            setMenuOpen={setMenuOpen}
-          />
-        </div>
+        <CorporateHeaderActions
+          styles={{
+            headerActions: styles.headerActions,
+            searchPill: styles.searchPill,
+            searchPlaceholder: styles.searchPlaceholder,
+            langButton: styles.langButton,
+            menuButton: [styles.menuButton, !navFits && styles.menuButtonShown],
+          }}
+          menuOpen={menuOpen}
+          menuId={menuId}
+          setMenuOpen={setMenuOpen}
+        />
       </div>
       <AnimatePresence initial={false}>
         {menuOpen ? (
@@ -1760,20 +1704,6 @@ function SiteHeader({
                   </a>
                 </li>
               ))}
-              {onOpenContactDialog ? (
-                <li style={{ padding: "16px 20px 8px" }}>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setMenuOpen(false);
-                      onOpenContactDialog();
-                    }}
-                    {...stylex.props(styles.mobileContactButton)}
-                  >
-                    在线咨询
-                  </button>
-                </li>
-              ) : null}
             </ul>
           </m.nav>
         ) : null}
@@ -2518,14 +2448,9 @@ export function VariantOOS1({
                         id="contact"
                         actions={[
                           {
-                            label: "立即咨询",
+                            label: "联系我们",
                             tone: "primary",
                             onClick: () => setContactModalOpen(true),
-                          },
-                          {
-                            label: "查看联系方式",
-                            tone: "secondary",
-                            onClick: () => handleNavigate("contact", "contact-top"),
                           },
                         ]}
                       />
