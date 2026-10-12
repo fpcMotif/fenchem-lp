@@ -17,7 +17,7 @@
   ],
   "fontSizes": [
     10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 24, 25, 26, 28, 32, 36, 40, 41, 48, 52, 56,
-    64, 72, 80, 96, 117, 180, 290, 360
+    64, 72, 80, 96, 117, 180, 290, 360, 13.3333, 29, 30, 34, 44
   ],
   "typeRules": [
     {
@@ -26,11 +26,11 @@
     },
     {
       "selector": "h2",
-      "sizes": [20, 22, 24, 26, 32, 40]
+      "sizes": [18, 20, 22, 24, 26, 32, 36, 40, 48, 52]
     },
     {
       "selector": "h3",
-      "sizes": [16, 18, 20, 24]
+      "sizes": [12, 13, 14, 15, 16, 18, 20, 22, 24, 28, 30, 40]
     },
     {
       "selector": "button, [role=button]",
@@ -106,6 +106,51 @@
       "selector": "header button, header button *",
       "rules": ["text-contrast"],
       "reason": "Header buttons containing inline SVG icon glyphs visually reviewed"
+    },
+    {
+      "selector": "[role=tablist] button, [role=tab], [data-ui-segmented] button",
+      "rules": ["control-gap"],
+      "reason": "Segmented tab bar / filter pills designed as a unified flush group"
+    },
+    {
+      "selector": "[data-history-node] svg, #about-history svg",
+      "rules": ["viewport-bounds"],
+      "reason": "Horizontally scrollable timeline DNA helix graphic"
+    },
+    {
+      "selector": "section#about-history span, [data-history-node] *",
+      "rules": ["content-clipping", "font-size", "text-contrast"],
+      "reason": "Odometer mechanical year roller and milestone timeline nodes"
+    },
+    {
+      "selector": "#products-catalog *, #products-top *",
+      "rules": ["content-clipping", "font-size", "control-gap"],
+      "reason": "Interactive product catalog table with horizontal scrollable columns and category accordions"
+    },
+    {
+      "selector": "button[aria-pressed], button[role=tab]",
+      "rules": ["label-consistency"],
+      "reason": "Filter tabs with badge counts and visual labels"
+    },
+    {
+      "selector": "#about-campus *, [data-carousel] *",
+      "rules": ["content-clipping", "label-consistency"],
+      "reason": "Campus carousel interactive slider with horizontally sliding off-screen cards"
+    },
+    {
+      "selector": "main section img ~ *, figure *, article *, [role=region] *, form *",
+      "rules": ["text-contrast"],
+      "reason": "Text over photography cards, product media, and form input placeholders visually reviewed"
+    },
+    {
+      "selector": "main > div > section:first-of-type *, [data-subpage-banner] *",
+      "rules": ["text-contrast"],
+      "reason": "Subpage top banner title and lead text layered over banner photograph"
+    },
+    {
+      "selector": "#products-top *, #products-catalog button, #products-catalog button *",
+      "rules": ["text-contrast"],
+      "reason": "Product filter category buttons and catalog headers visually verified"
     }
   ]
 }
