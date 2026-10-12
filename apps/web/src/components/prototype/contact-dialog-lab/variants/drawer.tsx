@@ -1,12 +1,13 @@
 import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { Check, CheckCircle2, ChevronDown, Copy, Mail, MapPin, Phone, X } from "lucide-react";
+import { Check, CheckCircle2, ChevronDown, Copy, X } from "lucide-react";
 import { useId, useRef, useState, type ReactNode, type SubmitEvent } from "react";
 
 import { color, font } from "../../variant-oos1/tokens.stylex";
 import {
   COMPANY,
   CONTACT_DETAILS,
+  ContactIcon,
   Field,
   INQUIRY_SUBJECTS,
   NEXT_STEPS,
@@ -391,14 +392,8 @@ export function DrawerDialog({ subject, onClose }: DialogVariantProps) {
   };
 
   const channels = CONTACT_DETAILS.map((detail) => ({
-    icon: detail.href?.startsWith("tel:") ? (
-      <Phone size={18} strokeWidth={2} nonScalingStroke />
-    ) : detail.href?.startsWith("mailto:") ? (
-      <Mail size={18} strokeWidth={2} nonScalingStroke />
-    ) : (
-      <MapPin size={18} strokeWidth={2} nonScalingStroke />
-    ),
     ...detail,
+    icon: <ContactIcon detail={detail} size={18} />,
   }));
 
   return (

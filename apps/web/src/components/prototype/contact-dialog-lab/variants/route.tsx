@@ -515,7 +515,7 @@ export function RouteDialog({ subject, onClose }: DialogVariantProps) {
                         <span>
                           急事请致电{" "}
                           <a
-                            href={COMPANY.phone.href}
+                            href={COMPANY.phone.href ?? undefined}
                             {...stylex.props(styles.companyLink, labStyles.focusRing)}
                           >
                             {COMPANY.phone.value}

@@ -22,10 +22,12 @@ export const INQUIRY_INTRO = {
   brochureLabel: "下载企业画册与产品目录 (PDF)",
 } as const;
 
+export type ContactIconName = "phone" | "mail" | "map-pin" | "clock";
+
 export const CONTACT_DETAILS = [
-  { term: "咨询专线", value: "025-8421 8888", href: "tel:+862584218888" },
-  { term: "公司邮箱", value: "info@fenchem.com", href: "mailto:info@fenchem.com" },
-  { term: "总部地址", value: HQ_ADDRESS, href: null },
+  { term: "咨询专线", value: "025-8421 8888", href: "tel:+862584218888", icon: "phone" },
+  { term: "公司邮箱", value: "info@fenchem.com", href: "mailto:info@fenchem.com", icon: "mail" },
+  { term: "总部地址", value: HQ_ADDRESS, href: null, icon: "map-pin" },
 ] as const;
 
 export const VISIT_INTRO = {

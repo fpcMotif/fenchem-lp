@@ -10,6 +10,7 @@ import {
   type ReactNode,
   type SyntheticEvent,
 } from "react";
+import { Clock, Mail, MapPin, Phone } from "lucide-react";
 
 import { ABOUT_HERO } from "../variant-oos1/about-data";
 import {
@@ -33,11 +34,15 @@ export type DialogVariantProps = {
   onClose: () => void;
 };
 
+const primaryPhone = CONTACT_DETAILS.find((d) => d.href?.startsWith("tel:")) ?? CONTACT_DETAILS[0];
+const primaryEmail =
+  CONTACT_DETAILS.find((d) => d.href?.startsWith("mailto:")) ?? CONTACT_DETAILS[0];
+
 export const COMPANY = {
   name: ABOUT_HERO.title,
   english: ABOUT_HERO.englishTitle,
   established: "1995",
-  phone: CONTACT_DETAILS[0],
+  phone: primaryPhone,
 } as const;
 
 export const SUBJECT_ROUTES: Record<
@@ -48,27 +53,55 @@ export const SUBJECT_ROUTES: Record<
     team: "样品服务中心",
     english: "Sample desk",
     reply: "48 小时内顺丰寄样",
-    channel: CONTACT_DETAILS[1],
+    channel: primaryEmail,
   },
   formulation: {
     team: "应用研发中心",
     english: "Application lab",
     reply: "1 对 1 配方工程师答疑",
-    channel: CONTACT_DETAILS[1],
+    channel: primaryEmail,
   },
   visit: {
     team: "总部行政接待",
     english: "Visitor desk",
     reply: "提前 3 个工作日确认到访",
-    channel: CONTACT_DETAILS[0],
+    channel: primaryPhone,
   },
   other: {
     team: "综合事务部",
     english: "General office",
     reply: "工作日 24 小时内回复",
-    channel: CONTACT_DETAILS[1],
+    channel: primaryEmail,
   },
 };
+
+export function ContactIcon({
+  detail,
+  size = 18,
+}: {
+  detail: { href?: string | null; icon?: string };
+  size?: number;
+}) {
+  const icon =
+    detail.icon ??
+    (detail.href?.startsWith("tel:")
+      ? "phone"
+      : detail.href?.startsWith("mailto:")
+        ? "mail"
+        : "map-pin");
+
+  switch (icon) {
+    case "phone":
+      return <Phone size={size} strokeWidth={2} nonScalingStroke aria-hidden="true" />;
+    case "mail":
+      return <Mail size={size} strokeWidth={2} nonScalingStroke aria-hidden="true" />;
+    case "clock":
+      return <Clock size={size} strokeWidth={2} nonScalingStroke aria-hidden="true" />;
+    case "map-pin":
+    default:
+      return <MapPin size={size} strokeWidth={2} nonScalingStroke aria-hidden="true" />;
+  }
+}
 
 export const subjectById = (id: InquirySubjectId) =>
   INQUIRY_SUBJECTS.find((item) => item.id === id) ?? INQUIRY_SUBJECTS[0];
