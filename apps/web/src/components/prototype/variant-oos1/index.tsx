@@ -1838,14 +1838,14 @@ function About({ onOpenAboutPage }: { onOpenAboutPage?: () => void }) {
             </Fragment>
           ))}
         </p>
-        <div style={{ display: "flex", gap: 12, flexWrap: "wrap", justifyContent: "center" }}>
+        <div style={{ display: "flex", justifyContent: "center" }}>
           {onOpenAboutPage ? (
             <button
               type="button"
               onClick={onOpenAboutPage}
               {...stylex.props(styles.button, styles.buttonPrimary, styles.buttonCompact)}
             >
-              了解泛成详情 · 关于我们
+              更多
             </button>
           ) : (
             <a
@@ -1855,12 +1855,6 @@ function About({ onOpenAboutPage }: { onOpenAboutPage?: () => void }) {
               {ABOUT.cta.label}
             </a>
           )}
-          <a
-            href="#products"
-            {...stylex.props(styles.button, styles.buttonSecondary, styles.buttonCompact)}
-          >
-            探索四大核心业务
-          </a>
         </div>
       </RiseReveal>
     </section>
