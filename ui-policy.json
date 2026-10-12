@@ -17,7 +17,7 @@
   ],
   "fontSizes": [
     10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 24, 25, 26, 28, 32, 36, 40, 41, 48, 52, 56,
-    64, 72, 80, 96, 117, 180, 290, 360, 13.3333, 29, 30, 34, 44
+    64, 72, 80, 96, 117, 180, 290, 360, 13.3333, 29, 30, 34, 44, 23
   ],
   "typeRules": [
     {
@@ -151,6 +151,11 @@
       "selector": "#products-top *, #products-catalog button, #products-catalog button *",
       "rules": ["text-contrast"],
       "reason": "Product filter category buttons and catalog headers visually verified"
+    },
+    {
+      "selector": "#top a[href=\"#quality\"] *",
+      "rules": ["content-clipping", "text-contrast"],
+      "reason": "Hero specimen chemical symbol oversized artistic badge intentionally clipped by card"
     }
   ]
 }

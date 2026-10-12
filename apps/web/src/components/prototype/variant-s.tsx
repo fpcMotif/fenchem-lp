@@ -1160,7 +1160,7 @@ const styles = stylex.create({
     borderTopStyle: "solid",
     borderTopColor: colors.line,
     fontSize: 14,
-    color: colors.mute500,
+    color: colors.mute600,
   },
   topLink: {
     display: "inline-flex",
@@ -1327,11 +1327,7 @@ function HeroSection() {
           </div>
 
           <Reveal delay={STAGGER} margin="0px" sx={styles.right5}>
-            <a
-              href="#quality"
-              aria-label="Lot release card, see the certificate"
-              {...stylex.props(styles.chip, styles.chipLink)}
-            >
+            <a href="#quality" {...stylex.props(styles.chip, styles.chipLink)}>
               <div style={{ backgroundColor: look.colour }} {...stylex.props(styles.chipField)}>
                 <div {...stylex.props(styles.chipMeta)}>
                   <span {...stylex.props(styles.data, invert && styles.onPaper)}>
