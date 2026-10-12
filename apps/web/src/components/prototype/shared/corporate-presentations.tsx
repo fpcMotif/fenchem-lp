@@ -260,6 +260,7 @@ export function RisingHero({
   backdropStyles,
   backdropFragment,
   backdropProgress,
+  onSecondaryClick,
 }: {
   styles: {
     hero: StyleXStyles;
@@ -309,6 +310,7 @@ export function RisingHero({
   backdropStyles: ComponentProps<typeof HeroBackdrop>["styles"];
   backdropFragment?: string;
   backdropProgress?: MotionValue<number>;
+  onSecondaryClick?: (event: React.MouseEvent<HTMLAnchorElement>) => void;
 }) {
   return (
     <section ref={heroRef} id="top" aria-labelledby="oo-hero-title" {...stylex.props(styles.hero)}>
@@ -400,6 +402,12 @@ export function RisingHero({
           </a>
           <a
             href={HERO.secondary.href}
+            onClick={(event) => {
+              if (onSecondaryClick) {
+                event.preventDefault();
+                onSecondaryClick(event);
+              }
+            }}
             {...stylex.props(styles.button, styles.buttonSecondary, styles.buttonHero)}
           >
             {HERO.secondary.label}

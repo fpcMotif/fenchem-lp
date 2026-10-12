@@ -1727,7 +1727,7 @@ function LogoMark() {
   );
 }
 
-function Hero() {
+function Hero({ onOpenContactDialog }: { onOpenContactDialog?: () => void }) {
   const heroRef = useRef<HTMLElement>(null);
   const reduce = useReducedMotion();
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
@@ -1790,6 +1790,7 @@ function Hero() {
       CLOSING_LEAD={CLOSING_LEAD}
       CLOSING_WORD={CLOSING_WORD}
       introAfter={introAfter}
+      onSecondaryClick={onOpenContactDialog}
     />
   );
 }
@@ -2434,7 +2435,7 @@ export function VariantOOS1({
                   <ContactPage onNavigateHome={(target) => handleNavigate("home", target)} />
                 ) : (
                   <>
-                    <Hero />
+                    <Hero onOpenContactDialog={() => setContactModalOpen(true)} />
                     <About onOpenAboutPage={() => handleNavigate("about", "about-top")} />
                     <Campus />
                     <Strengths />
