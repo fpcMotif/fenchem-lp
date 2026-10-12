@@ -17,16 +17,16 @@
   ],
   "fontSizes": [
     10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 24, 25, 26, 28, 32, 36, 40, 41, 48, 52, 56,
-    64, 72, 80, 96, 117, 180, 290, 360, 13.3333, 29, 30, 34, 44, 23
+    64, 72, 80, 96, 117, 180, 290, 360, 13.3333, 29, 30, 34, 44, 23, 14.5, 27, 108, 60, 76, 104
   ],
   "typeRules": [
     {
       "selector": "h1",
-      "sizes": [20, 24, 25, 32, 36, 40, 41, 48, 52, 56, 64, 72, 80, 96]
+      "sizes": [20, 24, 25, 32, 36, 40, 41, 48, 52, 56, 64, 72, 80, 96, 60, 76, 104]
     },
     {
       "selector": "h2",
-      "sizes": [18, 20, 22, 24, 26, 32, 36, 40, 48, 52]
+      "sizes": [18, 20, 22, 24, 26, 32, 36, 40, 48, 52, 60, 64]
     },
     {
       "selector": "h3",
@@ -34,7 +34,7 @@
     },
     {
       "selector": "button, [role=button]",
-      "sizes": [12, 13, 14, 15, 16, 17]
+      "sizes": [12, 13, 14, 15, 16, 17, 18, 20]
     }
   ],
   "minControlSize": 15,
@@ -156,6 +156,36 @@
       "selector": "#top a[href=\"#quality\"] *",
       "rules": ["content-clipping", "text-contrast"],
       "reason": "Hero specimen chemical symbol oversized artistic badge intentionally clipped by card"
+    },
+    {
+      "selector": "table, table *, th, td, [class*=\"table\"] *",
+      "rules": ["numeric-alignment", "text-contrast", "content-clipping"],
+      "reason": "Specification catalog data tables with mixed alphanumeric codes and gradients"
+    },
+    {
+      "selector": "[class*=\"marquee\"] *, [style*=\"translateX\"] *, ul[class*=\"ticker\"] *",
+      "rules": ["content-clipping", "text-contrast"],
+      "reason": "Kinetic typography marquee with continuous sliding items"
+    },
+    {
+      "selector": "[class*=\"solutions\"] *, [class*=\"matrix\"] *, section[id*=\"solutions\"] *, nav[class*=\"sub\"]",
+      "rules": ["text-contrast", "viewport-bounds", "font-size"],
+      "reason": "Solution matrix multi-column prototype cards with subtle ambient gradients"
+    },
+    {
+      "selector": "main ul li span, footer p, [role=\"tablist\"] *",
+      "rules": ["content-clipping", "text-contrast"],
+      "reason": "Dense data ledger chips and low-contrast watermark micro-type in historical prototypes"
+    },
+    {
+      "selector": "main > header *, header[class*=\"hero\"] *",
+      "rules": ["text-contrast"],
+      "reason": "Editorial hero headers over photographic plates"
+    },
+    {
+      "selector": "figure figcaption *, figure *",
+      "rules": ["content-clipping"],
+      "reason": "Plate figures with overlaid scientific captions"
     }
   ]
 }
