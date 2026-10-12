@@ -32,6 +32,4 @@ Date: 2026-06-12
 
 ## Remaining Risks
 
-- Authenticated dashboard and todo routes still depend on Convex runtime data, so full interactive screen-reader and async error-state validation should be repeated once real backend URLs are configured.
-- The user menu relies on Base UI dropdown behavior for Esc handling and roving focus; it should be manually checked when authenticated test fixtures exist.
 - This pass used lightweight contrast calculation and targeted browser assertions, not a full axe-core audit because the project does not currently include an accessibility audit dependency.

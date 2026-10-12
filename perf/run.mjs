@@ -3,9 +3,9 @@
 // to StyleX with exact visual retention").
 //
 // Runs build-time, asset-size, and local cold-start measurement, then appends one row
-// to perf/log.json and regenerates perf/log.md from it. The same script captures both
-// columns of the comparison — run with --stack=stylex once that migration phase lands,
-// so the two columns are produced by identical methodology (issue requirement #1).
+// to perf/log.json and regenerates perf/log.md from it. The same script captured both
+// columns of the comparison — the Tailwind baseline rows used --stack=tailwind — so the
+// two columns are produced by identical methodology (issue requirement #1).
 //
 // NOT covered by this script (separate follow-up — needs a live deployment decision):
 //   - Cloudflare deployed cold-start probe + Server-Timing Worker share (issue item 42)
@@ -13,7 +13,7 @@
 // See perf/README.md.
 //
 // Usage:
-//   node perf/run.mjs [--stack=tailwind] [--build-runs=5] [--build-warmup=1]
+//   node perf/run.mjs [--stack=stylex] [--build-runs=5] [--build-warmup=1]
 //                      [--coldstart-runs=5] [--skip-full=true]
 
 import { execFileSync } from "node:child_process";
@@ -91,7 +91,7 @@ undercounted LCP on this site's animated hero); mixed-method rows aren't a fair 
 
 async function main() {
   const args = parseArgs(process.argv.slice(2), {
-    stack: "tailwind",
+    stack: "stylex",
     buildRuns: 5,
     buildWarmup: 1,
     coldstartRuns: 7,

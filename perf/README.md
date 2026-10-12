@@ -18,7 +18,7 @@ a few minutes — it does a full cold monorepo build, several hyperfine-timed we
 builds, and 5 fresh-browser-context page loads against a production preview server.
 
 Flags: `--stack=tailwind|stylex` (which column this run belongs to — defaults to
-`tailwind`), `--build-runs`, `--build-warmup`, `--coldstart-runs`, `--skip-full=true`
+`stylex`), `--build-runs`, `--build-warmup`, `--coldstart-runs`, `--skip-full=true`
 (skip the expensive full-monorepo build when iterating on the scripts themselves).
 
 Each measurement also runs standalone for debugging:
@@ -94,8 +94,7 @@ picking this up rather than assuming it's covered.
 
 ## Reading the log
 
-`stack` in each row is `tailwind` until the StyleX migration phases land, then `stylex`
-— run `node perf/run.mjs --stack=stylex` at each phase gate per the issue's protocol
-("every phase appends to the perf log"). `git.dirty` (rendered as a trailing `*` on the
+`stack` is `tailwind` for the baseline rows recorded before the StyleX migration and
+`stylex` for the rows after it; new runs default to `stylex`. `git.dirty` (rendered as a trailing `*` on the
 commit in `log.md`) means the working tree had uncommitted changes when that row was
 captured — treat those rows as provisional, not a clean baseline.
