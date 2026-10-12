@@ -1,4 +1,5 @@
 import * as stylex from "@stylexjs/stylex";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { LayoutGroup, m } from "motion/react";
 import { useId, useRef, useState, type KeyboardEvent } from "react";
 
@@ -97,6 +98,9 @@ const styles = stylex.create({
     borderBottomStyle: "solid",
     borderBottomColor: tone.tintRule,
   },
+  colHeadActive: {
+    borderBottomColor: tone.accent,
+  },
   colLabel: {
     margin: 0,
     fontSize: 15,
@@ -104,6 +108,9 @@ const styles = stylex.create({
     lineHeight: "22px",
     letterSpacing: "0.04em",
     color: tone.tintInk,
+  },
+  colLabelActive: {
+    color: tone.accent,
   },
   colCount: {
     fontSize: 12,
@@ -172,14 +179,15 @@ const styles = stylex.create({
   },
   nameIndex: {
     position: "relative",
-    fontSize: 11,
+    fontFamily: face.display,
+    fontSize: 12,
     lineHeight: "22px",
     letterSpacing: "0.04em",
     fontVariantNumeric: "tabular-nums",
     color: tone.tintMuted,
   },
   nameIndexSelected: {
-    color: tone.ink,
+    color: tone.accent,
   },
   nameText: {
     position: "relative",
@@ -217,30 +225,79 @@ const styles = stylex.create({
   },
   sheetMeta: {
     display: "flex",
-    alignItems: "baseline",
+    alignItems: "center",
     justifyContent: "space-between",
     gap: 16,
-    marginBottom: 12,
+    marginBottom: 6,
   },
   sheetArea: {
     display: "flex",
     alignItems: "baseline",
     gap: 8,
+    minWidth: 0,
     margin: 0,
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: 500,
-    lineHeight: "18px",
-    letterSpacing: "0.08em",
-    color: tone.tintMuted,
+    lineHeight: "20px",
+    letterSpacing: "0.06em",
+    color: tone.accent,
+    whiteSpace: "nowrap",
   },
   english: {
+    overflow: "hidden",
+    textOverflow: "ellipsis",
     fontFamily: face.display,
     fontSize: 11,
     letterSpacing: "0.14em",
     textTransform: "uppercase",
+    color: tone.tintMuted,
+  },
+  stepper: {
+    flexShrink: 0,
+    display: "flex",
+    alignItems: "center",
+    gap: 8,
+  },
+  stepButton: {
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    width: 32,
+    height: 32,
+    boxSizing: "border-box",
+    padding: 0,
+    borderWidth: 1,
+    borderStyle: "solid",
+    borderColor: {
+      default: tone.tintRule,
+      ":hover": { default: tone.tintRule, [bp.hover]: tone.accentLine },
+    },
+    borderRadius: 8,
+    backgroundColor: tone.paper,
+    color: {
+      default: tone.tintInk,
+      ":hover": { default: tone.tintInk, [bp.hover]: tone.accent },
+    },
+    cursor: "pointer",
+    transform: { default: null, ":active": "scale(0.94)" },
+    transitionProperty: "border-color, color, transform",
+    transitionDuration: { default: "0ms", [bp.motionOk]: "140ms" },
+    transitionTimingFunction: motion.easeOut,
+    outlineStyle: { default: "none", ":focus-visible": "solid" },
+    outlineWidth: 2,
+    outlineColor: tone.accent,
+    outlineOffset: 2,
+  },
+  stepButtonDisabled: {
+    borderColor: tone.tintRuleSoft,
+    color: tone.tintMuted,
+    opacity: 0.5,
+    cursor: "default",
+    transform: "none",
   },
   sheetCount: {
     margin: 0,
+    marginInlineEnd: 4,
     fontFamily: face.display,
     fontSize: 12,
     lineHeight: "18px",
@@ -288,7 +345,7 @@ const styles = stylex.create({
     paddingBlock: { default: 16, [bp.md]: 20, [bp.xl]: 16 },
     borderTopWidth: 1,
     borderTopStyle: "solid",
-    borderTopColor: tone.tintRuleSoft,
+    borderTopColor: tone.tintRule,
   },
   fieldLabel: {
     margin: 0,
@@ -368,22 +425,57 @@ function FieldValue({ row }: { row: SheetRow }) {
   return <>{row.values.join("、")}</>;
 }
 
-function Sheet({ item, titleId }: { item: SolutionItem; titleId: string }) {
+function SheetMeta({
+  item,
+  previous,
+  next,
+  onStep,
+}: {
+  item: SolutionItem;
+  previous: SolutionItem | undefined;
+  next: SolutionItem | undefined;
+  onStep: (id: string) => void;
+}) {
   const area = areaOf(item.area);
+  return (
+    <div {...stylex.props(styles.sheetMeta)}>
+      <p {...stylex.props(styles.sheetArea)}>
+        <span>{area?.label}</span>
+        <span lang="en" {...stylex.props(styles.english)}>
+          {area?.englishLabel}
+        </span>
+      </p>
+      <div {...stylex.props(styles.stepper)}>
+        <p {...stylex.props(styles.sheetCount)}>
+          {padIndex(AREA_POSITION.get(item.id) ?? 0)} / {padIndex(areaSize(item) - 1)}
+        </p>
+        <button
+          type="button"
+          aria-label="上一个方案"
+          disabled={!previous}
+          onClick={() => previous && onStep(previous.id)}
+          {...stylex.props(styles.stepButton, !previous && styles.stepButtonDisabled)}
+        >
+          <ChevronLeft size={16} strokeWidth={1.75} aria-hidden="true" />
+        </button>
+        <button
+          type="button"
+          aria-label="下一个方案"
+          disabled={!next}
+          onClick={() => next && onStep(next.id)}
+          {...stylex.props(styles.stepButton, !next && styles.stepButtonDisabled)}
+        >
+          <ChevronRight size={16} strokeWidth={1.75} aria-hidden="true" />
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function Sheet({ item, titleId }: { item: SolutionItem; titleId: string }) {
   return (
     <>
       <header {...stylex.props(styles.sheetHead)}>
-        <div {...stylex.props(styles.sheetMeta)}>
-          <p {...stylex.props(styles.sheetArea)}>
-            <span>{area?.label}</span>
-            <span lang="en" {...stylex.props(styles.english)}>
-              {area?.englishLabel}
-            </span>
-          </p>
-          <p {...stylex.props(styles.sheetCount)}>
-            {padIndex(AREA_POSITION.get(item.id) ?? 0)} / {padIndex(areaSize(item) - 1)}
-          </p>
-        </div>
         <h3 id={titleId} {...stylex.props(styles.sheetTitle)}>
           {item.title}
         </h3>
@@ -462,7 +554,7 @@ function NameList({
 
 export function AtlasVariant() {
   const browser = useSolutionsBrowser();
-  const { area, groups, scope, selected, select } = browser;
+  const { area, groups, scope, selected, position, select } = browser;
   const reduce = useReducedMotion();
   const uid = useId();
   const sheetId = `${uid}-sheet`;
@@ -486,6 +578,11 @@ export function AtlasVariant() {
       top: window.scrollY + top - HEADER_OFFSET - SHEET_GAP,
       behavior: reduce ? "instant" : "smooth",
     });
+  };
+
+  const step = (id: string) => {
+    select(id);
+    setFocusId(id);
   };
 
   const navigate = (event: KeyboardEvent<HTMLDivElement>) => {
@@ -540,8 +637,11 @@ export function AtlasVariant() {
         >
           {currentArea ? (
             <section aria-labelledby={`${uid}-${currentArea.id}`}>
-              <header {...stylex.props(styles.colHead)}>
-                <h3 id={`${uid}-${currentArea.id}`} {...stylex.props(styles.colLabel)}>
+              <header {...stylex.props(styles.colHead, styles.colHeadActive)}>
+                <h3
+                  id={`${uid}-${currentArea.id}`}
+                  {...stylex.props(styles.colLabel, styles.colLabelActive)}
+                >
                   {currentArea.label}
                 </h3>
                 <span {...stylex.props(styles.colCount)}>{currentArea.items.length} 款</span>
@@ -557,24 +657,30 @@ export function AtlasVariant() {
             </section>
           ) : (
             <div {...stylex.props(styles.areaGrid)}>
-              {groups.map((group) => (
-                <section
-                  key={group.id}
-                  aria-labelledby={`${uid}-${group.id}`}
-                  {...stylex.props(styles.column)}
-                >
-                  <header {...stylex.props(styles.colHead)}>
-                    <h3 id={`${uid}-${group.id}`} {...stylex.props(styles.colLabel)}>
-                      {group.label}
-                    </h3>
-                    <span {...stylex.props(styles.colCount)}>{group.items.length} 款</span>
-                    <p lang="en" {...stylex.props(styles.colEnglish)}>
-                      {group.englishLabel}
-                    </p>
-                  </header>
-                  <NameList items={group.items} {...listProps} />
-                </section>
-              ))}
+              {groups.map((group) => {
+                const active = group.id === selected?.area;
+                return (
+                  <section
+                    key={group.id}
+                    aria-labelledby={`${uid}-${group.id}`}
+                    {...stylex.props(styles.column)}
+                  >
+                    <header {...stylex.props(styles.colHead, active && styles.colHeadActive)}>
+                      <h3
+                        id={`${uid}-${group.id}`}
+                        {...stylex.props(styles.colLabel, active && styles.colLabelActive)}
+                      >
+                        {group.label}
+                      </h3>
+                      <span {...stylex.props(styles.colCount)}>{group.items.length} 款</span>
+                      <p lang="en" {...stylex.props(styles.colEnglish)}>
+                        {group.englishLabel}
+                      </p>
+                    </header>
+                    <NameList items={group.items} {...listProps} />
+                  </section>
+                );
+              })}
             </div>
           )}
         </div>
@@ -586,9 +692,17 @@ export function AtlasVariant() {
         {...stylex.props(styles.sheet)}
       >
         {selected && (
-          <div key={selected.id} {...stylex.props(styles.fadeIn)}>
-            <Sheet item={selected} titleId={titleId} />
-          </div>
+          <>
+            <SheetMeta
+              item={selected}
+              previous={scope[position - 1]}
+              next={scope[position + 1]}
+              onStep={step}
+            />
+            <div key={selected.id} {...stylex.props(styles.fadeIn)}>
+              <Sheet item={selected} titleId={titleId} />
+            </div>
+          </>
         )}
       </article>
     </LabSection>

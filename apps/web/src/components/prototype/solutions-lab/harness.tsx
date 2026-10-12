@@ -5,6 +5,7 @@ import { useEffect, useLayoutEffect, useRef, useState, type ComponentType } from
 import { face, tone } from "./tokens.stylex";
 import { AtlasVariant } from "./variants/atlas";
 import { CompareVariant } from "./variants/compare";
+import { DropdownVariant } from "./variants/dropdown";
 import { FacetsVariant } from "./variants/facets";
 import { FolderVariant } from "./variants/folder";
 import { GridVariant } from "./variants/grid";
@@ -25,6 +26,7 @@ const VARIANTS: { name: string; Component: ComponentType }[] = [
   { name: "Studio", Component: StudioVariant },
   { name: "Facets", Component: FacetsVariant },
   { name: "Compare", Component: CompareVariant },
+  { name: "Dropdown", Component: DropdownVariant },
 ];
 
 const PICKER_CSS = `
@@ -37,7 +39,10 @@ const PICKER_CSS = `
   display: flex;
   align-items: center;
   gap: 2px;
+  max-width: calc(100vw - 24px);
   padding: 4px;
+  overflow-x: auto;
+  scrollbar-width: none;
   border-radius: 999px;
   background: rgba(10, 10, 10, 0.82);
   -webkit-backdrop-filter: blur(12px) saturate(1.4);
@@ -107,6 +112,7 @@ const PICKER_CSS = `
 }
 
 .proto-picker-divider {
+  flex-shrink: 0;
   width: 1px;
   height: 16px;
   margin: 0 4px;
@@ -161,6 +167,13 @@ export function SolutionsLab({ initial }: { initial: number }) {
 
   useLayoutEffect(moveHighlight);
 
+  useLayoutEffect(() => {
+    const item = itemRefs.current[current];
+    const picker = item?.parentElement;
+    if (!item || !picker) return;
+    picker.scrollTo({ left: item.offsetLeft - (picker.clientWidth - item.offsetWidth) / 2 });
+  }, [current]);
+
   useEffect(() => {
     window.addEventListener("resize", moveHighlight);
     return () => window.removeEventListener("resize", moveHighlight);
@@ -194,7 +207,8 @@ export function SolutionsLab({ initial }: { initial: number }) {
       const digit = Number.parseInt(event.key, 10);
       if (!Number.isNaN(digit)) setActive(digit === 0 ? 9 : digit - 1);
       else if (event.key === "ArrowRight") setActive((current + 1) % VARIANTS.length);
-      else if (event.key === "ArrowLeft") setActive((current - 1 + VARIANTS.length) % VARIANTS.length);
+      else if (event.key === "ArrowLeft")
+        setActive((current - 1 + VARIANTS.length) % VARIANTS.length);
       else if (event.key === "r" || event.key === "R") setMountKey((key) => key + 1);
     };
     document.addEventListener("keydown", onKeyDown);
@@ -209,9 +223,15 @@ export function SolutionsLab({ initial }: { initial: number }) {
         <style>{PICKER_CSS}</style>
         <div lang="zh-CN" {...stylex.props(styles.root)}>
           <div aria-hidden="true" {...stylex.props(styles.band)} />
-          <div {...stylex.props(styles.stage)}>{Variant && <Variant key={`${current}-${mountKey}`} />}</div>
+          <div {...stylex.props(styles.stage)}>
+            {Variant && <Variant key={`${current}-${mountKey}`} />}
+          </div>
         </div>
-        <nav className="proto-picker" aria-label="Prototype variants" data-ready={ready ? "" : undefined}>
+        <nav
+          className="proto-picker"
+          aria-label="Prototype variants"
+          data-ready={ready ? "" : undefined}
+        >
           <span ref={highlightRef} className="proto-picker-highlight" aria-hidden="true" />
           {VARIANTS.map((variant, index) => (
             <button
