@@ -9,7 +9,7 @@ import {
   loadTexture,
   sizeCanvas,
 } from "@/components/prototype/shared/webgl";
-import { GLYPH_SWEEP, PHOTO_INSET } from "./depth-photo-values";
+import { GLYPH_SWEEP, PHOTO_INSET } from "../shared/depth-photo-values";
 
 const FRAGMENT = `
 precision highp float;

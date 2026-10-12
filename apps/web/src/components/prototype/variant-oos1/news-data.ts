@@ -1,8 +1,12 @@
 export const NEWS_HEADER = {
   title: "News & Events",
   chineseTitle: "新闻与展会资讯",
+  tagline: "Global Industry Insights & Events",
   lead: "追踪泛成全球学术动态、重磅原料发布与全球展会日程。",
   englishLead: "Discover our latest product launches, global events, and scientific updates.",
+  meta: ["Latest Updates", "Global Calendar"],
+  image: "/prototype/about/campus-showroom-lg.webp",
+  imageAlt: "泛成前沿科技展厅与国际学术交流中心",
 } as const;
 
 export const NEWS_CATEGORIES = [
@@ -86,8 +90,7 @@ export const NEWS_LIST: readonly NewsItem[] = [
     title: "制造基地完成全封闭溶剂循环改造，获 EcoVadis 可持续发展评级",
     date: "2026-01-25",
     readTime: "2 min",
-    excerpt:
-      "秉承绿色化学原则，有机溶剂循环利用率达到 98.5%，年减少温室气体碳排放超 1,200 吨。",
+    excerpt: "秉承绿色化学原则，有机溶剂循环利用率达到 98.5%，年减少温室气体碳排放超 1,200 吨。",
     image: "/prototype/about/csr-campus-lake.webp",
   },
   {
@@ -97,8 +100,7 @@ export const NEWS_LIST: readonly NewsItem[] = [
     title: "泛成英国曼彻斯特仓储中心正式启用，提供本地化 48 小时极速交付",
     date: "2025-12-10",
     readTime: "2 min",
-    excerpt:
-      "进一步完善欧洲三点仓储网络，配备本地温控仓储与快速样品分拨，支持英镑直接结算。",
+    excerpt: "进一步完善欧洲三点仓储网络，配备本地温控仓储与快速样品分拨，支持英镑直接结算。",
     image: "/prototype/about/about-lobby.webp",
   },
 ];

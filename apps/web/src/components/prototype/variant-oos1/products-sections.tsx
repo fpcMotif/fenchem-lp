@@ -24,12 +24,11 @@ import {
   type SolutionAreaId,
   type SolutionItem,
 } from "./products-data";
-import { layout } from "./products-sections-values";
+import { kitStyles } from "./subpage-kit";
+import { color, ease, font, layout, media } from "./tokens.stylex";
 
 type AreaFilter = SolutionAreaId | "all";
 
-const INK = "#1a1a1a";
-const BODY_TEXT = "#4d4d4d";
 const SURFACE = "#f3f5fa";
 const TINT_INK = "oklch(0.26 0.035 261.5)";
 const TINT_BODY = "oklch(0.44 0.025 261.5)";
@@ -41,19 +40,15 @@ const TINT_HEAD = "oklch(0.958 0.011 261.5)";
 const DRAWER_FILL = "oklch(0.955 0.024 261.5)";
 const CARD_SHADOW = "0 1px 2px rgba(7, 67, 174, 0.04), 0 16px 40px -24px rgba(7, 67, 174, 0.18)";
 const ACCENT = colors.brandBlue700;
-const DISPLAY_FONT = '"Inter Tight", "Helvetica Neue", Arial, sans-serif';
 const TAB_FLARE = 12;
 const FLARE_TOP = "radial-gradient(circle at 0 0, transparent 11.5px, #fff 12px)";
 const FLARE_BOTTOM = "radial-gradient(circle at 0 100%, transparent 11.5px, #fff 12px)";
-const EASE_OUT_CSS = "cubic-bezier(0.22, 1, 0.36, 1)";
 
 const MD = breakpoints.md;
 const LG = breakpoints.lg;
-const TABLET = "@media (min-width: 768px) and (max-width: 1279.98px)";
 const DESKTOP = breakpoints.xl;
 const HOVER = "@media (hover: hover) and (pointer: fine)";
 
-const HEADER_HEIGHT = 80;
 const GUTTER = 24;
 const TWELVE = "repeat(12, minmax(0, 1fr))";
 const HEAD_SPACE = { default: 32, [DESKTOP]: 56 } as const;
@@ -97,7 +92,7 @@ const panelIn = stylex.keyframes({
 const styles = stylex.create({
   section: {
     paddingBlock: { default: 72, [DESKTOP]: 128 },
-    scrollMarginTop: HEADER_HEIGHT,
+    scrollMarginTop: layout.headerHeight,
   },
   bandSurface: {
     backgroundColor: SURFACE,
@@ -108,7 +103,7 @@ const styles = stylex.create({
   sectionEyebrow: {
     margin: 0,
     marginBottom: 12,
-    fontFamily: DISPLAY_FONT,
+    fontFamily: font.display,
     fontSize: 12,
     fontWeight: 600,
     letterSpacing: "0.22em",
@@ -117,11 +112,11 @@ const styles = stylex.create({
   },
   sectionTitle: {
     margin: 0,
-    fontSize: { default: 26, [TABLET]: 32, [DESKTOP]: 40 },
+    fontSize: { default: 26, [media.tablet]: 32, [DESKTOP]: 40 },
     fontWeight: 700,
     lineHeight: 1.2,
     textWrap: "balance",
-    color: INK,
+    color: color.ink,
   },
   sectionLead: {
     margin: 0,
@@ -129,7 +124,7 @@ const styles = stylex.create({
     maxWidth: 520,
     fontSize: 16,
     lineHeight: "26px",
-    color: BODY_TEXT,
+    color: color.bodyText,
     textWrap: "pretty",
   },
 
@@ -173,7 +168,7 @@ const styles = stylex.create({
     borderBottomColor: TINT_RULE_SOFT,
     transitionProperty: "background-color",
     transitionDuration: { default: "0ms", [breakpoints.motionOk]: "200ms" },
-    transitionTimingFunction: EASE_OUT_CSS,
+    transitionTimingFunction: ease.out,
   },
   ledgerRowOpen: {
     backgroundColor: DRAWER_FILL,
@@ -196,7 +191,7 @@ const styles = stylex.create({
     cursor: "pointer",
     transitionProperty: "background-color",
     transitionDuration: { default: "0ms", [breakpoints.motionOk]: "200ms" },
-    transitionTimingFunction: EASE_OUT_CSS,
+    transitionTimingFunction: ease.out,
     outlineStyle: { default: "none", ":focus-visible": "solid" },
     outlineWidth: 2,
     outlineColor: colors.brandBlue700,
@@ -251,7 +246,7 @@ const styles = stylex.create({
     opacity: 1,
     transitionProperty: "opacity",
     transitionDuration: { default: "0ms", [breakpoints.motionOk]: "200ms" },
-    transitionTimingFunction: EASE_OUT_CSS,
+    transitionTimingFunction: ease.out,
   },
   ledgerPreviewOpen: {
     opacity: 0,
@@ -279,7 +274,7 @@ const styles = stylex.create({
     whiteSpace: "nowrap",
     transitionProperty: "border-color, color",
     transitionDuration: { default: "0ms", [breakpoints.motionOk]: "200ms" },
-    transitionTimingFunction: EASE_OUT_CSS,
+    transitionTimingFunction: ease.out,
   },
   keepTogether: {
     display: "inline-block",
@@ -305,7 +300,7 @@ const styles = stylex.create({
     },
     transitionProperty: "background-color, color",
     transitionDuration: { default: "0ms", [breakpoints.motionOk]: "160ms" },
-    transitionTimingFunction: EASE_OUT_CSS,
+    transitionTimingFunction: ease.out,
   },
   toggleOpen: {
     backgroundColor: ACCENT,
@@ -411,10 +406,10 @@ const styles = stylex.create({
     flexWrap: { default: "nowrap", [DESKTOP]: "wrap" },
     gap: 8,
     minWidth: 0,
-    marginInline: { default: -16, [TABLET]: -40, [DESKTOP]: 0 },
-    paddingInline: { default: 16, [TABLET]: 40, [DESKTOP]: 0 },
+    marginInline: { default: -16, [media.tablet]: -40, [DESKTOP]: 0 },
+    paddingInline: { default: 16, [media.tablet]: 40, [DESKTOP]: 0 },
     paddingBlock: 4,
-    scrollPaddingInline: { default: 16, [TABLET]: 40, [DESKTOP]: 0 },
+    scrollPaddingInline: { default: 16, [media.tablet]: 40, [DESKTOP]: 0 },
     overflowX: { default: "auto", [DESKTOP]: "visible" },
     scrollbarWidth: "none",
     overscrollBehaviorX: "contain",
@@ -442,7 +437,7 @@ const styles = stylex.create({
     transform: { default: null, ":active": "scale(0.96)" },
     transitionProperty: "background-color, color, transform",
     transitionDuration: { default: "0ms", [breakpoints.motionOk]: "160ms" },
-    transitionTimingFunction: EASE_OUT_CSS,
+    transitionTimingFunction: ease.out,
     outlineStyle: { default: "none", ":focus-visible": "solid" },
     outlineWidth: 2,
     outlineColor: ACCENT,
@@ -632,7 +627,7 @@ const styles = stylex.create({
     textWrap: "pretty",
     transitionProperty: "color",
     transitionDuration: { default: "0ms", [breakpoints.motionOk]: "150ms" },
-    transitionTimingFunction: EASE_OUT_CSS,
+    transitionTimingFunction: ease.out,
   },
   tabTitleSelected: {
     color: TINT_INK,
@@ -666,7 +661,7 @@ const styles = stylex.create({
     minWidth: 0,
     animationName: { default: "none", [breakpoints.motionOk]: panelIn },
     animationDuration: "180ms",
-    animationTimingFunction: EASE_OUT_CSS,
+    animationTimingFunction: ease.out,
   },
   sheetHead: {
     paddingBottom: { default: 20, [MD]: 28 },
@@ -971,7 +966,10 @@ export function ProductCatalog({ categoryId }: { categoryId: string }) {
     if (openIndex !== null && openIndex < index) {
       const triggerTop = trigger.getBoundingClientRect().top;
       startInstantLayout(() => flushSync(() => setOpenIndex(null)));
-      window.scrollBy({ top: trigger.getBoundingClientRect().top - triggerTop, behavior: "instant" });
+      window.scrollBy({
+        top: trigger.getBoundingClientRect().top - triggerTop,
+        behavior: "instant",
+      });
     }
     setOpenIndex(openIndex === index ? null : index);
   };
@@ -982,7 +980,7 @@ export function ProductCatalog({ categoryId }: { categoryId: string }) {
       aria-labelledby="catalog-title"
       {...stylex.props(styles.section, styles.bandSurface)}
     >
-      <div {...stylex.props(layout.shell, layout.inset)}>
+      <div {...stylex.props(kitStyles.shell, kitStyles.inset120)}>
         <header {...stylex.props(styles.sectionHead)}>
           <p lang="en" {...stylex.props(styles.sectionEyebrow)}>
             Catalog
@@ -1044,7 +1042,8 @@ export function ProductSolutions() {
       rail.scrollTo({ left: Math.max(0, left), behavior });
       return;
     }
-    const visibleTop = rail.scrollTop + (Number.parseFloat(getComputedStyle(rail).scrollPaddingTop) || 0);
+    const visibleTop =
+      rail.scrollTop + (Number.parseFloat(getComputedStyle(rail).scrollPaddingTop) || 0);
     const visibleBottom = rail.scrollTop + rail.clientHeight;
     if (tab.offsetTop >= visibleTop && tab.offsetTop + tab.offsetHeight <= visibleBottom) return;
     const top = tab.offsetTop - (rail.clientHeight - tab.offsetHeight) / 2;
@@ -1098,7 +1097,7 @@ export function ProductSolutions() {
       aria-labelledby="solutions-title"
       {...stylex.props(styles.section)}
     >
-      <div {...stylex.props(layout.shell, layout.inset)}>
+      <div {...stylex.props(kitStyles.shell, kitStyles.inset120)}>
         <header {...stylex.props(styles.sectionHead)}>
           <p lang="en" {...stylex.props(styles.sectionEyebrow)}>
             Solutions
@@ -1148,9 +1147,7 @@ export function ProductSolutions() {
                 <div key={group.id} {...stylex.props(styles.railGroup)}>
                   <p aria-hidden="true" {...stylex.props(styles.railHeading)}>
                     {group.label}
-                    <span {...stylex.props(styles.railHeadingCount)}>
-                      {group.items.length} 款
-                    </span>
+                    <span {...stylex.props(styles.railHeadingCount)}>{group.items.length} 款</span>
                   </p>
                   {group.items.map((item) => {
                     const isSelected = item.id === selected.id;
@@ -1174,21 +1171,30 @@ export function ProductSolutions() {
                           <m.span
                             layoutId={`${uid}-solution-tab`}
                             transition={
-                              reduce ? { duration: 0 } : { type: "spring", duration: 0.32, bounce: 0 }
+                              reduce
+                                ? { duration: 0 }
+                                : { type: "spring", duration: 0.32, bounce: 0 }
                             }
                             {...stylex.props(styles.tabIndicator)}
                           />
                         )}
-                        <span {...stylex.props(styles.tabIndex, isSelected && styles.tabIndexSelected)}>
+                        <span
+                          {...stylex.props(styles.tabIndex, isSelected && styles.tabIndexSelected)}
+                        >
                           {padIndex(scope.indexOf(item))}
                         </span>
                         <span {...stylex.props(styles.tabText)}>
                           <span
-                            {...stylex.props(styles.tabTitle, isSelected && styles.tabTitleSelected)}
+                            {...stylex.props(
+                              styles.tabTitle,
+                              isSelected && styles.tabTitleSelected,
+                            )}
                           >
                             {item.title}
                           </span>
-                          <span {...stylex.props(styles.tabMeta)}>{item.functions.join(" · ")}</span>
+                          <span {...stylex.props(styles.tabMeta)}>
+                            {item.functions.join(" · ")}
+                          </span>
                         </span>
                       </button>
                     );

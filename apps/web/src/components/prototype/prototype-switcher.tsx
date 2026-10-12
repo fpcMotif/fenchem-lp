@@ -83,7 +83,7 @@ const styles = stylex.create({
   },
 });
 
-const PRODUCT_VARIANTS = VARIANTS.filter((variant) => /^oos1p[a-t]$/.test(variant.key));
+const PRODUCT_VARIANTS = VARIANTS.filter((variant) => variant.family === "products");
 
 export function PrototypeSwitcher({
   current,

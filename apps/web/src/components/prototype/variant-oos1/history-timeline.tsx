@@ -31,9 +31,8 @@ import {
   yearAt,
 } from "./history-helix";
 import { RiseReveal } from "./rise-reveal";
+import { color, ease, font, layout, media } from "./tokens.stylex";
 
-const INK = "#1a1a1a";
-const BODY_TEXT = "#4d4d4d";
 const PAGE = "#f3f5fa";
 const MUTED_INK = "rgba(26, 26, 26, 0.22)";
 const HAIRLINE = "rgba(26, 26, 26, 0.12)";
@@ -41,12 +40,7 @@ const CONTROL_EDGE = "rgba(26, 26, 26, 0.28)";
 const BLUE_TRACK = "rgba(7, 67, 174, 0.16)";
 const GREEN_TRACK = "rgba(100, 167, 51, 0.3)";
 const BLUE_RING = "rgba(7, 67, 174, 0.38)";
-const DISPLAY_FONT = '"Inter Tight", "Helvetica Neue", Arial, sans-serif';
-const SERIF_ACCENT = '"Instrument Serif", Georgia, serif';
-const EASE_OUT_CSS = "cubic-bezier(0.22, 1, 0.36, 1)";
-const TABLET = "@media (min-width: 768px) and (max-width: 1279.98px)";
 const DESKTOP = breakpoints.xl;
-const INSET_120 = "min(120px, 8.333vw)";
 const SHELL_EDGE = "max(0px, (100% - 1440px) / 2)";
 const PIN_QUERY = "(min-width: 1024px) and (min-height: 760px)";
 const PIN_SPRING = { stiffness: 260, damping: 40, restDelta: 0.0005 };
@@ -104,7 +98,7 @@ const styles = stylex.create({
     maxWidth: 1440,
     marginInline: "auto",
     boxSizing: "border-box",
-    paddingInline: { default: 16, [TABLET]: 40, [DESKTOP]: INSET_120 },
+    paddingInline: { default: 16, [media.tablet]: 40, [DESKTOP]: layout.inset120 },
   },
 
   header: {
@@ -117,7 +111,7 @@ const styles = stylex.create({
   eyebrow: {
     margin: 0,
     marginBottom: 12,
-    fontFamily: DISPLAY_FONT,
+    fontFamily: font.display,
     fontSize: 12,
     fontWeight: 600,
     letterSpacing: "0.22em",
@@ -126,29 +120,29 @@ const styles = stylex.create({
   },
   title: {
     margin: 0,
-    fontSize: { default: 26, [TABLET]: 32, [DESKTOP]: 40 },
+    fontSize: { default: 26, [media.tablet]: 32, [DESKTOP]: 40 },
     fontWeight: 700,
     lineHeight: 1.2,
-    color: INK,
+    color: color.ink,
   },
   caption: {
     margin: 0,
     marginTop: 12,
     fontSize: { default: 13, [breakpoints.md]: 14 },
     letterSpacing: "0.06em",
-    color: BODY_TEXT,
+    color: color.bodyText,
   },
 
   odometer: {
     display: "flex",
     flexShrink: 0,
-    fontFamily: DISPLAY_FONT,
+    fontFamily: font.display,
     fontSize: { default: 52, [breakpoints.md]: 72, [breakpoints.lg]: 88, [DESKTOP]: 112 },
     fontWeight: 300,
     lineHeight: 1,
     letterSpacing: "-0.04em",
     fontVariantNumeric: "tabular-nums",
-    color: INK,
+    color: color.ink,
   },
   digitWindow: {
     display: "block",
@@ -163,7 +157,7 @@ const styles = stylex.create({
     flexDirection: "column",
     transitionProperty: "transform",
     transitionDuration: { default: "0ms", [breakpoints.motionOk]: "650ms" },
-    transitionTimingFunction: EASE_OUT_CSS,
+    transitionTimingFunction: ease.out,
   },
 
   viewport: {
@@ -181,7 +175,7 @@ const styles = stylex.create({
     overflowY: "hidden",
     overscrollBehaviorX: "contain",
     scrollSnapType: "x proximity",
-    scrollPaddingInline: { default: 16, [TABLET]: 40, [DESKTOP]: INSET_120 },
+    scrollPaddingInline: { default: 16, [media.tablet]: 40, [DESKTOP]: layout.inset120 },
     scrollbarWidth: "none",
     outlineStyle: { default: "none", ":focus-visible": "solid" },
     outlineWidth: 2,
@@ -196,8 +190,8 @@ const styles = stylex.create({
     width: "max-content",
     paddingInline: {
       default: `calc(${SHELL_EDGE} + 16px)`,
-      [TABLET]: `calc(${SHELL_EDGE} + 40px)`,
-      [DESKTOP]: `calc(${SHELL_EDGE} + ${INSET_120})`,
+      [media.tablet]: `calc(${SHELL_EDGE} + 40px)`,
+      [DESKTOP]: `calc(${SHELL_EDGE} + ${layout.inset120})`,
     },
     willChange: "transform",
   },
@@ -264,7 +258,7 @@ const styles = stylex.create({
     transform: { default: null, [breakpoints.motionOk]: "scaleY(0)" },
     transitionProperty: "opacity, transform",
     transitionDuration: "700ms",
-    transitionTimingFunction: EASE_OUT_CSS,
+    transitionTimingFunction: ease.out,
   },
   poleFillAbove: {
     transformOrigin: "bottom",
@@ -284,7 +278,7 @@ const styles = stylex.create({
     alignItems: "baseline",
     gap: 10,
     margin: 0,
-    fontFamily: DISPLAY_FONT,
+    fontFamily: font.display,
     fontSize: { default: 30, [breakpoints.md]: 34, [DESKTOP]: 40 },
     fontWeight: 500,
     lineHeight: 1,
@@ -293,21 +287,21 @@ const styles = stylex.create({
     color: MUTED_INK,
     transitionProperty: "color",
     transitionDuration: "500ms",
-    transitionTimingFunction: EASE_OUT_CSS,
+    transitionTimingFunction: ease.out,
   },
   yearLit: {
-    color: INK,
+    color: color.ink,
   },
   yearActive: {
     color: colors.brandBlue700,
   },
   kicker: {
-    fontFamily: SERIF_ACCENT,
+    fontFamily: font.serifAccent,
     fontSize: { default: 18, [DESKTOP]: 22 },
     fontStyle: "italic",
     fontWeight: 400,
     letterSpacing: 0,
-    color: BODY_TEXT,
+    color: color.bodyText,
   },
   events: {
     display: "flex",
@@ -320,14 +314,14 @@ const styles = stylex.create({
     fontSize: { default: 14, [DESKTOP]: 15 },
     lineHeight: 1.65,
     letterSpacing: "0.04em",
-    color: BODY_TEXT,
+    color: color.bodyText,
     textWrap: "pretty",
   },
   event: {
     opacity: 0.3,
     transitionProperty: "opacity, transform",
     transitionDuration: "700ms",
-    transitionTimingFunction: EASE_OUT_CSS,
+    transitionTimingFunction: ease.out,
   },
   eventAbove: {
     transform: { default: null, [breakpoints.motionOk]: "translateY(10px)" },
@@ -340,10 +334,10 @@ const styles = stylex.create({
     transform: "none",
   },
   entity: {
-    fontFamily: DISPLAY_FONT,
+    fontFamily: font.display,
     fontWeight: 600,
     letterSpacing: "0.01em",
-    color: INK,
+    color: color.ink,
   },
 
   strandTrack: {
@@ -397,7 +391,7 @@ const styles = stylex.create({
     transform: { default: null, [breakpoints.motionOk]: "scale(0.6)" },
     transitionProperty: "opacity, transform",
     transitionDuration: "500ms",
-    transitionTimingFunction: EASE_OUT_CSS,
+    transitionTimingFunction: ease.out,
   },
   nodeHaloActive: {
     opacity: 0.7,
@@ -414,7 +408,7 @@ const styles = stylex.create({
   rippleLit: {
     animationName: { default: null, [breakpoints.motionOk]: ripple },
     animationDuration: "1100ms",
-    animationTimingFunction: EASE_OUT_CSS,
+    animationTimingFunction: ease.out,
   },
 
   controls: {
@@ -435,7 +429,7 @@ const styles = stylex.create({
     borderColor: CONTROL_EDGE,
     borderRadius: "50%",
     backgroundColor: { default: "transparent", ":hover": colors.paper },
-    color: INK,
+    color: color.ink,
     cursor: { default: "pointer", ":disabled": "default" },
     opacity: { default: 1, ":disabled": 0.35 },
     transform: {
@@ -444,7 +438,7 @@ const styles = stylex.create({
     },
     transitionProperty: "background-color, opacity, transform",
     transitionDuration: "160ms",
-    transitionTimingFunction: EASE_OUT_CSS,
+    transitionTimingFunction: ease.out,
     outlineStyle: { default: "none", ":focus-visible": "solid" },
     outlineWidth: 2,
     outlineColor: colors.brandBlue700,

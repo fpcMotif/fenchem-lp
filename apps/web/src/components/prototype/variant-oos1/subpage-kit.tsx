@@ -2,10 +2,11 @@ import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 import { ChevronRight } from "lucide-react";
 import { useInView } from "motion/react";
-import { useEffect, useRef, type ReactNode } from "react";
+import { Fragment, useEffect, useMemo, useRef, type ReactNode } from "react";
 
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
+import { color, ease, font, layout, media, texture, zIndex } from "./tokens.stylex";
 import { useActiveSection } from "./use-active-section";
 
 /*
@@ -15,24 +16,10 @@ import { useActiveSection } from "./use-active-section";
  * pill chips, uppercase display-font eyebrows, and hairline-ruled reveals.
  */
 
-const INK = "#1a1a1a";
-const BODY_TEXT = "#4d4d4d";
-const NAVY_DEEP = "#0b2a5c";
-const DISPLAY_FONT = '"Inter Tight", "Helvetica Neue", Arial, sans-serif';
-const SERIF_ACCENT = '"Instrument Serif", Georgia, serif';
-const BODY_FONT =
-  '"Noto Sans SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif';
-
-const HEADER_HEIGHT = 80;
-const SUB_BAR_HEIGHT = 64;
-
 const NAVY_SCRIM = "rgba(6, 28, 66, 0.78)";
-const GRAIN = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`;
 
-const TABLET = "@media (min-width: 768px) and (max-width: 1279.98px)";
 const DESKTOP = breakpoints.xl;
-const EASE_OUT_CSS = "cubic-bezier(0.22, 1, 0.36, 1)";
-const INSET_120 = "min(120px, 8.333vw)";
+const HOVER = "@media (hover: hover)";
 
 const REVEAL_STEP_MS = 70;
 const REVEAL_MAX_STEPS = 5;
@@ -56,8 +43,8 @@ const dynamic = stylex.create({
 export const kitStyles = stylex.create({
   root: {
     backgroundColor: colors.paper,
-    color: INK,
-    fontFamily: BODY_FONT,
+    color: color.ink,
+    fontFamily: font.body,
     minHeight: "100vh",
   },
   shell: {
@@ -67,10 +54,10 @@ export const kitStyles = stylex.create({
     boxSizing: "border-box",
   },
   inset120: {
-    paddingInline: { default: 16, [TABLET]: 40, [DESKTOP]: INSET_120 },
+    paddingInline: { default: 16, [media.tablet]: 40, [DESKTOP]: layout.inset120 },
   },
   anchor: {
-    scrollMarginTop: HEADER_HEIGHT + SUB_BAR_HEIGHT + 24,
+    scrollMarginTop: `calc(${layout.headerHeight} + ${layout.subBarHeight} + 24px)`,
   },
   section: {
     paddingBlock: { default: 72, [DESKTOP]: 112 },
@@ -92,7 +79,7 @@ const styles = stylex.create({
     transform: { default: null, [breakpoints.motionOk]: "translateY(18px)" },
     transitionProperty: "opacity, transform",
     transitionDuration: "900ms",
-    transitionTimingFunction: EASE_OUT_CSS,
+    transitionTimingFunction: ease.out,
   },
   revealShown: {
     opacity: 1,
@@ -114,7 +101,7 @@ const styles = stylex.create({
     left: 0,
     width: "100%",
     height: "100%",
-    backgroundImage: GRAIN,
+    backgroundImage: texture.grain,
     opacity: 0.14,
     mixBlendMode: "overlay",
     pointerEvents: "none",
@@ -125,15 +112,21 @@ const styles = stylex.create({
     overflow: "hidden",
     display: "flex",
     alignItems: "flex-end",
-    height: { default: 440, [TABLET]: 520, [DESKTOP]: "clamp(540px, 68svh, 660px)" },
-    backgroundColor: NAVY_DEEP,
+    height: { default: 440, [media.tablet]: 520, [DESKTOP]: "clamp(540px, 68svh, 660px)" },
+    backgroundColor: color.navyDeep,
     color: colors.paper,
+  },
+  bannerCompact: {
+    height: { default: 360, [media.tablet]: 420, [DESKTOP]: 460 },
+  },
+  bannerTall: {
+    height: { default: 480, [media.tablet]: 580, [DESKTOP]: "clamp(580px, 80svh, 720px)" },
   },
   bannerImage: {
     animationName: { default: null, [breakpoints.motionOk]: bannerSettle },
     animationDuration: "1800ms",
     animationDelay: "200ms",
-    animationTimingFunction: EASE_OUT_CSS,
+    animationTimingFunction: ease.out,
     animationFillMode: "both",
   },
   bannerScrim: {
@@ -146,16 +139,25 @@ const styles = stylex.create({
     alignItems: "flex-end",
     justifyContent: "space-between",
     gap: 40,
-    paddingBottom: { default: 44, [TABLET]: 56, [DESKTOP]: 72 },
+    paddingBottom: { default: 44, [media.tablet]: 56, [DESKTOP]: 72 },
+  },
+  bannerContentCompact: {
+    paddingBottom: { default: 32, [media.tablet]: 40, [DESKTOP]: 52 },
+  },
+  bannerContentTall: {
+    paddingBottom: { default: 44, [media.tablet]: 60, [DESKTOP]: 80 },
   },
   bannerText: {
     display: "flex",
     flexDirection: "column",
     gap: 18,
   },
+  bannerTextCompact: {
+    gap: 12,
+  },
   bannerEyebrow: {
     margin: 0,
-    fontFamily: DISPLAY_FONT,
+    fontFamily: font.display,
     fontSize: 12,
     fontWeight: 600,
     letterSpacing: "0.22em",
@@ -164,20 +166,26 @@ const styles = stylex.create({
   },
   bannerTitle: {
     margin: 0,
-    fontSize: { default: 40, [TABLET]: 56, [DESKTOP]: 72 },
+    fontSize: { default: 40, [media.tablet]: 56, [DESKTOP]: 72 },
     fontWeight: 800,
     lineHeight: 1.1,
     letterSpacing: "0.06em",
     textShadow: "0 2px 24px rgba(6, 28, 66, 0.35)",
   },
+  bannerTitleCompact: {
+    fontSize: { default: 36, [media.tablet]: 48, [DESKTOP]: 56 },
+  },
   bannerTagline: {
     margin: 0,
-    fontFamily: SERIF_ACCENT,
+    fontFamily: font.serifAccent,
     fontStyle: "italic",
-    fontSize: { default: 21, [TABLET]: 25, [DESKTOP]: 29 },
+    fontSize: { default: 21, [media.tablet]: 25, [DESKTOP]: 29 },
     fontWeight: 400,
     lineHeight: 1.2,
     color: "rgba(255, 255, 255, 0.94)",
+  },
+  bannerTaglineTall: {
+    fontSize: { default: 22, [media.tablet]: 26, [DESKTOP]: 30 },
   },
   bannerLead: {
     margin: 0,
@@ -188,13 +196,16 @@ const styles = stylex.create({
     color: "rgba(255, 255, 255, 0.84)",
     textWrap: "pretty",
   },
+  bannerLeadTall: {
+    maxWidth: 640,
+  },
   bannerMeta: {
     display: { default: "none", [breakpoints.md]: "flex" },
     flexDirection: "column",
     alignItems: "flex-end",
     gap: 14,
     flexShrink: 0,
-    fontFamily: DISPLAY_FONT,
+    fontFamily: font.display,
     fontSize: 12,
     fontWeight: 500,
     letterSpacing: "0.22em",
@@ -230,8 +241,8 @@ const styles = stylex.create({
 
   subBar: {
     position: "sticky",
-    top: HEADER_HEIGHT,
-    zIndex: 30,
+    top: layout.headerHeight,
+    zIndex: zIndex.subBar,
     backgroundColor: "rgba(255, 255, 255, 0.95)",
     backdropFilter: "blur(16px)",
     boxShadow: "0 1px 0 0 rgba(26, 26, 26, 0.08)",
@@ -241,7 +252,7 @@ const styles = stylex.create({
     alignItems: "center",
     justifyContent: "space-between",
     gap: 24,
-    height: SUB_BAR_HEIGHT,
+    height: layout.subBarHeight,
   },
   breadcrumb: {
     display: "flex",
@@ -250,7 +261,7 @@ const styles = stylex.create({
     flexShrink: 0,
     fontSize: 13,
     letterSpacing: "0.04em",
-    color: BODY_TEXT,
+    color: color.bodyText,
   },
   breadcrumbLink: {
     padding: 0,
@@ -259,11 +270,11 @@ const styles = stylex.create({
     fontSize: "inherit",
     letterSpacing: "inherit",
     fontFamily: "inherit",
-    color: { default: BODY_TEXT, ":hover": colors.brandBlue700 },
+    color: { default: color.bodyText, ":hover": { default: null, [HOVER]: colors.brandBlue700 } },
     cursor: "pointer",
   },
   breadcrumbCurrent: {
-    color: INK,
+    color: color.ink,
     fontWeight: 600,
   },
   chipList: {
@@ -285,25 +296,33 @@ const styles = stylex.create({
     height: 36,
     paddingInline: 18,
     borderRadius: 999,
-    backgroundColor: { default: "#f3f4f6", ":hover": "#e5e7eb" },
+    backgroundColor: { default: "#f3f4f6", ":hover": { default: null, [HOVER]: "#e5e7eb" } },
     fontFamily: "inherit",
     fontSize: 13,
     fontWeight: 500,
     letterSpacing: "0.04em",
-    color: { default: INK, ":hover": colors.brandBlue700 },
+    color: { default: color.ink, ":hover": { default: null, [HOVER]: colors.brandBlue700 } },
     textDecoration: "none",
     whiteSpace: "nowrap",
     cursor: "pointer",
+    transform: {
+      default: null,
+      ":active": { default: null, [breakpoints.motionOk]: "scale(0.96)" },
+    },
     transitionProperty: "background-color, color, transform, box-shadow",
     transitionDuration: "160ms",
-    transitionTimingFunction: EASE_OUT_CSS,
+    transitionTimingFunction: ease.out,
+    WebkitTapHighlightColor: "transparent",
   },
   chipLead: {
     marginInlineStart: { default: 0, [breakpoints.lg]: "auto" },
   },
   chipActive: {
-    backgroundColor: { default: colors.brandBlue700, ":hover": colors.brandBlue800 },
-    color: { default: colors.paper, ":hover": colors.paper },
+    backgroundColor: {
+      default: colors.brandBlue700,
+      ":hover": { default: null, [HOVER]: colors.brandBlue800 },
+    },
+    color: { default: colors.paper, ":hover": { default: null, [HOVER]: colors.paper } },
     boxShadow: "0 4px 12px -2px rgba(29, 78, 216, 0.32)",
   },
 
@@ -314,7 +333,7 @@ const styles = stylex.create({
   sectionEyebrow: {
     margin: 0,
     marginBottom: 12,
-    fontFamily: DISPLAY_FONT,
+    fontFamily: font.display,
     fontSize: 12,
     fontWeight: 600,
     letterSpacing: "0.22em",
@@ -326,10 +345,10 @@ const styles = stylex.create({
   },
   sectionTitle: {
     margin: 0,
-    fontSize: { default: 26, [TABLET]: 32, [DESKTOP]: 40 },
+    fontSize: { default: 26, [media.tablet]: 32, [DESKTOP]: 40 },
     fontWeight: 700,
     lineHeight: 1.2,
-    color: INK,
+    color: color.ink,
     textWrap: "balance",
   },
   sectionTitleInvert: {
@@ -342,7 +361,7 @@ const styles = stylex.create({
     fontSize: { default: 15, [DESKTOP]: 16 },
     lineHeight: 1.8,
     letterSpacing: "0.03em",
-    color: BODY_TEXT,
+    color: color.bodyText,
     textWrap: "pretty",
   },
   sectionLeadInvert: {
@@ -388,8 +407,9 @@ export function SubPageBanner({
   imageAlt,
   imagePosition = "center 58%",
   titleId,
+  size,
 }: {
-  eyebrow: string;
+  eyebrow?: string;
   title: string;
   tagline: string;
   lead: string;
@@ -398,9 +418,15 @@ export function SubPageBanner({
   imageAlt: string;
   imagePosition?: string;
   titleId: string;
+  size?: "compact" | "tall";
 }) {
+  const compact = size === "compact";
+  const tall = size === "tall";
   return (
-    <section aria-labelledby={titleId} {...stylex.props(styles.banner)}>
+    <section
+      aria-labelledby={titleId}
+      {...stylex.props(styles.banner, compact && styles.bannerCompact, tall && styles.bannerTall)}
+    >
       <img
         src={image}
         alt={imageAlt}
@@ -411,27 +437,40 @@ export function SubPageBanner({
       />
       <div aria-hidden="true" {...stylex.props(styles.fill, styles.bannerScrim)} />
       <div aria-hidden="true" {...stylex.props(styles.grain)} />
-      <div {...stylex.props(kitStyles.shell, kitStyles.inset120, styles.bannerContent)}>
-        <div {...stylex.props(styles.bannerText)}>
-          <p lang="en" {...stylex.props(styles.bannerEyebrow)}>
-            {eyebrow}
-          </p>
-          <h1 id={titleId} {...stylex.props(styles.bannerTitle)}>
+      <div
+        {...stylex.props(
+          kitStyles.shell,
+          kitStyles.inset120,
+          styles.bannerContent,
+          compact && styles.bannerContentCompact,
+          tall && styles.bannerContentTall,
+        )}
+      >
+        <div {...stylex.props(styles.bannerText, compact && styles.bannerTextCompact)}>
+          {eyebrow ? (
+            <p lang="en" {...stylex.props(styles.bannerEyebrow)}>
+              {eyebrow}
+            </p>
+          ) : null}
+          <h1
+            id={titleId}
+            {...stylex.props(styles.bannerTitle, compact && styles.bannerTitleCompact)}
+          >
             {title}
           </h1>
-          <p lang="en" {...stylex.props(styles.bannerTagline)}>
+          <p lang="en" {...stylex.props(styles.bannerTagline, tall && styles.bannerTaglineTall)}>
             {tagline}
           </p>
-          <p {...stylex.props(styles.bannerLead)}>{lead}</p>
+          <p {...stylex.props(styles.bannerLead, tall && styles.bannerLeadTall)}>{lead}</p>
         </div>
         <div lang="en" {...stylex.props(styles.bannerMeta)}>
           {meta.map((item, index) => (
-            <span key={item}>
+            <Fragment key={item}>
               {index > 0 ? (
                 <span aria-hidden="true" {...stylex.props(styles.bannerMetaRule)} />
               ) : null}
-              {item}
-            </span>
+              <span>{item}</span>
+            </Fragment>
           ))}
           <span aria-hidden="true" {...stylex.props(styles.scrollTrack)}>
             <span {...stylex.props(styles.scrollThumb)} />
@@ -459,7 +498,11 @@ export function SubPageNav({
   chipsLabel?: string;
 }) {
   const controlled = onSelectChip !== undefined;
-  const spy = useActiveSection(controlled ? [] : chips.map((chip) => chip.id));
+  const spyIds = useMemo(
+    () => (controlled ? [] : chips.map((chip) => chip.id)),
+    [controlled, chips],
+  );
+  const spy = useActiveSection(spyIds);
   const active = controlled ? activeChip : spy;
   const chipListRef = useRef<HTMLElement>(null);
   const reduce = useReducedMotion();
@@ -547,16 +590,10 @@ export function SectionHead({
 }) {
   return (
     <Reveal sx={styles.sectionHead}>
-      <p
-        lang="en"
-        {...stylex.props(styles.sectionEyebrow, invert && styles.sectionEyebrowInvert)}
-      >
+      <p lang="en" {...stylex.props(styles.sectionEyebrow, invert && styles.sectionEyebrowInvert)}>
         {eyebrow}
       </p>
-      <h2
-        id={titleId}
-        {...stylex.props(styles.sectionTitle, invert && styles.sectionTitleInvert)}
-      >
+      <h2 id={titleId} {...stylex.props(styles.sectionTitle, invert && styles.sectionTitleInvert)}>
         {title}
       </h2>
       {lead ? (

@@ -2,9 +2,9 @@ export const CONTACT_BANNER = {
   title: "联系我们",
   tagline: "Talk to the people behind the ingredients.",
   lead: "申请试样、咨询配方或探讨定制研发，泛成技术团队随时恭候您的联络。",
-  meta: ["Mon – Fri 08:30 – 17:30", "Nanjing · China"],
-  image: "/prototype/official-site/campus-lake.webp",
-  imageAlt: "泛成南京园区研发楼与景观水池",
+  meta: ["24H Response", "16 Global Sites"],
+  image: "/prototype/about/campus-reception-lg.webp",
+  imageAlt: "泛成总部接待大厅与全球客户服务中心",
 } as const;
 
 const HQ_ADDRESS = "南京市秦淮区洪武路359号财富大厦19层";

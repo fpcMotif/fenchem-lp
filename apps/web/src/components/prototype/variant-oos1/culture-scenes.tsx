@@ -7,19 +7,15 @@ import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
 import { ABOUT_CAMPUS, ABOUT_CULTURE, ABOUT_MOMENT } from "./about-data";
 import { RiseReveal } from "./rise-reveal";
+import { color, font, layout, media } from "./tokens.stylex";
 
-const INK = "#1a1a1a";
-const BODY_TEXT = "#4d4d4d";
-const DISPLAY_FONT = '"Inter Tight", "Helvetica Neue", Arial, sans-serif';
 const FRAME_TINT = "#e6ecf7";
 const WASH_SAND = "#f8f4ec";
 const WASH_BLUE = "#f1f4fa";
 const WASH_GREEN = "#f1f6ee";
-const TABLET = "@media (min-width: 768px) and (max-width: 1279.98px)";
 const MD_TO_LG = "@media (min-width: 768px) and (max-width: 1023.98px)";
 const DESKTOP = breakpoints.xl;
 const LG = breakpoints.lg;
-const INSET_120 = "min(120px, 8.333vw)";
 const SCENE_OFFSET: ["start end", "end 0.35"] = ["start end", "end 0.35"];
 const HUMAN_ZOOM = 2.3;
 
@@ -34,7 +30,7 @@ const styles = stylex.create({
     maxWidth: 1440,
     marginInline: "auto",
     boxSizing: "border-box",
-    paddingInline: { default: 16, [TABLET]: 40, [DESKTOP]: INSET_120 },
+    paddingInline: { default: 16, [media.tablet]: 40, [DESKTOP]: layout.inset120 },
   },
   header: {
     marginBottom: { default: 40, [DESKTOP]: 64 },
@@ -42,7 +38,7 @@ const styles = stylex.create({
   eyebrow: {
     margin: 0,
     marginBottom: 12,
-    fontFamily: DISPLAY_FONT,
+    fontFamily: font.display,
     fontSize: 12,
     fontWeight: 600,
     letterSpacing: "0.22em",
@@ -51,15 +47,15 @@ const styles = stylex.create({
   },
   title: {
     margin: 0,
-    fontSize: { default: 26, [TABLET]: 32, [DESKTOP]: 40 },
+    fontSize: { default: 26, [media.tablet]: 32, [DESKTOP]: 40 },
     fontWeight: 700,
     lineHeight: 1.2,
-    color: INK,
+    color: color.ink,
   },
   story: {
     display: "flex",
     flexDirection: "column",
-    gap: { default: 72, [TABLET]: 96, [DESKTOP]: 128 },
+    gap: { default: 72, [media.tablet]: 96, [DESKTOP]: 128 },
   },
   sceneGrid: {
     display: { default: "block", [LG]: "grid" },
@@ -90,7 +86,7 @@ const styles = stylex.create({
     fontSize: 12,
     lineHeight: 1.6,
     letterSpacing: "0.06em",
-    color: BODY_TEXT,
+    color: color.bodyText,
   },
 
   vastFigure: {
@@ -100,7 +96,7 @@ const styles = stylex.create({
     paddingLeft: { default: 16, [breakpoints.md]: 0 },
   },
   vastFrame: {
-    aspectRatio: { default: "4 / 3", [TABLET]: "2 / 1", [DESKTOP]: "2.3 / 1" },
+    aspectRatio: { default: "4 / 3", [media.tablet]: "2 / 1", [DESKTOP]: "2.3 / 1" },
   },
   vastImage: {
     objectPosition: "50% 72%",
@@ -135,7 +131,7 @@ const styles = stylex.create({
     fontWeight: 500,
     lineHeight: 1.3,
     letterSpacing: "0.06em",
-    color: INK,
+    color: color.ink,
   },
   desc: {
     maxWidth: "28em",
@@ -144,7 +140,7 @@ const styles = stylex.create({
     fontSize: 16,
     lineHeight: 2,
     letterSpacing: "0.04em",
-    color: BODY_TEXT,
+    color: color.bodyText,
     textWrap: "pretty",
   },
 });

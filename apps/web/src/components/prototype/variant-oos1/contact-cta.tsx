@@ -4,20 +4,14 @@ import { useId } from "react";
 
 import { CTA } from "./content";
 import { RiseReveal } from "./rise-reveal";
+import { color, ease, font, layout, media } from "./tokens.stylex";
 
-const INK = "#1a1a1a";
-const BODY_TEXT = "#4d4d4d";
 const TINT = "#e6ecf7";
 const PAPER_HOVER = "#f6f6f6";
 const OOX_WORD_ON_TINT = "#d7e1f1";
 const WORD_ON_TINT = `color-mix(in srgb, ${OOX_WORD_ON_TINT} 80%, ${TINT})`;
-const DISPLAY_FONT = '"Inter Tight", "Helvetica Neue", Arial, sans-serif';
 const WORD_TRACKING = "0.06em";
-const EASE_OUT_CSS = "cubic-bezier(0.22, 1, 0.36, 1)";
-const TABLET = "@media (min-width: 768px) and (max-width: 1279.98px)";
 const DESKTOP = breakpoints.xl;
-const INSET_124 = "min(124px, 8.611vw)";
-const HEADER_HEIGHT = 80;
 
 export type ContactCtaAction = {
   label: string;
@@ -37,15 +31,15 @@ const styles = stylex.create({
     overflow: "clip",
     paddingTop: { default: 80, [DESKTOP]: 128 },
     paddingBottom: { default: 120, [DESKTOP]: 220 },
-    paddingInline: { default: 16, [TABLET]: 40, [DESKTOP]: INSET_124 },
-    scrollMarginTop: HEADER_HEIGHT,
+    paddingInline: { default: 16, [media.tablet]: 40, [DESKTOP]: layout.inset124 },
+    scrollMarginTop: layout.headerHeight,
     backgroundColor: TINT,
   },
   word: {
     position: "absolute",
     left: "50%",
     bottom: 0,
-    fontFamily: DISPLAY_FONT,
+    fontFamily: font.display,
     fontSize: { default: "30vw", [DESKTOP]: "min(360px, 25vw)" },
     fontWeight: 800,
     lineHeight: 0.74,
@@ -75,17 +69,17 @@ const styles = stylex.create({
   },
   title: {
     margin: 0,
-    fontSize: { default: 26, [TABLET]: 32, [DESKTOP]: 40 },
+    fontSize: { default: 26, [media.tablet]: 32, [DESKTOP]: 40 },
     fontWeight: 700,
     lineHeight: 1.2,
-    color: INK,
+    color: color.ink,
     textWrap: "balance",
   },
   subtitle: {
     margin: 0,
     fontSize: { default: 16, [DESKTOP]: 18 },
     lineHeight: 1.6,
-    color: BODY_TEXT,
+    color: color.bodyText,
     textWrap: "pretty",
   },
   actions: {
@@ -117,7 +111,7 @@ const styles = stylex.create({
     },
     transitionProperty: "background-color, color, transform",
     transitionDuration: "160ms",
-    transitionTimingFunction: EASE_OUT_CSS,
+    transitionTimingFunction: ease.out,
     outlineStyle: { default: "none", ":focus-visible": "solid" },
     outlineWidth: 2,
     outlineColor: colors.brandBlue700,

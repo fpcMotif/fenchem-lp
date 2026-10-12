@@ -7,7 +7,7 @@ import {
   type SolutionAreaId,
   type SolutionItem,
 } from "../variant-oos1/products-data";
-import { layout } from "../variant-oos1/products-sections-values";
+import { kitStyles } from "../variant-oos1/subpage-kit";
 import { EXTRA_SOLUTIONS } from "../variant-oos1/worst-case-data";
 import { bp, face, motion, tone } from "./tokens.stylex";
 
@@ -191,7 +191,7 @@ const styles = stylex.create({
 export function LabSection({ children }: { children: ReactNode }) {
   return (
     <section aria-labelledby="lab-solutions-title" {...stylex.props(styles.section)}>
-      <div {...stylex.props(layout.shell, layout.inset)}>
+      <div {...stylex.props(kitStyles.shell, kitStyles.inset120)}>
         <header {...stylex.props(styles.head)}>
           <p lang="en" {...stylex.props(styles.eyebrow)}>
             Solutions

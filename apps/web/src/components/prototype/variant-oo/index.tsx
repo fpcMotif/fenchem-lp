@@ -55,7 +55,7 @@ import { useCountUp } from "@/components/prototype/shared/use-count-up";
 import { LINKEDIN_PATHS, LOGO_PATHS, WECHAT_PATHS, type VectorPath } from "../variant-o/vectors";
 import { INTRO_REVEAL_MS, useIntro } from "@/components/prototype/shared/intro";
 import { DepthPhoto } from "./depth-photo";
-import { glyphRise, screenWaterline } from "./depth-photo-values";
+import { glyphRise, screenWaterline } from "../shared/depth-photo-values";
 
 import {
   ABOUT,

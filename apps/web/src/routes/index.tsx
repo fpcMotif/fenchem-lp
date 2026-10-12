@@ -10,10 +10,10 @@ import {
 } from "@/components/prototype/variants";
 
 /*
- * PROTOTYPE — seven Fenchem landing pages on this route, switchable via
- * ?variant= (a..g) and the floating bottom bar / arrow keys.
+ * PROTOTYPE — every Fenchem landing variant renders on this route, switchable
+ * via ?variant=<key> and the floating bottom bar / arrow keys.
  * A/B/C: original editorial prototypes. D/E/F/G: green-led brand-book versions.
- * All seven are declared once in components/prototype/variants.ts.
+ * All variants are declared once in components/prototype/variants.ts.
  * See CONTEXT.md + docs/brand/fenchem-brand-book.md for the design contract.
  * The folded-in editorial landing page is preserved at the `landing-v1-editorial` tag.
  */

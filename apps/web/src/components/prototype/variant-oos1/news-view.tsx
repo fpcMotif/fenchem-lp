@@ -1,6 +1,6 @@
 import { breakpoints } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { ChevronRight, MapPin } from "lucide-react";
+import { MapPin } from "lucide-react";
 import { useState } from "react";
 
 import { Flow } from "../shared/flow";
@@ -14,126 +14,16 @@ import {
   UPCOMING_EVENTS,
   type NewsItem,
 } from "./news-data";
+import { SubPageBanner, SubPageNav, kitStyles } from "./subpage-kit";
+import { color } from "./tokens.stylex";
 
-const INK = "#1a1a1a";
-const BODY_TEXT = "#4d4d4d";
 const MUTED_LABEL = "#64748b";
 const NAVY_DEEP = "#071e42";
 const NAVY_ACCENT = "#0743a9";
-const BODY_FONT =
-  '"Noto Sans SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif';
 
-const TABLET = "@media (min-width: 768px) and (max-width: 1279.98px)";
 const DESKTOP = breakpoints.xl;
-const INSET_120 = "min(120px, 8.333vw)";
 
 const styles = stylex.create({
-  root: {
-    backgroundColor: "#ffffff",
-    color: INK,
-    fontFamily: BODY_FONT,
-    minHeight: "100vh",
-  },
-  shell: {
-    width: "100%",
-    maxWidth: 1440,
-    marginInline: "auto",
-    boxSizing: "border-box",
-  },
-  inset120: {
-    paddingInline: { default: 20, [TABLET]: 40, [DESKTOP]: INSET_120 },
-  },
-
-  // Top Bar with Breadcrumbs & Title
-  topBar: {
-    paddingBlock: { default: 24, [breakpoints.md]: 36 },
-    borderBottomWidth: 1,
-    borderBottomStyle: "solid",
-    borderBottomColor: "rgba(26, 26, 26, 0.06)",
-    backgroundColor: "#fafbfc",
-  },
-  breadcrumb: {
-    display: "flex",
-    alignItems: "center",
-    gap: 8,
-    fontSize: 13,
-    color: MUTED_LABEL,
-    marginBottom: 16,
-  },
-  breadcrumbLink: {
-    background: "none",
-    borderWidth: 0,
-    borderStyle: "none",
-    padding: 0,
-    color: MUTED_LABEL,
-    fontSize: 13,
-    fontWeight: 500,
-    cursor: "pointer",
-    textDecoration: "none",
-    ":hover": {
-      color: NAVY_ACCENT,
-    },
-  },
-  breadcrumbCurrent: {
-    color: INK,
-    fontWeight: 600,
-  },
-  pageTitle: {
-    fontSize: { default: 32, [breakpoints.md]: 44 },
-    fontWeight: 800,
-    letterSpacing: "-0.03em",
-    color: NAVY_DEEP,
-    margin: "0 0 8px 0",
-  },
-  pageLead: {
-    fontSize: { default: 15, [breakpoints.md]: 16 },
-    color: BODY_TEXT,
-    lineHeight: 1.6,
-    margin: 0,
-    maxWidth: 720,
-  },
-
-  // Category filter bar
-  filterSection: {
-    paddingBlock: { default: 16, [breakpoints.md]: 24 },
-    borderBottomWidth: 1,
-    borderBottomStyle: "solid",
-    borderBottomColor: "rgba(26, 26, 26, 0.06)",
-  },
-  filterBar: {
-    display: "flex",
-    alignItems: "center",
-    gap: 8,
-    overflowX: "auto",
-  },
-  filterBtn: {
-    padding: "8px 18px",
-    borderRadius: 9999,
-    fontSize: 13,
-    fontWeight: 600,
-    borderWidth: 1,
-    borderStyle: "solid",
-    borderColor: "rgba(26, 26, 26, 0.1)",
-    backgroundColor: "#ffffff",
-    color: BODY_TEXT,
-    cursor: "pointer",
-    whiteSpace: "nowrap",
-    transition: "all 0.2s ease",
-    ":hover": {
-      borderColor: NAVY_ACCENT,
-      color: INK,
-    },
-  },
-  filterBtnActive: {
-    backgroundColor: NAVY_DEEP,
-    borderColor: NAVY_DEEP,
-    color: "#ffffff",
-    ":hover": {
-      backgroundColor: NAVY_DEEP,
-      color: "#ffffff",
-    },
-  },
-
   // Content Area
   mainSection: {
     paddingBlock: { default: 36, [breakpoints.md]: 64 },
@@ -186,14 +76,14 @@ const styles = stylex.create({
   featuredTitle: {
     fontSize: { default: 18, [breakpoints.md]: 22 },
     fontWeight: 800,
-    color: INK,
+    color: color.ink,
     lineHeight: 1.35,
     margin: 0,
   },
   featuredExcerpt: {
     fontSize: 14,
     lineHeight: 1.65,
-    color: BODY_TEXT,
+    color: color.bodyText,
     margin: 0,
   },
   locationNote: {
@@ -212,7 +102,11 @@ const styles = stylex.create({
   // News Grid (3 columns)
   newsGrid: {
     display: "grid",
-    gridTemplateColumns: { default: "1fr", [breakpoints.md]: "repeat(2, 1fr)", [DESKTOP]: "repeat(3, 1fr)" },
+    gridTemplateColumns: {
+      default: "1fr",
+      [breakpoints.md]: "repeat(2, 1fr)",
+      [DESKTOP]: "repeat(3, 1fr)",
+    },
     gap: 24,
   },
   newsCard: {
@@ -251,14 +145,14 @@ const styles = stylex.create({
   newsTitle: {
     fontSize: 15,
     fontWeight: 700,
-    color: INK,
+    color: color.ink,
     lineHeight: 1.4,
     margin: 0,
   },
   newsExcerpt: {
     fontSize: 13,
     lineHeight: 1.6,
-    color: BODY_TEXT,
+    color: color.bodyText,
     margin: 0,
   },
 
@@ -276,17 +170,21 @@ const styles = stylex.create({
   eventsTitle: {
     fontSize: { default: 22, [breakpoints.md]: 26 },
     fontWeight: 800,
-    color: INK,
+    color: color.ink,
     margin: "0 0 6px 0",
   },
   eventsLead: {
     fontSize: 14,
-    color: BODY_TEXT,
+    color: color.bodyText,
     margin: 0,
   },
   eventsGrid: {
     display: "grid",
-    gridTemplateColumns: { default: "1fr", [breakpoints.md]: "repeat(2, 1fr)", [DESKTOP]: "repeat(4, 1fr)" },
+    gridTemplateColumns: {
+      default: "1fr",
+      [breakpoints.md]: "repeat(2, 1fr)",
+      [DESKTOP]: "repeat(4, 1fr)",
+    },
     gap: 16,
   },
   eventCard: {
@@ -308,12 +206,12 @@ const styles = stylex.create({
   eventName: {
     fontSize: 15,
     fontWeight: 800,
-    color: INK,
+    color: color.ink,
     lineHeight: 1.3,
   },
   eventCity: {
     fontSize: 13,
-    color: BODY_TEXT,
+    color: color.bodyText,
     display: "flex",
     alignItems: "center",
     gap: 6,
@@ -337,55 +235,30 @@ export function NewsView({ onNavigateHome }: { onNavigateHome: (target?: string)
     activeCat === "all" ? NEWS_LIST : NEWS_LIST.filter((item) => item.category === activeCat);
 
   return (
-    <div id="news-top" lang="zh-CN" {...stylex.props(styles.root)}>
-      {/* Top Bar with Breadcrumbs & Title */}
-      <section {...stylex.props(styles.topBar)}>
-        <div {...stylex.props(styles.shell, styles.inset120)}>
-          <nav aria-label="Breadcrumb" {...stylex.props(styles.breadcrumb)}>
-            <button
-              type="button"
-              onClick={() => onNavigateHome("top")}
-              {...stylex.props(styles.breadcrumbLink)}
-            >
-              首页
-            </button>
-            <ChevronRight size={13} strokeWidth={1.5} aria-hidden="true" />
-            <span aria-current="page" {...stylex.props(styles.breadcrumbCurrent)}>
-              新闻资讯
-            </span>
-          </nav>
+    <div id="news-top" lang="zh-CN" {...stylex.props(kitStyles.root)}>
+      <SubPageBanner
+        eyebrow={NEWS_HEADER.title}
+        title={NEWS_HEADER.chineseTitle}
+        titleId="news-title"
+        tagline={NEWS_HEADER.tagline}
+        lead={NEWS_HEADER.lead}
+        meta={NEWS_HEADER.meta}
+        image={NEWS_HEADER.image}
+        imageAlt={NEWS_HEADER.imageAlt}
+      />
 
-          <h1 {...stylex.props(styles.pageTitle)}>{NEWS_HEADER.chineseTitle}</h1>
-          <p {...stylex.props(styles.pageLead)}>{NEWS_HEADER.lead}</p>
-        </div>
-      </section>
-
-      {/* Category Filter Bar */}
-      <section {...stylex.props(styles.filterSection)}>
-        <div {...stylex.props(styles.shell, styles.inset120)}>
-          <div role="tablist" aria-label="News Categories" {...stylex.props(styles.filterBar)}>
-            {NEWS_CATEGORIES.map((cat) => {
-              const isActive = activeCat === cat.id;
-              return (
-                <button
-                  key={cat.id}
-                  type="button"
-                  role="tab"
-                  aria-selected={isActive}
-                  onClick={() => setActiveCat(cat.id)}
-                  {...stylex.props(styles.filterBtn, isActive && styles.filterBtnActive)}
-                >
-                  {cat.label}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      </section>
+      <SubPageNav
+        current="新闻资讯"
+        chips={NEWS_CATEGORIES}
+        activeChip={activeCat}
+        onSelectChip={setActiveCat}
+        chipsLabel="新闻分类"
+        onNavigateHome={onNavigateHome}
+      />
 
       {/* Main News Content */}
       <section {...stylex.props(styles.mainSection)}>
-        <div {...stylex.props(styles.shell, styles.inset120)}>
+        <div {...stylex.props(kitStyles.shell, kitStyles.inset120)}>
           {/* Featured Headline Story */}
           <article {...stylex.props(styles.featuredCard)}>
             <div {...stylex.props(styles.featuredImgWrap)}>
@@ -446,7 +319,7 @@ export function NewsView({ onNavigateHome }: { onNavigateHome: (target?: string)
 
       {/* Upcoming Events / Expos Strip */}
       <section {...stylex.props(styles.eventsSection)}>
-        <div {...stylex.props(styles.shell, styles.inset120)}>
+        <div {...stylex.props(kitStyles.shell, kitStyles.inset120)}>
           <div {...stylex.props(styles.eventsHeader)}>
             <h2 {...stylex.props(styles.eventsTitle)}>2026 全球重点展会日程</h2>
             <p {...stylex.props(styles.eventsLead)}>

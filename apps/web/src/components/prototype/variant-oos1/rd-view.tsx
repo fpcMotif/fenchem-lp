@@ -19,20 +19,11 @@ import {
   type PlatformItem,
 } from "./rd-data";
 import { Reveal, SectionHead, SubPageBanner, SubPageNav, kitStyles } from "./subpage-kit";
+import { color, ease, font, media, texture } from "./tokens.stylex";
 
-const INK = "#1a1a1a";
-const BODY_TEXT = "#4d4d4d";
-const MUTED = "#6b7280";
 const HAIRLINE = "rgba(26, 26, 26, 0.14)";
-const NAVY_DEEP = "#0b2a5c";
-const DISPLAY_FONT = '"Inter Tight", "Helvetica Neue", Arial, sans-serif';
-const SERIF_ACCENT = '"Instrument Serif", Georgia, serif';
 
-const TABLET = "@media (min-width: 768px) and (max-width: 1279.98px)";
 const DESKTOP = breakpoints.xl;
-const EASE_OUT_CSS = "cubic-bezier(0.22, 1, 0.36, 1)";
-
-const GRAIN = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`;
 
 const FACILITY_PHOTOS = [
   {
@@ -76,7 +67,7 @@ const styles = stylex.create({
     paddingTop: 16,
     borderTopWidth: 2,
     borderTopStyle: "solid",
-    borderTopColor: INK,
+    borderTopColor: color.ink,
   },
   metricRow: {
     display: "flex",
@@ -84,12 +75,12 @@ const styles = stylex.create({
     gap: 6,
   },
   metricValue: {
-    fontFamily: DISPLAY_FONT,
-    fontSize: { default: 34, [TABLET]: 40, [DESKTOP]: 48 },
+    fontFamily: font.display,
+    fontSize: { default: 34, [media.tablet]: 40, [DESKTOP]: 48 },
     fontWeight: 800,
     letterSpacing: "-0.02em",
     lineHeight: 1,
-    color: INK,
+    color: color.ink,
   },
   metricUnit: {
     fontSize: 13,
@@ -100,12 +91,12 @@ const styles = stylex.create({
     fontSize: 14,
     fontWeight: 700,
     letterSpacing: "0.04em",
-    color: INK,
+    color: color.ink,
   },
   metricDesc: {
     fontSize: 12,
     lineHeight: 1.6,
-    color: MUTED,
+    color: color.muted,
   },
 
   // Platforms: index rail + detail panel
@@ -149,11 +140,11 @@ const styles = stylex.create({
     outlineOffset: -2,
   },
   platformIndex: {
-    fontFamily: DISPLAY_FONT,
+    fontFamily: font.display,
     fontSize: 13,
     fontWeight: 800,
     letterSpacing: "0.12em",
-    color: MUTED,
+    color: color.muted,
     flexShrink: 0,
     width: 28,
     transitionProperty: "color",
@@ -173,7 +164,7 @@ const styles = stylex.create({
     fontSize: { default: 16, [DESKTOP]: 18 },
     fontWeight: 700,
     lineHeight: 1.4,
-    color: { default: INK, ":hover": colors.brandBlue700 },
+    color: { default: color.ink, ":hover": colors.brandBlue700 },
     transitionProperty: "color",
     transitionDuration: "160ms",
   },
@@ -181,11 +172,11 @@ const styles = stylex.create({
     color: colors.brandBlue700,
   },
   platformEnglish: {
-    fontFamily: SERIF_ACCENT,
+    fontFamily: font.serifAccent,
     fontStyle: "italic",
     fontSize: 14,
     lineHeight: 1.3,
-    color: MUTED,
+    color: color.muted,
   },
   platformArrow: {
     flexShrink: 0,
@@ -195,7 +186,7 @@ const styles = stylex.create({
     transform: { default: null, [breakpoints.motionOk]: "translateX(-6px)" },
     transitionProperty: "opacity, transform",
     transitionDuration: "200ms",
-    transitionTimingFunction: EASE_OUT_CSS,
+    transitionTimingFunction: ease.out,
   },
   platformArrowVisible: {
     opacity: 1,
@@ -230,16 +221,16 @@ const styles = stylex.create({
     paddingTop: 16,
     borderTopWidth: 2,
     borderTopStyle: "solid",
-    borderTopColor: INK,
+    borderTopColor: color.ink,
   },
   platformStatLabel: {
     fontSize: 14,
     fontWeight: 700,
     letterSpacing: "0.04em",
-    color: INK,
+    color: color.ink,
   },
   platformStatValue: {
-    fontFamily: DISPLAY_FONT,
+    fontFamily: font.display,
     fontSize: { default: 32, [DESKTOP]: 44 },
     fontWeight: 800,
     letterSpacing: "-0.02em",
@@ -251,7 +242,7 @@ const styles = stylex.create({
     fontSize: 15,
     lineHeight: 1.9,
     letterSpacing: "0.02em",
-    color: BODY_TEXT,
+    color: color.bodyText,
     textWrap: "pretty",
   },
   platformPoints: {
@@ -271,10 +262,10 @@ const styles = stylex.create({
     borderTopColor: HAIRLINE,
     fontSize: 14,
     lineHeight: 1.7,
-    color: BODY_TEXT,
+    color: color.bodyText,
   },
   pointMarker: {
-    fontFamily: DISPLAY_FONT,
+    fontFamily: font.display,
     fontWeight: 800,
     color: colors.brandBlue700,
     flexShrink: 0,
@@ -331,13 +322,13 @@ const styles = stylex.create({
     fontSize: 14,
     fontWeight: 600,
     letterSpacing: "0.04em",
-    color: INK,
+    color: color.ink,
   },
   facilityEnglish: {
-    fontFamily: SERIF_ACCENT,
+    fontFamily: font.serifAccent,
     fontStyle: "italic",
     fontSize: 13,
-    color: MUTED,
+    color: color.muted,
     textAlign: "end",
   },
 
@@ -365,7 +356,7 @@ const styles = stylex.create({
     borderTopColor: HAIRLINE,
   },
   processStep: {
-    fontFamily: DISPLAY_FONT,
+    fontFamily: font.display,
     fontSize: { default: 20, [DESKTOP]: 26 },
     fontWeight: 800,
     letterSpacing: "0.04em",
@@ -376,14 +367,14 @@ const styles = stylex.create({
     fontWeight: 700,
     lineHeight: 1.5,
     letterSpacing: "0.02em",
-    color: INK,
+    color: color.ink,
   },
   processDesc: {
     gridColumn: { default: "2", [breakpoints.md]: "auto" },
     margin: 0,
     fontSize: 14,
     lineHeight: 1.8,
-    color: BODY_TEXT,
+    color: color.bodyText,
     textWrap: "pretty",
   },
 
@@ -392,7 +383,7 @@ const styles = stylex.create({
     position: "relative",
     overflow: "hidden",
     isolation: "isolate",
-    backgroundColor: NAVY_DEEP,
+    backgroundColor: color.navyDeep,
     color: colors.paper,
   },
   qualityGrain: {
@@ -402,7 +393,7 @@ const styles = stylex.create({
     zIndex: -1,
     width: "100%",
     height: "100%",
-    backgroundImage: GRAIN,
+    backgroundImage: texture.grain,
     opacity: 0.12,
     mixBlendMode: "overlay",
     pointerEvents: "none",
@@ -426,7 +417,7 @@ const styles = stylex.create({
     borderTopColor: "rgba(255, 255, 255, 0.24)",
   },
   certName: {
-    fontFamily: DISPLAY_FONT,
+    fontFamily: font.display,
     fontSize: { default: 18, [DESKTOP]: 22 },
     fontWeight: 800,
     letterSpacing: "0.02em",

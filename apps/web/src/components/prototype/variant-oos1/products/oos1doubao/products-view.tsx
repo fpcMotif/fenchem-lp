@@ -11,7 +11,7 @@ import { ContactCta } from "../../contact-cta";
 import { CTA, PRODUCTS_CTA_SUBTITLE } from "../../content";
 import { CATEGORIES, FEATURED_PRODUCT } from "../../products-data";
 import { ProductCatalog, ProductSolutions } from "../../products-sections";
-import { layout } from "../../products-sections-values";
+import { kitStyles } from "../../subpage-kit";
 
 const INK = "#1a1a1a";
 const BODY_TEXT = "#4d4d4d";
@@ -429,7 +429,7 @@ export function ProductsOOS1Doubao({
             decoding="async"
             {...stylex.props(styles.heroImg)}
           />
-          <div {...stylex.props(layout.shell, layout.inset, styles.heroContent)}>
+          <div {...stylex.props(kitStyles.shell, kitStyles.inset120, styles.heroContent)}>
             <nav aria-label="Breadcrumb" {...stylex.props(styles.breadcrumb)}>
               <button
                 type="button"
@@ -452,7 +452,7 @@ export function ProductsOOS1Doubao({
           <div
             role="group"
             aria-label="Categories"
-            {...stylex.props(layout.shell, layout.inset, styles.tabRow)}
+            {...stylex.props(kitStyles.shell, kitStyles.inset120, styles.tabRow)}
           >
             {CATEGORIES.map((cat) => {
               const isActive = activeTab === cat.id;
@@ -478,7 +478,7 @@ export function ProductsOOS1Doubao({
 
       <section
         aria-labelledby="spotlight-title"
-        {...stylex.props(layout.shell, layout.inset, styles.section)}
+        {...stylex.props(kitStyles.shell, kitStyles.inset120, styles.section)}
       >
         <div {...stylex.props(styles.feature)}>
           <div {...stylex.props(styles.featureHead)}>

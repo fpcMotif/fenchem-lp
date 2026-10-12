@@ -1,8 +1,9 @@
 import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 import { m, useScroll, useSpring } from "motion/react";
-import { type RefObject, useRef, useState } from "react";
+import { type RefObject, useRef } from "react";
 
+import { useLightbox } from "@/components/prototype/shared/lightbox";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
 import { ABOUT_CAMPUS, ABOUT_HERO } from "../../about-data";
@@ -168,11 +169,9 @@ function Spiral({ mosaicRef }: { mosaicRef: RefObject<HTMLDivElement | null> }) 
 
 export function Campus() {
   const chip = ABOUT_HERO.navChips[1];
-  const [openIndex, setOpenIndex] = useState<number | null>(null);
-  const [stepped, setStepped] = useState(false);
   const mosaicRef = useRef<HTMLDivElement>(null);
   const photos = ABOUT_CAMPUS.photos;
-  const count = photos.length;
+  const lightbox = useLightbox(photos.length);
 
   return (
     <Section id={chip.id} label={ABOUT_CAMPUS.eyebrow} background={ui.onPage}>
@@ -183,10 +182,7 @@ export function Campus() {
               <button
                 type="button"
                 aria-label={`View larger: ${photo.english}`}
-                onClick={() => {
-                  setStepped(false);
-                  setOpenIndex(idx);
-                }}
+                onClick={() => lightbox.open(idx)}
                 {...stylex.props(s.tileButton)}
               >
                 <img
@@ -207,15 +203,7 @@ export function Campus() {
           </span>
         </div>
       </div>
-      <Lightbox
-        index={openIndex}
-        stepped={stepped}
-        onClose={() => setOpenIndex(null)}
-        onStep={(delta) => {
-          setStepped(true);
-          setOpenIndex((current) => (current === null ? null : (current + delta + count) % count));
-        }}
-      />
+      <Lightbox lightbox={lightbox} />
     </Section>
   );
 }

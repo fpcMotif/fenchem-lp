@@ -1,16 +1,6 @@
 import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import {
-  ArrowRight,
-  Check,
-  CheckCircle2,
-  ChevronRight,
-  Clock,
-  Copy,
-  Download,
-  MapPin,
-  Plus,
-} from "lucide-react";
+import { ArrowRight, Check, CheckCircle2, Clock, Copy, Download, MapPin, Plus } from "lucide-react";
 import { AnimatePresence, m } from "motion/react";
 import { useEffect, useRef, useState, type ReactNode, type SubmitEvent } from "react";
 import { toast } from "sonner";
@@ -34,25 +24,16 @@ import {
   type InquirySubjectId,
 } from "./contact-data";
 import { RiseReveal } from "./rise-reveal";
-import { useActiveSection } from "./use-active-section";
+import { SubPageBanner, SubPageNav, kitStyles } from "./subpage-kit";
+import { color, ease, font, layout, media } from "./tokens.stylex";
 
-const INK = "#1a1a1a";
-const BODY_TEXT = "#4d4d4d";
-const MUTED = "#6b7280";
 const HAIRLINE = "rgba(26, 26, 26, 0.14)";
 const FIELD_BORDER = "#8a93a3";
-const NAVY_DEEP = "#0b2a5c";
 const TINT = "#f3f5fa";
 const BLUE_TINT = "#e6ecf7";
 const BLUE_WASH = "#f2f6fd";
 const CHIP_BG = "#f3f4f6";
-const CHIP_BG_HOVER = "#e5e7eb";
 const REQUIRED_MARK = "#b91c1c";
-const DISPLAY_FONT = '"Inter Tight", "Helvetica Neue", Arial, sans-serif';
-const SERIF_ACCENT = '"Instrument Serif", Georgia, serif';
-const BODY_FONT =
-  '"Noto Sans SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif';
-const NAVY_SCRIM = "rgba(6, 28, 66, 0.78)";
 const MAP_LAND = "#eef1f5";
 const MAP_BLOCK = "#e3e8ef";
 const MAP_PARK = "#dce9d8";
@@ -62,33 +43,14 @@ const MAP_ROAD_CASING = "#d6dde7";
 const MAP_HIGHWAY = "#f2d896";
 const MAP_HIGHWAY_CASING = "#e0bf72";
 const MAP_SHADOW = "0 18px 40px -18px rgba(11, 42, 92, 0.35)";
-const GRAIN = `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`;
 
-const TABLET = "@media (min-width: 768px) and (max-width: 1279.98px)";
 const DESKTOP = breakpoints.xl;
 const HOVER = "@media (hover: hover)";
-const EASE_OUT_CSS = "cubic-bezier(0.22, 1, 0.36, 1)";
-const INSET_120 = "min(120px, 8.333vw)";
-const HEADER_HEIGHT = 80;
-const SUB_BAR_HEIGHT = 64;
-const STICKY_OFFSET = HEADER_HEIGHT + SUB_BAR_HEIGHT;
-
-const SECTION_IDS = CONTACT_NAV_CHIPS.map((chip) => chip.id);
 
 const RISE_STAGGER = 0.06;
 const RISE_MAX_STEPS = 3;
 const riseDelay = (index: number) => Math.min(index, RISE_MAX_STEPS) * RISE_STAGGER;
 const indexLabel = (index: number) => String(index + 1).padStart(2, "0");
-
-const bannerSettle = stylex.keyframes({
-  "0%": { scale: "1.08" },
-  "100%": { scale: "1" },
-});
-
-const scrollCue = stylex.keyframes({
-  "0%": { transform: "translateY(-100%)" },
-  "100%": { transform: "translateY(200%)" },
-});
 
 const pinPulse = stylex.keyframes({
   "0%": { transform: "translate(-50%, -50%) scale(0.4)", opacity: 0.6 },
@@ -110,32 +72,6 @@ const dynamic = stylex.create({
 });
 
 const styles = stylex.create({
-  root: {
-    backgroundColor: colors.paper,
-    color: INK,
-    fontFamily: BODY_FONT,
-  },
-  shell: {
-    width: "100%",
-    maxWidth: 1440,
-    marginInline: "auto",
-    boxSizing: "border-box",
-  },
-  inset120: {
-    paddingInline: { default: 16, [TABLET]: 40, [DESKTOP]: INSET_120 },
-  },
-  anchor: {
-    scrollMarginTop: STICKY_OFFSET,
-  },
-  section: {
-    paddingBlock: { default: 72, [DESKTOP]: 112 },
-  },
-  focusRing: {
-    outlineStyle: { default: "none", ":focus-visible": "solid" },
-    outlineWidth: 2,
-    outlineColor: colors.brandBlue700,
-    outlineOffset: 2,
-  },
   srOnly: {
     position: "absolute",
     width: 1,
@@ -161,200 +97,6 @@ const styles = stylex.create({
     height: "100%",
     objectFit: "cover",
   },
-  grain: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    width: "100%",
-    height: "100%",
-    backgroundImage: GRAIN,
-    opacity: 0.14,
-    mixBlendMode: "overlay",
-    pointerEvents: "none",
-  },
-  banner: {
-    position: "relative",
-    overflow: "hidden",
-    display: "flex",
-    alignItems: "flex-end",
-    height: { default: 480, [TABLET]: 580, [DESKTOP]: "clamp(580px, 80svh, 720px)" },
-    backgroundColor: NAVY_DEEP,
-    color: colors.paper,
-  },
-  bannerImage: {
-    objectPosition: "center 58%",
-    animationName: { default: null, [breakpoints.motionOk]: bannerSettle },
-    animationDuration: "1800ms",
-    animationDelay: "200ms",
-    animationTimingFunction: EASE_OUT_CSS,
-    animationFillMode: "both",
-  },
-  bannerScrim: {
-    backgroundImage: `linear-gradient(to bottom, rgba(255, 255, 255, 0.6) 0px, rgba(255, 255, 255, 0) 160px), linear-gradient(to top, ${NAVY_SCRIM} 0%, rgba(6, 28, 66, 0.34) 42%, rgba(6, 28, 66, 0) 66%)`,
-    pointerEvents: "none",
-  },
-  bannerContent: {
-    position: "relative",
-    display: "flex",
-    alignItems: "flex-end",
-    justifyContent: "space-between",
-    gap: 40,
-    paddingBottom: { default: 44, [TABLET]: 60, [DESKTOP]: 80 },
-  },
-  bannerText: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 18,
-  },
-  bannerTitle: {
-    margin: 0,
-    fontSize: { default: 40, [TABLET]: 56, [DESKTOP]: 72 },
-    fontWeight: 800,
-    lineHeight: 1.1,
-    letterSpacing: "0.06em",
-    textShadow: "0 2px 24px rgba(6, 28, 66, 0.35)",
-  },
-  bannerTagline: {
-    margin: 0,
-    fontFamily: SERIF_ACCENT,
-    fontStyle: "italic",
-    fontSize: { default: 22, [TABLET]: 26, [DESKTOP]: 30 },
-    fontWeight: 400,
-    lineHeight: 1.2,
-    color: "rgba(255, 255, 255, 0.94)",
-  },
-  bannerLead: {
-    margin: 0,
-    maxWidth: 640,
-    fontSize: { default: 15, [DESKTOP]: 17 },
-    lineHeight: 1.8,
-    letterSpacing: "0.08em",
-    color: "rgba(255, 255, 255, 0.84)",
-    textWrap: "pretty",
-  },
-  bannerMeta: {
-    display: { default: "none", [breakpoints.md]: "flex" },
-    flexDirection: "column",
-    alignItems: "flex-end",
-    gap: 14,
-    flexShrink: 0,
-    fontFamily: DISPLAY_FONT,
-    fontSize: 12,
-    fontWeight: 500,
-    letterSpacing: "0.22em",
-    textTransform: "uppercase",
-    color: "rgba(255, 255, 255, 0.92)",
-  },
-  bannerMetaRule: {
-    width: 40,
-    height: 1,
-    backgroundColor: "rgba(255, 255, 255, 0.72)",
-  },
-  scrollTrack: {
-    position: "relative",
-    overflow: "hidden",
-    width: 1,
-    height: 56,
-    marginTop: 10,
-    marginInlineEnd: 4,
-    backgroundColor: "rgba(255, 255, 255, 0.25)",
-  },
-  scrollThumb: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    width: "100%",
-    height: "40%",
-    backgroundColor: colors.paper,
-    animationName: { default: null, [breakpoints.motionOk]: scrollCue },
-    animationDuration: "2400ms",
-    animationTimingFunction: "cubic-bezier(0.65, 0, 0.35, 1)",
-    animationIterationCount: "infinite",
-  },
-
-  subBar: {
-    position: "sticky",
-    top: HEADER_HEIGHT,
-    zIndex: 30,
-    backgroundColor: "rgba(255, 255, 255, 0.95)",
-    backdropFilter: "blur(16px)",
-    boxShadow: "0 1px 0 0 rgba(26, 26, 26, 0.08)",
-  },
-  subBarInner: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: 24,
-    height: SUB_BAR_HEIGHT,
-  },
-  breadcrumb: {
-    display: "flex",
-    alignItems: "center",
-    gap: 8,
-    flexShrink: 0,
-    fontSize: 13,
-    letterSpacing: "0.04em",
-    color: BODY_TEXT,
-  },
-  breadcrumbLink: {
-    padding: 0,
-    borderWidth: 0,
-    backgroundColor: "transparent",
-    fontFamily: "inherit",
-    fontSize: "inherit",
-    letterSpacing: "inherit",
-    color: { default: BODY_TEXT, ":hover": { default: null, [HOVER]: colors.brandBlue700 } },
-    cursor: "pointer",
-  },
-  breadcrumbCurrent: {
-    color: INK,
-    fontWeight: 600,
-  },
-  chipList: {
-    display: "flex",
-    alignItems: "center",
-    gap: 12,
-    flexGrow: 1,
-    minWidth: 0,
-    paddingBlock: 4,
-    overflowX: "auto",
-    scrollbarWidth: "none",
-  },
-  chip: {
-    display: "inline-flex",
-    alignItems: "center",
-    flexShrink: 0,
-    height: 36,
-    paddingInline: 18,
-    borderRadius: 999,
-    backgroundColor: { default: CHIP_BG, ":hover": { default: null, [HOVER]: CHIP_BG_HOVER } },
-    fontSize: 13,
-    fontWeight: 500,
-    letterSpacing: "0.04em",
-    color: { default: INK, ":hover": { default: null, [HOVER]: colors.brandBlue700 } },
-    textDecoration: "none",
-    whiteSpace: "nowrap",
-    transform: {
-      default: null,
-      ":active": { default: null, [breakpoints.motionOk]: "scale(0.96)" },
-    },
-    transitionProperty: "background-color, color, box-shadow, transform",
-    transitionDuration: "150ms",
-    transitionTimingFunction: "ease, ease, ease, ease-out",
-    WebkitTapHighlightColor: "transparent",
-  },
-  chipLead: {
-    marginInlineStart: { default: 0, [breakpoints.lg]: "auto" },
-  },
-  chipActive: {
-    backgroundColor: {
-      default: colors.brandBlue700,
-      ":hover": { default: null, [HOVER]: colors.brandBlue800 },
-    },
-    color: { default: colors.paper, ":hover": { default: null, [HOVER]: colors.paper } },
-    boxShadow: "0 4px 12px -2px rgba(29, 78, 216, 0.32)",
-  },
-
   sectionHead: {
     maxWidth: 720,
     marginBottom: { default: 40, [DESKTOP]: 56 },
@@ -365,7 +107,7 @@ const styles = stylex.create({
   sectionEyebrow: {
     margin: 0,
     marginBottom: 12,
-    fontFamily: DISPLAY_FONT,
+    fontFamily: font.display,
     fontSize: 12,
     fontWeight: 600,
     letterSpacing: "0.22em",
@@ -374,10 +116,10 @@ const styles = stylex.create({
   },
   sectionTitle: {
     margin: 0,
-    fontSize: { default: 26, [TABLET]: 32, [DESKTOP]: 40 },
+    fontSize: { default: 26, [media.tablet]: 32, [DESKTOP]: 40 },
     fontWeight: 700,
     lineHeight: 1.2,
-    color: INK,
+    color: color.ink,
     textWrap: "balance",
   },
   sectionLead: {
@@ -387,7 +129,7 @@ const styles = stylex.create({
     fontSize: { default: 15, [DESKTOP]: 16 },
     lineHeight: 1.8,
     letterSpacing: "0.03em",
-    color: BODY_TEXT,
+    color: color.bodyText,
     textWrap: "pretty",
   },
 
@@ -402,13 +144,13 @@ const styles = stylex.create({
   },
   inquiryAside: {
     position: { default: "static", [breakpoints.lg]: "sticky" },
-    top: STICKY_OFFSET + 40,
+    top: `calc(${layout.headerHeight} + ${layout.subBarHeight} + 40px)`,
   },
   details: {
     margin: 0,
     borderTopWidth: 2,
     borderTopStyle: "solid",
-    borderTopColor: INK,
+    borderTopColor: color.ink,
   },
   detailRow: {
     display: "grid",
@@ -423,7 +165,7 @@ const styles = stylex.create({
   detailTerm: {
     fontSize: 13,
     letterSpacing: "0.04em",
-    color: MUTED,
+    color: color.muted,
   },
   detailValue: {
     margin: 0,
@@ -433,11 +175,11 @@ const styles = stylex.create({
     lineHeight: 1.6,
     letterSpacing: "0.01em",
     fontVariantNumeric: "tabular-nums",
-    color: INK,
+    color: color.ink,
     overflowWrap: "break-word",
   },
   detailLink: {
-    color: { default: INK, ":hover": { default: null, [HOVER]: colors.brandBlue700 } },
+    color: { default: color.ink, ":hover": { default: null, [HOVER]: colors.brandBlue700 } },
     textDecorationLine: { default: "none", ":hover": { default: null, [HOVER]: "underline" } },
     textDecorationThickness: 1,
     textUnderlineOffset: 4,
@@ -458,7 +200,7 @@ const styles = stylex.create({
     fontSize: 14,
     fontWeight: 500,
     lineHeight: 1.5,
-    color: BODY_TEXT,
+    color: color.bodyText,
   },
   promiseIcon: {
     flexShrink: 0,
@@ -519,12 +261,12 @@ const styles = stylex.create({
     paddingInline: 16,
     borderWidth: 1,
     borderStyle: "solid",
-    borderColor: { default: FIELD_BORDER, ":hover": { default: null, [HOVER]: INK } },
+    borderColor: { default: FIELD_BORDER, ":hover": { default: null, [HOVER]: color.ink } },
     backgroundColor: colors.paper,
     fontSize: 14,
     fontWeight: 500,
     letterSpacing: "0.02em",
-    color: INK,
+    color: color.ink,
     whiteSpace: "nowrap",
     cursor: "pointer",
     userSelect: "none",
@@ -573,7 +315,7 @@ const styles = stylex.create({
     fontSize: 13,
     fontWeight: 500,
     letterSpacing: "0.02em",
-    color: INK,
+    color: color.ink,
   },
   requiredMark: {
     marginInlineStart: 2,
@@ -588,14 +330,14 @@ const styles = stylex.create({
     borderStyle: "solid",
     borderColor: {
       default: FIELD_BORDER,
-      ":hover": { default: null, [HOVER]: INK },
+      ":hover": { default: null, [HOVER]: color.ink },
       ":focus-visible": colors.brandBlue700,
     },
     borderRadius: 0,
     backgroundColor: colors.paper,
     fontFamily: "inherit",
     fontSize: 15,
-    color: INK,
+    color: color.ink,
     transitionProperty: "border-color",
     transitionDuration: "150ms",
     transitionTimingFunction: "ease",
@@ -603,7 +345,7 @@ const styles = stylex.create({
     outlineWidth: 1,
     outlineColor: colors.brandBlue700,
     outlineOffset: 0,
-    "::placeholder": { color: MUTED },
+    "::placeholder": { color: color.muted },
   },
   textarea: {
     height: "auto",
@@ -632,7 +374,7 @@ const styles = stylex.create({
     maxWidth: { default: "none", [breakpoints.md]: "26em" },
     fontSize: 13,
     lineHeight: 1.7,
-    color: BODY_TEXT,
+    color: color.bodyText,
     cursor: "pointer",
   },
   checkbox: {
@@ -684,7 +426,7 @@ const styles = stylex.create({
     },
     transitionProperty: "transform",
     transitionDuration: "150ms",
-    transitionTimingFunction: EASE_OUT_CSS,
+    transitionTimingFunction: ease.out,
   },
 
   swapFrame: {
@@ -712,16 +454,16 @@ const styles = stylex.create({
     fontSize: { default: 22, [DESKTOP]: 26 },
     fontWeight: 700,
     lineHeight: 1.3,
-    color: INK,
+    color: color.ink,
     outlineStyle: "none",
-    scrollMarginTop: STICKY_OFFSET + 24,
+    scrollMarginTop: `calc(${layout.headerHeight} + ${layout.subBarHeight} + 24px)`,
   },
   doneText: {
     margin: 0,
     maxWidth: "32em",
     fontSize: 15,
     lineHeight: 1.8,
-    color: BODY_TEXT,
+    color: color.bodyText,
     textWrap: "pretty",
   },
   doneSteps: {
@@ -741,12 +483,12 @@ const styles = stylex.create({
     borderTopColor: HAIRLINE,
     fontSize: 14,
     lineHeight: 1.6,
-    color: INK,
+    color: color.ink,
   },
   doneStepIndex: {
     flexShrink: 0,
     width: 24,
-    fontFamily: DISPLAY_FONT,
+    fontFamily: font.display,
     fontSize: 13,
     fontWeight: 800,
     letterSpacing: "0.12em",
@@ -823,7 +565,7 @@ const styles = stylex.create({
     opacity: { default: 0.5, [breakpoints.motionOk]: 0 },
     animationName: { default: null, [breakpoints.motionOk]: pinPulse },
     animationDuration: "2400ms",
-    animationTimingFunction: "cubic-bezier(0.22, 1, 0.36, 1)",
+    animationTimingFunction: ease.out,
     animationIterationCount: "infinite",
     pointerEvents: "none",
   },
@@ -848,7 +590,7 @@ const styles = stylex.create({
     fontWeight: 700,
     letterSpacing: "0.06em",
     whiteSpace: "nowrap",
-    color: INK,
+    color: color.ink,
   },
   mapPinHead: {
     display: "grid",
@@ -885,7 +627,7 @@ const styles = stylex.create({
     fontSize: { default: 17, [DESKTOP]: 18 },
     fontWeight: 700,
     lineHeight: 1.4,
-    color: INK,
+    color: color.ink,
   },
   visitFacts: {
     display: "flex",
@@ -898,7 +640,7 @@ const styles = stylex.create({
     gap: 10,
     fontSize: 14,
     lineHeight: 1.7,
-    color: BODY_TEXT,
+    color: color.bodyText,
   },
   visitFactIcon: {
     flexShrink: 0,
@@ -963,7 +705,7 @@ const styles = stylex.create({
   faqList: {
     borderTopWidth: 2,
     borderTopStyle: "solid",
-    borderTopColor: INK,
+    borderTopColor: color.ink,
   },
   faqItem: {
     borderBottomWidth: 1,
@@ -980,7 +722,7 @@ const styles = stylex.create({
     fontSize: { default: 16, [DESKTOP]: 17 },
     fontWeight: 700,
     lineHeight: 1.5,
-    color: { default: INK, ":hover": { default: null, [HOVER]: colors.brandBlue700 } },
+    color: { default: color.ink, ":hover": { default: null, [HOVER]: colors.brandBlue700 } },
     cursor: "pointer",
     transitionProperty: "color",
     transitionDuration: "150ms",
@@ -999,10 +741,10 @@ const styles = stylex.create({
     height: 32,
     borderRadius: 999,
     backgroundColor: CHIP_BG,
-    color: INK,
+    color: color.ink,
     transitionProperty: "transform, background-color, color",
     transitionDuration: { default: "0s", [breakpoints.motionOk]: "200ms" },
-    transitionTimingFunction: EASE_OUT_CSS,
+    transitionTimingFunction: ease.out,
   },
   faqIconOpen: {
     transform: "rotate(45deg)",
@@ -1016,7 +758,7 @@ const styles = stylex.create({
     paddingInlineEnd: { default: 0, [breakpoints.md]: 56 },
     fontSize: 15,
     lineHeight: 1.9,
-    color: BODY_TEXT,
+    color: color.bodyText,
     textWrap: "pretty",
     animationName: {
       default: null,
@@ -1026,7 +768,7 @@ const styles = stylex.create({
       },
     },
     animationDuration: "200ms",
-    animationTimingFunction: EASE_OUT_CSS,
+    animationTimingFunction: ease.out,
   },
 });
 
@@ -1053,103 +795,6 @@ function SectionHead({
       </h2>
       {lead ? <p {...stylex.props(styles.sectionLead)}>{lead}</p> : null}
     </RiseReveal>
-  );
-}
-
-function Banner() {
-  return (
-    <section aria-labelledby="contact-banner-title" {...stylex.props(styles.banner)}>
-      <img
-        src={CONTACT_BANNER.image}
-        alt={CONTACT_BANNER.imageAlt}
-        fetchPriority="high"
-        decoding="async"
-        {...stylex.props(styles.fill, styles.bannerImage)}
-      />
-      <div aria-hidden="true" {...stylex.props(styles.fill, styles.bannerScrim)} />
-      <div aria-hidden="true" {...stylex.props(styles.grain)} />
-      <div {...stylex.props(styles.shell, styles.inset120, styles.bannerContent)}>
-        <div {...stylex.props(styles.bannerText)}>
-          <h1 id="contact-banner-title" {...stylex.props(styles.bannerTitle)}>
-            {CONTACT_BANNER.title}
-          </h1>
-          <p lang="en" {...stylex.props(styles.bannerTagline)}>
-            {CONTACT_BANNER.tagline}
-          </p>
-          <p {...stylex.props(styles.bannerLead)}>{CONTACT_BANNER.lead}</p>
-        </div>
-        <div lang="en" {...stylex.props(styles.bannerMeta)}>
-          {CONTACT_BANNER.meta.map((item, index) => (
-            <span key={item}>
-              {index > 0 ? (
-                <span aria-hidden="true" {...stylex.props(styles.bannerMetaRule)} />
-              ) : null}
-              {item}
-            </span>
-          ))}
-          <span aria-hidden="true" {...stylex.props(styles.scrollTrack)}>
-            <span {...stylex.props(styles.scrollThumb)} />
-          </span>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function SubNav({ onNavigateHome }: { onNavigateHome: (target?: string) => void }) {
-  const active = useActiveSection(SECTION_IDS);
-  const chipListRef = useRef<HTMLElement>(null);
-  const reduce = useReducedMotion();
-
-  useEffect(() => {
-    const list = chipListRef.current;
-    const chip = active ? list?.querySelector<HTMLElement>(`[href="#${active}"]`) : null;
-    if (!list || !chip) return;
-    const listBox = list.getBoundingClientRect();
-    const chipBox = chip.getBoundingClientRect();
-    if (chipBox.left < listBox.left || chipBox.right > listBox.right) {
-      list.scrollBy({
-        left: chipBox.left - listBox.left - 16,
-        behavior: reduce ? "auto" : "smooth",
-      });
-    }
-  }, [active, reduce]);
-
-  return (
-    <div {...stylex.props(styles.subBar)}>
-      <div {...stylex.props(styles.shell, styles.inset120, styles.subBarInner)}>
-        <nav aria-label="Breadcrumb" {...stylex.props(styles.breadcrumb)}>
-          <button
-            type="button"
-            onClick={() => onNavigateHome("top")}
-            {...stylex.props(styles.breadcrumbLink, styles.focusRing)}
-          >
-            首页
-          </button>
-          <ChevronRight size={14} strokeWidth={1.5} nonScalingStroke aria-hidden="true" />
-          <span aria-current="page" {...stylex.props(styles.breadcrumbCurrent)}>
-            {CONTACT_BANNER.title}
-          </span>
-        </nav>
-        <nav aria-label="本页导航" ref={chipListRef} {...stylex.props(styles.chipList)}>
-          {CONTACT_NAV_CHIPS.map((chip, index) => (
-            <a
-              key={chip.id}
-              href={`#${chip.id}`}
-              aria-current={active === chip.id ? "location" : undefined}
-              {...stylex.props(
-                styles.chip,
-                index === 0 && styles.chipLead,
-                active === chip.id && styles.chipActive,
-                styles.focusRing,
-              )}
-            >
-              {chip.label}
-            </a>
-          ))}
-        </nav>
-      </div>
-    </div>
   );
 }
 
@@ -1302,7 +947,7 @@ function InquiryFields({
         </label>
         <button
           type="submit"
-          {...stylex.props(styles.submit, styles.focusRing, stylex.defaultMarker())}
+          {...stylex.props(styles.submit, kitStyles.focusRing, stylex.defaultMarker())}
         >
           提交咨询
           <ArrowRight
@@ -1353,7 +998,7 @@ function InquirySubmitted({ onReset }: { onReset: () => void }) {
       <button
         type="button"
         onClick={onReset}
-        {...stylex.props(styles.againButton, styles.focusRing)}
+        {...stylex.props(styles.againButton, kitStyles.focusRing)}
       >
         提交另一条需求
       </button>
@@ -1415,9 +1060,9 @@ function Inquiry() {
     <section
       id="contact"
       aria-labelledby="contact-inquiry-title"
-      {...stylex.props(styles.section, styles.anchor)}
+      {...stylex.props(kitStyles.section, kitStyles.anchor)}
     >
-      <div {...stylex.props(styles.shell, styles.inset120, styles.inquiryLayout)}>
+      <div {...stylex.props(kitStyles.shell, kitStyles.inset120, styles.inquiryLayout)}>
         <div {...stylex.props(styles.inquiryAside)}>
           <SectionHead
             eyebrow={INQUIRY_INTRO.eyebrow}
@@ -1433,7 +1078,10 @@ function Inquiry() {
                   <dt {...stylex.props(styles.detailTerm)}>{detail.term}</dt>
                   <dd {...stylex.props(styles.detailValue)}>
                     {detail.href ? (
-                      <a href={detail.href} {...stylex.props(styles.detailLink, styles.focusRing)}>
+                      <a
+                        href={detail.href}
+                        {...stylex.props(styles.detailLink, kitStyles.focusRing)}
+                      >
                         {detail.value}
                       </a>
                     ) : (
@@ -1464,7 +1112,7 @@ function Inquiry() {
                   description: "可在表单中备注索取，我们会通过邮件发送最新版本。",
                 })
               }
-              {...stylex.props(styles.brochureButton, styles.focusRing)}
+              {...stylex.props(styles.brochureButton, kitStyles.focusRing)}
             >
               <Download size={16} strokeWidth={2} nonScalingStroke aria-hidden="true" />
               {INQUIRY_INTRO.brochureLabel}
@@ -1524,11 +1172,7 @@ function MapPlaceholder() {
             <path d="M520 380L560 610" strokeWidth="9" />
             <path d="M300 -10C380 160 470 262 600 300C760 350 980 330 1210 298" strokeWidth="15" />
           </g>
-          <path
-            d="M540 -10C610 180 700 380 770 610"
-            stroke={MAP_HIGHWAY_CASING}
-            strokeWidth="28"
-          />
+          <path d="M540 -10C610 180 700 380 770 610" stroke={MAP_HIGHWAY_CASING} strokeWidth="28" />
           <path d="M540 -10C610 180 700 380 770 610" stroke={MAP_HIGHWAY} strokeWidth="22" />
         </g>
       </svg>
@@ -1558,9 +1202,9 @@ function Visit() {
     <section
       id="contact-visit"
       aria-labelledby="contact-visit-title"
-      {...stylex.props(styles.section, styles.visitSection, styles.anchor)}
+      {...stylex.props(kitStyles.section, styles.visitSection, kitStyles.anchor)}
     >
-      <div {...stylex.props(styles.shell, styles.inset120)}>
+      <div {...stylex.props(kitStyles.shell, kitStyles.inset120)}>
         <SectionHead
           eyebrow={VISIT_INTRO.eyebrow}
           title={VISIT_INTRO.title}
@@ -1598,7 +1242,7 @@ function Visit() {
             <div {...stylex.props(styles.visitActions)}>
               <a
                 href="#contact"
-                {...stylex.props(styles.visitBook, styles.focusRing, stylex.defaultMarker())}
+                {...stylex.props(styles.visitBook, kitStyles.focusRing, stylex.defaultMarker())}
               >
                 预约到访
                 <ArrowRight
@@ -1612,7 +1256,7 @@ function Visit() {
               <button
                 type="button"
                 onClick={copyAddress}
-                {...stylex.props(styles.brochureButton, styles.visitCopy, styles.focusRing)}
+                {...stylex.props(styles.brochureButton, styles.visitCopy, kitStyles.focusRing)}
               >
                 <Copy size={16} strokeWidth={2} nonScalingStroke aria-hidden="true" />
                 复制地址
@@ -1651,9 +1295,9 @@ function Faq() {
     <section
       id="contact-faq"
       aria-labelledby="contact-faq-title"
-      {...stylex.props(styles.section, styles.anchor)}
+      {...stylex.props(kitStyles.section, kitStyles.anchor)}
     >
-      <div {...stylex.props(styles.shell, styles.inset120, styles.faqLayout)}>
+      <div {...stylex.props(kitStyles.shell, kitStyles.inset120, styles.faqLayout)}>
         <SectionHead
           eyebrow={CONTACT_FAQ_INTRO.eyebrow}
           title={CONTACT_FAQ_INTRO.title}
@@ -1661,7 +1305,7 @@ function Faq() {
           lead={
             <>
               没有找到答案？欢迎致电{" "}
-              <a href="tel:+862584218888" {...stylex.props(styles.faqPhone, styles.focusRing)}>
+              <a href="tel:+862584218888" {...stylex.props(styles.faqPhone, kitStyles.focusRing)}>
                 025-8421 8888
               </a>
               ，或直接在上方提交需求。
@@ -1682,9 +1326,23 @@ function Faq() {
 
 export function ContactView({ onNavigateHome }: { onNavigateHome: (target?: string) => void }) {
   return (
-    <div id="contact-top" lang="zh-CN" {...stylex.props(styles.root)}>
-      <Banner />
-      <SubNav onNavigateHome={onNavigateHome} />
+    <div id="contact-top" lang="zh-CN" {...stylex.props(kitStyles.root)}>
+      <SubPageBanner
+        size="compact"
+        title={CONTACT_BANNER.title}
+        titleId="contact-banner-title"
+        tagline={CONTACT_BANNER.tagline}
+        lead={CONTACT_BANNER.lead}
+        meta={CONTACT_BANNER.meta}
+        image={CONTACT_BANNER.image}
+        imageAlt={CONTACT_BANNER.imageAlt}
+      />
+      <SubPageNav
+        current={CONTACT_BANNER.title}
+        chips={CONTACT_NAV_CHIPS}
+        chipsLabel="本页导航"
+        onNavigateHome={onNavigateHome}
+      />
       <Inquiry />
       <Visit />
       <Faq />

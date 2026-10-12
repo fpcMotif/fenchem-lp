@@ -12,12 +12,10 @@ import {
 } from "react";
 
 import { CAMPUS_GALLERY } from "./campus-gallery";
+import { color, font } from "./tokens.stylex";
 
 const COUNT = CAMPUS_GALLERY.length;
 const BRAND_MARK = "/prototype/official-site/fenchem-logo.png";
-const INK = "#1a1a1a";
-const MUTED = "#6b7280";
-const DISPLAY_FONT = '"Inter Tight", "Helvetica Neue", Arial, sans-serif';
 const DESKTOP = breakpoints.xl;
 const SLIDE_EASE = "cubic-bezier(0.32, 0.72, 0, 1)";
 const SLIDE_MS = 700;
@@ -170,7 +168,7 @@ const styles = stylex.create({
     borderColor: "rgba(26, 26, 26, 0.14)",
     borderRadius: "50%",
     backgroundColor: { default: colors.paper, ":hover": "#f3f4f6" },
-    color: INK,
+    color: color.ink,
     cursor: "pointer",
     transform: {
       default: null,
@@ -206,14 +204,14 @@ const styles = stylex.create({
     fontSize: 15,
     fontWeight: 600,
     letterSpacing: "0.08em",
-    color: INK,
+    color: color.ink,
   },
   counter: {
-    fontFamily: DISPLAY_FONT,
+    fontFamily: font.display,
     fontSize: 13,
     fontVariantNumeric: "tabular-nums",
     letterSpacing: "0.08em",
-    color: MUTED,
+    color: color.muted,
   },
 });
 

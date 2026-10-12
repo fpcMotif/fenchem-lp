@@ -35,6 +35,8 @@ import { preinit } from "react-dom";
 import { EASE } from "@/components/prototype/motion-constants";
 
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
+import { RiseReveal } from "../variant-oos1/rise-reveal";
+import { useActiveSection } from "../variant-oos1/use-active-section";
 
 import { LINKEDIN_PATHS, LOGO_PATHS, WECHAT_PATHS, type VectorPath } from "../variant-o/vectors";
 import { INTRO_REVEAL_MS, useIntro } from "@/components/prototype/shared/intro";
@@ -107,7 +109,6 @@ const lerp = (from: number, to: number, t: number) => from + (to - from) * t;
 const clamp01 = (t: number) => Math.min(1, Math.max(0, t));
 const revealProgress = (progress: number) => 1 - (1 - clamp01(progress)) ** 3;
 
-const RISE_EASE: [number, number, number, number] = [0.16, 1, 0.3, 1];
 const RISE_STAGGER = 0.06;
 const RISE_MAX_STEPS = 3;
 const riseDelay = (index: number) => Math.min(index, RISE_MAX_STEPS) * RISE_STAGGER;
@@ -1409,28 +1410,6 @@ function ZoomReveal({
   );
 }
 
-type RiseProps = {
-  children: ReactNode;
-  sx?: StyleXStyles;
-  style?: StyleXStyles;
-  delay?: number;
-};
-
-function RiseReveal({ children, sx, style, delay = 0 }: RiseProps) {
-  const reduce = useReducedMotion();
-  return (
-    <m.div
-      {...stylex.props(sx, style)}
-      initial={{ opacity: 0, transform: "translateY(16px)" }}
-      whileInView={{ opacity: 1, transform: "translateY(0px)" }}
-      viewport={{ once: true, margin: "0px 0px -10% 0px" }}
-      transition={{ duration: reduce ? 0.2 : 0.45, delay: reduce ? 0 : delay, ease: RISE_EASE }}
-    >
-      {children}
-    </m.div>
-  );
-}
-
 function VectorArt({
   paths,
   viewBox,
@@ -1458,29 +1437,6 @@ function useScrolledPastTop() {
     return () => window.removeEventListener("scroll", update);
   }, []);
   return scrolled;
-}
-
-function useActiveSection(ids: readonly string[]) {
-  const [active, setActive] = useState<string | undefined>(ids[0]);
-  useEffect(() => {
-    const crossing = new Set<string>();
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) crossing.add(entry.target.id);
-          else crossing.delete(entry.target.id);
-        }
-        setActive(ids.find((id) => crossing.has(id)));
-      },
-      { rootMargin: "-40% 0px -59% 0px" },
-    );
-    for (const id of ids) {
-      const section = document.getElementById(id);
-      if (section) observer.observe(section);
-    }
-    return () => observer.disconnect();
-  }, [ids]);
-  return active;
 }
 
 function SiteHeader() {

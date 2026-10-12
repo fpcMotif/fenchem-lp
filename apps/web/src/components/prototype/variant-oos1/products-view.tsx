@@ -9,26 +9,21 @@ import { ContactCta } from "./contact-cta";
 import { CTA, PRODUCTS_CTA_SUBTITLE } from "./content";
 import { CATEGORIES, FEATURED_PRODUCT } from "./products-data";
 import { ProductCatalog, ProductSolutions } from "./products-sections";
-import { layout } from "./products-sections-values";
+import { kitStyles } from "./subpage-kit";
+import { color, ease, font, layout, media, zIndex } from "./tokens.stylex";
 
-const INK = "#1a1a1a";
-const BODY_TEXT = "#4d4d4d";
 const MUTED_LABEL = "#52525b";
 const PHOTO_OUTLINE = "rgba(0, 0, 0, 0.1)";
 const ACCENT = "#78598d";
-const EASE_OUT_CSS = "cubic-bezier(0.22, 1, 0.36, 1)";
-const BODY_FONT =
-  '"Noto Sans SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif';
 
-const TABLET = "@media (min-width: 768px) and (max-width: 1279.98px)";
 const DESKTOP = breakpoints.xl;
 const LG = breakpoints.lg;
 
 const styles = stylex.create({
   root: {
     backgroundColor: "#ffffff",
-    color: INK,
-    fontFamily: BODY_FONT,
+    color: color.ink,
+    fontFamily: font.body,
     minHeight: "100vh",
   },
 
@@ -39,7 +34,7 @@ const styles = stylex.create({
     alignItems: "flex-end",
     height: { default: 240, [breakpoints.md]: "clamp(300px, 31vw, 480px)" },
     overflow: "hidden",
-    backgroundColor: "#0b2a5c",
+    backgroundColor: color.navyDeep,
     color: colors.paper,
   },
   bannerFigure: {
@@ -67,8 +62,8 @@ const styles = stylex.create({
 
   subBar: {
     position: "sticky",
-    top: 80,
-    zIndex: 30,
+    top: layout.headerHeight,
+    zIndex: zIndex.subBar,
     backgroundColor: "rgba(255, 255, 255, 0.95)",
     backdropFilter: "blur(16px)",
     boxShadow: "0 1px 0 0 rgba(26, 26, 26, 0.08)",
@@ -80,7 +75,7 @@ const styles = stylex.create({
     justifyContent: "space-between",
     gap: { default: 12, [breakpoints.md]: 24 },
     paddingBlock: { default: 12, [breakpoints.md]: 0 },
-    height: { default: "auto", [breakpoints.md]: 64 },
+    height: { default: "auto", [breakpoints.md]: layout.subBarHeight },
   },
   breadcrumb: {
     display: "flex",
@@ -89,7 +84,7 @@ const styles = stylex.create({
     flexShrink: 0,
     fontSize: 13,
     letterSpacing: "0.04em",
-    color: BODY_TEXT,
+    color: color.bodyText,
   },
   breadcrumbLink: {
     position: "relative",
@@ -98,7 +93,7 @@ const styles = stylex.create({
     backgroundColor: "transparent",
     fontSize: "inherit",
     letterSpacing: "inherit",
-    color: { default: BODY_TEXT, ":hover": colors.brandBlue700 },
+    color: { default: color.bodyText, ":hover": colors.brandBlue700 },
     cursor: "pointer",
     outlineStyle: { default: "none", ":focus-visible": "solid" },
     outlineWidth: 2,
@@ -113,7 +108,7 @@ const styles = stylex.create({
     },
   },
   breadcrumbCurrent: {
-    color: INK,
+    color: color.ink,
     fontWeight: 600,
   },
   chipList: {
@@ -148,7 +143,7 @@ const styles = stylex.create({
     fontSize: 13,
     fontWeight: 500,
     letterSpacing: "0.04em",
-    color: { default: INK, ":hover": colors.brandBlue700 },
+    color: { default: color.ink, ":hover": colors.brandBlue700 },
     position: "relative",
     cursor: "pointer",
     whiteSpace: "nowrap",
@@ -164,7 +159,7 @@ const styles = stylex.create({
     },
     transitionProperty: "background-color, color, transform, box-shadow",
     transitionDuration: "160ms",
-    transitionTimingFunction: EASE_OUT_CSS,
+    transitionTimingFunction: ease.out,
     outlineStyle: { default: "none", ":focus-visible": "solid" },
     outlineWidth: 2,
     outlineColor: colors.brandBlue700,
@@ -194,7 +189,7 @@ const styles = stylex.create({
   },
   spotlightBrand: {
     margin: 0,
-    fontSize: { default: 36, [TABLET]: 44, [DESKTOP]: 52 },
+    fontSize: { default: 36, [media.tablet]: 44, [DESKTOP]: 52 },
     fontWeight: 400,
     lineHeight: 1.1,
     textWrap: "balance",
@@ -240,7 +235,7 @@ const styles = stylex.create({
     outlineOffset: { default: 2, ":focus-visible": 4 },
     transitionProperty: "outline-color, transform",
     transitionDuration: "160ms",
-    transitionTimingFunction: EASE_OUT_CSS,
+    transitionTimingFunction: ease.out,
   },
   productCardActive: {
     outlineWidth: { default: 2, ":focus-visible": 3 },
@@ -277,7 +272,7 @@ const styles = stylex.create({
     maxWidth: "18em",
     fontSize: { default: 14, [DESKTOP]: 15 },
     lineHeight: 1.7,
-    color: BODY_TEXT,
+    color: color.bodyText,
   },
   productList: {
     display: "flex",
@@ -293,7 +288,7 @@ const styles = stylex.create({
     fontFamily: "inherit",
     textAlign: "start",
     cursor: "pointer",
-    color: INK,
+    color: color.ink,
     transitionProperty: "color",
     transitionDuration: "150ms",
     transitionTimingFunction: "ease",
@@ -355,7 +350,7 @@ export function ProductsView({
       </section>
 
       <div {...stylex.props(styles.subBar)}>
-        <div {...stylex.props(layout.shell, layout.inset, styles.subBarInner)}>
+        <div {...stylex.props(kitStyles.shell, kitStyles.inset120, styles.subBarInner)}>
           <nav aria-label="Breadcrumb" {...stylex.props(styles.breadcrumb)}>
             <button
               type="button"
@@ -390,7 +385,7 @@ export function ProductsView({
 
       <section
         aria-labelledby="spotlight-title"
-        {...stylex.props(layout.shell, layout.inset, styles.spotlightSection)}
+        {...stylex.props(kitStyles.shell, kitStyles.inset120, styles.spotlightSection)}
       >
         <div {...stylex.props(styles.spotlightGrid)}>
           <div {...stylex.props(styles.spotlightText)}>

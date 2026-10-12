@@ -58,6 +58,7 @@ import { NewsView } from "./news-view";
 import { ProductsView } from "./products-view";
 import { RdView } from "./rd-view";
 import { RiseReveal } from "./rise-reveal";
+import { color, ease, font, layout, media, zIndex } from "./tokens.stylex";
 import { useActiveSection } from "./use-active-section";
 import {
   ABOUT,
@@ -83,27 +84,20 @@ import {
 const GOOGLE_FONTS =
   "https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter+Tight:ital,wght@0,500;0,800;1,500&family=Noto+Sans+SC:wght@400;500;700;900&display=swap";
 
-const INK = "#1a1a1a";
-const BODY_TEXT = "#4d4d4d";
 const TINT = "#e6ecf7";
 const DISPLAY_FONT = '"Inter Tight", "Helvetica Neue", Arial, "Noto Sans SC", sans-serif';
 const SURFACE = "#f6f6f6";
 const PANEL_ALT = "#e8e8e8";
 const FOOTER_BLUE = "#294f92";
 const HERO_OVERLAY = "#0743a9";
-const TABLET = "@media (min-width: 768px) and (max-width: 1279.98px)";
 const DESKTOP = breakpoints.xl;
 const HOVER_MOTION =
   "@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)";
-const EASE_OUT_CSS = "cubic-bezier(0.22, 1, 0.36, 1)";
 
-const INSET_120 = "min(120px, 8.333vw)";
-const INSET_124 = "min(124px, 8.611vw)";
 const INSET_132 = "min(132px, 9.167vw)";
 const INSET_118 = "min(118px, 8.194vw)";
 
 const NAV_SECTION_IDS = NAV_ITEMS.map((item) => item.href.slice(1));
-const HEADER_HEIGHT = 80;
 
 const ABOUT_CHARS = ABOUT.lines.join("").length;
 const ABOUT_INK_LINES = (() => {
@@ -263,8 +257,8 @@ const styles = stylex.create({
   root: {
     position: "relative",
     backgroundColor: "#f3f5fa",
-    color: INK,
-    fontFamily: '"Noto Sans SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif',
+    color: color.ink,
+    fontFamily: font.body,
     WebkitFontSmoothing: "antialiased",
     MozOsxFontSmoothing: "grayscale",
     "::selection": {
@@ -277,7 +271,7 @@ const styles = stylex.create({
     backgroundColor: colors.paper,
   },
   anchor: {
-    scrollMarginTop: HEADER_HEIGHT,
+    scrollMarginTop: layout.headerHeight,
   },
   skipLink: {
     position: "absolute",
@@ -307,28 +301,28 @@ const styles = stylex.create({
     boxSizing: "border-box",
   },
   inset120: {
-    paddingInline: { default: 16, [TABLET]: 40, [DESKTOP]: INSET_120 },
+    paddingInline: { default: 16, [media.tablet]: 40, [DESKTOP]: layout.inset120 },
   },
   inset124: {
-    paddingInline: { default: 16, [TABLET]: 40, [DESKTOP]: INSET_124 },
+    paddingInline: { default: 16, [media.tablet]: 40, [DESKTOP]: layout.inset124 },
   },
   inset132: {
-    paddingInline: { default: 16, [TABLET]: 40, [DESKTOP]: INSET_132 },
+    paddingInline: { default: 16, [media.tablet]: 40, [DESKTOP]: INSET_132 },
   },
 
   sectionTitle: {
     margin: 0,
-    fontSize: { default: 26, [TABLET]: 32, [DESKTOP]: 40 },
+    fontSize: { default: 26, [media.tablet]: 32, [DESKTOP]: 40 },
     fontWeight: 700,
     lineHeight: 1.2,
-    color: INK,
+    color: color.ink,
     textWrap: "balance",
   },
   sectionLead: {
     margin: 0,
     fontSize: { default: 16, [DESKTOP]: 18 },
     lineHeight: 1.6,
-    color: BODY_TEXT,
+    color: color.bodyText,
     textAlign: "center",
     textWrap: "pretty",
   },
@@ -336,7 +330,7 @@ const styles = stylex.create({
     margin: 0,
     fontSize: 16,
     lineHeight: 1.2,
-    color: BODY_TEXT,
+    color: color.bodyText,
     textWrap: "pretty",
   },
 
@@ -356,7 +350,7 @@ const styles = stylex.create({
     },
     transitionProperty: "background-color, color, transform",
     transitionDuration: "160ms",
-    transitionTimingFunction: EASE_OUT_CSS,
+    transitionTimingFunction: ease.out,
     outlineStyle: { default: "none", ":focus-visible": "solid" },
     outlineWidth: 2,
     outlineColor: colors.brandBlue700,
@@ -377,7 +371,7 @@ const styles = stylex.create({
     position: "fixed",
     top: 0,
     insetInline: 0,
-    zIndex: 2,
+    zIndex: zIndex.header,
     backgroundColor: "transparent",
     transitionProperty: "background-color, box-shadow",
     transitionDuration: "200ms",
@@ -392,9 +386,9 @@ const styles = stylex.create({
     display: "grid",
     gridTemplateColumns: "1fr auto 1fr",
     alignItems: "start",
-    height: 80,
-    paddingInlineStart: { default: 16, [TABLET]: 40, [DESKTOP]: INSET_120 },
-    paddingInlineEnd: { default: 16, [TABLET]: 40, [DESKTOP]: INSET_118 },
+    height: layout.headerHeight,
+    paddingInlineStart: { default: 16, [media.tablet]: 40, [DESKTOP]: layout.inset120 },
+    paddingInlineEnd: { default: 16, [media.tablet]: 40, [DESKTOP]: INSET_118 },
   },
   logoLink: {
     display: "block",
@@ -416,7 +410,7 @@ const styles = stylex.create({
     transformOrigin: "50% 50%",
     animationName: { default: logoPartRise, [breakpoints.motionReduce]: fadeIn },
     animationDuration: { default: "280ms", [breakpoints.motionReduce]: "200ms" },
-    animationTimingFunction: EASE_OUT_CSS,
+    animationTimingFunction: ease.out,
     animationFillMode: "both",
   },
   nav: {
@@ -439,7 +433,7 @@ const styles = stylex.create({
     fontSize: 16,
     fontWeight: 500,
     lineHeight: 1.2,
-    color: { default: INK, ":hover": colors.brandBlue700 },
+    color: { default: color.ink, ":hover": colors.brandBlue700 },
     textDecoration: "none",
     transitionProperty: "color",
     transitionDuration: "150ms",
@@ -477,10 +471,10 @@ const styles = stylex.create({
     boxSizing: "border-box",
     borderWidth: 1,
     borderStyle: "solid",
-    borderColor: INK,
+    borderColor: color.ink,
     borderRadius: 19,
     backgroundColor: { default: "transparent", ":hover": "rgba(7, 67, 174, 0.06)" },
-    color: INK,
+    color: color.ink,
     cursor: "pointer",
     transitionProperty: "background-color",
     transitionDuration: "150ms",
@@ -494,7 +488,7 @@ const styles = stylex.create({
     fontFamily: "inherit",
     fontSize: 14,
     lineHeight: 1.2,
-    color: BODY_TEXT,
+    color: color.bodyText,
   },
   langButton: {
     paddingBlock: 10,
@@ -506,7 +500,7 @@ const styles = stylex.create({
     fontFamily: "inherit",
     fontSize: 16,
     lineHeight: 1.2,
-    color: INK,
+    color: color.ink,
     cursor: "pointer",
     outlineStyle: { default: "none", ":focus-visible": "solid" },
     outlineWidth: 2,
@@ -525,7 +519,7 @@ const styles = stylex.create({
     borderWidth: 0,
     borderRadius: 22,
     backgroundColor: { default: "transparent", ":hover": "rgba(7, 67, 174, 0.06)" },
-    color: INK,
+    color: color.ink,
     cursor: "pointer",
     transitionProperty: "background-color",
     transitionDuration: "150ms",
@@ -540,10 +534,10 @@ const styles = stylex.create({
   },
   menuPanel: {
     position: "absolute",
-    top: 80,
+    top: layout.headerHeight,
     insetInline: 0,
     paddingBlock: 8,
-    paddingInline: { default: 8, [TABLET]: 32 },
+    paddingInline: { default: 8, [media.tablet]: 32 },
     backgroundColor: colors.paper,
     boxShadow: "0 24px 48px -12px rgba(0, 0, 0, 0.12), 0 1px 0 0 rgba(0, 0, 0, 0.06)",
   },
@@ -562,7 +556,7 @@ const styles = stylex.create({
     fontSize: 16,
     fontWeight: 500,
     lineHeight: 1.2,
-    color: { default: INK, ":hover": colors.brandBlue700 },
+    color: { default: color.ink, ":hover": colors.brandBlue700 },
     textDecoration: "none",
     transitionProperty: "color",
     transitionDuration: "150ms",
@@ -589,7 +583,7 @@ const styles = stylex.create({
     animationName: { default: revealZoom, [breakpoints.motionReduce]: "none" },
     animationDuration: "2000ms",
     animationDelay: "var(--oo-intro, 0ms)",
-    animationTimingFunction: EASE_OUT_CSS,
+    animationTimingFunction: ease.out,
     animationFillMode: "both",
   },
   heroParallax: {
@@ -605,7 +599,7 @@ const styles = stylex.create({
   heroFade: {
     animationName: fadeIn,
     animationDuration: { default: "400ms", [breakpoints.motionReduce]: "300ms" },
-    animationTimingFunction: EASE_OUT_CSS,
+    animationTimingFunction: ease.out,
     animationFillMode: "both",
   },
   heroPeriodSeat: {
@@ -673,7 +667,7 @@ const styles = stylex.create({
     flexDirection: "column",
     gap: { default: 18, [DESKTOP]: 30 },
     margin: 0,
-    color: INK,
+    color: color.ink,
   },
   heroHeadline: {
     display: "block",
@@ -682,7 +676,7 @@ const styles = stylex.create({
   },
   heroLead: {
     display: "block",
-    fontSize: { default: 20, [TABLET]: 26, [DESKTOP]: "min(34px, 2.5vw)" },
+    fontSize: { default: 20, [media.tablet]: 26, [DESKTOP]: "min(34px, 2.5vw)" },
     fontWeight: 500,
     lineHeight: 1.06,
     letterSpacing: "-0.025em",
@@ -703,7 +697,7 @@ const styles = stylex.create({
     display: "block",
     marginTop: "-0.07em",
     marginBottom: "-0.12em",
-    fontSize: { default: "10.5vw", [TABLET]: "7vw", [DESKTOP]: "min(84px, 6vw)" },
+    fontSize: { default: "10.5vw", [media.tablet]: "7vw", [DESKTOP]: "min(84px, 6vw)" },
     lineHeight: 1.18,
     letterSpacing: "-0.055em",
     whiteSpace: "nowrap",
@@ -744,7 +738,7 @@ const styles = stylex.create({
   },
   heroSubtitle: {
     display: "block",
-    fontSize: { default: 16, [TABLET]: 18, [DESKTOP]: 20 },
+    fontSize: { default: 16, [media.tablet]: 18, [DESKTOP]: 20 },
     fontWeight: 500,
     lineHeight: 1.3,
     letterSpacing: "0.14em",
@@ -778,7 +772,7 @@ const styles = stylex.create({
     fontSize: { default: 16, [DESKTOP]: 18 },
     fontWeight: 500,
     lineHeight: 1.8,
-    color: INK,
+    color: color.ink,
     textAlign: "center",
   },
   inkPhrase: {
@@ -824,7 +818,7 @@ const styles = stylex.create({
     margin: 0,
     fontSize: 16,
     lineHeight: 1.2,
-    color: INK,
+    color: color.ink,
   },
   statFigure: {
     display: "flex",
@@ -917,7 +911,7 @@ const styles = stylex.create({
     minHeight: { default: 200, [breakpoints.md]: 280 },
     padding: { default: 24, [DESKTOP]: 40 },
     boxSizing: "border-box",
-    color: INK,
+    color: color.ink,
   },
   quadrantUpper: {
     flexDirection: { default: "column", [breakpoints.md]: "column-reverse" },
@@ -955,7 +949,7 @@ const styles = stylex.create({
     alignItems: "inherit",
     gap: 32,
     flexGrow: 1,
-    color: INK,
+    color: color.ink,
   },
   quadrantInverse: {
     color: "#ffffff",
@@ -1017,7 +1011,7 @@ const styles = stylex.create({
     fontSize: 10.5,
     fontWeight: 500,
     letterSpacing: "0.12em",
-    fill: INK,
+    fill: color.ink,
   },
   badgeCross: {
     color: FOOTER_BLUE,
@@ -1037,13 +1031,13 @@ const styles = stylex.create({
     display: "grid",
     gridTemplateColumns: {
       default: "minmax(0, 1fr)",
-      [TABLET]: "repeat(2, minmax(0, 1fr))",
+      [media.tablet]: "repeat(2, minmax(0, 1fr))",
       [DESKTOP]: "repeat(4, minmax(0, 1fr))",
     },
     width: "100%",
     maxWidth: 1200,
     marginTop: { default: 48, [DESKTOP]: 96 },
-    scrollMarginTop: HEADER_HEIGHT + 24,
+    scrollMarginTop: `calc(${layout.headerHeight} + 24px)`,
   },
   productCard: {
     display: "flex",
@@ -1063,7 +1057,7 @@ const styles = stylex.create({
     transform: { default: null, ":hover": { default: null, [HOVER_MOTION]: "scale(1.04)" } },
     transitionProperty: "transform",
     transitionDuration: "600ms",
-    transitionTimingFunction: EASE_OUT_CSS,
+    transitionTimingFunction: ease.out,
   },
   productPanel: {
     display: "flex",
@@ -1089,7 +1083,7 @@ const styles = stylex.create({
     fontSize: { default: 26, [DESKTOP]: 32 },
     fontWeight: 400,
     lineHeight: 1.2,
-    color: INK,
+    color: color.ink,
   },
   rule: {
     width: "100%",
@@ -1120,10 +1114,10 @@ const styles = stylex.create({
     maxWidth: 1090,
     marginInlineStart: {
       default: 16,
-      [TABLET]: 40,
-      [DESKTOP]: `max(${INSET_120}, calc(50% - 522px))`,
+      [media.tablet]: 40,
+      [DESKTOP]: `max(${layout.inset120}, calc(50% - 522px))`,
     },
-    marginInlineEnd: { default: 16, [TABLET]: 40, [DESKTOP]: INSET_120 },
+    marginInlineEnd: { default: 16, [media.tablet]: 40, [DESKTOP]: layout.inset120 },
   },
   mapWrap: {
     position: "relative",
@@ -1149,7 +1143,7 @@ const styles = stylex.create({
   mapRingPulse: {
     animationName: { default: pinPulse, [breakpoints.motionReduce]: "none" },
     animationDuration: "1600ms",
-    animationTimingFunction: EASE_OUT_CSS,
+    animationTimingFunction: ease.out,
   },
   mapRingAt: (left: string, top: string, delay: string) => ({
     left,
@@ -1194,7 +1188,7 @@ const styles = stylex.create({
     animationName: { default: slideFromLeft, [breakpoints.motionReduce]: fadeIn },
     animationDuration: { default: "700ms", [breakpoints.motionReduce]: "300ms" },
     animationDelay: { default: `${MAP_SWEEP_MS / 2}ms`, [breakpoints.motionReduce]: "0ms" },
-    animationTimingFunction: EASE_OUT_CSS,
+    animationTimingFunction: ease.out,
     animationFillMode: "both",
   },
   globalCopy: {
@@ -1217,7 +1211,7 @@ const styles = stylex.create({
     display: "grid",
     gridTemplateColumns: {
       default: "minmax(0, 1fr)",
-      [TABLET]: "repeat(2, minmax(0, 1fr))",
+      [media.tablet]: "repeat(2, minmax(0, 1fr))",
       [DESKTOP]: "repeat(4, minmax(0, 1fr))",
     },
     gap: 32,
@@ -1241,7 +1235,7 @@ const styles = stylex.create({
     fontSize: 16,
     fontWeight: 700,
     lineHeight: 1.2,
-    color: INK,
+    color: color.ink,
   },
   regionBody: {
     flexGrow: 1,
@@ -1290,7 +1284,7 @@ const styles = stylex.create({
     fontWeight: 700,
     lineHeight: 1.2,
     textAlign: "start",
-    color: { default: INK, ":hover": colors.brandBlue700 },
+    color: { default: color.ink, ":hover": colors.brandBlue700 },
     cursor: "pointer",
     transitionProperty: "color",
     transitionDuration: "150ms",
