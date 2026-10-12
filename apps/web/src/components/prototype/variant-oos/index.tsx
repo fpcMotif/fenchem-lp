@@ -448,7 +448,6 @@ const styles = stylex.create({
     paddingBlock: 10,
     paddingInline: 6,
     marginBlock: -10,
-    marginInline: -6,
     borderWidth: 0,
     backgroundColor: "transparent",
     fontFamily: "inherit",
@@ -1014,6 +1013,7 @@ const styles = stylex.create({
     paddingTop: { default: 64, [DESKTOP]: 109 },
     paddingBottom: { default: 64, [DESKTOP]: 101 },
     backgroundColor: colors.paper,
+    overflow: "hidden",
   },
   globalRow: {
     display: "flex",
@@ -1065,10 +1065,10 @@ const styles = stylex.create({
     height: "auto",
   },
   mapWrapEnter: {
-    translate: { default: "-120px 0px", [breakpoints.motionReduce]: null },
+    translate: { default: "0px 0px", [DESKTOP]: "-120px 0px", [breakpoints.motionReduce]: null },
   },
   mapWrapEnterRun: {
-    animationName: { default: mapSlideIn, [breakpoints.motionReduce]: "none" },
+    animationName: { default: fadeIn, [DESKTOP]: mapSlideIn, [breakpoints.motionReduce]: "none" },
     animationDuration: `${MAP_SWEEP_MS}ms`,
     animationTimingFunction: MAP_SWEEP_EASE,
     animationFillMode: "both",
@@ -1091,10 +1091,14 @@ const styles = stylex.create({
   },
   globalCopyEnter: {
     opacity: 0,
-    translate: { default: "-80px 0px", [breakpoints.motionReduce]: null },
+    translate: { default: "0px 0px", [DESKTOP]: "-80px 0px", [breakpoints.motionReduce]: null },
   },
   globalCopyEnterRun: {
-    animationName: { default: slideFromLeft, [breakpoints.motionReduce]: fadeIn },
+    animationName: {
+      default: fadeIn,
+      [DESKTOP]: slideFromLeft,
+      [breakpoints.motionReduce]: fadeIn,
+    },
     animationDuration: { default: "700ms", [breakpoints.motionReduce]: "300ms" },
     animationDelay: { default: `${MAP_SWEEP_MS / 2}ms`, [breakpoints.motionReduce]: "0ms" },
     animationTimingFunction: EASE_OUT_CSS,
