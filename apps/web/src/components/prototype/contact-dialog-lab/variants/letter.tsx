@@ -440,21 +440,19 @@ export function LetterDialog({ subject, onClose }: DialogVariantProps) {
           </div>
         </header>
         <address {...stylex.props(styles.letterhead)}>
-          {[...CONTACT_DETAILS]
-            .sort((a, b) => (a.href === null ? -1 : b.href === null ? 1 : 0))
-            .map((detail) =>
-              detail.href ? (
-                <a
-                  key={detail.term}
-                  href={detail.href}
-                  {...stylex.props(styles.letterheadLink, labStyles.focusRing)}
-                >
-                  {detail.value}
-                </a>
-              ) : (
-                <span key={detail.term}>{detail.value}</span>
-              ),
-            )}
+          {CONTACT_DETAILS.map((detail) =>
+            detail.href ? (
+              <a
+                key={detail.term}
+                href={detail.href}
+                {...stylex.props(styles.letterheadLink, labStyles.focusRing)}
+              >
+                {detail.value}
+              </a>
+            ) : (
+              <span key={detail.term}>{detail.value}</span>
+            ),
+          )}
         </address>
 
         <div
