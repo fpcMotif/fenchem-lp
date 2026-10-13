@@ -664,7 +664,9 @@ export function StudioVariant() {
                         >
                           {padIndex(scope.indexOf(item))}
                         </span>
-                        <span {...stylex.props(styles.tabName, isSelected && styles.tabNameSelected)}>
+                        <span
+                          {...stylex.props(styles.tabName, isSelected && styles.tabNameSelected)}
+                        >
                           {item.title}
                         </span>
                       </button>

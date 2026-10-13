@@ -24,7 +24,9 @@ const INGREDIENTS_LABEL = "功能性成分";
 
 const splitNote = (text: string) => {
   const match = TRAILING_NOTE.exec(text);
-  return match ? { primary: match[1] ?? text, note: match[2] ?? null } : { primary: text, note: null };
+  return match
+    ? { primary: match[1] ?? text, note: match[2] ?? null }
+    : { primary: text, note: null };
 };
 
 const TAB_STEPS: Record<string, (index: number, count: number) => number> = {

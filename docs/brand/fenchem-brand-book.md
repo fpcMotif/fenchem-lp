@@ -80,5 +80,5 @@ English**, in three weights:
   fill for large areas.
 - **Auxiliary colors = wayfinding.** Tag a division/category, never a whole page.
 
-See `CONTEXT.md` for the glossary and `docs/adr/` for the decisions that shaped
+See `GLOSSARY.md` for the glossary and `docs/adr/` for the decisions that shaped
 how this palette is applied to the landing page.

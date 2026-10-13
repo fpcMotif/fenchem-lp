@@ -1,9 +1,13 @@
 import * as about from "./about-data";
 import * as content from "./content";
+import * as insights from "./insights-data";
 import * as products from "./products-data";
 
 export const DATASETS = ["demo", "worst", "empty", "one", "many"] as const;
 export type Dataset = (typeof DATASETS)[number];
+
+export const ARTICLE_COUNTS = [1, 2, 3, 4] as const;
+export type ArticleCount = (typeof ARTICLE_COUNTS)[number];
 
 type Widen<T> = T extends string
   ? string
@@ -485,6 +489,503 @@ const WORST_PRODUCTS = () => {
   ]);
 };
 
+const WORST_INSIGHT_ARTICLES: insights.InsightArticle[] = [
+  {
+    id: "gut-drinks",
+    category: "应用方案",
+    title:
+      "后生元、益生元与膳食纤维协同：面向GLP-1伴随营养与健康老龄化人群的日常型肠道健康饮品配方开发要点",
+    navLabel: null,
+    lead: "从原料筛选、发酵特征与胃肠耐受评估，到即饮饮料、冲调粉与条袋装等不同剂型的稳定性测试，系统梳理肠道健康饮品从概念到上市的关键环节",
+    thesis: {
+      label: "核心观点",
+      statement:
+        "肠道健康饮品的竞争点正在从“添加了什么”转向“每天能不能喝下去”：口感负担、胃肠耐受与剂型便利性，共同决定了产品能否被长期坚持。",
+    },
+    intro: [
+      "“每天喝、喝得下、喝得久”正在成为肠道健康饮品的核心评价标准。与一次性尝鲜的功能饮料不同，肠道健康产品的价值需要在持续使用中体现，因此配方的口感、黏度与胃肠舒适度比单一成分的添加量更重要。",
+      "对于同时面向体重管理人群与中老年人群的品牌而言，这意味着要在有限的饮用量中兼顾营养密度与低负担体验，并为不同渠道准备即饮、冲调与条袋装等多种剂型。",
+      "本文结合常见的原料组合与剂型测试经验，整理出从概念设计到上市前验证的主要关注点，供配方团队在立项阶段参考。",
+    ],
+    sections: [
+      {
+        slug: "need",
+        navLabel: "一　需求变化",
+        title: "一　从功能饮料到每日习惯：肠道健康饮品的需求变化与目标人群细分",
+        blocks: [
+          {
+            kind: "paragraphs",
+            items: [
+              "过去，肠道健康饮品多以“通便”“排毒”等短期诉求切入市场，产品生命周期短、复购率低。随着消费者对肠道微生态认知的加深，以及体重管理和健康老龄化需求的增长，品类正在向“每日饮用、长期坚持”的习惯型产品转变。",
+            ],
+          },
+          {
+            kind: "paragraphs",
+            items: [
+              "从目标人群看，至少可以细分为以下几类，每一类对口感、剂量和剂型的要求都不相同：",
+            ],
+          },
+          {
+            kind: "bullets",
+            items: [
+              "体重管理人群：进食量减少，更关注饱腹感、低能量和胃肠舒适度，对甜味和黏度较为敏感；",
+              "中老年人群：咀嚼和吞咽能力下降，偏好温和口感与易冲调的剂型，同时关注蛋白质与钙、维生素D等营养素的补充；",
+              "久坐办公人群：关注排便规律与便捷性，倾向于即饮或条袋装产品，对包装便携性要求较高；",
+              "运动与健身人群：希望在补充电解质和蛋白质的同时兼顾肠道舒适，避免训练前后出现胀气；",
+              "孕产与哺乳期人群：对原料安全性和法规合规要求更严格，配方需要更加保守；",
+              "儿童与青少年：口味接受度是首要门槛，同时需要关注添加量与适用年龄的法规限制。",
+            ],
+          },
+        ],
+      },
+      {
+        slug: "ingredients",
+        navLabel: "二　原料组合",
+        title: "二　常见原料组合及其在配方中的角色",
+        blocks: [
+          {
+            kind: "terms",
+            items: [
+              {
+                term: "后生元（灭活乳酸菌及其代谢产物）",
+                desc: "不依赖活菌存活，耐热、耐酸，适合热灌装即饮饮料与常温货架产品，可作为肠道健康定位的核心成分之一。",
+              },
+              {
+                term: "益生元（低聚果糖、低聚半乳糖、菊粉）",
+                desc: "可被肠道有益菌利用，但发酵速度较快，添加量过高时可能引起胀气，需要结合目标人群控制剂量。",
+              },
+              {
+                term: "可溶性膳食纤维",
+                desc: "部分水解瓜尔胶、抗性糊精等低黏度纤维，冲调性好、口味存在感低，适合作为每日饮用产品的纤维基础。",
+              },
+              {
+                term: "电解质与微量营养素",
+                desc: "钠、钾、镁及维生素C、锌等，有助于提升产品在运动后补水和日常营养补充场景中的价值。",
+              },
+              {
+                term: "植物提取物与天然风味",
+                desc: "姜、薄荷、柑橘等风味既能改善整体口感，也能在一定程度上掩盖纤维和后生元带来的不良风味。",
+              },
+            ],
+          },
+        ],
+      },
+      {
+        slug: "testing",
+        navLabel: "三　稳定性测试",
+        title: "三　上市前稳定性测试清单",
+        blocks: [
+          {
+            kind: "terms",
+            items: [
+              {
+                term: "沉淀与分层",
+                desc: "即饮产品静置后是否出现沉淀、絮状物或上下分层，摇匀后能否恢复",
+              },
+              {
+                term: "黏度变化（25℃/60%RH，12个月）",
+                desc: "加速与长期储存条件下黏度是否明显上升，是否影响口感与灌装",
+              },
+              {
+                term: "pH与风味漂移",
+                desc: "储存期内pH、酸甜比与风味是否发生变化，是否出现异味",
+              },
+              {
+                term: "冲调分散时间",
+                desc: "粉剂在常温水和温水中的分散时间，是否结团、挂壁或漂浮",
+              },
+              {
+                term: "热灌装耐受",
+                desc: "后生元、维生素与风味物质在热灌装或巴氏杀菌后的保留情况",
+              },
+              {
+                term: "包材阻隔性（铝箔复合膜 vs. PET瓶）",
+                desc: "不同包材对氧气和水分的阻隔能力，以及对货架期的影响",
+              },
+              { term: "运输振动", desc: "模拟运输后是否出现漏液、胀袋或粉剂板结" },
+            ],
+          },
+        ],
+      },
+      {
+        slug: "formats",
+        navLabel: "四　剂型选择",
+        title: "四　即饮、冲调粉还是条袋装？",
+        blocks: [
+          {
+            kind: "paragraphs",
+            items: [
+              "即饮饮料的饮用体验最好，但对稳定性和热处理工艺要求最高；冲调粉的配方自由度更大，适合高纤维和高蛋白组合，但需要解决分散与结团问题；条袋装便于携带和控制单次剂量，适合作为每日一袋的习惯型产品。",
+              "多数品牌会选择一个主剂型切入市场，再根据渠道反馈延展到其他剂型。配方设计时提前考虑剂型迁移，可以减少后续重复开发的工作量。",
+            ],
+          },
+        ],
+      },
+      {
+        slug: "summary",
+        navLabel: "五　小结",
+        title: "五　小结",
+        blocks: [
+          {
+            kind: "paragraphs",
+            items: [
+              "肠道健康饮品的下一阶段竞争，将更多地体现在长期饮用体验和配方的科学性上。品牌需要在原料选择、剂型设计和稳定性验证之间找到平衡，并以真实的消费场景为出发点。",
+            ],
+          },
+          {
+            kind: "note",
+            label: "开发提示",
+            text: "可与“GLP-1时代的膳食纤维机会”一文联动，形成“体重管理伴随营养”系列专题，并在产品页关联部分水解瓜尔胶、后生元及电解质相关原料。",
+          },
+          {
+            kind: "disclaimer",
+            text: "说明：本文为官网应用方案示范稿，不构成医疗建议或产品功效承诺。正式发布前，应结合目标市场法规、所用原料证据及最终配方进行合规审核。",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "hmb",
+    category: "原料解读",
+    title: "HMB",
+    navLabel: null,
+    lead: null,
+    thesis: null,
+    intro: [
+      "2026年，运动营养产品的目标人群正从专业运动员扩展到中老年与体重管理人群。HMB（β-羟基-β-甲基丁酸）作为亮氨酸的代谢产物，常被用于与肌肉维持相关的配方设计。",
+    ],
+    sections: [
+      {
+        slug: "formats",
+        navLabel: "一　剂型",
+        title: "一　剂型",
+        blocks: [
+          {
+            kind: "paragraphs",
+            items: ["HMB钙盐易溶于水，适合固体饮料、片剂与蛋白粉复配。"],
+          },
+        ],
+      },
+      {
+        slug: "notes",
+        navLabel: "二　提示",
+        title: "二　提示",
+        blocks: [{ kind: "bullets", items: ["注意苦味掩盖；", "关注目标市场法规。"] }],
+      },
+    ],
+  },
+  {
+    id: "probiotic-stability",
+    category: "技术洞察",
+    title:
+      "Lacticaseibacillus rhamnosus GG与Bifidobacterium animalis subsp. lactis在固体饮料中的活菌稳定性",
+    navLabel: "益生菌活菌稳定性",
+    lead: "水分活度、储存温度与包材阻隔性如何影响固体饮料中的活菌数，以及配方阶段可以提前做哪些准备",
+    thesis: {
+      label: "核心观点",
+      statement:
+        "固体饮料中的益生菌稳定性主要取决于“水、热、氧”三个因素，配方、工艺与包材需要作为一个整体来设计。",
+    },
+    intro: [
+      "Lacticaseibacillus rhamnosus（原Lactobacillus rhamnosus）与Bifidobacterium animalis subsp. lactis是固体饮料和条袋装产品中较常见的益生菌菌株。与液态产品相比，固体饮料的水分活度更低，有利于活菌保存，但在与膳食纤维、蛋白质和矿物质复配后，体系的吸湿性和储存条件会显著影响货架期内的活菌数。",
+      "因此，配方团队需要在立项阶段就明确目标活菌数、储存条件和包材方案，而不是在稳定性测试失败后再回头调整。",
+    ],
+    sections: [
+      {
+        slug: "factors",
+        navLabel: "一　影响因素",
+        title: "一　影响活菌稳定性的主要因素",
+        blocks: [
+          {
+            kind: "terms",
+            items: [
+              {
+                term: "水分活度（aw）",
+                desc: "体系水分活度越高，活菌数下降越快；吸湿性原料的比例需要严格控制",
+              },
+              {
+                term: "储存温度",
+                desc: "常温货架与冷链储存的活菌衰减速度差异明显，标签条件需与测试条件一致",
+              },
+              {
+                term: "微胶囊化（Microencapsulation）",
+                desc: "包埋工艺可以降低胃酸与加工过程对菌株的影响，但会增加成本和粒径",
+              },
+              {
+                term: "氧气与包材",
+                desc: "铝箔复合膜条袋的阻隔性优于普通复合膜，必要时可充氮包装",
+              },
+              {
+                term: "复配原料",
+                desc: "部分矿物质、酸味剂和高吸湿性纤维可能加速活菌数下降",
+              },
+            ],
+          },
+        ],
+      },
+      {
+        slug: "strains",
+        navLabel: "二　菌株选择",
+        title: "二　菌株与载体的选择",
+        blocks: [
+          {
+            kind: "terms",
+            items: [
+              {
+                term: "Lacticaseibacillus rhamnosus GG",
+                desc: "研究资料较多、应用历史较长的菌株之一，常用于儿童与成人肠道健康产品。",
+              },
+              {
+                term: "Bifidobacterium animalis subsp. lactis",
+                desc: "耐酸、耐氧能力相对较好，适合与乳制品和固体饮料体系复配。",
+              },
+              {
+                term: "载体与填充剂",
+                desc: "麦芽糊精、低聚果糖等载体的水分含量和吸湿性，会直接影响菌粉在成品中的稳定性。",
+              },
+            ],
+          },
+        ],
+      },
+      {
+        slug: "references",
+        navLabel: "三　参考资料",
+        title: "三　参考资料",
+        blocks: [
+          {
+            kind: "paragraphs",
+            items: [
+              "完整的加速与长期稳定性测试方案可参考：https://example.com/technical-library/probiotics/stability-testing-protocol-for-solid-beverages-and-stick-packs-2026-edition.pdf",
+            ],
+          },
+          {
+            kind: "disclaimer",
+            text: "说明：本文为官网技术洞察示范稿，菌株信息仅作配方讨论参考，不构成产品功效承诺。正式发布前，应结合目标市场法规与菌株证据进行合规审核。",
+          },
+        ],
+      },
+    ],
+  },
+];
+
+const WORST_INSIGHTS = () => {
+  setList(insights.INSIGHTS_ARTICLES, [...WORST_INSIGHT_ARTICLES, ...insights.INSIGHTS_ARTICLES]);
+};
+
+const TYPICAL_DISCLAIMER =
+  "说明：本文为官网技术洞察示范稿，不构成医疗建议或产品功效承诺。正式发布前，应结合目标市场法规、所用原料证据及最终配方进行合规审核。";
+
+const TYPICAL_INSIGHT_ARTICLES: insights.InsightArticle[] = [
+  {
+    id: "rtd-fiber",
+    category: "应用方案",
+    title: "低黏度膳食纤维在即饮饮品中的应用",
+    navLabel: "即饮饮品与膳食纤维",
+    lead: "兼顾口感、澄清度与货架期稳定性的配方思路",
+    thesis: {
+      label: "核心观点",
+      statement:
+        "即饮饮品添加膳食纤维的难点不在添加量本身，而在于黏度、澄清度与货架期稳定性之间的平衡。",
+    },
+    intro: [
+      "即饮饮品是消费者最容易坚持的日常摄入形式之一。越来越多品牌希望在饮品中加入膳食纤维，以支持肠道健康和饱腹管理定位。",
+      "然而，纤维的加入往往会带来增稠、浑浊、沉淀或风味变化。原料选择与工艺设计，决定了产品能否在整个货架期内保持稳定的饮用体验。",
+    ],
+    sections: [
+      {
+        slug: "constraints",
+        navLabel: "一　开发约束",
+        title: "一　即饮饮品的三项开发约束",
+        blocks: [
+          {
+            kind: "terms",
+            items: [
+              {
+                term: "黏度",
+                desc: "饮品需要保持顺滑、清爽的口感，高黏度纤维容易带来明显的厚重感。",
+              },
+              {
+                term: "澄清度",
+                desc: "透明或浅色饮品对浑浊和沉淀更加敏感，纤维需要具备良好的溶解性。",
+              },
+              {
+                term: "热与酸稳定性",
+                desc: "杀菌工艺和酸性体系可能导致部分纤维降解，影响标示含量。",
+              },
+            ],
+          },
+        ],
+      },
+      {
+        slug: "selection",
+        navLabel: "二　原料选择",
+        title: "二　原料选择要点",
+        blocks: [
+          {
+            kind: "bullets",
+            items: [
+              "优先选择低黏度、易溶解的水溶性膳食纤维；",
+              "在目标pH和杀菌条件下验证纤维含量的保留率；",
+              "关注纤维对甜味、酸味和香精表现的影响；",
+              "结合目标添加量评估胃肠耐受性。",
+            ],
+          },
+        ],
+      },
+      {
+        slug: "outlook",
+        navLabel: "三　观点",
+        title: "三　观点",
+        blocks: [
+          {
+            kind: "paragraphs",
+            items: [
+              "即饮饮品中的膳食纤维应用，需要从原料、工艺和包装三个环节同步设计。尽早开展稳定性测试，可以显著降低量产阶段的配方调整成本。",
+            ],
+          },
+          { kind: "disclaimer", text: TYPICAL_DISCLAIMER },
+        ],
+      },
+    ],
+  },
+  {
+    id: "hmb-aging",
+    category: "技术洞察",
+    title: "HMB与健康老龄化：肌肉营养的新机会",
+    navLabel: "HMB与肌肉健康",
+    lead: "从运动营养走向中老年日常营养的配方方向",
+    thesis: {
+      label: "核心观点",
+      statement:
+        "随着人口老龄化，肌肉健康正在从运动人群的专属话题，转变为中老年营养产品的核心需求之一。",
+    },
+    intro: [
+      "肌肉量和肌肉力量会随年龄增长逐渐下降，并影响日常活动能力与生活质量。中老年人群对蛋白质及相关营养素的关注度正在持续上升。",
+      "HMB（β-羟基-β-甲基丁酸）是亮氨酸的代谢产物，常与蛋白质、维生素D等成分组合，用于肌肉健康相关的营养产品开发。",
+    ],
+    sections: [
+      {
+        slug: "needs",
+        navLabel: "一　人群需求",
+        title: "一　中老年人群的营养需求",
+        blocks: [
+          {
+            kind: "bullets",
+            items: [
+              "日常饮食中优质蛋白摄入不足；",
+              "食欲和进食量随年龄增长而下降；",
+              "希望维持行动能力和独立生活能力；",
+              "偏好口感温和、易于冲调的产品形态。",
+            ],
+          },
+        ],
+      },
+      {
+        slug: "formats",
+        navLabel: "二　产品形态",
+        title: "二　值得关注的产品形态",
+        blocks: [
+          {
+            kind: "terms",
+            items: [
+              { term: "营养粉剂", desc: "可与蛋白质、维生素D和钙组合，适合早餐或加餐场景。" },
+              {
+                term: "即饮营养饮品",
+                desc: "便于每日饮用，需关注HMB的风味掩蔽与蛋白体系的稳定性。",
+              },
+              {
+                term: "片剂与软糖",
+                desc: "剂量精准、便于携带，适合作为日常饮食之外的营养补充。",
+              },
+            ],
+          },
+        ],
+      },
+      {
+        slug: "outlook",
+        navLabel: "三　观点",
+        title: "三　观点",
+        blocks: [
+          {
+            kind: "paragraphs",
+            items: [
+              "面向中老年人群的肌肉营养产品，需要同时考虑营养组合、口感接受度和长期使用的便利性。",
+            ],
+          },
+          { kind: "disclaimer", text: TYPICAL_DISCLAIMER },
+        ],
+      },
+    ],
+  },
+  {
+    id: "probiotic-shelf-life",
+    category: "应用方案",
+    title: "益生菌产品的活菌稳定性管理",
+    navLabel: "益生菌稳定性",
+    lead: "从菌株选择、生产工艺到包装储存的全链路思路",
+    thesis: {
+      label: "核心观点",
+      statement:
+        "益生菌产品的价值取决于货架期末的活菌数，稳定性管理需要贯穿配方、工艺和包装的每一个环节。",
+    },
+    intro: [
+      "益生菌是肠道健康品类中增长最快的原料之一。与多数营养成分不同，益生菌是活的微生物，其数量会在生产、运输和储存过程中逐渐下降。",
+      "因此，品牌在标示活菌数时，需要以货架期末而非出厂时的数据为依据，并为不同剂型设计相应的保护策略。",
+    ],
+    sections: [
+      {
+        slug: "factors",
+        navLabel: "一　影响因素",
+        title: "一　影响活菌稳定性的主要因素",
+        blocks: [
+          {
+            kind: "terms",
+            items: [
+              {
+                term: "水分活度",
+                desc: "水分是影响粉剂和片剂中益生菌存活的关键因素，需要严格控制原辅料含水率。",
+              },
+              {
+                term: "温度",
+                desc: "高温加工和常温储存都会加速活菌下降，部分剂型需要冷链或低温工艺。",
+              },
+              { term: "氧气", desc: "多数益生菌对氧气敏感，包装材料的阻隔性直接影响货架期表现。" },
+              { term: "配方相容性", desc: "酸性成分、矿物质和部分植物提取物可能影响菌株存活。" },
+            ],
+          },
+        ],
+      },
+      {
+        slug: "outlook",
+        navLabel: "二　观点",
+        title: "二　观点",
+        blocks: [
+          {
+            kind: "paragraphs",
+            items: [
+              "稳定性测试应在配方开发早期启动，并在目标储存条件下验证完整货架期的活菌数，为标签声称提供可靠依据。",
+            ],
+          },
+          { kind: "disclaimer", text: TYPICAL_DISCLAIMER },
+        ],
+      },
+    ],
+  },
+];
+
+const TYPICAL_INSIGHTS = (count: ArticleCount) => {
+  setList(
+    insights.INSIGHTS_ARTICLES,
+    [...insights.INSIGHTS_ARTICLES, ...TYPICAL_INSIGHT_ARTICLES].slice(0, count),
+  );
+  setFields(insights.INSIGHTS_PAGE, {
+    tagline: "以科学视角解读营养配方趋势",
+    lead: "围绕体重管理、肠道健康与健康老龄化，分享原料选择与配方开发的技术观点",
+    meta: [`技术洞察 · ${count}篇文章`],
+  });
+};
+
 const NEWS_EVENTS = [
   "In-cosmetics® 拉丁美洲展",
   "IFSCC 大会 2026",
@@ -857,6 +1358,7 @@ type Counts = {
     "categories" | "featured" | "catalogGroups" | "catalogItems" | "solutions",
     number
   >;
+  insights: number;
   strengths: number;
 };
 
@@ -873,6 +1375,7 @@ const COUNTS: Record<"empty" | "one" | "many", Counts> = {
       subsidiaries: 0,
     },
     products: { categories: 0, featured: 0, catalogGroups: 0, catalogItems: 0, solutions: 0 },
+    insights: 0,
     strengths: 0,
   },
   one: {
@@ -887,6 +1390,7 @@ const COUNTS: Record<"empty" | "one" | "many", Counts> = {
       subsidiaries: 1,
     },
     products: { categories: 1, featured: 1, catalogGroups: 1, catalogItems: 1, solutions: 1 },
+    insights: 1,
     strengths: 1,
   },
   many: {
@@ -901,6 +1405,7 @@ const COUNTS: Record<"empty" | "one" | "many", Counts> = {
       subsidiaries: 10,
     },
     products: { categories: 6, featured: 9, catalogGroups: 9, catalogItems: 40, solutions: 30 },
+    insights: 8,
     strengths: 5,
   },
 };
@@ -1131,20 +1636,49 @@ const resizeProducts = ({ products: counts }: Counts) => {
   );
 };
 
+const resizeInsights = ({ insights: count }: Counts) => {
+  const articles = [...insights.INSIGHTS_ARTICLES, ...WORST_INSIGHT_ARTICLES];
+  setList(
+    insights.INSIGHTS_ARTICLES,
+    cycle(articles, count, (article, index) =>
+      index < articles.length
+        ? article
+        : {
+            ...article,
+            id: `${article.id}-${index}`,
+            title: `${article.title} ${Math.floor(index / articles.length) + 1}`,
+            navLabel:
+              article.navLabel === null
+                ? null
+                : `${article.navLabel} ${Math.floor(index / articles.length) + 1}`,
+          },
+    ),
+  );
+};
+
 let applied = false;
 
-export function applyDataset(dataset: Dataset, keepFixedCounts: boolean) {
+export function applyDataset(
+  dataset: Dataset,
+  keepFixedCounts: boolean,
+  articleCount: ArticleCount,
+) {
   if (applied) return;
   applied = true;
   if (dataset === "worst") {
     WORST_HOME();
     WORST_ABOUT();
     WORST_PRODUCTS();
+    WORST_INSIGHTS();
     return;
   }
-  if (dataset === "demo") return;
+  if (dataset === "demo") {
+    if (articleCount > 1) TYPICAL_INSIGHTS(articleCount);
+    return;
+  }
   const counts = COUNTS[dataset];
   resizeHome(keepFixedCounts ? { ...counts, strengths: content.STRENGTHS.length } : counts);
   resizeAbout(counts, keepFixedCounts);
   resizeProducts(counts);
+  resizeInsights(counts);
 }

@@ -90,7 +90,7 @@ treatment. Full rationale: `plans/001-vivid-division-color-system.md`.
   (nutrition, food, cosmetics) — feed/agro/chem unused.
 - Design review: no alpha-muted text on color fields; `font-tech`
   micro-labels ≥ 11px; no new text/background pairs beyond the table below.
-- Vocabulary (`CONTEXT.md`): "division", "auxiliary color", "Brand Green /
+- Vocabulary (`GLOSSARY.md`): "division", "auxiliary color", "Brand Green /
   Brand Blue / Clean White / Neutral Gray" in code comments.
 
 ### Contrast table (pre-computed — do not invent new pairs)

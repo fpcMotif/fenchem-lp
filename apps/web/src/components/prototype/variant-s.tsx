@@ -33,6 +33,8 @@ import {
   company,
   createInquiryHref,
   ingredients,
+  lotDocuments,
+  reachStat,
   regions,
   type Ingredient,
 } from "@/components/landing/landing-content";
@@ -158,17 +160,6 @@ const CERTIFICATE = {
     },
   ],
 };
-
-const TRAVELS_WITH_LOT = [
-  "Certificate of analysis",
-  "Specification sheet",
-  "Safety data sheet",
-  "Regulatory dossier",
-  "Allergen statement",
-  "Chain-of-custody record",
-  "Stability data, on request",
-  "Kosher and Halal certificates",
-];
 
 /** Two families on the page: the serif for every word, the mono for every value. */
 const SANS = typography.display;
@@ -1309,8 +1300,9 @@ function HeroSection() {
                 to the decimal.
               </h1>
               <p {...stylex.props(styles.lead)}>
-                Eight standardized actives with assay, form and dossier fixed before sampling,
-                supplied from six bases to formulators in more than forty countries.
+                {ingredients.length} standardized actives with assay, form and dossier fixed before
+                sampling, supplied from {regions.length} bases to formulators in {reachStat.value}{" "}
+                countries.
               </p>
             </Reveal>
             <Reveal delay={STAGGER} margin="0px" sx={styles.heroTail}>
@@ -1561,7 +1553,7 @@ function CertificateSection() {
             </table>
             <div {...stylex.props(styles.certDocs)}>
               <span {...stylex.props(styles.certCell, styles.certLabel)}>Document set</span>
-              <span {...stylex.props(styles.certCell)}>{TRAVELS_WITH_LOT.join(", ")}.</span>
+              <span {...stylex.props(styles.certCell)}>{lotDocuments.join(", ")}.</span>
             </div>
             <div {...stylex.props(styles.certFoot)}>
               <p {...stylex.props(styles.prose)}>
@@ -1614,7 +1606,7 @@ function BasesSection() {
             <span {...stylex.props(styles.bigNumberUnit)}> h</span>
           </p>
           <h2 id="bases-title" {...stylex.props(styles.display, styles.bigLead, styles.right5)}>
-            {hours} hours of every day answered, from six bases on five continents.
+            {hours} hours of every day answered, from {regions.length} bases on five continents.
           </h2>
         </Reveal>
         <Reveal>

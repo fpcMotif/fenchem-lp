@@ -130,7 +130,7 @@ export function Products({ onNavigateHome }: { onNavigateHome: (hash?: string) =
               <article {...stylex.props(styles.card)}>
                 <img
                   src={product.image}
-                  alt={`${product.english} product image`}
+                  alt={product.english}
                   loading="lazy"
                   decoding="async"
                   {...stylex.props(styles.image)}

@@ -13,10 +13,12 @@ import {
   industries,
   ingredients,
   isSectionId,
+  lotDocuments,
   navLinks,
   pillars,
   processSteps,
   proofCards,
+  reachStat,
   regions,
   resolveSectionAnchor,
   sectionIds,
@@ -115,6 +117,8 @@ describe("landing content contract", () => {
     expect(new Set(processTitles).size).toBe(processTitles.length);
     expect(new Set(certifications).size).toBe(certifications.length);
     expect(new Set(regionCities).size).toBe(regionCities.length);
+    expect(lotDocuments.length).toBeGreaterThan(0);
+    expect(new Set(lotDocuments).size).toBe(lotDocuments.length);
     expect(
       proofCards.every(
         (card) => card.image.alt.length > 24 && card.image.src.startsWith("https://"),
@@ -209,6 +213,7 @@ describe("canonical content seam", () => {
     expect(new Set(statValues).size).toBe(statValues.length);
     expect(industries.every((industry) => industry.image.src.startsWith("https://"))).toBe(true);
     expect(stats.some((stat) => stat.label.includes("1995"))).toBe(true);
+    expect(stats[2]).toBe(reachStat);
   });
 
   test("routes inquiry links through the canonical company inbox", () => {

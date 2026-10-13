@@ -2,6 +2,7 @@ import * as stylex from "@stylexjs/stylex";
 import { m, useMotionValueEvent, type MotionValue } from "motion/react";
 import { useEffect, useId, useRef, useState, type RefObject } from "react";
 
+import { useReducedMotion } from "../use-reduced-motion";
 import { PRODUCTS, PRODUCTS_INTRO } from "./content";
 import { Reveal, usePinEnabled, usePinProgress } from "./motion";
 import { color, ease, font, layout as layoutTokens, media } from "./tokens.stylex";
@@ -451,6 +452,7 @@ function PinnedStage({
   sectionRef: RefObject<HTMLElement | null>;
 }) {
   const detailBase = useId();
+  const reduce = useReducedMotion();
   const [{ active, previous, forward }, setSelection] = useState<Selection>(() => ({
     active: categoryAt(progress.get()),
     previous: null,
@@ -491,7 +493,7 @@ function PinnedStage({
     const range = section.offsetHeight - window.innerHeight;
     window.scrollTo({
       top: sectionTop + range * ((index + SEGMENT_ENTRY) / COUNT),
-      behavior: "smooth",
+      behavior: reduce ? "auto" : "smooth",
     });
   };
 

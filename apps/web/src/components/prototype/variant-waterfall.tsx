@@ -1969,6 +1969,8 @@ function FooterRow({
   );
 }
 
+const CURRENT_YEAR = new Date().getFullYear();
+
 function Footer() {
   const documentHref = createInquiryHref("quality");
   return (
@@ -2009,7 +2011,7 @@ function Footer() {
           />
         </dl>
         <p {...stylex.props(styles.footerLegal)}>
-          © {new Date().getFullYear()} {company.legalName} {company.hq.city}, {company.hq.country}.
+          © {CURRENT_YEAR} {company.legalName} {company.hq.city}, {company.hq.country}.
         </p>
       </div>
     </footer>

@@ -11,7 +11,7 @@ A/B/C are the **original** prototypes (editorial palette + Newsreader serif,
 restored from commit `932b56c`). D/E/F/G are their **brand-book** versions —
 Brand Blue `#0743AE`, Brand Green `#64A733`, Clean White, Neutral Gray, six
 division accents, Source Han Sans — all **green-led** (green primary, blue
-structural accent). See `CONTEXT.md`, `docs/brand/fenchem-brand-book.md`, and
+structural accent). See `GLOSSARY.md`, `docs/brand/fenchem-brand-book.md`, and
 `docs/adr/0001-fenchem-brand-book-migration.md`.
 
 - **A → D — Botanical Editorial** · clean wellness-magazine, serif display (the

@@ -1,6 +1,7 @@
 import * as stylex from "@stylexjs/stylex";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 
+import { useReducedMotion } from "../use-reduced-motion";
 import {
   SOLUTION_AREAS,
   SOLUTION_ITEMS,
@@ -208,6 +209,7 @@ export function LabSection({ children }: { children: ReactNode }) {
 
 export function AreaChips({ browser }: { browser: SolutionsBrowser }) {
   const listRef = useRef<HTMLDivElement>(null);
+  const reduce = useReducedMotion();
   const { area, chips, chooseArea } = browser;
 
   useEffect(() => {
@@ -215,8 +217,8 @@ export function AreaChips({ browser }: { browser: SolutionsBrowser }) {
     const chip = list?.querySelector<HTMLElement>('[aria-pressed="true"]');
     if (!list || !chip || list.scrollWidth <= list.clientWidth) return;
     const left = chip.offsetLeft - (list.clientWidth - chip.offsetWidth) / 2;
-    list.scrollTo({ left: Math.max(0, left), behavior: "smooth" });
-  }, [area]);
+    list.scrollTo({ left: Math.max(0, left), behavior: reduce ? "auto" : "smooth" });
+  }, [area, reduce]);
 
   return (
     <div ref={listRef} role="group" aria-label="按应用领域筛选" {...stylex.props(styles.areaList)}>

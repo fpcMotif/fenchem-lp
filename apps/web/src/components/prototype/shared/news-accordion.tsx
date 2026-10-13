@@ -20,12 +20,21 @@ const local = stylex.create({
   },
 });
 
+function splitWithUrls(text: string) {
+  let cursor = 0;
+  return text.split(URL_PATTERN).map((part, index) => {
+    const key = `${cursor}-${part}`;
+    cursor += part.length;
+    return { key, part, isLink: index % 2 === 1 };
+  });
+}
+
 function DetailText({ text }: { text: string }) {
   return (
     <>
-      {text.split(URL_PATTERN).map((part, index) =>
-        index % 2 === 1 ? (
-          <a key={index} href={part} {...stylex.props(local.link)}>
+      {splitWithUrls(text).map(({ key, part, isLink }) =>
+        isLink ? (
+          <a key={key} href={part} {...stylex.props(local.link)}>
             {part}
           </a>
         ) : (

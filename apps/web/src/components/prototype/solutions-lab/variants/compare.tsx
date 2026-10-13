@@ -136,12 +136,14 @@ const styles = stylex.create({
     gap: 10,
     margin: 0,
     padding: 0,
+    listStyleType: "none",
   },
   tile: {
     position: "relative",
     flexShrink: 0,
     width: { default: 212, [bp.md]: "auto" },
     minWidth: 0,
+    listStyleType: "none",
   },
   tileButton: {
     display: "flex",
@@ -866,7 +868,7 @@ export function CompareVariant() {
     const slot = compareIds.indexOf(item.id);
     const tabIndex = item.id === rovingId ? 0 : -1;
     return (
-      <div key={item.id} role="listitem" {...stylex.props(styles.tile)}>
+      <li key={item.id} {...stylex.props(styles.tile)}>
         <button
           type="button"
           data-tile-id={item.id}
@@ -899,7 +901,7 @@ export function CompareVariant() {
           tabIndex={tabIndex}
           inTile
         />
-      </div>
+      </li>
     );
   };
 
@@ -914,8 +916,9 @@ export function CompareVariant() {
 
   const selectedSlot = compareIds.indexOf(selected.id);
   const pairRows = comparing ? [sheetRows(first), sheetRows(second)] : [];
+  const secondNames = comparing ? new Set(ingredientNames(second)) : new Set<string>();
   const sharedNames = comparing
-    ? new Set(ingredientNames(first).filter((name) => ingredientNames(second).includes(name)))
+    ? new Set(ingredientNames(first).filter((name) => secondNames.has(name)))
     : new Set<string>();
 
   return (
@@ -945,15 +948,11 @@ export function CompareVariant() {
                   {group.label}
                   <span {...stylex.props(styles.groupCount)}>{group.items.length} 款</span>
                 </p>
-                <div role="list" {...stylex.props(styles.grid)}>
-                  {group.items.map(renderTile)}
-                </div>
+                <ul {...stylex.props(styles.grid)}>{group.items.map(renderTile)}</ul>
               </div>
             ))
           ) : (
-            <div role="list" {...stylex.props(styles.grid)}>
-              {scope.map(renderTile)}
-            </div>
+            <ul {...stylex.props(styles.grid)}>{scope.map(renderTile)}</ul>
           )}
         </div>
       </div>
@@ -1040,11 +1039,7 @@ export function CompareVariant() {
                     {pair.map((item, index) => {
                       const cellRow = pairRows[index]?.[rowIndex];
                       return (
-                        <div
-                          key={item.id}
-                          role="cell"
-                          {...stylex.props(styles.value, styles.cell)}
-                        >
+                        <div key={item.id} role="cell" {...stylex.props(styles.value, styles.cell)}>
                           <span aria-hidden="true" {...stylex.props(styles.cellTag)}>
                             <span {...stylex.props(styles.letter)}>{LETTERS[index]}</span>
                             {item.title}

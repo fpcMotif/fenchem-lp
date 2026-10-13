@@ -122,7 +122,7 @@ switcher, it does not replace J.)
     decision — _"the alpha-muted greens failed at 2.2–2.8:1"_. Follow the same
     discipline: **no alpha-muted text on color fields** and no new
     text/background pairs beyond the table in this plan.
-- Vocabulary (`CONTEXT.md`): say **division** (not department/sector),
+- Vocabulary (`GLOSSARY.md`): say **division** (not department/sector),
   **auxiliary color** (not secondary/theme color), **Brand Green / Brand
   Blue / Clean White / Neutral Gray** for the four brand colors. Use these
   words in code comments.

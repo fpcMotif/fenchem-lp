@@ -1,6 +1,8 @@
 import * as stylex from "@stylexjs/stylex";
 import { useEffect, useRef } from "react";
 
+import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
+
 import { useActiveSection } from "../../use-active-section";
 import { SECTION_IDS, ui } from "./shared";
 import { bp, chrome, face, pane, tone } from "./tokens.stylex";
@@ -87,6 +89,7 @@ const styles = stylex.create({
 
 export function IndexBar() {
   const active = useActiveSection(SECTION_IDS);
+  const reduce = useReducedMotion();
   const listRef = useRef<HTMLOListElement>(null);
 
   useEffect(() => {
@@ -94,8 +97,8 @@ export function IndexBar() {
     if (!list || !active || list.scrollWidth <= list.clientWidth) return;
     const link = list.querySelector<HTMLElement>(`[href="#${active}"]`);
     if (!link) return;
-    list.scrollTo({ left: link.offsetLeft - 16, behavior: "smooth" });
-  }, [active]);
+    list.scrollTo({ left: link.offsetLeft - 16, behavior: reduce ? "auto" : "smooth" });
+  }, [active, reduce]);
 
   return (
     <nav aria-label="On this page" {...stylex.props(styles.bar)}>

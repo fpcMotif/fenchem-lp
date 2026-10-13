@@ -1,3 +1,5 @@
 {
-  "extends": "@fenchem-lp/config/tsconfig.base.json"
+  "extends": "@fenchem-lp/config/tsconfig.base.json",
+  "files": [],
+  "references": [{ "path": "./packages/ui" }, { "path": "./apps/web" }]
 }

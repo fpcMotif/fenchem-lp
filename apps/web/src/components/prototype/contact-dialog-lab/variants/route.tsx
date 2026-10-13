@@ -408,7 +408,7 @@ export function RouteDialog({ subject, onClose }: DialogVariantProps) {
   };
 
   const heightTransition = { duration: reduce ? 0 : 0.2, ease: EASE };
-  const stepTransition = { duration: 0.2, ease: EASE };
+  const stepTransition = { duration: reduce ? 0 : 0.2, ease: EASE };
   const offset = reduce ? 0 : 24;
   const stepIndex = step === "topic" ? 0 : 1;
 
@@ -458,12 +458,12 @@ export function RouteDialog({ subject, onClose }: DialogVariantProps) {
 
         <div {...stylex.props(styles.scroll)}>
           <m.div
-            initial={false}
-            animate={{ height }}
+            layout={!reduce}
+            style={{ height }}
             transition={heightTransition}
             {...stylex.props(styles.clip)}
           >
-            <div ref={measureRef} {...stylex.props(styles.measure)}>
+            <m.div ref={measureRef} layout="position" {...stylex.props(styles.measure)}>
               <AnimatePresence mode="wait" initial={false} custom={direction}>
                 <m.div
                   key={step}
@@ -473,7 +473,7 @@ export function RouteDialog({ subject, onClose }: DialogVariantProps) {
                   exit={{
                     opacity: 0,
                     x: (-offset / 2) * direction,
-                    transition: { duration: 0.12, ease: EASE },
+                    transition: { duration: reduce ? 0 : 0.12, ease: EASE },
                   }}
                   transition={stepTransition}
                 >
@@ -676,7 +676,7 @@ export function RouteDialog({ subject, onClose }: DialogVariantProps) {
                   )}
                 </m.div>
               </AnimatePresence>
-            </div>
+            </m.div>
           </m.div>
         </div>
       </div>

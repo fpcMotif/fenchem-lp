@@ -63,7 +63,8 @@ ds-bundle/
 
 # Agent & IDE tool states
 /.agent/
-/.agents/
+/.agents/*
+!/.agents/traits/
 /.claude/
 /.crush/
 /.factory/

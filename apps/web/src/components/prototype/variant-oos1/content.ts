@@ -10,7 +10,6 @@ export {
   COPYRIGHT,
   GLOBAL_INTRO,
   IMAGES,
-  NAV_ITEMS,
   NEWS_TITLE,
   OFFICE_COLUMNS,
   PRODUCTS,
@@ -19,6 +18,16 @@ export {
   type StrengthIcon,
   type StrengthTone,
 } from "../variant-o/content";
+
+export const NAV_ITEMS = [
+  { label: "首页", href: "#top" },
+  { label: "关于我们", href: "#about" },
+  { label: "产品与应用", href: "#products" },
+  { label: "研发与生产", href: "#campus" },
+  { label: "行业洞察", href: "#insights" },
+  { label: "新闻资讯", href: "#news" },
+  { label: "联系我们", href: "#contact" },
+] as const;
 
 export const HERO = {
   headline: ["Global ingredients", "Your next breakthrough."],
@@ -81,7 +90,7 @@ export const NEWS: readonly { title: string; details: readonly string[] }[] = [
 
 export type FooterLink = {
   label: string;
-  page?: "about" | "products" | "rd" | "news" | "contact";
+  page?: "about" | "products" | "rd" | "insights" | "news" | "contact";
 };
 
 export const FOOTER_COLUMNS: readonly { heading: string; links: readonly FooterLink[] }[] = [
@@ -97,8 +106,9 @@ export const FOOTER_COLUMNS: readonly { heading: string; links: readonly FooterL
   {
     heading: "资讯与资源",
     links: [
+      { label: "行业洞察", page: "insights" },
       { label: "新闻资讯", page: "news" },
-      { label: "技术白皮书", page: "news" },
+      { label: "技术白皮书", page: "insights" },
       { label: "全球展会日程", page: "news" },
       { label: "常见解答", page: "contact" },
     ],

@@ -3,14 +3,21 @@ import { Component, useEffect, useState, type ComponentType, type ReactNode } fr
 
 import {
   applyDataset,
+  ARTICLE_COUNTS,
   DATASETS,
+  type ArticleCount,
   type Dataset,
 } from "@/components/prototype/variant-oos1/worst-case-data";
 
-const PAGES = ["home", "about", "products"] as const;
+const PAGES = ["home", "about", "products", "insights"] as const;
 type Page = (typeof PAGES)[number];
 
-const PAGE_LABELS: Record<Page, string> = { home: "Home", about: "About", products: "Products" };
+const PAGE_LABELS: Record<Page, string> = {
+  home: "Home",
+  about: "About",
+  products: "Products",
+  insights: "Insights",
+};
 const DATASET_LABELS: Record<Dataset, string> = {
   demo: "Demo data",
   worst: "Worst case",
@@ -23,30 +30,32 @@ const ANCHOR_KEY = "worst-oos1-anchor";
 const RESTORE_DELAY_MS = 500;
 
 export const Route = createFileRoute("/worst/oos1")({
-  beforeLoad: () => {
-    if (!import.meta.env.DEV) throw notFound();
-  },
   validateSearch: (search: {
     data?: unknown;
     page?: unknown;
     fixed?: unknown;
-  }): { data?: Dataset; page?: Page; fixed?: boolean } => ({
+    articles?: unknown;
+  }): { data?: Dataset; page?: Page; fixed?: boolean; articles?: ArticleCount } => ({
     data: DATASETS.find((dataset) => dataset === search.data),
     page: PAGES.find((page) => page === search.page),
     fixed: search.fixed === 1 || search.fixed === "1" || search.fixed === true ? true : undefined,
+    articles: ARTICLE_COUNTS.find((count) => String(count) === String(search.articles)),
   }),
+  beforeLoad: () => {
+    if (!import.meta.env.DEV) throw notFound();
+  },
   component: WorstOOS1,
 });
 
 type Loaded = { Variant: ComponentType } | { error: unknown };
 
 function WorstOOS1() {
-  const { data = "demo", fixed = false } = Route.useSearch();
+  const { data = "demo", fixed = false, articles = 1 } = Route.useSearch();
   const [loaded, setLoaded] = useState<Loaded | null>(null);
 
   useEffect(() => {
     let active = true;
-    applyDataset(data, fixed);
+    applyDataset(data, fixed, articles);
     import("@/components/prototype/variant-oos1").then(
       (module) => {
         if (active) setLoaded({ Variant: module.VariantOOS1 });
@@ -58,7 +67,7 @@ function WorstOOS1() {
     return () => {
       active = false;
     };
-  }, [data, fixed]);
+  }, [data, fixed, articles]);
 
   useEffect(() => {
     if (loaded && "Variant" in loaded) restoreAnchor();
@@ -75,7 +84,7 @@ function WorstOOS1() {
           </CrashBoundary>
         )}
       </div>
-      <DataToggle data={data} fixed={fixed} />
+      <DataToggle data={data} fixed={fixed} articles={articles} />
     </>
   );
 }
@@ -173,6 +182,10 @@ const TOGGLE_CSS = `
   cursor: pointer;
   white-space: nowrap;
 }
+.data-toggle-track span {
+  padding: 6px 4px 6px 8px;
+  color: #555;
+}
 .data-toggle button[aria-pressed="true"] {
   background: #fff;
   color: #1a1a1a;
@@ -230,18 +243,32 @@ function restoreAnchor() {
   }, RESTORE_DELAY_MS);
 }
 
-function go(next: { data: Dataset; fixed: boolean; page: Page }, keepPlace: boolean) {
+function go(
+  next: { data: Dataset; fixed: boolean; page: Page; articles: ArticleCount },
+  keepPlace: boolean,
+) {
   const url = new URL(window.location.href);
   url.search = "";
   if (next.data !== "demo") url.searchParams.set("data", next.data);
   if (next.page !== "home") url.searchParams.set("page", next.page);
   if (next.fixed) url.searchParams.set("fixed", "1");
+  if (next.data === "demo" && next.articles > 1) {
+    url.searchParams.set("articles", String(next.articles));
+  }
   url.hash = "";
   if (keepPlace) saveAnchor();
   window.location.assign(url);
 }
 
-function DataToggle({ data, fixed }: { data: Dataset; fixed: boolean }) {
+function DataToggle({
+  data,
+  fixed,
+  articles,
+}: {
+  data: Dataset;
+  fixed: boolean;
+  articles: ArticleCount;
+}) {
   const [page, setPage] = useState<Page>("home");
   const [collapsed, setCollapsed] = useState(false);
 
@@ -268,7 +295,7 @@ function DataToggle({ data, fixed }: { data: Dataset; fixed: boolean }) {
                   key={candidate}
                   type="button"
                   aria-pressed={candidate === page}
-                  onClick={() => go({ data, fixed, page: candidate }, false)}
+                  onClick={() => go({ data, fixed, page: candidate, articles }, false)}
                 >
                   {PAGE_LABELS[candidate]}
                 </button>
@@ -280,19 +307,36 @@ function DataToggle({ data, fixed }: { data: Dataset; fixed: boolean }) {
                   key={candidate}
                   type="button"
                   aria-pressed={candidate === data}
-                  onClick={() => go({ data: candidate, fixed, page: currentPage() }, true)}
+                  onClick={() =>
+                    go({ data: candidate, fixed, page: currentPage(), articles }, true)
+                  }
                 >
                   {DATASET_LABELS[candidate]}
                 </button>
               ))}
             </div>
+            {data === "demo" && page === "insights" ? (
+              <div className="data-toggle-track" role="group" aria-label="Articles">
+                <span aria-hidden="true">Articles</span>
+                {ARTICLE_COUNTS.map((candidate) => (
+                  <button
+                    key={candidate}
+                    type="button"
+                    aria-pressed={candidate === articles}
+                    onClick={() => go({ data, fixed, page, articles: candidate }, false)}
+                  >
+                    {candidate}
+                  </button>
+                ))}
+              </div>
+            ) : null}
             {data === "empty" || data === "one" || data === "many" ? (
               <label>
                 <input
                   type="checkbox"
                   checked={fixed}
                   onChange={(event) =>
-                    go({ data, fixed: event.target.checked, page: currentPage() }, true)
+                    go({ data, fixed: event.target.checked, page: currentPage(), articles }, true)
                   }
                 />
                 Keep fixed-count lists

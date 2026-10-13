@@ -55,6 +55,7 @@ import { AboutView } from "./about-view";
 import { ContactCta } from "./contact-cta";
 import { ContactView } from "./contact-view";
 import { HERO_BLOB_TWIST } from "./hero-blob-twist";
+import { InsightsView } from "./insights-view";
 import { NewsView } from "./news-view";
 import { ProductsView } from "./products-view";
 import { RdView } from "./rd-view";
@@ -1538,7 +1539,7 @@ function useNavFits(
   return fits;
 }
 
-export type View = "home" | "about" | "products" | "rd" | "news" | "contact";
+export type View = "home" | "about" | "products" | "rd" | "insights" | "news" | "contact";
 export type AboutPageProps = { onNavigateHome: (hash?: string) => void };
 export type SubPageProps = AboutPageProps;
 
@@ -1572,6 +1573,9 @@ function SiteHeader({
     if (href === "#campus" || href === "#rd") {
       return currentView === "rd";
     }
+    if (href === "#insights") {
+      return currentView === "insights";
+    }
     if (href === "#news") {
       return currentView === "news";
     }
@@ -1601,6 +1605,12 @@ function SiteHeader({
     if (href === "#campus" || href === "#rd") {
       event.preventDefault();
       onNavigate("rd", "rd-top");
+      setMenuOpen(false);
+      return;
+    }
+    if (href === "#insights") {
+      event.preventDefault();
+      onNavigate("insights", "insights-top");
       setMenuOpen(false);
       return;
     }
@@ -2323,7 +2333,8 @@ const viewFromPage = (page: unknown, startView: View): View => {
   if (page === "about" || page === "home") return page;
   if (page === "products" || page === "produces") return "products";
   if (page === "rd" || page === "manufacturing" || page === "campus") return "rd";
-  if (page === "news" || page === "insights") return "news";
+  if (page === "insights" || page === "insight") return "insights";
+  if (page === "news") return "news";
   if (page === "contact") return "contact";
   return startView;
 };
@@ -2332,6 +2343,7 @@ export function VariantOOS1({
   AboutPage = AboutView,
   ProductsPage = ProductsView,
   RdPage = RdView,
+  InsightsPage = InsightsView,
   NewsPage = NewsView,
   ContactPage = ContactView,
   startView = "home",
@@ -2339,6 +2351,7 @@ export function VariantOOS1({
   AboutPage?: ComponentType<SubPageProps>;
   ProductsPage?: ComponentType<SubPageProps>;
   RdPage?: ComponentType<SubPageProps>;
+  InsightsPage?: ComponentType<SubPageProps>;
   NewsPage?: ComponentType<SubPageProps>;
   ContactPage?: ComponentType<SubPageProps>;
   startView?: View;
@@ -2374,13 +2387,14 @@ export function VariantOOS1({
       }
       url.hash = targetId ? `#${targetId}` : "";
       window.history.pushState({}, "", url.toString());
+      const behavior: ScrollBehavior = reduce ? "auto" : "smooth";
       if (targetId) {
         setTimeout(() => {
           const el = document.getElementById(targetId);
-          if (el) el.scrollIntoView({ behavior: "smooth" });
+          if (el) el.scrollIntoView({ behavior });
         }, 60);
       } else {
-        window.scrollTo({ top: 0, behavior: "smooth" });
+        window.scrollTo({ top: 0, behavior });
       }
     }
   };
@@ -2421,6 +2435,19 @@ export function VariantOOS1({
                   <RdPage
                     onNavigateHome={(target) =>
                       handleNavigate(target === "contact" ? "contact" : "home", target)
+                    }
+                  />
+                ) : view === "insights" ? (
+                  <InsightsPage
+                    onNavigateHome={(target) =>
+                      handleNavigate(
+                        target === "contact"
+                          ? "contact"
+                          : target === "products"
+                            ? "products"
+                            : "home",
+                        target,
+                      )
                     }
                   />
                 ) : view === "news" ? (

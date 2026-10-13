@@ -100,8 +100,7 @@ const fadeIn = stylex.keyframes({
   "100%": { opacity: 1 },
 });
 
-const SELECTED_RING =
-  "0 0 0 1px oklch(0.424 0.18 261.5 / 0.12), 0 1px 3px rgba(7, 67, 174, 0.08)";
+const SELECTED_RING = "0 0 0 1px oklch(0.424 0.18 261.5 / 0.12), 0 1px 3px rgba(7, 67, 174, 0.08)";
 
 const styles = stylex.create({
   facetBar: {
@@ -616,8 +615,10 @@ export function FacetsVariant() {
   const visible = active.length === 0 ? scope : scope.filter((item) => matchesAny(item, active));
   const current = visible.find((item) => item.id === selected?.id) ?? visible[0];
   const currentIndex = current ? visible.indexOf(current) : -1;
+  const visibleSet = new Set(visible);
+  const activeSet = new Set(active);
   const visibleGroups = groups
-    .map((group) => ({ ...group, items: group.items.filter((item) => visible.includes(item)) }))
+    .map((group) => ({ ...group, items: group.items.filter((item) => visibleSet.has(item)) }))
     .filter((group) => group.items.length > 0);
   const grouped = area === "all";
   const currentId = current?.id;
@@ -685,7 +686,7 @@ export function FacetsVariant() {
             {...stylex.props(styles.facetList)}
           >
             {facets.map((facet) => {
-              const isOn = active.includes(facet.label);
+              const isOn = activeSet.has(facet.label);
               return (
                 <button
                   key={facet.label}
@@ -763,7 +764,10 @@ export function FacetsVariant() {
                         </span>
                         <span {...stylex.props(styles.rowText)}>
                           <span
-                            {...stylex.props(styles.rowTitle, isSelected && styles.rowTitleSelected)}
+                            {...stylex.props(
+                              styles.rowTitle,
+                              isSelected && styles.rowTitleSelected,
+                            )}
                           >
                             {item.title}
                           </span>

@@ -21,7 +21,7 @@ export type ProofCard = {
 };
 
 /**
- * A Fenchem business unit. Each maps to one auxiliary brand color. See CONTEXT.md.
+ * A Fenchem business unit. Each maps to one auxiliary brand color. See GLOSSARY.md.
  * Ingredients carry an `application`; `divisionForApplication` resolves the accent.
  */
 export type DivisionKey = "feed" | "cosmetics" | "agro" | "food" | "chem" | "nutrition";
@@ -155,10 +155,12 @@ export const proofCards: ProofCard[] = [
  * Headline metrics. Holds the "since 1995" literal the variants used to re-inline.
  * Order: tenure, footprint, reach, certification.
  */
+export const reachStat: Stat = { value: "40+", label: "Countries served by our supply network" };
+
 export const stats: Stat[] = [
   { value: "30+", label: "Years of botanical expertise since 1995" },
   { value: "6", label: "Global bases across three continents" },
-  { value: "40+", label: "Countries served by our supply network" },
+  reachStat,
   { value: "ISO/GMP", label: "Certified manufacturing and quality systems" },
 ];
 
@@ -354,6 +356,17 @@ export const processSteps: ProcessStep[] = [
     title: "Release with proof",
     copy: "Certificates, dossiers, and compliance documents travel with every production-ready ingredient.",
   },
+];
+
+export const lotDocuments: string[] = [
+  "Certificate of analysis",
+  "Specification sheet",
+  "Safety data sheet",
+  "Regulatory dossier",
+  "Allergen statement",
+  "Chain-of-custody record",
+  "Stability data, on request",
+  "Kosher and Halal certificates",
 ];
 
 /** Quality certifications with a short qualifier for detailed presentations. */

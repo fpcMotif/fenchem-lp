@@ -23,7 +23,9 @@ const TRAILING_NOTE = /^(.+?)\s*[（(]([^（）()]+)[）)]$/;
 
 const splitNote = (text: string) => {
   const match = TRAILING_NOTE.exec(text);
-  return match ? { primary: match[1] ?? text, note: match[2] ?? null } : { primary: text, note: null };
+  return match
+    ? { primary: match[1] ?? text, note: match[2] ?? null }
+    : { primary: text, note: null };
 };
 
 const nearestInRow = (tabs: HTMLElement[], from: number, direction: 1 | -1) => {

@@ -380,7 +380,8 @@ const styles = stylex.create({
   },
 });
 
-const today = () => new Intl.DateTimeFormat("zh-CN", { dateStyle: "long" }).format(new Date());
+const ZH_DATE_FORMAT = new Intl.DateTimeFormat("zh-CN", { dateStyle: "long" });
+const today = () => ZH_DATE_FORMAT.format(new Date());
 
 export function LetterDialog({ subject, onClose }: DialogVariantProps) {
   const { closing, requestClose, dialogProps, panelProps } = useLabDialog(onClose);
