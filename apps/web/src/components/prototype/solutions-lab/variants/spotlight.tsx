@@ -3,16 +3,8 @@ import { m } from "motion/react";
 import { Fragment, useId, useRef, useState, type KeyboardEvent } from "react";
 
 import { useReducedMotion } from "../../use-reduced-motion";
-import {
-  AreaChips,
-  LabSection,
-  areaOf,
-  padIndex,
-  sheetRows,
-  useSolutionsBrowser,
-  type SheetRow,
-  type SolutionItem,
-} from "../kit";
+import { AreaChips, LabSection, useSolutionsBrowser } from "../kit";
+import { areaOf, padIndex, sheetRows, type SheetRow, type SolutionItem } from "../kit-values";
 import { bp, face, motion, tone } from "../tokens.stylex";
 
 const HEADER_OFFSET = 80;

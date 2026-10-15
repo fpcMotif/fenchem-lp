@@ -4,6 +4,7 @@ import { ArrowRight, ChevronDown, X } from "lucide-react";
 import { useId, useRef, useState, type SubmitEvent } from "react";
 
 import { color, ease, font } from "../../variant-oos1/tokens.stylex";
+import { useLabDialog } from "../kit";
 import {
   COMPANY,
   CONTACT_DETAILS,
@@ -11,10 +12,9 @@ import {
   SUBJECT_ROUTES,
   labStyles,
   subjectById,
-  useLabDialog,
   type DialogVariantProps,
   type InquirySubjectId,
-} from "../kit";
+} from "../kit-values";
 
 const BACKDROP = "rgba(6, 20, 44, 0.5)";
 const HAIRLINE = "rgba(26, 26, 26, 0.12)";

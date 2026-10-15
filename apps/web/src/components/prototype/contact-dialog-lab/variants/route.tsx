@@ -8,18 +8,17 @@ import { EASE } from "@/components/prototype/motion-constants";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
 import { color, ease, font } from "../../variant-oos1/tokens.stylex";
+import { Field, useLabDialog } from "../kit";
 import {
   COMPANY,
-  Field,
   INQUIRY_SUBJECTS,
   NEXT_STEPS,
   SUBJECT_ROUTES,
   labStyles,
   subjectById,
-  useLabDialog,
   type DialogVariantProps,
   type InquirySubjectId,
-} from "../kit";
+} from "../kit-values";
 
 const BACKDROP = "rgba(6, 20, 44, 0.5)";
 const HAIRLINE = "rgba(26, 26, 26, 0.12)";

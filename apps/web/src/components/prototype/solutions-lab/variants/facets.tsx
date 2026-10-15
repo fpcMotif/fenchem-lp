@@ -11,17 +11,15 @@ import {
   type KeyboardEvent,
 } from "react";
 
+import { AreaChips, LabSection, useSolutionsBrowser } from "../kit";
 import {
-  AreaChips,
-  LabSection,
   areaOf,
   padIndex,
   sheetRows,
-  useSolutionsBrowser,
   type AreaFilter,
   type SheetRow,
   type SolutionItem,
-} from "../kit";
+} from "../kit-values";
 import { bp, depth, face, motion, tone } from "../tokens.stylex";
 
 const WIDE_QUERY = "(min-width: 1024px)";

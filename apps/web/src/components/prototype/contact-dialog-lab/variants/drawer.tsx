@@ -4,20 +4,17 @@ import { Check, CheckCircle2, ChevronDown, Copy, X } from "lucide-react";
 import { useId, useRef, useState, type ReactNode, type SubmitEvent } from "react";
 
 import { color, font } from "../../variant-oos1/tokens.stylex";
+import { ContactIcon, Field, useCopy, useLabDialog } from "../kit";
 import {
   COMPANY,
   CONTACT_DETAILS,
-  ContactIcon,
-  Field,
   INQUIRY_SUBJECTS,
   NEXT_STEPS,
   labStyles,
   subjectById,
-  useCopy,
-  useLabDialog,
   type DialogVariantProps,
   type InquirySubjectId,
-} from "../kit";
+} from "../kit-values";
 
 const BACKDROP = "rgba(6, 20, 44, 0.32)";
 const EASE_DRAWER = "cubic-bezier(0.32, 0.72, 0, 1)";
