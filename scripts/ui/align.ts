@@ -1,26 +1,11 @@
 /// <reference lib="dom" />
 /// <reference lib="dom.iterable" />
 import { mkdirSync } from "node:fs";
-import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { parseArgs } from "node:util";
 
-import { chromium } from "@playwright/test";
-
-const USAGE = `Usage: bun scripts/center-audit.ts [url] [options]
-
-Draws a dotted center line, outlines every element whose center sits near it,
-and labels its offset from center (Δ) and its left/right distances (L/R).
-Single-line text is measured by its visible ink, not its layout box.
-
-  --widths 1440,1920   viewport widths to capture
-  --height 1000        viewport height
-  --tolerance 40       max |Δ| in px for an element to count as centered
-  --scroll-to bottom   "top", "bottom", or a CSS selector to scroll into view
-  --css "..."          extra CSS injected before measuring
-  --full               scroll the whole page, mark every section in one tall
-                       screenshot, and print only the off-center elements
-  --out DIR            screenshot folder (default: $TMPDIR/center-audit)`;
+import { problems, withPage } from "./browser";
+import { OUT_ROOT, fileKey, parseWidths, positiveInt, toTarget, type Command } from "./command";
 
 type Item = {
   n: number;
@@ -31,20 +16,6 @@ type Item = {
   delta: number;
   ink: boolean;
 };
-
-const { values, positionals } = parseArgs({
-  allowPositionals: true,
-  options: {
-    widths: { type: "string", default: "1440,1920" },
-    height: { type: "string", default: "1000" },
-    tolerance: { type: "string", default: "40" },
-    "scroll-to": { type: "string", default: "bottom" },
-    css: { type: "string", default: "" },
-    full: { type: "boolean", default: false },
-    out: { type: "string", default: join(tmpdir(), "center-audit") },
-    help: { type: "boolean", default: false },
-  },
-});
 
 function measureAndDraw({ tolerance, full }: { tolerance: number; full: boolean }): Item[] {
   const vw = document.documentElement.clientWidth;
@@ -270,56 +241,110 @@ function measureAndDraw({ tolerance, full }: { tolerance: number; full: boolean 
   });
 }
 
-if (values.help) {
-  console.log(USAGE);
-  process.exit(0);
-}
+export const align: Command = {
+  summary: "measure how far near-center elements sit off center",
+  usage: `Usage: bun run ui align <target...> [options]
 
-const url = positionals[0] ?? "http://localhost:3001/?variant=oos1&page=about";
-const widths = values.widths.split(",").map(Number);
-const height = Number(values.height);
-const tolerance = Number(values.tolerance);
-mkdirSync(values.out, { recursive: true });
+Draws a dotted center line, outlines every element whose center sits near it,
+and labels its offset from center (Δ) and its left/right distances (L/R).
+Single-line text is measured by its visible ink, not its layout box.
+Red when any near-center element is off center by 0.5px or more, or the page
+has errors or sideways overflow.
 
-const browser = await chromium.launch({ headless: true });
-try {
-  for (const width of widths) {
-    const context = await browser.newContext({
-      viewport: { width, height },
-      reducedMotion: "reduce",
+  --widths 1440,1920   viewport widths to capture
+  --height 1000        viewport height
+  --tolerance 40       max |Δ| in px for an element to count as centered
+  --scroll-to bottom   "top", "bottom", or a CSS selector to scroll into view
+  --css "..."          extra CSS injected before measuring
+  --full               scroll the whole page, mark every section in one tall
+                       screenshot, and print only the off-center elements
+  --out DIR            screenshot folder (default: .cache/ui/align)`,
+
+  plan(argv, origin) {
+    const { values, positionals } = parseArgs({
+      args: argv,
+      allowPositionals: true,
+      options: {
+        widths: { type: "string", default: "1440,1920" },
+        height: { type: "string", default: "1000" },
+        tolerance: { type: "string", default: "40" },
+        "scroll-to": { type: "string", default: "bottom" },
+        css: { type: "string", default: "" },
+        full: { type: "boolean", default: false },
+        out: { type: "string", default: join(OUT_ROOT, "align") },
+      },
     });
-    const page = await context.newPage();
-    await page.goto(url, { waitUntil: "networkidle" });
-    await page.addStyleTag({ content: `[data-mesurer-root]{display:none!important}${values.css}` });
-    await page.evaluate(() => document.fonts.ready);
-    if (values.full) {
-      await page.evaluate(async () => {
-        for (let y = 0; y < document.documentElement.scrollHeight; y += window.innerHeight * 0.8) {
-          window.scrollTo(0, y);
-          await new Promise((resolve) => setTimeout(resolve, 200));
+    if (positionals.length === 0) throw new Error("Name at least one target to measure.");
+    const height = positiveInt(values.height, "--height");
+    const tolerance = positiveInt(values.tolerance, "--tolerance");
+    const jobs = positionals.flatMap((label) =>
+      parseWidths(values.widths).map((width) => ({
+        target: toTarget(label, origin),
+        width,
+        file: join(values.out, `${fileKey(label)}-${width}.png`),
+      })),
+    );
+
+    return {
+      steps: jobs.map(
+        (job) =>
+          `measure ${job.target.url} at ${job.width}×${height} (${values.full ? "full page" : `scrolled to ${values["scroll-to"]}`}) → ${job.file}`,
+      ),
+      async run(browser) {
+        mkdirSync(values.out, { recursive: true });
+        const results = await Promise.all(
+          jobs.map((job) =>
+            withPage(
+              browser,
+              job.target.url,
+              { width: job.width, height },
+              values.css,
+              async ({ page, health, advance, scrollThrough, screenshot }) => {
+                if (values.full) await scrollThrough();
+                else {
+                  for (let pass = 0; pass < 2; pass++) {
+                    const found = await page.evaluate((target) => {
+                      if (target === "top") window.scrollTo(0, 0);
+                      else if (target === "bottom")
+                        window.scrollTo(0, document.documentElement.scrollHeight);
+                      else {
+                        const element = document.querySelector(target);
+                        if (!element) return false;
+                        element.scrollIntoView({ block: "center" });
+                      }
+                      return true;
+                    }, values["scroll-to"]);
+                    if (!found)
+                      throw new Error(`--scroll-to "${values["scroll-to"]}" matches nothing`);
+                    await advance();
+                  }
+                }
+                const pageHealth = await health();
+                const items = await page.evaluate(measureAndDraw, {
+                  tolerance,
+                  full: values.full,
+                });
+                await screenshot({ full: values.full, path: job.file });
+                return { job, items, found: problems(pageHealth) };
+              },
+            ),
+          ),
+        );
+
+        let red = false;
+        for (const { job, items, found } of results) {
+          const off = items.filter((item) => Math.abs(item.delta) >= 0.5);
+          red ||= off.length > 0 || found.length > 0;
+          console.log(
+            `\n${job.width}×${height}  ${job.target.label}  ${off.length || found.length ? "RED" : "ok"}`,
+          );
+          console.log(`  ${items.length} near-center elements, ${off.length} off center by ≥0.5px`);
+          for (const line of found) console.log(`  ${line}`);
+          console.log(`  file      ${job.file}`);
+          console.table(values.full ? off : items);
         }
-        window.scrollTo(0, 0);
-      });
-      await page.waitForTimeout(700);
-    } else {
-      for (let pass = 0; pass < 2; pass++) {
-        await page.evaluate((target) => {
-          if (target === "top") window.scrollTo(0, 0);
-          else if (target === "bottom") window.scrollTo(0, document.documentElement.scrollHeight);
-          else document.querySelector(target)?.scrollIntoView({ block: "center" });
-        }, values["scroll-to"]);
-        await page.waitForTimeout(700);
-      }
-    }
-    const items = await page.evaluate(measureAndDraw, { tolerance, full: values.full });
-    const off = items.filter((item) => Math.abs(item.delta) >= 0.5);
-    const file = join(values.out, `center-audit-${width}.png`);
-    await page.screenshot({ path: file, fullPage: values.full });
-    console.log(`\n${width}×${height}  ${file}`);
-    console.log(`${items.length} near-center elements, ${off.length} off center by ≥0.5px`);
-    console.table(values.full ? off : items);
-    await context.close();
-  }
-} finally {
-  await browser.close();
-}
+        return red;
+      },
+    };
+  },
+};

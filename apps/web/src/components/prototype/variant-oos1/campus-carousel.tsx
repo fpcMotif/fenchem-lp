@@ -1,6 +1,6 @@
 import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Pause, Play } from "lucide-react";
 import { useInView } from "motion/react";
 import {
   type KeyboardEvent,
@@ -10,6 +10,8 @@ import {
   useRef,
   useState,
 } from "react";
+
+import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
 import { CAMPUS_GALLERY } from "./campus-gallery";
 import { color, font } from "./tokens.stylex";
@@ -148,6 +150,35 @@ const styles = stylex.create({
     objectFit: "cover",
     objectPosition: "0% 50%",
   },
+  autoplayToggle: {
+    position: "absolute",
+    top: { default: 9, [DESKTOP]: 13 },
+    insetInlineEnd: { default: 9, [DESKTOP]: 13 },
+    zIndex: 101,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    width: 32,
+    height: 32,
+    padding: 0,
+    borderWidth: 0,
+    borderRadius: "50%",
+    backgroundColor: { default: "rgba(6, 28, 66, 0.42)", ":hover": "rgba(6, 28, 66, 0.6)" },
+    boxShadow: "0 0 0 1.5px rgba(255, 255, 255, 0.6)",
+    color: colors.paper,
+    cursor: "pointer",
+    transform: {
+      default: null,
+      ":active": { default: null, [breakpoints.motionOk]: "scale(0.96)" },
+    },
+    transitionProperty: "background-color, transform",
+    transitionDuration: "160ms",
+    transitionTimingFunction: SLIDE_EASE,
+    outlineStyle: { default: "none", ":focus-visible": "solid" },
+    outlineWidth: 2,
+    outlineColor: colors.paper,
+    outlineOffset: 2,
+  },
   controls: {
     display: "flex",
     alignItems: "center",
@@ -226,16 +257,19 @@ export function CampusCarousel({
 }) {
   const [position, setPosition] = useState(0);
   const [drag, setDrag] = useState<number | null>(null);
+  const [playChoice, setPlayChoice] = useState<boolean | null>(null);
   const regionRef = useRef<HTMLDivElement>(null);
   const slotRef = useRef<HTMLDivElement>(null);
   const gesture = useRef<Gesture | null>(null);
   const dragged = useRef(false);
   const wheel = useRef({ total: 0, lockedUntil: 0 });
   const approached = useInView(regionRef, { once: true, margin: "600px 0px" });
+  const reduceMotion = useReducedMotion();
 
   const active = wrapIndex(position);
   const current = CAMPUS_GALLERY[active];
-  const paused = pausedOutside || drag !== null;
+  const playing = playChoice ?? !reduceMotion;
+  const paused = pausedOutside || drag !== null || !playing;
   const step = (delta: number) => setPosition((value) => value + delta);
   const goTo = (index: number) => step(wrapOffset(index - active));
 
@@ -321,6 +355,18 @@ export function CampusCarousel({
         {...stylex.props(styles.stage)}
       >
         <div ref={slotRef} {...stylex.props(styles.slot)}>
+          <button
+            type="button"
+            aria-label={playing ? "Pause slideshow" : "Play slideshow"}
+            onClick={() => setPlayChoice(!playing)}
+            {...stylex.props(styles.autoplayToggle)}
+          >
+            {playing ? (
+              <Pause size={14} fill="currentColor" aria-hidden="true" />
+            ) : (
+              <Play size={14} fill="currentColor" aria-hidden="true" />
+            )}
+          </button>
           {CAMPUS_GALLERY.map((photo, index) => {
             const offset = wrapOffset(index - position - (drag ?? 0));
             const placed = poseAt(offset);

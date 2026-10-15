@@ -1,0 +1,9 @@
+{
+  "extends": "@fenchem-lp/config/tsconfig.base.json",
+  "include": ["*.ts"],
+  "compilerOptions": {
+    "lib": ["ESNext", "DOM", "DOM.Iterable"],
+    "types": ["node"],
+    "noEmit": true
+  }
+}

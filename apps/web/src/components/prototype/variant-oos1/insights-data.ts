@@ -24,10 +24,11 @@ export type InsightArticle = {
 };
 
 export const INSIGHTS_PAGE = {
-  eyebrow: "技术洞察",
-  tagline: "GLP-1时代的膳食纤维机会",
-  lead: "从饱腹管理到肠道健康支持，重新理解膳食纤维在营养中的价值",
-  meta: ["技术洞察 · 膳食纤维与体重管理"],
+  eyebrow: "Insights",
+  tagline: "Ingredient Science & Market Signals",
+  lead: "泛成技术团队对营养原料、配方趋势与市场变化的观察与解读。",
+  meta: ["Technical Insights", "Nutrition Trends"],
+  imageAlt: "身穿米白色毛衣的女士在明黄背景前闭眼微笑",
 };
 
 const GLP1_ARTICLE: InsightArticle = {
@@ -187,8 +188,8 @@ const GLP1_ARTICLE: InsightArticle = {
     },
     {
       slug: "outlook",
-      navLabel: "六　观点",
-      title: "六　观点",
+      navLabel: "六　结语",
+      title: "六　结语",
       blocks: [
         {
           kind: "paragraphs",
@@ -199,13 +200,8 @@ const GLP1_ARTICLE: InsightArticle = {
           ],
         },
         {
-          kind: "note",
-          label: "开发提示",
-          text: "适合进一步延展为“GLP-1伴随营养解决方案”专题页，并关联高蛋白高纤奶昔、肠道健康饮品及功能零食等应用方向。",
-        },
-        {
           kind: "disclaimer",
-          text: "说明：本文为官网技术洞察示范稿，不构成医疗建议或产品功效承诺。正式发布前，应结合目标市场法规、所用原料证据及最终配方进行合规审核。",
+          text: "本文仅供行业交流参考，不构成医疗建议或产品功效承诺。",
         },
       ],
     },
