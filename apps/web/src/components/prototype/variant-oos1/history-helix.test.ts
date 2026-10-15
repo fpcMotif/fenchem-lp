@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "vite-plus/test";
 
 import { ABOUT_HISTORY } from "./about-data";
 import { buildHelix, fractionAt, litCountAt, yearAt } from "./history-helix";

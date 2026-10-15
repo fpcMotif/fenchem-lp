@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "vite-plus/test";
 
 import { CATALOG_GROUPS, SOLUTION_ITEMS } from "../../products-data";
 import { FLAT_FORMULAS, FLAT_ITEMS, FORM_LABEL, FORMULA_TRAITS, ITEM_TRAITS } from "./derived";

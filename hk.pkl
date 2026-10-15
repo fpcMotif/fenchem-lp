@@ -8,7 +8,7 @@ steps {
   }
   ["fmt"] {
     glob = "*.{js,jsx,ts,tsx,mjs,cjs,mts,cts,json,jsonc,yaml,yml,md}"
-    check = "bun fmt --check {{files}}"
-    fix = "bun fmt {{files}}"
+    check = "bun oxfmt --check {{files}}"
+    fix = "bun oxfmt {{files}}"
   }
 }
