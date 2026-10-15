@@ -2,15 +2,8 @@ import * as stylex from "@stylexjs/stylex";
 import { useReducedMotion } from "motion/react";
 import { useEffect, useId, useRef, useSyncExternalStore, type KeyboardEvent } from "react";
 
-import {
-  AreaChips,
-  LabSection,
-  areaOf,
-  padIndex,
-  sheetRows,
-  useSolutionsBrowser,
-  type SheetRow,
-} from "../kit";
+import { AreaChips, LabSection, useSolutionsBrowser } from "../kit";
+import { areaOf, padIndex, sheetRows, type SheetRow } from "../kit-values";
 import { bp, depth, face, motion, tone } from "../tokens.stylex";
 
 const WIDE_QUERY = "(min-width: 1024px)";

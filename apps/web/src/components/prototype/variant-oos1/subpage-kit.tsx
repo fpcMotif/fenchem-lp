@@ -6,6 +6,7 @@ import { Fragment, useEffect, useMemo, useRef, type ReactNode } from "react";
 
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
+import { kitStyles } from "./subpage-kit-values";
 import { color, ease, font, layout, media, texture, zIndex } from "./tokens.stylex";
 import { useActiveSection } from "./use-active-section";
 
@@ -38,39 +39,6 @@ const scrollCue = stylex.keyframes({
 
 const dynamic = stylex.create({
   delay: (ms: number) => ({ transitionDelay: `${ms}ms` }),
-});
-
-export const kitStyles = stylex.create({
-  root: {
-    backgroundColor: colors.paper,
-    color: color.ink,
-    fontFamily: font.body,
-    minHeight: "100vh",
-  },
-  shell: {
-    width: "100%",
-    maxWidth: 1440,
-    marginInline: "auto",
-    boxSizing: "border-box",
-  },
-  inset120: {
-    paddingInline: { default: 16, [media.tablet]: 40, [DESKTOP]: layout.inset120 },
-  },
-  anchor: {
-    scrollMarginTop: `calc(${layout.headerHeight} + ${layout.subBarHeight} + 24px)`,
-  },
-  section: {
-    paddingBlock: { default: 72, [DESKTOP]: 112 },
-  },
-  sectionAlt: {
-    backgroundColor: "#f3f5fa",
-  },
-  focusRing: {
-    outlineStyle: { default: "none", ":focus-visible": "solid" },
-    outlineWidth: 2,
-    outlineColor: colors.brandBlue700,
-    outlineOffset: 2,
-  },
 });
 
 const styles = stylex.create({
