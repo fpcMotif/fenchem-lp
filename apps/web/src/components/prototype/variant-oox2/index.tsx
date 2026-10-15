@@ -1775,10 +1775,7 @@ function useRoute(rootRef: RefObject<HTMLDivElement | null>, enabled: boolean) {
   const [route, setRoute] = useState<Route | null>(null);
   useEffect(() => {
     const root = rootRef.current;
-    if (!root || !enabled) {
-      setRoute(null);
-      return;
-    }
+    if (!root || !enabled) return;
     let frame = 0;
     const measure = () => {
       frame = 0;
@@ -1797,7 +1794,7 @@ function useRoute(rootRef: RefObject<HTMLDivElement | null>, enabled: boolean) {
       if (frame) cancelAnimationFrame(frame);
     };
   }, [rootRef, enabled]);
-  return route;
+  return enabled ? route : null;
 }
 
 function RouteStroke({
