@@ -24,7 +24,7 @@ import {
   type SolutionAreaId,
   type SolutionItem,
 } from "./products-data";
-import { kitStyles } from "./subpage-kit";
+import { kitStyles } from "./subpage-kit-values";
 import { color, ease, font, layout, media } from "./tokens.stylex";
 
 type AreaFilter = SolutionAreaId | "all";

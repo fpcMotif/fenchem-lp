@@ -18,7 +18,8 @@ import {
   RD_TECH_STEPS,
   type PlatformItem,
 } from "./rd-data";
-import { Reveal, SectionHead, SubPageBanner, SubPageNav, kitStyles } from "./subpage-kit";
+import { Reveal, SectionHead, SubPageBanner, SubPageNav } from "./subpage-kit";
+import { kitStyles } from "./subpage-kit-values";
 import { color, ease, font, media, texture } from "./tokens.stylex";
 
 const HAIRLINE = "rgba(26, 26, 26, 0.14)";

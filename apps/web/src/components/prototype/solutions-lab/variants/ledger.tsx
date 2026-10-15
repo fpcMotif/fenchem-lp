@@ -6,16 +6,8 @@ import { flushSync } from "react-dom";
 
 import { Collapse } from "../../shared/collapse";
 import { useReducedMotion } from "../../use-reduced-motion";
-import {
-  AreaChips,
-  LabSection,
-  areaOf,
-  padIndex,
-  sheetRows,
-  useSolutionsBrowser,
-  type SheetRow,
-  type SolutionItem,
-} from "../kit";
+import { AreaChips, LabSection, useSolutionsBrowser } from "../kit";
+import { areaOf, padIndex, sheetRows, type SheetRow, type SolutionItem } from "../kit-values";
 import { bp, depth, face, motion, tone } from "../tokens.stylex";
 
 const EASE_OUT: [number, number, number, number] = [0.23, 1, 0.32, 1];

@@ -4,7 +4,7 @@ import { useEffect, useLayoutEffect, useRef, useState, type ComponentType } from
 import { createPortal } from "react-dom";
 
 import { VariantOOS1 } from "../variant-oos1/index";
-import { PickerHostContext, type DialogVariantProps, type InquirySubjectId } from "./kit";
+import { PickerHostContext, type DialogVariantProps, type InquirySubjectId } from "./kit-values";
 import { DrawerDialog } from "./variants/drawer";
 import { LetterDialog } from "./variants/letter";
 import { RouteDialog } from "./variants/route";

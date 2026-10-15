@@ -4,17 +4,15 @@ import { LayoutGroup, m } from "motion/react";
 import { useId, useRef, useState, type KeyboardEvent } from "react";
 
 import { useReducedMotion } from "../../use-reduced-motion";
+import { AreaChips, LabSection, useSolutionsBrowser } from "../kit";
 import {
-  AreaChips,
   LAB_SOLUTIONS,
-  LabSection,
   areaOf,
   padIndex,
   sheetRows,
-  useSolutionsBrowser,
   type SheetRow,
   type SolutionItem,
-} from "../kit";
+} from "../kit-values";
 import { bp, depth, face, motion, tone } from "../tokens.stylex";
 
 const EASE_OUT: [number, number, number, number] = [0.23, 1, 0.32, 1];

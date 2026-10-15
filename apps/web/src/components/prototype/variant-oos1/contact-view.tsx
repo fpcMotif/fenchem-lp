@@ -24,7 +24,8 @@ import {
   type InquirySubjectId,
 } from "./contact-data";
 import { RiseReveal } from "./rise-reveal";
-import { SubPageBanner, SubPageNav, kitStyles } from "./subpage-kit";
+import { SubPageBanner, SubPageNav } from "./subpage-kit";
+import { kitStyles } from "./subpage-kit-values";
 import { color, ease, font, layout, media } from "./tokens.stylex";
 
 const HAIRLINE = "rgba(26, 26, 26, 0.14)";

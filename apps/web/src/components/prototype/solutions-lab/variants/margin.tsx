@@ -2,16 +2,8 @@ import * as stylex from "@stylexjs/stylex";
 import { useEffect, useId, useRef, type KeyboardEvent } from "react";
 
 import { useReducedMotion } from "../../use-reduced-motion";
-import {
-  AreaChips,
-  LabSection,
-  areaOf,
-  padIndex,
-  sheetRows,
-  useSolutionsBrowser,
-  type SheetRow,
-  type SolutionItem,
-} from "../kit";
+import { AreaChips, LabSection, useSolutionsBrowser } from "../kit";
+import { areaOf, padIndex, sheetRows, type SheetRow, type SolutionItem } from "../kit-values";
 import { bp, face, motion, tone } from "../tokens.stylex";
 
 const TAB_STEPS: Record<string, (index: number, count: number) => number> = {
