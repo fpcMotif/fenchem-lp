@@ -213,6 +213,12 @@ export const VARIANTS: readonly VariantEntry[] = [
     () => import("./variant-oos1/products/oos1doubao/index").then((m) => m.VariantOOS1Doubao),
     "oos1",
   ),
+  page(
+    "oos1figma",
+    "O campus products · Figma per-tab hero + In fiber spotlight",
+    () => import("./variant-oos1/products/oos1figma/index").then((m) => m.VariantOOS1Figma),
+    "oos1",
+  ),
   ...PRODUCT_VARIANTS,
   page(
     "oos2",

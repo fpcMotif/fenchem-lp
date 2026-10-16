@@ -666,9 +666,11 @@ function useGeometry(
 export function HistoryTimeline({
   stickyTop,
   sx,
+  plain = false,
 }: {
   stickyTop: number;
   sx?: stylex.StyleXStyles;
+  plain?: boolean;
 }) {
   const sectionRef = useRef<HTMLElement>(null);
   const viewportRef = useRef<HTMLDivElement>(null);
@@ -751,15 +753,17 @@ export function HistoryTimeline({
       >
         <div ref={headerRef} {...stylex.props(styles.shell, styles.header)}>
           <RiseReveal>
-            <p lang="en" {...stylex.props(styles.eyebrow)}>
-              {ABOUT_HISTORY.eyebrow}
-            </p>
+            {plain ? null : (
+              <p lang="en" {...stylex.props(styles.eyebrow)}>
+                {ABOUT_HISTORY.eyebrow}
+              </p>
+            )}
             <h2 id="about-history-title" {...stylex.props(styles.title)}>
               {ABOUT_HISTORY.title}
             </h2>
             <p {...stylex.props(styles.caption)}>{ABOUT_HISTORY.caption}</p>
           </RiseReveal>
-          <Odometer year={year} />
+          {plain ? null : <Odometer year={year} />}
         </div>
 
         <div
@@ -819,7 +823,7 @@ export function HistoryTimeline({
                       )}
                     >
                       {milestone.year}
-                      {"kicker" in milestone ? (
+                      {"kicker" in milestone && !plain ? (
                         <span lang="en" {...stylex.props(styles.kicker)}>
                           {milestone.kicker}
                         </span>

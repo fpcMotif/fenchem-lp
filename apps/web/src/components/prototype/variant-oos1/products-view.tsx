@@ -3,11 +3,11 @@ import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 import { useSearch } from "@tanstack/react-router";
 import { ChevronRight } from "lucide-react";
-import { useState, type ComponentType } from "react";
+import { useState, type ComponentType, type ReactNode } from "react";
 
 import { ContactCta } from "./contact-cta";
 import { CTA, PRODUCTS_CTA_SUBTITLE } from "./content";
-import { CATEGORIES, FEATURED_PRODUCT } from "./products-data";
+import { CATEGORIES, FEATURED_PRODUCT, PRODUCTS_HERO_LEAD, type Category } from "./products-data";
 import { ProductCatalog, ProductSolutions } from "./products-sections";
 import { kitStyles } from "./subpage-kit";
 import { color, ease, font, layout, media, zIndex } from "./tokens.stylex";
@@ -15,6 +15,7 @@ import { color, ease, font, layout, media, zIndex } from "./tokens.stylex";
 const MUTED_LABEL = "#52525b";
 const PHOTO_OUTLINE = "rgba(0, 0, 0, 0.1)";
 const ACCENT = "#78598d";
+const HERO_LEAD = "#595959";
 
 const DESKTOP = breakpoints.xl;
 const LG = breakpoints.lg;
@@ -51,13 +52,24 @@ const styles = stylex.create({
     objectFit: "cover",
     objectPosition: "center 48%",
   },
-  srOnly: {
-    position: "absolute",
-    width: 1,
-    height: 1,
-    overflow: "hidden",
-    clipPath: "inset(50%)",
-    whiteSpace: "nowrap",
+  bannerContent: {
+    position: "relative",
+    paddingBottom: { default: 24, [breakpoints.md]: 40 },
+  },
+  bannerTitle: {
+    margin: 0,
+    fontSize: { default: 34, [breakpoints.md]: 48, [DESKTOP]: 60 },
+    fontWeight: 700,
+    lineHeight: 1.2,
+    letterSpacing: "0.072em",
+    color: color.ink,
+  },
+  bannerLead: {
+    margin: 0,
+    marginTop: { default: 8, [breakpoints.md]: 20 },
+    fontSize: { default: 15, [breakpoints.md]: 20 },
+    lineHeight: 1.53,
+    color: HERO_LEAD,
   },
 
   subBar: {
@@ -171,7 +183,7 @@ const styles = stylex.create({
     boxShadow: "0 4px 12px -2px rgba(29, 78, 216, 0.32)",
   },
   spotlightSection: {
-    paddingTop: { default: 24, [LG]: 16 },
+    paddingTop: { default: 48, [DESKTOP]: 128 },
     paddingBottom: { default: 72, [DESKTOP]: 128 },
   },
   spotlightGrid: {
@@ -190,7 +202,7 @@ const styles = stylex.create({
   spotlightBrand: {
     margin: 0,
     fontSize: { default: 36, [media.tablet]: 44, [DESKTOP]: 52 },
-    fontWeight: 400,
+    fontWeight: 700,
     lineHeight: 1.1,
     textWrap: "balance",
     color: ACCENT,
@@ -322,32 +334,42 @@ export function ProductsView({
   onNavigateHome,
   CatalogSection,
   SolutionsSection,
+  renderHero,
+  renderSpotlight,
 }: {
   onNavigateHome: (hash?: string) => void;
   CatalogSection?: ComponentType;
   SolutionsSection?: ComponentType;
+  renderHero?: (category: Category) => ReactNode;
+  renderSpotlight?: (category: Category) => ReactNode;
 }) {
   const [activeTab, setActiveTab] = useState<string>("personal-care");
   const [activeProductIndex, setActiveProductIndex] = useState<number>(0);
   const { compare } = useSearch({ strict: false });
+  const activeCategory = CATEGORIES.find((cat) => cat.id === activeTab) ?? CATEGORIES[0];
 
   return (
     <div id="products-top" lang="zh-CN" {...stylex.props(styles.root)}>
-      <section
-        aria-label="Products and applications panorama banner"
-        {...stylex.props(styles.bannerWrap)}
-      >
-        <h1 {...stylex.props(styles.srOnly)}>Products and applications</h1>
-        <figure {...stylex.props(styles.bannerFigure)}>
-          <img
-            src={FEATURED_PRODUCT.bannerImage}
-            alt="Panorama of Fenchem products and applications in their natural form"
-            fetchPriority="high"
-            decoding="async"
-            {...stylex.props(styles.bannerImg)}
-          />
-        </figure>
-      </section>
+      {renderHero?.(activeCategory) ?? (
+        <section
+          aria-label="Products and applications panorama banner"
+          {...stylex.props(styles.bannerWrap)}
+        >
+          <figure {...stylex.props(styles.bannerFigure)}>
+            <img
+              src={FEATURED_PRODUCT.bannerImage}
+              alt="Panorama of Fenchem products and applications in their natural form"
+              fetchPriority="high"
+              decoding="async"
+              {...stylex.props(styles.bannerImg)}
+            />
+          </figure>
+          <div {...stylex.props(kitStyles.shell, kitStyles.inset120, styles.bannerContent)}>
+            <h1 {...stylex.props(styles.bannerTitle)}>{activeCategory.label}</h1>
+            <p {...stylex.props(styles.bannerLead)}>{PRODUCTS_HERO_LEAD}</p>
+          </div>
+        </section>
+      )}
 
       <div {...stylex.props(styles.subBar)}>
         <div {...stylex.props(kitStyles.shell, kitStyles.inset120, styles.subBarInner)}>
@@ -383,61 +405,63 @@ export function ProductsView({
         </div>
       </div>
 
-      <section
-        aria-labelledby="spotlight-title"
-        {...stylex.props(kitStyles.shell, kitStyles.inset120, styles.spotlightSection)}
-      >
-        <div {...stylex.props(styles.spotlightGrid)}>
-          <div {...stylex.props(styles.spotlightText)}>
-            <h2 id="spotlight-title" {...stylex.props(styles.spotlightBrand)}>
-              {FEATURED_PRODUCT.brand}
-            </h2>
-            <p {...stylex.props(styles.spotlightTagline)}>{FEATURED_PRODUCT.tagline}</p>
-            <div {...stylex.props(styles.productList)}>
-              {FEATURED_PRODUCT.items.slice(0, 2).map((item, idx) => (
+      {renderSpotlight?.(activeCategory) ?? (
+        <section
+          aria-labelledby="spotlight-title"
+          {...stylex.props(kitStyles.shell, kitStyles.inset120, styles.spotlightSection)}
+        >
+          <div {...stylex.props(styles.spotlightGrid)}>
+            <div {...stylex.props(styles.spotlightText)}>
+              <h2 id="spotlight-title" {...stylex.props(styles.spotlightBrand)}>
+                {FEATURED_PRODUCT.brand}
+              </h2>
+              <p {...stylex.props(styles.spotlightTagline)}>{FEATURED_PRODUCT.tagline}</p>
+              <div {...stylex.props(styles.productList)}>
+                {FEATURED_PRODUCT.items.slice(0, 2).map((item, idx) => (
+                  <button
+                    key={item.id}
+                    type="button"
+                    aria-pressed={activeProductIndex === idx}
+                    onClick={() => setActiveProductIndex(idx)}
+                    onMouseEnter={() => setActiveProductIndex(idx)}
+                    {...stylex.props(
+                      styles.productText,
+                      activeProductIndex === idx && styles.productTextActive,
+                    )}
+                  >
+                    <span {...stylex.props(styles.cardBody)}>
+                      <span {...stylex.props(styles.cardName)}>{item.englishName}</span>
+                      <span {...stylex.props(styles.cardDesc)}>{item.desc}</span>
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div
+              role="group"
+              aria-label={`${FEATURED_PRODUCT.items.length} core oil ingredient cards`}
+              {...stylex.props(styles.spotlightCardsWrap)}
+            >
+              {FEATURED_PRODUCT.items.map((item, idx) => (
                 <button
                   key={item.id}
                   type="button"
                   aria-pressed={activeProductIndex === idx}
+                  aria-label={item.englishName}
                   onClick={() => setActiveProductIndex(idx)}
                   onMouseEnter={() => setActiveProductIndex(idx)}
                   {...stylex.props(
-                    styles.productText,
-                    activeProductIndex === idx && styles.productTextActive,
+                    styles.productCard,
+                    activeProductIndex === idx && styles.productCardActive,
                   )}
                 >
-                  <span {...stylex.props(styles.cardBody)}>
-                    <span {...stylex.props(styles.cardName)}>{item.englishName}</span>
-                    <span {...stylex.props(styles.cardDesc)}>{item.desc}</span>
-                  </span>
+                  <CardImage src={item.cardImage} alt={item.cardAlt} eager={idx < 3} />
                 </button>
               ))}
             </div>
           </div>
-          <div
-            role="group"
-            aria-label={`${FEATURED_PRODUCT.items.length} core oil ingredient cards`}
-            {...stylex.props(styles.spotlightCardsWrap)}
-          >
-            {FEATURED_PRODUCT.items.map((item, idx) => (
-              <button
-                key={item.id}
-                type="button"
-                aria-pressed={activeProductIndex === idx}
-                aria-label={item.englishName}
-                onClick={() => setActiveProductIndex(idx)}
-                onMouseEnter={() => setActiveProductIndex(idx)}
-                {...stylex.props(
-                  styles.productCard,
-                  activeProductIndex === idx && styles.productCardActive,
-                )}
-              >
-                <CardImage src={item.cardImage} alt={item.cardAlt} eager={idx < 3} />
-              </button>
-            ))}
-          </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {CatalogSection && compare !== "baseline" && compare !== "solutions" ? (
         <CatalogSection />

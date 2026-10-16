@@ -112,15 +112,11 @@ const styles = stylex.create({
     overflow: "hidden",
     display: "flex",
     alignItems: "flex-end",
-    height: { default: 440, [media.tablet]: 520, [DESKTOP]: "clamp(540px, 68svh, 660px)" },
+    boxSizing: "border-box",
+    minHeight: { default: 240, [breakpoints.md]: "clamp(300px, 31vw, 480px)" },
+    paddingTop: layout.headerHeight,
     backgroundColor: color.navyDeep,
     color: colors.paper,
-  },
-  bannerCompact: {
-    height: { default: 360, [media.tablet]: 420, [DESKTOP]: 460 },
-  },
-  bannerTall: {
-    height: { default: 480, [media.tablet]: 580, [DESKTOP]: "clamp(580px, 80svh, 720px)" },
   },
   bannerImage: {
     animationName: { default: null, [breakpoints.motionOk]: bannerSettle },
@@ -423,10 +419,7 @@ export function SubPageBanner({
   const compact = size === "compact";
   const tall = size === "tall";
   return (
-    <section
-      aria-labelledby={titleId}
-      {...stylex.props(styles.banner, compact && styles.bannerCompact, tall && styles.bannerTall)}
-    >
+    <section aria-labelledby={titleId} {...stylex.props(styles.banner)}>
       <img
         src={image}
         alt={imageAlt}

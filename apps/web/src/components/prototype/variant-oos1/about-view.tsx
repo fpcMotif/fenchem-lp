@@ -296,16 +296,20 @@ function SectionHeader({
   eyebrow,
   title,
   titleId,
+  sx,
 }: {
-  eyebrow: string;
+  eyebrow?: string;
   title: string;
   titleId: string;
+  sx?: stylex.StyleXStyles;
 }) {
   return (
-    <Reveal sx={styles.sectionHeader}>
-      <p lang="en" {...stylex.props(styles.sectionEyebrow)}>
-        {eyebrow}
-      </p>
+    <Reveal sx={[styles.sectionHeader, sx]}>
+      {eyebrow ? (
+        <p lang="en" {...stylex.props(styles.sectionEyebrow)}>
+          {eyebrow}
+        </p>
+      ) : null}
       <h2 id={titleId} {...stylex.props(styles.sectionTitle)}>
         {title}
       </h2>
@@ -400,7 +404,13 @@ function Lightbox({
   );
 }
 
-function CampusGallery() {
+export function CampusGallery({
+  showEyebrow = true,
+  headerSx,
+}: {
+  showEyebrow?: boolean;
+  headerSx?: stylex.StyleXStyles;
+}) {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const [stepped, setStepped] = useState(false);
   const count = CAMPUS_GALLERY.length;
@@ -417,9 +427,10 @@ function CampusGallery() {
     >
       <div {...stylex.props(kitStyles.shell, kitStyles.inset120)}>
         <SectionHeader
-          eyebrow={ABOUT_CAMPUS.eyebrow}
+          eyebrow={showEyebrow ? ABOUT_CAMPUS.eyebrow : undefined}
           title={ABOUT_CAMPUS.title}
           titleId="about-campus-title"
+          sx={headerSx}
         />
       </div>
       <CampusCarousel paused={openIndex !== null} onOpen={open} />

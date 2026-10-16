@@ -16,8 +16,8 @@ import { flushSync } from "react-dom";
 import { EASE } from "@/components/prototype/motion-constants";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 import {
-  CATALOG_GROUPS,
   CATEGORIES,
+  SHEET_CATALOG_GROUPS,
   SOLUTION_AREAS,
   SOLUTION_ITEMS,
   type CatalogGroup,
@@ -999,7 +999,7 @@ export function ProductCatalog({ categoryId }: { categoryId: string }) {
             <span {...stylex.props(styles.colName)}>原料分类</span>
           </div>
           <ul {...stylex.props(styles.ledger)}>
-            {CATALOG_GROUPS.map((group, index) => (
+            {SHEET_CATALOG_GROUPS.map((group, index) => (
               <LedgerRow
                 key={group.id}
                 group={group}
