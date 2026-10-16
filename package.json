@@ -13,7 +13,11 @@
       "react": "latest",
       "react-dom": "latest",
       "@types/react": "latest",
-      "@types/react-dom": "latest"
+      "@types/react-dom": "latest",
+      "vite": "npm:@voidzero-dev/vite-plus-core@1.2.0",
+      "vitest": "5.0.4",
+      "vite-plus": "1.2.0",
+      "@vitest/coverage-v8": "5.0.4"
     }
   },
   "type": "module",
@@ -26,12 +30,12 @@
     "qa:doctor": "bun --no-env-file tools/qa/run.mjs doctor",
     "dev": "vp run -r dev",
     "build": "vp run -r build",
-    "check-types": "bun check -b",
-    "typecheck": "bun check -b",
-    "check:lint": "oxlint && bun fmt && bun scripts/check-stylex-types.ts",
+    "check-types": "tsc -p packages/ui --noEmit && tsc -p apps/web",
+    "typecheck": "tsc -p packages/ui --noEmit && tsc -p apps/web",
+    "check:lint": "oxlint && oxfmt --check && bun scripts/check-stylex-types.ts",
     "check:stylex": "bun scripts/check-stylex-types.ts",
     "lint": "vp lint",
-    "format": "bun fmt",
+    "format": "oxfmt",
     "test": "vp run --filter web test",
     "test:coverage": "vp run --filter web test:coverage",
     "test:e2e": "vp run --filter web test:e2e",
@@ -54,27 +58,28 @@
     "@babel/parser": "^8.0.7",
     "@babel/traverse": "^8.0.7",
     "@babel/types": "^8.0.6",
-    "@cloudflare/workers-types": "^5.20261009.1",
+    "@cloudflare/workers-types": "^5.20261015.1",
     "@fenchem-lp/config": "workspace:*",
-    "@playwright/test": "^1.64.0",
-    "@types/node": "^26.6.4",
-    "@vitest/coverage-v8": "^5.0.3",
+    "@playwright/test": "^1.64.1",
+    "@types/node": "^26.6.5",
+    "@vitest/coverage-v8": "catalog:",
     "lightningcss": "^1.33.0",
-    "oxfmt": "^0.72.0",
-    "oxlint": "^1.87.0",
-    "oxlint-tsgolint": "^7.0.2003",
-    "react-doctor": "^0.9.17",
+    "oxfmt": "^0.73.0",
+    "oxlint": "^1.88.0",
+    "oxlint-tsgolint": "^7.0.2004",
+    "react-doctor": "^0.9.18",
     "rolldown": "1.2.13",
     "typescript": "next",
-    "vite-plus": "0.1.24",
-    "vitest": "npm:@voidzero-dev/vite-plus-test@0.1.24"
+    "vite": "catalog:",
+    "vite-plus": "catalog:",
+    "vitest": "catalog:"
   },
   "overrides": {
-    "vite": "npm:@voidzero-dev/vite-plus-core@0.1.24",
-    "vitest": "npm:@voidzero-dev/vite-plus-test@0.1.24"
+    "vite": "catalog:",
+    "vitest": "catalog:"
   },
   "packageManager": "bun@1.4.2",
   "patchedDependencies": {
-    "@stylexswc/unplugin@0.18.5": "patches/@stylexswc%2Funplugin@0.18.5.patch"
+    "@stylexswc/unplugin@0.19.1": "patches/@stylexswc%2Funplugin@0.19.1.patch"
   }
 }

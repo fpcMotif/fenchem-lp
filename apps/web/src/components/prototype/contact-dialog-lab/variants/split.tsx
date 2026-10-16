@@ -13,18 +13,15 @@ import {
 import { flushSync } from "react-dom";
 
 import { color, ease, font } from "../../variant-oos1/tokens.stylex";
+import { ContactIcon, Field, FieldError, useLabDialog } from "../kit";
 import {
   COMPANY,
   CONTACT_DETAILS,
-  ContactIcon,
-  Field,
-  FieldError,
   fieldAria,
   labStyles,
-  useLabDialog,
   type DialogVariantProps,
   type InquirySubjectId,
-} from "../kit";
+} from "../kit-values";
 
 const REQUEST_TYPES = [
   {
@@ -702,6 +699,8 @@ export function SplitDialog({ subject, onClose, state = "pristine" }: DialogVari
   );
   const doneTitleRef = useRef<HTMLHeadingElement>(null);
   const active = REQUEST_TYPES.find((type) => type.id === requestType) ?? REQUEST_TYPES[0];
+  const fixture = state === "long-text" ? LONG_TEXT_FIXTURE : undefined;
+  const invalidStyle = (name: string) => (errors[name] ? labStyles.inputInvalid : null);
 
   const handleSubmit = (event: SubmitEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -850,13 +849,8 @@ export function SplitDialog({ subject, onClose, state = "pristine" }: DialogVari
                       name="contactName"
                       required
                       autoComplete="name"
-                      defaultValue={
-                        state === "long-text" ? LONG_TEXT_FIXTURE.contactName : undefined
-                      }
-                      {...stylex.props(
-                        labStyles.input,
-                        errors.contactName ? labStyles.inputInvalid : null,
-                      )}
+                      defaultValue={fixture?.contactName}
+                      {...stylex.props(labStyles.input, invalidStyle("contactName"))}
                     />
                   </Field>
                   <Field id="split-company" label="公司或机构" required error={errors.company}>
@@ -865,11 +859,8 @@ export function SplitDialog({ subject, onClose, state = "pristine" }: DialogVari
                       name="company"
                       required
                       autoComplete="organization"
-                      defaultValue={state === "long-text" ? LONG_TEXT_FIXTURE.company : undefined}
-                      {...stylex.props(
-                        labStyles.input,
-                        errors.company ? labStyles.inputInvalid : null,
-                      )}
+                      defaultValue={fixture?.company}
+                      {...stylex.props(labStyles.input, invalidStyle("company"))}
                     />
                   </Field>
                   <Field id="split-phone" label="手机号" required error={errors.phone}>
@@ -880,12 +871,9 @@ export function SplitDialog({ subject, onClose, state = "pristine" }: DialogVari
                       required
                       autoComplete="tel"
                       inputMode="tel"
-                      defaultValue={state === "long-text" ? LONG_TEXT_FIXTURE.phone : undefined}
+                      defaultValue={fixture?.phone}
                       {...fieldAria("split-phone", errors.phone)}
-                      {...stylex.props(
-                        labStyles.input,
-                        errors.phone ? labStyles.inputInvalid : null,
-                      )}
+                      {...stylex.props(labStyles.input, invalidStyle("phone"))}
                     />
                   </Field>
                   <Field id="split-email" label="工作邮箱" required error={errors.email}>
@@ -897,12 +885,9 @@ export function SplitDialog({ subject, onClose, state = "pristine" }: DialogVari
                       autoComplete="email"
                       spellCheck={false}
                       placeholder="name@company.com"
-                      defaultValue={state === "long-text" ? LONG_TEXT_FIXTURE.email : undefined}
+                      defaultValue={fixture?.email}
                       {...fieldAria("split-email", errors.email)}
-                      {...stylex.props(
-                        labStyles.input,
-                        errors.email ? labStyles.inputInvalid : null,
-                      )}
+                      {...stylex.props(labStyles.input, invalidStyle("email"))}
                     />
                   </Field>
                   <Field
@@ -917,11 +902,11 @@ export function SplitDialog({ subject, onClose, state = "pristine" }: DialogVari
                       name="message"
                       required
                       placeholder={active.placeholder}
-                      defaultValue={state === "long-text" ? LONG_TEXT_FIXTURE.message : undefined}
+                      defaultValue={fixture?.message}
                       {...stylex.props(
                         labStyles.input,
                         labStyles.textarea,
-                        errors.message ? labStyles.inputInvalid : null,
+                        invalidStyle("message"),
                       )}
                     />
                   </Field>
@@ -935,7 +920,7 @@ export function SplitDialog({ subject, onClose, state = "pristine" }: DialogVari
                       type="checkbox"
                       name="consent"
                       required
-                      defaultChecked={state === "long-text" ? true : undefined}
+                      defaultChecked={fixture !== undefined}
                       {...fieldAria("split-consent", errors.consent)}
                       {...stylex.props(labStyles.checkbox)}
                     />

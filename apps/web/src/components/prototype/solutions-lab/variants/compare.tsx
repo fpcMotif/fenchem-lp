@@ -2,16 +2,8 @@ import * as stylex from "@stylexjs/stylex";
 import { AnimatePresence, m } from "motion/react";
 import { useEffect, useId, useRef, useState, type KeyboardEvent } from "react";
 
-import {
-  AreaChips,
-  LabSection,
-  areaOf,
-  padIndex,
-  sheetRows,
-  useSolutionsBrowser,
-  type SheetRow,
-  type SolutionItem,
-} from "../kit";
+import { AreaChips, LabSection, useSolutionsBrowser } from "../kit";
+import { areaOf, padIndex, sheetRows, type SheetRow, type SolutionItem } from "../kit-values";
 import { bp, depth, face, motion, tone } from "../tokens.stylex";
 
 const EASE_OUT = [0.23, 1, 0.32, 1] as const;

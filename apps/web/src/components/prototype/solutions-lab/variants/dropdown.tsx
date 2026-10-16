@@ -10,15 +10,8 @@ import {
   type KeyboardEvent,
 } from "react";
 
-import {
-  LabSection,
-  areaOf,
-  padIndex,
-  sheetRows,
-  useSolutionsBrowser,
-  type SheetRow,
-  type SolutionsBrowser,
-} from "../kit";
+import { LabSection, useSolutionsBrowser, type SolutionsBrowser } from "../kit";
+import { areaOf, padIndex, sheetRows, type SheetRow } from "../kit-values";
 import { bp, depth, face, motion, tone } from "../tokens.stylex";
 
 const WIDE_QUERY = "(min-width: 1024px)";

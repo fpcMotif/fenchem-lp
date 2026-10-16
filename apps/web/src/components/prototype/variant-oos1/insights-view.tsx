@@ -1,12 +1,11 @@
+import { Collapse } from "../shared/collapse";
 import { Flow } from "../shared/flow";
 import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 import { ChevronDown } from "lucide-react";
-import { AnimatePresence, m } from "motion/react";
 import { useState } from "react";
 
 import { EASE } from "@/components/prototype/motion-constants";
-import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
 import { ContactCta } from "./contact-cta";
 import {
@@ -16,12 +15,16 @@ import {
   type InsightBlock,
   type InsightSection,
 } from "./insights-data";
-import { SubPageBanner, SubPageNav, kitStyles } from "./subpage-kit";
+import { SubPageBanner, SubPageNav } from "./subpage-kit";
+import { kitStyles } from "./subpage-kit-values";
 import { color, ease, media } from "./tokens.stylex";
 
 const HAIRLINE = "rgba(26, 26, 26, 0.12)";
 const SURFACE_ALT = "#f3f5fa";
 const DESKTOP = breakpoints.xl;
+const ARTICLE_GAP = 22;
+const ARTICLE_GAP_DESKTOP = 26;
+const BODY_RULE_OFFSET = 8;
 
 const styles = stylex.create({
   pageSection: {
@@ -33,7 +36,7 @@ const styles = stylex.create({
     marginInline: "auto",
     display: "flex",
     flexDirection: "column",
-    gap: { default: 22, [DESKTOP]: 26 },
+    gap: { default: ARTICLE_GAP, [DESKTOP]: ARTICLE_GAP_DESKTOP },
   },
   moreList: {
     maxWidth: 800,
@@ -218,18 +221,21 @@ const styles = stylex.create({
     transform: "rotate(180deg)",
   },
 
-  expandedWrap: {
-    overflow: "hidden",
-  },
   expandedInner: {
     display: "flex",
     flexDirection: "column",
     gap: { default: 44, [DESKTOP]: 56 },
     paddingTop: { default: 32, [DESKTOP]: 44 },
-    marginTop: 8,
+    marginTop: BODY_RULE_OFFSET,
     borderTopWidth: 1,
     borderTopStyle: "solid",
     borderTopColor: HAIRLINE,
+  },
+  expandedInnerFeatured: {
+    marginTop: {
+      default: ARTICLE_GAP + BODY_RULE_OFFSET,
+      [DESKTOP]: ARTICLE_GAP_DESKTOP + BODY_RULE_OFFSET,
+    },
   },
   chapterSection: {
     display: "flex",
@@ -318,6 +324,20 @@ const articleAnchor = (article: InsightArticle) => `${article.id}-article`;
 const sectionAnchor = (article: InsightArticle, section: InsightSection) =>
   `${article.id}-${section.slug}`;
 
+const blockKey = (block: InsightBlock) => {
+  switch (block.kind) {
+    case "paragraphs":
+    case "bullets":
+      return `${block.kind}-${block.items[0]}`;
+    case "terms":
+      return `terms-${block.items[0]?.term}`;
+    case "note":
+      return `note-${block.label}`;
+    case "disclaimer":
+      return `disclaimer-${block.text}`;
+  }
+};
+
 function navChips(articles: readonly InsightArticle[], openId: string | null) {
   if (articles.length !== 1) {
     return articles.map((article) => ({
@@ -370,23 +390,26 @@ export function InsightsView({ onNavigateHome }: { onNavigateHome: (target?: str
             />
           ) : null}
           {more.length > 0 ? (
-            <div {...stylex.props(styles.moreList, more.length === 1 && styles.moreListSingle)}>
-              {more.length > 1 ? (
-                <div {...stylex.props(styles.moreHeader)}>
-                  <p {...stylex.props(styles.moreLabel)}>更多洞察</p>
-                  <p {...stylex.props(styles.moreCount)}>{`共 ${more.length} 篇`}</p>
-                </div>
-              ) : null}
-              {more.map((article) => (
-                <InsightArticleView
-                  key={article.id}
-                  article={article}
-                  featured={false}
-                  open={openId === article.id}
-                  onToggle={() => toggleArticle(article.id)}
-                />
-              ))}
-            </div>
+            <Flow>
+              <div {...stylex.props(styles.moreList, more.length === 1 && styles.moreListSingle)}>
+                {more.length > 1 ? (
+                  <div {...stylex.props(styles.moreHeader)}>
+                    <p {...stylex.props(styles.moreLabel)}>更多洞察</p>
+                    <p {...stylex.props(styles.moreCount)}>{`共 ${more.length} 篇`}</p>
+                  </div>
+                ) : null}
+                {more.map((article) => (
+                  <Flow key={article.id}>
+                    <InsightArticleView
+                      article={article}
+                      featured={false}
+                      open={openId === article.id}
+                      onToggle={() => toggleArticle(article.id)}
+                    />
+                  </Flow>
+                ))}
+              </div>
+            </Flow>
           ) : null}
         </div>
       </div>
@@ -414,15 +437,71 @@ function InsightArticleView({
   open: boolean;
   onToggle: () => void;
 }) {
-  const reduce = useReducedMotion();
   const titleId = `${article.id}-article-title`;
   const bodyId = `${article.id}-full-article`;
-
   const toggleButton = (
+    <ArticleToggle open={open} featured={featured} controls={bodyId} onToggle={onToggle} />
+  );
+  const body = <ArticleBody id={bodyId} article={article} featured={featured} open={open} />;
+
+  return (
+    <article
+      id={articleAnchor(article)}
+      aria-labelledby={titleId}
+      {...stylex.props(featured ? styles.article : styles.compactArticle, kitStyles.anchor)}
+    >
+      {featured ? (
+        <>
+          <p {...stylex.props(styles.docCategory)}>{article.category}</p>
+
+          <h2 id={titleId} {...stylex.props(styles.docTitle)}>
+            {article.title}
+          </h2>
+
+          {article.lead ? <p {...stylex.props(styles.docSubtitle)}>{article.lead}</p> : null}
+
+          <ArticlePreview article={article} />
+
+          <div>
+            <div {...stylex.props(styles.expandRow)}>{toggleButton}</div>
+            {body}
+          </div>
+        </>
+      ) : (
+        <>
+          <div {...stylex.props(styles.compactHead)}>
+            <div {...stylex.props(styles.compactText)}>
+              <p {...stylex.props(styles.docCategory)}>{article.category}</p>
+              <h2 id={titleId} {...stylex.props(styles.compactTitle)}>
+                {article.title}
+              </h2>
+              {article.lead ? <p {...stylex.props(styles.compactLead)}>{article.lead}</p> : null}
+            </div>
+            {toggleButton}
+          </div>
+          {body}
+        </>
+      )}
+    </article>
+  );
+}
+
+function ArticleToggle({
+  open,
+  featured,
+  controls,
+  onToggle,
+}: {
+  open: boolean;
+  featured: boolean;
+  controls: string;
+  onToggle: () => void;
+}) {
+  return (
     <button
       type="button"
       aria-expanded={open}
-      aria-controls={bodyId}
+      aria-controls={controls}
       onClick={onToggle}
       {...stylex.props(
         styles.expandButton,
@@ -439,8 +518,10 @@ function InsightArticleView({
       />
     </button>
   );
+}
 
-  const preview = (
+function ArticlePreview({ article }: { article: InsightArticle }) {
+  return (
     <>
       {article.thesis ? (
         <div {...stylex.props(styles.coreViewBox)}>
@@ -467,65 +548,36 @@ function InsightArticleView({
       </div>
     </>
   );
+}
 
+function ArticleBody({
+  id,
+  article,
+  featured,
+  open,
+}: {
+  id: string;
+  article: InsightArticle;
+  featured: boolean;
+  open: boolean;
+}) {
   return (
-    <article
-      id={articleAnchor(article)}
-      aria-labelledby={titleId}
-      {...stylex.props(featured ? styles.article : styles.compactArticle, kitStyles.anchor)}
-    >
-      {featured ? (
-        <>
-          <p {...stylex.props(styles.docCategory)}>{article.category}</p>
-
-          <h2 id={titleId} {...stylex.props(styles.docTitle)}>
-            {article.title}
-          </h2>
-
-          {article.lead ? <p {...stylex.props(styles.docSubtitle)}>{article.lead}</p> : null}
-
-          {preview}
-
-          <div {...stylex.props(styles.expandRow)}>{toggleButton}</div>
-        </>
-      ) : (
-        <div {...stylex.props(styles.compactHead)}>
-          <div {...stylex.props(styles.compactText)}>
-            <p {...stylex.props(styles.docCategory)}>{article.category}</p>
-            <h2 id={titleId} {...stylex.props(styles.compactTitle)}>
-              {article.title}
-            </h2>
-            {article.lead ? <p {...stylex.props(styles.compactLead)}>{article.lead}</p> : null}
-          </div>
-          {toggleButton}
+    <Collapse id={id} open={open} transition={{ duration: 0.26, ease: EASE }}>
+      {featured ? null : (
+        <div {...stylex.props(styles.compactPreview)}>
+          <ArticlePreview article={article} />
         </div>
       )}
-
-      <AnimatePresence initial={false}>
-        {open ? (
-          <m.div
-            id={bodyId}
-            key={bodyId}
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: reduce ? 0.15 : 0.4, ease: EASE }}
-            {...stylex.props(styles.expandedWrap)}
-          >
-            {featured ? null : <div {...stylex.props(styles.compactPreview)}>{preview}</div>}
-            <div {...stylex.props(styles.expandedInner)}>
-              {article.sections.map((section) => (
-                <InsightSectionView
-                  key={section.slug}
-                  id={sectionAnchor(article, section)}
-                  section={section}
-                />
-              ))}
-            </div>
-          </m.div>
-        ) : null}
-      </AnimatePresence>
-    </article>
+      <div {...stylex.props(styles.expandedInner, featured && styles.expandedInnerFeatured)}>
+        {article.sections.map((section) => (
+          <InsightSectionView
+            key={section.slug}
+            id={sectionAnchor(article, section)}
+            section={section}
+          />
+        ))}
+      </div>
+    </Collapse>
   );
 }
 
@@ -540,8 +592,8 @@ function InsightSectionView({ id, section }: { id: string; section: InsightSecti
       <h3 id={titleId} {...stylex.props(styles.chapterHeading)}>
         {section.title}
       </h3>
-      {section.blocks.map((block, index) => (
-        <InsightBlockView key={`${block.kind}-${index}`} block={block} />
+      {section.blocks.map((block) => (
+        <InsightBlockView key={blockKey(block)} block={block} />
       ))}
     </section>
   );

@@ -1,6 +1,6 @@
 import { act, renderHook } from "@testing-library/react";
 import { renderToString } from "react-dom/server";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vite-plus/test";
 
 import { useCountUp } from "./use-count-up";
 

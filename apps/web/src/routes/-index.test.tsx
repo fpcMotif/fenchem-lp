@@ -1,5 +1,5 @@
 import { configure, fireEvent, render, waitFor } from "@testing-library/react";
-import { describe, expect, test, vi } from "vitest";
+import { describe, expect, test, vi } from "vite-plus/test";
 
 import { DEFAULT_VARIANT } from "@/components/prototype/variants";
 import { Route } from "./index";

@@ -1,0 +1,36 @@
+diff --git a/dist/src-BLaGO9Cq.js b/dist/src-BLaGO9Cq.js
+index 209daaa12dc3fb45035d765c68b922d81d137e67..c4b87a5329ef6e023d0d0b7785eddfca2245d194 100644
+--- a/dist/src-BLaGO9Cq.js
++++ b/dist/src-BLaGO9Cq.js
+@@ -1155,6 +1155,13 @@ const unpluginFactory = (options = {}, meta) => {
+ 				});
+ 			},
+ 			configureServer(server) {
++				// PATCH(fenchem-lp): arm the dev CSS middleware and HMR channel here.
++				// Upstream arms both in transformIndexHtml, which SSR frameworks
++				// (TanStack Start) never invoke — without this the middleware
++				// falls through and the framework router answers /stylex.css
++				// with HTML.
++				wsSend || (wsSend = server.ws.send.bind(server.ws));
++				cssFileName || (cssFileName = ensureLeadingSlash(normalizedOptions.fileName));
+ 				if (cssRefreshTimer) {
+ 					clearTimeout(cssRefreshTimer);
+ 					cssRefreshTimer = null;
+diff --git a/dist/src-uRqb_32Q.cjs b/dist/src-uRqb_32Q.cjs
+index ee9b28d627e332bb2a5ba03026b43d0192efb0d6..c0c07a38edc6a3767ac49566153ce47a49c73f22 100644
+--- a/dist/src-uRqb_32Q.cjs
++++ b/dist/src-uRqb_32Q.cjs
+@@ -1180,6 +1180,13 @@ const unpluginFactory = (options = {}, meta) => {
+ 				});
+ 			},
+ 			configureServer(server) {
++				// PATCH(fenchem-lp): arm the dev CSS middleware and HMR channel here.
++				// Upstream arms both in transformIndexHtml, which SSR frameworks
++				// (TanStack Start) never invoke — without this the middleware
++				// falls through and the framework router answers /stylex.css
++				// with HTML.
++				wsSend || (wsSend = server.ws.send.bind(server.ws));
++				cssFileName || (cssFileName = ensureLeadingSlash(normalizedOptions.fileName));
+ 				if (cssRefreshTimer) {
+ 					clearTimeout(cssRefreshTimer);
+ 					cssRefreshTimer = null;

@@ -4,7 +4,7 @@ import { cloudflare } from "@cloudflare/vite-plugin";
 import stylexRs from "@stylexswc/unplugin/vite";
 import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 import viteReact from "@vitejs/plugin-react";
-import { defineConfig } from "vite";
+import { defineConfig } from "vite-plus";
 
 export default defineConfig({
   server: {
@@ -30,7 +30,6 @@ export default defineConfig({
         runtimeInjection: false,
         enableInlinedConditionalMerge: true,
         treeshakeCompensation: true,
-        enableDebugClassNames: false,
         enableDevClassNames: false,
         unstable_moduleResolution: {
           type: "commonJS",

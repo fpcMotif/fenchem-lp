@@ -9,7 +9,7 @@ import { ContactCta } from "./contact-cta";
 import { CTA, PRODUCTS_CTA_SUBTITLE } from "./content";
 import { CATEGORIES, FEATURED_PRODUCT } from "./products-data";
 import { ProductCatalog, ProductSolutions } from "./products-sections";
-import { kitStyles } from "./subpage-kit";
+import { kitStyles } from "./subpage-kit-values";
 import { color, ease, font, layout, media, zIndex } from "./tokens.stylex";
 
 const MUTED_LABEL = "#52525b";

@@ -2339,6 +2339,19 @@ const viewFromPage = (page: unknown, startView: View): View => {
   return startView;
 };
 
+const SUB_PAGE_EXITS: Record<View, readonly View[]> = {
+  home: [],
+  about: ["products"],
+  products: [],
+  rd: ["contact"],
+  insights: ["contact", "products"],
+  news: ["contact"],
+  contact: [],
+};
+
+const exitView = (from: View, target?: string): View =>
+  SUB_PAGE_EXITS[from].find((exit) => exit === target) ?? "home";
+
 export function VariantOOS1({
   AboutPage = AboutView,
   ProductsPage = ProductsView,
@@ -2398,6 +2411,16 @@ export function VariantOOS1({
       }
     }
   };
+  const leaveSubPage = (target?: string) => handleNavigate(exitView(view, target), target);
+  const subPages: Record<Exclude<View, "home">, ComponentType<SubPageProps>> = {
+    about: AboutPage,
+    products: ProductsPage,
+    rd: RdPage,
+    insights: InsightsPage,
+    news: NewsPage,
+    contact: ContactPage,
+  };
+  const SubPage = view === "home" ? null : subPages[view];
 
   useEffect(() => {
     const onPopState = () => {
@@ -2423,41 +2446,8 @@ export function VariantOOS1({
             />
             <div {...stylex.props(styles.page, intro === "play" && introStyles.pageReveal)}>
               <main id="main-content" tabIndex={-1} {...stylex.props(styles.mainTarget)}>
-                {view === "about" ? (
-                  <AboutPage
-                    onNavigateHome={(target) =>
-                      handleNavigate(target === "products" ? "products" : "home", target)
-                    }
-                  />
-                ) : view === "products" ? (
-                  <ProductsPage onNavigateHome={(target) => handleNavigate("home", target)} />
-                ) : view === "rd" ? (
-                  <RdPage
-                    onNavigateHome={(target) =>
-                      handleNavigate(target === "contact" ? "contact" : "home", target)
-                    }
-                  />
-                ) : view === "insights" ? (
-                  <InsightsPage
-                    onNavigateHome={(target) =>
-                      handleNavigate(
-                        target === "contact"
-                          ? "contact"
-                          : target === "products"
-                            ? "products"
-                            : "home",
-                        target,
-                      )
-                    }
-                  />
-                ) : view === "news" ? (
-                  <NewsPage
-                    onNavigateHome={(target) =>
-                      handleNavigate(target === "contact" ? "contact" : "home", target)
-                    }
-                  />
-                ) : view === "contact" ? (
-                  <ContactPage onNavigateHome={(target) => handleNavigate("home", target)} />
+                {SubPage ? (
+                  <SubPage onNavigateHome={leaveSubPage} />
                 ) : (
                   <>
                     <Hero onOpenContactDialog={() => setContactModalOpen(true)} />

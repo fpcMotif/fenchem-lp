@@ -2,7 +2,7 @@ import { fileURLToPath } from "node:url";
 
 import stylexRs from "@stylexswc/unplugin/vite";
 import viteReact from "@vitejs/plugin-react";
-import { defineConfig } from "vitest/config";
+import { defineConfig } from "vite-plus";
 
 const appSrc = fileURLToPath(new URL("./src", import.meta.url));
 const uiSrc = fileURLToPath(new URL("../../packages/ui/src", import.meta.url));

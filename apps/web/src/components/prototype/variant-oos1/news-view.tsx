@@ -14,7 +14,8 @@ import {
   UPCOMING_EVENTS,
   type NewsItem,
 } from "./news-data";
-import { SubPageBanner, SubPageNav, kitStyles } from "./subpage-kit";
+import { SubPageBanner, SubPageNav } from "./subpage-kit";
+import { kitStyles } from "./subpage-kit-values";
 import { color } from "./tokens.stylex";
 
 const MUTED_LABEL = "#64748b";
