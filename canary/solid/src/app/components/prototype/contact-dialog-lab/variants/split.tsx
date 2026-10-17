@@ -835,7 +835,7 @@ export function SplitDialog(props: DialogVariantProps) {
             <form
               novalidate
               onSubmit={handleSubmit}
-              onChange={updateError}
+              onInput={updateError}
               {...stylex.props(styles.form)}
             >
               <div {...stylex.props(styles.formBody)}>

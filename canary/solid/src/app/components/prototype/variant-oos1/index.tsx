@@ -8,7 +8,7 @@ import {
 import { CorporateHeaderActions, CampusStatistic } from "../shared/navigation-and-headline";
 import { CorporateNews } from "../shared/corporate-sections";
 import { Flow } from "../shared/flow";
-import { LayoutGroup } from "motion/react";
+import { LayoutGroup } from "../../../../compat/motion";
 import { FooterLegal } from "../shared/footer-content";
 import { NewsAccordion } from "../shared/news-accordion";
 import { ProductSummary } from "../shared/product-summary";
@@ -16,8 +16,9 @@ import { SplitDialog } from "../contact-dialog-lab/variants/split";
 import { breakpoints, colors } from "../../../ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 import type { StyleXStyles } from "@stylexjs/stylex";
-import { useSearch } from "@tanstack/react-router";
-import { Globe, Lightbulb, Plus, Shield, Users, type LucideIcon } from "lucide-react";
+import { useSearch } from "../../../../compat/router";
+import { Globe, Lightbulb, Plus, Shield, Users } from "lucide-solid";
+import type { LucideIcon } from "../../../../compat/lucide";
 import {
   AnimatePresence,
   LazyMotion,
@@ -28,21 +29,25 @@ import {
   useScroll,
   useTransform,
   type MotionValue,
-} from "motion/react";
+} from "../../../../compat/motion";
+import { createMediaQuery } from "../../../../compat/reduced-motion";
 import {
-  Fragment,
-  useEffect,
-  useId,
-  useRef,
-  useState,
-  useSyncExternalStore,
-  type ComponentType,
-  type CSSProperties,
-  type KeyboardEvent,
-  type ReactNode,
-  type RefObject,
-} from "react";
-import { preinit } from "react-dom";
+  createEffect,
+  createSignal,
+  createUniqueId,
+  For,
+  Match,
+  mergeProps,
+  on,
+  onCleanup,
+  onMount,
+  Show,
+  Switch,
+  type Accessor,
+  type Component,
+  type JSX,
+} from "solid-js";
+import { Dynamic } from "solid-js/web";
 
 import { EASE } from "../motion-constants";
 
@@ -82,9 +87,6 @@ import {
   type StrengthIcon,
   type StrengthTone,
 } from "./content";
-
-const GOOGLE_FONTS =
-  "https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter+Tight:ital,wght@0,500;0,800;1,500&family=Noto+Sans+SC:wght@400;500;700;900&display=swap";
 
 const TINT = "#e6ecf7";
 const DISPLAY_FONT =
@@ -130,18 +132,8 @@ const QUADRANT_DIRECTIONS = [
 const RING_RADIUS = 62;
 const RING_LENGTH = Math.round(2 * Math.PI * RING_RADIUS);
 
-const subscribeQuadrants = (onChange: () => void) => {
-  const media = window.matchMedia(QUADRANT_QUERY);
-  media.addEventListener("change", onChange);
-  return () => media.removeEventListener("change", onChange);
-};
-
 function useQuadrantMotion() {
-  return useSyncExternalStore(
-    subscribeQuadrants,
-    () => window.matchMedia(QUADRANT_QUERY).matches,
-    () => false,
-  );
+  return createMediaQuery(QUADRANT_QUERY);
 }
 
 const RISE_STAGGER = 0.06;
@@ -255,6 +247,11 @@ const PATTERN_TILE = {
     [32.75, 32.5],
   ],
 } as const;
+
+// stylex.props with reactive (accessor) arguments: the StyleX compiler tries to
+// evaluate local arrow functions at build time and throws, so these call sites
+// resolve at runtime instead.
+const sxProps = (...args: Parameters<typeof stylex.props>) => stylex.props(...args);
 
 const styles = stylex.create({
   root: {
@@ -1446,7 +1443,7 @@ const SETTLED = "translateY(0px) scale(1)";
 const zoomFrom = (y: number, scale: number) => `translateY(${y}px) scale(${scale})`;
 
 type ZoomProps = {
-  children: ReactNode;
+  children: JSX.Element;
   sx?: StyleXStyles;
   style?: StyleXStyles;
   delay?: number;
@@ -1454,67 +1451,54 @@ type ZoomProps = {
   scale?: number;
 };
 
-function ZoomReveal({
-  children,
-  sx,
-  style,
-  delay = 0,
-  y = 24,
-  scale = ZOOM_FROM_SCALE,
-}: ZoomProps) {
+function ZoomReveal(props: ZoomProps) {
+  const p = mergeProps({ delay: 0, y: 24, scale: ZOOM_FROM_SCALE }, props);
   const reduce = useReducedMotion();
   return (
     <m.div
-      {...stylex.props(sx, style)}
-      initial={{ opacity: 0, transform: zoomFrom(y, scale) }}
+      {...stylex.props(p.sx, p.style)}
+      initial={{ opacity: 0, transform: zoomFrom(p.y, p.scale) }}
       whileInView={{ opacity: 1, transform: SETTLED }}
       viewport={{ once: true, margin: "-80px" }}
-      transition={{ duration: reduce ? 0.2 : 0.8, delay: reduce ? 0 : delay, ease: EASE }}
+      transition={{ duration: reduce() ? 0.2 : 0.8, delay: reduce() ? 0 : p.delay, ease: EASE }}
     >
-      {children}
+      {p.children}
     </m.div>
   );
 }
 
-function VectorArt({
-  paths,
-  viewBox,
-  sx,
-}: {
-  paths: readonly VectorPath[];
-  viewBox: string;
-  sx: StyleXStyles;
-}) {
+function VectorArt(props: { paths: readonly VectorPath[]; viewBox: string; sx: StyleXStyles }) {
   return (
-    <svg viewBox={viewBox} aria-hidden="true" focusable="false" {...stylex.props(sx)}>
-      {paths.map((path) => (
-        <path key={path.d} d={path.d} fill={path.fill} />
-      ))}
+    <svg viewBox={props.viewBox} aria-hidden="true" {...UNFOCUSABLE} {...stylex.props(props.sx)}>
+      <For each={props.paths}>{(path) => <path d={path.d} fill={path.fill} />}</For>
     </svg>
   );
 }
 
 function useScrolledPastTop() {
-  const [scrolled, setScrolled] = useState(false);
-  useEffect(() => {
+  const [scrolled, setScrolled] = createSignal(false);
+  onMount(() => {
     const update = () => setScrolled(window.scrollY > 8);
     update();
     window.addEventListener("scroll", update, { passive: true });
-    return () => window.removeEventListener("scroll", update);
-  }, []);
+    onCleanup(() => window.removeEventListener("scroll", update));
+  });
   return scrolled;
 }
+
+// `focusable` (legacy SVG attribute) is not in Solid's JSX types.
+const UNFOCUSABLE = { focusable: "false" } as JSX.SvgSVGAttributes<SVGSVGElement>;
 
 const NAV_CLEARANCE = 12;
 
 function useNavFits(
-  innerRef: RefObject<HTMLDivElement | null>,
-  navRef: RefObject<HTMLElement | null>,
+  innerRef: Accessor<HTMLDivElement | undefined>,
+  navRef: Accessor<HTMLElement | undefined>,
 ) {
-  const [fits, setFits] = useState(true);
-  useEffect(() => {
-    const inner = innerRef.current;
-    const nav = navRef.current;
+  const [fits, setFits] = createSignal(true);
+  onMount(() => {
+    const inner = innerRef();
+    const nav = navRef();
     if (!inner || !nav) return;
     const measure = () => {
       const style = getComputedStyle(inner);
@@ -1534,8 +1518,8 @@ function useNavFits(
     observer.observe(inner);
     observer.observe(nav);
     void document.fonts?.ready.then(measure);
-    return () => observer.disconnect();
-  }, [innerRef, navRef]);
+    onCleanup(() => observer.disconnect());
+  });
   return fits;
 }
 
@@ -1543,27 +1527,27 @@ export type View = "home" | "about" | "products" | "rd" | "insights" | "news" | 
 export type AboutPageProps = { onNavigateHome: (hash?: string) => void };
 export type SubPageProps = AboutPageProps;
 
-function SiteHeader({
-  currentView,
-  onNavigate,
-  onOpenContactDialog,
-}: {
+function SiteHeader(props: {
   currentView?: View;
   onNavigate?: (view: View, targetId?: string) => void;
   onOpenContactDialog?: () => void;
 }) {
-  const [menuOpen, setMenuOpen] = useState(false);
-  const menuId = useId();
+  const [menuOpen, setMenuOpen] = createSignal(false);
+  const menuId = createUniqueId();
   const reduce = useReducedMotion();
   const scrolled = useScrolledPastTop();
   const activeId = useActiveSection(NAV_SECTION_IDS);
-  const innerRef = useRef<HTMLDivElement>(null);
-  const navRef = useRef<HTMLElement>(null);
-  const navFits = useNavFits(innerRef, navRef);
-  const closeOnEscape = (event: KeyboardEvent<HTMLElement>) => {
-    if (event.key === "Escape" && menuOpen) setMenuOpen(false);
+  let innerEl: HTMLDivElement | undefined;
+  let navEl: HTMLElement | undefined;
+  const navFits = useNavFits(
+    () => innerEl,
+    () => navEl,
+  );
+  const closeOnEscape = (event: KeyboardEvent) => {
+    if (event.key === "Escape" && menuOpen()) setMenuOpen(false);
   };
   const isActive = (href: string) => {
+    const currentView = props.currentView;
     if (href === "#about") {
       return currentView === "about";
     }
@@ -1585,10 +1569,12 @@ function SiteHeader({
     if (currentView !== "home") {
       return false;
     }
-    return href.slice(1) === activeId;
+    return href.slice(1) === activeId();
   };
 
-  const handleItemClick = (event: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+  const handleItemClick = (event: MouseEvent, href: string) => {
+    const onNavigate = props.onNavigate;
+    const currentView = props.currentView;
     if (!onNavigate) return;
     if (href === "#about") {
       event.preventDefault();
@@ -1622,8 +1608,8 @@ function SiteHeader({
     }
     if (href === "#contact") {
       event.preventDefault();
-      if (onOpenContactDialog) {
-        onOpenContactDialog();
+      if (props.onOpenContactDialog) {
+        props.onOpenContactDialog();
       } else if (onNavigate) {
         onNavigate("contact", "contact-top");
       }
@@ -1647,16 +1633,16 @@ function SiteHeader({
   return (
     <header
       onKeyDown={closeOnEscape}
-      {...stylex.props(styles.header, (scrolled || menuOpen) && styles.headerSolid)}
+      {...sxProps(styles.header, (scrolled() || menuOpen()) && styles.headerSolid)}
     >
-      <div ref={innerRef} {...stylex.props(styles.shell, styles.headerInner)}>
+      <div ref={innerEl} {...stylex.props(styles.shell, styles.headerInner)}>
         <a
           href="#top"
           aria-label="FENCHEM home"
           onClick={(event) => {
-            if (currentView !== "home" && onNavigate) {
+            if (props.currentView !== "home" && props.onNavigate) {
               event.preventDefault();
-              onNavigate("home", "top");
+              props.onNavigate("home", "top");
             }
           }}
           {...stylex.props(styles.logoLink)}
@@ -1664,13 +1650,12 @@ function SiteHeader({
           <LogoMark />
         </a>
         <nav
-          ref={navRef}
+          ref={navEl}
           aria-label="Main"
-          {...stylex.props(styles.nav, !navFits && styles.navCollapsed)}
+          {...sxProps(styles.nav, !navFits() && styles.navCollapsed)}
         >
           {NAV_ITEMS.map((item) => (
             <a
-              key={item.href}
               href={item.href}
               aria-current={isActive(item.href) ? "location" : undefined}
               onClick={(event) => handleItemClick(event, item.href)}
@@ -1686,28 +1671,27 @@ function SiteHeader({
             searchPill: styles.searchPill,
             searchPlaceholder: styles.searchPlaceholder,
             langButton: styles.langButton,
-            menuButton: [styles.menuButton, !navFits && styles.menuButtonShown],
+            menuButton: [styles.menuButton, !navFits() && styles.menuButtonShown],
           }}
-          menuOpen={menuOpen}
+          menuOpen={menuOpen()}
           menuId={menuId}
           setMenuOpen={setMenuOpen}
         />
       </div>
       <AnimatePresence initial={false}>
-        {menuOpen ? (
+        <Show when={menuOpen()}>
           <m.nav
-            key="menu"
             id={menuId}
             aria-label="Main"
             {...stylex.props(styles.menuPanel)}
             initial={{ opacity: 0, transform: "translateY(-8px)" }}
             animate={{ opacity: 1, transform: "translateY(0px)" }}
             exit={{ opacity: 0, transform: "translateY(-8px)" }}
-            transition={{ duration: reduce ? 0.15 : 0.2, ease: EASE }}
+            transition={{ duration: reduce() ? 0.15 : 0.2, ease: EASE }}
           >
             <ul {...stylex.props(styles.menuList)}>
               {NAV_ITEMS.map((item) => (
-                <li key={item.href}>
+                <li>
                   <a
                     href={item.href}
                     aria-current={isActive(item.href) ? "location" : undefined}
@@ -1720,7 +1704,7 @@ function SiteHeader({
               ))}
             </ul>
           </m.nav>
-        ) : null}
+        </Show>
       </AnimatePresence>
     </header>
   );
@@ -1728,10 +1712,9 @@ function SiteHeader({
 
 function LogoMark() {
   return (
-    <svg viewBox="0 0 161 52" aria-hidden="true" focusable="false" {...stylex.props(styles.logo)}>
+    <svg viewBox="0 0 161 52" aria-hidden="true" {...UNFOCUSABLE} {...stylex.props(styles.logo)}>
       {LOGO_PATHS.map((path) => (
         <path
-          key={path.d}
           d={path.d}
           fill={path.fill}
           {...stylex.props(styles.logoPart, styles.enterDelay(logoPartDelay(path.d)))}
@@ -1741,16 +1724,19 @@ function LogoMark() {
   );
 }
 
-function Hero({ onOpenContactDialog }: { onOpenContactDialog?: () => void }) {
-  const heroRef = useRef<HTMLElement>(null);
+function Hero(props: { onOpenContactDialog?: () => void }) {
+  let heroEl: HTMLElement | undefined;
   const reduce = useReducedMotion();
-  const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
+  const { scrollYProgress } = useScroll({
+    target: () => heroEl,
+    offset: ["start start", "end start"],
+  });
   const backdropY = useTransform(scrollYProgress, [0, 1], ["0%", "18%"]);
   const contentY = useTransform(scrollYProgress, [0, 1], [0, -120]);
   const contentOpacity = useTransform(scrollYProgress, [0, 0.75], [1, 0]);
   const blobScroll = useTransform(scrollYProgress, (progress) => {
     const t = clamp01(progress / BLOB_SCROLL_END);
-    return t * t * (3 - 2 * t) * (reduce ? BLOB_SCROLL_REDUCED : 1);
+    return t * t * (3 - 2 * t) * (reduce() ? BLOB_SCROLL_REDUCED : 1);
   });
   return (
     <RisingHero
@@ -1792,8 +1778,8 @@ function Hero({ onOpenContactDialog }: { onOpenContactDialog?: () => void }) {
       }}
       backdropFragment={HERO_BLOB_TWIST}
       backdropProgress={blobScroll}
-      heroRef={heroRef}
-      reduce={reduce}
+      heroRef={(el: HTMLElement) => (heroEl = el)}
+      reduce={reduce()}
       backdropY={backdropY}
       contentY={contentY}
       contentOpacity={contentOpacity}
@@ -1804,32 +1790,31 @@ function Hero({ onOpenContactDialog }: { onOpenContactDialog?: () => void }) {
       CLOSING_LEAD={CLOSING_LEAD}
       CLOSING_WORD={CLOSING_WORD}
       introAfter={introAfter}
-      onSecondaryClick={onOpenContactDialog}
+      onSecondaryClick={props.onOpenContactDialog}
     />
   );
 }
 
-function InkPhrase({
-  progress,
-  range,
-  children,
-}: {
+function InkPhrase(props: {
   progress: MotionValue<number>;
   range: [number, number];
-  children: ReactNode;
+  children: JSX.Element;
 }) {
   const reduce = useReducedMotion();
-  const opacity = useTransform(progress, range, [0.48, 1]);
+  const opacity = useTransform(props.progress, props.range, [0.48, 1]);
   return (
-    <m.span {...stylex.props(styles.inkPhrase)} style={reduce ? undefined : { opacity }}>
-      {children}
+    <m.span {...stylex.props(styles.inkPhrase)} style={reduce() ? undefined : { opacity }}>
+      {props.children}
     </m.span>
   );
 }
 
-function About({ onOpenAboutPage }: { onOpenAboutPage?: () => void }) {
-  const textRef = useRef<HTMLParagraphElement>(null);
-  const { scrollYProgress } = useScroll({ target: textRef, offset: ["start 0.85", "end 0.45"] });
+function About(props: { onOpenAboutPage?: () => void }) {
+  let textEl: HTMLParagraphElement | undefined;
+  const { scrollYProgress } = useScroll({
+    target: () => textEl,
+    offset: ["start 0.85", "end 0.45"],
+  });
   return (
     <section
       id="about"
@@ -1840,23 +1825,23 @@ function About({ onOpenAboutPage }: { onOpenAboutPage?: () => void }) {
         <h2 id="oo-about-title" {...stylex.props(styles.sectionTitle)}>
           {ABOUT.title}
         </h2>
-        <p ref={textRef} {...stylex.props(styles.aboutBody)}>
+        <p ref={textEl} {...stylex.props(styles.aboutBody)}>
           {ABOUT_INK_LINES.map((segments, lineIndex) => (
-            <Fragment key={segments[0].text}>
+            <>
               {lineIndex > 0 ? <br /> : null}
               {segments.map((segment) => (
-                <InkPhrase key={segment.text} progress={scrollYProgress} range={segment.range}>
+                <InkPhrase progress={scrollYProgress} range={segment.range}>
                   {segment.text}
                 </InkPhrase>
               ))}
-            </Fragment>
+            </>
           ))}
         </p>
-        <div style={{ display: "flex", justifyContent: "center" }}>
-          {onOpenAboutPage ? (
+        <div style={{ display: "flex", "justify-content": "center" }}>
+          {props.onOpenAboutPage ? (
             <button
               type="button"
-              onClick={onOpenAboutPage}
+              onClick={() => props.onOpenAboutPage?.()}
               {...stylex.props(styles.button, styles.buttonPrimary, styles.buttonCompact)}
             >
               更多
@@ -1876,15 +1861,18 @@ function About({ onOpenAboutPage }: { onOpenAboutPage?: () => void }) {
 }
 
 function Campus() {
-  const stageRef = useRef<HTMLDivElement>(null);
+  let stageEl: HTMLDivElement | undefined;
   const reduce = useReducedMotion();
-  const maxProgressRef = useRef(0);
-  const { scrollYProgress } = useScroll({ target: stageRef, offset: ["start end", "center 0.55"] });
+  let maxProgress = 0;
+  const { scrollYProgress } = useScroll({
+    target: () => stageEl,
+    offset: ["start end", "center 0.55"],
+  });
   const windowClip = useTransform(scrollYProgress, (progress) => {
-    if (progress > maxProgressRef.current) {
-      maxProgressRef.current = progress;
+    if (progress > maxProgress) {
+      maxProgress = progress;
     }
-    const t = revealProgress(maxProgressRef.current);
+    const t = revealProgress(maxProgress);
     const top = lerp(CLIP_FROM.top, CLIP_TO.top, t);
     const side = lerp(CLIP_FROM.side, CLIP_TO.side, t);
     const bottom = lerp(CLIP_FROM.bottom, CLIP_TO.bottom, t);
@@ -1892,10 +1880,10 @@ function Campus() {
     return `inset(${top}% ${side}% ${bottom}% ${side}% round ${radius}px)`;
   });
   const photoScale = useTransform(scrollYProgress, (progress) => {
-    if (progress > maxProgressRef.current) {
-      maxProgressRef.current = progress;
+    if (progress > maxProgress) {
+      maxProgress = progress;
     }
-    return lerp(1.22, 1, revealProgress(maxProgressRef.current));
+    return lerp(1.22, 1, revealProgress(maxProgress));
   });
 
   return (
@@ -1909,8 +1897,8 @@ function Campus() {
         inset132: styles.inset132,
         statsBand: styles.statsBand,
       }}
-      stageRef={stageRef}
-      reduce={reduce}
+      stageRef={(el: HTMLDivElement) => (stageEl = el)}
+      reduce={reduce()}
       windowClip={windowClip}
       photoScale={photoScale}
       IMAGES={IMAGES}
@@ -1920,48 +1908,42 @@ function Campus() {
   );
 }
 
-function DigitWheel({ digit, delay }: { digit: number; delay: number }) {
+function DigitWheel(props: { digit: number; delay: number }) {
   const reduce = useReducedMotion();
   return (
     <span {...stylex.props(styles.wheel)}>
       <m.span
         {...stylex.props(styles.wheelColumn)}
         initial={{ transform: "translateY(0%)" }}
-        whileInView={{ transform: `translateY(${-(10 + digit) * 5}%)` }}
+        whileInView={{ transform: `translateY(${-(10 + props.digit) * 5}%)` }}
         viewport={{ once: true, margin: "-60px" }}
-        transition={{ duration: reduce ? 0 : 1.6, delay: reduce ? 0 : delay, ease: EASE }}
+        transition={{ duration: reduce() ? 0 : 1.6, delay: reduce() ? 0 : props.delay, ease: EASE }}
       >
-        {DIGIT_CELLS.map((cell, index) => (
-          <span key={index} {...stylex.props(styles.wheelCell)}>
-            {cell}
-          </span>
+        {DIGIT_CELLS.map((cell) => (
+          <span {...stylex.props(styles.wheelCell)}>{cell}</span>
         ))}
       </m.span>
     </span>
   );
 }
 
-function Odometer({ value, offset }: { value: string; offset: number }) {
+function Odometer(props: { value: string; offset: number }) {
   return (
     <span aria-hidden="true" {...stylex.props(styles.statValue)}>
-      {value
-        .split("")
-        .map((character, index) =>
+      <For each={props.value.split("")}>
+        {(character, index) =>
           /\d/.test(character) ? (
-            <DigitWheel
-              key={index}
-              digit={Number(character)}
-              delay={offset + index * DIGIT_STAGGER}
-            />
+            <DigitWheel digit={Number(character)} delay={props.offset + index() * DIGIT_STAGGER} />
           ) : (
-            <span key={index}>{character}</span>
-          ),
-        )}
+            <span>{character}</span>
+          )
+        }
+      </For>
     </span>
   );
 }
 
-function StatItem({ stat, index }: { stat: (typeof STATS)[number]; index: number }) {
+function StatItem(props: { stat: (typeof STATS)[number]; index: number }) {
   return (
     <CampusStatistic
       styles={{
@@ -1972,8 +1954,8 @@ function StatItem({ stat, index }: { stat: (typeof STATS)[number]; index: number
         statUnit: styles.statUnit,
         visuallyHidden: styles.visuallyHidden,
       }}
-      index={index}
-      stat={stat}
+      index={props.index}
+      stat={props.stat}
       RiseReveal={RiseReveal}
       Odometer={Odometer}
       riseDelay={riseDelay}
@@ -1982,9 +1964,9 @@ function StatItem({ stat, index }: { stat: (typeof STATS)[number]; index: number
   );
 }
 
-function IconPattern({ icon }: { icon: StrengthIcon }) {
-  const Icon = STRENGTH_ICONS[icon];
-  const tileId = useId();
+function IconPattern(props: { icon: StrengthIcon }) {
+  const Icon = () => STRENGTH_ICONS[props.icon];
+  const tileId = createUniqueId();
   return (
     <svg aria-hidden="true" {...stylex.props(styles.pattern)}>
       <defs>
@@ -1996,7 +1978,14 @@ function IconPattern({ icon }: { icon: StrengthIcon }) {
           patternUnits="userSpaceOnUse"
         >
           {PATTERN_TILE.cells.map(([x, y]) => (
-            <Icon key={`${x}-${y}`} x={x} y={y} size={32} strokeWidth={2} absoluteStrokeWidth />
+            <Dynamic
+              component={Icon()}
+              x={x}
+              y={y}
+              size={32}
+              strokeWidth={2}
+              absoluteStrokeWidth
+            />
           ))}
         </pattern>
       </defs>
@@ -2005,33 +1994,35 @@ function IconPattern({ icon }: { icon: StrengthIcon }) {
   );
 }
 
-function Quadrant({
-  strength,
-  index,
-  apart,
-}: {
+function Quadrant(props: {
   strength: (typeof STRENGTHS)[number];
   index: number;
   apart: MotionValue<number>;
 }) {
-  const [dx, dy] = QUADRANT_DIRECTIONS[index % QUADRANT_DIRECTIONS.length];
-  const x = useTransform(apart, (value) => value * dx * 56);
-  const y = useTransform(apart, (value) => value * dy * 40);
-  const inverse = strength.tone === "blue";
-  const right = dx === 1;
+  const direction = () => QUADRANT_DIRECTIONS[props.index % QUADRANT_DIRECTIONS.length];
+  const x = useTransform(
+    () => props.apart(),
+    (value) => value * direction()[0] * 56,
+  );
+  const y = useTransform(
+    () => props.apart(),
+    (value) => value * direction()[1] * 40,
+  );
+  const inverse = () => props.strength.tone === "blue";
+  const right = () => direction()[0] === 1;
   return (
     <m.article
-      aria-labelledby={`oos1-strength-${index}`}
-      {...stylex.props(
+      aria-labelledby={`oos1-strength-${props.index}`}
+      {...sxProps(
         styles.quadrant,
-        TONE_STYLES[strength.tone],
-        dy === -1 && styles.quadrantUpper,
-        right && styles.quadrantRight,
+        TONE_STYLES[props.strength.tone],
+        direction()[1] === -1 && styles.quadrantUpper,
+        right() && styles.quadrantRight,
         stylex.defaultMarker(),
       )}
       style={{ x, y }}
     >
-      <IconPattern icon={strength.icon} />
+      <IconPattern icon={props.strength.icon} />
       <StrengthQuadrantCopy
         styles={{
           quadrantText: styles.quadrantText,
@@ -2041,9 +2032,9 @@ function Quadrant({
           quadrantSmall: styles.quadrantSmall,
           quadrantLink: styles.quadrantLink,
         }}
-        inverse={inverse}
-        index={index}
-        strength={{ ...strength, link: null }}
+        inverse={inverse()}
+        index={props.index}
+        strength={{ ...props.strength, link: null }}
         idPrefix="oos1"
       />
     </m.article>
@@ -2051,17 +2042,17 @@ function Quadrant({
 }
 
 function Strengths() {
-  const gridRef = useRef<HTMLDivElement>(null);
+  let gridEl: HTMLDivElement | undefined;
   const converge = useQuadrantMotion();
   const { scrollYProgress: approach } = useScroll({
-    target: gridRef,
+    target: () => gridEl,
     offset: ["start end", "center 0.6"],
   });
   const { scrollYProgress: pass } = useScroll({
-    target: gridRef,
+    target: () => gridEl,
     offset: ["start end", "end start"],
   });
-  const apart = useTransform(approach, (value) => (converge ? 1 - value : 0));
+  const apart = useTransform(approach, (value) => (converge() ? 1 - value : 0));
   const rotate = useTransform(pass, [0, 1], [0, 180]);
   return (
     <QuadrantStrengths
@@ -2080,7 +2071,7 @@ function Strengths() {
       }}
       RiseReveal={RiseReveal}
       STRENGTHS_INTRO={STRENGTHS_INTRO}
-      gridRef={gridRef}
+      gridRef={(el: HTMLDivElement) => (gridEl = el)}
       STRENGTHS={STRENGTHS}
       Quadrant={Quadrant}
       apart={apart}
@@ -2091,15 +2082,15 @@ function Strengths() {
   );
 }
 
-function ProductCard({ product, index }: { product: (typeof PRODUCTS)[number]; index: number }) {
-  const [imageFailed, setImageFailed] = useState(false);
+function ProductCard(props: { product: (typeof PRODUCTS)[number]; index: number }) {
+  const [imageFailed, setImageFailed] = createSignal(false);
   return (
-    <RiseReveal delay={riseDelay(index)} sx={styles.productCard}>
+    <RiseReveal delay={riseDelay(props.index)} sx={styles.productCard}>
       <div {...stylex.props(styles.productImageFrame)}>
-        {imageFailed ? null : (
+        {imageFailed() ? null : (
           <img
-            src={product.image}
-            alt={product.english}
+            src={props.product.image}
+            alt={props.product.english}
             loading="lazy"
             decoding="async"
             onError={() => setImageFailed(true)}
@@ -2108,8 +2099,8 @@ function ProductCard({ product, index }: { product: (typeof PRODUCTS)[number]; i
         )}
       </div>
       <ProductSummary
-        product={product}
-        sx={[styles.productPanel, index % 2 === 1 && styles.productPanelAlt]}
+        product={props.product}
+        sx={[styles.productPanel, props.index % 2 === 1 && styles.productPanelAlt]}
         styles={{
           mutedText: styles.mutedText,
           productTitleBlock: styles.productTitleBlock,
@@ -2122,7 +2113,7 @@ function ProductCard({ product, index }: { product: (typeof PRODUCTS)[number]; i
   );
 }
 
-function Products({ onOpenProductsPage }: { onOpenProductsPage?: () => void }) {
+function Products(props: { onOpenProductsPage?: () => void }) {
   return (
     <section
       id="products"
@@ -2139,9 +2130,9 @@ function Products({ onOpenProductsPage }: { onOpenProductsPage?: () => void }) {
         <a
           href="#products-top"
           onClick={(event) => {
-            if (onOpenProductsPage) {
+            if (props.onOpenProductsPage) {
               event.preventDefault();
-              onOpenProductsPage();
+              props.onOpenProductsPage();
             }
           }}
           {...stylex.props(styles.button, styles.buttonPrimary, styles.buttonCompact)}
@@ -2150,17 +2141,17 @@ function Products({ onOpenProductsPage }: { onOpenProductsPage?: () => void }) {
         </a>
       </RiseReveal>
       <div id="product-list" {...stylex.props(styles.productGrid)}>
-        {PRODUCTS.map((product, index) => (
-          <ProductCard key={product.title} product={product} index={index} />
-        ))}
+        <For each={PRODUCTS}>
+          {(product, index) => <ProductCard product={product} index={index()} />}
+        </For>
       </div>
     </section>
   );
 }
 
 function Offices() {
-  const rowRef = useRef<HTMLDivElement>(null);
-  const rowInView = useInView(rowRef, { once: true, amount: 0.5 });
+  let rowEl: HTMLDivElement | undefined;
+  const rowInView = useInView(() => rowEl, { once: true, amount: 0.5 });
   return (
     <SweepingOffices
       styles={{
@@ -2192,8 +2183,8 @@ function Offices() {
         regionBody: styles.regionBody,
         mutedText: styles.mutedText,
       }}
-      rowRef={rowRef}
-      rowInView={rowInView}
+      rowRef={(el: HTMLDivElement) => (rowEl = el)}
+      rowInView={rowInView()}
       IMAGES={IMAGES}
       OFFICE_MAP_PINS={OFFICE_MAP_PINS}
       MAP_SWEEP_MS={MAP_SWEEP_MS}
@@ -2206,14 +2197,14 @@ function Offices() {
   );
 }
 
-function AccordionIcon({ open }: { open: boolean }) {
+function AccordionIcon(props: { open: boolean }) {
   const reduce = useReducedMotion();
   return (
     <span aria-hidden="true" {...stylex.props(styles.newsIconSlot)}>
       <m.span
         {...stylex.props(styles.newsIconLayer)}
-        animate={{ rotate: open ? 45 : 0 }}
-        transition={reduce ? { duration: 0 } : { type: "spring", duration: 0.3, bounce: 0 }}
+        animate={{ rotate: props.open ? 45 : 0 }}
+        transition={reduce() ? { duration: 0 } : { type: "spring", duration: 0.3, bounce: 0 }}
       >
         <Plus size={16} strokeWidth={2} absoluteStrokeWidth />
       </m.span>
@@ -2221,21 +2212,13 @@ function AccordionIcon({ open }: { open: boolean }) {
   );
 }
 
-function NewsItem({
-  item,
-  open,
-  onToggle,
-}: {
-  item: (typeof NEWS)[number];
-  open: boolean;
-  onToggle: () => void;
-}) {
+function NewsItem(props: { item: (typeof NEWS)[number]; open: boolean; onToggle: () => void }) {
   return (
     <NewsAccordion
-      item={item}
-      open={open}
-      onToggle={onToggle}
-      icon={<AccordionIcon open={open} />}
+      item={props.item}
+      open={props.open}
+      onToggle={props.onToggle}
+      icon={<AccordionIcon open={props.open} />}
       styles={{
         mutedText: styles.mutedText,
         newsHeading: styles.newsHeading,
@@ -2268,7 +2251,7 @@ function News() {
   );
 }
 
-function SiteFooter({ onNavigate }: { onNavigate?: (view: View, targetId?: string) => void }) {
+function SiteFooter(props: { onNavigate?: (view: View, targetId?: string) => void }) {
   return (
     <footer {...stylex.props(styles.footer)}>
       <div {...stylex.props(styles.shell, styles.inset120, styles.footerInner)}>
@@ -2284,17 +2267,17 @@ function SiteFooter({ onNavigate }: { onNavigate?: (view: View, targetId?: strin
           />
           <nav aria-label="Footer" {...stylex.props(styles.footerColumns)}>
             {FOOTER_COLUMNS.map((column) => (
-              <div key={column.heading} {...stylex.props(styles.footerColumn)}>
+              <div {...stylex.props(styles.footerColumn)}>
                 <h3 {...stylex.props(styles.footerHeading)}>{column.heading}</h3>
                 <ul {...stylex.props(styles.footerLinks)}>
                   {column.links.map((link) => (
-                    <li key={link.label}>
+                    <li>
                       <a
                         href={link.page ? `#${link.page}-top` : "#top"}
                         onClick={(event) => {
-                          if (link.page && onNavigate) {
+                          if (link.page && props.onNavigate) {
                             event.preventDefault();
-                            onNavigate(link.page, `${link.page}-top`);
+                            props.onNavigate(link.page, `${link.page}-top`);
                           }
                         }}
                         {...stylex.props(styles.footerLink)}
@@ -2339,55 +2322,61 @@ const viewFromPage = (page: unknown, startView: View): View => {
   return startView;
 };
 
-export function VariantOOS1({
-  AboutPage = AboutView,
-  ProductsPage = ProductsView,
-  RdPage = RdView,
-  InsightsPage = InsightsView,
-  NewsPage = NewsView,
-  ContactPage = ContactView,
-  startView = "home",
-}: {
-  AboutPage?: ComponentType<SubPageProps>;
-  ProductsPage?: ComponentType<SubPageProps>;
-  RdPage?: ComponentType<SubPageProps>;
-  InsightsPage?: ComponentType<SubPageProps>;
-  NewsPage?: ComponentType<SubPageProps>;
-  ContactPage?: ComponentType<SubPageProps>;
+export function VariantOOS1(props: {
+  AboutPage?: Component<SubPageProps>;
+  ProductsPage?: Component<SubPageProps>;
+  RdPage?: Component<SubPageProps>;
+  InsightsPage?: Component<SubPageProps>;
+  NewsPage?: Component<SubPageProps>;
+  ContactPage?: Component<SubPageProps>;
   startView?: View;
 }) {
-  preinit(GOOGLE_FONTS, { as: "style" });
+  const p = mergeProps(
+    {
+      AboutPage: AboutView as Component<SubPageProps>,
+      ProductsPage: ProductsView as Component<SubPageProps>,
+      RdPage: RdView as Component<SubPageProps>,
+      InsightsPage: InsightsView as Component<SubPageProps>,
+      NewsPage: NewsView as Component<SubPageProps>,
+      ContactPage: ContactView as Component<SubPageProps>,
+      startView: "home" as View,
+    },
+    props,
+  );
   const reduce = useReducedMotion();
   const intro = useIntro();
-  const introVars = {
-    "--oo-intro": intro === "play" ? `${INTRO_REVEAL_MS}ms` : "0ms",
-  } as CSSProperties;
-  useEffect(() => {
-    if (reduce) return;
-    const root = document.documentElement;
-    const previous = root.style.scrollBehavior;
-    root.style.scrollBehavior = "smooth";
-    return () => {
-      root.style.scrollBehavior = previous;
-    };
-  }, [reduce]);
+  const introVars = () =>
+    ({
+      "--oo-intro": intro() === "play" ? `${INTRO_REVEAL_MS}ms` : "0ms",
+    }) as JSX.CSSProperties;
+  createEffect(
+    on(reduce, (reduced) => {
+      if (reduced) return;
+      const root = document.documentElement;
+      const previous = root.style.scrollBehavior;
+      root.style.scrollBehavior = "smooth";
+      onCleanup(() => {
+        root.style.scrollBehavior = previous;
+      });
+    }),
+  );
 
-  const { page } = useSearch({ strict: false });
-  const [view, setView] = useState<View>(() => viewFromPage(page, startView));
-  const [contactModalOpen, setContactModalOpen] = useState(false);
+  const search = useSearch();
+  const [view, setView] = createSignal<View>(viewFromPage(search().page, p.startView));
+  const [contactModalOpen, setContactModalOpen] = createSignal(false);
 
   const handleNavigate = (targetView: View, targetId?: string) => {
     setView(targetView);
     if (typeof window !== "undefined") {
       const url = new URL(window.location.href);
-      if (targetView === startView) {
+      if (targetView === p.startView) {
         url.searchParams.delete("page");
       } else {
         url.searchParams.set("page", targetView);
       }
       url.hash = targetId ? `#${targetId}` : "";
       window.history.pushState({}, "", url.toString());
-      const behavior: ScrollBehavior = reduce ? "auto" : "smooth";
+      const behavior: ScrollBehavior = reduce() ? "auto" : "smooth";
       if (targetId) {
         setTimeout(() => {
           const el = document.getElementById(targetId);
@@ -2399,98 +2388,117 @@ export function VariantOOS1({
     }
   };
 
-  useEffect(() => {
+  onMount(() => {
     const onPopState = () => {
       const params = new URLSearchParams(window.location.search);
-      setView(viewFromPage(params.get("page"), startView));
+      setView(viewFromPage(params.get("page"), p.startView));
     };
     window.addEventListener("popstate", onPopState);
-    return () => window.removeEventListener("popstate", onPopState);
-  }, [startView]);
+    onCleanup(() => window.removeEventListener("popstate", onPopState));
+  });
 
   return (
     <LazyMotion features={domMax} strict>
       <LayoutGroup>
         <MotionConfig reducedMotion="user">
-          <div lang="zh-CN" {...stylex.props(styles.root)} style={introVars}>
+          <div lang="zh-CN" {...stylex.props(styles.root)} style={introVars()}>
             <a href="#main-content" {...stylex.props(styles.skipLink)}>
               跳到主要内容
             </a>
             <SiteHeader
-              currentView={view}
+              currentView={view()}
               onNavigate={handleNavigate}
               onOpenContactDialog={() => setContactModalOpen(true)}
             />
-            <div {...stylex.props(styles.page, intro === "play" && introStyles.pageReveal)}>
-              <main id="main-content" tabIndex={-1} {...stylex.props(styles.mainTarget)}>
-                {view === "about" ? (
-                  <AboutPage
-                    onNavigateHome={(target) =>
-                      handleNavigate(target === "products" ? "products" : "home", target)
-                    }
-                  />
-                ) : view === "products" ? (
-                  <ProductsPage onNavigateHome={(target) => handleNavigate("home", target)} />
-                ) : view === "rd" ? (
-                  <RdPage
-                    onNavigateHome={(target) =>
-                      handleNavigate(target === "contact" ? "contact" : "home", target)
-                    }
-                  />
-                ) : view === "insights" ? (
-                  <InsightsPage
-                    onNavigateHome={(target) =>
-                      handleNavigate(
-                        target === "contact"
-                          ? "contact"
-                          : target === "products"
-                            ? "products"
-                            : "home",
-                        target,
-                      )
-                    }
-                  />
-                ) : view === "news" ? (
-                  <NewsPage
-                    onNavigateHome={(target) =>
-                      handleNavigate(target === "contact" ? "contact" : "home", target)
-                    }
-                  />
-                ) : view === "contact" ? (
-                  <ContactPage onNavigateHome={(target) => handleNavigate("home", target)} />
-                ) : (
-                  <>
-                    <Hero onOpenContactDialog={() => setContactModalOpen(true)} />
-                    <About onOpenAboutPage={() => handleNavigate("about", "about-top")} />
-                    <Campus />
-                    <Strengths />
-                    <Products
-                      onOpenProductsPage={() => handleNavigate("products", "products-top")}
-                    />
-                    <Offices />
-                    <News />
-                    <Flow>
-                      <ContactCta
-                        id="contact"
-                        actions={[
-                          {
-                            label: "联系我们",
-                            tone: "primary",
-                            onClick: () => setContactModalOpen(true),
-                          },
-                        ]}
+            <div {...sxProps(styles.page, intro() === "play" && introStyles.pageReveal)}>
+              <main id="main-content" tabindex={-1} {...stylex.props(styles.mainTarget)}>
+                <Switch
+                  fallback={
+                    <>
+                      <Hero onOpenContactDialog={() => setContactModalOpen(true)} />
+                      <About onOpenAboutPage={() => handleNavigate("about", "about-top")} />
+                      <Campus />
+                      <Strengths />
+                      <Products
+                        onOpenProductsPage={() => handleNavigate("products", "products-top")}
                       />
-                    </Flow>
-                  </>
-                )}
+                      <Offices />
+                      <News />
+                      <Flow>
+                        <ContactCta
+                          id="contact"
+                          actions={[
+                            {
+                              label: "联系我们",
+                              tone: "primary",
+                              onClick: () => setContactModalOpen(true),
+                            },
+                          ]}
+                        />
+                      </Flow>
+                    </>
+                  }
+                >
+                  <Match when={view() === "about"}>
+                    <Dynamic
+                      component={p.AboutPage}
+                      onNavigateHome={(target?: string) =>
+                        handleNavigate(target === "products" ? "products" : "home", target)
+                      }
+                    />
+                  </Match>
+                  <Match when={view() === "products"}>
+                    <Dynamic
+                      component={p.ProductsPage}
+                      onNavigateHome={(target?: string) => handleNavigate("home", target)}
+                    />
+                  </Match>
+                  <Match when={view() === "rd"}>
+                    <Dynamic
+                      component={p.RdPage}
+                      onNavigateHome={(target?: string) =>
+                        handleNavigate(target === "contact" ? "contact" : "home", target)
+                      }
+                    />
+                  </Match>
+                  <Match when={view() === "insights"}>
+                    <Dynamic
+                      component={p.InsightsPage}
+                      onNavigateHome={(target?: string) =>
+                        handleNavigate(
+                          target === "contact"
+                            ? "contact"
+                            : target === "products"
+                              ? "products"
+                              : "home",
+                          target,
+                        )
+                      }
+                    />
+                  </Match>
+                  <Match when={view() === "news"}>
+                    <Dynamic
+                      component={p.NewsPage}
+                      onNavigateHome={(target?: string) =>
+                        handleNavigate(target === "contact" ? "contact" : "home", target)
+                      }
+                    />
+                  </Match>
+                  <Match when={view() === "contact"}>
+                    <Dynamic
+                      component={p.ContactPage}
+                      onNavigateHome={(target?: string) => handleNavigate("home", target)}
+                    />
+                  </Match>
+                </Switch>
               </main>
               <Flow>
                 <SiteFooter onNavigate={handleNavigate} />
               </Flow>
             </div>
-            {contactModalOpen ? (
+            <Show when={contactModalOpen()}>
               <SplitDialog subject={null} onClose={() => setContactModalOpen(false)} />
-            ) : null}
+            </Show>
           </div>
         </MotionConfig>
       </LayoutGroup>

@@ -23,6 +23,7 @@ export default defineConfig(({ isSsrBuild }) => ({
     sourcemap: process.env.SOURCEMAP === "1",
     rollupOptions: isSsrBuild ? { output: { entryFileNames: "worker.js" } } : undefined,
   },
-  ssr: isSsrBuild ? { noExternal: true, target: "webworker" } : undefined,
-  resolve: isSsrBuild ? { conditions: ["workerd", "worker", "solid", "module", "import"] } : undefined,
+  ssr: isSsrBuild
+    ? { noExternal: true, target: "webworker", resolve: { conditions: ["workerd", "worker", "solid", "module", "import"] } }
+    : undefined,
 }));

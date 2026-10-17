@@ -158,7 +158,8 @@ export function useLabDialog(onClose: () => void) {
         dialog = el;
       },
       lang: "zh-CN",
-      tabindex: -1,
+      // Solid's dialog typings forbid tabindex; the React original sets it.
+      tabindex: -1 as unknown as undefined,
       onCancel: (event: Event) => {
         event.preventDefault();
         requestClose();

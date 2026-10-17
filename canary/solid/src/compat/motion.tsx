@@ -169,7 +169,6 @@ const layoutIds = new Map<string, { el: HTMLElement; transition: () => Transitio
 const before = new Map<HTMLElement, DOMRect>();
 const beforeIds = new Map<string, DOMRect>();
 let pending = false;
-let instant = false;
 
 function snapshot() {
   if (pending) return;
@@ -181,8 +180,7 @@ function snapshot() {
 
 function flip() {
   pending = false;
-  const skip = instant || reducedMotion();
-  instant = false;
+  const skip = reducedMotion();
   if (!skip) {
     for (const [el, entry] of layoutEls) {
       const from = before.get(el);
@@ -236,9 +234,15 @@ if (!isServer) {
 
 /** The next layout change jumps instead of animating (motion's useInstantLayoutTransition). */
 export function useInstantLayoutTransition() {
+  // React runs the callback in its own flushSync render, so later updates in the
+  // same handler still animate. Here: apply it, then re-baseline the snapshot.
   return (callback?: () => void) => {
-    instant = true;
     callback?.();
+    if (!pending) return;
+    before.clear();
+    beforeIds.clear();
+    pending = false;
+    snapshot();
   };
 }
 
