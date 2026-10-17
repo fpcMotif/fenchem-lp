@@ -105,5 +105,5 @@ would close the CSS, request and worker gaps. The JS, TBT and click gaps are mos
 the runtime: React DOM is far heavier than Solid's, and Solid updates the DOM without
 re-rendering components.
 
-Products LCP is about 28–30 s in both apps: a large image on 1.6 Mbps. It is not a
-framework effect.
+Products LCP is about 28–30 s in both apps. That looks like a late image, not the
+framework, but it has not been investigated.
