@@ -1,0 +1,8 @@
+{
+  "extends": "@fenchem-lp/config/tsconfig.base.json",
+  "include": ["*.ts"],
+  "compilerOptions": {
+    "types": ["node"],
+    "noEmit": true
+  }
+}
