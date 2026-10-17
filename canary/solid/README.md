@@ -79,3 +79,31 @@ and home at 390 px are pixel-identical, and home at 1440 px differs by 0.13%. Th
 difference is the office map's enter animation caught at a slightly different frame.
 `perf/measure-solid.mjs` also hashes the main DOM text after every benchmark click and
 compares it with React.
+
+## Results (2026-10-17, `perf/solid/2026-10-17-15-07.md`)
+
+7 interleaved runs, Fast 4G + 4x CPU, brotli proxy, both apps on workerd. p50.
+
+| Metric | React (current) | Solid |
+| --- | --- | --- |
+| Wire before LCP, home | 261 kB | 110 kB |
+| JS, home | 148 kB br | 81 kB br |
+| CSS, home | 99 kB br | 15 kB br |
+| Requests before LCP, home / products | 6 / 69 | 3 / 3 |
+| FCP / LCP, home | 1844 / 1884 ms | 916 / 916 ms |
+| TBT, home / products | 201 / 228 ms | 147 / 149 ms |
+| Click → frame, all steps | 86 ms | 46 ms |
+| Worker gzip | 1544 KiB | 126 KiB |
+| Cold SSR TTFB | 73 ms | 36 ms |
+| Warm SSR TTFB | 13 ms | 12 ms |
+| Errors / DOM mismatches | 0 / 0 | 0 / 0 |
+
+Not everything here is the framework. The React baseline is the whole app: its CSS
+holds every variant's StyleX rules, its worker holds all 75 variants, and it ships the
+TanStack Router/Start runtime and the prototype switcher. Tuning React's packaging
+would close the CSS, request and worker gaps. The JS, TBT and click gaps are mostly
+the runtime: React DOM is far heavier than Solid's, and Solid updates the DOM without
+re-rendering components.
+
+Products LCP is about 28–30 s in both apps: a large image on 1.6 Mbps. It is not a
+framework effect.
