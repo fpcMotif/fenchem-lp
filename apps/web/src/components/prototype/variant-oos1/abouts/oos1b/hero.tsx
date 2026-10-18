@@ -136,45 +136,45 @@ const styles = stylex.create({
 
 export function Hero() {
   return (
-    <section aria-labelledby="oos1b-title" {...stylex.props(ui.shell, styles.hero)}>
-      <div {...stylex.props(styles.titleRow, styles.introAnim, styles.introDelay(introAt(0)))}>
-        <h1 id="oos1b-title" {...stylex.props(styles.title)}>
+    <section aria-labelledby="oos1b-title" {...stylex.attrs(ui.shell, styles.hero)}>
+      <div {...stylex.attrs(styles.titleRow, styles.introAnim, styles.introDelay(introAt(0)))}>
+        <h1 id="oos1b-title" {...stylex.attrs(styles.title)}>
           {ABOUT_BANNER.title}
         </h1>
-        <p lang="en" {...stylex.props(ui.serif, styles.tagline)}>
+        <p lang="en" {...stylex.attrs(ui.serif, styles.tagline)}>
           {ABOUT_BANNER.tagline}
         </p>
       </div>
 
-      <div {...stylex.props(styles.introAnim, styles.introDelay(introAt(1)))}>
+      <div {...stylex.attrs(styles.introAnim, styles.introDelay(introAt(1)))}>
         <Mat
           raised
           foot={
-            <div {...stylex.props(styles.foot)}>
-              <p {...stylex.props(styles.lead)}>{ABOUT_BANNER.lead}</p>
-              <p lang="en" {...stylex.props(styles.meta)}>
+            <div {...stylex.attrs(styles.foot)}>
+              <p {...stylex.attrs(styles.lead)}>{ABOUT_BANNER.lead}</p>
+              <p lang="en" {...stylex.attrs(styles.meta)}>
                 {ABOUT_BANNER.established} · {ABOUT_BANNER.place}
               </p>
             </div>
           }
         >
           <Bevel>
-            <div {...stylex.props(styles.photo)}>
+            <div {...stylex.attrs(styles.photo)}>
               <img
                 src={ABOUT_BANNER.image}
                 alt={ABOUT_BANNER.alt}
-                fetchPriority="high"
+                fetchpriority="high"
                 decoding="async"
-                {...stylex.props(ui.fill, styles.banner)}
+                {...stylex.attrs(ui.fill, styles.banner)}
               />
-              <a href="#about-campus" {...stylex.props(styles.door, stylex.defaultMarker())}>
+              <a href="#about-campus" {...stylex.attrs(styles.door, stylex.defaultMarker())}>
                 <span {...srOnly}>Enter the campus: {LOBBY.english}</span>
                 <MiniPlate plate={LOBBY} photoStyle={styles.doorPhoto}>
-                  <span {...stylex.props(styles.speck)}>
+                  <span {...stylex.attrs(styles.speck)}>
                     <MiniPlate plate={RECEPTION} />
                   </span>
                 </MiniPlate>
-                <span {...stylex.props(styles.doorTag)}>
+                <span {...stylex.attrs(styles.doorTag)}>
                   <Tag numeral={LOBBY.numeral} pinned={false} />
                 </span>
               </a>

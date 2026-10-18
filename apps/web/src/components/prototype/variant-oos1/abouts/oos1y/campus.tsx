@@ -123,40 +123,39 @@ export function CampusWall() {
     <section
       id="about-campus"
       aria-labelledby="oos1y-campus"
-      {...stylex.props(ui.anchor, styles.section)}
+      {...stylex.attrs(ui.anchor, styles.section)}
     >
       <h2 id="oos1y-campus" {...srOnly}>
         {ABOUT_CAMPUS.eyebrow}
       </h2>
-      <ul ref={wallRef} {...stylex.props(styles.wall)}>
+      <ul ref={wallRef} {...stylex.attrs(styles.wall)}>
         {ABOUT_CAMPUS.photos.map((photo, index) => (
           <li
-            key={photo.id}
-            {...stylex.props(
+            {...stylex.attrs(
               styles.bay,
-              phase === "hidden" && styles.bayHidden,
-              phase === "shown" && styles.bayDelay(index * 80),
+              phase() === "hidden" && styles.bayHidden,
+              phase() === "shown" && styles.bayDelay(index * 80),
             )}
           >
             <button
               type="button"
               onClick={() => lightbox.open(index)}
-              {...stylex.props(styles.button, stylex.defaultMarker())}
+              {...stylex.attrs(styles.button, stylex.defaultMarker())}
             >
               <img
                 src={photo.src}
                 alt={photo.alt}
                 loading="lazy"
                 decoding="async"
-                {...stylex.props(ui.fill, styles.image, positions[photo.id])}
+                {...stylex.attrs(ui.fill, styles.image, positions[photo.id])}
               />
-              <span {...stylex.props(styles.band)}>
-                <span {...stylex.props(styles.caption)}>
+              <span {...stylex.attrs(styles.band)}>
+                <span {...stylex.attrs(styles.caption)}>
                   <span lang="en">{ENGLISH[photo.id]}</span>
                   <span {...srOnly}> {photo.english}, View larger</span>
                 </span>
               </span>
-              <span aria-hidden="true" {...stylex.props(styles.focusFrame)} />
+              <span aria-hidden="true" {...stylex.attrs(styles.focusFrame)} />
             </button>
           </li>
         ))}

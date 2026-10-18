@@ -1,5 +1,5 @@
 import * as stylex from "@stylexjs/stylex";
-import type { CSSProperties } from "react";
+import type { JSX } from "@solidjs/web";
 
 import { ABOUT_CULTURE } from "../../about-data";
 import { ui } from "./layout";
@@ -88,35 +88,29 @@ const styles = stylex.create({
   },
 });
 
-function KeyedTitle({ title, glyph }: { title: string; glyph: string }) {
-  return title.split(glyph).flatMap((part, index) =>
-    index === 0
-      ? [part]
-      : [
-          <span key={`${glyph}-${part}`} {...stylex.props(styles.key)}>
-            {glyph}
-          </span>,
-          part,
-        ],
-  );
+function KeyedTitle(props: { title: string; glyph: string }) {
+  return props.title
+    .split(props.glyph)
+    .flatMap((part, index) =>
+      index === 0 ? [part] : [<span {...stylex.attrs(styles.key)}>{props.glyph}</span>, part],
+    );
 }
 
-function GlyphPlate({ glyph, phase }: { glyph: Glyph; phase: Phase }) {
-  const plan = EXPOSURE_PLAN[glyph];
+function GlyphPlate(props: { glyph: Glyph; phase: Phase }) {
+  const plan = EXPOSURE_PLAN[props.glyph];
   const echoes = echoIndexes(plan.echoes);
   return (
-    <div aria-hidden="true" {...stylex.props(ui.q1, styles.plate)}>
+    <div aria-hidden="true" {...stylex.attrs(ui.q1, styles.plate)}>
       <span
-        {...stylex.props(styles.glyph)}
-        style={{ "--center": `${(plan.echoes * plan.unit) / 2}em` } as CSSProperties}
+        {...stylex.attrs(styles.glyph)}
+        style={{ "--center": `${(plan.echoes * plan.unit) / 2}em` } as JSX.CSSProperties}
       >
         {echoes.map((k) => (
           <span
-            key={k}
-            {...stylex.props(
+            {...stylex.attrs(
               styles.glyphEcho,
-              phase === "armed" && strobe.hidden,
-              phase === "fire" && strobe.pop,
+              props.phase === "armed" && strobe.hidden,
+              props.phase === "fire" && strobe.pop,
             )}
             style={
               {
@@ -126,36 +120,39 @@ function GlyphPlate({ glyph, phase }: { glyph: Glyph; phase: Phase }) {
                     ? DOUBLE_EXPOSURE_OPACITY
                     : trailOpacity(k, plan.echoes, TRAIL_BRIGHTEST),
                 "--pop-at": `${(plan.echoes - k) * TICK}ms`,
-              } as CSSProperties
+              } as JSX.CSSProperties
             }
           >
-            <span {...stylex.props(styles.glyphEchoInk)}>{glyph}</span>
+            <span {...stylex.attrs(styles.glyphEchoInk)}>{props.glyph}</span>
           </span>
         ))}
         <span
-          {...stylex.props(phase === "armed" && strobe.hidden, phase === "fire" && strobe.pop)}
-          style={{ "--pop-at": `${plan.echoes * TICK}ms` } as CSSProperties}
+          {...stylex.attrs(
+            props.phase === "armed" && strobe.hidden,
+            props.phase === "fire" && strobe.pop,
+          )}
+          style={{ "--pop-at": `${plan.echoes * TICK}ms` } as JSX.CSSProperties}
         >
-          {glyph}
+          {props.glyph}
         </span>
       </span>
-      <span lang="en" {...stylex.props(ui.frameNumber, styles.plateNote)}>
+      <span lang="en" {...stylex.attrs(ui.frameNumber, styles.plateNote)}>
         {plan.note}
       </span>
     </div>
   );
 }
 
-function ValueRow({ value }: { value: (typeof ABOUT_CULTURE.values)[number] }) {
+function ValueRow(props: { value: (typeof ABOUT_CULTURE.values)[number] }) {
   const [ref, phase] = useEntry<HTMLLIElement>();
   return (
-    <li ref={ref} {...stylex.props(ui.grid, styles.row)}>
-      <GlyphPlate glyph={value.glyph} phase={phase} />
-      <div {...stylex.props(ui.q2to3, styles.text)}>
-        <h3 {...stylex.props(styles.title)}>
-          <KeyedTitle title={value.title} glyph={value.glyph} />
+    <li ref={ref} {...stylex.attrs(ui.grid, styles.row)}>
+      <GlyphPlate glyph={props.value.glyph} phase={phase()} />
+      <div {...stylex.attrs(ui.q2to3, styles.text)}>
+        <h3 {...stylex.attrs(styles.title)}>
+          <KeyedTitle title={props.value.title} glyph={props.value.glyph} />
         </h3>
-        <p {...stylex.props(ui.body, styles.desc)}>{value.desc}</p>
+        <p {...stylex.attrs(ui.body, styles.desc)}>{props.value.desc}</p>
       </div>
     </li>
   );
@@ -163,12 +160,12 @@ function ValueRow({ value }: { value: (typeof ABOUT_CULTURE.values)[number] }) {
 
 export function Culture() {
   return (
-    <section id="about-culture" aria-labelledby="oos1p-culture" {...stylex.props(ui.plate)}>
+    <section id="about-culture" aria-labelledby="oos1p-culture" {...stylex.attrs(ui.plate)}>
       <PlateHead plate={3} english="Culture" title={ABOUT_CULTURE.title} titleId="oos1p-culture" />
-      <div {...stylex.props(ui.shell)}>
-        <ol {...stylex.props(styles.list)}>
+      <div {...stylex.attrs(ui.shell)}>
+        <ol {...stylex.attrs(styles.list)}>
           {ABOUT_CULTURE.values.map((value) => (
-            <ValueRow key={value.glyph} value={value} />
+            <ValueRow value={value} />
           ))}
         </ol>
       </div>

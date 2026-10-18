@@ -68,4 +68,4 @@ export const ui = stylex.create({
   dimDelay: (ms: number) => ({ transitionDelay: `${ms}ms` }),
 });
 
-export const srOnly = stylex.props(ui.srOnly);
+export const srOnly = stylex.attrs(ui.srOnly);

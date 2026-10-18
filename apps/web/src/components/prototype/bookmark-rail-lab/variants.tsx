@@ -1,7 +1,7 @@
 import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { AnimatePresence, m } from "motion/react";
-import { useCallback, useEffect, useMemo, useRef, useState, type MouseEvent } from "react";
+import { AnimatePresence, m } from "@/compat/motion";
+import { createMemo, createSignal, For, onCleanup, onSettled, Show, untrack } from "solid-js";
 
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
@@ -63,8 +63,8 @@ function featuredItems(): CodexBookmarkItem[] {
 }
 
 function useArticleInView(firstId: string | undefined, lastId: string | undefined) {
-  const [inView, setInView] = useState(false);
-  useEffect(() => {
+  const [inView, setInView] = createSignal(false);
+  onSettled(() => {
     let frame = 0;
     const update = () => {
       frame = 0;
@@ -86,7 +86,7 @@ function useArticleInView(firstId: string | undefined, lastId: string | undefine
       window.removeEventListener("resize", schedule);
       if (frame) cancelAnimationFrame(frame);
     };
-  }, [firstId, lastId]);
+  });
   return inView;
 }
 
@@ -216,127 +216,137 @@ function barStateFor(index: number, openIndex: number, isActive: boolean): BarSt
   return "rest";
 }
 
-function ProtoRail({ items, config }: { items: readonly CodexBookmarkItem[]; config: RailConfig }) {
+function ProtoRail(props: { items: readonly CodexBookmarkItem[]; config: RailConfig }) {
   const reduce = useReducedMotion();
-  const ids = useMemo(() => items.map((item) => item.id), [items]);
+  const ids = createMemo(() => props.items.map((item) => item.id));
   const activeId = useBookmarkActive(ids);
-  const [hoveredId, setHoveredId] = useState<string | null>(null);
-  const [pinnedId, setPinnedId] = useState<string | null>(null);
-  const pinTimerRef = useRef<number | undefined>(undefined);
-  const closeTimerRef = useRef<number | undefined>(undefined);
+  const [hoveredId, setHoveredId] = createSignal<string | null>(null);
+  const [pinnedId, setPinnedId] = createSignal<string | null>(null);
+  let pinTimer: number | undefined;
+  let closeTimer: number | undefined;
 
-  const cancelClose = useCallback(() => clearTimeout(closeTimerRef.current), []);
-  const scheduleClose = useCallback(() => {
-    clearTimeout(closeTimerRef.current);
-    closeTimerRef.current = window.setTimeout(() => setHoveredId(null), CLOSE_DELAY_MS);
-  }, []);
-  const openTick = useCallback((id: string) => {
-    clearTimeout(closeTimerRef.current);
+  const cancelClose = () => clearTimeout(closeTimer);
+  const scheduleClose = () => {
+    clearTimeout(closeTimer);
+    closeTimer = window.setTimeout(() => setHoveredId(null), CLOSE_DELAY_MS);
+  };
+  const openTick = (id: string) => {
+    clearTimeout(closeTimer);
     setHoveredId(id);
-  }, []);
-  const handleSelect = useCallback((id: string, event?: MouseEvent) => {
+  };
+  const handleSelect = (id: string, event?: MouseEvent) => {
     event?.stopPropagation();
     scrollToBookmark(id);
     setPinnedId(id);
-    clearTimeout(pinTimerRef.current);
-    pinTimerRef.current = window.setTimeout(() => setPinnedId(null), 1400);
-  }, []);
+    clearTimeout(pinTimer);
+    pinTimer = window.setTimeout(() => setPinnedId(null), 1400);
+  };
 
-  useEffect(
-    () => () => {
-      clearTimeout(pinTimerRef.current);
-      clearTimeout(closeTimerRef.current);
-    },
-    [],
-  );
+  onCleanup(() => {
+    clearTimeout(pinTimer);
+    clearTimeout(closeTimer);
+  });
 
-  const openId = hoveredId ?? pinnedId;
-  const openIndex = openId === null ? -1 : items.findIndex((item) => item.id === openId);
-  const openItem = openIndex === -1 ? null : items[openIndex];
-  const cardY = RAIL_PAD + openIndex * (config.tick + config.gap) + config.tick / 2;
+  const openIndex = createMemo(() => {
+    const openId = hoveredId() ?? pinnedId();
+    return openId === null ? -1 : props.items.findIndex((item) => item.id === openId);
+  });
+  const openItem = () => (openIndex() === -1 ? null : props.items[openIndex()]);
+  const cardY = () =>
+    RAIL_PAD + openIndex() * (props.config.tick + props.config.gap) + props.config.tick / 2;
 
   return (
     <nav
       aria-label="文章书签导航"
-      {...stylex.props(styles.rail)}
-      style={{ gap: config.gap, alignItems: ALIGN_FLEX[config.align] }}
+      {...stylex.attrs(styles.rail)}
+      style={{ gap: `${props.config.gap}px`, "align-items": ALIGN_FLEX[props.config.align] }}
       onMouseEnter={cancelClose}
       onMouseLeave={scheduleClose}
     >
-      {items.map((item, index) => {
-        const isActive = item.id === activeId;
-        const state = barStateFor(index, openIndex, isActive);
-        return (
-          <button
-            key={item.id}
-            type="button"
-            aria-label={`${item.title} — 书签`}
-            aria-current={isActive ? "location" : undefined}
-            onClick={(event) => handleSelect(item.id, event)}
-            onMouseEnter={() => openTick(item.id)}
-            onFocus={() => openTick(item.id)}
-            onBlur={scheduleClose}
-            {...stylex.props(styles.tickButton)}
-            style={{
-              height: config.tick,
-              minWidth: config.bar + 6,
-              justifyContent: ALIGN_FLEX[config.align],
-            }}
-          >
-            <span
-              aria-hidden="true"
-              {...stylex.props(styles.bar)}
+      <For each={props.items}>
+        {(item, index) => {
+          const isActive = () => item.id === activeId();
+          const state = () => barStateFor(index(), openIndex(), isActive());
+          return (
+            <button
+              type="button"
+              aria-label={`${item.title} — 书签`}
+              aria-current={isActive() ? "location" : undefined}
+              onClick={(event) => handleSelect(item.id, event)}
+              onMouseEnter={() => openTick(item.id)}
+              onFocus={() => openTick(item.id)}
+              onBlur={scheduleClose}
+              {...stylex.attrs(styles.tickButton)}
               style={{
-                width: config.bar,
-                transform: `scaleX(${config.scales[state]})`,
-                transformOrigin: ALIGN_ORIGIN[config.align],
-                backgroundColor: BAR_COLORS[state],
+                height: `${props.config.tick}px`,
+                "min-width": `${props.config.bar + 6}px`,
+                "justify-content": ALIGN_FLEX[props.config.align],
               }}
-            />
-          </button>
-        );
-      })}
+            >
+              <span
+                aria-hidden="true"
+                {...stylex.attrs(styles.bar)}
+                style={{
+                  width: `${props.config.bar}px`,
+                  transform: `scaleX(${props.config.scales[state()]})`,
+                  "transform-origin": ALIGN_ORIGIN[props.config.align],
+                  "background-color": BAR_COLORS[state()],
+                }}
+              />
+            </button>
+          );
+        }}
+      </For>
 
       <AnimatePresence>
-        {openItem ? (
+        <Show when={openItem() !== null}>
           <m.div
-            key="card-anchor"
             initial={
-              reduce ? { opacity: 0, y: cardY } : { opacity: 0, x: -4, scale: 0.97, y: cardY }
+              untrack(reduce)
+                ? { opacity: 0, y: untrack(cardY) }
+                : { opacity: 0, x: -4, scale: 0.97, y: untrack(cardY) }
             }
-            animate={{ opacity: 1, x: 0, scale: 1, y: cardY }}
+            animate={{ opacity: 1, x: 0, scale: 1, y: cardY() }}
             exit={
-              reduce
+              reduce()
                 ? { opacity: 0, transition: { duration: 0.12 } }
                 : { opacity: 0, x: -4, scale: 0.97, transition: { duration: 0.12, ease: EASE_OUT } }
             }
             transition={
-              reduce
+              reduce()
                 ? { duration: 0.12, y: { duration: 0 } }
                 : { duration: 0.18, ease: EASE_OUT, y: CARD_SPRING }
             }
-            {...stylex.props(styles.cardAnchor)}
+            {...stylex.attrs(styles.cardAnchor)}
             onMouseEnter={cancelClose}
-            onClick={(event) => handleSelect(openItem.id, event)}
+            onClick={(event: MouseEvent) => {
+              const item = openItem();
+              if (item) handleSelect(item.id, event);
+            }}
           >
-            <div {...stylex.props(styles.card)}>
+            <div {...stylex.attrs(styles.card)}>
               <AnimatePresence mode="popLayout" initial={false}>
-                <m.div
-                  key={openItem.id}
-                  initial={reduce ? { opacity: 0 } : { opacity: 0, filter: "blur(2px)" }}
-                  animate={{ opacity: 1, filter: "blur(0px)" }}
-                  exit={reduce ? { opacity: 0 } : { opacity: 0, filter: "blur(2px)" }}
-                  transition={{ duration: reduce ? 0 : 0.14, ease: EASE_OUT }}
-                >
-                  <span {...stylex.props(styles.cardTitle)} title={openItem.title}>
-                    {openItem.title}
-                  </span>
-                  <p {...stylex.props(styles.cardSummary)}>{openItem.summary}</p>
-                </m.div>
+                <Show when={openItem()} keyed>
+                  {(item) => (
+                    <m.div
+                      initial={
+                        untrack(reduce) ? { opacity: 0 } : { opacity: 0, filter: "blur(2px)" }
+                      }
+                      animate={{ opacity: 1, filter: "blur(0px)" }}
+                      exit={untrack(reduce) ? { opacity: 0 } : { opacity: 0, filter: "blur(2px)" }}
+                      transition={{ duration: untrack(reduce) ? 0 : 0.14, ease: EASE_OUT }}
+                    >
+                      <span {...stylex.attrs(styles.cardTitle)} title={item.title}>
+                        {item.title}
+                      </span>
+                      <p {...stylex.attrs(styles.cardSummary)}>{item.summary}</p>
+                    </m.div>
+                  )}
+                </Show>
               </AnimatePresence>
             </div>
           </m.div>
-        ) : null}
+        </Show>
       </AnimatePresence>
     </nav>
   );
@@ -348,19 +358,19 @@ type Placement = {
 };
 
 function makeVariant(placement: Placement, config: RailConfig) {
-  return function RailVariant({ onNavigateHome }: SubPageProps) {
-    const items = useMemo(featuredItems, []);
+  return function RailVariant(props: SubPageProps) {
+    const items = featuredItems();
     const inView = useArticleInView(items[0]?.id, items.at(-1)?.id);
     return (
       <>
         <style>{HIDE_PRODUCTION_RAIL}</style>
-        <InsightsView onNavigateHome={onNavigateHome} />
+        <InsightsView onNavigateHome={props.onNavigateHome} />
         <div
-          {...stylex.props(
+          {...stylex.attrs(
             styles.frame,
             styles[placement.horizontal],
             styles[placement.vertical],
-            !inView && styles.hidden,
+            !inView() && styles.hidden,
           )}
         >
           <ProtoRail items={items} config={config} />

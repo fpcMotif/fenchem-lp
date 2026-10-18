@@ -1,4 +1,4 @@
-import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
+import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 
 import { ABOUT_BANNER } from "../../about-data";
@@ -7,26 +7,25 @@ import { layout } from "./layout";
 import { media, palette } from "./palette.stylex";
 import { CountUp, Reveal } from "./reveal";
 
-const LG = breakpoints.lg;
-const MD = breakpoints.md;
+const LG = "@media (min-width: 1024px)";
+const MD = "@media (min-width: 768px)";
 const EDGE = "min(72px, 5.2vw)";
 const BOTTOM_SCRIM =
   "linear-gradient(to top, rgba(6, 28, 66, 0.78) 0%, rgba(6, 28, 66, 0.4) 36%, rgba(6, 28, 66, 0) 68%)";
 
-const rejoin = {
-  left: stylex.keyframes({
-    "0%": { transform: "translateY(56px)" },
-    "100%": { transform: "translateY(0)" },
-  }),
-  right: stylex.keyframes({
-    "0%": { transform: "translateY(-56px)" },
-    "100%": { transform: "translateY(0)" },
-  }),
-  word: stylex.keyframes({
-    "0%": { opacity: 0 },
-    "100%": { opacity: 1 },
-  }),
-};
+const rejoinLeft = stylex.keyframes({
+  "0%": { transform: "translateY(56px)" },
+  "100%": { transform: "translateY(0)" },
+});
+const rejoinRight = stylex.keyframes({
+  "0%": { transform: "translateY(-56px)" },
+  "100%": { transform: "translateY(0)" },
+});
+const rejoinWord = stylex.keyframes({
+  "0%": { opacity: 0 },
+  "100%": { opacity: 1 },
+});
+const rejoin = { left: rejoinLeft, right: rejoinRight, word: rejoinWord };
 
 const styles = stylex.create({
   hero: {
@@ -54,11 +53,17 @@ const styles = stylex.create({
   },
   halfLeft: {
     left: 0,
-    animationName: { default: null, [breakpoints.motionOk]: rejoin.left },
+    animationName: {
+      default: null,
+      ["@media (prefers-reduced-motion: no-preference)"]: rejoin.left,
+    },
   },
   halfRight: {
     left: "50%",
-    animationName: { default: null, [breakpoints.motionOk]: rejoin.right },
+    animationName: {
+      default: null,
+      ["@media (prefers-reduced-motion: no-preference)"]: rejoin.right,
+    },
   },
   image: {
     position: "absolute",
@@ -100,7 +105,10 @@ const styles = stylex.create({
     lineHeight: 0.98,
     letterSpacing: "0.02em",
     color: "#ffffff",
-    animationName: { default: null, [breakpoints.motionOk]: rejoin.word },
+    animationName: {
+      default: null,
+      ["@media (prefers-reduced-motion: no-preference)"]: rejoin.word,
+    },
     animationDuration: "1000ms",
     animationDelay: "500ms",
     animationTimingFunction: palette.easeOut,
@@ -162,13 +170,33 @@ const styles = stylex.create({
   cellMain: {
     alignItems: { default: "flex-start", [LG]: "flex-end" },
     textAlign: { default: "start", [LG]: "end" },
-    paddingInlineStart: { default: 20, [breakpoints.sm]: 28, [media.tablet]: 40, [LG]: EDGE },
-    paddingInlineEnd: { default: 20, [breakpoints.sm]: 28, [media.tablet]: 40, [LG]: 48 },
+    paddingInlineStart: {
+      default: 20,
+      ["@media (min-width: 640px)"]: 28,
+      [media.tablet]: 40,
+      [LG]: EDGE,
+    },
+    paddingInlineEnd: {
+      default: 20,
+      ["@media (min-width: 640px)"]: 28,
+      [media.tablet]: 40,
+      [LG]: 48,
+    },
   },
   cellSide: {
     alignItems: "flex-start",
-    paddingInlineStart: { default: 20, [breakpoints.sm]: 28, [media.tablet]: 40, [LG]: 40 },
-    paddingInlineEnd: { default: 20, [breakpoints.sm]: 28, [media.tablet]: 40, [LG]: 24 },
+    paddingInlineStart: {
+      default: 20,
+      ["@media (min-width: 640px)"]: 28,
+      [media.tablet]: 40,
+      [LG]: 40,
+    },
+    paddingInlineEnd: {
+      default: 20,
+      ["@media (min-width: 640px)"]: 28,
+      [media.tablet]: 40,
+      [LG]: 24,
+    },
   },
   figure: {
     display: "flex",
@@ -205,41 +233,41 @@ export function Hero() {
   const lead = ABOUT_BANNER.title.slice(0, cut);
   const brand = ABOUT_BANNER.title.slice(cut);
   return (
-    <section aria-labelledby="about-banner-title" {...stylex.props(styles.hero)}>
-      <div {...stylex.props(styles.stage)}>
-        <div {...stylex.props(styles.half, styles.halfLeft)}>
+    <section aria-labelledby="about-banner-title" {...stylex.attrs(styles.hero)}>
+      <div {...stylex.attrs(styles.stage)}>
+        <div {...stylex.attrs(styles.half, styles.halfLeft)}>
           <img
             src={ABOUT_BANNER.image}
             alt={ABOUT_BANNER.alt}
-            fetchPriority="high"
+            fetchpriority="high"
             decoding="async"
-            {...stylex.props(styles.image, styles.imageLeft)}
+            {...stylex.attrs(styles.image, styles.imageLeft)}
           />
         </div>
-        <div aria-hidden="true" {...stylex.props(styles.half, styles.halfRight)}>
+        <div aria-hidden="true" {...stylex.attrs(styles.half, styles.halfRight)}>
           <img
             src={ABOUT_BANNER.image}
             alt=""
-            fetchPriority="high"
+            fetchpriority="high"
             decoding="async"
-            {...stylex.props(styles.image, styles.imageRight)}
+            {...stylex.attrs(styles.image, styles.imageRight)}
           />
         </div>
-        <div aria-hidden="true" {...stylex.props(layout.fillBox, styles.scrim)} />
-        <h1 id="about-banner-title" {...stylex.props(styles.title)}>
-          <span {...stylex.props(styles.titleLeft)}>{lead}</span>
-          <span {...stylex.props(styles.titleRight)}>{brand}</span>
+        <div aria-hidden="true" {...stylex.attrs(layout.fillBox, styles.scrim)} />
+        <h1 id="about-banner-title" {...stylex.attrs(styles.title)}>
+          <span {...stylex.attrs(styles.titleLeft)}>{lead}</span>
+          <span {...stylex.attrs(styles.titleRight)}>{brand}</span>
         </h1>
       </div>
-      <div {...stylex.props(layout.shell, layout.split, styles.intro)}>
-        <div {...stylex.props(layout.padLeft, layout.seam)}>
-          <p lang="en" {...stylex.props(styles.tagline)}>
+      <div {...stylex.attrs(layout.shell, layout.split, styles.intro)}>
+        <div {...stylex.attrs(layout.padLeft, layout.seam)}>
+          <p lang="en" {...stylex.attrs(styles.tagline)}>
             {ABOUT_BANNER.tagline}
           </p>
         </div>
-        <div {...stylex.props(layout.padRight, styles.introRight)}>
-          <p {...stylex.props(styles.lead)}>{ABOUT_BANNER.lead}</p>
-          <p lang="en" {...stylex.props(layout.label)}>
+        <div {...stylex.attrs(layout.padRight, styles.introRight)}>
+          <p {...stylex.attrs(styles.lead)}>{ABOUT_BANNER.lead}</p>
+          <p lang="en" {...stylex.attrs(layout.label)}>
             {ABOUT_BANNER.established} · {ABOUT_BANNER.place}
           </p>
         </div>
@@ -250,22 +278,18 @@ export function Hero() {
 
 export function Stats() {
   return (
-    <section aria-label="Fenchem growth figures" {...stylex.props(styles.stats)}>
-      <div {...stylex.props(layout.shell, styles.statsGrid)}>
+    <section aria-label="Fenchem growth figures" {...stylex.attrs(styles.stats)}>
+      <div {...stylex.attrs(layout.shell, styles.statsGrid)}>
         {STATS.map((stat, index) => {
           const main = index === 0;
           return (
-            <Reveal
-              key={stat.label}
-              step={index}
-              sx={[styles.cell, main ? styles.cellMain : styles.cellSide]}
-            >
-              <p {...stylex.props(layout.label)}>{stat.label}</p>
-              <div {...stylex.props(styles.figure, main ? styles.figureMain : styles.figureSide)}>
+            <Reveal step={index} sx={[styles.cell, main ? styles.cellMain : styles.cellSide]}>
+              <p {...stylex.attrs(layout.label)}>{stat.label}</p>
+              <div {...stylex.attrs(styles.figure, main ? styles.figureMain : styles.figureSide)}>
                 <CountUp value={stat.value} />
-                {stat.unit ? <span {...stylex.props(styles.unit)}>{stat.unit}</span> : null}
+                {stat.unit ? <span {...stylex.attrs(styles.unit)}>{stat.unit}</span> : null}
               </div>
-              <p {...stylex.props(styles.caption)}>{stat.caption}</p>
+              <p {...stylex.attrs(styles.caption)}>{stat.caption}</p>
             </Reveal>
           );
         })}

@@ -1,4 +1,4 @@
-import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
+import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 
 import { HONORS_BY_LEVEL, LEVEL_LABEL, type Level } from "./data";
@@ -6,7 +6,7 @@ import { layout } from "./layout";
 import { palette } from "./palette.stylex";
 import { Reveal } from "./reveal";
 
-const LG = breakpoints.lg;
+const LG = "@media (min-width: 1024px)";
 
 const styles = stylex.create({
   section: {
@@ -59,28 +59,23 @@ export function Honors() {
     <section
       id="about-honor"
       aria-labelledby="about-honor-title"
-      {...stylex.props(styles.section, layout.sectionY, layout.anchor)}
+      {...stylex.attrs(styles.section, layout.sectionY, layout.anchor)}
     >
-      <h2 id="about-honor-title" {...stylex.props(layout.srOnly)}>
+      <h2 id="about-honor-title" {...stylex.attrs(layout.srOnly)}>
         Honors
       </h2>
-      <ol {...stylex.props(layout.shell, styles.groups)}>
+      <ol {...stylex.attrs(layout.shell, styles.groups)}>
         {HONORS_BY_LEVEL.map((group, index) => (
-          <li
-            key={group.level}
-            {...stylex.props(layout.split, styles.group, index === 0 && styles.groupFirst)}
-          >
+          <li {...stylex.attrs(layout.split, styles.group, index === 0 && styles.groupFirst)}>
             <Reveal sx={[layout.padLeft, layout.seam, styles.level]}>
-              <h3 id={levelTitleId(group.level)} {...stylex.props(layout.label)}>
+              <h3 id={levelTitleId(group.level)} {...stylex.attrs(layout.label)}>
                 {LEVEL_LABEL[group.level]}
               </h3>
             </Reveal>
             <Reveal step={1} sx={layout.padRight}>
-              <ul aria-labelledby={levelTitleId(group.level)} {...stylex.props(styles.list)}>
+              <ul aria-labelledby={levelTitleId(group.level)} {...stylex.attrs(styles.list)}>
                 {group.items.map((honor) => (
-                  <li key={honor.id} {...stylex.props(styles.row)}>
-                    {honor.title}
-                  </li>
+                  <li {...stylex.attrs(styles.row)}>{honor.title}</li>
                 ))}
               </ul>
             </Reveal>

@@ -9,8 +9,8 @@ const root = fileURLToPath(new URL("..", import.meta.url));
 const START_REGISTER_FOOTER = [
   [
     "import type { getRouter } from './router.tsx'",
-    "import type { createStart } from '@tanstack/react-start'",
-    "declare module '@tanstack/react-start' {",
+    "import type { createStart } from '@tanstack/solid-start'",
+    "declare module '@tanstack/solid-start' {",
     "  interface Register {",
     "    ssr: true",
     "    router: Awaited<ReturnType<typeof getRouter>>",
@@ -21,7 +21,7 @@ const START_REGISTER_FOOTER = [
 
 const config = getConfig(
   {
-    target: "react",
+    target: "solid",
     routesDirectory: "./src/routes",
     generatedRouteTree: "./src/routeTree.gen.ts",
     routeTreeFileFooter: START_REGISTER_FOOTER,

@@ -1,9 +1,10 @@
 import { Collapse } from "../../../shared/collapse";
-import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
+import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { ChevronUp, X } from "lucide-react";
-import { m } from "motion/react";
-import { useId, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
+import { ChevronUp, X } from "@fenchem-lp/ui/components/lucide";
+import { m } from "@/compat/motion";
+import { createMemo, createSignal, createUniqueId, For, Show } from "solid-js";
+import type { JSX } from "@solidjs/web";
 
 import { EASE } from "@/components/prototype/motion-constants";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
@@ -12,13 +13,13 @@ import { REGION_META, type FlatItem } from "../shared/derived";
 import { Inci } from "./inci";
 import { catalogTone, font, ink, layout, mq } from "./theme.stylex";
 
-const MD = breakpoints.md;
-const DESKTOP = breakpoints.xl;
+const MD = "@media (min-width: 768px)";
+const DESKTOP = "@media (min-width: 1280px)";
 const BAR_HEIGHT = 64;
 
 interface CompareRow {
   label: string;
-  render: (item: FlatItem) => ReactNode;
+  render: (item: FlatItem) => JSX.Element;
 }
 
 const originOf = (item: FlatItem) => {
@@ -205,7 +206,10 @@ const styles = stylex.create({
     cursor: "pointer",
     transform: {
       default: null,
-      ":active": { default: null, [breakpoints.motionOk]: "scale(0.97)" },
+      ":active": {
+        default: null,
+        ["@media (prefers-reduced-motion: no-preference)"]: "scale(0.97)",
+      },
     },
     transitionProperty: "background-color, border-color, color, transform",
     transitionDuration: "150ms",
@@ -408,40 +412,38 @@ const ROWS: CompareRow[] = [
     render: (item) => {
       const origin = originOf(item);
       return origin ? (
-        <span {...stylex.props(styles.origin)}>{origin}</span>
+        <span {...stylex.attrs(styles.origin)}>{origin}</span>
       ) : (
-        <span {...stylex.props(styles.none)}>—</span>
+        <span {...stylex.attrs(styles.none)}>—</span>
       );
     },
   },
   {
     label: "INCI 名称",
     render: (item) => (
-      <span {...stylex.props(styles.inci)}>
+      <span {...stylex.attrs(styles.inci)}>
         <Inci text={item.inci} />
       </span>
     ),
   },
   {
     label: "特性&应用",
-    render: (item) => <span {...stylex.props(styles.features)}>{item.features}</span>,
+    render: (item) => <span {...stylex.attrs(styles.features)}>{item.features}</span>,
   },
 ];
 
-function ItemName({ item }: { item: FlatItem }) {
+function ItemName(props: { item: FlatItem }) {
   return (
     <>
-      <span {...stylex.props(styles.namePrimary)}>{item.primary}</span>
-      {item.secondary && <span {...stylex.props(styles.nameSecondary)}>{item.secondary}</span>}
+      <span {...stylex.attrs(styles.namePrimary)}>{props.item.primary}</span>
+      {props.item.secondary && (
+        <span {...stylex.attrs(styles.nameSecondary)}>{props.item.secondary}</span>
+      )}
     </>
   );
 }
 
-function RemoveButton({
-  item,
-  inline,
-  onRemove,
-}: {
+function RemoveButton(props: {
   item: FlatItem;
   inline?: boolean;
   onRemove: (item: FlatItem) => void;
@@ -449,65 +451,68 @@ function RemoveButton({
   return (
     <button
       type="button"
-      aria-label={`Remove ${item.englishName}`}
-      onClick={() => onRemove(item)}
-      {...stylex.props(styles.remove, inline && styles.removeInline)}
+      aria-label={`Remove ${props.item.englishName}`}
+      onClick={() => props.onRemove(props.item)}
+      {...stylex.attrs(styles.remove, props.inline && styles.removeInline)}
     >
       <X size={16} strokeWidth={1.5} absoluteStrokeWidth aria-hidden="true" />
     </button>
   );
 }
 
-function CompareTable({
-  slots,
-  onRemove,
-}: {
-  slots: (FlatItem | null)[];
-  onRemove: (item: FlatItem) => void;
-}) {
+function CompareTable(props: { slots: (FlatItem | null)[]; onRemove: (item: FlatItem) => void }) {
   return (
-    <table aria-label="Comparison details" {...stylex.props(styles.table)}>
+    <table aria-label="Comparison details" {...stylex.attrs(styles.table)}>
       <colgroup>
-        <col {...stylex.props(styles.colLabel)} />
-        {slots.map((_, slot) => (
-          <col key={slot} />
-        ))}
+        <col {...stylex.attrs(styles.colLabel)} />
+        <For each={props.slots} keyed={false}>
+          {() => <col />}
+        </For>
       </colgroup>
       <thead>
         <tr>
-          <th scope="row" {...stylex.props(styles.rowLabel)}>
+          <th scope="row" {...stylex.attrs(styles.rowLabel)}>
             名称
           </th>
-          {slots.map((item, slot) =>
-            item ? (
-              <th key={item.id} scope="col" {...stylex.props(styles.cell, styles.nameCell)}>
-                <ItemName item={item} />
-                <RemoveButton item={item} onRemove={onRemove} />
-              </th>
-            ) : (
-              <td key={`slot-${slot}`} {...stylex.props(styles.cell, styles.nameCell)}>
-                <span {...stylex.props(styles.emptySlot)}>从目录勾选加入</span>
-              </td>
-            ),
-          )}
+          <For each={props.slots} keyed={false}>
+            {(slotItem) => (
+              <Show
+                when={slotItem()}
+                fallback={
+                  <td {...stylex.attrs(styles.cell, styles.nameCell)}>
+                    <span {...stylex.attrs(styles.emptySlot)}>从目录勾选加入</span>
+                  </td>
+                }
+                keyed
+              >
+                {(item) => (
+                  <th scope="col" {...stylex.attrs(styles.cell, styles.nameCell)}>
+                    <ItemName item={item} />
+                    <RemoveButton item={item} onRemove={props.onRemove} />
+                  </th>
+                )}
+              </Show>
+            )}
+          </For>
         </tr>
       </thead>
       <tbody>
         {ROWS.map((row, rowIndex) => {
           const last = rowIndex === ROWS.length - 1;
           return (
-            <tr key={row.label}>
-              <th scope="row" {...stylex.props(styles.rowLabel, last && styles.lastRow)}>
+            <tr>
+              <th scope="row" {...stylex.attrs(styles.rowLabel, last && styles.lastRow)}>
                 {row.label}
               </th>
-              {slots.map((item, slot) => (
-                <td
-                  key={item ? item.id : `slot-${slot}`}
-                  {...stylex.props(styles.cell, last && styles.lastRow)}
-                >
-                  {item ? row.render(item) : null}
-                </td>
-              ))}
+              <For each={props.slots} keyed={false}>
+                {(slotItem) => (
+                  <td {...stylex.attrs(styles.cell, last && styles.lastRow)}>
+                    <Show when={slotItem()} keyed>
+                      {(item) => row.render(item)}
+                    </Show>
+                  </td>
+                )}
+              </For>
             </tr>
           );
         })}
@@ -516,48 +521,39 @@ function CompareTable({
   );
 }
 
-function CompareList({
-  items,
-  onRemove,
-}: {
-  items: FlatItem[];
-  onRemove: (item: FlatItem) => void;
-}) {
+function CompareList(props: { items: FlatItem[]; onRemove: (item: FlatItem) => void }) {
   return (
-    <ol aria-label="Comparison details" {...stylex.props(styles.list)}>
-      {items.map((item, index) => (
-        <li
-          key={item.id}
-          {...stylex.props(styles.listItem, index === items.length - 1 && styles.listItemLast)}
-        >
-          <div {...stylex.props(styles.listHead)}>
-            <p {...stylex.props(styles.listName)}>
-              <ItemName item={item} />
-            </p>
-            <RemoveButton item={item} inline onRemove={onRemove} />
-          </div>
-          <dl {...stylex.props(styles.facts)}>
-            {ROWS.map((row) => (
-              <div key={row.label} {...stylex.props(styles.fact)}>
-                <dt {...stylex.props(styles.factLabel)}>{row.label}</dt>
-                <dd {...stylex.props(styles.factValue)}>{row.render(item)}</dd>
-              </div>
-            ))}
-          </dl>
-        </li>
-      ))}
+    <ol aria-label="Comparison details" {...stylex.attrs(styles.list)}>
+      <For each={props.items}>
+        {(item, index) => (
+          <li
+            {...stylex.attrs(
+              styles.listItem,
+              index() === props.items.length - 1 && styles.listItemLast,
+            )}
+          >
+            <div {...stylex.attrs(styles.listHead)}>
+              <p {...stylex.attrs(styles.listName)}>
+                <ItemName item={item} />
+              </p>
+              <RemoveButton item={item} inline onRemove={props.onRemove} />
+            </div>
+            <dl {...stylex.attrs(styles.facts)}>
+              {ROWS.map((row) => (
+                <div {...stylex.attrs(styles.fact)}>
+                  <dt {...stylex.attrs(styles.factLabel)}>{row.label}</dt>
+                  <dd {...stylex.attrs(styles.factValue)}>{row.render(item)}</dd>
+                </div>
+              ))}
+            </dl>
+          </li>
+        )}
+      </For>
     </ol>
   );
 }
 
-export function CompareStrip({
-  items,
-  max,
-  hintId,
-  limitHint,
-  onRemove,
-  onClear,
-}: {
+export function CompareStrip(props: {
   items: FlatItem[];
   max: number;
   hintId: string;
@@ -566,23 +562,26 @@ export function CompareStrip({
   onClear: () => void;
 }) {
   const reduce = useReducedMotion();
-  const panelId = useId();
-  const toggleRef = useRef<HTMLButtonElement>(null);
-  const [expanded, setExpanded] = useState(false);
-  const count = items.length;
-  const slots = Array.from({ length: max }, (_, slot) => items[slot] ?? null);
-  const transition = { duration: reduce ? 0 : 0.24, ease: EASE };
+  const panelId = createUniqueId();
+  let toggle: HTMLButtonElement | undefined;
+  const [expanded, setExpanded] = createSignal(false);
+  const count = () => props.items.length;
+  const slots = createMemo(() =>
+    Array.from({ length: props.max }, (_, slot) => props.items[slot] ?? null),
+  );
+  const transition = () => ({ duration: reduce() ? 0 : 0.24, ease: EASE });
 
   const remove = (item: FlatItem) => {
-    onRemove(item);
-    if (count > 1) toggleRef.current?.focus();
+    const before = count();
+    props.onRemove(item);
+    if (before > 1) toggle?.focus();
   };
 
-  const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-    if (event.key !== "Escape" || !expanded) return;
+  const handleKeyDown = (event: KeyboardEvent) => {
+    if (event.key !== "Escape" || !expanded()) return;
     event.stopPropagation();
     setExpanded(false);
-    toggleRef.current?.focus();
+    toggle?.focus();
   };
 
   return (
@@ -593,70 +592,76 @@ export function CompareStrip({
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 16 }}
-      transition={transition}
-      {...stylex.props(styles.strip)}
+      transition={transition()}
+      {...stylex.attrs(styles.strip)}
     >
-      <div {...stylex.props(styles.shell)}>
-        <div {...stylex.props(styles.bar)}>
-          <div {...stylex.props(styles.barLead)}>
-            {expanded ? (
-              <p {...stylex.props(styles.barTitle)}>
+      <div {...stylex.attrs(styles.shell)}>
+        <div {...stylex.attrs(styles.bar)}>
+          <div {...stylex.attrs(styles.barLead)}>
+            {expanded() ? (
+              <p {...stylex.attrs(styles.barTitle)}>
                 原料对比
-                <span {...stylex.props(styles.barCount)}>
-                  {count} / {max}
+                <span {...stylex.attrs(styles.barCount)}>
+                  {count()} / {props.max}
                 </span>
               </p>
             ) : (
               <>
-                <span aria-hidden="true" {...stylex.props(styles.barLabel)}>
+                <span aria-hidden="true" {...stylex.attrs(styles.barLabel)}>
                   对比清单
                 </span>
-                <ul aria-label="Selected ingredients" {...stylex.props(styles.chips)}>
-                  {items.map((item) => (
-                    <li key={item.id} {...stylex.props(styles.chipItem)}>
-                      <button
-                        type="button"
-                        aria-label={`Remove ${item.englishName}`}
-                        onClick={() => remove(item)}
-                        {...stylex.props(styles.chip)}
-                      >
-                        {item.primary}
-                        <span aria-hidden="true" {...stylex.props(styles.chipIcon)}>
-                          <X size={14} strokeWidth={1.5} absoluteStrokeWidth />
-                        </span>
-                      </button>
-                    </li>
-                  ))}
+                <ul aria-label="Selected ingredients" {...stylex.attrs(styles.chips)}>
+                  <For each={props.items}>
+                    {(item) => (
+                      <li {...stylex.attrs(styles.chipItem)}>
+                        <button
+                          type="button"
+                          aria-label={`Remove ${item.englishName}`}
+                          onClick={() => remove(item)}
+                          {...stylex.attrs(styles.chip)}
+                        >
+                          {item.primary}
+                          <span aria-hidden="true" {...stylex.attrs(styles.chipIcon)}>
+                            <X size={14} strokeWidth={1.5} absoluteStrokeWidth />
+                          </span>
+                        </button>
+                      </li>
+                    )}
+                  </For>
                 </ul>
               </>
             )}
-            {count >= max && (
-              <span id={hintId} {...stylex.props(styles.hint)}>
-                {limitHint}
+            {count() >= props.max && (
+              <span id={props.hintId} {...stylex.attrs(styles.hint)}>
+                {props.limitHint}
               </span>
             )}
           </div>
-          <div {...stylex.props(styles.actions)}>
-            {expanded && (
-              <button type="button" onClick={onClear} {...stylex.props(styles.textButton)}>
+          <div {...stylex.attrs(styles.actions)}>
+            {expanded() && (
+              <button
+                type="button"
+                onClick={() => props.onClear()}
+                {...stylex.attrs(styles.textButton)}
+              >
                 清除
               </button>
             )}
             <button
-              ref={toggleRef}
+              ref={toggle}
               type="button"
-              aria-expanded={expanded}
-              aria-controls={expanded ? panelId : undefined}
+              aria-expanded={expanded() ? "true" : "false"}
+              aria-controls={expanded() ? panelId : undefined}
               onClick={() => setExpanded((open) => !open)}
-              {...stylex.props(styles.toggle, expanded && styles.toggleOpen)}
+              {...stylex.attrs(styles.toggle, expanded() && styles.toggleOpen)}
             >
-              {expanded ? "收起" : `对比 (${count})`}
+              {expanded() ? "收起" : `对比 (${count()})`}
               <m.span
                 aria-hidden="true"
                 initial={false}
-                animate={{ rotate: expanded ? 180 : 0 }}
-                transition={transition}
-                {...stylex.props(styles.chevron)}
+                animate={{ rotate: expanded() ? 180 : 0 }}
+                transition={transition()}
+                {...stylex.attrs(styles.chevron)}
               >
                 <ChevronUp size={16} strokeWidth={1.5} absoluteStrokeWidth />
               </m.span>
@@ -664,21 +669,19 @@ export function CompareStrip({
           </div>
         </div>
         <Collapse
-          key="compare-panel"
           id={panelId}
-          open={expanded}
-
-          transition={transition}
-          {...stylex.props(styles.panelClip)}
+          open={expanded()}
+          transition={transition()}
+          {...stylex.attrs(styles.panelClip)}
         >
           <div
-            tabIndex={0}
+            tabindex={0}
             aria-label="Comparison details"
             role="group"
-            {...stylex.props(styles.panelScroll)}
+            {...stylex.attrs(styles.panelScroll)}
           >
-            <CompareTable slots={slots} onRemove={remove} />
-            <CompareList items={items} onRemove={remove} />
+            <CompareTable slots={slots()} onRemove={remove} />
+            <CompareList items={props.items} onRemove={remove} />
           </div>
         </Collapse>
       </div>

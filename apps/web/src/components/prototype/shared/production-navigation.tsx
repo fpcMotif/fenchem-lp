@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from "react";
-import { AnimatePresence, m } from "motion/react";
-import { ArrowRight, ChevronDown, Menu, Pause, Play, X } from "lucide-react";
+import { createEffect, createSignal, Show } from "solid-js";
+import { AnimatePresence, m } from "@/compat/motion";
+import { ArrowRight, ChevronDown, Menu, Pause, Play, X } from "@fenchem-lp/ui/components/lucide";
 import * as stylex from "@stylexjs/stylex";
 import type { StyleXStyles } from "@stylexjs/stylex";
 import { EASE } from "../motion-constants";
@@ -79,20 +79,21 @@ const MOBILE_NAV_LINKS = [
     href: "#standards",
   },
 ];
-export function PortfolioMenu({ styles }: { styles: ProductionNavigationStyles }) {
-  const [open, setOpen] = useState(false);
+export function PortfolioMenu(props: { styles: ProductionNavigationStyles }) {
+  const styles = props.styles;
+  const [open, setOpen] = createSignal(false);
   const reduce = useReducedMotion();
-  const rootRef = useRef<HTMLDivElement>(null);
-  const buttonRef = useRef<HTMLButtonElement>(null);
-  useEffect(() => {
-    if (!open) return;
+  let root!: HTMLDivElement;
+  let button!: HTMLButtonElement;
+  createEffect(open, (isOpen) => {
+    if (!isOpen) return;
     const onPointerDown = (event: PointerEvent) => {
-      if (!rootRef.current?.contains(event.target as Node)) setOpen(false);
+      if (!root.contains(event.target as Node)) setOpen(false);
     };
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         setOpen(false);
-        buttonRef.current?.focus();
+        button.focus();
       }
     };
     document.addEventListener("pointerdown", onPointerDown);
@@ -101,36 +102,36 @@ export function PortfolioMenu({ styles }: { styles: ProductionNavigationStyles }
       document.removeEventListener("pointerdown", onPointerDown);
       document.removeEventListener("keydown", onKeyDown);
     };
-  }, [open]);
+  });
   return (
     <div
-      ref={rootRef}
-      {...stylex.props(styles.portfolioMenuRoot)}
-      onBlur={(event) => {
-        if (!rootRef.current?.contains(event.relatedTarget as Node)) setOpen(false);
+      ref={root}
+      {...stylex.attrs(styles.portfolioMenuRoot)}
+      onFocusOut={(event) => {
+        if (!root.contains(event.relatedTarget as Node)) setOpen(false);
       }}
     >
       <button
-        ref={buttonRef}
+        ref={button}
         type="button"
-        aria-expanded={open}
+        aria-expanded={open() ? "true" : "false"}
         aria-controls="portfolio-menu"
         onClick={() => setOpen((v) => !v)}
-        {...stylex.props(styles.portfolioMenuBtn)}
+        {...stylex.attrs(styles.portfolioMenuBtn)}
       >
         Portfolio
         <ChevronDown
-          aria-hidden
-          {...stylex.props(styles.portfolioChevron, open && styles.portfolioChevronOpen)}
+          aria-hidden="true"
+          {...stylex.attrs(styles.portfolioChevron, open() && styles.portfolioChevronOpen)}
         />
       </button>
 
       <AnimatePresence>
-        {open && (
+        <Show when={open()}>
           <m.div
             id="portfolio-menu"
             initial={
-              reduce
+              reduce()
                 ? {
                     opacity: 0,
                   }
@@ -144,7 +145,7 @@ export function PortfolioMenu({ styles }: { styles: ProductionNavigationStyles }
               y: 0,
             }}
             exit={
-              reduce
+              reduce()
                 ? {
                     opacity: 0,
                   }
@@ -154,34 +155,34 @@ export function PortfolioMenu({ styles }: { styles: ProductionNavigationStyles }
                   }
             }
             transition={{
-              duration: reduce ? 0 : 0.22,
+              duration: reduce() ? 0 : 0.22,
               ease: EASE,
             }}
+            {...stylex.attrs(styles.portfolioPopover)}
             style={{
               x: "-50%",
             }}
-            {...stylex.props(styles.portfolioPopover)}
           >
-            <div {...stylex.props(styles.portfolioGrid)}>
+            <div {...stylex.attrs(styles.portfolioGrid)}>
               {MENU_APPLICATIONS.map((application) => {
                 const items = getIngredientsByApplication(application).slice(0, 4);
                 const division = divisionForApplication(application);
                 return (
-                  <div key={application} {...stylex.props(styles.portfolioCol)}>
-                    <p {...stylex.props(styles.portfolioColHeader)}>
+                  <div {...stylex.attrs(styles.portfolioCol)}>
+                    <p {...stylex.attrs(styles.portfolioColHeader)}>
                       <span
-                        aria-hidden
-                        {...stylex.props(styles.dotBase, styles[DIVISION_DOT_KEYS[division]])}
+                        aria-hidden="true"
+                        {...stylex.attrs(styles.dotBase, styles[DIVISION_DOT_KEYS[division]])}
                       />
                       {application}
                     </p>
-                    <ul {...stylex.props(styles.portfolioItemList)}>
+                    <ul {...stylex.attrs(styles.portfolioItemList)}>
                       {items.map((item) => (
-                        <li key={item.code}>
+                        <li>
                           <a
                             href="#matrix"
                             onClick={() => setOpen(false)}
-                            {...stylex.props(styles.portfolioItemLink)}
+                            {...stylex.attrs(styles.portfolioItemLink)}
                           >
                             {item.name}
                           </a>
@@ -192,79 +193,87 @@ export function PortfolioMenu({ styles }: { styles: ProductionNavigationStyles }
                 );
               })}
             </div>
-            <div {...stylex.props(styles.portfolioFooter)}>
-              <span {...stylex.props(styles.techLabel)}>{ingredients.length} active compounds</span>
+            <div {...stylex.attrs(styles.portfolioFooter)}>
+              <span {...stylex.attrs(styles.techLabel)}>{ingredients.length} active compounds</span>
               <a
                 href="#formulation"
                 onClick={() => setOpen(false)}
-                {...stylex.props(styles.portfolioFooterLink)}
+                {...stylex.attrs(styles.portfolioFooterLink)}
               >
                 Build a formulation
-                <ArrowRight aria-hidden size={14} />
+                <ArrowRight aria-hidden="true" size={14} />
               </a>
             </div>
           </m.div>
-        )}
+        </Show>
       </AnimatePresence>
     </div>
   );
 }
-export function MobileNav({ styles }: { styles: ProductionNavigationStyles }) {
-  const [open, setOpen] = useState(false);
+export function MobileNav(props: { styles: ProductionNavigationStyles }) {
+  const styles = props.styles;
+  const [open, setOpen] = createSignal(false);
   const reduce = useReducedMotion();
   return (
-    <div {...stylex.props(styles.mobileNavWrapper)}>
+    <div {...stylex.attrs(styles.mobileNavWrapper)}>
       <button
         type="button"
-        aria-expanded={open}
+        aria-expanded={open() ? "true" : "false"}
         aria-controls="mobile-menu"
-        aria-label={open ? "Close menu" : "Open menu"}
+        aria-label={open() ? "Close menu" : "Open menu"}
         onClick={() => setOpen((v) => !v)}
-        {...stylex.props(styles.mobileMenuBtn)}
+        {...stylex.attrs(styles.mobileMenuBtn)}
       >
         <AnimatePresence initial={false} mode="popLayout">
-          <m.span
-            key={open ? "close" : "open"}
-            initial={{
-              opacity: 0,
-              scale: 0.25,
-              filter: "blur(4px)",
-            }}
-            animate={{
-              opacity: 1,
-              scale: 1,
-              filter: "blur(0px)",
-            }}
-            exit={{
-              opacity: 0,
-              scale: 0.25,
-              filter: "blur(4px)",
-            }}
-            transition={
-              reduce
-                ? {
-                    duration: 0,
-                  }
-                : {
-                    type: "spring",
-                    duration: 0.3,
-                    bounce: 0,
-                  }
-            }
-            style={{
-              display: "inline-flex",
-            }}
-          >
-            {open ? <X aria-hidden size={20} /> : <Menu aria-hidden size={20} />}
-          </m.span>
+          <Show when={open() ? "close" : "open"} keyed>
+            {(icon) => (
+              <m.span
+                initial={{
+                  opacity: 0,
+                  scale: 0.25,
+                  filter: "blur(4px)",
+                }}
+                animate={{
+                  opacity: 1,
+                  scale: 1,
+                  filter: "blur(0px)",
+                }}
+                exit={{
+                  opacity: 0,
+                  scale: 0.25,
+                  filter: "blur(4px)",
+                }}
+                transition={
+                  reduce()
+                    ? {
+                        duration: 0,
+                      }
+                    : {
+                        type: "spring",
+                        duration: 0.3,
+                        bounce: 0,
+                      }
+                }
+                style={{
+                  display: "inline-flex",
+                }}
+              >
+                {icon === "close" ? (
+                  <X aria-hidden="true" size={20} />
+                ) : (
+                  <Menu aria-hidden="true" size={20} />
+                )}
+              </m.span>
+            )}
+          </Show>
         </AnimatePresence>
       </button>
       <AnimatePresence>
-        {open && (
+        <Show when={open()}>
           <m.div
             id="mobile-menu"
             initial={
-              reduce
+              reduce()
                 ? {
                     opacity: 0,
                   }
@@ -278,7 +287,7 @@ export function MobileNav({ styles }: { styles: ProductionNavigationStyles }) {
               y: 0,
             }}
             exit={
-              reduce
+              reduce()
                 ? {
                     opacity: 0,
                   }
@@ -288,18 +297,18 @@ export function MobileNav({ styles }: { styles: ProductionNavigationStyles }) {
                   }
             }
             transition={{
-              duration: reduce ? 0 : 0.22,
+              duration: reduce() ? 0 : 0.22,
               ease: EASE,
             }}
-            {...stylex.props(styles.mobileMenuPopover)}
+            {...stylex.attrs(styles.mobileMenuPopover)}
           >
-            <ul {...stylex.props(styles.mobileMenuList)}>
+            <ul {...stylex.attrs(styles.mobileMenuList)}>
               {MOBILE_NAV_LINKS.map((link, idx) => (
-                <li key={link.href}>
+                <li>
                   <a
                     href={link.href}
                     onClick={() => setOpen(false)}
-                    {...stylex.props(
+                    {...stylex.attrs(
                       styles.mobileNavLink,
                       idx === MOBILE_NAV_LINKS.length - 1 && styles.mobileNavLinkLast,
                     )}
@@ -310,94 +319,98 @@ export function MobileNav({ styles }: { styles: ProductionNavigationStyles }) {
               ))}
             </ul>
           </m.div>
-        )}
+        </Show>
       </AnimatePresence>
     </div>
   );
 }
-export function TickerSection({ styles }: { styles: ProductionNavigationStyles }) {
-  const [paused, setPaused] = useState(false);
+export function TickerSection(props: { styles: ProductionNavigationStyles }) {
+  const styles = props.styles;
+  const [paused, setPaused] = createSignal(false);
   const reduce = useReducedMotion();
   return (
-    <section aria-label="Ingredient index ticker" {...stylex.props(styles.tickerSection)}>
-      <span aria-hidden {...stylex.props(styles.tickerFadeLeft)} />
-      <span aria-hidden {...stylex.props(styles.tickerFadeRight)} />
+    <section aria-label="Ingredient index ticker" {...stylex.attrs(styles.tickerSection)}>
+      <span aria-hidden="true" {...stylex.attrs(styles.tickerFadeLeft)} />
+      <span aria-hidden="true" {...stylex.attrs(styles.tickerFadeRight)} />
       <button
         type="button"
-        aria-pressed={paused}
-        aria-label={paused ? "Resume ingredient ticker" : "Pause ingredient ticker"}
+        aria-pressed={paused() ? "true" : "false"}
+        aria-label={paused() ? "Resume ingredient ticker" : "Pause ingredient ticker"}
         onClick={() => setPaused((v) => !v)}
-        {...stylex.props(styles.tickerPauseBtn)}
+        {...stylex.attrs(styles.tickerPauseBtn)}
       >
         <AnimatePresence initial={false} mode="popLayout">
-          <m.span
-            key={paused ? "play" : "pause"}
-            initial={{
-              opacity: 0,
-              scale: 0.25,
-              filter: "blur(4px)",
-            }}
-            animate={{
-              opacity: 1,
-              scale: 1,
-              filter: "blur(0px)",
-            }}
-            exit={{
-              opacity: 0,
-              scale: 0.25,
-              filter: "blur(4px)",
-            }}
-            transition={
-              reduce
-                ? {
-                    duration: 0,
-                  }
-                : {
-                    type: "spring",
-                    duration: 0.3,
-                    bounce: 0,
-                  }
-            }
-            style={{
-              display: "inline-flex",
-            }}
-          >
-            {paused ? (
-              <Play
-                aria-hidden
-                size={14}
-                style={{
-                  marginLeft: 1,
+          <Show when={paused() ? "play" : "pause"} keyed>
+            {(icon) => (
+              <m.span
+                initial={{
+                  opacity: 0,
+                  scale: 0.25,
+                  filter: "blur(4px)",
                 }}
-              />
-            ) : (
-              <Pause aria-hidden size={14} />
+                animate={{
+                  opacity: 1,
+                  scale: 1,
+                  filter: "blur(0px)",
+                }}
+                exit={{
+                  opacity: 0,
+                  scale: 0.25,
+                  filter: "blur(4px)",
+                }}
+                transition={
+                  reduce()
+                    ? {
+                        duration: 0,
+                      }
+                    : {
+                        type: "spring",
+                        duration: 0.3,
+                        bounce: 0,
+                      }
+                }
+                style={{
+                  display: "inline-flex",
+                }}
+              >
+                {icon === "play" ? (
+                  <Play
+                    aria-hidden="true"
+                    size={14}
+                    style={{
+                      "margin-left": "1px",
+                    }}
+                  />
+                ) : (
+                  <Pause aria-hidden="true" size={14} />
+                )}
+              </m.span>
             )}
-          </m.span>
+          </Show>
         </AnimatePresence>
       </button>
       <div
+        {...stylex.attrs(styles.tickerMarqueeTrack)}
         style={
-          paused
+          paused()
             ? {
-                animationPlayState: "paused",
+                "animation-play-state": "paused",
               }
             : undefined
         }
-        {...stylex.props(styles.tickerMarqueeTrack)}
       >
         {([0, 1] as const).map((copy) => (
-          <ul key={copy} aria-hidden={copy === 1} {...stylex.props(styles.tickerList)}>
+          <ul aria-hidden={copy === 1 ? "true" : undefined} {...stylex.attrs(styles.tickerList)}>
             {ingredients.map((ingredient, i) => (
-              <li key={ingredient.name} {...stylex.props(styles.tickerItem)}>
-                <span {...stylex.props(styles.tickerText)}>
-                  <span {...stylex.props(styles.tickerIndex)}>
+              <li {...stylex.attrs(styles.tickerItem)}>
+                <span {...stylex.attrs(styles.tickerText)}>
+                  <span {...stylex.attrs(styles.tickerIndex)}>
                     {String(i + 1).padStart(2, "0")}
                   </span>
                   {" — "}
                   {ingredient.name}
                 </span>
-                <span aria-hidden {...stylex.props(styles.tickerDiamond)} />
+                <span aria-hidden="true" {...stylex.attrs(styles.tickerDiamond)} />
               </li>
             ))}
           </ul>
@@ -406,18 +419,18 @@ export function TickerSection({ styles }: { styles: ProductionNavigationStyles }
     </section>
   );
 }
-export function DivisionBadge({
-  styles,
-  ingredient,
-}: {
+export function DivisionBadge(props: {
   styles: ProductionNavigationStyles;
   ingredient: Ingredient;
 }) {
-  const division = divisionForApplication(ingredient.application);
+  const division = () => divisionForApplication(props.ingredient.application);
   return (
-    <span {...stylex.props(styles.divisionBadge)}>
-      <span aria-hidden {...stylex.props(styles.dotBase, styles[DIVISION_DOT_KEYS[division]])} />
-      {ingredient.application}
+    <span {...stylex.attrs(props.styles.divisionBadge)}>
+      <span
+        aria-hidden="true"
+        {...stylex.attrs(props.styles.dotBase, props.styles[DIVISION_DOT_KEYS[division()]])}
+      />
+      {props.ingredient.application}
     </span>
   );
 }

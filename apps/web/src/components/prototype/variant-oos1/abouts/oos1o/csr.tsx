@@ -87,8 +87,8 @@ const styles = stylex.create({
 
 export function Csr() {
   return (
-    <section id="about-csr" aria-labelledby="oos1o-csr" {...stylex.props(styles.section)}>
-      <div {...stylex.props(ui.shell, ui.grid)}>
+    <section id="about-csr" aria-labelledby="oos1o-csr" {...stylex.attrs(styles.section)}>
+      <div {...stylex.attrs(ui.shell, ui.grid)}>
         <SectionHead
           id="oos1o-csr"
           label="Responsibility"
@@ -96,24 +96,24 @@ export function Csr() {
           quiet
           sx={styles.head}
         />
-        <p {...stylex.props(styles.statement)}>
-          <span {...stylex.props(styles.line)}>{ABOUT_CSR.statement[0]}</span>
-          <span {...stylex.props(styles.line, styles.lineIndent)}>{ABOUT_CSR.statement[1]}</span>
+        <p {...stylex.attrs(styles.statement)}>
+          <span {...stylex.attrs(styles.line)}>{ABOUT_CSR.statement[0]}</span>
+          <span {...stylex.attrs(styles.line, styles.lineIndent)}>{ABOUT_CSR.statement[1]}</span>
         </p>
-        <p {...stylex.props(ui.lead, styles.desc)}>{ABOUT_CSR.desc}</p>
-        <figure {...stylex.props(styles.figure)}>
+        <p {...stylex.attrs(ui.lead, styles.desc)}>{ABOUT_CSR.desc}</p>
+        <figure {...stylex.attrs(styles.figure)}>
           <img
             src={ABOUT_CSR.image}
             alt={ABOUT_CSR.imageAlt}
             loading="lazy"
             decoding="async"
-            {...stylex.props(ui.fill, styles.image)}
+            {...stylex.attrs(ui.fill, styles.image)}
           />
         </figure>
-        <ol {...stylex.props(styles.outcomes)}>
+        <ol {...stylex.attrs(styles.outcomes)}>
           {ABOUT_CSR.outcomes.map((outcome, index) => (
-            <li key={outcome.icon} {...stylex.props(styles.outcome)}>
-              <span aria-hidden="true" {...stylex.props(ui.serif, styles.numeral)}>
+            <li {...stylex.attrs(styles.outcome)}>
+              <span aria-hidden="true" {...stylex.attrs(ui.serif, styles.numeral)}>
                 {NUMERALS[index]}
               </span>
               {outcome.title}

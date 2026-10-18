@@ -1,5 +1,5 @@
-import { useMotionValue, useMotionValueEvent, useScroll } from "motion/react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useMotionValue, useMotionValueEvent, useScroll } from "@/compat/motion";
+import { createSignal, onSettled } from "solid-js";
 
 import { ABOUT_HERO } from "../../about-data";
 
@@ -48,23 +48,23 @@ export function useRail() {
   const { scrollY } = useScroll();
   const progress = useMotionValue(0);
   const activeIndex = useMotionValue(-1);
-  const knots = useRef<Knots>({ ys: [0, 1], ps: [0, 1], navYs: [] });
-  const [active, setActive] = useState(-1);
+  let knots: Knots = { ys: [0, 1], ps: [0, 1], navYs: [] };
+  const [active, setActive] = createSignal(-1);
 
-  const sync = useCallback(() => {
+  const sync = () => {
     const y = scrollY.get();
-    progress.set(interpolate(y, knots.current));
+    progress.set(interpolate(y, knots));
     let next = -1;
-    knots.current.navYs.forEach((navY, position) => {
+    knots.navYs.forEach((navY, position) => {
       if (y >= navY) next = position;
     });
     activeIndex.set(next);
-  }, [activeIndex, progress, scrollY]);
+  };
 
   useMotionValueEvent(scrollY, "change", sync);
-  useMotionValueEvent(activeIndex, "change", setActive);
+  useMotionValueEvent(activeIndex, "change", (next) => setActive(next));
 
-  useEffect(() => {
+  onSettled(() => {
     const measure = () => {
       const root = document.getElementById(ROOT_ID);
       if (!root) return;
@@ -90,14 +90,14 @@ export function useRail() {
       );
       ys.push(end);
       ps.push(1);
-      knots.current = { ys, ps, navYs };
+      knots = { ys, ps, navYs };
       sync();
     };
     measure();
     const observer = new ResizeObserver(measure);
     observer.observe(document.documentElement);
     return () => observer.disconnect();
-  }, [sync]);
+  });
 
   return { progress, active };
 }

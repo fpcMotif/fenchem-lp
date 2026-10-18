@@ -1,4 +1,4 @@
-import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
+import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 
 import { STATS } from "../../content";
@@ -17,7 +17,7 @@ const STAT_ENGLISH: Record<string, string> = {
 
 const styles = stylex.create({
   band: {
-    paddingBlock: { default: 80, [breakpoints.xl]: 144 },
+    paddingBlock: { default: 80, ["@media (min-width: 1280px)"]: 144 },
     backgroundColor: ui.navy,
     color: colors.paper,
   },
@@ -25,9 +25,9 @@ const styles = stylex.create({
     display: "grid",
     gridTemplateColumns: {
       default: "minmax(0, 1fr)",
-      [breakpoints.md]: "minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.5fr)",
+      ["@media (min-width: 768px)"]: "minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.5fr)",
     },
-    columnGap: { default: 0, [mq.tablet]: 40, [breakpoints.xl]: 64 },
+    columnGap: { default: 0, [mq.tablet]: 40, ["@media (min-width: 1280px)"]: 64 },
     rowGap: 56,
     margin: 0,
     padding: 0,
@@ -37,13 +37,16 @@ const styles = stylex.create({
     display: "flex",
     flexDirection: "column",
     alignItems: "flex-start",
-    gap: { default: 14, [breakpoints.xl]: 20 },
+    gap: { default: 14, ["@media (min-width: 1280px)"]: 20 },
   },
   figure: {
     display: "flex",
     alignItems: "baseline",
     gap: "0.06em",
-    fontSize: { default: "min(92px, 20vw)", [breakpoints.md]: "clamp(56px, 8vw, 116px)" },
+    fontSize: {
+      default: "min(92px, 20vw)",
+      ["@media (min-width: 768px)"]: "clamp(56px, 8vw, 116px)",
+    },
     lineHeight: 1,
   },
   unit: {
@@ -63,17 +66,17 @@ const styles = stylex.create({
 
 export function StatsBand() {
   return (
-    <section id="about-stats" aria-label="Growth figures" {...stylex.props(styles.band)}>
-      <div {...stylex.props(shared.shell, shared.inset)}>
-        <ul {...stylex.props(styles.stats)}>
+    <section id="about-stats" aria-label="Growth figures" {...stylex.attrs(styles.band)}>
+      <div {...stylex.attrs(shared.shell, shared.inset)}>
+        <ul {...stylex.attrs(styles.stats)}>
           {STATS.map((stat, position) => (
-            <Reveal key={stat.label} as="li" step={position} sx={styles.stat}>
-              <div {...stylex.props(styles.figure)}>
+            <Reveal as="li" step={position} sx={styles.stat}>
+              <div {...stylex.attrs(styles.figure)}>
                 <Odometer value={stat.value} delay={position * STAT_STAGGER_SECONDS} />
-                {stat.unit ? <span {...stylex.props(styles.unit)}>{stat.unit}</span> : null}
+                {stat.unit ? <span {...stylex.attrs(styles.unit)}>{stat.unit}</span> : null}
               </div>
-              <p {...stylex.props(styles.caption)}>
-                <span {...stylex.props(shared.srOnly)}>{STAT_ENGLISH[stat.label]}:</span>
+              <p {...stylex.attrs(styles.caption)}>
+                <span {...stylex.attrs(shared.srOnly)}>{STAT_ENGLISH[stat.label]}:</span>
                 {stat.caption}
               </p>
             </Reveal>

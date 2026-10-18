@@ -1,4 +1,4 @@
-import { createFileRoute, notFound } from "@tanstack/react-router";
+import { createFileRoute, notFound } from "@tanstack/solid-router";
 
 import { InsightsLab, type LabVariant } from "@/components/prototype/insights-lab/harness";
 import { DrawerVariant } from "@/components/prototype/insights-lab/variants/drawer";
@@ -32,13 +32,13 @@ export const Route = createFileRoute("/prototypes/insights")({
 });
 
 function InsightsLabRoute() {
-  const { v = 1, n = 3 } = Route.useSearch();
+  const search = Route.useSearch();
   const navigate = Route.useNavigate();
   return (
     <InsightsLab
       variants={VARIANTS}
-      initial={v - 1}
-      count={n}
+      initial={(search().v ?? 1) - 1}
+      count={search().n ?? 3}
       onParamsChange={(params) =>
         navigate({
           search: (previous) => ({ ...previous, ...params }),

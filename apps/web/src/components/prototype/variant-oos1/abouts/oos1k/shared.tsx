@@ -1,8 +1,8 @@
 import * as stylex from "@stylexjs/stylex";
-import { useEffect, useRef, useState } from "react";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 import { bp, face, sky } from "./tokens.stylex";
 import { ui } from "./shared-values";
+import { createEffect, createSignal } from "solid-js";
 
 const heading = stylex.create({
   root: {
@@ -59,20 +59,14 @@ const pole = stylex.create({
 
 export function PoleMark() {
   return (
-    <svg aria-hidden="true" viewBox="-20 -20 40 40" {...stylex.props(pole.mark)}>
-      <circle r={7.5} {...stylex.props(pole.ring)} />
-      <circle r={1.7} {...stylex.props(pole.point)} />
+    <svg aria-hidden="true" viewBox="-20 -20 40 40" {...stylex.attrs(pole.mark)}>
+      <circle r={7.5} {...stylex.attrs(pole.ring)} />
+      <circle r={1.7} {...stylex.attrs(pole.point)} />
     </svg>
   );
 }
 
-export function ChartHeading({
-  id,
-  numeral,
-  label,
-  title,
-  note,
-}: {
+export function ChartHeading(props: {
   id: string;
   numeral: string;
   label: string;
@@ -80,15 +74,16 @@ export function ChartHeading({
   note: string;
 }) {
   return (
-    <header {...stylex.props(heading.root)}>
-      <p lang="en" {...stylex.props(ui.label)}>
-        Chart <span {...stylex.props(ui.designation, heading.numeral)}>{numeral}</span> · {label}
+    <header {...stylex.attrs(heading.root)}>
+      <p lang="en" {...stylex.attrs(ui.label)}>
+        Chart <span {...stylex.attrs(ui.designation, heading.numeral)}>{props.numeral}</span> ·{" "}
+        {props.label}
       </p>
-      <h2 id={id} {...stylex.props(heading.title)}>
-        {title}
+      <h2 id={props.id} {...stylex.attrs(heading.title)}>
+        {props.title}
       </h2>
-      <p lang="en" {...stylex.props(heading.note)}>
-        {note}
+      <p lang="en" {...stylex.attrs(heading.note)}>
+        {props.note}
       </p>
     </header>
   );
@@ -97,35 +92,37 @@ export function ChartHeading({
 type Phase = "rest" | "hidden" | "shown";
 
 export function useDusk<T extends HTMLElement>(margin = "0px 0px -18% 0px") {
-  const ref = useRef<T>(null);
-  const [phase, setPhase] = useState<Phase>("rest");
+  const [ref, setRef] = createSignal<T>();
+  const [phase, setPhase] = createSignal<Phase>("rest");
   const reduce = useReducedMotion();
 
-  useEffect(() => {
-    const element = ref.current;
-    if (!element || reduce) return;
-    let first = true;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (first) {
-          first = false;
-          if (entry.isIntersecting || entry.boundingClientRect.top < window.innerHeight) {
-            observer.disconnect();
+  createEffect(
+    () => ({ element: ref(), reduce: reduce() }),
+    ({ element, reduce }) => {
+      if (!element || reduce) return;
+      let first = true;
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          if (first) {
+            first = false;
+            if (entry.isIntersecting || entry.boundingClientRect.top < window.innerHeight) {
+              observer.disconnect();
+              return;
+            }
+            setPhase("hidden");
             return;
           }
-          setPhase("hidden");
-          return;
-        }
-        if (entry.isIntersecting) {
-          setPhase("shown");
-          observer.disconnect();
-        }
-      },
-      { rootMargin: margin },
-    );
-    observer.observe(element);
-    return () => observer.disconnect();
-  }, [reduce, margin]);
+          if (entry.isIntersecting) {
+            setPhase("shown");
+            observer.disconnect();
+          }
+        },
+        { rootMargin: margin },
+      );
+      observer.observe(element);
+      return () => observer.disconnect();
+    },
+  );
 
-  return [ref, phase === "hidden"] as const;
+  return [setRef, () => phase() === "hidden"] as const;
 }

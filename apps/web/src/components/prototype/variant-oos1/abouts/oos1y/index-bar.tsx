@@ -1,5 +1,5 @@
 import * as stylex from "@stylexjs/stylex";
-import { useEffect, useRef } from "react";
+import { createEffect } from "solid-js";
 
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
@@ -90,31 +90,34 @@ const styles = stylex.create({
 export function IndexBar() {
   const active = useActiveSection(SECTION_IDS);
   const reduce = useReducedMotion();
-  const listRef = useRef<HTMLOListElement>(null);
+  let listRef!: HTMLOListElement;
 
-  useEffect(() => {
-    const list = listRef.current;
-    if (!list || !active || list.scrollWidth <= list.clientWidth) return;
-    const link = list.querySelector<HTMLElement>(`[href="#${active}"]`);
-    if (!link) return;
-    list.scrollTo({ left: link.offsetLeft - 16, behavior: reduce ? "auto" : "smooth" });
-  }, [active, reduce]);
+  createEffect(
+    () => [active(), reduce()] as const,
+    ([current, reduced]) => {
+      const list = listRef;
+      if (!list || !current || list.scrollWidth <= list.clientWidth) return;
+      const link = list.querySelector<HTMLElement>(`[href="#${current}"]`);
+      if (!link) return;
+      list.scrollTo({ left: link.offsetLeft - 16, behavior: reduced ? "auto" : "smooth" });
+    },
+  );
 
   return (
-    <nav aria-label="On this page" {...stylex.props(styles.bar)}>
-      <div {...stylex.props(ui.shell, styles.row)}>
-        <ol ref={listRef} {...stylex.props(styles.list)}>
+    <nav aria-label="On this page" {...stylex.attrs(styles.bar)}>
+      <div {...stylex.attrs(ui.shell, styles.row)}>
+        <ol ref={listRef} {...stylex.attrs(styles.list)}>
           {SECTION_IDS.map((id) => (
-            <li key={id} {...stylex.props(styles.item)}>
+            <li {...stylex.attrs(styles.item)}>
               <a
                 href={`#${id}`}
-                aria-current={active === id ? "location" : undefined}
-                {...stylex.props(styles.link)}
+                aria-current={active() === id ? "location" : undefined}
+                {...stylex.attrs(styles.link)}
               >
                 <span lang="en">{ENTRIES[id]}</span>
                 <span
                   aria-hidden="true"
-                  {...stylex.props(styles.marker, active === id && styles.markerOn)}
+                  {...stylex.attrs(styles.marker, active() === id && styles.markerOn)}
                 />
               </a>
             </li>

@@ -1,9 +1,10 @@
 import { Collapse } from "../../../shared/collapse";
 import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { ChevronDown, ChevronsDownUp, ChevronsUpDown } from "lucide-react";
-import { m } from "motion/react";
-import { useId, useState, type MouseEvent, type ReactNode } from "react";
+import { ChevronDown, ChevronsDownUp, ChevronsUpDown } from "@fenchem-lp/ui/components/lucide";
+import { m } from "@/compat/motion";
+import type { JSX } from "@solidjs/web";
+import { createSignal, createUniqueId, For, untrack } from "solid-js";
 
 import { EASE } from "@/components/prototype/motion-constants";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
@@ -408,71 +409,62 @@ const styles = stylex.create({
 function Empty() {
   return (
     <>
-      <span aria-hidden="true" {...stylex.props(styles.empty)}>
+      <span aria-hidden="true" {...stylex.attrs(styles.empty)}>
         —
       </span>
-      <span {...stylex.props(styles.srOnly)}>None</span>
+      <span {...stylex.attrs(styles.srOnly)}>None</span>
     </>
   );
 }
 
-function Inci({ text }: { text: string }) {
-  const parts: ReactNode[] = [];
+function Inci(props: { text: string }) {
+  const text = untrack(() => props.text);
+  const parts: JSX.Element[] = [];
   let last = 0;
   for (const match of text.matchAll(INCI_LATIN)) {
     parts.push(text.slice(last, match.index));
-    parts.push(
-      <span key={match.index} {...stylex.props(styles.keepTogether)}>
-        {match[0]}
-      </span>,
-    );
+    parts.push(<span {...stylex.attrs(styles.keepTogether)}>{match[0]}</span>);
     last = match.index + match[0].length;
   }
   parts.push(text.slice(last));
   return <>{parts}</>;
 }
 
-function LatinNames({ names, complete }: { names: string[]; complete: boolean }) {
+function LatinNames(props: { names: string[]; complete: boolean }) {
+  const names = untrack(() => props.names);
   if (names.length === 0) return <Empty />;
-  const condensed = !complete && names.length > 2;
+  const condensed = !untrack(() => props.complete) && names.length > 2;
   const shown = condensed ? names.slice(0, 1) : names;
   return (
     <>
       {shown.map((name) => (
-        <span key={name} lang="la" {...stylex.props(styles.latin)}>
+        <span lang="la" {...stylex.attrs(styles.latin)}>
           {name}
         </span>
       ))}
       {condensed && (
         <>
-          <span aria-hidden="true" {...stylex.props(styles.latinMore)}>
+          <span aria-hidden="true" {...stylex.attrs(styles.latinMore)}>
             等 {names.length} 种
           </span>
-          <span {...stylex.props(styles.srOnly)}>and others, {names.length} in total</span>
+          <span {...stylex.attrs(styles.srOnly)}>and others, {names.length} in total</span>
         </>
       )}
     </>
   );
 }
 
-function ItemRows({
-  item,
-  open,
-  onToggle,
-}: {
-  item: FlatItem;
-  open: boolean;
-  onToggle: () => void;
-}) {
+function ItemRows(props: { item: FlatItem; open: boolean; onToggle: () => void }) {
   const reduce = useReducedMotion();
-  const detailId = useId();
+  const detailId = createUniqueId();
+  const item = props.item;
   const origin = originOf(item);
   const form = formOf(item);
 
-  const toggleFromRow = (event: MouseEvent<HTMLTableRowElement>) => {
+  const toggleFromRow = (event: MouseEvent) => {
     if (event.target instanceof Element && event.target.closest("button")) return;
     if (window.getSelection()?.toString()) return;
-    onToggle();
+    props.onToggle();
   };
 
   return (
@@ -481,43 +473,43 @@ function ItemRows({
         layout="position"
         transition={{ duration: 0.26, ease: EASE }}
         onClick={toggleFromRow}
-        {...stylex.props(styles.itemRow, stylex.defaultMarker())}
+        {...stylex.attrs(styles.itemRow, stylex.defaultMarker())}
       >
-        <th scope="row" {...stylex.props(styles.cell, styles.nameCell)}>
+        <th scope="row" {...stylex.attrs(styles.cell, styles.nameCell)}>
           <button
             type="button"
-            aria-expanded={open}
-            aria-controls={open ? detailId : undefined}
-            onClick={onToggle}
-            {...stylex.props(styles.disclosure)}
+            aria-expanded={props.open ? "true" : "false"}
+            aria-controls={props.open ? detailId : undefined}
+            onClick={() => props.onToggle()}
+            {...stylex.attrs(styles.disclosure)}
           >
             <m.span
               aria-hidden="true"
               initial={false}
-              animate={{ rotate: open ? 180 : 0 }}
-              transition={{ duration: reduce ? 0 : 0.22, ease: EASE }}
-              {...stylex.props(styles.chevron)}
+              animate={{ rotate: props.open ? 180 : 0 }}
+              transition={{ duration: reduce() ? 0 : 0.22, ease: EASE }}
+              {...stylex.attrs(styles.chevron)}
             >
               <ChevronDown size={16} strokeWidth={1.5} absoluteStrokeWidth />
             </m.span>
-            <span {...stylex.props(styles.names)}>
-              <span {...stylex.props(styles.primary)}>{item.primary}</span>
-              {item.secondary && <span {...stylex.props(styles.secondary)}>{item.secondary}</span>}
+            <span {...stylex.attrs(styles.names)}>
+              <span {...stylex.attrs(styles.primary)}>{item.primary}</span>
+              {item.secondary && <span {...stylex.attrs(styles.secondary)}>{item.secondary}</span>}
             </span>
           </button>
         </th>
-        <td {...stylex.props(styles.cell, styles.foldCell)}>
-          <span {...stylex.props(styles.foldContent)}>
+        <td {...stylex.attrs(styles.cell, styles.foldCell)}>
+          <span {...stylex.attrs(styles.foldContent)}>
             <LatinNames names={item.latin} complete={false} />
           </span>
         </td>
-        <td {...stylex.props(styles.cell)}>{origin ?? <Empty />}</td>
-        <td {...stylex.props(styles.cell, styles.foldCell)}>
-          <span {...stylex.props(styles.foldContent)}>
+        <td {...stylex.attrs(styles.cell)}>{origin ?? <Empty />}</td>
+        <td {...stylex.attrs(styles.cell, styles.foldCell)}>
+          <span {...stylex.attrs(styles.foldContent)}>
             {form ? (
               <>
                 <span aria-hidden="true">{form}</span>
-                <span {...stylex.props(styles.srOnly)}>{FORM_ENGLISH[item.traits.form]}</span>
+                <span {...stylex.attrs(styles.srOnly)}>{FORM_ENGLISH[item.traits.form]}</span>
               </>
             ) : (
               <Empty />
@@ -528,44 +520,42 @@ function ItemRows({
       <m.tr
         layout="position"
         transition={{ duration: 0.26, ease: EASE }}
-        key="detail"
         id={detailId}
-        aria-hidden={!open}
-        inert={!open}
+        aria-hidden={props.open ? "false" : "true"}
+        inert={!props.open}
       >
         <td
-          colSpan={COLUMN_COUNT}
-          {...stylex.props(styles.detailCell)}
-          style={{ borderBottomWidth: open ? 1 : 0 }}
+          colspan={COLUMN_COUNT}
+          {...stylex.attrs(styles.detailCell)}
+          style={{ "border-bottom-width": props.open ? "1px" : "0" }}
         >
           <Collapse
-            open={open}
-
-            transition={{ duration: reduce ? 0 : 0.26, ease: EASE }}
-            {...stylex.props(styles.detailClip)}
+            open={props.open}
+            transition={{ duration: reduce() ? 0 : 0.26, ease: EASE }}
+            {...stylex.attrs(styles.detailClip)}
           >
-            <dl {...stylex.props(styles.detail)}>
-              <div {...stylex.props(styles.phonePair)}>
-                <div {...stylex.props(styles.phonePairField)}>
-                  <dt {...stylex.props(styles.fieldLabel)}>学名</dt>
-                  <dd {...stylex.props(styles.fieldValue)}>
+            <dl {...stylex.attrs(styles.detail)}>
+              <div {...stylex.attrs(styles.phonePair)}>
+                <div {...stylex.attrs(styles.phonePairField)}>
+                  <dt {...stylex.attrs(styles.fieldLabel)}>学名</dt>
+                  <dd {...stylex.attrs(styles.fieldValue)}>
                     <LatinNames names={item.latin} complete />
                   </dd>
                 </div>
-                <div {...stylex.props(styles.phonePairField)}>
-                  <dt {...stylex.props(styles.fieldLabel)}>形态</dt>
-                  <dd {...stylex.props(styles.fieldValue)}>{form ?? <Empty />}</dd>
+                <div {...stylex.attrs(styles.phonePairField)}>
+                  <dt {...stylex.attrs(styles.fieldLabel)}>形态</dt>
+                  <dd {...stylex.attrs(styles.fieldValue)}>{form ?? <Empty />}</dd>
                 </div>
               </div>
-              <div {...stylex.props(styles.field, styles.fieldMeasure, styles.fieldInci)}>
-                <dt {...stylex.props(styles.fieldLabel)}>INCI 名称</dt>
-                <dd {...stylex.props(styles.fieldValue, styles.inci)}>
+              <div {...stylex.attrs(styles.field, styles.fieldMeasure, styles.fieldInci)}>
+                <dt {...stylex.attrs(styles.fieldLabel)}>INCI 名称</dt>
+                <dd {...stylex.attrs(styles.fieldValue, styles.inci)}>
                   <Inci text={item.inci} />
                 </dd>
               </div>
-              <div {...stylex.props(styles.field, styles.fieldMeasure, styles.fieldFeatures)}>
-                <dt {...stylex.props(styles.fieldLabel)}>特性&应用</dt>
-                <dd {...stylex.props(styles.fieldValue, styles.features)}>{item.features}</dd>
+              <div {...stylex.attrs(styles.field, styles.fieldMeasure, styles.fieldFeatures)}>
+                <dt {...stylex.attrs(styles.fieldLabel)}>特性&应用</dt>
+                <dd {...stylex.attrs(styles.fieldValue, styles.features)}>{item.features}</dd>
               </div>
             </dl>
           </Collapse>
@@ -576,10 +566,10 @@ function ItemRows({
 }
 
 export function Catalog() {
-  const titleId = useId();
-  const tableId = useId();
-  const [openIds, setOpenIds] = useState<ReadonlySet<string>>(() => new Set(ALL_IDS.slice(0, 1)));
-  const allOpen = openIds.size === ALL_IDS.length;
+  const titleId = createUniqueId();
+  const tableId = createUniqueId();
+  const [openIds, setOpenIds] = createSignal<ReadonlySet<string>>(new Set(ALL_IDS.slice(0, 1)));
+  const allOpen = () => openIds().size === ALL_IDS.length;
 
   const toggle = (id: string) => {
     setOpenIds((prev) => {
@@ -591,94 +581,97 @@ export function Catalog() {
   };
 
   const toggleAll = () => {
-    setOpenIds(allOpen ? new Set() : new Set(ALL_IDS));
+    setOpenIds(allOpen() ? new Set<string>() : new Set(ALL_IDS));
   };
 
   return (
-    <section id="products-catalog" aria-labelledby={titleId} {...stylex.props(styles.section)}>
-      <div {...stylex.props(styles.shell)}>
-        <header {...stylex.props(styles.head)}>
+    <section id="products-catalog" aria-labelledby={titleId} {...stylex.attrs(styles.section)}>
+      <div {...stylex.attrs(styles.shell)}>
+        <header {...stylex.attrs(styles.head)}>
           <div>
-            <h2 id={titleId} {...stylex.props(styles.title)}>
+            <h2 id={titleId} {...stylex.attrs(styles.title)}>
               产品目录
             </h2>
-            <p {...stylex.props(styles.meta)}>
-              <span {...stylex.props(styles.numeral)}>{CATALOG_GROUPS.length}</span> 个分组 ·{" "}
-              <span {...stylex.props(styles.numeral)}>{ALL_IDS.length}</span> 款原料
+            <p {...stylex.attrs(styles.meta)}>
+              <span {...stylex.attrs(styles.numeral)}>{CATALOG_GROUPS.length}</span> 个分组 ·{" "}
+              <span {...stylex.attrs(styles.numeral)}>{ALL_IDS.length}</span> 款原料
             </p>
           </div>
           <button
             type="button"
             aria-controls={tableId}
             onClick={toggleAll}
-            {...stylex.props(styles.expandAll)}
+            {...stylex.attrs(styles.expandAll)}
           >
-            {allOpen ? (
+            {allOpen() ? (
               <ChevronsDownUp size={16} strokeWidth={1.5} absoluteStrokeWidth aria-hidden="true" />
             ) : (
               <ChevronsUpDown size={16} strokeWidth={1.5} absoluteStrokeWidth aria-hidden="true" />
             )}
-            {allOpen ? "全部收起" : "全部展开"}
+            {allOpen() ? "全部收起" : "全部展开"}
           </button>
         </header>
-        <table id={tableId} aria-labelledby={titleId} {...stylex.props(styles.table)}>
+        <table id={tableId} aria-labelledby={titleId} {...stylex.attrs(styles.table)}>
           <colgroup>
-            <col {...stylex.props(styles.colName)} />
-            <col {...stylex.props(styles.colLatin)} />
-            <col {...stylex.props(styles.colOrigin)} />
-            <col {...stylex.props(styles.colForm)} />
+            <col {...stylex.attrs(styles.colName)} />
+            <col {...stylex.attrs(styles.colLatin)} />
+            <col {...stylex.attrs(styles.colOrigin)} />
+            <col {...stylex.attrs(styles.colForm)} />
           </colgroup>
           <thead>
             <m.tr layout="position" transition={{ duration: 0.26, ease: EASE }}>
-              <th scope="col" {...stylex.props(styles.headCell, styles.headName)}>
+              <th scope="col" {...stylex.attrs(styles.headCell, styles.headName)}>
                 名称
               </th>
-              <th scope="col" {...stylex.props(styles.headCell, styles.foldCell)}>
-                <span {...stylex.props(styles.foldContent)}>
+              <th scope="col" {...stylex.attrs(styles.headCell, styles.foldCell)}>
+                <span {...stylex.attrs(styles.foldContent)}>
                   <span aria-hidden="true">学名</span>
-                  <span {...stylex.props(styles.srOnly)}>Botanical name</span>
+                  <span {...stylex.attrs(styles.srOnly)}>Botanical name</span>
                 </span>
               </th>
-              <th scope="col" {...stylex.props(styles.headCell)}>
+              <th scope="col" {...stylex.attrs(styles.headCell)}>
                 产地
               </th>
-              <th scope="col" {...stylex.props(styles.headCell, styles.foldCell)}>
-                <span {...stylex.props(styles.foldContent)}>
+              <th scope="col" {...stylex.attrs(styles.headCell, styles.foldCell)}>
+                <span {...stylex.attrs(styles.foldContent)}>
                   <span aria-hidden="true">形态</span>
-                  <span {...stylex.props(styles.srOnly)}>Form</span>
+                  <span {...stylex.attrs(styles.srOnly)}>Form</span>
                 </span>
               </th>
             </m.tr>
           </thead>
-          {GROUPED.map(({ group, items }, groupIndex) => (
-            <m.tbody layout="position" transition={{ duration: 0.26, ease: EASE }} key={group.id}>
-              <m.tr layout="position" transition={{ duration: 0.26, ease: EASE }}>
-                <th
-                  scope="rowgroup"
-                  colSpan={COLUMN_COUNT}
-                  {...stylex.props(styles.groupCell, groupIndex === 0 && styles.groupCellFirst)}
-                >
-                  <span {...stylex.props(styles.groupLine)}>
-                    <span {...stylex.props(styles.groupLabel)}>{group.label}</span>
-                    <span {...stylex.props(styles.groupCount)}>
-                      <span {...stylex.props(styles.numeral)}>{items.length}</span> 款
+          <For each={GROUPED}>
+            {({ group, items }, groupIndex) => (
+              <m.tbody layout="position" transition={{ duration: 0.26, ease: EASE }}>
+                <m.tr layout="position" transition={{ duration: 0.26, ease: EASE }}>
+                  <th
+                    scope="rowgroup"
+                    colspan={COLUMN_COUNT}
+                    {...stylex.attrs(styles.groupCell, groupIndex() === 0 && styles.groupCellFirst)}
+                  >
+                    <span {...stylex.attrs(styles.groupLine)}>
+                      <span {...stylex.attrs(styles.groupLabel)}>{group.label}</span>
+                      <span {...stylex.attrs(styles.groupCount)}>
+                        <span {...stylex.attrs(styles.numeral)}>{items.length}</span> 款
+                      </span>
                     </span>
-                  </span>
-                  {group.intro && <p {...stylex.props(styles.groupIntro)}>{group.intro}</p>}
-                </th>
-              </m.tr>
-              {items.map((item) => (
-                <ItemRows
-                  key={item.id}
-                  item={item}
-                  open={openIds.has(item.id)}
-                  onToggle={() => toggle(item.id)}
-                />
-              ))}
-            </m.tbody>
-          ))}
+                    {group.intro && <p {...stylex.attrs(styles.groupIntro)}>{group.intro}</p>}
+                  </th>
+                </m.tr>
+                <For each={items}>
+                  {(item) => (
+                    <ItemRows
+                      item={item}
+                      open={openIds().has(item.id)}
+                      onToggle={() => toggle(item.id)}
+                    />
+                  )}
+                </For>
+              </m.tbody>
+            )}
+          </For>
         </table>
-        <p {...stylex.props(styles.note)}>产地按目录分组标注；形态据原料描述整理。</p>
+        <p {...stylex.attrs(styles.note)}>产地按目录分组标注；形态据原料描述整理。</p>
       </div>
     </section>
   );

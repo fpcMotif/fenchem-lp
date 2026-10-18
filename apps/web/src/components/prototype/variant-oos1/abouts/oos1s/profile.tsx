@@ -136,53 +136,53 @@ export function Profile() {
   const chip = ABOUT_HERO.navChips[0];
   return (
     <Section id={chip.id} label={chip.english} background={ui.onPaper}>
-      <div {...stylex.props(s.cols)}>
-        <div {...stylex.props(s.copy)}>
+      <div {...stylex.attrs(s.cols)}>
+        <div {...stylex.attrs(s.copy)}>
           <Reveal>
-            <h3 {...stylex.props(s.name)}>{ABOUT_HERO.title}</h3>
-            <div lang="en" {...stylex.props(s.english)}>
+            <h3 {...stylex.attrs(s.name)}>{ABOUT_HERO.title}</h3>
+            <div lang="en" {...stylex.attrs(s.english)}>
               {ABOUT_HERO.englishTitle}
             </div>
           </Reveal>
           <Reveal step={1}>
-            <p {...stylex.props(s.lead)}>{ABOUT_HERO.lead}</p>
+            <p {...stylex.attrs(s.lead)}>{ABOUT_HERO.lead}</p>
           </Reveal>
           <Reveal step={2}>
-            <p {...stylex.props(ui.label, s.networkLabel)}>{ABOUT_HERO.networkLabel}</p>
-            <ul {...stylex.props(s.countries)}>
+            <p {...stylex.attrs(ui.label, s.networkLabel)}>{ABOUT_HERO.networkLabel}</p>
+            <ul {...stylex.attrs(s.countries)}>
               {ABOUT_HERO.countries.map((country) => (
-                <li key={country}>{country}</li>
+                <li>{country}</li>
               ))}
-              <li {...stylex.props(s.countryMore)}>等地</li>
+              <li {...stylex.attrs(s.countryMore)}>等地</li>
             </ul>
           </Reveal>
         </div>
-        <div {...stylex.props(s.photo)}>
+        <div {...stylex.attrs(s.photo)}>
           <Reveal as="figure" sx={ui.figure}>
-            <div {...stylex.props(ui.frame, s.frame)}>
+            <div {...stylex.attrs(ui.frame, s.frame)}>
               <img
                 src={ABOUT_HERO.lobbyImage}
                 alt="Fenchem headquarters lobby with a curved ceiling and marble floor"
                 loading="lazy"
                 decoding="async"
-                {...stylex.props(ui.fill)}
+                {...stylex.attrs(ui.fill)}
               />
             </div>
-            <figcaption {...stylex.props(ui.caption)}>{ABOUT_HERO.lobbyCaption}</figcaption>
+            <figcaption {...stylex.attrs(ui.caption)}>{ABOUT_HERO.lobbyCaption}</figcaption>
           </Reveal>
         </div>
       </div>
-      <h3 {...stylex.props(ui.srOnly)}>Growth figures</h3>
-      <ul {...stylex.props(s.stats)}>
+      <h3 {...stylex.attrs(ui.srOnly)}>Growth figures</h3>
+      <ul {...stylex.attrs(s.stats)}>
         {STATS.map((stat, idx) => (
-          <Reveal key={stat.label} as="li" step={idx} sx={s.stat}>
-            <div {...stylex.props(s.statFigure)}>
-              <span {...stylex.props(s.statValue)}>{stat.value}</span>
-              {stat.unit ? <span {...stylex.props(s.statUnit)}>{stat.unit}</span> : null}
+          <Reveal as="li" step={idx} sx={s.stat}>
+            <div {...stylex.attrs(s.statFigure)}>
+              <span {...stylex.attrs(s.statValue)}>{stat.value}</span>
+              {stat.unit ? <span {...stylex.attrs(s.statUnit)}>{stat.unit}</span> : null}
             </div>
-            <div {...stylex.props(s.statText)}>
-              <p {...stylex.props(ui.label)}>{stat.label}</p>
-              <p {...stylex.props(s.statCaption)}>{stat.caption}</p>
+            <div {...stylex.attrs(s.statText)}>
+              <p {...stylex.attrs(ui.label)}>{stat.label}</p>
+              <p {...stylex.attrs(s.statCaption)}>{stat.caption}</p>
             </div>
           </Reveal>
         ))}

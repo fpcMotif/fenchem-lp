@@ -1,8 +1,18 @@
 import { Collapse } from "../../../shared/collapse";
 import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { AnimatePresence, m } from "motion/react";
-import { Fragment, useId, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
+import { AnimatePresence, m } from "@/compat/motion";
+import type { JSX } from "@solidjs/web";
+import {
+  createMemo,
+  createSignal,
+  createUniqueId,
+  flush,
+  For,
+  onCleanup,
+  Show,
+  untrack,
+} from "solid-js";
 
 import { EASE } from "@/components/prototype/motion-constants";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
@@ -510,59 +520,59 @@ const styles = stylex.create({
   },
 });
 
-function Inci({ text }: { text: string }) {
-  const parts: ReactNode[] = [];
+function Inci(props: { text: string }) {
+  const text = untrack(() => props.text);
+  const parts: JSX.Element[] = [];
   let last = 0;
   for (const match of text.matchAll(INCI_LATIN)) {
     parts.push(text.slice(last, match.index));
-    parts.push(
-      <span key={match.index} {...stylex.props(styles.keepTogether)}>
-        {match[0]}
-      </span>,
-    );
+    parts.push(<span {...stylex.attrs(styles.keepTogether)}>{match[0]}</span>);
     last = match.index + match[0].length;
   }
   parts.push(text.slice(last));
   return <>{parts}</>;
 }
 
-function LatinPreview({ latin }: { latin: string[] }) {
-  if (latin.length === 0) {
-    return (
-      <span {...stylex.props(styles.none)}>
-        <span aria-hidden="true">—</span>
-        <span {...stylex.props(styles.srOnly)}>No botanical name</span>
-      </span>
-    );
-  }
+function LatinPreview(props: { latin: string[] }) {
   return (
-    <>
-      {latin[0]}
-      {latin.length > 1 && <span {...stylex.props(styles.more)}>+{latin.length - 1}</span>}
-    </>
+    <Show
+      when={props.latin.length > 0}
+      fallback={
+        <span {...stylex.attrs(styles.none)}>
+          <span aria-hidden="true">—</span>
+          <span {...stylex.attrs(styles.srOnly)}>No botanical name</span>
+        </span>
+      }
+    >
+      {props.latin[0]}
+      {props.latin.length > 1 && (
+        <span {...stylex.attrs(styles.more)}>+{props.latin.length - 1}</span>
+      )}
+    </Show>
   );
 }
 
-function ItemFacts({ item, inline }: { item: FlatItem; inline: boolean }) {
-  const factRow = [styles.factRow, inline && styles.factRowInline];
+function ItemFacts(props: { item: FlatItem; inline: boolean }) {
+  const item = props.item;
+  const factRow = () => [styles.factRow, props.inline && styles.factRowInline];
   return (
-    <dl {...stylex.props(styles.facts, inline && styles.factsInline)}>
-      <div {...stylex.props(factRow)}>
-        <dt {...stylex.props(styles.factLabel)}>INCI 名称</dt>
-        <dd {...stylex.props(styles.factValue)}>
+    <dl {...stylex.attrs(styles.facts, props.inline && styles.factsInline)}>
+      <div {...stylex.attrs(factRow())}>
+        <dt {...stylex.attrs(styles.factLabel)}>INCI 名称</dt>
+        <dd {...stylex.attrs(styles.factValue)}>
           <Inci text={item.inci} />
         </dd>
       </div>
-      <div {...stylex.props(factRow)}>
-        <dt {...stylex.props(styles.factLabel)}>特性&应用</dt>
-        <dd {...stylex.props(styles.lead, inline && styles.leadInline)}>{item.features}</dd>
+      <div {...stylex.attrs(factRow())}>
+        <dt {...stylex.attrs(styles.factLabel)}>特性&应用</dt>
+        <dd {...stylex.attrs(styles.lead, props.inline && styles.leadInline)}>{item.features}</dd>
       </div>
-      <div {...stylex.props(factRow)}>
-        <dt {...stylex.props(styles.factLabel)}>{isGeographic(item) ? "产地" : "类别"}</dt>
-        <dd {...stylex.props(styles.factValue)}>
-          <span {...stylex.props(styles.regionName)}>{item.group.label}</span>
+      <div {...stylex.attrs(factRow())}>
+        <dt {...stylex.attrs(styles.factLabel)}>{isGeographic(item) ? "产地" : "类别"}</dt>
+        <dd {...stylex.attrs(styles.factValue)}>
+          <span {...stylex.attrs(styles.regionName)}>{item.group.label}</span>
           {item.group.intro && (
-            <span {...stylex.props(styles.regionIntro)}>{item.group.intro}</span>
+            <span {...stylex.attrs(styles.regionIntro)}>{item.group.intro}</span>
           )}
         </dd>
       </div>
@@ -570,25 +580,18 @@ function ItemFacts({ item, inline }: { item: FlatItem; inline: boolean }) {
   );
 }
 
-function DetailCard({
-  item,
-  position,
-  total,
-}: {
-  item: FlatItem;
-  position: number;
-  total: number;
-}) {
+function DetailCard(props: { item: FlatItem; position: number; total: number }) {
+  const item = props.item;
   return (
     <>
-      <p {...stylex.props(styles.counter)}>
-        <span {...stylex.props(styles.counterCurrent)}>{padIndex(position)}</span> /{" "}
-        {String(total).padStart(2, "0")}
+      <p {...stylex.attrs(styles.counter)}>
+        <span {...stylex.attrs(styles.counterCurrent)}>{padIndex(props.position)}</span> /{" "}
+        {String(props.total).padStart(2, "0")}
       </p>
-      <h3 {...stylex.props(styles.cardName)}>{item.primary}</h3>
-      {item.secondary && <p {...stylex.props(styles.cardSecondary)}>{item.secondary}</p>}
+      <h3 {...stylex.attrs(styles.cardName)}>{item.primary}</h3>
+      {item.secondary && <p {...stylex.attrs(styles.cardSecondary)}>{item.secondary}</p>}
       {item.latin.length > 0 && (
-        <p lang="la" {...stylex.props(styles.cardLatin)}>
+        <p lang="la" {...stylex.attrs(styles.cardLatin)}>
           {item.latin.join(", ")}
         </p>
       )}
@@ -600,26 +603,27 @@ function DetailCard({
 export function Catalog() {
   const reduce = useReducedMotion();
   const wide = useWideLayout();
-  const titleId = useId();
-  const tableId = useId();
-  const cardId = useId();
-  const detailBaseId = useId();
-  const [filterId, setFilterId] = useState(ALL);
-  const [filterVersion, setFilterVersion] = useState(0);
-  const [selectedId, setSelectedId] = useState(FLAT_ITEMS[0].id);
-  const [openId, setOpenId] = useState<string | null>(null);
-  const buttons = useRef(new Map<string, HTMLButtonElement>());
+  const titleId = createUniqueId();
+  const tableId = createUniqueId();
+  const cardId = createUniqueId();
+  const detailBaseId = createUniqueId();
+  const [filterId, setFilterId] = createSignal(ALL);
+  const [filterVersion, setFilterVersion] = createSignal(0);
+  const [selectedId, setSelectedId] = createSignal(FLAT_ITEMS[0].id);
+  const [openId, setOpenId] = createSignal<string | null>(null);
+  const buttons = new Map<string, HTMLButtonElement>();
 
-  const items = itemsFor(filterId);
-  const selectedIndex = Math.max(
-    0,
-    items.findIndex((item) => item.id === selectedId),
-  );
-  const selected = items[selectedIndex];
-  const activeFilter = FILTERS.find((filter) => filter.id === filterId) ?? FILTERS[0];
+  const items = createMemo(() => itemsFor(filterId()));
+  const selectedIndex = () =>
+    Math.max(
+      0,
+      items().findIndex((item) => item.id === selectedId()),
+    );
+  const selected = () => items()[selectedIndex()];
+  const activeFilter = () => FILTERS.find((filter) => filter.id === filterId()) ?? FILTERS[0];
 
   const applyFilter = (id: string) => {
-    if (id === filterId) return;
+    if (id === filterId()) return;
     setFilterId(id);
     setFilterVersion((version) => version + 1);
     setSelectedId(itemsFor(id)[0].id);
@@ -628,48 +632,49 @@ export function Catalog() {
 
   const activate = (item: FlatItem) => {
     setSelectedId(item.id);
-    setOpenId((current) => (!wide && current === item.id ? null : item.id));
+    setOpenId((current) => (!wide() && current === item.id ? null : item.id));
   };
 
-  const moveWithKeys = (event: KeyboardEvent<HTMLTableSectionElement>) => {
+  const moveWithKeys = (event: KeyboardEvent) => {
     const currentId = (event.target as HTMLElement).closest<HTMLElement>("[data-item-id]")?.dataset
       .itemId;
     if (!currentId) return;
-    const from = items.findIndex((item) => item.id === currentId);
+    const list = items();
+    const from = list.findIndex((item) => item.id === currentId);
     let to: number;
-    if (event.key === "ArrowDown") to = Math.min(items.length - 1, from + 1);
+    if (event.key === "ArrowDown") to = Math.min(list.length - 1, from + 1);
     else if (event.key === "ArrowUp") to = Math.max(0, from - 1);
     else if (event.key === "Home") to = 0;
-    else if (event.key === "End") to = items.length - 1;
+    else if (event.key === "End") to = list.length - 1;
     else return;
     event.preventDefault();
-    const next = items[to];
+    const next = list[to];
     setSelectedId(next.id);
-    if (wide || openId !== null) setOpenId(next.id);
-    buttons.current.get(next.id)?.focus();
+    if (wide() || openId() !== null) setOpenId(next.id);
+    flush();
+    buttons.get(next.id)?.focus();
   };
 
   return (
-    <section id="products-catalog" aria-labelledby={titleId} {...stylex.props(styles.section)}>
-      <div {...stylex.props(styles.shell)}>
-        <h2 id={titleId} {...stylex.props(styles.title)}>
+    <section id="products-catalog" aria-labelledby={titleId} {...stylex.attrs(styles.section)}>
+      <div {...stylex.attrs(styles.shell)}>
+        <h2 id={titleId} {...stylex.attrs(styles.title)}>
           产品目录
         </h2>
-        <div {...stylex.props(styles.filterScroller)}>
-          <div role="group" aria-label="Filter by origin" {...stylex.props(styles.segmented)}>
+        <div {...stylex.attrs(styles.filterScroller)}>
+          <div role="group" aria-label="Filter by origin" {...stylex.attrs(styles.segmented)}>
             {FILTERS.map((filter) => {
-              const on = filter.id === filterId;
+              const on = () => filter.id === filterId();
               return (
                 <button
-                  key={filter.id}
                   type="button"
-                  aria-pressed={on}
+                  aria-pressed={on() ? "true" : "false"}
                   aria-controls={tableId}
                   onClick={() => applyFilter(filter.id)}
-                  {...stylex.props(styles.segment, on && styles.segmentOn)}
+                  {...stylex.attrs(styles.segment, on() && styles.segmentOn)}
                 >
                   {filter.label}
-                  <span {...stylex.props(styles.segmentCount, on && styles.segmentCountOn)}>
+                  <span {...stylex.attrs(styles.segmentCount, on() && styles.segmentCountOn)}>
                     {filter.count}
                   </span>
                 </button>
@@ -678,172 +683,185 @@ export function Catalog() {
           </div>
         </div>
 
-        <div {...stylex.props(styles.layout)}>
-          <div {...stylex.props(styles.tableColumn)}>
-            <table id={tableId} {...stylex.props(styles.table)}>
-              <caption {...stylex.props(styles.srOnly)}>
-                Product catalog: {activeFilter.englishLabel}, {items.length} items
+        <div {...stylex.attrs(styles.layout)}>
+          <div {...stylex.attrs(styles.tableColumn)}>
+            <table id={tableId} {...stylex.attrs(styles.table)}>
+              <caption {...stylex.attrs(styles.srOnly)}>
+                Product catalog: {activeFilter().englishLabel}, {items().length} items
               </caption>
               <thead>
                 <m.tr layout="position" transition={{ duration: 0.26, ease: EASE }}>
-                  <th scope="col" {...stylex.props(styles.headCell, styles.headName)}>
+                  <th scope="col" {...stylex.attrs(styles.headCell, styles.headName)}>
                     名称
                   </th>
-                  <th scope="col" {...stylex.props(styles.headCell, styles.headLatin)}>
+                  <th scope="col" {...stylex.attrs(styles.headCell, styles.headLatin)}>
                     学名
                   </th>
-                  <th scope="col" {...stylex.props(styles.headCell, styles.headOrigin)}>
+                  <th scope="col" {...stylex.attrs(styles.headCell, styles.headOrigin)}>
                     产地
                   </th>
                 </m.tr>
               </thead>
-              <m.tbody
-                key={filterId}
-                onKeyDown={moveWithKeys}
-                initial={filterVersion === 0 ? false : { opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: reduce ? 0 : 0.2, ease: EASE }}
-              >
-                {items.map((item, index) => {
-                  const active = wide ? item.id === selected.id : item.id === openId;
-                  const expanded = !wide && item.id === openId;
-                  const detailId = `${detailBaseId}-${item.id}`;
-                  const relation = wide
-                    ? { "aria-pressed": active, "aria-controls": cardId }
-                    : {
-                        "aria-expanded": expanded,
-                        "aria-controls": expanded ? detailId : undefined,
-                      };
-                  return (
-                    <Fragment key={item.id}>
-                      <m.tr
-                        layout="position"
-                        transition={{ duration: 0.26, ease: EASE }}
-                        {...stylex.props(
-                          styles.row,
-                          active && styles.rowActive,
-                          stylex.defaultMarker(),
-                        )}
-                      >
-                        <th
-                          scope="row"
-                          {...stylex.props(
-                            styles.cell,
-                            styles.nameCell,
-                            active && styles.nameCellActive,
-                            expanded && styles.cellJoined,
-                          )}
-                        >
-                          <button
-                            type="button"
-                            data-item-id={item.id}
-                            ref={(node) => {
-                              if (node) buttons.current.set(item.id, node);
-                              else buttons.current.delete(item.id);
-                            }}
-                            onClick={() => activate(item)}
-                            {...relation}
-                            {...stylex.props(styles.rowButton, stylex.defaultMarker())}
+              <Show when={filterId()} keyed>
+                <m.tbody
+                  onKeyDown={moveWithKeys}
+                  initial={untrack(filterVersion) === 0 ? false : { opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: reduce() ? 0 : 0.2, ease: EASE }}
+                >
+                  <For each={items()}>
+                    {(item, index) => {
+                      const active = () =>
+                        wide() ? item.id === selected().id : item.id === openId();
+                      const expanded = () => !wide() && item.id === openId();
+                      const detailId = `${detailBaseId}-${item.id}`;
+                      onCleanup(() => buttons.delete(item.id));
+                      return (
+                        <>
+                          <m.tr
+                            layout="position"
+                            transition={{ duration: 0.26, ease: EASE }}
+                            {...stylex.attrs(
+                              styles.row,
+                              active() && styles.rowActive,
+                              stylex.defaultMarker(),
+                            )}
                           >
-                            <span {...stylex.props(styles.index, active && styles.indexActive)}>
-                              {padIndex(index)}
-                            </span>
-                            <span {...stylex.props(styles.names)}>
-                              <span {...stylex.props(styles.primaryLine)}>
+                            <th
+                              scope="row"
+                              {...stylex.attrs(
+                                styles.cell,
+                                styles.nameCell,
+                                active() && styles.nameCellActive,
+                                expanded() && styles.cellJoined,
+                              )}
+                            >
+                              <button
+                                type="button"
+                                data-item-id={item.id}
+                                ref={(node) => {
+                                  buttons.set(item.id, node);
+                                }}
+                                onClick={() => activate(item)}
+                                aria-pressed={wide() ? (active() ? "true" : "false") : undefined}
+                                aria-expanded={wide() ? undefined : expanded() ? "true" : "false"}
+                                aria-controls={wide() ? cardId : expanded() ? detailId : undefined}
+                                {...stylex.attrs(styles.rowButton, stylex.defaultMarker())}
+                              >
                                 <span
-                                  {...stylex.props(styles.primary, active && styles.primaryActive)}
+                                  {...stylex.attrs(styles.index, active() && styles.indexActive)}
                                 >
-                                  {item.primary}
+                                  {padIndex(index())}
                                 </span>
-                                {item.secondary && (
-                                  <span {...stylex.props(styles.secondary)}>{item.secondary}</span>
-                                )}
-                              </span>
-                              {item.latin.length > 0 && (
-                                <span lang="la" {...stylex.props(styles.latinInline)}>
-                                  <LatinPreview latin={item.latin} />
+                                <span {...stylex.attrs(styles.names)}>
+                                  <span {...stylex.attrs(styles.primaryLine)}>
+                                    <span
+                                      {...stylex.attrs(
+                                        styles.primary,
+                                        active() && styles.primaryActive,
+                                      )}
+                                    >
+                                      {item.primary}
+                                    </span>
+                                    {item.secondary && (
+                                      <span {...stylex.attrs(styles.secondary)}>
+                                        {item.secondary}
+                                      </span>
+                                    )}
+                                  </span>
+                                  {item.latin.length > 0 && (
+                                    <span lang="la" {...stylex.attrs(styles.latinInline)}>
+                                      <LatinPreview latin={item.latin} />
+                                    </span>
+                                  )}
                                 </span>
+                              </button>
+                            </th>
+                            <td
+                              lang={item.latin.length > 0 ? "la" : undefined}
+                              {...stylex.attrs(
+                                styles.cell,
+                                styles.latinCell,
+                                expanded() && styles.cellJoined,
                               )}
-                            </span>
-                          </button>
-                        </th>
-                        <td
-                          lang={item.latin.length > 0 ? "la" : undefined}
-                          {...stylex.props(
-                            styles.cell,
-                            styles.latinCell,
-                            expanded && styles.cellJoined,
-                          )}
-                        >
-                          <LatinPreview latin={item.latin} />
-                        </td>
-                        <td
-                          {...stylex.props(
-                            styles.cell,
-                            styles.originCell,
-                            expanded && styles.cellJoined,
-                          )}
-                        >
-                          {regionShort(item)}
-                        </td>
-                      </m.tr>
-                      <m.tr
-                        layout="position"
-                        transition={{ duration: 0.26, ease: EASE }}
-                        key="detail"
-                        aria-hidden={!expanded}
-                        inert={!expanded}
-                      >
-                        <td
-                          colSpan={3}
-                          {...stylex.props(styles.detailCell)}
-                          style={{ borderBottomWidth: expanded ? 1 : 0 }}
-                        >
-                          <Collapse
-                            id={detailId}
-                            open={expanded}
-
-                            transition={{ duration: reduce ? 0 : 0.26, ease: EASE }}
-                            {...stylex.props(styles.detailClip)}
+                            >
+                              <LatinPreview latin={item.latin} />
+                            </td>
+                            <td
+                              {...stylex.attrs(
+                                styles.cell,
+                                styles.originCell,
+                                expanded() && styles.cellJoined,
+                              )}
+                            >
+                              {regionShort(item)}
+                            </td>
+                          </m.tr>
+                          <m.tr
+                            layout="position"
+                            transition={{ duration: 0.26, ease: EASE }}
+                            aria-hidden={expanded() ? "false" : "true"}
+                            inert={!expanded()}
                           >
-                            <div {...stylex.props(styles.detailInner)}>
-                              {item.latin.length > 0 && (
-                                <p lang="la" {...stylex.props(styles.inlineLatin)}>
-                                  {item.latin.join(", ")}
-                                </p>
-                              )}
-                              <ItemFacts item={item} inline />
-                            </div>
-                          </Collapse>
-                        </td>
-                      </m.tr>
-                    </Fragment>
-                  );
-                })}
-              </m.tbody>
+                            <td
+                              colspan={3}
+                              {...stylex.attrs(styles.detailCell)}
+                              style={{ "border-bottom-width": expanded() ? "1px" : "0" }}
+                            >
+                              <Collapse
+                                id={detailId}
+                                open={expanded()}
+                                transition={{ duration: reduce() ? 0 : 0.26, ease: EASE }}
+                                {...stylex.attrs(styles.detailClip)}
+                              >
+                                <div {...stylex.attrs(styles.detailInner)}>
+                                  {item.latin.length > 0 && (
+                                    <p lang="la" {...stylex.attrs(styles.inlineLatin)}>
+                                      {item.latin.join(", ")}
+                                    </p>
+                                  )}
+                                  <ItemFacts item={item} inline />
+                                </div>
+                              </Collapse>
+                            </td>
+                          </m.tr>
+                        </>
+                      );
+                    }}
+                  </For>
+                </m.tbody>
+              </Show>
             </table>
           </div>
 
-          <div {...stylex.props(styles.cardColumn)}>
+          <div {...stylex.attrs(styles.cardColumn)}>
             <div
               id={cardId}
               role="region"
               aria-label="Ingredient details"
               aria-live="polite"
-              {...stylex.props(styles.card)}
+              {...stylex.attrs(styles.card)}
             >
-              <div {...stylex.props(styles.cardStack)}>
+              <div {...stylex.attrs(styles.cardStack)}>
                 <AnimatePresence initial={false}>
-                  <m.div
-                    key={selected.id}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: reduce ? 0 : 0.22, ease: EASE }}
-                    {...stylex.props(styles.cardLayer)}
-                  >
-                    <DetailCard item={selected} position={selectedIndex} total={items.length} />
-                  </m.div>
+                  <Show when={selected()} keyed>
+                    {(current) => {
+                      // An exiting card keeps the position it was rendered with, as in React.
+                      const position = untrack(selectedIndex);
+                      const total = untrack(items).length;
+                      return (
+                        <m.div
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          exit={{ opacity: 0 }}
+                          transition={{ duration: reduce() ? 0 : 0.22, ease: EASE }}
+                          {...stylex.attrs(styles.cardLayer)}
+                        >
+                          <DetailCard item={current} position={position} total={total} />
+                        </m.div>
+                      );
+                    }}
+                  </Show>
                 </AnimatePresence>
               </div>
             </div>

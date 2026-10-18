@@ -2,7 +2,7 @@ import { LightboxControls } from "../../../shared/lightbox-controls";
 import { LightboxStage } from "../../../shared/lightbox-stage";
 import { LightboxDialog, type LightboxState } from "../../../shared/lightbox";
 import * as stylex from "@stylexjs/stylex";
-import { ArrowLeft, ArrowRight, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, X } from "@fenchem-lp/ui/components/lucide";
 
 import { ui } from "./shared";
 import { bp, chrome, face, tone } from "./tokens.stylex";
@@ -116,27 +116,21 @@ const styles = stylex.create({
   },
 });
 
-export function Lightbox({
-  lightbox,
-  views,
-}: {
-  lightbox: LightboxState;
-  views: readonly LightboxView[];
-}) {
-  const { close: onClose, step: onStep } = lightbox;
+export function Lightbox(props: { lightbox: LightboxState; views: readonly LightboxView[] }) {
+  const { close: onClose, step: onStep } = props.lightbox;
   return (
-    <LightboxDialog lightbox={lightbox} items={views} sx={styles.dialog}>
+    <LightboxDialog lightbox={props.lightbox} items={props.views} sx={styles.dialog}>
       {(view) => (
         <>
           <LightboxStage onClose={onClose} sx={styles.stage}>
-            <figure key={view.id} {...stylex.props(styles.figure)}>
-              <img src={view.large} alt={view.alt} {...stylex.props(styles.image)} />
-              <figcaption {...stylex.props(styles.caption)}>
-                <span aria-hidden="true" {...stylex.props(ui.balloon)}>
+            <figure {...stylex.attrs(styles.figure)}>
+              <img src={view.large} alt={view.alt} {...stylex.attrs(styles.image)} />
+              <figcaption {...stylex.attrs(styles.caption)}>
+                <span aria-hidden="true" {...stylex.attrs(ui.balloon)}>
                   {view.letter}
                 </span>
-                <span {...stylex.props(styles.captionTitle)}>{view.caption}</span>
-                <span lang="en" {...stylex.props(ui.label)}>
+                <span {...stylex.attrs(styles.captionTitle)}>{view.caption}</span>
+                <span lang="en" {...stylex.attrs(ui.label)}>
                   View {view.letter} · {view.english}
                 </span>
               </figcaption>

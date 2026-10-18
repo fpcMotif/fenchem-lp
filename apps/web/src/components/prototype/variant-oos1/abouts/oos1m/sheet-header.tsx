@@ -45,27 +45,22 @@ const styles = stylex.create({
   },
 });
 
-export function SheetHeader({
-  sheet,
-  title,
-  english,
-  titleId,
-}: {
+export function SheetHeader(props: {
   sheet: number;
   title: string;
   english: string;
   titleId: string;
 }) {
   return (
-    <header {...stylex.props(styles.header)}>
-      <p aria-hidden="true" lang="en" {...stylex.props(ui.caps, styles.sheet)}>
-        Sheet {pad2(sheet)} / {pad2(SHEET_COUNT)}
+    <header {...stylex.attrs(styles.header)}>
+      <p aria-hidden="true" lang="en" {...stylex.attrs(ui.caps, styles.sheet)}>
+        Sheet {pad2(props.sheet)} / {pad2(SHEET_COUNT)}
       </p>
-      <h2 id={titleId} {...stylex.props(styles.title)}>
-        {title}
+      <h2 id={props.titleId} {...stylex.attrs(styles.title)}>
+        {props.title}
       </h2>
-      <p lang="en" {...stylex.props(ui.serif, styles.english)}>
-        {english}
+      <p lang="en" {...stylex.attrs(ui.serif, styles.english)}>
+        {props.english}
       </p>
     </header>
   );

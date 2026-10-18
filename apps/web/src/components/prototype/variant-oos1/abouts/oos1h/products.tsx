@@ -1,6 +1,6 @@
-import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
+import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight } from "@fenchem-lp/ui/components/lucide";
 
 import { PRODUCTS, PRODUCTS_INTRO } from "../../content";
 import { Reveal } from "./reveal";
@@ -13,9 +13,9 @@ const styles = stylex.create({
   },
   lead: {
     margin: 0,
-    marginBottom: { default: 56, [breakpoints.xl]: 96 },
+    marginBottom: { default: 56, ["@media (min-width: 1280px)"]: 96 },
     maxWidth: "30em",
-    fontSize: { default: 20, [breakpoints.xl]: 28 },
+    fontSize: { default: 20, ["@media (min-width: 1280px)"]: 28 },
     fontWeight: 400,
     lineHeight: 1.7,
     letterSpacing: "0.04em",
@@ -27,9 +27,9 @@ const styles = stylex.create({
     gridTemplateColumns: {
       default: "minmax(0, 1fr)",
       [mq.smToXl]: "repeat(2, minmax(0, 1fr))",
-      [breakpoints.xl]: "repeat(4, minmax(0, 1fr))",
+      ["@media (min-width: 1280px)"]: "repeat(4, minmax(0, 1fr))",
     },
-    gap: { default: 56, [breakpoints.xl]: 32 },
+    gap: { default: 56, ["@media (min-width: 1280px)"]: 32 },
     margin: 0,
     padding: 0,
     listStyle: "none",
@@ -110,40 +110,40 @@ const styles = stylex.create({
   },
 });
 
-export function Products({ onNavigateHome }: { onNavigateHome: (hash?: string) => void }) {
+export function Products(props: { onNavigateHome: (hash?: string) => void }) {
   return (
     <section
       id="about-products"
       aria-labelledby="about-products-title"
-      {...stylex.props(shared.anchor, shared.section, styles.section)}
+      {...stylex.attrs(shared.anchor, shared.section, styles.section)}
     >
-      <h2 id="about-products-title" {...stylex.props(shared.srOnly)}>
+      <h2 id="about-products-title" {...stylex.attrs(shared.srOnly)}>
         Products and applications
       </h2>
-      <div {...stylex.props(shared.shell, shared.inset)}>
+      <div {...stylex.attrs(shared.shell, shared.inset)}>
         <Reveal>
-          <p {...stylex.props(styles.lead)}>{PRODUCTS_INTRO.lead}</p>
+          <p {...stylex.attrs(styles.lead)}>{PRODUCTS_INTRO.lead}</p>
         </Reveal>
-        <ul {...stylex.props(styles.grid)}>
+        <ul {...stylex.attrs(styles.grid)}>
           {PRODUCTS.map((product, position) => (
-            <Reveal key={product.title} as="li" step={position} sx={styles.item}>
-              <article {...stylex.props(styles.card)}>
+            <Reveal as="li" step={position} sx={styles.item}>
+              <article {...stylex.attrs(styles.card)}>
                 <img
                   src={product.image}
                   alt={product.english}
                   loading="lazy"
                   decoding="async"
-                  {...stylex.props(styles.image)}
+                  {...stylex.attrs(styles.image)}
                 />
-                <div {...stylex.props(styles.body)}>
-                  <h3 {...stylex.props(styles.title)}>{product.title}</h3>
-                  <p {...stylex.props(styles.desc)}>{product.description}</p>
-                  <p {...stylex.props(styles.tags)}>{product.tags.join(" · ")}</p>
+                <div {...stylex.attrs(styles.body)}>
+                  <h3 {...stylex.attrs(styles.title)}>{product.title}</h3>
+                  <p {...stylex.attrs(styles.desc)}>{product.description}</p>
+                  <p {...stylex.attrs(styles.tags)}>{product.tags.join(" · ")}</p>
                   <button
                     type="button"
                     aria-label={`Learn about the solution: ${product.english}`}
-                    onClick={() => onNavigateHome("products")}
-                    {...stylex.props(styles.more)}
+                    onClick={() => props.onNavigateHome("products")}
+                    {...stylex.attrs(styles.more)}
                   >
                     <span aria-hidden="true">了解方案</span>
                     <ArrowRight size={16} aria-hidden="true" />

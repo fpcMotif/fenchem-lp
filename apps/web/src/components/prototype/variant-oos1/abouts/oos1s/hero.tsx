@@ -99,30 +99,30 @@ export function Hero() {
   const [taglineLead, taglineClose] = ABOUT_BANNER.tagline.split(", ");
 
   return (
-    <section aria-labelledby="about-banner-title" {...stylex.props(s.hero)}>
-      <div {...stylex.props(ui.shell, ui.inset, s.head)}>
-        <h1 id="about-banner-title" {...stylex.props(s.title)}>
+    <section aria-labelledby="about-banner-title" {...stylex.attrs(s.hero)}>
+      <div {...stylex.attrs(ui.shell, ui.inset, s.head)}>
+        <h1 id="about-banner-title" {...stylex.attrs(s.title)}>
           {ABOUT_BANNER.title}
         </h1>
-        <div {...stylex.props(s.opening)}>
-          <p lang="en" {...stylex.props(s.tagline)}>
-            <span {...stylex.props(s.taglineLine)}>{taglineLead},</span>
-            <span {...stylex.props(s.taglineLine)}>{taglineClose}</span>
+        <div {...stylex.attrs(s.opening)}>
+          <p lang="en" {...stylex.attrs(s.tagline)}>
+            <span {...stylex.attrs(s.taglineLine)}>{taglineLead},</span>
+            <span {...stylex.attrs(s.taglineLine)}>{taglineClose}</span>
           </p>
-          <p {...stylex.props(s.lead)}>{ABOUT_BANNER.lead}</p>
+          <p {...stylex.attrs(s.lead)}>{ABOUT_BANNER.lead}</p>
         </div>
       </div>
-      <figure {...stylex.props(s.figure)}>
-        <div {...stylex.props(s.frame)}>
+      <figure {...stylex.attrs(s.figure)}>
+        <div {...stylex.attrs(s.frame)}>
           <img
             src={ABOUT_BANNER.image}
             alt={ABOUT_BANNER.alt}
-            fetchPriority="high"
+            fetchpriority="high"
             decoding="async"
-            {...stylex.props(ui.fill, s.image)}
+            {...stylex.attrs(ui.fill, s.image)}
           />
         </div>
-        <figcaption lang="en" {...stylex.props(s.subtitle)}>
+        <figcaption lang="en" {...stylex.attrs(s.subtitle)}>
           {ABOUT_BANNER.established} · {ABOUT_BANNER.place}
         </figcaption>
       </figure>

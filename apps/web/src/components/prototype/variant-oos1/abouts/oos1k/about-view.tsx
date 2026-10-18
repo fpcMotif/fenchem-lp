@@ -1,5 +1,4 @@
 import * as stylex from "@stylexjs/stylex";
-import { useCallback, useRef, useState } from "react";
 
 import type { AboutPageProps } from "../../index";
 import { Campus } from "./campus";
@@ -12,6 +11,7 @@ import { Profile } from "./profile";
 import { StarField } from "./star-field";
 import { Structure } from "./structure";
 import { chrome, face, sky } from "./tokens.stylex";
+import { createSignal } from "solid-js";
 
 const styles = stylex.create({
   root: {
@@ -37,24 +37,24 @@ const styles = stylex.create({
   },
 });
 
-export function AboutOOS1K({ onNavigateHome }: AboutPageProps) {
-  const nightRef = useRef<HTMLDivElement>(null);
-  const [nova, setNova] = useState(false);
-  const ignite = useCallback(() => setNova(true), []);
+export function AboutOOS1K(props: AboutPageProps) {
+  const [nightRef, setNightRef] = createSignal<HTMLDivElement>();
+  const [nova, setNova] = createSignal(false);
+  const ignite = () => setNova(true);
 
   return (
-    <div id="about-top" {...stylex.props(styles.root)}>
-      <div ref={nightRef} {...stylex.props(styles.night)}>
-        <StarField trackRef={nightRef} flare={nova} />
-        <div {...stylex.props(styles.content)}>
+    <div id="about-top" {...stylex.attrs(styles.root)}>
+      <div ref={setNightRef} {...stylex.attrs(styles.night)}>
+        <StarField trackRef={nightRef} flare={nova()} />
+        <div {...stylex.attrs(styles.content)}>
           <Hero />
           <Profile />
           <Campus />
-          <Culture lit={nova} onIgnite={ignite} />
+          <Culture lit={nova()} onIgnite={ignite} />
           <Csr />
           <Honors />
           <Structure />
-          <Closing onNavigateHome={onNavigateHome} />
+          <Closing onNavigateHome={props.onNavigateHome} />
         </div>
       </div>
     </div>

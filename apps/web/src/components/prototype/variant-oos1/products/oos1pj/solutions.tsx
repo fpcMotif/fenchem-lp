@@ -1,8 +1,8 @@
 import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { ArrowLeftRight, ChevronDown } from "lucide-react";
-import { m } from "motion/react";
-import { useId, useState } from "react";
+import { ArrowLeftRight, ChevronDown } from "@fenchem-lp/ui/components/lucide";
+import { m } from "@/compat/motion";
+import { createSignal, createUniqueId, For, Show, untrack } from "solid-js";
 
 import { EASE } from "@/components/prototype/motion-constants";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
@@ -457,36 +457,28 @@ const styles = stylex.create({
   },
 });
 
-function Lines({ lines }: { lines: string[] }) {
+function Lines(props: { lines: string[] }) {
   return (
-    <ul {...stylex.props(styles.lineList)}>
-      {lines.map((line) => (
-        <li key={line} {...stylex.props(styles.lineItem)}>
-          {line}
-        </li>
-      ))}
+    <ul {...stylex.attrs(styles.lineList)}>
+      <For each={props.lines}>{(line) => <li {...stylex.attrs(styles.lineItem)}>{line}</li>}</For>
     </ul>
   );
 }
 
-function SwapButton({ onSwap }: { onSwap: () => void }) {
+function SwapButton(props: { onSwap: () => void }) {
   return (
-    <button type="button" aria-label="Swap" onClick={onSwap} {...stylex.props(styles.swap)}>
+    <button
+      type="button"
+      aria-label="Swap"
+      onClick={() => props.onSwap()}
+      {...stylex.attrs(styles.swap)}
+    >
       <ArrowLeftRight size={18} strokeWidth={1.5} absoluteStrokeWidth aria-hidden="true" />
     </button>
   );
 }
 
-function Sheet({
-  slot,
-  sheetId,
-  item,
-  otherSlot,
-  otherId,
-  onSelect,
-  shownOnPhone,
-  animateEntry,
-}: {
+function Sheet(props: {
   slot: Slot;
   sheetId: string;
   item: SolutionItem;
@@ -497,40 +489,40 @@ function Sheet({
   animateEntry: boolean;
 }) {
   const reduce = useReducedMotion();
-  const selectId = useId();
-  const labelId = useId();
-  const titleId = useId();
-  const entry = animateEntry && !reduce ? { opacity: 0, y: 4 } : false;
+  const selectId = createUniqueId();
+  const labelId = createUniqueId();
+  const titleId = createUniqueId();
+  const entry = () => (props.animateEntry && !reduce() ? { opacity: 0, y: 4 } : false);
   const settle = { opacity: 1, y: 0 };
-  const timing = { duration: reduce ? 0 : 0.22, ease: EASE };
+  const timing = () => ({ duration: reduce() ? 0 : 0.22, ease: EASE });
 
   return (
     <article
-      id={sheetId}
+      id={props.sheetId}
       aria-labelledby={`${labelId} ${titleId}`}
-      {...stylex.props(
+      {...stylex.attrs(
         styles.sheet,
-        slot === "A" ? styles.sheetA : styles.sheetB,
-        !shownOnPhone && styles.sheetHiddenOnPhone,
+        props.slot === "A" ? styles.sheetA : styles.sheetB,
+        !props.shownOnPhone && styles.sheetHiddenOnPhone,
       )}
     >
-      <div {...stylex.props(styles.control)}>
-        <label id={labelId} htmlFor={selectId} {...stylex.props(styles.controlLabel)}>
-          方案 {slot}
+      <div {...stylex.attrs(styles.control)}>
+        <label id={labelId} for={selectId} {...stylex.attrs(styles.controlLabel)}>
+          方案 {props.slot}
         </label>
-        <span {...stylex.props(styles.selectWrap)}>
+        <span {...stylex.attrs(styles.selectWrap)}>
           <select
             id={selectId}
-            value={item.id}
-            onChange={(event) => onSelect(event.target.value)}
-            {...stylex.props(styles.select)}
+            value={props.item.id}
+            onChange={(event) => props.onSelect(event.currentTarget.value)}
+            {...stylex.attrs(styles.select)}
           >
             {SOLUTION_ITEMS.map((solution, index) => {
-              const taken = solution.id === otherId;
+              const taken = () => solution.id === props.otherId;
               return (
-                <option key={solution.id} value={solution.id} disabled={taken}>
+                <option value={solution.id} disabled={taken()}>
                   {padIndex(index)} {solution.title}
-                  {taken ? `（方案 ${otherSlot}）` : ""}
+                  {taken() ? `（方案 ${props.otherSlot}）` : ""}
                 </option>
               );
             })}
@@ -540,69 +532,77 @@ function Sheet({
             strokeWidth={1.5}
             absoluteStrokeWidth
             aria-hidden="true"
-            {...stylex.props(styles.selectIcon)}
+            {...stylex.attrs(styles.selectIcon)}
           />
         </span>
       </div>
-      <div {...stylex.props(styles.paper)}>
-        <m.header
-          key={`head-${item.id}`}
-          initial={entry}
-          animate={settle}
-          transition={timing}
-          {...stylex.props(styles.paperHead)}
-        >
-          <span {...stylex.props(styles.index)}>{padIndex(INDEX_BY_ID[item.id] ?? 0)}</span>
-          <h3 id={titleId} {...stylex.props(styles.sheetTitle)}>
-            {item.title}
-          </h3>
-          <p {...stylex.props(styles.subtitle)}>{item.subtitle}</p>
-        </m.header>
-        <m.dl
-          key={`fields-${item.id}`}
-          initial={entry}
-          animate={settle}
-          transition={timing}
-          {...stylex.props(styles.fields)}
-        >
-          {FIELDS.map(({ key, label, english }) => {
-            const lines = item[key];
-            return (
-              <div key={key} {...stylex.props(styles.field)}>
-                <dt {...stylex.props(styles.fieldLabel)}>
-                  <span aria-hidden="true">{label}</span>
-                  <span {...stylex.props(styles.srOnly)}>{english}</span>
-                </dt>
-                <dd {...stylex.props(styles.fieldValue, styles.reserve(RESERVED_HEIGHT[key]))}>
-                  {lines.length > 0 ? (
-                    <Lines lines={lines} />
-                  ) : (
-                    <>
-                      <span aria-hidden="true" {...stylex.props(styles.empty)}>
-                        —
-                      </span>
-                      <span {...stylex.props(styles.srOnly)}>None</span>
-                    </>
-                  )}
-                </dd>
-              </div>
-            );
-          })}
-        </m.dl>
+      <div {...stylex.attrs(styles.paper)}>
+        <Show when={props.item} keyed>
+          {(item) => (
+            <>
+              <m.header
+                initial={untrack(entry)}
+                animate={settle}
+                transition={timing()}
+                {...stylex.attrs(styles.paperHead)}
+              >
+                <span {...stylex.attrs(styles.index)}>{padIndex(INDEX_BY_ID[item.id] ?? 0)}</span>
+                <h3 id={titleId} {...stylex.attrs(styles.sheetTitle)}>
+                  {item.title}
+                </h3>
+                <p {...stylex.attrs(styles.subtitle)}>{item.subtitle}</p>
+              </m.header>
+              <m.dl
+                initial={untrack(entry)}
+                animate={settle}
+                transition={timing()}
+                {...stylex.attrs(styles.fields)}
+              >
+                {FIELDS.map(({ key, label, english }) => {
+                  const lines = item[key];
+                  return (
+                    <div {...stylex.attrs(styles.field)}>
+                      <dt {...stylex.attrs(styles.fieldLabel)}>
+                        <span aria-hidden="true">{label}</span>
+                        <span {...stylex.attrs(styles.srOnly)}>{english}</span>
+                      </dt>
+                      <dd
+                        {...stylex.attrs(styles.fieldValue, styles.reserve(RESERVED_HEIGHT[key]))}
+                      >
+                        {lines.length > 0 ? (
+                          <Lines lines={lines} />
+                        ) : (
+                          <>
+                            <span aria-hidden="true" {...stylex.attrs(styles.empty)}>
+                              —
+                            </span>
+                            <span {...stylex.attrs(styles.srOnly)}>None</span>
+                          </>
+                        )}
+                      </dd>
+                    </div>
+                  );
+                })}
+              </m.dl>
+            </>
+          )}
+        </Show>
       </div>
     </article>
   );
 }
 
 export function Solutions() {
-  const titleId = useId();
-  const sheetAId = useId();
-  const sheetBId = useId();
-  const [[idA, idB], setPair] = useState<[string, string]>(DEFAULT_PAIR);
-  const [phoneSlot, setPhoneSlot] = useState<Slot>("A");
-  const [animateEntry, setAnimateEntry] = useState(false);
-  const itemA = findSolution(idA);
-  const itemB = findSolution(idB);
+  const titleId = createUniqueId();
+  const sheetAId = createUniqueId();
+  const sheetBId = createUniqueId();
+  const [pair, setPair] = createSignal<[string, string]>(DEFAULT_PAIR);
+  const [phoneSlot, setPhoneSlot] = createSignal<Slot>("A");
+  const [animateEntry, setAnimateEntry] = createSignal(false);
+  const idA = () => pair()[0];
+  const idB = () => pair()[1];
+  const itemA = () => findSolution(idA());
+  const itemB = () => findSolution(idB());
 
   const choose = (slot: Slot, id: string) => {
     setAnimateEntry(true);
@@ -615,14 +615,14 @@ export function Solutions() {
   };
 
   return (
-    <section id="products-solutions" aria-labelledby={titleId} {...stylex.props(styles.section)}>
-      <div {...stylex.props(styles.shell)}>
-        <header {...stylex.props(styles.head)}>
-          <h2 id={titleId} {...stylex.props(styles.title)}>
+    <section id="products-solutions" aria-labelledby={titleId} {...stylex.attrs(styles.section)}>
+      <div {...stylex.attrs(styles.shell)}>
+        <header {...stylex.attrs(styles.head)}>
+          <h2 id={titleId} {...stylex.attrs(styles.title)}>
             应用方案
           </h2>
-          <p {...stylex.props(styles.meta)}>
-            <span {...stylex.props(styles.numeral)}>{SOLUTION_ITEMS.length}</span>{" "}
+          <p {...stylex.attrs(styles.meta)}>
+            <span {...stylex.attrs(styles.numeral)}>{SOLUTION_ITEMS.length}</span>{" "}
             款方案，任选两款逐项对照
           </p>
         </header>
@@ -630,57 +630,55 @@ export function Solutions() {
         <div
           role="group"
           aria-label="Change the displayed solution"
-          {...stylex.props(styles.phoneBar)}
+          {...stylex.attrs(styles.phoneBar)}
         >
           <PhoneToggle
             slot="A"
-            title={itemA.title}
+            title={itemA().title}
             controls={sheetAId}
-            pressed={phoneSlot === "A"}
+            pressed={phoneSlot() === "A"}
             onPress={() => setPhoneSlot("A")}
           />
-          <span {...stylex.props(styles.phoneSwap)}>
+          <span {...stylex.attrs(styles.phoneSwap)}>
             <SwapButton onSwap={swap} />
           </span>
           <PhoneToggle
             slot="B"
-            title={itemB.title}
+            title={itemB().title}
             controls={sheetBId}
-            pressed={phoneSlot === "B"}
+            pressed={phoneSlot() === "B"}
             onPress={() => setPhoneSlot("B")}
           />
         </div>
 
-        <div {...stylex.props(styles.compare)}>
-          <ul aria-hidden="true" {...stylex.props(styles.rail)}>
-            {FIELDS.map(({ key, label }) => (
-              <li key={key} {...stylex.props(styles.railLabel)}>
-                {label}
-              </li>
+        <div {...stylex.attrs(styles.compare)}>
+          <ul aria-hidden="true" {...stylex.attrs(styles.rail)}>
+            {FIELDS.map(({ label }) => (
+              <li {...stylex.attrs(styles.railLabel)}>{label}</li>
             ))}
           </ul>
           <Sheet
             slot="A"
             sheetId={sheetAId}
-            item={itemA}
+            item={itemA()}
             otherSlot="B"
-            otherId={idB}
+            otherId={idB()}
             onSelect={(id) => choose("A", id)}
-            shownOnPhone={phoneSlot === "A"}
-            animateEntry={animateEntry}
+            shownOnPhone={phoneSlot() === "A"}
+            animateEntry={animateEntry()}
           />
-          <div {...stylex.props(styles.swapCell)}>
+          <div {...stylex.attrs(styles.swapCell)}>
             <SwapButton onSwap={swap} />
           </div>
           <Sheet
             slot="B"
             sheetId={sheetBId}
-            item={itemB}
+            item={itemB()}
             otherSlot="A"
-            otherId={idA}
+            otherId={idA()}
             onSelect={(id) => choose("B", id)}
-            shownOnPhone={phoneSlot === "B"}
-            animateEntry={animateEntry}
+            shownOnPhone={phoneSlot() === "B"}
+            animateEntry={animateEntry()}
           />
         </div>
       </div>
@@ -688,13 +686,7 @@ export function Solutions() {
   );
 }
 
-function PhoneToggle({
-  slot,
-  title,
-  controls,
-  pressed,
-  onPress,
-}: {
+function PhoneToggle(props: {
   slot: Slot;
   title: string;
   controls: string;
@@ -704,17 +696,17 @@ function PhoneToggle({
   return (
     <button
       type="button"
-      aria-pressed={pressed}
-      aria-controls={controls}
-      onClick={onPress}
-      {...stylex.props(
+      aria-pressed={props.pressed ? "true" : "false"}
+      aria-controls={props.controls}
+      onClick={() => props.onPress()}
+      {...stylex.attrs(
         styles.phoneToggle,
-        slot === "B" && styles.phoneToggleEnd,
-        pressed && styles.phoneToggleOn,
+        props.slot === "B" && styles.phoneToggleEnd,
+        props.pressed && styles.phoneToggleOn,
       )}
     >
-      <span {...stylex.props(styles.phoneToggleSlot)}>方案 {slot}</span>
-      <span {...stylex.props(styles.phoneToggleTitle)}>{title}</span>
+      <span {...stylex.attrs(styles.phoneToggleSlot)}>方案 {props.slot}</span>
+      <span {...stylex.attrs(styles.phoneToggleTitle)}>{props.title}</span>
     </button>
   );
 }

@@ -1,5 +1,5 @@
 import * as stylex from "@stylexjs/stylex";
-import { Fragment, type CSSProperties } from "react";
+import type { JSX } from "@solidjs/web";
 
 import type { CorridorGeometry } from "./corridor-geometry";
 import { LAKE, PLACE, WORKS, ui } from "./shared";
@@ -97,29 +97,26 @@ function place(
   y: number,
   depth: number,
   turn = "",
-): CSSProperties {
+): JSX.CSSProperties {
   return {
-    width,
-    height,
-    left: -width / 2,
-    top: -height / 2,
+    width: `${width}px`,
+    height: `${height}px`,
+    left: `${-width / 2}px`,
+    top: `${-height / 2}px`,
     transform: `translate3d(${x}px, ${y}px, ${-depth}px)${turn ? ` ${turn}` : ""}`,
   };
 }
 
-function run(x: number, y: number, from: number, to: number): CSSProperties {
+function run(x: number, y: number, from: number, to: number): JSX.CSSProperties {
   return place(to - from, 1, x, y, (from + to) / 2, "rotateY(90deg)");
 }
 
-export function CorridorScene({
-  geometry,
-  onOpen,
-}: {
+export function CorridorScene(props: {
   geometry: CorridorGeometry;
   onOpen: (index: number) => void;
 }) {
-  const { halfWidth: hw, halfHeight: hh, unit, end, rail, base, lake } = geometry;
-  const near = -geometry.perspective * 0.4;
+  const { halfWidth: hw, halfHeight: hh, unit, end, rail, base, lake } = props.geometry;
+  const near = -props.geometry.perspective * 0.4;
 
   const edges: [number, number][] = [
     [-hw, -hh],
@@ -150,40 +147,27 @@ export function CorridorScene({
   return (
     <>
       {edges.map(([x, y]) => (
-        <span
-          key={`edge${x}${y}`}
-          style={run(x, y, near, end)}
-          {...stylex.props(styles.part, styles.edge)}
-        />
+        <span style={run(x, y, near, end)} {...stylex.attrs(styles.part, styles.edge)} />
       ))}
       {fines.map(([x, y]) => (
-        <span
-          key={`fine${x}${y}`}
-          style={run(x, y, near, end)}
-          {...stylex.props(styles.part, styles.line)}
-        />
+        <span style={run(x, y, near, end)} {...stylex.attrs(styles.part, styles.line)} />
       ))}
       {joints.map((depth) => (
-        <span
-          key={`joint${depth}`}
-          style={place(hw * 2, 1, 0, hh, depth)}
-          {...stylex.props(styles.part, styles.line)}
-        />
+        <span style={place(hw * 2, 1, 0, hh, depth)} {...stylex.attrs(styles.part, styles.line)} />
       ))}
       {lights.map((depth) => (
         <span
-          key={`light${depth}`}
           style={place(hw * 0.4, 2, 0, -hh, depth)}
-          {...stylex.props(styles.part, styles.light)}
+          {...stylex.attrs(styles.part, styles.light)}
         />
       ))}
 
       <span
         style={place(hw * 2, hh * 2, 0, 0, end)}
-        {...stylex.props(styles.part, styles.endWall)}
+        {...stylex.attrs(styles.part, styles.endWall)}
       />
 
-      {geometry.frames.map((frame, index) => {
+      {props.geometry.frames.map((frame, index) => {
         const work = WORKS[index];
         const turn = frame.wall === "left" ? "rotateY(90deg)" : "rotateY(-90deg)";
         const x = frame.wall === "left" ? -hw + 1 : hw - 1;
@@ -192,49 +176,55 @@ export function CorridorScene({
         const labelDepth = frame.wall === "left" ? frame.depth + offset : frame.depth - offset;
         const labelY = frame.y + frame.height / 2 - labelHeight / 2;
         return (
-          <Fragment key={work.id}>
+          <>
             <button
               type="button"
-              tabIndex={-1}
-              onClick={() => onOpen(index)}
+              tabindex={-1}
+              onClick={() => props.onOpen(index)}
               style={{
                 ...place(frame.length, frame.height, x, frame.y, frame.depth, turn),
-                padding: frame.mat,
+                padding: `${frame.mat}px`,
               }}
-              {...stylex.props(styles.part, styles.frame)}
+              {...stylex.attrs(styles.part, styles.frame)}
             >
-              <span style={{ top: -wire - 1, height: wire }} {...stylex.props(styles.wire)} />
+              <span
+                style={{ top: `${-wire - 1}px`, height: `${wire}px` }}
+                {...stylex.attrs(styles.wire)}
+              />
               <img
                 src={work.src}
                 alt=""
                 loading="lazy"
                 decoding="async"
                 draggable={false}
-                {...stylex.props(styles.photo)}
+                {...stylex.attrs(styles.photo)}
               />
             </button>
             <span
               style={{
                 ...place(labelWidth, labelHeight, x, labelY, labelDepth, turn),
-                fontSize: unit * 0.024,
+                "font-size": `${unit * 0.024}px`,
               }}
-              {...stylex.props(styles.part, styles.label)}
+              {...stylex.attrs(styles.part, styles.label)}
             >
-              <span lang="en" {...stylex.props(ui.number, styles.labelNumber)}>
+              <span lang="en" {...stylex.attrs(ui.number, styles.labelNumber)}>
                 Nº {work.number}
               </span>
-              <span {...stylex.props(styles.labelTitle)}>{work.caption}</span>
-              <span lang="en" {...stylex.props(ui.italic, styles.labelMeta)}>
+              <span {...stylex.attrs(styles.labelTitle)}>{work.caption}</span>
+              <span lang="en" {...stylex.attrs(ui.italic, styles.labelMeta)}>
                 {work.english}, {PLACE}
               </span>
             </span>
-          </Fragment>
+          </>
         );
       })}
 
       <span
-        style={{ ...place(lakeOuterWidth, lakeOuterHeight, 0, 0, end - 1), padding: lake.mat }}
-        {...stylex.props(styles.part, styles.lakeFrame)}
+        style={{
+          ...place(lakeOuterWidth, lakeOuterHeight, 0, 0, end - 1),
+          padding: `${lake.mat}px`,
+        }}
+        {...stylex.attrs(styles.part, styles.lakeFrame)}
       >
         <img
           src={LAKE.src}
@@ -242,21 +232,21 @@ export function CorridorScene({
           loading="lazy"
           decoding="async"
           draggable={false}
-          {...stylex.props(styles.photo)}
+          {...stylex.attrs(styles.photo)}
         />
       </span>
       <span
         style={{
           ...place(lakeOuterWidth, unit * 0.06, 0, lakeOuterHeight / 2 + unit * 0.07, end - 1),
-          fontSize: unit * 0.018,
+          "font-size": `${unit * 0.018}px`,
         }}
-        {...stylex.props(styles.part, styles.lakeLabel)}
+        {...stylex.attrs(styles.part, styles.lakeLabel)}
       >
-        <span lang="en" {...stylex.props(ui.number, styles.lakeNumber)}>
+        <span lang="en" {...stylex.attrs(ui.number, styles.lakeNumber)}>
           Nº {LAKE.number}
         </span>
         <span>{LAKE.title}</span>
-        <span lang="en" {...stylex.props(ui.italic)}>
+        <span lang="en" {...stylex.attrs(ui.italic)}>
           {LAKE.facing}
         </span>
       </span>

@@ -1,4 +1,5 @@
-import { useSyncExternalStore } from "react";
+import { createExternalStore } from "@/compat/external-store";
+import type { Accessor } from "solid-js";
 
 const WIDE_QUERY = "(min-width: 1024px)";
 
@@ -8,8 +9,8 @@ function subscribe(onChange: () => void) {
   return () => media.removeEventListener("change", onChange);
 }
 
-export function useWideLayout(): boolean {
-  return useSyncExternalStore(
+export function useWideLayout(): Accessor<boolean> {
+  return createExternalStore(
     subscribe,
     () => window.matchMedia(WIDE_QUERY).matches,
     () => true,

@@ -1,5 +1,5 @@
 import * as stylex from "@stylexjs/stylex";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight } from "@fenchem-lp/ui/components/lucide";
 
 import { SectionHead } from "./shared";
 import { ui } from "./shared-values";
@@ -109,11 +109,11 @@ const styles = stylex.create({
   },
 });
 
-export function Closing({ onNavigateHome }: { onNavigateHome: (hash?: string) => void }) {
+export function Closing(props: { onNavigateHome: (hash?: string) => void }) {
   return (
-    <section aria-labelledby="oos1b-closing" {...stylex.props(ui.shell, styles.closing)}>
-      <div {...stylex.props(styles.grid)}>
-        <div {...stylex.props(styles.copy)}>
+    <section aria-labelledby="oos1b-closing" {...stylex.attrs(ui.shell, styles.closing)}>
+      <div {...stylex.attrs(styles.grid)}>
+        <div {...stylex.attrs(styles.copy)}>
           <SectionHead
             id="oos1b-closing"
             index={7}
@@ -126,20 +126,20 @@ export function Closing({ onNavigateHome }: { onNavigateHome: (hash?: string) =>
           href="#contact"
           onClick={(event) => {
             event.preventDefault();
-            onNavigateHome("contact");
+            props.onNavigateHome("contact");
           }}
-          {...stylex.props(styles.door, ui.focusRing, stylex.defaultMarker())}
+          {...stylex.attrs(styles.door, ui.focusRing, stylex.defaultMarker())}
         >
-          <span {...stylex.props(styles.mat, styles.raised)}>
-            <span {...stylex.props(styles.bevel)}>
-              <span {...stylex.props(styles.coreLine)}>
-                <span {...stylex.props(styles.mat, styles.inner)}>
-                  <span {...stylex.props(styles.bevel, styles.bevelInner)}>
-                    <span {...stylex.props(styles.coreLine)}>
-                      <span {...stylex.props(styles.core)}>
-                        <span {...stylex.props(styles.coreLabel)}>
+          <span {...stylex.attrs(styles.mat, styles.raised)}>
+            <span {...stylex.attrs(styles.bevel)}>
+              <span {...stylex.attrs(styles.coreLine)}>
+                <span {...stylex.attrs(styles.mat, styles.inner)}>
+                  <span {...stylex.attrs(styles.bevel, styles.bevelInner)}>
+                    <span {...stylex.attrs(styles.coreLine)}>
+                      <span {...stylex.attrs(styles.core)}>
+                        <span {...stylex.attrs(styles.coreLabel)}>
                           联系泛成
-                          <span lang="en" {...stylex.props(styles.coreEnglish)}>
+                          <span lang="en" {...stylex.attrs(styles.coreEnglish)}>
                             Get in touch
                           </span>
                         </span>
@@ -147,7 +147,7 @@ export function Closing({ onNavigateHome }: { onNavigateHome: (hash?: string) =>
                           size={22}
                           strokeWidth={1.5}
                           aria-hidden="true"
-                          {...stylex.props(styles.arrow)}
+                          {...stylex.attrs(styles.arrow)}
                         />
                       </span>
                     </span>

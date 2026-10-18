@@ -1,8 +1,9 @@
-import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
+import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { m, type MotionValue, useScroll, useTransform } from "motion/react";
-import { useRef, useSyncExternalStore } from "react";
+import { m, type MotionValue, useScroll, useTransform } from "@/compat/motion";
+import { createSignal, For } from "solid-js";
 
+import { createExternalStore } from "@/compat/external-store";
 import { useLightbox } from "@/components/prototype/shared/lightbox";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
@@ -32,12 +33,12 @@ const subscribeWide = (onChange: () => void) => {
 
 function usePinned() {
   const reduce = useReducedMotion();
-  const wide = useSyncExternalStore(
+  const wide = createExternalStore(
     subscribeWide,
     () => window.matchMedia(DESKTOP_QUERY).matches,
     () => false,
   );
-  return wide && !reduce;
+  return () => wide() && !reduce();
 }
 
 const styles = stylex.create({
@@ -67,9 +68,12 @@ const styles = stylex.create({
     gridTemplateColumns: {
       default: "repeat(2, minmax(0, 1fr))",
       [media.mdOnly]: "repeat(4, minmax(0, 1fr))",
-      [breakpoints.lg]: "repeat(16, minmax(0, 1fr))",
+      ["@media (min-width: 1024px)"]: "repeat(16, minmax(0, 1fr))",
     },
-    gridTemplateRows: { default: null, [breakpoints.lg]: "repeat(7, minmax(0, 1fr))" },
+    gridTemplateRows: {
+      default: null,
+      ["@media (min-width: 1024px)"]: "repeat(7, minmax(0, 1fr))",
+    },
     gridAutoRows: { default: 150, [media.mdOnly]: 190 },
     height: "100%",
     margin: 0,
@@ -77,7 +81,7 @@ const styles = stylex.create({
     listStyle: "none",
   },
   cellsStatic: {
-    height: { default: "auto", [breakpoints.lg]: "min(720px, 54vw)" },
+    height: { default: "auto", ["@media (min-width: 1024px)"]: "min(720px, 54vw)" },
   },
   cell: {
     position: "relative",
@@ -87,32 +91,32 @@ const styles = stylex.create({
     minHeight: 0,
   },
   cellAerial: {
-    gridColumn: { default: "span 2", [breakpoints.lg]: "1 / span 8" },
-    gridRow: { default: "span 2", [breakpoints.lg]: "1 / span 4" },
+    gridColumn: { default: "span 2", ["@media (min-width: 1024px)"]: "1 / span 8" },
+    gridRow: { default: "span 2", ["@media (min-width: 1024px)"]: "1 / span 4" },
   },
   cellLab: {
-    gridColumn: { default: "span 2", [breakpoints.lg]: "9 / span 8" },
-    gridRow: { default: null, [breakpoints.lg]: "1 / span 2" },
+    gridColumn: { default: "span 2", ["@media (min-width: 1024px)"]: "9 / span 8" },
+    gridRow: { default: null, ["@media (min-width: 1024px)"]: "1 / span 2" },
   },
   cellShowroom: {
-    gridColumn: { default: "span 1", [breakpoints.lg]: "9 / span 4" },
-    gridRow: { default: null, [breakpoints.lg]: "3 / span 2" },
+    gridColumn: { default: "span 1", ["@media (min-width: 1024px)"]: "9 / span 4" },
+    gridRow: { default: null, ["@media (min-width: 1024px)"]: "3 / span 2" },
   },
   cellReception: {
-    gridColumn: { default: "span 1", [breakpoints.lg]: "13 / span 4" },
-    gridRow: { default: null, [breakpoints.lg]: "3 / span 2" },
+    gridColumn: { default: "span 1", ["@media (min-width: 1024px)"]: "13 / span 4" },
+    gridRow: { default: null, ["@media (min-width: 1024px)"]: "3 / span 2" },
   },
   cellLounge: {
-    gridColumn: { default: "span 2", [breakpoints.lg]: "1 / span 6" },
-    gridRow: { default: null, [breakpoints.lg]: "5 / span 3" },
+    gridColumn: { default: "span 2", ["@media (min-width: 1024px)"]: "1 / span 6" },
+    gridRow: { default: null, ["@media (min-width: 1024px)"]: "5 / span 3" },
   },
   cellOffice: {
-    gridColumn: { default: "span 1", [breakpoints.lg]: "7 / span 6" },
-    gridRow: { default: null, [breakpoints.lg]: "5 / span 3" },
+    gridColumn: { default: "span 1", ["@media (min-width: 1024px)"]: "7 / span 6" },
+    gridRow: { default: null, ["@media (min-width: 1024px)"]: "5 / span 3" },
   },
   cellGrounds: {
-    gridColumn: { default: "span 1", [breakpoints.lg]: "13 / span 4" },
-    gridRow: { default: null, [breakpoints.lg]: "5 / span 3" },
+    gridColumn: { default: "span 1", ["@media (min-width: 1024px)"]: "13 / span 4" },
+    gridRow: { default: null, ["@media (min-width: 1024px)"]: "5 / span 3" },
   },
   face: {
     position: "relative",
@@ -164,14 +168,7 @@ const PLACEMENT: Record<PhotoId, stylex.StyleXStyles> = {
   grounds: styles.cellGrounds,
 };
 
-function CampusCell({
-  photo,
-  index,
-  progress,
-  animated,
-  onOpen,
-  onFocusCell,
-}: {
+function CampusCell(props: {
   photo: (typeof ABOUT_CAMPUS.photos)[number];
   index: number;
   progress: MotionValue<number>;
@@ -179,50 +176,52 @@ function CampusCell({
   onOpen: () => void;
   onFocusCell: () => void;
 }) {
-  const start = START_BASE + index * START_STEP;
-  const settled = useTransform(progress, (value) => easeOut(clamp01((value - start) / WINDOW)));
+  const start = START_BASE + props.index * START_STEP;
+  const settled = useTransform(props.progress, (value) =>
+    easeOut(clamp01((value - start) / WINDOW)),
+  );
   const rise = useTransform(settled, (value) => RISE_PX * (1 - value));
 
   return (
-    <li {...stylex.props(styles.cell, PLACEMENT[photo.id])}>
+    <li {...stylex.attrs(styles.cell, PLACEMENT[props.photo.id])}>
       <m.figure
-        style={animated ? { opacity: settled, y: rise } : undefined}
-        {...stylex.props(styles.face)}
+        style={props.animated ? { opacity: settled, y: rise } : undefined}
+        {...stylex.attrs(styles.face)}
       >
         <button
           type="button"
-          aria-label={`View larger: ${photo.english}`}
-          onClick={onOpen}
-          onFocus={onFocusCell}
-          {...stylex.props(styles.hit)}
+          aria-label={`View larger: ${props.photo.english}`}
+          onClick={() => props.onOpen()}
+          onFocus={() => props.onFocusCell()}
+          {...stylex.attrs(styles.hit)}
         >
           <img
-            src={photo.src}
-            alt={photo.alt}
+            src={props.photo.src}
+            alt={props.photo.alt}
             loading="lazy"
             decoding="async"
-            {...stylex.props(shared.cover)}
+            {...stylex.attrs(shared.cover)}
           />
         </button>
-        <figcaption {...stylex.props(styles.caption)}>{photo.caption}</figcaption>
+        <figcaption {...stylex.attrs(styles.caption)}>{props.photo.caption}</figcaption>
       </m.figure>
     </li>
   );
 }
 
 export function Campus() {
-  const trackRef = useRef<HTMLDivElement>(null);
+  const [track, setTrack] = createSignal<HTMLDivElement>();
   const pinned = usePinned();
   const { scrollYProgress } = useScroll({
-    target: trackRef,
+    target: track,
     offset: ["start end", "end end"],
   });
   const lightbox = useLightbox(COUNT);
 
   const completeAssembly = () => {
-    const track = trackRef.current;
-    if (!pinned || !track || scrollYProgress.get() > 0.98) return;
-    const top = window.scrollY + track.getBoundingClientRect().bottom - window.innerHeight;
+    const el = track();
+    if (!pinned() || !el || scrollYProgress.get() > 0.98) return;
+    const top = window.scrollY + el.getBoundingClientRect().bottom - window.innerHeight;
     window.scrollTo({ top, behavior: "instant" });
   };
 
@@ -230,31 +229,32 @@ export function Campus() {
     <section
       id="about-campus"
       aria-labelledby="about-campus-title"
-      {...stylex.props(styles.section)}
+      {...stylex.attrs(styles.section)}
     >
       <SectionName id="about-campus-title">{ABOUT_CAMPUS.eyebrow}</SectionName>
-      <div ref={trackRef} {...stylex.props(pinned && styles.track)}>
-        <div {...stylex.props(pinned && styles.stage)}>
+      <div ref={setTrack} {...stylex.attrs(pinned() && styles.track)}>
+        <div {...stylex.attrs(pinned() && styles.stage)}>
           <Frame
             lattice="full"
-            sx={pinned ? styles.full : undefined}
-            innerSx={pinned ? styles.stageInner : shared.sectionPad}
+            sx={pinned() ? styles.full : undefined}
+            innerSx={pinned() ? styles.stageInner : shared.sectionPad}
           >
             <ul
               aria-label="Campus photos"
-              {...stylex.props(styles.cells, !pinned && styles.cellsStatic)}
+              {...stylex.attrs(styles.cells, !pinned() && styles.cellsStatic)}
             >
-              {ABOUT_CAMPUS.photos.map((photo, index) => (
-                <CampusCell
-                  key={photo.id}
-                  photo={photo}
-                  index={index}
-                  progress={scrollYProgress}
-                  animated={pinned}
-                  onOpen={() => lightbox.open(index)}
-                  onFocusCell={completeAssembly}
-                />
-              ))}
+              <For each={ABOUT_CAMPUS.photos}>
+                {(photo, index) => (
+                  <CampusCell
+                    photo={photo}
+                    index={index()}
+                    progress={scrollYProgress}
+                    animated={pinned()}
+                    onOpen={() => lightbox.open(index())}
+                    onFocusCell={completeAssembly}
+                  />
+                )}
+              </For>
             </ul>
           </Frame>
         </div>

@@ -88,29 +88,29 @@ export function Csr() {
   return (
     <Section id={chip.id} label={chip.english}>
       <Reveal>
-        <h3 {...stylex.props(s.statement)}>
-          <span {...stylex.props(s.line)}>{first}</span>
-          <span {...stylex.props(s.line, s.lineIndent)}>{second}</span>
+        <h3 {...stylex.attrs(s.statement)}>
+          <span {...stylex.attrs(s.line)}>{first}</span>
+          <span {...stylex.attrs(s.line, s.lineIndent)}>{second}</span>
         </h3>
       </Reveal>
-      <div {...stylex.props(s.lower)}>
+      <div {...stylex.attrs(s.lower)}>
         <Reveal as="figure" sx={s.photoCell}>
-          <div {...stylex.props(ui.frame, s.ratio)}>
+          <div {...stylex.attrs(ui.frame, s.ratio)}>
             <img
               src={ABOUT_CSR.image}
               alt={ABOUT_CSR.imageAlt}
               loading="lazy"
               decoding="async"
-              {...stylex.props(ui.fill)}
+              {...stylex.attrs(ui.fill)}
             />
           </div>
         </Reveal>
         <Reveal delay={120} sx={s.copyCell}>
-          <p {...stylex.props(s.desc)}>{ABOUT_CSR.desc}</p>
-          <ul {...stylex.props(s.outcomes)}>
+          <p {...stylex.attrs(s.desc)}>{ABOUT_CSR.desc}</p>
+          <ul {...stylex.attrs(s.outcomes)}>
             {ABOUT_CSR.outcomes.map((outcome) => (
-              <li key={outcome.title} {...stylex.props(s.outcome)}>
-                <span aria-hidden="true" {...stylex.props(s.dot)} />
+              <li {...stylex.attrs(s.outcome)}>
+                <span aria-hidden="true" {...stylex.attrs(s.dot)} />
                 {outcome.title}
               </li>
             ))}

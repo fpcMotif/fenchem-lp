@@ -1,15 +1,17 @@
 import * as stylex from "@stylexjs/stylex";
-import { m, useReducedMotion } from "motion/react";
+import type { StyleXStyles } from "@stylexjs/stylex";
+import { createExternalStore } from "@/compat/external-store";
+import { m, useReducedMotion } from "@/compat/motion";
 import {
-  Fragment,
-  useEffect,
-  useId,
-  useMemo,
-  useRef,
-  useState,
-  useSyncExternalStore,
-  type KeyboardEvent,
-} from "react";
+  createEffect,
+  createMemo,
+  createSignal,
+  createUniqueId,
+  For,
+  Show,
+  untrack,
+} from "solid-js";
+import type { JSX } from "@solidjs/web";
 
 import {
   AreaChips,
@@ -39,6 +41,9 @@ const splitNote = (text: string) => {
 type Facet = { label: string; count: number };
 
 type FacetState = { area: AreaFilter; active: string[]; fadeRows: boolean };
+
+const sxProps = (...args: ReadonlyArray<StyleXStyles | false | null | undefined>) =>
+  stylex.attrs(...args);
 
 const isHit = (fn: string, active: string[]) => active.some((label) => fn.includes(label));
 
@@ -537,135 +542,148 @@ const styles = stylex.create({
   },
 });
 
-function Functions({ functions, active }: { functions: string[]; active: string[] }) {
+function Functions(props: { functions: string[]; active: string[] }) {
   return (
     <>
-      {functions.map((fn, index) => (
-        <Fragment key={fn}>
+      {props.functions.map((fn, index) => (
+        <>
           {index > 0 && " · "}
-          <span {...stylex.props(active.length > 0 && isHit(fn, active) && styles.hit)}>{fn}</span>
-        </Fragment>
+          <span {...stylex.attrs(props.active.length > 0 && isHit(fn, props.active) && styles.hit)}>
+            {fn}
+          </span>
+        </>
       ))}
     </>
   );
 }
 
-function RowValue({ row, active }: { row: SheetRow; active: string[] }) {
-  if (row.values.length === 0) return <span {...stylex.props(styles.absent)}>无</span>;
-  if (row.kind === "lines") {
+function RowValue(props: { row: SheetRow; active: string[] }) {
+  if (props.row.values.length === 0) return <span {...stylex.attrs(styles.absent)}>无</span>;
+  if (props.row.kind === "lines") {
     return (
-      <ul {...stylex.props(styles.lines, styles.body)}>
-        {row.values.map((line) => (
-          <li key={line}>{line}</li>
+      <ul {...stylex.attrs(styles.lines, styles.body)}>
+        {props.row.values.map((line) => (
+          <li>{line}</li>
         ))}
       </ul>
     );
   }
-  if (row.kind === "strong") {
+  if (props.row.kind === "strong") {
     return (
-      <span {...stylex.props(styles.strong)}>
-        {row.values.map((fn, index) => (
-          <Fragment key={fn}>
+      <span {...stylex.attrs(styles.strong)}>
+        {props.row.values.map((fn, index) => (
+          <>
             {index > 0 && " · "}
-            <span {...stylex.props(active.length > 0 && !isHit(fn, active) && styles.miss)}>
+            <span
+              {...stylex.attrs(props.active.length > 0 && !isHit(fn, props.active) && styles.miss)}
+            >
               {fn}
             </span>
-          </Fragment>
+          </>
         ))}
       </span>
     );
   }
-  if (row.kind === "list") {
+  if (props.row.kind === "list") {
     return (
-      <ul {...stylex.props(styles.lines)}>
-        {row.values.map((entry) => {
+      <ul {...stylex.attrs(styles.lines)}>
+        {props.row.values.map((entry) => {
           const { primary, note } = splitNote(entry);
           return (
-            <li key={entry} {...stylex.props(styles.keepWords)}>
-              <span {...stylex.props(styles.strong)}>
+            <li {...stylex.attrs(styles.keepWords)}>
+              <span {...stylex.attrs(styles.strong)}>
                 {primary.replaceAll(" / ", `${NO_BREAK_SPACE}/ `)}
               </span>
-              {note && <span {...stylex.props(styles.note)}>{note}</span>}
+              {note && <span {...stylex.attrs(styles.note)}>{note}</span>}
             </li>
           );
         })}
       </ul>
     );
   }
-  return <>{row.values.join("、")}</>;
+  return <>{props.row.values.join("、")}</>;
 }
 
 export function FacetsVariant() {
   const browser = useSolutionsBrowser();
-  const { area, scope, groups, selected, select } = browser;
-  const uid = useId();
+  const uid = createUniqueId();
   const reduce = useReducedMotion();
-  const wide = useSyncExternalStore(subscribeWide, readWide, readWideOnServer);
-  const listRef = useRef<HTMLDivElement>(null);
-  const facetListRef = useRef<HTMLDivElement>(null);
-  const [facetState, setFacetState] = useState<FacetState>({
-    area,
-    active: [],
-    fadeRows: false,
-  });
-  if (facetState.area !== area) setFacetState({ area, active: [], fadeRows: true });
+  const wide = createExternalStore(subscribeWide, readWide, readWideOnServer);
+  let list: HTMLDivElement | undefined;
+  let facetList: HTMLDivElement | undefined;
+  const [facetState, setFacetState] = createSignal<FacetState>(
+    untrack(() => ({ area: browser.area, active: [], fadeRows: false })),
+  );
 
-  const facets = useMemo(() => deriveFacets(scope), [scope]);
-  const active = facetState.area === area ? facetState.active : [];
-  const visible = active.length === 0 ? scope : scope.filter((item) => matchesAny(item, active));
-  const current = visible.find((item) => item.id === selected?.id) ?? visible[0];
-  const currentIndex = current ? visible.indexOf(current) : -1;
-  const visibleSet = new Set(visible);
-  const activeSet = new Set(active);
-  const visibleGroups = groups
-    .map((group) => ({ ...group, items: group.items.filter((item) => visibleSet.has(item)) }))
-    .filter((group) => group.items.length > 0);
-  const grouped = area === "all";
-  const currentId = current?.id;
-  const activeKey = active.join("|");
+  const facets = createMemo(() => deriveFacets(browser.scope));
+  const active = () => (facetState().area === browser.area ? facetState().active : []);
+  const fadeRows = () => (facetState().area === browser.area ? facetState().fadeRows : true);
+  const visible = createMemo(() =>
+    active().length === 0
+      ? browser.scope
+      : browser.scope.filter((item) => matchesAny(item, active())),
+  );
+  const current = createMemo(
+    () => visible().find((item) => item.id === browser.selected?.id) ?? visible()[0],
+  );
+  const currentIndex = () => {
+    const item = current();
+    return item ? visible().indexOf(item) : -1;
+  };
+  const visibleSet = createMemo(() => new Set(visible()));
+  const isOn = (label: string) => active().includes(label);
+  const visibleGroups = createMemo(() =>
+    browser.groups.filter((group) => group.items.some((item) => visibleSet().has(item))),
+  );
+  const grouped = () => browser.area === "all";
+  const currentId = () => current()?.id;
+  const activeKey = () => active().join("|");
 
-  useEffect(() => {
-    const list = listRef.current;
-    const tab = list?.querySelector<HTMLElement>('[aria-selected="true"]');
-    if (!list || !tab) return;
-    const behavior: ScrollBehavior = reduce ? "auto" : "smooth";
-    if (!wide) {
-      if (list.scrollWidth <= list.clientWidth) return;
-      const left = tab.offsetLeft - (list.clientWidth - tab.offsetWidth) / 2;
-      list.scrollTo({ left: Math.max(0, left), behavior });
-      return;
-    }
-    const inset = Number.parseFloat(getComputedStyle(list).scrollPaddingTop) || 0;
-    const top = tab.offsetTop - inset;
-    const bottom = tab.offsetTop + tab.offsetHeight + 12 - list.clientHeight;
-    if (list.scrollTop > top) list.scrollTo({ top: Math.max(0, top), behavior });
-    else if (list.scrollTop < bottom) list.scrollTo({ top: bottom, behavior });
-  }, [area, currentId, activeKey, wide, reduce]);
+  createEffect(
+    () => [browser.area, currentId(), activeKey(), wide(), reduce()] as const,
+    ([, , , isWide, reduced]) => {
+      const tab = list?.querySelector<HTMLElement>('[aria-selected="true"]');
+      if (!list || !tab) return;
+      const behavior: ScrollBehavior = reduced ? "auto" : "smooth";
+      if (!isWide) {
+        if (list.scrollWidth <= list.clientWidth) return;
+        const left = tab.offsetLeft - (list.clientWidth - tab.offsetWidth) / 2;
+        list.scrollTo({ left: Math.max(0, left), behavior });
+        return;
+      }
+      const inset = Number.parseFloat(getComputedStyle(list).scrollPaddingTop) || 0;
+      const top = tab.offsetTop - inset;
+      const bottom = tab.offsetTop + tab.offsetHeight + 12 - list.clientHeight;
+      if (list.scrollTop > top) list.scrollTo({ top: Math.max(0, top), behavior });
+      else if (list.scrollTop < bottom) list.scrollTo({ top: bottom, behavior });
+    },
+  );
 
   const toggleFacet = (label: string) => {
-    const next = active.includes(label)
-      ? active.filter((entry) => entry !== label)
-      : [...active, label];
-    setFacetState({ area, active: next, fadeRows: true });
-    const nextVisible = scope.filter((item) => matchesAny(item, next));
+    const now = active();
+    const next = now.includes(label) ? now.filter((entry) => entry !== label) : [...now, label];
+    setFacetState({ area: browser.area, active: next, fadeRows: true });
+    const nextVisible = browser.scope.filter((item) => matchesAny(item, next));
     const first = nextVisible[0];
-    if (first && !nextVisible.some((item) => item.id === currentId)) select(first.id);
+    const id = currentId();
+    if (first && !nextVisible.some((item) => item.id === id)) browser.select(first.id);
   };
 
   const clearFacets = () => {
-    setFacetState({ area, active: [], fadeRows: true });
-    facetListRef.current?.querySelector<HTMLElement>("button")?.focus();
+    setFacetState({ area: browser.area, active: [], fadeRows: true });
+    facetList?.querySelector<HTMLElement>("button")?.focus();
   };
 
-  const handleListKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-    const step = (wide ? VERTICAL_STEPS : HORIZONTAL_STEPS)[event.key];
-    if (!step || visible.length === 0) return;
+  const handleListKeyDown: JSX.EventHandler<HTMLDivElement, KeyboardEvent> = (event) => {
+    const step = (wide() ? VERTICAL_STEPS : HORIZONTAL_STEPS)[event.key];
+    const shown = visible();
+    if (!step || shown.length === 0) return;
     event.preventDefault();
     event.stopPropagation();
-    const next = step(Math.max(0, currentIndex), visible.length);
-    const nextItem = visible[next];
+    const next = step(Math.max(0, currentIndex()), shown.length);
+    const nextItem = shown[next];
     if (!nextItem) return;
-    select(nextItem.id);
+    browser.select(nextItem.id);
     event.currentTarget
       .querySelectorAll<HTMLElement>('[role="tab"]')
       [next]?.focus({ preventScroll: true });
@@ -674,150 +692,170 @@ export function FacetsVariant() {
   return (
     <LabSection>
       <AreaChips browser={browser} />
-      {facets.length > 0 && (
-        <div {...stylex.props(styles.facetBar)}>
-          <p id={`${uid}-facets`} {...stylex.props(styles.facetLead)}>
+      <Show when={facets().length > 0}>
+        <div {...stylex.attrs(styles.facetBar)}>
+          <p id={`${uid}-facets`} {...stylex.attrs(styles.facetLead)}>
             按功能
           </p>
           <div
-            ref={facetListRef}
+            ref={facetList}
             role="group"
             aria-labelledby={`${uid}-facets`}
-            {...stylex.props(styles.facetList)}
+            {...stylex.attrs(styles.facetList)}
           >
-            {facets.map((facet) => {
-              const isOn = activeSet.has(facet.label);
-              return (
+            <For each={facets()}>
+              {(facet) => (
                 <button
-                  key={facet.label}
                   type="button"
-                  aria-pressed={isOn}
+                  aria-pressed={isOn(facet.label) ? "true" : "false"}
                   onClick={() => toggleFacet(facet.label)}
-                  {...stylex.props(styles.facet, isOn && styles.facetOn)}
+                  {...stylex.attrs(styles.facet, isOn(facet.label) && styles.facetOn)}
                 >
                   <span>{facet.label}</span>
-                  <span {...stylex.props(styles.facetCount, isOn && styles.facetCountOn)}>
+                  <span
+                    {...stylex.attrs(styles.facetCount, isOn(facet.label) && styles.facetCountOn)}
+                  >
                     {facet.count}
                   </span>
                 </button>
-              );
-            })}
+              )}
+            </For>
           </div>
-          <div {...stylex.props(styles.facetMeta)}>
-            <p aria-live="polite" {...stylex.props(styles.matchCount)}>
-              {active.length > 0 ? `${visible.length} 款匹配` : `共 ${scope.length} 款`}
+          <div {...stylex.attrs(styles.facetMeta)}>
+            <p aria-live="polite" {...stylex.attrs(styles.matchCount)}>
+              {active().length > 0 ? `${visible().length} 款匹配` : `共 ${browser.scope.length} 款`}
             </p>
             <button
               type="button"
               onClick={clearFacets}
-              {...stylex.props(styles.clear, active.length === 0 && styles.clearHidden)}
+              {...sxProps(styles.clear, active().length === 0 && styles.clearHidden)}
             >
               清除
             </button>
           </div>
         </div>
-      )}
-      {current ? (
-        <div {...stylex.props(styles.browser)}>
-          <div {...stylex.props(styles.listPane)}>
-            <div
-              ref={listRef}
-              role="tablist"
-              aria-label="应用方案"
-              aria-orientation={wide ? "vertical" : "horizontal"}
-              onKeyDown={handleListKeyDown}
-              {...stylex.props(styles.list, grouped && styles.listGrouped)}
-            >
-              {visibleGroups.map((group) => (
-                <div key={group.id} {...stylex.props(styles.group)}>
-                  {grouped && (
-                    <p aria-hidden="true" {...stylex.props(styles.groupHead)}>
-                      {group.label}
-                      <span {...stylex.props(styles.groupCount)}>{group.items.length} 款</span>
-                    </p>
-                  )}
-                  {group.items.map((item) => {
-                    const isSelected = item.id === current.id;
-                    return (
-                      <m.button
-                        key={item.id}
-                        type="button"
-                        role="tab"
-                        id={`${uid}-tab-${item.id}`}
-                        aria-selected={isSelected}
-                        aria-controls={`${uid}-panel`}
-                        tabIndex={isSelected ? 0 : -1}
-                        initial={facetState.fadeRows ? { opacity: 0 } : false}
-                        animate={{ opacity: 1 }}
-                        transition={{ duration: 0.18, ease: EASE_OUT }}
-                        onClick={() => select(item.id)}
-                        {...stylex.props(
-                          styles.row,
-                          isSelected && styles.rowSelected,
-                          stylex.defaultMarker(),
-                        )}
-                      >
-                        <span
-                          {...stylex.props(styles.rowIndex, isSelected && styles.rowIndexSelected)}
-                        >
-                          {padIndex(scope.indexOf(item))}
-                        </span>
-                        <span {...stylex.props(styles.rowText)}>
-                          <span
-                            {...stylex.props(
-                              styles.rowTitle,
-                              isSelected && styles.rowTitleSelected,
-                            )}
-                          >
-                            {item.title}
-                          </span>
-                          <span {...stylex.props(styles.rowFunctions)}>
-                            <Functions functions={item.functions} active={active} />
-                          </span>
-                        </span>
-                      </m.button>
+      </Show>
+      <Show
+        when={current()}
+        fallback={
+          <div {...stylex.attrs(styles.empty)}>
+            <p {...stylex.attrs(styles.emptyText)}>没有符合所选功能的方案</p>
+            <Show when={active().length > 0}>
+              <button type="button" onClick={clearFacets} {...stylex.attrs(styles.clear)}>
+                清除筛选
+              </button>
+            </Show>
+          </div>
+        }
+      >
+        {(currentItem) => (
+          <div {...stylex.attrs(styles.browser)}>
+            <div {...stylex.attrs(styles.listPane)}>
+              <div
+                ref={list}
+                role="tablist"
+                aria-label="应用方案"
+                aria-orientation={wide() ? "vertical" : "horizontal"}
+                onKeyDown={handleListKeyDown}
+                {...stylex.attrs(styles.list, grouped() && styles.listGrouped)}
+              >
+                <For each={visibleGroups()}>
+                  {(group) => {
+                    const items = createMemo(() =>
+                      group.items.filter((item) => visibleSet().has(item)),
                     );
-                  })}
-                </div>
-              ))}
+                    return (
+                      <div {...stylex.attrs(styles.group)}>
+                        <Show when={grouped()}>
+                          <p aria-hidden="true" {...stylex.attrs(styles.groupHead)}>
+                            {group.label}
+                            <span {...stylex.attrs(styles.groupCount)}>{items().length} 款</span>
+                          </p>
+                        </Show>
+                        <For each={items()}>
+                          {(item) => {
+                            const isSelected = () => item.id === currentItem().id;
+                            return (
+                              <m.button
+                                type="button"
+                                role="tab"
+                                id={`${uid}-tab-${item.id}`}
+                                aria-selected={isSelected() ? "true" : "false"}
+                                aria-controls={`${uid}-panel`}
+                                tabindex={isSelected() ? 0 : -1}
+                                initial={untrack(fadeRows) ? { opacity: 0 } : false}
+                                animate={{ opacity: 1 }}
+                                transition={{ duration: 0.18, ease: EASE_OUT }}
+                                onClick={() => browser.select(item.id)}
+                                {...stylex.attrs(
+                                  styles.row,
+                                  isSelected() && styles.rowSelected,
+                                  stylex.defaultMarker(),
+                                )}
+                              >
+                                <span
+                                  {...stylex.attrs(
+                                    styles.rowIndex,
+                                    isSelected() && styles.rowIndexSelected,
+                                  )}
+                                >
+                                  {padIndex(browser.scope.indexOf(item))}
+                                </span>
+                                <span {...stylex.attrs(styles.rowText)}>
+                                  <span
+                                    {...stylex.attrs(
+                                      styles.rowTitle,
+                                      isSelected() && styles.rowTitleSelected,
+                                    )}
+                                  >
+                                    {item.title}
+                                  </span>
+                                  <span {...stylex.attrs(styles.rowFunctions)}>
+                                    <Functions functions={item.functions} active={active()} />
+                                  </span>
+                                </span>
+                              </m.button>
+                            );
+                          }}
+                        </For>
+                      </div>
+                    );
+                  }}
+                </For>
+              </div>
             </div>
-          </div>
-          <div
-            role="tabpanel"
-            id={`${uid}-panel`}
-            aria-labelledby={`${uid}-tab-${current.id}`}
-            tabIndex={0}
-            {...stylex.props(styles.sheet)}
-          >
-            <div key={current.id} {...stylex.props(styles.fade)}>
-              <header {...stylex.props(styles.sheetHead)}>
-                <p {...stylex.props(styles.sheetArea)}>{areaOf(current.area)?.label}</p>
-                <h3 {...stylex.props(styles.sheetTitle)}>{current.title}</h3>
-                <p {...stylex.props(styles.sheetSubtitle)}>{current.subtitle}</p>
-              </header>
-              <dl {...stylex.props(styles.fields)}>
-                {sheetRows(current).map((row) => (
-                  <div key={row.label} {...stylex.props(styles.field)}>
-                    <dt {...stylex.props(styles.fieldLabel)}>{row.label}</dt>
-                    <dd {...stylex.props(styles.fieldValue)}>
-                      <RowValue row={row} active={active} />
-                    </dd>
+            <div
+              role="tabpanel"
+              id={`${uid}-panel`}
+              aria-labelledby={`${uid}-tab-${currentItem().id}`}
+              tabindex={0}
+              {...stylex.attrs(styles.sheet)}
+            >
+              <Show when={currentItem()} keyed>
+                {(shown) => (
+                  <div {...stylex.attrs(styles.fade)}>
+                    <header {...stylex.attrs(styles.sheetHead)}>
+                      <p {...stylex.attrs(styles.sheetArea)}>{areaOf(shown.area)?.label}</p>
+                      <h3 {...stylex.attrs(styles.sheetTitle)}>{shown.title}</h3>
+                      <p {...stylex.attrs(styles.sheetSubtitle)}>{shown.subtitle}</p>
+                    </header>
+                    <dl {...stylex.attrs(styles.fields)}>
+                      {sheetRows(shown).map((row) => (
+                        <div {...stylex.attrs(styles.field)}>
+                          <dt {...stylex.attrs(styles.fieldLabel)}>{row.label}</dt>
+                          <dd {...stylex.attrs(styles.fieldValue)}>
+                            <RowValue row={row} active={active()} />
+                          </dd>
+                        </div>
+                      ))}
+                    </dl>
                   </div>
-                ))}
-              </dl>
+                )}
+              </Show>
             </div>
           </div>
-        </div>
-      ) : (
-        <div {...stylex.props(styles.empty)}>
-          <p {...stylex.props(styles.emptyText)}>没有符合所选功能的方案</p>
-          {active.length > 0 && (
-            <button type="button" onClick={clearFacets} {...stylex.props(styles.clear)}>
-              清除筛选
-            </button>
-          )}
-        </div>
-      )}
+        )}
+      </Show>
     </LabSection>
   );
 }

@@ -1,4 +1,3 @@
-import { breakpoints } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 
 import { ABOUT_HERO, ABOUT_HONORS } from "../../about-data";
@@ -17,10 +16,10 @@ const LEVELS = ["national", "provincial", "municipal"] as const;
 const s = stylex.create({
   group: {
     alignItems: "baseline",
-    rowGap: { default: 12, [breakpoints.lg]: 0 },
+    rowGap: { default: 12, ["@media (min-width: 1024px)"]: 0 },
   },
   level: {
-    paddingTop: { default: 28, [breakpoints.lg]: 0 },
+    paddingTop: { default: 28, ["@media (min-width: 1024px)"]: 0 },
   },
   list: {
     margin: 0,
@@ -33,11 +32,11 @@ const s = stylex.create({
     borderBottomColor: tone.hairline,
   },
   row: {
-    paddingBlock: { default: 18, [breakpoints.xl]: 24 },
+    paddingBlock: { default: 18, ["@media (min-width: 1280px)"]: 24 },
     borderTopWidth: 1,
     borderTopStyle: "solid",
     borderTopColor: tone.hairline,
-    fontSize: { default: step.body, [breakpoints.md]: "19px" },
+    fontSize: { default: step.body, ["@media (min-width: 768px)"]: "19px" },
     fontWeight: 400,
     lineHeight: 1.6,
     letterSpacing: "0.06em",
@@ -52,13 +51,13 @@ export function Honors() {
   return (
     <Section id={chip.id} label={ABOUT_HONORS.eyebrow} background={ui.onPage}>
       {LEVELS.map((level, levelIdx) => (
-        <div key={level} {...stylex.props(ui.phi, s.group)}>
-          <h3 {...stylex.props(ui.label, levelIdx > 0 && s.level)}>{LEVEL_LABEL[level]}</h3>
-          <ul {...stylex.props(ui.main, s.list, levelIdx === lastLevel && s.listLast)}>
+        <div {...stylex.attrs(ui.phi, s.group)}>
+          <h3 {...stylex.attrs(ui.label, levelIdx > 0 && s.level)}>{LEVEL_LABEL[level]}</h3>
+          <ul {...stylex.attrs(ui.main, s.list, levelIdx === lastLevel && s.listLast)}>
             {ABOUT_HONORS.items
               .filter((honor) => honor.level === level)
               .map((honor, idx) => (
-                <Reveal key={honor.id} as="li" step={idx % 4} sx={s.row}>
+                <Reveal as="li" step={idx % 4} sx={s.row}>
                   {honor.title}
                 </Reveal>
               ))}

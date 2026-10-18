@@ -1,7 +1,8 @@
 import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { ChevronDown } from "lucide-react";
-import { useId, useState, type ChangeEvent } from "react";
+import { ChevronDown } from "@fenchem-lp/ui/components/lucide";
+import type { JSX } from "@solidjs/web";
+import { createSignal, createUniqueId } from "solid-js";
 
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
@@ -417,49 +418,45 @@ const styles = stylex.create({
 });
 
 export function Catalog() {
-  const titleId = useId();
-  const selectId = useId();
+  const titleId = createUniqueId();
+  const selectId = createUniqueId();
   const reduce = useReducedMotion();
-  const [region, setRegion] = useState(CHAPTERS[0]?.group.id ?? "");
+  const [region, setRegion] = createSignal(CHAPTERS[0]?.group.id ?? "");
 
-  const jumpTo = (event: ChangeEvent<HTMLSelectElement>) => {
-    const groupId = event.target.value;
+  const jumpTo: JSX.EventHandler<HTMLSelectElement, Event> = (event) => {
+    const groupId = event.currentTarget.value;
     setRegion(groupId);
     const target = document.getElementById(chapterAnchor(groupId));
     if (!target) return;
     const top = target.getBoundingClientRect().top + window.scrollY - JUMP_OFFSET;
-    window.scrollTo({ top, behavior: reduce ? "instant" : "smooth" });
+    window.scrollTo({ top, behavior: reduce() ? "instant" : "smooth" });
   };
 
   return (
-    <section id="products-catalog" aria-labelledby={titleId} {...stylex.props(styles.section)}>
-      <div {...stylex.props(styles.shell)}>
-        <header {...stylex.props(styles.head)}>
+    <section id="products-catalog" aria-labelledby={titleId} {...stylex.attrs(styles.section)}>
+      <div {...stylex.attrs(styles.shell)}>
+        <header {...stylex.attrs(styles.head)}>
           <div>
-            <h2 id={titleId} {...stylex.props(styles.title)}>
+            <h2 id={titleId} {...stylex.attrs(styles.title)}>
               产品目录
             </h2>
-            <p {...stylex.props(styles.summary)}>
+            <p {...stylex.attrs(styles.summary)}>
               {FLAT_ITEMS.length} 款原料 · {CHAPTERS.length} 个分类
             </p>
           </div>
-          <div {...stylex.props(styles.jump)}>
-            <label htmlFor={selectId} {...stylex.props(styles.jumpLabel)}>
+          <div {...stylex.attrs(styles.jump)}>
+            <label for={selectId} {...stylex.attrs(styles.jumpLabel)}>
               跳转至
             </label>
-            <span {...stylex.props(styles.selectWrap)}>
+            <span {...stylex.attrs(styles.selectWrap)}>
               <select
                 id={selectId}
-                value={region}
+                value={region()}
                 onChange={jumpTo}
-                {...stylex.props(styles.select)}
+                {...stylex.attrs(styles.select)}
               >
                 {CHAPTERS.map((chapter) => (
-                  <option
-                    key={chapter.group.id}
-                    value={chapter.group.id}
-                    {...stylex.props(styles.option)}
-                  >
+                  <option value={chapter.group.id} {...stylex.attrs(styles.option)}>
                     {chapter.group.label}
                   </option>
                 ))}
@@ -469,83 +466,83 @@ export function Catalog() {
                 strokeWidth={1.5}
                 absoluteStrokeWidth
                 aria-hidden="true"
-                {...stylex.props(styles.selectIcon)}
+                {...stylex.attrs(styles.selectIcon)}
               />
             </span>
           </div>
         </header>
 
-        <div {...stylex.props(styles.frame)}>
-          <table aria-labelledby={titleId} {...stylex.props(styles.table)}>
+        <div {...stylex.attrs(styles.frame)}>
+          <table aria-labelledby={titleId} {...stylex.attrs(styles.table)}>
             <colgroup>
-              <col {...stylex.props(styles.colNumber)} />
-              <col {...stylex.props(styles.colName)} />
-              <col {...stylex.props(styles.colLatin)} />
-              <col {...stylex.props(styles.colInci)} />
+              <col {...stylex.attrs(styles.colNumber)} />
+              <col {...stylex.attrs(styles.colName)} />
+              <col {...stylex.attrs(styles.colLatin)} />
+              <col {...stylex.attrs(styles.colInci)} />
               <col />
             </colgroup>
-            <thead {...stylex.props(styles.thead)}>
+            <thead {...stylex.attrs(styles.thead)}>
               <tr>
-                <th scope="col" {...stylex.props(styles.headCell, styles.headNumber)}>
+                <th scope="col" {...stylex.attrs(styles.headCell, styles.headNumber)}>
                   No.
                 </th>
-                <th scope="col" {...stylex.props(styles.headCell)}>
+                <th scope="col" {...stylex.attrs(styles.headCell)}>
                   名称
                 </th>
-                <th scope="col" {...stylex.props(styles.headCell)}>
+                <th scope="col" {...stylex.attrs(styles.headCell)}>
                   学名
                 </th>
-                <th scope="col" {...stylex.props(styles.headCell)}>
+                <th scope="col" {...stylex.attrs(styles.headCell)}>
                   INCI 名称
                 </th>
-                <th scope="col" {...stylex.props(styles.headCell, styles.headCellLast)}>
+                <th scope="col" {...stylex.attrs(styles.headCell, styles.headCellLast)}>
                   特性&应用
                 </th>
               </tr>
             </thead>
             {CHAPTERS.map((chapter, chapterIndex) => (
-              <tbody key={chapter.group.id} {...stylex.props(styles.tbody)}>
-                <tr id={chapterAnchor(chapter.group.id)} {...stylex.props(styles.chapterRow)}>
+              <tbody {...stylex.attrs(styles.tbody)}>
+                <tr id={chapterAnchor(chapter.group.id)} {...stylex.attrs(styles.chapterRow)}>
                   <th
                     scope="rowgroup"
-                    colSpan={5}
-                    {...stylex.props(
+                    colspan={5}
+                    {...stylex.attrs(
                       styles.chapterCell,
                       chapterIndex === 0 && styles.chapterCellFirst,
                     )}
                   >
-                    <div {...stylex.props(styles.chapterGrid)}>
-                      <span aria-hidden="true" {...stylex.props(styles.chapterRange)}>
+                    <div {...stylex.attrs(styles.chapterGrid)}>
+                      <span aria-hidden="true" {...stylex.attrs(styles.chapterRange)}>
                         {chapter.range}
                       </span>
-                      <div {...stylex.props(styles.chapterHeading)}>
-                        <h3 {...stylex.props(styles.chapterLabel)}>{chapter.group.label}</h3>
-                        <p {...stylex.props(styles.chapterMeta)}>
-                          <span lang="en" {...stylex.props(styles.chapterEnglish)}>
+                      <div {...stylex.attrs(styles.chapterHeading)}>
+                        <h3 {...stylex.attrs(styles.chapterLabel)}>{chapter.group.label}</h3>
+                        <p {...stylex.attrs(styles.chapterMeta)}>
+                          <span lang="en" {...stylex.attrs(styles.chapterEnglish)}>
                             {chapter.english}
                           </span>
-                          <span {...stylex.props(styles.chapterCount)}>
+                          <span {...stylex.attrs(styles.chapterCount)}>
                             {chapter.rows.length} 款原料
                           </span>
                         </p>
                       </div>
                       {chapter.group.intro && (
-                        <p {...stylex.props(styles.chapterIntro)}>{chapter.group.intro}</p>
+                        <p {...stylex.attrs(styles.chapterIntro)}>{chapter.group.intro}</p>
                       )}
                     </div>
                   </th>
                 </tr>
                 {chapter.rows.map(({ item, number }) => (
-                  <tr key={item.id} {...stylex.props(styles.row)}>
-                    <td {...stylex.props(styles.cell, styles.numberCell)}>{number}</td>
-                    <th scope="row" {...stylex.props(styles.cell, styles.nameCell)}>
-                      <span {...stylex.props(styles.namePrimary)}>{item.primary}</span>
+                  <tr {...stylex.attrs(styles.row)}>
+                    <td {...stylex.attrs(styles.cell, styles.numberCell)}>{number}</td>
+                    <th scope="row" {...stylex.attrs(styles.cell, styles.nameCell)}>
+                      <span {...stylex.attrs(styles.namePrimary)}>{item.primary}</span>
                       {item.secondary && (
-                        <span {...stylex.props(styles.nameSecondary)}>{item.secondary}</span>
+                        <span {...stylex.attrs(styles.nameSecondary)}>{item.secondary}</span>
                       )}
                     </th>
                     <td
-                      {...stylex.props(
+                      {...stylex.attrs(
                         styles.cell,
                         styles.latinCell,
                         item.latin.length === 0 && styles.latinCellEmpty,
@@ -553,27 +550,27 @@ export function Catalog() {
                     >
                       {item.latin.length > 0 ? (
                         item.latin.map((name) => (
-                          <span key={name} lang="la" {...stylex.props(styles.latinName)}>
+                          <span lang="la" {...stylex.attrs(styles.latinName)}>
                             {name}
                           </span>
                         ))
                       ) : (
                         <>
-                          <span aria-hidden="true" {...stylex.props(styles.none)}>
+                          <span aria-hidden="true" {...stylex.attrs(styles.none)}>
                             —
                           </span>
-                          <span {...stylex.props(styles.visuallyHidden)}>None</span>
+                          <span {...stylex.attrs(styles.visuallyHidden)}>None</span>
                         </>
                       )}
                     </td>
-                    <td {...stylex.props(styles.cell, styles.inciCell)}>
-                      <span aria-hidden="true" {...stylex.props(styles.inciLabel)}>
+                    <td {...stylex.attrs(styles.cell, styles.inciCell)}>
+                      <span aria-hidden="true" {...stylex.attrs(styles.inciLabel)}>
                         INCI
                       </span>
                       {inciWithoutLatin(item.inci)}
                     </td>
-                    <td {...stylex.props(styles.cell, styles.cellLast, styles.featuresCell)}>
-                      <span {...stylex.props(styles.featuresText)}>{item.features}</span>
+                    <td {...stylex.attrs(styles.cell, styles.cellLast, styles.featuresCell)}>
+                      <span {...stylex.attrs(styles.featuresText)}>{item.features}</span>
                     </td>
                   </tr>
                 ))}

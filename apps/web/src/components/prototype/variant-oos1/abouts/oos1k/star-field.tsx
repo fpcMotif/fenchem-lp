@@ -1,6 +1,6 @@
 import * as stylex from "@stylexjs/stylex";
-import { m, useScroll, useSpring, useTransform } from "motion/react";
-import type { RefObject } from "react";
+import { m, useScroll, useSpring, useTransform } from "@/compat/motion";
+import type { Accessor } from "solid-js";
 
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
@@ -109,92 +109,91 @@ const styles = stylex.create({
   },
 });
 
-function Magnitudes({ paths }: { paths: MagnitudePaths }) {
+function Magnitudes(props: { paths: MagnitudePaths }) {
   return (
     <>
       <path
-        d={paths[3]}
-        vectorEffect="non-scaling-stroke"
-        {...stylex.props(styles.star, styles.mag3)}
+        d={props.paths[3]}
+        vector-effect="non-scaling-stroke"
+        {...stylex.attrs(styles.star, styles.mag3)}
       />
       <path
-        d={paths[2]}
-        vectorEffect="non-scaling-stroke"
-        {...stylex.props(styles.star, styles.mag2)}
+        d={props.paths[2]}
+        vector-effect="non-scaling-stroke"
+        {...stylex.attrs(styles.star, styles.mag2)}
       />
       <path
-        d={paths[1]}
-        vectorEffect="non-scaling-stroke"
-        {...stylex.props(styles.star, styles.mag1)}
+        d={props.paths[1]}
+        vector-effect="non-scaling-stroke"
+        {...stylex.attrs(styles.star, styles.mag1)}
       />
     </>
   );
 }
 
-export function StarField({
-  trackRef,
-  flare,
-}: {
-  trackRef: RefObject<HTMLDivElement | null>;
+export function StarField(props: {
+  trackRef: Accessor<HTMLDivElement | undefined>;
   flare: boolean;
 }) {
   const reduce = useReducedMotion();
-  const { scrollYProgress } = useScroll({ target: trackRef, offset: ["start start", "end end"] });
+  const { scrollYProgress } = useScroll({
+    target: props.trackRef,
+    offset: ["start start", "end end"],
+  });
   const settled = useSpring(scrollYProgress, { stiffness: 70, damping: 24, mass: 0.6 });
   const rotate = useTransform(settled, [0, 1], [0, -36]);
-  const exposure = flare && !reduce ? { opacity: [1, 0.38, 1] } : { opacity: 1 };
+  const exposure = () => (props.flare && !reduce() ? { opacity: [1, 0.38, 1] } : { opacity: 1 });
 
   return (
-    <div aria-hidden="true" {...stylex.props(styles.layer)}>
-      <div {...stylex.props(styles.sky)}>
+    <div aria-hidden="true" {...stylex.attrs(styles.layer)}>
+      <div {...stylex.attrs(styles.sky)}>
         <m.div
           initial={false}
-          animate={exposure}
+          animate={exposure()}
           transition={{ duration: 2.4, times: [0, 0.12, 1], ease: "easeOut" }}
-          {...stylex.props(styles.frame)}
+          {...stylex.attrs(styles.frame)}
         >
-          <m.div style={{ rotate: reduce ? 0 : rotate }} {...stylex.props(styles.rotor)}>
+          <m.div style={{ rotate: reduce() ? 0 : rotate }} {...stylex.attrs(styles.rotor)}>
             <svg
               viewBox={`${-FIELD_RADIUS} ${-FIELD_RADIUS} ${FIELD_RADIUS * 2} ${FIELD_RADIUS * 2}`}
-              {...stylex.props(styles.svg)}
+              {...stylex.attrs(styles.svg)}
             >
-              <g {...stylex.props(styles.grid)}>
+              <g {...stylex.attrs(styles.grid)}>
                 {DECLINATION_RADII.map((radius) => (
-                  <circle key={radius} r={radius} vectorEffect="non-scaling-stroke" />
+                  <circle r={radius} vector-effect="non-scaling-stroke" />
                 ))}
               </g>
               <path
                 d={HOUR_LINES}
-                vectorEffect="non-scaling-stroke"
-                {...stylex.props(styles.hours)}
+                vector-effect="non-scaling-stroke"
+                {...stylex.attrs(styles.hours)}
               />
-              <g {...stylex.props(styles.wideOnly)}>
+              <g {...stylex.attrs(styles.wideOnly)}>
                 <circle
                   r={RING_RADIUS}
-                  vectorEffect="non-scaling-stroke"
-                  {...stylex.props(styles.ticks)}
+                  vector-effect="non-scaling-stroke"
+                  {...stylex.attrs(styles.ticks)}
                 />
                 <path
                   d={RING_TICKS}
-                  vectorEffect="non-scaling-stroke"
-                  {...stylex.props(styles.ticks)}
+                  vector-effect="non-scaling-stroke"
+                  {...stylex.attrs(styles.ticks)}
                 />
                 {RING_HOURS.map((hour) => (
                   <text
-                    key={hour.label}
                     x={hour.x}
                     y={hour.y}
-                    textAnchor="middle"
-                    dominantBaseline="central"
+                    text-anchor="middle"
+                    dominant-baseline="central"
                     transform={`rotate(${hour.degrees + 90} ${hour.x} ${hour.y})`}
-                    {...stylex.props(styles.numeral)}
+                    {...stylex.attrs(styles.numeral)}
                   >
                     {hour.label}
                   </text>
                 ))}
               </g>
               <Magnitudes paths={FIELD.sparse} />
-              <g {...stylex.props(styles.wideOnly)}>
+              <g {...stylex.attrs(styles.wideOnly)}>
                 <Magnitudes paths={FIELD.dense} />
               </g>
             </svg>

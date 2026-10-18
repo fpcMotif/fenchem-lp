@@ -1,4 +1,4 @@
-import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
+import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 import {
   type MotionValue,
@@ -7,8 +7,16 @@ import {
   useMotionValueEvent,
   useScroll,
   useTransform,
-} from "motion/react";
-import { type RefObject, useCallback, useEffect, useId, useRef, useState } from "react";
+} from "@/compat/motion";
+import {
+  createEffect,
+  createSignal,
+  createUniqueId,
+  onSettled,
+  Show,
+  untrack,
+  type Accessor,
+} from "solid-js";
 
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
@@ -28,7 +36,7 @@ const styles = stylex.create({
       default: 28,
       [media.mdOnly]: 56,
       [media.lgOnly]: 96,
-      [breakpoints.xl]: 112,
+      ["@media (min-width: 1280px)"]: 112,
     },
     pointerEvents: "none",
   },
@@ -90,14 +98,7 @@ const styles = stylex.create({
 
 type Tone = "light" | "dark";
 
-function NodeDot({
-  cx,
-  y,
-  fraction,
-  radius,
-  draw,
-  tone,
-}: {
+function NodeDot(props: {
   cx: number;
   y: number;
   fraction: number;
@@ -105,105 +106,103 @@ function NodeDot({
   draw: MotionValue<number>;
   tone: Tone;
 }) {
-  const lit = useTransform(draw, [Math.max(0, fraction - 0.0015), fraction + 0.0001], [0, 1]);
-  const dark = tone === "dark";
+  const lit = useTransform(
+    props.draw,
+    [Math.max(0, props.fraction - 0.0015), props.fraction + 0.0001],
+    [0, 1],
+  );
+  const dark = () => props.tone === "dark";
   return (
     <>
       <circle
-        cx={cx}
-        cy={y}
-        r={radius}
-        {...stylex.props(dark ? styles.nodeRingDark : styles.nodeRing)}
+        cx={props.cx}
+        cy={props.y}
+        r={props.radius}
+        {...stylex.attrs(dark() ? styles.nodeRingDark : styles.nodeRing)}
       />
       <m.circle
-        cx={cx}
-        cy={y}
-        r={radius - 1.6}
-        {...stylex.props(dark ? styles.nodeCoreDark : styles.nodeCore)}
+        cx={props.cx}
+        cy={props.y}
+        r={props.radius - 1.6}
+        {...stylex.attrs(dark() ? styles.nodeCoreDark : styles.nodeCore)}
         style={{ opacity: lit }}
       />
     </>
   );
 }
 
-function StrandLayer({
-  shape,
-  draw,
-  tone,
-}: {
-  shape: StrandShape;
-  draw: MotionValue<number>;
-  tone: Tone;
-}) {
-  const dark = tone === "dark";
+function StrandLayer(props: { shape: StrandShape; draw: MotionValue<number>; tone: Tone }) {
+  const dark = () => props.tone === "dark";
   return (
     <>
       <path
-        d={shape.strandB}
-        {...stylex.props(styles.track, dark ? styles.trackDark : styles.trackMint)}
+        d={props.shape.strandB}
+        {...stylex.attrs(styles.track, dark() ? styles.trackDark : styles.trackMint)}
       />
       <path
-        d={shape.strandA}
-        {...stylex.props(styles.track, dark ? styles.trackDark : styles.trackBlue)}
+        d={props.shape.strandA}
+        {...stylex.attrs(styles.track, dark() ? styles.trackDark : styles.trackBlue)}
       />
       <m.path
-        d={shape.strandB}
-        {...stylex.props(styles.line, dark ? styles.mintDark : styles.mint)}
-        style={{ pathLength: draw }}
+        d={props.shape.strandB}
+        {...stylex.attrs(styles.line, dark() ? styles.mintDark : styles.mint)}
+        style={{ pathLength: props.draw }}
       />
       <m.path
-        d={shape.strandA}
-        {...stylex.props(styles.line, dark ? styles.blueDark : styles.blue)}
-        style={{ pathLength: draw }}
+        d={props.shape.strandA}
+        {...stylex.attrs(styles.line, dark() ? styles.blueDark : styles.blue)}
+        style={{ pathLength: props.draw }}
       />
-      {shape.nodes.map((node) => (
+      {props.shape.nodes.map((node) => (
         <NodeDot
-          key={node.y}
-          cx={shape.width / 2}
+          cx={props.shape.width / 2}
           y={node.y}
           fraction={node.fraction}
-          radius={shape.radius}
-          draw={draw}
-          tone={tone}
+          radius={props.shape.radius}
+          draw={props.draw}
+          tone={props.tone}
         />
       ))}
     </>
   );
 }
 
-export function Strand({ rootRef }: { rootRef: RefObject<HTMLDivElement | null> }) {
-  const zoneRef = useRef<HTMLDivElement>(null);
-  const signatureRef = useRef("");
-  const shapeRef = useRef<StrandShape | null>(null);
-  const [shape, setShape] = useState<StrandShape | null>(null);
+export function Strand(props: { root: Accessor<HTMLDivElement | undefined> }) {
+  let zoneRef: HTMLDivElement | undefined;
+  let signatureRef = "";
+  let shapeRef: StrandShape | null = null;
+  const [shape, setShape] = createSignal<StrandShape | null>(null);
   const reduce = useReducedMotion();
-  const clipId = useId().replaceAll(":", "");
+  const clipId = createUniqueId().replaceAll(":", "");
   const draw = useMotionValue(0);
   const { scrollYProgress } = useScroll({
-    target: rootRef,
+    target: props.root,
     offset: [`start ${TIP_VIEWPORT}`, `end ${TIP_VIEWPORT}`],
   });
 
-  const syncDraw = useCallback(() => {
-    const current = shapeRef.current;
+  const syncDraw = () => {
+    const current = shapeRef;
     if (!current) return;
-    if (reduce) {
+    if (untrack(reduce)) {
       draw.set(1);
       return;
     }
     draw.set(fractionAt(current, scrollYProgress.get() * current.height));
-  }, [draw, reduce, scrollYProgress]);
+  };
 
   useMotionValueEvent(scrollYProgress, "change", syncDraw);
 
-  useEffect(() => {
-    shapeRef.current = shape;
-    syncDraw();
-  }, [shape, syncDraw]);
+  createEffect(
+    () => [shape(), reduce()] as const,
+    ([current]) => {
+      shapeRef = current;
+      syncDraw();
+    },
+  );
 
-  useEffect(() => {
-    const root = rootRef.current;
-    const zone = zoneRef.current;
+  onSettled(() => {
+    const root = props.root();
+    const zone = zoneRef;
     if (!root || !zone) return;
     let frame = 0;
 
@@ -221,8 +220,8 @@ export function Strand({ rootRef }: { rootRef: RefObject<HTMLDivElement | null> 
       const bands = Array.from(root.querySelectorAll<HTMLElement>("[data-strand-band]"), relative);
       const input = { width: zone.offsetWidth, height: rootBox.height, nodeYs, bands };
       const signature = strandSignature(input);
-      if (signature === signatureRef.current) return;
-      signatureRef.current = signature;
+      if (signature === signatureRef) return;
+      signatureRef = signature;
       setShape(buildStrand(input));
     };
 
@@ -240,39 +239,47 @@ export function Strand({ rootRef }: { rootRef: RefObject<HTMLDivElement | null> 
       window.removeEventListener("load", schedule);
       if (frame) cancelAnimationFrame(frame);
     };
-  }, [rootRef]);
+  });
 
-  const bandRects = shape
-    ? shape.bands.map((band) => `M0 ${band.top}H${shape.width}V${band.bottom}H0Z`).join("")
-    : "";
-  const lightClip = shape ? `M0 0H${shape.width}V${shape.height}H0Z${bandRects}` : "";
+  const bandRects = () => {
+    const current = shape();
+    return current
+      ? current.bands.map((band) => `M0 ${band.top}H${current.width}V${band.bottom}H0Z`).join("")
+      : "";
+  };
+  const lightClip = () => {
+    const current = shape();
+    return current ? `M0 0H${current.width}V${current.height}H0Z${bandRects()}` : "";
+  };
 
   return (
-    <div ref={zoneRef} aria-hidden="true" {...stylex.props(styles.zone)}>
-      {shape ? (
-        <svg
-          width={shape.width}
-          height={shape.height}
-          viewBox={`0 0 ${shape.width} ${shape.height}`}
-          focusable="false"
-          {...stylex.props(styles.svg)}
-        >
-          <defs>
-            <clipPath id={`${clipId}-light`}>
-              <path d={lightClip} clipRule="evenodd" />
-            </clipPath>
-            <clipPath id={`${clipId}-dark`}>
-              <path d={bandRects} />
-            </clipPath>
-          </defs>
-          <g clipPath={`url(#${clipId}-light)`}>
-            <StrandLayer shape={shape} draw={draw} tone="light" />
-          </g>
-          <g clipPath={`url(#${clipId}-dark)`}>
-            <StrandLayer shape={shape} draw={draw} tone="dark" />
-          </g>
-        </svg>
-      ) : null}
+    <div ref={zoneRef} aria-hidden="true" {...stylex.attrs(styles.zone)}>
+      <Show when={shape()}>
+        {(current) => (
+          <svg
+            width={current().width}
+            height={current().height}
+            viewBox={`0 0 ${current().width} ${current().height}`}
+            {...{ focusable: "false" }}
+            {...stylex.attrs(styles.svg)}
+          >
+            <defs>
+              <clipPath id={`${clipId}-light`}>
+                <path d={lightClip()} clip-rule="evenodd" />
+              </clipPath>
+              <clipPath id={`${clipId}-dark`}>
+                <path d={bandRects()} />
+              </clipPath>
+            </defs>
+            <g clip-path={`url(#${clipId}-light)`}>
+              <StrandLayer shape={current()} draw={draw} tone="light" />
+            </g>
+            <g clip-path={`url(#${clipId}-dark)`}>
+              <StrandLayer shape={current()} draw={draw} tone="dark" />
+            </g>
+          </svg>
+        )}
+      </Show>
     </div>
   );
 }

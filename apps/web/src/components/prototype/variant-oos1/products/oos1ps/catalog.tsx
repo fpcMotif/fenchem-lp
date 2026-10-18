@@ -1,8 +1,8 @@
-import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
+import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { Check } from "lucide-react";
-import { AnimatePresence } from "motion/react";
-import { useId, useState } from "react";
+import { Check } from "@fenchem-lp/ui/components/lucide";
+import { AnimatePresence } from "@/compat/motion";
+import { createMemo, createSignal, createUniqueId, Show } from "solid-js";
 
 import { CATALOG_GROUPS } from "../../products-data";
 import { FLAT_ITEMS, ITEM_BY_ID, padIndex, type FlatItem } from "../shared/derived";
@@ -11,8 +11,8 @@ import { Inci } from "./inci";
 import { catalogTone, font, ink, layout, mq } from "./theme.stylex";
 
 const MAX_COMPARE = 3;
-const MD = breakpoints.md;
-const DESKTOP = breakpoints.xl;
+const MD = "@media (min-width: 768px)";
+const DESKTOP = "@media (min-width: 1280px)";
 const HEADER_HEIGHT = 80;
 const LIMIT_HINT = `最多对比 ${MAX_COMPARE} 款`;
 
@@ -336,14 +336,7 @@ const styles = stylex.create({
   },
 });
 
-function CompareCheckbox({
-  item,
-  inputId,
-  checked,
-  disabled,
-  hintId,
-  onToggle,
-}: {
+function CompareCheckbox(props: {
   item: FlatItem;
   inputId: string;
   checked: boolean;
@@ -353,26 +346,26 @@ function CompareCheckbox({
 }) {
   return (
     <label
-      title={disabled ? LIMIT_HINT : undefined}
-      {...stylex.props(styles.checkHit, disabled && styles.checkHitDisabled)}
+      title={props.disabled ? LIMIT_HINT : undefined}
+      {...stylex.attrs(styles.checkHit, props.disabled && styles.checkHitDisabled)}
     >
-      <span {...stylex.props(styles.checkBox)}>
+      <span {...stylex.attrs(styles.checkBox)}>
         <input
-          id={inputId}
+          id={props.inputId}
           type="checkbox"
-          checked={checked}
-          disabled={disabled}
-          onChange={onToggle}
-          aria-label={`Add to comparison: ${item.englishName}`}
-          aria-describedby={disabled ? hintId : undefined}
-          {...stylex.props(
+          checked={props.checked}
+          disabled={props.disabled}
+          onChange={() => props.onToggle()}
+          aria-label={`Add to comparison: ${props.item.englishName}`}
+          aria-describedby={props.disabled ? props.hintId : undefined}
+          {...stylex.attrs(
             styles.checkInput,
-            checked && styles.checkInputChecked,
-            disabled && styles.checkInputDisabled,
+            props.checked && styles.checkInputChecked,
+            props.disabled && styles.checkInputDisabled,
           )}
         />
-        {checked && (
-          <span aria-hidden="true" {...stylex.props(styles.checkMark)}>
+        {props.checked && (
+          <span aria-hidden="true" {...stylex.attrs(styles.checkMark)}>
             <Check size={13} strokeWidth={2.25} absoluteStrokeWidth />
           </span>
         )}
@@ -381,14 +374,7 @@ function CompareCheckbox({
   );
 }
 
-function ItemRow({
-  item,
-  inputId,
-  checked,
-  disabled,
-  hintId,
-  onToggle,
-}: {
+function ItemRow(props: {
   item: FlatItem;
   inputId: string;
   checked: boolean;
@@ -396,45 +382,48 @@ function ItemRow({
   hintId: string;
   onToggle: () => void;
 }) {
+  const item = props.item;
   return (
-    <tr {...stylex.props(styles.itemRow, checked && styles.itemRowSelected)}>
-      <td {...stylex.props(styles.cell, styles.checkCell)}>
+    <tr {...stylex.attrs(styles.itemRow, props.checked && styles.itemRowSelected)}>
+      <td {...stylex.attrs(styles.cell, styles.checkCell)}>
         <CompareCheckbox
           item={item}
-          inputId={inputId}
-          checked={checked}
-          disabled={disabled}
-          hintId={hintId}
-          onToggle={onToggle}
+          inputId={props.inputId}
+          checked={props.checked}
+          disabled={props.disabled}
+          hintId={props.hintId}
+          onToggle={props.onToggle}
         />
       </td>
-      <th scope="row" {...stylex.props(styles.cell)}>
-        <span {...stylex.props(styles.namePrimary)}>{item.primary}</span>
-        {item.secondary && <span {...stylex.props(styles.nameSecondary)}>{item.secondary}</span>}
+      <th scope="row" {...stylex.attrs(styles.cell)}>
+        <span {...stylex.attrs(styles.namePrimary)}>{item.primary}</span>
+        {item.secondary && <span {...stylex.attrs(styles.nameSecondary)}>{item.secondary}</span>}
       </th>
-      <td {...stylex.props(styles.cell, styles.inci)}>
+      <td {...stylex.attrs(styles.cell, styles.inci)}>
         <Inci text={item.inci} />
       </td>
-      <td {...stylex.props(styles.cell, styles.cellLast, styles.features)}>{item.features}</td>
+      <td {...stylex.attrs(styles.cell, styles.cellLast, styles.features)}>{item.features}</td>
     </tr>
   );
 }
 
 export function Catalog() {
-  const titleId = useId();
-  const metaId = useId();
-  const hintId = useId();
-  const inputBase = useId();
-  const [selectedIds, setSelectedIds] = useState<string[]>([]);
-  const selectedIdSet = new Set(selectedIds);
-  const [announcement, setAnnouncement] = useState("");
+  const titleId = createUniqueId();
+  const metaId = createUniqueId();
+  const hintId = createUniqueId();
+  const inputBase = createUniqueId();
+  const [selectedIds, setSelectedIds] = createSignal<string[]>([]);
+  const selectedIdSet = createMemo(() => new Set(selectedIds()));
+  const [announcement, setAnnouncement] = createSignal("");
 
   const inputIdFor = (itemId: string) => `${inputBase}-${itemId}`;
-  const selectedItems = selectedIds.flatMap((id) => {
-    const item = ITEM_BY_ID[id];
-    return item ? [item] : [];
-  });
-  const full = selectedIds.length >= MAX_COMPARE;
+  const selectedItems = createMemo(() =>
+    selectedIds().flatMap((id) => {
+      const item = ITEM_BY_ID[id];
+      return item ? [item] : [];
+    }),
+  );
+  const full = () => selectedIds().length >= MAX_COMPARE;
 
   const announce = (lead: string, count: number) => {
     setAnnouncement(
@@ -445,27 +434,28 @@ export function Catalog() {
   };
 
   const toggleItem = (item: FlatItem) => {
-    if (selectedIds.includes(item.id)) {
-      const next = selectedIds.filter((id) => id !== item.id);
+    const current = selectedIds();
+    if (current.includes(item.id)) {
+      const next = current.filter((id) => id !== item.id);
       setSelectedIds(next);
       announce(`Removed from comparison: ${item.englishName}`, next.length);
       return;
     }
-    if (full) return;
-    const next = [...selectedIds, item.id];
+    if (full()) return;
+    const next = [...current, item.id];
     setSelectedIds(next);
     announce(`Added to comparison: ${item.englishName}`, next.length);
   };
 
   const removeItem = (item: FlatItem) => {
-    const next = selectedIds.filter((id) => id !== item.id);
+    const next = selectedIds().filter((id) => id !== item.id);
     setSelectedIds(next);
     announce(`Removed from comparison: ${item.englishName}`, next.length);
     if (next.length === 0) document.getElementById(inputIdFor(item.id))?.focus();
   };
 
   const clearAll = () => {
-    const first = selectedIds[0];
+    const first = selectedIds()[0];
     setSelectedIds([]);
     setAnnouncement("Comparison list cleared");
     if (first) document.getElementById(inputIdFor(first))?.focus();
@@ -476,63 +466,55 @@ export function Catalog() {
       id="products-catalog"
       aria-labelledby={titleId}
       lang="zh-CN"
-      {...stylex.props(styles.section)}
+      {...stylex.attrs(styles.section)}
     >
-      <div {...stylex.props(styles.shell)}>
-        <header {...stylex.props(styles.head)}>
-          <h2 id={titleId} {...stylex.props(styles.title)}>
+      <div {...stylex.attrs(styles.shell)}>
+        <header {...stylex.attrs(styles.head)}>
+          <h2 id={titleId} {...stylex.attrs(styles.title)}>
             产品目录
           </h2>
-          <p id={metaId} {...stylex.props(styles.meta)}>
-            <span {...stylex.props(styles.metaCount)}>{FLAT_ITEMS.length}</span> 款原料
-            <span aria-hidden="true" {...stylex.props(styles.metaDot)}>
+          <p id={metaId} {...stylex.attrs(styles.meta)}>
+            <span {...stylex.attrs(styles.metaCount)}>{FLAT_ITEMS.length}</span> 款原料
+            <span aria-hidden="true" {...stylex.attrs(styles.metaDot)}>
               ·
             </span>
-            勾选最多 {MAX_COMPARE} 款加入对比
+            <span>{`勾选最多 ${MAX_COMPARE} 款加入对比`}</span>
           </p>
         </header>
-        <table aria-labelledby={titleId} aria-describedby={metaId} {...stylex.props(styles.table)}>
+        <table aria-labelledby={titleId} aria-describedby={metaId} {...stylex.attrs(styles.table)}>
           <colgroup>
-            <col {...stylex.props(styles.colCheck)} />
-            <col {...stylex.props(styles.colName)} />
-            <col {...stylex.props(styles.colInci)} />
+            <col {...stylex.attrs(styles.colCheck)} />
+            <col {...stylex.attrs(styles.colName)} />
+            <col {...stylex.attrs(styles.colInci)} />
             <col />
           </colgroup>
-          <thead {...stylex.props(styles.thead)}>
+          <thead {...stylex.attrs(styles.thead)}>
             <tr>
-              <th
-                scope="col"
-
-                {...stylex.props(styles.headCell, styles.headCellFirst)}
-              >
+              <th scope="col" {...stylex.attrs(styles.headCell, styles.headCellFirst)}>
                 <span aria-hidden="true">加入对比</span>
-                <span {...stylex.props(styles.srOnly)}>Add to comparison</span>
+                <span {...stylex.attrs(styles.srOnly)}>Add to comparison</span>
               </th>
-              <th scope="col" {...stylex.props(styles.headCell)}>
+              <th scope="col" {...stylex.attrs(styles.headCell)}>
                 <span aria-hidden="true">名称</span>
-                <span {...stylex.props(styles.srOnly)}>Name</span>
+                <span {...stylex.attrs(styles.srOnly)}>Name</span>
               </th>
-              <th scope="col" {...stylex.props(styles.headCell)}>
+              <th scope="col" {...stylex.attrs(styles.headCell)}>
                 <span aria-hidden="true">INCI 名称</span>
-                <span {...stylex.props(styles.srOnly)}>INCI name</span>
+                <span {...stylex.attrs(styles.srOnly)}>INCI name</span>
               </th>
-              <th
-                scope="col"
-
-                {...stylex.props(styles.headCell, styles.headCellLast)}
-              >
+              <th scope="col" {...stylex.attrs(styles.headCell, styles.headCellLast)}>
                 <span aria-hidden="true">特性&应用</span>
-                <span {...stylex.props(styles.srOnly)}>Features & applications</span>
+                <span {...stylex.attrs(styles.srOnly)}>Features & applications</span>
               </th>
             </tr>
           </thead>
           {GROUPS.map(({ group, index, items }) => {
             const first = index === 0;
             return (
-              <tbody key={group.id} {...stylex.props(styles.tbody)}>
-                <tr {...stylex.props(styles.groupRow, first && styles.groupRowFirst)}>
+              <tbody {...stylex.attrs(styles.tbody)}>
+                <tr {...stylex.attrs(styles.groupRow, first && styles.groupRowFirst)}>
                   <td
-                    {...stylex.props(
+                    {...stylex.attrs(
                       styles.groupCell,
                       first && styles.groupCellFirst,
                       styles.groupIndexCell,
@@ -542,39 +524,37 @@ export function Catalog() {
                   </td>
                   <th
                     scope="rowgroup"
-
-                    colSpan={group.intro ? 1 : 3}
-                    {...stylex.props(
+                    colspan={group.intro ? 1 : 3}
+                    {...stylex.attrs(
                       styles.groupCell,
                       first && styles.groupCellFirst,
                       styles.groupLabelCell,
                     )}
                   >
-                    <span {...stylex.props(styles.groupLabel)}>{group.label}</span>
-                    <span {...stylex.props(styles.groupCount)}>{items.length} 款</span>
+                    <span {...stylex.attrs(styles.groupLabel)}>{group.label}</span>
+                    <span {...stylex.attrs(styles.groupCount)}>{items.length} 款</span>
                   </th>
                   {group.intro && (
                     <td
-                      colSpan={2}
-                      {...stylex.props(
+                      colspan={2}
+                      {...stylex.attrs(
                         styles.groupCell,
                         first && styles.groupCellFirst,
                         styles.groupIntroCell,
                       )}
                     >
-                      <p {...stylex.props(styles.groupIntro)}>{group.intro}</p>
+                      <p {...stylex.attrs(styles.groupIntro)}>{group.intro}</p>
                     </td>
                   )}
                 </tr>
                 {items.map((item) => {
-                  const checked = selectedIdSet.has(item.id);
+                  const checked = () => selectedIdSet().has(item.id);
                   return (
                     <ItemRow
-                      key={item.id}
                       item={item}
                       inputId={inputIdFor(item.id)}
-                      checked={checked}
-                      disabled={full && !checked}
+                      checked={checked()}
+                      disabled={full() && !checked()}
                       hintId={hintId}
                       onToggle={() => toggleItem(item)}
                     />
@@ -586,20 +566,19 @@ export function Catalog() {
         </table>
       </div>
       <AnimatePresence initial={false}>
-        {selectedItems.length > 0 && (
+        <Show when={selectedItems().length > 0}>
           <CompareStrip
-            key="compare-strip"
-            items={selectedItems}
+            items={selectedItems()}
             max={MAX_COMPARE}
             hintId={hintId}
             limitHint={LIMIT_HINT}
             onRemove={removeItem}
             onClear={clearAll}
           />
-        )}
+        </Show>
       </AnimatePresence>
-      <p aria-live="polite" aria-atomic="true" {...stylex.props(styles.srOnly)}>
-        {announcement}
+      <p aria-live="polite" aria-atomic="true" {...stylex.attrs(styles.srOnly)}>
+        {announcement()}
       </p>
     </section>
   );

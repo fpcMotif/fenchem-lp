@@ -1,6 +1,6 @@
-import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
+import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { useEffect, useRef } from "react";
+import { createEffect } from "solid-js";
 
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
@@ -38,7 +38,7 @@ const styles = stylex.create({
     height: 56,
   },
   breadcrumb: {
-    display: { default: "none", [breakpoints.lg]: "flex" },
+    display: { default: "none", ["@media (min-width: 1024px)"]: "flex" },
     alignItems: "center",
     gap: 10,
     flexShrink: 0,
@@ -68,8 +68,8 @@ const styles = stylex.create({
   tabs: {
     display: "flex",
     alignItems: "center",
-    justifyContent: { default: "flex-start", [breakpoints.lg]: "flex-end" },
-    gap: { default: 24, [breakpoints.md]: 32 },
+    justifyContent: { default: "flex-start", ["@media (min-width: 1024px)"]: "flex-end" },
+    gap: { default: 24, ["@media (min-width: 768px)"]: 32 },
     flexGrow: 1,
     minWidth: 0,
     overflowX: "auto",
@@ -123,67 +123,69 @@ const styles = stylex.create({
   },
 });
 
-function Braid({ shown }: { shown: boolean }) {
+function Braid(props: { shown: boolean }) {
   return (
     <svg
       aria-hidden="true"
-      focusable="false"
+      {...{ focusable: "false" }}
       width="20"
       height="7"
       viewBox="0 0 20 7"
-      {...stylex.props(styles.braid, shown && styles.braidShown)}
+      {...stylex.attrs(styles.braid, props.shown && styles.braidShown)}
     >
-      <path d="M0 3.5C3.3 0.4 6.7 0.4 10 3.5S16.7 6.6 20 3.5" {...stylex.props(styles.braidBlue)} />
-      <path d="M0 3.5C3.3 6.6 6.7 6.6 10 3.5S16.7 0.4 20 3.5" {...stylex.props(styles.braidMint)} />
+      <path d="M0 3.5C3.3 0.4 6.7 0.4 10 3.5S16.7 6.6 20 3.5" {...stylex.attrs(styles.braidBlue)} />
+      <path d="M0 3.5C3.3 6.6 6.7 6.6 10 3.5S16.7 0.4 20 3.5" {...stylex.attrs(styles.braidMint)} />
     </svg>
   );
 }
 
-export function SubNav({ onNavigateHome }: { onNavigateHome: (hash?: string) => void }) {
+export function SubNav(props: { onNavigateHome: (hash?: string) => void }) {
   const active = useActiveSection(SECTION_IDS);
-  const tabsRef = useRef<HTMLElement>(null);
+  let tabsRef: HTMLElement | undefined;
   const reduce = useReducedMotion();
 
-  useEffect(() => {
-    const list = tabsRef.current;
-    const tab = active ? list?.querySelector<HTMLElement>(`[href="#${active}"]`) : null;
-    if (!list || !tab) return;
-    const listBox = list.getBoundingClientRect();
-    const tabBox = tab.getBoundingClientRect();
-    if (tabBox.left < listBox.left || tabBox.right > listBox.right) {
-      list.scrollBy({
-        left: tabBox.left - listBox.left - 16,
-        behavior: reduce ? "auto" : "smooth",
-      });
-    }
-  }, [active, reduce]);
+  createEffect(
+    () => [active(), reduce()] as const,
+    ([current, reduceNow]) => {
+      const list = tabsRef;
+      const tab = current ? list?.querySelector<HTMLElement>(`[href="#${current}"]`) : null;
+      if (!list || !tab) return;
+      const listBox = list.getBoundingClientRect();
+      const tabBox = tab.getBoundingClientRect();
+      if (tabBox.left < listBox.left || tabBox.right > listBox.right) {
+        list.scrollBy({
+          left: tabBox.left - listBox.left - 16,
+          behavior: reduceNow ? "auto" : "smooth",
+        });
+      }
+    },
+  );
 
   return (
-    <div {...stylex.props(styles.bar)}>
+    <div {...stylex.attrs(styles.bar)}>
       <Shell sx={styles.inner}>
-        <nav aria-label="Breadcrumb" {...stylex.props(styles.breadcrumb)}>
+        <nav aria-label="Breadcrumb" {...stylex.attrs(styles.breadcrumb)}>
           <button
             type="button"
-            onClick={() => onNavigateHome("top")}
-            {...stylex.props(styles.breadcrumbLink)}
+            onClick={() => props.onNavigateHome("top")}
+            {...stylex.attrs(styles.breadcrumbLink)}
           >
             首页
           </button>
           <span aria-hidden="true">/</span>
-          <span aria-current="page" {...stylex.props(styles.breadcrumbCurrent)}>
+          <span aria-current="page" {...stylex.attrs(styles.breadcrumbCurrent)}>
             关于我们
           </span>
         </nav>
-        <nav aria-label="On this page" ref={tabsRef} {...stylex.props(styles.tabs)}>
+        <nav aria-label="On this page" ref={tabsRef} {...stylex.attrs(styles.tabs)}>
           {ABOUT_HERO.navChips.map((chip) => (
             <a
-              key={chip.id}
               href={`#${chip.id}`}
-              aria-current={active === chip.id ? "location" : undefined}
-              {...stylex.props(styles.tab, active === chip.id && styles.tabActive)}
+              aria-current={active() === chip.id ? "location" : undefined}
+              {...stylex.attrs(styles.tab, active() === chip.id && styles.tabActive)}
             >
               <span lang="en">{ENGLISH_LABELS[chip.id]}</span>
-              <Braid shown={active === chip.id} />
+              <Braid shown={active() === chip.id} />
             </a>
           ))}
         </nav>

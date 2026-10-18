@@ -1,6 +1,9 @@
 import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { createContext, use, useMemo, useSyncExternalStore, type ReactNode } from "react";
+import { createContext, createMemo, For, Show, untrack, useContext, type Accessor } from "solid-js";
+import type { JSX } from "@solidjs/web";
+
+import { createExternalStore } from "@/compat/external-store";
 
 import { Flow } from "../shared/flow";
 import { ContactCta } from "../variant-oos1/contact-cta";
@@ -17,26 +20,26 @@ export { kitStyles };
 export const STICKY_OFFSET = 144;
 const DESKTOP = breakpoints.xl;
 
-type LabState = { count: number; setPickerHost: (host: HTMLElement | null) => void };
+type LabState = { count: Accessor<number>; setPickerHost: (host: HTMLElement | null) => void };
 
 export const InsightsLabContext = createContext<LabState>({
-  count: LAB_ARTICLES.length,
+  count: () => LAB_ARTICLES.length,
   setPickerHost: () => {},
 });
 
 export function useLabArticles() {
-  const { count } = use(InsightsLabContext);
-  return useMemo(() => LAB_ARTICLES.slice(0, count), [count]);
+  const { count } = useContext(InsightsLabContext);
+  return createMemo(() => LAB_ARTICLES.slice(0, count()));
 }
 
 export function usePickerHost() {
-  return use(InsightsLabContext).setPickerHost;
+  return useContext(InsightsLabContext).setPickerHost;
 }
 
 const subscribeNever = () => () => {};
 
 export function useIsClient() {
-  return useSyncExternalStore(
+  return createExternalStore(
     subscribeNever,
     () => true,
     () => false,
@@ -366,166 +369,162 @@ export const labStyles = stylex.create({
   },
 });
 
-export function LabPage({
-  onNavigateHome,
-  chips,
-  activeChip,
-  onSelectChip,
-  children,
-}: SubPageProps & {
-  chips: readonly { id: string; label: string }[];
-  activeChip?: string;
-  onSelectChip?: (id: string) => void;
-  children: ReactNode;
-}) {
+export function LabPage(
+  props: SubPageProps & {
+    chips: readonly { id: string; label: string }[];
+    activeChip?: string;
+    onSelectChip?: (id: string) => void;
+    children: JSX.Element;
+  },
+) {
   const articles = useLabArticles();
   return (
-    <div id="insights-top" lang="zh-CN" {...stylex.props(kitStyles.root)}>
+    <div id="insights-top" lang="zh-CN" {...stylex.attrs(kitStyles.root)}>
       <SubPageBanner
         eyebrow="Insights"
         title="行业洞察"
         tagline="Notes from the formulation bench"
         lead="来自泛成应用研发团队的原料趋势、配方方法与法规观察"
-        meta={[`${articles.length} 篇洞察 · 持续更新`]}
+        meta={[`${articles().length} 篇洞察 · 持续更新`]}
         image="/prototype/official-site/product-human-nutrition.webp"
         imageAlt="行业洞察"
         titleId="insights-banner-title"
       />
       <SubPageNav
         current="行业洞察"
-        chips={chips}
-        activeChip={activeChip}
-        onSelectChip={onSelectChip}
-        onNavigateHome={onNavigateHome}
+        chips={props.chips}
+        activeChip={props.activeChip}
+        onSelectChip={props.onSelectChip}
+        onNavigateHome={props.onNavigateHome}
         chipsLabel="本页文章"
       />
-      <div {...stylex.props(labStyles.pageSection)}>
-        <div {...stylex.props(kitStyles.shell, kitStyles.inset120)}>{children}</div>
+      <div {...stylex.attrs(labStyles.pageSection)}>
+        <div {...stylex.attrs(kitStyles.shell, kitStyles.inset120)}>{props.children}</div>
       </div>
       <Flow>
         <ContactCta
           id="insights-bottom-cta"
           title="需要索取样品或技术资料？"
           subtitle="我们的应用团队随时为您提供添加量指导与配方参考。"
-          actions={[{ label: "联系我们", onClick: () => onNavigateHome("contact") }]}
+          actions={[{ label: "联系我们", onClick: () => props.onNavigateHome("contact") }]}
         />
       </Flow>
     </div>
   );
 }
 
-export function ArticleMeta({ article, extra }: { article: LabArticle; extra?: ReactNode }) {
+export function ArticleMeta(props: { article: LabArticle; extra?: JSX.Element }) {
   return (
-    <p {...stylex.props(labStyles.meta)}>
-      <span {...stylex.props(labStyles.metaCategory)}>{article.category}</span>
-      <span aria-hidden="true" {...stylex.props(labStyles.metaDot)} />
-      <span>{`约 ${readMinutes(article)} 分钟阅读`}</span>
-      <span aria-hidden="true" {...stylex.props(labStyles.metaDot)} />
-      <time dateTime={article.date} {...stylex.props(labStyles.displayNumber)}>
-        {article.date.replace("-", ".")}
+    <p {...stylex.attrs(labStyles.meta)}>
+      <span {...stylex.attrs(labStyles.metaCategory)}>{props.article.category}</span>
+      <span aria-hidden="true" {...stylex.attrs(labStyles.metaDot)} />
+      <span>{`约 ${readMinutes(props.article)} 分钟阅读`}</span>
+      <span aria-hidden="true" {...stylex.attrs(labStyles.metaDot)} />
+      <time datetime={props.article.date} {...stylex.attrs(labStyles.displayNumber)}>
+        {props.article.date.replace("-", ".")}
       </time>
-      {extra}
+      {props.extra}
     </p>
   );
 }
 
-export function ArticlePreview({ article }: { article: LabArticle }) {
+export function ArticlePreview(props: { article: LabArticle }) {
   return (
     <>
-      {article.thesis ? (
-        <div {...stylex.props(labStyles.thesis)}>
-          <p {...stylex.props(labStyles.thesisText)}>
-            <strong {...stylex.props(labStyles.thesisLabel)}>{article.thesis.label}</strong>
-            {article.thesis.statement}
-          </p>
-        </div>
-      ) : null}
-      <div {...stylex.props(labStyles.paragraphs)}>
-        {article.intro.map((paragraph, index) => (
-          <p key={paragraph} {...stylex.props(labStyles.paragraph)}>
-            {index === 0 ? (
-              <>
-                <span {...stylex.props(labStyles.dropCap)}>{paragraph.slice(0, 1)}</span>
-                {paragraph.slice(1)}
-              </>
-            ) : (
-              paragraph
-            )}
-          </p>
-        ))}
+      <Show when={props.article.thesis}>
+        {(thesis) => (
+          <div {...stylex.attrs(labStyles.thesis)}>
+            <p {...stylex.attrs(labStyles.thesisText)}>
+              <strong {...stylex.attrs(labStyles.thesisLabel)}>{thesis().label}</strong>
+              {thesis().statement}
+            </p>
+          </div>
+        )}
+      </Show>
+      <div {...stylex.attrs(labStyles.paragraphs)}>
+        <For each={props.article.intro}>
+          {(paragraph, index) => (
+            <p {...stylex.attrs(labStyles.paragraph)}>
+              {index() === 0 ? (
+                <>
+                  <span {...stylex.attrs(labStyles.dropCap)}>{paragraph.slice(0, 1)}</span>
+                  {paragraph.slice(1)}
+                </>
+              ) : (
+                paragraph
+              )}
+            </p>
+          )}
+        </For>
       </div>
     </>
   );
 }
 
-export function ArticleSections({ article }: { article: LabArticle }) {
+export function ArticleSections(props: { article: LabArticle }) {
   return (
-    <div {...stylex.props(labStyles.sections)}>
-      {article.sections.map((section) => {
-        const id = sectionAnchor(article, section);
-        return (
-          <section
-            key={section.slug}
-            id={id}
-            aria-labelledby={`${id}-title`}
-            {...stylex.props(labStyles.section, kitStyles.anchor)}
-          >
-            <h3 id={`${id}-title`} {...stylex.props(labStyles.sectionTitle)}>
-              {section.title}
-            </h3>
-            {section.blocks.map((block, index) => (
-              <Block key={`${block.kind}-${index}`} block={block} />
-            ))}
-          </section>
-        );
-      })}
+    <div {...stylex.attrs(labStyles.sections)}>
+      <For each={props.article.sections}>
+        {(section) => {
+          const id = () => sectionAnchor(props.article, section);
+          return (
+            <section
+              id={id()}
+              aria-labelledby={`${id()}-title`}
+              {...stylex.attrs(labStyles.section, kitStyles.anchor)}
+            >
+              <h3 id={`${id()}-title`} {...stylex.attrs(labStyles.sectionTitle)}>
+                {section.title}
+              </h3>
+              <For each={section.blocks}>{(block) => <Block block={block} />}</For>
+            </section>
+          );
+        }}
+      </For>
     </div>
   );
 }
 
-function Block({ block }: { block: InsightBlock }) {
+function Block(props: { block: InsightBlock }) {
+  const block = untrack(() => props.block);
   switch (block.kind) {
     case "paragraphs":
       return (
-        <div {...stylex.props(labStyles.paragraphs)}>
+        <div {...stylex.attrs(labStyles.paragraphs)}>
           {block.items.map((paragraph) => (
-            <p key={paragraph} {...stylex.props(labStyles.paragraph)}>
-              {paragraph}
-            </p>
+            <p {...stylex.attrs(labStyles.paragraph)}>{paragraph}</p>
           ))}
         </div>
       );
     case "bullets":
       return (
-        <ul {...stylex.props(labStyles.bullets)}>
+        <ul {...stylex.attrs(labStyles.bullets)}>
           {block.items.map((item) => (
-            <li key={item} {...stylex.props(labStyles.bullet)}>
-              {item}
-            </li>
+            <li {...stylex.attrs(labStyles.bullet)}>{item}</li>
           ))}
         </ul>
       );
     case "terms":
       return (
-        <ul {...stylex.props(labStyles.terms)}>
+        <ul {...stylex.attrs(labStyles.terms)}>
           {block.items.map((item) => (
-            <li key={item.term} {...stylex.props(labStyles.termRow)}>
-              <h4 {...stylex.props(labStyles.term)}>{item.term}</h4>
-              <p {...stylex.props(labStyles.paragraph)}>{item.desc}</p>
+            <li {...stylex.attrs(labStyles.termRow)}>
+              <h4 {...stylex.attrs(labStyles.term)}>{item.term}</h4>
+              <p {...stylex.attrs(labStyles.paragraph)}>{item.desc}</p>
             </li>
           ))}
         </ul>
       );
     case "note":
       return (
-        <div {...stylex.props(labStyles.note)}>
-          <p {...stylex.props(labStyles.noteText)}>
-            <strong {...stylex.props(labStyles.thesisLabel)}>{block.label}</strong>
+        <div {...stylex.attrs(labStyles.note)}>
+          <p {...stylex.attrs(labStyles.noteText)}>
+            <strong {...stylex.attrs(labStyles.thesisLabel)}>{block.label}</strong>
             {block.text}
           </p>
         </div>
       );
     case "disclaimer":
-      return <p {...stylex.props(labStyles.disclaimer)}>{block.text}</p>;
+      return <p {...stylex.attrs(labStyles.disclaimer)}>{block.text}</p>;
   }
 }

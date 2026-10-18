@@ -14,9 +14,11 @@ import {
   Shield,
   Users,
   type LucideIcon,
-} from "lucide-react";
-import { LazyMotion, domAnimation, m } from "motion/react";
-import { preinit } from "react-dom";
+} from "@fenchem-lp/ui/components/lucide";
+import { LazyMotion, domAnimation, m } from "@/compat/motion";
+import { preinit } from "@/compat/react-dom";
+import { For } from "solid-js";
+import type { JSX } from "@solidjs/web";
 
 import { HeroGradeFilter } from "@/components/prototype/hero-grade";
 import { Intro, Reveal } from "@/components/prototype/motion";
@@ -818,48 +820,40 @@ const TONE_STYLES: Record<StrengthTone, StyleXStyles> = {
   cream: styles.toneCream,
 };
 
-function VectorArt({
-  paths,
-  viewBox,
-  sx,
-}: {
-  paths: readonly VectorPath[];
-  viewBox: string;
-  sx: StyleXStyles;
-}) {
+function VectorArt(props: { paths: readonly VectorPath[]; viewBox: string; sx: StyleXStyles }) {
   return (
-    <svg viewBox={viewBox} aria-hidden="true" focusable="false" {...stylex.props(sx)}>
-      {paths.map((path) => (
-        <path key={path.d} d={path.d} fill={path.fill} />
-      ))}
+    <svg viewBox={props.viewBox} aria-hidden="true" {...UNFOCUSABLE} {...stylex.attrs(props.sx)}>
+      <For each={props.paths}>{(path) => <path d={path.d} fill={path.fill} />}</For>
     </svg>
   );
 }
 
+// `focusable` (legacy SVG attribute) is not in Solid's JSX types.
+const UNFOCUSABLE = { focusable: "false" } as JSX.SvgSVGAttributes<SVGSVGElement>;
+
 function SiteHeader() {
   return (
-    <header {...stylex.props(styles.header)}>
+    <header {...stylex.attrs(styles.header)}>
       <Intro y={-16} sx={[styles.shell, styles.headerInner]}>
-        <a href="#top" aria-label="FENCHEM home" {...stylex.props(styles.logoLink)}>
+        <a href="#top" aria-label="FENCHEM home" {...stylex.attrs(styles.logoLink)}>
           <VectorArt paths={LOGO_PATHS} viewBox="0 0 161 52" sx={styles.logo} />
         </a>
-        <nav aria-label="Main" {...stylex.props(styles.nav)}>
+        <nav aria-label="Main" {...stylex.attrs(styles.nav)}>
           {NAV_ITEMS.map((item, index) => (
             <a
-              key={item.href}
               href={item.href}
               aria-current={index === 0 ? "page" : undefined}
-              {...stylex.props(styles.navLink, index === 0 && styles.navLinkActive)}
+              {...stylex.attrs(styles.navLink, index === 0 && styles.navLinkActive)}
             >
               {item.label}
             </a>
           ))}
         </nav>
-        <div {...stylex.props(styles.headerActions)}>
-          <button type="button" aria-label="AI search" {...stylex.props(styles.searchPill)}>
+        <div {...stylex.attrs(styles.headerActions)}>
+          <button type="button" aria-label="AI search" {...stylex.attrs(styles.searchPill)}>
             <Search size={16} strokeWidth={2} absoluteStrokeWidth aria-hidden="true" />
           </button>
-          <button type="button" aria-label="Switch language" {...stylex.props(styles.langButton)}>
+          <button type="button" aria-label="Switch language" {...stylex.attrs(styles.langButton)}>
             CN
           </button>
         </div>
@@ -871,45 +865,45 @@ function SiteHeader() {
 function Hero() {
   const reduce = useReducedMotion();
   return (
-    <section id="top" aria-labelledby="official-hero-title" {...stylex.props(styles.hero)}>
+    <section id="top" aria-labelledby="official-hero-title" {...stylex.attrs(styles.hero)}>
       <HeroGradeFilter />
       <m.div
         aria-hidden="true"
-        {...stylex.props(styles.heroBackdrop)}
+        {...stylex.attrs(styles.heroBackdrop)}
         initial={{ scale: 1.14 }}
         animate={{ scale: 1 }}
-        transition={{ duration: reduce ? 0 : 2, ease: EASE }}
+        transition={{ duration: reduce() ? 0 : 2, ease: EASE }}
       >
         <img
           src={IMAGES.hero}
           alt=""
           decoding="async"
-          {...stylex.props(styles.heroLayer, styles.heroImage)}
+          {...stylex.attrs(styles.heroLayer, styles.heroImage)}
         />
-        <div {...stylex.props(styles.heroLayer, styles.heroTintColor)} />
-        <div {...stylex.props(styles.heroLayer, styles.heroTintScreen)} />
+        <div {...stylex.attrs(styles.heroLayer, styles.heroTintColor)} />
+        <div {...stylex.attrs(styles.heroLayer, styles.heroTintScreen)} />
       </m.div>
-      <div {...stylex.props(styles.shell, styles.inset120, styles.heroContent)}>
-        <div {...stylex.props(styles.heroCopy)}>
+      <div {...stylex.attrs(styles.shell, styles.inset120, styles.heroContent)}>
+        <div {...stylex.attrs(styles.heroCopy)}>
           <Intro delay={0.3} scale={0.92}>
-            <h1 id="official-hero-title" {...stylex.props(styles.heroTitle)}>
+            <h1 id="official-hero-title" {...stylex.attrs(styles.heroTitle)}>
               {HERO.title}
             </h1>
           </Intro>
           <Intro delay={0.45} scale={0.95}>
-            <p {...stylex.props(styles.heroLead)}>{HERO.lead}</p>
+            <p {...stylex.attrs(styles.heroLead)}>{HERO.lead}</p>
           </Intro>
         </div>
         <Intro delay={0.6} scale={0.95} sx={styles.ctaRow}>
           <a
             href={HERO.primary.href}
-            {...stylex.props(styles.button, styles.buttonPrimary, styles.buttonHero)}
+            {...stylex.attrs(styles.button, styles.buttonPrimary, styles.buttonHero)}
           >
             {HERO.primary.label}
           </a>
           <a
             href={HERO.secondary.href}
-            {...stylex.props(styles.button, styles.buttonSecondary, styles.buttonHero)}
+            {...stylex.attrs(styles.button, styles.buttonSecondary, styles.buttonHero)}
           >
             {HERO.secondary.label}
           </a>
@@ -924,16 +918,16 @@ function About() {
     <section
       id="about"
       aria-labelledby="official-about-title"
-      {...stylex.props(styles.about, styles.inset124)}
+      {...stylex.attrs(styles.about, styles.inset124)}
     >
       <Reveal scale={0.92} sx={styles.aboutInner}>
-        <h2 id="official-about-title" {...stylex.props(styles.sectionTitle)}>
+        <h2 id="official-about-title" {...stylex.attrs(styles.sectionTitle)}>
           {ABOUT.title}
         </h2>
-        <p {...stylex.props(styles.aboutBody)}>{ABOUT.body}</p>
+        <p {...stylex.attrs(styles.aboutBody)}>{ABOUT.body}</p>
         <a
           href={ABOUT.cta.href}
-          {...stylex.props(styles.button, styles.buttonPrimary, styles.buttonCompact)}
+          {...stylex.attrs(styles.button, styles.buttonPrimary, styles.buttonCompact)}
         >
           {ABOUT.cta.label}
         </a>
@@ -946,55 +940,56 @@ function Campus() {
   const reduce = useReducedMotion();
   return (
     <section id="campus" aria-label="R&D and production">
-      <div {...stylex.props(styles.campusFrame)}>
+      <div {...stylex.attrs(styles.campusFrame)}>
         <m.img
           src={IMAGES.campus.src}
           alt={IMAGES.campus.alt}
           loading="lazy"
           decoding="async"
-          {...stylex.props(styles.campusImage)}
+          {...stylex.attrs(styles.campusImage)}
           initial={{ scale: 1.12 }}
           whileInView={{ scale: 1 }}
           viewport={{ once: true, margin: "-80px" }}
-          transition={{ duration: reduce ? 0 : 1.6, ease: EASE }}
+          transition={{ duration: reduce() ? 0 : 1.6, ease: EASE }}
         />
       </div>
-      <div {...stylex.props(styles.shell, styles.inset132, styles.statsBand)}>
+      <div {...stylex.attrs(styles.shell, styles.inset132, styles.statsBand)}>
         {STATS.map((stat, index) => (
-          <StatItem key={stat.label} stat={stat} index={index} />
+          <StatItem stat={stat} index={index} />
         ))}
       </div>
     </section>
   );
 }
 
-function StatItem({ stat, index }: { stat: (typeof STATS)[number]; index: number }) {
+function StatItem(props: { stat: (typeof STATS)[number]; index: number }) {
   return (
     <>
-      {index > 0 ? <span aria-hidden="true" {...stylex.props(styles.statDivider)} /> : null}
-      <Reveal delay={index * STAGGER} scale={0.88} sx={styles.stat}>
-        <p {...stylex.props(styles.statText)}>{stat.label}</p>
-        <p {...stylex.props(styles.statFigure)}>
-          <span {...stylex.props(styles.statValue)}>{stat.value}</span>
-          {stat.unit ? <span {...stylex.props(styles.statUnit)}>{stat.unit}</span> : null}
+      {props.index > 0 ? <span aria-hidden="true" {...stylex.attrs(styles.statDivider)} /> : null}
+      <Reveal delay={props.index * STAGGER} scale={0.88} sx={styles.stat}>
+        <p {...stylex.attrs(styles.statText)}>{props.stat.label}</p>
+        <p {...stylex.attrs(styles.statFigure)}>
+          <span {...stylex.attrs(styles.statValue)}>{props.stat.value}</span>
+          {props.stat.unit ? (
+            <span {...stylex.attrs(styles.statUnit)}>{props.stat.unit}</span>
+          ) : null}
         </p>
-        <p {...stylex.props(styles.statText)}>{stat.caption}</p>
+        <p {...stylex.attrs(styles.statText)}>{props.stat.caption}</p>
       </Reveal>
     </>
   );
 }
 
-function IconPattern({ icon }: { icon: StrengthIcon }) {
-  const Icon = STRENGTH_ICONS[icon];
+function IconPattern(props: { icon: StrengthIcon }) {
+  const Icon = STRENGTH_ICONS[props.icon];
   return (
-    <div aria-hidden="true" {...stylex.props(styles.pattern)}>
+    <div aria-hidden="true" {...stylex.attrs(styles.pattern)}>
       {PATTERN_CELLS.map((cell) => (
         <Icon
-          key={`${cell.left}-${cell.top}`}
           size={32}
           strokeWidth={2}
           absoluteStrokeWidth
-          {...stylex.props(styles.patternCell(`${cell.left}px`, `${cell.top}px`))}
+          {...stylex.attrs(styles.patternCell(`${cell.left}px`, `${cell.top}px`))}
         />
       ))}
     </div>
@@ -1006,33 +1001,32 @@ function Strengths() {
     <section
       id="strengths"
       aria-labelledby="official-strengths-title"
-      {...stylex.props(styles.strengths, styles.inset120)}
+      {...stylex.attrs(styles.strengths, styles.inset120)}
     >
       <Reveal scale={0.94} sx={styles.introBlock}>
-        <h2 id="official-strengths-title" {...stylex.props(styles.sectionTitle)}>
+        <h2 id="official-strengths-title" {...stylex.attrs(styles.sectionTitle)}>
           {STRENGTHS_INTRO.title}
         </h2>
-        <p {...stylex.props(styles.mutedText, styles.centered)}>{STRENGTHS_INTRO.lead}</p>
+        <p {...stylex.attrs(styles.mutedText, styles.centered)}>{STRENGTHS_INTRO.lead}</p>
       </Reveal>
-      <div {...stylex.props(styles.strengthGrid)}>
+      <div {...stylex.attrs(styles.strengthGrid)}>
         {STRENGTHS.map((strength, index) => (
           <Reveal
-            key={strength.title}
             delay={index * STAGGER}
             scale={0.9}
             sx={[styles.strengthCard, stylex.defaultMarker()]}
             style={TONE_STYLES[strength.tone]}
           >
             <IconPattern icon={strength.icon} />
-            <div {...stylex.props(styles.strengthText)}>
-              <div {...stylex.props(styles.strengthCopy)}>
-                <h3 {...stylex.props(styles.strengthTitle)}>{strength.title}</h3>
+            <div {...stylex.attrs(styles.strengthText)}>
+              <div {...stylex.attrs(styles.strengthCopy)}>
+                <h3 {...stylex.attrs(styles.strengthTitle)}>{strength.title}</h3>
                 {strength.description ? (
-                  <p {...stylex.props(styles.strengthSmall)}>{strength.description}</p>
+                  <p {...stylex.attrs(styles.strengthSmall)}>{strength.description}</p>
                 ) : null}
               </div>
               {strength.link ? (
-                <a href="#products" {...stylex.props(styles.strengthLink)}>
+                <a href="#products" {...stylex.attrs(styles.strengthLink)}>
                   {strength.link}
                   <ArrowUpRight size={12} strokeWidth={1} absoluteStrokeWidth aria-hidden="true" />
                 </a>
@@ -1050,32 +1044,32 @@ function Products() {
     <section
       id="products"
       aria-labelledby="official-products-title"
-      {...stylex.props(styles.products, styles.inset120)}
+      {...stylex.attrs(styles.products, styles.inset120)}
     >
       <Reveal scale={0.94} sx={styles.introBlock}>
-        <h2 id="official-products-title" {...stylex.props(styles.sectionTitle)}>
+        <h2 id="official-products-title" {...stylex.attrs(styles.sectionTitle)}>
           {PRODUCTS_INTRO.title}
         </h2>
-        <p {...stylex.props(styles.mutedText, styles.centered)}>{PRODUCTS_INTRO.lead}</p>
+        <p {...stylex.attrs(styles.mutedText, styles.centered)}>{PRODUCTS_INTRO.lead}</p>
       </Reveal>
       <Reveal delay={0.1} scale={0.9} sx={styles.productsCta}>
         <a
           href={PRODUCTS_INTRO.cta.href}
-          {...stylex.props(styles.button, styles.buttonPrimary, styles.buttonSmall)}
+          {...stylex.attrs(styles.button, styles.buttonPrimary, styles.buttonSmall)}
         >
           {PRODUCTS_INTRO.cta.label}
         </a>
       </Reveal>
-      <div {...stylex.props(styles.productGrid)}>
+      <div {...stylex.attrs(styles.productGrid)}>
         {PRODUCTS.map((product, index) => (
-          <Reveal key={product.title} delay={index * STAGGER} scale={0.92} sx={styles.productCard}>
-            <div {...stylex.props(styles.productImageFrame)}>
+          <Reveal delay={index * STAGGER} scale={0.92} sx={styles.productCard}>
+            <div {...stylex.attrs(styles.productImageFrame)}>
               <img
                 src={product.image}
                 alt={product.english}
                 loading="lazy"
                 decoding="async"
-                {...stylex.props(styles.productImage)}
+                {...stylex.attrs(styles.productImage)}
               />
             </div>
             <ProductSummary
@@ -1099,7 +1093,7 @@ function Products() {
 function Offices() {
   return (
     <section id="offices" aria-labelledby="official-offices-title">
-      <div {...stylex.props(styles.globalBand)}>
+      <div {...stylex.attrs(styles.globalBand)}>
         <Reveal scale={0.94} sx={styles.globalRow}>
           <img
             src={IMAGES.officeMap.src}
@@ -1108,33 +1102,26 @@ function Offices() {
             height={321}
             loading="lazy"
             decoding="async"
-            {...stylex.props(styles.mapImage)}
+            {...stylex.attrs(styles.mapImage)}
           />
-          <div {...stylex.props(styles.globalCopy)}>
-            <h2 id="official-offices-title" {...stylex.props(styles.sectionTitle)}>
+          <div {...stylex.attrs(styles.globalCopy)}>
+            <h2 id="official-offices-title" {...stylex.attrs(styles.sectionTitle)}>
               {GLOBAL_INTRO.title}
             </h2>
-            <p {...stylex.props(styles.mutedText, styles.centered)}>{GLOBAL_INTRO.lead}</p>
+            <p {...stylex.attrs(styles.mutedText, styles.centered)}>{GLOBAL_INTRO.lead}</p>
           </div>
         </Reveal>
       </div>
-      <div {...stylex.props(styles.officesBand)}>
-        <div {...stylex.props(styles.shell, styles.inset124, styles.regions)}>
+      <div {...stylex.attrs(styles.officesBand)}>
+        <div {...stylex.attrs(styles.shell, styles.inset124, styles.regions)}>
           {OFFICE_COLUMNS.map((column, index) => (
-            <Reveal
-              key={column[0].region}
-              delay={index * STAGGER}
-              scale={0.94}
-              sx={styles.officeColumn}
-            >
+            <Reveal delay={index * STAGGER} scale={0.94} sx={styles.officeColumn}>
               {column.map((group) => (
-                <div key={group.region} {...stylex.props(styles.officeGroup)}>
-                  <h3 {...stylex.props(styles.regionHeader)}>{group.region}</h3>
-                  <ul {...stylex.props(styles.list, styles.regionBody)}>
+                <div {...stylex.attrs(styles.officeGroup)}>
+                  <h3 {...stylex.attrs(styles.regionHeader)}>{group.region}</h3>
+                  <ul {...stylex.attrs(styles.list, styles.regionBody)}>
                     {group.offices.map((office) => (
-                      <li key={office} {...stylex.props(styles.mutedText)}>
-                        {office}
-                      </li>
+                      <li {...stylex.attrs(styles.mutedText)}>{office}</li>
                     ))}
                   </ul>
                 </div>
@@ -1149,29 +1136,26 @@ function Offices() {
 
 function News() {
   return (
-    <section id="news" aria-labelledby="official-news-title" {...stylex.props(styles.news)}>
-      <div {...stylex.props(styles.shell, styles.inset124, styles.newsInner)}>
+    <section id="news" aria-labelledby="official-news-title" {...stylex.attrs(styles.news)}>
+      <div {...stylex.attrs(styles.shell, styles.inset124, styles.newsInner)}>
         <Reveal scale={0.96}>
-          <h2 id="official-news-title" {...stylex.props(styles.sectionTitle)}>
+          <h2 id="official-news-title" {...stylex.attrs(styles.sectionTitle)}>
             {NEWS_TITLE}
           </h2>
         </Reveal>
-        <ul {...stylex.props(styles.accordion)}>
+        <ul {...stylex.attrs(styles.accordion)}>
           {NEWS.map((item, index) => (
-            <li
-              key={item.title}
-              {...stylex.props(styles.newsItem, item.muted && styles.newsItemMuted)}
-            >
+            <li {...stylex.attrs(styles.newsItem, item.muted && styles.newsItemMuted)}>
               <Reveal delay={index * STAGGER} scale={0.97} sx={styles.newsItemInner}>
-                <div {...stylex.props(styles.newsHeader)}>
-                  <h3 {...stylex.props(styles.newsTitle)}>{item.title}</h3>
+                <div {...stylex.attrs(styles.newsHeader)}>
+                  <h3 {...stylex.attrs(styles.newsTitle)}>{item.title}</h3>
                   {item.details.length > 0 ? (
                     <Minus
                       size={16}
                       strokeWidth={1.5}
                       absoluteStrokeWidth
                       aria-hidden="true"
-                      {...stylex.props(styles.newsIcon)}
+                      {...stylex.attrs(styles.newsIcon)}
                     />
                   ) : (
                     <Plus
@@ -1179,14 +1163,12 @@ function News() {
                       strokeWidth={1.5}
                       absoluteStrokeWidth
                       aria-hidden="true"
-                      {...stylex.props(styles.newsIcon)}
+                      {...stylex.attrs(styles.newsIcon)}
                     />
                   )}
                 </div>
                 {item.details.map((detail) => (
-                  <p key={detail} {...stylex.props(styles.mutedText)}>
-                    {detail}
-                  </p>
+                  <p {...stylex.attrs(styles.mutedText)}>{detail}</p>
                 ))}
               </Reveal>
             </li>
@@ -1202,15 +1184,15 @@ function ContactCta() {
     <section
       id="contact"
       aria-labelledby="official-contact-title"
-      {...stylex.props(styles.cta, styles.inset124)}
+      {...stylex.attrs(styles.cta, styles.inset124)}
     >
       <Reveal scale={0.9} sx={styles.ctaInner}>
-        <h2 id="official-contact-title" {...stylex.props(styles.sectionTitle)}>
+        <h2 id="official-contact-title" {...stylex.attrs(styles.sectionTitle)}>
           {CTA.title}
         </h2>
         <a
           href={CTA.action.href}
-          {...stylex.props(styles.button, styles.buttonPrimary, styles.buttonWide)}
+          {...stylex.attrs(styles.button, styles.buttonPrimary, styles.buttonWide)}
         >
           {CTA.action.label}
         </a>
@@ -1247,10 +1229,10 @@ function SiteFooter() {
       columns={FOOTER_COLUMNS}
       copyright={COPYRIGHT}
     >
-      <a href="#top" aria-label="LinkedIn" {...stylex.props(styles.socialLink)}>
+      <a href="#top" aria-label="LinkedIn" {...stylex.attrs(styles.socialLink)}>
         <VectorArt paths={LINKEDIN_PATHS} viewBox="0 0 20 20" sx={styles.socialIcon} />
       </a>
-      <a href="#top" aria-label="WeChat" {...stylex.props(styles.socialLink)}>
+      <a href="#top" aria-label="WeChat" {...stylex.attrs(styles.socialLink)}>
         <VectorArt paths={WECHAT_PATHS} viewBox="0 0 20 20" sx={styles.socialIcon} />
       </a>
     </InsetCorporateFooter>
@@ -1261,7 +1243,7 @@ export function VariantO() {
   preinit(NOTO_SANS_SC, { as: "style" });
   return (
     <LazyMotion features={domAnimation} strict>
-      <div lang="zh-CN" {...stylex.props(styles.root)}>
+      <div lang="zh-CN" {...stylex.attrs(styles.root)}>
         <SiteHeader />
         <main>
           <Hero />

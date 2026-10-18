@@ -1,8 +1,7 @@
 import { LightboxStage } from "../../../shared/lightbox-stage";
 import { LightboxDialog, type LightboxState } from "../../../shared/lightbox";
 import * as stylex from "@stylexjs/stylex";
-import { ArrowLeft, ArrowRight, X } from "lucide-react";
-import { useRef } from "react";
+import { ArrowLeft, ArrowRight, X } from "@fenchem-lp/ui/components/lucide";
 
 import { srOnly, type, ui } from "./shared";
 import { bp, grid, tone } from "./tokens.stylex";
@@ -142,52 +141,54 @@ const styles = stylex.create({
   },
 });
 
-export function Lightbox({
-  lightbox,
-  photos,
-}: {
-  lightbox: LightboxState;
-  photos: readonly LightboxPhoto[];
-}) {
-  const { stepped, close: onClose, step: onStep } = lightbox;
-  const closeRef = useRef<HTMLButtonElement>(null);
+export function Lightbox(props: { lightbox: LightboxState; photos: readonly LightboxPhoto[] }) {
+  const onClose = () => props.lightbox.close();
+  const onStep = (delta: number) => props.lightbox.step(delta);
+  let closeRef: HTMLButtonElement | undefined;
 
   return (
-    <LightboxDialog lightbox={lightbox} items={photos} sx={styles.dialog} initialFocus={closeRef}>
+    <LightboxDialog
+      lightbox={props.lightbox}
+      items={props.photos}
+      sx={styles.dialog}
+      initialFocus={() => closeRef}
+    >
       {(photo, index) => (
         <>
-          <div {...stylex.props(styles.layout, ui.shell)}>
+          <div {...stylex.attrs(styles.layout, ui.shell)}>
             <LightboxStage onClose={onClose} sx={styles.stage}>
               <img
-                key={photo.id}
                 src={photo.large}
                 alt={photo.alt}
-                {...stylex.props(styles.image, stepped ? styles.imageStep : styles.imageOpen)}
+                {...stylex.attrs(
+                  styles.image,
+                  props.lightbox.stepped ? styles.imageStep : styles.imageOpen,
+                )}
               />
             </LightboxStage>
-            <div {...stylex.props(ui.columns, styles.bar)}>
-              <p aria-live="polite" {...stylex.props(styles.arm)}>
-                <span aria-hidden="true" {...stylex.props(type.counterweight, styles.count)}>
+            <div {...stylex.attrs(ui.columns, styles.bar)}>
+              <p aria-live="polite" {...stylex.attrs(styles.arm)}>
+                <span aria-hidden="true" {...stylex.attrs(type.counterweight, styles.count)}>
                   {String(index + 1).padStart(2, "0")}
-                  <span {...stylex.props(styles.total)}>
-                    /{String(photos.length).padStart(2, "0")}
+                  <span {...stylex.attrs(styles.total)}>
+                    /{String(props.photos.length).padStart(2, "0")}
                   </span>
                 </span>
-                <span {...stylex.props(type.light, styles.caption)}>{photo.caption}</span>
-                <span lang="en" {...stylex.props(type.serif, styles.english)}>
+                <span {...stylex.attrs(type.light, styles.caption)}>{photo.caption}</span>
+                <span lang="en" {...stylex.attrs(type.serif, styles.english)}>
                   {photo.english}
                 </span>
                 <span {...srOnly}>
-                  Photo {index + 1} of {photos.length}
+                  Photo {index + 1} of {props.photos.length}
                 </span>
               </p>
-              <div {...stylex.props(styles.controls)}>
-                <div {...stylex.props(styles.pager)}>
+              <div {...stylex.attrs(styles.controls)}>
+                <div {...stylex.attrs(styles.pager)}>
                   <button
                     type="button"
                     aria-label="Previous photo"
                     onClick={() => onStep(-1)}
-                    {...stylex.props(styles.button, ui.focusRing)}
+                    {...stylex.attrs(styles.button, ui.focusRing)}
                   >
                     <ArrowLeft size={20} strokeWidth={1.5} aria-hidden="true" />
                   </button>
@@ -195,7 +196,7 @@ export function Lightbox({
                     type="button"
                     aria-label="Next photo"
                     onClick={() => onStep(1)}
-                    {...stylex.props(styles.button, ui.focusRing)}
+                    {...stylex.attrs(styles.button, ui.focusRing)}
                   >
                     <ArrowRight size={20} strokeWidth={1.5} aria-hidden="true" />
                   </button>
@@ -208,7 +209,7 @@ export function Lightbox({
             aria-label="Close"
             ref={closeRef}
             onClick={onClose}
-            {...stylex.props(styles.button, styles.close, ui.focusRing)}
+            {...stylex.attrs(styles.button, styles.close, ui.focusRing)}
           >
             <X size={20} strokeWidth={1.5} aria-hidden="true" />
           </button>

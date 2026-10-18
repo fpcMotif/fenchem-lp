@@ -1,8 +1,10 @@
 import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { ArrowLeft, ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
-import { m } from "motion/react";
-import { useLayoutEffect, useRef, useState } from "react";
+import type { StyleXStyles } from "@stylexjs/stylex";
+import { ArrowLeft, ArrowRight, ChevronLeft, ChevronRight } from "@fenchem-lp/ui/components/lucide";
+import { createEffect, createMemo, createSignal, For, onCleanup, Show, untrack } from "solid-js";
+
+import { m } from "@/compat/motion";
 
 import { EASE } from "../../motion-constants";
 import { color } from "../../variant-oos1/tokens.stylex";
@@ -26,6 +28,9 @@ import {
 import { lab } from "../tokens.stylex";
 
 const DESKTOP = breakpoints.xl;
+
+const sxProps = (...args: ReadonlyArray<StyleXStyles | false | null | undefined>) =>
+  stylex.attrs(...args);
 
 const styles = stylex.create({
   shelf: {
@@ -301,243 +306,252 @@ const styles = stylex.create({
   },
 });
 
-export function ShelfVariant({ onNavigateHome }: SubPageProps) {
+export function ShelfVariant(props: SubPageProps) {
   const articles = useLabArticles();
-  const [readingId, setReadingId] = useState<string | null>(null);
-  const cameFrom = useRef<string | null>(null);
-  const stageRef = useRef<HTMLDivElement>(null);
-  const headingRef = useRef<HTMLHeadingElement>(null);
-  const cardRefs = useRef(new Map<string, HTMLButtonElement>());
-  const readingIndex = articles.findIndex((article) => article.id === readingId);
-  const reading = readingIndex >= 0 ? articles[readingIndex] : undefined;
+  const [readingId, setReadingId] = createSignal<string | null>(null);
+  let cameFrom: string | null = null;
+  let stage: HTMLDivElement | undefined;
+  let heading: HTMLHeadingElement | undefined;
+  const cards = new Map<string, HTMLButtonElement>();
+  const readingIndex = createMemo(() =>
+    articles().findIndex((article) => article.id === readingId()),
+  );
+  const reading = createMemo(() => (readingIndex() >= 0 ? articles()[readingIndex()] : undefined));
 
-  useLayoutEffect(() => {
-    const stage = stageRef.current;
+  createEffect(readingId, (id) => {
     if (!stage) return;
-    if (readingId) {
+    if (id) {
       if (isAboveReadingLine(stage)) jumpTo(stage);
-      headingRef.current?.focus({ preventScroll: true });
+      heading?.focus({ preventScroll: true });
       return;
     }
-    const origin = cameFrom.current ? cardRefs.current.get(cameFrom.current) : undefined;
+    const origin = cameFrom ? cards.get(cameFrom) : undefined;
     if (!origin) return;
     const card = origin.closest("li") ?? origin;
     const box = card.getBoundingClientRect();
     if (box.top < 0 || box.bottom > window.innerHeight) jumpTo(card);
     origin.focus({ preventScroll: true });
-  }, [readingId]);
+  });
 
   const read = (id: string) => {
-    cameFrom.current = id;
+    cameFrom = id;
     setReadingId(id);
   };
 
   return (
     <LabPage
-      onNavigateHome={onNavigateHome}
-      chips={reading ? sectionChips(reading) : articleIdChips(articles)}
-      onSelectChip={reading ? undefined : read}
+      onNavigateHome={props.onNavigateHome}
+      chips={reading() ? sectionChips(reading()!) : articleIdChips(articles())}
+      onSelectChip={reading() ? undefined : read}
     >
-      <div ref={stageRef} {...stylex.props(kitStyles.anchor)}>
-        <m.div
-          key={reading?.id ?? "shelf"}
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.24, ease: EASE }}
-        >
-          {reading ? (
-            <Reader
-              article={reading}
-              index={readingIndex}
-              total={articles.length}
-              next={articles[readingIndex + 1]}
-              headingRef={headingRef}
-              onBack={() => setReadingId(null)}
-              onGo={(offset) => {
-                const target = articles[readingIndex + offset];
-                if (target) read(target.id);
-              }}
-            />
-          ) : (
-            <div {...stylex.props(styles.shelf)}>
-              <div {...stylex.props(labStyles.listHeader)}>
-                <p {...stylex.props(labStyles.listLabel)}>全部洞察</p>
-                <p {...stylex.props(labStyles.listCount)}>{`共 ${articles.length} 篇`}</p>
-              </div>
-              <ul {...stylex.props(styles.grid, articles.length === 3 && styles.gridThree)}>
-                {articles.map((article, index) => (
-                  <li key={article.id}>
-                    <ShelfCard
-                      article={article}
-                      index={index}
-                      buttonRef={(node) => {
-                        if (node) cardRefs.current.set(article.id, node);
-                        else cardRefs.current.delete(article.id);
-                      }}
-                      onRead={() => read(article.id)}
-                    />
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-        </m.div>
+      <div ref={stage} {...stylex.attrs(kitStyles.anchor)}>
+        <Show when={reading()?.id ?? "shelf"} keyed>
+          {(_key) => {
+            const current = untrack(reading);
+            return (
+              <m.div
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.24, ease: EASE }}
+              >
+                {current ? (
+                  <Reader
+                    article={current}
+                    index={readingIndex()}
+                    total={articles().length}
+                    next={articles()[readingIndex() + 1]}
+                    headingRef={(node) => {
+                      heading = node;
+                    }}
+                    onBack={() => setReadingId(null)}
+                    onGo={(offset) => {
+                      const target = articles()[readingIndex() + offset];
+                      if (target) read(target.id);
+                    }}
+                  />
+                ) : (
+                  <div {...stylex.attrs(styles.shelf)}>
+                    <div {...stylex.attrs(labStyles.listHeader)}>
+                      <p {...stylex.attrs(labStyles.listLabel)}>全部洞察</p>
+                      <p {...stylex.attrs(labStyles.listCount)}>{`共 ${articles().length} 篇`}</p>
+                    </div>
+                    <ul {...sxProps(styles.grid, articles().length === 3 && styles.gridThree)}>
+                      <For each={articles()}>
+                        {(article, index) => {
+                          onCleanup(() => cards.delete(article.id));
+                          return (
+                            <li>
+                              <ShelfCard
+                                article={article}
+                                index={index()}
+                                buttonRef={(node) => {
+                                  cards.set(article.id, node);
+                                }}
+                                onRead={() => read(article.id)}
+                              />
+                            </li>
+                          );
+                        }}
+                      </For>
+                    </ul>
+                  </div>
+                )}
+              </m.div>
+            );
+          }}
+        </Show>
       </div>
     </LabPage>
   );
 }
 
-function ShelfCard({
-  article,
-  index,
-  buttonRef,
-  onRead,
-}: {
+function ShelfCard(props: {
   article: LabArticle;
   index: number;
-  buttonRef: (node: HTMLButtonElement | null) => void;
+  buttonRef: (node: HTMLButtonElement) => void;
   onRead: () => void;
 }) {
   return (
-    <article {...stylex.props(styles.card, stylex.defaultMarker())}>
-      <div {...stylex.props(styles.media)}>
+    <article {...stylex.attrs(styles.card, stylex.defaultMarker())}>
+      <div {...stylex.attrs(styles.media)}>
         <img
-          src={article.image}
+          src={props.article.image}
           alt=""
           loading="lazy"
           decoding="async"
-          {...stylex.props(styles.image)}
+          {...stylex.attrs(styles.image)}
         />
-        <span {...stylex.props(styles.index, labStyles.displayNumber)}>{padIndex(index)}</span>
+        <span {...stylex.attrs(styles.index, labStyles.displayNumber)}>
+          {padIndex(props.index)}
+        </span>
       </div>
-      <div {...stylex.props(styles.cardBody)}>
-        <ArticleMeta article={article} />
-        <h2 {...stylex.props(styles.cardTitle)}>
+      <div {...stylex.attrs(styles.cardBody)}>
+        <ArticleMeta article={props.article} />
+        <h2 {...stylex.attrs(styles.cardTitle)}>
           <button
-            ref={buttonRef}
+            ref={(node) => props.buttonRef(node)}
             type="button"
-            onClick={onRead}
-            {...stylex.props(styles.cardButton)}
+            onClick={() => props.onRead()}
+            {...stylex.attrs(styles.cardButton)}
           >
-            {article.title}
+            {props.article.title}
           </button>
         </h2>
-        {article.lead ? <p {...stylex.props(styles.cardLead)}>{article.lead}</p> : null}
-        <span aria-hidden="true" {...stylex.props(styles.cardCta)}>
+        <Show when={props.article.lead}>
+          <p {...stylex.attrs(styles.cardLead)}>{props.article.lead}</p>
+        </Show>
+        <span aria-hidden="true" {...stylex.attrs(styles.cardCta)}>
           阅读全文
-          <ArrowRight size={16} strokeWidth={2} {...stylex.props(styles.cardArrow)} />
+          <ArrowRight size={16} strokeWidth={2} {...stylex.attrs(styles.cardArrow)} />
         </span>
       </div>
     </article>
   );
 }
 
-function Reader({
-  article,
-  index,
-  total,
-  next,
-  headingRef,
-  onBack,
-  onGo,
-}: {
+function Reader(props: {
   article: LabArticle;
   index: number;
   total: number;
   next: LabArticle | undefined;
-  headingRef: { current: HTMLHeadingElement | null };
+  headingRef: (node: HTMLHeadingElement) => void;
   onBack: () => void;
   onGo: (offset: number) => void;
 }) {
+  const article = untrack(() => props.article);
   const titleId = `${article.id}-shelf-title`;
   return (
-    <article aria-labelledby={titleId} {...stylex.props(styles.reader)}>
-      <div {...stylex.props(styles.bar)}>
+    <article aria-labelledby={titleId} {...stylex.attrs(styles.reader)}>
+      <div {...stylex.attrs(styles.bar)}>
         <button
           type="button"
-          onClick={onBack}
-          {...stylex.props(labStyles.textButton, kitStyles.focusRing)}
+          onClick={() => props.onBack()}
+          {...stylex.attrs(labStyles.textButton, kitStyles.focusRing)}
         >
           <ArrowLeft size={18} strokeWidth={2} aria-hidden="true" />
           全部洞察
         </button>
-        <div {...stylex.props(styles.barRight)}>
-          <span {...stylex.props(styles.position, labStyles.displayNumber)}>
-            {`${padIndex(index)} / ${padIndex(total - 1)}`}
+        <div {...stylex.attrs(styles.barRight)}>
+          <span {...stylex.attrs(styles.position, labStyles.displayNumber)}>
+            {`${padIndex(props.index)} / ${padIndex(props.total - 1)}`}
           </span>
           <button
             type="button"
             aria-label="上一篇"
-            disabled={index === 0}
-            onClick={() => onGo(-1)}
-            {...stylex.props(styles.iconButton, kitStyles.focusRing)}
+            disabled={props.index === 0}
+            onClick={() => props.onGo(-1)}
+            {...stylex.attrs(styles.iconButton, kitStyles.focusRing)}
           >
             <ChevronLeft size={18} strokeWidth={2} aria-hidden="true" />
           </button>
           <button
             type="button"
             aria-label="下一篇"
-            disabled={index === total - 1}
-            onClick={() => onGo(1)}
-            {...stylex.props(styles.iconButton, kitStyles.focusRing)}
+            disabled={props.index === props.total - 1}
+            onClick={() => props.onGo(1)}
+            {...stylex.attrs(styles.iconButton, kitStyles.focusRing)}
           >
             <ChevronRight size={18} strokeWidth={2} aria-hidden="true" />
           </button>
         </div>
       </div>
 
-      <header {...stylex.props(styles.head)}>
+      <header {...stylex.attrs(styles.head)}>
         <ArticleMeta article={article} />
         <h2
-          ref={headingRef}
+          ref={(node) => props.headingRef(node)}
           id={titleId}
-          tabIndex={-1}
-          {...stylex.props(labStyles.docTitle, styles.headTitle)}
+          tabindex={-1}
+          {...stylex.attrs(labStyles.docTitle, styles.headTitle)}
         >
           {article.title}
         </h2>
-        {article.lead ? <p {...stylex.props(labStyles.docLead)}>{article.lead}</p> : null}
+        <Show when={article.lead}>
+          <p {...stylex.attrs(labStyles.docLead)}>{article.lead}</p>
+        </Show>
       </header>
 
-      <div {...stylex.props(labStyles.stack)}>
+      <div {...stylex.attrs(labStyles.stack)}>
         <ArticlePreview article={article} />
-        <div {...stylex.props(styles.sectionsGap)}>
+        <div {...stylex.attrs(styles.sectionsGap)}>
           <ArticleSections article={article} />
         </div>
       </div>
 
-      <footer {...stylex.props(styles.footer)}>
-        {next ? (
+      <footer {...stylex.attrs(styles.footer)}>
+        <Show when={props.next}>
+          {(next) => (
+            <button
+              type="button"
+              onClick={() => props.onGo(1)}
+              {...stylex.attrs(styles.next, kitStyles.focusRing, stylex.defaultMarker())}
+            >
+              <span {...stylex.attrs(styles.nextMedia)}>
+                <img
+                  src={next().image}
+                  alt=""
+                  loading="lazy"
+                  decoding="async"
+                  {...stylex.attrs(styles.image)}
+                />
+              </span>
+              <span {...stylex.attrs(styles.nextText)}>
+                <span
+                  {...stylex.attrs(styles.nextLabel)}
+                >{`下一篇 · 约 ${readMinutes(next())} 分钟`}</span>
+                <span {...stylex.attrs(styles.nextTitle)}>{next().title}</span>
+              </span>
+              <span aria-hidden="true" {...stylex.attrs(styles.nextArrow)}>
+                <ArrowRight size={20} strokeWidth={2} />
+              </span>
+            </button>
+          )}
+        </Show>
+        <div {...stylex.attrs(styles.footerActions)}>
           <button
             type="button"
-            onClick={() => onGo(1)}
-            {...stylex.props(styles.next, kitStyles.focusRing, stylex.defaultMarker())}
-          >
-            <span {...stylex.props(styles.nextMedia)}>
-              <img
-                src={next.image}
-                alt=""
-                loading="lazy"
-                decoding="async"
-                {...stylex.props(styles.image)}
-              />
-            </span>
-            <span {...stylex.props(styles.nextText)}>
-              <span
-                {...stylex.props(styles.nextLabel)}
-              >{`下一篇 · 约 ${readMinutes(next)} 分钟`}</span>
-              <span {...stylex.props(styles.nextTitle)}>{next.title}</span>
-            </span>
-            <span aria-hidden="true" {...stylex.props(styles.nextArrow)}>
-              <ArrowRight size={20} strokeWidth={2} />
-            </span>
-          </button>
-        ) : null}
-        <div {...stylex.props(styles.footerActions)}>
-          <button
-            type="button"
-            onClick={onBack}
-            {...stylex.props(labStyles.pillButton, kitStyles.focusRing)}
+            onClick={() => props.onBack()}
+            {...stylex.attrs(labStyles.pillButton, kitStyles.focusRing)}
           >
             <ArrowLeft size={18} strokeWidth={2} aria-hidden="true" />
             返回全部洞察

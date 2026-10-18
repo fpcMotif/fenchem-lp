@@ -93,48 +93,48 @@ const s = stylex.create({
   },
 });
 
-export function Products({ onNavigateHome }: { onNavigateHome: (hash?: string) => void }) {
+export function Products(props: { onNavigateHome: (hash?: string) => void }) {
   return (
     <Section id="about-products" label="Products and application solutions" background={ui.onPage}>
       <Reveal sx={s.intro}>
-        <p {...stylex.props(s.lead)}>{PRODUCTS_INTRO.lead}</p>
+        <p {...stylex.attrs(s.lead)}>{PRODUCTS_INTRO.lead}</p>
         <button
           type="button"
-          onClick={() => onNavigateHome("products")}
-          {...stylex.props(ui.button, ui.buttonSecondary, ui.focusRing)}
+          onClick={() => props.onNavigateHome("products")}
+          {...stylex.attrs(ui.button, ui.buttonSecondary, ui.focusRing)}
         >
           {PRODUCTS_INTRO.cta.label}
         </button>
       </Reveal>
-      <ul {...stylex.props(s.grid)}>
+      <ul {...stylex.attrs(s.grid)}>
         {PRODUCTS.map((product, idx) => (
-          <Reveal key={product.title} as="li" step={idx % 2}>
-            <article {...stylex.props(s.card)}>
-              <div {...stylex.props(ui.frame, s.frame)}>
+          <Reveal as="li" step={idx % 2}>
+            <article {...stylex.attrs(s.card)}>
+              <div {...stylex.attrs(ui.frame, s.frame)}>
                 <img
                   src={product.image}
                   alt=""
                   loading="lazy"
                   decoding="async"
-                  {...stylex.props(ui.fill)}
+                  {...stylex.attrs(ui.fill)}
                 />
               </div>
-              <h3 {...stylex.props(s.name)}>
+              <h3 {...stylex.attrs(s.name)}>
                 <a
                   href="#products"
                   onClick={(event) => {
                     event.preventDefault();
-                    onNavigateHome("products");
+                    props.onNavigateHome("products");
                   }}
-                  {...stylex.props(s.link)}
+                  {...stylex.attrs(s.link)}
                 >
                   {product.title}
                 </a>
               </h3>
-              <p {...stylex.props(s.desc)}>{product.description}</p>
-              <ul {...stylex.props(s.tags)}>
+              <p {...stylex.attrs(s.desc)}>{product.description}</p>
+              <ul {...stylex.attrs(s.tags)}>
                 {product.tags.map((tag) => (
-                  <li key={tag}>{tag}</li>
+                  <li>{tag}</li>
                 ))}
               </ul>
             </article>

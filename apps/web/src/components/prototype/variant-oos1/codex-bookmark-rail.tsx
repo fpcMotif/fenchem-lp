@@ -1,7 +1,16 @@
 import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { AnimatePresence, m } from "motion/react";
-import { useCallback, useEffect, useRef, useState, type MouseEvent } from "react";
+import { AnimatePresence, m } from "@/compat/motion";
+import {
+  createEffect,
+  createMemo,
+  createSignal,
+  For,
+  onCleanup,
+  Show,
+  untrack,
+  type Accessor,
+} from "solid-js";
 
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 import { color, ease } from "./tokens.stylex";
@@ -24,6 +33,10 @@ function tickCenter(index: number) {
 }
 
 type BarState = "open" | "near" | "active" | "rest";
+
+// stylex.attrs with reactive (accessor) arguments resolves at runtime here, because
+// the StyleX compiler tries to evaluate them at build time and throws.
+const sxProps: typeof stylex.attrs = (...args) => stylex.attrs(...args);
 
 const styles = stylex.create({
   rail: {
@@ -150,10 +163,14 @@ export function scrollToBookmark(id: string, headerOffset = 144) {
   });
 }
 
-export function useBookmarkActive(ids: readonly string[], headerOffset = 160): string {
-  const [activeId, setActiveId] = useState<string>(ids[0] ?? "");
+export function useBookmarkActive(
+  source: readonly string[] | Accessor<readonly string[]>,
+  headerOffset = 160,
+): Accessor<string> {
+  const readIds = typeof source === "function" ? source : () => source;
+  const [activeId, setActiveId] = createSignal<string>(untrack(readIds)[0] ?? "");
 
-  useEffect(() => {
+  createEffect(readIds, (ids) => {
     if (ids.length === 0) return;
 
     let frame = 0;
@@ -169,7 +186,7 @@ export function useBookmarkActive(ids: readonly string[], headerOffset = 160): s
           }
         }
       }
-      setActiveId(current);
+      setActiveId(current ?? "");
     };
 
     const schedule = () => {
@@ -184,7 +201,7 @@ export function useBookmarkActive(ids: readonly string[], headerOffset = 160): s
       window.removeEventListener("resize", schedule);
       if (frame) cancelAnimationFrame(frame);
     };
-  }, [ids, headerOffset]);
+  });
 
   return activeId;
 }
@@ -196,145 +213,147 @@ function barStateFor(index: number, openIndex: number, isActive: boolean): BarSt
   return "rest";
 }
 
-export function CodexBookmarkRail({
-  items,
-  activeId,
-  onSelect,
-}: {
+export function CodexBookmarkRail(props: {
   items: readonly CodexBookmarkItem[];
   activeId: string;
   onSelect: (id: string) => void;
 }) {
   const reduce = useReducedMotion();
-  const [hoveredId, setHoveredId] = useState<string | null>(null);
-  const [pinnedId, setPinnedId] = useState<string | null>(null);
-  const pinTimerRef = useRef<number | undefined>(undefined);
-  const closeTimerRef = useRef<number | undefined>(undefined);
+  const [hoveredId, setHoveredId] = createSignal<string | null>(null);
+  const [pinnedId, setPinnedId] = createSignal<string | null>(null);
+  let pinTimer: number | undefined;
+  let closeTimer: number | undefined;
 
-  const cancelClose = useCallback(() => {
-    clearTimeout(closeTimerRef.current);
-  }, []);
+  const cancelClose = () => {
+    clearTimeout(closeTimer);
+  };
 
-  const scheduleClose = useCallback(() => {
-    clearTimeout(closeTimerRef.current);
-    closeTimerRef.current = window.setTimeout(() => {
+  const scheduleClose = () => {
+    clearTimeout(closeTimer);
+    closeTimer = window.setTimeout(() => {
       setHoveredId(null);
     }, CLOSE_DELAY_MS);
-  }, []);
+  };
 
-  const openTick = useCallback((id: string) => {
-    clearTimeout(closeTimerRef.current);
+  const openTick = (id: string) => {
+    clearTimeout(closeTimer);
     setHoveredId(id);
-  }, []);
+  };
 
-  const handleSelect = useCallback(
-    (id: string, event?: MouseEvent) => {
-      event?.stopPropagation();
-      onSelect(id);
-      setPinnedId(id);
-      clearTimeout(pinTimerRef.current);
-      pinTimerRef.current = window.setTimeout(() => {
-        setPinnedId(null);
-      }, 1400);
-    },
-    [onSelect],
-  );
+  const handleSelect = (id: string, event?: MouseEvent) => {
+    event?.stopPropagation();
+    props.onSelect(id);
+    setPinnedId(id);
+    clearTimeout(pinTimer);
+    pinTimer = window.setTimeout(() => {
+      setPinnedId(null);
+    }, 1400);
+  };
 
-  useEffect(() => {
-    return () => {
-      clearTimeout(pinTimerRef.current);
-      clearTimeout(closeTimerRef.current);
-    };
-  }, []);
+  onCleanup(() => {
+    clearTimeout(pinTimer);
+    clearTimeout(closeTimer);
+  });
 
-  const openId = hoveredId ?? pinnedId;
-  const openIndex = openId === null ? -1 : items.findIndex((item) => item.id === openId);
-  const openItem = openIndex === -1 ? null : items[openIndex];
-  const cardY = openIndex === -1 ? 0 : tickCenter(openIndex);
+  const openId = () => hoveredId() ?? pinnedId();
+  const openIndex = createMemo(() => {
+    const id = openId();
+    return id === null ? -1 : props.items.findIndex((item) => item.id === id);
+  });
+  const openItem = () => (openIndex() === -1 ? null : props.items[openIndex()]);
+  const cardY = () => (openIndex() === -1 ? 0 : tickCenter(openIndex()));
 
   return (
     <nav
       aria-label="文章书签导航"
-      {...stylex.props(styles.rail)}
+      {...stylex.attrs(styles.rail)}
       onMouseEnter={cancelClose}
       onMouseLeave={scheduleClose}
     >
-      {items.map((item, index) => {
-        const isActive = item.id === activeId;
-        const barState = barStateFor(index, openIndex, isActive);
+      <For each={props.items}>
+        {(item, index) => {
+          const isActive = () => item.id === props.activeId;
+          const barState = () => barStateFor(index(), openIndex(), isActive());
 
-        return (
-          <div key={item.id} {...stylex.props(styles.tickItem)}>
-            <button
-              type="button"
-              aria-label={`${item.title} — 书签`}
-              aria-current={isActive ? "location" : undefined}
-              onClick={(e) => handleSelect(item.id, e)}
-              onMouseEnter={() => openTick(item.id)}
-              onFocus={() => openTick(item.id)}
-              onBlur={scheduleClose}
-              {...stylex.props(styles.tickButton)}
-            >
-              <span
-                aria-hidden="true"
-                {...stylex.props(
-                  styles.bar,
-                  barState === "open" && styles.barOpen,
-                  barState === "near" && styles.barNear,
-                  barState === "active" && styles.barActive,
-                  barState === "rest" && styles.barRest,
-                )}
-              />
-            </button>
-          </div>
-        );
-      })}
+          return (
+            <div {...stylex.attrs(styles.tickItem)}>
+              <button
+                type="button"
+                aria-label={`${item.title} — 书签`}
+                aria-current={isActive() ? "location" : undefined}
+                onClick={(e) => handleSelect(item.id, e)}
+                onMouseEnter={() => openTick(item.id)}
+                onFocus={() => openTick(item.id)}
+                onBlur={scheduleClose}
+                {...stylex.attrs(styles.tickButton)}
+              >
+                <span
+                  aria-hidden="true"
+                  {...sxProps(
+                    styles.bar,
+                    barState() === "open" && styles.barOpen,
+                    barState() === "near" && styles.barNear,
+                    barState() === "active" && styles.barActive,
+                    barState() === "rest" && styles.barRest,
+                  )}
+                />
+              </button>
+            </div>
+          );
+        }}
+      </For>
 
       <AnimatePresence>
-        {openItem ? (
-          <m.div
-            key="card-anchor"
-            initial={
-              reduce ? { opacity: 0, y: cardY } : { opacity: 0, x: -4, scale: 0.97, y: cardY }
-            }
-            animate={{ opacity: 1, x: 0, scale: 1, y: cardY }}
-            exit={
-              reduce
-                ? { opacity: 0, transition: { duration: 0.12 } }
-                : {
-                    opacity: 0,
-                    x: -4,
-                    scale: 0.97,
-                    transition: { duration: 0.12, ease: EASE_OUT },
-                  }
-            }
-            transition={
-              reduce
-                ? { duration: 0.12, y: { duration: 0 } }
-                : { duration: 0.18, ease: EASE_OUT, y: CARD_SPRING }
-            }
-            {...stylex.props(styles.cardAnchor)}
-            onMouseEnter={cancelClose}
-            onClick={(e) => handleSelect(openItem.id, e)}
-          >
-            <div {...stylex.props(styles.card)}>
-              <AnimatePresence mode="popLayout" initial={false}>
-                <m.div
-                  key={openItem.id}
-                  initial={reduce ? { opacity: 0 } : { opacity: 0, filter: "blur(2px)" }}
-                  animate={{ opacity: 1, filter: "blur(0px)" }}
-                  exit={reduce ? { opacity: 0 } : { opacity: 0, filter: "blur(2px)" }}
-                  transition={{ duration: reduce ? 0 : 0.14, ease: EASE_OUT }}
-                >
-                  <span {...stylex.props(styles.cardTitle)} title={openItem.title}>
-                    {openItem.title}
-                  </span>
-                  <p {...stylex.props(styles.cardSummary)}>{openItem.summary}</p>
-                </m.div>
-              </AnimatePresence>
-            </div>
-          </m.div>
-        ) : null}
+        <Show when={openItem()}>
+          {(anchored) => (
+            <m.div
+              initial={
+                reduce()
+                  ? { opacity: 0, y: cardY() }
+                  : { opacity: 0, x: -4, scale: 0.97, y: cardY() }
+              }
+              animate={{ opacity: 1, x: 0, scale: 1, y: cardY() }}
+              exit={
+                reduce()
+                  ? { opacity: 0, transition: { duration: 0.12 } }
+                  : {
+                      opacity: 0,
+                      x: -4,
+                      scale: 0.97,
+                      transition: { duration: 0.12, ease: EASE_OUT },
+                    }
+              }
+              transition={
+                reduce()
+                  ? { duration: 0.12, y: { duration: 0 } }
+                  : { duration: 0.18, ease: EASE_OUT, y: CARD_SPRING }
+              }
+              {...stylex.attrs(styles.cardAnchor)}
+              onMouseEnter={cancelClose}
+              onClick={(e: MouseEvent) => handleSelect(anchored().id, e)}
+            >
+              <div {...stylex.attrs(styles.card)}>
+                <AnimatePresence mode="popLayout" initial={false}>
+                  <Show when={anchored()} keyed>
+                    {(shown) => (
+                      <m.div
+                        initial={reduce() ? { opacity: 0 } : { opacity: 0, filter: "blur(2px)" }}
+                        animate={{ opacity: 1, filter: "blur(0px)" }}
+                        exit={reduce() ? { opacity: 0 } : { opacity: 0, filter: "blur(2px)" }}
+                        transition={{ duration: reduce() ? 0 : 0.14, ease: EASE_OUT }}
+                      >
+                        <span {...stylex.attrs(styles.cardTitle)} title={shown.title}>
+                          {shown.title}
+                        </span>
+                        <p {...stylex.attrs(styles.cardSummary)}>{shown.summary}</p>
+                      </m.div>
+                    )}
+                  </Show>
+                </AnimatePresence>
+              </div>
+            </m.div>
+          )}
+        </Show>
       </AnimatePresence>
     </nav>
   );

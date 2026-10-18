@@ -1,15 +1,9 @@
 import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { ArrowUp, ChevronLeft, ChevronRight } from "lucide-react";
-import { m } from "motion/react";
-import {
-  useEffect,
-  useRef,
-  useState,
-  type KeyboardEvent,
-  type MouseEvent,
-  type ReactNode,
-} from "react";
+import { ArrowUp, ChevronLeft, ChevronRight } from "@fenchem-lp/ui/components/lucide";
+import { m } from "@/compat/motion";
+import type { JSX } from "@solidjs/web";
+import { createEffect, createSignal, flush, For, Show, untrack } from "solid-js";
 
 import { EASE } from "@/components/prototype/motion-constants";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
@@ -27,6 +21,10 @@ const TOTAL = SOLUTION_ITEMS.length;
 
 const tabId = (formulaId: string) => `oos1pc-tab-${formulaId}`;
 const panelId = (formulaId: string) => `oos1pc-panel-${formulaId}`;
+
+// stylex.attrs with reactive (accessor) arguments resolves at runtime here, because
+// the StyleX compiler tries to evaluate them at build time and throws.
+const sxProps: typeof stylex.attrs = (...args) => stylex.attrs(...args);
 
 const styles = stylex.create({
   section: {
@@ -422,93 +420,91 @@ const styles = stylex.create({
   },
 });
 
-function Trademarked({ text }: { text: string }) {
-  const [mark, rest] = text.split("™");
-  if (rest === undefined) return <>{text}</>;
+function Trademarked(props: { text: string }) {
+  const [mark, rest] = untrack(() => props.text).split("™");
+  if (rest === undefined) return <>{props.text}</>;
   return (
     <>
       {mark}
-      <sup {...stylex.props(styles.trademark)}>™</sup>
+      <sup {...stylex.attrs(styles.trademark)}>™</sup>
       {rest}
     </>
   );
 }
 
-function Lines({ lines }: { lines: string[] }) {
+function Lines(props: { lines: string[] }) {
   return (
-    <ul {...stylex.props(styles.lines)}>
-      {lines.map((line) => (
-        <li key={line}>{line}</li>
-      ))}
+    <ul {...stylex.attrs(styles.lines)}>
+      <For each={props.lines}>{(line) => <li>{line}</li>}</For>
     </ul>
   );
 }
 
-function Field({ label, children }: { label: string; children: ReactNode }) {
+function Field(props: { label: string; children: JSX.Element }) {
   return (
-    <div {...stylex.props(styles.field)}>
-      <dt {...stylex.props(styles.fieldLabel)}>{label}</dt>
-      <dd {...stylex.props(styles.fieldValue)}>{children}</dd>
+    <div {...stylex.attrs(styles.field)}>
+      <dt {...stylex.attrs(styles.fieldLabel)}>{props.label}</dt>
+      <dd {...stylex.attrs(styles.fieldValue)}>{props.children}</dd>
     </div>
   );
 }
 
-function IngredientName({ part }: { part: IngredientPart }) {
+function IngredientName(props: { part: IngredientPart }) {
   return (
-    <span {...stylex.props(styles.ingredientName)}>
-      <Trademarked text={part.name} />
-      {part.note && <span {...stylex.props(styles.ingredientNote)}>{part.note}</span>}
+    <span {...stylex.attrs(styles.ingredientName)}>
+      <Trademarked text={props.part.name} />
+      {props.part.note && <span {...stylex.attrs(styles.ingredientNote)}>{props.part.note}</span>}
     </span>
   );
 }
 
-function IngredientList({ formulaId }: { formulaId: string }) {
+function IngredientList(props: { formulaId: string }) {
   const reduce = useReducedMotion();
-  const { parts, catalogCount } = FORMULA_INGREDIENTS[formulaId] ?? {
+  const { parts, catalogCount } = FORMULA_INGREDIENTS[untrack(() => props.formulaId)] ?? {
     parts: [],
     catalogCount: 0,
   };
 
-  const goToCatalogItem = (event: MouseEvent<HTMLAnchorElement>, catalogId: string) => {
+  const goToCatalogItem = (event: MouseEvent, catalogId: string) => {
     const row = document.getElementById(catalogRowId(catalogId));
     if (!row) return;
     event.preventDefault();
     row.focus({ preventScroll: true });
-    row.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "center" });
+    row.scrollIntoView({ behavior: reduce() ? "auto" : "smooth", block: "center" });
     flashCatalogItem(catalogId);
   };
 
   return (
     <>
-      <ul {...stylex.props(styles.ingredients)}>
+      <ul {...stylex.attrs(styles.ingredients)}>
         {parts.map((part) => {
           const { catalogId } = part;
           return (
-            <li key={part.key} {...stylex.props(styles.ingredient)}>
+            <li {...stylex.attrs(styles.ingredient)}>
               {catalogId ? (
                 <a
                   href={`#${catalogRowId(catalogId)}`}
                   onClick={(event) => goToCatalogItem(event, catalogId)}
-                  {...stylex.props(
+                  {...stylex.attrs(
                     styles.ingredientRow,
                     styles.ingredientLink,
                     stylex.defaultMarker(),
                   )}
                 >
                   <IngredientName part={part} />
-                  <span {...stylex.props(styles.affordance)}>
+                  <span {...stylex.attrs(styles.affordance)}>
                     目录
                     <ArrowUp
                       size={12}
                       strokeWidth={1.75}
                       absoluteStrokeWidth
                       aria-hidden="true"
-                      {...stylex.props(styles.affordanceIcon)}
+                      {...stylex.attrs(styles.affordanceIcon)}
                     />
                   </span>
                 </a>
               ) : (
-                <span {...stylex.props(styles.ingredientRow)}>
+                <span {...stylex.attrs(styles.ingredientRow)}>
                   <IngredientName part={part} />
                 </span>
               )}
@@ -517,53 +513,46 @@ function IngredientList({ formulaId }: { formulaId: string }) {
         })}
       </ul>
       {catalogCount > 0 && (
-        <p {...stylex.props(styles.catalogNote)}>其中 {catalogCount} 种可在产品目录中找到</p>
+        <p {...stylex.attrs(styles.catalogNote)}>其中 {catalogCount} 种可在产品目录中找到</p>
       )}
     </>
   );
 }
 
-function FormulaPanel({
-  item,
-  index,
-  isActive,
-}: {
-  item: SolutionItem;
-  index: number;
-  isActive: boolean;
-}) {
+function FormulaPanel(props: { item: SolutionItem; index: number; isActive: boolean }) {
   const reduce = useReducedMotion();
+  const item = props.item;
   const hasCatalogLinks = (FORMULA_INGREDIENTS[item.id]?.catalogCount ?? 0) > 0;
   return (
     <m.div
       role="tabpanel"
       id={panelId(item.id)}
       aria-labelledby={tabId(item.id)}
-      tabIndex={hasCatalogLinks ? undefined : 0}
-      inert={!isActive}
+      tabindex={hasCatalogLinks ? undefined : 0}
+      inert={!props.isActive}
       initial={false}
-      animate={isActive ? { opacity: 1, y: 0 } : { opacity: 0, y: 6 }}
-      transition={isActive ? { duration: reduce ? 0 : 0.24, ease: EASE } : { duration: 0 }}
-      {...stylex.props(styles.panel, !isActive && styles.panelHidden)}
+      animate={props.isActive ? { opacity: 1, y: 0 } : { opacity: 0, y: 6 }}
+      transition={props.isActive ? { duration: reduce() ? 0 : 0.24, ease: EASE } : { duration: 0 }}
+      {...stylex.attrs(styles.panel, !props.isActive && styles.panelHidden)}
     >
-      <header {...stylex.props(styles.sheetHead)}>
-        <p {...stylex.props(styles.sheetIndex)}>
-          {padIndex(index)}
-          <span {...stylex.props(styles.sheetTotal)}> / {padIndex(TOTAL - 1)}</span>
+      <header {...stylex.attrs(styles.sheetHead)}>
+        <p {...stylex.attrs(styles.sheetIndex)}>
+          {padIndex(props.index)}
+          <span {...stylex.attrs(styles.sheetTotal)}> / {padIndex(TOTAL - 1)}</span>
         </p>
-        <h3 {...stylex.props(styles.sheetTitle)}>{item.title}</h3>
-        <p {...stylex.props(styles.sheetSubtitle)}>{item.subtitle}</p>
+        <h3 {...stylex.attrs(styles.sheetTitle)}>{item.title}</h3>
+        <p {...stylex.attrs(styles.sheetSubtitle)}>{item.subtitle}</p>
       </header>
-      <div {...stylex.props(styles.body)}>
-        <dl {...stylex.props(styles.column, styles.columnCentre)}>
-          <div {...stylex.props(styles.field)}>
-            <dt {...stylex.props(styles.fieldLabel, styles.fieldLabelCentre)}>功能性成分</dt>
-            <dd {...stylex.props(styles.fieldValue)}>
+      <div {...stylex.attrs(styles.body)}>
+        <dl {...stylex.attrs(styles.column, styles.columnCentre)}>
+          <div {...stylex.attrs(styles.field)}>
+            <dt {...stylex.attrs(styles.fieldLabel, styles.fieldLabelCentre)}>功能性成分</dt>
+            <dd {...stylex.attrs(styles.fieldValue)}>
               <IngredientList formulaId={item.id} />
             </dd>
           </div>
         </dl>
-        <dl {...stylex.props(styles.column, styles.columnLeft)}>
+        <dl {...stylex.attrs(styles.column, styles.columnLeft)}>
           <Field label="概述">
             <Lines lines={item.overview} />
           </Field>
@@ -571,7 +560,7 @@ function FormulaPanel({
             <Lines lines={item.functions} />
           </Field>
         </dl>
-        <dl {...stylex.props(styles.column, styles.columnRight)}>
+        <dl {...stylex.attrs(styles.column, styles.columnRight)}>
           {item.challenges.length > 0 && (
             <Field label="配方挑战">
               <Lines lines={item.challenges} />
@@ -589,45 +578,41 @@ function FormulaPanel({
   );
 }
 
-function StepButton({
-  direction,
-  target,
-  onStep,
-}: {
+function StepButton(props: {
   direction: "previous" | "next";
   target: number | null;
   onStep: (index: number) => void;
 }) {
-  const neighbour = target === null ? null : SOLUTION_ITEMS[target];
-  const isNext = direction === "next";
+  const neighbour = () => (props.target === null ? null : SOLUTION_ITEMS[props.target]);
+  const isNext = untrack(() => props.direction) === "next";
   const Icon = isNext ? ChevronRight : ChevronLeft;
+  const neighbourLabel = () => (
+    <Show when={neighbour()}>
+      {(entry) => (
+        <span {...stylex.attrs(styles.stepNeighbour)}>
+          <span {...stylex.attrs(styles.stepNeighbourIndex)}>{padIndex(props.target!)}</span>
+          {entry().title}
+        </span>
+      )}
+    </Show>
+  );
   return (
     <button
       type="button"
-      aria-disabled={neighbour === null}
+      aria-disabled={neighbour() === null ? "true" : "false"}
       onClick={() => {
-        if (target !== null) onStep(target);
+        if (props.target !== null) props.onStep(props.target);
       }}
-      {...stylex.props(
+      {...sxProps(
         styles.step,
         isNext && styles.stepNext,
-        neighbour === null && styles.stepDisabled,
+        neighbour() === null && styles.stepDisabled,
       )}
     >
       {!isNext && <Icon size={16} strokeWidth={1.5} absoluteStrokeWidth aria-hidden="true" />}
-      {isNext && neighbour && target !== null && (
-        <span {...stylex.props(styles.stepNeighbour)}>
-          <span {...stylex.props(styles.stepNeighbourIndex)}>{padIndex(target)}</span>
-          {neighbour.title}
-        </span>
-      )}
+      {isNext && neighbourLabel()}
       <span>{isNext ? "下一个" : "上一个"}</span>
-      {!isNext && neighbour && target !== null && (
-        <span {...stylex.props(styles.stepNeighbour)}>
-          <span {...stylex.props(styles.stepNeighbourIndex)}>{padIndex(target)}</span>
-          {neighbour.title}
-        </span>
-      )}
+      {!isNext && neighbourLabel()}
       {isNext && <Icon size={16} strokeWidth={1.5} absoluteStrokeWidth aria-hidden="true" />}
     </button>
   );
@@ -635,26 +620,30 @@ function StepButton({
 
 export function Solutions() {
   const reduce = useReducedMotion();
-  const [activeIndex, setActiveIndex] = useState(0);
-  const tablistRef = useRef<HTMLDivElement>(null);
-  const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const [activeIndex, setActiveIndex] = createSignal(0);
+  let tablist!: HTMLDivElement;
+  const tabRefs: (HTMLButtonElement | undefined)[] = [];
 
-  useEffect(() => {
-    const list = tablistRef.current;
-    const tab = tabRefs.current[activeIndex];
-    if (!list || !tab || list.scrollWidth <= list.clientWidth) return;
-    list.scrollTo({
-      left: tab.offsetLeft - (list.clientWidth - tab.offsetWidth) / 2,
-      behavior: reduce ? "auto" : "smooth",
-    });
-  }, [activeIndex, reduce]);
+  createEffect(
+    () => [activeIndex(), reduce()] as const,
+    ([index, reduceNow]) => {
+      const list = tablist;
+      const tab = tabRefs[index];
+      if (!list || !tab || list.scrollWidth <= list.clientWidth) return;
+      list.scrollTo({
+        left: tab.offsetLeft - (list.clientWidth - tab.offsetWidth) / 2,
+        behavior: reduceNow ? "auto" : "smooth",
+      });
+    },
+  );
 
   const focusTab = (index: number) => {
     setActiveIndex(index);
-    tabRefs.current[index]?.focus();
+    flush();
+    tabRefs[index]?.focus();
   };
 
-  const onTabKeyDown = (event: KeyboardEvent<HTMLButtonElement>, index: number) => {
+  const onTabKeyDown = (event: KeyboardEvent, index: number) => {
     const last = TOTAL - 1;
     const target =
       event.key === "ArrowRight"
@@ -679,68 +668,62 @@ export function Solutions() {
     <section
       id="products-solutions"
       aria-labelledby="oos1pc-solutions-title"
-      {...stylex.props(styles.section)}
+      {...stylex.attrs(styles.section)}
     >
-      <div {...stylex.props(styles.shell)}>
-        <header {...stylex.props(styles.head)}>
-          <h2 id="oos1pc-solutions-title" {...stylex.props(styles.title)}>
+      <div {...stylex.attrs(styles.shell)}>
+        <header {...stylex.attrs(styles.head)}>
+          <h2 id="oos1pc-solutions-title" {...stylex.attrs(styles.title)}>
             应用方案
           </h2>
         </header>
         <div
-          ref={tablistRef}
+          ref={tablist}
           role="tablist"
           aria-labelledby="oos1pc-solutions-title"
-          {...stylex.props(styles.tablist)}
+          {...stylex.attrs(styles.tablist)}
         >
           {SOLUTION_ITEMS.map((item, index) => {
-            const isActive = index === activeIndex;
+            const isActive = () => index === activeIndex();
             return (
               <button
-                key={item.id}
                 ref={(node) => {
-                  tabRefs.current[index] = node;
+                  tabRefs[index] = node;
                 }}
                 type="button"
                 role="tab"
                 id={tabId(item.id)}
-                aria-selected={isActive}
+                aria-selected={isActive() ? "true" : "false"}
                 aria-controls={panelId(item.id)}
-                tabIndex={isActive ? 0 : -1}
+                tabindex={isActive() ? 0 : -1}
                 onClick={() => setActiveIndex(index)}
                 onKeyDown={(event) => onTabKeyDown(event, index)}
-                {...stylex.props(styles.tab, isActive && styles.tabSelected)}
+                {...stylex.attrs(styles.tab, isActive() && styles.tabSelected)}
               >
-                <span {...stylex.props(styles.tabIndex, isActive && styles.tabIndexSelected)}>
+                <span {...stylex.attrs(styles.tabIndex, isActive() && styles.tabIndexSelected)}>
                   {padIndex(index)}
                 </span>
-                <span {...stylex.props(styles.tabTitle, isActive && styles.tabTitleSelected)}>
+                <span {...stylex.attrs(styles.tabTitle, isActive() && styles.tabTitleSelected)}>
                   {item.title}
                 </span>
               </button>
             );
           })}
         </div>
-        <div {...stylex.props(styles.paper)}>
-          <div {...stylex.props(styles.stack)}>
+        <div {...stylex.attrs(styles.paper)}>
+          <div {...stylex.attrs(styles.stack)}>
             {SOLUTION_ITEMS.map((item, index) => (
-              <FormulaPanel
-                key={item.id}
-                item={item}
-                index={index}
-                isActive={index === activeIndex}
-              />
+              <FormulaPanel item={item} index={index} isActive={index === activeIndex()} />
             ))}
           </div>
-          <nav aria-label="Switch application solution" {...stylex.props(styles.foot)}>
+          <nav aria-label="Switch application solution" {...stylex.attrs(styles.foot)}>
             <StepButton
               direction="previous"
-              target={activeIndex > 0 ? activeIndex - 1 : null}
+              target={activeIndex() > 0 ? activeIndex() - 1 : null}
               onStep={setActiveIndex}
             />
             <StepButton
               direction="next"
-              target={activeIndex < TOTAL - 1 ? activeIndex + 1 : null}
+              target={activeIndex() < TOTAL - 1 ? activeIndex() + 1 : null}
               onStep={setActiveIndex}
             />
           </nav>

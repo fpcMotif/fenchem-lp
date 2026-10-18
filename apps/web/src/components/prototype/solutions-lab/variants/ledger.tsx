@@ -1,8 +1,9 @@
 import * as stylex from "@stylexjs/stylex";
-import { Plus } from "lucide-react";
-import { m, useInstantLayoutTransition } from "motion/react";
-import { useId, useState } from "react";
-import { flushSync } from "react-dom";
+import { Plus } from "@fenchem-lp/ui/components/lucide";
+import { m, useInstantLayoutTransition } from "@/compat/motion";
+import { flushSync } from "@/compat/react-dom";
+import { createSignal, createUniqueId, For, Show, untrack } from "solid-js";
+import { dynamic as dynamicTag } from "@solidjs/web";
 
 import { Collapse } from "../../shared/collapse";
 import { useReducedMotion } from "../../use-reduced-motion";
@@ -381,52 +382,52 @@ const styles = stylex.create({
   },
 });
 
-function FieldValue({ row }: { row: SheetRow }) {
-  if (row.values.length === 0) return <span {...stylex.props(styles.absent)}>无</span>;
-  if (row.kind === "lines") {
+function FieldValue(props: { row: SheetRow }) {
+  if (props.row.values.length === 0) return <span {...stylex.attrs(styles.absent)}>无</span>;
+  if (props.row.kind === "lines") {
     return (
-      <ul {...stylex.props(styles.lines, styles.description)}>
-        {row.values.map((line) => (
-          <li key={line}>{line}</li>
+      <ul {...stylex.attrs(styles.lines, styles.description)}>
+        {props.row.values.map((line) => (
+          <li>{line}</li>
         ))}
       </ul>
     );
   }
-  if (row.kind === "strong") {
-    return <span {...stylex.props(styles.strong)}>{row.values.join(" · ")}</span>;
+  if (props.row.kind === "strong") {
+    return <span {...stylex.attrs(styles.strong)}>{props.row.values.join(" · ")}</span>;
   }
-  if (row.kind === "list") {
+  if (props.row.kind === "list") {
     return (
-      <ul {...stylex.props(styles.lines)}>
-        {row.values.map((entry) => {
+      <ul {...stylex.attrs(styles.lines)}>
+        {props.row.values.map((entry) => {
           const { primary, note } = splitNote(entry);
           return (
-            <li key={entry} {...stylex.props(styles.keepWords)}>
-              <span {...stylex.props(styles.strong)}>
+            <li {...stylex.attrs(styles.keepWords)}>
+              <span {...stylex.attrs(styles.strong)}>
                 {primary.replaceAll(" / ", `${NO_BREAK_SPACE}/ `)}
               </span>
-              {note && <span {...stylex.props(styles.note)}>{note}</span>}
+              {note && <span {...stylex.attrs(styles.note)}>{note}</span>}
             </li>
           );
         })}
       </ul>
     );
   }
-  return <>{row.values.join("、")}</>;
+  return <>{props.row.values.join("、")}</>;
 }
 
-function ToggleIcon({ open }: { open: boolean }) {
+function ToggleIcon(props: { open: boolean }) {
   const reduce = useReducedMotion();
   return (
     <span
       aria-hidden="true"
-      {...stylex.props(styles.toggle, open && styles.toggleOpen, styles.colToggle)}
+      {...stylex.attrs(styles.toggle, props.open && styles.toggleOpen, styles.colToggle)}
     >
       <m.span
-        {...stylex.props(styles.toggleGlyph)}
+        {...stylex.attrs(styles.toggleGlyph)}
         initial={false}
-        animate={{ rotate: open ? 45 : 0 }}
-        transition={reduce ? { duration: 0 } : { duration: 0.22, ease: EASE_OUT }}
+        animate={{ rotate: props.open ? 45 : 0 }}
+        transition={reduce() ? { duration: 0 } : { duration: 0.22, ease: EASE_OUT }}
       >
         <Plus size={16} strokeWidth={1.5} absoluteStrokeWidth />
       </m.span>
@@ -434,13 +435,7 @@ function ToggleIcon({ open }: { open: boolean }) {
   );
 }
 
-function SolutionRow({
-  item,
-  index,
-  open,
-  heading: Heading,
-  onToggle,
-}: {
+function SolutionRow(props: {
   item: SolutionItem;
   index: number;
   open: boolean;
@@ -448,66 +443,75 @@ function SolutionRow({
   onToggle: (trigger: HTMLElement) => void;
 }) {
   const reduce = useReducedMotion();
-  const panelId = useId();
+  const panelId = createUniqueId();
+  const Heading = dynamicTag(() => props.heading);
+  const item = untrack(() => props.item);
   const area = areaOf(item.area);
 
   return (
     <m.li
       layout="position"
       transition={{ duration: 0.26, ease: EASE_OUT }}
-      {...stylex.props(styles.row, open && styles.rowOpen)}
+      {...stylex.attrs(styles.row, props.open && styles.rowOpen)}
     >
-      <Heading {...stylex.props(styles.heading, stylex.defaultMarker())}>
+      <Heading {...stylex.attrs(styles.heading, stylex.defaultMarker())}>
         <button
           type="button"
-          aria-expanded={open}
+          aria-expanded={props.open ? "true" : "false"}
           aria-controls={panelId}
-          onClick={(event) => onToggle(event.currentTarget)}
-          {...stylex.props(styles.grid, styles.inline, styles.trigger, open && styles.triggerOpen)}
+          onClick={(event) => props.onToggle(event.currentTarget)}
+          {...stylex.attrs(
+            styles.grid,
+            styles.inline,
+            styles.trigger,
+            props.open && styles.triggerOpen,
+          )}
         >
-          <span {...stylex.props(styles.name, styles.colName)}>
-            <span {...stylex.props(styles.index, open && styles.indexOpen)}>{padIndex(index)}</span>
-            <span {...stylex.props(styles.names)}>
-              <span {...stylex.props(styles.title, open && styles.titleOpen)}>{item.title}</span>
-              <span {...stylex.props(styles.meta)}>{item.functions.join(" · ")}</span>
+          <span {...stylex.attrs(styles.name, styles.colName)}>
+            <span {...stylex.attrs(styles.index, props.open && styles.indexOpen)}>
+              {padIndex(props.index)}
+            </span>
+            <span {...stylex.attrs(styles.names)}>
+              <span {...stylex.attrs(styles.title, props.open && styles.titleOpen)}>
+                {item.title}
+              </span>
+              <span {...stylex.attrs(styles.meta)}>{item.functions.join(" · ")}</span>
             </span>
           </span>
           <span
             aria-hidden="true"
-            {...stylex.props(styles.preview, open && styles.previewOpen, styles.colPreview)}
+            {...stylex.attrs(styles.preview, props.open && styles.previewOpen, styles.colPreview)}
           >
             {ingredientNames(item).map((name) => (
-              <span key={name} {...stylex.props(styles.chip)}>
-                {name}
-              </span>
+              <span {...stylex.attrs(styles.chip)}>{name}</span>
             ))}
           </span>
-          <ToggleIcon open={open} />
+          <ToggleIcon open={props.open} />
         </button>
       </Heading>
       <Collapse
         id={panelId}
-        open={open}
-        transition={{ duration: reduce ? 0 : 0.28, ease: EASE_OUT }}
-        {...stylex.props(styles.panelClip)}
+        open={props.open}
+        transition={{ duration: reduce() ? 0 : 0.28, ease: EASE_OUT }}
+        {...stylex.attrs(styles.panelClip)}
       >
-        <div {...stylex.props(styles.grid, styles.inline, styles.panel)}>
-          <div {...stylex.props(styles.lead)}>
+        <div {...stylex.attrs(styles.grid, styles.inline, styles.panel)}>
+          <div {...stylex.attrs(styles.lead)}>
             {area && (
-              <p {...stylex.props(styles.areaLine)}>
+              <p {...stylex.attrs(styles.areaLine)}>
                 <span>{area.label}</span>
-                <span lang="en" {...stylex.props(styles.areaEnglish)}>
+                <span lang="en" {...stylex.attrs(styles.areaEnglish)}>
                   {area.englishLabel}
                 </span>
               </p>
             )}
-            <p {...stylex.props(styles.subtitle)}>{item.subtitle}</p>
+            <p {...stylex.attrs(styles.subtitle)}>{item.subtitle}</p>
           </div>
-          <dl {...stylex.props(styles.sheet)}>
+          <dl {...stylex.attrs(styles.sheet)}>
             {sheetRows(item).map((row) => (
-              <div key={row.label} {...stylex.props(styles.field)}>
-                <dt {...stylex.props(styles.fieldLabel)}>{row.label}</dt>
-                <dd {...stylex.props(styles.fieldValue)}>
+              <div {...stylex.attrs(styles.field)}>
+                <dt {...stylex.attrs(styles.fieldLabel)}>{row.label}</dt>
+                <dd {...stylex.attrs(styles.fieldValue)}>
                   <FieldValue row={row} />
                 </dd>
               </div>
@@ -521,19 +525,18 @@ function SolutionRow({
 
 export function LedgerVariant() {
   const browser = useSolutionsBrowser();
-  const { area, scope, groups } = browser;
   const startInstantLayout = useInstantLayoutTransition();
-  const [openId, setOpenId] = useState<string | null>(() => scope[0]?.id ?? null);
-  const [shownArea, setShownArea] = useState(area);
-
-  if (shownArea !== area) {
-    setShownArea(area);
-    setOpenId(scope[0]?.id ?? null);
-  }
+  const [openState, setOpenState] = createSignal<{ area: string; id: string | null }>(
+    untrack(() => ({ area: browser.area, id: browser.scope[0]?.id ?? null })),
+  );
+  const openId = () =>
+    openState().area === browser.area ? openState().id : (browser.scope[0]?.id ?? null);
+  const setOpenId = (id: string | null) => setOpenState({ area: browser.area, id });
 
   const toggle = (id: string, trigger: HTMLElement) => {
-    const openIndex = scope.findIndex((item) => item.id === openId);
-    const index = scope.findIndex((item) => item.id === id);
+    const current = openId();
+    const openIndex = browser.scope.findIndex((item) => item.id === current);
+    const index = browser.scope.findIndex((item) => item.id === id);
     if (openIndex !== -1 && openIndex < index) {
       const triggerTop = trigger.getBoundingClientRect().top;
       startInstantLayout(() => flushSync(() => setOpenId(null)));
@@ -542,52 +545,59 @@ export function LedgerVariant() {
         behavior: "instant",
       });
     }
-    setOpenId(openId === id ? null : id);
+    setOpenId(current === id ? null : id);
   };
 
   const renderRows = (items: SolutionItem[], heading: "h3" | "h4") => (
-    <ul {...stylex.props(styles.list)}>
-      {items.map((item, index) => (
-        <SolutionRow
-          key={item.id}
-          item={item}
-          index={index}
-          open={item.id === openId}
-          heading={heading}
-          onToggle={(trigger) => toggle(item.id, trigger)}
-        />
-      ))}
+    <ul {...stylex.attrs(styles.list)}>
+      <For each={items}>
+        {(item, index) => (
+          <SolutionRow
+            item={item}
+            index={index()}
+            open={item.id === openId()}
+            heading={heading}
+            onToggle={(trigger) => toggle(item.id, trigger)}
+          />
+        )}
+      </For>
     </ul>
   );
 
   return (
     <LabSection>
       <AreaChips browser={browser} />
-      <div {...stylex.props(styles.card)}>
-        <div aria-hidden="true" {...stylex.props(styles.grid, styles.inline, styles.columnHead)}>
-          <span {...stylex.props(styles.colName)}>方案</span>
-          <span {...stylex.props(styles.colPreview)}>核心成分</span>
+      <div {...stylex.attrs(styles.card)}>
+        <div aria-hidden="true" {...stylex.attrs(styles.grid, styles.inline, styles.columnHead)}>
+          <span {...stylex.attrs(styles.colName)}>方案</span>
+          <span {...stylex.attrs(styles.colPreview)}>核心成分</span>
         </div>
-        <div key={area} {...stylex.props(styles.enter)}>
-          {area === "all" ? (
-            <ul {...stylex.props(styles.list)}>
-              {groups.map((group) => (
-                <li key={group.id} {...stylex.props(styles.group)}>
-                  <h3 {...stylex.props(styles.groupHeading, styles.inline)}>
-                    <span {...stylex.props(styles.groupLabel)}>{group.label}</span>
-                    <span lang="en" {...stylex.props(styles.groupEnglish)}>
-                      {group.englishLabel}
-                    </span>
-                    <span {...stylex.props(styles.groupCount)}>{group.items.length} 款</span>
-                  </h3>
-                  {renderRows(group.items, "h4")}
-                </li>
-              ))}
-            </ul>
-          ) : (
-            renderRows(scope, "h3")
+        <Show when={browser.area} keyed>
+          {(area) => (
+            <div {...stylex.attrs(styles.enter)}>
+              {area === "all" ? (
+                <ul {...stylex.attrs(styles.list)}>
+                  <For each={browser.groups}>
+                    {(group) => (
+                      <li {...stylex.attrs(styles.group)}>
+                        <h3 {...stylex.attrs(styles.groupHeading, styles.inline)}>
+                          <span {...stylex.attrs(styles.groupLabel)}>{group.label}</span>
+                          <span lang="en" {...stylex.attrs(styles.groupEnglish)}>
+                            {group.englishLabel}
+                          </span>
+                          <span {...stylex.attrs(styles.groupCount)}>{group.items.length} 款</span>
+                        </h3>
+                        {renderRows(group.items, "h4")}
+                      </li>
+                    )}
+                  </For>
+                </ul>
+              ) : (
+                renderRows(browser.scope, "h3")
+              )}
+            </div>
           )}
-        </div>
+        </Show>
       </div>
     </LabSection>
   );

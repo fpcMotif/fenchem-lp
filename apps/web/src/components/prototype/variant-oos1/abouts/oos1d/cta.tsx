@@ -1,4 +1,3 @@
-import { breakpoints } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 
 import { CTA } from "../../content";
@@ -9,21 +8,29 @@ import { step, tone } from "./tokens.stylex";
 const s = stylex.create({
   cta: {
     scrollMarginTop: 136,
-    paddingBlock: { default: 40, [breakpoints.md]: 56, [breakpoints.xl]: 72 },
+    paddingBlock: {
+      default: 40,
+      ["@media (min-width: 768px)"]: 56,
+      ["@media (min-width: 1280px)"]: 72,
+    },
   },
   grid: {
     display: "grid",
     gridTemplateColumns: {
       default: "minmax(0, 1fr)",
-      [breakpoints.lg]: "minmax(0, 61.8fr) minmax(0, 38.2fr)",
+      ["@media (min-width: 1024px)"]: "minmax(0, 61.8fr) minmax(0, 38.2fr)",
     },
-    columnGap: { default: 0, [breakpoints.lg]: 48, [breakpoints.xl]: 80 },
+    columnGap: {
+      default: 0,
+      ["@media (min-width: 1024px)"]: 48,
+      ["@media (min-width: 1280px)"]: 80,
+    },
     rowGap: 40,
     alignItems: "end",
   },
   title: {
     margin: 0,
-    fontSize: { default: step.display, [breakpoints.md]: step.large },
+    fontSize: { default: step.display, ["@media (min-width: 768px)"]: step.large },
     fontWeight: 500,
     lineHeight: 1.15,
     letterSpacing: "0.04em",
@@ -32,33 +39,33 @@ const s = stylex.create({
   },
   actions: {
     display: "flex",
-    flexDirection: { default: "column", [breakpoints.sm]: "row" },
-    alignItems: { default: "stretch", [breakpoints.sm]: "center" },
+    flexDirection: { default: "column", ["@media (min-width: 640px)"]: "row" },
+    alignItems: { default: "stretch", ["@media (min-width: 640px)"]: "center" },
     flexWrap: "wrap",
     gap: 16,
   },
 });
 
-export function Cta({ onNavigateHome }: { onNavigateHome: (hash?: string) => void }) {
+export function Cta(props: { onNavigateHome: (hash?: string) => void }) {
   return (
-    <section aria-labelledby="about-cta-title" {...stylex.props(s.cta, ui.onPaper)}>
-      <div {...stylex.props(ui.shell, ui.inset)}>
+    <section aria-labelledby="about-cta-title" {...stylex.attrs(s.cta, ui.onPaper)}>
+      <div {...stylex.attrs(ui.shell, ui.inset)}>
         <Reveal sx={s.grid}>
-          <h2 id="about-cta-title" {...stylex.props(s.title)}>
+          <h2 id="about-cta-title" {...stylex.attrs(s.title)}>
             {CTA.title}
           </h2>
-          <div {...stylex.props(s.actions)}>
+          <div {...stylex.attrs(s.actions)}>
             <button
               type="button"
-              onClick={() => onNavigateHome("contact")}
-              {...stylex.props(ui.button, ui.buttonPrimary, ui.focusRing)}
+              onClick={() => props.onNavigateHome("contact")}
+              {...stylex.attrs(ui.button, ui.buttonPrimary, ui.focusRing)}
             >
               {CTA.action.label}
             </button>
             <button
               type="button"
-              onClick={() => onNavigateHome("products")}
-              {...stylex.props(ui.button, ui.buttonSecondary, ui.focusRing)}
+              onClick={() => props.onNavigateHome("products")}
+              {...stylex.attrs(ui.button, ui.buttonSecondary, ui.focusRing)}
             >
               产品与应用
             </button>

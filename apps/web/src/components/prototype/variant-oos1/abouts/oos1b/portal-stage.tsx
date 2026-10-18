@@ -1,6 +1,7 @@
 import * as stylex from "@stylexjs/stylex";
-import { useScroll, type MotionValue } from "motion/react";
-import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
+import { useScroll, type MotionValue } from "@/compat/motion";
+import { createEffect, createMemo, createSignal, onSettled, Show } from "solid-js";
+import type { JSX } from "@solidjs/web";
 
 import { AERIAL_PLATE, ROOMS_IN_WALKING_ORDER } from "./journey";
 import {
@@ -21,7 +22,7 @@ import { chrome, face, motion, tone } from "./tokens.stylex";
 const PLATES = [...ROOMS_IN_WALKING_ORDER.map((room) => room.plate), AERIAL_PLATE];
 const SCROLL_SVH_PER_UNIT = 46;
 
-const rectStyle = (x: number, y: number, w: number, h: number): CSSProperties => ({
+const rectStyle = (x: number, y: number, w: number, h: number): JSX.CSSProperties => ({
   left: `${x}px`,
   top: `${y}px`,
   width: `${w}px`,
@@ -135,22 +136,22 @@ const styles = stylex.create({
 const strokeProps = {
   fill: "none",
   stroke: "rgba(11, 42, 92, 0.62)",
-  strokeWidth: 1,
-  vectorEffect: "non-scaling-stroke",
-  shapeRendering: "crispEdges",
+  "stroke-width": 1,
+  "vector-effect": "non-scaling-stroke",
+  "shape-rendering": "crispEdges",
 } as const;
 
 export function PortalStage() {
-  const trackRef = useRef<HTMLDivElement>(null);
-  const stageRef = useRef<HTMLDivElement>(null);
-  const [size, setSize] = useState<Size | null>(null);
+  let trackRef: HTMLDivElement | undefined;
+  let stageRef: HTMLDivElement | undefined;
+  const [size, setSize] = createSignal<Size | null>(null);
   const { scrollYProgress } = useScroll({
-    target: trackRef,
+    target: () => trackRef,
     offset: ["start 80px", "end end"],
   });
 
-  useEffect(() => {
-    const stage = stageRef.current;
+  onSettled(() => {
+    const stage = stageRef;
     if (!stage) return;
     const observer = new ResizeObserver(([entry]) => {
       const width = Math.round(entry.contentRect.width);
@@ -163,150 +164,160 @@ export function PortalStage() {
     });
     observer.observe(stage);
     return () => observer.disconnect();
-  }, []);
+  });
 
-  const layout = useMemo(() => (size ? layoutStage(size, AERIAL_PLATE.aspect) : null), [size]);
+  const layout = createMemo(() => {
+    const current = size();
+    return current ? layoutStage(current, AERIAL_PLATE.aspect) : null;
+  });
 
   return (
     <div
       ref={trackRef}
-      {...stylex.props(styles.track)}
+      {...stylex.attrs(styles.track)}
       style={{ height: `calc(${TIMELINE_UNITS * SCROLL_SVH_PER_UNIT}svh + 100svh - 80px)` }}
     >
-      <div ref={stageRef} aria-hidden="true" {...stylex.props(styles.stage)}>
-        {layout ? <Scene layout={layout} progress={scrollYProgress} /> : null}
+      <div ref={stageRef} aria-hidden="true" {...stylex.attrs(styles.stage)}>
+        <Show when={layout()}>
+          {(current) => <Scene layout={current()} progress={scrollYProgress} />}
+        </Show>
       </div>
     </div>
   );
 }
 
-function Scene({ layout, progress }: { layout: StageLayout; progress: MotionValue<number> }) {
-  const plateEls = useRef<(HTMLDivElement | null)[]>([]);
-  const lineEls = useRef<(SVGGElement | null)[]>([]);
-  const tagEls = useRef<(HTMLSpanElement | null)[]>([]);
-  const ringEls = useRef<(SVGRectElement | null)[]>([]);
-  const [caption, setCaption] = useState(0);
-  const { size, box, gap, aerial, aerialFrameStep } = layout;
+function Scene(props: { layout: StageLayout; progress: MotionValue<number> }) {
+  const plateEls: (HTMLDivElement | undefined)[] = [];
+  const lineEls: (SVGGElement | undefined)[] = [];
+  const tagEls: (HTMLSpanElement | undefined)[] = [];
+  const ringEls: (SVGRectElement | undefined)[] = [];
+  const [caption, setCaption] = createSignal(0);
+  const size = () => props.layout.size;
+  const box = () => props.layout.box;
+  const gap = () => props.layout.gap;
+  const aerial = () => props.layout.aerial;
+  const aerialFrameStep = () => props.layout.aerialFrameStep;
 
-  useEffect(() => {
-    const place = (index: number, pose: Pose | null, opacity: number, layer: number) => {
-      const plate = plateEls.current[index];
-      const lines = lineEls.current[index];
-      const tag = tagEls.current[index];
-      if (!plate || !lines || !tag) return;
-      const visibility = pose ? "visible" : "hidden";
-      plate.style.visibility = visibility;
-      lines.style.visibility = visibility;
-      tag.style.visibility = pose && layer === 2 ? "visible" : "hidden";
-      if (!pose) return;
-      const opacityText = String(opacity);
-      plate.style.transform = `translate(${pose.x}px, ${pose.y}px) scale(${pose.s})`;
-      plate.style.opacity = opacityText;
-      plate.style.zIndex = String(layer);
-      lines.setAttribute("transform", `matrix(${pose.s} 0 0 ${pose.s} ${pose.x} ${pose.y})`);
-      lines.style.opacity = opacityText;
-      tag.style.opacity = opacityText;
-      tag.style.transform = `translate(${pose.x - pose.s * gap}px, ${pose.y - pose.s * gap}px) translateY(-50%)`;
-    };
+  createEffect(
+    () => [props.layout, props.progress] as const,
+    ([layout, progress]) => {
+      const gap = layout.gap;
+      const place = (index: number, pose: Pose | null, opacity: number, layer: number) => {
+        const plate = plateEls[index];
+        const lines = lineEls[index];
+        const tag = tagEls[index];
+        if (!plate || !lines || !tag) return;
+        const visibility = pose ? "visible" : "hidden";
+        plate.style.visibility = visibility;
+        lines.style.visibility = visibility;
+        tag.style.visibility = pose && layer === 2 ? "visible" : "hidden";
+        if (!pose) return;
+        const opacityText = String(opacity);
+        plate.style.transform = `translate(${pose.x}px, ${pose.y}px) scale(${pose.s})`;
+        plate.style.opacity = opacityText;
+        plate.style.zIndex = String(layer);
+        lines.setAttribute("transform", `matrix(${pose.s} 0 0 ${pose.s} ${pose.x} ${pose.y})`);
+        lines.style.opacity = opacityText;
+        tag.style.opacity = opacityText;
+        tag.style.transform = `translate(${pose.x - pose.s * gap}px, ${pose.y - pose.s * gap}px) translateY(-50%)`;
+      };
 
-    const paint = (value: number) => {
-      const frame = frameAt(value, layout);
-      PLATES.forEach((_, index) => {
-        if (frame.base.plate === index) place(index, frame.base.pose, 1, 1);
-        else if (frame.window && frame.window.plate === index)
-          place(index, frame.window.pose, frame.window.opacity, 2);
-        else place(index, null, 0, 0);
-      });
-      ringEls.current.forEach((ring, index) => {
-        if (!ring) return;
-        const shown = Math.min(1, Math.max(0, frame.settled * AERIAL_FRAME_COUNT - index));
-        ring.style.opacity = String(shown);
-      });
-      setCaption(frame.caption);
-    };
+      const paint = (value: number) => {
+        const frame = frameAt(value, layout);
+        PLATES.forEach((_, index) => {
+          if (frame.base.plate === index) place(index, frame.base.pose, 1, 1);
+          else if (frame.window && frame.window.plate === index)
+            place(index, frame.window.pose, frame.window.opacity, 2);
+          else place(index, null, 0, 0);
+        });
+        ringEls.forEach((ring, index) => {
+          if (!ring) return;
+          const shown = Math.min(1, Math.max(0, frame.settled * AERIAL_FRAME_COUNT - index));
+          ring.style.opacity = String(shown);
+        });
+        setCaption(frame.caption);
+      };
 
-    paint(progress.get());
-    const unsubscribe = progress.on("change", paint);
-    return () => unsubscribe();
-  }, [layout, progress, gap]);
+      paint(progress.get());
+      const unsubscribe = progress.on("change", paint);
+      return () => unsubscribe();
+    },
+  );
 
   return (
     <>
-      <div {...stylex.props(styles.viewport)} style={rectStyle(box.x, box.y, box.w, box.h)}>
+      <div {...stylex.attrs(styles.viewport)} style={rectStyle(box().x, box().y, box().w, box().h)}>
         <div
-          {...stylex.props(styles.world)}
-          style={rectStyle(-box.x, -box.y, size.width, size.height)}
+          {...stylex.attrs(styles.world)}
+          style={rectStyle(-box().x, -box().y, size().width, size().height)}
         >
           {PLATES.map((plate, index) => (
             <div
-              key={plate.id}
               ref={(node) => {
-                plateEls.current[index] = node;
+                plateEls[index] = node;
               }}
-              {...stylex.props(styles.plate)}
-              style={rectStyle(0, 0, size.width, size.height)}
+              {...stylex.attrs(styles.plate)}
+              style={rectStyle(0, 0, size().width, size().height)}
             >
               <img
                 src={plate.large}
                 alt=""
                 loading="lazy"
                 decoding="async"
-                {...stylex.props(styles.photo)}
+                {...stylex.attrs(styles.photo)}
                 style={
                   index === AERIAL_INDEX
-                    ? rectStyle(aerial.x, aerial.y, aerial.w, aerial.h)
-                    : rectStyle(box.x, box.y, box.w, box.h)
+                    ? rectStyle(aerial().x, aerial().y, aerial().w, aerial().h)
+                    : rectStyle(box().x, box().y, box().w, box().h)
                 }
               />
             </div>
           ))}
 
           <svg
-            width={size.width}
-            height={size.height}
-            viewBox={`0 0 ${size.width} ${size.height}`}
-            {...stylex.props(styles.lines)}
+            width={size().width}
+            height={size().height}
+            viewBox={`0 0 ${size().width} ${size().height}`}
+            {...stylex.attrs(styles.lines)}
           >
-            {PLATES.map((plate, index) => (
+            {PLATES.map((_plate, index) => (
               <g
-                key={plate.id}
                 ref={(node) => {
-                  lineEls.current[index] = node;
+                  lineEls[index] = node;
                 }}
-                {...stylex.props(styles.hidden)}
+                {...stylex.attrs(styles.hidden)}
               >
                 {index === AERIAL_INDEX ? (
                   Array.from({ length: AERIAL_FRAME_COUNT }, (_, ring) => {
-                    const offset = aerialFrameStep * (ring + 0.5) - 0.5;
+                    const offset = () => aerialFrameStep() * (ring + 0.5) - 0.5;
                     return (
                       <rect
-                        key={ring}
                         ref={(node) => {
-                          if (ring > 0) ringEls.current[ring - 1] = node;
+                          if (ring > 0) ringEls[ring - 1] = node;
                         }}
-                        x={aerial.x - offset}
-                        y={aerial.y - offset}
-                        width={aerial.w + offset * 2}
-                        height={aerial.h + offset * 2}
+                        x={aerial().x - offset()}
+                        y={aerial().y - offset()}
+                        width={aerial().w + offset() * 2}
+                        height={aerial().h + offset() * 2}
                         {...strokeProps}
-                        strokeOpacity={1 - ring * 0.22}
+                        stroke-opacity={1 - ring * 0.22}
                       />
                     );
                   })
                 ) : (
                   <>
                     <rect
-                      x={-gap}
-                      y={-gap}
-                      width={size.width + gap * 2}
-                      height={size.height + gap * 2}
+                      x={-gap()}
+                      y={-gap()}
+                      width={size().width + gap() * 2}
+                      height={size().height + gap() * 2}
                       {...strokeProps}
                     />
                     <rect
-                      x={box.x - gap}
-                      y={box.y - gap}
-                      width={box.w + gap * 2}
-                      height={box.h + gap * 2}
+                      x={box().x - gap()}
+                      y={box().y - gap()}
+                      width={box().w + gap() * 2}
+                      height={box().h + gap() * 2}
                       {...strokeProps}
                     />
                   </>
@@ -317,11 +328,10 @@ function Scene({ layout, progress }: { layout: StageLayout; progress: MotionValu
 
           {PLATES.map((plate, index) => (
             <span
-              key={plate.id}
               ref={(node) => {
-                tagEls.current[index] = node;
+                tagEls[index] = node;
               }}
-              {...stylex.props(styles.tag)}
+              {...stylex.attrs(styles.tag)}
             >
               <Tag numeral={plate.numeral} pinned={false} />
             </span>
@@ -330,29 +340,36 @@ function Scene({ layout, progress }: { layout: StageLayout; progress: MotionValu
       </div>
 
       <span
-        {...stylex.props(styles.passe)}
-        style={rectStyle(box.x - gap, box.y - gap, box.w + gap * 2, box.h + gap * 2)}
+        {...stylex.attrs(styles.passe)}
+        style={rectStyle(
+          box().x - gap(),
+          box().y - gap(),
+          box().w + gap() * 2,
+          box().h + gap() * 2,
+        )}
       />
 
       <div
-        {...stylex.props(styles.band)}
-        style={rectStyle(box.x, box.y + box.h + gap, box.w, size.height - box.y - box.h - gap)}
+        {...stylex.attrs(styles.band)}
+        style={rectStyle(
+          box().x,
+          box().y + box().h + gap(),
+          box().w,
+          size().height - box().y - box().h - gap(),
+        )}
       >
-        <div {...stylex.props(styles.captions)}>
+        <div {...stylex.attrs(styles.captions)}>
           {PLATES.map((plate, index) => (
-            <p
-              key={plate.id}
-              {...stylex.props(styles.caption, ui.reset, caption === index && styles.captionOn)}
-            >
-              <span {...stylex.props(styles.numeral)}>{plate.numeral}</span>
-              <span {...stylex.props(styles.chinese)}>{plate.caption}</span>
-              <span lang="en" {...stylex.props(ui.serif, styles.english)}>
+            <p {...stylex.attrs(styles.caption, ui.reset, caption() === index && styles.captionOn)}>
+              <span {...stylex.attrs(styles.numeral)}>{plate.numeral}</span>
+              <span {...stylex.attrs(styles.chinese)}>{plate.caption}</span>
+              <span lang="en" {...stylex.attrs(ui.serif, styles.english)}>
                 {plate.english}
               </span>
             </p>
           ))}
         </div>
-        <DepthGauge depth={caption} />
+        <DepthGauge depth={caption()} />
       </div>
     </>
   );

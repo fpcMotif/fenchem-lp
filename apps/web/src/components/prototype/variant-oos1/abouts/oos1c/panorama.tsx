@@ -1,7 +1,7 @@
 import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { m, useMotionValue, useScroll, useSpring, useTransform } from "motion/react";
-import { type FocusEvent, Fragment, useCallback, useEffect, useRef, useState } from "react";
+import { m, useMotionValue, useScroll, useSpring, useTransform } from "@/compat/motion";
+import { createEffect, createSignal } from "solid-js";
 
 import { ABOUT_CAMPUS, ABOUT_CULTURE, ABOUT_HERO, ABOUT_MOMENT } from "../../about-data";
 import { STATS } from "../../content";
@@ -36,6 +36,10 @@ type Metrics = {
 };
 
 const clamp01 = (value: number) => Math.min(1, Math.max(0, value));
+
+// stylex.attrs with reactive (accessor) arguments resolves at runtime here, because
+// the StyleX compiler tries to evaluate them at build time and throws.
+const sxProps: typeof stylex.attrs = (...args) => stylex.attrs(...args);
 
 const dyn = stylex.create({
   runwayHeight: (value: number) => ({ height: `${value}px` }),
@@ -508,120 +512,112 @@ const SHAPE_MEDIA = {
   portrait: styles.shapePortrait,
 } as const;
 
-function PhotoNote({ en, cn }: { en: string; cn: string }) {
+function PhotoNote(props: { en: string; cn: string }) {
   return (
-    <figcaption {...stylex.props(styles.note)}>
-      <span>{cn}</span>
-      <span lang="en" {...stylex.props(styles.noteEnglish)}>
-        {en}
+    <figcaption {...stylex.attrs(styles.note)}>
+      <span>{props.cn}</span>
+      <span lang="en" {...stylex.attrs(styles.noteEnglish)}>
+        {props.en}
       </span>
     </figcaption>
   );
 }
 
-export function Panorama({
-  pinned,
-  onOpenPhoto,
-}: {
-  pinned: boolean;
-  onOpenPhoto: (index: number) => void;
-}) {
-  const runwayRef = useRef<HTMLElement>(null);
-  const stageRef = useRef<HTMLDivElement>(null);
-  const trackRef = useRef<HTMLDivElement>(null);
-  const stripRef = useRef<HTMLDivElement>(null);
-  const metricsRef = useRef<Metrics | null>(null);
-  const [measured, setMetrics] = useState<Metrics | null>(null);
-  const metrics = pinned ? measured : null;
+export function Panorama(props: { pinned: boolean; onOpenPhoto: (index: number) => void }) {
+  let runwayRef: HTMLElement | undefined;
+  let stageRef: HTMLDivElement | undefined;
+  let trackRef: HTMLDivElement | undefined;
+  let stripRef: HTMLDivElement | undefined;
+  let metricsRef: Metrics | null = null;
+  const [measured, setMetrics] = createSignal<Metrics | null>(null);
+  const metrics = () => (props.pinned ? measured() : null);
 
   const { scrollYProgress } = useScroll({
-    target: runwayRef,
+    target: () => runwayRef,
     offset: [`start ${STAGE_TOP}px`, "end end"],
   });
   const progress = useSpring(scrollYProgress, SPRING);
   const distance = useMotionValue(0);
   const stripDistance = useMotionValue(0);
-  const trackX = useTransform<number, number>([progress, distance], ([p, d]) => -p * d);
-  const stripX = useTransform<number, number>([progress, stripDistance], ([p, d]) => -p * d);
+  const trackX = useTransform([progress, distance], ([p, d]) => -p * d);
+  const stripX = useTransform([progress, stripDistance], ([p, d]) => -p * d);
 
-  useEffect(() => {
-    if (!pinned) {
-      metricsRef.current = null;
-      return;
-    }
-    const stageNode = stageRef.current;
-    const trackNode = trackRef.current;
-    if (!stageNode || !trackNode) return;
+  createEffect(
+    () => props.pinned,
+    (pinned) => {
+      if (!pinned) {
+        metricsRef = null;
+        return;
+      }
+      const stageNode = stageRef;
+      const trackNode = trackRef;
+      if (!stageNode || !trackNode) return;
 
-    const measure = () => {
-      const width = stageNode.clientWidth;
-      const trackLeft = trackNode.getBoundingClientRect().left;
-      const frames = Array.from(trackNode.querySelectorAll<HTMLElement>("[data-frame]"));
-      const groups = Array.from(trackNode.querySelectorAll<HTMLElement>("[data-group]"));
-      const centers = frames.map(
-        (node) => node.getBoundingClientRect().left - trackLeft + node.offsetWidth / 2,
-      );
-      const groupLefts = groups.map((node) => node.getBoundingClientRect().left - trackLeft);
-      const lead = groupLefts[0] ?? 0;
-      const travel = Math.max(0, trackNode.offsetWidth - width);
-      const scrollRange = travel * PACE;
-      const runwayHeight = Math.round(stageNode.offsetHeight + scrollRange);
-      const at = (x: number) => (travel > 0 ? clamp01(x / travel) : 0);
-      const groupTicks = GROUPS.map((_, index) => at((groupLefts[index] ?? lead) - lead));
-      const anchors = GROUPS.map((entry, index) => {
-        const from = groupTicks[index];
-        const top = from * scrollRange;
-        const height =
-          index + 1 < GROUPS.length
-            ? (groupTicks[index + 1] - from) * scrollRange
-            : runwayHeight - top;
-        return { id: entry.id, top, height };
-      });
-      metricsRef.current = {
-        runwayHeight,
-        scrollRange,
-        distance: travel,
-        viewport: width,
-        centers,
-        anchors,
+      const measure = () => {
+        const width = stageNode.clientWidth;
+        const trackLeft = trackNode.getBoundingClientRect().left;
+        const frames = Array.from(trackNode.querySelectorAll<HTMLElement>("[data-frame]"));
+        const groups = Array.from(trackNode.querySelectorAll<HTMLElement>("[data-group]"));
+        const centers = frames.map(
+          (node) => node.getBoundingClientRect().left - trackLeft + node.offsetWidth / 2,
+        );
+        const groupLefts = groups.map((node) => node.getBoundingClientRect().left - trackLeft);
+        const lead = groupLefts[0] ?? 0;
+        const travel = Math.max(0, trackNode.offsetWidth - width);
+        const scrollRange = travel * PACE;
+        const runwayHeight = Math.round(stageNode.offsetHeight + scrollRange);
+        const at = (x: number) => (travel > 0 ? clamp01(x / travel) : 0);
+        const groupTicks = GROUPS.map((_, index) => at((groupLefts[index] ?? lead) - lead));
+        const anchors = GROUPS.map((entry, index) => {
+          const from = groupTicks[index];
+          const top = from * scrollRange;
+          const height =
+            index + 1 < GROUPS.length
+              ? (groupTicks[index + 1] - from) * scrollRange
+              : runwayHeight - top;
+          return { id: entry.id, top, height };
+        });
+        metricsRef = {
+          runwayHeight,
+          scrollRange,
+          distance: travel,
+          viewport: width,
+          centers,
+          anchors,
+        };
+        distance.set(travel);
+        const stripNode = stripRef;
+        stripDistance.set(stripNode ? Math.max(0, stripNode.scrollWidth - width) : 0);
+        setMetrics(metricsRef);
       };
-      distance.set(travel);
-      const stripNode = stripRef.current;
-      stripDistance.set(stripNode ? Math.max(0, stripNode.scrollWidth - width) : 0);
-      setMetrics(metricsRef.current);
-    };
 
-    measure();
-    const observer = new ResizeObserver(measure);
-    observer.observe(stageNode);
-    observer.observe(trackNode);
-    return () => observer.disconnect();
-  }, [pinned, distance, stripDistance]);
-
-  const revealFocused = useCallback(
-    (event: FocusEvent<HTMLElement>) => {
-      const current = metricsRef.current;
-      const runway = runwayRef.current;
-      if (!pinned || !current || !runway || current.distance <= 0) return;
-      const target = event.target.closest<HTMLElement>("[data-frame]");
-      if (!target) return;
-      const box = target.getBoundingClientRect();
-      if (box.left >= 0 && box.right <= current.viewport) return;
-      const frames = Array.from(
-        trackRef.current?.querySelectorAll<HTMLElement>("[data-frame]") ?? [],
-      );
-      const index = frames.indexOf(target);
-      if (index < 0) return;
-      const wanted = clamp01((current.centers[index] - current.viewport / 2) / current.distance);
-      const top =
-        runway.getBoundingClientRect().top +
-        window.scrollY -
-        STAGE_TOP +
-        wanted * current.scrollRange;
-      window.scrollTo({ top, behavior: "auto" });
+      measure();
+      const observer = new ResizeObserver(measure);
+      observer.observe(stageNode);
+      observer.observe(trackNode);
+      return () => observer.disconnect();
     },
-    [pinned],
   );
+
+  const revealFocused = (event: FocusEvent) => {
+    const current = metricsRef;
+    const runway = runwayRef;
+    if (!props.pinned || !current || !runway || current.distance <= 0) return;
+    const target = (event.target as HTMLElement).closest<HTMLElement>("[data-frame]");
+    if (!target) return;
+    const box = target.getBoundingClientRect();
+    if (box.left >= 0 && box.right <= current.viewport) return;
+    const frames = Array.from(trackRef?.querySelectorAll<HTMLElement>("[data-frame]") ?? []);
+    const index = frames.indexOf(target);
+    if (index < 0) return;
+    const wanted = clamp01((current.centers[index] - current.viewport / 2) / current.distance);
+    const top =
+      runway.getBoundingClientRect().top +
+      window.scrollY -
+      STAGE_TOP +
+      wanted * current.scrollRange;
+    window.scrollTo({ top, behavior: "auto" });
+  };
 
   const campus = ABOUT_CAMPUS.photos;
 
@@ -629,95 +625,97 @@ export function Panorama({
     <section
       ref={runwayRef}
       aria-label="Fenchem panorama"
-      {...stylex.props(styles.runway, pinned && metrics && dyn.runwayHeight(metrics.runwayHeight))}
+      {...sxProps(
+        styles.runway,
+        props.pinned && metrics() && dyn.runwayHeight(metrics()!.runwayHeight),
+      )}
     >
-      {pinned
+      {props.pinned
         ? GROUPS.map((entry, index) => {
-            const anchor = metrics?.anchors[index];
+            const anchor = () => metrics()?.anchors[index];
             return (
               <div
-                key={entry.id}
                 id={entry.id}
-                {...stylex.props(styles.slab, dyn.slab(anchor?.top ?? 0, anchor?.height ?? 1))}
+                {...stylex.attrs(styles.slab, dyn.slab(anchor()?.top ?? 0, anchor()?.height ?? 1))}
               />
             );
           })
         : null}
-      <div ref={stageRef} {...stylex.props(styles.stage)}>
-        <div aria-hidden="true" {...stylex.props(styles.strip)}>
+      <div ref={stageRef} {...stylex.attrs(styles.stage)}>
+        <div aria-hidden="true" {...stylex.attrs(styles.strip)}>
           <m.div
-            ref={stripRef}
-            {...stylex.props(styles.stripTrain)}
-            style={pinned ? { x: stripX } : undefined}
+            ref={(el: HTMLElement) => (stripRef = el as HTMLDivElement)}
+            {...stylex.attrs(styles.stripTrain)}
+            style={props.pinned ? { x: stripX } : undefined}
           >
-            {Array.from({ length: STRIP_LOOPS }, (_, loop) =>
+            {Array.from({ length: STRIP_LOOPS }, () =>
               STRIP_PHRASES.map((phrase) => (
-                <Fragment key={`${loop}-${phrase}`}>
-                  <span lang="en" {...stylex.props(styles.phrase)}>
+                <>
+                  <span lang="en" {...stylex.attrs(styles.phrase)}>
                     {phrase}
                   </span>
-                  <span {...stylex.props(styles.join)}>
+                  <span {...stylex.attrs(styles.join)}>
                     <Cross />
                   </span>
-                </Fragment>
+                </>
               )),
             )}
           </m.div>
         </div>
 
-        <div {...stylex.props(styles.view)}>
+        <div {...stylex.attrs(styles.view)}>
           <m.div
-            ref={trackRef}
-            onFocusCapture={revealFocused}
-            {...stylex.props(styles.track)}
-            style={pinned ? { x: trackX } : undefined}
+            ref={(el: HTMLElement) => (trackRef = el as HTMLDivElement)}
+            onFocusIn={revealFocused}
+            {...stylex.attrs(styles.track)}
+            style={props.pinned ? { x: trackX } : undefined}
           >
-            <ProfileFrames pinned={pinned} />
+            <ProfileFrames pinned={props.pinned} />
 
             <Seam />
 
             <section
-              id={pinned ? undefined : GROUPS[1].id}
+              id={props.pinned ? undefined : GROUPS[1].id}
               data-group
               aria-labelledby="about-campus-title"
-              {...stylex.props(styles.group)}
+              {...stylex.attrs(styles.group)}
             >
-              <h2 id="about-campus-title" {...stylex.props(ui.srOnly)}>
+              <h2 id="about-campus-title" {...stylex.attrs(ui.srOnly)}>
                 {ABOUT_CAMPUS.eyebrow}
               </h2>
               {campus.map((photo, index) => {
                 const shape = PHOTO_SHAPE[photo.id];
                 return (
-                  <Fragment key={photo.id}>
+                  <>
                     {index > 0 ? <Seam /> : null}
                     <figure
                       data-frame
-                      {...stylex.props(
+                      {...stylex.attrs(
                         styles.frame,
                         styles.photo,
                         SHAPE_FIGURE[shape],
                         shiftFor(index + 3),
                       )}
                     >
-                      <div {...stylex.props(styles.media, SHAPE_MEDIA[shape])}>
+                      <div {...stylex.attrs(styles.media, SHAPE_MEDIA[shape])}>
                         <img
                           src={photo.src}
                           alt={photo.alt}
                           loading="lazy"
                           decoding="async"
-                          draggable={false}
-                          {...stylex.props(styles.fill)}
+                          draggable="false"
+                          {...stylex.attrs(styles.fill)}
                         />
                         <button
                           type="button"
                           aria-label={`View larger: ${photo.english}`}
-                          onClick={() => onOpenPhoto(index)}
-                          {...stylex.props(styles.tileButton)}
+                          onClick={() => props.onOpenPhoto(index)}
+                          {...stylex.attrs(styles.tileButton)}
                         />
                       </div>
                       <PhotoNote en={PHOTO_ENGLISH[photo.id]} cn={photo.caption} />
                     </figure>
-                  </Fragment>
+                  </>
                 );
               })}
             </section>
@@ -725,28 +723,25 @@ export function Panorama({
             <Seam />
 
             <section
-              id={pinned ? undefined : GROUPS[2].id}
+              id={props.pinned ? undefined : GROUPS[2].id}
               data-group
               aria-labelledby="about-culture-title"
-              {...stylex.props(styles.group)}
+              {...stylex.attrs(styles.group)}
             >
-              <h2 id="about-culture-title" {...stylex.props(ui.srOnly)}>
+              <h2 id="about-culture-title" {...stylex.attrs(ui.srOnly)}>
                 {ABOUT_CULTURE.eyebrow}
               </h2>
-              <ul data-frame {...stylex.props(styles.frame, styles.culture, shiftFor(10))}>
+              <ul data-frame {...stylex.attrs(styles.frame, styles.culture, shiftFor(10))}>
                 {ABOUT_CULTURE.values.map((value, index) => (
-                  <li
-                    key={value.title}
-                    {...stylex.props(styles.value, index === 0 && styles.valueFirst)}
-                  >
+                  <li {...stylex.attrs(styles.value, index === 0 && styles.valueFirst)}>
                     <span
                       aria-hidden="true"
-                      {...stylex.props(styles.glyph, VALUE_GLYPH[value.tone])}
+                      {...stylex.attrs(styles.glyph, VALUE_GLYPH[value.tone])}
                     >
                       {value.glyph}
                     </span>
-                    <h3 {...stylex.props(styles.valueTitle)}>{value.title}</h3>
-                    <p {...stylex.props(styles.valueDesc)}>{value.desc}</p>
+                    <h3 {...stylex.attrs(styles.valueTitle)}>{value.title}</h3>
+                    <p {...stylex.attrs(styles.valueDesc)}>{value.desc}</p>
                   </li>
                 ))}
               </ul>
@@ -754,9 +749,9 @@ export function Panorama({
           </m.div>
         </div>
 
-        <div aria-hidden="true" {...stylex.props(styles.hud)}>
-          <div {...stylex.props(styles.progress)}>
-            <m.span {...stylex.props(styles.progressFill)} style={{ scaleX: progress }} />
+        <div aria-hidden="true" {...stylex.attrs(styles.hud)}>
+          <div {...stylex.attrs(styles.progress)}>
+            <m.span {...stylex.attrs(styles.progressFill)} style={{ scaleX: progress }} />
           </div>
         </div>
       </div>
@@ -764,26 +759,26 @@ export function Panorama({
   );
 }
 
-function ProfileFrames({ pinned }: { pinned: boolean }) {
+function ProfileFrames(props: { pinned: boolean }) {
   return (
     <section
-      id={pinned ? undefined : GROUPS[0].id}
+      id={props.pinned ? undefined : GROUPS[0].id}
       data-group
       aria-label={NAV_ENGLISH[GROUPS[0].id]}
-      {...stylex.props(styles.group)}
+      {...stylex.attrs(styles.group)}
     >
-      <div data-frame {...stylex.props(styles.frame, styles.profile, shiftFor(0))}>
+      <div data-frame {...stylex.attrs(styles.frame, styles.profile, shiftFor(0))}>
         <div>
-          <h2 {...stylex.props(styles.profileTitle)}>{ABOUT_HERO.title}</h2>
-          <div lang="en" {...stylex.props(styles.profileEnglish)}>
+          <h2 {...stylex.attrs(styles.profileTitle)}>{ABOUT_HERO.title}</h2>
+          <div lang="en" {...stylex.attrs(styles.profileEnglish)}>
             {ABOUT_HERO.englishTitle}
           </div>
         </div>
-        <p {...stylex.props(styles.profileLead)}>{ABOUT_HERO.lead}</p>
-        <p {...stylex.props(styles.network)}>
-          <span {...stylex.props(styles.networkLead)}>{ABOUT_HERO.networkLabel}</span>
+        <p {...stylex.attrs(styles.profileLead)}>{ABOUT_HERO.lead}</p>
+        <p {...stylex.attrs(styles.network)}>
+          <span {...stylex.attrs(styles.networkLead)}>{ABOUT_HERO.networkLabel}</span>
           {ABOUT_HERO.countries.map((country, index) => (
-            <span key={country} {...stylex.props(styles.place)}>
+            <span {...stylex.attrs(styles.place)}>
               {country}
               {index < LAST_COUNTRY ? "、" : "等地。"}
             </span>
@@ -795,16 +790,16 @@ function ProfileFrames({ pinned }: { pinned: boolean }) {
 
       <figure
         data-frame
-        {...stylex.props(styles.frame, styles.photo, SHAPE_FIGURE.portrait, shiftFor(1))}
+        {...stylex.attrs(styles.frame, styles.photo, SHAPE_FIGURE.portrait, shiftFor(1))}
       >
-        <div {...stylex.props(styles.media, SHAPE_MEDIA.portrait)}>
+        <div {...stylex.attrs(styles.media, SHAPE_MEDIA.portrait)}>
           <img
             src={ABOUT_HERO.lobbyImage}
             alt={LOBBY_ALT}
             loading="lazy"
             decoding="async"
-            draggable={false}
-            {...stylex.props(styles.fill)}
+            draggable="false"
+            {...stylex.attrs(styles.fill)}
           />
         </div>
         <PhotoNote en="Headquarters Lobby" cn={ABOUT_HERO.lobbyCaption} />
@@ -812,29 +807,29 @@ function ProfileFrames({ pinned }: { pinned: boolean }) {
 
       <Seam />
 
-      <div data-frame {...stylex.props(styles.frame, styles.stats, shiftFor(2))}>
-        <figure {...stylex.props(styles.statsFigure)}>
-          <div {...stylex.props(styles.statsMedia)}>
+      <div data-frame {...stylex.attrs(styles.frame, styles.stats, shiftFor(2))}>
+        <figure {...stylex.attrs(styles.statsFigure)}>
+          <div {...stylex.attrs(styles.statsMedia)}>
             <img
               src={ABOUT_MOMENT.image}
               alt={ABOUT_MOMENT.alt}
               loading="lazy"
               decoding="async"
-              draggable={false}
-              {...stylex.props(styles.fill)}
+              draggable="false"
+              {...stylex.attrs(styles.fill)}
             />
           </div>
-          <figcaption {...stylex.props(styles.note)}>{ABOUT_MOMENT.caption}</figcaption>
+          <figcaption {...stylex.attrs(styles.note)}>{ABOUT_MOMENT.caption}</figcaption>
         </figure>
-        <div {...stylex.props(styles.statsRow)}>
+        <div {...stylex.attrs(styles.statsRow)}>
           {STATS.map((stat, index) => (
-            <div key={stat.label} {...stylex.props(styles.stat, index > 0 && styles.statDivided)}>
-              <div {...stylex.props(styles.statFigure)}>
-                <span {...stylex.props(styles.statValue)}>{stat.value}</span>
-                {stat.unit ? <span {...stylex.props(styles.statUnit)}>{stat.unit}</span> : null}
+            <div {...stylex.attrs(styles.stat, index > 0 && styles.statDivided)}>
+              <div {...stylex.attrs(styles.statFigure)}>
+                <span {...stylex.attrs(styles.statValue)}>{stat.value}</span>
+                {stat.unit ? <span {...stylex.attrs(styles.statUnit)}>{stat.unit}</span> : null}
               </div>
-              <p {...stylex.props(styles.quiet)}>
-                <span {...stylex.props(ui.srOnly)}>{STAT_ENGLISH[stat.label]}: </span>
+              <p {...stylex.attrs(styles.quiet)}>
+                <span {...stylex.attrs(ui.srOnly)}>{STAT_ENGLISH[stat.label]}: </span>
                 {stat.caption}
               </p>
             </div>

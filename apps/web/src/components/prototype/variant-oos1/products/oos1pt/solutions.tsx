@@ -1,16 +1,10 @@
-import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
+import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { ArrowLeft, ArrowRight } from "lucide-react";
-import { AnimatePresence, m } from "motion/react";
-import {
-  useEffect,
-  useId,
-  useRef,
-  useState,
-  useSyncExternalStore,
-  type KeyboardEvent,
-} from "react";
+import { ArrowLeft, ArrowRight } from "@fenchem-lp/ui/components/lucide";
+import { AnimatePresence, m } from "@/compat/motion";
+import { createEffect, createSignal, createUniqueId, For, Show } from "solid-js";
 
+import { createExternalStore } from "@/compat/external-store";
 import { EASE } from "@/components/prototype/motion-constants";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
@@ -35,9 +29,9 @@ const BODY_FONT =
 const NUMERAL_FONT = '"Inter Tight", "Source Han Sans SC", "Noto Sans SC", sans-serif';
 
 const TABLET = "@media (min-width: 768px) and (max-width: 1279.98px)";
-const DESKTOP = breakpoints.xl;
-const MD = breakpoints.md;
-const LG = breakpoints.lg;
+const DESKTOP = "@media (min-width: 1280px)";
+const MD = "@media (min-width: 768px)";
+const LG = "@media (min-width: 1024px)";
 const MD_ONLY = "@media (min-width: 768px) and (max-width: 1023.98px)";
 const LG_ONLY = "@media (min-width: 1024px) and (max-width: 1279.98px)";
 const INSET = "min(120px, 8.333vw)";
@@ -64,7 +58,7 @@ function subscribeWide(onChange: () => void) {
 }
 
 function useWideLayout() {
-  return useSyncExternalStore(
+  return createExternalStore(
     subscribeWide,
     () => window.matchMedia(WIDE_QUERY).matches,
     () => false,
@@ -416,48 +410,34 @@ const styles = stylex.create({
   },
 });
 
-function Fact({ label, values, divided }: { label: string; values: string[]; divided: boolean }) {
+function Fact(props: { label: string; values: string[]; divided: boolean }) {
   return (
-    <div {...stylex.props(styles.fact, divided && styles.divided)}>
-      <dt {...stylex.props(styles.factLabel)}>{label}</dt>
-      <dd {...stylex.props(styles.factValue)}>
-        <ul {...stylex.props(styles.factList)}>
-          {values.map((value) => (
-            <li key={value}>{value}</li>
-          ))}
+    <div {...stylex.attrs(styles.fact, props.divided && styles.divided)}>
+      <dt {...stylex.attrs(styles.factLabel)}>{props.label}</dt>
+      <dd {...stylex.attrs(styles.factValue)}>
+        <ul {...stylex.attrs(styles.factList)}>
+          <For each={props.values}>{(value) => <li>{value}</li>}</For>
         </ul>
       </dd>
     </div>
   );
 }
 
-function Column({
-  label,
-  lines,
-  divided,
-  ink = false,
-}: {
-  label: string;
-  lines: string[];
-  divided: boolean;
-  ink?: boolean;
-}) {
+function Column(props: { label: string; lines: string[]; divided: boolean; ink?: boolean }) {
   return (
-    <div {...stylex.props(styles.column, divided && styles.divided)}>
-      <dt {...stylex.props(styles.columnLabel)}>{label}</dt>
-      <dd {...stylex.props(styles.columnValue)}>
-        {lines.length > 0 ? (
-          <ul {...stylex.props(styles.lines, ink && styles.linesInk)}>
-            {lines.map((line) => (
-              <li key={line}>{line}</li>
-            ))}
+    <div {...stylex.attrs(styles.column, props.divided && styles.divided)}>
+      <dt {...stylex.attrs(styles.columnLabel)}>{props.label}</dt>
+      <dd {...stylex.attrs(styles.columnValue)}>
+        {props.lines.length > 0 ? (
+          <ul {...stylex.attrs(styles.lines, props.ink && styles.linesInk)}>
+            <For each={props.lines}>{(line) => <li>{line}</li>}</For>
           </ul>
         ) : (
           <>
-            <span aria-hidden="true" {...stylex.props(styles.dash)}>
+            <span aria-hidden="true" {...stylex.attrs(styles.dash)}>
               —
             </span>
-            <span {...stylex.props(styles.visuallyHidden)}>Not provided</span>
+            <span {...stylex.attrs(styles.visuallyHidden)}>Not provided</span>
           </>
         )}
       </dd>
@@ -465,24 +445,25 @@ function Column({
   );
 }
 
-function SheetBody({ item, index }: { item: SolutionItem; index: number }) {
+function SheetBody(props: { item: SolutionItem; index: number }) {
+  const item = props.item;
   const columns = item.challenges.length > 0 ? styles.columnsEven : styles.columnsNarrowLast;
   return (
     <>
-      <header {...stylex.props(styles.sheetHead)}>
-        <p {...stylex.props(styles.sheetIndex)}>
-          {padIndex(index)}
-          <span {...stylex.props(styles.sheetTotal)}> / {padIndex(LAST_INDEX)}</span>
+      <header {...stylex.attrs(styles.sheetHead)}>
+        <p {...stylex.attrs(styles.sheetIndex)}>
+          {padIndex(props.index)}
+          <span {...stylex.attrs(styles.sheetTotal)}> / {padIndex(LAST_INDEX)}</span>
         </p>
-        <h3 {...stylex.props(styles.sheetTitle)}>{item.title}</h3>
-        <p {...stylex.props(styles.sheetSubtitle)}>{item.subtitle}</p>
+        <h3 {...stylex.attrs(styles.sheetTitle)}>{item.title}</h3>
+        <p {...stylex.attrs(styles.sheetSubtitle)}>{item.subtitle}</p>
       </header>
-      <dl {...stylex.props(styles.grid, styles.facts, columns)}>
+      <dl {...stylex.attrs(styles.grid, styles.facts, columns)}>
         <Fact label="功能" values={item.functions} divided={false} />
         <Fact label="质地" values={item.texture} divided />
         <Fact label="应用" values={item.applications} divided />
       </dl>
-      <dl {...stylex.props(styles.grid, columns)}>
+      <dl {...stylex.attrs(styles.grid, columns)}>
         <Column label="概述" lines={item.overview} divided={false} />
         <Column label="功能性成分" lines={item.keyIngredients} divided ink />
         <Column label="配方挑战" lines={item.challenges} divided />
@@ -491,29 +472,27 @@ function SheetBody({ item, index }: { item: SolutionItem; index: number }) {
   );
 }
 
-function FootButton({
-  direction,
-  target,
-  onStep,
-}: {
+function FootButton(props: {
   direction: "prev" | "next";
   target: SolutionItem | undefined;
   onStep: () => void;
 }) {
-  const isNext = direction === "next";
+  const isNext = props.direction === "next";
   const label = isNext ? "下一个" : "上一个";
   return (
     <button
       type="button"
-      aria-disabled={target ? undefined : true}
-      onClick={target ? onStep : undefined}
-      {...stylex.props(
+      aria-disabled={props.target ? undefined : "true"}
+      onClick={() => {
+        if (props.target) props.onStep();
+      }}
+      {...stylex.attrs(
         styles.footButton,
         isNext && styles.footNext,
-        !target && styles.footDisabled,
+        !props.target && styles.footDisabled,
       )}
     >
-      <span {...stylex.props(styles.footLabel)}>
+      <span {...stylex.attrs(styles.footLabel)}>
         {!isNext && (
           <ArrowLeft size={16} strokeWidth={1.5} absoluteStrokeWidth aria-hidden="true" />
         )}
@@ -522,7 +501,7 @@ function FootButton({
           <ArrowRight size={16} strokeWidth={1.5} absoluteStrokeWidth aria-hidden="true" />
         )}
       </span>
-      {target && <span {...stylex.props(styles.footTitle)}>{target.title}</span>}
+      {props.target && <span {...stylex.attrs(styles.footTitle)}>{props.target.title}</span>}
     </button>
   );
 }
@@ -530,82 +509,83 @@ function FootButton({
 export function Solutions() {
   const reduce = useReducedMotion();
   const wide = useWideLayout();
-  const baseId = useId();
+  const baseId = createUniqueId();
   const titleId = `${baseId}-title`;
   const panelId = `${baseId}-panel`;
   const tabId = (index: number) => `${baseId}-tab-${index}`;
-  const [activeIndex, setActiveIndex] = useState(0);
-  const tabRefs = useRef<Array<HTMLButtonElement | null>>([]);
-  const stripRef = useRef<HTMLDivElement>(null);
-  const layoutRef = useRef<HTMLDivElement>(null);
-  const sheetRef = useRef<HTMLDivElement>(null);
-  const active = SOLUTION_ITEMS[activeIndex];
+  const [activeIndex, setActiveIndex] = createSignal(0);
+  const tabs: Array<HTMLButtonElement | undefined> = [];
+  let strip: HTMLDivElement | undefined;
+  let layout: HTMLDivElement | undefined;
+  let sheet: HTMLDivElement | undefined;
+  const active = () => SOLUTION_ITEMS[activeIndex()];
 
-  useEffect(() => {
-    const strip = stripRef.current;
-    const tab = tabRefs.current[activeIndex];
-    if (!strip || !tab || strip.scrollWidth <= strip.clientWidth) return;
-    strip.scrollTo({
-      left: tab.offsetLeft - (strip.clientWidth - tab.offsetWidth) / 2,
-      behavior: reduce ? "auto" : "smooth",
-    });
-  }, [activeIndex, reduce]);
+  createEffect(
+    () => [activeIndex(), reduce()] as const,
+    ([index, reduced]) => {
+      const tab = tabs[index];
+      if (!strip || !tab || strip.scrollWidth <= strip.clientWidth) return;
+      strip.scrollTo({
+        left: tab.offsetLeft - (strip.clientWidth - tab.offsetWidth) / 2,
+        behavior: reduced ? "auto" : "smooth",
+      });
+    },
+  );
 
-  const onTabKeyDown = (event: KeyboardEvent<HTMLButtonElement>, index: number) => {
+  const onTabKeyDown = (event: KeyboardEvent, index: number) => {
     const step = KEY_STEPS[event.key];
     if (!step) return;
     event.preventDefault();
     const target = (step(index) + SOLUTION_ITEMS.length) % SOLUTION_ITEMS.length;
     setActiveIndex(target);
-    tabRefs.current[target]?.focus();
+    tabs[target]?.focus();
   };
 
   const stepBy = (delta: number) => {
-    setActiveIndex(activeIndex + delta);
-    const sheetTop = sheetRef.current?.getBoundingClientRect().top ?? HEADER_HEIGHT;
+    setActiveIndex(activeIndex() + delta);
+    const sheetTop = sheet?.getBoundingClientRect().top ?? HEADER_HEIGHT;
     if (sheetTop < HEADER_HEIGHT) {
-      layoutRef.current?.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+      layout?.scrollIntoView({ behavior: reduce() ? "auto" : "smooth", block: "start" });
     }
   };
 
   return (
-    <section id="products-solutions" aria-labelledby={titleId} {...stylex.props(styles.section)}>
-      <div {...stylex.props(styles.shell)}>
-        <header {...stylex.props(styles.head)}>
-          <h2 id={titleId} {...stylex.props(styles.title)}>
+    <section id="products-solutions" aria-labelledby={titleId} {...stylex.attrs(styles.section)}>
+      <div {...stylex.attrs(styles.shell)}>
+        <header {...stylex.attrs(styles.head)}>
+          <h2 id={titleId} {...stylex.attrs(styles.title)}>
             应用方案
           </h2>
         </header>
-        <div ref={layoutRef} {...stylex.props(styles.layout)}>
+        <div ref={layout} {...stylex.attrs(styles.layout)}>
           <div
-            ref={stripRef}
+            ref={strip}
             role="tablist"
             aria-labelledby={titleId}
-            aria-orientation={wide ? "vertical" : "horizontal"}
-            {...stylex.props(styles.strip)}
+            aria-orientation={wide() ? "vertical" : "horizontal"}
+            {...stylex.attrs(styles.strip)}
           >
             {SOLUTION_ITEMS.map((item, index) => {
-              const selected = index === activeIndex;
+              const selected = () => index === activeIndex();
               return (
                 <button
-                  key={item.id}
                   ref={(node) => {
-                    tabRefs.current[index] = node;
+                    tabs[index] = node;
                   }}
                   type="button"
                   role="tab"
                   id={tabId(index)}
-                  aria-selected={selected}
+                  aria-selected={selected() ? "true" : "false"}
                   aria-controls={panelId}
-                  tabIndex={selected ? 0 : -1}
+                  tabindex={selected() ? 0 : -1}
                   onClick={() => setActiveIndex(index)}
                   onKeyDown={(event) => onTabKeyDown(event, index)}
-                  {...stylex.props(styles.tab, selected && styles.tabSelected)}
+                  {...stylex.attrs(styles.tab, selected() && styles.tabSelected)}
                 >
-                  <span {...stylex.props(styles.tabIndex, selected && styles.tabIndexSelected)}>
+                  <span {...stylex.attrs(styles.tabIndex, selected() && styles.tabIndexSelected)}>
                     {padIndex(index)}
                   </span>
-                  <span {...stylex.props(styles.tabTitle, selected && styles.tabTitleSelected)}>
+                  <span {...stylex.attrs(styles.tabTitle, selected() && styles.tabTitleSelected)}>
                     {item.title}
                   </span>
                 </button>
@@ -613,35 +593,38 @@ export function Solutions() {
             })}
           </div>
           <div
-            ref={sheetRef}
+            ref={sheet}
             role="tabpanel"
             id={panelId}
-            aria-labelledby={tabId(activeIndex)}
-            tabIndex={0}
-            {...stylex.props(styles.sheet)}
+            aria-labelledby={tabId(activeIndex())}
+            tabindex={0}
+            {...stylex.attrs(styles.sheet)}
           >
-            <div {...stylex.props(styles.sheetContent)}>
+            <div {...stylex.attrs(styles.sheetContent)}>
               <AnimatePresence mode="wait" initial={false}>
-                <m.div
-                  key={active.id}
-                  initial={{ opacity: 0, y: 6 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 0 }}
-                  transition={{ duration: reduce ? 0 : 0.18, ease: EASE }}
-                >
-                  <SheetBody item={active} index={activeIndex} />
-                </m.div>
+                <Show when={active()} keyed>
+                  {(item) => (
+                    <m.div
+                      initial={{ opacity: 0, y: 6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 0 }}
+                      transition={{ duration: reduce() ? 0 : 0.18, ease: EASE }}
+                    >
+                      <SheetBody item={item} index={SOLUTION_ITEMS.indexOf(item)} />
+                    </m.div>
+                  )}
+                </Show>
               </AnimatePresence>
             </div>
-            <div {...stylex.props(styles.foot)}>
+            <div {...stylex.attrs(styles.foot)}>
               <FootButton
                 direction="prev"
-                target={SOLUTION_ITEMS[activeIndex - 1]}
+                target={SOLUTION_ITEMS[activeIndex() - 1]}
                 onStep={() => stepBy(-1)}
               />
               <FootButton
                 direction="next"
-                target={SOLUTION_ITEMS[activeIndex + 1]}
+                target={SOLUTION_ITEMS[activeIndex() + 1]}
                 onStep={() => stepBy(1)}
               />
             </div>

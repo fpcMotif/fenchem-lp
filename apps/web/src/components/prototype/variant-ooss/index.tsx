@@ -1,7 +1,7 @@
 import * as stylex from "@stylexjs/stylex";
-import { LazyMotion, MotionConfig, domAnimation } from "motion/react";
-import { useCallback, useEffect, useState } from "react";
-import { preinit, preload } from "react-dom";
+import { LazyMotion, MotionConfig, domAnimation } from "@/compat/motion";
+import { createEffect, createSignal } from "solid-js";
+import { preinit, preload } from "@/compat/react-dom";
 
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
@@ -58,28 +58,31 @@ export function VariantOOSS() {
   preinit(GOOGLE_FONTS, { as: "style" });
   preload(HERO.image, { as: "image", fetchPriority: "high" });
   const reduce = useReducedMotion();
-  const [introStarted, setIntroStarted] = useState(false);
-  const startIntro = useCallback(() => setIntroStarted(true), []);
-  useEffect(() => {
-    if (reduce) return;
-    const root = document.documentElement;
-    const previous = root.style.scrollBehavior;
-    root.style.scrollBehavior = "smooth";
-    return () => {
-      root.style.scrollBehavior = previous;
-    };
-  }, [reduce]);
+  const [introStarted, setIntroStarted] = createSignal(false);
+  const startIntro = () => setIntroStarted(true);
+  createEffect(
+    () => reduce(),
+    (reduced) => {
+      if (reduced) return;
+      const root = document.documentElement;
+      const previous = root.style.scrollBehavior;
+      root.style.scrollBehavior = "smooth";
+      return () => {
+        root.style.scrollBehavior = previous;
+      };
+    },
+  );
   return (
     <LazyMotion features={domAnimation} strict>
       <MotionConfig reducedMotion="user">
-        <div lang="zh-CN" {...stylex.props(styles.root)}>
-          <div {...stylex.props(styles.page)}>
-            <a href="#main-content" {...stylex.props(styles.skipLink)}>
+        <div lang="zh-CN" {...stylex.attrs(styles.root)}>
+          <div {...stylex.attrs(styles.page)}>
+            <a href="#main-content" {...stylex.attrs(styles.skipLink)}>
               跳到主要内容
             </a>
-            <SiteHeader introStarted={introStarted} />
-            <main id="main-content" tabIndex={-1} {...stylex.props(styles.mainTarget)}>
-              <Hero ready={introStarted} onReady={startIntro} />
+            <SiteHeader introStarted={introStarted()} />
+            <main id="main-content" tabindex={-1} {...stylex.attrs(styles.mainTarget)}>
+              <Hero ready={introStarted()} onReady={startIntro} />
               <Campus />
               <Markets />
               <Network />

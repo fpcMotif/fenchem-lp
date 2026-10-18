@@ -1,5 +1,4 @@
 import * as stylex from "@stylexjs/stylex";
-import { useRef } from "react";
 
 import { ABOUT_STRUCTURE } from "../../about-data";
 import { SheetHeader } from "./sheet-header";
@@ -7,6 +6,7 @@ import { srOnly, ui } from "./shared";
 import { StructureDrawing } from "./structure-drawing";
 import { bp, face, tone } from "./tokens.stylex";
 import { useViewAssembly } from "./use-assembly-progress";
+import { createSignal } from "solid-js";
 
 const ENTRIES = [
   { id: "holding", ...ABOUT_STRUCTURE.holding },
@@ -99,14 +99,14 @@ const styles = stylex.create({
 });
 
 export function Structure() {
-  const drawingRef = useRef<HTMLDivElement>(null);
+  const [drawingRef, setDrawingRef] = createSignal<HTMLDivElement>();
   const progress = useViewAssembly(drawingRef, 2.2);
 
   return (
     <section
       id="about-structure"
       aria-labelledby="oos1m-structure"
-      {...stylex.props(ui.shell, ui.section, ui.anchor)}
+      {...stylex.attrs(ui.shell, ui.section, ui.anchor)}
     >
       <SheetHeader
         sheet={6}
@@ -114,37 +114,37 @@ export function Structure() {
         english="General assembly"
         titleId="oos1m-structure"
       />
-      <div {...stylex.props(ui.grid, styles.body)}>
-        <div ref={drawingRef} {...stylex.props(styles.drawing)}>
+      <div {...stylex.attrs(ui.grid, styles.body)}>
+        <div ref={setDrawingRef} {...stylex.attrs(styles.drawing)}>
           <StructureDrawing progress={progress} />
         </div>
-        <div {...stylex.props(styles.bom)}>
-          <p {...stylex.props(ui.caps, styles.caption)}>
+        <div {...stylex.attrs(styles.bom)}>
+          <p {...stylex.attrs(ui.caps, styles.caption)}>
             <span lang="en">Parts list</span>
             <span lang="en">6 items · all flush</span>
           </p>
-          <div aria-hidden="true" {...stylex.props(ui.caps, styles.row, styles.head)}>
+          <div aria-hidden="true" {...stylex.attrs(ui.caps, styles.row, styles.head)}>
             <span lang="en">Item</span>
             <span lang="en">Name</span>
-            <span lang="en" {...stylex.props(styles.typeHead)}>
+            <span lang="en" {...stylex.attrs(styles.typeHead)}>
               Type
             </span>
           </div>
-          <ol {...stylex.props(styles.list)}>
+          <ol {...stylex.attrs(styles.list)}>
             {ENTRIES.map((entry, index) => (
-              <li key={entry.id} {...stylex.props(styles.row, styles.item)}>
-                <span aria-hidden="true" {...stylex.props(ui.balloon)}>
+              <li {...stylex.attrs(styles.row, styles.item)}>
+                <span aria-hidden="true" {...stylex.attrs(ui.balloon)}>
                   {index + 1}
                 </span>
-                <span {...stylex.props(styles.names)}>
-                  <span {...stylex.props(styles.name, index === 0 && styles.holdingName)}>
+                <span {...stylex.attrs(styles.names)}>
+                  <span {...stylex.attrs(styles.name, index === 0 && styles.holdingName)}>
                     {entry.name}
                   </span>
-                  <span lang="en" {...stylex.props(ui.label)}>
+                  <span lang="en" {...stylex.attrs(ui.label)}>
                     {entry.english}
                   </span>
                 </span>
-                <span {...stylex.props(styles.type)}>
+                <span {...stylex.attrs(styles.type)}>
                   <span {...srOnly}>Type:</span>
                   {entry.badge}
                 </span>

@@ -1,6 +1,6 @@
-import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
+import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { useEffect, useId, useRef, useState } from "react";
+import { createSignal, createUniqueId, onSettled } from "solid-js";
 
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
@@ -23,9 +23,9 @@ const NUMERAL_FONT =
   '"Inter Tight", "Source Han Sans SC", "Noto Sans SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif';
 
 const TABLET = "@media (min-width: 768px) and (max-width: 1279.98px)";
-const DESKTOP = breakpoints.xl;
-const MD = breakpoints.md;
-const LG = breakpoints.lg;
+const DESKTOP = "@media (min-width: 1280px)";
+const MD = "@media (min-width: 768px)";
+const LG = "@media (min-width: 1024px)";
 const INSET = "min(120px, 8.333vw)";
 const HEADER_HEIGHT = 80;
 const STRIP_HEIGHT = 48;
@@ -400,53 +400,55 @@ const styles = stylex.create({
   },
 });
 
-function GroupHeading({ group }: { group: LetterGroup }) {
+function GroupHeading(props: { group: LetterGroup }) {
+  const group = props.group;
   const isUnnamed = group.key === NO_LATIN;
   return (
-    <span {...stylex.props(styles.groupHeading)}>
-      <span lang={isUnnamed ? undefined : "la"} {...stylex.props(styles.groupLetter)}>
+    <span {...stylex.attrs(styles.groupHeading)}>
+      <span lang={isUnnamed ? undefined : "la"} {...stylex.attrs(styles.groupLetter)}>
         {group.key}
       </span>
-      {isUnnamed && <span {...stylex.props(styles.groupLabel)}>{NO_LATIN_LABEL}</span>}
-      <span {...stylex.props(styles.groupCount)}>{group.items.length} 款</span>
+      {isUnnamed && <span {...stylex.attrs(styles.groupLabel)}>{NO_LATIN_LABEL}</span>}
+      <span {...stylex.attrs(styles.groupCount)}>{group.items.length} 款</span>
     </span>
   );
 }
 
-function ItemRow({ item, isPlace }: { item: FlatItem; isPlace: boolean }) {
+function ItemRow(props: { item: FlatItem; isPlace: boolean }) {
+  const item = props.item;
   const [headword, ...otherLatin] = item.latin;
   return (
-    <tr {...stylex.props(styles.row)}>
-      <td {...stylex.props(styles.cell, styles.latinCell, !headword && styles.latinCellEmpty)}>
+    <tr {...stylex.attrs(styles.row)}>
+      <td {...stylex.attrs(styles.cell, styles.latinCell, !headword && styles.latinCellEmpty)}>
         {headword ? (
           <>
-            <span lang="la" {...stylex.props(styles.latinHead)}>
+            <span lang="la" {...stylex.attrs(styles.latinHead)}>
               {headword}
             </span>
             {otherLatin.map((name) => (
-              <span key={name} lang="la" {...stylex.props(styles.latinMore)}>
+              <span lang="la" {...stylex.attrs(styles.latinMore)}>
                 {name}
               </span>
             ))}
           </>
         ) : (
-          <span aria-hidden="true" {...stylex.props(styles.latinNone)}>
+          <span aria-hidden="true" {...stylex.attrs(styles.latinNone)}>
             —
           </span>
         )}
       </td>
-      <th scope="row" {...stylex.props(styles.cell, styles.nameCell)}>
-        <span {...stylex.props(styles.namePrimary)}>{item.primary}</span>
-        {item.secondary && <span {...stylex.props(styles.nameSecondary)}>{item.secondary}</span>}
-        <span {...stylex.props(styles.inci)}>{item.inci}</span>
+      <th scope="row" {...stylex.attrs(styles.cell, styles.nameCell)}>
+        <span {...stylex.attrs(styles.namePrimary)}>{item.primary}</span>
+        {item.secondary && <span {...stylex.attrs(styles.nameSecondary)}>{item.secondary}</span>}
+        <span {...stylex.attrs(styles.inci)}>{item.inci}</span>
       </th>
-      <td {...stylex.props(styles.cell, styles.originCell)}>
-        <span {...stylex.props(styles.origin, !isPlace && styles.originCategory)}>
+      <td {...stylex.attrs(styles.cell, styles.originCell)}>
+        <span {...stylex.attrs(styles.origin, !props.isPlace && styles.originCategory)}>
           {originOf(item)}
         </span>
       </td>
-      <td {...stylex.props(styles.cell, styles.cellLast, styles.featuresCell)}>
-        <p {...stylex.props(styles.features)}>{item.features}</p>
+      <td {...stylex.attrs(styles.cell, styles.cellLast, styles.featuresCell)}>
+        <p {...stylex.attrs(styles.features)}>{item.features}</p>
       </td>
     </tr>
   );
@@ -454,15 +456,15 @@ function ItemRow({ item, isPlace }: { item: FlatItem; isPlace: boolean }) {
 
 export function Catalog() {
   const reduce = useReducedMotion();
-  const titleId = useId();
-  const baseId = useId();
-  const [current, setCurrent] = useState<string | null>(null);
-  const bodyRefs = useRef(new Map<string, HTMLTableSectionElement>());
-  const headRefs = useRef(new Map<string, HTMLTableCellElement>());
+  const titleId = createUniqueId();
+  const baseId = createUniqueId();
+  const [current, setCurrent] = createSignal<string | null>(null);
+  const bodies = new Map<string, HTMLTableSectionElement>();
+  const heads = new Map<string, HTMLTableCellElement>();
 
   const groupRowId = (group: LetterGroup) => `${baseId}-letter-${group.slug}`;
 
-  useEffect(() => {
+  onSettled(() => {
     const visible = new Set<string>();
     const observer = new IntersectionObserver(
       (entries) => {
@@ -476,47 +478,47 @@ export function Catalog() {
       },
       { rootMargin: `-${HEADER_HEIGHT + STRIP_HEIGHT + 24}px 0px -50% 0px` },
     );
-    for (const node of bodyRefs.current.values()) observer.observe(node);
+    for (const node of bodies.values()) observer.observe(node);
     return () => observer.disconnect();
-  }, []);
+  });
 
   const jumpTo = (key: string) => {
-    const heading = headRefs.current.get(key);
+    const heading = heads.get(key);
     const row = heading?.parentElement;
     if (!heading || !row) return;
     heading.focus({ preventScroll: true });
-    row.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+    row.scrollIntoView({ behavior: reduce() ? "auto" : "smooth", block: "start" });
     setCurrent(key);
   };
 
   return (
-    <section id="products-catalog" aria-labelledby={titleId} {...stylex.props(styles.section)}>
-      <div {...stylex.props(styles.shell)}>
-        <header {...stylex.props(styles.head)}>
-          <h2 id={titleId} {...stylex.props(styles.title)}>
+    <section id="products-catalog" aria-labelledby={titleId} {...stylex.attrs(styles.section)}>
+      <div {...stylex.attrs(styles.shell)}>
+        <header {...stylex.attrs(styles.head)}>
+          <h2 id={titleId} {...stylex.attrs(styles.title)}>
             产品目录
           </h2>
-          <p {...stylex.props(styles.lead)}>
-            <span {...stylex.props(styles.leadCount)}>{FLAT_ITEMS.length}</span>
+          <p {...stylex.attrs(styles.lead)}>
+            <span {...stylex.attrs(styles.leadCount)}>{FLAT_ITEMS.length}</span>
             {" 款原料，按植物学名首字母 A–Z 排列；无植物学名者列于末尾。"}
           </p>
         </header>
 
-        <nav aria-label="Jump to botanical names by first letter" {...stylex.props(styles.strip)}>
-          <ul {...stylex.props(styles.stripList)}>
+        <nav aria-label="Jump to botanical names by first letter" {...stylex.attrs(styles.strip)}>
+          <ul {...stylex.attrs(styles.stripList)}>
             {STRIP_ENTRIES.map(({ key, filled }) => {
-              const isCurrent = current === key;
+              const isCurrent = () => current() === key;
               return (
-                <li key={key}>
+                <li>
                   <button
                     type="button"
                     disabled={!filled}
                     aria-label={key === NO_LATIN ? "No botanical name" : undefined}
-                    aria-current={isCurrent ? "true" : undefined}
+                    aria-current={isCurrent() ? "true" : undefined}
                     onClick={() => jumpTo(key)}
-                    {...stylex.props(
+                    {...stylex.attrs(
                       styles.letter,
-                      isCurrent && styles.letterCurrent,
+                      isCurrent() && styles.letterCurrent,
                       !filled && styles.letterOff,
                     )}
                   >
@@ -528,59 +530,56 @@ export function Catalog() {
           </ul>
         </nav>
 
-        <table aria-labelledby={titleId} {...stylex.props(styles.table)}>
+        <table aria-labelledby={titleId} {...stylex.attrs(styles.table)}>
           <colgroup>
-            <col {...stylex.props(styles.colLatin)} />
-            <col {...stylex.props(styles.colName)} />
-            <col {...stylex.props(styles.colOrigin)} />
-            <col {...stylex.props(styles.colFeatures)} />
+            <col {...stylex.attrs(styles.colLatin)} />
+            <col {...stylex.attrs(styles.colName)} />
+            <col {...stylex.attrs(styles.colOrigin)} />
+            <col {...stylex.attrs(styles.colFeatures)} />
           </colgroup>
-          <thead {...stylex.props(styles.thead)}>
+          <thead {...stylex.attrs(styles.thead)}>
             <tr>
-              <th scope="col" {...stylex.props(styles.colHead)}>
+              <th scope="col" {...stylex.attrs(styles.colHead)}>
                 <span aria-hidden="true">学名</span>
-                <span {...stylex.props(styles.srOnly)}>Botanical name</span>
+                <span {...stylex.attrs(styles.srOnly)}>Botanical name</span>
               </th>
-              <th scope="col" {...stylex.props(styles.colHead)}>
+              <th scope="col" {...stylex.attrs(styles.colHead)}>
                 <span aria-hidden="true">名称</span>
-                <span {...stylex.props(styles.srOnly)}>Name</span>
+                <span {...stylex.attrs(styles.srOnly)}>Name</span>
               </th>
-              <th scope="col" {...stylex.props(styles.colHead)}>
+              <th scope="col" {...stylex.attrs(styles.colHead)}>
                 <span aria-hidden="true">产地</span>
-                <span {...stylex.props(styles.srOnly)}>Origin</span>
+                <span {...stylex.attrs(styles.srOnly)}>Origin</span>
               </th>
-              <th scope="col" {...stylex.props(styles.colHead, styles.colHeadLast)}>
+              <th scope="col" {...stylex.attrs(styles.colHead, styles.colHeadLast)}>
                 <span aria-hidden="true">特性&应用</span>
-                <span {...stylex.props(styles.srOnly)}>Features & applications</span>
+                <span {...stylex.attrs(styles.srOnly)}>Features & applications</span>
               </th>
             </tr>
           </thead>
           {LETTER_GROUPS.map((group, index) => (
             <tbody
-              key={group.key}
               data-letter={group.key}
               ref={(node) => {
-                if (node) bodyRefs.current.set(group.key, node);
-                else bodyRefs.current.delete(group.key);
+                bodies.set(group.key, node);
               }}
-              {...stylex.props(styles.tbody)}
+              {...stylex.attrs(styles.tbody)}
             >
-              <tr id={groupRowId(group)} {...stylex.props(styles.groupRow)}>
+              <tr id={groupRowId(group)} {...stylex.attrs(styles.groupRow)}>
                 <th
                   scope="rowgroup"
-                  colSpan={4}
-                  tabIndex={-1}
+                  colspan={4}
+                  tabindex={-1}
                   ref={(node) => {
-                    if (node) headRefs.current.set(group.key, node);
-                    else headRefs.current.delete(group.key);
+                    heads.set(group.key, node);
                   }}
-                  {...stylex.props(styles.groupCell, index === 0 && styles.groupCellFirst)}
+                  {...stylex.attrs(styles.groupCell, index === 0 && styles.groupCellFirst)}
                 >
                   <GroupHeading group={group} />
                 </th>
               </tr>
               {group.items.map((item) => (
-                <ItemRow key={item.id} item={item} isPlace={PLACE_GROUPS.has(item.group.id)} />
+                <ItemRow item={item} isPlace={PLACE_GROUPS.has(item.group.id)} />
               ))}
             </tbody>
           ))}

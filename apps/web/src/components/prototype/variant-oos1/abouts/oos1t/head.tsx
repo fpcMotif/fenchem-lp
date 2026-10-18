@@ -1,5 +1,5 @@
 import * as stylex from "@stylexjs/stylex";
-import type { CSSProperties } from "react";
+import type { JSX } from "@solidjs/web";
 
 import { ui } from "./shared";
 import { clock, hourAngle } from "./sun";
@@ -92,42 +92,37 @@ const styles = stylex.create({
   },
 });
 
-export function SectionHead({
-  titleId,
-  hour,
-  title,
-  english,
-}: {
+export function SectionHead(props: {
   titleId: string;
   hour: number;
   title: string;
   english: string;
 }) {
-  const reading = clock(hour);
+  const reading = clock(props.hour);
   return (
-    <header {...stylex.props(ui.grid, styles.head)}>
-      <div {...stylex.props(styles.reading)}>
-        <span aria-hidden="true" {...stylex.props(styles.dial)}>
+    <header {...stylex.attrs(ui.grid, styles.head)}>
+      <div {...stylex.attrs(styles.reading)}>
+        <span aria-hidden="true" {...stylex.attrs(styles.dial)}>
           <span
-            style={{ "--mark": hourAngle(hour) } as CSSProperties}
-            {...stylex.props(styles.hand, styles.mark)}
+            style={{ "--mark": hourAngle(props.hour) } as JSX.CSSProperties}
+            {...stylex.attrs(styles.hand, styles.mark)}
           />
-          <span {...stylex.props(styles.hand, styles.live)} />
-          <span {...stylex.props(styles.pin)} />
+          <span {...stylex.attrs(styles.hand, styles.live)} />
+          <span {...stylex.attrs(styles.pin)} />
         </span>
-        <p {...stylex.props(styles.time)}>
-          <span {...stylex.props(styles.digits)}>{reading.time}</span>
-          <span lang="en" {...stylex.props(styles.half)}>
+        <p {...stylex.attrs(styles.time)}>
+          <span {...stylex.attrs(styles.digits)}>{reading.time}</span>
+          <span lang="en" {...stylex.attrs(styles.half)}>
             {reading.half}
           </span>
         </p>
       </div>
-      <div {...stylex.props(styles.titles)}>
-        <h2 id={titleId} {...stylex.props(styles.title)}>
-          {title}
+      <div {...stylex.attrs(styles.titles)}>
+        <h2 id={props.titleId} {...stylex.attrs(styles.title)}>
+          {props.title}
         </h2>
-        <p lang="en" {...stylex.props(ui.eyebrow)}>
-          {english}
+        <p lang="en" {...stylex.attrs(ui.eyebrow)}>
+          {props.english}
         </p>
       </div>
     </header>

@@ -79,28 +79,28 @@ const styles = stylex.create({
 export function StatsSheet() {
   return (
     <Sheet def={STATS_SHEET}>
-      <div {...stylex.props(styles.photo)}>
+      <div {...stylex.attrs(styles.photo)}>
         <img
           src={ABOUT_MOMENT.image}
           alt={ABOUT_MOMENT.alt}
           loading="lazy"
           decoding="async"
-          {...stylex.props(base.fill, styles.photoImage)}
+          {...stylex.attrs(base.fill, styles.photoImage)}
         />
       </div>
-      <ul {...stylex.props(styles.stats)}>
+      <ul {...stylex.attrs(styles.stats)}>
         {STATS.map((stat, idx) => (
-          <Reveal key={stat.label} as="li" step={idx} sx={styles.stat}>
-            <span {...stylex.props(base.quiet, styles.label)}>{stat.label}</span>
-            <div {...stylex.props(styles.figure)}>
-              <span {...stylex.props(styles.value)}>{stat.value}</span>
-              {stat.unit ? <span {...stylex.props(styles.unit)}>{stat.unit}</span> : null}
+          <Reveal as="li" step={idx} sx={styles.stat}>
+            <span {...stylex.attrs(base.quiet, styles.label)}>{stat.label}</span>
+            <div {...stylex.attrs(styles.figure)}>
+              <span {...stylex.attrs(styles.value)}>{stat.value}</span>
+              {stat.unit ? <span {...stylex.attrs(styles.unit)}>{stat.unit}</span> : null}
             </div>
-            <p {...stylex.props(styles.caption)}>{stat.caption}</p>
+            <p {...stylex.attrs(styles.caption)}>{stat.caption}</p>
           </Reveal>
         ))}
       </ul>
-      <p {...stylex.props(base.quiet, styles.photoCaption)}>{ABOUT_MOMENT.caption}</p>
+      <p {...stylex.attrs(base.quiet, styles.photoCaption)}>{ABOUT_MOMENT.caption}</p>
     </Sheet>
   );
 }

@@ -1,4 +1,4 @@
-import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
+import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 
 import { useLightbox } from "@/components/prototype/shared/lightbox";
@@ -10,8 +10,8 @@ import { Lightbox } from "./lightbox";
 import { palette } from "./palette.stylex";
 import { Reveal } from "./reveal";
 
-const LG = breakpoints.lg;
-const MD = breakpoints.md;
+const LG = "@media (min-width: 1024px)";
+const MD = "@media (min-width: 768px)";
 const DROP = 24;
 
 const dynamic = stylex.create({
@@ -31,7 +31,7 @@ const styles = stylex.create({
       default: "auto",
       [MD]: "1 / 1",
       [LG]: "3 / 2",
-      [breakpoints.xl]: "2 / 1",
+      ["@media (min-width: 1280px)"]: "2 / 1",
     },
     marginBottom: { default: 0, [MD]: DROP },
   },
@@ -131,22 +131,22 @@ export function Campus() {
     if (!entry) return null;
     const { photo, index } = entry;
     return (
-      <figure key={photo.id} {...stylex.props(styles.tile, placementStyle(placement))}>
+      <figure {...stylex.attrs(styles.tile, placementStyle(placement))}>
         <button
           type="button"
           aria-label={`View larger: ${photo.english}`}
           onClick={() => lightbox.open(index)}
-          {...stylex.props(styles.button)}
+          {...stylex.attrs(styles.button)}
         >
           <img
             src={photo.src}
             alt={photo.alt}
             loading="lazy"
             decoding="async"
-            {...stylex.props(layout.fill, dynamic.focus(MOSAIC_FOCUS[id] ?? "50% 50%"))}
+            {...stylex.attrs(layout.fill, dynamic.focus(MOSAIC_FOCUS[id] ?? "50% 50%"))}
           />
         </button>
-        <figcaption {...stylex.props(styles.caption)}>{photo.caption}</figcaption>
+        <figcaption {...stylex.attrs(styles.caption)}>{photo.caption}</figcaption>
       </figure>
     );
   };
@@ -155,13 +155,13 @@ export function Campus() {
     <section
       id="about-campus"
       aria-labelledby="about-campus-title"
-      {...stylex.props(styles.section, layout.sectionY, layout.anchor)}
+      {...stylex.attrs(styles.section, layout.sectionY, layout.anchor)}
     >
-      <h2 id="about-campus-title" {...stylex.props(layout.srOnly)}>
+      <h2 id="about-campus-title" {...stylex.attrs(layout.srOnly)}>
         Campus
       </h2>
-      <div {...stylex.props(layout.shell, layout.padBoth)}>
-        <div {...stylex.props(styles.canvas)}>
+      <div {...stylex.attrs(layout.shell, layout.padBoth)}>
+        <div {...stylex.attrs(styles.canvas)}>
           <Reveal sx={styles.groupLeft}>{MOSAIC_LEFT.map((id) => renderTile(id, "a"))}</Reveal>
           <Reveal step={1} sx={styles.groupRight}>
             {MOSAIC_RIGHT.map((id) => renderTile(id, rightPlacement(id)))}

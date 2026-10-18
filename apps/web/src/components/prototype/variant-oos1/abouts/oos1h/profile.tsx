@@ -1,4 +1,4 @@
-import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
+import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 
 import { ABOUT_HERO, ABOUT_MOMENT } from "../../about-data";
@@ -11,14 +11,14 @@ const COUNTRY_TOTAL = String(ABOUT_HERO.countries.length);
 
 const styles = stylex.create({
   section: {
-    paddingTop: { default: 80, [breakpoints.xl]: 144 },
+    paddingTop: { default: 80, ["@media (min-width: 1280px)"]: 144 },
     backgroundColor: colors.paper,
   },
   top: {
     display: "grid",
     gridTemplateColumns: {
       default: "minmax(0, 1fr)",
-      [breakpoints.xl]: "minmax(0, 5fr) minmax(0, 6fr)",
+      ["@media (min-width: 1280px)"]: "minmax(0, 5fr) minmax(0, 6fr)",
     },
     columnGap: 96,
     rowGap: 56,
@@ -31,7 +31,7 @@ const styles = stylex.create({
   },
   name: {
     margin: 0,
-    fontSize: { default: 30, [mq.tablet]: 40, [breakpoints.xl]: 44 },
+    fontSize: { default: 30, [mq.tablet]: 40, ["@media (min-width: 1280px)"]: 44 },
     fontWeight: 500,
     lineHeight: 1.3,
     letterSpacing: "0.03em",
@@ -48,7 +48,7 @@ const styles = stylex.create({
   lead: {
     margin: 0,
     maxWidth: "36em",
-    fontSize: { default: 16, [breakpoints.xl]: 17 },
+    fontSize: { default: 16, ["@media (min-width: 1280px)"]: 17 },
     lineHeight: 2,
     letterSpacing: "0.04em",
     color: ui.ink,
@@ -74,18 +74,18 @@ const styles = stylex.create({
     display: "grid",
     gridTemplateColumns: {
       default: "minmax(0, 1fr)",
-      [breakpoints.xl]: "minmax(0, 5fr) minmax(0, 6fr)",
+      ["@media (min-width: 1280px)"]: "minmax(0, 5fr) minmax(0, 6fr)",
     },
     columnGap: 96,
     rowGap: 32,
     alignItems: "start",
-    marginTop: { default: 72, [breakpoints.xl]: 112 },
+    marginTop: { default: 72, ["@media (min-width: 1280px)"]: 112 },
   },
   count: {
     display: "flex",
     alignItems: "baseline",
     gap: "0.08em",
-    fontSize: { default: 72, [breakpoints.xl]: 96 },
+    fontSize: { default: 72, ["@media (min-width: 1280px)"]: 96 },
     lineHeight: 1,
     color: ui.ink,
   },
@@ -112,7 +112,7 @@ const styles = stylex.create({
     padding: 0,
     maxWidth: "36em",
     listStyle: "none",
-    fontSize: { default: 16, [breakpoints.xl]: 17 },
+    fontSize: { default: 16, ["@media (min-width: 1280px)"]: 17 },
     letterSpacing: "0.06em",
     color: ui.ink,
   },
@@ -121,13 +121,13 @@ const styles = stylex.create({
   },
   panorama: {
     margin: 0,
-    marginTop: { default: 80, [breakpoints.xl]: 144 },
+    marginTop: { default: 80, ["@media (min-width: 1280px)"]: 144 },
   },
   panoramaImage: {
     display: "block",
     width: "100%",
     height: "auto",
-    aspectRatio: { default: "4 / 3", [breakpoints.md]: "2400 / 1000" },
+    aspectRatio: { default: "4 / 3", ["@media (min-width: 768px)"]: "2400 / 1000" },
     objectFit: "cover",
     objectPosition: "center 55%",
   },
@@ -144,59 +144,59 @@ export function Profile() {
     <section
       id="about-profile"
       aria-label="Company overview"
-      {...stylex.props(shared.anchor, styles.section)}
+      {...stylex.attrs(shared.anchor, styles.section)}
     >
-      <div {...stylex.props(shared.shell, shared.inset)}>
-        <div {...stylex.props(styles.top)}>
+      <div {...stylex.attrs(shared.shell, shared.inset)}>
+        <div {...stylex.attrs(styles.top)}>
           <Reveal sx={styles.copy}>
-            <h2 {...stylex.props(styles.name)}>{ABOUT_HERO.title}</h2>
-            <div lang="en" {...stylex.props(styles.english)}>
+            <h2 {...stylex.attrs(styles.name)}>{ABOUT_HERO.title}</h2>
+            <div lang="en" {...stylex.attrs(styles.english)}>
               {ABOUT_HERO.englishTitle}
             </div>
-            <p {...stylex.props(styles.lead)}>{ABOUT_HERO.lead}</p>
+            <p {...stylex.attrs(styles.lead)}>{ABOUT_HERO.lead}</p>
           </Reveal>
           <Reveal step={1}>
-            <figure {...stylex.props(styles.figure)}>
+            <figure {...stylex.attrs(styles.figure)}>
               <img
                 src={ABOUT_HERO.lobbyImage}
                 alt="Fenchem headquarters lobby with a curved ceiling and marble floor"
                 loading="lazy"
                 decoding="async"
-                {...stylex.props(styles.lobby)}
+                {...stylex.attrs(styles.lobby)}
               />
-              <figcaption {...stylex.props(styles.caption)}>{ABOUT_HERO.lobbyCaption}</figcaption>
+              <figcaption {...stylex.attrs(styles.caption)}>{ABOUT_HERO.lobbyCaption}</figcaption>
             </figure>
           </Reveal>
         </div>
 
-        <div {...stylex.props(styles.network)}>
+        <div {...stylex.attrs(styles.network)}>
           <div>
-            <div {...stylex.props(styles.count)}>
+            <div {...stylex.attrs(styles.count)}>
               <Odometer value={COUNTRY_TOTAL} />
-              <span {...stylex.props(styles.unit)}>国</span>
+              <span {...stylex.attrs(styles.unit)}>国</span>
             </div>
-            <p {...stylex.props(styles.networkLabel)}>{ABOUT_HERO.networkLabel}</p>
+            <p {...stylex.attrs(styles.networkLabel)}>{ABOUT_HERO.networkLabel}</p>
           </div>
           <Reveal>
-            <ul {...stylex.props(styles.countries)}>
+            <ul {...stylex.attrs(styles.countries)}>
               {ABOUT_HERO.countries.map((country) => (
-                <li key={country}>{country}</li>
+                <li>{country}</li>
               ))}
-              <li {...stylex.props(styles.countryMore)}>等地</li>
+              <li {...stylex.attrs(styles.countryMore)}>等地</li>
             </ul>
           </Reveal>
         </div>
       </div>
 
-      <figure {...stylex.props(styles.panorama)}>
+      <figure {...stylex.attrs(styles.panorama)}>
         <img
           src={ABOUT_MOMENT.image}
           alt={ABOUT_MOMENT.alt}
           loading="lazy"
           decoding="async"
-          {...stylex.props(styles.panoramaImage)}
+          {...stylex.attrs(styles.panoramaImage)}
         />
-        <figcaption {...stylex.props(shared.shell, shared.inset, styles.panoramaCaption)}>
+        <figcaption {...stylex.attrs(shared.shell, shared.inset, styles.panoramaCaption)}>
           {ABOUT_MOMENT.caption}
         </figcaption>
       </figure>

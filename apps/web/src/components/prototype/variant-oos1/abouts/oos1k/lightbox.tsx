@@ -2,7 +2,7 @@ import { LightboxControls } from "../../../shared/lightbox-controls";
 import { LightboxStage } from "../../../shared/lightbox-stage";
 import { LightboxDialog, type LightboxState } from "../../../shared/lightbox";
 import * as stylex from "@stylexjs/stylex";
-import { ChevronLeft, ChevronRight, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, X } from "@fenchem-lp/ui/components/lucide";
 
 import { ui } from "./shared-values";
 import { bp, chrome, face, sky } from "./tokens.stylex";
@@ -124,27 +124,26 @@ const styles = stylex.create({
   },
 });
 
-export function Lightbox({
-  lightbox,
-  photos,
-}: {
-  lightbox: LightboxState;
-  photos: readonly PlatePhoto[];
-}) {
-  const { close: onClose, step: onStep } = lightbox;
+export function Lightbox(props: { lightbox: LightboxState; photos: readonly PlatePhoto[] }) {
+  const { close: onClose, step: onStep } = props.lightbox;
   return (
-    <LightboxDialog lightbox={lightbox} items={photos} sx={styles.dialog} label="Campus film strip">
+    <LightboxDialog
+      lightbox={props.lightbox}
+      items={props.photos}
+      sx={styles.dialog}
+      label="Campus film strip"
+    >
       {(photo) => (
         <>
           <LightboxStage onClose={onClose} sx={styles.stage}>
-            <figure key={photo.id} {...stylex.props(styles.holder)}>
-              <img src={photo.large} alt={photo.alt} {...stylex.props(styles.image)} />
-              <figcaption {...stylex.props(styles.strip)}>
-                <span lang="en" {...stylex.props(ui.label, styles.plate)}>
+            <figure {...stylex.attrs(styles.holder)}>
+              <img src={photo.large} alt={photo.alt} {...stylex.attrs(styles.image)} />
+              <figcaption {...stylex.attrs(styles.strip)}>
+                <span lang="en" {...stylex.attrs(ui.label, styles.plate)}>
                   Plate
-                  <span {...stylex.props(ui.designation, styles.numeral)}>{photo.numeral}</span>
+                  <span {...stylex.attrs(ui.designation, styles.numeral)}>{photo.numeral}</span>
                 </span>
-                <span {...stylex.props(styles.caption)}>{photo.caption}</span>
+                <span {...stylex.attrs(styles.caption)}>{photo.caption}</span>
               </figcaption>
             </figure>
           </LightboxStage>

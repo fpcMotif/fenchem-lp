@@ -1,5 +1,5 @@
 import * as stylex from "@stylexjs/stylex";
-import { m, useTransform, type MotionValue } from "motion/react";
+import { m, useTransform, type MotionValue } from "@/compat/motion";
 
 import {
   guideArrowOpacity,
@@ -97,8 +97,8 @@ const styles = stylex.create({
 const STROKE = {
   fill: "none",
   stroke: "rgba(11, 42, 92, 0.88)",
-  strokeWidth: 1,
-  vectorEffect: "non-scaling-stroke",
+  "stroke-width": 1,
+  "vector-effect": "non-scaling-stroke",
 } as const;
 
 type Hover = {
@@ -106,25 +106,22 @@ type Hover = {
   onActive: (id: HeroPartId | null) => void;
 };
 
-function PlateLabel({
-  progress,
-  id,
-  active,
-  onActive,
-}: { progress: MotionValue<number>; id: HeroPartId } & Hover) {
-  const part = HERO_PARTS.find((entry) => entry.id === id) ?? HERO_PARTS[0];
-  const y = useTransform(progress, (value) => cq(labelY(heroPose(value), id)));
+function PlateLabel(props: { progress: MotionValue<number>; id: HeroPartId } & Hover) {
+  const part = HERO_PARTS.find((entry) => entry.id === props.id) ?? HERO_PARTS[0];
+  const y = useTransform(props.progress, (value) => cq(labelY(heroPose(value), props.id)));
   return (
     <m.div
       style={{ left: cq(HERO_SHEET.balloonX), y }}
-      onPointerEnter={() => onActive(id)}
-      onPointerLeave={() => onActive(null)}
-      {...stylex.props(styles.label)}
+      onPointerEnter={() => props.onActive(props.id)}
+      onPointerLeave={() => props.onActive(null)}
+      {...stylex.attrs(styles.label)}
     >
-      <span {...stylex.props(ui.balloon, active === id && ui.balloonActive)}>{part.item}</span>
-      <span {...stylex.props(styles.labelName)}>
+      <span {...stylex.attrs(ui.balloon, props.active === props.id && ui.balloonActive)}>
+        {part.item}
+      </span>
+      <span {...stylex.attrs(styles.labelName)}>
         {part.name}
-        <span lang="en" {...stylex.props(ui.label, styles.labelEnglish)}>
+        <span lang="en" {...stylex.attrs(ui.label, styles.labelEnglish)}>
           {part.english}
         </span>
       </span>
@@ -132,61 +129,45 @@ function PlateLabel({
   );
 }
 
-function Leader({
-  progress,
-  id,
-  active,
-}: {
-  progress: MotionValue<number>;
-  id: HeroPartId;
-  active: boolean;
-}) {
-  const d = useTransform(progress, (value) => leaderPath(heroPose(value), id));
-  const cx = useTransform(progress, (value) => leaderAnchor(heroPose(value), id).x);
-  const cy = useTransform(progress, (value) => leaderAnchor(heroPose(value), id).y);
-  const color = active ? "#0743a9" : "rgba(11, 42, 92, 0.92)";
+function Leader(props: { progress: MotionValue<number>; id: HeroPartId; active: boolean }) {
+  const d = useTransform(props.progress, (value) => leaderPath(heroPose(value), props.id));
+  const cx = useTransform(props.progress, (value) => leaderAnchor(heroPose(value), props.id).x);
+  const cy = useTransform(props.progress, (value) => leaderAnchor(heroPose(value), props.id).y);
+  const color = props.active ? "#0743a9" : "rgba(11, 42, 92, 0.92)";
   return (
     <>
-      <m.path d={d} {...STROKE} stroke={color} strokeWidth={active ? 1.5 : 1} />
-      <m.circle cx={cx} cy={cy} r={4.2} fill={color} />
+      <m.path d={d()} {...STROKE} stroke={color} stroke-width={props.active ? 1.5 : 1} />
+      <m.circle cx={cx()} cy={cy()} r={4.2} fill={color} />
     </>
   );
 }
 
-function Guide({
-  progress,
-  upper,
-  lower,
-}: {
-  progress: MotionValue<number>;
-  upper: HeroPartId;
-  lower: HeroPartId;
-}) {
-  const d = useTransform(progress, (value) => guidePath(heroPose(value), upper, lower));
-  const arrows = useTransform(progress, (value) => guideArrows(heroPose(value), upper, lower));
-  const arrowOpacity = useTransform(progress, (value) =>
-    guideArrowOpacity(heroPose(value), upper, lower),
+function Guide(props: { progress: MotionValue<number>; upper: HeroPartId; lower: HeroPartId }) {
+  const d = useTransform(props.progress, (value) =>
+    guidePath(heroPose(value), props.upper, props.lower),
+  );
+  const arrows = useTransform(props.progress, (value) =>
+    guideArrows(heroPose(value), props.upper, props.lower),
+  );
+  const arrowOpacity = useTransform(props.progress, (value) =>
+    guideArrowOpacity(heroPose(value), props.upper, props.lower),
   );
   return (
     <>
-      <m.path d={d} {...STROKE} stroke="rgba(11, 42, 92, 0.5)" strokeDasharray="5 4" />
-      <m.path d={arrows} {...STROKE} style={{ opacity: arrowOpacity }} />
+      <m.path d={d()} {...STROKE} stroke="rgba(11, 42, 92, 0.5)" stroke-dasharray="5 4" />
+      <m.path d={arrows()} {...STROKE} style={{ opacity: arrowOpacity }} />
     </>
   );
 }
 
-export function HeroDrawing({
-  progress,
-  active,
-  onActive,
-}: { progress: MotionValue<number> } & Hover) {
-  const groundY = useTransform(progress, (value) => cq(heroPose(value).groundY));
-  const rdTop = useTransform(progress, (value) => cq(heroPose(value).top.rd));
-  const makeTop = useTransform(progress, (value) => cq(heroPose(value).top.make));
-  const sellTop = useTransform(progress, (value) => cq(heroPose(value).top.sell));
-  const dimensionOpacity = useTransform(progress, (value) => heroPose(value).dimension);
-  const explodedOpacity = useTransform(progress, (value) => heroPose(value).exploded);
-  const assembledOpacity = useTransform(progress, (value) => heroPose(value).assembled);
+export function HeroDrawing(props: { progress: MotionValue<number> } & Hover) {
+  const groundY = useTransform(props.progress, (value) => cq(heroPose(value).groundY));
+  const rdTop = useTransform(props.progress, (value) => cq(heroPose(value).top.rd));
+  const makeTop = useTransform(props.progress, (value) => cq(heroPose(value).top.make));
+  const sellTop = useTransform(props.progress, (value) => cq(heroPose(value).top.sell));
+  const dimensionOpacity = useTransform(props.progress, (value) => heroPose(value).dimension);
+  const explodedOpacity = useTransform(props.progress, (value) => heroPose(value).exploded);
+  const assembledOpacity = useTransform(props.progress, (value) => heroPose(value).assembled);
   const dimension = liftDimension(heroPose(1));
   const tops: Record<HeroPartId, MotionValue<string>> = {
     rd: rdTop,
@@ -206,14 +187,13 @@ export function HeroDrawing({
             const part = HERO_PARTS.find((entry) => entry.id === id) ?? HERO_PARTS[0];
             return (
               <IsoBox
-                key={id}
                 x={0}
                 y={0}
                 w={PLATE}
                 d={PLATE}
                 t={HERO_SHEET.thickness}
                 topZ={tops[id]}
-                highlighted={active === id}
+                highlighted={props.active === id}
                 etch={`${String(part.item).padStart(2, "0")} — ${part.english}`}
               >
                 <PlateFace glyph={part.glyph} glyphSize={cq(PLATE * 0.4)} />
@@ -226,12 +206,12 @@ export function HeroDrawing({
       <svg
         viewBox={`0 0 1000 ${HERO_SHEET.heightUnits}`}
         aria-hidden="true"
-        {...stylex.props(styles.overlay)}
+        {...stylex.attrs(styles.overlay)}
       >
-        <Guide progress={progress} upper="rd" lower="make" />
-        <Guide progress={progress} upper="make" lower="sell" />
+        <Guide progress={props.progress} upper="rd" lower="make" />
+        <Guide progress={props.progress} upper="make" lower="sell" />
         {HERO_PARTS.map((part) => (
-          <Leader key={part.id} progress={progress} id={part.id} active={active === part.id} />
+          <Leader progress={props.progress} id={part.id} active={props.active === part.id} />
         ))}
         <m.g style={{ opacity: dimensionOpacity }}>
           <path d={dimension.ext} {...STROKE} stroke="rgba(11, 42, 92, 0.6)" />
@@ -242,37 +222,36 @@ export function HeroDrawing({
 
       {HERO_PARTS.map((part) => (
         <PlateLabel
-          key={part.id}
-          progress={progress}
+          progress={props.progress}
           id={part.id}
-          active={active}
-          onActive={onActive}
+          active={props.active}
+          onActive={props.onActive}
         />
       ))}
 
       <m.div
         aria-hidden="true"
         style={{ left: cq(dimension.labelX), top: cq(dimension.labelY), opacity: dimensionOpacity }}
-        {...stylex.props(styles.delta)}
+        {...stylex.attrs(styles.delta)}
       >
-        <span {...stylex.props(styles.deltaGlyph)}>δ</span>
+        <span {...stylex.attrs(styles.deltaGlyph)}>δ</span>
         <FlagNote number={1} />
       </m.div>
 
-      <div aria-hidden="true" {...stylex.props(styles.figure)}>
-        <span {...stylex.props(ui.caps)}>Fig. 1</span>
-        <span {...stylex.props(styles.figureState)}>
+      <div aria-hidden="true" {...stylex.attrs(styles.figure)}>
+        <span {...stylex.attrs(ui.caps)}>Fig. 1</span>
+        <span {...stylex.attrs(styles.figureState)}>
           <m.span
             lang="en"
             style={{ opacity: explodedOpacity }}
-            {...stylex.props(styles.figureWord)}
+            {...stylex.attrs(styles.figureWord)}
           >
             Exploded view
           </m.span>
           <m.span
             lang="en"
             style={{ opacity: assembledOpacity }}
-            {...stylex.props(styles.figureWord)}
+            {...stylex.attrs(styles.figureWord)}
           >
             Assembly — 研 · 产 · 销
           </m.span>

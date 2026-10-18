@@ -15,18 +15,13 @@
     "check-types": "bun check"
   },
   "dependencies": {
-    "@base-ui/react": "^1.8.0",
+    "@solidjs/web": "2.0.0-rc.15",
     "@stylexjs/stylex": "^0.19.1",
-    "lucide-react": "^1.53.0",
-    "next-themes": "catalog:",
-    "react": "catalog:",
-    "react-dom": "catalog:",
-    "sonner": "^2.0.8"
+    "lucide": "1.59.0",
+    "solid-js": "2.0.0-rc.15"
   },
   "devDependencies": {
     "@fenchem-lp/config": "workspace:*",
-    "@types/react": "catalog:",
-    "@types/react-dom": "catalog:",
     "typescript": "next"
   },
   "knip": {

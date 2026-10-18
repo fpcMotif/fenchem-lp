@@ -118,4 +118,4 @@ export const type = stylex.create({
   },
 });
 
-export const srOnly = stylex.props(ui.srOnly);
+export const srOnly = stylex.attrs(ui.srOnly);

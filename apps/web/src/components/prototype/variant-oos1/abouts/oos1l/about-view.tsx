@@ -1,6 +1,5 @@
 import * as stylex from "@stylexjs/stylex";
-import { useRef } from "react";
-import { preinit } from "react-dom";
+import { preinit } from "@/compat/react-dom";
 
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
@@ -17,6 +16,7 @@ import { LIGHT_WEIGHT_FONT } from "./shared";
 import { Structure } from "./structure";
 import { chrome, face, tone } from "./tokens.stylex";
 import { useSentence } from "./use-sentence";
+import { createSignal } from "solid-js";
 
 const styles = stylex.create({
   root: {
@@ -30,18 +30,18 @@ const styles = stylex.create({
   },
 });
 
-export function AboutOOS1L({ onNavigateHome }: AboutPageProps) {
+export function AboutOOS1L(props: AboutPageProps) {
   preinit(LIGHT_WEIGHT_FONT, { as: "style" });
-  const rootRef = useRef<HTMLDivElement>(null);
-  const barRef = useRef<HTMLElement>(null);
-  const trackRef = useRef<HTMLOListElement>(null);
+  const [rootRef, setRootRef] = createSignal<HTMLDivElement>();
+  const [barRef, setBarRef] = createSignal<HTMLElement>();
+  const [trackRef, setTrackRef] = createSignal<HTMLOListElement>();
   const reduce = useReducedMotion();
   useSentence(rootRef, barRef, trackRef, reduce);
 
   return (
-    <div id="about-top" ref={rootRef} {...stylex.props(styles.root)}>
+    <div id="about-top" ref={setRootRef} {...stylex.attrs(styles.root)}>
       <div>
-        <RunningLine barRef={barRef} trackRef={trackRef} />
+        <RunningLine barRef={setBarRef} trackRef={setTrackRef} />
         <Hero />
         <Profile />
         <Campus />
@@ -50,7 +50,7 @@ export function AboutOOS1L({ onNavigateHome }: AboutPageProps) {
         <Honors />
         <Structure />
       </div>
-      <Closing onNavigateHome={onNavigateHome} />
+      <Closing onNavigateHome={props.onNavigateHome} />
     </div>
   );
 }

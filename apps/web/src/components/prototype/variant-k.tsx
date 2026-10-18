@@ -37,9 +37,9 @@
  *   → Stat moment → Compact matrix strip → Certifications row
  *   → Deep-green finale → Slim footer
  */
-import { useEffect, useState } from "react";
-import { AnimatePresence, LazyMotion, domAnimation, m } from "motion/react";
-import { ArrowRight, ArrowUpRight, Leaf, Menu, X } from "lucide-react";
+import { Show, createSignal, createEffect } from "solid-js";
+import { AnimatePresence, LazyMotion, domAnimation, m } from "@/compat/motion";
+import { ArrowRight, ArrowUpRight, Leaf, Menu, X } from "@fenchem-lp/ui/components/lucide";
 import * as stylex from "@stylexjs/stylex";
 import { breakpoints, colors, radii, shadows, typography } from "@fenchem-lp/ui/tokens.stylex";
 import { EASE, STAGGER } from "@/components/prototype/motion-constants";
@@ -1343,26 +1343,26 @@ const MATRIX_TOP_KEYS: Record<DivisionKey, keyof typeof styles> = {
 /* ─────────────────────────────── Nav ─────────────────────────────── */
 
 function MobileNav() {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = createSignal(false);
   const reduce = useReducedMotion();
   return (
-    <div {...stylex.props(styles.mobileNavWrapper)}>
+    <div {...stylex.attrs(styles.mobileNavWrapper)}>
       <button
         type="button"
-        aria-expanded={open}
+        aria-expanded={open() ? "true" : "false"}
         aria-controls="k-mobile-menu"
-        aria-label={open ? "Close menu" : "Open menu"}
+        aria-label={open() ? "Close menu" : "Open menu"}
         onClick={() => setOpen((v) => !v)}
-        {...stylex.props(styles.mobileMenuBtn)}
+        {...stylex.attrs(styles.mobileMenuBtn)}
       >
-        {open ? <X aria-hidden size={20} /> : <Menu aria-hidden size={20} />}
+        {open() ? <X aria-hidden="true" size={20} /> : <Menu aria-hidden="true" size={20} />}
       </button>
       <AnimatePresence>
-        {open && (
+        <Show when={open()}>
           <m.div
             id="k-mobile-menu"
             initial={
-              reduce
+              reduce()
                 ? {
                     opacity: 0,
                   }
@@ -1376,7 +1376,7 @@ function MobileNav() {
               y: 0,
             }}
             exit={
-              reduce
+              reduce()
                 ? {
                     opacity: 0,
                   }
@@ -1386,18 +1386,18 @@ function MobileNav() {
                   }
             }
             transition={{
-              duration: reduce ? 0 : 0.22,
+              duration: reduce() ? 0 : 0.22,
               ease: EASE,
             }}
-            {...stylex.props(styles.mobileMenuPopover)}
+            {...stylex.attrs(styles.mobileMenuPopover)}
           >
-            <ul {...stylex.props(styles.mobileMenuList)}>
+            <ul {...stylex.attrs(styles.mobileMenuList)}>
               {NAV_LINKS.map((link, idx) => (
-                <li key={link.href}>
+                <li>
                   <a
                     href={link.href}
                     onClick={() => setOpen(false)}
-                    {...stylex.props(
+                    {...stylex.attrs(
                       styles.mobileNavLink,
                       idx === NAV_LINKS.length - 1 && styles.mobileNavLinkLast,
                     )}
@@ -1408,33 +1408,33 @@ function MobileNav() {
               ))}
             </ul>
           </m.div>
-        )}
+        </Show>
       </AnimatePresence>
     </div>
   );
 }
 function NavBar() {
   return (
-    <header {...stylex.props(styles.header)}>
-      <nav aria-label="Main navigation" {...stylex.props(styles.container, styles.navInner)}>
-        <a href="#top" aria-label="Fenchem home" {...stylex.props(styles.brandLink)}>
-          <span {...stylex.props(styles.brandText)}>FENCHEM</span>
-          <Leaf aria-hidden strokeWidth={1.5} {...stylex.props(styles.brandLeaf)} />
+    <header {...stylex.attrs(styles.header)}>
+      <nav aria-label="Main navigation" {...stylex.attrs(styles.container, styles.navInner)}>
+        <a href="#top" aria-label="Fenchem home" {...stylex.attrs(styles.brandLink)}>
+          <span {...stylex.attrs(styles.brandText)}>FENCHEM</span>
+          <Leaf aria-hidden="true" strokeWidth={1.5} {...stylex.attrs(styles.brandLeaf)} />
         </a>
 
-        <div {...stylex.props(styles.navLinksDesktop)}>
+        <div {...stylex.attrs(styles.navLinksDesktop)}>
           {NAV_LINKS.map((link) => (
-            <a key={link.href} href={link.href} {...stylex.props(styles.navLink)}>
+            <a href={link.href} {...stylex.attrs(styles.navLink)}>
               {link.label}
             </a>
           ))}
         </div>
 
-        <div {...stylex.props(styles.navRight)}>
+        <div {...stylex.attrs(styles.navRight)}>
           <MobileNav />
-          <a href={createInquiryHref()} {...stylex.props(styles.ctaPrimary)}>
+          <a href={createInquiryHref()} {...stylex.attrs(styles.ctaPrimary)}>
             Request Specifications
-            <ArrowRight aria-hidden size={14} />
+            <ArrowRight aria-hidden="true" size={14} />
           </a>
         </div>
       </nav>
@@ -1447,35 +1447,35 @@ function NavBar() {
 function HeroSection() {
   const reduce = useReducedMotion();
   return (
-    <section id="top" aria-label="Hero" {...stylex.props(styles.heroSection)}>
-      <div {...stylex.props(styles.container, styles.heroInner)}>
-        <div {...stylex.props(styles.heroGrid)}>
+    <section id="top" aria-label="Hero" {...stylex.attrs(styles.heroSection)}>
+      <div {...stylex.attrs(styles.container, styles.heroInner)}>
+        <div {...stylex.attrs(styles.heroGrid)}>
           {/* Headline block */}
-          <div {...stylex.props(styles.heroLeft)}>
+          <div {...stylex.attrs(styles.heroLeft)}>
             <Intro>
-              <p {...stylex.props(styles.heroBadge)}>Botanical ingredients — since 1995</p>
+              <p {...stylex.attrs(styles.heroBadge)}>Botanical ingredients — since 1995</p>
             </Intro>
             <Intro delay={STAGGER}>
-              <h1 {...stylex.props(styles.heroTitle)}>
+              <h1 {...stylex.attrs(styles.heroTitle)}>
                 Every division,
                 <br />
-                <em {...stylex.props(styles.italicGreen)}>one standard.</em>
+                <em {...stylex.attrs(styles.italicGreen)}>one standard.</em>
               </h1>
             </Intro>
             <Intro delay={STAGGER * 2}>
-              <p {...stylex.props(styles.heroLead)}>
+              <p {...stylex.attrs(styles.heroLead)}>
                 Nutrition, food &amp; beverage, personal care — three color-coded divisions,
                 supplied from a single documented quality system to formulators in more than forty
                 countries.
               </p>
             </Intro>
             <Intro delay={STAGGER * 3}>
-              <div {...stylex.props(styles.heroActions)}>
-                <a href={createInquiryHref()} {...stylex.props(styles.ctaPrimary)}>
+              <div {...stylex.attrs(styles.heroActions)}>
+                <a href={createInquiryHref()} {...stylex.attrs(styles.ctaPrimary)}>
                   Request Specifications
-                  <ArrowRight aria-hidden size={16} />
+                  <ArrowRight aria-hidden="true" size={16} />
                 </a>
-                <a href="#matrix" {...stylex.props(styles.ctaOutlineBlue)}>
+                <a href="#matrix" {...stylex.attrs(styles.ctaOutlineBlue)}>
                   See the portfolio
                 </a>
               </div>
@@ -1483,15 +1483,15 @@ function HeroSection() {
           </div>
 
           {/* Color-block collage: two tinted panels, thick saturated frames */}
-          <div {...stylex.props(styles.heroRight)}>
+          <div {...stylex.attrs(styles.heroRight)}>
             <Intro delay={STAGGER * 2}>
-              <figure {...stylex.props(styles.heroFigureNutrition)}>
-                <div {...stylex.props(styles.frameNutrition)}>
+              <figure {...stylex.attrs(styles.heroFigureNutrition)}>
+                <div {...stylex.attrs(styles.frameNutrition)}>
                   <m.img
                     src={IMG.heroLeaves.src}
                     alt={IMG.heroLeaves.alt}
                     initial={
-                      reduce
+                      reduce()
                         ? false
                         : {
                             scale: 1.08,
@@ -1505,28 +1505,28 @@ function HeroSection() {
                       ease: EASE,
                     }}
                     loading="eager"
-                    {...stylex.props(styles.imgCover1610)}
+                    {...stylex.attrs(styles.imgCover1610)}
                   />
                 </div>
-                <figcaption {...stylex.props(styles.figCaption)}>
-                  <span {...stylex.props(styles.techLabel)}>Nutrition division</span>
-                  <span {...stylex.props(styles.captionFieldAccent)}>Field — 01</span>
+                <figcaption {...stylex.attrs(styles.figCaption)}>
+                  <span {...stylex.attrs(styles.techLabel)}>Nutrition division</span>
+                  <span {...stylex.attrs(styles.captionFieldAccent)}>Field — 01</span>
                 </figcaption>
               </figure>
             </Intro>
             <Intro delay={STAGGER * 3}>
-              <figure {...stylex.props(styles.heroFigureCare)}>
-                <div {...stylex.props(styles.frameCosmetics)}>
+              <figure {...stylex.attrs(styles.heroFigureCare)}>
+                <div {...stylex.attrs(styles.frameCosmetics)}>
                   <img
                     src={IMG.heroCare.src}
                     alt={IMG.heroCare.alt}
                     loading="eager"
-                    {...stylex.props(styles.imgCover169)}
+                    {...stylex.attrs(styles.imgCover169)}
                   />
                 </div>
-                <figcaption {...stylex.props(styles.figCaption)}>
-                  <span {...stylex.props(styles.techLabel)}>Personal care division</span>
-                  <span {...stylex.props(styles.captionFieldAccent)}>Field — 03</span>
+                <figcaption {...stylex.attrs(styles.figCaption)}>
+                  <span {...stylex.attrs(styles.techLabel)}>Personal care division</span>
+                  <span {...stylex.attrs(styles.captionFieldAccent)}>Field — 03</span>
                 </figcaption>
               </figure>
             </Intro>
@@ -1539,66 +1539,66 @@ function HeroSection() {
 
 /* ─────────────────────────────── Division bands — signature module ─────────────────────────────── */
 
-function DivisionBand({ band, index }: { band: BandConfig; index: number }) {
-  const industry = industries[index];
-  const items = getIngredientsByApplication(band.application).slice(0, 3);
-  const flip = index % 2 === 1;
-  const headingId = `division-${band.key}-heading`;
+function DivisionBand(props: { band: BandConfig; index: number }) {
+  const industry = industries[props.index];
+  const items = getIngredientsByApplication(props.band.application).slice(0, 3);
+  const flip = props.index % 2 === 1;
+  const headingId = `division-${props.band.key}-heading`;
   return (
     <section
       aria-labelledby={headingId}
-      {...stylex.props(styles.bandSection, styles[band.washKey])}
+      {...stylex.attrs(styles.bandSection, styles[props.band.washKey])}
     >
-      <div {...stylex.props(styles.container, styles.bandInner)}>
-        <div {...stylex.props(styles.bandGrid)}>
+      <div {...stylex.attrs(styles.container, styles.bandInner)}>
+        <div {...stylex.attrs(styles.bandGrid)}>
           {/* Text column */}
-          <div {...stylex.props(styles.bandTextCol, flip && styles.bandTextColOrder2)}>
+          <div {...stylex.attrs(styles.bandTextCol, flip && styles.bandTextColOrder2)}>
             <Reveal>
               <span
-                aria-hidden
+                aria-hidden="true"
                 style={{
-                  WebkitTextStroke: `2.5px ${band.stroke}`,
+                  "-webkit-text-stroke": `2.5px ${props.band.stroke}`,
                 }}
-                {...stylex.props(styles.bandNumeral)}
+                {...stylex.attrs(styles.bandNumeral)}
               >
-                {band.numeral}
+                {props.band.numeral}
               </span>
-              <p {...stylex.props(styles.eyebrowGreen)}>
-                Division {band.numeral} — {band.application}
+              <p {...stylex.attrs(styles.eyebrowGreen)}>
+                Division {props.band.numeral} — {props.band.application}
               </p>
-              <h3 id={headingId} {...stylex.props(styles.bandTitle)}>
+              <h3 id={headingId} {...stylex.attrs(styles.bandTitle)}>
                 {industry.title}
               </h3>
-              <p {...stylex.props(styles.bandCopy)}>{industry.copy}</p>
+              <p {...stylex.attrs(styles.bandCopy)}>{industry.copy}</p>
 
               {/* Ingredient pill chips — saturated border, paper ground, ink text */}
-              <ul {...stylex.props(styles.bandChipsList)}>
+              <ul {...stylex.attrs(styles.bandChipsList)}>
                 {items.map((item) => (
-                  <li key={item.code}>
-                    <span {...stylex.props(styles.bandChipBase, styles[band.chipBorderKey])}>
-                      <span {...stylex.props(styles.chipName)}>{item.name}</span>
-                      <span {...stylex.props(styles.chipPurity)}>{item.purity}</span>
+                  <li>
+                    <span {...stylex.attrs(styles.bandChipBase, styles[props.band.chipBorderKey])}>
+                      <span {...stylex.attrs(styles.chipName)}>{item.name}</span>
+                      <span {...stylex.attrs(styles.chipPurity)}>{item.purity}</span>
                     </span>
                   </li>
                 ))}
               </ul>
 
-              <a href="#matrix" {...stylex.props(styles.bandMatrixLink)}>
+              <a href="#matrix" {...stylex.attrs(styles.bandMatrixLink)}>
                 Matching actives in the matrix
-                <ArrowUpRight aria-hidden size={14} />
+                <ArrowUpRight aria-hidden="true" size={14} />
               </a>
             </Reveal>
           </div>
 
           {/* Image column — thick saturated accent frame */}
-          <div {...stylex.props(styles.bandImageCol, flip && styles.bandImageColOrder1)}>
+          <div {...stylex.attrs(styles.bandImageCol, flip && styles.bandImageColOrder1)}>
             <Reveal delay={STAGGER}>
-              <div {...stylex.props(styles[band.frameKey])}>
+              <div {...stylex.attrs(styles[props.band.frameKey])}>
                 <img
-                  src={band.image.src}
-                  alt={band.image.alt}
+                  src={props.band.image.src}
+                  alt={props.band.image.alt}
                   loading="lazy"
-                  {...stylex.props(styles.imgCover45)}
+                  {...stylex.attrs(styles.imgCover45)}
                 />
               </div>
             </Reveal>
@@ -1611,17 +1611,17 @@ function DivisionBand({ band, index }: { band: BandConfig; index: number }) {
 function DivisionsSection() {
   return (
     <div id="divisions">
-      <div {...stylex.props(styles.divisionsHeaderOuter)}>
-        <div {...stylex.props(styles.container, styles.divisionsHeaderInner)}>
+      <div {...stylex.attrs(styles.divisionsHeaderOuter)}>
+        <div {...stylex.attrs(styles.container, styles.divisionsHeaderInner)}>
           <Reveal>
-            <p {...stylex.props(styles.eyebrowGreen)}>01 — The divisions</p>
-            <h2 {...stylex.props(styles.divisionsHeading)}>
+            <p {...stylex.attrs(styles.eyebrowGreen)}>01 — The divisions</p>
+            <h2 {...stylex.attrs(styles.divisionsHeading)}>
               Three fields of color,{" "}
-              <span {...stylex.props(styles.italicGreen)}>one signature.</span>
+              <span {...stylex.attrs(styles.italicGreen)}>one signature.</span>
             </h2>
           </Reveal>
           <Reveal delay={STAGGER}>
-            <p {...stylex.props(styles.divisionsLead)}>
+            <p {...stylex.attrs(styles.divisionsLead)}>
               Each division carries its own hue from the Fenchem brand book — worn here as a wash,
               never a wall — and every one releases against the same audited standard.
             </p>
@@ -1629,7 +1629,7 @@ function DivisionsSection() {
         </div>
       </div>
       {BANDS.map((band, i) => (
-        <DivisionBand key={band.key} band={band} index={i} />
+        <DivisionBand band={band} index={i} />
       ))}
     </div>
   );
@@ -1639,16 +1639,16 @@ function DivisionsSection() {
 
 function StorySection() {
   return (
-    <section id="story" aria-labelledby="story-heading" {...stylex.props(styles.storySection)}>
-      <div {...stylex.props(styles.container, styles.storyInner)}>
+    <section id="story" aria-labelledby="story-heading" {...stylex.attrs(styles.storySection)}>
+      <div {...stylex.attrs(styles.container, styles.storyInner)}>
         <Reveal>
-          <p {...stylex.props(styles.eyebrowGreen)}>02 — The record</p>
-          <h2 id="story-heading" {...stylex.props(styles.storyTitle)}>
-            <span {...stylex.props(styles.italicGreen)}>30+ years.</span> 6 bases. 40+ countries.
+          <p {...stylex.attrs(styles.eyebrowGreen)}>02 — The record</p>
+          <h2 id="story-heading" {...stylex.attrs(styles.storyTitle)}>
+            <span {...stylex.attrs(styles.italicGreen)}>30+ years.</span> 6 bases. 40+ countries.
           </h2>
         </Reveal>
         <Reveal delay={STAGGER * 2}>
-          <p {...stylex.props(styles.storyBody)}>
+          <p {...stylex.attrs(styles.storyBody)}>
             Founded in {company.hq.city} in {company.founded}, Fenchem has spent three decades
             converting raw botanical complexity into precisely documented actives. One laboratory
             became six global bases across three continents; a first shipment became a supply
@@ -1657,7 +1657,7 @@ function StorySection() {
           </p>
         </Reveal>
         <Reveal delay={STAGGER * 3}>
-          <p {...stylex.props(styles.storyTagline)}>
+          <p {...stylex.attrs(styles.storyTagline)}>
             {company.tagline} — {company.since}
           </p>
         </Reveal>
@@ -1668,21 +1668,23 @@ function StorySection() {
 
 /* ─────────────────────────────── Compact matrix strip ─────────────────────────────── */
 
-function MatrixCard({ item, index }: { item: Ingredient; index: number }) {
-  const division = divisionForApplication(item.application);
+function MatrixCard(props: { item: Ingredient; index: number }) {
+  const division = divisionForApplication(props.item.application);
   const topStyleKey = MATRIX_TOP_KEYS[division];
   return (
-    <article {...stylex.props(styles.matrixCard, styles[topStyleKey])}>
-      <div {...stylex.props(styles.matrixCardMeta)}>
-        <span {...stylex.props(styles.matrixIndex)}>{String(index + 1).padStart(2, "0")} —</span>
-        <span {...stylex.props(styles.matrixCode)}>{item.code}</span>
+    <article {...stylex.attrs(styles.matrixCard, styles[topStyleKey])}>
+      <div {...stylex.attrs(styles.matrixCardMeta)}>
+        <span {...stylex.attrs(styles.matrixIndex)}>
+          {String(props.index + 1).padStart(2, "0")} —
+        </span>
+        <span {...stylex.attrs(styles.matrixCode)}>{props.item.code}</span>
       </div>
-      <h3 {...stylex.props(styles.matrixCardTitle)}>{item.name}</h3>
-      <p {...stylex.props(styles.matrixCardLatin)}>{item.latin}</p>
-      <dl {...stylex.props(styles.matrixCardDl)}>
-        <div {...stylex.props(styles.matrixCardRow)}>
-          <dt {...stylex.props(styles.matrixDt)}>Purity</dt>
-          <dd {...stylex.props(styles.matrixDd)}>{item.purity}</dd>
+      <h3 {...stylex.attrs(styles.matrixCardTitle)}>{props.item.name}</h3>
+      <p {...stylex.attrs(styles.matrixCardLatin)}>{props.item.latin}</p>
+      <dl {...stylex.attrs(styles.matrixCardDl)}>
+        <div {...stylex.attrs(styles.matrixCardRow)}>
+          <dt {...stylex.attrs(styles.matrixDt)}>Purity</dt>
+          <dd {...stylex.attrs(styles.matrixDd)}>{props.item.purity}</dd>
         </div>
       </dl>
     </article>
@@ -1690,19 +1692,19 @@ function MatrixCard({ item, index }: { item: Ingredient; index: number }) {
 }
 function MatrixSection() {
   return (
-    <section id="matrix" aria-labelledby="matrix-heading" {...stylex.props(styles.matrixSection)}>
-      <div {...stylex.props(styles.container, styles.matrixInner)}>
-        <div {...stylex.props(styles.matrixHeaderRow)}>
+    <section id="matrix" aria-labelledby="matrix-heading" {...stylex.attrs(styles.matrixSection)}>
+      <div {...stylex.attrs(styles.container, styles.matrixInner)}>
+        <div {...stylex.attrs(styles.matrixHeaderRow)}>
           <Reveal>
-            <p {...stylex.props(styles.eyebrowGreen)}>03 — Featured portfolio</p>
-            <h2 id="matrix-heading" {...stylex.props(styles.matrixHeading)}>
-              The compact <span {...stylex.props(styles.italicGreen)}>matrix</span>
+            <p {...stylex.attrs(styles.eyebrowGreen)}>03 — Featured portfolio</p>
+            <h2 id="matrix-heading" {...stylex.attrs(styles.matrixHeading)}>
+              The compact <span {...stylex.attrs(styles.italicGreen)}>matrix</span>
             </h2>
           </Reveal>
           <Reveal delay={STAGGER}>
-            <a href={createInquiryHref()} {...stylex.props(styles.ctaOutlineBlue)}>
+            <a href={createInquiryHref()} {...stylex.attrs(styles.ctaOutlineBlue)}>
               Request full specifications
-              <ArrowRight aria-hidden size={14} />
+              <ArrowRight aria-hidden="true" size={14} />
             </a>
           </Reveal>
         </div>
@@ -1711,10 +1713,10 @@ function MatrixSection() {
         <Reveal delay={STAGGER * 2}>
           <address
             aria-label="Featured ingredients — scrolls horizontally"
-            {...stylex.props(styles.matrixStrip)}
+            {...stylex.attrs(styles.matrixStrip)}
           >
             {getFeaturedIngredients().map((item, i) => (
-              <MatrixCard key={item.code} item={item} index={i} />
+              <MatrixCard item={item} index={i} />
             ))}
           </address>
         </Reveal>
@@ -1727,21 +1729,21 @@ function MatrixSection() {
 
 function CertificationsSection() {
   return (
-    <section aria-labelledby="certs-heading" {...stylex.props(styles.certsSection)}>
-      <div {...stylex.props(styles.container, styles.certsInner)}>
+    <section aria-labelledby="certs-heading" {...stylex.attrs(styles.certsSection)}>
+      <div {...stylex.attrs(styles.container, styles.certsInner)}>
         <Reveal>
-          <div {...stylex.props(styles.certsFlex)}>
+          <div {...stylex.attrs(styles.certsFlex)}>
             <div>
-              <p {...stylex.props(styles.eyebrowGreen)}>04 — Certified</p>
-              <h2 id="certs-heading" {...stylex.props(styles.certsHeading)}>
+              <p {...stylex.attrs(styles.eyebrowGreen)}>04 — Certified</p>
+              <h2 id="certs-heading" {...stylex.attrs(styles.certsHeading)}>
                 Audited on every lot
               </h2>
             </div>
-            <ul {...stylex.props(styles.certsList)}>
+            <ul {...stylex.attrs(styles.certsList)}>
               {certificationDetails.map((cert) => (
-                <li key={cert.name} {...stylex.props(styles.certBadge)}>
-                  <span {...stylex.props(styles.certName)}>{cert.name}</span>
-                  <span {...stylex.props(styles.certSub)}>{cert.sub}</span>
+                <li {...stylex.attrs(styles.certBadge)}>
+                  <span {...stylex.attrs(styles.certName)}>{cert.name}</span>
+                  <span {...stylex.attrs(styles.certSub)}>{cert.sub}</span>
                 </li>
               ))}
             </ul>
@@ -1756,37 +1758,37 @@ function CertificationsSection() {
 
 function FinaleSection() {
   return (
-    <section id="contact" aria-labelledby="contact-heading" {...stylex.props(styles.finaleSection)}>
+    <section id="contact" aria-labelledby="contact-heading" {...stylex.attrs(styles.finaleSection)}>
       {/* Radial glow — the one saturated field the brand book does allow */}
       <div
-        aria-hidden
+        aria-hidden="true"
         style={{
           background:
             "radial-gradient(80% 70% at 50% 0%, oklch(from var(--color-brand-green-500) l c h / 0.16), transparent 65%)",
         }}
-        {...stylex.props(styles.finaleGlow)}
+        {...stylex.attrs(styles.finaleGlow)}
       />
-      <div {...stylex.props(styles.container, styles.finaleInner)}>
+      <div {...stylex.attrs(styles.container, styles.finaleInner)}>
         <Reveal>
-          <p {...stylex.props(styles.eyebrowGreen400)}>05 — Partner with Fenchem</p>
-          <h2 id="contact-heading" {...stylex.props(styles.finaleHeading)}>
-            One standard, <span {...stylex.props(styles.italicGreen)}>signed on every lot.</span>
+          <p {...stylex.attrs(styles.eyebrowGreen400)}>05 — Partner with Fenchem</p>
+          <h2 id="contact-heading" {...stylex.attrs(styles.finaleHeading)}>
+            One standard, <span {...stylex.attrs(styles.italicGreen)}>signed on every lot.</span>
           </h2>
-          <p {...stylex.props(styles.finaleLead)}>
+          <p {...stylex.attrs(styles.finaleLead)}>
             Send a target specification — purity, form, matrix, regulatory map — and our laboratory
             returns a validated proposal with full documentation within one business day.
           </p>
         </Reveal>
         <Reveal delay={STAGGER * 2}>
-          <div {...stylex.props(styles.finaleActions)}>
-            <a href={createInquiryHref()} {...stylex.props(styles.ctaPrimaryDark)}>
+          <div {...stylex.attrs(styles.finaleActions)}>
+            <a href={createInquiryHref()} {...stylex.attrs(styles.ctaPrimaryDark)}>
               Request Specifications
-              <ArrowRight aria-hidden size={16} />
+              <ArrowRight aria-hidden="true" size={16} />
             </a>
           </div>
         </Reveal>
         <Reveal delay={STAGGER * 3}>
-          <p {...stylex.props(styles.finaleResponseTime)}>
+          <p {...stylex.attrs(styles.finaleResponseTime)}>
             Response &lt; 24h — Technical dossiers on request
           </p>
         </Reveal>
@@ -1799,18 +1801,18 @@ function FinaleSection() {
 
 function FooterSection() {
   return (
-    <footer {...stylex.props(styles.footer)}>
-      <div {...stylex.props(styles.container)}>
+    <footer {...stylex.attrs(styles.footer)}>
+      <div {...stylex.attrs(styles.container)}>
         {/* Ghost wordmark — extrabold: Jakarta loads 300–800; 900 would synthesize */}
-        <p aria-hidden {...stylex.props(styles.footerWordmark)}>
+        <p aria-hidden="true" {...stylex.attrs(styles.footerWordmark)}>
           FENCHEM
         </p>
-        <div {...stylex.props(styles.footerLegal)}>
+        <div {...stylex.attrs(styles.footerLegal)}>
           <span>© 2026 {company.legalName} — All Rights Reserved</span>
-          <a href="#top" {...stylex.props(styles.backToTopLink)}>
+          <a href="#top" {...stylex.attrs(styles.backToTopLink)}>
             Back to top
           </a>
-          <span {...stylex.props(styles.footerTagline)}>{company.tagline}</span>
+          <span {...stylex.attrs(styles.footerTagline)}>{company.tagline}</span>
         </div>
       </div>
     </footer>
@@ -1822,21 +1824,21 @@ function FooterSection() {
 /** Anchor navigation glides instead of jumping; restores on unmount and honors reduced motion. */
 function SmoothScroll() {
   const reduce = useReducedMotion();
-  useEffect(() => {
-    if (reduce) return;
+  createEffect(reduce, (value) => {
+    if (value) return;
     const root = document.documentElement;
     const previous = root.style.scrollBehavior;
     root.style.scrollBehavior = "smooth";
     return () => {
       root.style.scrollBehavior = previous;
     };
-  }, [reduce]);
+  });
   return null;
 }
 export function VariantK() {
   return (
     <LazyMotion features={domAnimation} strict>
-      <div {...stylex.props(styles.root)}>
+      <div {...stylex.attrs(styles.root)}>
         <SmoothScroll />
         <NavBar />
         <main>

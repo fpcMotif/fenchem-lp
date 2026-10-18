@@ -1,5 +1,13 @@
-import { createFileRoute, notFound } from "@tanstack/react-router";
-import { Component, useEffect, useState, type ComponentType, type ReactNode } from "react";
+import { createFileRoute, notFound } from "@tanstack/solid-router";
+import {
+  createEffect,
+  createSignal,
+  Errored,
+  onSettled,
+  Show,
+  untrack,
+  type Component,
+} from "solid-js";
 
 import {
   applyDataset,
@@ -47,65 +55,61 @@ export const Route = createFileRoute("/worst/oos1")({
   component: WorstOOS1,
 });
 
-type Loaded = { Variant: ComponentType } | { error: unknown };
+type Loaded = { Variant: Component } | { error: unknown };
 
 function WorstOOS1() {
-  const { data = "demo", fixed = false, articles = 1 } = Route.useSearch();
-  const [loaded, setLoaded] = useState<Loaded | null>(null);
+  const search = Route.useSearch();
+  const data = () => search().data ?? "demo";
+  const fixed = () => search().fixed ?? false;
+  const articles = () => search().articles ?? 1;
+  const [loaded, setLoaded] = createSignal<Loaded | null>(null);
 
-  useEffect(() => {
-    let active = true;
-    applyDataset(data, fixed, articles);
-    import("@/components/prototype/variant-oos1").then(
-      (module) => {
-        if (active) setLoaded({ Variant: module.VariantOOS1 });
-      },
-      (error: unknown) => {
-        if (active) setLoaded({ error });
-      },
-    );
-    return () => {
-      active = false;
-    };
-  }, [data, fixed, articles]);
+  createEffect(
+    () => [data(), fixed(), articles()] as const,
+    ([nextData, nextFixed, nextArticles]) => {
+      let active = true;
+      applyDataset(nextData, nextFixed, nextArticles);
+      import("@/components/prototype/variant-oos1").then(
+        (module) => {
+          if (active) setLoaded({ Variant: module.VariantOOS1 as Component });
+        },
+        (error: unknown) => {
+          if (active) setLoaded({ error });
+        },
+      );
+      return () => {
+        active = false;
+      };
+    },
+  );
 
-  useEffect(() => {
-    if (loaded && "Variant" in loaded) restoreAnchor();
-  }, [loaded]);
+  createEffect(loaded, (current) => {
+    if (current && "Variant" in current) restoreAnchor();
+  });
 
   return (
     <>
-      <div style={{ minWidth: 0 }}>
-        {loaded === null ? null : "error" in loaded ? (
-          <CrashNotice error={loaded.error} />
-        ) : (
-          <CrashBoundary>
-            <loaded.Variant />
-          </CrashBoundary>
-        )}
+      <div style={{ "min-width": 0 }}>
+        <Show when={loaded()}>
+          {(current) => {
+            const state = current();
+            if ("error" in state) return <CrashNotice error={state.error} />;
+            const Variant = state.Variant;
+            return (
+              <Errored fallback={(error) => <CrashNotice error={error()} />}>
+                <Variant />
+              </Errored>
+            );
+          }}
+        </Show>
       </div>
-      <DataToggle data={data} fixed={fixed} articles={articles} />
+      <DataToggle data={data()} fixed={fixed()} articles={articles()} />
     </>
   );
 }
 
-class CrashBoundary extends Component<{ children: ReactNode }, { error: unknown }> {
-  state: { error: unknown } = { error: null };
-
-  static getDerivedStateFromError(error: unknown) {
-    return { error };
-  }
-
-  render() {
-    return this.state.error === null ? (
-      this.props.children
-    ) : (
-      <CrashNotice error={this.state.error} />
-    );
-  }
-}
-
-function CrashNotice({ error }: { error: unknown }) {
+function CrashNotice(props: { error: unknown }) {
+  const error = untrack(() => props.error);
   const message = error instanceof Error ? error.message : String(error);
   const stack =
     error instanceof Error ? (error.stack ?? "").split("\n").slice(1, 6).join("\n") : "";
@@ -113,26 +117,28 @@ function CrashNotice({ error }: { error: unknown }) {
     <div
       role="alert"
       style={{
-        boxSizing: "border-box",
-        minHeight: "100vh",
+        "box-sizing": "border-box",
+        "min-height": "100vh",
         padding: "96px 16px 160px",
         background: "#fafafa",
         color: "#1a1a1a",
         font: "14px/1.5 system-ui, -apple-system, sans-serif",
       }}
     >
-      <div style={{ maxWidth: 720, marginInline: "auto" }}>
-        <p style={{ margin: 0, fontSize: 18, fontWeight: 600 }}>This dataset crashes the page</p>
-        <p style={{ margin: "8px 0 0", overflowWrap: "anywhere" }}>{message}</p>
+      <div style={{ "max-width": "720px", "margin-inline": "auto" }}>
+        <p style={{ margin: 0, "font-size": "18px", "font-weight": 600 }}>
+          This dataset crashes the page
+        </p>
+        <p style={{ margin: "8px 0 0", "overflow-wrap": "anywhere" }}>{message}</p>
         {stack ? (
           <pre
             style={{
               margin: "16px 0 0",
-              padding: 12,
-              overflowX: "auto",
+              padding: "12px",
+              "overflow-x": "auto",
               background: "#f0f0f0",
-              borderRadius: 8,
-              fontSize: 12,
+              "border-radius": "8px",
+              "font-size": "12px",
             }}
           >
             {stack}
@@ -260,19 +266,11 @@ function go(
   window.location.assign(url);
 }
 
-function DataToggle({
-  data,
-  fixed,
-  articles,
-}: {
-  data: Dataset;
-  fixed: boolean;
-  articles: ArticleCount;
-}) {
-  const [page, setPage] = useState<Page>("home");
-  const [collapsed, setCollapsed] = useState(false);
+function DataToggle(props: { data: Dataset; fixed: boolean; articles: ArticleCount }) {
+  const [page, setPage] = createSignal<Page>("home");
+  const [collapsed, setCollapsed] = createSignal(false);
 
-  useEffect(() => {
+  onSettled(() => {
     const sync = () => window.setTimeout(() => setPage(currentPage()), 0);
     sync();
     window.addEventListener("popstate", sync);
@@ -281,76 +279,102 @@ function DataToggle({
       window.removeEventListener("popstate", sync);
       document.removeEventListener("click", sync, true);
     };
-  }, []);
+  });
 
   return (
     <>
       <style>{TOGGLE_CSS}</style>
-      <div className="data-toggle" role="group" aria-label="Fixture data">
-        {collapsed ? null : (
-          <>
-            <div className="data-toggle-track" role="group" aria-label="Page">
-              {PAGES.map((candidate) => (
+      <div class="data-toggle" role="group" aria-label="Fixture data">
+        <Show when={!collapsed()}>
+          <div class="data-toggle-track" role="group" aria-label="Page">
+            {PAGES.map((candidate) => (
+              <button
+                type="button"
+                aria-pressed={candidate === page() ? "true" : "false"}
+                onClick={() =>
+                  go(
+                    {
+                      data: props.data,
+                      fixed: props.fixed,
+                      page: candidate,
+                      articles: props.articles,
+                    },
+                    false,
+                  )
+                }
+              >
+                {PAGE_LABELS[candidate]}
+              </button>
+            ))}
+          </div>
+          <div class="data-toggle-track" role="group" aria-label="Dataset">
+            {DATASETS.map((candidate) => (
+              <button
+                type="button"
+                aria-pressed={candidate === props.data ? "true" : "false"}
+                onClick={() =>
+                  go(
+                    {
+                      data: candidate,
+                      fixed: props.fixed,
+                      page: currentPage(),
+                      articles: props.articles,
+                    },
+                    true,
+                  )
+                }
+              >
+                {DATASET_LABELS[candidate]}
+              </button>
+            ))}
+          </div>
+          <Show when={props.data === "demo" && page() === "insights"}>
+            <div class="data-toggle-track" role="group" aria-label="Articles">
+              <span aria-hidden="true">Articles</span>
+              {ARTICLE_COUNTS.map((candidate) => (
                 <button
-                  key={candidate}
                   type="button"
-                  aria-pressed={candidate === page}
-                  onClick={() => go({ data, fixed, page: candidate, articles }, false)}
-                >
-                  {PAGE_LABELS[candidate]}
-                </button>
-              ))}
-            </div>
-            <div className="data-toggle-track" role="group" aria-label="Dataset">
-              {DATASETS.map((candidate) => (
-                <button
-                  key={candidate}
-                  type="button"
-                  aria-pressed={candidate === data}
+                  aria-pressed={candidate === props.articles ? "true" : "false"}
                   onClick={() =>
-                    go({ data: candidate, fixed, page: currentPage(), articles }, true)
+                    go(
+                      { data: props.data, fixed: props.fixed, page: page(), articles: candidate },
+                      false,
+                    )
                   }
                 >
-                  {DATASET_LABELS[candidate]}
+                  {candidate}
                 </button>
               ))}
             </div>
-            {data === "demo" && page === "insights" ? (
-              <div className="data-toggle-track" role="group" aria-label="Articles">
-                <span aria-hidden="true">Articles</span>
-                {ARTICLE_COUNTS.map((candidate) => (
-                  <button
-                    key={candidate}
-                    type="button"
-                    aria-pressed={candidate === articles}
-                    onClick={() => go({ data, fixed, page, articles: candidate }, false)}
-                  >
-                    {candidate}
-                  </button>
-                ))}
-              </div>
-            ) : null}
-            {data === "empty" || data === "one" || data === "many" ? (
-              <label>
-                <input
-                  type="checkbox"
-                  checked={fixed}
-                  onChange={(event) =>
-                    go({ data, fixed: event.target.checked, page: currentPage(), articles }, true)
-                  }
-                />
-                Keep fixed-count lists
-              </label>
-            ) : null}
-          </>
-        )}
+          </Show>
+          <Show when={props.data === "empty" || props.data === "one" || props.data === "many"}>
+            <label>
+              <input
+                type="checkbox"
+                checked={props.fixed}
+                onChange={(event) =>
+                  go(
+                    {
+                      data: props.data,
+                      fixed: event.currentTarget.checked,
+                      page: currentPage(),
+                      articles: props.articles,
+                    },
+                    true,
+                  )
+                }
+              />
+              Keep fixed-count lists
+            </label>
+          </Show>
+        </Show>
         <button
           type="button"
-          aria-expanded={!collapsed}
-          aria-label={collapsed ? "Show data toggle" : "Hide data toggle"}
+          aria-expanded={collapsed() ? "false" : "true"}
+          aria-label={collapsed() ? "Show data toggle" : "Hide data toggle"}
           onClick={() => setCollapsed((value) => !value)}
         >
-          {collapsed ? `${DATASET_LABELS[data]} ▴` : "▾"}
+          {collapsed() ? `${DATASET_LABELS[props.data]} ▴` : "▾"}
         </button>
       </div>
     </>

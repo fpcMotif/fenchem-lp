@@ -1,7 +1,8 @@
 import * as stylex from "@stylexjs/stylex";
-import { Menu, Search, X } from "lucide-react";
-import { AnimatePresence, m } from "motion/react";
-import { useEffect, useId, useState, type KeyboardEvent } from "react";
+import { Menu, Search, X } from "@fenchem-lp/ui/components/lucide";
+import { AnimatePresence, m } from "@/compat/motion";
+import { createSignal, createUniqueId, onSettled, Show, type Accessor } from "solid-js";
+import type { JSX } from "@solidjs/web";
 
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
@@ -41,9 +42,9 @@ function readActiveId(): string | null {
   return current && NAV_IDS.includes(current) ? current : null;
 }
 
-function useHeaderState(): HeaderState {
-  const [state, setState] = useState<HeaderState>({ solid: false, activeId: "top" });
-  useEffect(() => {
+function useHeaderState(): Accessor<HeaderState> {
+  const [state, setState] = createSignal<HeaderState>({ solid: false, activeId: "top" });
+  onSettled(() => {
     let frame = 0;
     const update = () => {
       frame = 0;
@@ -64,7 +65,7 @@ function useHeaderState(): HeaderState {
       window.removeEventListener("scroll", schedule);
       window.removeEventListener("resize", schedule);
     };
-  }, []);
+  });
   return state;
 }
 
@@ -288,74 +289,85 @@ const styles = stylex.create({
   },
 });
 
-function LogoMark({ white }: { white: boolean }) {
+// stylex.attrs with reactive (accessor) arguments: the StyleX compiler tries to
+// evaluate local arrow functions at build time and throws, so these call sites
+// resolve at runtime instead.
+const sxProps: typeof stylex.attrs = (...args) => stylex.attrs(...args);
+
+// `focusable` (legacy SVG attribute) is not in Solid's JSX types.
+const UNFOCUSABLE = { focusable: "false" } as JSX.SvgSVGAttributes<SVGSVGElement>;
+
+function LogoMark(props: { white: boolean }) {
   return (
-    <svg viewBox="0 0 161 52" aria-hidden="true" focusable="false" {...stylex.props(styles.logo)}>
+    <svg viewBox="0 0 161 52" aria-hidden="true" {...UNFOCUSABLE} {...stylex.attrs(styles.logo)}>
       {LOGO_PATHS.map((path) => (
         <path
-          key={path.d}
           d={path.d}
           fill={path.fill}
-          {...stylex.props(white ? styles.logoPathHero : styles.logoPathSolid)}
+          {...stylex.attrs(props.white ? styles.logoPathHero : styles.logoPathSolid)}
         />
       ))}
     </svg>
   );
 }
 
-export function SiteHeader({ introStarted }: { introStarted: boolean }) {
-  const [menuOpen, setMenuOpen] = useState(false);
-  const menuId = useId();
+export function SiteHeader(props: { introStarted: boolean }) {
+  const [menuOpen, setMenuOpen] = createSignal(false);
+  const menuId = createUniqueId();
   const reduce = useReducedMotion();
-  const { solid, activeId } = useHeaderState();
-  const onLight = menuOpen || solid;
-  const closeOnEscape = (event: KeyboardEvent<HTMLElement>) => {
-    if (event.key === "Escape" && menuOpen) setMenuOpen(false);
+  const headerState = useHeaderState();
+  const onLight = () => menuOpen() || headerState().solid;
+  const closeOnEscape = (event: KeyboardEvent) => {
+    if (event.key === "Escape" && menuOpen()) setMenuOpen(false);
   };
-  const isActive = (href: string) => href.slice(1) === activeId;
+  const isActive = (href: string) => href.slice(1) === headerState().activeId;
   return (
     <header
       onKeyDown={closeOnEscape}
-      {...stylex.props(styles.header, onLight ? styles.headerSolid : styles.headerHero)}
+      {...sxProps(styles.header, onLight() ? styles.headerSolid : styles.headerHero)}
     >
       <div
-        {...stylex.props(layout.shell, layout.inset, styles.inner, introStarted && styles.innerIn)}
+        {...stylex.attrs(
+          layout.shell,
+          layout.inset,
+          styles.inner,
+          props.introStarted && styles.innerIn,
+        )}
       >
-        <a href="#top" aria-label="FENCHEM home" {...stylex.props(styles.logoLink)}>
-          <LogoMark white={!onLight} />
+        <a href="#top" aria-label="FENCHEM home" {...stylex.attrs(styles.logoLink)}>
+          <LogoMark white={!onLight()} />
         </a>
-        <nav aria-label="Main" {...stylex.props(styles.nav)}>
+        <nav aria-label="Main" {...stylex.attrs(styles.nav)}>
           {NAV_ITEMS.map((item) => (
             <a
-              key={item.href}
               href={item.href}
               aria-current={isActive(item.href) ? "location" : undefined}
-              {...stylex.props(
+              {...sxProps(
                 styles.navLink,
-                onLight ? styles.navHoverSolid : styles.navHoverHero,
-                isActive(item.href) && (onLight ? styles.navActiveSolid : styles.navActiveHero),
+                onLight() ? styles.navHoverSolid : styles.navHoverHero,
+                isActive(item.href) && (onLight() ? styles.navActiveSolid : styles.navActiveHero),
               )}
             >
               {item.label}
             </a>
           ))}
         </nav>
-        <div {...stylex.props(styles.actions)}>
-          <button type="button" aria-label="Search" {...stylex.props(styles.iconButton)}>
+        <div {...stylex.attrs(styles.actions)}>
+          <button type="button" aria-label="Search" {...stylex.attrs(styles.iconButton)}>
             <Search size={18} strokeWidth={2} absoluteStrokeWidth aria-hidden="true" />
           </button>
-          <button type="button" aria-label="Switch to English" {...stylex.props(styles.langButton)}>
+          <button type="button" aria-label="Switch to English" {...stylex.attrs(styles.langButton)}>
             EN
           </button>
           <button
             type="button"
-            aria-label={menuOpen ? "Close menu" : "Open menu"}
-            aria-expanded={menuOpen}
+            aria-label={menuOpen() ? "Close menu" : "Open menu"}
+            aria-expanded={menuOpen() ? "true" : "false"}
             aria-controls={menuId}
             onClick={() => setMenuOpen((open) => !open)}
-            {...stylex.props(styles.menuButton)}
+            {...stylex.attrs(styles.menuButton)}
           >
-            {menuOpen ? (
+            {menuOpen() ? (
               <X size={24} strokeWidth={2} absoluteStrokeWidth aria-hidden="true" />
             ) : (
               <Menu size={24} strokeWidth={2} absoluteStrokeWidth aria-hidden="true" />
@@ -364,25 +376,24 @@ export function SiteHeader({ introStarted }: { introStarted: boolean }) {
         </div>
       </div>
       <AnimatePresence initial={false}>
-        {menuOpen ? (
+        <Show when={menuOpen()}>
           <m.nav
-            key="menu"
             id={menuId}
             aria-label="Main"
-            {...stylex.props(styles.menuPanel)}
+            {...stylex.attrs(styles.menuPanel)}
             initial={{ opacity: 0, transform: "translateY(-8px)" }}
             animate={{ opacity: 1, transform: "translateY(0px)" }}
             exit={{ opacity: 0, transform: "translateY(-8px)" }}
-            transition={{ duration: reduce ? 0.15 : 0.2, ease: EASE_OUT }}
+            transition={{ duration: reduce() ? 0.15 : 0.2, ease: EASE_OUT }}
           >
-            <ul {...stylex.props(styles.menuList)}>
+            <ul {...stylex.attrs(styles.menuList)}>
               {NAV_ITEMS.map((item) => (
-                <li key={item.href}>
+                <li>
                   <a
                     href={item.href}
                     aria-current={isActive(item.href) ? "location" : undefined}
                     onClick={() => setMenuOpen(false)}
-                    {...stylex.props(styles.menuLink, isActive(item.href) && styles.menuLinkActive)}
+                    {...stylex.attrs(styles.menuLink, isActive(item.href) && styles.menuLinkActive)}
                   >
                     {item.label}
                   </a>
@@ -390,7 +401,7 @@ export function SiteHeader({ introStarted }: { introStarted: boolean }) {
               ))}
             </ul>
           </m.nav>
-        ) : null}
+        </Show>
       </AnimatePresence>
     </header>
   );

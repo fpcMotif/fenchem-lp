@@ -53,11 +53,10 @@ export function Honors() {
     <section
       id="about-honor"
       aria-labelledby="oos1x-honor"
-      {...stylex.props(ui.anchor, styles.section)}
+      {...stylex.attrs(ui.anchor, styles.section)}
     >
       {LEVELS.map((group, index) => (
         <Pair
-          key={group.level}
           lever={AT_REST}
           loadLine
           loadFirstOnPhone
@@ -69,21 +68,19 @@ export function Honors() {
             ) : undefined
           }
           load={
-            <p {...stylex.props(styles.level)}>
-              <span {...stylex.props(styles.levelLabel)}>{group.label}</span>
-              <span lang="en" {...stylex.props(type.serif, styles.levelEnglish)}>
+            <p {...stylex.attrs(styles.level)}>
+              <span {...stylex.attrs(styles.levelLabel)}>{group.label}</span>
+              <span lang="en" {...stylex.attrs(type.serif, styles.levelEnglish)}>
                 {group.english}
               </span>
             </p>
           }
         >
-          <ul {...stylex.props(styles.titles)}>
+          <ul {...stylex.attrs(styles.titles)}>
             {ABOUT_HONORS.items
               .filter((item) => item.level === group.level)
               .map((item) => (
-                <li key={item.id} {...stylex.props(type.light, styles.title)}>
-                  {item.title}
-                </li>
+                <li {...stylex.attrs(type.light, styles.title)}>{item.title}</li>
               ))}
           </ul>
         </Pair>

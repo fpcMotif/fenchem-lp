@@ -73,38 +73,36 @@ const S = stylex.create({
   },
 });
 
-export function Products({ onNavigateHome }: { onNavigateHome: (hash?: string) => void }) {
+export function Products(props: { onNavigateHome: (hash?: string) => void }) {
   return (
     <Section id="about-products" labelledBy="about-products-title" surface="paper">
       <SectionName id="about-products-title">Products and application solutions</SectionName>
-      <div {...stylex.props(base.shell, base.inset)}>
+      <div {...stylex.attrs(base.shell, base.inset)}>
         <Reveal sx={S.intro}>
-          <p {...stylex.props(base.prose)}>{PRODUCTS_INTRO.lead}</p>
+          <p {...stylex.attrs(base.prose)}>{PRODUCTS_INTRO.lead}</p>
           <button
             type="button"
-            onClick={() => onNavigateHome("products")}
-            {...stylex.props(S.link, base.focusRing)}
+            onClick={() => props.onNavigateHome("products")}
+            {...stylex.attrs(S.link, base.focusRing)}
           >
             {PRODUCTS_INTRO.cta.label}
           </button>
         </Reveal>
-        <ul {...stylex.props(S.grid)}>
+        <ul {...stylex.attrs(S.grid)}>
           {PRODUCTS.map((product, index) => (
-            <Reveal key={product.title} as="li" delay={(index % 4) * 90} sx={S.product}>
+            <Reveal as="li" delay={(index % 4) * 90} sx={S.product}>
               <img
                 src={product.image}
                 alt={product.english}
                 loading="lazy"
                 decoding="async"
-                {...stylex.props(S.photo)}
+                {...stylex.attrs(S.photo)}
               />
-              <h3 {...stylex.props(base.headline)}>{product.title}</h3>
-              <p {...stylex.props(base.prose, S.desc)}>{product.description}</p>
-              <ul {...stylex.props(S.tags)}>
+              <h3 {...stylex.attrs(base.headline)}>{product.title}</h3>
+              <p {...stylex.attrs(base.prose, S.desc)}>{product.description}</p>
+              <ul {...stylex.attrs(S.tags)}>
                 {product.tags.map((tag) => (
-                  <li key={tag} {...stylex.props(base.quiet, S.tag)}>
-                    {tag}
-                  </li>
+                  <li {...stylex.attrs(base.quiet, S.tag)}>{tag}</li>
                 ))}
               </ul>
             </Reveal>

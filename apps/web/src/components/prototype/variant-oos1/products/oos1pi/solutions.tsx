@@ -1,7 +1,7 @@
 import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
-import { useId, useRef, useState, type KeyboardEvent } from "react";
+import { ChevronDown, ChevronLeft, ChevronRight } from "@fenchem-lp/ui/components/lucide";
+import { createSignal, createUniqueId, flush, For } from "solid-js";
 
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
@@ -22,6 +22,10 @@ const sheetIn = stylex.keyframes({
   from: { opacity: 0 },
   to: { opacity: 1 },
 });
+
+// stylex.attrs with reactive (accessor) arguments resolves at runtime here, because
+// the StyleX compiler tries to evaluate them at build time and throws.
+const sxProps: typeof stylex.attrs = (...args) => stylex.attrs(...args);
 
 const styles = stylex.create({
   ground: {
@@ -426,65 +430,60 @@ const styles = stylex.create({
   },
 });
 
-function PlainLines({ lines }: { lines: string[] }) {
+function PlainLines(props: { lines: string[] }) {
   return (
-    <ul {...stylex.props(styles.plainLines)}>
-      {lines.map((line) => (
-        <li key={line}>{line}</li>
-      ))}
+    <ul {...stylex.attrs(styles.plainLines)}>
+      <For each={props.lines}>{(line) => <li>{line}</li>}</For>
     </ul>
   );
 }
 
-function Fact({ label, lines }: { label: string; lines: string[] }) {
+function Fact(props: { label: string; lines: string[] }) {
   return (
-    <div {...stylex.props(styles.fact)}>
-      <dt {...stylex.props(styles.factLabel)}>{label}</dt>
-      <dd {...stylex.props(styles.factValue)}>
-        <PlainLines lines={lines} />
+    <div {...stylex.attrs(styles.fact)}>
+      <dt {...stylex.attrs(styles.factLabel)}>{props.label}</dt>
+      <dd {...stylex.attrs(styles.factValue)}>
+        <PlainLines lines={props.lines} />
       </dd>
     </div>
   );
 }
 
-function Field({ label, lines }: { label: string; lines: string[] }) {
+function Field(props: { label: string; lines: string[] }) {
   return (
-    <div {...stylex.props(styles.field)}>
-      <dt {...stylex.props(styles.fieldLabel)}>{label}</dt>
-      <dd {...stylex.props(styles.fieldValue)}>
-        <ul {...stylex.props(styles.bullets)}>
-          {lines.map((line) => (
-            <li key={line} {...stylex.props(styles.bullet)}>
-              {line}
-            </li>
-          ))}
+    <div {...stylex.attrs(styles.field)}>
+      <dt {...stylex.attrs(styles.fieldLabel)}>{props.label}</dt>
+      <dd {...stylex.attrs(styles.fieldValue)}>
+        <ul {...stylex.attrs(styles.bullets)}>
+          <For each={props.lines}>{(line) => <li {...stylex.attrs(styles.bullet)}>{line}</li>}</For>
         </ul>
       </dd>
     </div>
   );
 }
 
-function SheetPair({ item, index, shown }: { item: SolutionItem; index: number; shown: boolean }) {
+function SheetPair(props: { item: SolutionItem; index: number; shown: boolean }) {
+  const item = props.item;
   return (
     <div
-      inert={!shown}
-      {...stylex.props(styles.pair, shown ? styles.pairShown : styles.pairHidden)}
+      inert={!props.shown}
+      {...stylex.attrs(styles.pair, props.shown ? styles.pairShown : styles.pairHidden)}
     >
-      <div {...stylex.props(styles.paper, styles.card)}>
-        <div {...stylex.props(styles.cardHead)}>
-          <span {...stylex.props(styles.cardNumber)}>{padIndex(index)}</span>
-          <span {...stylex.props(styles.cardTotal)}>/ {TOTAL}</span>
+      <div {...stylex.attrs(styles.paper, styles.card)}>
+        <div {...stylex.attrs(styles.cardHead)}>
+          <span {...stylex.attrs(styles.cardNumber)}>{padIndex(props.index)}</span>
+          <span {...stylex.attrs(styles.cardTotal)}>/ {TOTAL}</span>
         </div>
-        <h3 {...stylex.props(styles.cardTitle)}>{item.title}</h3>
-        <dl {...stylex.props(styles.facts)}>
+        <h3 {...stylex.attrs(styles.cardTitle)}>{item.title}</h3>
+        <dl {...stylex.attrs(styles.facts)}>
           <Fact label="功能" lines={item.functions} />
           <Fact label="质地" lines={item.texture} />
           <Fact label="应用" lines={item.applications} />
         </dl>
       </div>
-      <div {...stylex.props(styles.paper, styles.notes)}>
-        <p {...stylex.props(styles.lead)}>{item.subtitle}</p>
-        <dl {...stylex.props(styles.fields)}>
+      <div {...stylex.attrs(styles.paper, styles.notes)}>
+        <p {...stylex.attrs(styles.lead)}>{item.subtitle}</p>
+        <dl {...stylex.attrs(styles.fields)}>
           <Field label="概述" lines={item.overview} />
           <Field label="功能性成分" lines={item.keyIngredients} />
           {item.challenges.length > 0 && <Field label="配方挑战" lines={item.challenges} />}
@@ -496,23 +495,24 @@ function SheetPair({ item, index, shown }: { item: SolutionItem; index: number; 
 
 export function Solutions() {
   const reduce = useReducedMotion();
-  const baseId = useId();
+  const baseId = createUniqueId();
   const titleId = `${baseId}-title`;
   const panelId = `${baseId}-panel`;
   const selectId = `${baseId}-select`;
   const tabDomId = (index: number) => `${baseId}-tab-${index}`;
-  const [selected, setSelected] = useState(0);
-  const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
-  const pickerRef = useRef<HTMLDivElement>(null);
-  const previous = SOLUTION_ITEMS[selected - 1];
-  const next = SOLUTION_ITEMS[selected + 1];
+  const [selected, setSelected] = createSignal(0);
+  const tabRefs: (HTMLButtonElement | undefined)[] = [];
+  let pickerEl!: HTMLDivElement;
+  const previous = () => SOLUTION_ITEMS[selected() - 1];
+  const next = () => SOLUTION_ITEMS[selected() + 1];
 
-  const onTabKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+  const onTabKeyDown = (event: KeyboardEvent) => {
+    const current = selected();
     const target =
       event.key === "ArrowDown"
-        ? (selected + 1) % TOTAL
+        ? (current + 1) % TOTAL
         : event.key === "ArrowUp"
-          ? (selected - 1 + TOTAL) % TOTAL
+          ? (current - 1 + TOTAL) % TOTAL
           : event.key === "Home"
             ? 0
             : event.key === "End"
@@ -521,15 +521,16 @@ export function Solutions() {
     if (target < 0) return;
     event.preventDefault();
     setSelected(target);
-    tabRefs.current[target]?.focus();
+    flush();
+    tabRefs[target]?.focus();
   };
 
   const step = (delta: number) => {
-    const target = selected + delta;
+    const target = selected() + delta;
     if (target < 0 || target >= TOTAL) return;
-    const picker = pickerRef.current;
+    const picker = pickerEl;
     if (picker && picker.getBoundingClientRect().top < HEADER_HEIGHT) {
-      picker.scrollIntoView({ block: "start", behavior: reduce ? "instant" : "smooth" });
+      picker.scrollIntoView({ block: "start", behavior: reduce() ? "instant" : "smooth" });
     }
     setSelected(target);
   };
@@ -538,65 +539,62 @@ export function Solutions() {
     <section
       id="products-solutions"
       aria-labelledby={titleId}
-      {...stylex.props(ui.section, styles.ground)}
+      {...stylex.attrs(ui.section, styles.ground)}
     >
-      <div {...stylex.props(ui.shell)}>
-        <header {...stylex.props(styles.head)}>
-          <h2 id={titleId} {...stylex.props(ui.title)}>
+      <div {...stylex.attrs(ui.shell)}>
+        <header {...stylex.attrs(styles.head)}>
+          <h2 id={titleId} {...stylex.attrs(ui.title)}>
             应用方案
           </h2>
         </header>
-        <div {...stylex.props(styles.layout)}>
+        <div {...stylex.attrs(styles.layout)}>
           <div
             role="tablist"
             aria-orientation="vertical"
             aria-labelledby={titleId}
             onKeyDown={onTabKeyDown}
-            {...stylex.props(styles.list)}
+            {...stylex.attrs(styles.list)}
           >
             {SOLUTION_ITEMS.map((item, index) => {
-              const isSelected = index === selected;
+              const isSelected = () => index === selected();
               return (
                 <button
-                  key={item.id}
                   ref={(node) => {
-                    tabRefs.current[index] = node;
+                    tabRefs[index] = node;
                   }}
                   type="button"
                   role="tab"
                   id={tabDomId(index)}
-                  aria-selected={isSelected}
+                  aria-selected={isSelected() ? "true" : "false"}
                   aria-controls={panelId}
-                  tabIndex={isSelected ? 0 : -1}
+                  tabindex={isSelected() ? 0 : -1}
                   onClick={() => setSelected(index)}
-                  {...stylex.props(styles.tab, isSelected && styles.tabSelected)}
+                  {...stylex.attrs(styles.tab, isSelected() && styles.tabSelected)}
                 >
-                  <span {...stylex.props(styles.tabIndex, isSelected && styles.tabIndexSelected)}>
+                  <span {...stylex.attrs(styles.tabIndex, isSelected() && styles.tabIndexSelected)}>
                     {padIndex(index)}
                   </span>
-                  <span {...stylex.props(styles.tabName, isSelected && styles.tabNameSelected)}>
+                  <span {...stylex.attrs(styles.tabName, isSelected() && styles.tabNameSelected)}>
                     {item.title}
                   </span>
                 </button>
               );
             })}
           </div>
-          <div ref={pickerRef} {...stylex.props(styles.picker)}>
-            <label htmlFor={selectId} {...stylex.props(ui.srOnly)}>
+          <div ref={pickerEl} {...stylex.attrs(styles.picker)}>
+            <label for={selectId} {...stylex.attrs(ui.srOnly)}>
               Choose an application solution
             </label>
-            <div {...stylex.props(styles.selectWrap)}>
+            <div {...stylex.attrs(styles.selectWrap)}>
               <select
                 id={selectId}
-                value={selected}
+                value={selected()}
                 aria-controls={panelId}
-                onChange={(event) => setSelected(Number(event.target.value))}
-                {...stylex.props(styles.select)}
+                onChange={(event) => setSelected(Number(event.currentTarget.value))}
+                {...stylex.attrs(styles.select)}
               >
                 {SOLUTION_ITEMS.map((item, index) => (
-                  <option key={item.id} value={index}>
-                    {`${padIndex(index)}　${item.title}`}
-                  </option>
+                  <option value={index}>{`${padIndex(index)}　${item.title}`}</option>
                 ))}
               </select>
               <ChevronDown
@@ -604,58 +602,60 @@ export function Solutions() {
                 size={18}
                 strokeWidth={1.5}
                 absoluteStrokeWidth
-                {...stylex.props(styles.selectIcon)}
+                {...stylex.attrs(styles.selectIcon)}
               />
             </div>
           </div>
           <div
             role="tabpanel"
             id={panelId}
-            aria-labelledby={tabDomId(selected)}
-            tabIndex={0}
-            {...stylex.props(styles.stack)}
+            aria-labelledby={tabDomId(selected())}
+            tabindex={0}
+            {...stylex.attrs(styles.stack)}
           >
             {SOLUTION_ITEMS.map((item, index) => (
-              <SheetPair key={item.id} item={item} index={index} shown={index === selected} />
+              <SheetPair item={item} index={index} shown={index === selected()} />
             ))}
           </div>
-          <div {...stylex.props(styles.pager)}>
+          <div {...stylex.attrs(styles.pager)}>
             <button
               type="button"
-              disabled={!previous}
+              disabled={!previous()}
               aria-controls={panelId}
               onClick={() => step(-1)}
-              {...stylex.props(styles.pagerButton, !previous && styles.pagerDisabled)}
+              {...sxProps(styles.pagerButton, !previous() && styles.pagerDisabled)}
             >
               <ChevronLeft
                 aria-hidden="true"
                 size={18}
                 strokeWidth={1.5}
                 absoluteStrokeWidth
-                {...stylex.props(styles.pagerIcon)}
+                {...stylex.attrs(styles.pagerIcon)}
               />
-              <span {...stylex.props(styles.pagerText)}>
-                <span {...stylex.props(styles.pagerLabel)}>上一个</span>
-                {previous && <span {...stylex.props(styles.pagerTitle)}>{previous.title}</span>}
+              <span {...stylex.attrs(styles.pagerText)}>
+                <span {...stylex.attrs(styles.pagerLabel)}>上一个</span>
+                {previous() && (
+                  <span {...stylex.attrs(styles.pagerTitle)}>{previous()!.title}</span>
+                )}
               </span>
             </button>
             <button
               type="button"
-              disabled={!next}
+              disabled={!next()}
               aria-controls={panelId}
               onClick={() => step(1)}
-              {...stylex.props(styles.pagerButton, styles.pagerNext, !next && styles.pagerDisabled)}
+              {...sxProps(styles.pagerButton, styles.pagerNext, !next() && styles.pagerDisabled)}
             >
-              <span {...stylex.props(styles.pagerText)}>
-                <span {...stylex.props(styles.pagerLabel)}>下一个</span>
-                {next && <span {...stylex.props(styles.pagerTitle)}>{next.title}</span>}
+              <span {...stylex.attrs(styles.pagerText)}>
+                <span {...stylex.attrs(styles.pagerLabel)}>下一个</span>
+                {next() && <span {...stylex.attrs(styles.pagerTitle)}>{next()!.title}</span>}
               </span>
               <ChevronRight
                 aria-hidden="true"
                 size={18}
                 strokeWidth={1.5}
                 absoluteStrokeWidth
-                {...stylex.props(styles.pagerIcon)}
+                {...stylex.attrs(styles.pagerIcon)}
               />
             </button>
           </div>

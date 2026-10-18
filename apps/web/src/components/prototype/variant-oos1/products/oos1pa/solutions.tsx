@@ -1,7 +1,7 @@
 import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { ArrowUpRight } from "lucide-react";
-import { useId, useRef, useState } from "react";
+import { ArrowUpRight } from "@fenchem-lp/ui/components/lucide";
+import { createSignal, createUniqueId } from "solid-js";
 
 import { FLAT_FORMULAS, padIndex } from "../shared/derived";
 import { SheetDialog } from "./sheet-dialog";
@@ -198,14 +198,14 @@ const styles = stylex.create({
 });
 
 export function Solutions() {
-  const titleId = useId();
-  const dialogId = useId();
-  const [openIndex, setOpenIndex] = useState<number | null>(null);
-  const [direction, setDirection] = useState<1 | -1>(1);
-  const triggerRef = useRef<HTMLButtonElement | null>(null);
+  const titleId = createUniqueId();
+  const dialogId = createUniqueId();
+  const [openIndex, setOpenIndex] = createSignal<number | null>(null);
+  const [direction, setDirection] = createSignal<1 | -1>(1);
+  let trigger: HTMLButtonElement | null = null;
 
-  const open = (index: number, trigger: HTMLButtonElement) => {
-    triggerRef.current = trigger;
+  const open = (index: number, target: HTMLButtonElement) => {
+    trigger = target;
     setDirection(1);
     setOpenIndex(index);
   };
@@ -217,44 +217,44 @@ export function Solutions() {
 
   const close = () => {
     setOpenIndex(null);
-    triggerRef.current?.focus();
+    trigger?.focus();
   };
 
   return (
-    <section id="products-solutions" aria-labelledby={titleId} {...stylex.props(styles.section)}>
-      <div {...stylex.props(styles.shell)}>
-        <header {...stylex.props(styles.head)}>
-          <h2 id={titleId} {...stylex.props(styles.title)}>
+    <section id="products-solutions" aria-labelledby={titleId} {...stylex.attrs(styles.section)}>
+      <div {...stylex.attrs(styles.shell)}>
+        <header {...stylex.attrs(styles.head)}>
+          <h2 id={titleId} {...stylex.attrs(styles.title)}>
             应用方案
           </h2>
-          <p {...stylex.props(styles.meta)}>
-            共 <span {...stylex.props(styles.metaCount)}>{COUNT}</span> 款配方
+          <p {...stylex.attrs(styles.meta)}>
+            共 <span {...stylex.attrs(styles.metaCount)}>{COUNT}</span> 款配方
           </p>
         </header>
-        <ol {...stylex.props(styles.grid)}>
+        <ol {...stylex.attrs(styles.grid)}>
           {FLAT_FORMULAS.map((formula) => (
-            <li key={formula.id} {...stylex.props(styles.item)}>
+            <li {...stylex.attrs(styles.item)}>
               <button
                 type="button"
                 aria-haspopup="dialog"
                 aria-controls={dialogId}
                 onClick={(event) => open(formula.index, event.currentTarget)}
-                {...stylex.props(styles.card, stylex.defaultMarker())}
+                {...stylex.attrs(styles.card, stylex.defaultMarker())}
               >
-                <span {...stylex.props(styles.cardHead)}>
-                  <span {...stylex.props(styles.cardIndex)}>{padIndex(formula.index)}</span>
-                  <span aria-hidden="true" {...stylex.props(styles.cardArrow)}>
+                <span {...stylex.attrs(styles.cardHead)}>
+                  <span {...stylex.attrs(styles.cardIndex)}>{padIndex(formula.index)}</span>
+                  <span aria-hidden="true" {...stylex.attrs(styles.cardArrow)}>
                     <ArrowUpRight size={16} strokeWidth={1.5} absoluteStrokeWidth />
                   </span>
                 </span>
-                <span {...stylex.props(styles.cardBody)}>
-                  <span {...stylex.props(styles.cardTitle)}>{formula.title}</span>
-                  <span {...stylex.props(styles.cardSubtitle)}>{formula.subtitle}</span>
+                <span {...stylex.attrs(styles.cardBody)}>
+                  <span {...stylex.attrs(styles.cardTitle)}>{formula.title}</span>
+                  <span {...stylex.attrs(styles.cardSubtitle)}>{formula.subtitle}</span>
                 </span>
                 {formula.texture[0] && (
-                  <span {...stylex.props(styles.cardFoot)}>
-                    <span {...stylex.props(styles.footLabel)}>质地</span>
-                    <span {...stylex.props(styles.footValue)}>{formula.texture[0]}</span>
+                  <span {...stylex.attrs(styles.cardFoot)}>
+                    <span {...stylex.attrs(styles.footLabel)}>质地</span>
+                    <span {...stylex.attrs(styles.footValue)}>{formula.texture[0]}</span>
                   </span>
                 )}
               </button>
@@ -264,8 +264,8 @@ export function Solutions() {
       </div>
       <SheetDialog
         id={dialogId}
-        index={openIndex}
-        direction={direction}
+        index={openIndex()}
+        direction={direction()}
         onRoute={route}
         onClose={close}
       />

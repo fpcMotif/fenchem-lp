@@ -1,15 +1,9 @@
-import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
+import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { ChevronLeft, ChevronRight, Pause, Play } from "lucide-react";
-import { useInView } from "motion/react";
-import {
-  type KeyboardEvent,
-  type PointerEvent,
-  type WheelEvent,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { ChevronLeft, ChevronRight, Pause, Play } from "@fenchem-lp/ui/components/lucide";
+import { useInView } from "@/compat/motion";
+import { createEffect, createSignal } from "solid-js";
+import type { JSX } from "@solidjs/web";
 
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
@@ -18,7 +12,7 @@ import { color, font } from "./tokens.stylex";
 
 const COUNT = CAMPUS_GALLERY.length;
 const BRAND_MARK = "/prototype/official-site/fenchem-logo.png";
-const DESKTOP = breakpoints.xl;
+const DESKTOP = "@media (min-width: 1280px)";
 const SLIDE_EASE = "cubic-bezier(0.32, 0.72, 0, 1)";
 const SLIDE_MS = 700;
 
@@ -78,8 +72,12 @@ const styles = stylex.create({
   slot: {
     position: "relative",
     flexShrink: 0,
-    width: { default: "calc(100vw - 112px)", [breakpoints.md]: "min(520px, 62vw)", [DESKTOP]: 600 },
-    aspectRatio: { default: "4 / 3", [breakpoints.md]: "16 / 10" },
+    width: {
+      default: "calc(100vw - 112px)",
+      ["@media (min-width: 768px)"]: "min(520px, 62vw)",
+      [DESKTOP]: 600,
+    },
+    aspectRatio: { default: "4 / 3", ["@media (min-width: 768px)"]: "16 / 10" },
   },
   card: {
     position: "absolute",
@@ -96,7 +94,10 @@ const styles = stylex.create({
     cursor: "pointer",
     willChange: "transform, filter, opacity",
     transitionProperty: "transform, opacity, filter",
-    transitionDuration: { default: "0ms", [breakpoints.motionOk]: `${SLIDE_MS}ms` },
+    transitionDuration: {
+      default: "0ms",
+      ["@media (prefers-reduced-motion: no-preference)"]: `${SLIDE_MS}ms`,
+    },
     transitionTimingFunction: SLIDE_EASE,
     outlineStyle: { default: "none", ":focus-visible": "solid" },
     outlineWidth: 3,
@@ -169,7 +170,10 @@ const styles = stylex.create({
     cursor: "pointer",
     transform: {
       default: null,
-      ":active": { default: null, [breakpoints.motionOk]: "scale(0.96)" },
+      ":active": {
+        default: null,
+        ["@media (prefers-reduced-motion: no-preference)"]: "scale(0.96)",
+      },
     },
     transitionProperty: "background-color, transform",
     transitionDuration: "160ms",
@@ -203,7 +207,10 @@ const styles = stylex.create({
     cursor: "pointer",
     transform: {
       default: null,
-      ":active": { default: null, [breakpoints.motionOk]: "scale(0.96)" },
+      ":active": {
+        default: null,
+        ["@media (prefers-reduced-motion: no-preference)"]: "scale(0.96)",
+      },
     },
     transitionProperty: "background-color, transform",
     transitionDuration: "160ms",
@@ -248,50 +255,47 @@ const styles = stylex.create({
 
 type Gesture = { pointerId: number; startX: number; width: number; moved: boolean };
 
-export function CampusCarousel({
-  paused: pausedOutside,
-  onOpen,
-}: {
-  paused: boolean;
-  onOpen: (index: number) => void;
-}) {
-  const [position, setPosition] = useState(0);
-  const [drag, setDrag] = useState<number | null>(null);
-  const [playChoice, setPlayChoice] = useState<boolean | null>(null);
-  const regionRef = useRef<HTMLDivElement>(null);
-  const slotRef = useRef<HTMLDivElement>(null);
-  const gesture = useRef<Gesture | null>(null);
-  const dragged = useRef(false);
-  const wheel = useRef({ total: 0, lockedUntil: 0 });
-  const approached = useInView(regionRef, { once: true, margin: "600px 0px" });
+export function CampusCarousel(props: { paused: boolean; onOpen: (index: number) => void }) {
+  const [position, setPosition] = createSignal(0);
+  const [drag, setDrag] = createSignal<number | null>(null);
+  const [playChoice, setPlayChoice] = createSignal<boolean | null>(null);
+  let region: HTMLDivElement | undefined;
+  let slot: HTMLDivElement | undefined;
+  let gesture: Gesture | null = null;
+  let dragged = false;
+  let wheel = { total: 0, lockedUntil: 0 };
+  const approached = useInView(() => region, { once: true, margin: "600px 0px" });
   const reduceMotion = useReducedMotion();
 
-  const active = wrapIndex(position);
-  const current = CAMPUS_GALLERY[active];
-  const playing = playChoice ?? !reduceMotion;
-  const paused = pausedOutside || drag !== null || !playing;
+  const active = () => wrapIndex(position());
+  const current = () => CAMPUS_GALLERY[active()];
+  const playing = () => playChoice() ?? !reduceMotion();
+  const paused = () => props.paused || drag() !== null || !playing();
   const step = (delta: number) => setPosition((value) => value + delta);
-  const goTo = (index: number) => step(wrapOffset(index - active));
+  const goTo = (index: number) => step(wrapOffset(index - active()));
 
-  useEffect(() => {
-    if (paused) return;
-    const timer = window.setTimeout(() => setPosition((value) => value + 1), AUTOPLAY_MS);
-    return () => window.clearTimeout(timer);
-  }, [paused, position]);
+  createEffect(
+    () => [paused(), position()] as const,
+    ([isPaused]) => {
+      if (isPaused) return;
+      const timer = window.setTimeout(() => setPosition((value) => value + 1), AUTOPLAY_MS);
+      return () => window.clearTimeout(timer);
+    },
+  );
 
-  const onPointerDown = (event: PointerEvent<HTMLDivElement>) => {
+  const onPointerDown = (event: PointerEvent) => {
     if (event.button !== 0) return;
-    dragged.current = false;
-    gesture.current = {
+    dragged = false;
+    gesture = {
       pointerId: event.pointerId,
       startX: event.clientX,
-      width: slotRef.current?.offsetWidth ?? 1,
+      width: slot?.offsetWidth ?? 1,
       moved: false,
     };
   };
 
-  const onPointerMove = (event: PointerEvent<HTMLDivElement>) => {
-    const tracked = gesture.current;
+  const onPointerMove: JSX.EventHandler<HTMLDivElement, PointerEvent> = (event) => {
+    const tracked = gesture;
     if (!tracked || tracked.pointerId !== event.pointerId) return;
     const dx = event.clientX - tracked.startX;
     if (!tracked.moved) {
@@ -302,11 +306,11 @@ export function CampusCarousel({
     setDrag(-dx / tracked.width);
   };
 
-  const onPointerUp = (event: PointerEvent<HTMLDivElement>) => {
-    const tracked = gesture.current;
-    gesture.current = null;
+  const onPointerUp = (event: PointerEvent) => {
+    const tracked = gesture;
+    gesture = null;
     if (!tracked?.moved) return;
-    dragged.current = true;
+    dragged = true;
     const travelled = -(event.clientX - tracked.startX) / tracked.width;
     const steps =
       Math.abs(travelled) < SWIPE_COMMIT
@@ -317,21 +321,21 @@ export function CampusCarousel({
   };
 
   const onPointerCancel = () => {
-    gesture.current = null;
+    gesture = null;
     setDrag(null);
   };
 
-  const onWheel = (event: WheelEvent<HTMLDivElement>) => {
+  const onWheel = (event: WheelEvent) => {
     if (Math.abs(event.deltaX) <= Math.abs(event.deltaY)) return;
     const now = performance.now();
-    if (now < wheel.current.lockedUntil) return;
-    wheel.current.total += event.deltaX;
-    if (Math.abs(wheel.current.total) < WHEEL_STEP_PX) return;
-    step(Math.sign(wheel.current.total));
-    wheel.current = { total: 0, lockedUntil: now + WHEEL_LOCK_MS };
+    if (now < wheel.lockedUntil) return;
+    wheel.total += event.deltaX;
+    if (Math.abs(wheel.total) < WHEEL_STEP_PX) return;
+    step(Math.sign(wheel.total));
+    wheel = { total: 0, lockedUntil: now + WHEEL_LOCK_MS };
   };
 
-  const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+  const onKeyDown = (event: KeyboardEvent) => {
     if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
     event.preventDefault();
     step(event.key === "ArrowRight" ? 1 : -1);
@@ -339,11 +343,11 @@ export function CampusCarousel({
 
   return (
     <div
-      ref={regionRef}
+      ref={region}
       role="region"
       aria-roledescription="carousel"
       aria-label="Campus photos"
-      tabIndex={-1}
+      tabindex={-1}
       onKeyDown={onKeyDown}
     >
       <div
@@ -352,62 +356,61 @@ export function CampusCarousel({
         onPointerUp={onPointerUp}
         onPointerCancel={onPointerCancel}
         onWheel={onWheel}
-        {...stylex.props(styles.stage)}
+        {...stylex.attrs(styles.stage)}
       >
-        <div ref={slotRef} {...stylex.props(styles.slot)}>
+        <div ref={slot} {...stylex.attrs(styles.slot)}>
           <button
             type="button"
-            aria-label={playing ? "Pause slideshow" : "Play slideshow"}
-            onClick={() => setPlayChoice(!playing)}
-            {...stylex.props(styles.autoplayToggle)}
+            aria-label={playing() ? "Pause slideshow" : "Play slideshow"}
+            onClick={() => setPlayChoice(!playing())}
+            {...stylex.attrs(styles.autoplayToggle)}
           >
-            {playing ? (
+            {playing() ? (
               <Pause size={14} fill="currentColor" aria-hidden="true" />
             ) : (
               <Play size={14} fill="currentColor" aria-hidden="true" />
             )}
           </button>
           {CAMPUS_GALLERY.map((photo, index) => {
-            const offset = wrapOffset(index - position - (drag ?? 0));
-            const placed = poseAt(offset);
-            const front = index === active;
+            const offset = () => wrapOffset(index - position() - (drag() ?? 0));
+            const placed = () => poseAt(offset());
+            const front = () => index === active();
             return (
               <button
-                key={photo.id}
                 type="button"
-                tabIndex={front ? 0 : -1}
-                inert={placed.opacity === 0}
-                aria-label={front ? `View larger: ${photo.english}` : `Show: ${photo.english}`}
+                tabindex={front() ? 0 : -1}
+                inert={placed().opacity === 0}
+                aria-label={front() ? `View larger: ${photo.english}` : `Show: ${photo.english}`}
                 onClick={() => {
-                  if (dragged.current) {
-                    dragged.current = false;
+                  if (dragged) {
+                    dragged = false;
                     return;
                   }
-                  if (front) onOpen(index);
+                  if (front()) props.onOpen(index);
                   else goTo(index);
                 }}
-                {...stylex.props(
+                {...stylex.attrs(
                   styles.card,
-                  front && styles.cardFront,
-                  drag !== null && styles.cardDragging,
+                  front() && styles.cardFront,
+                  drag() !== null && styles.cardDragging,
                   dynamic.pose(
-                    `translate3d(${placed.x}%, 0, 0) scale(${placed.scale})`,
-                    placed.opacity,
-                    `brightness(${1 - placed.dim}) blur(${placed.blur}px)`,
-                    placed.z,
+                    `translate3d(${placed().x}%, 0, 0) scale(${placed().scale})`,
+                    placed().opacity,
+                    `brightness(${1 - placed().dim}) blur(${placed().blur}px)`,
+                    placed().z,
                   ),
                 )}
               >
                 <img
                   src={photo.image}
                   alt={photo.alt}
-                  loading={approached && Math.abs(offset) <= EAGER_RANGE ? "eager" : "lazy"}
+                  loading={approached() && Math.abs(offset()) <= EAGER_RANGE ? "eager" : "lazy"}
                   decoding="async"
                   draggable={false}
-                  {...stylex.props(styles.photo, dynamic.focus(photo.focus))}
+                  {...stylex.attrs(styles.photo, dynamic.focus(photo.focus))}
                 />
-                <span aria-hidden="true" {...stylex.props(styles.head)}>
-                  <img src={BRAND_MARK} alt="" {...stylex.props(styles.avatar)} />
+                <span aria-hidden="true" {...stylex.attrs(styles.head)}>
+                  <img src={BRAND_MARK} alt="" {...stylex.attrs(styles.avatar)} />
                   {photo.caption}
                 </span>
               </button>
@@ -415,21 +418,21 @@ export function CampusCarousel({
           })}
         </div>
       </div>
-      <div {...stylex.props(styles.controls)}>
+      <div {...stylex.attrs(styles.controls)}>
         <button
           type="button"
           aria-label="Previous photo"
           onClick={() => step(-1)}
-          {...stylex.props(styles.navButton)}
+          {...stylex.attrs(styles.navButton)}
         >
           <ChevronLeft size={20} aria-hidden="true" />
         </button>
-        <p {...stylex.props(styles.status)}>
-          <span {...stylex.props(styles.area)}>{current.area}</span>
-          <span {...stylex.props(styles.captionRow)}>
-            <span {...stylex.props(styles.caption)}>{current.caption}</span>
-            <span lang="en" {...stylex.props(styles.counter)}>
-              {pad(active + 1)} / {pad(COUNT)}
+        <p {...stylex.attrs(styles.status)}>
+          <span {...stylex.attrs(styles.area)}>{current().area}</span>
+          <span {...stylex.attrs(styles.captionRow)}>
+            <span {...stylex.attrs(styles.caption)}>{current().caption}</span>
+            <span lang="en" {...stylex.attrs(styles.counter)}>
+              {pad(active() + 1)} / {pad(COUNT)}
             </span>
           </span>
         </p>
@@ -437,7 +440,7 @@ export function CampusCarousel({
           type="button"
           aria-label="Next photo"
           onClick={() => step(1)}
-          {...stylex.props(styles.navButton)}
+          {...stylex.attrs(styles.navButton)}
         >
           <ChevronRight size={20} aria-hidden="true" />
         </button>

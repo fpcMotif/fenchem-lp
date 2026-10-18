@@ -1,8 +1,8 @@
 import { radii, typography } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { useNavigate } from "@tanstack/react-router";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useCallback, useEffect } from "react";
+import { useNavigate } from "@tanstack/solid-router";
+import { ChevronLeft, ChevronRight } from "@fenchem-lp/ui/components/lucide";
+import { onSettled, Show } from "solid-js";
 
 import { VARIANTS, type VariantKey } from "./variants";
 
@@ -85,29 +85,23 @@ const styles = stylex.create({
 
 const PRODUCT_VARIANTS = VARIANTS.filter((variant) => variant.family === "products");
 
-export function PrototypeSwitcher({
-  current,
-  compare,
-}: {
+export function PrototypeSwitcher(props: {
   current: VariantKey;
   compare?: "baseline" | "catalog" | "solutions";
 }) {
   const navigate = useNavigate({ from: "/" });
-  const isProductVariant = PRODUCT_VARIANTS.some((variant) => variant.key === current);
+  const isProductVariant = () => PRODUCT_VARIANTS.some((variant) => variant.key === props.current);
 
-  const step = useCallback(
-    (dir: 1 | -1) => {
-      const variants = compare && isProductVariant ? PRODUCT_VARIANTS : VARIANTS;
-      const i = variants.findIndex((v) => v.key === current);
-      const nextEntry = variants[(i + dir + variants.length) % variants.length];
-      if (nextEntry) {
-        void navigate({ search: { variant: nextEntry.key, compare }, replace: true });
-      }
-    },
-    [current, compare, isProductVariant, navigate],
-  );
+  const step = (dir: 1 | -1) => {
+    const variants = props.compare && isProductVariant() ? PRODUCT_VARIANTS : VARIANTS;
+    const i = variants.findIndex((v) => v.key === props.current);
+    const nextEntry = variants[(i + dir + variants.length) % variants.length];
+    if (nextEntry) {
+      void navigate({ search: { variant: nextEntry.key, compare: props.compare }, replace: true });
+    }
+  };
 
-  useEffect(() => {
+  onSettled(() => {
     if (import.meta.env.PROD) return;
     const onKey = (e: KeyboardEvent) => {
       if (e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
@@ -124,40 +118,40 @@ export function PrototypeSwitcher({
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [step]);
+  });
 
   // Never ship the switcher: the whole prototype bar is dev-only.
   if (import.meta.env.PROD) return null;
 
-  const name = VARIANTS.find((v) => v.key === current)?.name ?? "";
+  const name = () => VARIANTS.find((v) => v.key === props.current)?.name ?? "";
 
   return (
-    <div {...stylex.props(styles.container)}>
+    <div {...stylex.attrs(styles.container)}>
       <button
         type="button"
         onClick={() => step(-1)}
         aria-label="Previous variant"
-        {...stylex.props(styles.button)}
+        {...stylex.attrs(styles.button)}
       >
-        <ChevronLeft {...stylex.props(styles.icon)} />
+        <ChevronLeft {...stylex.attrs(styles.icon)} />
       </button>
-      <span {...stylex.props(styles.label)}>
-        {current.toUpperCase()} — {name}
+      <span {...stylex.attrs(styles.label)}>
+        {props.current.toUpperCase()} — {name()}
       </span>
       <button
         type="button"
         onClick={() => step(1)}
         aria-label="Next variant"
-        {...stylex.props(styles.button)}
+        {...stylex.attrs(styles.button)}
       >
-        <ChevronRight {...stylex.props(styles.icon)} />
+        <ChevronRight {...stylex.attrs(styles.icon)} />
       </button>
-      {isProductVariant && (
+      <Show when={isProductVariant()}>
         <select
           aria-label="Product comparison"
-          value={compare ?? "combined"}
+          value={props.compare ?? "combined"}
           onChange={(event) => {
-            const value = event.target.value;
+            const value = event.currentTarget.value;
             void navigate({
               search: (previous) => ({
                 ...previous,
@@ -170,14 +164,22 @@ export function PrototypeSwitcher({
               resetScroll: false,
             });
           }}
-          {...stylex.props(styles.comparison)}
+          {...stylex.attrs(styles.comparison)}
         >
-          <option value="combined">Combined design</option>
-          <option value="baseline">OOS1 baseline</option>
-          <option value="catalog">Catalog only · baseline solutions</option>
-          <option value="solutions">Solutions only · baseline catalog</option>
+          <option value="combined" selected={!props.compare}>
+            Combined design
+          </option>
+          <option value="baseline" selected={props.compare === "baseline"}>
+            OOS1 baseline
+          </option>
+          <option value="catalog" selected={props.compare === "catalog"}>
+            Catalog only · baseline solutions
+          </option>
+          <option value="solutions" selected={props.compare === "solutions"}>
+            Solutions only · baseline catalog
+          </option>
         </select>
-      )}
+      </Show>
     </div>
   );
 }

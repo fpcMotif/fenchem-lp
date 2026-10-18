@@ -65,16 +65,16 @@ export function Honors() {
 
   return (
     <Section id={chip.id} label={chip.english} background={ui.onPage}>
-      <ul {...stylex.props(s.groups)}>
+      <ul {...stylex.attrs(s.groups)}>
         {LEVELS.map((level, idx) => (
-          <Reveal key={level.key} as="li" sx={[s.group, idx === lastIndex && s.groupLast]}>
-            <p {...stylex.props(ui.label, s.level)}>{level.label}</p>
-            <ul {...stylex.props(s.titles)}>
+          <Reveal as="li" sx={[s.group, idx === lastIndex && s.groupLast]}>
+            <p {...stylex.attrs(ui.label, s.level)}>{level.label}</p>
+            <ul {...stylex.attrs(s.titles)}>
               {ABOUT_HONORS.items
                 .filter((honor) => honor.level === level.key)
                 .map((honor) => (
-                  <li key={honor.id}>
-                    <h3 {...stylex.props(s.title)}>{honor.title}</h3>
+                  <li>
+                    <h3 {...stylex.attrs(s.title)}>{honor.title}</h3>
                   </li>
                 ))}
             </ul>

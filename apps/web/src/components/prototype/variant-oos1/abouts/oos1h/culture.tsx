@@ -1,4 +1,3 @@
-import { breakpoints } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 
 import { ABOUT_CULTURE } from "../../about-data";
@@ -14,9 +13,9 @@ const styles = stylex.create({
     display: "grid",
     gridTemplateColumns: {
       default: "minmax(0, 1fr)",
-      [breakpoints.md]: "repeat(3, minmax(0, 1fr))",
+      ["@media (min-width: 768px)"]: "repeat(3, minmax(0, 1fr))",
     },
-    columnGap: { default: 0, [mq.tablet]: 40, [breakpoints.xl]: 96 },
+    columnGap: { default: 0, [mq.tablet]: 40, ["@media (min-width: 1280px)"]: 96 },
     rowGap: 72,
     margin: 0,
     padding: 0,
@@ -30,7 +29,7 @@ const styles = stylex.create({
   },
   glyph: {
     display: "block",
-    fontSize: { default: 120, [breakpoints.xl]: 168 },
+    fontSize: { default: 120, ["@media (min-width: 1280px)"]: 168 },
     fontWeight: 500,
     lineHeight: 1,
   },
@@ -39,7 +38,7 @@ const styles = stylex.create({
   glyphGreen: { color: ui.glyphGreen },
   title: {
     margin: 0,
-    fontSize: { default: 24, [breakpoints.xl]: 28 },
+    fontSize: { default: 24, ["@media (min-width: 1280px)"]: 28 },
     fontWeight: 500,
     lineHeight: 1.3,
     letterSpacing: "0.08em",
@@ -67,20 +66,20 @@ export function Culture() {
     <section
       id="about-culture"
       aria-labelledby="about-culture-title"
-      {...stylex.props(shared.anchor, shared.section, styles.section)}
+      {...stylex.attrs(shared.anchor, shared.section, styles.section)}
     >
-      <h2 id="about-culture-title" {...stylex.props(shared.srOnly)}>
+      <h2 id="about-culture-title" {...stylex.attrs(shared.srOnly)}>
         {ABOUT_CULTURE.eyebrow}
       </h2>
-      <div {...stylex.props(shared.shell, shared.inset)}>
-        <ul {...stylex.props(styles.grid)}>
+      <div {...stylex.attrs(shared.shell, shared.inset)}>
+        <ul {...stylex.attrs(styles.grid)}>
           {ABOUT_CULTURE.values.map((value, position) => (
-            <Reveal key={value.title} as="li" step={position} sx={styles.value}>
-              <span aria-hidden="true" {...stylex.props(styles.glyph, TONES[value.tone])}>
+            <Reveal as="li" step={position} sx={styles.value}>
+              <span aria-hidden="true" {...stylex.attrs(styles.glyph, TONES[value.tone])}>
                 {value.glyph}
               </span>
-              <h3 {...stylex.props(styles.title)}>{value.title}</h3>
-              <p {...stylex.props(styles.desc)}>{value.desc}</p>
+              <h3 {...stylex.attrs(styles.title)}>{value.title}</h3>
+              <p {...stylex.attrs(styles.desc)}>{value.desc}</p>
             </Reveal>
           ))}
         </ul>

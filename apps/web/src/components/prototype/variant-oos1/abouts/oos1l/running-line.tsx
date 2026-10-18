@@ -1,5 +1,4 @@
 import * as stylex from "@stylexjs/stylex";
-import type { Ref } from "react";
 
 import { Words } from "./clause";
 import { UNITS } from "./sentence";
@@ -108,27 +107,24 @@ const tracking = stylex.create({
   s3: { letterSpacing: 0 },
 });
 
-export function RunningLine({
-  barRef,
-  trackRef,
-}: {
-  barRef: Ref<HTMLElement>;
-  trackRef: Ref<HTMLOListElement>;
+export function RunningLine(props: {
+  barRef: (element: HTMLElement) => void;
+  trackRef: (element: HTMLOListElement) => void;
 }) {
   return (
-    <nav ref={barRef} aria-label="On this page" {...stylex.props(styles.bar)}>
-      <div {...stylex.props(ui.shell, styles.row)}>
-        <ol ref={trackRef} {...stylex.props(styles.track)}>
+    <nav ref={props.barRef} aria-label="On this page" {...stylex.attrs(styles.bar)}>
+      <div {...stylex.attrs(ui.shell, styles.row)}>
+        <ol ref={props.trackRef} {...stylex.attrs(styles.track)}>
           {UNITS.map((unit) => (
-            <li key={unit.id} {...stylex.props(styles.item, unit.index === 0 && styles.subject)}>
-              <span data-slot={unit.index} {...stylex.props(styles.clip)}>
-                <a href={`#${unit.id}`} {...stylex.props(styles.link, tracking[unit.size])}>
+            <li {...stylex.attrs(styles.item, unit.index === 0 && styles.subject)}>
+              <span data-slot={unit.index} {...stylex.attrs(styles.clip)}>
+                <a href={`#${unit.id}`} {...stylex.attrs(styles.link, tracking[unit.size])}>
                   <Words segments={unit.segments} heavy={styles.heavy} light={styles.light} />
-                  {unit.hinge ? <span {...stylex.props(styles.hinge)}>{unit.hinge}</span> : null}
+                  {unit.hinge ? <span {...stylex.attrs(styles.hinge)}>{unit.hinge}</span> : null}
                 </a>
               </span>
               {unit.index === 0 ? (
-                <span data-ellipsis aria-hidden="true" {...stylex.props(styles.ellipsis)}>
+                <span data-ellipsis aria-hidden="true" {...stylex.attrs(styles.ellipsis)}>
                   ……
                 </span>
               ) : null}

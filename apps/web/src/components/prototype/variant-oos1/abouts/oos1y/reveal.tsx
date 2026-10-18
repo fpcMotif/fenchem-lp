@@ -1,6 +1,7 @@
 import * as stylex from "@stylexjs/stylex";
 import type { StyleXStyles } from "@stylexjs/stylex";
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import type { JSX } from "@solidjs/web";
+import { createEffect, createSignal, merge } from "solid-js";
 
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
@@ -26,62 +27,57 @@ const styles = stylex.create({
 });
 
 export function useReveal<T extends HTMLElement>() {
-  const ref = useRef<T>(null);
-  const [phase, setPhase] = useState<Phase>("rest");
+  const [ref, setRef] = createSignal<T>();
+  const [phase, setPhase] = createSignal<Phase>("rest");
   const reduce = useReducedMotion();
 
-  useEffect(() => {
-    const element = ref.current;
-    if (!element || reduce) return;
-    let first = true;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        const alreadyOnScreen = entry.boundingClientRect.top < window.innerHeight;
-        if (first) {
-          first = false;
-          if (entry.isIntersecting || alreadyOnScreen) {
-            observer.disconnect();
+  createEffect(
+    () => [ref(), reduce()] as const,
+    ([element, reduced]) => {
+      if (!element || reduced) return;
+      let first = true;
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          const alreadyOnScreen = entry.boundingClientRect.top < window.innerHeight;
+          if (first) {
+            first = false;
+            if (entry.isIntersecting || alreadyOnScreen) {
+              observer.disconnect();
+              return;
+            }
+            setPhase("hidden");
             return;
           }
-          setPhase("hidden");
-          return;
-        }
-        if (entry.isIntersecting) {
-          setPhase("shown");
-          observer.disconnect();
-        }
-      },
-      { rootMargin: "0px 0px -8% 0px" },
-    );
-    observer.observe(element);
-    return () => observer.disconnect();
-  }, [reduce]);
+          if (entry.isIntersecting) {
+            setPhase("shown");
+            observer.disconnect();
+          }
+        },
+        { rootMargin: "0px 0px -8% 0px" },
+      );
+      observer.observe(element);
+      return () => observer.disconnect();
+    },
+  );
 
-  return [ref, phase] as const;
+  return [setRef, phase] as const;
 }
 
-export function Reveal({
-  children,
-  sx,
-  delay = 0,
-}: {
-  children: ReactNode;
-  sx?: StyleXStyles;
-  delay?: number;
-}) {
+export function Reveal(props: { children: JSX.Element; sx?: StyleXStyles; delay?: number }) {
+  const p = merge({ delay: 0 }, props);
   const [ref, phase] = useReveal<HTMLDivElement>();
   return (
     <div
       ref={ref}
-      {...stylex.props(
+      {...stylex.attrs(
         styles.base,
-        phase === "hidden" && styles.hidden,
-        phase === "shown" && styles.shown,
-        delay > 0 && styles.delay(delay),
-        sx,
+        phase() === "hidden" && styles.hidden,
+        phase() === "shown" && styles.shown,
+        p.delay > 0 && styles.delay(p.delay),
+        p.sx,
       )}
     >
-      {children}
+      {p.children}
     </div>
   );
 }

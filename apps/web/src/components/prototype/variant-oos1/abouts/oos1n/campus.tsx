@@ -100,31 +100,26 @@ export function Campus() {
 
   return (
     <Section id={chip.id} label={ABOUT_CAMPUS.eyebrow} background={ui.onPaper}>
-      <div {...stylex.props(s.stage)}>
+      <div {...stylex.attrs(s.stage)}>
         {PHOTOS.map((photo, idx) => (
-          <Reveal
-            key={photo.id}
-            as="figure"
-            step={idx > 2 ? idx - 3 : 0}
-            sx={[ui.figure, s.tile, CELL[idx]]}
-          >
-            <div {...stylex.props(ui.frame, s.frame, RATIO[idx])}>
+          <Reveal as="figure" step={idx > 2 ? idx - 3 : 0} sx={[ui.figure, s.tile, CELL[idx]]}>
+            <div {...stylex.attrs(ui.frame, s.frame, RATIO[idx])}>
               <button
                 type="button"
                 aria-label={`View larger: ${photo.english}`}
                 onClick={() => lightbox.open(idx)}
-                {...stylex.props(s.trigger)}
+                {...stylex.attrs(s.trigger)}
               >
                 <img
                   src={photo.src}
                   alt={photo.alt}
                   loading="lazy"
                   decoding="async"
-                  {...stylex.props(ui.fill, photo.id === "grounds" && s.groundsPhoto)}
+                  {...stylex.attrs(ui.fill, photo.id === "grounds" && s.groundsPhoto)}
                 />
               </button>
             </div>
-            <figcaption {...stylex.props(ui.caption)}>{photo.caption}</figcaption>
+            <figcaption {...stylex.attrs(ui.caption)}>{photo.caption}</figcaption>
           </Reveal>
         ))}
       </div>

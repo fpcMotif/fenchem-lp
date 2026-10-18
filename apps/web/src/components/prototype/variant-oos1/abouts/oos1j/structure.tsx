@@ -1,12 +1,12 @@
 import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { ChevronDown } from "lucide-react";
-import { useId, useState } from "react";
+import { ChevronDown } from "@fenchem-lp/ui/components/lucide";
 
 import { ABOUT_STRUCTURE } from "../../about-data";
 import { Reveal, SectionName, useInViewOnce } from "./parts";
 import { base, btn, ty } from "./shared";
 import { hue, size } from "./theme.stylex";
+import { createSignal, createUniqueId } from "solid-js";
 
 const COMPANY_SUFFIX = "有限公司";
 const SUBSIDIARY_GAP = 24;
@@ -144,49 +144,49 @@ const styles = stylex.create({
 });
 
 export function Structure() {
-  const [showDiagram, setShowDiagram] = useState(false);
-  const diagramId = useId();
+  const [showDiagram, setShowDiagram] = createSignal(false);
+  const diagramId = createUniqueId();
   const [treeRef, grown] = useInViewOnce<HTMLDivElement>();
 
   return (
     <section
       id="about-structure"
       aria-labelledby="about-structure-title"
-      {...stylex.props(base.section, base.anchor, styles.structure)}
+      {...stylex.attrs(base.section, base.anchor, styles.structure)}
     >
       <SectionName id="about-structure-title">{ABOUT_STRUCTURE.eyebrow}</SectionName>
-      <div {...stylex.props(base.shell)}>
+      <div {...stylex.attrs(base.shell)}>
         <Reveal sx={styles.holding}>
-          <span {...stylex.props(base.srOnly)}>{ABOUT_STRUCTURE.holding.badgeEnglish}</span>
-          <h3 {...stylex.props(ty.headline)}>{ABOUT_STRUCTURE.holding.name}</h3>
-          <p lang="en" {...stylex.props(ty.serif)}>
+          <span {...stylex.attrs(base.srOnly)}>{ABOUT_STRUCTURE.holding.badgeEnglish}</span>
+          <h3 {...stylex.attrs(ty.headline)}>{ABOUT_STRUCTURE.holding.name}</h3>
+          <p lang="en" {...stylex.attrs(ty.serif)}>
             {ABOUT_STRUCTURE.holding.english}
           </p>
         </Reveal>
-        <div ref={treeRef} {...stylex.props(styles.tree)}>
-          <span aria-hidden="true" {...stylex.props(styles.trunk, grown && styles.grown)} />
-          <span aria-hidden="true" {...stylex.props(styles.bus, grown && styles.grown)} />
+        <div ref={treeRef} {...stylex.attrs(styles.tree)}>
+          <span aria-hidden="true" {...stylex.attrs(styles.trunk, grown() && styles.grown)} />
+          <span aria-hidden="true" {...stylex.attrs(styles.bus, grown() && styles.grown)} />
           <ul
             aria-label={ABOUT_STRUCTURE.subsidiaryBadgeEnglish}
-            {...stylex.props(styles.subsidiaries)}
+            {...stylex.attrs(styles.subsidiaries)}
           >
             {ABOUT_STRUCTURE.subsidiaries.map((sub, idx) => {
               const stem = sub.name.endsWith(COMPANY_SUFFIX)
                 ? sub.name.slice(0, -COMPANY_SUFFIX.length)
                 : sub.name;
               return (
-                <Reveal key={sub.id} as="li" step={idx} sx={styles.subsidiary}>
+                <Reveal as="li" step={idx} sx={styles.subsidiary}>
                   <span
                     aria-hidden="true"
-                    {...stylex.props(styles.drop, grown && styles.grown, styles.dropDelay(idx))}
+                    {...stylex.attrs(styles.drop, grown() && styles.grown, styles.dropDelay(idx))}
                   />
-                  <h4 {...stylex.props(styles.name)}>
+                  <h4 {...stylex.attrs(styles.name)}>
                     <span>{stem}</span>
                     {stem === sub.name ? null : (
-                      <span {...stylex.props(styles.suffix)}>{COMPANY_SUFFIX}</span>
+                      <span {...stylex.attrs(styles.suffix)}>{COMPANY_SUFFIX}</span>
                     )}
                   </h4>
-                  <span lang="en" {...stylex.props(ty.quiet)}>
+                  <span lang="en" {...stylex.attrs(ty.quiet)}>
                     {sub.english}
                   </span>
                 </Reveal>
@@ -194,28 +194,28 @@ export function Structure() {
             })}
           </ul>
         </div>
-        <div {...stylex.props(styles.toggleWrap)}>
+        <div {...stylex.attrs(styles.toggleWrap)}>
           <button
             type="button"
-            aria-expanded={showDiagram}
+            aria-expanded={showDiagram() ? "true" : "false"}
             aria-controls={diagramId}
             onClick={() => setShowDiagram((prev) => !prev)}
-            {...stylex.props(btn.base, btn.outline, base.focus)}
+            {...stylex.attrs(btn.base, btn.outline, base.focus)}
           >
-            <span>{showDiagram ? "收起组织架构图" : "查看官方组织架构图"}</span>
+            <span>{showDiagram() ? "收起组织架构图" : "查看官方组织架构图"}</span>
             <ChevronDown
               size={16}
               aria-hidden="true"
-              {...stylex.props(styles.chevron, showDiagram && styles.chevronOpen)}
+              {...stylex.attrs(styles.chevron, showDiagram() && styles.chevronOpen)}
             />
           </button>
-          <div id={diagramId} hidden={!showDiagram} {...stylex.props(styles.diagram)}>
+          <div id={diagramId} hidden={!showDiagram()} {...stylex.attrs(styles.diagram)}>
             <img
               src={ABOUT_STRUCTURE.chartImage}
               alt="Official organizational chart of Nanjing Fenchem International Holdings Corporation Limited"
               loading="lazy"
               decoding="async"
-              {...stylex.props(styles.diagramImage)}
+              {...stylex.attrs(styles.diagramImage)}
             />
           </div>
         </div>

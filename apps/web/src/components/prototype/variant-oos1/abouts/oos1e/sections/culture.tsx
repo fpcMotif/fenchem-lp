@@ -63,15 +63,15 @@ const GLYPH_TONES = {
 export function CultureSheet() {
   return (
     <Sheet def={CULTURE_SHEET}>
-      <ul {...stylex.props(styles.values)}>
+      <ul {...stylex.attrs(styles.values)}>
         {ABOUT_CULTURE.values.map((value, idx) => (
-          <Reveal key={value.title} as="li" step={idx} sx={styles.value}>
-            <span aria-hidden="true" {...stylex.props(styles.glyph, GLYPH_TONES[value.tone])}>
+          <Reveal as="li" step={idx} sx={styles.value}>
+            <span aria-hidden="true" {...stylex.attrs(styles.glyph, GLYPH_TONES[value.tone])}>
               {value.glyph}
             </span>
-            <h3 {...stylex.props(styles.title)}>{value.title}</h3>
-            <p {...stylex.props(styles.desc)}>
-              <span {...stylex.props(base.balance)}>{value.desc}</span>
+            <h3 {...stylex.attrs(styles.title)}>{value.title}</h3>
+            <p {...stylex.attrs(styles.desc)}>
+              <span {...stylex.attrs(base.balance)}>{value.desc}</span>
             </p>
           </Reveal>
         ))}

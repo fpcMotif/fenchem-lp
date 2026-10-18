@@ -1,6 +1,6 @@
 import * as stylex from "@stylexjs/stylex";
-import { ArrowRight } from "lucide-react";
-import { useEffect, useRef, type MouseEvent } from "react";
+import { createEffect } from "solid-js";
+import { ArrowRight } from "@fenchem-lp/ui/components/lucide";
 
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
@@ -296,24 +296,23 @@ const styles = stylex.create({
 
 function Banner() {
   return (
-    <section aria-labelledby="about-banner-title" {...stylex.props(styles.banner)}>
-      <div {...stylex.props(ui.shell)}>
-        <div {...stylex.props(styles.bannerHead)}>
-          <h1 id="about-banner-title" {...stylex.props(styles.title)}>
+    <section aria-labelledby="about-banner-title" {...stylex.attrs(styles.banner)}>
+      <div {...stylex.attrs(ui.shell)}>
+        <div {...stylex.attrs(styles.bannerHead)}>
+          <h1 id="about-banner-title" {...stylex.attrs(styles.title)}>
             {ABOUT_BANNER.title}
           </h1>
-          <div {...stylex.props(styles.bannerAside)}>
-            <p {...stylex.props(styles.bannerLead)}>{ABOUT_BANNER.lead}</p>
-            <p lang="en" {...stylex.props(ui.caption)}>
+          <div {...stylex.attrs(styles.bannerAside)}>
+            <p {...stylex.attrs(styles.bannerLead)}>{ABOUT_BANNER.lead}</p>
+            <p lang="en" {...stylex.attrs(ui.caption)}>
               {ABOUT_BANNER.established} · {ABOUT_BANNER.place}
             </p>
           </div>
         </div>
-        <div role="img" aria-label={ABOUT_BANNER.alt} {...stylex.props(styles.warp)}>
+        <div role="img" aria-label={ABOUT_BANNER.alt} {...stylex.attrs(styles.warp)}>
           {Array.from({ length: WARP }, (_, index) => (
             <span
-              key={`warp-${index}`}
-              {...stylex.props(
+              {...stylex.attrs(
                 styles.warpStrip(index),
                 styles.warpSettle,
                 index % 2 === 0 ? styles.warpRise : styles.warpFall,
@@ -322,9 +321,9 @@ function Banner() {
               <img
                 src={ABOUT_BANNER.image}
                 alt=""
-                fetchPriority="high"
+                fetchpriority="high"
                 decoding="async"
-                {...stylex.props(styles.warpImage(index))}
+                {...stylex.attrs(styles.warpImage(index))}
               />
             </span>
           ))}
@@ -334,50 +333,55 @@ function Banner() {
   );
 }
 
-function SectionBar({ onNavigateHome }: AboutPageProps) {
+function SectionBar(props: AboutPageProps) {
   const active = useActiveSection(SECTION_IDS);
-  const navRef = useRef<HTMLElement>(null);
+  let navRef: HTMLElement | undefined;
   const reduce = useReducedMotion();
 
-  useEffect(() => {
-    const nav = navRef.current;
-    const link = active ? nav?.querySelector<HTMLElement>(`[href="#${active}"]`) : null;
-    if (!nav || !link || nav.scrollWidth <= nav.clientWidth) return;
-    const navBox = nav.getBoundingClientRect();
-    const linkBox = link.getBoundingClientRect();
-    if (linkBox.left < navBox.left + 16 || linkBox.right > navBox.right - 16) {
-      nav.scrollBy({ left: linkBox.left - navBox.left - 16, behavior: reduce ? "auto" : "smooth" });
-    }
-  }, [active, reduce]);
+  createEffect(
+    () => [active(), reduce()] as const,
+    ([current, reduced]) => {
+      const nav = navRef;
+      const link = current ? nav?.querySelector<HTMLElement>(`[href="#${current}"]`) : null;
+      if (!nav || !link || nav.scrollWidth <= nav.clientWidth) return;
+      const navBox = nav.getBoundingClientRect();
+      const linkBox = link.getBoundingClientRect();
+      if (linkBox.left < navBox.left + 16 || linkBox.right > navBox.right - 16) {
+        nav.scrollBy({
+          left: linkBox.left - navBox.left - 16,
+          behavior: reduced ? "auto" : "smooth",
+        });
+      }
+    },
+  );
 
-  const goHome = (event: MouseEvent<HTMLAnchorElement>) => {
+  const goHome = (event: MouseEvent) => {
     event.preventDefault();
-    onNavigateHome("top");
+    props.onNavigateHome("top");
   };
 
   return (
-    <div {...stylex.props(styles.bar)}>
-      <div {...stylex.props(ui.shell, styles.barInner)}>
-        <nav aria-label="Breadcrumb" {...stylex.props(styles.crumbs)}>
-          <a href="#top" onClick={goHome} {...stylex.props(styles.crumbLink, styles.navFocus)}>
+    <div {...stylex.attrs(styles.bar)}>
+      <div {...stylex.attrs(ui.shell, styles.barInner)}>
+        <nav aria-label="Breadcrumb" {...stylex.attrs(styles.crumbs)}>
+          <a href="#top" onClick={goHome} {...stylex.attrs(styles.crumbLink, styles.navFocus)}>
             <span lang="en">Home</span>
           </a>
-          <span aria-hidden="true" {...stylex.props(styles.crumbJoin)}>
+          <span aria-hidden="true" {...stylex.attrs(styles.crumbJoin)}>
             /
           </span>
           <span aria-current="page">
             <span lang="en">About</span>
           </span>
         </nav>
-        <nav aria-label="On this page" ref={navRef} {...stylex.props(styles.sectionNav)}>
+        <nav aria-label="On this page" ref={navRef} {...stylex.attrs(styles.sectionNav)}>
           {ABOUT_HERO.navChips.map((chip) => (
             <a
-              key={chip.id}
               href={`#${chip.id}`}
-              aria-current={active === chip.id ? "location" : undefined}
-              {...stylex.props(
+              aria-current={active() === chip.id ? "location" : undefined}
+              {...stylex.attrs(
                 styles.navLink,
-                active === chip.id && styles.navLinkActive,
+                active() === chip.id && styles.navLinkActive,
                 styles.navFocus,
               )}
             >
@@ -390,26 +394,26 @@ function SectionBar({ onNavigateHome }: AboutPageProps) {
   );
 }
 
-function Closing({ onNavigateHome }: AboutPageProps) {
+function Closing(props: AboutPageProps) {
   return (
-    <section aria-labelledby="about-cta-title" {...stylex.props(ui.section, styles.closing)}>
+    <section aria-labelledby="about-cta-title" {...stylex.attrs(ui.section, styles.closing)}>
       <Reveal sx={[ui.shell, styles.closingInner]}>
-        <h2 id="about-cta-title" {...stylex.props(styles.closingTitle)}>
+        <h2 id="about-cta-title" {...stylex.attrs(styles.closingTitle)}>
           {CTA.title}
         </h2>
-        <div {...stylex.props(styles.actions)}>
+        <div {...stylex.attrs(styles.actions)}>
           <button
             type="button"
-            onClick={() => onNavigateHome("contact")}
-            {...stylex.props(styles.primary, ui.focusRing)}
+            onClick={() => props.onNavigateHome("contact")}
+            {...stylex.attrs(styles.primary, ui.focusRing)}
           >
             {CTA.action.label}
             <ArrowRight size={16} aria-hidden="true" />
           </button>
           <button
             type="button"
-            onClick={() => onNavigateHome("products")}
-            {...stylex.props(styles.secondary, ui.focusRing)}
+            onClick={() => props.onNavigateHome("products")}
+            {...stylex.attrs(styles.secondary, ui.focusRing)}
           >
             产品与应用
           </button>
@@ -419,18 +423,18 @@ function Closing({ onNavigateHome }: AboutPageProps) {
   );
 }
 
-export function AboutOOS1U({ onNavigateHome }: AboutPageProps) {
+export function AboutOOS1U(props: AboutPageProps) {
   return (
-    <div id="about-top" {...stylex.props(styles.root)}>
+    <div id="about-top" {...stylex.attrs(styles.root)}>
       <Banner />
-      <SectionBar onNavigateHome={onNavigateHome} />
+      <SectionBar onNavigateHome={props.onNavigateHome} />
       <Profile />
       <CampusLoom />
       <CultureStory />
       <Responsibility />
       <Honors />
       <Structure />
-      <Closing onNavigateHome={onNavigateHome} />
+      <Closing onNavigateHome={props.onNavigateHome} />
     </div>
   );
 }

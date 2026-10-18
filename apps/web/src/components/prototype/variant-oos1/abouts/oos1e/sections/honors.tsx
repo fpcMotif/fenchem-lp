@@ -78,21 +78,18 @@ const styles = stylex.create({
 export function HonorsSheet() {
   return (
     <Sheet def={HONORS_SHEET}>
-      <div {...stylex.props(styles.groups)}>
+      <div {...stylex.attrs(styles.groups)}>
         {LEVELS.map((level, groupIdx) => {
           const label = LEVEL_LABEL[level];
           const entries = ABOUT_HONORS.items.filter((item) => item.level === level);
           return (
-            <Reveal key={level} step={groupIdx} sx={styles.group}>
-              <p {...stylex.props(base.quiet, styles.label)}>{label}</p>
-              <ul {...stylex.props(styles.list, entries.length === 1 && styles.listSingle)}>
+            <Reveal step={groupIdx} sx={styles.group}>
+              <p {...stylex.attrs(base.quiet, styles.label)}>{label}</p>
+              <ul {...stylex.attrs(styles.list, entries.length === 1 && styles.listSingle)}>
                 {entries.map((honor) => (
-                  <li
-                    key={honor.id}
-                    {...stylex.props(styles.item, level === "national" && styles.itemLead)}
-                  >
+                  <li {...stylex.attrs(styles.item, level === "national" && styles.itemLead)}>
                     {level === "national" ? (
-                      <span {...stylex.props(styles.mark)}>
+                      <span {...stylex.attrs(styles.mark)}>
                         {honor.title}
                         <Stamp
                           kind="cert"

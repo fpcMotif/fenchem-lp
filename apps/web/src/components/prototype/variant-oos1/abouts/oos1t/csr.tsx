@@ -1,5 +1,5 @@
 import * as stylex from "@stylexjs/stylex";
-import { Factory, Leaf, Recycle } from "lucide-react";
+import { Factory, Leaf, Recycle } from "@fenchem-lp/ui/components/lucide";
 
 import { ABOUT_CSR } from "../../about-data";
 import { Cast } from "./cast";
@@ -78,7 +78,7 @@ export function Csr() {
       id="about-csr"
       aria-labelledby="oos1t-csr"
       data-hour={SECTION_HOURS.csr}
-      {...stylex.props(ui.section, ui.shell)}
+      {...stylex.attrs(ui.section, ui.shell)}
     >
       <SectionHead
         titleId="oos1t-csr"
@@ -86,38 +86,36 @@ export function Csr() {
         title={ABOUT_CSR.title}
         english="Responsibility"
       />
-      <div {...stylex.props(ui.grid, styles.body)}>
-        <p {...stylex.props(styles.statement)}>
+      <div {...stylex.attrs(ui.grid, styles.body)}>
+        <p {...stylex.attrs(styles.statement)}>
           {ABOUT_CSR.statement.map((line) => (
-            <span key={line} {...stylex.props(styles.line)}>
-              {line}
-            </span>
+            <span {...stylex.attrs(styles.line)}>{line}</span>
           ))}
         </p>
-        <figure {...stylex.props(styles.figure)}>
+        <figure {...stylex.attrs(styles.figure)}>
           <Cast lift={LIFT.block} still />
-          <div {...stylex.props(ui.face, styles.photo)}>
+          <div {...stylex.attrs(ui.face, styles.photo)}>
             <img
               src={ABOUT_CSR.image}
               alt={ABOUT_CSR.imageAlt}
               loading="lazy"
               decoding="async"
-              {...stylex.props(ui.fill)}
+              {...stylex.attrs(ui.fill)}
             />
           </div>
         </figure>
-        <div {...stylex.props(styles.text)}>
-          <p {...stylex.props(ui.body)}>{ABOUT_CSR.desc}</p>
-          <ul {...stylex.props(styles.outcomes)}>
+        <div {...stylex.attrs(styles.text)}>
+          <p {...stylex.attrs(ui.body)}>{ABOUT_CSR.desc}</p>
+          <ul {...stylex.attrs(styles.outcomes)}>
             {ABOUT_CSR.outcomes.map((outcome) => {
               const Icon = ICONS[outcome.icon];
               return (
-                <li key={outcome.title} {...stylex.props(styles.outcome)}>
+                <li {...stylex.attrs(styles.outcome)}>
                   <Icon
                     size={22}
                     strokeWidth={1.5}
                     aria-hidden="true"
-                    {...stylex.props(styles.icon)}
+                    {...stylex.attrs(styles.icon)}
                   />
                   {outcome.title}
                 </li>

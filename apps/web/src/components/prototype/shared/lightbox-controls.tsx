@@ -1,47 +1,46 @@
 import * as stylex from "@stylexjs/stylex";
 import type { StyleXStyles } from "@stylexjs/stylex";
-import type { ReactNode } from "react";
-import { useEffect, useRef } from "react";
+import type { JSX } from "@solidjs/web";
+import { onSettled } from "solid-js";
 
-export function LightboxControls({
-  onStep,
-  onClose,
-  previous,
-  next,
-  close,
-}: {
+export function LightboxControls(props: {
   onStep: (delta: number) => void;
   onClose: () => void;
-  previous: { icon: ReactNode; sx: StyleXStyles };
-  next: { icon: ReactNode; sx: StyleXStyles };
-  close: { icon: ReactNode; sx: StyleXStyles };
+  previous: { icon: JSX.Element; sx: StyleXStyles };
+  next: { icon: JSX.Element; sx: StyleXStyles };
+  close: { icon: JSX.Element; sx: StyleXStyles };
 }) {
-  const previousRef = useRef<HTMLButtonElement>(null);
-  useEffect(() => {
-    queueMicrotask(() => previousRef.current?.focus());
-  }, []);
+  let previousButton: HTMLButtonElement | undefined;
+  onSettled(() => {
+    queueMicrotask(() => previousButton?.focus());
+  });
 
   return (
     <>
       <button
-        ref={previousRef}
+        ref={previousButton}
         type="button"
         aria-label="Previous photo"
-        onClick={() => onStep(-1)}
-        {...stylex.props(previous.sx)}
+        onClick={() => props.onStep(-1)}
+        {...stylex.attrs(props.previous.sx)}
       >
-        {previous.icon}
+        {props.previous.icon}
       </button>
       <button
         type="button"
         aria-label="Next photo"
-        onClick={() => onStep(1)}
-        {...stylex.props(next.sx)}
+        onClick={() => props.onStep(1)}
+        {...stylex.attrs(props.next.sx)}
       >
-        {next.icon}
+        {props.next.icon}
       </button>
-      <button type="button" aria-label="Close" onClick={onClose} {...stylex.props(close.sx)}>
-        {close.icon}
+      <button
+        type="button"
+        aria-label="Close"
+        onClick={() => props.onClose()}
+        {...stylex.attrs(props.close.sx)}
+      >
+        {props.close.icon}
       </button>
     </>
   );

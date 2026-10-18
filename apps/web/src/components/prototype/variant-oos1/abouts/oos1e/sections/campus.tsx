@@ -72,10 +72,9 @@ export function CampusSheet() {
   return (
     <>
       <Sheet def={CAMPUS_SHEET}>
-        <div {...stylex.props(styles.grid)}>
+        <div {...stylex.attrs(styles.grid)}>
           {ABOUT_CAMPUS.photos.map((photo, idx) => (
             <Reveal
-              key={photo.id}
               as="figure"
               step={idx}
               sx={[
@@ -88,17 +87,17 @@ export function CampusSheet() {
                 type="button"
                 aria-label={`View larger: ${photo.english}`}
                 onClick={() => lightbox.open(idx)}
-                {...stylex.props(styles.button)}
+                {...stylex.attrs(styles.button)}
               >
                 <img
                   src={photo.src}
                   alt={photo.alt}
                   loading="lazy"
                   decoding="async"
-                  {...stylex.props(base.fill)}
+                  {...stylex.attrs(base.fill)}
                 />
               </button>
-              <figcaption {...stylex.props(styles.caption)}>{photo.caption}</figcaption>
+              <figcaption {...stylex.attrs(styles.caption)}>{photo.caption}</figcaption>
             </Reveal>
           ))}
         </div>

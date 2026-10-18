@@ -1,6 +1,6 @@
-import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
+import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight } from "@fenchem-lp/ui/components/lucide";
 
 import { PRODUCTS, PRODUCTS_INTRO } from "../../content";
 import { fonts, media, palette } from "./lattice.stylex";
@@ -15,37 +15,37 @@ const styles = stylex.create({
     display: "grid",
     gridTemplateColumns: {
       default: "minmax(0, 1fr)",
-      [breakpoints.lg]: "repeat(16, minmax(0, 1fr))",
+      ["@media (min-width: 1024px)"]: "repeat(16, minmax(0, 1fr))",
     },
     rowGap: 28,
     alignItems: "end",
   },
   lead: {
-    gridColumn: { default: null, [breakpoints.lg]: "1 / span 7" },
+    gridColumn: { default: null, ["@media (min-width: 1024px)"]: "1 / span 7" },
   },
   action: {
-    gridColumn: { default: null, [breakpoints.lg]: "12 / span 5" },
+    gridColumn: { default: null, ["@media (min-width: 1024px)"]: "12 / span 5" },
     display: "flex",
-    justifyContent: { default: "flex-start", [breakpoints.lg]: "flex-end" },
+    justifyContent: { default: "flex-start", ["@media (min-width: 1024px)"]: "flex-end" },
   },
   list: {
     display: "grid",
     gridTemplateColumns: {
       default: "minmax(0, 1fr)",
       [media.smBelowLg]: "repeat(2, minmax(0, 1fr))",
-      [breakpoints.lg]: "repeat(16, minmax(0, 1fr))",
+      ["@media (min-width: 1024px)"]: "repeat(16, minmax(0, 1fr))",
     },
     rowGap: 56,
     columnGap: { default: 0, [media.smBelowLg]: 24 },
     margin: 0,
-    marginTop: { default: 56, [breakpoints.lg]: 96 },
+    marginTop: { default: 56, ["@media (min-width: 1024px)"]: 96 },
     padding: 0,
     listStyle: "none",
   },
   item: {
-    gridColumn: { default: null, [breakpoints.lg]: "span 4" },
+    gridColumn: { default: null, ["@media (min-width: 1024px)"]: "span 4" },
     boxSizing: "border-box",
-    paddingInline: { default: 0, [breakpoints.lg]: 8 },
+    paddingInline: { default: 0, ["@media (min-width: 1024px)"]: 8 },
   },
   article: {
     position: "relative",
@@ -63,7 +63,7 @@ const styles = stylex.create({
   title: {
     margin: 0,
     fontFamily: fonts.cjk,
-    fontSize: { default: 22, [breakpoints.xl]: 24 },
+    fontSize: { default: 22, ["@media (min-width: 1280px)"]: 24 },
     fontWeight: 500,
     lineHeight: 1.3,
     letterSpacing: "0.06em",
@@ -100,52 +100,52 @@ const styles = stylex.create({
   },
 });
 
-export function Products({ onNavigateHome }: { onNavigateHome: (hash?: string) => void }) {
+export function Products(props: { onNavigateHome: (hash?: string) => void }) {
   return (
     <section
       id="about-products"
       aria-labelledby="about-products-title"
-      {...stylex.props(styles.section)}
+      {...stylex.attrs(styles.section)}
     >
       <SectionName id="about-products-title">Products and application solutions</SectionName>
       <Frame innerSx={shared.sectionPad}>
-        <div {...stylex.props(styles.intro)}>
+        <div {...stylex.attrs(styles.intro)}>
           <Reveal sx={styles.lead}>
-            <p {...stylex.props(shared.body)}>{PRODUCTS_INTRO.lead}</p>
+            <p {...stylex.attrs(shared.body)}>{PRODUCTS_INTRO.lead}</p>
           </Reveal>
           <Reveal step={1} sx={styles.action}>
             <Action
-              onClick={() => onNavigateHome("products")}
+              onClick={() => props.onNavigateHome("products")}
               icon={<ArrowRight size={16} aria-hidden="true" />}
             >
               {PRODUCTS_INTRO.cta.label}
             </Action>
           </Reveal>
         </div>
-        <ul {...stylex.props(styles.list)}>
+        <ul {...stylex.attrs(styles.list)}>
           {PRODUCTS.map((product, index) => (
-            <Reveal key={product.title} as="li" step={index} sx={styles.item}>
-              <article {...stylex.props(styles.article)}>
-                <div {...stylex.props(styles.photo)}>
+            <Reveal as="li" step={index} sx={styles.item}>
+              <article {...stylex.attrs(styles.article)}>
+                <div {...stylex.attrs(styles.photo)}>
                   <img
                     src={product.image}
                     alt=""
                     loading="lazy"
                     decoding="async"
-                    {...stylex.props(shared.cover)}
+                    {...stylex.attrs(shared.cover)}
                   />
                 </div>
-                <h3 {...stylex.props(styles.title)}>
+                <h3 {...stylex.attrs(styles.title)}>
                   <button
                     type="button"
-                    onClick={() => onNavigateHome("products")}
-                    {...stylex.props(styles.cardButton, shared.focusRing)}
+                    onClick={() => props.onNavigateHome("products")}
+                    {...stylex.attrs(styles.cardButton, shared.focusRing)}
                   >
                     {product.title}
                   </button>
                 </h3>
-                <p {...stylex.props(shared.small, styles.desc)}>{product.description}</p>
-                <p {...stylex.props(shared.small)}>{product.tags.join(" / ")}</p>
+                <p {...stylex.attrs(shared.small, styles.desc)}>{product.description}</p>
+                <p {...stylex.attrs(shared.small)}>{product.tags.join(" / ")}</p>
               </article>
             </Reveal>
           ))}

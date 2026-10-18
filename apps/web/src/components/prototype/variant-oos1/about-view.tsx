@@ -1,9 +1,16 @@
 import { LightboxStage } from "../shared/lightbox-stage";
-import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
+import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { ChevronLeft, ChevronRight, Factory, Leaf, Recycle, X } from "lucide-react";
-import { m, useScroll, useTransform } from "motion/react";
-import { useEffect, useRef, useState } from "react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Factory,
+  Leaf,
+  Recycle,
+  X,
+} from "@fenchem-lp/ui/components/lucide";
+import { m, useScroll, useTransform } from "@/compat/motion";
+import { createEffect, createMemo, createSignal, Show } from "solid-js";
 
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
@@ -20,7 +27,7 @@ import { Profile as ProfileOOS1G } from "./abouts/oos1g/profile";
 import { NavyBand } from "./abouts/oos1c/navy-band";
 
 const CSR_ACCENT = "#8cd6a3";
-const DESKTOP = breakpoints.xl;
+const DESKTOP = "@media (min-width: 1280px)";
 
 const STICKY_TOP = Number.parseFloat(layout.headerHeight) + Number.parseFloat(layout.subBarHeight);
 
@@ -127,7 +134,7 @@ const styles = stylex.create({
     width: "100%",
     height: "100%",
     boxSizing: "border-box",
-    padding: { default: "64px 12px", [breakpoints.md]: "72px 104px" },
+    padding: { default: "64px 12px", ["@media (min-width: 768px)"]: "72px 104px" },
   },
   lightboxFigure: {
     display: "flex",
@@ -139,7 +146,7 @@ const styles = stylex.create({
     animationTimingFunction: ease.out,
   },
   lightboxFigureOpen: {
-    animationName: { default: fadeIn, [breakpoints.motionOk]: zoomIn },
+    animationName: { default: fadeIn, ["@media (prefers-reduced-motion: no-preference)"]: zoomIn },
     animationDuration: "260ms",
   },
   lightboxFigureStep: {
@@ -174,7 +181,10 @@ const styles = stylex.create({
     cursor: "pointer",
     transform: {
       default: null,
-      ":active": { default: null, [breakpoints.motionOk]: "scale(0.96)" },
+      ":active": {
+        default: null,
+        ["@media (prefers-reduced-motion: no-preference)"]: "scale(0.96)",
+      },
     },
     transitionProperty: "background-color, transform",
     transitionDuration: "160ms",
@@ -186,17 +196,17 @@ const styles = stylex.create({
   },
   lightboxPrev: {
     top: "50%",
-    insetInlineStart: { default: 12, [breakpoints.md]: 32 },
+    insetInlineStart: { default: 12, ["@media (min-width: 768px)"]: 32 },
     marginTop: -24,
   },
   lightboxNext: {
     top: "50%",
-    insetInlineEnd: { default: 12, [breakpoints.md]: 32 },
+    insetInlineEnd: { default: 12, ["@media (min-width: 768px)"]: 32 },
     marginTop: -24,
   },
   lightboxClose: {
-    top: { default: 12, [breakpoints.md]: 24 },
-    insetInlineEnd: { default: 12, [breakpoints.md]: 32 },
+    top: { default: 12, ["@media (min-width: 768px)"]: 24 },
+    insetInlineEnd: { default: 12, ["@media (min-width: 768px)"]: 32 },
   },
 
   csrSection: {
@@ -268,7 +278,10 @@ const styles = stylex.create({
   },
   csrOutcomes: {
     display: "grid",
-    gridTemplateColumns: { default: "1fr", [breakpoints.md]: "repeat(3, minmax(0, 1fr))" },
+    gridTemplateColumns: {
+      default: "1fr",
+      ["@media (min-width: 768px)"]: "repeat(3, minmax(0, 1fr))",
+    },
     columnGap: 40,
     margin: 0,
     padding: 0,
@@ -278,7 +291,7 @@ const styles = stylex.create({
     display: "flex",
     alignItems: "center",
     gap: 14,
-    paddingBlock: { default: 18, [breakpoints.md]: 24 },
+    paddingBlock: { default: 18, ["@media (min-width: 768px)"]: 24 },
     borderTopWidth: 1,
     borderTopStyle: "solid",
     borderTopColor: "rgba(255, 255, 255, 0.22)",
@@ -292,127 +305,119 @@ const styles = stylex.create({
   },
 });
 
-function SectionHeader({
-  eyebrow,
-  title,
-  titleId,
-  sx,
-}: {
+function SectionHeader(props: {
   eyebrow?: string;
   title: string;
   titleId: string;
   sx?: stylex.StyleXStyles;
 }) {
   return (
-    <Reveal sx={[styles.sectionHeader, sx]}>
-      {eyebrow ? (
-        <p lang="en" {...stylex.props(styles.sectionEyebrow)}>
-          {eyebrow}
-        </p>
-      ) : null}
-      <h2 id={titleId} {...stylex.props(styles.sectionTitle)}>
-        {title}
+    <Reveal sx={[styles.sectionHeader, props.sx]}>
+      <Show when={props.eyebrow}>
+        {(eyebrow) => (
+          <p lang="en" {...stylex.attrs(styles.sectionEyebrow)}>
+            {eyebrow()}
+          </p>
+        )}
+      </Show>
+      <h2 id={props.titleId} {...stylex.attrs(styles.sectionTitle)}>
+        {props.title}
       </h2>
     </Reveal>
   );
 }
 
-function Lightbox({
-  index,
-  stepped,
-  onClose,
-  onStep,
-}: {
+function Lightbox(props: {
   index: number | null;
   stepped: boolean;
   onClose: () => void;
   onStep: (delta: number) => void;
 }) {
-  const dialogRef = useRef<HTMLDialogElement>(null);
+  let dialog: HTMLDialogElement | undefined;
   const photos = CAMPUS_GALLERY;
-  const photo = index === null ? null : photos[index];
+  const photo = createMemo(() => (props.index === null ? undefined : photos[props.index]));
 
-  useEffect(() => {
-    const dialog = dialogRef.current;
-    if (!dialog) return;
-    if (index !== null && !dialog.open) dialog.showModal();
-    if (index === null && dialog.open) dialog.close();
-  }, [index]);
-
-  useEffect(() => {
-    if (index === null) return;
-    for (const delta of [1, -1]) {
-      const neighbor = new Image();
-      neighbor.src = photos[(index + delta + photos.length) % photos.length].image;
-    }
-  }, [index, photos]);
+  createEffect(
+    () => props.index,
+    (index) => {
+      if (!dialog) return;
+      if (index !== null && !dialog.open) dialog.showModal();
+      if (index === null && dialog.open) dialog.close();
+      if (index === null) return;
+      for (const delta of [1, -1]) {
+        const neighbor = new Image();
+        neighbor.src = photos[(index + delta + photos.length) % photos.length].image;
+      }
+    },
+  );
 
   return (
     <dialog
-      ref={dialogRef}
+      ref={dialog}
       aria-label="Campus photos"
-      onClose={onClose}
+      onClose={() => props.onClose()}
       onKeyDown={(event) => {
         if (event.key !== "ArrowRight" && event.key !== "ArrowLeft") return;
         event.preventDefault();
         event.stopPropagation();
-        onStep(event.key === "ArrowRight" ? 1 : -1);
+        props.onStep(event.key === "ArrowRight" ? 1 : -1);
       }}
-      {...stylex.props(styles.lightbox)}
+      {...stylex.attrs(styles.lightbox)}
     >
-      {photo ? (
-        <>
-          <LightboxStage onClose={onClose} sx={styles.lightboxStage}>
-            <figure
-              key={photo.id}
-              {...stylex.props(
-                styles.lightboxFigure,
-                stepped ? styles.lightboxFigureStep : styles.lightboxFigureOpen,
-              )}
+      <Show when={photo()}>
+        {(current) => (
+          <>
+            <LightboxStage onClose={() => props.onClose()} sx={styles.lightboxStage}>
+              <figure
+                {...stylex.attrs(
+                  styles.lightboxFigure,
+                  props.stepped ? styles.lightboxFigureStep : styles.lightboxFigureOpen,
+                )}
+              >
+                <img
+                  src={current().image}
+                  alt={current().alt}
+                  {...stylex.attrs(styles.lightboxImage)}
+                />
+                <figcaption {...stylex.attrs(styles.lightboxCaption)}>
+                  {current().caption}
+                </figcaption>
+              </figure>
+            </LightboxStage>
+            <button
+              type="button"
+              aria-label="Previous photo"
+              onClick={() => props.onStep(-1)}
+              {...stylex.attrs(styles.lightboxButton, styles.lightboxPrev)}
             >
-              <img src={photo.image} alt={photo.alt} {...stylex.props(styles.lightboxImage)} />
-              <figcaption {...stylex.props(styles.lightboxCaption)}>{photo.caption}</figcaption>
-            </figure>
-          </LightboxStage>
-          <button
-            type="button"
-            aria-label="Previous photo"
-            onClick={() => onStep(-1)}
-            {...stylex.props(styles.lightboxButton, styles.lightboxPrev)}
-          >
-            <ChevronLeft size={22} aria-hidden="true" />
-          </button>
-          <button
-            type="button"
-            aria-label="Next photo"
-            onClick={() => onStep(1)}
-            {...stylex.props(styles.lightboxButton, styles.lightboxNext)}
-          >
-            <ChevronRight size={22} aria-hidden="true" />
-          </button>
-          <button
-            type="button"
-            aria-label="Close"
-            onClick={onClose}
-            {...stylex.props(styles.lightboxButton, styles.lightboxClose)}
-          >
-            <X size={22} aria-hidden="true" />
-          </button>
-        </>
-      ) : null}
+              <ChevronLeft size={22} aria-hidden="true" />
+            </button>
+            <button
+              type="button"
+              aria-label="Next photo"
+              onClick={() => props.onStep(1)}
+              {...stylex.attrs(styles.lightboxButton, styles.lightboxNext)}
+            >
+              <ChevronRight size={22} aria-hidden="true" />
+            </button>
+            <button
+              type="button"
+              aria-label="Close"
+              onClick={() => props.onClose()}
+              {...stylex.attrs(styles.lightboxButton, styles.lightboxClose)}
+            >
+              <X size={22} aria-hidden="true" />
+            </button>
+          </>
+        )}
+      </Show>
     </dialog>
   );
 }
 
-export function CampusGallery({
-  showEyebrow = true,
-  headerSx,
-}: {
-  showEyebrow?: boolean;
-  headerSx?: stylex.StyleXStyles;
-}) {
-  const [openIndex, setOpenIndex] = useState<number | null>(null);
-  const [stepped, setStepped] = useState(false);
+export function CampusGallery(props: { showEyebrow?: boolean; headerSx?: stylex.StyleXStyles }) {
+  const [openIndex, setOpenIndex] = createSignal<number | null>(null);
+  const [stepped, setStepped] = createSignal(false);
   const count = CAMPUS_GALLERY.length;
   const open = (index: number) => {
     setStepped(false);
@@ -423,20 +428,20 @@ export function CampusGallery({
     <section
       id="about-campus"
       aria-labelledby="about-campus-title"
-      {...stylex.props(styles.campusSection, kitStyles.anchor)}
+      {...stylex.attrs(styles.campusSection, kitStyles.anchor)}
     >
-      <div {...stylex.props(kitStyles.shell, kitStyles.inset120)}>
+      <div {...stylex.attrs(kitStyles.shell, kitStyles.inset120)}>
         <SectionHeader
-          eyebrow={showEyebrow ? ABOUT_CAMPUS.eyebrow : undefined}
+          eyebrow={(props.showEyebrow ?? true) ? ABOUT_CAMPUS.eyebrow : undefined}
           title={ABOUT_CAMPUS.title}
           titleId="about-campus-title"
-          sx={headerSx}
+          sx={props.headerSx}
         />
       </div>
-      <CampusCarousel paused={openIndex !== null} onOpen={open} />
+      <CampusCarousel paused={openIndex() !== null} onOpen={open} />
       <Lightbox
-        index={openIndex}
-        stepped={stepped}
+        index={openIndex()}
+        stepped={stepped()}
         onClose={() => setOpenIndex(null)}
         onStep={(delta) => {
           setStepped(true);
@@ -448,58 +453,56 @@ export function CampusGallery({
 }
 
 function CsrSection() {
-  const sectionRef = useRef<HTMLElement>(null);
+  let section: HTMLElement | undefined;
   const reduce = useReducedMotion();
   const { scrollYProgress } = useScroll({
-    target: sectionRef,
+    target: () => section,
     offset: ["start end", "end start"],
   });
   const drift = useTransform(scrollYProgress, [0, 1], ["-6%", "6%"]);
 
   return (
     <section
-      ref={sectionRef}
+      ref={section}
       id="about-csr"
       aria-labelledby="about-csr-title"
-      {...stylex.props(styles.csrSection, kitStyles.anchor)}
+      {...stylex.attrs(styles.csrSection, kitStyles.anchor)}
     >
-      <m.div {...stylex.props(styles.csrMedia)} style={reduce ? undefined : { y: drift }}>
+      <m.div {...stylex.attrs(styles.csrMedia)} style={reduce() ? undefined : { y: drift }}>
         <img
           src={ABOUT_CSR.image}
           alt={ABOUT_CSR.imageAlt}
           loading="lazy"
           decoding="async"
-          {...stylex.props(styles.csrImage)}
+          {...stylex.attrs(styles.csrImage)}
         />
       </m.div>
-      <div aria-hidden="true" {...stylex.props(styles.fill, styles.csrScrim)} />
-      <div aria-hidden="true" {...stylex.props(styles.grain, styles.behind)} />
-      <div {...stylex.props(kitStyles.shell, kitStyles.inset120, styles.csrInner)}>
+      <div aria-hidden="true" {...stylex.attrs(styles.fill, styles.csrScrim)} />
+      <div aria-hidden="true" {...stylex.attrs(styles.grain, styles.behind)} />
+      <div {...stylex.attrs(kitStyles.shell, kitStyles.inset120, styles.csrInner)}>
         <Reveal sx={styles.csrHead}>
           <div>
-            <h2 id="about-csr-title" {...stylex.props(styles.csrTitle)}>
+            <h2 id="about-csr-title" {...stylex.attrs(styles.csrTitle)}>
               {ABOUT_CSR.title}
             </h2>
-            <p {...stylex.props(styles.csrStatement)}>
+            <p {...stylex.attrs(styles.csrStatement)}>
               {ABOUT_CSR.statement.map((line) => (
-                <span key={line} {...stylex.props(styles.csrStatementLine)}>
-                  {line}
-                </span>
+                <span {...stylex.attrs(styles.csrStatementLine)}>{line}</span>
               ))}
             </p>
           </div>
-          <p {...stylex.props(styles.csrDesc)}>{ABOUT_CSR.desc}</p>
+          <p {...stylex.attrs(styles.csrDesc)}>{ABOUT_CSR.desc}</p>
         </Reveal>
-        <ul {...stylex.props(styles.csrOutcomes)}>
+        <ul {...stylex.attrs(styles.csrOutcomes)}>
           {ABOUT_CSR.outcomes.map((outcome, idx) => {
             const Icon = CSR_ICONS[outcome.icon];
             return (
-              <Reveal key={outcome.title} as="li" step={idx} sx={styles.csrOutcome}>
+              <Reveal as="li" step={idx} sx={styles.csrOutcome}>
                 <Icon
                   size={22}
                   strokeWidth={1.75}
                   aria-hidden="true"
-                  {...stylex.props(styles.csrOutcomeIcon)}
+                  {...stylex.attrs(styles.csrOutcomeIcon)}
                 />
                 {outcome.title}
               </Reveal>
@@ -511,9 +514,9 @@ function CsrSection() {
   );
 }
 
-export function AboutView({ onNavigateHome }: { onNavigateHome: (hash?: string) => void }) {
+export function AboutView(props: { onNavigateHome: (hash?: string) => void }) {
   return (
-    <div id="about-top" {...stylex.props(styles.root)}>
+    <div id="about-top" {...stylex.attrs(styles.root)}>
       <SubPageBanner
         size="tall"
         title={ABOUT_BANNER.title}
@@ -525,7 +528,7 @@ export function AboutView({ onNavigateHome }: { onNavigateHome: (hash?: string) 
         imageAlt={ABOUT_BANNER.alt}
       />
 
-      <SubPageNav current="关于我们" chips={NAV_CHIPS} onNavigateHome={onNavigateHome} />
+      <SubPageNav current="关于我们" chips={NAV_CHIPS} onNavigateHome={props.onNavigateHome} />
 
       <ProfileOOS1G />
 
@@ -541,8 +544,12 @@ export function AboutView({ onNavigateHome }: { onNavigateHome: (hash?: string) 
 
       <ContactCta
         actions={[
-          { label: CTA.action.label, onClick: () => onNavigateHome("contact") },
-          { label: "产品与应用", tone: "secondary", onClick: () => onNavigateHome("products") },
+          { label: CTA.action.label, onClick: () => props.onNavigateHome("contact") },
+          {
+            label: "产品与应用",
+            tone: "secondary",
+            onClick: () => props.onNavigateHome("products"),
+          },
         ]}
       />
     </div>

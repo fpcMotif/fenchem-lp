@@ -184,36 +184,36 @@ export function Campus() {
   const lightbox = useLightbox(count);
 
   return (
-    <section id="about-campus" aria-labelledby="oos1p-campus" {...stylex.props(ui.plate)}>
+    <section id="about-campus" aria-labelledby="oos1p-campus" {...stylex.attrs(ui.plate)}>
       <PlateHead plate={2} english="Campus" title={ABOUT_CAMPUS.title} titleId="oos1p-campus" />
-      <div {...stylex.props(styles.band)}>
-        <div {...stylex.props(ui.shell)}>
-          <div aria-hidden="true" {...stylex.props(ui.grid, styles.rebate)}>
-            <p {...stylex.props(ui.q1to2, ui.frameNumber, styles.rebateText)}>
+      <div {...stylex.attrs(styles.band)}>
+        <div {...stylex.attrs(ui.shell)}>
+          <div aria-hidden="true" {...stylex.attrs(ui.grid, styles.rebate)}>
+            <p {...stylex.attrs(ui.q1to2, ui.frameNumber, styles.rebateText)}>
               <ForwardArrow />
               Plate 02 · Chronophotographic study
             </p>
-            <p {...stylex.props(ui.q3to4, ui.frameNumber, styles.rebateText, styles.rebateEnd)}>
+            <p {...stylex.attrs(ui.q3to4, ui.frameNumber, styles.rebateText, styles.rebateEnd)}>
               {frameLabel(count)} exposures · 1/12 s
             </p>
           </div>
-          <ul ref={studyRef} {...stylex.props(styles.study)}>
+          <ul ref={studyRef} {...stylex.attrs(styles.study)}>
             {ABOUT_CAMPUS.photos.map((photo, index) => (
-              <li key={photo.id} {...stylex.props(styles.cell)}>
+              <li {...stylex.attrs(styles.cell)}>
                 <button
                   type="button"
                   onClick={() => lightbox.open(index)}
-                  {...stylex.props(styles.button, stylex.defaultMarker())}
+                  {...stylex.attrs(styles.button, stylex.defaultMarker())}
                 >
-                  <span aria-hidden="true" {...stylex.props(ui.frameNumber, styles.edge)}>
-                    <span {...stylex.props(styles.edgeNumber)}>
+                  <span aria-hidden="true" {...stylex.attrs(ui.frameNumber, styles.edge)}>
+                    <span {...stylex.attrs(styles.edgeNumber)}>
                       <ForwardArrow />
                       {frameLabel(index + 1)}
                     </span>
-                    <span {...stylex.props(styles.edgeTime)}>{exposureTime(index)}</span>
+                    <span {...stylex.attrs(styles.edgeTime)}>{exposureTime(index)}</span>
                   </span>
                   <StrobeImage
-                    phase={phase}
+                    phase={phase()}
                     delay={index * FRAME_STAGGER}
                     count={3}
                     unit="7%"
@@ -222,9 +222,9 @@ export function Campus() {
                     sx={styles.frame}
                     imageSx={positions[photo.id]}
                   />
-                  <span {...stylex.props(styles.caption)}>
-                    <span {...stylex.props(styles.captionText)}>{photo.caption}</span>
-                    <span lang="en" {...stylex.props(styles.captionEnglish)}>
+                  <span {...stylex.attrs(styles.caption)}>
+                    <span {...stylex.attrs(styles.captionText)}>{photo.caption}</span>
+                    <span lang="en" {...stylex.attrs(styles.captionEnglish)}>
                       {ENGLISH[photo.id]}
                     </span>
                     <span {...srOnly}>View larger</span>
@@ -232,9 +232,9 @@ export function Campus() {
                 </button>
               </li>
             ))}
-            <li {...stylex.props(styles.legend)}>
-              <p {...stylex.props(styles.legendTitle)}>{ABOUT_MOMENT.caption}</p>
-              <p {...stylex.props(styles.legendNote)}>
+            <li {...stylex.attrs(styles.legend)}>
+              <p {...stylex.attrs(styles.legendTitle)}>{ABOUT_MOMENT.caption}</p>
+              <p {...stylex.attrs(styles.legendNote)}>
                 七帧，一处园区。
                 <br />
                 点击任一帧，查看大图。

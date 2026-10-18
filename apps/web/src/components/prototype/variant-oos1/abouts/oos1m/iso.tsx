@@ -1,9 +1,10 @@
-import { m } from "motion/react";
+import { m } from "@/compat/motion";
 import * as stylex from "@stylexjs/stylex";
-import { type MotionValue } from "motion/react";
-import type { CSSProperties, ReactNode } from "react";
+import { type MotionStyle, type MotionValue } from "@/compat/motion";
+import type { JSX } from "@solidjs/web";
 import { bp, face, tone } from "./tokens.stylex";
 import { cq, SHEET_WIDTH_UNITS } from "./iso-values";
+import { merge } from "solid-js";
 
 const styles = stylex.create({
   drawing: {
@@ -83,74 +84,50 @@ const styles = stylex.create({
   },
 });
 
-export function Drawing({
-  heightUnits,
-  label,
-  children,
-}: {
-  heightUnits: number;
-  label: string;
-  children: ReactNode;
-}) {
+export function Drawing(props: { heightUnits: number; label: string; children: JSX.Element }) {
   return (
     <div
       role="img"
-      aria-label={label}
-      style={{ aspectRatio: `${SHEET_WIDTH_UNITS} / ${heightUnits}` }}
-      {...stylex.props(styles.drawing)}
+      aria-label={props.label}
+      style={{ "aspect-ratio": `${SHEET_WIDTH_UNITS} / ${props.heightUnits}` }}
+      {...stylex.attrs(styles.drawing)}
     >
-      {children}
+      {props.children}
     </div>
   );
 }
 
-export function Camera({ y, children }: { y?: MotionValue<string>; children: ReactNode }) {
+export function Camera(props: { y?: MotionValue<string>; children: JSX.Element }) {
   return (
-    <m.div style={{ y }} {...stylex.props(styles.camera)}>
-      {children}
+    <m.div style={{ y: props.y }} {...stylex.attrs(styles.camera)}>
+      {props.children}
     </m.div>
   );
 }
 
-export function GroundPlane({
-  width,
-  depth,
-  centerX,
-  centerY,
-  children,
-}: {
+export function GroundPlane(props: {
   width: number;
   depth: number;
   centerX: number;
   centerY: number;
-  children: ReactNode;
+  children: JSX.Element;
 }) {
   return (
     <div
       style={{
-        left: cq(centerX - width / 2),
-        top: cq(centerY - depth / 2),
-        width: cq(width),
-        height: cq(depth),
+        left: cq(props.centerX - props.width / 2),
+        top: cq(props.centerY - props.depth / 2),
+        width: cq(props.width),
+        height: cq(props.depth),
       }}
-      {...stylex.props(styles.scene)}
+      {...stylex.attrs(styles.scene)}
     >
-      {children}
+      {props.children}
     </div>
   );
 }
 
-export function IsoBox({
-  x,
-  y,
-  w,
-  d,
-  t,
-  topZ,
-  etch,
-  highlighted = false,
-  children,
-}: {
+export function IsoBox(props: {
   x: number;
   y: number;
   w: number;
@@ -159,38 +136,39 @@ export function IsoBox({
   topZ: MotionValue<string> | string;
   etch?: string;
   highlighted?: boolean;
-  children?: ReactNode;
+  children?: JSX.Element;
 }) {
+  const p = merge({ highlighted: false }, props);
   const style = {
-    left: cq(x),
-    top: cq(y),
-    width: cq(w),
-    height: cq(d),
-    z: topZ,
-    "--t": cq(t),
-  } as CSSProperties & { z: MotionValue<string> | string };
+    left: cq(p.x),
+    top: cq(p.y),
+    width: cq(p.w),
+    height: cq(p.d),
+    z: p.topZ,
+    "--t": cq(p.t),
+  } satisfies MotionStyle;
   return (
-    <m.div style={style} {...stylex.props(styles.box, highlighted && styles.highlighted)}>
-      {children}
-      <span {...stylex.props(styles.side)} />
-      <span {...stylex.props(styles.front)}>
-        {etch ? <span {...stylex.props(styles.etch)}>{etch}</span> : null}
+    <m.div style={style} {...stylex.attrs(styles.box, p.highlighted && styles.highlighted)}>
+      {p.children}
+      <span {...stylex.attrs(styles.side)} />
+      <span {...stylex.attrs(styles.front)}>
+        {p.etch ? <span {...stylex.attrs(styles.etch)}>{p.etch}</span> : null}
       </span>
     </m.div>
   );
 }
 
-export function GroundShadow({ x, y, w, d }: { x: number; y: number; w: number; d: number }) {
+export function GroundShadow(props: { x: number; y: number; w: number; d: number }) {
   return (
     <span
       style={{
-        left: cq(x),
-        top: cq(y),
-        width: cq(w),
-        height: cq(d),
+        left: cq(props.x),
+        top: cq(props.y),
+        width: cq(props.w),
+        height: cq(props.d),
         transform: "translateZ(-0.1cqw)",
       }}
-      {...stylex.props(styles.shadow)}
+      {...stylex.attrs(styles.shadow)}
     />
   );
 }

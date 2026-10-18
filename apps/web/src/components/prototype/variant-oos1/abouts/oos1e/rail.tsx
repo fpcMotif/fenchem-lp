@@ -1,6 +1,6 @@
 import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { useEffect, useRef } from "react";
+import { createEffect } from "solid-js";
 
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
@@ -9,6 +9,10 @@ import { NAV_ENGLISH, SHEETS } from "./sheets";
 import { color, font, media, metric } from "./tokens.stylex";
 
 const EASE_OUT_CSS = "cubic-bezier(0.22, 1, 0.36, 1)";
+
+// stylex.attrs with reactive (accessor) arguments resolves at runtime here, because
+// the StyleX compiler tries to evaluate them at build time and throws.
+const sxProps: typeof stylex.attrs = (...args) => stylex.attrs(...args);
 
 const styles = stylex.create({
   rail: {
@@ -84,35 +88,38 @@ const styles = stylex.create({
   },
 });
 
-export function Rail({ reachedIndex }: { reachedIndex: number }) {
-  const listRef = useRef<HTMLUListElement>(null);
+export function Rail(props: { reachedIndex: number }) {
+  let listRef: HTMLUListElement | undefined;
   const reduce = useReducedMotion();
-  const activeNav = SHEETS[reachedIndex]?.nav ?? null;
+  const activeNav = () => SHEETS[props.reachedIndex]?.nav ?? null;
 
-  useEffect(() => {
-    const list = listRef.current;
-    const link = activeNav ? list?.querySelector<HTMLElement>(`[href="#${activeNav}"]`) : null;
-    if (!list || !link) return;
-    const listBox = list.getBoundingClientRect();
-    const linkBox = link.getBoundingClientRect();
-    if (linkBox.left < listBox.left || linkBox.right > listBox.right) {
-      list.scrollBy({
-        left: linkBox.left - listBox.left - 16,
-        behavior: reduce ? "auto" : "smooth",
-      });
-    }
-  }, [activeNav, reduce]);
+  createEffect(
+    () => [activeNav(), reduce()] as const,
+    ([current, reduceNow]) => {
+      const list = listRef;
+      const link = current ? list?.querySelector<HTMLElement>(`[href="#${current}"]`) : null;
+      if (!list || !link) return;
+      const listBox = list.getBoundingClientRect();
+      const linkBox = link.getBoundingClientRect();
+      if (linkBox.left < listBox.left || linkBox.right > listBox.right) {
+        list.scrollBy({
+          left: linkBox.left - listBox.left - 16,
+          behavior: reduceNow ? "auto" : "smooth",
+        });
+      }
+    },
+  );
 
   return (
-    <nav aria-label="On this page" {...stylex.props(styles.rail)}>
-      <div {...stylex.props(styles.frame)}>
-        <ul ref={listRef} {...stylex.props(styles.list)}>
+    <nav aria-label="On this page" {...stylex.attrs(styles.rail)}>
+      <div {...stylex.attrs(styles.frame)}>
+        <ul ref={listRef} {...stylex.attrs(styles.list)}>
           {ABOUT_HERO.navChips.map((chip) => (
-            <li key={chip.id} {...stylex.props(styles.item)}>
+            <li {...stylex.attrs(styles.item)}>
               <a
                 href={`#${chip.id}`}
-                aria-current={activeNav === chip.id ? "location" : undefined}
-                {...stylex.props(styles.link, activeNav === chip.id && styles.linkActive)}
+                aria-current={activeNav() === chip.id ? "location" : undefined}
+                {...sxProps(styles.link, activeNav() === chip.id && styles.linkActive)}
               >
                 <span lang="en">{NAV_ENGLISH[chip.id]}</span>
               </a>

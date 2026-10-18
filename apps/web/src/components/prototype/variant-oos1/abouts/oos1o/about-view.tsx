@@ -1,5 +1,5 @@
 import * as stylex from "@stylexjs/stylex";
-import { preinit } from "react-dom";
+import { preinit } from "@/compat/react-dom";
 
 import type { AboutPageProps } from "../../index";
 import { Campus } from "./campus";
@@ -22,17 +22,17 @@ const styles = stylex.create({
   },
 });
 
-export function AboutOOS1O({ onNavigateHome }: AboutPageProps) {
+export function AboutOOS1O(props: AboutPageProps) {
   preinit(LIGHT_WEIGHT_FONT, { as: "style" });
   return (
-    <div id="about-top" {...stylex.props(styles.root)}>
+    <div id="about-top" {...stylex.attrs(styles.root)}>
       <Growth />
       <Campus />
       <Culture />
       <Csr />
       <Honors />
       <Structure />
-      <Closing onNavigateHome={onNavigateHome} />
+      <Closing onNavigateHome={props.onNavigateHome} />
     </div>
   );
 }

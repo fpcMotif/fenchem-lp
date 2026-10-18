@@ -1,7 +1,7 @@
-import { breakpoints } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { animate, useInView } from "motion/react";
-import { type ReactNode, useLayoutEffect, useRef } from "react";
+import { animate, motionValue, useInView } from "@/compat/motion";
+import { createEffect } from "solid-js";
+import { dynamic as dynamicTag, type JSX } from "@solidjs/web";
 
 import { EASE } from "@/components/prototype/motion-constants";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
@@ -19,8 +19,11 @@ const dynamic = stylex.create({
 
 const styles = stylex.create({
   hidden: {
-    opacity: { default: 0, [breakpoints.motionReduce]: 1 },
-    transform: { default: null, [breakpoints.motionOk]: "translateY(20px)" },
+    opacity: { default: 0, ["@media (prefers-reduced-motion: reduce)"]: 1 },
+    transform: {
+      default: null,
+      ["@media (prefers-reduced-motion: no-preference)"]: "translateY(20px)",
+    },
     transitionProperty: "opacity, transform",
     transitionDuration: "800ms",
     transitionTimingFunction: palette.easeOut,
@@ -34,70 +37,69 @@ const styles = stylex.create({
   },
 });
 
-export function Reveal({
-  children,
-  step = 0,
-  sx,
-  as: Tag = "div",
-}: {
-  children: ReactNode;
+export function Reveal(props: {
+  children: JSX.Element;
   step?: number;
   sx?: stylex.StyleXStyles;
   as?: "div" | "li" | "figure";
 }) {
-  const ref = useRef<HTMLDivElement & HTMLLIElement>(null);
-  const shown = useInView(ref, { once: true, margin: "0px 0px -10% 0px" });
+  const Tag = dynamicTag(() => props.as ?? "div");
+  let ref: HTMLElement | undefined;
+  const shown = useInView(() => ref, { once: true, margin: "0px 0px -10% 0px" });
   return (
     <Tag
-      ref={ref}
-      {...stylex.props(
+      ref={(el: HTMLElement) => (ref = el)}
+      {...stylex.attrs(
         styles.hidden,
-        shown && styles.shown,
-        dynamic.delay(Math.min(step, REVEAL_MAX_STEPS) * REVEAL_STEP_MS),
-        sx,
+        shown() && styles.shown,
+        dynamic.delay(Math.min(props.step ?? 0, REVEAL_MAX_STEPS) * REVEAL_STEP_MS),
+        props.sx,
       )}
     >
-      {children}
+      {props.children}
     </Tag>
   );
 }
 
-export function CountUp({ value }: { value: string }) {
-  const target = Number(value.replaceAll(",", ""));
-  const ref = useRef<HTMLSpanElement>(null);
-  const inView = useInView(ref, { once: true, margin: "0px 0px -8% 0px" });
+export function CountUp(props: { value: string }) {
+  const target = () => Number(props.value.replaceAll(",", ""));
+  let ref: HTMLSpanElement | undefined;
+  const inView = useInView(() => ref, { once: true, margin: "0px 0px -8% 0px" });
   const reduce = useReducedMotion();
 
-  useLayoutEffect(() => {
-    const node = ref.current;
-    if (!node) return;
-    if (reduce) {
-      node.textContent = value;
-      return;
-    }
-    if (!inView) {
-      node.textContent = "0";
-      return;
-    }
-    const controls = animate(0, target, {
-      duration: COUNT_UP_SECONDS,
-      ease: EASE,
-      onUpdate: (latest) => {
-        node.textContent = Math.round(latest).toLocaleString("en-US");
-      },
-      onComplete: () => {
+  createEffect(
+    () => [inView(), reduce(), target(), props.value] as const,
+    ([inViewNow, reduceNow, targetNow, value]) => {
+      const node = ref;
+      if (!node) return;
+      if (reduceNow) {
         node.textContent = value;
-      },
-    });
-    return () => controls.stop();
-  }, [inView, reduce, target, value]);
+        return;
+      }
+      if (!inViewNow) {
+        node.textContent = "0";
+        return;
+      }
+      const controls = animate(motionValue(0), targetNow, {
+        duration: COUNT_UP_SECONDS,
+        ease: EASE,
+        onUpdate: (latest: number) => {
+          node.textContent = Math.round(latest).toLocaleString("en-US");
+        },
+        onComplete: () => {
+          node.textContent = value;
+        },
+      });
+      return () => controls.stop();
+    },
+  );
 
   return (
     <>
-      <span ref={ref} aria-hidden="true" {...stylex.props(styles.count)}>
-        {value}
+      <span ref={ref} aria-hidden="true" {...stylex.attrs(styles.count)}>
+        {props.value}
       </span>
-      <span {...stylex.props(layout.srOnly)}>{value}</span>
+      <span {...stylex.attrs(layout.srOnly)}>{props.value}</span>
     </>
   );
 }

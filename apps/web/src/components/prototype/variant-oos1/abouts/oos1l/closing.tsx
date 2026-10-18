@@ -1,7 +1,6 @@
 import * as stylex from "@stylexjs/stylex";
-import { ArrowUpRight } from "lucide-react";
-import { m, useScroll, useTransform } from "motion/react";
-import { useEffect, useRef, useState } from "react";
+import { ArrowUpRight } from "@fenchem-lp/ui/components/lucide";
+import { m, useScroll, useTransform } from "@/compat/motion";
 
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
@@ -10,6 +9,7 @@ import { Clause } from "./clause";
 import { CLOSING } from "./sentence";
 import { srOnly, ui } from "./shared";
 import { bp, face, size, tone } from "./tokens.stylex";
+import { createSignal, onSettled } from "solid-js";
 
 const STOP_INK_WIDTH = 0.294;
 const STOP_BEARING = 0.048 / STOP_INK_WIDTH;
@@ -128,16 +128,16 @@ const styles = stylex.create({
   },
 });
 
-export function Closing({ onNavigateHome }: AboutPageProps) {
-  const sectionRef = useRef<HTMLElement>(null);
-  const boxRef = useRef<HTMLDivElement>(null);
-  const stopRef = useRef<HTMLDivElement>(null);
+export function Closing(props: AboutPageProps) {
+  const [sectionRef, setSectionRef] = createSignal<HTMLElement>();
+  const [boxRef, setBoxRef] = createSignal<HTMLDivElement>();
+  const [stopRef, setStopRef] = createSignal<HTMLDivElement>();
   const reduce = useReducedMotion();
-  const [startScale, setStartScale] = useState(1);
+  const [startScale, setStartScale] = createSignal(1);
 
-  useEffect(() => {
-    const box = boxRef.current;
-    const stop = stopRef.current;
+  onSettled(() => {
+    const box = boxRef();
+    const stop = stopRef();
     if (!box || !stop) return;
     const measure = () => {
       const font = Number.parseFloat(getComputedStyle(box).fontSize);
@@ -147,53 +147,58 @@ export function Closing({ onNavigateHome }: AboutPageProps) {
     window.addEventListener("resize", measure);
     void document.fonts.ready.then(measure);
     return () => window.removeEventListener("resize", measure);
-  }, []);
+  });
 
   const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start 0.85", "end end"] });
   const scale = useTransform(
-    scrollYProgress,
-    (value) => startScale + (1 - startScale) * ease((value - 0.1) / 0.6),
+    () => startScale() + (1 - startScale()) * ease((scrollYProgress() - 0.1) / 0.6),
   );
 
   return (
-    <section ref={sectionRef} aria-label="Closing" {...stylex.props(styles.section)}>
-      <div {...stylex.props(ui.shell)}>
-        <div {...stylex.props(styles.coda)}>
-          <div {...stylex.props(styles.column)}>
-            <div {...stylex.props(styles.links)}>
+    <section ref={setSectionRef} aria-label="Closing" {...stylex.attrs(styles.section)}>
+      <div {...stylex.attrs(ui.shell)}>
+        <div {...stylex.attrs(styles.coda)}>
+          <div {...stylex.attrs(styles.column)}>
+            <div {...stylex.attrs(styles.links)}>
               <button
                 type="button"
-                onClick={() => onNavigateHome("contact")}
-                {...stylex.props(styles.contact)}
+                onClick={() => props.onNavigateHome("contact")}
+                {...stylex.attrs(styles.contact)}
               >
                 <span>
-                  <span {...stylex.props(styles.contactStrong)}>联系</span>我们
+                  <span {...stylex.attrs(styles.contactStrong)}>联系</span>我们
                 </span>
                 <ArrowUpRight
                   aria-hidden="true"
                   strokeWidth={1.5}
-                  {...stylex.props(styles.arrow)}
+                  {...stylex.attrs(styles.arrow)}
                 />
               </button>
-              <button type="button" onClick={() => onNavigateHome()} {...stylex.props(styles.home)}>
+              <button
+                type="button"
+                onClick={() => props.onNavigateHome()}
+                {...stylex.attrs(styles.home)}
+              >
                 <span>回到首页</span>
-                <span lang="en" {...stylex.props(styles.homeEn)}>
+                <span lang="en" {...stylex.attrs(styles.homeEn)}>
                   Home
                 </span>
               </button>
             </div>
             <Clause line={CLOSING} sx={styles.line} />
           </div>
-          <div ref={boxRef} {...stylex.props(styles.stopBox)}>
+          <div ref={setBoxRef} {...stylex.attrs(styles.stopBox)}>
             <m.div
-              ref={stopRef}
-              style={reduce ? undefined : { scale, originX: -STOP_BEARING, originY: 1 }}
-              {...stylex.props(styles.stop)}
+              ref={setStopRef}
+              style={
+                reduce() ? undefined : { scale, transformOrigin: `${-STOP_BEARING * 100}% 100%` }
+              }
+              {...stylex.attrs(styles.stop)}
             >
               <svg
                 viewBox={`0 0 ${STOP_VIEW} ${STOP_VIEW}`}
                 aria-hidden="true"
-                {...stylex.props(styles.svg)}
+                {...stylex.attrs(styles.svg)}
               >
                 <circle
                   cx={STOP_VIEW / 2}
@@ -201,7 +206,7 @@ export function Closing({ onNavigateHome }: AboutPageProps) {
                   r={STOP_RADIUS}
                   fill="none"
                   stroke="currentColor"
-                  strokeWidth={STOP_VIEW * STOP_STROKE}
+                  stroke-width={STOP_VIEW * STOP_STROKE}
                 />
               </svg>
             </m.div>

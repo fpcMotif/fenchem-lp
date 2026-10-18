@@ -87,33 +87,28 @@ export function Campus() {
 
   return (
     <Section id={chip.id} label={chip.english}>
-      <div {...stylex.props(s.grid)}>
+      <div {...stylex.attrs(s.grid)}>
         {photos.map((photo, idx) => {
           const place = PLACEMENT[photo.id];
           return (
-            <Reveal
-              key={photo.id}
-              as="figure"
-              delay={idx % 2 === 0 ? 0 : 100}
-              sx={[s.tile, place.cell]}
-            >
+            <Reveal as="figure" delay={idx % 2 === 0 ? 0 : 100} sx={[s.tile, place.cell]}>
               <button
                 type="button"
                 aria-label={`View larger: ${photo.english}`}
                 onClick={() => lightbox.open(idx)}
-                {...stylex.props(s.trigger, ui.focusRing)}
+                {...stylex.attrs(s.trigger, ui.focusRing)}
               >
-                <span {...stylex.props(ui.frame, place.ratio, s.block)}>
+                <span {...stylex.attrs(ui.frame, place.ratio, s.block)}>
                   <img
                     src={photo.src}
                     alt={photo.alt}
                     loading="lazy"
                     decoding="async"
-                    {...stylex.props(ui.fill, place.image)}
+                    {...stylex.attrs(ui.fill, place.image)}
                   />
                 </span>
               </button>
-              <figcaption {...stylex.props(ui.caption)}>{photo.caption}</figcaption>
+              <figcaption {...stylex.attrs(ui.caption)}>{photo.caption}</figcaption>
             </Reveal>
           );
         })}

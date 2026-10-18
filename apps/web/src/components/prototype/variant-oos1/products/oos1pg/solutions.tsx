@@ -1,8 +1,8 @@
 import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import { AnimatePresence, m } from "motion/react";
-import { useEffect, useId, useRef, useState, type KeyboardEvent } from "react";
+import { ChevronLeft, ChevronRight } from "@fenchem-lp/ui/components/lucide";
+import { AnimatePresence, m } from "@/compat/motion";
+import { createEffect, createSignal, createUniqueId, flush, For, Show, untrack } from "solid-js";
 
 import { EASE } from "@/components/prototype/motion-constants";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
@@ -45,6 +45,10 @@ const LAST_SOLUTION = SOLUTION_ITEMS.length - 1;
 
 const fieldsOn = (item: SolutionItem, page: number) =>
   PAGE_FIELDS[page].filter((key) => item[key].length > 0);
+
+// stylex.attrs with reactive (accessor) arguments resolves at runtime here, because
+// the StyleX compiler tries to evaluate them at build time and throws.
+const sxProps: typeof stylex.attrs = (...args) => stylex.attrs(...args);
 
 const styles = stylex.create({
   section: {
@@ -420,53 +424,41 @@ const styles = stylex.create({
   },
 });
 
-function Field({ label, lines }: { label: string; lines: string[] }) {
+function Field(props: { label: string; lines: string[] }) {
   return (
-    <div {...stylex.props(styles.fieldRow)}>
-      <dt {...stylex.props(styles.fieldLabel)}>{label}</dt>
-      <dd {...stylex.props(styles.fieldValue)}>
-        <ul {...stylex.props(styles.lineList)}>
-          {lines.map((line) => (
-            <li key={line}>{line}</li>
-          ))}
+    <div {...stylex.attrs(styles.fieldRow)}>
+      <dt {...stylex.attrs(styles.fieldLabel)}>{props.label}</dt>
+      <dd {...stylex.attrs(styles.fieldValue)}>
+        <ul {...stylex.attrs(styles.lineList)}>
+          <For each={props.lines}>{(line) => <li>{line}</li>}</For>
         </ul>
       </dd>
     </div>
   );
 }
 
-function SheetPage({
-  item,
-  page,
-  current,
-  reduce,
-}: {
-  item: SolutionItem;
-  page: number;
-  current: number;
-  reduce: boolean;
-}) {
-  const active = page === current;
+function SheetPage(props: { item: SolutionItem; page: number; current: number; reduce: boolean }) {
+  const active = () => props.page === props.current;
   return (
     <m.div
-      inert={!active}
-      aria-hidden={!active}
+      inert={!active()}
+      aria-hidden={active() ? "false" : "true"}
       initial={false}
       animate={
-        active
+        active()
           ? { opacity: 1, x: 0, visibility: "visible" }
           : {
               opacity: 0,
-              x: page < current ? -SLIDE : SLIDE,
+              x: props.page < props.current ? -SLIDE : SLIDE,
               transitionEnd: { visibility: "hidden" },
             }
       }
-      transition={{ duration: reduce ? 0 : 0.26, ease: EASE }}
-      {...stylex.props(styles.pageLayer)}
+      transition={{ duration: props.reduce ? 0 : 0.26, ease: EASE }}
+      {...stylex.attrs(styles.pageLayer)}
     >
-      <dl {...stylex.props(styles.fields)}>
-        {fieldsOn(item, page).map((key) => (
-          <Field key={key} label={FIELD_LABEL[key]} lines={item[key]} />
+      <dl {...stylex.attrs(styles.fields)}>
+        {fieldsOn(props.item, props.page).map((key) => (
+          <Field label={FIELD_LABEL[key]} lines={props.item[key]} />
         ))}
       </dl>
     </m.div>
@@ -475,48 +467,52 @@ function SheetPage({
 
 export function Solutions() {
   const reduce = useReducedMotion();
-  const titleId = useId();
-  const tabBaseId = useId();
-  const panelId = useId();
-  const [position, setPosition] = useState({ index: 0, page: 0 });
-  const scrollerRef = useRef<HTMLDivElement>(null);
-  const sheetRef = useRef<HTMLDivElement>(null);
-  const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
-  const hasMounted = useRef(false);
+  const titleId = createUniqueId();
+  const tabBaseId = createUniqueId();
+  const panelId = createUniqueId();
+  const [position, setPosition] = createSignal({ index: 0, page: 0 });
+  let scrollerEl!: HTMLDivElement;
+  let sheetEl!: HTMLDivElement;
+  const tabRefs: (HTMLButtonElement | undefined)[] = [];
+  let hasMounted = false;
 
-  const { index, page } = position;
-  const item = SOLUTION_ITEMS[index];
-  const previous = index > 0 ? SOLUTION_ITEMS[index - 1] : null;
-  const next = index < LAST_SOLUTION ? SOLUTION_ITEMS[index + 1] : null;
-  const canGoBack = page > 0 || previous !== null;
-  const canGoForward = page < LAST_PAGE || next !== null;
+  const index = () => position().index;
+  const page = () => position().page;
+  const item = () => SOLUTION_ITEMS[index()];
+  const previous = () => (index() > 0 ? SOLUTION_ITEMS[index() - 1] : null);
+  const next = () => (index() < LAST_SOLUTION ? SOLUTION_ITEMS[index() + 1] : null);
+  const canGoBack = () => page() > 0 || previous() !== null;
+  const canGoForward = () => page() < LAST_PAGE || next() !== null;
 
-  useEffect(() => {
-    if (!hasMounted.current) {
-      hasMounted.current = true;
-      return;
-    }
-    const scroller = scrollerRef.current;
-    const tab = tabRefs.current[index];
-    if (!scroller || !tab || scroller.scrollWidth <= scroller.clientWidth) return;
-    const inset = Number.parseFloat(getComputedStyle(scroller).paddingInlineStart) || 0;
-    const start = tab.offsetLeft - inset;
-    const end = tab.offsetLeft + tab.offsetWidth + inset - scroller.clientWidth;
-    if (scroller.scrollLeft > start)
-      scroller.scrollTo({ left: start, behavior: reduce ? "auto" : "smooth" });
-    else if (scroller.scrollLeft < end)
-      scroller.scrollTo({ left: end, behavior: reduce ? "auto" : "smooth" });
-  }, [index, reduce]);
+  createEffect(
+    () => [index(), reduce()] as const,
+    ([current, reduceNow]) => {
+      if (!hasMounted) {
+        hasMounted = true;
+        return;
+      }
+      const scroller = scrollerEl;
+      const tab = tabRefs[current];
+      if (!scroller || !tab || scroller.scrollWidth <= scroller.clientWidth) return;
+      const inset = Number.parseFloat(getComputedStyle(scroller).paddingInlineStart) || 0;
+      const start = tab.offsetLeft - inset;
+      const end = tab.offsetLeft + tab.offsetWidth + inset - scroller.clientWidth;
+      if (scroller.scrollLeft > start)
+        scroller.scrollTo({ left: start, behavior: reduceNow ? "auto" : "smooth" });
+      else if (scroller.scrollLeft < end)
+        scroller.scrollTo({ left: end, behavior: reduceNow ? "auto" : "smooth" });
+    },
+  );
 
   const revealSheet = () => {
     requestAnimationFrame(() => {
-      const sheet = sheetRef.current;
+      const sheet = sheetEl;
       if (!sheet) return;
       const top = sheet.getBoundingClientRect().top;
       if (top >= HEADER_HEIGHT) return;
       window.scrollTo({
         top: window.scrollY + top - HEADER_HEIGHT - 16,
-        behavior: reduce ? "auto" : "smooth",
+        behavior: reduce() ? "auto" : "smooth",
       });
     });
   };
@@ -530,67 +526,68 @@ export function Solutions() {
   };
 
   const goBack = () => {
-    if (page > 0) goToPage(page - 1);
-    else if (previous) selectSolution(index - 1);
+    if (page() > 0) goToPage(page() - 1);
+    else if (previous()) selectSolution(index() - 1);
     revealSheet();
   };
 
   const goForward = () => {
-    if (page < LAST_PAGE) goToPage(page + 1);
-    else if (next) selectSolution(index + 1);
+    if (page() < LAST_PAGE) goToPage(page() + 1);
+    else if (next()) selectSolution(index() + 1);
     revealSheet();
   };
 
-  const moveTabs = (event: KeyboardEvent<HTMLDivElement>) => {
+  const moveTabs = (event: KeyboardEvent) => {
     const count = SOLUTION_ITEMS.length;
+    const current = index();
     let to: number;
-    if (event.key === "ArrowRight") to = (index + 1) % count;
-    else if (event.key === "ArrowLeft") to = (index - 1 + count) % count;
+    if (event.key === "ArrowRight") to = (current + 1) % count;
+    else if (event.key === "ArrowLeft") to = (current - 1 + count) % count;
     else if (event.key === "Home") to = 0;
     else if (event.key === "End") to = count - 1;
     else return;
     event.preventDefault();
     selectSolution(to);
-    tabRefs.current[to]?.focus();
+    flush();
+    tabRefs[to]?.focus();
   };
 
-  const backLabel = page > 0 ? "上一页" : "上一个方案";
+  const backLabel = () => (page() > 0 ? "上一页" : "上一个方案");
 
   return (
-    <section id="products-solutions" aria-labelledby={titleId} {...stylex.props(styles.section)}>
-      <div {...stylex.props(styles.shell)}>
-        <h2 id={titleId} {...stylex.props(styles.title)}>
+    <section id="products-solutions" aria-labelledby={titleId} {...stylex.attrs(styles.section)}>
+      <div {...stylex.attrs(styles.shell)}>
+        <h2 id={titleId} {...stylex.attrs(styles.title)}>
           应用方案
         </h2>
 
-        <div ref={scrollerRef} {...stylex.props(styles.tabScroller)}>
+        <div ref={scrollerEl} {...stylex.attrs(styles.tabScroller)}>
           <div
             role="tablist"
             aria-label="Application solutions"
             onKeyDown={moveTabs}
-            {...stylex.props(styles.tablist)}
+            {...stylex.attrs(styles.tablist)}
           >
             {SOLUTION_ITEMS.map((solution, solutionIndex) => {
-              const on = solutionIndex === index;
+              const on = () => solutionIndex === index();
               return (
                 <button
-                  key={solution.id}
                   ref={(node) => {
-                    tabRefs.current[solutionIndex] = node;
+                    tabRefs[solutionIndex] = node;
                   }}
                   type="button"
                   role="tab"
                   id={`${tabBaseId}-${solutionIndex}`}
-                  aria-selected={on}
+                  aria-selected={on() ? "true" : "false"}
                   aria-controls={panelId}
-                  tabIndex={on ? 0 : -1}
+                  tabindex={on() ? 0 : -1}
                   onClick={() => selectSolution(solutionIndex)}
-                  {...stylex.props(styles.tab, on && styles.tabOn)}
+                  {...stylex.attrs(styles.tab, on() && styles.tabOn)}
                 >
-                  <span {...stylex.props(styles.tabNumber, on && styles.tabNumberOn)}>
+                  <span {...stylex.attrs(styles.tabNumber, on() && styles.tabNumberOn)}>
                     {padIndex(solutionIndex)}
                   </span>
-                  <span {...stylex.props(styles.tabTitle, on && styles.tabTitleOn)}>
+                  <span {...stylex.attrs(styles.tabTitle, on() && styles.tabTitleOn)}>
                     {solution.title}
                   </span>
                 </button>
@@ -600,130 +597,140 @@ export function Solutions() {
         </div>
 
         <div
-          ref={sheetRef}
+          ref={sheetEl}
           id={panelId}
           role="tabpanel"
-          aria-labelledby={`${tabBaseId}-${index}`}
-          {...stylex.props(styles.sheet)}
+          aria-labelledby={`${tabBaseId}-${index()}`}
+          {...stylex.attrs(styles.sheet)}
         >
-          <div {...stylex.props(styles.sheetStack)}>
+          <div {...stylex.attrs(styles.sheetStack)}>
             <AnimatePresence initial={false}>
-              <m.div
-                key={item.id}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1, transition: { duration: reduce ? 0 : 0.24, ease: EASE } }}
-                exit={{ opacity: 0, transition: { duration: reduce ? 0 : 0.12, ease: EASE } }}
-                {...stylex.props(styles.sheetLayer)}
-              >
-                <header {...stylex.props(styles.sheetHead)}>
-                  <span aria-hidden="true" {...stylex.props(styles.number)}>
-                    {padIndex(index)}
-                  </span>
-                  <div>
-                    <h3 {...stylex.props(styles.headTitle)}>{item.title}</h3>
-                    <p {...stylex.props(styles.headSubtitle)}>{item.subtitle}</p>
-                  </div>
-                  <ol aria-label="Solution pages" {...stylex.props(styles.pageIndex)}>
-                    {PAGE_FIELDS.map((_, pageIndex) => {
-                      const on = pageIndex === page;
-                      return (
-                        <li key={pageIndex}>
-                          <button
-                            type="button"
-                            aria-current={on ? "true" : undefined}
-                            onClick={() => goToPage(pageIndex)}
-                            {...stylex.props(
-                              styles.pageIndexButton,
-                              on && styles.pageIndexButtonOn,
-                            )}
-                          >
-                            <span
-                              {...stylex.props(
-                                styles.pageIndexLabel,
-                                on && styles.pageIndexLabelOn,
-                              )}
-                            >
-                              第 {pageIndex + 1} 页
-                            </span>
-                            <span {...stylex.props(styles.pageIndexFields)}>
-                              {fieldsOn(item, pageIndex)
-                                .map((key) => FIELD_LABEL[key])
-                                .join(" · ")}
-                            </span>
-                          </button>
-                        </li>
-                      );
-                    })}
-                  </ol>
-                </header>
-                <div {...stylex.props(styles.pagesStack)}>
-                  {PAGE_FIELDS.map((_, pageIndex) => (
-                    <SheetPage
-                      key={pageIndex}
-                      item={item}
-                      page={pageIndex}
-                      current={page}
-                      reduce={reduce}
-                    />
-                  ))}
-                </div>
-              </m.div>
+              <Show when={item()} keyed>
+                {(current) => {
+                  const currentIndex = untrack(index);
+                  return (
+                    <m.div
+                      initial={{ opacity: 0 }}
+                      animate={{
+                        opacity: 1,
+                        transition: { duration: reduce() ? 0 : 0.24, ease: EASE },
+                      }}
+                      exit={{
+                        opacity: 0,
+                        transition: { duration: reduce() ? 0 : 0.12, ease: EASE },
+                      }}
+                      {...stylex.attrs(styles.sheetLayer)}
+                    >
+                      <header {...stylex.attrs(styles.sheetHead)}>
+                        <span aria-hidden="true" {...stylex.attrs(styles.number)}>
+                          {padIndex(currentIndex)}
+                        </span>
+                        <div>
+                          <h3 {...stylex.attrs(styles.headTitle)}>{current.title}</h3>
+                          <p {...stylex.attrs(styles.headSubtitle)}>{current.subtitle}</p>
+                        </div>
+                        <ol aria-label="Solution pages" {...stylex.attrs(styles.pageIndex)}>
+                          {PAGE_FIELDS.map((_, pageIndex) => {
+                            const on = () => pageIndex === page();
+                            return (
+                              <li>
+                                <button
+                                  type="button"
+                                  aria-current={on() ? "true" : undefined}
+                                  onClick={() => goToPage(pageIndex)}
+                                  {...stylex.attrs(
+                                    styles.pageIndexButton,
+                                    on() && styles.pageIndexButtonOn,
+                                  )}
+                                >
+                                  <span
+                                    {...stylex.attrs(
+                                      styles.pageIndexLabel,
+                                      on() && styles.pageIndexLabelOn,
+                                    )}
+                                  >
+                                    第 {pageIndex + 1} 页
+                                  </span>
+                                  <span {...stylex.attrs(styles.pageIndexFields)}>
+                                    {fieldsOn(current, pageIndex)
+                                      .map((key) => FIELD_LABEL[key])
+                                      .join(" · ")}
+                                  </span>
+                                </button>
+                              </li>
+                            );
+                          })}
+                        </ol>
+                      </header>
+                      <div {...stylex.attrs(styles.pagesStack)}>
+                        {PAGE_FIELDS.map((_, pageIndex) => (
+                          <SheetPage
+                            item={current}
+                            page={pageIndex}
+                            current={page()}
+                            reduce={reduce()}
+                          />
+                        ))}
+                      </div>
+                    </m.div>
+                  );
+                }}
+              </Show>
             </AnimatePresence>
           </div>
 
-          <div {...stylex.props(styles.footer)}>
+          <div {...stylex.attrs(styles.footer)}>
             <button
               type="button"
               onClick={goBack}
-              disabled={!canGoBack}
+              disabled={!canGoBack()}
               aria-label={
-                page === 0 && previous ? `Previous solution: ${previous.englishName}` : undefined
+                page() === 0 && previous()
+                  ? `Previous solution: ${previous()!.englishName}`
+                  : undefined
               }
-              {...stylex.props(styles.navButton, styles.navBack, !canGoBack && styles.navDisabled)}
+              {...sxProps(styles.navButton, styles.navBack, !canGoBack() && styles.navDisabled)}
             >
               <ChevronLeft
                 size={16}
                 strokeWidth={1.5}
                 absoluteStrokeWidth
                 aria-hidden="true"
-                {...stylex.props(styles.navIcon)}
+                {...stylex.attrs(styles.navIcon)}
               />
-              {backLabel}
+              {backLabel()}
             </button>
-            <p aria-live="polite" {...stylex.props(styles.indicator)}>
+            <p aria-live="polite" {...stylex.attrs(styles.indicator)}>
               <span>
-                第 {page + 1} 页 / 共 {PAGE_COUNT} 页
+                第 {page() + 1} 页 / 共 {PAGE_COUNT} 页
               </span>
-              <span aria-hidden="true" {...stylex.props(styles.pips)}>
+              <span aria-hidden="true" {...stylex.attrs(styles.pips)}>
                 {PAGE_FIELDS.map((_, pageIndex) => (
-                  <span
-                    key={pageIndex}
-                    {...stylex.props(styles.pip, pageIndex === page && styles.pipOn)}
-                  />
+                  <span {...stylex.attrs(styles.pip, pageIndex === page() && styles.pipOn)} />
                 ))}
               </span>
             </p>
             <button
               type="button"
               onClick={goForward}
-              disabled={!canGoForward}
-              {...stylex.props(
+              disabled={!canGoForward()}
+              {...sxProps(
                 styles.navButton,
                 styles.navForward,
-                !canGoForward && styles.navDisabled,
+                !canGoForward() && styles.navDisabled,
               )}
             >
-              {page < LAST_PAGE ? (
+              {page() < LAST_PAGE ? (
                 "下一页"
               ) : (
-                <span>{next ? `下一个方案：${next.title}` : "下一个方案"}</span>
+                <span>{next() ? `下一个方案：${next()!.title}` : "下一个方案"}</span>
               )}
               <ChevronRight
                 size={16}
                 strokeWidth={1.5}
                 absoluteStrokeWidth
                 aria-hidden="true"
-                {...stylex.props(styles.navIcon)}
+                {...stylex.attrs(styles.navIcon)}
               />
             </button>
           </div>

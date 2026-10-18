@@ -1,6 +1,7 @@
 import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { useEffect, useId, useRef, useState, type MouseEvent, type ReactNode } from "react";
+import type { JSX } from "@solidjs/web";
+import { createSignal, createUniqueId, onSettled, untrack } from "solid-js";
 
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
@@ -338,57 +339,53 @@ const styles = stylex.create({
   },
 });
 
-function Inci({ text }: { text: string }) {
-  const parts: ReactNode[] = [];
+function Inci(props: { text: string }) {
+  const text = untrack(() => props.text);
+  const parts: JSX.Element[] = [];
   let last = 0;
   for (const match of text.matchAll(LATIN_PART)) {
     parts.push(text.slice(last, match.index));
-    parts.push(
-      <span key={match.index} {...stylex.props(styles.latin)}>
-        {match[0]}
-      </span>,
-    );
+    parts.push(<span {...stylex.attrs(styles.latin)}>{match[0]}</span>);
     last = match.index + match[0].length;
   }
   parts.push(text.slice(last));
   return <>{parts}</>;
 }
 
-function ItemRow({ item, short, edge }: { item: FlatItem; short: string; edge: boolean }) {
+function ItemRow(props: { item: FlatItem; short: string; edge: boolean }) {
+  const item = props.item;
   return (
     <tr>
       <th
         scope="row"
-        {...stylex.props(
+        {...stylex.attrs(
           styles.bodyCell,
           styles.firstCell,
           styles.frozen,
           styles.frozenBody,
-          edge && styles.edgeOn,
+          props.edge && styles.edgeOn,
         )}
       >
-        <span {...stylex.props(styles.name)}>{item.primary}</span>
-        {item.secondary && <span {...stylex.props(styles.nameSecondary)}>{item.secondary}</span>}
+        <span {...stylex.attrs(styles.name)}>{item.primary}</span>
+        {item.secondary && <span {...stylex.attrs(styles.nameSecondary)}>{item.secondary}</span>}
       </th>
-      <td {...stylex.props(styles.bodyCell, styles.region)}>{short}</td>
-      <td {...stylex.props(styles.bodyCell, styles.inci)}>
+      <td {...stylex.attrs(styles.bodyCell, styles.region)}>{props.short}</td>
+      <td {...stylex.attrs(styles.bodyCell, styles.inci)}>
         <Inci text={item.inci} />
       </td>
-      <td {...stylex.props(styles.bodyCell, styles.lastCell, styles.features)}>{item.features}</td>
+      <td {...stylex.attrs(styles.bodyCell, styles.lastCell, styles.features)}>{item.features}</td>
     </tr>
   );
 }
 
 export function Catalog() {
-  const titleId = useId();
+  const titleId = createUniqueId();
   const reduce = useReducedMotion();
-  const scrollerRef = useRef<HTMLDivElement>(null);
-  const [overflowing, setOverflowing] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
+  let scroller!: HTMLDivElement;
+  const [overflowing, setOverflowing] = createSignal(false);
+  const [scrolled, setScrolled] = createSignal(false);
 
-  useEffect(() => {
-    const scroller = scrollerRef.current;
-    if (!scroller) return;
+  onSettled(() => {
     const measure = () => {
       setOverflowing(scroller.scrollWidth > scroller.clientWidth + 1);
       setScrolled(scroller.scrollLeft > 0);
@@ -398,44 +395,44 @@ export function Catalog() {
     observer.observe(scroller);
     if (scroller.firstElementChild) observer.observe(scroller.firstElementChild);
     return () => observer.disconnect();
-  }, []);
+  });
 
-  const jumpTo = (event: MouseEvent<HTMLAnchorElement>, anchor: string) => {
+  const jumpTo = (event: MouseEvent, anchor: string) => {
     const target = document.getElementById(anchor);
     if (!target) return;
     event.preventDefault();
     const margin = Number.parseFloat(getComputedStyle(target).scrollMarginTop) || 0;
     window.scrollTo({
       top: target.getBoundingClientRect().top + window.scrollY - margin,
-      behavior: reduce ? "auto" : "smooth",
+      behavior: reduce() ? "auto" : "smooth",
     });
     target.focus({ preventScroll: true });
   };
 
   return (
-    <section id="products-catalog" aria-labelledby={titleId} {...stylex.props(styles.section)}>
-      <div {...stylex.props(styles.shell)}>
-        <header {...stylex.props(styles.head)}>
-          <h2 id={titleId} {...stylex.props(styles.title)}>
+    <section id="products-catalog" aria-labelledby={titleId} {...stylex.attrs(styles.section)}>
+      <div {...stylex.attrs(styles.shell)}>
+        <header {...stylex.attrs(styles.head)}>
+          <h2 id={titleId} {...stylex.attrs(styles.title)}>
             产品目录
           </h2>
-          <p {...stylex.props(styles.meta)}>
-            共 <span {...stylex.props(styles.metaCount)}>{FLAT_ITEMS.length}</span> 款原料
+          <p {...stylex.attrs(styles.meta)}>
+            共 <span {...stylex.attrs(styles.metaCount)}>{FLAT_ITEMS.length}</span> 款原料
           </p>
         </header>
 
         <nav aria-label="Jump by origin">
-          <ul {...stylex.props(styles.jumpList)}>
+          <ul {...stylex.attrs(styles.jumpList)}>
             {REGIONS.map((region) => (
-              <li key={region.group.id}>
+              <li>
                 <a
                   href={`#${region.anchor}`}
                   onClick={(event) => jumpTo(event, region.anchor)}
-                  {...stylex.props(styles.jumpLink, stylex.defaultMarker())}
+                  {...stylex.attrs(styles.jumpLink, stylex.defaultMarker())}
                 >
-                  <span aria-hidden="true" {...stylex.props(styles.jumpBar)} />
+                  <span aria-hidden="true" {...stylex.attrs(styles.jumpBar)} />
                   <span>{region.short}</span>
-                  <span {...stylex.props(styles.jumpCount)}>{region.items.length}</span>
+                  <span {...stylex.attrs(styles.jumpCount)}>{region.items.length}</span>
                 </a>
               </li>
             ))}
@@ -443,62 +440,62 @@ export function Catalog() {
         </nav>
 
         <div
-          ref={scrollerRef}
-          role={overflowing ? "region" : undefined}
-          aria-labelledby={overflowing ? titleId : undefined}
-          tabIndex={overflowing ? 0 : undefined}
+          ref={scroller}
+          role={overflowing() ? "region" : undefined}
+          aria-labelledby={overflowing() ? titleId : undefined}
+          tabindex={overflowing() ? 0 : undefined}
           onScroll={(event) => setScrolled(event.currentTarget.scrollLeft > 0)}
-          {...stylex.props(styles.scroller)}
+          {...stylex.attrs(styles.scroller)}
         >
-          <table aria-labelledby={titleId} {...stylex.props(styles.table)}>
+          <table aria-labelledby={titleId} {...stylex.attrs(styles.table)}>
             <colgroup>
-              <col {...stylex.props(styles.colName)} />
-              <col {...stylex.props(styles.colRegion)} />
-              <col {...stylex.props(styles.colInci)} />
-              <col {...stylex.props(styles.colFeatures)} />
+              <col {...stylex.attrs(styles.colName)} />
+              <col {...stylex.attrs(styles.colRegion)} />
+              <col {...stylex.attrs(styles.colInci)} />
+              <col {...stylex.attrs(styles.colFeatures)} />
             </colgroup>
             <thead>
               <tr>
                 <th
                   scope="col"
-                  {...stylex.props(
+                  {...stylex.attrs(
                     styles.headCell,
                     styles.firstCell,
                     styles.frozen,
                     styles.frozenHead,
-                    scrolled && styles.edgeOn,
+                    scrolled() && styles.edgeOn,
                   )}
                 >
                   名称
                 </th>
-                <th scope="col" {...stylex.props(styles.headCell)}>
+                <th scope="col" {...stylex.attrs(styles.headCell)}>
                   产地
                 </th>
-                <th scope="col" {...stylex.props(styles.headCell)}>
+                <th scope="col" {...stylex.attrs(styles.headCell)}>
                   INCI 名称
                 </th>
-                <th scope="col" {...stylex.props(styles.headCell, styles.lastCell)}>
+                <th scope="col" {...stylex.attrs(styles.headCell, styles.lastCell)}>
                   特性&应用
                 </th>
               </tr>
             </thead>
             {REGIONS.map((region) => (
-              <tbody key={region.group.id}>
+              <tbody>
                 <tr>
                   <th
                     id={region.anchor}
                     scope="rowgroup"
-                    colSpan={4}
-                    tabIndex={-1}
-                    {...stylex.props(styles.groupCell, region.index === 0 && styles.groupCellFirst)}
+                    colspan={4}
+                    tabindex={-1}
+                    {...stylex.attrs(styles.groupCell, region.index === 0 && styles.groupCellFirst)}
                   >
-                    <div {...stylex.props(styles.groupInner)}>
-                      <span {...stylex.props(styles.groupName)}>
-                        <span {...stylex.props(styles.groupIndex)}>{padIndex(region.index)}</span>
-                        <span {...stylex.props(styles.groupLabelRow)}>
-                          <span {...stylex.props(styles.groupLabel)}>{region.group.label}</span>
-                          <span {...stylex.props(styles.groupCount)}>
-                            <span {...stylex.props(styles.groupCountNumber)}>
+                    <div {...stylex.attrs(styles.groupInner)}>
+                      <span {...stylex.attrs(styles.groupName)}>
+                        <span {...stylex.attrs(styles.groupIndex)}>{padIndex(region.index)}</span>
+                        <span {...stylex.attrs(styles.groupLabelRow)}>
+                          <span {...stylex.attrs(styles.groupLabel)}>{region.group.label}</span>
+                          <span {...stylex.attrs(styles.groupCount)}>
+                            <span {...stylex.attrs(styles.groupCountNumber)}>
                               {region.items.length}
                             </span>{" "}
                             款
@@ -506,13 +503,13 @@ export function Catalog() {
                         </span>
                       </span>
                       {region.group.intro && (
-                        <p {...stylex.props(styles.groupIntro)}>{region.group.intro}</p>
+                        <p {...stylex.attrs(styles.groupIntro)}>{region.group.intro}</p>
                       )}
                     </div>
                   </th>
                 </tr>
                 {region.items.map((item) => (
-                  <ItemRow key={item.id} item={item} short={region.short} edge={scrolled} />
+                  <ItemRow item={item} short={region.short} edge={scrolled()} />
                 ))}
               </tbody>
             ))}

@@ -93,7 +93,7 @@ export function Csr() {
 
   return (
     <Section id={chip.id} label={chip.english}>
-      <div {...stylex.props(s.stage)}>
+      <div {...stylex.attrs(s.stage)}>
         <Figure
           src={ABOUT_CSR.image}
           alt={ABOUT_CSR.imageAlt}
@@ -102,15 +102,15 @@ export function Csr() {
           sx={s.photo}
         />
         <Reveal as="p" sx={s.statement}>
-          <span {...stylex.props(s.statementLine)}>{statementLead}</span>
-          <span {...stylex.props(s.statementLine)}>{statementClose}</span>
+          <span {...stylex.attrs(s.statementLine)}>{statementLead}</span>
+          <span {...stylex.attrs(s.statementLine)}>{statementClose}</span>
         </Reveal>
         <Reveal sx={s.text}>
-          <p {...stylex.props(s.desc)}>{ABOUT_CSR.desc}</p>
-          <ul {...stylex.props(s.outcomes)}>
+          <p {...stylex.attrs(s.desc)}>{ABOUT_CSR.desc}</p>
+          <ul {...stylex.attrs(s.outcomes)}>
             {ABOUT_CSR.outcomes.map((outcome, idx) => (
-              <li key={outcome.title} {...stylex.props(s.outcome)}>
-                {idx === leafIndex ? <span aria-hidden="true" {...stylex.props(s.leaf)} /> : null}
+              <li {...stylex.attrs(s.outcome)}>
+                {idx === leafIndex ? <span aria-hidden="true" {...stylex.attrs(s.leaf)} /> : null}
                 {outcome.title}
               </li>
             ))}

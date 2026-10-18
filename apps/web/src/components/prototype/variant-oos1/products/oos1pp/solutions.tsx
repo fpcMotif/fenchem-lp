@@ -1,8 +1,9 @@
-import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
+import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import { AnimatePresence, m } from "motion/react";
-import { useId, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
+import { ChevronLeft, ChevronRight } from "@fenchem-lp/ui/components/lucide";
+import { AnimatePresence, m } from "@/compat/motion";
+import { createSignal, createUniqueId, For, Show } from "solid-js";
+import type { JSX } from "@solidjs/web";
 
 import { EASE } from "@/components/prototype/motion-constants";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
@@ -27,10 +28,10 @@ const BODY_FONT =
 const NUMERAL_FONT = '"Inter Tight", "Source Han Sans SC", "Noto Sans SC", sans-serif';
 
 const TABLET = "@media (min-width: 768px) and (max-width: 1279.98px)";
-const DESKTOP = breakpoints.xl;
-const SM = breakpoints.sm;
-const MD = breakpoints.md;
-const LG = breakpoints.lg;
+const DESKTOP = "@media (min-width: 1280px)";
+const SM = "@media (min-width: 640px)";
+const MD = "@media (min-width: 768px)";
+const LG = "@media (min-width: 1024px)";
 const INSET = "min(120px, 8.333vw)";
 const HEADER_HEIGHT = 80;
 const TWELVE = "repeat(12, minmax(0, 1fr))";
@@ -429,58 +430,44 @@ const styles = stylex.create({
   },
 });
 
-function Lines({ lines }: { lines: string[] }) {
+function Lines(props: { lines: string[] }) {
   return (
-    <ul {...stylex.props(styles.lines)}>
-      {lines.map((line) => (
-        <li key={line} {...stylex.props(styles.line)}>
-          {line}
-        </li>
-      ))}
+    <ul {...stylex.attrs(styles.lines)}>
+      <For each={props.lines}>{(line) => <li {...stylex.attrs(styles.line)}>{line}</li>}</For>
     </ul>
   );
 }
 
-function Field({
-  label,
-  last = false,
-  children,
-}: {
-  label: string;
-  last?: boolean;
-  children: ReactNode;
-}) {
+function Field(props: { label: string; last?: boolean; children: JSX.Element }) {
   return (
-    <div {...stylex.props(styles.field, last && styles.fieldLast)}>
-      <dt {...stylex.props(styles.label)}>{label}</dt>
-      <dd {...stylex.props(styles.value)}>{children}</dd>
+    <div {...stylex.attrs(styles.field, props.last && styles.fieldLast)}>
+      <dt {...stylex.attrs(styles.label)}>{props.label}</dt>
+      <dd {...stylex.attrs(styles.value)}>{props.children}</dd>
     </div>
   );
 }
 
-function SheetBody({ item, index }: { item: SolutionItem; index: number }) {
+function SheetBody(props: { item: SolutionItem; index: number }) {
+  const item = props.item;
   return (
     <>
-      <div {...stylex.props(styles.topline)}>
+      <div {...stylex.attrs(styles.topline)}>
         <span>
           方案{" "}
-          <span {...stylex.props(styles.numeral)}>
-            {padIndex(index)} / {TOTAL_LABEL}
+          <span {...stylex.attrs(styles.numeral)}>
+            {padIndex(props.index)} / {TOTAL_LABEL}
           </span>
         </span>
       </div>
-      <h3 {...stylex.props(styles.sheetTitle)}>{item.title}</h3>
-      <p {...stylex.props(styles.subtitle)}>{item.subtitle}</p>
-      <dl {...stylex.props(styles.facts)}>
-        <div {...stylex.props(styles.field, styles.factsField)}>
-          <dt {...stylex.props(styles.label)}>功能</dt>
-          <dd {...stylex.props(styles.value)}>
-            <ul {...stylex.props(styles.factList)}>
+      <h3 {...stylex.attrs(styles.sheetTitle)}>{item.title}</h3>
+      <p {...stylex.attrs(styles.subtitle)}>{item.subtitle}</p>
+      <dl {...stylex.attrs(styles.facts)}>
+        <div {...stylex.attrs(styles.field, styles.factsField)}>
+          <dt {...stylex.attrs(styles.label)}>功能</dt>
+          <dd {...stylex.attrs(styles.value)}>
+            <ul {...stylex.attrs(styles.factList)}>
               {item.functions.map((fact, factIndex) => (
-                <li
-                  key={fact}
-                  {...stylex.props(styles.fact, factIndex > 0 && styles.factSeparated)}
-                >
+                <li {...stylex.attrs(styles.fact, factIndex > 0 && styles.factSeparated)}>
                   {fact}
                 </li>
               ))}
@@ -488,7 +475,7 @@ function SheetBody({ item, index }: { item: SolutionItem; index: number }) {
           </dd>
         </div>
       </dl>
-      <dl {...stylex.props(styles.body)}>
+      <dl {...stylex.attrs(styles.body)}>
         <Field label="概述">
           <Lines lines={item.overview} />
         </Field>
@@ -499,9 +486,9 @@ function SheetBody({ item, index }: { item: SolutionItem; index: number }) {
           {item.challenges.length > 0 ? (
             <Lines lines={item.challenges} />
           ) : (
-            <span {...stylex.props(styles.none)}>
+            <span {...stylex.attrs(styles.none)}>
               <span aria-hidden="true">—</span>
-              <span {...stylex.props(styles.srOnly)}>Not provided</span>
+              <span {...stylex.attrs(styles.srOnly)}>Not provided</span>
             </span>
           )}
         </Field>
@@ -518,37 +505,37 @@ function SheetBody({ item, index }: { item: SolutionItem; index: number }) {
 
 export function Solutions() {
   const reduce = useReducedMotion();
-  const baseId = useId();
+  const baseId = createUniqueId();
   const titleId = `${baseId}-title`;
   const panelId = `${baseId}-panel`;
   const tabId = (index: number) => `${baseId}-tab-${index}`;
-  const [active, setActive] = useState(0);
-  const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
-  const dotRefs = useRef<(HTMLButtonElement | null)[]>([]);
-  const activeItem = SOLUTION_ITEMS[active] ?? SOLUTION_ITEMS[0];
-  const atStart = active === 0;
-  const atEnd = active === TOTAL - 1;
+  const [active, setActive] = createSignal(0);
+  const tabs: (HTMLButtonElement | undefined)[] = [];
+  const dots: (HTMLButtonElement | undefined)[] = [];
+  const activeItem = () => SOLUTION_ITEMS[active()] ?? SOLUTION_ITEMS[0];
+  const atStart = () => active() === 0;
+  const atEnd = () => active() === TOTAL - 1;
 
   const select = (next: number, from?: EventTarget | null) => {
     const target = Math.min(TOTAL - 1, Math.max(0, next));
     setActive(target);
     if (!(from instanceof HTMLButtonElement)) return;
-    if (tabRefs.current.includes(from)) tabRefs.current[target]?.focus();
-    else if (dotRefs.current.includes(from)) dotRefs.current[target]?.focus();
+    if (tabs.includes(from)) tabs[target]?.focus();
+    else if (dots.includes(from)) dots[target]?.focus();
   };
 
-  const onSectionKeyDown = (event: KeyboardEvent<HTMLElement>) => {
+  const onSectionKeyDown = (event: KeyboardEvent) => {
     if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
     const step = event.key === "ArrowRight" ? 1 : event.key === "ArrowLeft" ? -1 : 0;
     if (step === 0) return;
     event.preventDefault();
-    select(active + step, event.target);
+    select(active() + step, event.target);
   };
 
-  const onTablistKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+  const onTablistKeyDown = (event: KeyboardEvent) => {
     const targets: Record<string, number> = {
-      ArrowDown: active + 1,
-      ArrowUp: active - 1,
+      ArrowDown: active() + 1,
+      ArrowUp: active() - 1,
       Home: 0,
       End: TOTAL - 1,
     };
@@ -558,152 +545,156 @@ export function Solutions() {
     select(next, event.target);
   };
 
-  if (!activeItem) return null;
-
   return (
-    <section
-      id="products-solutions"
-      aria-labelledby={titleId}
-      onKeyDown={onSectionKeyDown}
-      {...stylex.props(styles.section)}
-    >
-      <div {...stylex.props(styles.shell)}>
-        <header {...stylex.props(styles.head)}>
-          <h2 id={titleId} {...stylex.props(styles.title)}>
-            应用方案
-          </h2>
-          <p {...stylex.props(styles.meta)}>
-            <span {...stylex.props(styles.numeral)}>{TOTAL}</span> 款方案
-          </p>
-        </header>
-        <div {...stylex.props(styles.layout)}>
-          <nav aria-labelledby={titleId} {...stylex.props(styles.nav)}>
-            <div
-              role="tablist"
-              aria-orientation="vertical"
-              aria-labelledby={titleId}
-              onKeyDown={onTablistKeyDown}
-              {...stylex.props(styles.tablist)}
-            >
-              {SOLUTION_ITEMS.map((item, index) => {
-                const selected = index === active;
-                return (
-                  <button
-                    key={item.id}
-                    ref={(node) => {
-                      tabRefs.current[index] = node;
-                    }}
-                    id={tabId(index)}
-                    type="button"
-                    role="tab"
-                    aria-selected={selected}
-                    aria-controls={panelId}
-                    tabIndex={selected ? 0 : -1}
-                    onClick={() => select(index)}
-                    {...stylex.props(styles.tab, selected && styles.tabSelected)}
-                  >
-                    <span
-                      {...stylex.props(
-                        styles.tabIndex,
-                        styles.numeral,
-                        selected && styles.tabIndexSelected,
-                      )}
-                    >
-                      {padIndex(index)}
-                    </span>
-                    <span {...stylex.props(styles.tabTitle, selected && styles.tabTitleSelected)}>
-                      {item.title}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          </nav>
-          <div {...stylex.props(styles.main)}>
-            <div
-              id={panelId}
-              role="tabpanel"
-              aria-labelledby={tabId(active)}
-              tabIndex={0}
-              {...stylex.props(styles.sheet)}
-            >
-              <div {...stylex.props(styles.stack)}>
-                {SOLUTION_ITEMS.map((item, index) => (
-                  <div
-                    key={item.id}
-                    aria-hidden="true"
-                    {...stylex.props(styles.layer, styles.sizer)}
-                  >
-                    <SheetBody item={item} index={index} />
-                  </div>
-                ))}
-                <AnimatePresence initial={false}>
-                  <m.div
-                    key={activeItem.id}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: reduce ? 0 : 0.2, ease: EASE }}
-                    {...stylex.props(styles.layer)}
-                  >
-                    <SheetBody item={activeItem} index={active} />
-                  </m.div>
-                </AnimatePresence>
-              </div>
-            </div>
-            <p aria-live="polite" {...stylex.props(styles.srOnly)}>
-              Solution {active + 1} of {TOTAL}: {activeItem.englishName}
+    <Show when={activeItem()}>
+      <section
+        id="products-solutions"
+        aria-labelledby={titleId}
+        onKeyDown={onSectionKeyDown}
+        {...stylex.attrs(styles.section)}
+      >
+        <div {...stylex.attrs(styles.shell)}>
+          <header {...stylex.attrs(styles.head)}>
+            <h2 id={titleId} {...stylex.attrs(styles.title)}>
+              应用方案
+            </h2>
+            <p {...stylex.attrs(styles.meta)}>
+              <span {...stylex.attrs(styles.numeral)}>{TOTAL}</span> 款方案
             </p>
-            <div {...stylex.props(styles.pager)}>
-              <button
-                type="button"
-                aria-controls={panelId}
-                aria-disabled={atStart}
-                onClick={() => select(active - 1)}
-                {...stylex.props(styles.step, styles.stepPrev, atStart && styles.stepDisabled)}
+          </header>
+          <div {...stylex.attrs(styles.layout)}>
+            <nav aria-labelledby={titleId} {...stylex.attrs(styles.nav)}>
+              <div
+                role="tablist"
+                aria-orientation="vertical"
+                aria-labelledby={titleId}
+                onKeyDown={onTablistKeyDown}
+                {...stylex.attrs(styles.tablist)}
               >
-                <ChevronLeft size={16} strokeWidth={1.5} absoluteStrokeWidth aria-hidden="true" />
-                <span aria-hidden="true" {...stylex.props(styles.stepLabel)}>
-                  上一个
-                </span>
-                <span {...stylex.props(styles.srOnly)}>Previous</span>
-              </button>
-              <div role="group" aria-label="Choose a solution" {...stylex.props(styles.dots)}>
                 {SOLUTION_ITEMS.map((item, index) => {
-                  const selected = index === active;
+                  const selected = () => index === active();
                   return (
                     <button
-                      key={item.id}
                       ref={(node) => {
-                        dotRefs.current[index] = node;
+                        tabs[index] = node;
                       }}
+                      id={tabId(index)}
                       type="button"
-                      aria-label={item.englishName}
-                      aria-current={selected ? "true" : undefined}
+                      role="tab"
+                      aria-selected={selected() ? "true" : "false"}
                       aria-controls={panelId}
+                      tabindex={selected() ? 0 : -1}
                       onClick={() => select(index)}
-                      {...stylex.props(styles.dot, selected && styles.dotSelected)}
-                    />
+                      {...stylex.attrs(styles.tab, selected() && styles.tabSelected)}
+                    >
+                      <span
+                        {...stylex.attrs(
+                          styles.tabIndex,
+                          styles.numeral,
+                          selected() && styles.tabIndexSelected,
+                        )}
+                      >
+                        {padIndex(index)}
+                      </span>
+                      <span
+                        {...stylex.attrs(styles.tabTitle, selected() && styles.tabTitleSelected)}
+                      >
+                        {item.title}
+                      </span>
+                    </button>
                   );
                 })}
               </div>
-              <button
-                type="button"
-                aria-controls={panelId}
-                aria-disabled={atEnd}
-                onClick={() => select(active + 1)}
-                {...stylex.props(styles.step, styles.stepNext, atEnd && styles.stepDisabled)}
+            </nav>
+            <div {...stylex.attrs(styles.main)}>
+              <div
+                id={panelId}
+                role="tabpanel"
+                aria-labelledby={tabId(active())}
+                tabindex={0}
+                {...stylex.attrs(styles.sheet)}
               >
-                <span aria-hidden="true" {...stylex.props(styles.stepLabel)}>
-                  下一个
-                </span>
-                <span {...stylex.props(styles.srOnly)}>Next</span>
-                <ChevronRight size={16} strokeWidth={1.5} absoluteStrokeWidth aria-hidden="true" />
-              </button>
+                <div {...stylex.attrs(styles.stack)}>
+                  {SOLUTION_ITEMS.map((item, index) => (
+                    <div aria-hidden="true" {...stylex.attrs(styles.layer, styles.sizer)}>
+                      <SheetBody item={item} index={index} />
+                    </div>
+                  ))}
+                  <AnimatePresence initial={false}>
+                    <Show when={activeItem()} keyed>
+                      {(item) => (
+                        <m.div
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          exit={{ opacity: 0 }}
+                          transition={{ duration: reduce() ? 0 : 0.2, ease: EASE }}
+                          {...stylex.attrs(styles.layer)}
+                        >
+                          <SheetBody item={item} index={SOLUTION_ITEMS.indexOf(item)} />
+                        </m.div>
+                      )}
+                    </Show>
+                  </AnimatePresence>
+                </div>
+              </div>
+              <p aria-live="polite" {...stylex.attrs(styles.srOnly)}>
+                Solution {active() + 1} of {TOTAL}: {activeItem()?.englishName}
+              </p>
+              <div {...stylex.attrs(styles.pager)}>
+                <button
+                  type="button"
+                  aria-controls={panelId}
+                  aria-disabled={atStart() ? "true" : "false"}
+                  onClick={() => select(active() - 1)}
+                  {...stylex.attrs(styles.step, styles.stepPrev, atStart() && styles.stepDisabled)}
+                >
+                  <ChevronLeft size={16} strokeWidth={1.5} absoluteStrokeWidth aria-hidden="true" />
+                  <span aria-hidden="true" {...stylex.attrs(styles.stepLabel)}>
+                    上一个
+                  </span>
+                  <span {...stylex.attrs(styles.srOnly)}>Previous</span>
+                </button>
+                <div role="group" aria-label="Choose a solution" {...stylex.attrs(styles.dots)}>
+                  {SOLUTION_ITEMS.map((item, index) => {
+                    const selected = () => index === active();
+                    return (
+                      <button
+                        ref={(node) => {
+                          dots[index] = node;
+                        }}
+                        type="button"
+                        aria-label={item.englishName}
+                        aria-current={selected() ? "true" : undefined}
+                        aria-controls={panelId}
+                        onClick={() => select(index)}
+                        {...stylex.attrs(styles.dot, selected() && styles.dotSelected)}
+                      />
+                    );
+                  })}
+                </div>
+                <button
+                  type="button"
+                  aria-controls={panelId}
+                  aria-disabled={atEnd() ? "true" : "false"}
+                  onClick={() => select(active() + 1)}
+                  {...stylex.attrs(styles.step, styles.stepNext, atEnd() && styles.stepDisabled)}
+                >
+                  <span aria-hidden="true" {...stylex.attrs(styles.stepLabel)}>
+                    下一个
+                  </span>
+                  <span {...stylex.attrs(styles.srOnly)}>Next</span>
+                  <ChevronRight
+                    size={16}
+                    strokeWidth={1.5}
+                    absoluteStrokeWidth
+                    aria-hidden="true"
+                  />
+                </button>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
+    </Show>
   );
 }

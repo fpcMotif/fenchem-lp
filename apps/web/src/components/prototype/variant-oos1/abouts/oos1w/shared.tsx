@@ -1,6 +1,7 @@
 import * as stylex from "@stylexjs/stylex";
-import type { ReactNode } from "react";
+import type { JSX } from "@solidjs/web";
 import { bp, face, tone } from "./tokens.stylex";
+import { merge } from "solid-js";
 
 export const LIGHT_WEIGHT_FONT =
   "https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300&display=swap";
@@ -64,47 +65,35 @@ const head = stylex.create({
   },
 });
 
-export function SectionHead({
-  num,
-  word,
-  title,
-  titleId,
-  fig,
-  legend,
-  children,
-}: {
+export function SectionHead(props: {
   num: string;
   word: string;
   title: string | readonly string[];
   titleId: string;
   fig?: string;
   legend?: string;
-  children?: ReactNode;
+  children?: JSX.Element;
 }) {
   return (
     <>
-      <p {...stylex.props(head.eyebrow)}>
-        <span {...stylex.props(head.num)}>{num}</span>
-        <span lang="en" {...stylex.props(head.word)}>
-          {word}
+      <p {...stylex.attrs(head.eyebrow)}>
+        <span {...stylex.attrs(head.num)}>{props.num}</span>
+        <span lang="en" {...stylex.attrs(head.word)}>
+          {props.word}
         </span>
       </p>
-      <h2 id={titleId} {...stylex.props(head.title)}>
-        {typeof title === "string"
-          ? title
-          : title.map((line) => (
-              <span key={line} {...stylex.props(head.line)}>
-                {line}
-              </span>
-            ))}
+      <h2 id={props.titleId} {...stylex.attrs(head.title)}>
+        {typeof props.title === "string"
+          ? props.title
+          : props.title.map((line) => <span {...stylex.attrs(head.line)}>{line}</span>)}
       </h2>
-      {legend ? (
-        <p lang="en" {...stylex.props(head.legend)}>
-          {fig ? <span {...stylex.props(head.fig)}>{fig}</span> : null}
-          <span {...stylex.props(head.italic)}>{legend}</span>
+      {props.legend ? (
+        <p lang="en" {...stylex.attrs(head.legend)}>
+          {props.fig ? <span {...stylex.attrs(head.fig)}>{props.fig}</span> : null}
+          <span {...stylex.attrs(head.italic)}>{props.legend}</span>
         </p>
       ) : null}
-      {children}
+      {props.children}
     </>
   );
 }
@@ -143,12 +132,13 @@ const rf = stylex.create({
   },
 });
 
-export function Rf({ value, ahead = false }: { value: number; ahead?: boolean }) {
+export function Rf(props: { value: number; ahead?: boolean }) {
+  const p = merge({ ahead: false }, props);
   return (
-    <span aria-hidden="true" {...stylex.props(rf.root, ahead && rf.ahead)}>
-      <span {...stylex.props(rf.r)}>R</span>
-      <span {...stylex.props(rf.f)}>f</span>
-      <span {...stylex.props(rf.value)}>{value.toFixed(2)}</span>
+    <span aria-hidden="true" {...stylex.attrs(rf.root, p.ahead && rf.ahead)}>
+      <span {...stylex.attrs(rf.r)}>R</span>
+      <span {...stylex.attrs(rf.f)}>f</span>
+      <span {...stylex.attrs(rf.value)}>{p.value.toFixed(2)}</span>
     </span>
   );
 }

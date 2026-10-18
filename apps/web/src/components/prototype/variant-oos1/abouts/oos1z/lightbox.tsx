@@ -1,7 +1,7 @@
 import { LightboxStage } from "../../../shared/lightbox-stage";
 import { LightboxDialog, type LightboxState } from "../../../shared/lightbox";
 import * as stylex from "@stylexjs/stylex";
-import { ArrowLeft, ArrowRight, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, X } from "@fenchem-lp/ui/components/lucide";
 
 import { PLACE, WORKS, ui } from "./shared";
 import { bp, chrome, face, tone } from "./tokens.stylex";
@@ -127,23 +127,29 @@ const styles = stylex.create({
   },
 });
 
-export function Lightbox({ lightbox }: { lightbox: LightboxState }) {
-  const { stepped, close: onClose, step: onStep } = lightbox;
+export function Lightbox(props: { lightbox: LightboxState }) {
+  const onClose = () => props.lightbox.close();
+  const onStep = (delta: number) => props.lightbox.step(delta);
   return (
-    <LightboxDialog lightbox={lightbox} items={WORKS} sx={styles.dialog} label="Campus images">
+    <LightboxDialog
+      lightbox={props.lightbox}
+      items={WORKS}
+      sx={styles.dialog}
+      label="Campus images"
+    >
       {(work) => (
         <>
           <LightboxStage onClose={onClose} sx={styles.room}>
-            <figure key={stepped ? work.id : "open"} {...stylex.props(styles.figure)}>
-              <div {...stylex.props(styles.frame)}>
-                <img src={work.large} alt={work.alt} {...stylex.props(styles.image)} />
+            <figure {...stylex.attrs(styles.figure)}>
+              <div {...stylex.attrs(styles.frame)}>
+                <img src={work.large} alt={work.alt} {...stylex.attrs(styles.image)} />
               </div>
-              <figcaption {...stylex.props(styles.label)}>
-                <span lang="en" {...stylex.props(ui.number, styles.number)}>
+              <figcaption {...stylex.attrs(styles.label)}>
+                <span lang="en" {...stylex.attrs(ui.number, styles.number)}>
                   Nº {work.number}
                 </span>
-                <span {...stylex.props(styles.title)}>{work.caption}</span>
-                <span lang="en" {...stylex.props(ui.italic, styles.meta)}>
+                <span {...stylex.attrs(styles.title)}>{work.caption}</span>
+                <span lang="en" {...stylex.attrs(ui.italic, styles.meta)}>
                   {work.english}, {PLACE}
                 </span>
               </figcaption>
@@ -153,7 +159,7 @@ export function Lightbox({ lightbox }: { lightbox: LightboxState }) {
             type="button"
             aria-label="Previous image"
             onClick={() => onStep(-1)}
-            {...stylex.props(ui.button, ui.focus, styles.control, styles.prev)}
+            {...stylex.attrs(ui.button, ui.focus, styles.control, styles.prev)}
           >
             <ArrowLeft size={18} strokeWidth={1.5} aria-hidden="true" />
           </button>
@@ -161,7 +167,7 @@ export function Lightbox({ lightbox }: { lightbox: LightboxState }) {
             type="button"
             aria-label="Next image"
             onClick={() => onStep(1)}
-            {...stylex.props(ui.button, ui.focus, styles.control, styles.next)}
+            {...stylex.attrs(ui.button, ui.focus, styles.control, styles.next)}
           >
             <ArrowRight size={18} strokeWidth={1.5} aria-hidden="true" />
           </button>
@@ -169,7 +175,7 @@ export function Lightbox({ lightbox }: { lightbox: LightboxState }) {
             type="button"
             aria-label="Close"
             onClick={onClose}
-            {...stylex.props(ui.button, ui.focus, styles.control, styles.close)}
+            {...stylex.attrs(ui.button, ui.focus, styles.control, styles.close)}
           >
             <X size={18} strokeWidth={1.5} aria-hidden="true" />
           </button>

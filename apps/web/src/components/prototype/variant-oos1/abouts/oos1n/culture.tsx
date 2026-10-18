@@ -72,14 +72,14 @@ export function Culture() {
 
   return (
     <Section id={chip.id} label={ABOUT_CULTURE.eyebrow} background={ui.onPage}>
-      <ul {...stylex.props(s.list)}>
+      <ul {...stylex.attrs(s.list)}>
         {ABOUT_CULTURE.values.map((value) => (
-          <Reveal key={value.title} as="li" sx={s.row}>
-            <span aria-hidden="true" {...stylex.props(s.glyph, GLYPH_TONE[value.tone])}>
+          <Reveal as="li" sx={s.row}>
+            <span aria-hidden="true" {...stylex.attrs(s.glyph, GLYPH_TONE[value.tone])}>
               {value.glyph}
             </span>
-            <h3 {...stylex.props(s.title)}>{value.title}</h3>
-            <p {...stylex.props(s.desc)}>{value.desc}</p>
+            <h3 {...stylex.attrs(s.title)}>{value.title}</h3>
+            <p {...stylex.attrs(s.desc)}>{value.desc}</p>
           </Reveal>
         ))}
       </ul>

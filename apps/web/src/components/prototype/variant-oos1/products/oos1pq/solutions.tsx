@@ -1,8 +1,9 @@
-import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
+import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import { m } from "motion/react";
-import { useEffect, useId, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
+import { ChevronLeft, ChevronRight } from "@fenchem-lp/ui/components/lucide";
+import { m } from "@/compat/motion";
+import { createSignal, createUniqueId, For, onSettled, Show } from "solid-js";
+import type { JSX } from "@solidjs/web";
 
 import { EASE } from "@/components/prototype/motion-constants";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
@@ -26,10 +27,10 @@ const BODY_FONT =
 const NUMERAL_FONT =
   '"Inter Tight", "Source Han Sans SC", "Noto Sans SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif';
 
-const SM = breakpoints.sm;
-const LG = breakpoints.lg;
+const SM = "@media (min-width: 640px)";
+const LG = "@media (min-width: 1024px)";
 const TABLET = "@media (min-width: 768px) and (max-width: 1279.98px)";
-const DESKTOP = breakpoints.xl;
+const DESKTOP = "@media (min-width: 1280px)";
 const INSET = "min(120px, 8.333vw)";
 const HEADER_HEIGHT = 80;
 const SETTLE_MS = 140;
@@ -154,7 +155,10 @@ const styles = stylex.create({
     cursor: "pointer",
     transform: {
       default: null,
-      ":active": { default: null, [breakpoints.motionOk]: "scale(0.97)" },
+      ":active": {
+        default: null,
+        ["@media (prefers-reduced-motion: no-preference)"]: "scale(0.97)",
+      },
     },
     transitionProperty: "color, border-color, transform",
     transitionDuration: "150ms",
@@ -356,44 +360,41 @@ const styles = stylex.create({
   },
 });
 
-function Lines({ lines }: { lines: string[] }) {
+function Lines(props: { lines: string[] }) {
   return (
-    <ul {...stylex.props(styles.lines)}>
-      {lines.map((line) => (
-        <li key={line} {...stylex.props(styles.line)}>
-          {line}
-        </li>
-      ))}
+    <ul {...stylex.attrs(styles.lines)}>
+      <For each={props.lines}>{(line) => <li {...stylex.attrs(styles.line)}>{line}</li>}</For>
     </ul>
   );
 }
 
-function Field({ label, children }: { label: string; children: ReactNode }) {
+function Field(props: { label: string; children: JSX.Element }) {
   return (
-    <div {...stylex.props(styles.fieldRow)}>
-      <dt {...stylex.props(styles.fieldLabel)}>{label}</dt>
-      <dd {...stylex.props(styles.fieldValue)}>{children}</dd>
+    <div {...stylex.attrs(styles.fieldRow)}>
+      <dt {...stylex.attrs(styles.fieldLabel)}>{props.label}</dt>
+      <dd {...stylex.attrs(styles.fieldValue)}>{props.children}</dd>
     </div>
   );
 }
 
-function Sheet({ item, index }: { item: SolutionItem; index: number }) {
-  const titleId = useId();
+function Sheet(props: { item: SolutionItem; index: number }) {
+  const item = props.item;
+  const titleId = createUniqueId();
   return (
     <article
       aria-labelledby={titleId}
       aria-roledescription="Solution"
-      {...stylex.props(styles.sheet)}
+      {...stylex.attrs(styles.sheet)}
     >
-      <header {...stylex.props(styles.sheetHead)}>
-        <span {...stylex.props(styles.sheetNumber)}>{padIndex(index)}</span>
-        <h3 id={titleId} {...stylex.props(styles.sheetTitle)}>
+      <header {...stylex.attrs(styles.sheetHead)}>
+        <span {...stylex.attrs(styles.sheetNumber)}>{padIndex(props.index)}</span>
+        <h3 id={titleId} {...stylex.attrs(styles.sheetTitle)}>
           {item.title}
         </h3>
-        <p {...stylex.props(styles.sheetSubtitle)}>{item.subtitle}</p>
+        <p {...stylex.attrs(styles.sheetSubtitle)}>{item.subtitle}</p>
       </header>
-      <div {...stylex.props(styles.fields)}>
-        <dl {...stylex.props(styles.fieldList)}>
+      <div {...stylex.attrs(styles.fields)}>
+        <dl {...stylex.attrs(styles.fieldList)}>
           <Field label="概述">
             <Lines lines={item.overview} />
           </Field>
@@ -404,7 +405,7 @@ function Sheet({ item, index }: { item: SolutionItem; index: number }) {
             <Lines lines={item.keyIngredients} />
           </Field>
         </dl>
-        <dl {...stylex.props(styles.fieldList, styles.fieldListFollow)}>
+        <dl {...stylex.attrs(styles.fieldList, styles.fieldListFollow)}>
           {item.challenges.length > 0 && (
             <Field label="配方挑战">
               <Lines lines={item.challenges} />
@@ -424,57 +425,53 @@ function Sheet({ item, index }: { item: SolutionItem; index: number }) {
 
 export function Solutions() {
   const reduce = useReducedMotion();
-  const titleId = useId();
-  const trackId = useId();
-  const trackRef = useRef<HTMLDivElement>(null);
-  const pendingRef = useRef<number | null>(null);
-  const settleTimer = useRef(0);
-  const frame = useRef(0);
-  const [active, setActive] = useState(0);
+  const titleId = createUniqueId();
+  const trackId = createUniqueId();
+  let track: HTMLDivElement | undefined;
+  let pending: number | null = null;
+  let settleTimer = 0;
+  let frame = 0;
+  const [active, setActive] = createSignal(0);
 
-  useEffect(() => {
-    const track = trackRef.current;
+  onSettled(() => {
     if (track) setActive(nearestIndex(track));
     return () => {
-      window.clearTimeout(settleTimer.current);
-      window.cancelAnimationFrame(frame.current);
+      window.clearTimeout(settleTimer);
+      window.cancelAnimationFrame(frame);
     };
-  }, []);
+  });
 
   const scheduleSettle = () => {
-    window.clearTimeout(settleTimer.current);
-    settleTimer.current = window.setTimeout(() => {
-      pendingRef.current = null;
-      const track = trackRef.current;
+    window.clearTimeout(settleTimer);
+    settleTimer = window.setTimeout(() => {
+      pending = null;
       if (track) setActive(nearestIndex(track));
     }, SETTLE_MS);
   };
 
   const goTo = (index: number) => {
-    const track = trackRef.current;
     if (!track) return;
     const target = clampIndex(index);
     const sheet = sheetsOf(track)[target];
     if (!sheet) return;
-    pendingRef.current = target;
+    pending = target;
     setActive(target);
-    track.scrollTo({ left: sheet.offsetLeft, behavior: reduce ? "auto" : "smooth" });
+    track.scrollTo({ left: sheet.offsetLeft, behavior: reduce() ? "auto" : "smooth" });
     scheduleSettle();
   };
 
-  const step = (delta: number) => goTo((pendingRef.current ?? active) + delta);
+  const step = (delta: number) => goTo((pending ?? active()) + delta);
 
   const handleScroll = () => {
     scheduleSettle();
-    if (pendingRef.current !== null) return;
-    window.cancelAnimationFrame(frame.current);
-    frame.current = window.requestAnimationFrame(() => {
-      const track = trackRef.current;
+    if (pending !== null) return;
+    window.cancelAnimationFrame(frame);
+    frame = window.requestAnimationFrame(() => {
       if (track) setActive(nearestIndex(track));
     });
   };
 
-  const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+  const handleKeyDown = (event: KeyboardEvent) => {
     if (event.target !== event.currentTarget) return;
     const moves: Record<string, () => void> = {
       ArrowRight: () => step(1),
@@ -489,94 +486,96 @@ export function Solutions() {
     move();
   };
 
-  const atStart = active === 0;
-  const atEnd = active === COUNT - 1;
-  const current = SOLUTION_ITEMS[active];
+  const atStart = () => active() === 0;
+  const atEnd = () => active() === COUNT - 1;
+  const current = () => SOLUTION_ITEMS[active()];
 
   return (
-    <section id="products-solutions" aria-labelledby={titleId} {...stylex.props(styles.section)}>
-      <div {...stylex.props(styles.shell)}>
-        <header {...stylex.props(styles.head)}>
-          <h2 id={titleId} {...stylex.props(styles.title)}>
+    <section id="products-solutions" aria-labelledby={titleId} {...stylex.attrs(styles.section)}>
+      <div {...stylex.attrs(styles.shell)}>
+        <header {...stylex.attrs(styles.head)}>
+          <h2 id={titleId} {...stylex.attrs(styles.title)}>
             应用方案
           </h2>
-          <div {...stylex.props(styles.controls)}>
-            <p aria-live="polite" aria-atomic="true" {...stylex.props(styles.counter)}>
+          <div {...stylex.attrs(styles.controls)}>
+            <p aria-live="polite" aria-atomic="true" {...stylex.attrs(styles.counter)}>
               <span aria-hidden="true">
-                <m.span
-                  key={active}
-                  initial={{ opacity: 0, y: 4 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: reduce ? 0 : 0.18, ease: EASE }}
-                  {...stylex.props(styles.counterCurrent)}
-                >
-                  {padIndex(active)}
-                </m.span>
-                <span {...stylex.props(styles.counterTotal)}> / {TOTAL_LABEL}</span>
+                <Show when={padIndex(active())} keyed>
+                  {(label) => (
+                    <m.span
+                      initial={{ opacity: 0, y: 4 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: reduce() ? 0 : 0.18, ease: EASE }}
+                      {...stylex.attrs(styles.counterCurrent)}
+                    >
+                      {label}
+                    </m.span>
+                  )}
+                </Show>
+                <span {...stylex.attrs(styles.counterTotal)}> / {TOTAL_LABEL}</span>
               </span>
-              <span {...stylex.props(styles.srOnly)}>
-                Solution {active + 1} of {COUNT}: {current?.englishName}
+              <span {...stylex.attrs(styles.srOnly)}>
+                Solution {active() + 1} of {COUNT}: {current()?.englishName}
               </span>
             </p>
             <button
               type="button"
               aria-controls={trackId}
-              aria-disabled={atStart}
+              aria-disabled={atStart() ? "true" : "false"}
               onClick={() => {
-                if (!atStart) step(-1);
+                if (!atStart()) step(-1);
               }}
-              {...stylex.props(styles.navButton, atStart && styles.navButtonDisabled)}
+              {...stylex.attrs(styles.navButton, atStart() && styles.navButtonDisabled)}
             >
               <ChevronLeft size={16} strokeWidth={1.5} absoluteStrokeWidth aria-hidden="true" />
-              <span aria-hidden="true" {...stylex.props(styles.navLabel)}>
+              <span aria-hidden="true" {...stylex.attrs(styles.navLabel)}>
                 上一个
               </span>
-              <span {...stylex.props(styles.srOnly)}>Previous</span>
+              <span {...stylex.attrs(styles.srOnly)}>Previous</span>
             </button>
             <button
               type="button"
               aria-controls={trackId}
-              aria-disabled={atEnd}
+              aria-disabled={atEnd() ? "true" : "false"}
               onClick={() => {
-                if (!atEnd) step(1);
+                if (!atEnd()) step(1);
               }}
-              {...stylex.props(styles.navButton, atEnd && styles.navButtonDisabled)}
+              {...stylex.attrs(styles.navButton, atEnd() && styles.navButtonDisabled)}
             >
-              <span aria-hidden="true" {...stylex.props(styles.navLabel)}>
+              <span aria-hidden="true" {...stylex.attrs(styles.navLabel)}>
                 下一个
               </span>
-              <span {...stylex.props(styles.srOnly)}>Next</span>
+              <span {...stylex.attrs(styles.srOnly)}>Next</span>
               <ChevronRight size={16} strokeWidth={1.5} absoluteStrokeWidth aria-hidden="true" />
             </button>
           </div>
         </header>
         <div
-          ref={trackRef}
+          ref={track}
           id={trackId}
           role="region"
           aria-roledescription="Carousel"
           aria-label="Application solution list; use the left and right arrow keys to switch"
-          tabIndex={0}
+          tabindex={0}
           onScroll={handleScroll}
           onKeyDown={handleKeyDown}
-          {...stylex.props(styles.track)}
+          {...stylex.attrs(styles.track)}
         >
           {SOLUTION_ITEMS.map((item, index) => (
-            <Sheet key={item.id} item={item} index={index} />
+            <Sheet item={item} index={index} />
           ))}
         </div>
-        <div role="group" aria-label="Jump to solution" {...stylex.props(styles.dots)}>
+        <div role="group" aria-label="Jump to solution" {...stylex.attrs(styles.dots)}>
           {SOLUTION_ITEMS.map((item, index) => {
-            const isCurrent = index === active;
+            const isCurrent = () => index === active();
             return (
               <button
-                key={item.id}
                 type="button"
                 aria-label={`${padIndex(index)} ${item.englishName}`}
-                aria-current={isCurrent ? "true" : undefined}
+                aria-current={isCurrent() ? "true" : undefined}
                 aria-controls={trackId}
                 onClick={() => goTo(index)}
-                {...stylex.props(styles.dot, isCurrent && styles.dotCurrent)}
+                {...stylex.attrs(styles.dot, isCurrent() && styles.dotCurrent)}
               >
                 {padIndex(index)}
               </button>

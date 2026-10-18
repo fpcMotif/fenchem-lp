@@ -78,26 +78,26 @@ export function Csr() {
   return (
     <Section id="about-csr" labelledBy="about-csr-title" surface="page">
       <SectionName id="about-csr-title">Responsibility</SectionName>
-      <div {...stylex.props(base.shell, base.inset, S.grid)}>
+      <div {...stylex.attrs(base.shell, base.inset, S.grid)}>
         <Reveal>
           <img
             src={ABOUT_CSR.image}
             alt={ABOUT_CSR.imageAlt}
             loading="lazy"
             decoding="async"
-            {...stylex.props(S.photo)}
+            {...stylex.attrs(S.photo)}
           />
         </Reveal>
         <Reveal delay={120} sx={S.copy}>
-          <p {...stylex.props(S.statement)}>
-            <span {...stylex.props(S.statementLine)}>{lead}</span>
-            <span {...stylex.props(S.statementLine)}>{tail}</span>
+          <p {...stylex.attrs(S.statement)}>
+            <span {...stylex.attrs(S.statementLine)}>{lead}</span>
+            <span {...stylex.attrs(S.statementLine)}>{tail}</span>
           </p>
-          <p {...stylex.props(base.prose)}>{ABOUT_CSR.desc}</p>
-          <ul {...stylex.props(S.outcomes)}>
+          <p {...stylex.attrs(base.prose)}>{ABOUT_CSR.desc}</p>
+          <ul {...stylex.attrs(S.outcomes)}>
             {ABOUT_CSR.outcomes.map((outcome) => (
-              <li key={outcome.title} {...stylex.props(S.outcome)}>
-                <span aria-hidden="true" {...stylex.props(S.dot)} />
+              <li {...stylex.attrs(S.outcome)}>
+                <span aria-hidden="true" {...stylex.attrs(S.dot)} />
                 {outcome.title}
               </li>
             ))}

@@ -1,12 +1,12 @@
 import { breakpoints } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { useId, useState } from "react";
 
 import { ABOUT_STRUCTURE } from "../../about-data";
 import { Reveal } from "./motion";
 import { Section, SectionName } from "./primitives";
 import { base } from "./primitives-values";
 import { font, media, tone } from "./shear.stylex";
+import { createSignal, createUniqueId } from "solid-js";
 
 const S = stylex.create({
   grid: {
@@ -99,31 +99,28 @@ const S = stylex.create({
 });
 
 export function Structure() {
-  const [showDiagram, setShowDiagram] = useState(false);
-  const diagramId = useId();
+  const [showDiagram, setShowDiagram] = createSignal(false);
+  const diagramId = createUniqueId();
   const { holding, subsidiaries } = ABOUT_STRUCTURE;
   return (
     <Section id="about-structure" labelledBy="about-structure-title" surface="page">
       <SectionName id="about-structure-title">{ABOUT_STRUCTURE.eyebrow}</SectionName>
-      <div {...stylex.props(base.shell, base.inset)}>
-        <div {...stylex.props(S.grid)}>
+      <div {...stylex.attrs(base.shell, base.inset)}>
+        <div {...stylex.attrs(S.grid)}>
           <Reveal sx={S.holding}>
-            <p {...stylex.props(base.quiet)}>{holding.badge}</p>
-            <h3 {...stylex.props(S.name)}>{holding.name}</h3>
-            <p lang="en" {...stylex.props(base.quiet)}>
+            <p {...stylex.attrs(base.quiet)}>{holding.badge}</p>
+            <h3 {...stylex.attrs(S.name)}>{holding.name}</h3>
+            <p lang="en" {...stylex.attrs(base.quiet)}>
               {holding.english}
             </p>
           </Reveal>
           <Reveal delay={120}>
-            <p {...stylex.props(base.quiet)}>{ABOUT_STRUCTURE.subsidiaryBadge}</p>
-            <ul {...stylex.props(S.rows)}>
+            <p {...stylex.attrs(base.quiet)}>{ABOUT_STRUCTURE.subsidiaryBadge}</p>
+            <ul {...stylex.attrs(S.rows)}>
               {subsidiaries.map((sub, index) => (
-                <li
-                  key={sub.id}
-                  {...stylex.props(S.row, index === subsidiaries.length - 1 && S.rowLast)}
-                >
-                  <h4 {...stylex.props(S.subName)}>{sub.name}</h4>
-                  <span lang="en" {...stylex.props(base.quiet)}>
+                <li {...stylex.attrs(S.row, index === subsidiaries.length - 1 && S.rowLast)}>
+                  <h4 {...stylex.attrs(S.subName)}>{sub.name}</h4>
+                  <span lang="en" {...stylex.attrs(base.quiet)}>
                     {sub.english}
                   </span>
                 </li>
@@ -131,23 +128,23 @@ export function Structure() {
             </ul>
           </Reveal>
         </div>
-        <div {...stylex.props(S.toggleWrap)}>
+        <div {...stylex.attrs(S.toggleWrap)}>
           <button
             type="button"
-            aria-expanded={showDiagram}
+            aria-expanded={showDiagram() ? "true" : "false"}
             aria-controls={diagramId}
             onClick={() => setShowDiagram((prev) => !prev)}
-            {...stylex.props(S.toggle, base.focusRing)}
+            {...stylex.attrs(S.toggle, base.focusRing)}
           >
-            {showDiagram ? "收起组织架构图" : "查看官方组织架构图"}
+            {showDiagram() ? "收起组织架构图" : "查看官方组织架构图"}
           </button>
-          <div id={diagramId} hidden={!showDiagram} {...stylex.props(S.diagram)}>
+          <div id={diagramId} hidden={!showDiagram()} {...stylex.attrs(S.diagram)}>
             <img
               src={ABOUT_STRUCTURE.chartImage}
               alt="Official organizational chart of Nanjing Fenchem International Holdings Corporation Limited"
               loading="lazy"
               decoding="async"
-              {...stylex.props(S.diagramImage)}
+              {...stylex.attrs(S.diagramImage)}
             />
           </div>
         </div>

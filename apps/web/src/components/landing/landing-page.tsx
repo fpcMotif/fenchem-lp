@@ -9,7 +9,7 @@ import {
   ShieldCheck,
   Sprout,
   Truck,
-} from "lucide-react";
+} from "@fenchem-lp/ui/components/lucide";
 
 import {
   certifications,
@@ -1073,8 +1073,8 @@ const ingredientGroups = [
 
 export function LandingPage() {
   return (
-    <main {...stylex.props(styles.main)}>
-      <a href="#industries" {...stylex.props(styles.skipLink)}>
+    <main {...stylex.attrs(styles.main)}>
+      <a href="#industries" {...stylex.attrs(styles.skipLink)}>
         Skip to ingredients
       </a>
       <Hero />
@@ -1089,55 +1089,55 @@ export function LandingPage() {
 
 function Hero() {
   return (
-    <section {...stylex.props(styles.heroSection)}>
+    <section {...stylex.attrs(styles.heroSection)}>
       <img
         src={heroImage.src}
         alt={heroImage.alt}
-        {...stylex.props(styles.heroImage)}
+        {...stylex.attrs(styles.heroImage)}
         loading="eager"
       />
-      <div {...stylex.props(styles.heroOverlay)} />
-      <header {...stylex.props(styles.heroHeader)}>
-        <a href="#top" {...stylex.props(styles.brandLink)}>
+      <div {...stylex.attrs(styles.heroOverlay)} />
+      <header {...stylex.attrs(styles.heroHeader)}>
+        <a href="#top" {...stylex.attrs(styles.brandLink)}>
           Fenchem
         </a>
-        <nav aria-label="Primary navigation" {...stylex.props(styles.headerNav)}>
+        <nav aria-label="Primary navigation" {...stylex.attrs(styles.headerNav)}>
           {navLinks.map((link) => (
-            <a key={link.section} href={toAnchor(link.section)} {...stylex.props(styles.navLink)}>
+            <a href={toAnchor(link.section)} {...stylex.attrs(styles.navLink)}>
               {link.label}
             </a>
           ))}
         </nav>
         <a
           href={createInquiryHref("contact")}
-          {...stylex.props(styles.actionBase, styles.headerAction)}
+          {...stylex.attrs(styles.actionBase, styles.headerAction)}
         >
           Request specs
-          <ArrowRight {...stylex.props(styles.iconSm)} aria-hidden />
+          <ArrowRight {...stylex.attrs(styles.iconSm)} aria-hidden="true" />
         </a>
       </header>
 
-      <div id="top" {...stylex.props(styles.heroContent)}>
-        <div {...stylex.props(styles.heroTextWrapper)}>
-          <p {...stylex.props(styles.eyebrow, styles.textMint)}>
+      <div id="top" {...stylex.attrs(styles.heroContent)}>
+        <div {...stylex.attrs(styles.heroTextWrapper)}>
+          <p {...stylex.attrs(styles.eyebrow, styles.textMint)}>
             Botanical intelligence since 1995
           </p>
-          <h1 {...stylex.props(styles.heroTitle)}>Fenchem</h1>
-          <p {...stylex.props(styles.heroParagraph)}>
+          <h1 {...stylex.attrs(styles.heroTitle)}>Fenchem</h1>
+          <p {...stylex.attrs(styles.heroParagraph)}>
             Production-ready botanical and functional ingredients for nutrition, food, beverage, and
             personal care teams that need clean specifications without procurement friction.
           </p>
-          <div {...stylex.props(styles.heroActions)}>
+          <div {...stylex.attrs(styles.heroActions)}>
             <a
               href={toAnchor("industries")}
-              {...stylex.props(styles.actionBase, styles.heroPrimaryCta)}
+              {...stylex.attrs(styles.actionBase, styles.heroPrimaryCta)}
             >
               Explore portfolio
-              <ArrowRight {...stylex.props(styles.iconSm)} aria-hidden />
+              <ArrowRight {...stylex.attrs(styles.iconSm)} aria-hidden="true" />
             </a>
             <a
               href={createInquiryHref("quality")}
-              {...stylex.props(styles.actionBase, styles.heroSecondaryCta)}
+              {...stylex.attrs(styles.actionBase, styles.heroSecondaryCta)}
             >
               Request documentation
             </a>
@@ -1145,19 +1145,16 @@ function Hero() {
         </div>
       </div>
 
-      <div {...stylex.props(styles.heroStatsBar)}>
-        <dl {...stylex.props(styles.statsGrid)}>
+      <div {...stylex.attrs(styles.heroStatsBar)}>
+        <dl {...stylex.attrs(styles.statsGrid)}>
           {[
             ["30+", "years of ingredient expertise"],
             ["40+", "countries supported"],
             ["ISO/GMP", "audited quality systems"],
           ].map(([value, label], index) => (
-            <div
-              key={label}
-              {...stylex.props(styles.statItem, index === 0 && styles.statItemFirst)}
-            >
-              <dt {...stylex.props(styles.statLabel)}>{label}</dt>
-              <dd {...stylex.props(styles.statValue)}>{value}</dd>
+            <div {...stylex.attrs(styles.statItem, index === 0 && styles.statItemFirst)}>
+              <dt {...stylex.attrs(styles.statLabel)}>{label}</dt>
+              <dd {...stylex.attrs(styles.statValue)}>{value}</dd>
             </div>
           ))}
         </dl>
@@ -1168,20 +1165,20 @@ function Hero() {
 
 function IndustryProof() {
   return (
-    <section id="industries" {...stylex.props(styles.industrySection)}>
-      <div {...stylex.props(styles.container)}>
-        <div {...stylex.props(styles.industryHeader)}>
+    <section id="industries" {...stylex.attrs(styles.industrySection)}>
+      <div {...stylex.attrs(styles.container)}>
+        <div {...stylex.attrs(styles.industryHeader)}>
           <div>
-            <p {...stylex.props(styles.eyebrow, styles.textMoss)}>Supply-ready applications</p>
-            <h2 {...stylex.props(styles.industryTitle)}>Built for real formulation work.</h2>
+            <p {...stylex.attrs(styles.eyebrow, styles.textMoss)}>Supply-ready applications</p>
+            <h2 {...stylex.attrs(styles.industryTitle)}>Built for real formulation work.</h2>
           </div>
-          <p {...stylex.props(styles.industryDescription)}>
+          <p {...stylex.attrs(styles.industryDescription)}>
             The page is quiet on purpose: direct ingredient categories, visible proof, and clear
             contact routes for buyers who already know what they need.
           </p>
         </div>
 
-        <div {...stylex.props(styles.proofGrid)}>
+        <div {...stylex.attrs(styles.proofGrid)}>
           {proofCards.map((card, index) => {
             const Icon = proofIcons[index];
             const spanStyle =
@@ -1191,25 +1188,25 @@ function IndustryProof() {
                   ? styles.proofCardSpanSecondary
                   : styles.proofCardSpanWide;
             return (
-              <article key={card.title} {...stylex.props(styles.proofCard, spanStyle)}>
-                <div {...stylex.props(styles.proofCardInner)}>
-                  <div {...stylex.props(styles.proofImageWrapper)}>
+              <article {...stylex.attrs(styles.proofCard, spanStyle)}>
+                <div {...stylex.attrs(styles.proofCardInner)}>
+                  <div {...stylex.attrs(styles.proofImageWrapper)}>
                     <img
                       src={card.image.src}
                       alt={card.image.alt}
-                      {...stylex.props(styles.proofCardImage)}
+                      {...stylex.attrs(styles.proofCardImage)}
                       loading={index === 0 ? "eager" : "lazy"}
                     />
                   </div>
-                  <div {...stylex.props(styles.proofCardBody)}>
+                  <div {...stylex.attrs(styles.proofCardBody)}>
                     <div>
-                      <span {...stylex.props(styles.proofIconWrapper)}>
-                        <Icon {...stylex.props(styles.iconMd)} aria-hidden />
+                      <span {...stylex.attrs(styles.proofIconWrapper)}>
+                        <Icon {...stylex.attrs(styles.iconMd)} aria-hidden="true" />
                       </span>
-                      <h3 {...stylex.props(styles.proofCardTitle)}>{card.title}</h3>
-                      <p {...stylex.props(styles.proofCardCopy)}>{card.copy}</p>
+                      <h3 {...stylex.attrs(styles.proofCardTitle)}>{card.title}</h3>
+                      <p {...stylex.attrs(styles.proofCardCopy)}>{card.copy}</p>
                     </div>
-                    <p {...stylex.props(styles.proofCardMetric)}>{card.metric}</p>
+                    <p {...stylex.attrs(styles.proofCardMetric)}>{card.metric}</p>
                   </div>
                 </div>
               </article>
@@ -1223,32 +1220,30 @@ function IndustryProof() {
 
 function QualityProcess() {
   return (
-    <section id="quality" {...stylex.props(styles.qualitySection)}>
-      <div {...stylex.props(styles.qualityGrid)}>
-        <div {...stylex.props(styles.qualityCol)}>
-          <p {...stylex.props(styles.eyebrow, styles.textMoss)}>Quality without the chase</p>
-          <h2 {...stylex.props(styles.qualityTitle)}>
+    <section id="quality" {...stylex.attrs(styles.qualitySection)}>
+      <div {...stylex.attrs(styles.qualityGrid)}>
+        <div {...stylex.attrs(styles.qualityCol)}>
+          <p {...stylex.attrs(styles.eyebrow, styles.textMoss)}>Quality without the chase</p>
+          <h2 {...stylex.attrs(styles.qualityTitle)}>
             Every lot has a paper trail before it has a sales story.
           </h2>
-          <div {...stylex.props(styles.certList)}>
+          <div {...stylex.attrs(styles.certList)}>
             {certifications.map((certification) => (
-              <span key={certification} {...stylex.props(styles.certBadge)}>
-                {certification}
-              </span>
+              <span {...stylex.attrs(styles.certBadge)}>{certification}</span>
             ))}
           </div>
         </div>
 
-        <ol {...stylex.props(styles.processList)}>
+        <ol {...stylex.attrs(styles.processList)}>
           {processSteps.map((step, index) => (
-            <li key={step.title} {...stylex.props(styles.processItem)}>
-              <div {...stylex.props(styles.processItemInner)}>
-                <span aria-hidden="true" {...stylex.props(styles.processStepNumber)}>
+            <li {...stylex.attrs(styles.processItem)}>
+              <div {...stylex.attrs(styles.processItemInner)}>
+                <span aria-hidden="true" {...stylex.attrs(styles.processStepNumber)}>
                   {String(index + 1).padStart(2, "0")}
                 </span>
                 <div>
-                  <h3 {...stylex.props(styles.processStepTitle)}>{step.title}</h3>
-                  <p {...stylex.props(styles.processStepCopy)}>{step.copy}</p>
+                  <h3 {...stylex.attrs(styles.processStepTitle)}>{step.title}</h3>
+                  <p {...stylex.attrs(styles.processStepCopy)}>{step.copy}</p>
                 </div>
               </div>
             </li>
@@ -1261,46 +1256,44 @@ function QualityProcess() {
 
 function IngredientPortfolio() {
   return (
-    <section {...stylex.props(styles.portfolioSection)}>
-      <div {...stylex.props(styles.container)}>
-        <div {...stylex.props(styles.portfolioHeader)}>
+    <section {...stylex.attrs(styles.portfolioSection)}>
+      <div {...stylex.attrs(styles.container)}>
+        <div {...stylex.attrs(styles.portfolioHeader)}>
           <div>
-            <p {...stylex.props(styles.eyebrow, styles.textMoss)}>Ingredient portfolio</p>
-            <h2 {...stylex.props(styles.portfolioTitle)}>A tighter route from sample to scale.</h2>
+            <p {...stylex.attrs(styles.eyebrow, styles.textMoss)}>Ingredient portfolio</p>
+            <h2 {...stylex.attrs(styles.portfolioTitle)}>A tighter route from sample to scale.</h2>
           </div>
           <a
             href={createInquiryHref("industries")}
-            {...stylex.props(styles.actionBase, styles.portfolioCta)}
+            {...stylex.attrs(styles.actionBase, styles.portfolioCta)}
           >
             Ask for a spec sheet
-            <ArrowRight {...stylex.props(styles.iconSm)} aria-hidden />
+            <ArrowRight {...stylex.attrs(styles.iconSm)} aria-hidden="true" />
           </a>
         </div>
 
-        <div {...stylex.props(styles.portfolioGrid)}>
+        <div {...stylex.attrs(styles.portfolioGrid)}>
           {ingredientGroups.map((group) => (
             <section
-              key={group.label}
               aria-labelledby={`${group.label.toLowerCase().replace(/[^a-z]+/g, "-")}-heading`}
-              {...stylex.props(styles.portfolioCard)}
+              {...stylex.attrs(styles.portfolioCard)}
             >
               <h3
                 id={`${group.label.toLowerCase().replace(/[^a-z]+/g, "-")}-heading`}
-                {...stylex.props(styles.portfolioCardHeading)}
+                {...stylex.attrs(styles.portfolioCardHeading)}
               >
                 {group.label}
               </h3>
-              <ul {...stylex.props(styles.ingredientList)}>
+              <ul {...stylex.attrs(styles.ingredientList)}>
                 {group.items.map((ingredient, idx) => (
                   <li
-                    key={ingredient.name}
-                    {...stylex.props(
+                    {...stylex.attrs(
                       styles.ingredientItem,
                       idx === 0 && styles.ingredientItemFirst,
                     )}
                   >
-                    <p {...stylex.props(styles.ingredientName)}>{ingredient.name}</p>
-                    <p {...stylex.props(styles.ingredientSpec)}>{ingredient.specification}</p>
+                    <p {...stylex.attrs(styles.ingredientName)}>{ingredient.name}</p>
+                    <p {...stylex.attrs(styles.ingredientSpec)}>{ingredient.specification}</p>
                   </li>
                 ))}
               </ul>
@@ -1314,25 +1307,25 @@ function IngredientPortfolio() {
 
 function GlobalSupply() {
   return (
-    <section id="global-supply" {...stylex.props(styles.globalSection)}>
-      <div {...stylex.props(styles.container)}>
-        <div {...stylex.props(styles.globalGrid)}>
+    <section id="global-supply" {...stylex.attrs(styles.globalSection)}>
+      <div {...stylex.attrs(styles.container)}>
+        <div {...stylex.attrs(styles.globalGrid)}>
           <div>
-            <p {...stylex.props(styles.eyebrow, styles.textMint)}>Global supply</p>
-            <h2 {...stylex.props(styles.globalTitle)}>Regional support without handoff fog.</h2>
-            <p {...stylex.props(styles.globalParagraph)}>
+            <p {...stylex.attrs(styles.eyebrow, styles.textMint)}>Global supply</p>
+            <h2 {...stylex.attrs(styles.globalTitle)}>Regional support without handoff fog.</h2>
+            <p {...stylex.attrs(styles.globalParagraph)}>
               Fenchem pairs global production with local commercial and documentation support so
               teams can move from inquiry to compliant supply with fewer loops.
             </p>
           </div>
-          <div {...stylex.props(styles.regionGrid)}>
+          <div {...stylex.attrs(styles.regionGrid)}>
             {regions.map((region) => (
-              <div key={region.city} {...stylex.props(styles.regionCard)}>
-                <div {...stylex.props(styles.regionCardInner)}>
-                  <Globe2 {...stylex.props(styles.regionIcon)} aria-hidden />
+              <div {...stylex.attrs(styles.regionCard)}>
+                <div {...stylex.attrs(styles.regionCardInner)}>
+                  <Globe2 {...stylex.attrs(styles.regionIcon)} aria-hidden="true" />
                   <div>
-                    <h3 {...stylex.props(styles.regionCity)}>{region.city}</h3>
-                    <p {...stylex.props(styles.regionRole)}>{region.role}</p>
+                    <h3 {...stylex.attrs(styles.regionCity)}>{region.city}</h3>
+                    <p {...stylex.attrs(styles.regionRole)}>{region.role}</p>
                   </div>
                 </div>
               </div>
@@ -1346,50 +1339,50 @@ function GlobalSupply() {
 
 function ContactFooter() {
   return (
-    <footer id="contact" {...stylex.props(styles.footerSection)}>
-      <div {...stylex.props(styles.footerGrid)}>
-        <div {...stylex.props(styles.footerCol)}>
-          <p {...stylex.props(styles.eyebrow, styles.textBlush)}>Start with the spec</p>
-          <h2 {...stylex.props(styles.footerTitle)}>Tell Fenchem what you are formulating.</h2>
-          <p {...stylex.props(styles.footerParagraph)}>
+    <footer id="contact" {...stylex.attrs(styles.footerSection)}>
+      <div {...stylex.attrs(styles.footerGrid)}>
+        <div {...stylex.attrs(styles.footerCol)}>
+          <p {...stylex.attrs(styles.eyebrow, styles.textBlush)}>Start with the spec</p>
+          <h2 {...stylex.attrs(styles.footerTitle)}>Tell Fenchem what you are formulating.</h2>
+          <p {...stylex.attrs(styles.footerParagraph)}>
             Send a target ingredient, application, format, and market. The technical team can return
             documentation, lead times, and sampling options within one business day.
           </p>
-          <div {...stylex.props(styles.footerCtaGroup)}>
+          <div {...stylex.attrs(styles.footerCtaGroup)}>
             <a
               href={createInquiryHref("contact")}
-              {...stylex.props(styles.actionBase, styles.footerPrimaryCta)}
+              {...stylex.attrs(styles.actionBase, styles.footerPrimaryCta)}
             >
               <span>Contact technical sales</span>
-              <ArrowRight {...stylex.props(styles.iconSm)} aria-hidden />
+              <ArrowRight {...stylex.attrs(styles.iconSm)} aria-hidden="true" />
             </a>
             <a
               href={toAnchor("industries")}
-              {...stylex.props(styles.actionBase, styles.footerSecondaryCta)}
+              {...stylex.attrs(styles.actionBase, styles.footerSecondaryCta)}
             >
               Review portfolio
             </a>
           </div>
         </div>
-        <div {...stylex.props(styles.checklistCard)}>
-          <Truck {...stylex.props(styles.iconLg, styles.textMint)} aria-hidden />
-          <h3 {...stylex.props(styles.checklistTitle)}>What to include</h3>
-          <ul {...stylex.props(styles.checklistList)}>
+        <div {...stylex.attrs(styles.checklistCard)}>
+          <Truck {...stylex.attrs(styles.iconLg, styles.textMint)} aria-hidden="true" />
+          <h3 {...stylex.attrs(styles.checklistTitle)}>What to include</h3>
+          <ul {...stylex.attrs(styles.checklistList)}>
             {[
               "Target ingredient or blend",
               "Delivery format and annual volume",
               "Destination market and compliance needs",
             ].map((item) => (
-              <li key={item} {...stylex.props(styles.checklistItem)}>
-                <CheckCircle2 {...stylex.props(styles.checklistIcon)} aria-hidden />
+              <li {...stylex.attrs(styles.checklistItem)}>
+                <CheckCircle2 {...stylex.attrs(styles.checklistIcon)} aria-hidden="true" />
                 <span>{item}</span>
               </li>
             ))}
           </ul>
         </div>
       </div>
-      <div {...stylex.props(styles.subFooter)}>
-        <div {...stylex.props(styles.subFooterInner)}>
+      <div {...stylex.attrs(styles.subFooter)}>
+        <div {...stylex.attrs(styles.subFooterInner)}>
           <p>Fenchem Biotek Ltd. Rooted in nature, refined by science.</p>
           <p>2026 Fenchem. Specifications available on request.</p>
         </div>

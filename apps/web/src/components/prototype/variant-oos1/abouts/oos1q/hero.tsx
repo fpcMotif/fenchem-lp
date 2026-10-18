@@ -84,31 +84,31 @@ export function Hero() {
   const [taglineLead, taglineClose] = ABOUT_BANNER.tagline.split(", ");
 
   return (
-    <section aria-labelledby="about-banner-title" {...stylex.props(s.hero)}>
-      <div {...stylex.props(ui.shell, ui.inset)}>
-        <div {...stylex.props(ui.grid, s.head)}>
-          <div {...stylex.props(s.titleBlock)}>
-            <h1 id="about-banner-title" {...stylex.props(s.title, s.enter, dynamic.delay(200))}>
+    <section aria-labelledby="about-banner-title" {...stylex.attrs(s.hero)}>
+      <div {...stylex.attrs(ui.shell, ui.inset)}>
+        <div {...stylex.attrs(ui.grid, s.head)}>
+          <div {...stylex.attrs(s.titleBlock)}>
+            <h1 id="about-banner-title" {...stylex.attrs(s.title, s.enter, dynamic.delay(200))}>
               {ABOUT_BANNER.title}
             </h1>
-            <p lang="en" {...stylex.props(s.tagline, s.enter, dynamic.delay(420))}>
-              <span {...stylex.props(s.taglineLine)}>{taglineLead},</span>
-              <span {...stylex.props(s.taglineLine)}>{taglineClose}</span>
+            <p lang="en" {...stylex.attrs(s.tagline, s.enter, dynamic.delay(420))}>
+              <span {...stylex.attrs(s.taglineLine)}>{taglineLead},</span>
+              <span {...stylex.attrs(s.taglineLine)}>{taglineClose}</span>
             </p>
           </div>
-          <p {...stylex.props(s.lead, s.enter, dynamic.delay(600))}>{ABOUT_BANNER.lead}</p>
+          <p {...stylex.attrs(s.lead, s.enter, dynamic.delay(600))}>{ABOUT_BANNER.lead}</p>
         </div>
-        <figure {...stylex.props(s.figure, s.enter, dynamic.delay(760))}>
-          <div {...stylex.props(ui.frame, s.frame)}>
+        <figure {...stylex.attrs(s.figure, s.enter, dynamic.delay(760))}>
+          <div {...stylex.attrs(ui.frame, s.frame)}>
             <img
               src={ABOUT_BANNER.image}
               alt={ABOUT_BANNER.alt}
-              fetchPriority="high"
+              fetchpriority="high"
               decoding="async"
-              {...stylex.props(ui.fill, s.image)}
+              {...stylex.attrs(ui.fill, s.image)}
             />
           </div>
-          <figcaption lang="en" {...stylex.props(ui.caption, s.captionRow)}>
+          <figcaption lang="en" {...stylex.attrs(ui.caption, s.captionRow)}>
             <span>{ABOUT_BANNER.place}</span>
             <span>{ABOUT_BANNER.established}</span>
           </figcaption>

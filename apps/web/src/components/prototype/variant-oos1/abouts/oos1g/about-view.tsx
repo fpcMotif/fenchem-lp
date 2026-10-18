@@ -1,6 +1,6 @@
 import * as stylex from "@stylexjs/stylex";
-import { useScroll } from "motion/react";
-import { useRef } from "react";
+import { useScroll } from "@/compat/motion";
+import { createSignal } from "solid-js";
 
 import type { AboutPageProps } from "../../index";
 import { Campus } from "./campus";
@@ -24,18 +24,18 @@ const styles = stylex.create({
   },
 });
 
-export function AboutOOS1G({ onNavigateHome }: AboutPageProps) {
-  const rootRef = useRef<HTMLDivElement>(null);
+export function AboutOOS1G(props: AboutPageProps) {
+  const [root, setRoot] = createSignal<HTMLDivElement>();
   const { scrollYProgress } = useScroll({
-    target: rootRef,
+    target: root,
     offset: ["start start", "end end"],
   });
 
   return (
-    <div id="about-top" ref={rootRef} {...stylex.props(styles.root)}>
-      <BisectLine progress={scrollYProgress} rootRef={rootRef} />
+    <div id="about-top" ref={setRoot} {...stylex.attrs(styles.root)}>
+      <BisectLine progress={scrollYProgress} root={root} />
       <Hero />
-      <SubNav onNavigateHome={onNavigateHome} />
+      <SubNav onNavigateHome={props.onNavigateHome} />
       <Stats />
       <Profile />
       <Campus />
@@ -43,8 +43,8 @@ export function AboutOOS1G({ onNavigateHome }: AboutPageProps) {
       <Csr />
       <Honors />
       <Structure />
-      <Products onNavigateHome={onNavigateHome} />
-      <Closing onNavigateHome={onNavigateHome} />
+      <Products onNavigateHome={props.onNavigateHome} />
+      <Closing onNavigateHome={props.onNavigateHome} />
     </div>
   );
 }

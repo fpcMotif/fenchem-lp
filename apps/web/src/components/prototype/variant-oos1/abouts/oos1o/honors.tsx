@@ -1,12 +1,12 @@
 import * as stylex from "@stylexjs/stylex";
-import { useInView } from "motion/react";
-import { useRef } from "react";
+import { useInView } from "@/compat/motion";
 
 import { ABOUT_HONORS } from "../../about-data";
 import { polyline } from "./geometry";
 import { SectionHead } from "./section-head";
 import { srOnly, ui, useSvgId } from "./shared";
 import { bp, chrome, face, tone } from "./tokens.stylex";
+import { createSignal } from "solid-js";
 
 type Level = (typeof ABOUT_HONORS.items)[number]["level"];
 
@@ -180,39 +180,38 @@ const styles = stylex.create({
 });
 
 export function Honors() {
-  const figureRef = useRef<HTMLDivElement>(null);
+  const [figureRef, setFigureRef] = createSignal<HTMLDivElement>();
   const shown = useInView(figureRef, { once: true, amount: 0.35 });
   const baseId = useSvgId();
 
   return (
-    <section id="about-honor" aria-labelledby="oos1o-honor" {...stylex.props(styles.section)}>
-      <div {...stylex.props(ui.shell)}>
-        <div ref={figureRef} {...stylex.props(styles.figure)}>
-          <svg viewBox={VIEW_BOX} aria-hidden="true" {...stylex.props(ui.svg, styles.disc)}>
+    <section id="about-honor" aria-labelledby="oos1o-honor" {...stylex.attrs(styles.section)}>
+      <div {...stylex.attrs(ui.shell)}>
+        <div ref={setFigureRef} {...stylex.attrs(styles.figure)}>
+          <svg viewBox={VIEW_BOX} aria-hidden="true" {...stylex.attrs(ui.svg, styles.disc)}>
             <defs>
               {BANDS.map((band) => (
-                <path key={band.id} id={`${baseId}-${band.id}`} d={band.arc} />
+                <path id={`${baseId}-${band.id}`} d={band.arc} />
               ))}
             </defs>
             <path
               d={`${CORE_RING}L${CENTER + CORE} ${HORIZON}L${CENTER - CORE} ${HORIZON}Z`}
               fill={NAVY}
-              fillOpacity={0.035}
+              fill-opacity={0.035}
             />
             <path
               d={CORE_RING}
               fill="none"
               stroke={NAVY}
-              strokeOpacity={0.5}
-              strokeWidth={1}
-              vectorEffect="non-scaling-stroke"
+              stroke-opacity={0.5}
+              stroke-width={1}
+              vector-effect="non-scaling-stroke"
             />
             {BANDS.map((band, index) => (
               <g
-                key={band.id}
-                {...stylex.props(
+                {...stylex.attrs(
                   styles.band,
-                  !shown && styles.bandHidden,
+                  !shown() && styles.bandHidden,
                   styles.bandDelay(200 + index * 110),
                 )}
               >
@@ -220,17 +219,17 @@ export function Honors() {
                   d={band.ring}
                   fill="none"
                   stroke={NAVY}
-                  strokeOpacity={band.strong ? 0.5 : 0.2}
-                  strokeWidth={1}
-                  vectorEffect="non-scaling-stroke"
+                  stroke-opacity={band.strong ? 0.5 : 0.2}
+                  stroke-width={1}
+                  vector-effect="non-scaling-stroke"
                 />
                 <text
                   fill={band.color}
-                  fontFamily='"Source Han Sans SC", "Noto Sans SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif'
-                  fontSize={band.size}
-                  fontWeight={band.national ? 500 : 400}
-                  letterSpacing={band.national ? 1.6 : 1}
-                  textAnchor="middle"
+                  font-family='"Source Han Sans SC", "Noto Sans SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif'
+                  font-size={String(band.size)}
+                  font-weight={band.national ? "500" : "400"}
+                  letter-spacing={band.national ? "1.6" : "1"}
+                  text-anchor="middle"
                 >
                   <textPath href={`#${baseId}-${band.id}`} startOffset="50%">
                     {band.title}
@@ -248,36 +247,32 @@ export function Honors() {
           />
         </div>
 
-        <div aria-hidden="true" {...stylex.props(styles.feet)}>
-          <span {...stylex.props(styles.pith)} />
+        <div aria-hidden="true" {...stylex.attrs(styles.feet)}>
+          <span {...stylex.attrs(styles.pith)} />
           {LEVEL_SPANS.map((span) => (
-            <span
-              key={span.level}
-              {...stylex.props(styles.foot)}
-              style={{ left: `${50 + span.offset}%` }}
-            >
+            <span {...stylex.attrs(styles.foot)} style={{ left: `${50 + span.offset}%` }}>
               {span.zh}
-              <span lang="en" {...stylex.props(ui.serif, styles.footSerif)}>
+              <span lang="en" {...stylex.attrs(ui.serif, styles.footSerif)}>
                 {span.en}
               </span>
             </span>
           ))}
         </div>
 
-        <div {...stylex.props(styles.groups)}>
+        <div {...stylex.attrs(styles.groups)}>
           {LEVELS.map(({ level, zh, en }) => (
-            <div key={level} {...stylex.props(styles.group)}>
-              <p {...stylex.props(styles.groupLabel)}>
+            <div {...stylex.attrs(styles.group)}>
+              <p {...stylex.attrs(styles.groupLabel)}>
                 <span aria-hidden="true">{zh}</span>
-                <span lang="en" {...stylex.props(ui.serif)}>
+                <span lang="en" {...stylex.attrs(ui.serif)}>
                   {en}
                 </span>
               </p>
-              <ul {...stylex.props(styles.items)}>
+              <ul {...stylex.attrs(styles.items)}>
                 {ABOUT_HONORS.items
                   .filter((item) => item.level === level)
                   .map((item) => (
-                    <li key={item.id}>
+                    <li>
                       <span aria-hidden="true">{item.title}</span>
                       <span lang="en" {...srOnly}>
                         {item.english}

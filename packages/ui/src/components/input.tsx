@@ -1,8 +1,8 @@
-import { Input as InputPrimitive } from "@base-ui/react/input";
 import { colors, radii } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 import type { StyleXStyles } from "@stylexjs/stylex";
-import * as React from "react";
+import type { ComponentProps } from "@solidjs/web";
+import { omit } from "solid-js";
 
 const inputStyles = stylex.create({
   base: {
@@ -54,21 +54,22 @@ const inputStyles = stylex.create({
   },
 });
 
-export interface InputProps extends Omit<React.ComponentProps<"input">, "className"> {
+export interface InputProps extends Omit<ComponentProps<"input">, "class"> {
   sx?: StyleXStyles;
 }
 
-function Input({ sx, type, "aria-invalid": ariaInvalid, ...props }: InputProps) {
-  const isInvalid = ariaInvalid === true || ariaInvalid === "true";
-  const styleProps = stylex.props(inputStyles.base, isInvalid && inputStyles.invalid, sx);
+function Input(props: InputProps) {
+  const rest = omit(props, "sx");
+  const isInvalid = () => {
+    const ariaInvalid: unknown = props["aria-invalid"];
+    return ariaInvalid === true || ariaInvalid === "true";
+  };
 
   return (
-    <InputPrimitive
-      type={type}
+    <input
       data-slot="input"
-      aria-invalid={ariaInvalid}
-      {...styleProps}
-      {...props}
+      {...stylex.attrs(inputStyles.base, isInvalid() && inputStyles.invalid, props.sx)}
+      {...rest}
     />
   );
 }

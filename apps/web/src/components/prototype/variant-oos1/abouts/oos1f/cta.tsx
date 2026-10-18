@@ -1,4 +1,4 @@
-import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
+import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 
 import { CTA } from "../../content";
@@ -12,16 +12,20 @@ const styles = stylex.create({
       default: space.sectionSm,
       [media.mdOnly]: space.sectionMd,
       [media.lgOnly]: space.sectionLg,
-      [breakpoints.xl]: space.sectionXl,
+      ["@media (min-width: 1280px)"]: space.sectionXl,
     },
-    paddingBottom: { default: 96, [breakpoints.md]: 128, [breakpoints.xl]: 160 },
+    paddingBottom: {
+      default: 96,
+      ["@media (min-width: 768px)"]: 128,
+      ["@media (min-width: 1280px)"]: 160,
+    },
     fontFamily: font.cjk,
   },
   inner: {
     display: "flex",
     flexDirection: "column",
     alignItems: "flex-start",
-    gap: { default: 32, [breakpoints.lg]: 48 },
+    gap: { default: 32, ["@media (min-width: 1024px)"]: 48 },
   },
   title: {
     margin: 0,
@@ -29,7 +33,7 @@ const styles = stylex.create({
       default: 36,
       [media.mdOnly]: 56,
       [media.lgOnly]: 56,
-      [breakpoints.xl]: "clamp(64px, 5.6vw, 80px)",
+      ["@media (min-width: 1280px)"]: "clamp(64px, 5.6vw, 80px)",
     },
     fontWeight: 500,
     lineHeight: 1.2,
@@ -91,27 +95,27 @@ const styles = stylex.create({
   },
 });
 
-export function Cta({ onNavigateHome }: { onNavigateHome: (hash?: string) => void }) {
+export function Cta(props: { onNavigateHome: (hash?: string) => void }) {
   return (
-    <section aria-labelledby="about-cta-title" {...stylex.props(styles.section)}>
+    <section aria-labelledby="about-cta-title" {...stylex.attrs(styles.section)}>
       <Shell>
         <NodeMarker />
         <Reveal sx={styles.inner}>
-          <h2 id="about-cta-title" {...stylex.props(styles.title)}>
+          <h2 id="about-cta-title" {...stylex.attrs(styles.title)}>
             {CTA.title}
           </h2>
-          <div {...stylex.props(styles.buttons)}>
+          <div {...stylex.attrs(styles.buttons)}>
             <button
               type="button"
-              onClick={() => onNavigateHome("contact")}
-              {...stylex.props(styles.button)}
+              onClick={() => props.onNavigateHome("contact")}
+              {...stylex.attrs(styles.button)}
             >
               {CTA.action.label}
             </button>
             <button
               type="button"
-              onClick={() => onNavigateHome("products")}
-              {...stylex.props(styles.link)}
+              onClick={() => props.onNavigateHome("products")}
+              {...stylex.attrs(styles.link)}
             >
               产品与应用
             </button>

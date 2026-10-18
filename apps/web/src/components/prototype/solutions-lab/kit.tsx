@@ -1,5 +1,6 @@
 import * as stylex from "@stylexjs/stylex";
-import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { createEffect, createMemo, createSignal, For } from "solid-js";
+import type { JSX } from "@solidjs/web";
 
 import { useReducedMotion } from "../use-reduced-motion";
 import {
@@ -40,26 +41,29 @@ export const sheetRows = (item: SolutionItem): SheetRow[] => [
 
 export function useSolutionsBrowser(initialArea: AreaFilter = "all") {
   const solutions = LAB_SOLUTIONS;
-  const [area, setArea] = useState<AreaFilter>(initialArea);
-  const [selectedId, setSelectedId] = useState<string | undefined>(
+  const [area, setArea] = createSignal<AreaFilter>(initialArea);
+  const [selectedId, setSelectedId] = createSignal<string | undefined>(
     initialArea === "all"
       ? solutions[0]?.id
       : solutions.find((item) => item.area === initialArea)?.id,
   );
 
-  const scope = useMemo(
-    () => (area === "all" ? solutions : solutions.filter((item) => item.area === area)),
-    [area, solutions],
+  const scope = createMemo(() =>
+    area() === "all" ? solutions : solutions.filter((item) => item.area === area()),
   );
-  const position = Math.max(
-    0,
-    scope.findIndex((item) => item.id === selectedId),
+  const position = createMemo(() =>
+    Math.max(
+      0,
+      scope().findIndex((item) => item.id === selectedId()),
+    ),
   );
-  const selected = scope[position];
-  const groups = SOLUTION_AREAS.map((entry) => ({
-    ...entry,
-    items: scope.filter((item) => item.area === entry.id),
-  })).filter((group) => group.items.length > 0);
+  const selected = createMemo(() => scope()[position()]!);
+  const groups = createMemo(() =>
+    SOLUTION_AREAS.map((entry) => ({
+      ...entry,
+      items: scope().filter((item) => item.area === entry.id),
+    })).filter((group) => group.items.length > 0),
+  );
   const chips = [{ id: "all" as const, label: "全部" }, ...SOLUTION_AREAS]
     .map((entry) => ({
       id: entry.id as AreaFilter,
@@ -73,21 +77,33 @@ export function useSolutionsBrowser(initialArea: AreaFilter = "all") {
 
   const chooseArea = (next: AreaFilter) => {
     setArea(next);
-    if (next !== "all" && selected?.area !== next) {
+    if (next !== "all" && selected()?.area !== next) {
       setSelectedId(solutions.find((item) => item.area === next)?.id);
     }
   };
 
   return {
     solutions,
-    area,
+    get area() {
+      return area();
+    },
     chooseArea,
     chips,
-    scope,
-    groups,
-    selected,
-    position,
-    select: setSelectedId,
+    get scope() {
+      return scope();
+    },
+    get groups() {
+      return groups();
+    },
+    get selected() {
+      return selected();
+    },
+    get position() {
+      return position();
+    },
+    select: (id: string | undefined) => {
+      setSelectedId(id);
+    },
   };
 }
 
@@ -189,56 +205,58 @@ const styles = stylex.create({
   },
 });
 
-export function LabSection({ children }: { children: ReactNode }) {
+export function LabSection(props: { children: JSX.Element }) {
   return (
-    <section aria-labelledby="lab-solutions-title" {...stylex.props(styles.section)}>
-      <div {...stylex.props(kitStyles.shell, kitStyles.inset120)}>
-        <header {...stylex.props(styles.head)}>
-          <p lang="en" {...stylex.props(styles.eyebrow)}>
+    <section aria-labelledby="lab-solutions-title" {...stylex.attrs(styles.section)}>
+      <div {...stylex.attrs(kitStyles.shell, kitStyles.inset120)}>
+        <header {...stylex.attrs(styles.head)}>
+          <p lang="en" {...stylex.attrs(styles.eyebrow)}>
             Solutions
           </p>
-          <h2 id="lab-solutions-title" {...stylex.props(styles.title)}>
+          <h2 id="lab-solutions-title" {...stylex.attrs(styles.title)}>
             应用方案
           </h2>
         </header>
-        {children}
+        {props.children}
       </div>
     </section>
   );
 }
 
-export function AreaChips({ browser }: { browser: SolutionsBrowser }) {
-  const listRef = useRef<HTMLDivElement>(null);
+export function AreaChips(props: { browser: SolutionsBrowser }) {
+  let list!: HTMLDivElement;
   const reduce = useReducedMotion();
-  const { area, chips, chooseArea } = browser;
 
-  useEffect(() => {
-    const list = listRef.current;
-    const chip = list?.querySelector<HTMLElement>('[aria-pressed="true"]');
-    if (!list || !chip || list.scrollWidth <= list.clientWidth) return;
-    const left = chip.offsetLeft - (list.clientWidth - chip.offsetWidth) / 2;
-    list.scrollTo({ left: Math.max(0, left), behavior: reduce ? "auto" : "smooth" });
-  }, [area, reduce]);
+  createEffect(
+    () => [props.browser.area, reduce()] as const,
+    ([, reduced]) => {
+      const chip = list.querySelector<HTMLElement>('[aria-pressed="true"]');
+      if (!chip || list.scrollWidth <= list.clientWidth) return;
+      const left = chip.offsetLeft - (list.clientWidth - chip.offsetWidth) / 2;
+      list.scrollTo({ left: Math.max(0, left), behavior: reduced ? "auto" : "smooth" });
+    },
+  );
 
   return (
-    <div ref={listRef} role="group" aria-label="按应用领域筛选" {...stylex.props(styles.areaList)}>
-      {chips.map((entry) => {
-        const isActive = area === entry.id;
-        return (
-          <button
-            key={entry.id}
-            type="button"
-            aria-pressed={isActive}
-            onClick={() => chooseArea(entry.id)}
-            {...stylex.props(styles.area, isActive && styles.areaActive)}
-          >
-            <span {...stylex.props(styles.areaLabel)}>{entry.label}</span>
-            <span {...stylex.props(styles.areaCount, isActive && styles.areaCountActive)}>
-              {entry.count}
-            </span>
-          </button>
-        );
-      })}
+    <div ref={list} role="group" aria-label="按应用领域筛选" {...stylex.attrs(styles.areaList)}>
+      <For each={props.browser.chips}>
+        {(entry) => {
+          const isActive = () => props.browser.area === entry.id;
+          return (
+            <button
+              type="button"
+              aria-pressed={isActive() ? "true" : "false"}
+              onClick={() => props.browser.chooseArea(entry.id)}
+              {...stylex.attrs(styles.area, isActive() && styles.areaActive)}
+            >
+              <span {...stylex.attrs(styles.areaLabel)}>{entry.label}</span>
+              <span {...stylex.attrs(styles.areaCount, isActive() && styles.areaCountActive)}>
+                {entry.count}
+              </span>
+            </button>
+          );
+        }}
+      </For>
     </div>
   );
 }

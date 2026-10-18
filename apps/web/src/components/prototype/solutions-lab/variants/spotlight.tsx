@@ -1,6 +1,7 @@
 import * as stylex from "@stylexjs/stylex";
-import { m } from "motion/react";
-import { Fragment, useId, useRef, useState, type KeyboardEvent } from "react";
+import { m } from "@/compat/motion";
+import { createSignal, createUniqueId, For, Show } from "solid-js";
+import type { JSX } from "@solidjs/web";
 
 import { useReducedMotion } from "../../use-reduced-motion";
 import {
@@ -438,77 +439,77 @@ const placementFor = (label: string) => {
   }
 };
 
-function RowValue({ row }: { row: SheetRow }) {
-  if (row.values.length === 0) return <span {...stylex.props(styles.absent)}>无</span>;
-  if (row.kind === "lines") {
+function RowValue(props: { row: SheetRow }) {
+  if (props.row.values.length === 0) return <span {...stylex.attrs(styles.absent)}>无</span>;
+  if (props.row.kind === "lines") {
     return (
-      <ul {...stylex.props(styles.lines, styles.description)}>
-        {row.values.map((line) => (
-          <li key={line}>{line}</li>
+      <ul {...stylex.attrs(styles.lines, styles.description)}>
+        {props.row.values.map((line) => (
+          <li>{line}</li>
         ))}
       </ul>
     );
   }
-  if (row.kind === "strong") {
-    return <span {...stylex.props(styles.strong)}>{row.values.join(" · ")}</span>;
+  if (props.row.kind === "strong") {
+    return <span {...stylex.attrs(styles.strong)}>{props.row.values.join(" · ")}</span>;
   }
-  if (row.kind === "list") {
+  if (props.row.kind === "list") {
     return (
-      <ul {...stylex.props(styles.lines)}>
-        {row.values.map((value) => {
+      <ul {...stylex.attrs(styles.lines)}>
+        {props.row.values.map((value) => {
           const { primary, note } = splitNote(value);
           return (
-            <li key={value} {...stylex.props(styles.keepWords)}>
-              <span {...stylex.props(styles.strong)}>
+            <li {...stylex.attrs(styles.keepWords)}>
+              <span {...stylex.attrs(styles.strong)}>
                 {primary.replaceAll(" / ", `${NO_BREAK_SPACE}/ `)}
               </span>
-              {note && <span {...stylex.props(styles.note)}>{note}</span>}
+              {note && <span {...stylex.attrs(styles.note)}>{note}</span>}
             </li>
           );
         })}
       </ul>
     );
   }
-  return <>{row.values.join("、")}</>;
+  return <>{props.row.values.join("、")}</>;
 }
 
-function Hero({ item, position, total }: { item: SolutionItem; position: number; total: number }) {
-  const rows = sheetRows(item);
+function Hero(props: { item: SolutionItem; position: number; total: number }) {
+  const rows = sheetRows(props.item);
   const ingredients = rows.find((row) => row.label === INGREDIENTS_LABEL);
-  const area = areaOf(item.area);
+  const area = areaOf(props.item.area);
   return (
     <>
       <header>
-        <p {...stylex.props(styles.heroMeta)}>
-          <span {...stylex.props(styles.heroArea)}>
+        <p {...stylex.attrs(styles.heroMeta)}>
+          <span {...stylex.attrs(styles.heroArea)}>
             {area?.label}
-            <span lang="en" {...stylex.props(styles.english)}>
+            <span lang="en" {...stylex.attrs(styles.english)}>
               {area?.englishLabel}
             </span>
           </span>
-          <span {...stylex.props(styles.heroPosition)}>
-            <span {...stylex.props(styles.heroPositionCurrent)}>{padIndex(position)}</span>
-            {` / ${padIndex(total - 1)}`}
+          <span {...stylex.attrs(styles.heroPosition)}>
+            <span {...stylex.attrs(styles.heroPositionCurrent)}>{padIndex(props.position)}</span>
+            {` / ${padIndex(props.total - 1)}`}
           </span>
         </p>
-        <h3 {...stylex.props(styles.heroTitle)}>{item.title}</h3>
-        <p {...stylex.props(styles.heroSubtitle)}>{item.subtitle}</p>
+        <h3 {...stylex.attrs(styles.heroTitle)}>{props.item.title}</h3>
+        <p {...stylex.attrs(styles.heroSubtitle)}>{props.item.subtitle}</p>
       </header>
-      <dl {...stylex.props(styles.fields)}>
+      <dl {...stylex.attrs(styles.fields)}>
         {ingredients && (
-          <div {...stylex.props(styles.ingredients)}>
-            <dt {...stylex.props(styles.label)}>{ingredients.label}</dt>
-            <dd {...stylex.props(styles.fieldValue)}>
+          <div {...stylex.attrs(styles.ingredients)}>
+            <dt {...stylex.attrs(styles.label)}>{ingredients.label}</dt>
+            <dd {...stylex.attrs(styles.fieldValue)}>
               {ingredients.values.length === 0 ? (
-                <span {...stylex.props(styles.absent)}>无</span>
+                <span {...stylex.attrs(styles.absent)}>无</span>
               ) : (
-                <ul {...stylex.props(styles.chips)}>
+                <ul {...stylex.attrs(styles.chips)}>
                   {ingredients.values.map((value) => {
                     const { primary, note } = splitNote(value);
                     return (
-                      <li key={value} {...stylex.props(styles.chip)}>
+                      <li {...stylex.attrs(styles.chip)}>
                         <span>{primary.replaceAll(" / ", `${NO_BREAK_SPACE}/ `)}</span>
-                        {note && <span {...stylex.props(styles.chipNote)}>{note}</span>}
+                        {note && <span {...stylex.attrs(styles.chipNote)}>{note}</span>}
                       </li>
                     );
                   })}
@@ -520,9 +521,9 @@ function Hero({ item, position, total }: { item: SolutionItem; position: number;
         {rows
           .filter((row) => row.label !== INGREDIENTS_LABEL)
           .map((row) => (
-            <div key={row.label} {...stylex.props(styles.field, placementFor(row.label))}>
-              <dt {...stylex.props(styles.label)}>{row.label}</dt>
-              <dd {...stylex.props(styles.fieldValue)}>
+            <div {...stylex.attrs(styles.field, placementFor(row.label))}>
+              <dt {...stylex.attrs(styles.label)}>{row.label}</dt>
+              <dd {...stylex.attrs(styles.fieldValue)}>
                 <RowValue row={row} />
               </dd>
             </div>
@@ -535,63 +536,69 @@ function Hero({ item, position, total }: { item: SolutionItem; position: number;
 export function SpotlightVariant() {
   const browser = useSolutionsBrowser();
   const reduce = useReducedMotion();
-  const uid = useId();
-  const heroRef = useRef<HTMLDivElement>(null);
-  const [swapped, setSwapped] = useState(false);
-  const { area, scope, groups, selected, position, select } = browser;
-  const next = scope.length > 1 ? scope[(position + 1) % scope.length] : undefined;
+  const uid = createUniqueId();
+  let hero: HTMLDivElement | undefined;
+  const [swapped, setSwapped] = createSignal(false);
+  const next = () =>
+    browser.scope.length > 1
+      ? browser.scope[(browser.position + 1) % browser.scope.length]
+      : undefined;
 
   const choose = (id: string) => {
-    if (id !== selected?.id) setSwapped(true);
-    select(id);
+    if (id !== browser.selected?.id) setSwapped(true);
+    browser.select(id);
   };
 
   const revealHero = () => {
-    const hero = heroRef.current;
     if (!hero) return;
     const top = hero.getBoundingClientRect().top;
     if (top >= HEADER_OFFSET && top <= window.innerHeight - 200) return;
     window.scrollTo({
       top: window.scrollY + top - HEADER_OFFSET - REVEAL_MARGIN,
-      behavior: reduce ? "auto" : "smooth",
+      behavior: reduce() ? "auto" : "smooth",
     });
   };
 
-  const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+  const handleKeyDown: JSX.EventHandler<HTMLDivElement, KeyboardEvent> = (event) => {
     const step = TAB_STEPS[event.key];
     if (!step) return;
     event.preventDefault();
-    const nextIndex = step(position, scope.length);
-    const item = scope[nextIndex];
+    const nextIndex = step(browser.position, browser.scope.length);
+    const item = browser.scope[nextIndex];
     if (!item) return;
     choose(item.id);
     event.currentTarget.querySelectorAll<HTMLElement>('[role="tab"]')[nextIndex]?.focus();
   };
 
   const renderEntry = (item: SolutionItem) => {
-    const isSelected = item.id === selected?.id;
+    const isSelected = () => item.id === browser.selected?.id;
     return (
       <button
-        key={item.id}
         type="button"
         role="tab"
         id={`${uid}-tab-${item.id}`}
-        aria-selected={isSelected}
+        aria-selected={isSelected() ? "true" : "false"}
         aria-controls={`${uid}-panel`}
-        tabIndex={isSelected ? 0 : -1}
+        tabindex={isSelected() ? 0 : -1}
         onClick={() => {
           choose(item.id);
           revealHero();
         }}
-        {...stylex.props(styles.entry, isSelected && styles.entrySelected, stylex.defaultMarker())}
+        {...stylex.attrs(
+          styles.entry,
+          isSelected() && styles.entrySelected,
+          stylex.defaultMarker(),
+        )}
       >
-        <span {...stylex.props(styles.entryName, isSelected && styles.entryNameSelected)}>
+        <span {...stylex.attrs(styles.entryName, isSelected() && styles.entryNameSelected)}>
           {item.title}
         </span>
-        {isSelected && <span {...stylex.props(styles.entryCurrent)}>当前</span>}
-        <span aria-hidden="true" {...stylex.props(styles.leader)} />
-        <span {...stylex.props(styles.entryIndex, isSelected && styles.entryIndexSelected)}>
-          {padIndex(scope.indexOf(item))}
+        <Show when={isSelected()}>
+          <span {...stylex.attrs(styles.entryCurrent)}>当前</span>
+        </Show>
+        <span aria-hidden="true" {...stylex.attrs(styles.leader)} />
+        <span {...stylex.attrs(styles.entryIndex, isSelected() && styles.entryIndexSelected)}>
+          {padIndex(browser.scope.indexOf(item))}
         </span>
       </button>
     );
@@ -600,49 +607,54 @@ export function SpotlightVariant() {
   return (
     <LabSection>
       <AreaChips browser={browser} />
-      {selected && (
+      <Show when={browser.selected}>
         <div
-          ref={heroRef}
+          ref={hero}
           role="tabpanel"
           id={`${uid}-panel`}
-          aria-labelledby={`${uid}-tab-${selected.id}`}
-          tabIndex={0}
-          {...stylex.props(styles.hero)}
+          aria-labelledby={`${uid}-tab-${browser.selected.id}`}
+          tabindex={0}
+          {...stylex.attrs(styles.hero)}
         >
-          <m.div
-            key={selected.id}
-            initial={swapped ? { opacity: 0, y: 6 } : false}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: reduce ? 0 : 0.18, ease: EASE_OUT }}
-          >
-            <Hero item={selected} position={position} total={scope.length} />
-          </m.div>
-          {next && (
-            <div {...stylex.props(styles.heroFoot)}>
-              <button
-                type="button"
-                onClick={() => {
-                  choose(next.id);
-                  revealHero();
-                }}
-                {...stylex.props(styles.next, stylex.defaultMarker())}
+          <Show when={browser.selected} keyed>
+            {(item) => (
+              <m.div
+                initial={swapped() ? { opacity: 0, y: 6 } : false}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: reduce() ? 0 : 0.18, ease: EASE_OUT }}
               >
-                <span {...stylex.props(styles.nextLabel)}>下一个</span>
-                <span {...stylex.props(styles.nextName)}>{next.title}</span>
-                <span aria-hidden="true" {...stylex.props(styles.nextArrow)}>
-                  →
-                </span>
-              </button>
-            </div>
-          )}
+                <Hero item={item} position={browser.position} total={browser.scope.length} />
+              </m.div>
+            )}
+          </Show>
+          <Show when={next()}>
+            {(upcoming) => (
+              <div {...stylex.attrs(styles.heroFoot)}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    choose(upcoming().id);
+                    revealHero();
+                  }}
+                  {...stylex.attrs(styles.next, stylex.defaultMarker())}
+                >
+                  <span {...stylex.attrs(styles.nextLabel)}>下一个</span>
+                  <span {...stylex.attrs(styles.nextName)}>{upcoming().title}</span>
+                  <span aria-hidden="true" {...stylex.attrs(styles.nextArrow)}>
+                    →
+                  </span>
+                </button>
+              </div>
+            )}
+          </Show>
         </div>
-      )}
-      <div {...stylex.props(styles.contents)}>
-        <div {...stylex.props(styles.contentsHead)}>
-          <h3 id={`${uid}-contents`} {...stylex.props(styles.contentsTitle)}>
+      </Show>
+      <div {...stylex.attrs(styles.contents)}>
+        <div {...stylex.attrs(styles.contentsHead)}>
+          <h3 id={`${uid}-contents`} {...stylex.attrs(styles.contentsTitle)}>
             目录
           </h3>
-          <span lang="en" {...stylex.props(styles.english)}>
+          <span lang="en" {...stylex.attrs(styles.english)}>
             Contents
           </span>
         </div>
@@ -651,21 +663,26 @@ export function SpotlightVariant() {
           aria-labelledby={`${uid}-contents`}
           aria-orientation="vertical"
           onKeyDown={handleKeyDown}
-          {...stylex.props(styles.toc)}
+          {...stylex.attrs(styles.toc)}
         >
-          {area === "all"
-            ? groups.map((group) => (
-                <Fragment key={group.id}>
-                  <p aria-hidden="true" {...stylex.props(styles.tocGroup)}>
+          <Show
+            when={browser.area === "all"}
+            fallback={<For each={browser.scope}>{renderEntry}</For>}
+          >
+            <For each={browser.groups}>
+              {(group) => (
+                <>
+                  <p aria-hidden="true" {...stylex.attrs(styles.tocGroup)}>
                     {group.label}
-                    <span lang="en" {...stylex.props(styles.english)}>
+                    <span lang="en" {...stylex.attrs(styles.english)}>
                       {group.englishLabel}
                     </span>
                   </p>
-                  {group.items.map(renderEntry)}
-                </Fragment>
-              ))
-            : scope.map(renderEntry)}
+                  <For each={group.items}>{renderEntry}</For>
+                </>
+              )}
+            </For>
+          </Show>
         </div>
       </div>
     </LabSection>

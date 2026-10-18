@@ -1,17 +1,17 @@
-import type { ComponentType } from "react";
+import type { Component } from "solid-js";
 import { describe, expect, it } from "vitest";
 
 import { DEFAULT_VARIANT, VARIANTS } from "./variants";
 
-const aboutViews = import.meta.glob<Record<string, ComponentType | undefined>>(
+const aboutViews = import.meta.glob<Record<string, Component | undefined>>(
   "./variant-oos1/abouts/*/about-view.tsx",
   { eager: true },
 );
-const catalogs = import.meta.glob<{ Catalog?: ComponentType }>(
+const catalogs = import.meta.glob<{ Catalog?: Component }>(
   "./variant-oos1/products/*/catalog.tsx",
   { eager: true },
 );
-const solutions = import.meta.glob<{ Solutions?: ComponentType }>(
+const solutions = import.meta.glob<{ Solutions?: Component }>(
   "./variant-oos1/products/*/solutions.tsx",
   { eager: true },
 );

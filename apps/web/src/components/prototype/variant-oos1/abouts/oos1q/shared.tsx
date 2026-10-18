@@ -1,5 +1,6 @@
 import * as stylex from "@stylexjs/stylex";
-import { type ReactNode, useEffect, useRef, useState } from "react";
+import { createEffect, createSignal, merge } from "solid-js";
+import { dynamic as dynamicTag, type JSX } from "@solidjs/web";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 import {} from "./tokens.stylex";
 import { ui } from "./shared-values";
@@ -15,91 +16,78 @@ const dynamic = stylex.create({
 
 type RevealPhase = "visible" | "hidden" | "shown";
 
-export function Reveal({
-  children,
-  step: stagger = 0,
-  sx,
-  as: Tag = "div",
-}: {
-  children: ReactNode;
+export function Reveal(props: {
+  children: JSX.Element;
   step?: number;
   sx?: stylex.StyleXStyles;
   as?: "div" | "li" | "figure" | "article" | "p";
 }) {
-  const ref = useRef<HTMLDivElement & HTMLLIElement & HTMLParagraphElement>(null);
+  const p = merge({ step: 0, as: "div" as const }, props);
+  const Tag = dynamicTag(() => p.as);
+  let node: HTMLElement | undefined;
   const reduce = useReducedMotion();
-  const [phase, setPhase] = useState<RevealPhase>("visible");
+  const [phase, setPhase] = createSignal<RevealPhase>("visible");
 
-  useEffect(() => {
-    const node = ref.current;
-    if (!node || reduce || typeof IntersectionObserver === "undefined") return;
-    if (node.getBoundingClientRect().top < window.innerHeight * REVEAL_EDGE) return;
-    setPhase("hidden");
-    let observing = false;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        observing = true;
-        if (!entries.some((entry) => entry.isIntersecting)) return;
-        setPhase("shown");
+  createEffect(
+    () => reduce(),
+    (reduced) => {
+      if (!node || reduced || typeof IntersectionObserver === "undefined") return;
+      if (node.getBoundingClientRect().top < window.innerHeight * REVEAL_EDGE) return;
+      setPhase("hidden");
+      let observing = false;
+      const observer = new IntersectionObserver(
+        (entries) => {
+          observing = true;
+          if (!entries.some((entry) => entry.isIntersecting)) return;
+          setPhase("shown");
+          observer.disconnect();
+        },
+        { rootMargin: "0px 0px -6% 0px" },
+      );
+      observer.observe(node);
+      const rescue = window.setTimeout(() => {
+        if (!observing) setPhase("shown");
+      }, REVEAL_RESCUE_MS);
+      return () => {
         observer.disconnect();
-      },
-      { rootMargin: "0px 0px -6% 0px" },
-    );
-    observer.observe(node);
-    const rescue = window.setTimeout(() => {
-      if (!observing) setPhase("shown");
-    }, REVEAL_RESCUE_MS);
-    return () => {
-      observer.disconnect();
-      window.clearTimeout(rescue);
-    };
-  }, [reduce]);
+        window.clearTimeout(rescue);
+      };
+    },
+  );
 
   return (
     <Tag
-      ref={ref}
-      {...stylex.props(
-        sx,
-        phase === "hidden" && ui.hidden,
-        phase === "shown" && ui.shown,
-        phase === "shown" && dynamic.delay(Math.min(stagger, REVEAL_MAX_STEPS) * REVEAL_STEP_MS),
+      ref={(el: HTMLElement) => (node = el)}
+      {...stylex.attrs(
+        p.sx,
+        phase() === "hidden" && ui.hidden,
+        phase() === "shown" && ui.shown,
+        phase() === "shown" && dynamic.delay(Math.min(p.step, REVEAL_MAX_STEPS) * REVEAL_STEP_MS),
       )}
     >
-      {children}
+      {p.children}
     </Tag>
   );
 }
 
-export function Section({
-  id,
-  label,
-  sx,
-  children,
-}: {
+export function Section(props: {
   id: string;
   label: string;
   sx?: stylex.StyleXStyles;
-  children: ReactNode;
+  children: JSX.Element;
 }) {
-  const nameId = `${id}-name`;
+  const nameId = () => `${props.id}-name`;
   return (
-    <section id={id} aria-labelledby={nameId} {...stylex.props(ui.section, sx)}>
-      <h2 id={nameId} {...stylex.props(ui.srOnly)}>
-        {label}
+    <section id={props.id} aria-labelledby={nameId()} {...stylex.attrs(ui.section, props.sx)}>
+      <h2 id={nameId()} {...stylex.attrs(ui.srOnly)}>
+        {props.label}
       </h2>
-      <div {...stylex.props(ui.shell, ui.inset)}>{children}</div>
+      <div {...stylex.attrs(ui.shell, ui.inset)}>{props.children}</div>
     </section>
   );
 }
 
-export function Figure({
-  src,
-  alt,
-  caption,
-  ratio,
-  fit,
-  sx,
-}: {
+export function Figure(props: {
   src: string;
   alt: string;
   caption?: string;
@@ -108,11 +96,19 @@ export function Figure({
   sx?: stylex.StyleXStyles;
 }) {
   return (
-    <Reveal as="figure" sx={[ui.figure, sx]}>
-      <div {...stylex.props(ui.frame, ratio)}>
-        <img src={src} alt={alt} loading="lazy" decoding="async" {...stylex.props(ui.fill, fit)} />
+    <Reveal as="figure" sx={[ui.figure, props.sx]}>
+      <div {...stylex.attrs(ui.frame, props.ratio)}>
+        <img
+          src={props.src}
+          alt={props.alt}
+          loading="lazy"
+          decoding="async"
+          {...stylex.attrs(ui.fill, props.fit)}
+        />
       </div>
-      {caption ? <figcaption {...stylex.props(ui.caption)}>{caption}</figcaption> : null}
+      {props.caption ? (
+        <figcaption {...stylex.attrs(ui.caption)}>{props.caption}</figcaption>
+      ) : null}
     </Reveal>
   );
 }

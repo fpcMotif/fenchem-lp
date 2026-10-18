@@ -1,6 +1,5 @@
 import * as stylex from "@stylexjs/stylex";
-import { m, useMotionValueEvent, useTransform, type MotionValue } from "motion/react";
-import { useRef } from "react";
+import { m, useMotionValueEvent, useTransform, type MotionValue } from "@/compat/motion";
 
 import {
   CURRENT_YEAR,
@@ -19,6 +18,7 @@ import {
 } from "./geometry";
 import { srOnly, ui, useSvgId } from "./shared";
 import { face, tone } from "./tokens.stylex";
+import { createSignal } from "solid-js";
 
 const NAVY = "#0b2a5c";
 const BLUE = "#0743a9";
@@ -94,22 +94,17 @@ const styles = stylex.create({
   },
 });
 
-function GrowthRing({
-  index,
-  href,
-  alpha,
-  front,
-}: {
+function GrowthRing(props: {
   index: number;
   href: string;
   alpha: number;
   front: MotionValue<number>;
 }) {
-  const opacity = useTransform(front, [index, index + 0.6], [0, 1]);
+  const opacity = useTransform(props.front, [props.index, props.index + 0.6], [0, 1]);
   return (
     <m.g fill="none" stroke={NAVY} style={{ opacity }}>
-      <use href={href} strokeOpacity={0.045} strokeWidth={4} />
-      <use href={href} strokeOpacity={alpha} strokeWidth={1} />
+      <use href={props.href} stroke-opacity={0.045} stroke-width={4} />
+      <use href={props.href} stroke-opacity={props.alpha} stroke-width={1} />
     </m.g>
   );
 }
@@ -139,70 +134,64 @@ function tipAt(sweep: number) {
   return { x: radius * Math.cos(angle), y: radius * Math.sin(angle) };
 }
 
-export function GrowthDisc({ growth }: { growth: MotionValue<number> }) {
+export function GrowthDisc(props: { growth: MotionValue<number> }) {
   const baseId = useSvgId();
   const clipId = `${baseId}-front`;
   const sweepId = `${baseId}-sweep`;
   const ringId = `${baseId}-ring`;
 
-  const front = useTransform(growth, [0, FRONT_DONE], [0, FRONT_SPAN]);
+  const front = useTransform(props.growth, [0, FRONT_DONE], [0, FRONT_SPAN]);
   const frontPath = useTransform(front, (value) => blendRing(Math.min(value, LAST_CLOSED)));
-  const frontOpacity = useTransform(growth, [0.82, 0.9], [1, 0]);
+  const frontOpacity = useTransform(props.growth, [0.82, 0.9], [1, 0]);
   const heartPath = useTransform(front, (value) =>
     blendRing(Math.max(Math.min(value, LAST_CLOSED) - HEART_LAG, 0)),
   );
   const heartOpacity = useTransform(front, [HEART_LAG - 1, HEART_LAG], [0, 1]);
 
-  const sweep = useTransform(growth, [0.86, 1], [0, SWEEP]);
+  const sweep = useTransform(props.growth, [0.86, 1], [0, SWEEP]);
   const sweepPath = useTransform(sweep, sweepWedge);
   const tipLeft = useTransform(sweep, (value) => `${toPercent(tipAt(value).x)}%`);
   const tipTop = useTransform(sweep, (value) => `${toPercent(tipAt(value).y)}%`);
-  const tipOpacity = useTransform(growth, [0.86, 0.88], [0, 1]);
-  const labelOpacity = useTransform(growth, [0.97, 1], [0, 1]);
+  const tipOpacity = useTransform(props.growth, [0.86, 0.88], [0, 1]);
+  const labelOpacity = useTransform(props.growth, [0.97, 1], [0, 1]);
 
-  const svgRef = useRef<SVGSVGElement>(null);
+  const [svgRef, setSvgRef] = createSignal<SVGSVGElement>();
   useMotionValueEvent(front, "change", (value) => {
-    svgRef.current?.setAttribute("viewBox", zoomBox(value));
+    svgRef()?.setAttribute("viewBox", zoomBox(value));
   });
 
   return (
-    <figure {...stylex.props(styles.figure)}>
+    <figure {...stylex.attrs(styles.figure)}>
       <svg
-        ref={svgRef}
+        ref={setSvgRef}
         viewBox={zoomBox(front.get())}
         aria-hidden="true"
-        {...stylex.props(ui.svg, styles.svg)}
+        {...stylex.attrs(ui.svg, styles.svg)}
       >
         <defs>
           {RINGS.map((ring) => (
-            <path
-              key={ring.year}
-              id={`${ringId}-${ring.year}`}
-              d={ring.path}
-              vectorEffect="non-scaling-stroke"
-            />
+            <path id={`${ringId}-${ring.year}`} d={ring.path} vector-effect="non-scaling-stroke" />
           ))}
           <clipPath id={clipId}>
-            <m.path d={frontPath} />
+            <m.path d={frontPath()} />
           </clipPath>
           <clipPath id={sweepId}>
-            <m.path d={sweepPath} />
+            <m.path d={sweepPath()} />
           </clipPath>
         </defs>
-        <m.path d={frontPath} fill={MIST} />
-        <m.path d={heartPath} fill={NAVY} fillOpacity={0.05} style={{ opacity: heartOpacity }} />
+        <m.path d={frontPath()} fill={MIST} />
+        <m.path d={heartPath()} fill={NAVY} fill-opacity={0.05} style={{ opacity: heartOpacity }} />
         <path
           d={RAY_PATH}
-          clipPath={`url(#${clipId})`}
+          clip-path={`url(#${clipId})`}
           fill="none"
           stroke={NAVY}
-          strokeOpacity={0.13}
-          strokeWidth={0.75}
-          vectorEffect="non-scaling-stroke"
+          stroke-opacity={0.13}
+          stroke-width={0.75}
+          vector-effect="non-scaling-stroke"
         />
         {RINGS.map((ring, index) => (
           <GrowthRing
-            key={ring.year}
             index={index}
             href={`#${ringId}-${ring.year}`}
             alpha={ring.alpha}
@@ -210,50 +199,50 @@ export function GrowthDisc({ growth }: { growth: MotionValue<number> }) {
           />
         ))}
         <m.path
-          d={frontPath}
+          d={frontPath()}
           fill="none"
           stroke={BLUE}
-          strokeWidth={1.75}
-          vectorEffect="non-scaling-stroke"
+          stroke-width={1.75}
+          vector-effect="non-scaling-stroke"
           style={{ opacity: frontOpacity }}
         />
         <path
           d={OPEN_RING.path}
-          clipPath={`url(#${sweepId})`}
+          clip-path={`url(#${sweepId})`}
           fill="none"
           stroke={BLUE}
-          strokeWidth={1.75}
-          strokeLinecap="round"
-          vectorEffect="non-scaling-stroke"
+          stroke-width={1.75}
+          stroke-linecap="round"
+          vector-effect="non-scaling-stroke"
         />
       </svg>
 
       <span
         aria-hidden="true"
-        {...stylex.props(styles.dot, styles.pith)}
+        {...stylex.attrs(styles.dot, styles.pith)}
         style={{ left: "50%", top: "50%" }}
       />
       <m.span
         aria-hidden="true"
-        {...stylex.props(styles.dot, styles.tip)}
+        {...stylex.attrs(styles.dot, styles.tip)}
         style={{ left: tipLeft, top: tipTop, opacity: tipOpacity }}
       />
 
-      <p {...stylex.props(styles.label, styles.pithLabel)}>
-        <span {...stylex.props(ui.latin)}>{ORIGIN_YEAR}</span>
+      <p {...stylex.attrs(styles.label, styles.pithLabel)}>
+        <span {...stylex.attrs(ui.latin)}>{ORIGIN_YEAR}</span>
         <span aria-hidden="true">·</span>
         <span>南京</span>
       </p>
       <m.p
-        {...stylex.props(styles.label, styles.openLabel)}
+        {...stylex.attrs(styles.label, styles.openLabel)}
         style={{
           left: `${toPercent(OPEN_RING.gap.x)}%`,
           top: `${toPercent(OPEN_RING.gap.y)}%`,
           opacity: labelOpacity,
         }}
       >
-        <span {...stylex.props(ui.latin, styles.year)}>{CURRENT_YEAR}</span>
-        <span lang="en" {...stylex.props(ui.serif, styles.growing)}>
+        <span {...stylex.attrs(ui.latin, styles.year)}>{CURRENT_YEAR}</span>
+        <span lang="en" {...stylex.attrs(ui.serif, styles.growing)}>
           still growing
         </span>
       </m.p>

@@ -1,4 +1,4 @@
-import { render, screen, within } from "@testing-library/react";
+import { render, screen, within } from "@/test/render";
 import { describe, expect, test } from "vitest";
 
 import {
@@ -15,7 +15,7 @@ import { LandingPage } from "./landing-page";
 
 describe("LandingPage", () => {
   test("renders one production landing page without prototype controls", () => {
-    render(<LandingPage />);
+    render(() => <LandingPage />);
 
     expect(screen.getByRole("main")).toBeTruthy();
     expect(screen.getByRole("heading", { level: 1, name: "Fenchem" })).toBeTruthy();
@@ -24,7 +24,7 @@ describe("LandingPage", () => {
   });
 
   test("links primary navigation to each section", () => {
-    render(<LandingPage />);
+    render(() => <LandingPage />);
 
     const navigation = screen.getByRole("navigation", { name: "Primary navigation" });
     for (const link of navLinks) {
@@ -34,7 +34,7 @@ describe("LandingPage", () => {
   });
 
   test("renders stable section ids with no duplicates", () => {
-    const { container } = render(<LandingPage />);
+    const { container } = render(() => <LandingPage />);
     const ids = Array.from(container.querySelectorAll("[id]"), (element) => element.id);
 
     for (const sectionId of sectionIds) {
@@ -44,7 +44,7 @@ describe("LandingPage", () => {
   });
 
   test("shows all proof cards with accessible imagery", () => {
-    render(<LandingPage />);
+    render(() => <LandingPage />);
 
     for (const card of proofCards) {
       expect(screen.getByRole("heading", { name: card.title })).toBeTruthy();
@@ -54,7 +54,7 @@ describe("LandingPage", () => {
   });
 
   test("shows the quality process and certification evidence", () => {
-    render(<LandingPage />);
+    render(() => <LandingPage />);
 
     for (const step of processSteps) {
       expect(screen.getByRole("heading", { name: step.title })).toBeTruthy();
@@ -66,7 +66,7 @@ describe("LandingPage", () => {
   });
 
   test("shows all ingredient groups and specifications", () => {
-    render(<LandingPage />);
+    render(() => <LandingPage />);
 
     for (const ingredient of ingredients) {
       expect(screen.getByText(ingredient.name)).toBeTruthy();
@@ -75,7 +75,7 @@ describe("LandingPage", () => {
   });
 
   test("shows regional support and frictionless inquiry links", () => {
-    render(<LandingPage />);
+    render(() => <LandingPage />);
 
     for (const region of regions) {
       expect(screen.getByRole("heading", { name: region.city })).toBeTruthy();
@@ -93,7 +93,7 @@ describe("LandingPage", () => {
   });
 
   test("keeps every rendered image accessible", () => {
-    const { container } = render(<LandingPage />);
+    const { container } = render(() => <LandingPage />);
     const images = Array.from(container.querySelectorAll("img"));
 
     expect(images.length).toBeGreaterThanOrEqual(5);

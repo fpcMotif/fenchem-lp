@@ -10,9 +10,16 @@ import { EASE } from "@/components/prototype/motion-constants";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 import { breakpoints, colors, radii, typography } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { ArrowRight, ArrowUpRight, ChevronDown, FlaskConical, Globe2, Sprout } from "lucide-react";
-import { domAnimation, LazyMotion, m, useScroll, useTransform } from "motion/react";
-import { useRef } from "react";
+import {
+  ArrowRight,
+  ArrowUpRight,
+  ChevronDown,
+  FlaskConical,
+  Globe2,
+  Sprout,
+} from "@fenchem-lp/ui/components/lucide";
+import { domAnimation, LazyMotion, m, useScroll, useTransform } from "@/compat/motion";
+import { createSignal } from "solid-js";
 
 const img = (id: string, w = 1600, q = 80) =>
   `https://images.unsplash.com/${id}?auto=format&fit=crop&w=${w}&q=${q}`;
@@ -675,48 +682,48 @@ const styles = stylex.create({
   },
 });
 
-function ChapterImage({ src, alt }: { src: string; alt: string }) {
+function ChapterImage(props: { src: string; alt: string }) {
   const reduce = useReducedMotion();
-  const ref = useRef<HTMLDivElement | null>(null);
+  const [ref, setRef] = createSignal<HTMLDivElement>();
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start end", "end start"],
   });
   const y = useTransform(scrollYProgress, [0, 1], ["-8%", "8%"]);
   return (
-    <div ref={ref} {...stylex.props(styles.chapterImgBox)}>
+    <div ref={setRef} {...stylex.attrs(styles.chapterImgBox)}>
       <m.img
-        src={src}
-        alt={alt}
-        style={{ y: reduce ? 0 : y }}
-        {...stylex.props(styles.chapterImg)}
+        src={props.src}
+        alt={props.alt}
+        style={{ y: reduce() ? 0 : y }}
+        {...stylex.attrs(styles.chapterImg)}
         loading="lazy"
       />
-      <div aria-hidden {...stylex.props(styles.chapterImgOverlay)} />
+      <div aria-hidden="true" {...stylex.attrs(styles.chapterImgOverlay)} />
     </div>
   );
 }
 
-function HeroNav({ reduce }: { reduce: boolean | null }) {
+function HeroNav(props: { reduce: boolean | null }) {
   return (
     <m.nav
-      initial={reduce ? { opacity: 0 } : { opacity: 0, y: -16 }}
+      initial={props.reduce ? { opacity: 0 } : { opacity: 0, y: -16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8, delay: 0.2, ease: EASE }}
-      {...stylex.props(styles.nav)}
+      {...stylex.attrs(styles.nav)}
     >
-      <div {...stylex.props(styles.navInner)}>
-        <a href="#top" {...stylex.props(styles.navLogo)}>
+      <div {...stylex.attrs(styles.navInner)}>
+        <a href="#top" {...stylex.attrs(styles.navLogo)}>
           Fenchem
         </a>
-        <div {...stylex.props(styles.navLinksWrapper)}>
+        <div {...stylex.attrs(styles.navLinksWrapper)}>
           {NAV_LINKS.map((link) => (
-            <a key={link.href} href={link.href} {...stylex.props(styles.navLink)}>
+            <a href={link.href} {...stylex.attrs(styles.navLink)}>
               {link.label}
             </a>
           ))}
         </div>
-        <a href="#contact" {...stylex.props(styles.navInquireBtn)}>
+        <a href="#contact" {...stylex.attrs(styles.navInquireBtn)}>
           Inquire
         </a>
       </div>
@@ -724,8 +731,8 @@ function HeroNav({ reduce }: { reduce: boolean | null }) {
   );
 }
 
-function HeroHeader({ reduce }: { reduce: boolean | null }) {
-  const heroRef = useRef<HTMLElement | null>(null);
+function HeroHeader(props: { reduce: boolean | null }) {
+  const [heroRef, setHeroRef] = createSignal<HTMLElement>();
   const { scrollYProgress } = useScroll({
     target: heroRef,
     offset: ["start start", "end start"],
@@ -734,55 +741,58 @@ function HeroHeader({ reduce }: { reduce: boolean | null }) {
   const heroFade = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
 
   return (
-    <header id="top" ref={heroRef} {...stylex.props(styles.heroHeader)}>
-      <m.div style={{ y: reduce ? 0 : heroY }} {...stylex.props(styles.heroBgDiv)}>
+    <header id="top" ref={setHeroRef} {...stylex.attrs(styles.heroHeader)}>
+      <m.div style={{ y: props.reduce ? 0 : heroY }} {...stylex.attrs(styles.heroBgDiv)}>
         <img
           src={img("photo-1569936906148-06de87cb0681", 2000)}
           alt="Sunlight breaking through a deep forest canopy"
-          {...stylex.props(styles.heroBgImg)}
+          {...stylex.attrs(styles.heroBgImg)}
           loading="eager"
         />
       </m.div>
-      <div aria-hidden {...stylex.props(styles.heroGradientOverlay)} />
+      <div aria-hidden="true" {...stylex.attrs(styles.heroGradientOverlay)} />
 
-      <m.div style={{ opacity: reduce ? 1 : heroFade }} {...stylex.props(styles.heroTextContainer)}>
+      <m.div
+        style={{ opacity: props.reduce ? 1 : heroFade }}
+        {...stylex.attrs(styles.heroTextContainer)}
+      >
         <m.p
-          initial={reduce ? { opacity: 0 } : { opacity: 0, y: 20 }}
+          initial={props.reduce ? { opacity: 0 } : { opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.4, ease: EASE }}
-          {...stylex.props(styles.heroEyebrow)}
+          {...stylex.attrs(styles.heroEyebrow)}
         >
           Botanical Intelligence Since 1995
         </m.p>
         <m.h1
-          initial={reduce ? { opacity: 0 } : { opacity: 0, y: 32 }}
+          initial={props.reduce ? { opacity: 0 } : { opacity: 0, y: 32 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1.1, delay: 0.55, ease: EASE }}
-          {...stylex.props(styles.heroTitle)}
+          {...stylex.attrs(styles.heroTitle)}
         >
           Rooted in Nature,
           <br />
-          <em {...stylex.props(styles.heroMistItalic)}>Refined by Science.</em>
+          <em {...stylex.attrs(styles.heroMistItalic)}>Refined by Science.</em>
         </m.h1>
         <m.p
-          initial={reduce ? { opacity: 0 } : { opacity: 0, y: 24 }}
+          initial={props.reduce ? { opacity: 0 } : { opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.75, ease: EASE }}
-          {...stylex.props(styles.heroDesc)}
+          {...stylex.attrs(styles.heroDesc)}
         >
           Premium botanical ingredients for the world&rsquo;s most demanding formulations — grown
           with patience, perfected in the laboratory.
         </m.p>
         <m.div
-          initial={reduce ? { opacity: 0 } : { opacity: 0, y: 24 }}
+          initial={props.reduce ? { opacity: 0 } : { opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.9, ease: EASE }}
-          {...stylex.props(styles.heroButtons)}
+          {...stylex.attrs(styles.heroButtons)}
         >
-          <a href="#portfolio" {...stylex.props(styles.heroPrimaryBtn)}>
+          <a href="#portfolio" {...stylex.attrs(styles.heroPrimaryBtn)}>
             Explore the Portfolio
           </a>
-          <a href="#origin" {...stylex.props(styles.heroSecondaryBtn)}>
+          <a href="#origin" {...stylex.attrs(styles.heroSecondaryBtn)}>
             Our Story
           </a>
         </m.div>
@@ -791,11 +801,13 @@ function HeroHeader({ reduce }: { reduce: boolean | null }) {
       <m.a
         href="#origin"
         aria-label="Scroll to story"
-        animate={reduce ? undefined : { y: [0, 8, 0] }}
-        transition={reduce ? undefined : { duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
-        {...stylex.props(styles.scrollChevron)}
+        animate={props.reduce ? undefined : { y: [0, 8, 0] }}
+        transition={
+          props.reduce ? undefined : { duration: 2.2, repeat: Infinity, ease: "easeInOut" }
+        }
+        {...stylex.attrs(styles.scrollChevron)}
       >
-        <ChevronDown {...stylex.props(styles.chevronIcon)} />
+        <ChevronDown {...stylex.attrs(styles.chevronIcon)} />
       </m.a>
     </header>
   );
@@ -803,17 +815,17 @@ function HeroHeader({ reduce }: { reduce: boolean | null }) {
 
 function StatsBand() {
   return (
-    <section {...stylex.props(styles.statsSection)}>
-      <div {...stylex.props(styles.statsGrid)}>
+    <section {...stylex.attrs(styles.statsSection)}>
+      <div {...stylex.attrs(styles.statsGrid)}>
         {[
           ["30+", "Years of botanical R&D"],
           ["6", "Global production bases"],
           ["40+", "Markets with full dossiers"],
         ].map(([stat, label], i) => (
-          <Reveal key={label} delay={i * 0.1}>
-            <div {...stylex.props(styles.statCard)}>
-              <p {...stylex.props(styles.statNumber)}>{stat}</p>
-              <p {...stylex.props(styles.statLabel)}>{label}</p>
+          <Reveal delay={i * 0.1}>
+            <div {...stylex.attrs(styles.statCard)}>
+              <p {...stylex.attrs(styles.statNumber)}>{stat}</p>
+              <p {...stylex.attrs(styles.statLabel)}>{label}</p>
             </div>
           </Reveal>
         ))}
@@ -824,25 +836,25 @@ function StatsBand() {
 
 function OriginChapter() {
   return (
-    <section id="origin" {...stylex.props(styles.originSection)}>
-      <div {...stylex.props(styles.chapterGrid)}>
+    <section id="origin" {...stylex.attrs(styles.originSection)}>
+      <div {...stylex.attrs(styles.chapterGrid)}>
         <Reveal>
           <ChapterImage
             src={img("photo-1741513599050-487ccfb86275", 1200)}
             alt="Dense green foliage in soft light"
           />
         </Reveal>
-        <div {...stylex.props(styles.originTextCol)}>
+        <div {...stylex.attrs(styles.originTextCol)}>
           <Reveal>
-            <p {...stylex.props(styles.chapterEyebrow)}>01 — Origin</p>
-            <h2 {...stylex.props(styles.chapterTitle)}>
-              Grown with <em {...stylex.props(styles.heroMistItalic)}>patience.</em>
+            <p {...stylex.attrs(styles.chapterEyebrow)}>01 — Origin</p>
+            <h2 {...stylex.attrs(styles.chapterTitle)}>
+              Grown with <em {...stylex.attrs(styles.heroMistItalic)}>patience.</em>
             </h2>
-            <p {...stylex.props(styles.chapterCopy)}>
+            <p {...stylex.attrs(styles.chapterCopy)}>
               Our botanicals begin in soil we know by name — a global network of partner farms
               cultivated over decades, where harvests are timed to the plant, never to the quarter.
             </p>
-            <blockquote {...stylex.props(styles.originQuote)}>
+            <blockquote {...stylex.attrs(styles.originQuote)}>
               &ldquo;Nature holds the keys to human vitality. We simply refuse to lose them in
               translation.&rdquo;
             </blockquote>
@@ -855,22 +867,22 @@ function OriginChapter() {
 
 function ScienceChapter() {
   return (
-    <section id="science" {...stylex.props(styles.scienceSection)}>
-      <div {...stylex.props(styles.chapterGrid)}>
-        <div {...stylex.props(styles.scienceTextCol)}>
+    <section id="science" {...stylex.attrs(styles.scienceSection)}>
+      <div {...stylex.attrs(styles.chapterGrid)}>
+        <div {...stylex.attrs(styles.scienceTextCol)}>
           <Reveal>
-            <p {...stylex.props(styles.chapterEyebrow)}>02 — Science</p>
-            <h2 {...stylex.props(styles.chapterTitle)}>
-              Refined to the <em {...stylex.props(styles.heroMistItalic)}>molecule.</em>
+            <p {...stylex.attrs(styles.chapterEyebrow)}>02 — Science</p>
+            <h2 {...stylex.attrs(styles.chapterTitle)}>
+              Refined to the <em {...stylex.attrs(styles.heroMistItalic)}>molecule.</em>
             </h2>
-            <p {...stylex.props(styles.chapterCopy)}>
+            <p {...stylex.attrs(styles.chapterCopy)}>
               Every extract passes through clinical-grade validation — identity, potency, stability
               — before it carries the Fenchem name. 98% bio-active retention across our extraction
               process is not a goal; it is the specification.
             </p>
-            <a href="#portfolio" {...stylex.props(styles.scienceLink)}>
+            <a href="#portfolio" {...stylex.attrs(styles.scienceLink)}>
               See what we make
-              <ArrowRight {...stylex.props(styles.iconSm)} />
+              <ArrowRight {...stylex.attrs(styles.iconSm)} />
             </a>
           </Reveal>
         </div>
@@ -887,42 +899,42 @@ function ScienceChapter() {
 
 function IngredientRail() {
   return (
-    <section id="portfolio" {...stylex.props(styles.portfolioSection)}>
-      <div {...stylex.props(styles.portfolioHeaderWrap)}>
+    <section id="portfolio" {...stylex.attrs(styles.portfolioSection)}>
+      <div {...stylex.attrs(styles.portfolioHeaderWrap)}>
         <Reveal sx={styles.portfolioHeaderFlex}>
           <div>
-            <p {...stylex.props(styles.chapterEyebrow)}>03 — Portfolio</p>
-            <h2 {...stylex.props(styles.chapterTitle)}>
-              The <em {...stylex.props(styles.heroMistItalic)}>living</em> library
+            <p {...stylex.attrs(styles.chapterEyebrow)}>03 — Portfolio</p>
+            <h2 {...stylex.attrs(styles.chapterTitle)}>
+              The <em {...stylex.attrs(styles.heroMistItalic)}>living</em> library
             </h2>
           </div>
-          <p {...stylex.props(styles.portfolioScrollTag)}>Scroll &rarr;</p>
+          <p {...stylex.attrs(styles.portfolioScrollTag)}>Scroll &rarr;</p>
         </Reveal>
       </div>
-      <div {...stylex.props(styles.portfolioRailScroll)}>
-        <div {...stylex.props(styles.portfolioRailTrack)}>
+      <div {...stylex.attrs(styles.portfolioRailScroll)}>
+        <div {...stylex.attrs(styles.portfolioRailTrack)}>
           {getFeaturedIngredients().map((item, i) => (
-            <Reveal key={item.name} delay={Math.min(i * 0.08, 0.3)} sx={styles.portfolioRailItem}>
-              <article {...stylex.props(styles.ingredientCard)}>
-                <div {...stylex.props(styles.ingredientCardImgWrap)}>
+            <Reveal delay={Math.min(i * 0.08, 0.3)} sx={styles.portfolioRailItem}>
+              <article {...stylex.attrs(styles.ingredientCard)}>
+                <div {...stylex.attrs(styles.ingredientCardImgWrap)}>
                   <img
                     src={item.image.src}
                     alt={item.image.alt}
-                    {...stylex.props(styles.ingredientCardImg)}
+                    {...stylex.attrs(styles.ingredientCardImg)}
                     loading="lazy"
                   />
                 </div>
-                <div {...stylex.props(styles.ingredientCardBody)}>
-                  <h3 {...stylex.props(styles.ingredientCardTitle)}>{item.name}</h3>
-                  <p {...stylex.props(styles.ingredientCardLatin)}>{item.latin}</p>
-                  <dl {...stylex.props(styles.ingredientCardDl)}>
+                <div {...stylex.attrs(styles.ingredientCardBody)}>
+                  <h3 {...stylex.attrs(styles.ingredientCardTitle)}>{item.name}</h3>
+                  <p {...stylex.attrs(styles.ingredientCardLatin)}>{item.latin}</p>
+                  <dl {...stylex.attrs(styles.ingredientCardDl)}>
                     {[
                       ["Purity", item.purity],
                       ["Form", item.form],
                     ].map(([k, v]) => (
-                      <div key={k} {...stylex.props(styles.ingredientCardDlRow)}>
-                        <dt {...stylex.props(styles.ingredientCardDt)}>{k}</dt>
-                        <dd {...stylex.props(styles.ingredientCardDd)}>{v}</dd>
+                      <div {...stylex.attrs(styles.ingredientCardDlRow)}>
+                        <dt {...stylex.attrs(styles.ingredientCardDt)}>{k}</dt>
+                        <dd {...stylex.attrs(styles.ingredientCardDd)}>{v}</dd>
                       </div>
                     ))}
                   </dl>
@@ -938,18 +950,18 @@ function IngredientRail() {
 
 function StandardsPillars() {
   return (
-    <section id="standards" {...stylex.props(styles.standardsSection)}>
-      <div {...stylex.props(styles.standardsGrid)}>
+    <section id="standards" {...stylex.attrs(styles.standardsSection)}>
+      <div {...stylex.attrs(styles.standardsGrid)}>
         {pillars.map((pillar, i) => {
           const Icon = PILLAR_DETAIL[i].icon;
           return (
-            <Reveal key={pillar.title} delay={i * 0.1}>
-              <div {...stylex.props(styles.pillarCard)}>
-                <span {...stylex.props(styles.pillarIconBox)}>
-                  <Icon {...stylex.props(styles.pillarIcon)} aria-hidden />
+            <Reveal delay={i * 0.1}>
+              <div {...stylex.attrs(styles.pillarCard)}>
+                <span {...stylex.attrs(styles.pillarIconBox)}>
+                  <Icon {...stylex.attrs(styles.pillarIcon)} aria-hidden="true" />
                 </span>
-                <h3 {...stylex.props(styles.pillarTitle)}>{pillar.title}</h3>
-                <p {...stylex.props(styles.pillarCopy)}>{PILLAR_DETAIL[i].copy}</p>
+                <h3 {...stylex.attrs(styles.pillarTitle)}>{pillar.title}</h3>
+                <p {...stylex.attrs(styles.pillarCopy)}>{PILLAR_DETAIL[i].copy}</p>
               </div>
             </Reveal>
           );
@@ -961,16 +973,16 @@ function StandardsPillars() {
 
 function CtaSection() {
   return (
-    <section id="contact" {...stylex.props(styles.ctaSection)}>
-      <div aria-hidden {...stylex.props(styles.ctaGlow)} />
+    <section id="contact" {...stylex.attrs(styles.ctaSection)}>
+      <div aria-hidden="true" {...stylex.attrs(styles.ctaGlow)} />
       <Reveal sx={styles.ctaContentWrap}>
-        <p {...stylex.props(styles.ctaEyebrow)}>Partner with Fenchem</p>
-        <h2 {...stylex.props(styles.ctaHeading)}>
-          Bring the forest to <em {...stylex.props(styles.heroMistItalic)}>your formulation.</em>
+        <p {...stylex.attrs(styles.ctaEyebrow)}>Partner with Fenchem</p>
+        <h2 {...stylex.attrs(styles.ctaHeading)}>
+          Bring the forest to <em {...stylex.attrs(styles.heroMistItalic)}>your formulation.</em>
         </h2>
-        <a href="#top" {...stylex.props(styles.ctaBtn)}>
+        <a href="#top" {...stylex.attrs(styles.ctaBtn)}>
           Request a Specification
-          <ArrowUpRight {...stylex.props(styles.iconSm)} />
+          <ArrowUpRight {...stylex.attrs(styles.iconSm)} />
         </a>
       </Reveal>
     </section>
@@ -979,19 +991,19 @@ function CtaSection() {
 
 function SiteFooter() {
   return (
-    <footer {...stylex.props(styles.footer)}>
-      <div {...stylex.props(styles.footerContainer)}>
-        <p {...stylex.props(styles.footerTitle)}>Fenchem</p>
-        <nav {...stylex.props(styles.footerNav)}>
+    <footer {...stylex.attrs(styles.footer)}>
+      <div {...stylex.attrs(styles.footerContainer)}>
+        <p {...stylex.attrs(styles.footerTitle)}>Fenchem</p>
+        <nav {...stylex.attrs(styles.footerNav)}>
           {["Privacy Policy", "Terms of Service", "Ingredient Transparency", "Global Offices"].map(
             (l) => (
-              <a key={l} href="#top" {...stylex.props(styles.footerLink)}>
+              <a href="#top" {...stylex.attrs(styles.footerLink)}>
                 {l}
               </a>
             ),
           )}
         </nav>
-        <p {...stylex.props(styles.footerCopyright)}>
+        <p {...stylex.attrs(styles.footerCopyright)}>
           © 2026 Fenchem Biotek Ltd. — Rooted in Nature, Refined by Science
         </p>
       </div>
@@ -1004,9 +1016,9 @@ export function VariantC() {
 
   return (
     <LazyMotion features={domAnimation} strict>
-      <main {...stylex.props(styles.main)}>
-        <HeroNav reduce={reduce} />
-        <HeroHeader reduce={reduce} />
+      <main {...stylex.attrs(styles.main)}>
+        <HeroNav reduce={reduce()} />
+        <HeroHeader reduce={reduce()} />
         <StatsBand />
         <OriginChapter />
         <ScienceChapter />

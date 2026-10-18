@@ -11,10 +11,10 @@ export function HeroGradeFilter() {
       width="0"
       height="0"
       aria-hidden="true"
-      focusable="false"
-      style={{ position: "absolute", pointerEvents: "none" }}
+      {...{ focusable: "false" }}
+      style={{ position: "absolute", "pointer-events": "none" }}
     >
-      <filter id="fenchem-hero-grade" colorInterpolationFilters="sRGB">
+      <filter id="fenchem-hero-grade" color-interpolation-filters="sRGB">
         <feColorMatrix type="matrix" values={HERO_GRADE_MATRIX} />
       </filter>
     </svg>

@@ -1,37 +1,35 @@
-import { m, type HTMLMotionProps, type Transition } from "motion/react";
-import type { ReactNode } from "react";
+import { m, type HTMLMotionProps, type Transition } from "@/compat/motion";
+import { omit } from "solid-js";
+import type { JSX } from "@solidjs/web";
 import { useReducedMotion } from "../use-reduced-motion";
 
-export function Collapse({
-  open,
-  children,
-  transition,
-  style,
-  ...props
-}: Omit<HTMLMotionProps<"div">, "children"> & {
-  open: boolean;
-  children: ReactNode;
-  transition: Transition;
-}) {
+export function Collapse(
+  props: Omit<HTMLMotionProps<"div">, "children"> & {
+    open: boolean;
+    children: JSX.Element;
+    transition: Transition;
+  },
+) {
+  const rest = omit(props, "open", "children", "transition", "style");
   const reduce = useReducedMotion();
-  const timing = reduce ? { duration: 0 } : transition;
+  const timing = () => (reduce() ? { duration: 0 } : props.transition);
 
   return (
     <m.div
-      {...props}
-      layout={!reduce}
-      inert={!open}
-      aria-hidden={!open}
-      style={{ ...style, height: open ? "auto" : 0, overflow: "hidden" }}
-      transition={timing}
+      {...rest}
+      layout={!reduce()}
+      inert={!props.open || undefined}
+      aria-hidden={props.open ? "false" : "true"}
+      style={{ ...props.style, height: props.open ? "auto" : 0, overflow: "hidden" }}
+      transition={timing()}
     >
       <m.div
         layout="position"
         initial={false}
-        animate={{ opacity: open ? 1 : 0 }}
-        transition={timing}
+        animate={{ opacity: props.open ? 1 : 0 }}
+        transition={timing()}
       >
-        {children}
+        {props.children}
       </m.div>
     </m.div>
   );

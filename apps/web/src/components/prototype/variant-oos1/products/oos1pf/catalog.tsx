@@ -1,7 +1,8 @@
 import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { AnimatePresence, m, type Variants } from "motion/react";
-import { useId, useState, type ReactNode } from "react";
+import { AnimatePresence, m, type Variants } from "@/compat/motion";
+import type { JSX } from "@solidjs/web";
+import { createSignal, createUniqueId, For, Show, untrack } from "solid-js";
 
 import { EASE } from "@/components/prototype/motion-constants";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
@@ -341,174 +342,173 @@ const styles = stylex.create({
   },
 });
 
-function Inci({ text }: { text: string }) {
-  const parts: ReactNode[] = [];
+function Inci(props: { text: string }) {
+  const text = untrack(() => props.text);
+  const parts: JSX.Element[] = [];
   let last = 0;
   for (const match of text.matchAll(INCI_LATIN)) {
     parts.push(text.slice(last, match.index));
-    parts.push(
-      <span key={match.index} {...stylex.props(styles.keepTogether)}>
-        {match[0]}
-      </span>,
-    );
+    parts.push(<span {...stylex.attrs(styles.keepTogether)}>{match[0]}</span>);
     last = match.index + match[0].length;
   }
   parts.push(text.slice(last));
   return <>{parts}</>;
 }
 
-function GroupBody({
-  group,
-  mode,
-  first,
-  variants,
-}: {
+function GroupBody(props: {
   group: TableGroup;
   mode: GroupMode;
   first: boolean;
   variants: Variants;
 }) {
+  const group = props.group;
   return (
-    <m.tbody variants={variants} {...stylex.props(styles.group)}>
-      <tr {...stylex.props(styles.groupRow)}>
+    <m.tbody variants={props.variants} {...stylex.attrs(styles.group)}>
+      <tr {...stylex.attrs(styles.groupRow)}>
         <th
           scope="rowgroup"
-          colSpan={4}
-          {...stylex.props(styles.groupCell, first && styles.groupCellFirst)}
+          colspan={4}
+          {...stylex.attrs(styles.groupCell, props.first && styles.groupCellFirst)}
         >
-          <span {...stylex.props(styles.groupHeading)}>
-            <span {...stylex.props(styles.groupLabel)}>{group.label}</span>
-            <span {...stylex.props(styles.groupCount)}>
-              <span {...stylex.props(styles.numeral)}>{group.rows.length}</span>款原料
+          <span {...stylex.attrs(styles.groupHeading)}>
+            <span {...stylex.attrs(styles.groupLabel)}>{group.label}</span>
+            <span {...stylex.attrs(styles.groupCount)}>
+              <span {...stylex.attrs(styles.numeral)}>{group.rows.length}</span>款原料
             </span>
           </span>
-          {group.intro && <p {...stylex.props(styles.groupIntro)}>{group.intro}</p>}
+          {group.intro && <p {...stylex.attrs(styles.groupIntro)}>{group.intro}</p>}
         </th>
       </tr>
-      {group.rows.map((item) => (
-        <tr key={item.id} {...stylex.props(styles.row)}>
-          <th scope="row" {...stylex.props(styles.cell, styles.nameCell)}>
-            <span {...stylex.props(styles.primary)}>{item.primary}</span>
-            {item.secondary && <span {...stylex.props(styles.secondary)}>{item.secondary}</span>}
-          </th>
-          <td {...stylex.props(styles.cell, styles.smallCell, styles.attributeCell)}>
-            {attributeOf(item, mode)}
-          </td>
-          <td {...stylex.props(styles.cell, styles.smallCell, styles.inciCell)}>
-            <Inci text={item.inci} />
-          </td>
-          <td {...stylex.props(styles.cell, styles.lastCell, styles.featuresCell)}>
-            {item.features}
-          </td>
-        </tr>
-      ))}
+      <For each={group.rows}>
+        {(item) => (
+          <tr {...stylex.attrs(styles.row)}>
+            <th scope="row" {...stylex.attrs(styles.cell, styles.nameCell)}>
+              <span {...stylex.attrs(styles.primary)}>{item.primary}</span>
+              {item.secondary && <span {...stylex.attrs(styles.secondary)}>{item.secondary}</span>}
+            </th>
+            <td {...stylex.attrs(styles.cell, styles.smallCell, styles.attributeCell)}>
+              {attributeOf(item, props.mode)}
+            </td>
+            <td {...stylex.attrs(styles.cell, styles.smallCell, styles.inciCell)}>
+              <Inci text={item.inci} />
+            </td>
+            <td {...stylex.attrs(styles.cell, styles.lastCell, styles.featuresCell)}>
+              {item.features}
+            </td>
+          </tr>
+        )}
+      </For>
     </m.tbody>
   );
 }
 
 export function Catalog() {
   const reduce = useReducedMotion();
-  const titleId = useId();
-  const tableId = useId();
-  const noteId = useId();
-  const [mode, setMode] = useState<GroupMode>("region");
-  const activeMode = MODES.find((option) => option.id === mode) ?? MODES[0];
-  const groups = GROUPS_BY_MODE[mode];
+  const titleId = createUniqueId();
+  const tableId = createUniqueId();
+  const noteId = createUniqueId();
+  const [mode, setMode] = createSignal<GroupMode>("region");
 
-  const tableVariants: Variants = {
+  const tableVariants = (): Variants => ({
     hidden: { opacity: 1 },
-    shown: { opacity: 1, transition: { staggerChildren: reduce ? 0 : 0.035 } },
-    gone: { opacity: 0, transition: { duration: reduce ? 0 : 0.14, ease: "easeOut" } },
-  };
-  const groupVariants: Variants = {
-    hidden: { opacity: 0, y: reduce ? 0 : 8 },
-    shown: { opacity: 1, y: 0, transition: { duration: reduce ? 0 : 0.24, ease: EASE } },
-  };
+    shown: { opacity: 1, transition: { staggerChildren: reduce() ? 0 : 0.035 } },
+    gone: { opacity: 0, transition: { duration: reduce() ? 0 : 0.14, ease: "easeOut" } },
+  });
+  const groupVariants = (): Variants => ({
+    hidden: { opacity: 0, y: reduce() ? 0 : 8 },
+    shown: { opacity: 1, y: 0, transition: { duration: reduce() ? 0 : 0.24, ease: EASE } },
+  });
 
   return (
-    <section id="products-catalog" aria-labelledby={titleId} {...stylex.props(styles.section)}>
-      <div {...stylex.props(styles.shell)}>
-        <header {...stylex.props(styles.head)}>
-          <h2 id={titleId} {...stylex.props(styles.title)}>
+    <section id="products-catalog" aria-labelledby={titleId} {...stylex.attrs(styles.section)}>
+      <div {...stylex.attrs(styles.shell)}>
+        <header {...stylex.attrs(styles.head)}>
+          <h2 id={titleId} {...stylex.attrs(styles.title)}>
             产品目录
           </h2>
-          <div {...stylex.props(styles.controls)}>
+          <div {...stylex.attrs(styles.controls)}>
             <div
               role="group"
               aria-label="Group by"
               aria-describedby={noteId}
-              {...stylex.props(styles.segmented)}
+              {...stylex.attrs(styles.segmented)}
             >
               <span
                 aria-hidden="true"
-                {...stylex.props(styles.thumb, mode === "form" && styles.thumbEnd)}
+                {...stylex.attrs(styles.thumb, mode() === "form" && styles.thumbEnd)}
               />
               {MODES.map((option) => {
-                const selected = option.id === mode;
+                const selected = () => option.id === mode();
                 return (
                   <button
-                    key={option.id}
                     type="button"
-                    aria-pressed={selected}
+                    aria-pressed={selected() ? "true" : "false"}
                     aria-controls={tableId}
                     onClick={() => setMode(option.id)}
-                    {...stylex.props(styles.segment, selected && styles.segmentOn)}
+                    {...stylex.attrs(styles.segment, selected() && styles.segmentOn)}
                   >
                     {option.label}
                   </button>
                 );
               })}
             </div>
-            <p id={noteId} {...stylex.props(styles.note)}>
+            <p id={noteId} {...stylex.attrs(styles.note)}>
               形态依据原料描述整理
             </p>
           </div>
         </header>
         <AnimatePresence mode="wait" initial={false}>
-          <m.table
-            key={mode}
-            id={tableId}
-            variants={tableVariants}
-            initial="hidden"
-            animate="shown"
-            exit="gone"
-            {...stylex.props(styles.table)}
-          >
-            <caption {...stylex.props(styles.srOnly)}>
-              Product catalog, {activeMode.englishLabel}
-            </caption>
-            <colgroup {...stylex.props(styles.colgroup)}>
-              <col {...stylex.props(styles.colName)} />
-              <col {...stylex.props(styles.colAttribute)} />
-              <col {...stylex.props(styles.colInci)} />
-              <col {...stylex.props(styles.colFeatures)} />
-            </colgroup>
-            <thead {...stylex.props(styles.thead)}>
-              <tr>
-                <th scope="col" {...stylex.props(styles.headCell)}>
-                  名称
-                </th>
-                <th scope="col" {...stylex.props(styles.headCell)}>
-                  {activeMode.attributeHeading}
-                </th>
-                <th scope="col" {...stylex.props(styles.headCell)}>
-                  INCI 名称
-                </th>
-                <th scope="col" {...stylex.props(styles.headCell, styles.lastCell)}>
-                  特性&应用
-                </th>
-              </tr>
-            </thead>
-            {groups.map((group, index) => (
-              <GroupBody
-                key={group.key}
-                group={group}
-                mode={mode}
-                first={index === 0}
-                variants={groupVariants}
-              />
-            ))}
-          </m.table>
+          <Show when={mode()} keyed>
+            {(current) => {
+              const activeMode = MODES.find((option) => option.id === current) ?? MODES[0]!;
+              return (
+                <m.table
+                  id={tableId}
+                  variants={tableVariants()}
+                  initial="hidden"
+                  animate="shown"
+                  exit="gone"
+                  {...stylex.attrs(styles.table)}
+                >
+                  <caption {...stylex.attrs(styles.srOnly)}>
+                    Product catalog, {activeMode.englishLabel}
+                  </caption>
+                  <colgroup {...stylex.attrs(styles.colgroup)}>
+                    <col {...stylex.attrs(styles.colName)} />
+                    <col {...stylex.attrs(styles.colAttribute)} />
+                    <col {...stylex.attrs(styles.colInci)} />
+                    <col {...stylex.attrs(styles.colFeatures)} />
+                  </colgroup>
+                  <thead {...stylex.attrs(styles.thead)}>
+                    <tr>
+                      <th scope="col" {...stylex.attrs(styles.headCell)}>
+                        名称
+                      </th>
+                      <th scope="col" {...stylex.attrs(styles.headCell)}>
+                        {activeMode.attributeHeading}
+                      </th>
+                      <th scope="col" {...stylex.attrs(styles.headCell)}>
+                        INCI 名称
+                      </th>
+                      <th scope="col" {...stylex.attrs(styles.headCell, styles.lastCell)}>
+                        特性&应用
+                      </th>
+                    </tr>
+                  </thead>
+                  <For each={GROUPS_BY_MODE[current]}>
+                    {(group, index) => (
+                      <GroupBody
+                        group={group}
+                        mode={current}
+                        first={index() === 0}
+                        variants={groupVariants()}
+                      />
+                    )}
+                  </For>
+                </m.table>
+              );
+            }}
+          </Show>
         </AnimatePresence>
       </div>
     </section>

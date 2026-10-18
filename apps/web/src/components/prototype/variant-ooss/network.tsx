@@ -1,6 +1,6 @@
 import * as stylex from "@stylexjs/stylex";
-import { useInView } from "motion/react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useInView } from "@/compat/motion";
+import { createEffect, createMemo, createSignal, onSettled, Show, untrack } from "solid-js";
 
 import { GLOBAL_INTRO, IMAGES, OFFICE_COLUMNS } from "./content";
 import { Reveal } from "./motion";
@@ -568,72 +568,68 @@ const SIDE_STYLE = {
   s: styles.labelS,
 } as const;
 
-function MarkerLabel({
-  city,
-  drawn,
-  state,
-  delay,
-}: {
-  city: City;
-  drawn: boolean;
-  state: MarkerState;
-  delay: number;
-}) {
+// stylex.attrs with reactive (accessor) arguments: the StyleX compiler tries to
+// evaluate local arrow functions at build time and throws, so these call sites
+// resolve at runtime instead.
+const sxProps: typeof stylex.attrs = (...args) => stylex.attrs(...args);
+
+function MarkerLabel(props: { city: City; drawn: boolean; state: MarkerState; delay: number }) {
   return (
     <span
-      {...stylex.props(
+      {...stylex.attrs(
         styles.label,
-        SIDE_STYLE[city.side],
-        styles.labelAt(city.dx, city.dy),
-        city.hq && styles.labelHq,
-        state === "on" && styles.labelOn,
+        SIDE_STYLE[props.city.side],
+        styles.labelAt(props.city.dx, props.city.dy),
+        props.city.hq && styles.labelHq,
+        props.state === "on" && styles.labelOn,
         styles.reveal,
-        drawn && styles.revealIn,
-        styles.revealAt(delay),
+        props.drawn && styles.revealIn,
+        styles.revealAt(props.delay),
       )}
     >
-      {city.hq ? `${city.name} · ${HQ_TAG}` : city.name}
+      {props.city.hq ? `${props.city.name} · ${HQ_TAG}` : props.city.name}
     </span>
   );
 }
 
-function Marker({ city, drawn, state }: { city: City; drawn: boolean; state: MarkerState }) {
+function Marker(props: { city: City; drawn: boolean; state: MarkerState }) {
+  const city = untrack(() => props.city);
   const arcDelay = ARC_DELAY.get(city.office) ?? 0;
   const dotDelay = city.hq ? 0 : arcDelay + DOT_POP_AFTER_MS;
   const labelDelay = city.hq ? 120 : dotDelay + 60;
   const leader = Math.hypot(city.dx, city.dy) > LEADER_MIN_PX;
   return (
     <span
-      {...stylex.props(
+      {...stylex.attrs(
         styles.marker,
         styles.markerAt(`${(city.x / MAP_WIDTH) * 100}%`, `${(city.y / MAP_HEIGHT) * 100}%`),
         city.hq && styles.markerHq,
-        state === "off" && !city.hq && styles.markerOff,
+        props.state === "off" && !city.hq && styles.markerOff,
       )}
     >
       {leader ? (
         <svg
           aria-hidden="true"
-          {...stylex.props(
+          {...stylex.attrs(
             styles.leader,
             styles.reveal,
-            drawn && styles.revealIn,
+            props.drawn && styles.revealIn,
             styles.revealAt(labelDelay),
           )}
         >
-          <line x1={0} y1={0} x2={city.dx} y2={city.dy} {...stylex.props(styles.leaderLine)} />
+          <line x1={0} y1={0} x2={city.dx} y2={city.dy} {...stylex.attrs(styles.leaderLine)} />
         </svg>
       ) : null}
       <span
-        {...stylex.props(
+        {...stylex.attrs(
           styles.dot,
           city.hq && styles.dotHq,
-          drawn && styles.dotIn,
-          state === "on" && styles.dotOn,
+          props.drawn && styles.dotIn,
+          props.state === "on" && styles.dotOn,
           styles.dotAt(dotDelay),
         )}
       />
-      <MarkerLabel city={city} drawn={drawn} state={state} delay={labelDelay} />
+      <MarkerLabel city={city} drawn={props.drawn} state={props.state} delay={labelDelay} />
     </span>
   );
 }
@@ -643,23 +639,23 @@ function stateOf(region: number, active: number | null): MarkerState {
   return region === active ? "on" : "off";
 }
 
-function WorldMap({ active }: { active: number | null }) {
-  const boxRef = useRef<HTMLDivElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [width, setWidth] = useState(0);
-  const drawn = useInView(boxRef, { once: true, amount: 0.4 });
+function WorldMap(props: { active: number | null }) {
+  let boxEl: HTMLDivElement | undefined;
+  let canvasEl: HTMLCanvasElement | undefined;
+  const [width, setWidth] = createSignal(0);
+  const drawn = useInView(() => boxEl, { once: true, amount: 0.4 });
 
-  useEffect(() => {
-    const box = boxRef.current;
+  onSettled(() => {
+    const box = boxEl;
     if (!box) return;
     const observer = new ResizeObserver(() => setWidth(box.clientWidth));
     observer.observe(box);
     return () => observer.disconnect();
-  }, []);
+  });
 
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas || width === 0) return;
+  createEffect(width, (currentWidth) => {
+    const canvas = canvasEl;
+    if (!canvas || currentWidth === 0) return;
     let cancelled = false;
     void loadLandMask().then((mask) => {
       if (!cancelled) paintLand(canvas, mask);
@@ -667,49 +663,42 @@ function WorldMap({ active }: { active: number | null }) {
     return () => {
       cancelled = true;
     };
-  }, [width]);
+  });
 
-  const scale = width / MAP_WIDTH;
-  const paths = useMemo(
-    () => (width === 0 ? [] : ARCS.map(({ city }) => arcPath(HQ, city, scale))),
-    [scale, width],
-  );
+  const paths = createMemo(() => {
+    const scale = width() / MAP_WIDTH;
+    return width() === 0 ? [] : ARCS.map(({ city }) => arcPath(HQ, city, scale));
+  });
 
   return (
-    <div ref={boxRef} role="img" aria-label={IMAGES.officeMap.alt} {...stylex.props(styles.mapBox)}>
-      <canvas ref={canvasRef} aria-hidden="true" {...stylex.props(styles.landMap)} />
-      {width > 0 ? (
+    <div ref={boxEl} role="img" aria-label={IMAGES.officeMap.alt} {...stylex.attrs(styles.mapBox)}>
+      <canvas ref={canvasEl} aria-hidden="true" {...stylex.attrs(styles.landMap)} />
+      <Show when={width() > 0}>
         <svg
           aria-hidden="true"
-          width={width}
-          height={width * (MAP_HEIGHT / MAP_WIDTH)}
-          viewBox={`0 0 ${width} ${width * (MAP_HEIGHT / MAP_WIDTH)}`}
-          {...stylex.props(styles.arcs)}
+          width={width()}
+          height={width() * (MAP_HEIGHT / MAP_WIDTH)}
+          viewBox={`0 0 ${width()} ${width() * (MAP_HEIGHT / MAP_WIDTH)}`}
+          {...stylex.attrs(styles.arcs)}
         >
           {ARCS.map(({ city, delayMs }, index) => (
             <path
-              key={city.office}
-              d={paths[index]}
+              d={paths()[index]}
               pathLength={1}
-              {...stylex.props(
+              {...sxProps(
                 styles.arc,
-                drawn && styles.arcDrawn,
-                active !== null && city.region === active && styles.arcOn,
-                active !== null && city.region !== active && styles.arcOff,
+                drawn() && styles.arcDrawn,
+                props.active !== null && city.region === props.active && styles.arcOn,
+                props.active !== null && city.region !== props.active && styles.arcOff,
                 styles.arcAt(delayMs),
               )}
             />
           ))}
         </svg>
-      ) : null}
-      <div aria-hidden="true" {...stylex.props(styles.markers)}>
+      </Show>
+      <div aria-hidden="true" {...stylex.attrs(styles.markers)}>
         {CITIES.map((city) => (
-          <Marker
-            key={city.office}
-            city={city}
-            drawn={drawn}
-            state={stateOf(city.region, active)}
-          />
+          <Marker city={city} drawn={drawn()} state={stateOf(city.region, props.active)} />
         ))}
       </div>
     </div>
@@ -717,18 +706,18 @@ function WorldMap({ active }: { active: number | null }) {
 }
 
 export function Network() {
-  const [hovered, setHovered] = useState<number | null>(null);
-  const [pinned, setPinned] = useState<number | null>(null);
-  const active = hovered ?? pinned;
+  const [hovered, setHovered] = createSignal<number | null>(null);
+  const [pinned, setPinned] = createSignal<number | null>(null);
+  const active = () => hovered() ?? pinned();
 
   return (
     <section
       id="offices"
       aria-labelledby="oo-offices-title"
-      {...stylex.props(styles.section, layout.section)}
+      {...stylex.attrs(styles.section, layout.section)}
     >
-      <div {...stylex.props(layout.shell, layout.inset, styles.grid)}>
-        <div {...stylex.props(styles.header)}>
+      <div {...stylex.attrs(layout.shell, layout.inset, styles.grid)}>
+        <div {...stylex.attrs(styles.header)}>
           <SectionTitle id="oo-offices-title" tone="dark">
             {GLOBAL_INTRO.title}
           </SectionTitle>
@@ -739,38 +728,34 @@ export function Network() {
             {META}
           </Reveal>
         </div>
-        <WorldMap active={active} />
-        <div {...stylex.props(styles.panel)}>
-          <ul aria-label="Global office regions" {...stylex.props(styles.regions)}>
+        <WorldMap active={active()} />
+        <div {...stylex.attrs(styles.panel)}>
+          <ul aria-label="Global office regions" {...stylex.attrs(styles.regions)}>
             {REGIONS.map((region, index) => (
               <Reveal
                 as="li"
-                key={region.name}
                 index={index}
-                sx={[styles.region, active === index && styles.regionOn]}
+                sx={[styles.region, active() === index && styles.regionOn]}
               >
                 <button
                   type="button"
-                  aria-pressed={pinned === index}
+                  aria-pressed={pinned() === index ? "true" : "false"}
                   onMouseEnter={() => setHovered(index)}
                   onMouseLeave={() => setHovered(null)}
                   onFocus={(event) => {
                     if (event.currentTarget.matches(":focus-visible")) setHovered(index);
                   }}
                   onBlur={() => setHovered(null)}
-                  onClick={() => setPinned(pinned === index ? null : index)}
-                  {...stylex.props(styles.regionButton)}
+                  onClick={() => setPinned(pinned() === index ? null : index)}
+                  {...stylex.attrs(styles.regionButton)}
                 >
-                  <span {...stylex.props(styles.regionName)}>{region.name}</span>
-                  <span {...stylex.props(styles.offices)}>
+                  <span {...stylex.attrs(styles.regionName)}>{region.name}</span>
+                  <span {...stylex.attrs(styles.offices)}>
                     {region.offices.map((office) => (
-                      <span
-                        key={office}
-                        {...stylex.props(styles.office, active === index && styles.officeOn)}
-                      >
+                      <span {...sxProps(styles.office, active() === index && styles.officeOn)}>
                         {office}
                         {office === HQ_OFFICE ? (
-                          <span {...stylex.props(styles.officeTag)}>{` · ${HQ_TAG}`}</span>
+                          <span {...stylex.attrs(styles.officeTag)}>{` · ${HQ_TAG}`}</span>
                         ) : null}
                       </span>
                     ))}

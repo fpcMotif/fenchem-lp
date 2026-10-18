@@ -1,7 +1,8 @@
 import * as stylex from "@stylexjs/stylex";
 import type { StyleXStyles } from "@stylexjs/stylex";
-import { m, useScroll, useTransform } from "motion/react";
-import { useRef } from "react";
+import { m, useScroll, useTransform } from "@/compat/motion";
+import { For } from "solid-js";
+import type { JSX } from "@solidjs/web";
 
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
@@ -226,61 +227,63 @@ const styles = stylex.create({
   },
 });
 
-function VectorArt({
-  paths,
-  viewBox,
-  sx,
-  knockout = false,
-}: {
+function VectorArt(props: {
   paths: readonly VectorPath[];
   viewBox: string;
   sx: StyleXStyles;
   knockout?: boolean;
 }) {
   return (
-    <svg viewBox={viewBox} aria-hidden="true" focusable="false" {...stylex.props(sx)}>
-      {paths.map((path) => (
-        <path
-          key={path.d}
-          d={path.d}
-          {...stylex.props(
-            knockout && path.fill !== WHITE_FILL ? styles.fillFooter : styles.fillPaper,
-          )}
-        />
-      ))}
+    <svg viewBox={props.viewBox} aria-hidden="true" {...UNFOCUSABLE} {...stylex.attrs(props.sx)}>
+      <For each={props.paths}>
+        {(path) => (
+          <path
+            d={path.d}
+            {...stylex.attrs(
+              props.knockout && path.fill !== WHITE_FILL ? styles.fillFooter : styles.fillPaper,
+            )}
+          />
+        )}
+      </For>
     </svg>
   );
 }
 
+// `focusable` (legacy SVG attribute) is not in Solid's JSX types.
+const UNFOCUSABLE = { focusable: "false" } as JSX.SvgSVGAttributes<SVGSVGElement>;
+
 export function ContactBand() {
-  const bandRef = useRef<HTMLElement>(null);
+  let bandEl: HTMLElement | undefined;
   const reduce = useReducedMotion();
-  const { scrollYProgress } = useScroll({ target: bandRef, offset: ["start end", "end start"] });
+  const { scrollYProgress } = useScroll({
+    target: () => bandEl,
+    offset: ["start end", "end start"],
+  });
   const scale = useTransform(scrollYProgress, [0, 1], [1, BAND_SCALE_END]);
   return (
     <section
-      ref={bandRef}
+      ref={bandEl}
       id="contact"
       aria-labelledby="oo-contact-title"
-      {...stylex.props(styles.band)}
+      {...stylex.attrs(styles.band)}
     >
-      <m.div style={reduce ? undefined : { scale }} {...stylex.props(styles.bandMedia)}>
+      <m.div style={reduce() ? undefined : { scale }} {...stylex.attrs(styles.bandMedia)}>
         <img
           src={BAND_IMAGE}
           alt=""
           aria-hidden="true"
           loading="lazy"
           decoding="async"
-          {...stylex.props(styles.bandImage)}
+          {...stylex.attrs(styles.bandImage)}
         />
       </m.div>
-      <div {...stylex.props(styles.bandScrim)} />
-      <div {...stylex.props(layout.shell, layout.inset, layout.grid12, styles.bandContent)}>
+      <div {...stylex.attrs(styles.bandScrim)} />
+      <div {...stylex.attrs(layout.shell, layout.inset, layout.grid12, styles.bandContent)}>
         <Reveal sx={styles.bandCopy}>
-          <h2 id="oo-contact-title" {...stylex.props(styles.bandHeadline)}>
+          <h2 id="oo-contact-title" {...stylex.attrs(styles.bandHeadline)}>
             {HEADLINE}
           </h2>
-          <a href={CTA.action.href} {...stylex.props(styles.bandButton)}>
+          <a href={CTA.action.href} {...stylex.attrs(styles.bandButton)}>
             {CTA.action.label}
           </a>
         </Reveal>
@@ -291,22 +294,22 @@ export function ContactBand() {
 
 export function SiteFooter() {
   return (
-    <footer {...stylex.props(styles.footer)}>
-      <div {...stylex.props(layout.shell, layout.inset)}>
-        <div {...stylex.props(styles.grid)}>
-          <div {...stylex.props(styles.brand)}>
-            <a href="#top" aria-label="FENCHEM home" {...stylex.props(styles.logoLink)}>
+    <footer {...stylex.attrs(styles.footer)}>
+      <div {...stylex.attrs(layout.shell, layout.inset)}>
+        <div {...stylex.attrs(styles.grid)}>
+          <div {...stylex.attrs(styles.brand)}>
+            <a href="#top" aria-label="FENCHEM home" {...stylex.attrs(styles.logoLink)}>
               <VectorArt paths={LOGO_PATHS} viewBox="0 0 161 52" sx={styles.logo} />
             </a>
           </div>
-          <nav aria-label="Footer" {...stylex.props(styles.columns)}>
+          <nav aria-label="Footer" {...stylex.attrs(styles.columns)}>
             {FOOTER_COLUMNS.map((column) => (
-              <div key={column.heading}>
-                <h3 {...stylex.props(styles.columnHeading)}>{column.heading}</h3>
-                <ul {...stylex.props(styles.columnLinks)}>
+              <div>
+                <h3 {...stylex.attrs(styles.columnHeading)}>{column.heading}</h3>
+                <ul {...stylex.attrs(styles.columnLinks)}>
                   {column.links.map((link) => (
-                    <li key={link}>
-                      <a href={LINK_TARGETS[link] ?? "#top"} {...stylex.props(styles.columnLink)}>
+                    <li>
+                      <a href={LINK_TARGETS[link] ?? "#top"} {...stylex.attrs(styles.columnLink)}>
                         {link}
                       </a>
                     </li>
@@ -316,16 +319,11 @@ export function SiteFooter() {
             ))}
           </nav>
         </div>
-        <div {...stylex.props(styles.bottom)}>
-          <p {...stylex.props(styles.copyright)}>{COPYRIGHT}</p>
-          <div {...stylex.props(styles.social)}>
+        <div {...stylex.attrs(styles.bottom)}>
+          <p {...stylex.attrs(styles.copyright)}>{COPYRIGHT}</p>
+          <div {...stylex.attrs(styles.social)}>
             {SOCIALS.map((social) => (
-              <a
-                key={social.label}
-                href="#top"
-                aria-label={social.label}
-                {...stylex.props(styles.socialLink)}
-              >
+              <a href="#top" aria-label={social.label} {...stylex.attrs(styles.socialLink)}>
                 <VectorArt
                   paths={social.paths}
                   viewBox={social.viewBox}

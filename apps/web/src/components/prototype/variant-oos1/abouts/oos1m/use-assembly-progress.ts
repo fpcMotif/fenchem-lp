@@ -5,9 +5,10 @@ import {
   useMotionValueEvent,
   useScroll,
   type MotionValue,
-} from "motion/react";
-import { useEffect, useSyncExternalStore, type RefObject } from "react";
+} from "@/compat/motion";
+import { createEffect, type Accessor } from "solid-js";
 
+import { createExternalStore } from "@/compat/external-store";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
 const DESKTOP_QUERY = "(min-width: 1024px)";
@@ -19,7 +20,7 @@ function subscribeDesktop(onChange: () => void) {
 }
 
 export function useIsDesktop() {
-  return useSyncExternalStore(
+  return createExternalStore(
     subscribeDesktop,
     () => window.matchMedia(DESKTOP_QUERY).matches,
     () => false,
@@ -27,8 +28,8 @@ export function useIsDesktop() {
 }
 
 export function useScrollAssembly(
-  track: RefObject<HTMLElement | null>,
-  drawing: RefObject<HTMLElement | null>,
+  track: Accessor<HTMLElement | undefined>,
+  drawing: Accessor<HTMLElement | undefined>,
 ): MotionValue<number> {
   const reduce = useReducedMotion();
   const desktop = useIsDesktop();
@@ -37,43 +38,49 @@ export function useScrollAssembly(
   const { scrollYProgress } = useScroll({ target: track, offset: ["start 80px", "end end"] });
 
   useMotionValueEvent(scrollYProgress, "change", (value) => {
-    if (desktop && !reduce) progress.set(value);
+    if (desktop() && !reduce()) progress.set(value);
   });
 
-  useEffect(() => {
-    if (reduce) {
-      progress.set(1);
-      return;
-    }
-    if (desktop) {
-      progress.set(scrollYProgress.get());
-      return;
-    }
-    if (!inView) return;
-    const controls = animate(progress, 1, { duration: 2.6, ease: "linear" });
-    return () => controls.stop();
-  }, [reduce, desktop, inView, progress, scrollYProgress]);
+  createEffect(
+    () => ({ reduce: reduce(), desktop: desktop(), inView: inView() }),
+    ({ reduce, desktop, inView }) => {
+      if (reduce) {
+        progress.set(1);
+        return;
+      }
+      if (desktop) {
+        progress.set(scrollYProgress.get());
+        return;
+      }
+      if (!inView) return;
+      const controls = animate(progress, 1, { duration: 2.6, ease: "linear" });
+      return () => controls.stop();
+    },
+  );
 
   return progress;
 }
 
 export function useViewAssembly(
-  target: RefObject<HTMLElement | null>,
+  target: Accessor<HTMLElement | undefined>,
   duration: number,
 ): MotionValue<number> {
   const reduce = useReducedMotion();
   const progress = useMotionValue(0);
   const inView = useInView(target, { once: true, amount: 0.45 });
 
-  useEffect(() => {
-    if (reduce) {
-      progress.set(1);
-      return;
-    }
-    if (!inView) return;
-    const controls = animate(progress, 1, { duration, ease: "linear" });
-    return () => controls.stop();
-  }, [reduce, inView, progress, duration]);
+  createEffect(
+    () => ({ reduce: reduce(), inView: inView() }),
+    ({ reduce, inView }) => {
+      if (reduce) {
+        progress.set(1);
+        return;
+      }
+      if (!inView) return;
+      const controls = animate(progress, 1, { duration, ease: "linear" });
+      return () => controls.stop();
+    },
+  );
 
   return progress;
 }

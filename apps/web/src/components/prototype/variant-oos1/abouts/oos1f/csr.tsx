@@ -1,4 +1,3 @@
-import { breakpoints } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 
 import { ABOUT_CSR } from "../../about-data";
@@ -10,9 +9,9 @@ const styles = stylex.create({
     display: "grid",
     gridTemplateColumns: {
       default: "minmax(0, 1fr)",
-      [breakpoints.lg]: "minmax(0, 6fr) minmax(0, 5fr)",
+      ["@media (min-width: 1024px)"]: "minmax(0, 6fr) minmax(0, 5fr)",
     },
-    columnGap: { default: 0, [breakpoints.lg]: 80 },
+    columnGap: { default: 0, ["@media (min-width: 1024px)"]: 80 },
     rowGap: 48,
     alignItems: "center",
   },
@@ -29,7 +28,7 @@ const styles = stylex.create({
       default: 28,
       [media.mdOnly]: 40,
       [media.lgOnly]: 30,
-      [breakpoints.xl]: "clamp(34px, 3vw, 44px)",
+      ["@media (min-width: 1280px)"]: "clamp(34px, 3vw, 44px)",
     },
     fontWeight: 400,
     lineHeight: 1.45,
@@ -43,7 +42,7 @@ const styles = stylex.create({
   desc: {
     margin: 0,
     maxWidth: "32em",
-    fontSize: { default: 16, [breakpoints.lg]: 17 },
+    fontSize: { default: 16, ["@media (min-width: 1024px)"]: 17 },
     fontWeight: 400,
     lineHeight: 2,
     letterSpacing: "0.04em",
@@ -54,7 +53,7 @@ const styles = stylex.create({
     display: "grid",
     gridTemplateColumns: {
       default: "minmax(0, 1fr)",
-      [breakpoints.md]: "repeat(3, minmax(0, 1fr))",
+      ["@media (min-width: 768px)"]: "repeat(3, minmax(0, 1fr))",
     },
     columnGap: 24,
     rowGap: 12,
@@ -76,7 +75,7 @@ const styles = stylex.create({
   image: {
     display: "block",
     width: "100%",
-    aspectRatio: { default: "4 / 3", [breakpoints.lg]: "4 / 5" },
+    aspectRatio: { default: "4 / 3", ["@media (min-width: 1024px)"]: "4 / 5" },
     objectFit: "cover",
     objectPosition: "56% 50%",
     borderRadius: 2,
@@ -89,18 +88,16 @@ export function Csr() {
     <Section id="about-csr" name="Responsibility">
       <Shell>
         <NodeMarker />
-        <div {...stylex.props(styles.grid)}>
+        <div {...stylex.attrs(styles.grid)}>
           <Reveal sx={styles.copy}>
-            <h3 {...stylex.props(styles.statement)}>
-              <span {...stylex.props(styles.statementLine)}>{lead}</span>
-              <span {...stylex.props(styles.statementLine)}>{close}</span>
+            <h3 {...stylex.attrs(styles.statement)}>
+              <span {...stylex.attrs(styles.statementLine)}>{lead}</span>
+              <span {...stylex.attrs(styles.statementLine)}>{close}</span>
             </h3>
-            <p {...stylex.props(styles.desc)}>{ABOUT_CSR.desc}</p>
-            <ul {...stylex.props(styles.outcomes)}>
+            <p {...stylex.attrs(styles.desc)}>{ABOUT_CSR.desc}</p>
+            <ul {...stylex.attrs(styles.outcomes)}>
               {ABOUT_CSR.outcomes.map((outcome) => (
-                <li key={outcome.title} {...stylex.props(styles.outcome)}>
-                  {outcome.title}
-                </li>
+                <li {...stylex.attrs(styles.outcome)}>{outcome.title}</li>
               ))}
             </ul>
           </Reveal>
@@ -110,7 +107,7 @@ export function Csr() {
               alt={ABOUT_CSR.imageAlt}
               loading="lazy"
               decoding="async"
-              {...stylex.props(styles.image)}
+              {...stylex.attrs(styles.image)}
             />
           </Reveal>
         </div>

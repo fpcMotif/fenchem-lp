@@ -1,33 +1,12 @@
-import { useSyncExternalStore } from "react";
+import type { Accessor } from "solid-js";
+
+import { createMediaQuery, REDUCED_MOTION_QUERY } from "@/compat/reduced-motion";
 
 /*
- * Hydration-safe replacement for motion/react's `useReducedMotion`.
- *
- * motion's hook seeds `useState` from `matchMedia` synchronously, so under
- * `prefers-reduced-motion: reduce` the first client render takes the reduce
- * branch while the server rendered the other one — every variant page then
- * logs "Hydration failed because the server rendered HTML didn't match the
- * client". `useSyncExternalStore` renders the server snapshot (false) during
- * hydration, then re-renders with the real preference and tracks live changes.
- *
- * Consequence for callers: the reduce value arrives one render AFTER mount,
- * so a reduce-branched `initial` is captured with its non-reduce value —
- * animation targets must always reset transforms (e.g. `y: 0`) rather than
- * relying on the reduce branch to never have applied them.
+ * Hydration-safe reduced-motion preference: false on the server and during
+ * hydration, then the live `prefers-reduced-motion` value (same contract as the
+ * React app's useSyncExternalStore version).
  */
-
-const QUERY = "(prefers-reduced-motion: reduce)";
-
-function subscribe(onChange: () => void) {
-  const mediaQuery = window.matchMedia(QUERY);
-  mediaQuery.addEventListener("change", onChange);
-  return () => mediaQuery.removeEventListener("change", onChange);
-}
-
-export function useReducedMotion(): boolean {
-  return useSyncExternalStore(
-    subscribe,
-    () => window.matchMedia(QUERY).matches,
-    () => false,
-  );
+export function useReducedMotion(): Accessor<boolean> {
+  return createMediaQuery(REDUCED_MOTION_QUERY);
 }

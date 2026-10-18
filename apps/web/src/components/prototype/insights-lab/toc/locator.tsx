@@ -1,8 +1,10 @@
 import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { ChevronDown, ChevronRight } from "lucide-react";
-import { AnimatePresence, m, type MotionValue } from "motion/react";
-import { useEffect, useRef, useState, type KeyboardEvent, type RefObject } from "react";
+import type { StyleXStyles } from "@stylexjs/stylex";
+import { ChevronDown, ChevronRight } from "@fenchem-lp/ui/components/lucide";
+import { createEffect, createMemo, createSignal, For, onSettled, Show, untrack } from "solid-js";
+
+import { AnimatePresence, m, type MotionValue } from "@/compat/motion";
 
 import { ArticleMeta } from "../kit";
 import { useReducedMotion } from "../../use-reduced-motion";
@@ -35,6 +37,9 @@ import {
 const READING_LINE = STICKY_OFFSET + READING_GAP;
 const PANEL_ID = "insights-locator-panel";
 const EASE_OUT = [0.23, 1, 0.32, 1] as const;
+
+const sxProps = (...args: ReadonlyArray<StyleXStyles | false | null | undefined>) =>
+  stylex.attrs(...args);
 
 const styles = stylex.create({
   trigger: {
@@ -359,26 +364,26 @@ const styles = stylex.create({
   },
 });
 
-export function LocatorVariant({ onNavigateHome }: SubPageProps) {
+export function LocatorVariant(props: SubPageProps) {
   const articles = useLabArticles();
   const { position, articleProgress } = useReadingPosition(articles, READING_LINE);
-  const [open, setOpen] = useState(false);
-  const triggerRef = useRef<HTMLButtonElement>(null);
-  const panelRef = useRef<HTMLElement>(null);
-  const where = locationLabel(articles, position);
+  const [open, setOpen] = createSignal(false);
+  let trigger: HTMLButtonElement | undefined;
+  let panel: HTMLElement | undefined;
+  const where = createMemo(() => locationLabel(articles(), position()));
 
-  useEffect(() => {
-    if (!open) return;
+  createEffect(open, (isOpen) => {
+    if (!isOpen) return;
     const onPointerDown = (event: PointerEvent) => {
       const target = event.target as Node;
-      if (panelRef.current?.contains(target) || triggerRef.current?.contains(target)) return;
+      if (panel?.contains(target) || trigger?.contains(target)) return;
       setOpen(false);
     };
-    const onKeyDown = (event: globalThis.KeyboardEvent) => {
+    const onKeyDown = (event: KeyboardEvent) => {
       if (event.key !== "Escape") return;
       event.preventDefault();
       setOpen(false);
-      triggerRef.current?.focus();
+      trigger?.focus();
     };
     document.addEventListener("pointerdown", onPointerDown);
     document.addEventListener("keydown", onKeyDown);
@@ -386,104 +391,113 @@ export function LocatorVariant({ onNavigateHome }: SubPageProps) {
       document.removeEventListener("pointerdown", onPointerDown);
       document.removeEventListener("keydown", onKeyDown);
     };
-  }, [open]);
+  });
 
   return (
     <TocPage
-      onNavigateHome={onNavigateHome}
+      onNavigateHome={props.onNavigateHome}
       bar={
         <button
-          ref={triggerRef}
+          ref={trigger}
           type="button"
-          aria-expanded={open}
+          aria-expanded={open() ? "true" : "false"}
           aria-controls={PANEL_ID}
           onClick={() => setOpen((value) => !value)}
-          {...stylex.props(styles.trigger, open && styles.triggerOpen, kitStyles.focusRing)}
+          {...sxProps(styles.trigger, open() && styles.triggerOpen, kitStyles.focusRing)}
         >
           <ProgressRing progress={articleProgress} />
-          {where ? (
-            <>
-              <span {...stylex.props(styles.count, labStyles.displayNumber)}>
-                {`${padIndex(position.article)}/${padIndex(articles.length - 1)}`}
-              </span>
-              <span {...stylex.props(styles.title)}>{shortTitle(where.article)}</span>
-              <ChevronRight
-                size={14}
-                strokeWidth={2}
-                aria-hidden="true"
-                {...stylex.props(styles.separator)}
-              />
-              <span {...stylex.props(styles.chapter)}>
-                {where.section ? `${where.section.numeral} ${where.section.text}` : "导读"}
-              </span>
-            </>
-          ) : (
-            <span {...stylex.props(styles.chapter)}>{`本页目录 · ${articles.length} 篇`}</span>
-          )}
+          <Show
+            when={where()}
+            fallback={
+              <span {...stylex.attrs(styles.chapter)}>{`本页目录 · ${articles().length} 篇`}</span>
+            }
+          >
+            {(current) => (
+              <>
+                <span {...stylex.attrs(styles.count, labStyles.displayNumber)}>
+                  {`${padIndex(position().article)}/${padIndex(articles().length - 1)}`}
+                </span>
+                <span {...stylex.attrs(styles.title)}>{shortTitle(current().article)}</span>
+                <ChevronRight
+                  size={14}
+                  strokeWidth={2}
+                  aria-hidden="true"
+                  {...stylex.attrs(styles.separator)}
+                />
+                <span {...stylex.attrs(styles.chapter)}>
+                  {current().section
+                    ? `${current().section!.numeral} ${current().section!.text}`
+                    : "导读"}
+                </span>
+              </>
+            )}
+          </Show>
           <ChevronDown
             size={16}
             strokeWidth={2}
             aria-hidden="true"
-            {...stylex.props(styles.chevron, open && styles.chevronOpen)}
+            {...sxProps(styles.chevron, open() && styles.chevronOpen)}
           />
         </button>
       }
       under={
-        <div {...stylex.props(kitStyles.shell, kitStyles.inset120)}>
-          <div {...stylex.props(styles.anchorBox)}>
+        <div {...stylex.attrs(kitStyles.shell, kitStyles.inset120)}>
+          <div {...stylex.attrs(styles.anchorBox)}>
             <AnimatePresence>
-              {open ? (
+              <Show when={open()}>
                 <LocatorPanel
-                  key="panel"
-                  panelRef={panelRef}
-                  articles={articles}
-                  position={position}
+                  panelRef={(el) => {
+                    panel = el;
+                  }}
+                  articles={articles()}
+                  position={position()}
                   progress={articleProgress}
                   onNavigate={() => setOpen(false)}
                 />
-              ) : null}
+              </Show>
             </AnimatePresence>
           </div>
         </div>
       }
     >
-      <ArticleFlow articles={articles} />
+      <ArticleFlow articles={articles()} />
     </TocPage>
   );
 }
 
-function ProgressRing({ progress }: { progress: MotionValue<number> }) {
+function ProgressRing(props: { progress: MotionValue<number> }) {
   return (
     <svg
       width="18"
       height="18"
       viewBox="0 0 18 18"
       aria-hidden="true"
-      {...stylex.props(styles.ring)}
+      {...stylex.attrs(styles.ring)}
     >
-      <circle cx="9" cy="9" r="7" fill="none" strokeWidth="2" {...stylex.props(styles.ringTrack)} />
+      <circle
+        cx="9"
+        cy="9"
+        r="7"
+        fill="none"
+        stroke-width="2"
+        {...stylex.attrs(styles.ringTrack)}
+      />
       <m.circle
         cx="9"
         cy="9"
         r="7"
         fill="none"
         stroke="currentColor"
-        strokeWidth="2"
+        stroke-width="2"
         transform="rotate(-90 9 9)"
-        style={{ pathLength: progress }}
+        style={{ pathLength: props.progress }}
       />
     </svg>
   );
 }
 
-function LocatorPanel({
-  panelRef,
-  articles,
-  position,
-  progress,
-  onNavigate,
-}: {
-  panelRef: RefObject<HTMLElement | null>;
+function LocatorPanel(props: {
+  panelRef: (element: HTMLElement) => void;
   articles: readonly LabArticle[];
   position: ReadingPosition;
   progress: MotionValue<number>;
@@ -491,30 +505,36 @@ function LocatorPanel({
 }) {
   const reduce = useReducedMotion();
   const wide = useMediaQuery("(min-width: 768px)");
-  const [preview, setPreview] = useState(() => Math.max(position.article, 0));
-  const articleLinks = useRef<(HTMLAnchorElement | null)[]>([]);
-  const detailRef = useRef<HTMLDivElement>(null);
-  const previewed = articles[preview] ?? articles[0];
+  const [preview, setPreview] = createSignal(untrack(() => Math.max(props.position.article, 0)));
+  const articleLinks: (HTMLAnchorElement | undefined)[] = [];
+  let panel: HTMLElement | undefined;
+  let detail: HTMLDivElement | undefined;
+  const previewed = () => props.articles[preview()] ?? props.articles[0];
+  const navigate = () => props.onNavigate();
 
-  useEffect(() => {
-    const first = panelRef.current?.querySelector<HTMLElement>("[data-initial]");
-    first?.focus({ preventScroll: true });
-  }, [panelRef]);
+  onSettled(() => {
+    const frame = requestAnimationFrame(() => {
+      const first = panel?.querySelector<HTMLElement>("[data-initial]");
+      first?.focus({ preventScroll: true });
+    });
+    return () => cancelAnimationFrame(frame);
+  });
 
   const chapterLinks = () => [
-    ...(detailRef.current?.querySelectorAll<HTMLAnchorElement>("a[data-chapter]") ?? []),
+    ...(detail?.querySelectorAll<HTMLAnchorElement>("a[data-chapter]") ?? []),
   ];
 
-  const onKeyDown = (event: KeyboardEvent<HTMLElement>) => {
+  const onKeyDown = (event: KeyboardEvent) => {
     const active = document.activeElement;
-    const inArticles = articleLinks.current.some((link) => link === active);
+    const inArticles = articleLinks.some((link) => link === active);
     const chapters = chapterLinks();
     const chapterIndex = chapters.findIndex((link) => link === active);
     const move = (offset: number) => {
       event.preventDefault();
       if (inArticles) {
-        const next = (preview + offset + articles.length) % articles.length;
-        articleLinks.current[next]?.focus();
+        const count = props.articles.length;
+        const next = (preview() + offset + count) % count;
+        articleLinks[next]?.focus();
       } else if (chapterIndex >= 0) {
         chapters[(chapterIndex + offset + chapters.length) % chapters.length]?.focus();
       }
@@ -526,183 +546,217 @@ function LocatorPanel({
       chapters[0]?.focus();
     } else if (event.key === "ArrowLeft" && chapterIndex >= 0) {
       event.preventDefault();
-      articleLinks.current[preview]?.focus();
+      articleLinks[preview()]?.focus();
     }
   };
 
   return (
     <m.nav
-      ref={panelRef}
+      ref={(element: HTMLElement) => {
+        panel = element;
+        props.panelRef(element);
+      }}
       id={PANEL_ID}
       aria-label="本页目录"
-      onKeyDown={wide ? onKeyDown : undefined}
-      initial={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.97, y: -6 }}
+      onKeyDown={(event: KeyboardEvent) => {
+        if (wide()) onKeyDown(event);
+      }}
+      initial={untrack(reduce) ? { opacity: 0 } : { opacity: 0, scale: 0.97, y: -6 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
       exit={{
         opacity: 0,
-        ...(reduce ? {} : { scale: 0.98, y: -4 }),
+        ...(reduce() ? {} : { scale: 0.98, y: -4 }),
         transition: { duration: 0.12, ease: EASE_OUT },
       }}
       transition={{ duration: 0.2, ease: EASE_OUT }}
-      {...stylex.props(styles.panel)}
+      {...stylex.attrs(styles.panel)}
     >
-      {wide ? (
-        <>
-          <ol {...stylex.props(styles.articles)}>
-            {articles.map((article, index) => (
-              <li key={article.id}>
-                <a
-                  ref={(node) => {
-                    articleLinks.current[index] = node;
-                  }}
-                  href={`#${articleAnchor(article)}`}
-                  data-initial={index === preview ? "" : undefined}
-                  aria-current={index === position.article ? "location" : undefined}
-                  onPointerEnter={() => setPreview(index)}
-                  onFocus={() => setPreview(index)}
-                  onClick={onNavigate}
-                  {...stylex.props(
-                    styles.articleRow,
-                    index === preview && styles.articleRowPreview,
-                  )}
-                >
-                  <span
-                    {...stylex.props(
-                      styles.articleNumber,
-                      labStyles.displayNumber,
-                      index === position.article && styles.articleNumberHere,
+      <Show
+        when={wide()}
+        fallback={
+          <ol {...stylex.attrs(styles.stack)}>
+            <For each={props.articles}>
+              {(article, index) => {
+                const isHere = () => index() === props.position.article;
+                return (
+                  <li {...stylex.attrs(styles.stackItem)}>
+                    <a
+                      href={`#${articleAnchor(article)}`}
+                      data-initial={index() === preview() ? "" : undefined}
+                      aria-current={isHere() ? "location" : undefined}
+                      onClick={navigate}
+                      {...stylex.attrs(styles.stackArticle, kitStyles.focusRing)}
+                    >
+                      <span
+                        {...sxProps(
+                          styles.articleNumber,
+                          labStyles.displayNumber,
+                          isHere() && styles.articleNumberHere,
+                        )}
+                      >
+                        {padIndex(index())}
+                      </span>
+                      <span>{shortTitle(article)}</span>
+                    </a>
+                    <ol {...stylex.attrs(styles.stackChapters)}>
+                      {article.sections.map((section, chapter) => {
+                        const { numeral, text } = splitNumeral(section.navLabel);
+                        const here = () => isHere() && chapter === props.position.chapter;
+                        return (
+                          <li>
+                            <a
+                              href={`#${sectionAnchor(article, section)}`}
+                              aria-current={here() ? "location" : undefined}
+                              onClick={navigate}
+                              {...sxProps(
+                                styles.stackChapter,
+                                here() && styles.chapterHere,
+                                kitStyles.focusRing,
+                              )}
+                            >
+                              <span {...stylex.attrs(styles.numeral)}>{numeral}</span>
+                              <span>{text}</span>
+                              <Show when={here()}>
+                                <span {...stylex.attrs(styles.here)}>当前</span>
+                              </Show>
+                            </a>
+                          </li>
+                        );
+                      })}
+                    </ol>
+                  </li>
+                );
+              }}
+            </For>
+          </ol>
+        }
+      >
+        <ol {...stylex.attrs(styles.articles)}>
+          <For each={props.articles}>
+            {(article, index) => {
+              const isHere = () => index() === props.position.article;
+              return (
+                <li>
+                  <a
+                    ref={(node) => {
+                      articleLinks[index()] = node;
+                    }}
+                    href={`#${articleAnchor(article)}`}
+                    data-initial={index() === preview() ? "" : undefined}
+                    aria-current={isHere() ? "location" : undefined}
+                    onPointerEnter={() => setPreview(index())}
+                    onFocusIn={() => setPreview(index())}
+                    onClick={navigate}
+                    {...sxProps(
+                      styles.articleRow,
+                      index() === preview() && styles.articleRowPreview,
                     )}
                   >
-                    {padIndex(index)}
-                  </span>
-                  <span>{shortTitle(article)}</span>
-                  <span {...stylex.props(styles.articleMinutes, labStyles.displayNumber)}>
-                    {`${readMinutes(article)} 分钟`}
-                  </span>
-                  <span aria-hidden="true" {...stylex.props(styles.bar)}>
-                    {index === position.article ? (
-                      <m.span style={{ scaleX: progress }} {...stylex.props(styles.barFill)} />
-                    ) : (
-                      <span
-                        {...stylex.props(
-                          styles.barFill,
-                          index < position.article ? styles.barFillDone : styles.barFillAhead,
-                        )}
-                      />
-                    )}
-                  </span>
-                </a>
-              </li>
-            ))}
-          </ol>
-          {previewed ? (
-            <div ref={detailRef} {...stylex.props(styles.detail)}>
-              <ArticleMeta article={previewed} />
-              <p {...stylex.props(styles.detailTitle)}>
+                    <span
+                      {...sxProps(
+                        styles.articleNumber,
+                        labStyles.displayNumber,
+                        isHere() && styles.articleNumberHere,
+                      )}
+                    >
+                      {padIndex(index())}
+                    </span>
+                    <span>{shortTitle(article)}</span>
+                    <span {...stylex.attrs(styles.articleMinutes, labStyles.displayNumber)}>
+                      {`${readMinutes(article)} 分钟`}
+                    </span>
+                    <span aria-hidden="true" {...stylex.attrs(styles.bar)}>
+                      <Show
+                        when={isHere()}
+                        fallback={
+                          <span
+                            {...sxProps(
+                              styles.barFill,
+                              index() < props.position.article
+                                ? styles.barFillDone
+                                : styles.barFillAhead,
+                            )}
+                          />
+                        }
+                      >
+                        <m.span
+                          style={{ scaleX: props.progress }}
+                          {...stylex.attrs(styles.barFill)}
+                        />
+                      </Show>
+                    </span>
+                  </a>
+                </li>
+              );
+            }}
+          </For>
+        </ol>
+        <Show when={previewed()} keyed>
+          {(current) => (
+            <div ref={detail} {...stylex.attrs(styles.detail)}>
+              <ArticleMeta article={current} />
+              <p {...stylex.attrs(styles.detailTitle)}>
                 <a
-                  href={`#${articleAnchor(previewed)}`}
-                  tabIndex={-1}
-                  onClick={onNavigate}
-                  {...stylex.props(styles.detailTitleLink)}
+                  href={`#${articleAnchor(current)}`}
+                  tabindex={-1}
+                  onClick={navigate}
+                  {...stylex.attrs(styles.detailTitleLink)}
                 >
-                  {previewed.title}
+                  {current.title}
                 </a>
               </p>
-              {previewed.lead ? <p {...stylex.props(styles.detailLead)}>{previewed.lead}</p> : null}
-              <ol {...stylex.props(styles.chapters)}>
-                {previewed.sections.map((section, chapter) => {
+              <Show when={current.lead}>
+                <p {...stylex.attrs(styles.detailLead)}>{current.lead}</p>
+              </Show>
+              <ol {...stylex.attrs(styles.chapters)}>
+                {current.sections.map((section, chapter) => {
                   const { numeral, text } = splitNumeral(section.title);
-                  const here = preview === position.article && chapter === position.chapter;
+                  const here = () =>
+                    preview() === props.position.article && chapter === props.position.chapter;
                   return (
-                    <li key={section.slug}>
+                    <li>
                       <a
-                        href={`#${sectionAnchor(previewed, section)}`}
+                        href={`#${sectionAnchor(current, section)}`}
                         data-chapter=""
-                        aria-current={here ? "location" : undefined}
-                        onClick={onNavigate}
-                        {...stylex.props(styles.chapterLink, here && styles.chapterHere)}
+                        aria-current={here() ? "location" : undefined}
+                        onClick={navigate}
+                        {...sxProps(styles.chapterLink, here() && styles.chapterHere)}
                       >
-                        <span {...stylex.props(styles.numeral)}>{numeral}</span>
+                        <span {...stylex.attrs(styles.numeral)}>{numeral}</span>
                         <span>{text}</span>
-                        {here ? (
-                          <span {...stylex.props(styles.here)}>当前</span>
-                        ) : (
-                          <span {...stylex.props(styles.chars, labStyles.displayNumber)}>
-                            {formatChars(sectionChars(section))}
-                          </span>
-                        )}
+                        <Show
+                          when={here()}
+                          fallback={
+                            <span {...stylex.attrs(styles.chars, labStyles.displayNumber)}>
+                              {formatChars(sectionChars(section))}
+                            </span>
+                          }
+                        >
+                          <span {...stylex.attrs(styles.here)}>当前</span>
+                        </Show>
                       </a>
                     </li>
                   );
                 })}
               </ol>
             </div>
-          ) : null}
-          <p {...stylex.props(styles.hint)}>
-            <span>
-              <kbd {...stylex.props(styles.key)}>↑↓</kbd>
-              切换文章
-            </span>
-            <span>
-              <kbd {...stylex.props(styles.key)}>→</kbd>
-              进入章节
-            </span>
-            <span>
-              <kbd {...stylex.props(styles.key)}>Esc</kbd>
-              关闭
-            </span>
-          </p>
-        </>
-      ) : (
-        <ol {...stylex.props(styles.stack)}>
-          {articles.map((article, index) => (
-            <li key={article.id} {...stylex.props(styles.stackItem)}>
-              <a
-                href={`#${articleAnchor(article)}`}
-                data-initial={index === preview ? "" : undefined}
-                aria-current={index === position.article ? "location" : undefined}
-                onClick={onNavigate}
-                {...stylex.props(styles.stackArticle, kitStyles.focusRing)}
-              >
-                <span
-                  {...stylex.props(
-                    styles.articleNumber,
-                    labStyles.displayNumber,
-                    index === position.article && styles.articleNumberHere,
-                  )}
-                >
-                  {padIndex(index)}
-                </span>
-                <span>{shortTitle(article)}</span>
-              </a>
-              <ol {...stylex.props(styles.stackChapters)}>
-                {article.sections.map((section, chapter) => {
-                  const { numeral, text } = splitNumeral(section.navLabel);
-                  const here = index === position.article && chapter === position.chapter;
-                  return (
-                    <li key={section.slug}>
-                      <a
-                        href={`#${sectionAnchor(article, section)}`}
-                        aria-current={here ? "location" : undefined}
-                        onClick={onNavigate}
-                        {...stylex.props(
-                          styles.stackChapter,
-                          here && styles.chapterHere,
-                          kitStyles.focusRing,
-                        )}
-                      >
-                        <span {...stylex.props(styles.numeral)}>{numeral}</span>
-                        <span>{text}</span>
-                        {here ? <span {...stylex.props(styles.here)}>当前</span> : null}
-                      </a>
-                    </li>
-                  );
-                })}
-              </ol>
-            </li>
-          ))}
-        </ol>
-      )}
+          )}
+        </Show>
+        <p {...stylex.attrs(styles.hint)}>
+          <span>
+            <kbd {...stylex.attrs(styles.key)}>↑↓</kbd>
+            切换文章
+          </span>
+          <span>
+            <kbd {...stylex.attrs(styles.key)}>→</kbd>
+            进入章节
+          </span>
+          <span>
+            <kbd {...stylex.attrs(styles.key)}>Esc</kbd>
+            关闭
+          </span>
+        </p>
+      </Show>
     </m.nav>
   );
 }

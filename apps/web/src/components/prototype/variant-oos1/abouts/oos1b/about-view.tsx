@@ -21,9 +21,9 @@ const styles = stylex.create({
   },
 });
 
-export function AboutOOS1B({ onNavigateHome }: AboutPageProps) {
+export function AboutOOS1B(props: AboutPageProps) {
   return (
-    <div id="about-top" {...stylex.props(styles.root)}>
+    <div id="about-top" {...stylex.attrs(styles.root)}>
       <Hero />
       <Profile />
       <Campus />
@@ -31,7 +31,7 @@ export function AboutOOS1B({ onNavigateHome }: AboutPageProps) {
       <Csr />
       <Honors />
       <Structure />
-      <Closing onNavigateHome={onNavigateHome} />
+      <Closing onNavigateHome={props.onNavigateHome} />
     </div>
   );
 }

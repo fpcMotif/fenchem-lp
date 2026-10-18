@@ -1,7 +1,7 @@
-import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
+import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { animate, useInView } from "motion/react";
-import { useEffect, useRef } from "react";
+import { animate, motionValue, useInView } from "@/compat/motion";
+import { createEffect } from "solid-js";
 
 import { EASE } from "@/components/prototype/motion-constants";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
@@ -17,7 +17,7 @@ const styles = stylex.create({
     paddingBlock: {
       default: space.bandSm,
       [media.lgOnly]: space.bandLg,
-      [breakpoints.xl]: space.bandXl,
+      ["@media (min-width: 1280px)"]: space.bandXl,
     },
     backgroundColor: color.navy,
     color: colors.paper,
@@ -26,7 +26,7 @@ const styles = stylex.create({
     display: "grid",
     gridTemplateColumns: {
       default: "minmax(0, 1fr)",
-      [breakpoints.lg]: "repeat(3, minmax(0, 1fr))",
+      ["@media (min-width: 1024px)"]: "repeat(3, minmax(0, 1fr))",
     },
     columnGap: 40,
     rowGap: 56,
@@ -59,7 +59,7 @@ const styles = stylex.create({
       default: 72,
       [media.mdOnly]: 88,
       [media.lgOnly]: 60,
-      [breakpoints.xl]: "clamp(56px, 5.2vw, 80px)",
+      ["@media (min-width: 1280px)"]: "clamp(56px, 5.2vw, 80px)",
     },
     fontWeight: 500,
     lineHeight: 1,
@@ -67,7 +67,7 @@ const styles = stylex.create({
     fontVariantNumeric: "tabular-nums",
   },
   unit: {
-    fontSize: { default: 28, [breakpoints.xl]: 32 },
+    fontSize: { default: 28, ["@media (min-width: 1280px)"]: 32 },
     fontWeight: 500,
     color: color.mint,
   },
@@ -92,39 +92,42 @@ function formatCount(value: number) {
   return value.toLocaleString("en-US");
 }
 
-function CountUp({ value }: { value: string }) {
-  const target = Number(value.replaceAll(",", ""));
-  const ref = useRef<HTMLSpanElement>(null);
-  const inView = useInView(ref, { once: true, margin: "0px 0px -10% 0px" });
+function CountUp(props: { value: string }) {
+  const target = () => Number(props.value.replaceAll(",", ""));
+  let ref: HTMLSpanElement | undefined;
+  const inView = useInView(() => ref, { once: true, margin: "0px 0px -10% 0px" });
   const reduce = useReducedMotion();
 
-  useEffect(() => {
-    const node = ref.current;
-    if (!node) return;
-    if (reduce) {
-      node.textContent = formatCount(target);
-      return;
-    }
-    if (!inView) {
-      node.textContent = "0";
-      return;
-    }
-    const controls = animate(0, target, {
-      duration: COUNT_UP_SECONDS,
-      ease: EASE,
-      onUpdate: (latest) => {
-        node.textContent = formatCount(Math.round(latest));
-      },
-    });
-    return () => controls.stop();
-  }, [inView, reduce, target]);
+  createEffect(
+    () => [inView(), reduce(), target()] as const,
+    ([inViewNow, reduceNow, targetNow]) => {
+      const node = ref;
+      if (!node) return;
+      if (reduceNow) {
+        node.textContent = formatCount(targetNow);
+        return;
+      }
+      if (!inViewNow) {
+        node.textContent = "0";
+        return;
+      }
+      const controls = animate(motionValue(0), targetNow, {
+        duration: COUNT_UP_SECONDS,
+        ease: EASE,
+        onUpdate: (latest: number) => {
+          node.textContent = formatCount(Math.round(latest));
+        },
+      });
+      return () => controls.stop();
+    },
+  );
 
   return (
-    <span {...stylex.props(styles.value)}>
+    <span {...stylex.attrs(styles.value)}>
       <span ref={ref} aria-hidden="true">
-        {formatCount(target)}
+        {formatCount(target())}
       </span>
-      <span {...stylex.props(styles.srOnly)}>{value}</span>
+      <span {...stylex.attrs(styles.srOnly)}>{props.value}</span>
     </span>
   );
 }
@@ -134,15 +137,15 @@ export function Stats() {
     <Section id="about-stats" name="Growth figures" band sx={styles.band}>
       <Shell>
         <NodeMarker />
-        <ul {...stylex.props(styles.stats)}>
+        <ul {...stylex.attrs(styles.stats)}>
           {STATS.map((stat) => (
-            <li key={stat.label} {...stylex.props(styles.stat)}>
-              <p {...stylex.props(styles.label)}>{stat.label}</p>
-              <div {...stylex.props(styles.figure)}>
+            <li {...stylex.attrs(styles.stat)}>
+              <p {...stylex.attrs(styles.label)}>{stat.label}</p>
+              <div {...stylex.attrs(styles.figure)}>
                 <CountUp value={stat.value} />
-                {stat.unit ? <span {...stylex.props(styles.unit)}>{stat.unit}</span> : null}
+                {stat.unit ? <span {...stylex.attrs(styles.unit)}>{stat.unit}</span> : null}
               </div>
-              <p {...stylex.props(styles.caption)}>{stat.caption}</p>
+              <p {...stylex.attrs(styles.caption)}>{stat.caption}</p>
             </li>
           ))}
         </ul>

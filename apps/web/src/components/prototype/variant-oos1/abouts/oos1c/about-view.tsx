@@ -1,7 +1,7 @@
 import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { ChevronRight } from "lucide-react";
-import { useEffect, useMemo, useRef } from "react";
+import { ChevronRight } from "@fenchem-lp/ui/components/lucide";
+import { createEffect, For } from "solid-js";
 
 import { useLightbox } from "@/components/prototype/shared/lightbox";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
@@ -199,88 +199,83 @@ const styles = stylex.create({
 
 function Banner() {
   return (
-    <section aria-labelledby="about-banner-title" {...stylex.props(styles.banner)}>
-      <div {...stylex.props(ui.shell, ui.inset)}>
-        <div {...stylex.props(styles.head)}>
-          <h1 id="about-banner-title" {...stylex.props(styles.title)}>
-            <span {...stylex.props(styles.titleLight)}>关于</span>
-            <span {...stylex.props(styles.titleHeavy)}>泛成</span>
+    <section aria-labelledby="about-banner-title" {...stylex.attrs(styles.banner)}>
+      <div {...stylex.attrs(ui.shell, ui.inset)}>
+        <div {...stylex.attrs(styles.head)}>
+          <h1 id="about-banner-title" {...stylex.attrs(styles.title)}>
+            <span {...stylex.attrs(styles.titleLight)}>关于</span>
+            <span {...stylex.attrs(styles.titleHeavy)}>泛成</span>
           </h1>
-          <div {...stylex.props(styles.aside)}>
-            <p lang="en" {...stylex.props(styles.tagline)}>
+          <div {...stylex.attrs(styles.aside)}>
+            <p lang="en" {...stylex.attrs(styles.tagline)}>
               {ABOUT_BANNER.tagline}
             </p>
-            <p {...stylex.props(styles.lead)}>{ABOUT_BANNER.lead}</p>
+            <p {...stylex.attrs(styles.lead)}>{ABOUT_BANNER.lead}</p>
           </div>
         </div>
       </div>
-      <figure {...stylex.props(styles.figure)}>
+      <figure {...stylex.attrs(styles.figure)}>
         <img
           src={ABOUT_BANNER.image}
           alt={ABOUT_BANNER.alt}
-          fetchPriority="high"
+          fetchpriority="high"
           decoding="async"
-          {...stylex.props(styles.figureImage)}
+          {...stylex.attrs(styles.figureImage)}
         />
       </figure>
     </section>
   );
 }
 
-function SubNav({
-  pinned,
-  onNavigateHome,
-}: {
-  pinned: boolean;
-  onNavigateHome: (hash?: string) => void;
-}) {
-  const ids = useMemo(() => (pinned ? [...SECTION_IDS] : SECTION_IDS), [pinned]);
-  const active = useActiveSection(ids);
-  const chipListRef = useRef<HTMLElement>(null);
+function SubNav(props: { pinned: boolean; onNavigateHome: (hash?: string) => void }) {
+  const active = useActiveSection(SECTION_IDS);
+  let chipListRef: HTMLElement | undefined;
   const reduce = useReducedMotion();
 
-  useEffect(() => {
-    const list = chipListRef.current;
-    const chip = active ? list?.querySelector<HTMLElement>(`[href="#${active}"]`) : null;
-    if (!list || !chip) return;
-    const listBox = list.getBoundingClientRect();
-    const chipBox = chip.getBoundingClientRect();
-    if (chipBox.left < listBox.left || chipBox.right > listBox.right) {
-      list.scrollBy({
-        left: chipBox.left - listBox.left - 16,
-        behavior: reduce ? "auto" : "smooth",
-      });
-    }
-  }, [active, reduce]);
+  createEffect(
+    () => [active(), reduce()] as const,
+    ([current, reduceNow]) => {
+      const list = chipListRef;
+      const chip = current ? list?.querySelector<HTMLElement>(`[href="#${current}"]`) : null;
+      if (!list || !chip) return;
+      const listBox = list.getBoundingClientRect();
+      const chipBox = chip.getBoundingClientRect();
+      if (chipBox.left < listBox.left || chipBox.right > listBox.right) {
+        list.scrollBy({
+          left: chipBox.left - listBox.left - 16,
+          behavior: reduceNow ? "auto" : "smooth",
+        });
+      }
+    },
+  );
 
   return (
-    <div {...stylex.props(styles.subBar)}>
-      <div {...stylex.props(ui.shell, ui.inset, styles.subBarInner)}>
-        <nav aria-label="Breadcrumb" {...stylex.props(styles.breadcrumb)}>
+    <div {...stylex.attrs(styles.subBar)}>
+      <div {...stylex.attrs(ui.shell, ui.inset, styles.subBarInner)}>
+        <nav aria-label="Breadcrumb" {...stylex.attrs(styles.breadcrumb)}>
           <button
             type="button"
-            onClick={() => onNavigateHome("top")}
-            {...stylex.props(styles.breadcrumbLink, ui.focusRing)}
+            onClick={() => props.onNavigateHome("top")}
+            {...stylex.attrs(styles.breadcrumbLink, ui.focusRing)}
           >
             首页
           </button>
           <ChevronRight size={12} aria-hidden="true" />
           <span aria-current="page">关于我们</span>
         </nav>
-        <nav aria-label="On this page" ref={chipListRef} {...stylex.props(styles.chips)}>
+        <nav aria-label="On this page" ref={chipListRef} {...stylex.attrs(styles.chips)}>
           {ABOUT_HERO.navChips.map((chip) => {
-            const isActive = active === chip.id;
+            const isActive = () => active() === chip.id;
             return (
               <a
-                key={chip.id}
                 href={`#${chip.id}`}
-                aria-current={isActive ? "location" : undefined}
-                {...stylex.props(styles.chip)}
+                aria-current={isActive() ? "location" : undefined}
+                {...stylex.attrs(styles.chip)}
               >
                 <span lang="en">{NAV_ENGLISH[chip.id]}</span>
                 <span
                   aria-hidden="true"
-                  {...stylex.props(styles.chipMark, isActive && styles.chipMarkActive)}
+                  {...stylex.attrs(styles.chipMark, isActive() && styles.chipMarkActive)}
                 >
                   <Cross size={6} />
                 </span>
@@ -293,19 +288,21 @@ function SubNav({
   );
 }
 
-export function AboutOOS1C({ onNavigateHome }: AboutPageProps) {
+export function AboutOOS1C(props: AboutPageProps) {
   const pinned = usePinned();
   const lightbox = useLightbox(ABOUT_CAMPUS.photos.length);
 
   return (
-    <div id="about-top" {...stylex.props(styles.root)}>
+    <div id="about-top" {...stylex.attrs(styles.root)}>
       <Banner />
-      <SubNav pinned={pinned} onNavigateHome={onNavigateHome} />
-      <Panorama pinned={pinned} onOpenPhoto={lightbox.open} />
+      <For each={[pinned()]}>
+        {(isPinned) => <SubNav pinned={isPinned} onNavigateHome={props.onNavigateHome} />}
+      </For>
+      <Panorama pinned={pinned()} onOpenPhoto={lightbox.open} />
       <CsrSection />
-      <ProductsSection onNavigateHome={onNavigateHome} />
+      <ProductsSection onNavigateHome={props.onNavigateHome} />
       <NavyBand />
-      <ClosingCta onNavigateHome={onNavigateHome} />
+      <ClosingCta onNavigateHome={props.onNavigateHome} />
       <Lightbox lightbox={lightbox} />
     </div>
   );

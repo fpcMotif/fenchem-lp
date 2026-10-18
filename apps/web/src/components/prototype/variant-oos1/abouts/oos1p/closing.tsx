@@ -1,6 +1,6 @@
 import * as stylex from "@stylexjs/stylex";
-import { ArrowLeft } from "lucide-react";
-import type { CSSProperties } from "react";
+import { ArrowLeft } from "@fenchem-lp/ui/components/lucide";
+import type { JSX } from "@solidjs/web";
 
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
@@ -103,20 +103,20 @@ const styles = stylex.create({
   },
 });
 
-export function Closing({ onNavigateHome }: AboutPageProps) {
+export function Closing(props: AboutPageProps) {
   const reduce = useReducedMotion();
   const [linkRef, phase] = useEntry<HTMLAnchorElement>();
-  const echoes = reduce ? [1] : echoIndexes(BACKWARD_ECHOES);
+  const echoes = () => (reduce() ? [1] : echoIndexes(BACKWARD_ECHOES));
 
-  const lineContent = (
+  const lineContent = () => (
     <>
-      <ArrowLeft aria-hidden="true" strokeWidth={1.5} {...stylex.props(styles.arrow)} />
+      <ArrowLeft aria-hidden="true" strokeWidth={1.5} {...stylex.attrs(styles.arrow)} />
       <span>返回首页</span>
     </>
   );
 
   return (
-    <section aria-labelledby="oos1p-closing" {...stylex.props(ui.plate, styles.section)}>
+    <section aria-labelledby="oos1p-closing" {...stylex.attrs(ui.plate, styles.section)}>
       <PlateHead
         plate={7}
         english="Return"
@@ -124,59 +124,58 @@ export function Closing({ onNavigateHome }: AboutPageProps) {
         titleId="oos1p-closing"
         latin
       />
-      <div {...stylex.props(ui.shell)}>
-        <div {...stylex.props(ui.grid)}>
-          <div {...stylex.props(ui.q2to4)}>
+      <div {...stylex.attrs(ui.shell)}>
+        <div {...stylex.attrs(ui.grid)}>
+          <div {...stylex.attrs(ui.q2to4)}>
             <a
               ref={linkRef}
               href="#contact"
               onClick={(event) => {
                 event.preventDefault();
-                onNavigateHome("contact");
+                props.onNavigateHome("contact");
               }}
-              {...stylex.props(styles.link, stylex.defaultMarker())}
+              {...stylex.attrs(styles.link, stylex.defaultMarker())}
             >
-              <span {...stylex.props(styles.sub)}>
+              <span {...stylex.attrs(styles.sub)}>
                 联系我们
-                <span lang="en" {...stylex.props(ui.eyebrow, styles.subEnglish)}>
+                <span lang="en" {...stylex.attrs(ui.eyebrow, styles.subEnglish)}>
                   Contact
                 </span>
               </span>
-              <span {...stylex.props(styles.stack, reduce && styles.stackReduced)}>
+              <span {...stylex.attrs(styles.stack, reduce() && styles.stackReduced)}>
                 <span
-                  {...stylex.props(
+                  {...stylex.attrs(
                     styles.line,
                     styles.final,
-                    phase === "armed" && strobe.hidden,
-                    phase === "fire" && strobe.pop,
+                    phase() === "armed" && strobe.hidden,
+                    phase() === "fire" && strobe.pop,
                   )}
-                  style={{ "--pop-at": `${BACKWARD_ECHOES * TICK}ms` } as CSSProperties}
+                  style={{ "--pop-at": `${BACKWARD_ECHOES * TICK}ms` } as JSX.CSSProperties}
                 >
-                  {lineContent}
+                  {lineContent()}
                 </span>
-                {echoes.map((k) => (
+                {echoes().map((k) => (
                   <span
-                    key={k}
                     aria-hidden="true"
-                    {...stylex.props(
+                    {...stylex.attrs(
                       styles.echo,
-                      phase === "armed" && strobe.hidden,
-                      phase === "fire" && strobe.pop,
+                      phase() === "armed" && strobe.hidden,
+                      phase() === "fire" && strobe.pop,
                     )}
-                    style={{ "--pop-at": `${(BACKWARD_ECHOES - k) * TICK}ms` } as CSSProperties}
+                    style={{ "--pop-at": `${(BACKWARD_ECHOES - k) * TICK}ms` } as JSX.CSSProperties}
                   >
                     <span
-                      {...stylex.props(styles.line, styles.echoInner)}
+                      {...stylex.attrs(styles.line, styles.echoInner)}
                       style={
                         {
                           "--k": k,
-                          "--o": reduce
+                          "--o": reduce()
                             ? REDUCED_ECHO_OPACITY
                             : trailOpacity(k, BACKWARD_ECHOES, BRIGHTEST_ECHO).toFixed(3),
-                        } as CSSProperties
+                        } as JSX.CSSProperties
                       }
                     >
-                      {lineContent}
+                      {lineContent()}
                     </span>
                   </span>
                 ))}

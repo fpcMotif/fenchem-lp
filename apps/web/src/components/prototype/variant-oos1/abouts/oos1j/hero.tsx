@@ -1,7 +1,6 @@
 import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { m, useScroll, useTransform } from "motion/react";
-import { useRef } from "react";
+import { m, useScroll, useTransform } from "@/compat/motion";
 
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
@@ -9,6 +8,7 @@ import { ABOUT_BANNER, ABOUT_CSR } from "../../about-data";
 import { CropMarks, Monument, RiseText } from "./parts";
 import { base, ty } from "./shared";
 import { hue, size } from "./theme.stylex";
+import { createSignal } from "solid-js";
 
 const TITLE_LEAD_CHARS = 2;
 const TITLE_DELAY_MS = 180;
@@ -162,32 +162,30 @@ const styles = stylex.create({
 export function Hero() {
   const lead = ABOUT_BANNER.title.slice(0, TITLE_LEAD_CHARS);
   const reduce = useReducedMotion();
-  const stripRef = useRef<HTMLDivElement>(null);
+  const [stripRef, setStripRef] = createSignal<HTMLDivElement>();
   const { scrollY } = useScroll();
   const { scrollYProgress } = useScroll({ target: stripRef, offset: ["start start", "end start"] });
-  const water = useTransform(
-    scrollY,
-    [0, 900],
-    reduce ? [MONUMENT_WATER[0], MONUMENT_WATER[0]] : MONUMENT_WATER,
-  );
-  const imageY = useTransform(scrollYProgress, [0, 1], reduce ? ["0%", "0%"] : ["0%", "8%"]);
+  const waterMotion = useTransform(scrollY, [0, 900], MONUMENT_WATER);
+  const water = useTransform(() => (reduce() ? MONUMENT_WATER[0] : waterMotion()));
+  const imageYMotion = useTransform(scrollYProgress, [0, 1], ["0%", "8%"]);
+  const imageY = useTransform(() => (reduce() ? "0%" : imageYMotion()));
 
   return (
-    <section aria-labelledby="about-banner-title" {...stylex.props(styles.hero)}>
+    <section aria-labelledby="about-banner-title" {...stylex.attrs(styles.hero)}>
       <Monument
         text="Fenchem"
         photo={ABOUT_CSR.image}
         style={{ backgroundPosition: water }}
         sx={styles.monument}
       />
-      <div {...stylex.props(base.shell, styles.inner)}>
-        <p lang="en" {...stylex.props(ty.quiet, styles.meta)}>
+      <div {...stylex.attrs(base.shell, styles.inner)}>
+        <p lang="en" {...stylex.attrs(ty.quiet, styles.meta)}>
           <span>{ABOUT_BANNER.established}</span>
-          <span aria-hidden="true" {...stylex.props(styles.metaRule)} />
+          <span aria-hidden="true" {...stylex.attrs(styles.metaRule)} />
           <span>{ABOUT_BANNER.place}</span>
         </p>
-        <div {...stylex.props(styles.head)}>
-          <h1 id="about-banner-title" {...stylex.props(styles.title)}>
+        <div {...stylex.attrs(styles.head)}>
+          <h1 id="about-banner-title" {...stylex.attrs(styles.title)}>
             <RiseText
               text={ABOUT_BANNER.title}
               srText="About Fenchem"
@@ -197,23 +195,23 @@ export function Hero() {
               charSx={(index) => index >= lead.length && styles.titleAccent}
             />
           </h1>
-          <div {...stylex.props(styles.text)}>
-            <p lang="en" {...stylex.props(ty.serif)}>
+          <div {...stylex.attrs(styles.text)}>
+            <p lang="en" {...stylex.attrs(ty.serif)}>
               {ABOUT_BANNER.tagline}
             </p>
-            <p {...stylex.props(ty.body, styles.lead)}>{ABOUT_BANNER.lead}</p>
+            <p {...stylex.attrs(ty.body, styles.lead)}>{ABOUT_BANNER.lead}</p>
           </div>
         </div>
-        <div {...stylex.props(styles.stripWrap)}>
-          <div ref={stripRef} {...stylex.props(styles.strip)}>
-            <div {...stylex.props(styles.settle)}>
+        <div {...stylex.attrs(styles.stripWrap)}>
+          <div ref={setStripRef} {...stylex.attrs(styles.strip)}>
+            <div {...stylex.attrs(styles.settle)}>
               <m.img
                 src={ABOUT_BANNER.image}
                 alt={ABOUT_BANNER.alt}
-                fetchPriority="high"
+                fetchpriority="high"
                 decoding="async"
-                {...stylex.props(styles.image)}
-                style={{ y: imageY, scale: reduce ? 1 : 1.18 }}
+                {...stylex.attrs(styles.image)}
+                style={{ y: imageY, scale: reduce() ? 1 : 1.18 }}
               />
             </div>
           </div>

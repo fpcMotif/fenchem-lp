@@ -1,5 +1,5 @@
 import * as stylex from "@stylexjs/stylex";
-import { useRef } from "react";
+import { createSignal } from "solid-js";
 
 import type { AboutPageProps } from "../../index";
 import { Banner } from "./banner";
@@ -26,12 +26,12 @@ const styles = stylex.create({
   },
 });
 
-export function AboutOOS1F({ onNavigateHome }: AboutPageProps) {
-  const rootRef = useRef<HTMLDivElement>(null);
+export function AboutOOS1F(props: AboutPageProps) {
+  const [root, setRoot] = createSignal<HTMLDivElement>();
   return (
-    <div id="about-top" ref={rootRef} {...stylex.props(styles.root)}>
+    <div id="about-top" ref={setRoot} {...stylex.attrs(styles.root)}>
       <Banner />
-      <SubNav onNavigateHome={onNavigateHome} />
+      <SubNav onNavigateHome={props.onNavigateHome} />
       <Profile />
       <Campus />
       <Stats />
@@ -39,9 +39,9 @@ export function AboutOOS1F({ onNavigateHome }: AboutPageProps) {
       <Csr />
       <Honors />
       <Structure />
-      <Products onNavigateHome={onNavigateHome} />
-      <Cta onNavigateHome={onNavigateHome} />
-      <Strand rootRef={rootRef} />
+      <Products onNavigateHome={props.onNavigateHome} />
+      <Cta onNavigateHome={props.onNavigateHome} />
+      <Strand root={root} />
     </div>
   );
 }

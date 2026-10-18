@@ -1,8 +1,7 @@
 import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { ArrowRight } from "lucide-react";
-import { useScroll, useTransform } from "motion/react";
-import { useRef } from "react";
+import { ArrowRight } from "@fenchem-lp/ui/components/lucide";
+import { useScroll, useTransform } from "@/compat/motion";
 
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
@@ -10,6 +9,7 @@ import { CTA } from "../../content";
 import { Monument, Reveal, RiseText, useInViewOnce } from "./parts";
 import { base, btn } from "./shared";
 import { hue, size } from "./theme.stylex";
+import { createSignal } from "solid-js";
 
 const styles = stylex.create({
   finale: {
@@ -46,41 +46,42 @@ const styles = stylex.create({
   },
 });
 
-export function Finale({ onNavigateHome }: { onNavigateHome: (hash?: string) => void }) {
-  const sectionRef = useRef<HTMLElement>(null);
+export function Finale(props: { onNavigateHome: (hash?: string) => void }) {
+  const [sectionRef, setSectionRef] = createSignal<HTMLElement>();
   const [titleRef, titleShown] = useInViewOnce<HTMLHeadingElement>();
   const reduce = useReducedMotion();
   const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start end", "end end"] });
-  const slide = useTransform(scrollYProgress, [0, 1], reduce ? ["0%", "0%"] : ["14%", "0%"]);
+  const slideMotion = useTransform(scrollYProgress, [0, 1], ["14%", "0%"]);
+  const slide = useTransform(() => (reduce() ? "0%" : slideMotion()));
   return (
     <section
-      ref={sectionRef}
+      ref={setSectionRef}
       aria-labelledby="about-cta-title"
-      {...stylex.props(base.section, styles.finale)}
+      {...stylex.attrs(base.section, styles.finale)}
     >
       <Monument text="Fenchem" style={{ x: slide }} sx={styles.monument} />
-      <div {...stylex.props(base.shell, styles.inner)}>
-        <h2 ref={titleRef} id="about-cta-title" {...stylex.props(styles.title)}>
+      <div {...stylex.attrs(base.shell, styles.inner)}>
+        <h2 ref={titleRef} id="about-cta-title" {...stylex.attrs(styles.title)}>
           <RiseText
             text={CTA.title}
             srText="Together, open the next breakthrough"
-            play={titleShown}
+            play={titleShown()}
             stagger={55}
           />
         </h2>
         <Reveal step={1} sx={styles.buttons}>
           <button
             type="button"
-            onClick={() => onNavigateHome("contact")}
-            {...stylex.props(btn.base, btn.accent, base.focus)}
+            onClick={() => props.onNavigateHome("contact")}
+            {...stylex.attrs(btn.base, btn.accent, base.focus)}
           >
             <span>{CTA.action.label}</span>
             <ArrowRight size={16} aria-hidden="true" />
           </button>
           <button
             type="button"
-            onClick={() => onNavigateHome("products")}
-            {...stylex.props(btn.base, btn.outline, base.focus)}
+            onClick={() => props.onNavigateHome("products")}
+            {...stylex.attrs(btn.base, btn.outline, base.focus)}
           >
             <span>产品与应用</span>
           </button>

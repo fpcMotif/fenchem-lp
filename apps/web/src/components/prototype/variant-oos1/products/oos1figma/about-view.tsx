@@ -1,8 +1,9 @@
 import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { Factory, Leaf, Recycle } from "lucide-react";
-import { m, useScroll, useTransform } from "motion/react";
-import { useId, useRef } from "react";
+import { Factory, Leaf, Recycle } from "@fenchem-lp/ui/components/lucide";
+import { m, useScroll, useTransform } from "@/compat/motion";
+import { Dynamic } from "@solidjs/web";
+import { createSignal, createUniqueId } from "solid-js";
 
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
@@ -608,20 +609,20 @@ const styles = stylex.create({
 
 function AboutHero() {
   return (
-    <section aria-labelledby="about-banner-title" {...stylex.props(styles.hero)}>
+    <section aria-labelledby="about-banner-title" {...stylex.attrs(styles.hero)}>
       <img
         src={ABOUT_BANNER.image}
         alt={ABOUT_BANNER.alt}
-        fetchPriority="high"
+        fetchpriority="high"
         decoding="async"
-        {...stylex.props(styles.heroImage)}
+        {...stylex.attrs(styles.heroImage)}
       />
-      <div aria-hidden="true" {...stylex.props(styles.heroScrim)} />
-      <div {...stylex.props(kitStyles.shell, kitStyles.inset120, styles.heroContent)}>
-        <h1 id="about-banner-title" {...stylex.props(styles.heroTitle)}>
+      <div aria-hidden="true" {...stylex.attrs(styles.heroScrim)} />
+      <div {...stylex.attrs(kitStyles.shell, kitStyles.inset120, styles.heroContent)}>
+        <h1 id="about-banner-title" {...stylex.attrs(styles.heroTitle)}>
           {HERO_TITLE}
         </h1>
-        <p {...stylex.props(styles.heroLead)}>{ABOUT_BANNER.lead}</p>
+        <p {...stylex.attrs(styles.heroLead)}>{ABOUT_BANNER.lead}</p>
       </div>
     </section>
   );
@@ -632,37 +633,37 @@ function Profile() {
     <section
       id="about-profile"
       aria-label="Company overview"
-      {...stylex.props(styles.profile, kitStyles.anchor)}
+      {...stylex.attrs(styles.profile, kitStyles.anchor)}
     >
-      <div {...stylex.props(kitStyles.shell, styles.profileGrid)}>
-        <div {...stylex.props(styles.profilePhotoCell)}>
+      <div {...stylex.attrs(kitStyles.shell, styles.profileGrid)}>
+        <div {...stylex.attrs(styles.profilePhotoCell)}>
           <Reveal as="figure" sx={styles.profilePhoto}>
             <img
               src={ABOUT_HERO.lobbyImage}
               alt="Fenchem headquarters lobby with a curved ceiling and marble floor"
               loading="lazy"
               decoding="async"
-              {...stylex.props(styles.fill, styles.profileLobby)}
+              {...stylex.attrs(styles.fill, styles.profileLobby)}
             />
           </Reveal>
         </div>
-        <div {...stylex.props(styles.profileTextCell)}>
+        <div {...stylex.attrs(styles.profileTextCell)}>
           <Reveal>
-            <h2 {...stylex.props(styles.profileName)}>{ABOUT_HERO.title}</h2>
-            <p lang="en" {...stylex.props(styles.profileEnglish)}>
+            <h2 {...stylex.attrs(styles.profileName)}>{ABOUT_HERO.title}</h2>
+            <p lang="en" {...stylex.attrs(styles.profileEnglish)}>
               {ABOUT_HERO.englishTitle}
             </p>
           </Reveal>
           <Reveal step={1}>
-            <p {...stylex.props(styles.profileLead)}>{ABOUT_HERO.lead}</p>
+            <p {...stylex.attrs(styles.profileLead)}>{ABOUT_HERO.lead}</p>
           </Reveal>
         </div>
       </div>
       <Reveal step={2} sx={styles.network}>
-        <p {...stylex.props(styles.networkLabel)}>{NETWORK_LABEL}</p>
-        <ul {...stylex.props(styles.countries)}>
+        <p {...stylex.attrs(styles.networkLabel)}>{NETWORK_LABEL}</p>
+        <ul {...stylex.attrs(styles.countries)}>
           {ABOUT_HERO.countries.map((country) => (
-            <li key={country}>{country}</li>
+            <li>{country}</li>
           ))}
         </ul>
       </Reveal>
@@ -699,34 +700,34 @@ function Culture() {
     <section
       id="about-culture"
       aria-labelledby="about-culture-title"
-      {...stylex.props(styles.culture, kitStyles.anchor)}
+      {...stylex.attrs(styles.culture, kitStyles.anchor)}
     >
-      <div {...stylex.props(kitStyles.shell, kitStyles.inset120)}>
+      <div {...stylex.attrs(kitStyles.shell, kitStyles.inset120)}>
         <Reveal sx={styles.cultureHead}>
-          <h2 id="about-culture-title" {...stylex.props(styles.sectionTitle)}>
+          <h2 id="about-culture-title" {...stylex.attrs(styles.sectionTitle)}>
             {ABOUT_CULTURE.title}
           </h2>
         </Reveal>
-        <div {...stylex.props(styles.story)}>
+        <div {...stylex.attrs(styles.story)}>
           {SCENES.map((scene) => (
-            <article key={scene.value.title} {...stylex.props(styles.scene)}>
+            <article {...stylex.attrs(styles.scene)}>
               <Reveal
                 as="figure"
                 sx={[styles.sceneFigure, scene.imageEnd && styles.sceneFigureEnd]}
               >
-                <div {...stylex.props(styles.sceneFrame)}>
+                <div {...stylex.attrs(styles.sceneFrame)}>
                   <img
                     src={scene.art}
                     alt={scene.alt}
                     loading="lazy"
                     decoding="async"
-                    {...stylex.props(styles.sceneArt, scene.artStyle)}
+                    {...stylex.attrs(styles.sceneArt, scene.artStyle)}
                   />
                 </div>
               </Reveal>
               <Reveal step={1} sx={[styles.sceneText, scene.imageEnd && styles.sceneTextStart]}>
-                <h3 {...stylex.props(styles.valueTitle)}>{scene.value.title}</h3>
-                <p {...stylex.props(styles.valueDesc)}>{scene.value.desc}</p>
+                <h3 {...stylex.attrs(styles.valueTitle)}>{scene.value.title}</h3>
+                <p {...stylex.attrs(styles.valueDesc)}>{scene.value.desc}</p>
               </Reveal>
             </article>
           ))}
@@ -737,36 +738,36 @@ function Culture() {
 }
 
 function Structure() {
-  const subsLabelId = useId();
+  const subsLabelId = createUniqueId();
   return (
     <section
       id="about-structure"
       aria-labelledby="about-structure-title"
-      {...stylex.props(styles.band, kitStyles.anchor)}
+      {...stylex.attrs(styles.band, kitStyles.anchor)}
     >
-      <div {...stylex.props(kitStyles.shell, kitStyles.inset120)}>
+      <div {...stylex.attrs(kitStyles.shell, kitStyles.inset120)}>
         <Reveal sx={styles.bandHead}>
-          <h2 id="about-structure-title" {...stylex.props(styles.sectionTitle)}>
+          <h2 id="about-structure-title" {...stylex.attrs(styles.sectionTitle)}>
             {ABOUT_STRUCTURE.title}
           </h2>
         </Reveal>
-        <div {...stylex.props(styles.structure)}>
+        <div {...stylex.attrs(styles.structure)}>
           <Reveal sx={styles.stack}>
-            <p {...stylex.props(styles.smallLabel)}>{ABOUT_STRUCTURE.holding.badge}</p>
-            <h3 {...stylex.props(styles.holdingName)}>{ABOUT_STRUCTURE.holding.name}</h3>
-            <div lang="en" {...stylex.props(styles.holdingEnglish)}>
+            <p {...stylex.attrs(styles.smallLabel)}>{ABOUT_STRUCTURE.holding.badge}</p>
+            <h3 {...stylex.attrs(styles.holdingName)}>{ABOUT_STRUCTURE.holding.name}</h3>
+            <div lang="en" {...stylex.attrs(styles.holdingEnglish)}>
               {ABOUT_STRUCTURE.holding.english}
             </div>
           </Reveal>
-          <div {...stylex.props(styles.stack)}>
-            <p id={subsLabelId} {...stylex.props(styles.smallLabel)}>
+          <div {...stylex.attrs(styles.stack)}>
+            <p id={subsLabelId} {...stylex.attrs(styles.smallLabel)}>
               {ABOUT_STRUCTURE.subsidiaryBadge}
             </p>
-            <ul aria-labelledby={subsLabelId} {...stylex.props(styles.subs)}>
+            <ul aria-labelledby={subsLabelId} {...stylex.attrs(styles.subs)}>
               {ABOUT_STRUCTURE.subsidiaries.map((sub, index) => (
-                <Reveal key={sub.id} as="li" step={index} sx={styles.sub}>
-                  <h4 {...stylex.props(styles.subName)}>{sub.name}</h4>
-                  <span lang="en" {...stylex.props(styles.subEnglish)}>
+                <Reveal as="li" step={index} sx={styles.sub}>
+                  <h4 {...stylex.attrs(styles.subName)}>{sub.name}</h4>
+                  <span lang="en" {...stylex.attrs(styles.subEnglish)}>
                     {sub.english}
                   </span>
                 </Reveal>
@@ -784,11 +785,11 @@ function Honors() {
     <section
       id="about-honor"
       aria-labelledby="about-honor-title"
-      {...stylex.props(styles.band, kitStyles.anchor)}
+      {...stylex.attrs(styles.band, kitStyles.anchor)}
     >
-      <div {...stylex.props(kitStyles.shell, kitStyles.inset120)}>
+      <div {...stylex.attrs(kitStyles.shell, kitStyles.inset120)}>
         <Reveal sx={styles.bandHead}>
-          <h2 id="about-honor-title" {...stylex.props(styles.sectionTitle)}>
+          <h2 id="about-honor-title" {...stylex.attrs(styles.sectionTitle)}>
             {ABOUT_HONORS.title}
           </h2>
         </Reveal>
@@ -796,13 +797,12 @@ function Honors() {
           const items = ABOUT_HONORS.items.filter((item) => item.level === entry.level);
           if (items.length === 0) return null;
           return (
-            <Reveal key={entry.level} sx={styles.level}>
-              <h3 {...stylex.props(styles.levelLabel)}>{entry.label}</h3>
-              <ul aria-label={`${entry.english} honors`} {...stylex.props(styles.honorList)}>
+            <Reveal sx={styles.level}>
+              <h3 {...stylex.attrs(styles.levelLabel)}>{entry.label}</h3>
+              <ul aria-label={`${entry.english} honors`} {...stylex.attrs(styles.honorList)}>
                 {items.map((honor) => (
                   <li
-                    key={honor.id}
-                    {...stylex.props(styles.honor, entry.level === "national" && styles.honorLead)}
+                    {...stylex.attrs(styles.honor, entry.level === "national" && styles.honorLead)}
                   >
                     {honor.title}
                   </li>
@@ -817,59 +817,59 @@ function Honors() {
 }
 
 function Csr() {
-  const sectionRef = useRef<HTMLElement>(null);
+  const [sectionEl, setSectionEl] = createSignal<HTMLElement>();
   const reduce = useReducedMotion();
   const { scrollYProgress } = useScroll({
-    target: sectionRef,
+    target: sectionEl,
     offset: ["start end", "end start"],
   });
   const drift = useTransform(scrollYProgress, [0, 1], ["0%", "12%"]);
 
   return (
     <section
-      ref={sectionRef}
+      ref={setSectionEl}
       id="about-csr"
       aria-labelledby="about-csr-title"
-      {...stylex.props(styles.csr, kitStyles.anchor)}
+      {...stylex.attrs(styles.csr, kitStyles.anchor)}
     >
-      <m.div {...stylex.props(styles.csrMedia)} style={reduce ? undefined : { y: drift }}>
+      <m.div {...stylex.attrs(styles.csrMedia)} style={reduce() ? undefined : { y: drift }}>
         <img
           src={ABOUT_CSR.image}
           alt={ABOUT_CSR.imageAlt}
           loading="lazy"
           decoding="async"
-          {...stylex.props(styles.csrImage)}
+          {...stylex.attrs(styles.csrImage)}
         />
       </m.div>
-      <div aria-hidden="true" {...stylex.props(styles.fill, styles.csrScrim)} />
-      <div aria-hidden="true" {...stylex.props(styles.fill, styles.csrGrain)} />
-      <div {...stylex.props(kitStyles.shell, kitStyles.inset120, styles.csrInner)}>
+      <div aria-hidden="true" {...stylex.attrs(styles.fill, styles.csrScrim)} />
+      <div aria-hidden="true" {...stylex.attrs(styles.fill, styles.csrGrain)} />
+      <div {...stylex.attrs(kitStyles.shell, kitStyles.inset120, styles.csrInner)}>
         <Reveal sx={styles.csrHead}>
-          <h2 id="about-csr-title" {...stylex.props(styles.csrTitle)}>
+          <h2 id="about-csr-title" {...stylex.attrs(styles.csrTitle)}>
             {ABOUT_CSR.title}
           </h2>
-          <p {...stylex.props(styles.csrStatement)}>{ABOUT_CSR.statement.join("")}</p>
+          <p {...stylex.attrs(styles.csrStatement)}>{ABOUT_CSR.statement.join("")}</p>
         </Reveal>
         <Reveal step={1} sx={styles.csrDescBlock}>
-          <p {...stylex.props(styles.csrDesc)}>
-            <span {...stylex.props(styles.csrDescLine)}>
+          <p {...stylex.attrs(styles.csrDesc)}>
+            <span {...stylex.attrs(styles.csrDescLine)}>
               {ABOUT_CSR.desc.slice(0, CSR_DESC_BREAK)}
             </span>
-            <span {...stylex.props(styles.csrDescLine)}>
+            <span {...stylex.attrs(styles.csrDescLine)}>
               {ABOUT_CSR.desc.slice(CSR_DESC_BREAK)}
             </span>
           </p>
         </Reveal>
-        <ul {...stylex.props(styles.csrOutcomes)}>
+        <ul {...stylex.attrs(styles.csrOutcomes)}>
           {ABOUT_CSR.outcomes.map((outcome, index) => {
-            const Icon = CSR_ICONS[outcome.icon];
             return (
-              <Reveal key={outcome.title} as="li" step={index} sx={styles.csrOutcome}>
-                <Icon
+              <Reveal as="li" step={index} sx={styles.csrOutcome}>
+                <Dynamic
+                  component={CSR_ICONS[outcome.icon]}
                   size={22}
                   strokeWidth={1.75}
                   aria-hidden="true"
-                  {...stylex.props(styles.csrOutcomeIcon)}
+                  {...stylex.attrs(styles.csrOutcomeIcon)}
                 />
                 {outcome.title}
               </Reveal>
@@ -881,37 +881,37 @@ function Csr() {
   );
 }
 
-function FigmaCta({ onNavigateHome }: SubPageProps) {
-  const titleId = useId();
-  const wordFillId = useId();
+function FigmaCta(props: SubPageProps) {
+  const titleId = createUniqueId();
+  const wordFillId = createUniqueId();
   return (
-    <section aria-labelledby={titleId} {...stylex.props(styles.cta)}>
+    <section aria-labelledby={titleId} {...stylex.attrs(styles.cta)}>
       <Reveal>
-        <h2 id={titleId} {...stylex.props(styles.ctaTitle)}>
+        <h2 id={titleId} {...stylex.attrs(styles.ctaTitle)}>
           {CTA.title}
         </h2>
-        <div {...stylex.props(styles.ctaActions)}>
+        <div {...stylex.attrs(styles.ctaActions)}>
           <button
             type="button"
-            onClick={() => onNavigateHome("contact")}
-            {...stylex.props(styles.ctaButton, styles.ctaPrimary)}
+            onClick={() => props.onNavigateHome("contact")}
+            {...stylex.attrs(styles.ctaButton, styles.ctaPrimary)}
           >
             {CTA.action.label}
           </button>
           <button
             type="button"
-            onClick={() => onNavigateHome("products")}
-            {...stylex.props(styles.ctaButton, styles.ctaSecondary)}
+            onClick={() => props.onNavigateHome("products")}
+            {...stylex.attrs(styles.ctaButton, styles.ctaSecondary)}
           >
             产品与应用
           </button>
         </div>
       </Reveal>
-      <div {...stylex.props(kitStyles.shell, kitStyles.inset120)}>
+      <div {...stylex.attrs(kitStyles.shell, kitStyles.inset120)}>
         <svg
           viewBox={`0 0 ${WORDMARK_WIDTH} ${WORDMARK_HEIGHT}`}
           aria-hidden="true"
-          {...stylex.props(styles.ctaWord)}
+          {...stylex.attrs(styles.ctaWord)}
         >
           <defs>
             <linearGradient
@@ -922,19 +922,19 @@ function FigmaCta({ onNavigateHome }: SubPageProps) {
               x2="0"
               y2={WORDMARK_HEIGHT}
             >
-              <stop offset="0" stopColor={FRAME_TINT} />
-              <stop offset="1" stopColor={WORDMARK_INK} />
+              <stop offset="0" stop-color={FRAME_TINT} />
+              <stop offset="1" stop-color={WORDMARK_INK} />
             </linearGradient>
           </defs>
           <g
-            fontFamily={WORDMARK_FONT}
-            fontSize={WORDMARK_FONT_SIZE}
-            fontWeight={600}
-            textAnchor="middle"
+            font-family={WORDMARK_FONT}
+            font-size={WORDMARK_FONT_SIZE}
+            font-weight={600}
+            text-anchor="middle"
             fill={`url(#${wordFillId})`}
           >
             {WORDMARK_LETTERS.map(({ letter, center }) => (
-              <text key={center} x={center} y={WORDMARK_HEIGHT}>
+              <text x={center} y={WORDMARK_HEIGHT}>
                 {letter}
               </text>
             ))}
@@ -945,11 +945,11 @@ function FigmaCta({ onNavigateHome }: SubPageProps) {
   );
 }
 
-export function AboutOOS1Figma({ onNavigateHome }: SubPageProps) {
+export function AboutOOS1Figma(props: SubPageProps) {
   return (
-    <div id="about-top" {...stylex.props(styles.root)}>
+    <div id="about-top" {...stylex.attrs(styles.root)}>
       <AboutHero />
-      <SubPageNav current="关于我们" chips={NAV_CHIPS} onNavigateHome={onNavigateHome} />
+      <SubPageNav current="关于我们" chips={NAV_CHIPS} onNavigateHome={props.onNavigateHome} />
       <Profile />
       <HistoryTimeline stickyTop={STICKY_TOP} plain sx={[kitStyles.anchor, styles.historyGray]} />
       <CampusGallery showEyebrow={false} headerSx={styles.campusHead} />
@@ -957,7 +957,7 @@ export function AboutOOS1Figma({ onNavigateHome }: SubPageProps) {
       <Structure />
       <Csr />
       <Honors />
-      <FigmaCta onNavigateHome={onNavigateHome} />
+      <FigmaCta onNavigateHome={props.onNavigateHome} />
     </div>
   );
 }

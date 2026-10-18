@@ -1,6 +1,7 @@
-import { useMotionValue, useMotionValueEvent, useScroll, useTransform } from "motion/react";
-import { useCallback, useEffect, useRef, useSyncExternalStore } from "react";
+import { createEffect, createSignal, untrack, type Accessor } from "solid-js";
 
+import { createExternalStore } from "@/compat/external-store";
+import { useMotionValue, useMotionValueEvent, useScroll, useTransform } from "@/compat/motion";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
 export const HEADER_HEIGHT = 80;
@@ -28,8 +29,8 @@ function subscribeTwoColumn(onChange: () => void) {
   return () => query.removeEventListener("change", onChange);
 }
 
-export function useTwoColumn(): boolean {
-  return useSyncExternalStore(
+export function useTwoColumn(): Accessor<boolean> {
+  return createExternalStore(
     subscribeTwoColumn,
     () => window.matchMedia(TWO_COLUMN_QUERY).matches,
     () => true,
@@ -37,19 +38,19 @@ export function useTwoColumn(): boolean {
 }
 
 export function useCounterweight<T extends HTMLElement>(lever: number) {
-  const beamRef = useRef<T>(null);
+  const [beamRef, setBeamRef] = createSignal<T>();
   const reduce = useReducedMotion();
   const twoColumn = useTwoColumn();
-  const balanced = reduce || !twoColumn;
+  const balanced = () => reduce() || !twoColumn();
   const { scrollY } = useScroll();
   const arm = useMotionValue(0);
   const load = useTransform(arm, (offset) => -offset);
   const engage = useMotionValue(0);
 
-  const update = useCallback(() => {
-    const beam = beamRef.current;
+  const update = () => {
+    const beam = untrack(beamRef);
     if (!beam) return;
-    if (balanced) {
+    if (untrack(balanced)) {
       arm.set(0);
       engage.set(0);
       return;
@@ -57,20 +58,23 @@ export function useCounterweight<T extends HTMLElement>(lever: number) {
     const distance = beam.getBoundingClientRect().top - readingLine(window.innerHeight);
     arm.set(lever * distance);
     engage.set(Math.max(0, 1 - Math.abs(distance) / ENGAGE_RANGE));
-  }, [arm, engage, lever, balanced]);
+  };
 
   useMotionValueEvent(scrollY, "change", update);
 
-  useEffect(() => {
-    update();
-    const observer = new ResizeObserver(update);
-    observer.observe(document.body);
-    window.addEventListener("resize", update);
-    return () => {
-      observer.disconnect();
-      window.removeEventListener("resize", update);
-    };
-  }, [update]);
+  createEffect(
+    () => [beamRef(), balanced()],
+    () => {
+      update();
+      const observer = new ResizeObserver(update);
+      observer.observe(document.body);
+      window.addEventListener("resize", update);
+      return () => {
+        observer.disconnect();
+        window.removeEventListener("resize", update);
+      };
+    },
+  );
 
-  return { beamRef, arm, load, engage };
+  return { beamRef: setBeamRef, arm, load, engage };
 }

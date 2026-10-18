@@ -1,8 +1,8 @@
-import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
+import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { ArrowLeft, ArrowRight } from "lucide-react";
-import { m } from "motion/react";
-import { useEffect, useId, useRef, useState, type KeyboardEvent } from "react";
+import { ArrowLeft, ArrowRight } from "@fenchem-lp/ui/components/lucide";
+import { m } from "@/compat/motion";
+import { createEffect, createSignal, createUniqueId, For } from "solid-js";
 
 import { EASE } from "@/components/prototype/motion-constants";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
@@ -27,8 +27,8 @@ const NUMERAL_FONT =
   '"Inter Tight", "Source Han Sans SC", "Noto Sans SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif';
 
 const TABLET = "@media (min-width: 768px) and (max-width: 1279.98px)";
-const DESKTOP = breakpoints.xl;
-const MD = breakpoints.md;
+const DESKTOP = "@media (min-width: 1280px)";
+const MD = "@media (min-width: 768px)";
 const INSET = "min(120px, 8.333vw)";
 const HEADER_HEIGHT = 80;
 const SHEET_PAD = { default: 20, [TABLET]: 28, [DESKTOP]: 32 } as const;
@@ -45,6 +45,10 @@ const FIELDS: { label: string; pick: (item: SolutionItem) => string[] }[] = [
   { label: "质地", pick: (item) => item.texture },
   { label: "应用", pick: (item) => item.applications },
 ];
+
+// stylex.attrs with reactive (accessor) arguments resolves at runtime here, because
+// the StyleX compiler tries to evaluate them at build time and throws.
+const sxProps: typeof stylex.attrs = (...args) => stylex.attrs(...args);
 
 const styles = stylex.create({
   section: {
@@ -369,25 +373,21 @@ const styles = stylex.create({
   },
 });
 
-function Field({ label, lines }: { label: string; lines: string[] }) {
+function Field(props: { label: string; lines: string[] }) {
   return (
-    <div {...stylex.props(styles.field)}>
-      <dt {...stylex.props(styles.fieldLabel)}>{label}</dt>
-      <dd {...stylex.props(styles.fieldValue)}>
-        {lines.length > 0 ? (
-          <ul {...stylex.props(styles.lines)}>
-            {lines.map((line) => (
-              <li key={line} {...stylex.props(styles.line)}>
-                {line}
-              </li>
-            ))}
+    <div {...stylex.attrs(styles.field)}>
+      <dt {...stylex.attrs(styles.fieldLabel)}>{props.label}</dt>
+      <dd {...stylex.attrs(styles.fieldValue)}>
+        {props.lines.length > 0 ? (
+          <ul {...stylex.attrs(styles.lines)}>
+            <For each={props.lines}>{(line) => <li {...stylex.attrs(styles.line)}>{line}</li>}</For>
           </ul>
         ) : (
           <>
-            <span aria-hidden="true" {...stylex.props(styles.empty)}>
+            <span aria-hidden="true" {...stylex.attrs(styles.empty)}>
               —
             </span>
-            <span {...stylex.props(styles.srOnly)}>None</span>
+            <span {...stylex.attrs(styles.srOnly)}>None</span>
           </>
         )}
       </dd>
@@ -395,99 +395,97 @@ function Field({ label, lines }: { label: string; lines: string[] }) {
   );
 }
 
-function SheetBody({ item, index }: { item: SolutionItem; index: number }) {
+function SheetBody(props: { item: SolutionItem; index: number }) {
   return (
     <>
-      <header {...stylex.props(styles.sheetHead)}>
-        <p {...stylex.props(styles.sheetNumber)}>
-          <span {...stylex.props(styles.sheetNumberCurrent)}>{padIndex(index)}</span> /{" "}
+      <header {...stylex.attrs(styles.sheetHead)}>
+        <p {...stylex.attrs(styles.sheetNumber)}>
+          <span {...stylex.attrs(styles.sheetNumberCurrent)}>{padIndex(props.index)}</span> /{" "}
           {padIndex(LAST)}
         </p>
-        <h3 {...stylex.props(styles.sheetTitle)}>{item.title}</h3>
-        <p {...stylex.props(styles.sheetSubtitle)}>{item.subtitle}</p>
+        <h3 {...stylex.attrs(styles.sheetTitle)}>{props.item.title}</h3>
+        <p {...stylex.attrs(styles.sheetSubtitle)}>{props.item.subtitle}</p>
       </header>
-      <dl {...stylex.props(styles.fields)}>
+      <dl {...stylex.attrs(styles.fields)}>
         {FIELDS.map((field) => (
-          <Field key={field.label} label={field.label} lines={field.pick(item)} />
+          <Field label={field.label} lines={field.pick(props.item)} />
         ))}
       </dl>
     </>
   );
 }
 
-function FootButton({
-  direction,
-  target,
-  controls,
-  onGo,
-}: {
+function FootButton(props: {
   direction: "prev" | "next";
   target: number | null;
   controls: string;
   onGo: (index: number) => void;
 }) {
-  const disabled = target === null;
-  const neighbour = target === null ? null : SOLUTION_ITEMS[target];
-  const Arrow = direction === "prev" ? ArrowLeft : ArrowRight;
-  const arrow = (
+  const disabled = () => props.target === null;
+  const neighbour = () => (props.target === null ? null : SOLUTION_ITEMS[props.target]);
+  const Arrow = props.direction === "prev" ? ArrowLeft : ArrowRight;
+  const arrow = () => (
     <Arrow
       size={16}
       strokeWidth={1.5}
       absoluteStrokeWidth
       aria-hidden="true"
-      {...stylex.props(styles.footArrow)}
+      {...stylex.attrs(styles.footArrow)}
     />
   );
   return (
     <button
       type="button"
-      aria-disabled={disabled || undefined}
-      aria-controls={controls}
+      aria-disabled={disabled() ? "true" : undefined}
+      aria-controls={props.controls}
       onClick={() => {
-        if (target !== null) onGo(target);
+        const target = props.target;
+        if (target !== null) props.onGo(target);
       }}
-      {...stylex.props(
+      {...stylex.attrs(
         styles.footButton,
-        direction === "next" && styles.footNext,
-        disabled && styles.footDisabled,
+        props.direction === "next" && styles.footNext,
+        disabled() && styles.footDisabled,
       )}
     >
-      {direction === "prev" && arrow}
-      <span {...stylex.props(styles.footText)}>
-        <span {...stylex.props(styles.footLabel, disabled && styles.footLabelDisabled)}>
-          {direction === "prev" ? "上一个" : "下一个"}
+      {props.direction === "prev" && arrow()}
+      <span {...stylex.attrs(styles.footText)}>
+        <span {...stylex.attrs(styles.footLabel, disabled() && styles.footLabelDisabled)}>
+          {props.direction === "prev" ? "上一个" : "下一个"}
         </span>
-        {neighbour && target !== null && (
-          <span {...stylex.props(styles.footTitle)}>
-            <span {...stylex.props(styles.footIndex)}>{padIndex(target)}</span>
-            {neighbour.title}
+        {neighbour() && props.target !== null && (
+          <span {...stylex.attrs(styles.footTitle)}>
+            <span {...stylex.attrs(styles.footIndex)}>{padIndex(props.target)}</span>
+            {neighbour()?.title}
           </span>
         )}
       </span>
-      {direction === "next" && arrow}
+      {props.direction === "next" && arrow()}
     </button>
   );
 }
 
 export function Solutions() {
   const reduce = useReducedMotion();
-  const baseId = useId();
+  const baseId = createUniqueId();
   const titleId = `${baseId}-title`;
   const tabId = (index: number) => `${baseId}-tab-${index}`;
   const panelId = (index: number) => `${baseId}-panel-${index}`;
-  const [active, setActive] = useState(0);
-  const [announcement, setAnnouncement] = useState("");
-  const listRef = useRef<HTMLDivElement>(null);
-  const paperRef = useRef<HTMLDivElement>(null);
-  const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const [active, setActive] = createSignal(0);
+  const [announcement, setAnnouncement] = createSignal("");
+  let list: HTMLDivElement | undefined;
+  let paper: HTMLDivElement | undefined;
+  const tabs: (HTMLButtonElement | undefined)[] = [];
 
-  useEffect(() => {
-    const list = listRef.current;
-    const tab = tabRefs.current[active];
-    if (!list || !tab || list.scrollWidth <= list.clientWidth) return;
-    const left = tab.offsetLeft - (list.clientWidth - tab.offsetWidth) / 2;
-    list.scrollTo({ left, behavior: reduce ? "auto" : "smooth" });
-  }, [active, reduce]);
+  createEffect(
+    () => [active(), reduce()] as const,
+    ([index, reduced]) => {
+      const tab = tabs[index];
+      if (!list || !tab || list.scrollWidth <= list.clientWidth) return;
+      const left = tab.offsetLeft - (list.clientWidth - tab.offsetWidth) / 2;
+      list.scrollTo({ left, behavior: reduced ? "auto" : "smooth" });
+    },
+  );
 
   const selectFromTabs = (index: number) => {
     setActive(index);
@@ -497,22 +495,22 @@ export function Solutions() {
   const selectFromFoot = (index: number) => {
     setActive(index);
     setAnnouncement(`${padIndex(index)} ${SOLUTION_ITEMS[index]?.englishName ?? ""}`);
-    const paper = paperRef.current;
     if (paper && paper.getBoundingClientRect().top < HEADER_HEIGHT) {
-      paper.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+      paper.scrollIntoView({ behavior: reduce() ? "auto" : "smooth", block: "start" });
     }
   };
 
-  const onTabKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+  const onTabKeyDown = (event: KeyboardEvent) => {
+    const current = active();
     const next =
       event.key === "ArrowRight"
-        ? active === LAST
+        ? current === LAST
           ? 0
-          : active + 1
+          : current + 1
         : event.key === "ArrowLeft"
-          ? active === 0
+          ? current === 0
             ? LAST
-            : active - 1
+            : current - 1
           : event.key === "Home"
             ? 0
             : event.key === "End"
@@ -521,7 +519,7 @@ export function Solutions() {
     if (next === null) return;
     event.preventDefault();
     selectFromTabs(next);
-    tabRefs.current[next]?.focus();
+    tabs[next]?.focus();
   };
 
   return (
@@ -529,86 +527,84 @@ export function Solutions() {
       id="products-solutions"
       aria-labelledby={titleId}
       lang="zh-CN"
-      {...stylex.props(styles.section)}
+      {...stylex.attrs(styles.section)}
     >
-      <div {...stylex.props(styles.shell)}>
-        <h2 id={titleId} {...stylex.props(styles.title)}>
+      <div {...stylex.attrs(styles.shell)}>
+        <h2 id={titleId} {...stylex.attrs(styles.title)}>
           应用方案
         </h2>
         <div
-          ref={listRef}
+          ref={list}
           role="tablist"
           aria-labelledby={titleId}
           aria-orientation="horizontal"
           onKeyDown={onTabKeyDown}
-          {...stylex.props(styles.tablist)}
+          {...stylex.attrs(styles.tablist)}
         >
           {SOLUTION_ITEMS.map((item, index) => {
-            const isActive = index === active;
+            const isActive = () => index === active();
             return (
               <button
-                key={item.id}
                 ref={(node) => {
-                  tabRefs.current[index] = node;
+                  tabs[index] = node;
                 }}
                 type="button"
                 role="tab"
                 id={tabId(index)}
-                aria-selected={isActive}
+                aria-selected={isActive() ? "true" : "false"}
                 aria-controls={panelId(index)}
-                tabIndex={isActive ? 0 : -1}
+                tabindex={isActive() ? 0 : -1}
                 onClick={() => selectFromTabs(index)}
-                {...stylex.props(styles.chip, isActive && styles.chipSelected)}
+                {...stylex.attrs(styles.chip, isActive() && styles.chipSelected)}
               >
-                <span {...stylex.props(styles.chipNumber, isActive && styles.chipNumberSelected)}>
+                <span {...stylex.attrs(styles.chipNumber, isActive() && styles.chipNumberSelected)}>
                   {padIndex(index)}
                 </span>
-                <span {...stylex.props(styles.chipTitle)}>{item.title}</span>
+                <span {...stylex.attrs(styles.chipTitle)}>{item.title}</span>
               </button>
             );
           })}
         </div>
-        <div ref={paperRef} {...stylex.props(styles.paper)}>
-          <div {...stylex.props(styles.stack)}>
+        <div ref={paper} {...stylex.attrs(styles.paper)}>
+          <div {...stylex.attrs(styles.stack)}>
             {SOLUTION_ITEMS.map((item, index) => {
-              const isActive = index === active;
+              const isActive = () => index === active();
               return (
                 <m.div
-                  key={item.id}
                   role="tabpanel"
                   id={panelId(index)}
                   aria-labelledby={tabId(index)}
-                  tabIndex={isActive ? 0 : -1}
-                  inert={!isActive}
+                  tabindex={isActive() ? 0 : -1}
+                  inert={!isActive()}
                   initial={false}
-                  animate={isActive ? { opacity: 1, y: 0 } : { opacity: 0, y: 6 }}
+                  animate={isActive() ? { opacity: 1, y: 0 } : { opacity: 0, y: 6 }}
                   transition={
-                    isActive && !reduce ? { duration: 0.24, ease: EASE } : { duration: 0 }
+                    isActive() && !reduce() ? { duration: 0.24, ease: EASE } : { duration: 0 }
                   }
-                  {...stylex.props(styles.panel, !isActive && styles.panelIdle)}
+                  {...sxProps(styles.panel, !isActive() && styles.panelIdle)}
                 >
                   <SheetBody item={item} index={index} />
                 </m.div>
               );
             })}
           </div>
-          <div {...stylex.props(styles.foot)}>
+          <div {...stylex.attrs(styles.foot)}>
             <FootButton
               direction="prev"
-              target={active > 0 ? active - 1 : null}
-              controls={panelId(active)}
+              target={active() > 0 ? active() - 1 : null}
+              controls={panelId(active())}
               onGo={selectFromFoot}
             />
             <FootButton
               direction="next"
-              target={active < LAST ? active + 1 : null}
-              controls={panelId(active)}
+              target={active() < LAST ? active() + 1 : null}
+              controls={panelId(active())}
               onGo={selectFromFoot}
             />
           </div>
         </div>
-        <p aria-live="polite" {...stylex.props(styles.srOnly)}>
-          {announcement}
+        <p aria-live="polite" {...stylex.attrs(styles.srOnly)}>
+          {announcement()}
         </p>
       </div>
     </section>

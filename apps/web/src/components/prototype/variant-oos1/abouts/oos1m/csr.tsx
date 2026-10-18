@@ -122,14 +122,14 @@ const styles = stylex.create({
   },
 });
 
-const CASED = { fill: "none", vectorEffect: "non-scaling-stroke" } as const;
+const CASED = { fill: "none", "vector-effect": "non-scaling-stroke" } as const;
 
 export function Csr() {
   return (
     <section
       id="about-csr"
       aria-labelledby="oos1m-csr"
-      {...stylex.props(ui.shell, ui.section, ui.anchor)}
+      {...stylex.attrs(ui.shell, ui.section, ui.anchor)}
     >
       <SheetHeader
         sheet={4}
@@ -137,44 +137,42 @@ export function Csr() {
         english="One site, three outcomes"
         titleId="oos1m-csr"
       />
-      <div {...stylex.props(ui.grid, styles.intro)}>
-        <p {...stylex.props(styles.statement)}>
+      <div {...stylex.attrs(ui.grid, styles.intro)}>
+        <p {...stylex.attrs(styles.statement)}>
           {ABOUT_CSR.statement.map((line) => (
-            <span key={line} {...stylex.props(styles.line)}>
-              {line}
-            </span>
+            <span {...stylex.attrs(styles.line)}>{line}</span>
           ))}
         </p>
-        <p {...stylex.props(styles.desc)}>{ABOUT_CSR.desc}</p>
+        <p {...stylex.attrs(styles.desc)}>{ABOUT_CSR.desc}</p>
       </div>
-      <div {...stylex.props(styles.assembly)}>
-        <figure {...stylex.props(styles.photo)}>
+      <div {...stylex.attrs(styles.assembly)}>
+        <figure {...stylex.attrs(styles.photo)}>
           <img
             src={ABOUT_CSR.image}
             alt={ABOUT_CSR.imageAlt}
             loading="lazy"
             decoding="async"
-            {...stylex.props(styles.image)}
+            {...stylex.attrs(styles.image)}
           />
           <svg
             viewBox="0 0 100 100"
             preserveAspectRatio="none"
             aria-hidden="true"
-            {...stylex.props(styles.overlay)}
+            {...stylex.attrs(styles.overlay)}
           >
             {ROW_CENTERS.map((y) => (
-              <g key={y}>
+              <g>
                 <path
                   d={`M${TARGET.x} ${TARGET.y}L100 ${y}`}
                   {...CASED}
                   stroke="rgba(11, 42, 92, 0.35)"
-                  strokeWidth={3}
+                  stroke-width={3}
                 />
                 <path
                   d={`M${TARGET.x} ${TARGET.y}L100 ${y}`}
                   {...CASED}
                   stroke="#ffffff"
-                  strokeWidth={1}
+                  stroke-width={1}
                 />
               </g>
             ))}
@@ -182,21 +180,21 @@ export function Csr() {
           <span
             aria-hidden="true"
             style={{ left: `${TARGET.x}%`, top: `${TARGET.y}%` }}
-            {...stylex.props(styles.target)}
+            {...stylex.attrs(styles.target)}
           />
         </figure>
-        <ol {...stylex.props(styles.parts)}>
+        <ol {...stylex.attrs(styles.parts)}>
           {ABOUT_CSR.outcomes.map((outcome, index) => (
-            <li key={outcome.title} {...stylex.props(styles.part)}>
-              <span aria-hidden="true" {...stylex.props(styles.shoulder)} />
-              <span aria-hidden="true" {...stylex.props(ui.balloon)}>
+            <li {...stylex.attrs(styles.part)}>
+              <span aria-hidden="true" {...stylex.attrs(styles.shoulder)} />
+              <span aria-hidden="true" {...stylex.attrs(ui.balloon)}>
                 {index + 1}
               </span>
-              <span {...stylex.props(styles.partText)}>
-                <span lang="en" {...stylex.props(ui.label)}>
+              <span {...stylex.attrs(styles.partText)}>
+                <span lang="en" {...stylex.attrs(ui.label)}>
                   {ENGLISH[index]}
                 </span>
-                <span {...stylex.props(styles.partTitle)}>{outcome.title}</span>
+                <span {...stylex.attrs(styles.partTitle)}>{outcome.title}</span>
               </span>
             </li>
           ))}

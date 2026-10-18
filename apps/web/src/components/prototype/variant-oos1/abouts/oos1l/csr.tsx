@@ -58,30 +58,30 @@ export function Csr() {
     <section
       id="about-csr"
       aria-labelledby={headingId("about-csr")}
-      {...stylex.props(ui.section, styles.section)}
+      {...stylex.attrs(ui.section, styles.section)}
     >
-      <div {...stylex.props(ui.shell)}>
+      <div {...stylex.attrs(ui.shell)}>
         <SectionLabel section="about-csr" />
-        <div {...stylex.props(styles.statement)}>
+        <div {...stylex.attrs(styles.statement)}>
           {SENTENCE.csr.map((line) => (
-            <Clause key={line.id} line={line} />
+            <Clause line={line} />
           ))}
         </div>
-        <div {...stylex.props(styles.row)}>
-          <figure {...stylex.props(styles.frame)}>
+        <div {...stylex.attrs(styles.row)}>
+          <figure {...stylex.attrs(styles.frame)}>
             <img
               src={ABOUT_CSR.image}
               alt={ABOUT_CSR.imageAlt}
               loading="lazy"
               decoding="async"
-              {...stylex.props(ui.photo)}
+              {...stylex.attrs(ui.photo)}
             />
           </figure>
-          <div {...stylex.props(styles.text)}>
-            <p {...stylex.props(ui.body)}>{ABOUT_CSR.desc}</p>
-            <ul {...stylex.props(styles.outcomes)}>
+          <div {...stylex.attrs(styles.text)}>
+            <p {...stylex.attrs(ui.body)}>{ABOUT_CSR.desc}</p>
+            <ul {...stylex.attrs(styles.outcomes)}>
               {outcomes.map((outcome, index) => (
-                <li key={outcome.icon} {...stylex.props(styles.outcome)}>
+                <li {...stylex.attrs(styles.outcome)}>
                   {outcome.title}
                   {index < outcomes.length - 1 ? <Hinge mark="、" /> : null}
                 </li>

@@ -34,20 +34,20 @@ const S = stylex.create({
   },
 });
 
-export function Cta({ onNavigateHome }: { onNavigateHome: (hash?: string) => void }) {
+export function Cta(props: { onNavigateHome: (hash?: string) => void }) {
   return (
     <Section labelledBy="about-cta-title" surface="page">
-      <div {...stylex.props(base.shell, base.inset, S.inner)}>
+      <div {...stylex.attrs(base.shell, base.inset, S.inner)}>
         <Reveal>
-          <h2 id="about-cta-title" {...stylex.props(S.title)}>
+          <h2 id="about-cta-title" {...stylex.attrs(S.title)}>
             {CTA.title}
           </h2>
         </Reveal>
         <Reveal delay={120} sx={S.buttons}>
-          <Button variant="primary" onClick={() => onNavigateHome("contact")}>
+          <Button variant="primary" onClick={() => props.onNavigateHome("contact")}>
             {CTA.action.label}
           </Button>
-          <Button variant="secondary" onClick={() => onNavigateHome("products")}>
+          <Button variant="secondary" onClick={() => props.onNavigateHome("products")}>
             产品与应用
           </Button>
         </Reveal>

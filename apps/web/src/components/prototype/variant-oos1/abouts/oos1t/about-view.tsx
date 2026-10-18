@@ -1,5 +1,5 @@
 import * as stylex from "@stylexjs/stylex";
-import { useRef } from "react";
+import { createSignal } from "solid-js";
 
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
@@ -45,15 +45,15 @@ const styles = stylex.create({
   },
 });
 
-export function AboutOOS1T({ onNavigateHome }: AboutPageProps) {
-  const rootRef = useRef<HTMLDivElement>(null);
+export function AboutOOS1T(props: AboutPageProps) {
+  const [rootRef, setRootRef] = createSignal<HTMLDivElement>();
   const reduce = useReducedMotion();
   const hour = useSunClock(rootRef, reduce);
 
   return (
     <SunContext value={hour}>
-      <div id="about-top" ref={rootRef} {...stylex.props(styles.root)}>
-        <span aria-hidden="true" {...stylex.props(styles.daylight)} />
+      <div id="about-top" ref={setRootRef} {...stylex.attrs(styles.root)}>
+        <span aria-hidden="true" {...stylex.attrs(styles.daylight)} />
         <Hero />
         <Profile />
         <Campus />
@@ -61,7 +61,7 @@ export function AboutOOS1T({ onNavigateHome }: AboutPageProps) {
         <Csr />
         <Honors />
         <Structure />
-        <Closing onNavigateHome={onNavigateHome} />
+        <Closing onNavigateHome={props.onNavigateHome} />
       </div>
     </SunContext>
   );

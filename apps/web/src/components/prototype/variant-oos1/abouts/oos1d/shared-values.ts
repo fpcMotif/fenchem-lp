@@ -1,4 +1,4 @@
-import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
+import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 import { ABOUT_HERO } from "../../about-data";
 import { font, motionCss, step, tone } from "./tokens.stylex";
@@ -25,11 +25,19 @@ export const ui = stylex.create({
     boxSizing: "border-box",
   },
   inset: {
-    paddingInline: { default: 16, [breakpoints.md]: 40, [breakpoints.xl]: "min(124px, 8.611vw)" },
+    paddingInline: {
+      default: 16,
+      ["@media (min-width: 768px)"]: 40,
+      ["@media (min-width: 1280px)"]: "min(124px, 8.611vw)",
+    },
   },
   section: {
     scrollMarginTop: 136,
-    paddingBlock: { default: 40, [breakpoints.md]: 56, [breakpoints.xl]: 72 },
+    paddingBlock: {
+      default: 40,
+      ["@media (min-width: 768px)"]: 56,
+      ["@media (min-width: 1280px)"]: 72,
+    },
   },
   onPaper: {
     backgroundColor: colors.paper,
@@ -62,8 +70,11 @@ export const ui = stylex.create({
     objectFit: "cover",
   },
   reveal: {
-    opacity: { default: 0, [breakpoints.motionReduce]: 1 },
-    transform: { default: null, [breakpoints.motionOk]: "translateY(20px)" },
+    opacity: { default: 0, ["@media (prefers-reduced-motion: reduce)"]: 1 },
+    transform: {
+      default: null,
+      ["@media (prefers-reduced-motion: no-preference)"]: "translateY(20px)",
+    },
     transitionProperty: "opacity, transform",
     transitionDuration: "800ms",
     transitionTimingFunction: motionCss.out,
@@ -76,17 +87,21 @@ export const ui = stylex.create({
     display: "grid",
     gridTemplateColumns: {
       default: "minmax(0, 1fr)",
-      [breakpoints.lg]: "minmax(0, 38.2fr) minmax(0, 61.8fr)",
+      ["@media (min-width: 1024px)"]: "minmax(0, 38.2fr) minmax(0, 61.8fr)",
     },
-    columnGap: { default: 0, [breakpoints.lg]: 48, [breakpoints.xl]: 80 },
-    rowGap: { default: 32, [breakpoints.lg]: 0 },
+    columnGap: {
+      default: 0,
+      ["@media (min-width: 1024px)"]: 48,
+      ["@media (min-width: 1280px)"]: 80,
+    },
+    rowGap: { default: 32, ["@media (min-width: 1024px)"]: 0 },
   },
   asideCol: {
     minWidth: 0,
   },
   asideSticky: {
-    position: { default: "static", [breakpoints.lg]: "sticky" },
-    top: { default: "auto", [breakpoints.lg]: 160 },
+    position: { default: "static", ["@media (min-width: 1024px)"]: "sticky" },
+    top: { default: "auto", ["@media (min-width: 1024px)"]: 160 },
   },
   main: {
     minWidth: 0,
@@ -131,7 +146,10 @@ export const ui = stylex.create({
     cursor: "pointer",
     transform: {
       default: null,
-      ":active": { default: null, [breakpoints.motionOk]: "scale(0.98)" },
+      ":active": {
+        default: null,
+        ["@media (prefers-reduced-motion: no-preference)"]: "scale(0.98)",
+      },
     },
     transitionProperty: "background-color, color, transform",
     transitionDuration: "160ms",

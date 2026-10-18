@@ -1,6 +1,6 @@
 import * as stylex from "@stylexjs/stylex";
-import { m, useInView, useMotionValueEvent, useTransform, type MotionValue } from "motion/react";
-import { useEffect, useRef, useState } from "react";
+import { m, useInView, useMotionValueEvent, useTransform, type MotionValue } from "@/compat/motion";
+import { createSignal, onSettled, untrack } from "solid-js";
 
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
@@ -261,28 +261,28 @@ type StatementLineProps = {
   pinned: boolean;
 };
 
-function StatementLine({ children, on, index, pin, pinned }: StatementLineProps) {
+function StatementLine(props: StatementLineProps) {
   const reduce = useReducedMotion();
-  const start = STATEMENT_START + index * STATEMENT_LINE_STEP;
+  const start = untrack(() => STATEMENT_START + props.index * STATEMENT_LINE_STEP);
   const y = useTransform(
-    pin,
+    untrack(() => props.pin),
     [0, start, start + STATEMENT_LINE_SPAN, 1],
     [MASK_HIDDEN, MASK_HIDDEN, "0%", "0%"],
   );
   return (
-    <span {...stylex.props(styles.statementMask)}>
+    <span {...stylex.attrs(styles.statementMask)}>
       <m.span
-        {...stylex.props(styles.statementInner)}
-        style={pinned ? { y } : undefined}
-        initial={pinned ? false : { y: MASK_HIDDEN }}
-        animate={pinned ? undefined : { y: on ? "0%" : MASK_HIDDEN }}
+        {...stylex.attrs(styles.statementInner)}
+        style={props.pinned ? { y } : undefined}
+        initial={props.pinned ? false : { y: MASK_HIDDEN }}
+        animate={props.pinned ? undefined : { y: props.on ? "0%" : MASK_HIDDEN }}
         transition={{
-          duration: reduce ? 0 : STATEMENT_RISE_S,
-          delay: reduce || !on ? 0 : index * STATEMENT_STAGGER_S,
+          duration: reduce() ? 0 : STATEMENT_RISE_S,
+          delay: reduce() || !props.on ? 0 : props.index * STATEMENT_STAGGER_S,
           ease: EASE_OUT,
         }}
       >
-        {children}
+        {props.children}
       </m.span>
     </span>
   );
@@ -290,17 +290,17 @@ function StatementLine({ children, on, index, pin, pinned }: StatementLineProps)
 
 type HeroProps = { ready: boolean; onReady: () => void };
 
-export function Hero({ ready, onReady }: HeroProps) {
+export function Hero(props: HeroProps) {
   const reduce = useReducedMotion();
-  const sectionRef = useRef<HTMLElement>(null);
-  const photoAreaRef = useRef<HTMLDivElement>(null);
-  const imageRef = useRef<HTMLImageElement>(null);
-  const statementRef = useRef<HTMLDivElement>(null);
+  const [sectionEl, setSectionEl] = createSignal<HTMLElement>();
+  const [photoAreaEl, setPhotoAreaEl] = createSignal<HTMLDivElement>();
+  let imageEl: HTMLImageElement | undefined;
+  let statementEl: HTMLDivElement | undefined;
   const pinned = usePinEnabled();
-  const [copyGone, setCopyGone] = useState(false);
-  const [waterPaused, setWaterPaused] = useState(false);
-  const statementSeen = useInView(statementRef, { once: true, margin: REVEAL_MARGIN });
-  const pin = usePinProgress(sectionRef);
+  const [copyGone, setCopyGone] = createSignal(false);
+  const [waterPaused, setWaterPaused] = createSignal(false);
+  const statementSeen = useInView(() => statementEl, { once: true, margin: REVEAL_MARGIN });
+  const pin = usePinProgress(sectionEl);
   const frame = useTransform(pin, [0, CARD_END, 1], [0, 1, 1]);
   const clipPath = useTransform(frame, cardInset);
   const photoScale = useTransform(frame, [0, 1], [1, PHOTO_ZOOM_END]);
@@ -319,13 +319,13 @@ export function Hero({ ready, onReady }: HeroProps) {
     setWaterPaused(value >= CARD_END);
   });
 
-  useEffect(() => {
-    const image = imageRef.current;
+  onSettled(() => {
+    const image = imageEl;
     let settled = false;
     const finish = () => {
       if (settled) return;
       settled = true;
-      onReady();
+      props.onReady();
     };
     const timer = window.setTimeout(finish, READY_TIMEOUT_MS);
     if (image) image.decode().then(finish, finish);
@@ -334,77 +334,82 @@ export function Hero({ ready, onReady }: HeroProps) {
       settled = true;
       window.clearTimeout(timer);
     };
-  }, [onReady]);
+  });
 
-  const statementVisible = reduce || statementSeen;
+  const statementVisible = () => reduce() || statementSeen();
 
   return (
     <section
-      ref={sectionRef}
+      ref={setSectionEl}
       id="top"
       aria-labelledby="oo-hero-title"
-      {...stylex.props(styles.hero)}
+      {...stylex.attrs(styles.hero)}
     >
-      <span id="about" aria-hidden="true" {...stylex.props(styles.aboutAnchor)} />
-      <div {...stylex.props(styles.stage)}>
-        <div ref={photoAreaRef} data-hero-photo="" {...stylex.props(styles.photoArea)}>
-          <m.div {...stylex.props(styles.photoClip)} style={pinned ? { clipPath } : undefined}>
+      <span id="about" aria-hidden="true" {...stylex.attrs(styles.aboutAnchor)} />
+      <div {...stylex.attrs(styles.stage)}>
+        <div ref={setPhotoAreaEl} data-hero-photo="" {...stylex.attrs(styles.photoArea)}>
+          <m.div {...stylex.attrs(styles.photoClip)} style={pinned() ? { clipPath } : undefined}>
             <m.div
               aria-hidden="true"
-              {...stylex.props(styles.photoZoom)}
-              style={pinned ? { scale: photoScale } : undefined}
+              {...stylex.attrs(styles.photoZoom)}
+              style={pinned() ? { scale: photoScale } : undefined}
             >
-              <div {...stylex.props(styles.photoLayer, ready && styles.photoSettle)}>
+              <div {...stylex.attrs(styles.photoLayer, props.ready && styles.photoSettle)}>
                 <img
-                  ref={imageRef}
+                  ref={imageEl}
                   src={HERO.image}
                   alt=""
                   width={2400}
                   height={1712}
                   decoding="async"
-                  fetchPriority="high"
-                  {...stylex.props(styles.photoImage)}
+                  fetchpriority="high"
+                  {...stylex.attrs(styles.photoImage)}
                 />
                 <LiquidImage
                   src={HERO.image}
                   focus={PHOTO_FOCUS}
-                  hostRef={photoAreaRef}
-                  paused={pinned && waterPaused}
+                  host={photoAreaEl}
+                  paused={pinned() && waterPaused()}
                 />
               </div>
             </m.div>
             <m.div
               aria-hidden="true"
-              {...stylex.props(styles.scrimTop)}
-              style={pinned ? { opacity: topScrimOpacity } : undefined}
+              {...stylex.attrs(styles.scrimTop)}
+              style={pinned() ? { opacity: topScrimOpacity } : undefined}
             />
             <m.div
               aria-hidden="true"
-              {...stylex.props(styles.scrimBottom)}
-              style={pinned ? { opacity: copyOpacity } : undefined}
+              {...stylex.attrs(styles.scrimBottom)}
+              style={pinned() ? { opacity: copyOpacity } : undefined}
             />
             <m.div
-              {...stylex.props(layout.shell, layout.inset, styles.copy)}
-              style={pinned ? { y: copyY, opacity: copyOpacity } : undefined}
+              {...stylex.attrs(layout.shell, layout.inset, styles.copy)}
+              style={pinned() ? { y: copyY, opacity: copyOpacity } : undefined}
             >
-              <h1 id="oo-hero-title" {...stylex.props(styles.title)}>
+              <h1 id="oo-hero-title" {...stylex.attrs(styles.title)}>
                 <MaskLine
                   sx={styles.titleLine}
                   when="load"
-                  start={ready}
+                  start={props.ready}
                   delay={TITLE_START_MS}
                   duration={LINE_MS}
                 >
                   {HERO.zh}
                 </MaskLine>
               </h1>
-              <p lang="en" {...stylex.props(styles.subtitle)}>
-                <MaskLine when="load" start={ready} delay={LINE_START_MS} duration={LINE_MS}>
+              <p lang="en" {...stylex.attrs(styles.subtitle)}>
+                <MaskLine when="load" start={props.ready} delay={LINE_START_MS} duration={LINE_MS}>
                   {HERO.en}
                 </MaskLine>
               </p>
-              <div {...stylex.props(styles.ctaSlot, pinned && copyGone && styles.ctaSlotGone)}>
-                <LoadFade start={ready} delay={CTA_START_MS} duration={CTA_MS} sx={styles.cta}>
+              <div {...sxProps(styles.ctaSlot, pinned() && copyGone() && styles.ctaSlotGone)}>
+                <LoadFade
+                  start={props.ready}
+                  delay={CTA_START_MS}
+                  duration={CTA_MS}
+                  sx={styles.cta}
+                >
                   <Button href={HERO.primary.href} tone="white" size="large">
                     {HERO.primary.label}
                   </Button>
@@ -416,25 +421,19 @@ export function Hero({ ready, onReady }: HeroProps) {
             </m.div>
           </m.div>
         </div>
-        <div ref={statementRef} {...stylex.props(styles.statementLayer)}>
-          <div {...stylex.props(layout.shell, layout.inset)}>
-            <div {...stylex.props(styles.statementGrid)}>
-              <h2 {...stylex.props(styles.statement)}>
+        <div ref={statementEl} {...stylex.attrs(styles.statementLayer)}>
+          <div {...stylex.attrs(layout.shell, layout.inset)}>
+            <div {...stylex.attrs(styles.statementGrid)}>
+              <h2 {...stylex.attrs(styles.statement)}>
                 {ABOUT_STATEMENT.map((line, index) => (
-                  <StatementLine
-                    key={line}
-                    on={statementVisible}
-                    index={index}
-                    pin={pin}
-                    pinned={pinned}
-                  >
+                  <StatementLine on={statementVisible()} index={index} pin={pin} pinned={pinned()}>
                     {line}
                   </StatementLine>
                 ))}
               </h2>
               <HeroSupport
-                pinned={pinned}
-                statementVisible={statementVisible}
+                pinned={pinned()}
+                statementVisible={statementVisible()}
                 supportOpacity={supportOpacity}
                 supportY={supportY}
               />
@@ -446,12 +445,12 @@ export function Hero({ ready, onReady }: HeroProps) {
   );
 }
 
-function HeroSupport({
-  pinned,
-  statementVisible,
-  supportOpacity,
-  supportY,
-}: {
+// stylex.attrs with reactive (accessor) arguments: the StyleX compiler tries to
+// evaluate local arrow functions at build time and throws, so these call sites
+// resolve at runtime instead.
+const sxProps: typeof stylex.attrs = (...args) => stylex.attrs(...args);
+
+function HeroSupport(props: {
   pinned: boolean;
   statementVisible: boolean;
   supportOpacity: MotionValue<number>;
@@ -460,20 +459,20 @@ function HeroSupport({
   const reduce = useReducedMotion();
   return (
     <m.p
-      {...stylex.props(styles.support)}
-      style={pinned ? { opacity: supportOpacity, y: supportY } : undefined}
-      initial={pinned ? false : { opacity: 0, y: SUPPORT_RISE_PX }}
+      {...stylex.attrs(styles.support)}
+      style={props.pinned ? { opacity: props.supportOpacity, y: props.supportY } : undefined}
+      initial={props.pinned ? false : { opacity: 0, y: SUPPORT_RISE_PX }}
       animate={
-        pinned
+        props.pinned
           ? undefined
           : {
-              opacity: statementVisible ? 1 : 0,
-              y: statementVisible ? 0 : SUPPORT_RISE_PX,
+              opacity: props.statementVisible ? 1 : 0,
+              y: props.statementVisible ? 0 : SUPPORT_RISE_PX,
             }
       }
       transition={{
-        duration: reduce ? 0 : STATEMENT_RISE_S,
-        delay: reduce || !statementVisible ? 0 : SUPPORT_DELAY_S,
+        duration: reduce() ? 0 : STATEMENT_RISE_S,
+        delay: reduce() || !props.statementVisible ? 0 : SUPPORT_DELAY_S,
         ease: EASE_OUT,
       }}
     >

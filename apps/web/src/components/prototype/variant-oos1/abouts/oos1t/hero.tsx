@@ -1,6 +1,5 @@
 import * as stylex from "@stylexjs/stylex";
-import { useMotionValueEvent } from "motion/react";
-import { useRef } from "react";
+import { useMotionValueEvent } from "@/compat/motion";
 
 import { ABOUT_BANNER } from "../../about-data";
 import { Dial } from "./dial";
@@ -170,37 +169,37 @@ const styles = stylex.create({
 
 export function Hero() {
   const hour = useSunHour();
-  const tipRef = useRef<HTMLSpanElement>(null);
+  let tipRef: HTMLSpanElement | undefined;
   useMotionValueEvent(hour, "change", (value) => {
-    if (tipRef.current) tipRef.current.textContent = clock(value).time;
+    if (tipRef) tipRef.textContent = clock(value).time;
   });
 
   return (
-    <section aria-labelledby="oos1t-title" {...stylex.props(styles.hero)}>
-      <div {...stylex.props(styles.stage)}>
-        <div {...stylex.props(ui.shell, ui.grid, styles.overlay)}>
-          <div {...stylex.props(styles.meta)}>
-            <p lang="en" {...stylex.props(styles.established)}>
+    <section aria-labelledby="oos1t-title" {...stylex.attrs(styles.hero)}>
+      <div {...stylex.attrs(styles.stage)}>
+        <div {...stylex.attrs(ui.shell, ui.grid, styles.overlay)}>
+          <div {...stylex.attrs(styles.meta)}>
+            <p lang="en" {...stylex.attrs(styles.established)}>
               {ABOUT_BANNER.established}
             </p>
-            <p lang="en" {...stylex.props(styles.place)}>
+            <p lang="en" {...stylex.attrs(styles.place)}>
               {ABOUT_BANNER.place} · 32° N
             </p>
           </div>
-          <p {...stylex.props(styles.lead)}>{ABOUT_BANNER.lead}</p>
-          <p {...stylex.props(styles.hint)}>
-            <span lang="en" aria-hidden="true" {...stylex.props(styles.hintSerif)}>
+          <p {...stylex.attrs(styles.lead)}>{ABOUT_BANNER.lead}</p>
+          <p {...stylex.attrs(styles.hint)}>
+            <span lang="en" aria-hidden="true" {...stylex.attrs(styles.hintSerif)}>
               IX — I
             </span>
             <span>向下滚动，日影随时辰移动</span>
           </p>
         </div>
-        <div {...stylex.props(styles.comp)}>
-          <div {...stylex.props(styles.anchor)}>
+        <div {...stylex.attrs(styles.comp)}>
+          <div {...stylex.attrs(styles.anchor)}>
             <Gnomon text={ABOUT_BANNER.title} id="oos1t-title" level={1} rise>
               <Dial />
-              <span aria-hidden="true" {...stylex.props(styles.tipDot, styles.appear)} />
-              <span ref={tipRef} aria-hidden="true" {...stylex.props(styles.tip, styles.appear)}>
+              <span aria-hidden="true" {...stylex.attrs(styles.tipDot, styles.appear)} />
+              <span ref={tipRef} aria-hidden="true" {...stylex.attrs(styles.tip, styles.appear)}>
                 {clock(DAY_START).time}
               </span>
             </Gnomon>
@@ -211,7 +210,7 @@ export function Hero() {
         aria-hidden="true"
         data-hour="10"
         data-hour-at="release"
-        {...stylex.props(styles.release)}
+        {...stylex.attrs(styles.release)}
       />
     </section>
   );

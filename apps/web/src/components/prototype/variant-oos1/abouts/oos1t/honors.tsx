@@ -145,7 +145,7 @@ export function Honors() {
       id="about-honor"
       aria-labelledby="oos1t-honor"
       data-hour={SECTION_HOURS.honor}
-      {...stylex.props(ui.section, ui.shell)}
+      {...stylex.attrs(ui.section, ui.shell)}
     >
       <SectionHead
         titleId="oos1t-honor"
@@ -153,29 +153,28 @@ export function Honors() {
         title={ABOUT_HONORS.title}
         english="Honors"
       />
-      <div {...stylex.props(styles.wall)}>
+      <div {...stylex.attrs(styles.wall)}>
         {TIERS.map((tier) => {
           const items = ABOUT_HONORS.items.filter((item) => item.level === tier.level);
           const oddTail = items.length > 1 && items.length % 2 === 1;
           const plaques = items.map((item, index) => (
             <li
-              key={item.id}
-              {...stylex.props(
+              {...stylex.attrs(
                 styles.plaque,
                 tiers[tier.level],
                 oddTail && index === items.length - 1 && tiers.lastOdd,
               )}
             >
               <Cast lift={LIFT.block} still />
-              <div {...stylex.props(styles.face, faces[tier.level])}>
-                <p {...stylex.props(styles.level)}>
-                  <span {...stylex.props(styles.levelChinese)}>{tier.label}</span>
-                  <span lang="en" {...stylex.props(styles.levelSerif)}>
+              <div {...stylex.attrs(styles.face, faces[tier.level])}>
+                <p {...stylex.attrs(styles.level)}>
+                  <span {...stylex.attrs(styles.levelChinese)}>{tier.label}</span>
+                  <span lang="en" {...stylex.attrs(styles.levelSerif)}>
                     {tier.english}
                   </span>
                 </p>
-                <span aria-hidden="true" {...stylex.props(styles.rule)} />
-                <p {...stylex.props(styles.title)}>
+                <span aria-hidden="true" {...stylex.attrs(styles.rule)} />
+                <p {...stylex.attrs(styles.title)}>
                   <Phrase text={item.title} />
                 </p>
               </div>
@@ -183,17 +182,17 @@ export function Honors() {
           ));
           if (tier.level !== "national") {
             return (
-              <ul key={tier.level} aria-label={tier.english} {...stylex.props(ui.grid, styles.row)}>
+              <ul aria-label={tier.english} {...stylex.attrs(ui.grid, styles.row)}>
                 {plaques}
               </ul>
             );
           }
           return (
-            <div key={tier.level} {...stylex.props(ui.grid, styles.row)}>
-              <ul aria-label={tier.english} {...stylex.props(styles.single)}>
+            <div {...stylex.attrs(ui.grid, styles.row)}>
+              <ul aria-label={tier.english} {...stylex.attrs(styles.single)}>
                 {plaques}
               </ul>
-              <p lang="en" {...stylex.props(styles.noon)}>
+              <p lang="en" {...stylex.attrs(styles.noon)}>
                 High noon. The sun stands overhead and every shadow is at its shortest.
               </p>
             </div>

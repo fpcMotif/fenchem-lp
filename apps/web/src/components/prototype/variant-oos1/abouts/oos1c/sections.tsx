@@ -1,6 +1,6 @@
 import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight } from "@fenchem-lp/ui/components/lucide";
 
 import { ABOUT_CSR } from "../../about-data";
 import { CTA, PRODUCTS, PRODUCTS_INTRO } from "../../content";
@@ -242,40 +242,38 @@ export function CsrSection() {
     <section
       id="about-csr"
       aria-labelledby="about-csr-title"
-      {...stylex.props(styles.csr, ui.section, ui.anchor)}
+      {...stylex.attrs(styles.csr, ui.section, ui.anchor)}
     >
-      <h2 id="about-csr-title" {...stylex.props(ui.srOnly)}>
+      <h2 id="about-csr-title" {...stylex.attrs(ui.srOnly)}>
         Responsibility
       </h2>
-      <div {...stylex.props(ui.shell, ui.inset)}>
+      <div {...stylex.attrs(ui.shell, ui.inset)}>
         <Reveal>
-          <p {...stylex.props(styles.statement)}>
-            <span {...stylex.props(styles.statementLine)}>{statementLead}</span>
-            <span {...stylex.props(styles.statementLine)}>{statementClose}</span>
+          <p {...stylex.attrs(styles.statement)}>
+            <span {...stylex.attrs(styles.statementLine)}>{statementLead}</span>
+            <span {...stylex.attrs(styles.statementLine)}>{statementClose}</span>
           </p>
         </Reveal>
       </div>
 
-      <figure {...stylex.props(styles.figure)}>
+      <figure {...stylex.attrs(styles.figure)}>
         <img
           src={ABOUT_CSR.image}
           alt={ABOUT_CSR.imageAlt}
           loading="lazy"
           decoding="async"
-          {...stylex.props(styles.image)}
+          {...stylex.attrs(styles.image)}
         />
       </figure>
 
-      <div {...stylex.props(ui.shell, ui.inset, styles.csrBody)}>
+      <div {...stylex.attrs(ui.shell, ui.inset, styles.csrBody)}>
         <Reveal>
-          <p {...stylex.props(styles.desc)}>{ABOUT_CSR.desc}</p>
+          <p {...stylex.attrs(styles.desc)}>{ABOUT_CSR.desc}</p>
         </Reveal>
         <Reveal step={1}>
-          <ul {...stylex.props(styles.outcomes)}>
+          <ul {...stylex.attrs(styles.outcomes)}>
             {ABOUT_CSR.outcomes.map((outcome) => (
-              <li key={outcome.title} {...stylex.props(styles.outcome)}>
-                {outcome.title}
-              </li>
+              <li {...stylex.attrs(styles.outcome)}>{outcome.title}</li>
             ))}
           </ul>
         </Reveal>
@@ -284,62 +282,60 @@ export function CsrSection() {
   );
 }
 
-export function ProductsSection({ onNavigateHome }: { onNavigateHome: (hash?: string) => void }) {
+export function ProductsSection(props: { onNavigateHome: (hash?: string) => void }) {
   return (
     <section
       id="about-products"
       aria-labelledby="about-products-title"
-      {...stylex.props(styles.products, ui.section, ui.anchor)}
+      {...stylex.attrs(styles.products, ui.section, ui.anchor)}
     >
-      <h2 id="about-products-title" {...stylex.props(ui.srOnly)}>
+      <h2 id="about-products-title" {...stylex.attrs(ui.srOnly)}>
         Products and application solutions
       </h2>
-      <div {...stylex.props(ui.shell, ui.inset)}>
+      <div {...stylex.attrs(ui.shell, ui.inset)}>
         <Reveal sx={styles.productsHead}>
-          <p {...stylex.props(styles.productsLead)}>
+          <p {...stylex.attrs(styles.productsLead)}>
             {LEAD_CLAUSES.map((clause) => (
-              <span key={clause} {...stylex.props(styles.clause)}>
-                {clause}
-              </span>
+              <span {...stylex.attrs(styles.clause)}>{clause}</span>
             ))}
           </p>
           <button
             type="button"
-            onClick={() => onNavigateHome("products")}
-            {...stylex.props(ui.textLink, ui.focusRing)}
+            onClick={() => props.onNavigateHome("products")}
+            {...stylex.attrs(ui.textLink, ui.focusRing)}
           >
             <span>{PRODUCTS_INTRO.cta.label}</span>
             <ArrowRight size={15} aria-hidden="true" />
           </button>
         </Reveal>
 
-        <ul {...stylex.props(styles.productList)}>
+        <ul {...stylex.attrs(styles.productList)}>
           {PRODUCTS.map((product, index) => (
-            <Reveal key={product.title} as="li" step={index} sx={styles.product}>
+            <Reveal as="li" step={index} sx={styles.product}>
               <div
-                {...stylex.props(styles.productMedia, PRODUCT_SHIFT[index % PRODUCT_SHIFT.length])}
+                {...stylex.attrs(styles.productMedia, PRODUCT_SHIFT[index % PRODUCT_SHIFT.length])}
               >
                 <img
                   src={product.image}
                   alt={`${product.english} solution illustration`}
                   loading="lazy"
                   decoding="async"
-                  {...stylex.props(styles.productImage)}
+                  {...stylex.attrs(styles.productImage)}
                 />
               </div>
-              <h3 {...stylex.props(styles.productTitle)}>
+              <h3 {...stylex.attrs(styles.productTitle)}>
                 <button
                   type="button"
-                  onClick={() => onNavigateHome("products")}
-                  {...stylex.props(styles.productLink, ui.focusRing)}
+                  onClick={() => props.onNavigateHome("products")}
+                  {...stylex.attrs(styles.productLink, ui.focusRing)}
                 >
                   {product.title}
                 </button>
               </h3>
-              <p {...stylex.props(styles.productDesc)}>{product.description}</p>
-              <ul aria-label={`${product.english} tags`} {...stylex.props(styles.tags)}>
+              <p {...stylex.attrs(styles.productDesc)}>{product.description}</p>
+              <ul aria-label={`${product.english} tags`} {...stylex.attrs(styles.tags)}>
                 {product.tags.map((tag) => (
-                  <li key={tag}>{tag}</li>
+                  <li>{tag}</li>
                 ))}
               </ul>
             </Reveal>
@@ -350,27 +346,27 @@ export function ProductsSection({ onNavigateHome }: { onNavigateHome: (hash?: st
   );
 }
 
-export function ClosingCta({ onNavigateHome }: { onNavigateHome: (hash?: string) => void }) {
+export function ClosingCta(props: { onNavigateHome: (hash?: string) => void }) {
   return (
-    <section aria-labelledby="about-cta-title" {...stylex.props(styles.cta, ui.section)}>
-      <div {...stylex.props(ui.shell, ui.inset)}>
+    <section aria-labelledby="about-cta-title" {...stylex.attrs(styles.cta, ui.section)}>
+      <div {...stylex.attrs(ui.shell, ui.inset)}>
         <Reveal sx={styles.ctaInner}>
-          <h2 id="about-cta-title" {...stylex.props(styles.ctaTitle)}>
+          <h2 id="about-cta-title" {...stylex.attrs(styles.ctaTitle)}>
             {CTA.title}
           </h2>
-          <div {...stylex.props(styles.buttonGroup)}>
+          <div {...stylex.attrs(styles.buttonGroup)}>
             <button
               type="button"
-              onClick={() => onNavigateHome("contact")}
-              {...stylex.props(ui.button, ui.buttonPrimary, ui.focusRing)}
+              onClick={() => props.onNavigateHome("contact")}
+              {...stylex.attrs(ui.button, ui.buttonPrimary, ui.focusRing)}
             >
               <span>{CTA.action.label}</span>
               <ArrowRight size={16} aria-hidden="true" />
             </button>
             <button
               type="button"
-              onClick={() => onNavigateHome("products")}
-              {...stylex.props(ui.button, ui.buttonOutline, ui.focusRing)}
+              onClick={() => props.onNavigateHome("products")}
+              {...stylex.attrs(ui.button, ui.buttonOutline, ui.focusRing)}
             >
               <span>产品与应用</span>
             </button>

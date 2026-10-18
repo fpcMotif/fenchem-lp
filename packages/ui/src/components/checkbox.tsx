@@ -1,10 +1,11 @@
 "use client";
 
-import { Checkbox as CheckboxPrimitive } from "@base-ui/react/checkbox";
+import { Check as CheckIcon } from "@fenchem-lp/ui/components/lucide";
 import { colors, radii } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 import type { StyleXStyles } from "@stylexjs/stylex";
-import { CheckIcon } from "lucide-react";
+import type { ComponentProps } from "@solidjs/web";
+import { createSignal, omit, Show } from "solid-js";
 
 const checkboxStyles = stylex.create({
   root: {
@@ -53,44 +54,93 @@ const checkboxStyles = stylex.create({
   },
 });
 
-export interface CheckboxProps extends Omit<CheckboxPrimitive.Root.Props, "className"> {
+export interface CheckboxProps extends Omit<
+  ComponentProps<"button">,
+  "class" | "value" | "onChange" | "type"
+> {
+  checked?: boolean;
+  defaultChecked?: boolean;
+  onCheckedChange?: (checked: boolean, event: Event) => void;
+  name?: string;
+  value?: string;
+  required?: boolean;
+  readOnly?: boolean;
   sx?: StyleXStyles;
 }
 
-function Checkbox({ sx, "aria-invalid": ariaInvalid, ...props }: CheckboxProps) {
-  const isInvalid = ariaInvalid === true || ariaInvalid === "true";
+function Checkbox(props: CheckboxProps) {
+  const rest = omit(
+    props,
+    "sx",
+    "checked",
+    "defaultChecked",
+    "onCheckedChange",
+    "name",
+    "value",
+    "required",
+    "readOnly",
+    "disabled",
+    "onClick",
+  );
+  const [uncontrolled, setUncontrolled] = createSignal(props.defaultChecked ?? false);
+  const checked = () => props.checked ?? uncontrolled();
+  const isInvalid = () => {
+    const ariaInvalid: unknown = props["aria-invalid"];
+    return ariaInvalid === true || ariaInvalid === "true";
+  };
+
+  const toggle = (event: MouseEvent & { currentTarget: HTMLButtonElement; target: Element }) => {
+    const onClick = props.onClick;
+    if (typeof onClick === "function") onClick(event);
+    if (event.defaultPrevented || props.disabled || props.readOnly) return;
+    const next = !checked();
+    if (props.checked === undefined) setUncontrolled(next);
+    props.onCheckedChange?.(next, event);
+  };
 
   return (
-    <CheckboxPrimitive.Root
-      data-slot="checkbox"
-      aria-invalid={ariaInvalid}
-      render={(rootProps, state) => {
-        const styleProps = stylex.props(
+    <>
+      <button
+        type="button"
+        role="checkbox"
+        data-slot="checkbox"
+        aria-checked={checked() ? "true" : "false"}
+        aria-required={props.required ? "true" : undefined}
+        aria-readonly={props.readOnly ? "true" : undefined}
+        data-checked={checked() ? "" : undefined}
+        data-unchecked={checked() ? undefined : ""}
+        data-disabled={props.disabled ? "" : undefined}
+        disabled={props.disabled}
+        {...rest}
+        {...stylex.attrs(
           checkboxStyles.root,
-          state.checked && checkboxStyles.checked,
-          state.disabled && checkboxStyles.disabled,
-          isInvalid && checkboxStyles.invalid,
-          sx,
-        );
-
-        return (
-          <button type="button" {...rootProps} {...styleProps}>
-            <CheckboxPrimitive.Indicator
-              data-slot="checkbox-indicator"
-              render={(indicatorProps) => {
-                const indStyleProps = stylex.props(checkboxStyles.indicator);
-                return (
-                  <span {...indicatorProps} {...indStyleProps}>
-                    <CheckIcon size={14} />
-                  </span>
-                );
-              }}
-            />
-          </button>
-        );
-      }}
-      {...props}
-    />
+          checked() && checkboxStyles.checked,
+          !!props.disabled && checkboxStyles.disabled,
+          isInvalid() && checkboxStyles.invalid,
+          props.sx,
+        )}
+        onClick={toggle}
+      >
+        <Show when={checked()}>
+          <span data-slot="checkbox-indicator" {...stylex.attrs(checkboxStyles.indicator)}>
+            <CheckIcon size={14} />
+          </span>
+        </Show>
+      </button>
+      <Show when={props.name}>
+        <input
+          type="checkbox"
+          aria-hidden="true"
+          tabindex={-1}
+          hidden
+          name={props.name}
+          value={props.value ?? "on"}
+          checked={checked()}
+          required={props.required}
+          disabled={props.disabled}
+        />
+      </Show>
+    </>
   );
 }
 

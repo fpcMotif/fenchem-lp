@@ -87,88 +87,88 @@ export function Culture() {
   const nameId = `${chip.id}-name`;
 
   return (
-    <section id={chip.id} aria-labelledby={nameId} {...stylex.props(s.anchor)}>
-      <h2 id={nameId} {...stylex.props(ui.srOnly)}>
+    <section id={chip.id} aria-labelledby={nameId} {...stylex.attrs(s.anchor)}>
+      <h2 id={nameId} {...stylex.attrs(ui.srOnly)}>
         {chip.english}
       </h2>
 
-      <article aria-labelledby="about-culture-focus" {...stylex.props(s.scene, s.cool)}>
-        <div {...stylex.props(ui.shell, ui.inset)}>
+      <article aria-labelledby="about-culture-focus" {...stylex.attrs(s.scene, s.cool)}>
+        <div {...stylex.attrs(ui.shell, ui.inset)}>
           <Reveal>
-            <p lang="en" {...stylex.props(s.slug)}>
+            <p lang="en" {...stylex.attrs(s.slug)}>
               In the lab,
             </p>
           </Reveal>
           <Reveal as="figure" step={1} sx={ui.figure}>
-            <div {...stylex.props(s.frame, s.ratioFocus)}>
+            <div {...stylex.attrs(s.frame, s.ratioFocus)}>
               <img
                 src={LAB.large}
                 alt={LAB.alt}
                 loading="lazy"
                 decoding="async"
-                {...stylex.props(ui.fill, s.focusImage)}
+                {...stylex.attrs(ui.fill, s.focusImage)}
               />
             </div>
           </Reveal>
           <Reveal step={2} sx={s.subtitle}>
-            <h3 id="about-culture-focus" {...stylex.props(s.subtitleTitle)}>
+            <h3 id="about-culture-focus" {...stylex.attrs(s.subtitleTitle)}>
               {FOCUS.title}
             </h3>
-            <p {...stylex.props(s.subtitleDesc)}>{FOCUS.desc}</p>
+            <p {...stylex.attrs(s.subtitleDesc)}>{FOCUS.desc}</p>
           </Reveal>
         </div>
       </article>
 
-      <article aria-labelledby="about-culture-patience" {...stylex.props(s.scene, s.day)}>
-        <div {...stylex.props(ui.shell, ui.inset)}>
+      <article aria-labelledby="about-culture-patience" {...stylex.attrs(s.scene, s.day)}>
+        <div {...stylex.attrs(ui.shell, ui.inset)}>
           <Reveal>
-            <p lang="en" {...stylex.props(s.slug, s.slugMid)}>
+            <p lang="en" {...stylex.attrs(s.slug, s.slugMid)}>
               by the lake,
             </p>
           </Reveal>
           <Reveal as="figure" step={1} sx={ui.figure}>
-            <div {...stylex.props(s.frame, s.ratioPatience)}>
+            <div {...stylex.attrs(s.frame, s.ratioPatience)}>
               <img
                 src="/prototype/official-site/campus-lake.webp"
                 alt="Still water reflecting the Fenchem R&D building"
                 loading="lazy"
                 decoding="async"
-                {...stylex.props(ui.fill, s.patienceImage)}
+                {...stylex.attrs(ui.fill, s.patienceImage)}
               />
             </div>
           </Reveal>
           <Reveal step={2} sx={s.subtitle}>
-            <h3 id="about-culture-patience" {...stylex.props(s.subtitleTitle)}>
+            <h3 id="about-culture-patience" {...stylex.attrs(s.subtitleTitle)}>
               {PATIENCE.title}
             </h3>
-            <p {...stylex.props(s.subtitleDesc)}>{PATIENCE.desc}</p>
+            <p {...stylex.attrs(s.subtitleDesc)}>{PATIENCE.desc}</p>
           </Reveal>
         </div>
       </article>
 
-      <article aria-labelledby="about-culture-together" {...stylex.props(s.scene, s.warm)}>
-        <div {...stylex.props(ui.shell, ui.inset)}>
+      <article aria-labelledby="about-culture-together" {...stylex.attrs(s.scene, s.warm)}>
+        <div {...stylex.attrs(ui.shell, ui.inset)}>
           <Reveal>
-            <p lang="en" {...stylex.props(s.slug, s.slugLate)}>
+            <p lang="en" {...stylex.attrs(s.slug, s.slugLate)}>
               where people meet.
             </p>
           </Reveal>
           <Reveal as="figure" step={1} sx={ui.figure}>
-            <div {...stylex.props(s.frame, s.ratioTogether)}>
+            <div {...stylex.attrs(s.frame, s.ratioTogether)}>
               <img
                 src={LOUNGE.large}
                 alt={LOUNGE.alt}
                 loading="lazy"
                 decoding="async"
-                {...stylex.props(ui.fill, s.togetherImage)}
+                {...stylex.attrs(ui.fill, s.togetherImage)}
               />
             </div>
           </Reveal>
           <Reveal step={2} sx={s.subtitle}>
-            <h3 id="about-culture-together" {...stylex.props(s.subtitleTitle)}>
+            <h3 id="about-culture-together" {...stylex.attrs(s.subtitleTitle)}>
               {TOGETHER.title}
             </h3>
-            <p {...stylex.props(s.subtitleDesc)}>{TOGETHER.desc}</p>
+            <p {...stylex.attrs(s.subtitleDesc)}>{TOGETHER.desc}</p>
           </Reveal>
         </div>
       </article>

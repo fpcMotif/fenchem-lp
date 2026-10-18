@@ -1,4 +1,4 @@
-import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
+import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 
 import { ABOUT_HERO } from "../../about-data";
@@ -14,12 +14,12 @@ const s = stylex.create({
   body: {
     display: "flex",
     flexDirection: "column",
-    gap: { default: 32, [breakpoints.xl]: 40 },
+    gap: { default: 32, ["@media (min-width: 1280px)"]: 40 },
     maxWidth: "36em",
   },
   name: {
     margin: 0,
-    fontSize: { default: step.title, [breakpoints.md]: step.display },
+    fontSize: { default: step.title, ["@media (min-width: 768px)"]: step.display },
     fontWeight: 500,
     lineHeight: 1.3,
     letterSpacing: "0.04em",
@@ -36,7 +36,7 @@ const s = stylex.create({
   lead: {
     margin: 0,
     maxWidth: "32em",
-    fontSize: { default: step.body, [breakpoints.xl]: "18px" },
+    fontSize: { default: step.body, ["@media (min-width: 1280px)"]: "18px" },
     fontWeight: 400,
     lineHeight: 1.95,
     letterSpacing: "0.04em",
@@ -44,7 +44,7 @@ const s = stylex.create({
     textWrap: "balance",
   },
   network: {
-    paddingTop: { default: 24, [breakpoints.xl]: 32 },
+    paddingTop: { default: 24, ["@media (min-width: 1280px)"]: 32 },
     borderTopWidth: 1,
     borderTopStyle: "solid",
     borderTopColor: tone.hairline,
@@ -72,12 +72,12 @@ const s = stylex.create({
     display: "grid",
     gridTemplateColumns: {
       default: "minmax(0, 1fr)",
-      [breakpoints.md]: "repeat(3, minmax(0, 1fr))",
+      ["@media (min-width: 768px)"]: "repeat(3, minmax(0, 1fr))",
     },
-    columnGap: { default: 24, [breakpoints.xl]: 48 },
+    columnGap: { default: 24, ["@media (min-width: 1280px)"]: 48 },
     rowGap: 40,
     margin: 0,
-    marginTop: { default: 72, [breakpoints.xl]: 120 },
+    marginTop: { default: 72, ["@media (min-width: 1280px)"]: 120 },
     padding: 0,
     listStyle: "none",
   },
@@ -93,26 +93,26 @@ const s = stylex.create({
     display: "flex",
     alignItems: "baseline",
     gap: 8,
-    marginTop: { default: 20, [breakpoints.xl]: 28 },
-    marginBottom: { default: 16, [breakpoints.xl]: 20 },
+    marginTop: { default: 20, ["@media (min-width: 1280px)"]: 28 },
+    marginBottom: { default: 16, ["@media (min-width: 1280px)"]: 20 },
     fontFamily: font.serif,
     color: tone.ink,
   },
   statValue: {
-    fontSize: { default: step.large, [breakpoints.xl]: step.huge },
+    fontSize: { default: step.large, ["@media (min-width: 1280px)"]: step.huge },
     fontWeight: 400,
     lineHeight: 1,
     letterSpacing: "-0.02em",
     fontVariantNumeric: "lining-nums",
   },
   statUnit: {
-    fontSize: { default: step.title, [breakpoints.xl]: step.display },
+    fontSize: { default: step.title, ["@media (min-width: 1280px)"]: step.display },
     lineHeight: 1,
     color: colors.brandBlue700,
   },
   statCaption: {
     margin: 0,
-    fontSize: { default: "15px", [breakpoints.xl]: step.body },
+    fontSize: { default: "15px", ["@media (min-width: 1280px)"]: step.body },
     lineHeight: 1.7,
     letterSpacing: "0.06em",
     color: tone.body,
@@ -123,8 +123,8 @@ export function Profile() {
   const chip = ABOUT_HERO.navChips[0];
   return (
     <Section id={chip.id} label={chip.english} background={ui.onPaper}>
-      <div {...stylex.props(ui.phi)}>
-        <div {...stylex.props(ui.asideCol)}>
+      <div {...stylex.attrs(ui.phi)}>
+        <div {...stylex.attrs(ui.asideCol)}>
           <Figure
             src={ABOUT_HERO.lobbyImage}
             alt="Fenchem headquarters lobby with a curved ceiling and marble floor"
@@ -132,37 +132,37 @@ export function Profile() {
             ratio={s.ratio}
           />
         </div>
-        <div {...stylex.props(ui.main, s.body)}>
+        <div {...stylex.attrs(ui.main, s.body)}>
           <Reveal>
-            <h3 {...stylex.props(s.name)}>{ABOUT_HERO.title}</h3>
-            <div lang="en" {...stylex.props(s.english)}>
+            <h3 {...stylex.attrs(s.name)}>{ABOUT_HERO.title}</h3>
+            <div lang="en" {...stylex.attrs(s.english)}>
               {ABOUT_HERO.englishTitle}
             </div>
           </Reveal>
           <Reveal step={1}>
-            <p {...stylex.props(s.lead)}>{ABOUT_HERO.lead}</p>
+            <p {...stylex.attrs(s.lead)}>{ABOUT_HERO.lead}</p>
           </Reveal>
           <Reveal step={2} sx={s.network}>
-            <p {...stylex.props(ui.label, s.networkLabel)}>{ABOUT_HERO.networkLabel}</p>
-            <ul {...stylex.props(s.countries)}>
+            <p {...stylex.attrs(ui.label, s.networkLabel)}>{ABOUT_HERO.networkLabel}</p>
+            <ul {...stylex.attrs(s.countries)}>
               {ABOUT_HERO.countries.map((country) => (
-                <li key={country}>{country}</li>
+                <li>{country}</li>
               ))}
-              <li {...stylex.props(s.countryMore)}>等地</li>
+              <li {...stylex.attrs(s.countryMore)}>等地</li>
             </ul>
           </Reveal>
         </div>
       </div>
-      <h3 {...stylex.props(ui.srOnly)}>Growth figures</h3>
-      <ul {...stylex.props(s.stats)}>
+      <h3 {...stylex.attrs(ui.srOnly)}>Growth figures</h3>
+      <ul {...stylex.attrs(s.stats)}>
         {STATS.map((stat, idx) => (
-          <Reveal key={stat.label} as="li" step={idx} sx={s.stat}>
-            <p {...stylex.props(ui.label)}>{stat.label}</p>
-            <div {...stylex.props(s.statFigure)}>
-              <span {...stylex.props(s.statValue)}>{stat.value}</span>
-              {stat.unit ? <span {...stylex.props(s.statUnit)}>{stat.unit}</span> : null}
+          <Reveal as="li" step={idx} sx={s.stat}>
+            <p {...stylex.attrs(ui.label)}>{stat.label}</p>
+            <div {...stylex.attrs(s.statFigure)}>
+              <span {...stylex.attrs(s.statValue)}>{stat.value}</span>
+              {stat.unit ? <span {...stylex.attrs(s.statUnit)}>{stat.unit}</span> : null}
             </div>
-            <p {...stylex.props(s.statCaption)}>{stat.caption}</p>
+            <p {...stylex.attrs(s.statCaption)}>{stat.caption}</p>
           </Reveal>
         ))}
       </ul>

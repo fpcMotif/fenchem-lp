@@ -1,5 +1,5 @@
 import * as stylex from "@stylexjs/stylex";
-import { type CSSProperties } from "react";
+import type { JSX } from "@solidjs/web";
 
 import { useLightbox } from "@/components/prototype/shared/lightbox";
 
@@ -79,7 +79,7 @@ const SAMPLES = CORE_SAMPLE.map((sample, index) => {
 
 const HEIGHT = Math.ceil(Math.max(...SAMPLES.map((sample) => sample.top + sample.height)) + 96);
 
-const GALLERY_VARS = { "--oos1o-gallery-ratio": `1000 / ${HEIGHT}` } as CSSProperties;
+const GALLERY_VARS = { "--oos1o-gallery-ratio": `1000 / ${HEIGHT}` } as JSX.CSSProperties;
 
 const arc = (ringDepth: number) => {
   const radius = ORIGIN + ringDepth;
@@ -261,39 +261,39 @@ function sampleVars(sample: (typeof SAMPLES)[number], index: number) {
     "--oos1o-caption-x": `${sample.captionX}%`,
     "--oos1o-caption-y": `${sample.captionY}%`,
     "--oos1o-angle": `${sample.angle}deg`,
-  } as CSSProperties;
+  } as JSX.CSSProperties;
 }
 
 export function Campus() {
   const lightbox = useLightbox(LIGHTBOX.length);
 
   return (
-    <section id="about-campus" aria-labelledby="oos1o-campus" {...stylex.props(styles.section)}>
-      <div {...stylex.props(ui.shell)}>
-        <div {...stylex.props(styles.head)}>
+    <section id="about-campus" aria-labelledby="oos1o-campus" {...stylex.attrs(styles.section)}>
+      <div {...stylex.attrs(ui.shell)}>
+        <div {...stylex.attrs(styles.head)}>
           <SectionHead id="oos1o-campus" label="Campus" title={ABOUT_CAMPUS.title} />
-          <p lang="en" {...stylex.props(ui.serif, styles.note)}>
+          <p lang="en" {...stylex.attrs(ui.serif, styles.note)}>
             Seven samples taken along one radius, from the heart of the building out to the grounds.
           </p>
         </div>
 
-        <div {...stylex.props(styles.gallery)} style={GALLERY_VARS}>
-          <svg viewBox={`-500 0 2000 ${HEIGHT}`} aria-hidden="true" {...stylex.props(styles.rings)}>
+        <div {...stylex.attrs(styles.gallery)} style={GALLERY_VARS}>
+          <svg viewBox={`-500 0 2000 ${HEIGHT}`} aria-hidden="true" {...stylex.attrs(styles.rings)}>
             <path
               d={TEXTURE}
               fill="none"
               stroke="#0b2a5c"
-              strokeOpacity={0.07}
-              strokeWidth={1}
-              vectorEffect="non-scaling-stroke"
+              stroke-opacity={0.07}
+              stroke-width={1}
+              vector-effect="non-scaling-stroke"
             />
             <path
               d={SAMPLE_RINGS}
               fill="none"
               stroke="#0b2a5c"
-              strokeOpacity={0.32}
-              strokeWidth={1}
-              vectorEffect="non-scaling-stroke"
+              stroke-opacity={0.32}
+              stroke-width={1}
+              vector-effect="non-scaling-stroke"
             />
             <line
               x1={CORE}
@@ -301,51 +301,51 @@ export function Campus() {
               y1={0}
               y2={HEIGHT - 52}
               stroke="#0b2a5c"
-              strokeOpacity={0.45}
-              strokeWidth={1}
-              vectorEffect="non-scaling-stroke"
+              stroke-opacity={0.45}
+              stroke-width={1}
+              vector-effect="non-scaling-stroke"
             />
             {SAMPLES.map((sample) => (
-              <circle key={sample.id} cx={CORE} cy={sample.depth} r={3.4} fill="#0b2a5c" />
+              <circle cx={CORE} cy={sample.depth} r={3.4} fill="#0b2a5c" />
             ))}
           </svg>
-          <p lang="en" aria-hidden="true" {...stylex.props(ui.serif, styles.end, styles.endTop)}>
+          <p lang="en" aria-hidden="true" {...stylex.attrs(ui.serif, styles.end, styles.endTop)}>
             toward the pith
           </p>
-          <p lang="en" aria-hidden="true" {...stylex.props(ui.serif, styles.end, styles.endBottom)}>
+          <p lang="en" aria-hidden="true" {...stylex.attrs(ui.serif, styles.end, styles.endBottom)}>
             toward the bark
           </p>
 
-          <ol {...stylex.props(styles.list)}>
+          <ol {...stylex.attrs(styles.list)}>
             {SAMPLES.map((sample, index) => (
-              <li key={sample.id} {...stylex.props(styles.item)} style={sampleVars(sample, index)}>
-                <span aria-hidden="true" {...stylex.props(styles.dot)} />
+              <li {...stylex.attrs(styles.item)} style={sampleVars(sample, index)}>
+                <span aria-hidden="true" {...stylex.attrs(styles.dot)} />
                 <p
                   aria-hidden="true"
-                  {...stylex.props(
+                  {...stylex.attrs(
                     styles.caption,
                     sample.side > 0 ? styles.captionOut : styles.captionIn,
                   )}
                 >
-                  <span {...stylex.props(ui.latin, styles.index)}>
+                  <span {...stylex.attrs(ui.latin, styles.index)}>
                     {String(index + 1).padStart(2, "0")}
                   </span>
                   <span>{sample.caption}</span>
-                  <span lang="en" {...stylex.props(ui.serif, styles.english)}>
+                  <span lang="en" {...stylex.attrs(ui.serif, styles.english)}>
                     {sample.english}
                   </span>
                 </p>
                 <button
                   type="button"
                   onClick={() => lightbox.open(index)}
-                  {...stylex.props(styles.button, ui.focusRing, stylex.defaultMarker())}
+                  {...stylex.attrs(styles.button, ui.focusRing, stylex.defaultMarker())}
                 >
                   <img
                     src={sample.src}
                     alt={sample.alt}
                     loading="lazy"
                     decoding="async"
-                    {...stylex.props(ui.fill, styles.image)}
+                    {...stylex.attrs(ui.fill, styles.image)}
                   />
                   <span {...srOnly}>View larger</span>
                 </button>

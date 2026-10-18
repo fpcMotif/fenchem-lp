@@ -1,7 +1,9 @@
 import * as stylex from "@stylexjs/stylex";
 import type { StyleXStyles } from "@stylexjs/stylex";
-import { m, useInView, useScroll, type MotionValue } from "motion/react";
-import { useRef, useSyncExternalStore, type ReactNode, type RefObject } from "react";
+import { m, useInView, useScroll, type MotionValue } from "@/compat/motion";
+import { createMediaQuery } from "@/compat/reduced-motion";
+import { merge, type Accessor } from "solid-js";
+import type { JSX } from "@solidjs/web";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 import { ease, media } from "./tokens.stylex";
 import { EASE_OUT, staggerMs } from "./motion-values";
@@ -15,21 +17,11 @@ const MASK_HIDDEN = "120%";
 
 const PIN_QUERY = "(min-width: 768px) and (prefers-reduced-motion: no-preference)";
 
-function subscribePin(onChange: () => void) {
-  const query = window.matchMedia(PIN_QUERY);
-  query.addEventListener("change", onChange);
-  return () => query.removeEventListener("change", onChange);
+export function usePinEnabled(): Accessor<boolean> {
+  return createMediaQuery(PIN_QUERY);
 }
 
-export function usePinEnabled(): boolean {
-  return useSyncExternalStore(
-    subscribePin,
-    () => window.matchMedia(PIN_QUERY).matches,
-    () => false,
-  );
-}
-
-export function usePinProgress(target: RefObject<HTMLElement | null>): MotionValue<number> {
+export function usePinProgress(target: Accessor<HTMLElement | undefined>): MotionValue<number> {
   const { scrollYProgress } = useScroll({ target, offset: ["start start", "end end"] });
   return scrollYProgress;
 }
@@ -83,35 +75,36 @@ const styles = stylex.create({
 const REVEAL_TAGS = { div: m.div, li: m.li, article: m.article, p: m.p } as const;
 
 type RevealProps = {
-  children: ReactNode;
+  children: JSX.Element;
   sx?: StyleXStyles;
   as?: keyof typeof REVEAL_TAGS;
   index?: number;
   delay?: number;
 };
 
-export function Reveal({ children, sx, as = "div", index = 0, delay = 0 }: RevealProps) {
+export function Reveal(props: RevealProps) {
+  const p = merge({ as: "div" as const, index: 0, delay: 0 }, props);
   const reduce = useReducedMotion();
-  const Tag = REVEAL_TAGS[as] as typeof m.div;
+  const Tag = REVEAL_TAGS[p.as] as typeof m.div;
   return (
     <Tag
-      {...stylex.props(sx)}
+      {...stylex.attrs(p.sx)}
       initial={{ opacity: 0, y: REVEAL_RISE_PX }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: REVEAL_MARGIN }}
       transition={{
-        duration: reduce ? 0 : REVEAL_SECONDS,
-        delay: reduce ? 0 : (delay + staggerMs(index)) / 1000,
+        duration: reduce() ? 0 : REVEAL_SECONDS,
+        delay: reduce() ? 0 : (p.delay + staggerMs(p.index)) / 1000,
         ease: EASE_OUT,
       }}
     >
-      {children}
+      {p.children}
     </Tag>
   );
 }
 
 type MaskLineProps = {
-  children: ReactNode;
+  children: JSX.Element;
   sx?: StyleXStyles;
   when?: "view" | "load";
   start?: boolean;
@@ -120,53 +113,49 @@ type MaskLineProps = {
   duration?: number;
 };
 
-export function MaskLine({
-  children,
-  sx,
-  when = "view",
-  start = true,
-  index = 0,
-  delay = 0,
-  duration = MASK_SECONDS * 1000,
-}: MaskLineProps) {
+export function MaskLine(props: MaskLineProps) {
+  const p = merge(
+    { when: "view" as const, start: true, index: 0, delay: 0, duration: MASK_SECONDS * 1000 },
+    props,
+  );
   const reduce = useReducedMotion();
-  const ref = useRef<HTMLSpanElement>(null);
-  const seen = useInView(ref, { once: true, margin: REVEAL_MARGIN });
-  if (when === "load") {
+  let el: HTMLSpanElement | undefined;
+  const seen = useInView(() => el, { once: true, margin: REVEAL_MARGIN });
+  if (p.when === "load") {
     return (
-      <span {...stylex.props(styles.maskLine, sx)}>
+      <span {...stylex.attrs(styles.maskLine, p.sx)}>
         <span
-          {...stylex.props(
+          {...stylex.attrs(
             styles.maskInner,
-            start ? styles.maskLoad : styles.maskLoadWaiting,
-            start && styles.maskLoadAt(delay + staggerMs(index), duration),
+            p.start ? styles.maskLoad : styles.maskLoadWaiting,
+            p.start && styles.maskLoadAt(p.delay + staggerMs(p.index), p.duration),
           )}
         >
-          {children}
+          {p.children}
         </span>
       </span>
     );
   }
   return (
-    <span ref={ref} {...stylex.props(styles.maskLine, sx)}>
+    <span ref={el} {...stylex.attrs(styles.maskLine, p.sx)}>
       <m.span
-        {...stylex.props(styles.maskInner)}
+        {...stylex.attrs(styles.maskInner)}
         initial={{ y: MASK_HIDDEN }}
-        animate={{ y: seen ? "0%" : MASK_HIDDEN }}
+        animate={{ y: seen() ? "0%" : MASK_HIDDEN }}
         transition={{
-          duration: reduce ? 0 : duration / 1000,
-          delay: reduce ? 0 : (delay + staggerMs(index)) / 1000,
+          duration: reduce() ? 0 : p.duration / 1000,
+          delay: reduce() ? 0 : (p.delay + staggerMs(p.index)) / 1000,
           ease: EASE_OUT,
         }}
       >
-        {children}
+        {p.children}
       </m.span>
     </span>
   );
 }
 
 type LoadFadeProps = {
-  children: ReactNode;
+  children: JSX.Element;
   sx?: StyleXStyles;
   as?: "div" | "p";
   start?: boolean;
@@ -174,18 +163,30 @@ type LoadFadeProps = {
   duration?: number;
 };
 
-export function LoadFade({
-  children,
-  sx,
-  as = "div",
-  start = true,
-  delay = 0,
-  duration = REVEAL_SECONDS * 1000,
-}: LoadFadeProps) {
-  const props = stylex.props(
-    start ? styles.loadFade : styles.loadFadeWaiting,
-    start && styles.loadFadeAt(delay, duration),
-    sx,
+export function LoadFade(props: LoadFadeProps) {
+  const p = merge(
+    { as: "div" as const, start: true, delay: 0, duration: REVEAL_SECONDS * 1000 },
+    props,
   );
-  return as === "p" ? <p {...props}>{children}</p> : <div {...props}>{children}</div>;
+  return p.as === "p" ? (
+    <p
+      {...stylex.attrs(
+        p.start ? styles.loadFade : styles.loadFadeWaiting,
+        p.start && styles.loadFadeAt(p.delay, p.duration),
+        p.sx,
+      )}
+    >
+      {p.children}
+    </p>
+  ) : (
+    <div
+      {...stylex.attrs(
+        p.start ? styles.loadFade : styles.loadFadeWaiting,
+        p.start && styles.loadFadeAt(p.delay, p.duration),
+        p.sx,
+      )}
+    >
+      {p.children}
+    </div>
+  );
 }

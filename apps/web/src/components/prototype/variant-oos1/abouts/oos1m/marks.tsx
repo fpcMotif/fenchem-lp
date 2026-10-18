@@ -32,19 +32,19 @@ const styles = stylex.create({
   },
 });
 
-export function FlagNote({ number }: { number: number }) {
+export function FlagNote(props: { number: number }) {
   return (
-    <span {...stylex.props(styles.flag)}>
-      <svg viewBox="0 0 20 18" aria-hidden="true" {...stylex.props(styles.triangle)}>
+    <span {...stylex.attrs(styles.flag)}>
+      <svg viewBox="0 0 20 18" aria-hidden="true" {...stylex.attrs(styles.triangle)}>
         <path
           d="M10 0.8 L19.2 17.2 H0.8 Z"
           fill="#ffffff"
           stroke="rgba(11, 42, 92, 0.88)"
-          strokeWidth={1}
-          strokeLinejoin="round"
+          stroke-width={1}
+          stroke-linejoin="round"
         />
       </svg>
-      <span {...stylex.props(styles.number)}>{number}</span>
+      <span {...stylex.attrs(styles.number)}>{props.number}</span>
     </span>
   );
 }

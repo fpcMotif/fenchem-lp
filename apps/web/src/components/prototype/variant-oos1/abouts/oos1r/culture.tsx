@@ -147,72 +147,72 @@ export function Culture() {
 
   return (
     <Section id={chip.id} label={chip.english}>
-      <div {...stylex.props(s.story)}>
+      <div {...stylex.attrs(s.story)}>
         <article>
           <Reveal as="figure" sx={s.vastFigure}>
-            <div {...stylex.props(ui.frame, s.vastFrame)}>
+            <div {...stylex.attrs(ui.frame, s.vastFrame)}>
               <img
                 src={ABOUT_MOMENT.image}
                 alt={ABOUT_MOMENT.alt}
                 loading="lazy"
                 decoding="async"
-                {...stylex.props(ui.fill, s.vastImage)}
+                {...stylex.attrs(ui.fill, s.vastImage)}
               />
             </div>
-            <figcaption {...stylex.props(ui.caption, s.captionInset)}>
+            <figcaption {...stylex.attrs(ui.caption, s.captionInset)}>
               {ABOUT_MOMENT.caption}
             </figcaption>
           </Reveal>
           <Reveal delay={150} sx={s.vastText}>
-            <p lang="en" {...stylex.props(s.slug, s.vastSlug)}>
+            <p lang="en" {...stylex.attrs(s.slug, s.vastSlug)}>
               From above
             </p>
-            <div {...stylex.props(s.vastBody)}>
-              <h3 {...stylex.props(s.titleVast)}>{quiet.title}</h3>
-              <p {...stylex.props(s.desc)}>{quiet.desc}</p>
+            <div {...stylex.attrs(s.vastBody)}>
+              <h3 {...stylex.attrs(s.titleVast)}>{quiet.title}</h3>
+              <p {...stylex.attrs(s.desc)}>{quiet.desc}</p>
             </div>
           </Reveal>
         </article>
-        <article {...stylex.props(s.scene)}>
+        <article {...stylex.attrs(s.scene)}>
           <Reveal as="figure" sx={s.roomFigure}>
-            <div {...stylex.props(ui.frame, s.roomFrame)}>
+            <div {...stylex.attrs(ui.frame, s.roomFrame)}>
               <img
                 src={lab.src}
                 alt={lab.alt}
                 loading="lazy"
                 decoding="async"
-                {...stylex.props(ui.fill)}
+                {...stylex.attrs(ui.fill)}
               />
             </div>
-            <figcaption {...stylex.props(ui.caption)}>{lab.caption}</figcaption>
+            <figcaption {...stylex.attrs(ui.caption)}>{lab.caption}</figcaption>
           </Reveal>
           <Reveal delay={150} sx={s.roomText}>
-            <p lang="en" {...stylex.props(s.slug, s.roomSlug)}>
+            <p lang="en" {...stylex.attrs(s.slug, s.roomSlug)}>
               Down the corridor
             </p>
-            <h3 {...stylex.props(s.titleRoom)}>{professional.title}</h3>
-            <p {...stylex.props(s.desc)}>{professional.desc}</p>
+            <h3 {...stylex.attrs(s.titleRoom)}>{professional.title}</h3>
+            <p {...stylex.attrs(s.desc)}>{professional.desc}</p>
           </Reveal>
         </article>
-        <article {...stylex.props(s.scene)}>
+        <article {...stylex.attrs(s.scene)}>
           <Reveal as="figure" sx={s.humanFigure}>
-            <div {...stylex.props(ui.frame, s.humanFrame)}>
+            <div {...stylex.attrs(ui.frame, s.humanFrame)}>
               <img
                 src={lounge.large}
                 alt={lounge.alt}
                 loading="lazy"
                 decoding="async"
-                {...stylex.props(ui.fill, s.humanImage)}
+                {...stylex.attrs(ui.fill, s.humanImage)}
               />
             </div>
-            <figcaption {...stylex.props(ui.caption)}>{lounge.caption}</figcaption>
+            <figcaption {...stylex.attrs(ui.caption)}>{lounge.caption}</figcaption>
           </Reveal>
           <Reveal delay={150} sx={s.humanText}>
-            <p lang="en" {...stylex.props(s.slug, s.humanSlug)}>
+            <p lang="en" {...stylex.attrs(s.slug, s.humanSlug)}>
               Where people meet
             </p>
-            <h3 {...stylex.props(s.titleHuman)}>{together.title}</h3>
-            <p {...stylex.props(s.desc)}>{together.desc}</p>
+            <h3 {...stylex.attrs(s.titleHuman)}>{together.title}</h3>
+            <p {...stylex.attrs(s.desc)}>{together.desc}</p>
           </Reveal>
         </article>
       </div>

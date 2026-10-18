@@ -1,4 +1,3 @@
-import { breakpoints } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 
 import { ABOUT_CSR } from "../../about-data";
@@ -15,7 +14,11 @@ const styles = stylex.create({
     overflow: "hidden",
     margin: 0,
     backgroundColor: palette.tint,
-    aspectRatio: { default: "4 / 3", [media.mdOnly]: "16 / 9", [breakpoints.lg]: "2.3 / 1" },
+    aspectRatio: {
+      default: "4 / 3",
+      [media.mdOnly]: "16 / 9",
+      ["@media (min-width: 1024px)"]: "2.3 / 1",
+    },
   },
   image: {
     objectPosition: "center 42%",
@@ -24,18 +27,18 @@ const styles = stylex.create({
     display: "grid",
     gridTemplateColumns: {
       default: "minmax(0, 1fr)",
-      [breakpoints.lg]: "repeat(16, minmax(0, 1fr))",
+      ["@media (min-width: 1024px)"]: "repeat(16, minmax(0, 1fr))",
     },
     rowGap: 32,
-    marginTop: { default: 40, [breakpoints.lg]: 80 },
+    marginTop: { default: 40, ["@media (min-width: 1024px)"]: 80 },
   },
   statementCell: {
-    gridColumn: { default: null, [breakpoints.lg]: "1 / span 9" },
+    gridColumn: { default: null, ["@media (min-width: 1024px)"]: "1 / span 9" },
   },
   statement: {
     margin: 0,
     fontFamily: fonts.cjk,
-    fontSize: { default: 24, [media.tablet]: 38, [breakpoints.xl]: 48 },
+    fontSize: { default: 24, [media.tablet]: 38, ["@media (min-width: 1280px)"]: 48 },
     fontWeight: 500,
     lineHeight: 1.45,
     letterSpacing: "0.03em",
@@ -48,18 +51,18 @@ const styles = stylex.create({
     backgroundImage: `linear-gradient(transparent 70%, ${palette.mint} 70%, ${palette.mint} 92%, transparent 92%)`,
   },
   desc: {
-    gridColumn: { default: null, [breakpoints.lg]: "11 / span 6" },
+    gridColumn: { default: null, ["@media (min-width: 1024px)"]: "11 / span 6" },
     alignSelf: "end",
   },
   outcomes: {
-    gridColumn: { default: null, [breakpoints.lg]: "1 / span 16" },
+    gridColumn: { default: null, ["@media (min-width: 1024px)"]: "1 / span 16" },
     display: "grid",
     gridTemplateColumns: {
       default: "minmax(0, 1fr)",
-      [breakpoints.lg]: "repeat(16, minmax(0, 1fr))",
+      ["@media (min-width: 1024px)"]: "repeat(16, minmax(0, 1fr))",
     },
     margin: 0,
-    marginTop: { default: 8, [breakpoints.lg]: 32 },
+    marginTop: { default: 8, ["@media (min-width: 1024px)"]: 32 },
     padding: 0,
     listStyle: "none",
   },
@@ -70,14 +73,14 @@ const styles = stylex.create({
     borderTopStyle: "solid",
     borderTopColor: palette.inkRule,
     fontFamily: fonts.cjk,
-    fontSize: { default: 17, [breakpoints.xl]: 19 },
+    fontSize: { default: 17, ["@media (min-width: 1280px)"]: 19 },
     fontWeight: 400,
     letterSpacing: "0.08em",
     color: palette.ink,
   },
-  one: { gridColumn: { default: null, [breakpoints.lg]: "1 / span 5" } },
-  two: { gridColumn: { default: null, [breakpoints.lg]: "6 / span 5" } },
-  three: { gridColumn: { default: null, [breakpoints.lg]: "11 / span 6" } },
+  one: { gridColumn: { default: null, ["@media (min-width: 1024px)"]: "1 / span 5" } },
+  two: { gridColumn: { default: null, ["@media (min-width: 1024px)"]: "6 / span 5" } },
+  three: { gridColumn: { default: null, ["@media (min-width: 1024px)"]: "11 / span 6" } },
 });
 
 const COLUMN_STYLES = [styles.one, styles.two, styles.three] as const;
@@ -88,7 +91,7 @@ export function Csr() {
     <section
       id="about-csr"
       aria-labelledby="about-csr-title"
-      {...stylex.props(styles.section, shared.anchor)}
+      {...stylex.attrs(styles.section, shared.anchor)}
     >
       <SectionName id="about-csr-title">Responsibility</SectionName>
       <Frame innerSx={shared.sectionPad}>
@@ -98,25 +101,25 @@ export function Csr() {
             alt={ABOUT_CSR.imageAlt}
             loading="lazy"
             decoding="async"
-            {...stylex.props(shared.cover, styles.image)}
+            {...stylex.attrs(shared.cover, styles.image)}
           />
         </Reveal>
-        <div {...stylex.props(styles.text)}>
+        <div {...stylex.attrs(styles.text)}>
           <Reveal sx={styles.statementCell}>
-            <p {...stylex.props(styles.statement)}>
-              <span {...stylex.props(styles.statementLine)}>{statementLead}</span>
-              <span {...stylex.props(styles.statementLine)}>
-                <span {...stylex.props(styles.statementMark)}>{statementClose}</span>
+            <p {...stylex.attrs(styles.statement)}>
+              <span {...stylex.attrs(styles.statementLine)}>{statementLead}</span>
+              <span {...stylex.attrs(styles.statementLine)}>
+                <span {...stylex.attrs(styles.statementMark)}>{statementClose}</span>
               </span>
             </p>
           </Reveal>
           <Reveal step={1} sx={styles.desc}>
-            <p {...stylex.props(shared.body)}>{ABOUT_CSR.desc}</p>
+            <p {...stylex.attrs(shared.body)}>{ABOUT_CSR.desc}</p>
           </Reveal>
-          <ul {...stylex.props(styles.outcomes)}>
+          <ul {...stylex.attrs(styles.outcomes)}>
             {ABOUT_CSR.outcomes.map((outcome, index) => (
-              <Reveal key={outcome.title} as="li" step={index} sx={COLUMN_STYLES[index]}>
-                <p {...stylex.props(styles.outcome)}>{outcome.title}</p>
+              <Reveal as="li" step={index} sx={COLUMN_STYLES[index]}>
+                <p {...stylex.attrs(styles.outcome)}>{outcome.title}</p>
               </Reveal>
             ))}
           </ul>

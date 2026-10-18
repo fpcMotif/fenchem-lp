@@ -1,5 +1,5 @@
 import * as stylex from "@stylexjs/stylex";
-import type { CSSProperties } from "react";
+import type { JSX } from "@solidjs/web";
 
 import { ABOUT_STRUCTURE } from "../../about-data";
 import { srOnly, ui } from "./layout";
@@ -101,22 +101,22 @@ const styles = stylex.create({
   },
 });
 
-function Mark({ exposure, phase }: { exposure: number; phase: Phase }) {
+function Mark(props: { exposure: number; phase: Phase }) {
   return (
-    <span aria-hidden="true" {...stylex.props(styles.track)}>
+    <span aria-hidden="true" {...stylex.attrs(styles.track)}>
       <span
-        {...stylex.props(
+        {...stylex.attrs(
           styles.mark,
-          exposure === 0 ? styles.markHolding : styles.markSubsidiary,
-          phase === "armed" && strobe.hidden,
-          phase === "fire" && strobe.pop,
+          props.exposure === 0 ? styles.markHolding : styles.markSubsidiary,
+          props.phase === "armed" && strobe.hidden,
+          props.phase === "fire" && strobe.pop,
         )}
         style={
           {
-            "--k": exposure,
+            "--k": props.exposure,
             "--last": LAST_EXPOSURE,
-            "--pop-at": `${exposure * TICK}ms`,
-          } as CSSProperties
+            "--pop-at": `${props.exposure * TICK}ms`,
+          } as JSX.CSSProperties
         }
       />
     </span>
@@ -127,46 +127,46 @@ export function Structure() {
   const [rowsRef, phase] = useEntry<HTMLDivElement>();
   const { holding, subsidiaries, subsidiaryBadge, subsidiaryBadgeEnglish } = ABOUT_STRUCTURE;
   return (
-    <section id="about-structure" aria-labelledby="oos1p-structure" {...stylex.props(ui.plate)}>
+    <section id="about-structure" aria-labelledby="oos1p-structure" {...stylex.attrs(ui.plate)}>
       <PlateHead
         plate={6}
         english="Structure"
         title={ABOUT_STRUCTURE.title}
         titleId="oos1p-structure"
       />
-      <div {...stylex.props(ui.shell)}>
-        <div ref={rowsRef} {...stylex.props(styles.rows)}>
-          <div {...stylex.props(ui.grid, styles.row)}>
-            <Mark exposure={0} phase={phase} />
-            <div {...stylex.props(styles.text)}>
-              <h3 {...stylex.props(styles.holdingName)}>{holding.name}</h3>
-              <p lang="en" {...stylex.props(styles.english)}>
+      <div {...stylex.attrs(ui.shell)}>
+        <div ref={rowsRef} {...stylex.attrs(styles.rows)}>
+          <div {...stylex.attrs(ui.grid, styles.row)}>
+            <Mark exposure={0} phase={phase()} />
+            <div {...stylex.attrs(styles.text)}>
+              <h3 {...stylex.attrs(styles.holdingName)}>{holding.name}</h3>
+              <p lang="en" {...stylex.attrs(styles.english)}>
                 {holding.english}
               </p>
             </div>
-            <p {...stylex.props(styles.badge)}>
-              <span {...stylex.props(styles.badgeLabel)}>{holding.badge}</span>
-              <span lang="en" {...stylex.props(ui.eyebrow, styles.badgeEnglish)}>
+            <p {...stylex.attrs(styles.badge)}>
+              <span {...stylex.attrs(styles.badgeLabel)}>{holding.badge}</span>
+              <span lang="en" {...stylex.attrs(ui.eyebrow, styles.badgeEnglish)}>
                 Holding
               </span>
             </p>
           </div>
 
           <h3 {...srOnly}>{subsidiaryBadgeEnglish}</h3>
-          <ol {...stylex.props(styles.rows, styles.firstSubsidiary)}>
+          <ol {...stylex.attrs(styles.rows, styles.firstSubsidiary)}>
             {subsidiaries.map((subsidiary, index) => (
-              <li key={subsidiary.id} {...stylex.props(ui.grid, styles.row)}>
-                <Mark exposure={index + 1} phase={phase} />
-                <div {...stylex.props(styles.text)}>
-                  <p {...stylex.props(styles.name)}>{subsidiary.name}</p>
-                  <p lang="en" {...stylex.props(styles.english)}>
+              <li {...stylex.attrs(ui.grid, styles.row)}>
+                <Mark exposure={index + 1} phase={phase()} />
+                <div {...stylex.attrs(styles.text)}>
+                  <p {...stylex.attrs(styles.name)}>{subsidiary.name}</p>
+                  <p lang="en" {...stylex.attrs(styles.english)}>
                     {subsidiary.english}
                   </p>
                 </div>
                 {index === 0 ? (
-                  <p aria-hidden="true" {...stylex.props(styles.badge)}>
-                    <span {...stylex.props(styles.badgeLabel)}>{subsidiaryBadge}</span>
-                    <span lang="en" {...stylex.props(ui.eyebrow, styles.badgeEnglish)}>
+                  <p aria-hidden="true" {...stylex.attrs(styles.badge)}>
+                    <span {...stylex.attrs(styles.badgeLabel)}>{subsidiaryBadge}</span>
+                    <span lang="en" {...stylex.attrs(ui.eyebrow, styles.badgeEnglish)}>
                       Subsidiaries
                     </span>
                   </p>

@@ -1,4 +1,6 @@
-import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { createSignal, onSettled, type Accessor } from "solid-js";
+
+import { createExternalStore } from "@/compat/external-store";
 
 import { SHEET_IDS } from "./sheets";
 
@@ -34,8 +36,8 @@ function subscribeStack(onChange: () => void) {
   return () => query.removeEventListener("change", onChange);
 }
 
-export function useStackMode() {
-  return useSyncExternalStore(
+export function useStackMode(): Accessor<boolean> {
+  return createExternalStore(
     subscribeStack,
     () => window.matchMedia(STACK_QUERY).matches,
     () => false,
@@ -43,24 +45,28 @@ export function useStackMode() {
 }
 
 export function useBoxHeight<T extends HTMLElement>() {
-  const ref = useRef<T>(null);
-  const [height, setHeight] = useState(0);
-  useEffect(() => {
-    const element = ref.current;
-    if (!element) return;
+  let element: T | undefined;
+  const ref = (el: T) => (element = el);
+  const [height, setHeight] = createSignal(0);
+  onSettled(() => {
+    const node = element;
+    if (!node) return;
     const observer = new ResizeObserver(([entry]) => {
-      const next = entry?.borderBoxSize?.[0]?.blockSize ?? element.offsetHeight;
+      const next = entry?.borderBoxSize?.[0]?.blockSize ?? node.offsetHeight;
       setHeight(Math.ceil(next));
     });
-    observer.observe(element);
+    observer.observe(node);
     return () => observer.disconnect();
-  }, []);
+  });
   return [ref, height] as const;
 }
 
-export function useReachedSheet(ids: readonly string[], lineTop: number) {
-  const [reached, setReached] = useState<string | undefined>();
-  useEffect(() => {
+export function useReachedSheet(
+  ids: readonly string[],
+  lineTop: number,
+): Accessor<string | undefined> {
+  const [reached, setReached] = createSignal<string | undefined>();
+  onSettled(() => {
     const crossing = new Set<string>();
     let observer: IntersectionObserver | undefined;
     const observe = () => {
@@ -88,6 +94,6 @@ export function useReachedSheet(ids: readonly string[], lineTop: number) {
       observer?.disconnect();
       window.removeEventListener("resize", observe);
     };
-  }, [ids, lineTop]);
+  });
   return reached;
 }

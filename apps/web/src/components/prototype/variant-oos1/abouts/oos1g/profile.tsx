@@ -1,4 +1,4 @@
-import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
+import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 
 import { ABOUT_HERO } from "../../about-data";
@@ -6,12 +6,12 @@ import { layout } from "./layout";
 import { media, palette } from "./palette.stylex";
 import { Reveal } from "./reveal";
 
-const LG = breakpoints.lg;
+const LG = "@media (min-width: 1024px)";
 const INSET_120 = "min(120px, 8.333vw)";
 
 const styles = stylex.create({
   section: {
-    paddingBlock: { default: 72, [breakpoints.xl]: 128 },
+    paddingBlock: { default: 72, ["@media (min-width: 1280px)"]: 128 },
     backgroundColor: colors.paper,
   },
   grid: {
@@ -24,7 +24,12 @@ const styles = stylex.create({
     paddingInlineEnd: { default: 0, [LG]: 48 },
   },
   textCell: {
-    paddingInlineEnd: { default: 20, [breakpoints.sm]: 28, [media.tablet]: 40, [LG]: INSET_120 },
+    paddingInlineEnd: {
+      default: 20,
+      ["@media (min-width: 640px)"]: 28,
+      [media.tablet]: 40,
+      [LG]: INSET_120,
+    },
   },
   photo: {
     position: "relative",
@@ -98,38 +103,38 @@ export function Profile() {
     <section
       id="about-profile"
       aria-label="Company overview"
-      {...stylex.props(styles.section, layout.anchor)}
+      {...stylex.attrs(styles.section, layout.anchor)}
     >
-      <div {...stylex.props(layout.shell, layout.split, styles.grid)}>
-        <div {...stylex.props(styles.photoCell)}>
+      <div {...stylex.attrs(layout.shell, layout.split, styles.grid)}>
+        <div {...stylex.attrs(styles.photoCell)}>
           <Reveal as="figure" sx={styles.photo}>
             <img
               src={ABOUT_HERO.lobbyImage}
               alt="Fenchem headquarters lobby with a curved ceiling and marble floor"
               loading="lazy"
               decoding="async"
-              {...stylex.props(layout.fill, styles.lobby)}
+              {...stylex.attrs(layout.fill, styles.lobby)}
             />
-            <figcaption {...stylex.props(styles.caption)}>{ABOUT_HERO.lobbyCaption}</figcaption>
+            <figcaption {...stylex.attrs(styles.caption)}>{ABOUT_HERO.lobbyCaption}</figcaption>
           </Reveal>
         </div>
-        <div {...stylex.props(layout.padRight, layout.stack, styles.textCell)}>
+        <div {...stylex.attrs(layout.padRight, layout.stack, styles.textCell)}>
           <Reveal>
-            <h2 {...stylex.props(styles.name)}>{ABOUT_HERO.title}</h2>
-            <p lang="en" {...stylex.props(styles.english)}>
+            <h2 {...stylex.attrs(styles.name)}>{ABOUT_HERO.title}</h2>
+            <p lang="en" {...stylex.attrs(styles.english)}>
               {ABOUT_HERO.englishTitle}
             </p>
           </Reveal>
           <Reveal step={1}>
-            <p {...stylex.props(styles.lead)}>{ABOUT_HERO.lead}</p>
+            <p {...stylex.attrs(styles.lead)}>{ABOUT_HERO.lead}</p>
           </Reveal>
           <Reveal step={2} sx={layout.stack}>
-            <p {...stylex.props(layout.label)}>{ABOUT_HERO.networkLabel}</p>
-            <ul {...stylex.props(styles.countries)}>
+            <p {...stylex.attrs(layout.label)}>{ABOUT_HERO.networkLabel}</p>
+            <ul {...stylex.attrs(styles.countries)}>
               {ABOUT_HERO.countries.map((country) => (
-                <li key={country}>{country}</li>
+                <li>{country}</li>
               ))}
-              <li {...stylex.props(styles.more)}>等地</li>
+              <li {...stylex.attrs(styles.more)}>等地</li>
             </ul>
           </Reveal>
         </div>

@@ -1,5 +1,5 @@
 import * as stylex from "@stylexjs/stylex";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight } from "@fenchem-lp/ui/components/lucide";
 
 import { ABOUT_BANNER, ABOUT_HERO } from "../../about-data";
 import { pad2, SHEET_COUNT, ui } from "./shared";
@@ -111,58 +111,56 @@ const styles = stylex.create({
   },
 });
 
-export function Closing({ onNavigateHome }: { onNavigateHome: (hash?: string) => void }) {
+export function Closing(props: { onNavigateHome: (hash?: string) => void }) {
   return (
-    <section aria-labelledby="oos1m-cta" {...stylex.props(ui.shell, styles.section)}>
-      <div {...stylex.props(styles.block)}>
-        <div {...stylex.props(styles.cell, styles.titleCell)}>
-          <p lang="en" {...stylex.props(ui.caps)}>
+    <section aria-labelledby="oos1m-cta" {...stylex.attrs(ui.shell, styles.section)}>
+      <div {...stylex.attrs(styles.block)}>
+        <div {...stylex.attrs(styles.cell, styles.titleCell)}>
+          <p lang="en" {...stylex.attrs(ui.caps)}>
             End of set · Sheets 01–{pad2(SHEET_COUNT)}
           </p>
-          <h2 id="oos1m-cta" {...stylex.props(styles.title)}>
+          <h2 id="oos1m-cta" {...stylex.attrs(styles.title)}>
             {CLOSING_LINES.map((line) => (
-              <span key={line} {...stylex.props(styles.titleLine)}>
-                {line}
-              </span>
+              <span {...stylex.attrs(styles.titleLine)}>{line}</span>
             ))}
           </h2>
         </div>
-        <div {...stylex.props(styles.cell, styles.companyCell)}>
-          <p lang="en" {...stylex.props(ui.caps)}>
+        <div {...stylex.attrs(styles.cell, styles.companyCell)}>
+          <p lang="en" {...stylex.attrs(ui.caps)}>
             Drawn by
           </p>
-          <p {...stylex.props(styles.value)}>{ABOUT_HERO.title}</p>
-          <p lang="en" {...stylex.props(ui.caps)}>
+          <p {...stylex.attrs(styles.value)}>{ABOUT_HERO.title}</p>
+          <p lang="en" {...stylex.attrs(ui.caps)}>
             {ABOUT_BANNER.established} · {ABOUT_BANNER.place}
           </p>
         </div>
-        <div {...stylex.props(styles.cell, styles.sheetCell)}>
-          <p lang="en" {...stylex.props(ui.caps)}>
+        <div {...stylex.attrs(styles.cell, styles.sheetCell)}>
+          <p lang="en" {...stylex.attrs(ui.caps)}>
             Sheets
           </p>
-          <p lang="en" {...stylex.props(styles.value, styles.latinValue)}>
+          <p lang="en" {...stylex.attrs(styles.value, styles.latinValue)}>
             {pad2(SHEET_COUNT)} / {pad2(SHEET_COUNT)}
           </p>
         </div>
-        <div aria-hidden="true" {...stylex.props(styles.cell, styles.estCell)}>
-          <p lang="en" {...stylex.props(ui.caps)}>
+        <div aria-hidden="true" {...stylex.attrs(styles.cell, styles.estCell)}>
+          <p lang="en" {...stylex.attrs(ui.caps)}>
             Est.
           </p>
-          <p lang="en" {...stylex.props(styles.value, styles.latinValue)}>
+          <p lang="en" {...stylex.attrs(styles.value, styles.latinValue)}>
             {ABOUT_BANNER.established.replace("Est. ", "")}
           </p>
         </div>
         <button
           type="button"
-          onClick={() => onNavigateHome("contact")}
-          {...stylex.props(styles.action)}
+          onClick={() => props.onNavigateHome("contact")}
+          {...stylex.attrs(styles.action)}
         >
           联系我们
           <ArrowRight
             size={20}
             strokeWidth={1.5}
             aria-hidden="true"
-            {...stylex.props(styles.arrow)}
+            {...stylex.attrs(styles.arrow)}
           />
         </button>
       </div>

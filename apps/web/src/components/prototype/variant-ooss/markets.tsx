@@ -1,6 +1,15 @@
 import * as stylex from "@stylexjs/stylex";
-import { m, useMotionValueEvent, type MotionValue } from "motion/react";
-import { useEffect, useId, useRef, useState, type RefObject } from "react";
+import { m, useMotionValueEvent, type MotionValue } from "@/compat/motion";
+import {
+  createSignal,
+  createUniqueId,
+  For,
+  onCleanup,
+  Show,
+  untrack,
+  type Accessor,
+} from "solid-js";
+import type { JSX } from "@solidjs/web";
 
 import { useReducedMotion } from "../use-reduced-motion";
 import { PRODUCTS, PRODUCTS_INTRO } from "./content";
@@ -367,17 +376,25 @@ const styles = stylex.create({
 
 const GRADE_STYLES = [styles.grade0, styles.grade1, styles.grade2, styles.grade3] as const;
 
+// stylex.attrs with reactive (accessor) arguments: the StyleX compiler tries to
+// evaluate local arrow functions at build time and throws, so these call sites
+// resolve at runtime instead.
+const sxProps: typeof stylex.attrs = (...args) => stylex.attrs(...args);
+
+// `focusable` (legacy SVG attribute) is not in Solid's JSX types.
+const UNFOCUSABLE = { focusable: "false" } as JSX.SvgSVGAttributes<SVGSVGElement>;
+
 function DuotoneFilters() {
   return (
     <svg
       width="0"
       height="0"
       aria-hidden="true"
-      focusable="false"
-      {...stylex.props(styles.filterDefs)}
+      {...UNFOCUSABLE}
+      {...stylex.attrs(styles.filterDefs)}
     >
       {GRADES.map((grade, index) => (
-        <filter key={filterId(index)} id={filterId(index)} colorInterpolationFilters="sRGB">
+        <filter id={filterId(index)} color-interpolation-filters="sRGB">
           <feColorMatrix type="matrix" values={LUMA_MATRIX} />
           <feComponentTransfer>
             <feFuncR type="table" tableValues={channelTable(0, grade)} />
@@ -390,46 +407,38 @@ function DuotoneFilters() {
   );
 }
 
-function GradedImage({
-  product,
-  index,
-  settling = false,
-}: {
-  product: Product;
-  index: number;
-  settling?: boolean;
-}) {
+function GradedImage(props: { product: Product; index: number; settling?: boolean }) {
   return (
     <img
-      src={product.image}
-      alt={`${product.english} application illustration`}
+      src={props.product.image}
+      alt={`${props.product.english} application illustration`}
       loading="lazy"
       decoding="async"
-      {...stylex.props(styles.image, GRADE_STYLES[index], settling && styles.imageSettle)}
+      {...stylex.attrs(
+        styles.image,
+        GRADE_STYLES[props.index],
+        props.settling && styles.imageSettle,
+      )}
     />
   );
 }
 
 function Grain() {
-  return <span aria-hidden="true" {...stylex.props(styles.grain)} />;
+  return <span aria-hidden="true" {...stylex.attrs(styles.grain)} />;
 }
 
-function TagList({ tags }: { tags: Product["tags"] }) {
+function TagList(props: { tags: Product["tags"] }) {
   return (
-    <ul role="list" {...stylex.props(styles.tags)}>
-      {tags.map((tag) => (
-        <li key={tag} {...stylex.props(styles.tag)}>
-          {tag}
-        </li>
-      ))}
+    <ul role="list" {...stylex.attrs(styles.tags)}>
+      <For each={props.tags}>{(tag) => <li {...stylex.attrs(styles.tag)}>{tag}</li>}</For>
     </ul>
   );
 }
 
 function MarketsHeader() {
   return (
-    <div {...stylex.props(styles.header)}>
-      <div {...stylex.props(styles.headerRow)}>
+    <div {...stylex.attrs(styles.header)}>
+      <div {...stylex.attrs(styles.headerRow)}>
         <SectionTitle id="oo-products-title">{PRODUCTS_INTRO.title}</SectionTitle>
         <Reveal index={2} sx={styles.headerAction}>
           <TextLink href={PRODUCTS_INTRO.cta.href}>{PRODUCTS_INTRO.cta.label}</TextLink>
@@ -444,22 +453,20 @@ function MarketsHeader() {
 
 type Selection = { active: number; previous: number | null; forward: boolean };
 
-function PinnedStage({
-  progress,
-  sectionRef,
-}: {
+function PinnedStage(props: {
   progress: MotionValue<number>;
-  sectionRef: RefObject<HTMLElement | null>;
+  section: Accessor<HTMLElement | undefined>;
 }) {
-  const detailBase = useId();
+  const detailBase = createUniqueId();
   const reduce = useReducedMotion();
-  const [{ active, previous, forward }, setSelection] = useState<Selection>(() => ({
+  const progress = untrack(() => props.progress);
+  const [selection, setSelection] = createSignal<Selection>({
     active: categoryAt(progress.get()),
     previous: null,
     forward: true,
-  }));
-  const target = useRef<number | null>(null);
-  const settleTimer = useRef<number | undefined>(undefined);
+  });
+  let target: number | null = null;
+  let settleTimer: number | undefined;
 
   const select = (next: number) =>
     setSelection((current) =>
@@ -470,57 +477,58 @@ function PinnedStage({
 
   useMotionValueEvent(progress, "change", (value) => {
     const next = categoryAt(value);
-    if (target.current !== null) {
-      if (next === target.current) target.current = null;
+    if (target !== null) {
+      if (next === target) target = null;
       return;
     }
     select(next);
   });
 
-  useEffect(() => () => window.clearTimeout(settleTimer.current), []);
+  onCleanup(() => window.clearTimeout(settleTimer));
 
   const goTo = (index: number) => {
-    const section = sectionRef.current;
+    const section = props.section();
     if (!section) return;
-    target.current = index;
+    target = index;
     select(index);
-    window.clearTimeout(settleTimer.current);
-    settleTimer.current = window.setTimeout(() => {
-      target.current = null;
+    window.clearTimeout(settleTimer);
+    settleTimer = window.setTimeout(() => {
+      target = null;
       select(categoryAt(progress.get()));
     }, SCROLL_SETTLE_MS);
     const sectionTop = section.getBoundingClientRect().top + window.scrollY;
     const range = section.offsetHeight - window.innerHeight;
     window.scrollTo({
       top: sectionTop + range * ((index + SEGMENT_ENTRY) / COUNT),
-      behavior: reduce ? "auto" : "smooth",
+      behavior: reduce() ? "auto" : "smooth",
     });
   };
 
-  const wiping = previous !== null;
+  const active = () => selection().active;
+  const wiping = () => selection().previous !== null;
   const detailId = (index: number) => `${detailBase}-${index}`;
 
   return (
-    <div id="product-list" {...stylex.props(styles.stage)}>
-      <div {...stylex.props(layout.shell, layout.inset, styles.stageContent)}>
+    <div id="product-list" {...stylex.attrs(styles.stage)}>
+      <div {...stylex.attrs(layout.shell, layout.inset, styles.stageContent)}>
         <MarketsHeader />
-        <div {...stylex.props(layout.grid12, styles.body)}>
+        <div {...stylex.attrs(layout.grid12, styles.body)}>
           <Reveal index={3} sx={styles.rail}>
-            <ul aria-label="Product categories" role="list" {...stylex.props(styles.nameList)}>
+            <ul aria-label="Product categories" role="list" {...stylex.attrs(styles.nameList)}>
               {PRODUCTS.map((product, index) => {
-                const isActive = index === active;
+                const isActive = () => index === active();
                 return (
-                  <li key={product.title} {...stylex.props(styles.nameItem)}>
+                  <li {...stylex.attrs(styles.nameItem)}>
                     <button
                       type="button"
-                      aria-current={isActive ? "true" : undefined}
+                      aria-current={isActive() ? "true" : undefined}
                       aria-describedby={detailId(index)}
                       onClick={() => goTo(index)}
-                      {...stylex.props(styles.nameButton, isActive && styles.nameButtonActive)}
+                      {...sxProps(styles.nameButton, isActive() && styles.nameButtonActive)}
                     >
                       <span
                         aria-hidden="true"
-                        {...stylex.props(styles.mark, isActive && styles.markActive)}
+                        {...sxProps(styles.mark, isActive() && styles.markActive)}
                       />
                       {product.title}
                     </button>
@@ -528,44 +536,48 @@ function PinnedStage({
                 );
               })}
             </ul>
-            <div {...stylex.props(styles.detail)}>
+            <div {...stylex.attrs(styles.detail)}>
               {PRODUCTS.map((product, index) => {
-                const isActive = index === active;
+                const isActive = () => index === active();
                 return (
                   <div
-                    key={product.title}
                     id={detailId(index)}
-                    aria-hidden={!isActive}
-                    {...stylex.props(styles.detailItem, isActive && styles.detailItemActive)}
+                    aria-hidden={isActive() ? "false" : "true"}
+                    {...sxProps(styles.detailItem, isActive() && styles.detailItemActive)}
                   >
-                    <p {...stylex.props(styles.description)}>{product.description}</p>
+                    <p {...stylex.attrs(styles.description)}>{product.description}</p>
                     <TagList tags={product.tags} />
                   </div>
                 );
               })}
             </div>
-            <div aria-hidden="true" {...stylex.props(styles.progress)}>
-              <div {...stylex.props(styles.track)}>
-                <m.span {...stylex.props(styles.fill)} style={{ scaleX: progress }} />
+            <div aria-hidden="true" {...stylex.attrs(styles.progress)}>
+              <div {...stylex.attrs(styles.track)}>
+                <m.span {...stylex.attrs(styles.fill)} style={{ scaleX: progress }} />
               </div>
             </div>
           </Reveal>
           <Reveal index={4} sx={styles.plateCell}>
-            <div {...stylex.props(styles.plate)}>
+            <div {...stylex.attrs(styles.plate)}>
               {PRODUCTS.map((product, index) => {
-                const isActive = index === active;
+                const isActive = () => index === active();
                 return (
                   <div
-                    key={product.title}
-                    aria-hidden={!isActive}
-                    {...stylex.props(
+                    aria-hidden={isActive() ? "false" : "true"}
+                    {...sxProps(
                       styles.layer,
-                      index === previous && styles.layerPrevious,
-                      isActive && styles.layerActive,
-                      isActive && wiping && (forward ? styles.wipeForward : styles.wipeBack),
+                      index === selection().previous && styles.layerPrevious,
+                      isActive() && styles.layerActive,
+                      isActive() &&
+                        wiping() &&
+                        (selection().forward ? styles.wipeForward : styles.wipeBack),
                     )}
                   >
-                    <GradedImage product={product} index={index} settling={isActive && wiping} />
+                    <GradedImage
+                      product={product}
+                      index={index}
+                      settling={isActive() && wiping()}
+                    />
                   </div>
                 );
               })}
@@ -580,20 +592,20 @@ function PinnedStage({
 
 function StackedList() {
   return (
-    <div {...stylex.props(layout.shell, layout.inset)}>
-      <div {...stylex.props(styles.stackedHeader)}>
+    <div {...stylex.attrs(layout.shell, layout.inset)}>
+      <div {...stylex.attrs(styles.stackedHeader)}>
         <MarketsHeader />
       </div>
-      <ul id="product-list" role="list" {...stylex.props(styles.rows)}>
+      <ul id="product-list" role="list" {...stylex.attrs(styles.rows)}>
         {PRODUCTS.map((product, index) => (
-          <Reveal key={product.title} as="li" index={index} sx={styles.row}>
-            <div {...stylex.props(styles.frame)}>
+          <Reveal as="li" index={index} sx={styles.row}>
+            <div {...stylex.attrs(styles.frame)}>
               <GradedImage product={product} index={index} />
               <Grain />
             </div>
-            <div {...stylex.props(styles.rowText)}>
-              <h3 {...stylex.props(styles.rowTitle)}>{product.title}</h3>
-              <p {...stylex.props(styles.description)}>{product.description}</p>
+            <div {...stylex.attrs(styles.rowText)}>
+              <h3 {...stylex.attrs(styles.rowTitle)}>{product.title}</h3>
+              <p {...stylex.attrs(styles.description)}>{product.description}</p>
               <TagList tags={product.tags} />
             </div>
           </Reveal>
@@ -604,19 +616,21 @@ function StackedList() {
 }
 
 export function Markets() {
-  const sectionRef = useRef<HTMLElement>(null);
+  const [sectionEl, setSectionEl] = createSignal<HTMLElement>();
   const pinned = usePinEnabled();
-  const progress = usePinProgress(sectionRef);
+  const progress = usePinProgress(sectionEl);
 
   return (
     <section
-      ref={sectionRef}
+      ref={setSectionEl}
       id="products"
       aria-labelledby="oo-products-title"
-      {...stylex.props(styles.section, pinned ? styles.sectionPinned : layout.section)}
+      {...sxProps(styles.section, pinned() ? styles.sectionPinned : layout.section)}
     >
       <DuotoneFilters />
-      {pinned ? <PinnedStage progress={progress} sectionRef={sectionRef} /> : <StackedList />}
+      <Show when={pinned()} fallback={<StackedList />}>
+        <PinnedStage progress={progress} section={sectionEl} />
+      </Show>
     </section>
   );
 }

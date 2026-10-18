@@ -1,9 +1,9 @@
-import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
+import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 
 import { media, palette } from "./palette.stylex";
 
-const LG = breakpoints.lg;
+const LG = "@media (min-width: 1024px)";
 const EDGE = "min(72px, 5.2vw)";
 const SECTION_PAD_LG = "clamp(64px, 5.6vw, 80px)";
 
@@ -21,17 +21,42 @@ export const layout = stylex.create({
   padLeft: {
     boxSizing: "border-box",
     paddingBottom: { default: 32, [LG]: 0 },
-    paddingInlineStart: { default: 20, [breakpoints.sm]: 28, [media.tablet]: 40, [LG]: EDGE },
-    paddingInlineEnd: { default: 20, [breakpoints.sm]: 28, [media.tablet]: 40, [LG]: 48 },
+    paddingInlineStart: {
+      default: 20,
+      ["@media (min-width: 640px)"]: 28,
+      [media.tablet]: 40,
+      [LG]: EDGE,
+    },
+    paddingInlineEnd: {
+      default: 20,
+      ["@media (min-width: 640px)"]: 28,
+      [media.tablet]: 40,
+      [LG]: 48,
+    },
   },
   padRight: {
     boxSizing: "border-box",
-    paddingInlineStart: { default: 20, [breakpoints.sm]: 28, [media.tablet]: 40, [LG]: 48 },
-    paddingInlineEnd: { default: 20, [breakpoints.sm]: 28, [media.tablet]: 40, [LG]: EDGE },
+    paddingInlineStart: {
+      default: 20,
+      ["@media (min-width: 640px)"]: 28,
+      [media.tablet]: 40,
+      [LG]: 48,
+    },
+    paddingInlineEnd: {
+      default: 20,
+      ["@media (min-width: 640px)"]: 28,
+      [media.tablet]: 40,
+      [LG]: EDGE,
+    },
   },
   padBoth: {
     boxSizing: "border-box",
-    paddingInline: { default: 20, [breakpoints.sm]: 28, [media.tablet]: 40, [LG]: EDGE },
+    paddingInline: {
+      default: 20,
+      ["@media (min-width: 640px)"]: 28,
+      [media.tablet]: 40,
+      [LG]: EDGE,
+    },
   },
   seam: {
     display: "flex",

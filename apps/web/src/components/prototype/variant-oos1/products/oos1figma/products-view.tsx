@@ -155,27 +155,28 @@ const styles = stylex.create({
   },
 });
 
-function CategoryHero({ art }: { art: HeroArt }) {
+function CategoryHero(props: { art: HeroArt }) {
+  const art = props.art;
   const light = art.tone === "light";
   const food = art.layout === "food";
   return (
-    <section aria-label={`${art.title} banner`} {...stylex.props(styles.hero)}>
+    <section aria-label={`${art.title} banner`} {...stylex.attrs(styles.hero)}>
       <img
         src={art.src}
         alt={art.alt}
-        fetchPriority="high"
+        fetchpriority="high"
         decoding="async"
-        {...stylex.props(styles.photoRight, food && styles.photoRightFood)}
+        {...stylex.attrs(styles.photoRight, food && styles.photoRightFood)}
       />
       <div
         aria-hidden="true"
-        style={{ backgroundImage: `url(${art.src})` }}
-        {...stylex.props(styles.leftEdgeStretch, food && styles.leftEdgeStretchFood)}
+        {...stylex.attrs(styles.leftEdgeStretch, food && styles.leftEdgeStretchFood)}
+        style={{ "background-image": `url(${art.src})` }}
       />
-      {light && <div aria-hidden="true" {...stylex.props(styles.mobileTextScrim)} />}
-      <div {...stylex.props(kitStyles.shell, kitStyles.inset120, styles.content)}>
-        <h1 {...stylex.props(styles.title, light && styles.titleLight)}>{art.title}</h1>
-        <p {...stylex.props(styles.lead, light && styles.leadLight)}>{art.lead}</p>
+      {light && <div aria-hidden="true" {...stylex.attrs(styles.mobileTextScrim)} />}
+      <div {...stylex.attrs(kitStyles.shell, kitStyles.inset120, styles.content)}>
+        <h1 {...stylex.attrs(styles.title, light && styles.titleLight)}>{art.title}</h1>
+        <p {...stylex.attrs(styles.lead, light && styles.leadLight)}>{art.lead}</p>
       </div>
     </section>
   );
@@ -185,21 +186,21 @@ function FiberSpotlight() {
   return (
     <section
       aria-labelledby="fiber-spotlight-title"
-      {...stylex.props(kitStyles.shell, kitStyles.inset120, styles.spotlight)}
+      {...stylex.attrs(kitStyles.shell, kitStyles.inset120, styles.spotlight)}
     >
-      <div {...stylex.props(styles.spotlightGrid)}>
+      <div {...stylex.attrs(styles.spotlightGrid)}>
         <div>
-          <h2 id="fiber-spotlight-title" lang="en" {...stylex.props(styles.brand)}>
+          <h2 id="fiber-spotlight-title" lang="en" {...stylex.attrs(styles.brand)}>
             In fiber
           </h2>
-          <p {...stylex.props(styles.slogan)}>源自纤维，不止纤维</p>
+          <p {...stylex.attrs(styles.slogan)}>源自纤维，不止纤维</p>
         </div>
         <img
           src="/products/figma/fiber-plate.jpg"
           alt="A plate of fibre-rich foods: greens, berries, legumes, grains and nuts"
           loading="lazy"
           decoding="async"
-          {...stylex.props(styles.plate)}
+          {...stylex.attrs(styles.plate)}
         />
       </div>
     </section>

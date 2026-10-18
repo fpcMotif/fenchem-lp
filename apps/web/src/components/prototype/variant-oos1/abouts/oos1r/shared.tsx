@@ -1,6 +1,7 @@
 import { breakpoints } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { type ReactNode, useEffect, useRef, useState } from "react";
+import { dynamic as dynamicTag, type JSX } from "@solidjs/web";
+import { createEffect, createSignal, merge } from "solid-js";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 import { motionCss } from "./tokens.stylex";
 import { ui } from "./shared-values";
@@ -24,72 +25,67 @@ const reveal = stylex.create({
 
 type RevealState = "static" | "hidden" | "shown";
 
-export function Reveal({
-  children,
-  delay = 0,
-  sx,
-  as: Tag = "div",
-}: {
-  children: ReactNode;
+export function Reveal(props: {
+  children: JSX.Element;
   delay?: number;
   sx?: stylex.StyleXStyles;
   as?: "div" | "li" | "figure" | "article";
 }) {
-  const ref = useRef<HTMLDivElement & HTMLLIElement>(null);
+  const p = merge({ delay: 0, as: "div" as const }, props);
+  const Tag = dynamicTag(() => p.as);
+  let ref: HTMLElement | undefined;
   const reduce = useReducedMotion();
-  const [state, setState] = useState<RevealState>("static");
+  const [state, setState] = createSignal<RevealState>("static");
 
-  useEffect(() => {
-    const node = ref.current;
-    if (!node || reduce || !("IntersectionObserver" in window)) return;
-    if (node.getBoundingClientRect().top < window.innerHeight) return;
-    setState("hidden");
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (!entries.some((entry) => entry.isIntersecting)) return;
-        setState("shown");
-        observer.disconnect();
-      },
-      { rootMargin: "0px 0px -8% 0px" },
-    );
-    observer.observe(node);
-    return () => observer.disconnect();
-  }, [reduce]);
+  createEffect(
+    () => reduce(),
+    (reduced) => {
+      const node = ref;
+      if (!node || reduced || !("IntersectionObserver" in window)) return;
+      if (node.getBoundingClientRect().top < window.innerHeight) return;
+      setState("hidden");
+      const observer = new IntersectionObserver(
+        (entries) => {
+          if (!entries.some((entry) => entry.isIntersecting)) return;
+          setState("shown");
+          observer.disconnect();
+        },
+        { rootMargin: "0px 0px -8% 0px" },
+      );
+      observer.observe(node);
+      return () => observer.disconnect();
+    },
+  );
 
   return (
     <Tag
-      ref={ref}
-      {...stylex.props(
+      ref={(el: HTMLElement) => (ref = el)}
+      {...stylex.attrs(
         reveal.base,
-        state === "hidden" && reveal.hidden,
-        state === "shown" && reveal.shown,
-        state === "shown" && delay > 0 && reveal.delay(delay),
-        sx,
+        state() === "hidden" && reveal.hidden,
+        state() === "shown" && reveal.shown,
+        state() === "shown" && p.delay > 0 && reveal.delay(p.delay),
+        p.sx,
       )}
     >
-      {children}
+      {p.children}
     </Tag>
   );
 }
 
-export function Section({
-  id,
-  label,
-  sx,
-  children,
-}: {
+export function Section(props: {
   id: string;
   label: string;
   sx?: stylex.StyleXStyles;
-  children: ReactNode;
+  children: JSX.Element;
 }) {
-  const nameId = `${id}-name`;
+  const nameId = `${props.id}-name`;
   return (
-    <section id={id} aria-labelledby={nameId} {...stylex.props(ui.section, sx)}>
-      <h2 id={nameId} {...stylex.props(ui.srOnly)}>
-        {label}
+    <section id={props.id} aria-labelledby={nameId} {...stylex.attrs(ui.section, props.sx)}>
+      <h2 id={nameId} {...stylex.attrs(ui.srOnly)}>
+        {props.label}
       </h2>
-      <div {...stylex.props(ui.shell, ui.inset)}>{children}</div>
+      <div {...stylex.attrs(ui.shell, ui.inset)}>{props.children}</div>
     </section>
   );
 }

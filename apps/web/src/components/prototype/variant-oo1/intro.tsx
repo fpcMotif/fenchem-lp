@@ -1,7 +1,7 @@
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 import * as stylex from "@stylexjs/stylex";
-import { animate } from "motion/react";
-import { useEffect, useRef, useState } from "react";
+import { animate } from "@/compat/motion";
+import { createSignal, onSettled, type Accessor } from "solid-js";
 import { styles } from "./intro-values";
 
 export const INTRO_REVEAL_MS = 500;
@@ -12,10 +12,10 @@ const IMPACT_AT = 0.7;
 
 export type IntroState = "play" | "skip";
 
-export function useIntro(): IntroState {
+export function useIntro(): Accessor<IntroState> {
   const reduce = useReducedMotion();
-  const [state, setState] = useState<IntroState>("play");
-  useEffect(() => {
+  const [state, setState] = createSignal<IntroState>("play");
+  onSettled(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       return;
     }
@@ -29,37 +29,25 @@ export function useIntro(): IntroState {
       window.clearTimeout(finished);
       for (const name of events) window.removeEventListener(name, skip);
     };
-  }, []);
-  return reduce ? "skip" : state;
+  });
+  return () => (reduce() ? "skip" : state());
 }
 
-export function IntroOverlay({
-  onImpact,
-  onLanded,
-}: {
-  onImpact: () => void;
-  onLanded: () => void;
-}) {
-  const dotRef = useRef<HTMLSpanElement>(null);
-  const impactRef = useRef(onImpact);
-  const landedRef = useRef(onLanded);
-  useEffect(() => {
-    impactRef.current = onImpact;
-    landedRef.current = onLanded;
-  }, [onImpact, onLanded]);
+export function IntroOverlay(props: { onImpact: () => void; onLanded: () => void }) {
+  let dotEl: HTMLSpanElement | undefined;
 
-  useEffect(() => {
+  onSettled(() => {
     let stop = () => {};
     let impactTimer = 0;
     const timer = window.setTimeout(() => {
-      const dot = dotRef.current;
+      const dot = dotEl;
       const period = document.querySelector("[data-hero-period]");
       if (!dot || !period) {
-        impactRef.current();
-        landedRef.current();
+        props.onImpact();
+        props.onLanded();
         return;
       }
-      impactTimer = window.setTimeout(() => impactRef.current(), FLIGHT_SECONDS * IMPACT_AT * 1000);
+      impactTimer = window.setTimeout(() => props.onImpact(), FLIGHT_SECONDS * IMPACT_AT * 1000);
       const from = dot.getBoundingClientRect();
       const to = period.getBoundingClientRect();
       const dx = to.left + to.width / 2 - (from.left + from.width / 2);
@@ -81,9 +69,9 @@ export function IntroOverlay({
         },
       );
       stop = () => controls.stop();
-      void controls.then(() => {
+      void controls.finished.then(() => {
         dot.style.opacity = "0";
-        landedRef.current();
+        props.onLanded();
       });
     }, FLIGHT_START_MS);
     return () => {
@@ -91,11 +79,11 @@ export function IntroOverlay({
       window.clearTimeout(impactTimer);
       stop();
     };
-  }, []);
+  });
 
   return (
-    <div aria-hidden="true" {...stylex.props(styles.overlay)}>
-      <span ref={dotRef} {...stylex.props(styles.dot)} />
+    <div aria-hidden="true" {...stylex.attrs(styles.overlay)}>
+      <span ref={dotEl} {...stylex.attrs(styles.dot)} />
     </div>
   );
 }

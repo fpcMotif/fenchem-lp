@@ -1,16 +1,7 @@
-import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
+import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { ArrowRight, Check, CheckCircle2, ChevronDown, X } from "lucide-react";
-import {
-  useEffect,
-  useId,
-  useRef,
-  useState,
-  type ChangeEvent,
-  type KeyboardEvent,
-  type SubmitEvent,
-} from "react";
-import { flushSync } from "react-dom";
+import { ArrowRight, Check, CheckCircle2, ChevronDown, X } from "@fenchem-lp/ui/components/lucide";
+import { createEffect, createSignal, createUniqueId, flush, Show, untrack } from "solid-js";
 
 import { color, ease, font } from "../../variant-oos1/tokens.stylex";
 import {
@@ -107,7 +98,7 @@ const HOVER = "@media (hover: hover)";
 const ON_NAVY = "rgba(255, 255, 255, 0.92)";
 const ON_NAVY_MUTED = "rgba(255, 255, 255, 0.58)";
 const HAIRLINE = "rgba(26, 26, 26, 0.12)";
-const DESKTOP = breakpoints.md;
+const DESKTOP = "@media (min-width: 768px)";
 const STICKY_FOOTER_ROOM = 176;
 const SHEET_MOTION = "@media (prefers-reduced-motion: no-preference) and (max-width: 767.98px)";
 const POP_MOTION = "@media (prefers-reduced-motion: no-preference) and (min-width: 768px)";
@@ -405,7 +396,10 @@ const styles = stylex.create({
   chevron: {
     color: color.ink,
     transitionProperty: "transform",
-    transitionDuration: { default: "0s", [breakpoints.motionOk]: "200ms" },
+    transitionDuration: {
+      default: "0s",
+      ["@media (prefers-reduced-motion: no-preference)"]: "200ms",
+    },
     transitionTimingFunction: ease.out,
   },
   chevronOpen: {
@@ -427,7 +421,7 @@ const styles = stylex.create({
     backgroundColor: colors.paper,
     boxShadow: "0 16px 32px -16px rgba(6, 20, 44, 0.28)",
     transformOrigin: "top center",
-    animationName: { default: fadeIn, [breakpoints.motionOk]: listIn },
+    animationName: { default: fadeIn, ["@media (prefers-reduced-motion: no-preference)"]: listIn },
     animationDuration: "150ms",
     animationTimingFunction: ease.out,
   },
@@ -460,7 +454,10 @@ const styles = stylex.create({
   },
   grid: {
     display: "grid",
-    gridTemplateColumns: { default: "1fr", [breakpoints.sm]: "repeat(2, minmax(0, 1fr))" },
+    gridTemplateColumns: {
+      default: "1fr",
+      ["@media (min-width: 640px)"]: "repeat(2, minmax(0, 1fr))",
+    },
     columnGap: 16,
     rowGap: 18,
   },
@@ -471,8 +468,8 @@ const styles = stylex.create({
     position: { default: "sticky", [DESKTOP]: "static" },
     bottom: 0,
     display: "flex",
-    flexDirection: { default: "column", [breakpoints.sm]: "row" },
-    alignItems: { default: "stretch", [breakpoints.sm]: "center" },
+    flexDirection: { default: "column", ["@media (min-width: 640px)"]: "row" },
+    alignItems: { default: "stretch", ["@media (min-width: 640px)"]: "center" },
     justifyContent: "space-between",
     gap: 16,
     flexShrink: 0,
@@ -530,31 +527,28 @@ const stagger = (index: number) => [
   styles.staggerDelay(index),
 ];
 
-function RequestTypeSelect({
-  value,
-  onChange,
-}: {
+function RequestTypeSelect(props: {
   value: RequestTypeId;
   onChange: (value: RequestTypeId) => void;
 }) {
-  const baseId = useId();
+  const baseId = createUniqueId();
   const labelId = `${baseId}-label`;
   const listId = `${baseId}-list`;
   const optionId = (index: number) => `${baseId}-option-${index}`;
-  const rootRef = useRef<HTMLDivElement>(null);
-  const selectedIndex = REQUEST_TYPES.findIndex((type) => type.id === value);
-  const [open, setOpen] = useState(false);
-  const [activeIndex, setActiveIndex] = useState(selectedIndex);
-  const selected = REQUEST_TYPES[selectedIndex];
+  let rootRef: HTMLDivElement | undefined;
+  const selectedIndex = () => REQUEST_TYPES.findIndex((type) => type.id === props.value);
+  const [open, setOpen] = createSignal(false);
+  const [activeIndex, setActiveIndex] = createSignal(untrack(selectedIndex));
+  const selected = () => REQUEST_TYPES[selectedIndex()];
 
-  useEffect(() => {
-    if (!open) return;
+  createEffect(open, (isOpen) => {
+    if (!isOpen) return;
     const closeOnOutside = (event: PointerEvent) => {
-      if (!rootRef.current?.contains(event.target as Node)) setOpen(false);
+      if (!rootRef?.contains(event.target as Node)) setOpen(false);
     };
     document.addEventListener("pointerdown", closeOnOutside);
     return () => document.removeEventListener("pointerdown", closeOnOutside);
-  }, [open]);
+  });
 
   const openAt = (index: number) => {
     setActiveIndex(index);
@@ -562,17 +556,17 @@ function RequestTypeSelect({
   };
 
   const choose = (index: number) => {
-    onChange(REQUEST_TYPES[index].id);
+    props.onChange(REQUEST_TYPES[index].id);
     setOpen(false);
   };
 
   const last = REQUEST_TYPES.length - 1;
 
-  const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-    if (!open) {
+  const handleKeyDown = (event: KeyboardEvent) => {
+    if (!open()) {
       if (["ArrowDown", "ArrowUp", "Enter", " "].includes(event.key)) {
         event.preventDefault();
-        openAt(selectedIndex);
+        openAt(selectedIndex());
       } else if (event.key === "Home" || event.key === "End") {
         event.preventDefault();
         openAt(event.key === "Home" ? 0 : last);
@@ -599,7 +593,7 @@ function RequestTypeSelect({
       case "Enter":
       case " ":
         event.preventDefault();
-        choose(activeIndex);
+        choose(activeIndex());
         break;
       case "Escape":
         event.preventDefault();
@@ -613,71 +607,70 @@ function RequestTypeSelect({
   };
 
   return (
-    <div ref={rootRef} {...stylex.props(labStyles.field, styles.select)}>
-      <span id={labelId} {...stylex.props(labStyles.label)}>
+    <div ref={rootRef} {...stylex.attrs(labStyles.field, styles.select)}>
+      <span id={labelId} {...stylex.attrs(labStyles.label)}>
         咨询类型
       </span>
-      <input type="hidden" name="requestType" value={value} />
+      <input type="hidden" name="requestType" value={props.value} />
       <div
         role="combobox"
-        tabIndex={0}
+        tabindex={0}
         aria-haspopup="listbox"
-        aria-expanded={open}
-        aria-controls={open ? listId : undefined}
+        aria-expanded={open() ? "true" : "false"}
+        aria-controls={open() ? listId : undefined}
         aria-labelledby={labelId}
-        aria-activedescendant={open ? optionId(activeIndex) : undefined}
-        onClick={() => (open ? setOpen(false) : openAt(selectedIndex))}
+        aria-activedescendant={open() ? optionId(activeIndex()) : undefined}
+        onClick={() => (open() ? setOpen(false) : openAt(selectedIndex()))}
         onKeyDown={handleKeyDown}
-        {...stylex.props(labStyles.input, styles.trigger, open && styles.triggerOpen)}
+        {...stylex.attrs(labStyles.input, styles.trigger, open() && styles.triggerOpen)}
       >
-        <span {...stylex.props(styles.triggerValue)}>
-          {selected.label}
-          <span lang="en" {...stylex.props(styles.english)}>
-            {selected.english}
+        <span {...stylex.attrs(styles.triggerValue)}>
+          {selected().label}
+          <span lang="en" {...stylex.attrs(styles.english)}>
+            {selected().english}
           </span>
         </span>
         <ChevronDown
           size={20}
           strokeWidth={1.75}
           aria-hidden="true"
-          {...stylex.props(styles.chevron, open && styles.chevronOpen)}
+          {...stylex.attrs(styles.chevron, open() && styles.chevronOpen)}
         />
       </div>
       <ul
         id={listId}
         role="listbox"
         aria-labelledby={labelId}
-        hidden={!open}
-        {...stylex.props(styles.listbox)}
+        hidden={!open()}
+        {...stylex.attrs(styles.listbox)}
       >
         {REQUEST_TYPES.map((type, index) => {
-          const isSelected = index === selectedIndex;
+          const isSelected = () => index === selectedIndex();
           return (
             <li
-              key={type.id}
               id={optionId(index)}
               role="option"
-              aria-selected={isSelected}
+              aria-selected={isSelected() ? "true" : "false"}
               onPointerDown={(event) => event.preventDefault()}
               onPointerMove={() => setActiveIndex(index)}
               onClick={() => choose(index)}
-              {...stylex.props(
+              {...stylex.attrs(
                 styles.option,
-                index === activeIndex && styles.optionActive,
-                isSelected && styles.optionSelected,
+                index === activeIndex() && styles.optionActive,
+                isSelected() && styles.optionSelected,
               )}
             >
               {type.label}
-              <span lang="en" {...stylex.props(styles.english)}>
+              <span lang="en" {...stylex.attrs(styles.english)}>
                 {type.english}
               </span>
-              {isSelected ? (
+              {isSelected() ? (
                 <Check
                   size={16}
                   strokeWidth={2}
                   nonScalingStroke
                   aria-hidden="true"
-                  {...stylex.props(styles.optionCheck)}
+                  {...stylex.attrs(styles.optionCheck)}
                 />
               ) : null}
             </li>
@@ -688,43 +681,43 @@ function RequestTypeSelect({
   );
 }
 
-export function SplitDialog({ subject, onClose, state = "pristine" }: DialogVariantProps) {
-  const { closing, requestClose, dialogProps, panelProps } = useLabDialog(onClose);
-  const titleId = useId();
-  const [requestType, setRequestType] = useState<RequestTypeId>(() => {
-    if (state === "technical") return "technical";
-    if (state === "commercial") return "commercial";
-    return subject ? REQUEST_TYPE_FOR_SUBJECT[subject] : "general";
-  });
-  const [submitted, setSubmitted] = useState(() => state === "submitted");
-  const [errors, setErrors] = useState<Record<string, string>>(() =>
+export function SplitDialog(props: DialogVariantProps) {
+  const state = untrack(() => props.state ?? "pristine");
+  const { closing, requestClose, dialogProps, panelProps } = useLabDialog(() => props.onClose());
+  const titleId = createUniqueId();
+  const [requestType, setRequestType] = createSignal<RequestTypeId>(
+    untrack(() => {
+      if (state === "technical") return "technical";
+      if (state === "commercial") return "commercial";
+      return props.subject ? REQUEST_TYPE_FOR_SUBJECT[props.subject] : "general";
+    }),
+  );
+  const [submitted, setSubmitted] = createSignal(state === "submitted");
+  const [errors, setErrors] = createSignal<Record<string, string>>(
     state === "errors" ? { ...MISSING_ERRORS } : {},
   );
-  const doneTitleRef = useRef<HTMLHeadingElement>(null);
-  const active = REQUEST_TYPES.find((type) => type.id === requestType) ?? REQUEST_TYPES[0];
+  let doneTitleRef: HTMLHeadingElement | undefined;
+  const active = () => REQUEST_TYPES.find((type) => type.id === requestType()) ?? REQUEST_TYPES[0];
 
-  const handleSubmit = (event: SubmitEvent<HTMLFormElement>) => {
+  const handleSubmit = (event: SubmitEvent & { currentTarget: HTMLFormElement }) => {
     event.preventDefault();
     const invalid = Array.from(event.currentTarget.elements)
       .filter(isFormField)
       .filter((field) => !field.validity.valid);
     if (invalid.length > 0) {
-      flushSync(() =>
-        setErrors(Object.fromEntries(invalid.map((field) => [field.name, errorFor(field)]))),
-      );
+      setErrors(Object.fromEntries(invalid.map((field) => [field.name, errorFor(field)])));
       invalid[0].focus();
       return;
     }
-    flushSync(() => {
-      setErrors({});
-      setSubmitted(true);
-    });
-    doneTitleRef.current?.focus();
+    setErrors({});
+    setSubmitted(true);
+    flush();
+    doneTitleRef?.focus();
   };
 
-  const updateError = (event: ChangeEvent<HTMLFormElement>) => {
+  const updateError = (event: Event) => {
     const field = event.target;
-    if (!isFormField(field) || !(field.name in errors)) return;
+    if (!isFormField(field) || !(field.name in errors())) return;
     setErrors((current) =>
       field.validity.valid
         ? Object.fromEntries(Object.entries(current).filter(([name]) => name !== field.name))
@@ -736,48 +729,44 @@ export function SplitDialog({ subject, onClose, state = "pristine" }: DialogVari
     <dialog
       aria-labelledby={titleId}
       {...dialogProps}
-      {...stylex.props(labStyles.dialog, styles.dialog, closing && styles.dialogClosing)}
+      {...stylex.attrs(labStyles.dialog, styles.dialog, closing() && styles.dialogClosing)}
     >
       <button
         type="button"
-        tabIndex={-1}
+        tabindex={-1}
         aria-hidden="true"
         onClick={requestClose}
-        {...stylex.props(labStyles.dismiss)}
+        {...stylex.attrs(labStyles.dismiss)}
       />
-      <div {...panelProps} {...stylex.props(styles.panel, closing && styles.panelClosing)}>
-        <aside aria-label="公司信息" {...stylex.props(styles.aside)}>
+      <div {...panelProps} {...stylex.attrs(styles.panel, closing() && styles.panelClosing)}>
+        <aside aria-label="公司信息" {...stylex.attrs(styles.aside)}>
           <div>
-            <p {...stylex.props(styles.companyName)}>{COMPANY.name}</p>
-            <p lang="en" {...stylex.props(styles.companyEnglish)}>
+            <p {...stylex.attrs(styles.companyName)}>{COMPANY.name}</p>
+            <p lang="en" {...stylex.attrs(styles.companyEnglish)}>
               {COMPANY.english}
             </p>
           </div>
-          <div {...stylex.props(styles.quickLinks)}>
+          <div {...stylex.attrs(styles.quickLinks)}>
             {CONTACT_DETAILS.filter((d) => d.href).map((detail) => (
-              <a
-                key={detail.term}
-                href={detail.href!}
-                {...stylex.props(styles.detailLink, styles.quickLinkItem)}
-              >
+              <a href={detail.href!} {...stylex.attrs(styles.detailLink, styles.quickLinkItem)}>
                 <ContactIcon detail={detail} size={14} />
                 <span>{detail.value}</span>
               </a>
             ))}
           </div>
-          <dl {...stylex.props(styles.details)}>
+          <dl {...stylex.attrs(styles.details)}>
             {CONTACT_DETAILS.map((detail) => (
-              <div key={detail.term} {...stylex.props(styles.detailRow)}>
+              <div {...stylex.attrs(styles.detailRow)}>
                 <dt
                   title={detail.term}
                   aria-label={detail.term}
-                  {...stylex.props(styles.detailTerm)}
+                  {...stylex.attrs(styles.detailTerm)}
                 >
                   <ContactIcon detail={detail} size={15} />
                 </dt>
-                <dd {...stylex.props(styles.detailValue)}>
+                <dd {...stylex.attrs(styles.detailValue)}>
                   {detail.href ? (
-                    <a href={detail.href} {...stylex.props(styles.detailLink)}>
+                    <a href={detail.href} {...stylex.attrs(styles.detailLink)}>
                       {detail.value}
                     </a>
                   ) : (
@@ -787,121 +776,126 @@ export function SplitDialog({ subject, onClose, state = "pristine" }: DialogVari
               </div>
             ))}
           </dl>
-          <div {...stylex.props(styles.qrSection)}>
-            <span {...stylex.props(styles.qrHeaderTitle)}>扫码关注官方社媒</span>
-            <div {...stylex.props(styles.dualQrRow)}>
+          <div {...stylex.attrs(styles.qrSection)}>
+            <span {...stylex.attrs(styles.qrHeaderTitle)}>扫码关注官方社媒</span>
+            <div {...stylex.attrs(styles.dualQrRow)}>
               {QR_CODES.map((qr) => (
-                <figure key={qr.id} {...stylex.props(styles.dualQrCard)}>
+                <figure {...stylex.attrs(styles.dualQrCard)}>
                   <img
                     src={qr.image}
                     alt={qr.alt}
                     width={88}
                     height={88}
-                    {...stylex.props(styles.dualQrImage)}
+                    {...stylex.attrs(styles.dualQrImage)}
                   />
-                  <figcaption {...stylex.props(styles.dualQrCaption)}>{qr.label}</figcaption>
+                  <figcaption {...stylex.attrs(styles.dualQrCaption)}>{qr.label}</figcaption>
                 </figure>
               ))}
             </div>
           </div>
         </aside>
 
-        <div {...stylex.props(styles.main)}>
-          <header {...stylex.props(styles.mainHead)}>
-            <h2 id={titleId} {...stylex.props(styles.title)}>
+        <div {...stylex.attrs(styles.main)}>
+          <header {...stylex.attrs(styles.mainHead)}>
+            <h2 id={titleId} {...stylex.attrs(styles.title)}>
               给我们留言
             </h2>
             <button
               type="button"
               aria-label="关闭"
               onClick={requestClose}
-              {...stylex.props(labStyles.closeButton, styles.closeOnNavy)}
+              {...stylex.attrs(labStyles.closeButton, styles.closeOnNavy)}
             >
               <X size={20} strokeWidth={1.75} aria-hidden="true" />
             </button>
           </header>
 
-          {submitted ? (
-            <div {...stylex.props(styles.done)}>
-              <CheckCircle2
-                size={36}
-                strokeWidth={2.5}
-                nonScalingStroke
-                aria-hidden="true"
-                {...stylex.props(styles.doneIcon, stagger(0))}
-              />
-              <h3 ref={doneTitleRef} tabIndex={-1} {...stylex.props(styles.doneTitle, stagger(1))}>
-                需求已提交
-              </h3>
-            </div>
-          ) : (
+          <Show
+            when={!submitted()}
+            fallback={
+              <div {...stylex.attrs(styles.done)}>
+                <CheckCircle2
+                  size={36}
+                  strokeWidth={2.5}
+                  nonScalingStroke
+                  aria-hidden="true"
+                  {...stylex.attrs(styles.doneIcon, stagger(0))}
+                />
+                <h3
+                  ref={doneTitleRef}
+                  tabindex={-1}
+                  {...stylex.attrs(styles.doneTitle, stagger(1))}
+                >
+                  需求已提交
+                </h3>
+              </div>
+            }
+          >
             <form
-              noValidate
+              novalidate
               onSubmit={handleSubmit}
-              onChange={updateError}
-              {...stylex.props(styles.form)}
+              onInput={updateError}
+              {...stylex.attrs(styles.form)}
             >
-              <div {...stylex.props(styles.formBody)}>
-                <RequestTypeSelect value={requestType} onChange={setRequestType} />
-                <div {...stylex.props(styles.grid)}>
-                  <Field id="split-name" label="联系人姓名" required error={errors.contactName}>
+              <div {...stylex.attrs(styles.formBody)}>
+                <RequestTypeSelect value={requestType()} onChange={setRequestType} />
+                <div {...stylex.attrs(styles.grid)}>
+                  <Field id="split-name" label="联系人姓名" required error={errors().contactName}>
                     <input
                       id="split-name"
                       name="contactName"
                       required
-                      autoComplete="name"
-                      defaultValue={
-                        state === "long-text" ? LONG_TEXT_FIXTURE.contactName : undefined
-                      }
-                      {...stylex.props(
+                      autocomplete="name"
+                      value={state === "long-text" ? LONG_TEXT_FIXTURE.contactName : undefined}
+                      {...stylex.attrs(
                         labStyles.input,
-                        errors.contactName ? labStyles.inputInvalid : null,
+                        errors().contactName ? labStyles.inputInvalid : null,
                       )}
                     />
                   </Field>
-                  <Field id="split-company" label="公司或机构" required error={errors.company}>
+                  <Field id="split-company" label="公司或机构" required error={errors().company}>
                     <input
                       id="split-company"
                       name="company"
                       required
-                      autoComplete="organization"
-                      defaultValue={state === "long-text" ? LONG_TEXT_FIXTURE.company : undefined}
-                      {...stylex.props(
+                      autocomplete="organization"
+                      value={state === "long-text" ? LONG_TEXT_FIXTURE.company : undefined}
+                      {...stylex.attrs(
                         labStyles.input,
-                        errors.company ? labStyles.inputInvalid : null,
+                        errors().company ? labStyles.inputInvalid : null,
                       )}
                     />
                   </Field>
-                  <Field id="split-phone" label="手机号" required error={errors.phone}>
+                  <Field id="split-phone" label="手机号" required error={errors().phone}>
                     <input
                       id="split-phone"
                       name="phone"
                       type="tel"
                       required
-                      autoComplete="tel"
-                      inputMode="tel"
-                      defaultValue={state === "long-text" ? LONG_TEXT_FIXTURE.phone : undefined}
-                      {...fieldAria("split-phone", errors.phone)}
-                      {...stylex.props(
+                      autocomplete="tel"
+                      inputmode="tel"
+                      value={state === "long-text" ? LONG_TEXT_FIXTURE.phone : undefined}
+                      {...fieldAria("split-phone", errors().phone)}
+                      {...stylex.attrs(
                         labStyles.input,
-                        errors.phone ? labStyles.inputInvalid : null,
+                        errors().phone ? labStyles.inputInvalid : null,
                       )}
                     />
                   </Field>
-                  <Field id="split-email" label="工作邮箱" required error={errors.email}>
+                  <Field id="split-email" label="工作邮箱" required error={errors().email}>
                     <input
                       id="split-email"
                       name="email"
                       type="email"
                       required
-                      autoComplete="email"
-                      spellCheck={false}
+                      autocomplete="email"
+                      spellcheck={false}
                       placeholder="name@company.com"
-                      defaultValue={state === "long-text" ? LONG_TEXT_FIXTURE.email : undefined}
-                      {...fieldAria("split-email", errors.email)}
-                      {...stylex.props(
+                      value={state === "long-text" ? LONG_TEXT_FIXTURE.email : undefined}
+                      {...fieldAria("split-email", errors().email)}
+                      {...stylex.attrs(
                         labStyles.input,
-                        errors.email ? labStyles.inputInvalid : null,
+                        errors().email ? labStyles.inputInvalid : null,
                       )}
                     />
                   </Field>
@@ -909,43 +903,47 @@ export function SplitDialog({ subject, onClose, state = "pristine" }: DialogVari
                     id="split-message"
                     label="需求描述"
                     required
-                    error={errors.message}
+                    error={errors().message}
                     sx={styles.full}
                   >
                     <textarea
                       id="split-message"
                       name="message"
                       required
-                      placeholder={active.placeholder}
-                      defaultValue={state === "long-text" ? LONG_TEXT_FIXTURE.message : undefined}
-                      {...stylex.props(
+                      placeholder={active().placeholder}
+                      value={state === "long-text" ? LONG_TEXT_FIXTURE.message : undefined}
+                      {...stylex.attrs(
                         labStyles.input,
                         labStyles.textarea,
-                        errors.message ? labStyles.inputInvalid : null,
+                        errors().message ? labStyles.inputInvalid : null,
                       )}
                     />
                   </Field>
                 </div>
               </div>
-              <div {...stylex.props(styles.footer)}>
-                <div {...stylex.props(styles.consent)}>
-                  <label {...stylex.props(labStyles.consent)}>
+              <div {...stylex.attrs(styles.footer)}>
+                <div {...stylex.attrs(styles.consent)}>
+                  <label {...stylex.attrs(labStyles.consent)}>
                     <input
                       id="split-consent"
                       type="checkbox"
                       name="consent"
                       required
-                      defaultChecked={state === "long-text" ? true : undefined}
-                      {...fieldAria("split-consent", errors.consent)}
-                      {...stylex.props(labStyles.checkbox)}
+                      checked={state === "long-text" ? true : undefined}
+                      {...fieldAria("split-consent", errors().consent)}
+                      {...stylex.attrs(labStyles.checkbox)}
                     />
                     <span>同意泛成就本次咨询联系我，配方信息严格保密</span>
                   </label>
-                  <FieldError id="split-consent" error={errors.consent} sx={styles.consentError} />
+                  <FieldError
+                    id="split-consent"
+                    error={errors().consent}
+                    sx={styles.consentError}
+                  />
                 </div>
                 <button
                   type="submit"
-                  {...stylex.props(
+                  {...stylex.attrs(
                     labStyles.primaryButton,
                     labStyles.trailingIcon,
                     labStyles.focusRing,
@@ -958,12 +956,12 @@ export function SplitDialog({ subject, onClose, state = "pristine" }: DialogVari
                     strokeWidth={2}
                     nonScalingStroke
                     aria-hidden="true"
-                    {...stylex.props(labStyles.buttonArrow)}
+                    {...stylex.attrs(labStyles.buttonArrow)}
                   />
                 </button>
               </div>
             </form>
-          )}
+          </Show>
         </div>
       </div>
     </dialog>

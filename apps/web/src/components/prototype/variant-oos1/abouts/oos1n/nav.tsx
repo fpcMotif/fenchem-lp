@@ -1,11 +1,11 @@
 import { breakpoints } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { useEffect, useRef } from "react";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 import { useActiveSection } from "../../use-active-section";
 import { ui } from "./shared-values";
 import { font, motionCss, step, tone } from "./tokens.stylex";
 import { NAV_ITEMS } from "./nav-values";
+import { createEffect, createSignal } from "solid-js";
 
 const SECTION_IDS: readonly string[] = NAV_ITEMS.map((item) => item.id);
 
@@ -103,57 +103,58 @@ const s = stylex.create({
   },
 });
 
-export function SubNav({ onNavigateHome }: { onNavigateHome: (hash?: string) => void }) {
+export function SubNav(props: { onNavigateHome: (hash?: string) => void }) {
   const active = useActiveSection(SECTION_IDS);
-  const tabsRef = useRef<HTMLElement>(null);
+  const [tabsRef, setTabsRef] = createSignal<HTMLElement>();
   const reduce = useReducedMotion();
 
-  useEffect(() => {
-    const list = tabsRef.current;
-    const tab = active ? list?.querySelector<HTMLElement>(`[href="#${active}"]`) : null;
-    if (!list || !tab) return;
-    const listBox = list.getBoundingClientRect();
-    const tabBox = tab.getBoundingClientRect();
-    if (tabBox.left < listBox.left || tabBox.right > listBox.right) {
-      list.scrollBy({
-        left: tabBox.left - listBox.left - 16,
-        behavior: reduce ? "auto" : "smooth",
-      });
-    }
-  }, [active, reduce]);
+  createEffect(
+    () => ({ list: tabsRef(), active: active(), reduce: reduce() }),
+    ({ list, active, reduce }) => {
+      const tab = active ? list?.querySelector<HTMLElement>(`[href="#${active}"]`) : null;
+      if (!list || !tab) return;
+      const listBox = list.getBoundingClientRect();
+      const tabBox = tab.getBoundingClientRect();
+      if (tabBox.left < listBox.left || tabBox.right > listBox.right) {
+        list.scrollBy({
+          left: tabBox.left - listBox.left - 16,
+          behavior: reduce ? "auto" : "smooth",
+        });
+      }
+    },
+  );
 
   return (
-    <div {...stylex.props(s.bar)}>
-      <div {...stylex.props(ui.shell, ui.inset, s.inner)}>
-        <nav aria-label="Breadcrumb" {...stylex.props(s.crumb)}>
+    <div {...stylex.attrs(s.bar)}>
+      <div {...stylex.attrs(ui.shell, ui.inset, s.inner)}>
+        <nav aria-label="Breadcrumb" {...stylex.attrs(s.crumb)}>
           <button
             type="button"
-            onClick={() => onNavigateHome("top")}
-            {...stylex.props(s.crumbLink, ui.focusRing)}
+            onClick={() => props.onNavigateHome("top")}
+            {...stylex.attrs(s.crumbLink, ui.focusRing)}
           >
             <span lang="en">Home</span>
           </button>
-          <span aria-hidden="true" {...stylex.props(s.crumbSep)}>
+          <span aria-hidden="true" {...stylex.attrs(s.crumbSep)}>
             /
           </span>
-          <span aria-current="page" {...stylex.props(s.crumbCurrent)}>
+          <span aria-current="page" {...stylex.attrs(s.crumbCurrent)}>
             <span lang="en">About</span>
           </span>
         </nav>
-        <nav aria-label="On this page" ref={tabsRef} {...stylex.props(s.tabs)}>
+        <nav aria-label="On this page" ref={setTabsRef} {...stylex.attrs(s.tabs)}>
           {NAV_ITEMS.map((item) => {
-            const isActive = active === item.id;
+            const isActive = () => active() === item.id;
             return (
               <a
-                key={item.id}
                 href={`#${item.id}`}
-                aria-current={isActive ? "location" : undefined}
-                {...stylex.props(s.tab, isActive && s.tabActive, ui.focusRing)}
+                aria-current={isActive() ? "location" : undefined}
+                {...stylex.attrs(s.tab, isActive() && s.tabActive, ui.focusRing)}
               >
                 <span lang="en">{item.english}</span>
                 <span
                   aria-hidden="true"
-                  {...stylex.props(s.tabMark, isActive && s.tabMarkActive)}
+                  {...stylex.attrs(s.tabMark, isActive() && s.tabMarkActive)}
                 />
               </a>
             );

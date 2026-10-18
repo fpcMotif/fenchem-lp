@@ -117,33 +117,33 @@ export function Campus() {
     <section
       id="about-campus"
       aria-labelledby={headingId("about-campus")}
-      {...stylex.props(ui.section, styles.section)}
+      {...stylex.attrs(ui.section, styles.section)}
     >
-      <div {...stylex.props(ui.shell)}>
+      <div {...stylex.attrs(ui.shell)}>
         <SectionLabel section="about-campus" />
-        <ol {...stylex.props(styles.essay)}>
+        <ol {...stylex.attrs(styles.essay)}>
           {ABOUT_CAMPUS.photos.map((photo, index) => {
             const large = index % 2 === 0;
             return (
-              <li key={photo.id} {...stylex.props(styles.entry)}>
+              <li {...stylex.attrs(styles.entry)}>
                 <Clause line={SENTENCE.campus[index]} sx={styles.caption} />
-                <figure {...stylex.props(styles.figure, large ? styles.large : styles.small)}>
+                <figure {...stylex.attrs(styles.figure, large ? styles.large : styles.small)}>
                   <button
                     type="button"
                     onClick={() => lightbox.open(index)}
-                    {...stylex.props(styles.button, large ? styles.largeFrame : styles.smallFrame)}
+                    {...stylex.attrs(styles.button, large ? styles.largeFrame : styles.smallFrame)}
                   >
                     <img
                       src={photo.src}
                       alt={photo.alt}
                       loading="lazy"
                       decoding="async"
-                      {...stylex.props(ui.photo, styles.image, crops[photo.id])}
+                      {...stylex.attrs(ui.photo, styles.image, crops[photo.id])}
                     />
                     <span {...srOnly}>, View larger</span>
                   </button>
-                  <figcaption lang="en" {...stylex.props(ui.note, styles.note)}>
-                    <span {...stylex.props(styles.number)}>
+                  <figcaption lang="en" {...stylex.attrs(ui.note, styles.note)}>
+                    <span {...stylex.attrs(styles.number)}>
                       {String(index + 1).padStart(2, "0")}
                     </span>
                     <span>{ENGLISH[photo.id]}</span>

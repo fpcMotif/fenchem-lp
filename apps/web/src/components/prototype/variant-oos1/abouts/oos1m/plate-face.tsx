@@ -36,16 +36,16 @@ const styles = stylex.create({
   glyphSize: (size: string) => ({ fontSize: size }),
 });
 
-export function PlateFace({ glyph, glyphSize }: { glyph?: string; glyphSize?: string }) {
+export function PlateFace(props: { glyph?: string; glyphSize?: string }) {
   return (
     <>
-      <span {...stylex.props(styles.recess)} />
+      <span {...stylex.attrs(styles.recess)} />
       {HOLE_CORNERS.map((corner) => (
-        <span key={corner} {...stylex.props(styles.hole, styles[corner])} />
+        <span {...stylex.attrs(styles.hole, styles[corner])} />
       ))}
-      {glyph && glyphSize ? (
-        <span aria-hidden="true" {...stylex.props(styles.glyph, styles.glyphSize(glyphSize))}>
-          {glyph}
+      {props.glyph && props.glyphSize ? (
+        <span aria-hidden="true" {...stylex.attrs(styles.glyph, styles.glyphSize(props.glyphSize))}>
+          {props.glyph}
         </span>
       ) : null}
     </>

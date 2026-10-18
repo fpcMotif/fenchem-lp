@@ -1,6 +1,6 @@
-import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
+import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { useId, useState } from "react";
+import { createSignal, createUniqueId } from "solid-js";
 
 import { ABOUT_STRUCTURE } from "../../about-data";
 import { NodeMarker, Reveal, Section, Shell } from "./layout";
@@ -16,9 +16,9 @@ const styles = stylex.create({
     display: "grid",
     gridTemplateColumns: {
       default: "minmax(0, 1fr)",
-      [breakpoints.lg]: "minmax(0, 5fr) minmax(0, 7fr)",
+      ["@media (min-width: 1024px)"]: "minmax(0, 5fr) minmax(0, 7fr)",
     },
-    columnGap: { default: 0, [breakpoints.lg]: 80 },
+    columnGap: { default: 0, ["@media (min-width: 1024px)"]: 80 },
     rowGap: 40,
     alignItems: "start",
     fontFamily: font.cjk,
@@ -37,7 +37,7 @@ const styles = stylex.create({
   },
   holdingName: {
     margin: 0,
-    fontSize: { default: 26, [breakpoints.lg]: 32 },
+    fontSize: { default: 26, ["@media (min-width: 1024px)"]: 32 },
     fontWeight: 500,
     lineHeight: 1.35,
     letterSpacing: "0.03em",
@@ -62,10 +62,10 @@ const styles = stylex.create({
   },
   subsidiary: {
     display: "flex",
-    flexDirection: { default: "column", [breakpoints.md]: "row" },
-    alignItems: { default: "flex-start", [breakpoints.md]: "baseline" },
+    flexDirection: { default: "column", ["@media (min-width: 768px)"]: "row" },
+    alignItems: { default: "flex-start", ["@media (min-width: 768px)"]: "baseline" },
     justifyContent: "space-between",
-    gap: { default: 4, [breakpoints.md]: 24 },
+    gap: { default: 4, ["@media (min-width: 768px)"]: 24 },
     paddingBlock: 18,
     borderTopWidth: 1,
     borderTopStyle: "solid",
@@ -73,7 +73,7 @@ const styles = stylex.create({
   },
   subsidiaryName: {
     margin: 0,
-    fontSize: { default: 17, [breakpoints.lg]: 19 },
+    fontSize: { default: 17, ["@media (min-width: 1024px)"]: 19 },
     fontWeight: 500,
     lineHeight: 1.5,
     letterSpacing: "0.04em",
@@ -84,7 +84,7 @@ const styles = stylex.create({
     flexDirection: "column",
     alignItems: "flex-start",
     gap: 32,
-    marginTop: { default: 40, [breakpoints.lg]: 56 },
+    marginTop: { default: 40, ["@media (min-width: 1024px)"]: 56 },
   },
   toggle: {
     padding: 0,
@@ -124,8 +124,8 @@ const styles = stylex.create({
 });
 
 export function Structure() {
-  const [showChart, setShowChart] = useState(false);
-  const chartId = useId();
+  const [showChart, setShowChart] = createSignal(false);
+  const chartId = createUniqueId();
   const { holding, subsidiaries, subsidiaryBadge } = ABOUT_STRUCTURE;
 
   return (
@@ -133,21 +133,21 @@ export function Structure() {
       <Shell>
         <NodeMarker />
         <Reveal>
-          <div {...stylex.props(styles.grid)}>
-            <div {...stylex.props(styles.holding)}>
-              <p {...stylex.props(styles.quiet)}>{holding.badge}</p>
-              <h3 {...stylex.props(styles.holdingName)}>{holding.name}</h3>
-              <div lang="en" {...stylex.props(styles.english)}>
+          <div {...stylex.attrs(styles.grid)}>
+            <div {...stylex.attrs(styles.holding)}>
+              <p {...stylex.attrs(styles.quiet)}>{holding.badge}</p>
+              <h3 {...stylex.attrs(styles.holdingName)}>{holding.name}</h3>
+              <div lang="en" {...stylex.attrs(styles.english)}>
                 {holding.english}
               </div>
             </div>
-            <div {...stylex.props(styles.subsidiaries)}>
-              <p {...stylex.props(styles.quiet)}>{subsidiaryBadge}</p>
-              <ul {...stylex.props(styles.list)}>
+            <div {...stylex.attrs(styles.subsidiaries)}>
+              <p {...stylex.attrs(styles.quiet)}>{subsidiaryBadge}</p>
+              <ul {...stylex.attrs(styles.list)}>
                 {subsidiaries.map((sub) => (
-                  <li key={sub.id} {...stylex.props(styles.subsidiary)}>
-                    <h4 {...stylex.props(styles.subsidiaryName)}>{sub.name}</h4>
-                    <span lang="en" {...stylex.props(styles.english)}>
+                  <li {...stylex.attrs(styles.subsidiary)}>
+                    <h4 {...stylex.attrs(styles.subsidiaryName)}>{sub.name}</h4>
+                    <span lang="en" {...stylex.attrs(styles.english)}>
                       {sub.english}
                     </span>
                   </li>
@@ -155,23 +155,23 @@ export function Structure() {
               </ul>
             </div>
           </div>
-          <div {...stylex.props(styles.toggleWrap)}>
+          <div {...stylex.attrs(styles.toggleWrap)}>
             <button
               type="button"
-              aria-expanded={showChart}
+              aria-expanded={showChart() ? "true" : "false"}
               aria-controls={chartId}
               onClick={() => setShowChart((prev) => !prev)}
-              {...stylex.props(styles.toggle)}
+              {...stylex.attrs(styles.toggle)}
             >
-              {showChart ? "收起组织架构图" : "查看官方组织架构图"}
+              {showChart() ? "收起组织架构图" : "查看官方组织架构图"}
             </button>
-            <div id={chartId} hidden={!showChart} {...stylex.props(styles.frame)}>
+            <div id={chartId} hidden={!showChart()} {...stylex.attrs(styles.frame)}>
               <img
                 src={ABOUT_STRUCTURE.chartImage}
                 alt="Official organizational chart of Nanjing Fenchem International Holdings Corporation Limited"
                 loading="lazy"
                 decoding="async"
-                {...stylex.props(styles.chart)}
+                {...stylex.attrs(styles.chart)}
               />
             </div>
           </div>

@@ -1,5 +1,5 @@
 import * as stylex from "@stylexjs/stylex";
-import type { CSSProperties } from "react";
+import type { JSX } from "@solidjs/web";
 
 import { ABOUT_CULTURE } from "../../about-data";
 import { Cast } from "./cast";
@@ -123,7 +123,7 @@ export function Culture() {
       id="about-culture"
       aria-labelledby="oos1t-culture"
       data-hour={SECTION_HOURS.culture}
-      {...stylex.props(ui.section, ui.shell)}
+      {...stylex.attrs(ui.section, ui.shell)}
     >
       <SectionHead
         titleId="oos1t-culture"
@@ -131,34 +131,34 @@ export function Culture() {
         title={ABOUT_CULTURE.title}
         english="Culture"
       />
-      <ul {...stylex.props(ui.grid, styles.field)}>
+      <ul {...stylex.attrs(ui.grid, styles.field)}>
         {ABOUT_CULTURE.values.map((value, index) => {
           const toward = value.glyph === STILL_GLYPH;
           const column = index === 0 ? columns[0] : index === 1 ? columns[1] : columns[2];
           return (
-            <li key={value.glyph} {...stylex.props(styles.value, column)}>
+            <li {...stylex.attrs(styles.value, column)}>
               <div
-                style={{ "--lift": LIFT } as CSSProperties}
-                {...stylex.props(styles.stele, column)}
+                style={{ "--lift": LIFT } as JSX.CSSProperties}
+                {...stylex.attrs(styles.stele, column)}
               >
                 <Cast lift={LIFT} toward={toward} />
                 {toward ? (
-                  <span aria-hidden="true" lang="en" {...stylex.props(styles.against)}>
+                  <span aria-hidden="true" lang="en" {...stylex.attrs(styles.against)}>
                     against the light
                   </span>
                 ) : null}
-                <div {...stylex.props(styles.face)}>
-                  <span aria-hidden="true" {...stylex.props(styles.glyph)}>
+                <div {...stylex.attrs(styles.face)}>
+                  <span aria-hidden="true" {...stylex.attrs(styles.glyph)}>
                     {value.glyph}
                   </span>
-                  <h3 {...stylex.props(styles.title)}>{value.title}</h3>
-                  <span lang="en" aria-hidden="true" {...stylex.props(styles.english)}>
+                  <h3 {...stylex.attrs(styles.title)}>{value.title}</h3>
+                  <span lang="en" aria-hidden="true" {...stylex.attrs(styles.english)}>
                     {ENGLISH[index]}
                   </span>
                 </div>
               </div>
-              <p {...stylex.props(ui.body, styles.desc)}>
-                <span aria-hidden="true" {...stylex.props(styles.descGlyph)}>
+              <p {...stylex.attrs(ui.body, styles.desc)}>
+                <span aria-hidden="true" {...stylex.attrs(styles.descGlyph)}>
                   {value.glyph}
                 </span>
                 <span>{value.desc}</span>

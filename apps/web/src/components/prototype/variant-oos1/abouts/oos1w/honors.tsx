@@ -1,5 +1,4 @@
 import * as stylex from "@stylexjs/stylex";
-import { useRef } from "react";
 
 import { ABOUT_HONORS } from "../../about-data";
 import { PinnedSection } from "./pinned-section";
@@ -158,12 +157,12 @@ const styles = stylex.create({
 
 function LevelKey() {
   return (
-    <dl {...stylex.props(styles.key)}>
+    <dl {...stylex.attrs(styles.key)}>
       {[...LANES].reverse().map((lane) => (
-        <div key={lane.level} {...stylex.props(styles.keyRow)}>
-          <dt {...stylex.props(styles.code)}>{lane.code}</dt>
-          <dd {...stylex.props(styles.keyLevel)}>{lane.label}</dd>
-          <dd {...stylex.props(ui.micro, styles.keyCount)}>
+        <div {...stylex.attrs(styles.keyRow)}>
+          <dt {...stylex.attrs(styles.code)}>{lane.code}</dt>
+          <dd {...stylex.attrs(styles.keyLevel)}>{lane.label}</dd>
+          <dd {...stylex.attrs(ui.micro, styles.keyCount)}>
             {ABOUT_HONORS.items.filter((item) => item.level === lane.level).length}
           </dd>
         </div>
@@ -173,15 +172,19 @@ function LevelKey() {
 }
 
 export function Honors() {
-  const sectionRef = useRef<HTMLElement>(null);
-  const figureRef = useRef<HTMLDivElement>(null);
-  const development = useDevelopment({ section: sectionRef, figure: figureRef, pinnable: true });
+  let sectionRef: HTMLElement | undefined;
+  let figureRef: HTMLDivElement | undefined;
+  const development = useDevelopment({
+    section: () => sectionRef,
+    figure: () => figureRef,
+    pinnable: true,
+  });
 
   return (
     <PinnedSection
       id="about-honor"
       titleId="oos1w-honor"
-      sectionRef={sectionRef}
+      sectionRef={(element) => (sectionRef = element)}
       head={
         <>
           <SectionHead
@@ -204,21 +207,21 @@ export function Honors() {
           geometry={GEOMETRY}
           listLabel={ABOUT_HONORS.eyebrow}
           laneLabels={LANES.map((lane) => (
-            <span key={lane.level} aria-hidden="true" {...stylex.props(styles.lane)}>
-              <span {...stylex.props(styles.code)}>{lane.code}</span>
-              <span {...stylex.props(styles.laneLevel)}>{lane.label}</span>
+            <span aria-hidden="true" {...stylex.attrs(styles.lane)}>
+              <span {...stylex.attrs(styles.code)}>{lane.code}</span>
+              <span {...stylex.attrs(styles.laneLevel)}>{lane.label}</span>
             </span>
           ))}
           renderLabel={(band) => (
-            <p {...stylex.props(ui.micro, styles.label)}>
-              <span {...stylex.props(styles.rfSlot)}>
+            <p {...stylex.attrs(ui.micro, styles.label)}>
+              <span {...stylex.attrs(styles.rfSlot)}>
                 <Rf value={band.rf} ahead={band.ahead} />
               </span>
-              <span {...stylex.props(styles.title, band.ahead && styles.titleAhead)}>
+              <span {...stylex.attrs(styles.title, band.ahead && styles.titleAhead)}>
                 {titleOf(band)}
               </span>
               {band.ahead ? (
-                <span lang="en" aria-hidden="true" {...stylex.props(styles.note)}>
+                <span lang="en" aria-hidden="true" {...stylex.attrs(styles.note)}>
                   past the front
                 </span>
               ) : null}

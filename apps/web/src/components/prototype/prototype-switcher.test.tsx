@@ -1,11 +1,11 @@
-import { fireEvent, render } from "@testing-library/react";
+import { fireEvent, render } from "@/test/render";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { PrototypeSwitcher } from "./prototype-switcher";
 
 const { navigate } = vi.hoisted(() => ({ navigate: vi.fn() }));
 
-vi.mock("@tanstack/react-router", () => ({ useNavigate: () => navigate }));
+vi.mock("@tanstack/solid-router", () => ({ useNavigate: () => navigate }));
 
 beforeEach(() => {
   navigate.mockClear();
@@ -17,14 +17,14 @@ afterEach(() => vi.unstubAllEnvs());
 describe("prototype keyboard isolation", () => {
   it("does not register keyboard navigation in production", () => {
     vi.stubEnv("PROD", true);
-    const { queryByLabelText } = render(<PrototypeSwitcher current="oos1pb" />);
+    const { queryByLabelText } = render(() => <PrototypeSwitcher current="oos1pb" />);
     fireEvent.keyDown(window, { key: "ArrowRight" });
     expect(queryByLabelText("Next variant")).toBeNull();
     expect(navigate).not.toHaveBeenCalled();
   });
 
   it("retains background shortcuts in development and cleans them up", () => {
-    const { unmount } = render(<PrototypeSwitcher current="oos1pb" />);
+    const { unmount } = render(() => <PrototypeSwitcher current="oos1pb" />);
     fireEvent.keyDown(document.body, { key: "ArrowRight" });
     expect(navigate).toHaveBeenCalledTimes(1);
     unmount();
@@ -33,7 +33,7 @@ describe("prototype keyboard isolation", () => {
   });
 
   it("leaves interactive controls and their children alone", () => {
-    const { getByText, getByRole } = render(
+    const { getByText, getByRole } = render(() => (
       <>
         <PrototypeSwitcher current="oos1pb" />
         <button type="button" role="tab">
@@ -42,11 +42,9 @@ describe("prototype keyboard isolation", () => {
         <select aria-label="Product">
           <option>One</option>
         </select>
-        <div contentEditable suppressContentEditableWarning>
-          Editable
-        </div>
-      </>,
-    );
+        <div contenteditable>Editable</div>
+      </>
+    ));
     for (const target of [
       getByText("Product tab"),
       getByRole("combobox", { name: "Product" }),
@@ -58,7 +56,7 @@ describe("prototype keyboard isolation", () => {
   });
 
   it("respects handled events and modifier shortcuts", () => {
-    render(<PrototypeSwitcher current="oos1pb" />);
+    render(() => <PrototypeSwitcher current="oos1pb" />);
     const event = new KeyboardEvent("keydown", {
       key: "ArrowRight",
       bubbles: true,
@@ -73,7 +71,9 @@ describe("prototype keyboard isolation", () => {
   });
 
   it("keeps section comparisons inside the product family", () => {
-    const { getByLabelText } = render(<PrototypeSwitcher current="oos1pt" compare="catalog" />);
+    const { getByLabelText } = render(() => (
+      <PrototypeSwitcher current="oos1pt" compare="catalog" />
+    ));
     fireEvent.click(getByLabelText("Next variant"));
     expect(navigate).toHaveBeenCalledWith({
       search: { variant: "oos1pa", compare: "catalog" },
@@ -82,7 +82,7 @@ describe("prototype keyboard isolation", () => {
   });
 
   it("changes the comparison without changing the variant or scroll position", () => {
-    const { getByLabelText } = render(<PrototypeSwitcher current="oos1pb" />);
+    const { getByLabelText } = render(() => <PrototypeSwitcher current="oos1pb" />);
     fireEvent.change(getByLabelText("Product comparison"), { target: { value: "solutions" } });
     const options = navigate.mock.calls[0]?.[0];
     expect(options.resetScroll).toBe(false);

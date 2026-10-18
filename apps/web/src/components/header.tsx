@@ -1,6 +1,6 @@
 import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { Link } from "@tanstack/react-router";
+import { Link } from "@tanstack/solid-router";
 
 const styles = stylex.create({
   root: {
@@ -40,16 +40,16 @@ const styles = stylex.create({
 
 export default function Header() {
   return (
-    <div {...stylex.props(styles.root)}>
-      <div {...stylex.props(styles.header)}>
-        <nav {...stylex.props(styles.nav)}>
-          <Link to="/" search={{ variant: "a" }} {...stylex.props(styles.link)}>
+    <div {...stylex.attrs(styles.root)}>
+      <div {...stylex.attrs(styles.header)}>
+        <nav {...stylex.attrs(styles.nav)}>
+          <Link to="/" search={{ variant: "a" }} {...stylex.attrs(styles.link)}>
             Home
           </Link>
         </nav>
-        <div {...stylex.props(styles.right)}></div>
+        <div {...stylex.attrs(styles.right)}></div>
       </div>
-      <hr {...stylex.props(styles.hr)} />
+      <hr {...stylex.attrs(styles.hr)} />
     </div>
   );
 }

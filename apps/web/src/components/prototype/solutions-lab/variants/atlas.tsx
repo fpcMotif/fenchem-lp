@@ -1,7 +1,8 @@
 import * as stylex from "@stylexjs/stylex";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import { LayoutGroup, m } from "motion/react";
-import { useId, useRef, useState, type KeyboardEvent } from "react";
+import { ChevronLeft, ChevronRight } from "@fenchem-lp/ui/components/lucide";
+import { LayoutGroup, m } from "@/compat/motion";
+import { createMemo, createSignal, createUniqueId, For, Show, untrack } from "solid-js";
+import type { JSX } from "@solidjs/web";
 
 import { useReducedMotion } from "../../use-reduced-motion";
 import {
@@ -391,79 +392,74 @@ const styles = stylex.create({
   },
 });
 
-function FieldValue({ row }: { row: SheetRow }) {
-  if (row.values.length === 0) return <span {...stylex.props(styles.absent)}>无</span>;
-  if (row.kind === "lines") {
+function FieldValue(props: { row: SheetRow }) {
+  if (props.row.values.length === 0) return <span {...stylex.attrs(styles.absent)}>无</span>;
+  if (props.row.kind === "lines") {
     return (
-      <ul {...stylex.props(styles.lines, styles.description)}>
-        {row.values.map((line) => (
-          <li key={line}>{line}</li>
+      <ul {...stylex.attrs(styles.lines, styles.description)}>
+        {props.row.values.map((line) => (
+          <li>{line}</li>
         ))}
       </ul>
     );
   }
-  if (row.kind === "strong") {
-    return <span {...stylex.props(styles.strong)}>{row.values.join(" · ")}</span>;
+  if (props.row.kind === "strong") {
+    return <span {...stylex.attrs(styles.strong)}>{props.row.values.join(" · ")}</span>;
   }
-  if (row.kind === "list") {
+  if (props.row.kind === "list") {
     return (
-      <ul {...stylex.props(styles.lines)}>
-        {row.values.map((entry) => {
+      <ul {...stylex.attrs(styles.lines)}>
+        {props.row.values.map((entry) => {
           const { primary, note } = splitNote(entry);
           return (
-            <li key={entry} {...stylex.props(styles.keepWords)}>
-              <span {...stylex.props(styles.strong)}>
+            <li {...stylex.attrs(styles.keepWords)}>
+              <span {...stylex.attrs(styles.strong)}>
                 {primary.replaceAll(" / ", `${NO_BREAK_SPACE}/ `)}
               </span>
-              {note && <span {...stylex.props(styles.note)}>{note}</span>}
+              {note && <span {...stylex.attrs(styles.note)}>{note}</span>}
             </li>
           );
         })}
       </ul>
     );
   }
-  return <>{row.values.join("、")}</>;
+  return <>{props.row.values.join("、")}</>;
 }
 
-function SheetMeta({
-  item,
-  previous,
-  next,
-  onStep,
-}: {
+function SheetMeta(props: {
   item: SolutionItem;
   previous: SolutionItem | undefined;
   next: SolutionItem | undefined;
   onStep: (id: string) => void;
 }) {
-  const area = areaOf(item.area);
+  const area = () => areaOf(props.item.area);
   return (
-    <div {...stylex.props(styles.sheetMeta)}>
-      <p {...stylex.props(styles.sheetArea)}>
-        <span>{area?.label}</span>
-        <span lang="en" {...stylex.props(styles.english)}>
-          {area?.englishLabel}
+    <div {...stylex.attrs(styles.sheetMeta)}>
+      <p {...stylex.attrs(styles.sheetArea)}>
+        <span>{area()?.label}</span>
+        <span lang="en" {...stylex.attrs(styles.english)}>
+          {area()?.englishLabel}
         </span>
       </p>
-      <div {...stylex.props(styles.stepper)}>
-        <p {...stylex.props(styles.sheetCount)}>
-          {padIndex(AREA_POSITION.get(item.id) ?? 0)} / {padIndex(areaSize(item) - 1)}
+      <div {...stylex.attrs(styles.stepper)}>
+        <p {...stylex.attrs(styles.sheetCount)}>
+          {padIndex(AREA_POSITION.get(props.item.id) ?? 0)} / {padIndex(areaSize(props.item) - 1)}
         </p>
         <button
           type="button"
           aria-label="上一个方案"
-          disabled={!previous}
-          onClick={() => previous && onStep(previous.id)}
-          {...stylex.props(styles.stepButton, !previous && styles.stepButtonDisabled)}
+          disabled={!props.previous}
+          onClick={() => props.previous && props.onStep(props.previous.id)}
+          {...stylex.attrs(styles.stepButton, !props.previous && styles.stepButtonDisabled)}
         >
           <ChevronLeft size={16} strokeWidth={1.75} aria-hidden="true" />
         </button>
         <button
           type="button"
           aria-label="下一个方案"
-          disabled={!next}
-          onClick={() => next && onStep(next.id)}
-          {...stylex.props(styles.stepButton, !next && styles.stepButtonDisabled)}
+          disabled={!props.next}
+          onClick={() => props.next && props.onStep(props.next.id)}
+          {...stylex.attrs(styles.stepButton, !props.next && styles.stepButtonDisabled)}
         >
           <ChevronRight size={16} strokeWidth={1.75} aria-hidden="true" />
         </button>
@@ -472,20 +468,20 @@ function SheetMeta({
   );
 }
 
-function Sheet({ item, titleId }: { item: SolutionItem; titleId: string }) {
+function Sheet(props: { item: SolutionItem; titleId: string }) {
   return (
     <>
-      <header {...stylex.props(styles.sheetHead)}>
-        <h3 id={titleId} {...stylex.props(styles.sheetTitle)}>
-          {item.title}
+      <header {...stylex.attrs(styles.sheetHead)}>
+        <h3 id={props.titleId} {...stylex.attrs(styles.sheetTitle)}>
+          {props.item.title}
         </h3>
-        <p {...stylex.props(styles.sheetSubtitle)}>{item.subtitle}</p>
+        <p {...stylex.attrs(styles.sheetSubtitle)}>{props.item.subtitle}</p>
       </header>
-      <dl {...stylex.props(styles.fields)}>
-        {sheetRows(item).map((row) => (
-          <div key={row.label} {...stylex.props(styles.field)}>
-            <dt {...stylex.props(styles.fieldLabel)}>{row.label}</dt>
-            <dd {...stylex.props(styles.fieldValue)}>
+      <dl {...stylex.attrs(styles.fields)}>
+        {sheetRows(props.item).map((row) => (
+          <div {...stylex.attrs(styles.field)}>
+            <dt {...stylex.attrs(styles.fieldLabel)}>{row.label}</dt>
+            <dd {...stylex.attrs(styles.fieldValue)}>
               <FieldValue row={row} />
             </dd>
           </div>
@@ -495,14 +491,7 @@ function Sheet({ item, titleId }: { item: SolutionItem; titleId: string }) {
   );
 }
 
-function NameList({
-  items,
-  selectedId,
-  rovingId,
-  sheetId,
-  onChoose,
-  onFocusItem,
-}: {
+function NameList(props: {
   items: SolutionItem[];
   selectedId: string | undefined;
   rovingId: string | undefined;
@@ -512,198 +501,225 @@ function NameList({
 }) {
   const reduce = useReducedMotion();
   return (
-    <ul {...stylex.props(styles.names)}>
-      {items.map((item) => {
-        const isSelected = item.id === selectedId;
-        return (
-          <li key={item.id}>
-            <button
-              type="button"
-              data-solution-id={item.id}
-              tabIndex={item.id === rovingId ? 0 : -1}
-              aria-current={isSelected ? "true" : undefined}
-              aria-controls={sheetId}
-              onClick={() => onChoose(item.id)}
-              onFocus={() => onFocusItem(item.id)}
-              {...stylex.props(
-                styles.name,
-                isSelected && styles.nameSelected,
-                stylex.defaultMarker(),
-              )}
-            >
-              {isSelected && (
-                <m.span
-                  layoutId="atlas-pill"
-                  transition={reduce ? { duration: 0 } : { duration: 0.22, ease: EASE_OUT }}
-                  {...stylex.props(styles.pill)}
-                />
-              )}
-              <span {...stylex.props(styles.nameIndex, isSelected && styles.nameIndexSelected)}>
-                {padIndex(AREA_POSITION.get(item.id) ?? 0)}
-              </span>
-              <span {...stylex.props(styles.nameText, isSelected && styles.nameTextSelected)}>
-                {item.title}
-              </span>
-            </button>
-          </li>
-        );
-      })}
+    <ul {...stylex.attrs(styles.names)}>
+      <For each={props.items}>
+        {(item) => {
+          const isSelected = () => item.id === props.selectedId;
+          return (
+            <li>
+              <button
+                type="button"
+                data-solution-id={item.id}
+                tabindex={item.id === props.rovingId ? 0 : -1}
+                aria-current={isSelected() ? "true" : undefined}
+                aria-controls={props.sheetId}
+                onClick={() => props.onChoose(item.id)}
+                onFocus={() => props.onFocusItem(item.id)}
+                {...stylex.attrs(
+                  styles.name,
+                  isSelected() && styles.nameSelected,
+                  stylex.defaultMarker(),
+                )}
+              >
+                <Show when={isSelected()}>
+                  <m.span
+                    layoutId="atlas-pill"
+                    transition={reduce() ? { duration: 0 } : { duration: 0.22, ease: EASE_OUT }}
+                    {...stylex.attrs(styles.pill)}
+                  />
+                </Show>
+                <span {...stylex.attrs(styles.nameIndex, isSelected() && styles.nameIndexSelected)}>
+                  {padIndex(AREA_POSITION.get(item.id) ?? 0)}
+                </span>
+                <span {...stylex.attrs(styles.nameText, isSelected() && styles.nameTextSelected)}>
+                  {item.title}
+                </span>
+              </button>
+            </li>
+          );
+        }}
+      </For>
     </ul>
   );
 }
 
 export function AtlasVariant() {
   const browser = useSolutionsBrowser();
-  const { area, groups, scope, selected, position, select } = browser;
   const reduce = useReducedMotion();
-  const uid = useId();
+  const uid = createUniqueId();
   const sheetId = `${uid}-sheet`;
   const titleId = `${uid}-title`;
-  const matrixRef = useRef<HTMLDivElement>(null);
-  const sheetRef = useRef<HTMLElement>(null);
-  const [focusId, setFocusId] = useState(selected?.id);
-  const grouped = area === "all";
-  const columns = grouped ? groups.map((group) => group.items) : flowColumns(scope);
-  const rovingId = scope.some((item) => item.id === focusId) ? focusId : selected?.id;
-  const currentArea = grouped ? undefined : groups[0];
+  let matrix: HTMLDivElement | undefined;
+  let sheet: HTMLElement | undefined;
+  const [focusId, setFocusId] = createSignal(untrack(() => browser.selected?.id));
+  const grouped = () => browser.area === "all";
+  const columns = createMemo(() =>
+    grouped() ? browser.groups.map((group) => group.items) : flowColumns(browser.scope),
+  );
+  const rovingId = () =>
+    browser.scope.some((item) => item.id === focusId()) ? focusId() : browser.selected?.id;
+  const currentArea = () => (grouped() ? undefined : browser.groups[0]);
 
   const choose = (id: string) => {
-    select(id);
+    browser.select(id);
     setFocusId(id);
-    const sheet = sheetRef.current;
     if (!sheet) return;
     const top = sheet.getBoundingClientRect().top;
     if (top >= HEADER_OFFSET && top <= window.innerHeight - BOTTOM_CLEARANCE) return;
     window.scrollTo({
       top: window.scrollY + top - HEADER_OFFSET - SHEET_GAP,
-      behavior: reduce ? "instant" : "smooth",
+      behavior: reduce() ? "instant" : "smooth",
     });
   };
 
   const step = (id: string) => {
-    select(id);
+    browser.select(id);
     setFocusId(id);
   };
 
-  const navigate = (event: KeyboardEvent<HTMLDivElement>) => {
+  const navigate: JSX.EventHandler<HTMLDivElement, KeyboardEvent> = (event) => {
     const id = (event.target as HTMLElement).dataset.solutionId;
     if (!id) return;
-    const column = columns.findIndex((entries) => entries.some((item) => item.id === id));
-    const entries = columns[column];
+    const cols = columns();
+    const column = cols.findIndex((entries) => entries.some((item) => item.id === id));
+    const entries = cols[column];
     if (!entries) return;
     const row = entries.findIndex((item) => item.id === id);
     const across = (offset: number) => {
-      const target = columns[column + offset];
+      const target = cols[column + offset];
       return target?.[Math.min(row, target.length - 1)];
     };
     const moves: Partial<Record<string, () => SolutionItem | undefined>> = {
-      ArrowDown: () => entries[row + 1] ?? columns[column + 1]?.[0],
-      ArrowUp: () => entries[row - 1] ?? columns[column - 1]?.at(-1),
+      ArrowDown: () => entries[row + 1] ?? cols[column + 1]?.[0],
+      ArrowUp: () => entries[row - 1] ?? cols[column - 1]?.at(-1),
       ArrowRight: () => across(1),
       ArrowLeft: () => across(-1),
-      Home: () => columns[0]?.[0],
-      End: () => columns.at(-1)?.at(-1),
+      Home: () => cols[0]?.[0],
+      End: () => cols.at(-1)?.at(-1),
     };
     const move = moves[event.key];
     if (!move) return;
     event.preventDefault();
     event.stopPropagation();
-    event.nativeEvent.stopImmediatePropagation();
+    event.stopImmediatePropagation();
     const next = move();
     if (!next) return;
     setFocusId(next.id);
-    matrixRef.current?.querySelector<HTMLElement>(`[data-solution-id="${next.id}"]`)?.focus();
+    matrix?.querySelector<HTMLElement>(`[data-solution-id="${next.id}"]`)?.focus();
   };
 
   const listProps = {
-    selectedId: selected?.id,
-    rovingId,
+    get selectedId() {
+      return browser.selected?.id;
+    },
+    get rovingId() {
+      return rovingId();
+    },
     sheetId,
     onChoose: choose,
-    onFocusItem: setFocusId,
+    onFocusItem: (id: string) => {
+      setFocusId(id);
+    },
   };
 
   return (
     <LabSection>
       <AreaChips browser={browser} />
-      <LayoutGroup id={`atlas-${area}`}>
-        <div
-          key={area}
-          ref={matrixRef}
-          role="group"
-          aria-label="应用方案索引"
-          onKeyDown={navigate}
-          {...stylex.props(styles.matrix, styles.fadeIn)}
-        >
-          {currentArea ? (
-            <section aria-labelledby={`${uid}-${currentArea.id}`}>
-              <header {...stylex.props(styles.colHead, styles.colHeadActive)}>
-                <h3
-                  id={`${uid}-${currentArea.id}`}
-                  {...stylex.props(styles.colLabel, styles.colLabelActive)}
-                >
-                  {currentArea.label}
-                </h3>
-                <span {...stylex.props(styles.colCount)}>{currentArea.items.length} 款</span>
-                <p lang="en" {...stylex.props(styles.colEnglish)}>
-                  {currentArea.englishLabel}
-                </p>
-              </header>
-              <div {...stylex.props(styles.flowGrid)}>
-                {columns.map((items) => (
-                  <NameList key={items[0]?.id} items={items} {...listProps} />
-                ))}
-              </div>
-            </section>
-          ) : (
-            <div {...stylex.props(styles.areaGrid)}>
-              {groups.map((group) => {
-                const active = group.id === selected?.area;
-                return (
-                  <section
-                    key={group.id}
-                    aria-labelledby={`${uid}-${group.id}`}
-                    {...stylex.props(styles.column)}
-                  >
-                    <header {...stylex.props(styles.colHead, active && styles.colHeadActive)}>
+      <LayoutGroup id={`atlas-${browser.area}`}>
+        <Show when={browser.area} keyed>
+          {(_area) => (
+            <div
+              ref={matrix}
+              role="group"
+              aria-label="应用方案索引"
+              onKeyDown={navigate}
+              {...stylex.attrs(styles.matrix, styles.fadeIn)}
+            >
+              <Show
+                when={currentArea()}
+                fallback={
+                  <div {...stylex.attrs(styles.areaGrid)}>
+                    <For each={browser.groups}>
+                      {(group) => {
+                        const active = () => group.id === browser.selected?.area;
+                        return (
+                          <section
+                            aria-labelledby={`${uid}-${group.id}`}
+                            {...stylex.attrs(styles.column)}
+                          >
+                            <header
+                              {...stylex.attrs(styles.colHead, active() && styles.colHeadActive)}
+                            >
+                              <h3
+                                id={`${uid}-${group.id}`}
+                                {...stylex.attrs(
+                                  styles.colLabel,
+                                  active() && styles.colLabelActive,
+                                )}
+                              >
+                                {group.label}
+                              </h3>
+                              <span {...stylex.attrs(styles.colCount)}>
+                                {group.items.length} 款
+                              </span>
+                              <p lang="en" {...stylex.attrs(styles.colEnglish)}>
+                                {group.englishLabel}
+                              </p>
+                            </header>
+                            <NameList items={group.items} {...listProps} />
+                          </section>
+                        );
+                      }}
+                    </For>
+                  </div>
+                }
+              >
+                {(area) => (
+                  <section aria-labelledby={`${uid}-${area().id}`}>
+                    <header {...stylex.attrs(styles.colHead, styles.colHeadActive)}>
                       <h3
-                        id={`${uid}-${group.id}`}
-                        {...stylex.props(styles.colLabel, active && styles.colLabelActive)}
+                        id={`${uid}-${area().id}`}
+                        {...stylex.attrs(styles.colLabel, styles.colLabelActive)}
                       >
-                        {group.label}
+                        {area().label}
                       </h3>
-                      <span {...stylex.props(styles.colCount)}>{group.items.length} 款</span>
-                      <p lang="en" {...stylex.props(styles.colEnglish)}>
-                        {group.englishLabel}
+                      <span {...stylex.attrs(styles.colCount)}>{area().items.length} 款</span>
+                      <p lang="en" {...stylex.attrs(styles.colEnglish)}>
+                        {area().englishLabel}
                       </p>
                     </header>
-                    <NameList items={group.items} {...listProps} />
+                    <div {...stylex.attrs(styles.flowGrid)}>
+                      <For each={columns()}>
+                        {(items) => <NameList items={items} {...listProps} />}
+                      </For>
+                    </div>
                   </section>
-                );
-              })}
+                )}
+              </Show>
             </div>
           )}
-        </div>
+        </Show>
       </LayoutGroup>
-      <article
-        ref={sheetRef}
-        id={sheetId}
-        aria-labelledby={titleId}
-        {...stylex.props(styles.sheet)}
-      >
-        {selected && (
-          <>
-            <SheetMeta
-              item={selected}
-              previous={scope[position - 1]}
-              next={scope[position + 1]}
-              onStep={step}
-            />
-            <div key={selected.id} {...stylex.props(styles.fadeIn)}>
-              <Sheet item={selected} titleId={titleId} />
-            </div>
-          </>
-        )}
+      <article ref={sheet} id={sheetId} aria-labelledby={titleId} {...stylex.attrs(styles.sheet)}>
+        <Show when={browser.selected}>
+          {(selected) => (
+            <>
+              <SheetMeta
+                item={selected()}
+                previous={browser.scope[browser.position - 1]}
+                next={browser.scope[browser.position + 1]}
+                onStep={step}
+              />
+              <Show when={selected()} keyed>
+                {(item) => (
+                  <div {...stylex.attrs(styles.fadeIn)}>
+                    <Sheet item={item} titleId={titleId} />
+                  </div>
+                )}
+              </Show>
+            </>
+          )}
+        </Show>
       </article>
     </LabSection>
   );

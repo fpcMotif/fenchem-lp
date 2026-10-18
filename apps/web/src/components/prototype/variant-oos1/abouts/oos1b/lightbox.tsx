@@ -2,7 +2,7 @@ import { LightboxControls } from "../../../shared/lightbox-controls";
 import { LightboxStage } from "../../../shared/lightbox-stage";
 import { LightboxDialog, type LightboxState } from "../../../shared/lightbox";
 import * as stylex from "@stylexjs/stylex";
-import { ArrowLeft, ArrowRight, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, X } from "@fenchem-lp/ui/components/lucide";
 
 import type { Plate } from "./journey";
 import { Tag } from "./shared";
@@ -142,31 +142,25 @@ const styles = stylex.create({
   },
 });
 
-export function Lightbox({
-  lightbox,
-  plates,
-}: {
-  lightbox: LightboxState;
-  plates: readonly Plate[];
-}) {
-  const { stepped, close: onClose, step: onStep } = lightbox;
+export function Lightbox(props: { lightbox: LightboxState; plates: readonly Plate[] }) {
+  const { close: onClose, step: onStep } = props.lightbox;
   return (
-    <LightboxDialog lightbox={lightbox} items={plates} sx={styles.dialog}>
+    <LightboxDialog lightbox={props.lightbox} items={props.plates} sx={styles.dialog}>
       {(plate, index) => (
         <>
           <LightboxStage onClose={onClose} sx={styles.stage}>
-            <figure key={plate.id} {...stylex.props(styles.figure)}>
-              <div {...stylex.props(styles.frame, stepped && styles.stepped)}>
+            <figure {...stylex.attrs(styles.figure)}>
+              <div {...stylex.attrs(styles.frame, props.lightbox.stepped && styles.stepped)}>
                 <Tag numeral={plate.numeral} />
-                <img src={plate.large} alt={plate.alt} {...stylex.props(styles.image)} />
+                <img src={plate.large} alt={plate.alt} {...stylex.attrs(styles.image)} />
               </div>
-              <figcaption {...stylex.props(styles.caption)}>
-                <span {...stylex.props(styles.chinese)}>{plate.caption}</span>
-                <span lang="en" {...stylex.props(ui.serif, styles.english)}>
+              <figcaption {...stylex.attrs(styles.caption)}>
+                <span {...stylex.attrs(styles.chinese)}>{plate.caption}</span>
+                <span lang="en" {...stylex.attrs(ui.serif, styles.english)}>
                   {plate.english}
                 </span>
-                <span {...stylex.props(styles.count)}>
-                  {index + 1} / {plates.length}
+                <span {...stylex.attrs(styles.count)}>
+                  {index + 1} / {props.plates.length}
                 </span>
               </figcaption>
             </figure>

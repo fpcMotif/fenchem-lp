@@ -1,7 +1,7 @@
 import { breakpoints, colors, radii, typography } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 import gsap from "gsap";
-import { Leaf } from "lucide-react";
+import { Leaf } from "@fenchem-lp/ui/components/lucide";
 import { navLinks, toAnchor } from "@/components/landing/landing-content";
 import { useSectionAnimation } from "../motion";
 
@@ -119,20 +119,20 @@ export function NavBar() {
   });
 
   return (
-    <header ref={ref} {...stylex.props(styles.header)}>
-      <nav data-nav-pill aria-label="Primary" {...stylex.props(styles.pill)}>
-        <a href="#top" {...stylex.props(styles.logo)}>
-          <Leaf aria-hidden="true" {...stylex.props(styles.logoIcon)} />
+    <header ref={ref} {...stylex.attrs(styles.header)}>
+      <nav data-nav-pill="" aria-label="Primary" {...stylex.attrs(styles.pill)}>
+        <a href="#top" {...stylex.attrs(styles.logo)}>
+          <Leaf aria-hidden="true" {...stylex.attrs(styles.logoIcon)} />
           Fenchem
         </a>
-        <div {...stylex.props(styles.navLinks)}>
+        <div {...stylex.attrs(styles.navLinks)}>
           {navLinks.map((link) => (
-            <a key={link.section} href={toAnchor(link.section)} {...stylex.props(styles.link)}>
+            <a href={toAnchor(link.section)} {...stylex.attrs(styles.link)}>
               {link.label}
             </a>
           ))}
         </div>
-        <a href="#global-supply" {...stylex.props(styles.cta)}>
+        <a href="#global-supply" {...stylex.attrs(styles.cta)}>
           Partner with Us
         </a>
       </nav>

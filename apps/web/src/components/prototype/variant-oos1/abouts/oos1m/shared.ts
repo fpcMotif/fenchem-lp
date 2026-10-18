@@ -97,6 +97,6 @@ export const ui = stylex.create({
   },
 });
 
-export const srOnly = stylex.props(ui.srOnly);
+export const srOnly = stylex.attrs(ui.srOnly);
 
 export const pad2 = (value: number) => String(value).padStart(2, "0");

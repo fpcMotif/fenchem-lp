@@ -1,14 +1,14 @@
-import { m } from "motion/react";
+import { m } from "@/compat/motion";
 import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { useScroll } from "motion/react";
-import { useEffect, useRef, useState } from "react";
+import { useScroll } from "@/compat/motion";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 import { ABOUT_HERO } from "../../about-data";
 import { useActiveSection } from "../../use-active-section";
 import { base, ty } from "./shared";
 import { hue, size } from "./theme.stylex";
 import { SECTION_IDS } from "./index-bar-values";
+import { createEffect, createSignal } from "solid-js";
 
 const NAV_LABELS: Record<(typeof ABOUT_HERO.navChips)[number]["id"], string> = {
   "about-profile": "Profile",
@@ -116,63 +116,66 @@ function measureMarker(list: HTMLElement, label: HTMLElement): MarkerBox {
   return { left: labelBox.left - listBox.left + list.scrollLeft, width: labelBox.width };
 }
 
-export function IndexBar({ onNavigateHome }: { onNavigateHome: (hash?: string) => void }) {
+export function IndexBar(props: { onNavigateHome: (hash?: string) => void }) {
   const active = useActiveSection(SECTION_IDS);
-  const listRef = useRef<HTMLElement>(null);
+  const [listRef, setListRef] = createSignal<HTMLElement>();
   const reduce = useReducedMotion();
-  const [marker, setMarker] = useState<MarkerBox | null>(null);
+  const [marker, setMarker] = createSignal<MarkerBox | null>(null);
   const { scrollYProgress } = useScroll();
 
-  useEffect(() => {
-    const list = listRef.current;
-    const link = active ? list?.querySelector<HTMLElement>(`[href="#${active}"]`) : null;
-    if (!list || !link) return;
-    const listBox = list.getBoundingClientRect();
-    const linkBox = link.getBoundingClientRect();
-    if (linkBox.left < listBox.left || linkBox.right > listBox.right) {
-      list.scrollBy({
-        left: linkBox.left - listBox.left - 16,
-        behavior: reduce ? "auto" : "smooth",
-      });
-    }
-  }, [active, reduce]);
+  createEffect(
+    () => ({ list: listRef(), active: active(), reduce: reduce() }),
+    ({ list, active, reduce }) => {
+      const link = active ? list?.querySelector<HTMLElement>(`[href="#${active}"]`) : null;
+      if (!list || !link) return;
+      const listBox = list.getBoundingClientRect();
+      const linkBox = link.getBoundingClientRect();
+      if (linkBox.left < listBox.left || linkBox.right > listBox.right) {
+        list.scrollBy({
+          left: linkBox.left - listBox.left - 16,
+          behavior: reduce ? "auto" : "smooth",
+        });
+      }
+    },
+  );
 
-  useEffect(() => {
-    const list = listRef.current;
-    const label = active
-      ? list?.querySelector<HTMLElement>(`[href="#${active}"] > [lang="en"]`)
-      : null;
-    if (!list || !label) return;
-    const place = () => setMarker(measureMarker(list, label));
-    place();
-    window.addEventListener("resize", place);
-    return () => window.removeEventListener("resize", place);
-  }, [active]);
+  createEffect(
+    () => ({ list: listRef(), active: active() }),
+    ({ list, active }) => {
+      const label = active
+        ? list?.querySelector<HTMLElement>(`[href="#${active}"] > [lang="en"]`)
+        : null;
+      if (!list || !label) return;
+      const place = () => setMarker(measureMarker(list, label));
+      place();
+      window.addEventListener("resize", place);
+      return () => window.removeEventListener("resize", place);
+    },
+  );
 
   return (
-    <div {...stylex.props(styles.bar)}>
-      <div {...stylex.props(base.shell, styles.inner)}>
-        <nav aria-label="Breadcrumb" lang="en" {...stylex.props(ty.quiet, styles.breadcrumb)}>
+    <div {...stylex.attrs(styles.bar)}>
+      <div {...stylex.attrs(base.shell, styles.inner)}>
+        <nav aria-label="Breadcrumb" lang="en" {...stylex.attrs(ty.quiet, styles.breadcrumb)}>
           <button
             type="button"
-            onClick={() => onNavigateHome("top")}
-            {...stylex.props(styles.crumbLink, base.focus)}
+            onClick={() => props.onNavigateHome("top")}
+            {...stylex.attrs(styles.crumbLink, base.focus)}
           >
             Home
           </button>
           <span aria-hidden="true">/</span>
           <span aria-current="page">About</span>
         </nav>
-        <nav aria-label="On this page" ref={listRef} {...stylex.props(styles.list)}>
+        <nav aria-label="On this page" ref={setListRef} {...stylex.attrs(styles.list)}>
           {ABOUT_HERO.navChips.map((chip) => (
             <a
-              key={chip.id}
               href={`#${chip.id}`}
-              aria-current={active === chip.id ? "location" : undefined}
-              {...stylex.props(
+              aria-current={active() === chip.id ? "location" : undefined}
+              {...stylex.attrs(
                 ty.quiet,
                 styles.link,
-                active === chip.id && styles.linkOn,
+                active() === chip.id && styles.linkOn,
                 base.focus,
               )}
             >
@@ -181,17 +184,17 @@ export function IndexBar({ onNavigateHome }: { onNavigateHome: (hash?: string) =
           ))}
           <span
             aria-hidden="true"
-            {...stylex.props(
+            {...stylex.attrs(
               styles.marker,
-              active !== undefined && marker !== null && styles.markerOn,
-              marker !== null && styles.markerAt(marker.left, marker.width),
+              active() !== undefined && marker() !== null && styles.markerOn,
+              marker() !== null && styles.markerAt(marker()!.left, marker()!.width),
             )}
           />
         </nav>
       </div>
       <m.span
         aria-hidden="true"
-        {...stylex.props(styles.progress)}
+        {...stylex.attrs(styles.progress)}
         style={{ scaleX: scrollYProgress }}
       />
     </div>

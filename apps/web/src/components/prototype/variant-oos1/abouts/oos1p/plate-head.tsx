@@ -5,6 +5,7 @@ import { StrobeText, useEntry } from "./strobe";
 import { ForwardArrow } from "./time-grid";
 import { frameLabel } from "./time-grid-values";
 import { bp, face, tone } from "./tokens.stylex";
+import { merge } from "solid-js";
 
 const styles = stylex.create({
   head: {
@@ -45,38 +46,33 @@ const styles = stylex.create({
   },
 });
 
-export function PlateHead({
-  plate,
-  english,
-  title,
-  titleId,
-  latin = false,
-}: {
+export function PlateHead(props: {
   plate: number;
   english: string;
   title: string;
   titleId: string;
   latin?: boolean;
 }) {
+  const p = merge({ latin: false }, props);
   const [ref, phase] = useEntry<HTMLDivElement>();
   return (
-    <div ref={ref} {...stylex.props(ui.shell)}>
-      <div {...stylex.props(ui.grid, styles.head)}>
-        <p {...stylex.props(ui.q1, styles.label)}>
-          <span {...stylex.props(ui.frameNumber, styles.plateNumber)}>
+    <div ref={ref} {...stylex.attrs(ui.shell)}>
+      <div {...stylex.attrs(ui.grid, styles.head)}>
+        <p {...stylex.attrs(ui.q1, styles.label)}>
+          <span {...stylex.attrs(ui.frameNumber, styles.plateNumber)}>
             <ForwardArrow />
-            {frameLabel(plate)}
+            {frameLabel(p.plate)}
           </span>
-          <span lang="en" {...stylex.props(ui.eyebrow)}>
-            {english}
+          <span lang="en" {...stylex.attrs(ui.eyebrow)}>
+            {p.english}
           </span>
         </p>
         <h2
-          id={titleId}
-          lang={latin ? "en" : undefined}
-          {...stylex.props(ui.q2to4, styles.title, latin && styles.titleLatin)}
+          id={p.titleId}
+          lang={p.latin ? "en" : undefined}
+          {...stylex.attrs(ui.q2to4, styles.title, p.latin && styles.titleLatin)}
         >
-          <StrobeText phase={phase}>{title}</StrobeText>
+          <StrobeText phase={phase()}>{p.title}</StrobeText>
         </h2>
       </div>
     </div>

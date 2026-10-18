@@ -124,31 +124,26 @@ export function Culture() {
     <section
       id="about-culture"
       aria-labelledby="about-culture-title"
-      {...stylex.props(base.section, base.anchor, styles.culture)}
+      {...stylex.attrs(base.section, base.anchor, styles.culture)}
     >
       <SectionName id="about-culture-title">{ABOUT_CULTURE.eyebrow}</SectionName>
-      <div {...stylex.props(base.shell)}>
-        <ul {...stylex.props(styles.values)}>
+      <div {...stylex.attrs(base.shell)}>
+        <ul {...stylex.attrs(styles.values)}>
           {ABOUT_CULTURE.values.map((value, idx) => (
-            <Reveal
-              key={value.title}
-              as="li"
-              step={idx}
-              sx={[styles.value, stylex.defaultMarker()]}
-            >
-              <span aria-hidden="true" {...stylex.props(styles.rule)} />
-              <span aria-hidden="true" {...stylex.props(styles.ruleInk)} />
-              <span aria-hidden="true" lang="en" {...stylex.props(styles.numeral)}>
+            <Reveal as="li" step={idx} sx={[styles.value, stylex.defaultMarker()]}>
+              <span aria-hidden="true" {...stylex.attrs(styles.rule)} />
+              <span aria-hidden="true" {...stylex.attrs(styles.ruleInk)} />
+              <span aria-hidden="true" lang="en" {...stylex.attrs(styles.numeral)}>
                 {String(idx + 1).padStart(2, "0")}
               </span>
               <span
                 aria-hidden="true"
-                {...stylex.props(styles.glyph, styles.glyphImage(WATER), GLYPH_WATER[idx])}
+                {...stylex.attrs(styles.glyph, styles.glyphImage(WATER), GLYPH_WATER[idx])}
               >
                 {value.glyph}
               </span>
-              <h3 {...stylex.props(styles.title)}>{value.title}</h3>
-              <p {...stylex.props(ty.body, styles.desc)}>{value.desc}</p>
+              <h3 {...stylex.attrs(styles.title)}>{value.title}</h3>
+              <p {...stylex.attrs(ty.body, styles.desc)}>{value.desc}</p>
             </Reveal>
           ))}
         </ul>

@@ -1,6 +1,6 @@
 import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { useId } from "react";
+import { createUniqueId } from "solid-js";
 
 import { ABOUT_HONORS, ABOUT_STRUCTURE } from "../../about-data";
 import { Reveal } from "./reveal";
@@ -157,20 +157,20 @@ const styles = stylex.create({
 });
 
 export function NavyBand() {
-  const subsLabelId = useId();
+  const subsLabelId = createUniqueId();
 
   return (
-    <div {...stylex.props(styles.band)}>
+    <div {...stylex.attrs(styles.band)}>
       <section
         id="about-honor"
         aria-labelledby="about-honor-title"
-        {...stylex.props(ui.shell, ui.inset, ui.anchor)}
+        {...stylex.attrs(ui.shell, ui.inset, ui.anchor)}
       >
         <Reveal sx={styles.head}>
-          <p lang="en" {...stylex.props(styles.eyebrow)}>
+          <p lang="en" {...stylex.attrs(styles.eyebrow)}>
             {ABOUT_HONORS.eyebrow}
           </p>
-          <h2 id="about-honor-title" {...stylex.props(styles.title)}>
+          <h2 id="about-honor-title" {...stylex.attrs(styles.title)}>
             {ABOUT_HONORS.title}
           </h2>
         </Reveal>
@@ -178,13 +178,12 @@ export function NavyBand() {
           const items = ABOUT_HONORS.items.filter((item) => item.level === entry.level);
           if (items.length === 0) return null;
           return (
-            <Reveal key={entry.level} sx={styles.level}>
-              <h3 {...stylex.props(styles.levelLabel)}>{entry.label}</h3>
-              <ul aria-label={`${entry.english} honors`} {...stylex.props(styles.honorList)}>
+            <Reveal sx={styles.level}>
+              <h3 {...stylex.attrs(styles.levelLabel)}>{entry.label}</h3>
+              <ul aria-label={`${entry.english} honors`} {...stylex.attrs(styles.honorList)}>
                 {items.map((honor) => (
                   <li
-                    key={honor.id}
-                    {...stylex.props(styles.honor, entry.level === "national" && styles.honorLead)}
+                    {...stylex.attrs(styles.honor, entry.level === "national" && styles.honorLead)}
                   >
                     {honor.title}
                   </li>
@@ -198,34 +197,34 @@ export function NavyBand() {
       <section
         id="about-structure"
         aria-labelledby="about-structure-title"
-        {...stylex.props(ui.shell, ui.inset, ui.anchor)}
+        {...stylex.attrs(ui.shell, ui.inset, ui.anchor)}
       >
         <Reveal sx={styles.head}>
-          <p lang="en" {...stylex.props(styles.eyebrow)}>
+          <p lang="en" {...stylex.attrs(styles.eyebrow)}>
             {ABOUT_STRUCTURE.eyebrow}
           </p>
-          <h2 id="about-structure-title" {...stylex.props(styles.title)}>
+          <h2 id="about-structure-title" {...stylex.attrs(styles.title)}>
             {ABOUT_STRUCTURE.title}
           </h2>
         </Reveal>
-        <div {...stylex.props(styles.structure)}>
+        <div {...stylex.attrs(styles.structure)}>
           <Reveal sx={styles.holding}>
-            <p {...stylex.props(styles.holdingLabel)}>{ABOUT_STRUCTURE.holding.badge}</p>
-            <h3 {...stylex.props(styles.holdingName)}>{ABOUT_STRUCTURE.holding.name}</h3>
-            <div lang="en" {...stylex.props(styles.holdingEnglish)}>
+            <p {...stylex.attrs(styles.holdingLabel)}>{ABOUT_STRUCTURE.holding.badge}</p>
+            <h3 {...stylex.attrs(styles.holdingName)}>{ABOUT_STRUCTURE.holding.name}</h3>
+            <div lang="en" {...stylex.attrs(styles.holdingEnglish)}>
               {ABOUT_STRUCTURE.holding.english}
             </div>
           </Reveal>
 
-          <div {...stylex.props(styles.holding)}>
-            <p id={subsLabelId} {...stylex.props(styles.holdingLabel)}>
+          <div {...stylex.attrs(styles.holding)}>
+            <p id={subsLabelId} {...stylex.attrs(styles.holdingLabel)}>
               {ABOUT_STRUCTURE.subsidiaryBadge}
             </p>
-            <ul aria-labelledby={subsLabelId} {...stylex.props(styles.subs)}>
+            <ul aria-labelledby={subsLabelId} {...stylex.attrs(styles.subs)}>
               {ABOUT_STRUCTURE.subsidiaries.map((sub, index) => (
-                <Reveal key={sub.id} as="li" step={index} sx={styles.sub}>
-                  <h4 {...stylex.props(styles.subName)}>{sub.name}</h4>
-                  <span lang="en" {...stylex.props(styles.subEnglish)}>
+                <Reveal as="li" step={index} sx={styles.sub}>
+                  <h4 {...stylex.attrs(styles.subName)}>{sub.name}</h4>
+                  <span lang="en" {...stylex.attrs(styles.subEnglish)}>
                     {sub.english}
                   </span>
                 </Reveal>

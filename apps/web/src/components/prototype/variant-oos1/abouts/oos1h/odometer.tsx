@@ -8,8 +8,8 @@ import {
   useMotionValue,
   useSpring,
   useTransform,
-} from "motion/react";
-import { useEffect, useMemo, useRef } from "react";
+} from "@/compat/motion";
+import { createEffect, createMemo, For } from "solid-js";
 
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
@@ -70,62 +70,53 @@ const styles = stylex.create({
   },
 });
 
-function DigitColumn({ cell, cells }: { cell: MotionValue<number>; cells: readonly Cell[] }) {
-  const y = useTransform(cell, (value) => `${(-value / cells.length) * 100}%`);
+function DigitColumn(props: { cell: MotionValue<number>; cells: readonly Cell[] }) {
+  const y = useTransform(props.cell, (value) => `${(-value / props.cells.length) * 100}%`);
   return (
-    <span {...stylex.props(styles.window)}>
-      <m.span style={{ y }} {...stylex.props(styles.column)}>
-        {cells.map((item) => (
-          <span key={item.id} {...stylex.props(styles.cell)}>
-            {item.digit}
-          </span>
+    <span {...stylex.attrs(styles.window)}>
+      <m.span style={{ y }} {...stylex.attrs(styles.column)}>
+        {props.cells.map((item) => (
+          <span {...stylex.attrs(styles.cell)}>{item.digit}</span>
         ))}
       </m.span>
     </span>
   );
 }
 
-function RollDigit({
-  target,
-  delay,
-  inView,
-  reduce,
-}: {
-  target: number;
-  delay: number;
-  inView: boolean;
-  reduce: boolean;
-}) {
-  const end = 10 + target;
-  const cell = useMotionValue(end);
+function RollDigit(props: { target: number; delay: number; inView: boolean; reduce: boolean }) {
+  const cell = useMotionValue(10 + props.target);
 
-  useEffect(() => {
-    if (reduce) {
-      cell.set(end);
-      return;
-    }
-    if (!inView) {
-      cell.set(end);
-      return;
-    }
-    let cancelled = false;
-    let settle: AnimationPlaybackControls | undefined;
-    cell.set(target);
-    const roll = animate(cell, end + OVERSHOOT_CELLS, {
-      duration: ROLL_SECONDS,
-      delay,
-      ease: ROLL_EASE,
-    });
-    void roll.then(() => {
-      if (cancelled) return;
-      settle = animate(cell, end, { type: "spring", stiffness: 260, damping: 22, mass: 0.9 });
-    });
-    return () => {
-      cancelled = true;
-      roll.stop();
-      settle?.stop();
-    };
-  }, [cell, delay, end, inView, reduce, target]);
+  createEffect(
+    () => [props.inView, props.reduce, props.target, props.delay] as const,
+    ([inView, reduce, target, delay]) => {
+      const end = 10 + target;
+      if (reduce) {
+        cell.set(end);
+        return;
+      }
+      if (!inView) {
+        cell.set(end);
+        return;
+      }
+      let cancelled = false;
+      let settle: AnimationPlaybackControls | undefined;
+      cell.set(target);
+      const roll = animate(cell, end + OVERSHOOT_CELLS, {
+        duration: ROLL_SECONDS,
+        delay,
+        ease: ROLL_EASE,
+      });
+      void roll.finished.then(() => {
+        if (cancelled) return;
+        settle = animate(cell, end, { type: "spring", stiffness: 260, damping: 22, mass: 0.9 });
+      });
+      return () => {
+        cancelled = true;
+        roll.stop();
+        settle?.stop();
+      };
+    },
+  );
 
   return <DigitColumn cell={cell} cells={ROLL_CELLS} />;
 }
@@ -147,43 +138,32 @@ function toParts(value: string): Part[] {
   });
 }
 
-export function Odometer({
-  value,
-  delay = 0,
-  sx,
-}: {
-  value: string;
-  delay?: number;
-  sx?: stylex.StyleXStyles;
-}) {
-  const ref = useRef<HTMLSpanElement>(null);
-  const inView = useInView(ref, { once: true, margin: "0px 0px -12% 0px" });
+export function Odometer(props: { value: string; delay?: number; sx?: stylex.StyleXStyles }) {
+  let ref: HTMLSpanElement | undefined;
+  const inView = useInView(() => ref, { once: true, margin: "0px 0px -12% 0px" });
   const reduce = useReducedMotion();
-  const parts = useMemo(() => toParts(value), [value]);
+  const parts = createMemo(() => toParts(props.value));
 
   return (
-    <span ref={ref} {...stylex.props(styles.root, sx)}>
-      <span aria-hidden="true" {...stylex.props(styles.digits)}>
-        {parts.map((part) => {
-          if (part.digit === null) {
+    <span ref={ref} {...stylex.attrs(styles.root, props.sx)}>
+      <span aria-hidden="true" {...stylex.attrs(styles.digits)}>
+        <For each={parts()}>
+          {(part) => {
+            if (part.digit === null) {
+              return <span {...stylex.attrs(styles.glyph)}>{part.char}</span>;
+            }
             return (
-              <span key={part.id} {...stylex.props(styles.glyph)}>
-                {part.char}
-              </span>
+              <RollDigit
+                target={part.digit}
+                delay={(props.delay ?? 0) + part.order * DIGIT_STAGGER}
+                inView={inView()}
+                reduce={reduce()}
+              />
             );
-          }
-          return (
-            <RollDigit
-              key={part.id}
-              target={part.digit}
-              delay={delay + part.order * DIGIT_STAGGER}
-              inView={inView}
-              reduce={reduce}
-            />
-          );
-        })}
+          }}
+        </For>
       </span>
-      <span {...stylex.props(shared.srOnly)}>{value}</span>
+      <span {...stylex.attrs(shared.srOnly)}>{props.value}</span>
     </span>
   );
 }
@@ -199,38 +179,27 @@ function positionAt(year: number, place: number, snap: boolean) {
   return digit + carry;
 }
 
-function YearDigit({
-  year,
-  place,
-  snap,
-}: {
-  year: MotionValue<number>;
-  place: number;
-  snap: boolean;
-}) {
-  const cell = useTransform(year, (value) => positionAt(value, place, snap));
+function YearDigit(props: { year: MotionValue<number>; place: number; snap: boolean }) {
+  const cell = useTransform(() => positionAt(props.year.get(), props.place, props.snap));
   return <DigitColumn cell={cell} cells={WRAP_CELLS} />;
 }
 
-export function YearReadout({
-  progress,
-  sx,
-}: {
-  progress: MotionValue<number>;
-  sx?: stylex.StyleXStyles;
-}) {
+export function YearReadout(props: { progress: MotionValue<number>; sx?: stylex.StyleXStyles }) {
   const reduce = useReducedMotion();
-  const raw = useTransform(progress, (value) => YEAR_FIRST + value * (YEAR_LAST - YEAR_FIRST));
+  const raw = useTransform(
+    props.progress,
+    (value) => YEAR_FIRST + value * (YEAR_LAST - YEAR_FIRST),
+  );
   const sprung = useSpring(raw, { stiffness: 150, damping: 15, mass: 0.7 });
-  const year = reduce ? raw : sprung;
+  const year = useTransform(() => (reduce() ? raw.get() : sprung.get()));
 
   return (
-    <span {...stylex.props(styles.root, sx)}>
-      <span aria-hidden="true" {...stylex.props(styles.digits)}>
-        <YearDigit year={year} place={3} snap={reduce} />
-        <YearDigit year={year} place={2} snap={reduce} />
-        <YearDigit year={year} place={1} snap={reduce} />
-        <YearDigit year={year} place={0} snap={reduce} />
+    <span {...stylex.attrs(styles.root, props.sx)}>
+      <span aria-hidden="true" {...stylex.attrs(styles.digits)}>
+        <YearDigit year={year} place={3} snap={reduce()} />
+        <YearDigit year={year} place={2} snap={reduce()} />
+        <YearDigit year={year} place={1} snap={reduce()} />
+        <YearDigit year={year} place={0} snap={reduce()} />
       </span>
     </span>
   );

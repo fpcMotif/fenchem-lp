@@ -83,41 +83,35 @@ const focus = stylex.create({
   position: (value: string) => ({ objectPosition: value }),
 });
 
-export function PlateList({
-  always,
-  onOpen,
-}: {
-  always: boolean;
-  onOpen: (index: number) => void;
-}) {
+export function PlateList(props: { always: boolean; onOpen: (index: number) => void }) {
   return (
-    <ol {...stylex.props(styles.list, always && styles.always)}>
+    <ol {...stylex.attrs(styles.list, props.always && styles.always)}>
       {PLATES.map((plate, index) => (
-        <li key={plate.id}>
+        <li>
           <button
             type="button"
-            onClick={() => onOpen(index)}
-            {...stylex.props(styles.row, ui.focusable, stylex.defaultMarker())}
+            onClick={() => props.onOpen(index)}
+            {...stylex.attrs(styles.row, ui.focusable, stylex.defaultMarker())}
           >
-            <span {...stylex.props(styles.holder)}>
+            <span {...stylex.attrs(styles.holder)}>
               <img
                 src={plate.src}
                 alt={plate.alt}
                 loading="lazy"
                 decoding="async"
-                {...stylex.props(styles.image, focus.position(plate.focus))}
+                {...stylex.attrs(styles.image, focus.position(plate.focus))}
               />
               <Registration size="small" />
             </span>
-            <span {...stylex.props(styles.card)}>
-              <span lang="en" {...stylex.props(ui.label)}>
+            <span {...stylex.attrs(styles.card)}>
+              <span lang="en" {...stylex.attrs(ui.label)}>
                 Plate
               </span>
-              <span aria-hidden="true" {...stylex.props(ui.designation, styles.numeral)}>
+              <span aria-hidden="true" {...stylex.attrs(ui.designation, styles.numeral)}>
                 {plate.numeral}
               </span>
-              <span {...stylex.props(styles.caption)}>{plate.caption}</span>
-              <span lang="en" {...stylex.props(styles.english)}>
+              <span {...stylex.attrs(styles.caption)}>{plate.caption}</span>
+              <span lang="en" {...stylex.attrs(styles.english)}>
                 {plate.english}
               </span>
               <span {...srOnly}>{plate.numeral}, View larger</span>

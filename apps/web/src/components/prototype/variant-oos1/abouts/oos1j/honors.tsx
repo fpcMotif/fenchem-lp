@@ -1,7 +1,6 @@
 import { breakpoints } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { useScroll, useTransform } from "motion/react";
-import { useRef } from "react";
+import { useScroll, useTransform } from "@/compat/motion";
 
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
@@ -9,6 +8,7 @@ import { ABOUT_HONORS } from "../../about-data";
 import { Monument, Reveal, SectionName, useInViewOnce } from "./parts";
 import { base, ty } from "./shared";
 import { font, hue, size } from "./theme.stylex";
+import { createSignal, merge } from "solid-js";
 
 const LEVEL_LABEL = {
   national: "国家级",
@@ -90,53 +90,50 @@ const styles = stylex.create({
   },
 });
 
-function HonorRow({
-  title,
-  level,
-  index,
-  last,
-}: {
+function HonorRow(props: {
   title: string;
   level: keyof typeof LEVEL_LABEL;
   index: number;
   last: boolean;
 }) {
   return (
-    <Reveal as="li" step={index % 3} sx={styles.row}>
+    <Reveal as="li" step={props.index % 3} sx={styles.row}>
       <RowRule />
-      {last ? <RowRule bottom /> : null}
-      <span aria-hidden="true" lang="en" {...stylex.props(styles.numeral)}>
-        {String(index + 1).padStart(2, "0")}
+      {props.last ? <RowRule bottom /> : null}
+      <span aria-hidden="true" lang="en" {...stylex.attrs(styles.numeral)}>
+        {String(props.index + 1).padStart(2, "0")}
       </span>
-      <h3 {...stylex.props(styles.title)}>{title}</h3>
-      <span {...stylex.props(ty.quiet, styles.level)}>{LEVEL_LABEL[level]}</span>
+      <h3 {...stylex.attrs(styles.title)}>{props.title}</h3>
+      <span {...stylex.attrs(ty.quiet, styles.level)}>{LEVEL_LABEL[props.level]}</span>
     </Reveal>
   );
 }
 
-function RowRule({ bottom = false }: { bottom?: boolean }) {
+function RowRule(props: { bottom?: boolean }) {
+  const p = merge({ bottom: false }, props);
   const [ref, shown] = useInViewOnce<HTMLSpanElement>();
   return (
     <span
       ref={ref}
       aria-hidden="true"
-      {...stylex.props(styles.rule, bottom && styles.ruleBottom, shown && styles.ruleShown)}
+      {...stylex.attrs(styles.rule, p.bottom && styles.ruleBottom, shown() && styles.ruleShown)}
     />
   );
 }
 
 export function Honors() {
   const lastIndex = ABOUT_HONORS.items.length - 1;
-  const sectionRef = useRef<HTMLElement>(null);
+  const [sectionRef, setSectionRef] = createSignal<HTMLElement>();
   const reduce = useReducedMotion();
   const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start end", "end start"] });
-  const drift = useTransform(scrollYProgress, [0, 1], reduce ? ["0%", "0%"] : ["-6%", "10%"]);
+  const driftMotion = useTransform(scrollYProgress, [0, 1], ["-6%", "10%"]);
+  const drift = useTransform(() => (reduce() ? "0%" : driftMotion()));
   return (
     <section
-      ref={sectionRef}
+      ref={setSectionRef}
       id="about-honor"
       aria-labelledby="about-honor-title"
-      {...stylex.props(base.section, base.anchor, styles.honors)}
+      {...stylex.attrs(base.section, base.anchor, styles.honors)}
     >
       <Monument
         text={String(ABOUT_HONORS.items.length).padStart(2, "0")}
@@ -144,11 +141,10 @@ export function Honors() {
         sx={styles.monument}
       />
       <SectionName id="about-honor-title">{ABOUT_HONORS.eyebrow}</SectionName>
-      <div {...stylex.props(base.shell)}>
-        <ul {...stylex.props(styles.list)}>
+      <div {...stylex.attrs(base.shell)}>
+        <ul {...stylex.attrs(styles.list)}>
           {ABOUT_HONORS.items.map((honor, idx) => (
             <HonorRow
-              key={honor.id}
               title={honor.title}
               level={honor.level}
               index={idx}

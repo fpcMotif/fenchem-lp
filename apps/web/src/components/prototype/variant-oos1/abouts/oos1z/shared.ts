@@ -1,4 +1,5 @@
 import * as stylex from "@stylexjs/stylex";
+import type { JSX } from "@solidjs/web";
 
 import { ABOUT_CAMPUS, ABOUT_CSR, ABOUT_HERO } from "../../about-data";
 import { bp, face, tone } from "./tokens.stylex";
@@ -147,4 +148,7 @@ export const ui = stylex.create({
   },
 });
 
-export const srOnly = stylex.props(ui.srOnly);
+export const srOnly = stylex.attrs(ui.srOnly);
+
+export const UNFOCUSABLE = { focusable: "false" } as JSX.SvgSVGAttributes<SVGSVGElement>;
+export const NON_SCALING: Record<string, string> = { "vector-effect": "non-scaling-stroke" };

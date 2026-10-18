@@ -1,8 +1,8 @@
 import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { ArrowLeft, ArrowRight, ChevronDown } from "lucide-react";
-import { m } from "motion/react";
-import { useId, useState } from "react";
+import { ArrowLeft, ArrowRight, ChevronDown } from "@fenchem-lp/ui/components/lucide";
+import { m } from "@/compat/motion";
+import { createSignal, createUniqueId, Show, untrack } from "solid-js";
 
 import { EASE } from "@/components/prototype/motion-constants";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
@@ -304,47 +304,41 @@ const styles = stylex.create({
   },
 });
 
-function SheetFace({
-  side,
-  item,
-  shown,
-  reduce,
-}: {
+function SheetFace(props: {
   side: SheetSide;
   item: SolutionItem;
   shown: boolean;
   reduce: boolean;
 }) {
+  const side = props.side;
   return (
     <div
-      inert={!shown}
-      aria-hidden={!shown}
-      {...stylex.props(
+      inert={!props.shown}
+      aria-hidden={props.shown ? "false" : "true"}
+      {...stylex.attrs(
         styles.side,
-        side.id === "back" && !reduce && styles.sideTurned,
-        reduce && !shown && styles.sideHidden,
+        side.id === "back" && !props.reduce && styles.sideTurned,
+        props.reduce && !props.shown && styles.sideHidden,
       )}
     >
-      <p {...stylex.props(styles.caption)}>{side.label}</p>
-      <dl {...stylex.props(styles.fields)}>
-        {side.fields(item).map((field) => (
-          <div key={field.label} {...stylex.props(styles.field)}>
-            <dt {...stylex.props(styles.fieldLabel)}>{field.label}</dt>
-            <dd {...stylex.props(styles.fieldValue)}>
+      <p {...stylex.attrs(styles.caption)}>{side.label}</p>
+      <dl {...stylex.attrs(styles.fields)}>
+        {side.fields(props.item).map((field) => (
+          <div {...stylex.attrs(styles.field)}>
+            <dt {...stylex.attrs(styles.fieldLabel)}>{field.label}</dt>
+            <dd {...stylex.attrs(styles.fieldValue)}>
               {field.lines.length > 0 ? (
-                <ul {...stylex.props(styles.lines)}>
+                <ul {...stylex.attrs(styles.lines)}>
                   {field.lines.map((line) => (
-                    <li key={line} {...stylex.props(styles.line)}>
-                      {line}
-                    </li>
+                    <li {...stylex.attrs(styles.line)}>{line}</li>
                   ))}
                 </ul>
               ) : (
                 <>
-                  <span aria-hidden="true" {...stylex.props(styles.absent)}>
+                  <span aria-hidden="true" {...stylex.attrs(styles.absent)}>
                     —
                   </span>
-                  <span {...stylex.props(ui.srOnly)}>None</span>
+                  <span {...stylex.attrs(ui.srOnly)}>None</span>
                 </>
               )}
             </dd>
@@ -357,19 +351,19 @@ function SheetFace({
 
 export function Solutions() {
   const reduce = useReducedMotion();
-  const baseId = useId();
+  const baseId = createUniqueId();
   const titleId = `${baseId}-title`;
   const selectId = `${baseId}-select`;
   const stageId = `${baseId}-stage`;
   const sheetId = `${baseId}-sheet`;
-  const [index, setIndex] = useState(0);
-  const [sideId, setSideId] = useState<FaceId>("front");
-  const [routed, setRouted] = useState(false);
-  const item = SOLUTION_ITEMS[index];
-  const flipped = sideId === "back";
+  const [index, setIndex] = createSignal(0);
+  const [sideId, setSideId] = createSignal<FaceId>("front");
+  const [routed, setRouted] = createSignal(false);
+  const item = () => SOLUTION_ITEMS[index()];
+  const flipped = () => sideId() === "back";
 
   const route = (next: number) => {
-    if (next < 0 || next >= SOLUTION_ITEMS.length || next === index) return;
+    if (next < 0 || next >= SOLUTION_ITEMS.length || next === index()) return;
     setIndex(next);
     setSideId("front");
     setRouted(true);
@@ -379,29 +373,29 @@ export function Solutions() {
     <section
       id="products-solutions"
       aria-labelledby={titleId}
-      {...stylex.props(ui.section, styles.ground)}
+      {...stylex.attrs(ui.section, styles.ground)}
     >
-      <div {...stylex.props(ui.shell)}>
-        <header {...stylex.props(styles.head)}>
-          <h2 id={titleId} {...stylex.props(ui.sectionTitle)}>
+      <div {...stylex.attrs(ui.shell)}>
+        <header {...stylex.attrs(styles.head)}>
+          <h2 id={titleId} {...stylex.attrs(ui.sectionTitle)}>
             应用方案
           </h2>
         </header>
-        <div {...stylex.props(styles.layout)}>
-          <div role="group" aria-label="Switch solution" {...stylex.props(styles.rail)}>
-            <label htmlFor={selectId} {...stylex.props(ui.srOnly)}>
+        <div {...stylex.attrs(styles.layout)}>
+          <div role="group" aria-label="Switch solution" {...stylex.attrs(styles.rail)}>
+            <label for={selectId} {...stylex.attrs(ui.srOnly)}>
               Choose a solution
             </label>
-            <div {...stylex.props(styles.selectWrap)}>
+            <div {...stylex.attrs(styles.selectWrap)}>
               <select
                 id={selectId}
-                value={index}
+                value={index()}
                 aria-controls={stageId}
-                onChange={(event) => route(Number(event.target.value))}
-                {...stylex.props(styles.select)}
+                onChange={(event) => route(Number(event.currentTarget.value))}
+                {...stylex.attrs(styles.select)}
               >
                 {SOLUTION_ITEMS.map((solution, solutionIndex) => (
-                  <option key={solution.id} value={solutionIndex}>
+                  <option value={solutionIndex}>
                     {`${padIndex(solutionIndex)}  ${solution.title}`}
                   </option>
                 ))}
@@ -411,86 +405,87 @@ export function Solutions() {
                 strokeWidth={1.5}
                 absoluteStrokeWidth
                 aria-hidden="true"
-                {...stylex.props(styles.selectIcon)}
+                {...stylex.attrs(styles.selectIcon)}
               />
             </div>
-            <div {...stylex.props(styles.stepper)}>
+            <div {...stylex.attrs(styles.stepper)}>
               <button
                 type="button"
                 aria-label="Previous"
                 aria-controls={stageId}
-                disabled={index === 0}
-                onClick={() => route(index - 1)}
-                {...stylex.props(styles.stepButton)}
+                disabled={index() === 0}
+                onClick={() => route(index() - 1)}
+                {...stylex.attrs(styles.stepButton)}
               >
                 <ArrowLeft size={18} strokeWidth={1.5} absoluteStrokeWidth aria-hidden="true" />
               </button>
-              <p {...stylex.props(styles.counter)}>
-                {padIndex(index)}
-                <span {...stylex.props(styles.counterTotal)}> / {TOTAL}</span>
+              <p {...stylex.attrs(styles.counter)}>
+                {padIndex(index())}
+                <span {...stylex.attrs(styles.counterTotal)}> / {TOTAL}</span>
               </p>
               <button
                 type="button"
                 aria-label="Next"
                 aria-controls={stageId}
-                disabled={index === SOLUTION_ITEMS.length - 1}
-                onClick={() => route(index + 1)}
-                {...stylex.props(styles.stepButton)}
+                disabled={index() === SOLUTION_ITEMS.length - 1}
+                onClick={() => route(index() + 1)}
+                {...stylex.attrs(styles.stepButton)}
               >
                 <ArrowRight size={18} strokeWidth={1.5} absoluteStrokeWidth aria-hidden="true" />
               </button>
             </div>
-            <p aria-live="polite" {...stylex.props(ui.srOnly)}>
-              {routed ? `${padIndex(index)} / ${TOTAL} ${item.englishName}` : ""}
+            <p aria-live="polite" {...stylex.attrs(ui.srOnly)}>
+              {routed() ? `${padIndex(index())} / ${TOTAL} ${item().englishName}` : ""}
             </p>
           </div>
-          <div id={stageId} {...stylex.props(styles.stage)}>
-            <m.div
-              key={item.id}
-              initial={routed ? { opacity: 0, y: 6 } : false}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: reduce ? 0 : 0.22, ease: EASE }}
-            >
-              <div {...stylex.props(styles.intro)}>
-                <p {...stylex.props(styles.number)}>{padIndex(index)}</p>
-                <h3 {...stylex.props(styles.title)}>{item.title}</h3>
-                <p {...stylex.props(styles.subtitle)}>{item.subtitle}</p>
-              </div>
-              <div {...stylex.props(styles.sideToggle)}>
-                <SegmentTrack role="group" aria-label="Front and back" stretch>
-                  {SIDES.map((side) => (
-                    <SegmentButton
-                      key={side.id}
-                      aria-pressed={side.id === sideId}
-                      aria-controls={sheetId}
-                      selected={side.id === sideId}
-                      stretch
-                      onClick={() => setSideId(side.id)}
-                    >
-                      {side.label}
-                    </SegmentButton>
-                  ))}
-                </SegmentTrack>
-              </div>
-              <div id={sheetId} {...stylex.props(styles.perspective)}>
+          <div id={stageId} {...stylex.attrs(styles.stage)}>
+            <Show when={item()} keyed>
+              {(current) => (
                 <m.div
-                  initial={false}
-                  animate={{ rotateY: flipped && !reduce ? 180 : 0 }}
-                  transition={{ duration: reduce ? 0 : 0.3, ease: EASE }}
-                  {...stylex.props(styles.flipper)}
+                  initial={untrack(routed) ? { opacity: 0, y: 6 } : false}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: reduce() ? 0 : 0.22, ease: EASE }}
                 >
-                  {SIDES.map((side) => (
-                    <SheetFace
-                      key={side.id}
-                      side={side}
-                      item={item}
-                      shown={side.id === sideId}
-                      reduce={reduce}
-                    />
-                  ))}
+                  <div {...stylex.attrs(styles.intro)}>
+                    <p {...stylex.attrs(styles.number)}>{padIndex(index())}</p>
+                    <h3 {...stylex.attrs(styles.title)}>{current.title}</h3>
+                    <p {...stylex.attrs(styles.subtitle)}>{current.subtitle}</p>
+                  </div>
+                  <div {...stylex.attrs(styles.sideToggle)}>
+                    <SegmentTrack role="group" aria-label="Front and back" stretch>
+                      {SIDES.map((side) => (
+                        <SegmentButton
+                          aria-pressed={side.id === sideId() ? "true" : "false"}
+                          aria-controls={sheetId}
+                          selected={side.id === sideId()}
+                          stretch
+                          onClick={() => setSideId(side.id)}
+                        >
+                          {side.label}
+                        </SegmentButton>
+                      ))}
+                    </SegmentTrack>
+                  </div>
+                  <div id={sheetId} {...stylex.attrs(styles.perspective)}>
+                    <m.div
+                      initial={false}
+                      animate={{ rotateY: flipped() && !reduce() ? 180 : 0 }}
+                      transition={{ duration: reduce() ? 0 : 0.3, ease: EASE }}
+                      {...stylex.attrs(styles.flipper)}
+                    >
+                      {SIDES.map((side) => (
+                        <SheetFace
+                          side={side}
+                          item={current}
+                          shown={side.id === sideId()}
+                          reduce={reduce()}
+                        />
+                      ))}
+                    </m.div>
+                  </div>
                 </m.div>
-              </div>
-            </m.div>
+              )}
+            </Show>
           </div>
         </div>
       </div>

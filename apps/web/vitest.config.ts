@@ -1,7 +1,7 @@
 import { fileURLToPath } from "node:url";
 
-import stylexRs from "@stylexswc/unplugin/vite";
-import viteReact from "@vitejs/plugin-react";
+import solid from "@solidjs/vite-plugin";
+import stylex from "@stylexjs/unplugin";
 import { defineConfig } from "vitest/config";
 
 const appSrc = fileURLToPath(new URL("./src", import.meta.url));
@@ -10,28 +10,27 @@ const rootDir = fileURLToPath(new URL("../..", import.meta.url));
 
 export default defineConfig({
   plugins: [
-    stylexRs({
+    stylex.vite({
       useCSSLayers: true,
-      rsOptions: {
-        dev: true,
-        unstable_moduleResolution: {
-          type: "commonJS",
-          rootDir,
-        },
+      unstable_moduleResolution: {
+        type: "commonJS",
+        rootDir,
       },
     }),
-    viteReact(),
+    solid(),
   ],
   resolve: {
     alias: {
       "@": appSrc,
       "@fenchem-lp/ui": uiSrc,
     },
+    conditions: ["browser", "development"],
   },
   test: {
     environment: "jsdom",
     include: ["src/**/*.test.{ts,tsx}"],
     setupFiles: ["./src/test/setup.ts"],
+    server: { deps: { inline: [/solid-js/, /@solidjs\/web/] } },
     coverage: {
       provider: "v8",
       reporter: ["text", "json-summary"],

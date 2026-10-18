@@ -1,4 +1,3 @@
-import { breakpoints } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 
 import { ABOUT_CULTURE, ABOUT_HERO, ABOUT_MOMENT } from "../../about-data";
@@ -19,11 +18,11 @@ const s = stylex.create({
     display: "grid",
     gridTemplateColumns: {
       default: "minmax(0, 1fr)",
-      [breakpoints.md]: "repeat(13, minmax(0, 1fr))",
+      ["@media (min-width: 768px)"]: "repeat(13, minmax(0, 1fr))",
     },
-    rowGap: { default: 20, [breakpoints.md]: 8 },
+    rowGap: { default: 20, ["@media (min-width: 768px)"]: 8 },
     alignItems: "center",
-    paddingBlock: { default: 40, [breakpoints.xl]: 56 },
+    paddingBlock: { default: 40, ["@media (min-width: 1280px)"]: 56 },
     borderTopWidth: 1,
     borderTopStyle: "solid",
     borderTopColor: tone.hairline,
@@ -33,22 +32,22 @@ const s = stylex.create({
     borderTopWidth: 0,
   },
   glyphCell: {
-    gridColumn: { default: "auto", [breakpoints.md]: "span 5" },
+    gridColumn: { default: "auto", ["@media (min-width: 768px)"]: "span 5" },
   },
   glyphCellWide: {
-    gridColumn: { default: "auto", [breakpoints.md]: "span 6" },
+    gridColumn: { default: "auto", ["@media (min-width: 768px)"]: "span 6" },
   },
   textCell: {
-    gridColumn: { default: "auto", [breakpoints.md]: "span 8" },
+    gridColumn: { default: "auto", ["@media (min-width: 768px)"]: "span 8" },
     minWidth: 0,
   },
   textCellNarrow: {
-    gridColumn: { default: "auto", [breakpoints.md]: "span 7" },
+    gridColumn: { default: "auto", ["@media (min-width: 768px)"]: "span 7" },
   },
   glyph: {
     display: "block",
     fontFamily: font.cjk,
-    fontSize: { default: "88px", [breakpoints.md]: step.huge },
+    fontSize: { default: "88px", ["@media (min-width: 768px)"]: step.huge },
     fontWeight: 500,
     lineHeight: 1,
   },
@@ -58,7 +57,7 @@ const s = stylex.create({
   valueTitle: {
     margin: 0,
     marginBottom: 16,
-    fontSize: { default: step.lead, [breakpoints.xl]: step.title },
+    fontSize: { default: step.lead, ["@media (min-width: 1280px)"]: step.title },
     fontWeight: 500,
     lineHeight: 1.3,
     letterSpacing: "0.08em",
@@ -87,9 +86,9 @@ export function Culture() {
 
   return (
     <Section id={chip.id} label={ABOUT_CULTURE.eyebrow} background={ui.onPaper}>
-      <div {...stylex.props(ui.phi)}>
-        <div {...stylex.props(ui.asideCol)}>
-          <div {...stylex.props(ui.asideSticky)}>
+      <div {...stylex.attrs(ui.phi)}>
+        <div {...stylex.attrs(ui.asideCol)}>
+          <div {...stylex.attrs(ui.asideSticky)}>
             <Figure
               src={ABOUT_MOMENT.image}
               alt={ABOUT_MOMENT.alt}
@@ -98,19 +97,19 @@ export function Culture() {
             />
           </div>
         </div>
-        <ul {...stylex.props(ui.main, s.list)}>
+        <ul {...stylex.attrs(ui.main, s.list)}>
           {ABOUT_CULTURE.values.map((value, idx) => {
             const isLast = idx === lastIndex;
             return (
-              <Reveal key={value.title} as="li" sx={[s.row, idx === 0 && s.rowFirst]}>
-                <div {...stylex.props(s.glyphCell, isLast && s.glyphCellWide)}>
-                  <span aria-hidden="true" {...stylex.props(s.glyph, GLYPH_TONES[value.tone])}>
+              <Reveal as="li" sx={[s.row, idx === 0 && s.rowFirst]}>
+                <div {...stylex.attrs(s.glyphCell, isLast && s.glyphCellWide)}>
+                  <span aria-hidden="true" {...stylex.attrs(s.glyph, GLYPH_TONES[value.tone])}>
                     {value.glyph}
                   </span>
                 </div>
-                <div {...stylex.props(s.textCell, isLast && s.textCellNarrow)}>
-                  <h3 {...stylex.props(s.valueTitle)}>{value.title}</h3>
-                  <p {...stylex.props(s.valueDesc)}>{value.desc}</p>
+                <div {...stylex.attrs(s.textCell, isLast && s.textCellNarrow)}>
+                  <h3 {...stylex.attrs(s.valueTitle)}>{value.title}</h3>
+                  <p {...stylex.attrs(s.valueDesc)}>{value.desc}</p>
                 </div>
               </Reveal>
             );

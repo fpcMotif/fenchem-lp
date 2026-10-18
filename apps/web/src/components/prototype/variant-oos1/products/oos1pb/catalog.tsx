@@ -1,9 +1,10 @@
 import { Collapse } from "../../../shared/collapse";
 import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { Plus, X } from "lucide-react";
-import { m } from "motion/react";
-import { useId, useState, type ReactNode } from "react";
+import { Plus, X } from "@fenchem-lp/ui/components/lucide";
+import { m } from "@/compat/motion";
+import type { JSX } from "@solidjs/web";
+import { createMemo, createSignal, createUniqueId, For, Show, untrack } from "solid-js";
 
 import { EASE } from "@/components/prototype/motion-constants";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
@@ -432,67 +433,64 @@ const styles = stylex.create({
   },
 });
 
-function Inci({ text }: { text: string }) {
-  const parts: ReactNode[] = [];
+function Inci(props: { text: string }) {
+  const text = untrack(() => props.text);
+  const parts: JSX.Element[] = [];
   let last = 0;
   for (const match of text.matchAll(INCI_LATIN)) {
     parts.push(text.slice(last, match.index));
-    parts.push(
-      <span key={match.index} {...stylex.props(styles.keepTogether)}>
-        {match[0]}
-      </span>,
-    );
+    parts.push(<span {...stylex.attrs(styles.keepTogether)}>{match[0]}</span>);
     last = match.index + match[0].length;
   }
   parts.push(text.slice(last));
   return <>{parts}</>;
 }
 
-function LatinLine({ names }: { names: string[] }) {
-  const [first, ...rest] = names;
-  if (!first) return null;
+function LatinLine(props: { names: string[] }) {
   return (
-    <span lang="la" title={names.join(", ")} {...stylex.props(styles.latin)}>
-      {first}
-      {rest.length > 0 && <span {...stylex.props(styles.latinMore)}>+{rest.length}</span>}
-    </span>
+    <Show when={props.names[0]}>
+      {(first) => (
+        <span lang="la" title={props.names.join(", ")} {...stylex.attrs(styles.latin)}>
+          {first()}
+          {props.names.length > 1 && (
+            <span {...stylex.attrs(styles.latinMore)}>+{props.names.length - 1}</span>
+          )}
+        </span>
+      )}
+    </Show>
   );
 }
 
-function ItemRows({
-  item,
-  activeTag,
-  open,
-  onToggle,
-}: {
+function ItemRows(props: {
   item: FlatItem;
   activeTag: FunctionTag | null;
   open: boolean;
   onToggle: () => void;
 }) {
   const reduce = useReducedMotion();
-  const detailId = useId();
+  const detailId = createUniqueId();
+  const item = props.item;
 
   return (
     <>
       <m.tr
         layout="position"
         transition={{ duration: 0.26, ease: EASE }}
-        {...stylex.props(styles.row, open && styles.rowOpen)}
+        {...stylex.attrs(styles.row, props.open && styles.rowOpen)}
       >
-        <th scope="row" {...stylex.props(styles.nameCell, open && styles.nameCellOpen)}>
+        <th scope="row" {...stylex.attrs(styles.nameCell, props.open && styles.nameCellOpen)}>
           <button
             type="button"
-            aria-expanded={open}
-            aria-controls={open ? detailId : undefined}
-            onClick={onToggle}
-            {...stylex.props(frame.focusRing, styles.nameButton)}
+            aria-expanded={props.open ? "true" : "false"}
+            aria-controls={props.open ? detailId : undefined}
+            onClick={() => props.onToggle()}
+            {...stylex.attrs(frame.focusRing, styles.nameButton)}
           >
-            <span {...stylex.props(styles.names)}>
-              <span {...stylex.props(styles.primary)}>
+            <span {...stylex.attrs(styles.names)}>
+              <span {...stylex.attrs(styles.primary)}>
                 {item.primary}
                 {item.secondary && (
-                  <span {...stylex.props(styles.secondary)}>{item.secondary}</span>
+                  <span {...stylex.attrs(styles.secondary)}>{item.secondary}</span>
                 )}
               </span>
               <LatinLine names={item.latin} />
@@ -500,9 +498,9 @@ function ItemRows({
             <m.span
               aria-hidden="true"
               initial={false}
-              animate={{ rotate: open ? 45 : 0 }}
-              transition={reduce ? { duration: 0 } : { duration: 0.2, ease: EASE }}
-              {...stylex.props(styles.toggle)}
+              animate={{ rotate: props.open ? 45 : 0 }}
+              transition={reduce() ? { duration: 0 } : { duration: 0.2, ease: EASE }}
+              {...stylex.attrs(styles.toggle)}
             >
               <Plus size={14} strokeWidth={1.5} absoluteStrokeWidth />
             </m.span>
@@ -510,17 +508,16 @@ function ItemRows({
         </th>
         {FUNCTION_TAGS.map((tag) => (
           <td
-            key={tag}
-            {...stylex.props(
+            {...stylex.attrs(
               styles.tagCell,
-              activeTag === tag && styles.tagCellOn,
-              open && styles.tagCellOpen,
+              props.activeTag === tag && styles.tagCellOn,
+              props.open && styles.tagCellOpen,
             )}
           >
             {hasTag(item, tag) && (
               <>
-                <span aria-hidden="true" {...stylex.props(styles.dot)} />
-                <span {...stylex.props(frame.srOnly)}>Yes</span>
+                <span aria-hidden="true" {...stylex.attrs(styles.dot)} />
+                <span {...stylex.attrs(frame.srOnly)}>Yes</span>
               </>
             )}
           </td>
@@ -529,32 +526,30 @@ function ItemRows({
       <m.tr
         layout="position"
         transition={{ duration: 0.26, ease: EASE }}
-        key="detail"
-        aria-hidden={!open}
-        inert={!open}
+        aria-hidden={props.open ? "false" : "true"}
+        inert={!props.open}
       >
         <td
-          colSpan={COLUMN_COUNT}
-          {...stylex.props(styles.detailCell)}
-          style={{ borderBottomWidth: open ? 1 : 0 }}
+          colspan={COLUMN_COUNT}
+          {...stylex.attrs(styles.detailCell)}
+          style={{ "border-bottom-width": props.open ? "1px" : "0" }}
         >
           <Collapse
             id={detailId}
-            open={open}
-
-            transition={{ duration: reduce ? 0 : 0.24, ease: EASE }}
-            {...stylex.props(styles.detailClip)}
+            open={props.open}
+            transition={{ duration: reduce() ? 0 : 0.24, ease: EASE }}
+            {...stylex.attrs(styles.detailClip)}
           >
-            <dl {...stylex.props(styles.detail)}>
-              <div {...stylex.props(styles.field)}>
-                <dt {...stylex.props(styles.fieldLabel)}>INCI 名称</dt>
-                <dd {...stylex.props(styles.inci)}>
+            <dl {...stylex.attrs(styles.detail)}>
+              <div {...stylex.attrs(styles.field)}>
+                <dt {...stylex.attrs(styles.fieldLabel)}>INCI 名称</dt>
+                <dd {...stylex.attrs(styles.inci)}>
                   <Inci text={item.inci} />
                 </dd>
               </div>
-              <div {...stylex.props(styles.field)}>
-                <dt {...stylex.props(styles.fieldLabel)}>特性&应用</dt>
-                <dd {...stylex.props(styles.features)}>{item.features}</dd>
+              <div {...stylex.attrs(styles.field)}>
+                <dt {...stylex.attrs(styles.fieldLabel)}>特性&应用</dt>
+                <dd {...stylex.attrs(styles.features)}>{item.features}</dd>
               </div>
             </dl>
           </Collapse>
@@ -565,90 +560,91 @@ function ItemRows({
 }
 
 export function Catalog() {
-  const tableId = useId();
-  const noteId = useId();
-  const [activeTag, setActiveTag] = useState<FunctionTag | null>(null);
-  const [openId, setOpenId] = useState<string | null>(null);
-  const matchCount = activeTag ? (TAG_TOTALS.get(activeTag) ?? 0) : FLAT_ITEMS.length;
+  const tableId = createUniqueId();
+  const noteId = createUniqueId();
+  const [activeTag, setActiveTag] = createSignal<FunctionTag | null>(null);
+  const [openId, setOpenId] = createSignal<string | null>(null);
+  const matchCount = () => {
+    const tag = activeTag();
+    return tag ? (TAG_TOTALS.get(tag) ?? 0) : FLAT_ITEMS.length;
+  };
 
   return (
     <section
       id="products-catalog"
       aria-labelledby="catalog-title"
-      {...stylex.props(frame.section, styles.ground)}
+      {...stylex.attrs(frame.section, styles.ground)}
     >
-      <div {...stylex.props(frame.shell)}>
-        <header {...stylex.props(styles.head)}>
-          <h2 id="catalog-title" {...stylex.props(frame.title)}>
+      <div {...stylex.attrs(frame.shell)}>
+        <header {...stylex.attrs(styles.head)}>
+          <h2 id="catalog-title" {...stylex.attrs(frame.title)}>
             产品目录
           </h2>
-          <p id={noteId} {...stylex.props(styles.note)}>
+          <p id={noteId} {...stylex.attrs(styles.note)}>
             功效依据原料描述整理
           </p>
         </header>
-        <div {...stylex.props(styles.status)}>
-          <p aria-live="polite" {...stylex.props(styles.statusText)}>
-            {activeTag ?? "全部"}
-            <span aria-hidden="true" {...stylex.props(styles.statusDivider)}>
+        <div {...stylex.attrs(styles.status)}>
+          <p aria-live="polite" {...stylex.attrs(styles.statusText)}>
+            {activeTag() ?? "全部"}
+            <span aria-hidden="true" {...stylex.attrs(styles.statusDivider)}>
               ·
             </span>
-            <span {...stylex.props(styles.numeral)}>{matchCount}</span>
-            <span {...stylex.props(styles.statusUnit)}>款</span>
+            <span {...stylex.attrs(styles.numeral)}>{matchCount()}</span>
+            <span {...stylex.attrs(styles.statusUnit)}>款</span>
           </p>
-          {activeTag ? (
+          <Show
+            when={activeTag()}
+            fallback={<span {...stylex.attrs(styles.hint)}>点按功效列标题筛选</span>}
+          >
             <button
               type="button"
               onClick={() => setActiveTag(null)}
-              {...stylex.props(frame.focusRing, styles.clear)}
+              {...stylex.attrs(frame.focusRing, styles.clear)}
             >
               <X size={14} strokeWidth={1.5} absoluteStrokeWidth aria-hidden="true" />
               清除
             </button>
-          ) : (
-            <span {...stylex.props(styles.hint)}>点按功效列标题筛选</span>
-          )}
+          </Show>
         </div>
-        <div {...stylex.props(styles.scroller)}>
+        <div {...stylex.attrs(styles.scroller)}>
           <table
             id={tableId}
             aria-labelledby="catalog-title"
             aria-describedby={noteId}
-            {...stylex.props(styles.table)}
+            {...stylex.attrs(styles.table)}
           >
             <colgroup>
-              <col {...stylex.props(styles.nameCol)} />
-              {FUNCTION_TAGS.map((tag) => (
-                <col key={tag} {...stylex.props(styles.tagCol)} />
+              <col {...stylex.attrs(styles.nameCol)} />
+              {FUNCTION_TAGS.map(() => (
+                <col {...stylex.attrs(styles.tagCol)} />
               ))}
             </colgroup>
             <thead>
               <m.tr layout="position" transition={{ duration: 0.26, ease: EASE }}>
-                <th scope="col" {...stylex.props(styles.headCell, styles.nameHead)}>
+                <th scope="col" {...stylex.attrs(styles.headCell, styles.nameHead)}>
                   名称
                 </th>
                 {FUNCTION_TAGS.map((tag) => {
-                  const pressed = activeTag === tag;
+                  const pressed = () => activeTag() === tag;
                   return (
                     <th
-                      key={tag}
                       scope="col"
-                      {...stylex.props(styles.headCell, pressed && styles.tagHeadOn)}
+                      {...stylex.attrs(styles.headCell, pressed() && styles.tagHeadOn)}
                     >
                       <button
                         type="button"
-                        aria-pressed={pressed}
+                        aria-pressed={pressed() ? "true" : "false"}
                         aria-controls={tableId}
-                        onClick={() => setActiveTag(pressed ? null : tag)}
-                        {...stylex.props(
+                        onClick={() => setActiveTag(pressed() ? null : tag)}
+                        {...stylex.attrs(
                           frame.focusRing,
                           styles.tagButton,
-                          pressed && styles.tagButtonOn,
+                          pressed() && styles.tagButtonOn,
                         )}
                       >
                         {stackedLabel(tag).map((part) => (
-                          <span key={part} {...stylex.props(styles.tagLine)}>
-                            {part}
-                          </span>
+                          <span {...stylex.attrs(styles.tagLine)}>{part}</span>
                         ))}
                       </button>
                     </th>
@@ -656,48 +652,55 @@ export function Catalog() {
                 })}
               </m.tr>
             </thead>
-            {GROUP_ROWS.map(({ group, items }) => {
-              const visibleItems = activeTag
-                ? items.filter((item) => hasTag(item, activeTag))
-                : items;
-              const matching = visibleItems.length;
-              if (matching === 0) return null;
-              return (
-                <m.tbody
-                  layout="position"
-                  transition={{ duration: 0.26, ease: EASE }}
-                  key={group.id}
-                >
-                  <m.tr layout="position" transition={{ duration: 0.26, ease: EASE }}>
-                    <th scope="rowgroup" colSpan={COLUMN_COUNT} {...stylex.props(styles.groupCell)}>
-                      <span {...stylex.props(styles.groupInner)}>
-                        <span {...stylex.props(styles.groupTitle)}>
-                          <span {...stylex.props(styles.groupLabel)}>{group.label}</span>
-                          <span {...stylex.props(styles.groupCount)}>
-                            <span {...stylex.props(styles.numeral)}>
-                              {activeTag ? `${matching} / ${items.length}` : items.length}
+            <For each={GROUP_ROWS}>
+              {({ group, items }) => {
+                const visibleItems = createMemo(() => {
+                  const tag = activeTag();
+                  return tag ? items.filter((item) => hasTag(item, tag)) : items;
+                });
+                const matching = () => visibleItems().length;
+                return (
+                  <Show when={matching() > 0}>
+                    <m.tbody layout="position" transition={{ duration: 0.26, ease: EASE }}>
+                      <m.tr layout="position" transition={{ duration: 0.26, ease: EASE }}>
+                        <th
+                          scope="rowgroup"
+                          colspan={COLUMN_COUNT}
+                          {...stylex.attrs(styles.groupCell)}
+                        >
+                          <span {...stylex.attrs(styles.groupInner)}>
+                            <span {...stylex.attrs(styles.groupTitle)}>
+                              <span {...stylex.attrs(styles.groupLabel)}>{group.label}</span>
+                              <span {...stylex.attrs(styles.groupCount)}>
+                                <span {...stylex.attrs(styles.numeral)}>
+                                  {activeTag() ? `${matching()} / ${items.length}` : items.length}
+                                </span>
+                                <span {...stylex.attrs(styles.statusUnit)}>款</span>
+                              </span>
                             </span>
-                            <span {...stylex.props(styles.statusUnit)}>款</span>
+                            {group.intro && (
+                              <span {...stylex.attrs(styles.groupIntro)}>{group.intro}</span>
+                            )}
                           </span>
-                        </span>
-                        {group.intro && (
-                          <span {...stylex.props(styles.groupIntro)}>{group.intro}</span>
+                        </th>
+                      </m.tr>
+                      <For each={visibleItems()}>
+                        {(item) => (
+                          <ItemRows
+                            item={item}
+                            activeTag={activeTag()}
+                            open={openId() === item.id}
+                            onToggle={() =>
+                              setOpenId((prev) => (prev === item.id ? null : item.id))
+                            }
+                          />
                         )}
-                      </span>
-                    </th>
-                  </m.tr>
-                  {visibleItems.map((item) => (
-                    <ItemRows
-                      key={item.id}
-                      item={item}
-                      activeTag={activeTag}
-                      open={openId === item.id}
-                      onToggle={() => setOpenId((prev) => (prev === item.id ? null : item.id))}
-                    />
-                  ))}
-                </m.tbody>
-              );
-            })}
+                      </For>
+                    </m.tbody>
+                  </Show>
+                );
+              }}
+            </For>
           </table>
         </div>
       </div>

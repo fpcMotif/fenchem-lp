@@ -1,19 +1,22 @@
 import {
   createContext,
-  use,
-  useEffect,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState,
-  type ComponentType,
-} from "react";
-import { createPortal } from "react-dom";
+  createEffect,
+  createMemo,
+  createSignal,
+  For,
+  onSettled,
+  Show,
+  untrack,
+  useContext,
+  type Accessor,
+  type Component,
+} from "solid-js";
+import { Portal } from "@solidjs/web";
 
 import { useIsClient } from "../insights-lab/kit";
 import { VariantOOS1, type SubPageProps } from "../variant-oos1/index";
 
-export type RailLabVariant = { name: string; Component: ComponentType<SubPageProps> };
+export type RailLabVariant = { name: string; Component: Component<SubPageProps> };
 
 const PICKER_CSS = `
 .proto-picker {
@@ -112,44 +115,51 @@ const PICKER_CSS = `
 }
 `;
 
-type ActiveVariant = { Component: ComponentType<SubPageProps>; mountKey: string };
+type ActiveVariant = { Component: Component<SubPageProps>; mountKey: string };
 
-const ActiveVariantContext = createContext<ActiveVariant | null>(null);
+const ActiveVariantContext = createContext<Accessor<ActiveVariant | null>>(() => null);
 
 function LabInsightsPage(props: SubPageProps) {
-  const active = use(ActiveVariantContext);
-  if (!active) return null;
-  const { Component, mountKey } = active;
-  return <Component key={mountKey} {...props} />;
+  const active = useContext(ActiveVariantContext);
+  // React remounted the page through `key={mountKey}`; a keyed Show does the same here.
+  return (
+    <Show when={active()?.mountKey} keyed>
+      {(_mountKey) => {
+        const Variant = untrack(() => active()!.Component);
+        return <Variant {...props} />;
+      }}
+    </Show>
+  );
 }
 
-export function BookmarkRailLab({
-  variants,
-  initial,
-  onVariantChange,
-}: {
+export function BookmarkRailLab(props: {
   variants: readonly RailLabVariant[];
   initial: number;
   onVariantChange: (v: number) => void;
 }) {
-  const [current, setCurrent] = useState(() => Math.min(Math.max(initial, 0), variants.length - 1));
-  const [replays, setReplays] = useState(0);
+  const [current, setCurrent] = createSignal(
+    untrack(() => Math.min(Math.max(props.initial, 0), props.variants.length - 1)),
+  );
+  const [replays, setReplays] = createSignal(0);
   const mounted = useIsClient();
-  const [ready, setReady] = useState(false);
-  const highlightRef = useRef<HTMLSpanElement>(null);
-  const itemRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const [ready, setReady] = createSignal(false);
+  let highlightEl: HTMLSpanElement | undefined;
+  const itemEls: (HTMLButtonElement | undefined)[] = [];
 
   const moveHighlight = () => {
-    const item = itemRefs.current[current];
-    const highlight = highlightRef.current;
+    const item = itemEls[untrack(current)];
+    const highlight = highlightEl;
     if (!item || !highlight) return;
     highlight.style.width = `${item.offsetWidth}px`;
     highlight.style.transform = `translateX(${item.offsetLeft}px)`;
   };
 
-  useLayoutEffect(moveHighlight);
+  createEffect(
+    () => [current(), mounted()],
+    () => moveHighlight(),
+  );
 
-  useEffect(() => {
+  onSettled(() => {
     let second = 0;
     const first = requestAnimationFrame(() => {
       second = requestAnimationFrame(() => setReady(true));
@@ -158,76 +168,41 @@ export function BookmarkRailLab({
       cancelAnimationFrame(first);
       cancelAnimationFrame(second);
     };
-  }, []);
+  });
 
-  useEffect(() => {
+  onSettled(() => {
     window.addEventListener("resize", moveHighlight);
     return () => window.removeEventListener("resize", moveHighlight);
   });
 
   const setActive = (index: number) => {
-    if (index < 0 || index >= variants.length) return;
+    if (index < 0 || index >= props.variants.length) return;
     setCurrent(index);
     setReplays((value) => value + 1);
-    onVariantChange(index + 1);
+    props.onVariantChange(index + 1);
   };
 
-  useEffect(() => {
+  onSettled(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.defaultPrevented) return;
       const target = event.target as HTMLElement;
       if (/^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName) || target.isContentEditable) return;
       if (event.metaKey || event.ctrlKey || event.altKey) return;
+      const count = props.variants.length;
       const digit = Number.parseInt(event.key, 10);
-      if (digit >= 1 && digit <= variants.length) setActive(digit - 1);
-      else if (event.key === "ArrowRight") setActive((current + 1) % variants.length);
-      else if (event.key === "ArrowLeft")
-        setActive((current - 1 + variants.length) % variants.length);
+      if (digit >= 1 && digit <= count) setActive(digit - 1);
+      else if (event.key === "ArrowRight") setActive((current() + 1) % count);
+      else if (event.key === "ArrowLeft") setActive((current() - 1 + count) % count);
       else if (event.key === "r" || event.key === "R") setReplays((value) => value + 1);
     };
     document.addEventListener("keydown", onKeyDown);
     return () => document.removeEventListener("keydown", onKeyDown);
   });
 
-  const variant = variants[current] ?? variants[0];
-  const active = useMemo<ActiveVariant | null>(
-    () => (variant ? { Component: variant.Component, mountKey: `${current}-${replays}` } : null),
-    [variant, current, replays],
-  );
-
-  const picker = (
-    <nav
-      className="proto-picker"
-      aria-label="Prototype variants"
-      data-ready={ready ? "" : undefined}
-    >
-      <span ref={highlightRef} className="proto-picker-highlight" aria-hidden="true" />
-      {variants.map((entry, index) => (
-        <button
-          key={entry.name}
-          ref={(node) => {
-            itemRefs.current[index] = node;
-          }}
-          type="button"
-          className="proto-picker-item"
-          data-active={index === current ? "" : undefined}
-          aria-current={index === current ? "true" : undefined}
-          onClick={() => setActive(index)}
-        >
-          {entry.name}
-        </button>
-      ))}
-      <span className="proto-picker-divider" aria-hidden="true" />
-      <button
-        type="button"
-        className="proto-picker-item proto-picker-replay"
-        aria-label="Replay animation (R)"
-        onClick={() => setReplays((value) => value + 1)}
-      >
-        ↻
-      </button>
-    </nav>
-  );
+  const active = createMemo<ActiveVariant | null>(() => {
+    const variant = props.variants[current()] ?? props.variants[0];
+    return variant ? { Component: variant.Component, mountKey: `${current()}-${replays()}` } : null;
+  });
 
   return (
     <>
@@ -235,7 +210,42 @@ export function BookmarkRailLab({
       <ActiveVariantContext value={active}>
         <VariantOOS1 startView="insights" InsightsPage={LabInsightsPage} />
       </ActiveVariantContext>
-      {mounted ? createPortal(picker, document.body) : null}
+      <Show when={mounted()}>
+        <Portal mount={document.body}>
+          <nav
+            class="proto-picker"
+            aria-label="Prototype variants"
+            data-ready={ready() ? "" : undefined}
+          >
+            <span ref={highlightEl} class="proto-picker-highlight" aria-hidden="true" />
+            <For each={props.variants}>
+              {(entry, index) => (
+                <button
+                  ref={(node) => {
+                    itemEls[index()] = node;
+                  }}
+                  type="button"
+                  class="proto-picker-item"
+                  data-active={index() === current() ? "" : undefined}
+                  aria-current={index() === current() ? "true" : undefined}
+                  onClick={() => setActive(index())}
+                >
+                  {entry.name}
+                </button>
+              )}
+            </For>
+            <span class="proto-picker-divider" aria-hidden="true" />
+            <button
+              type="button"
+              class="proto-picker-item proto-picker-replay"
+              aria-label="Replay animation (R)"
+              onClick={() => setReplays((value) => value + 1)}
+            >
+              ↻
+            </button>
+          </nav>
+        </Portal>
+      </Show>
     </>
   );
 }

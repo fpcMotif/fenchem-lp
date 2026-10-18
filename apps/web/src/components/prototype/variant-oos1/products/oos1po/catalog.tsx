@@ -1,6 +1,6 @@
-import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
+import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { useId } from "react";
+import { createUniqueId } from "solid-js";
 
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
@@ -20,10 +20,10 @@ const NUMERAL_FONT =
   '"Inter Tight", "Source Han Sans SC", "Noto Sans SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif';
 
 const TABLET = "@media (min-width: 768px) and (max-width: 1279.98px)";
-const DESKTOP = breakpoints.xl;
-const MD = breakpoints.md;
+const DESKTOP = "@media (min-width: 1280px)";
+const MD = "@media (min-width: 768px)";
 const MID = "@media (min-width: 768px) and (max-width: 1023.98px)";
-const WIDE = breakpoints.lg;
+const WIDE = "@media (min-width: 1024px)";
 const INSET = "min(120px, 8.333vw)";
 const HEADER_HEIGHT = 80;
 const TABLE_HEAD_HEIGHT = 42;
@@ -384,78 +384,75 @@ const styles = stylex.create({
   },
 });
 
-function SwatchGlyph({
-  color,
-  stated,
-  size,
-}: {
-  color: string | null;
-  stated: boolean;
-  size: number;
-}) {
-  const center = size / 2;
-  const radius = center - 0.5;
-  const fill = color === null ? "none" : stated ? color : desaturate(color, 0.4);
+function SwatchGlyph(props: { color: string | null; stated: boolean; size: number }) {
+  const center = () => props.size / 2;
+  const radius = () => center() - 0.5;
+  const fill = () => {
+    const color = props.color;
+    return color === null ? "none" : props.stated ? color : desaturate(color, 0.4);
+  };
   return (
     <svg
-      width={size}
-      height={size}
-      viewBox={`0 0 ${size} ${size}`}
+      width={props.size}
+      height={props.size}
+      viewBox={`0 0 ${props.size} ${props.size}`}
       aria-hidden="true"
-      focusable="false"
-      {...stylex.props(styles.legendDot)}
+      {...{ focusable: "false" }}
+      {...stylex.attrs(styles.legendDot)}
     >
       <circle
-        cx={center}
-        cy={center}
-        r={radius}
-        fill={fill}
-        stroke={color === null ? EMPTY_RING : SWATCH_RING}
-        strokeWidth={1}
-        strokeDasharray={color !== null && !stated ? dashPattern(radius) : undefined}
+        cx={center()}
+        cy={center()}
+        r={radius()}
+        fill={fill()}
+        stroke={props.color === null ? EMPTY_RING : SWATCH_RING}
+        stroke-width={1}
+        stroke-dasharray={props.color !== null && !props.stated ? dashPattern(radius()) : undefined}
       />
     </svg>
   );
 }
 
-function ToneCell({ traits }: { traits: ItemTraits }) {
+function ToneCell(props: { traits: ItemTraits }) {
+  const traits = props.traits;
   const reference = traits.color !== null && !traits.colorStated;
   return (
     <td
       title={reference ? REFERENCE_NOTE : undefined}
-      {...stylex.props(styles.cell, styles.toneCell)}
+      {...stylex.attrs(styles.cell, styles.toneCell)}
     >
-      <span {...stylex.props(styles.swatchSlot)}>
+      <span {...stylex.attrs(styles.swatchSlot)}>
         <SwatchGlyph color={traits.color} stated={traits.colorStated} size={16} />
       </span>
-      <span {...stylex.props(styles.toneWord)}>
+      <span {...stylex.attrs(styles.toneWord)}>
         {traits.colorWord ?? <span aria-hidden="true">—</span>}
-        {traits.colorWord === null && <span {...stylex.props(styles.srOnly)}>Not specified</span>}
-        {reference && <span {...stylex.props(styles.srOnly)}>, color is for reference</span>}
+        {traits.colorWord === null && <span {...stylex.attrs(styles.srOnly)}>Not specified</span>}
+        {reference && <span {...stylex.attrs(styles.srOnly)}>, color is for reference</span>}
       </span>
     </td>
   );
 }
 
-function ItemRow({ item }: { item: FlatItem }) {
+function ItemRow(props: { item: FlatItem }) {
+  const item = props.item;
   return (
-    <tr {...stylex.props(styles.row)}>
+    <tr {...stylex.attrs(styles.row)}>
       <ToneCell traits={item.traits} />
-      <th scope="row" {...stylex.props(styles.cell, styles.nameCell)}>
-        <span {...stylex.props(styles.primary)}>{item.primary}</span>
-        {item.secondary && <span {...stylex.props(styles.secondary)}>{item.secondary}</span>}
+      <th scope="row" {...stylex.attrs(styles.cell, styles.nameCell)}>
+        <span {...stylex.attrs(styles.primary)}>{item.primary}</span>
+        {item.secondary && <span {...stylex.attrs(styles.secondary)}>{item.secondary}</span>}
       </th>
-      <td {...stylex.props(styles.cell, styles.inciCell)}>
+      <td {...stylex.attrs(styles.cell, styles.inciCell)}>
         {item.inci.replaceAll("）", GLUED_CLOSE_PAREN)}
       </td>
-      <td {...stylex.props(styles.cell, styles.featCell, styles.lastCell)}>{item.features}</td>
+      <td {...stylex.attrs(styles.cell, styles.featCell, styles.lastCell)}>{item.features}</td>
     </tr>
   );
 }
 
 export function Catalog() {
   const reduce = useReducedMotion();
-  const baseId = useId();
+  const baseId = createUniqueId();
   const titleId = `${baseId}-title`;
   const captionId = `${baseId}-caption`;
   const legendId = `${baseId}-legend`;
@@ -465,7 +462,7 @@ export function Catalog() {
     const target = document.getElementById(groupHeadId(groupId));
     if (!target) return;
     target.focus({ preventScroll: true });
-    target.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+    target.scrollIntoView({ behavior: reduce() ? "auto" : "smooth", block: "start" });
   };
 
   return (
@@ -473,25 +470,25 @@ export function Catalog() {
       id="products-catalog"
       aria-labelledby={titleId}
       lang="zh-CN"
-      {...stylex.props(styles.section)}
+      {...stylex.attrs(styles.section)}
     >
-      <div {...stylex.props(styles.shell)}>
-        <h2 id={titleId} {...stylex.props(styles.title)}>
+      <div {...stylex.attrs(styles.shell)}>
+        <h2 id={titleId} {...stylex.attrs(styles.title)}>
           产品目录
         </h2>
-        <nav aria-label="Jump by group" {...stylex.props(styles.jumpNav)}>
-          <ul {...stylex.props(styles.jumpList)}>
+        <nav aria-label="Jump by group" {...stylex.attrs(styles.jumpNav)}>
+          <ul {...stylex.attrs(styles.jumpList)}>
             {GROUP_ROWS.map(({ group, short, items }) => (
-              <li key={group.id} {...stylex.props(styles.jumpItem)}>
+              <li {...stylex.attrs(styles.jumpItem)}>
                 <button
                   type="button"
                   aria-controls={groupHeadId(group.id)}
                   onClick={() => jumpTo(group.id)}
-                  {...stylex.props(styles.jumpButton)}
+                  {...stylex.attrs(styles.jumpButton)}
                 >
                   {short}
-                  <span {...stylex.props(styles.jumpCount)}>{items.length}</span>
-                  <span {...stylex.props(styles.srOnly)}> items</span>
+                  <span {...stylex.attrs(styles.jumpCount)}>{items.length}</span>
+                  <span {...stylex.attrs(styles.srOnly)}> items</span>
                 </button>
               </li>
             ))}
@@ -500,71 +497,71 @@ export function Catalog() {
         <table
           aria-labelledby={`${titleId} ${captionId}`}
           aria-describedby={legendId}
-          {...stylex.props(styles.table)}
+          {...stylex.attrs(styles.table)}
         >
-          <caption {...stylex.props(styles.caption)}>
-            <span id={captionId} {...stylex.props(styles.captionLine)}>
+          <caption {...stylex.attrs(styles.caption)}>
+            <span id={captionId} {...stylex.attrs(styles.captionLine)}>
               全部原料
-              <span {...stylex.props(styles.captionCount)}>{TOTAL_ITEMS}</span>款
+              <span {...stylex.attrs(styles.captionCount)}>{TOTAL_ITEMS}</span>款
             </span>
-            <span id={legendId} {...stylex.props(styles.legend)}>
-              <span {...stylex.props(styles.legendKey)}>
+            <span id={legendId} {...stylex.attrs(styles.legend)}>
+              <span {...stylex.attrs(styles.legendKey)}>
                 <SwatchGlyph color="#d9c690" stated size={12} />
                 实线：描述中注明的色泽
               </span>
               <span aria-hidden="true">·</span>
-              <span {...stylex.props(styles.legendKey)}>
+              <span {...stylex.attrs(styles.legendKey)}>
                 <SwatchGlyph color="#d9c690" stated={false} size={12} />
                 虚线：参考色泽
               </span>
             </span>
           </caption>
           <colgroup>
-            <col {...stylex.props(styles.colTone)} />
-            <col {...stylex.props(styles.colName)} />
-            <col {...stylex.props(styles.colInci)} />
+            <col {...stylex.attrs(styles.colTone)} />
+            <col {...stylex.attrs(styles.colName)} />
+            <col {...stylex.attrs(styles.colInci)} />
             <col />
           </colgroup>
-          <thead {...stylex.props(styles.head)}>
+          <thead {...stylex.attrs(styles.head)}>
             <tr>
-              <th scope="col" {...stylex.props(styles.headCell)}>
+              <th scope="col" {...stylex.attrs(styles.headCell)}>
                 <span aria-hidden="true">色泽</span>
-                <span {...stylex.props(styles.srOnly)}>Color</span>
+                <span {...stylex.attrs(styles.srOnly)}>Color</span>
               </th>
-              <th scope="col" {...stylex.props(styles.headCell)}>
+              <th scope="col" {...stylex.attrs(styles.headCell)}>
                 <span aria-hidden="true">名称</span>
-                <span {...stylex.props(styles.srOnly)}>Name</span>
+                <span {...stylex.attrs(styles.srOnly)}>Name</span>
               </th>
-              <th scope="col" {...stylex.props(styles.headCell)}>
+              <th scope="col" {...stylex.attrs(styles.headCell)}>
                 <span aria-hidden="true">INCI 名称</span>
-                <span {...stylex.props(styles.srOnly)}>INCI name</span>
+                <span {...stylex.attrs(styles.srOnly)}>INCI name</span>
               </th>
-              <th scope="col" {...stylex.props(styles.headCell, styles.lastCell)}>
+              <th scope="col" {...stylex.attrs(styles.headCell, styles.lastCell)}>
                 <span aria-hidden="true">特性&应用</span>
-                <span {...stylex.props(styles.srOnly)}>Features & applications</span>
+                <span {...stylex.attrs(styles.srOnly)}>Features & applications</span>
               </th>
             </tr>
           </thead>
           {GROUP_ROWS.map(({ group, items }, index) => (
-            <tbody key={group.id} {...stylex.props(styles.group)}>
-              <tr {...stylex.props(styles.groupRow)}>
+            <tbody {...stylex.attrs(styles.group)}>
+              <tr {...stylex.attrs(styles.groupRow)}>
                 <th
                   id={groupHeadId(group.id)}
 
                   scope="rowgroup"
-                  colSpan={4}
-                  tabIndex={-1}
-                  {...stylex.props(styles.groupCell, index === 0 && styles.groupCellFirst)}
+                  colspan={4}
+                  tabindex={-1}
+                  {...stylex.attrs(styles.groupCell, index === 0 && styles.groupCellFirst)}
                 >
-                  <span {...stylex.props(styles.groupLine)}>
-                    <span {...stylex.props(styles.groupLabel)}>{group.label}</span>
-                    <span {...stylex.props(styles.groupCount)}>{items.length} 款</span>
+                  <span {...stylex.attrs(styles.groupLine)}>
+                    <span {...stylex.attrs(styles.groupLabel)}>{group.label}</span>
+                    <span {...stylex.attrs(styles.groupCount)}>{items.length} 款</span>
                   </span>
-                  {group.intro && <p {...stylex.props(styles.groupIntro)}>{group.intro}</p>}
+                  {group.intro && <p {...stylex.attrs(styles.groupIntro)}>{group.intro}</p>}
                 </th>
               </tr>
               {items.map((item) => (
-                <ItemRow key={item.id} item={item} />
+                <ItemRow item={item} />
               ))}
             </tbody>
           ))}

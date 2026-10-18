@@ -25,11 +25,11 @@ const S = stylex.create({
   },
 });
 
-export function AboutOOS1I({ onNavigateHome }: AboutPageProps) {
+export function AboutOOS1I(props: AboutPageProps) {
   return (
-    <div id="about-top" {...stylex.props(S.root)}>
+    <div id="about-top" {...stylex.attrs(S.root)}>
       <Hero />
-      <SubNav onNavigateHome={onNavigateHome} />
+      <SubNav onNavigateHome={props.onNavigateHome} />
       <Profile />
       <Band />
       <Campus />
@@ -37,8 +37,8 @@ export function AboutOOS1I({ onNavigateHome }: AboutPageProps) {
       <Csr />
       <Honors />
       <Structure />
-      <Products onNavigateHome={onNavigateHome} />
-      <Cta onNavigateHome={onNavigateHome} />
+      <Products onNavigateHome={props.onNavigateHome} />
+      <Cta onNavigateHome={props.onNavigateHome} />
     </div>
   );
 }

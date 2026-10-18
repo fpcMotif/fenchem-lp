@@ -1,8 +1,8 @@
-import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
+import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { ChevronRight } from "lucide-react";
-import { type MotionValue, m, useMotionValue, useTransform } from "motion/react";
-import { type RefObject, useEffect, useRef } from "react";
+import { ChevronRight } from "@fenchem-lp/ui/components/lucide";
+import { type MotionValue, m, useMotionValue, useTransform } from "@/compat/motion";
+import { createEffect, Show, type Accessor } from "solid-js";
 
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
@@ -12,7 +12,7 @@ import { SECTION_IDS } from "./data";
 import { layout } from "./layout";
 import { media, palette } from "./palette.stylex";
 
-const LG = breakpoints.lg;
+const LG = "@media (min-width: 1024px)";
 
 const NAV_NAMES: Readonly<Record<string, string>> = {
   "about-profile": "Profile",
@@ -85,7 +85,7 @@ const styles = stylex.create({
     boxSizing: "border-box",
     paddingInlineStart: {
       default: 20,
-      [breakpoints.sm]: 28,
+      ["@media (min-width: 640px)"]: 28,
       [media.tablet]: 40,
       [LG]: "min(72px, 5.2vw)",
     },
@@ -123,7 +123,7 @@ const styles = stylex.create({
   },
   breadcrumbCurrent: {
     position: "relative",
-    display: { default: "none", [breakpoints.md]: "inline" },
+    display: { default: "none", ["@media (min-width: 768px)"]: "inline" },
     color: palette.ink,
   },
   breadcrumbChevron: {
@@ -169,89 +169,87 @@ const styles = stylex.create({
 
 const CROSS_PATH = "M8 0V16M0 8H16";
 
-export function BisectLine({
-  progress,
-  rootRef,
-}: {
+export function BisectLine(props: {
   progress: MotionValue<number>;
-  rootRef: RefObject<HTMLElement | null>;
+  root: Accessor<HTMLElement | undefined>;
 }) {
   const reduce = useReducedMotion();
   const rootHeight = useMotionValue(0);
-  const riderY = useTransform([progress, rootHeight], ([p, h]: number[]) => p * h);
+  const riderY = useTransform([props.progress, rootHeight], ([p, h]: number[]) => p * h);
 
-  useEffect(() => {
-    const root = rootRef.current;
+  createEffect(props.root, (root) => {
     if (!root) return;
     rootHeight.set(root.offsetHeight);
     const observer = new ResizeObserver(() => rootHeight.set(root.offsetHeight));
     observer.observe(root);
     return () => observer.disconnect();
-  }, [rootRef, rootHeight]);
+  });
 
   return (
-    <div aria-hidden="true" {...stylex.props(styles.overlay)}>
-      <span {...stylex.props(styles.line)} />
-      {reduce ? null : (
-        <m.span {...stylex.props(styles.rider)} style={{ y: riderY }}>
-          <svg viewBox="0 0 16 16" width="16" height="16" focusable="false">
-            <path d={CROSS_PATH} {...stylex.props(styles.crossHalo)} />
-            <path d={CROSS_PATH} {...stylex.props(styles.crossLine)} />
+    <div aria-hidden="true" {...stylex.attrs(styles.overlay)}>
+      <span {...stylex.attrs(styles.line)} />
+      <Show when={!reduce()}>
+        <m.span {...stylex.attrs(styles.rider)} style={{ y: riderY }}>
+          <svg viewBox="0 0 16 16" width="16" height="16" {...{ focusable: "false" }}>
+            <path d={CROSS_PATH} {...stylex.attrs(styles.crossHalo)} />
+            <path d={CROSS_PATH} {...stylex.attrs(styles.crossLine)} />
           </svg>
         </m.span>
-      )}
+      </Show>
     </div>
   );
 }
 
-export function SubNav({ onNavigateHome }: { onNavigateHome: (hash?: string) => void }) {
+export function SubNav(props: { onNavigateHome: (hash?: string) => void }) {
   const active = useActiveSection(SECTION_IDS);
-  const chipsRef = useRef<HTMLElement>(null);
+  let chipsRef: HTMLElement | undefined;
   const reduce = useReducedMotion();
 
-  useEffect(() => {
-    const list = chipsRef.current;
-    const chip = active ? list?.querySelector<HTMLElement>(`[href="#${active}"]`) : null;
-    if (!list || !chip) return;
-    const listBox = list.getBoundingClientRect();
-    const chipBox = chip.getBoundingClientRect();
-    if (chipBox.left < listBox.left || chipBox.right > listBox.right) {
-      list.scrollBy({
-        left: chipBox.left - listBox.left - 16,
-        behavior: reduce ? "auto" : "smooth",
-      });
-    }
-  }, [active, reduce]);
+  createEffect(
+    () => [active(), reduce()] as const,
+    ([current, reduceNow]) => {
+      const list = chipsRef;
+      const chip = current ? list?.querySelector<HTMLElement>(`[href="#${current}"]`) : null;
+      if (!list || !chip) return;
+      const listBox = list.getBoundingClientRect();
+      const chipBox = chip.getBoundingClientRect();
+      if (chipBox.left < listBox.left || chipBox.right > listBox.right) {
+        list.scrollBy({
+          left: chipBox.left - listBox.left - 16,
+          behavior: reduceNow ? "auto" : "smooth",
+        });
+      }
+    },
+  );
 
   return (
-    <div {...stylex.props(styles.bar)}>
-      <div {...stylex.props(layout.shell, styles.barSplit)}>
-        <nav aria-label="Breadcrumb" {...stylex.props(styles.barLeft, styles.breadcrumb)}>
+    <div {...stylex.attrs(styles.bar)}>
+      <div {...stylex.attrs(layout.shell, styles.barSplit)}>
+        <nav aria-label="Breadcrumb" {...stylex.attrs(styles.barLeft, styles.breadcrumb)}>
           <button
             type="button"
-            onClick={() => onNavigateHome("top")}
-            {...stylex.props(styles.breadcrumbLink, layout.focusRing)}
+            onClick={() => props.onNavigateHome("top")}
+            {...stylex.attrs(styles.breadcrumbLink, layout.focusRing)}
           >
             <span lang="en">Home</span>
           </button>
-          <ChevronRight size={14} aria-hidden="true" {...stylex.props(styles.breadcrumbChevron)} />
-          <span aria-current="page" {...stylex.props(styles.breadcrumbCurrent)}>
+          <ChevronRight size={14} aria-hidden="true" {...stylex.attrs(styles.breadcrumbChevron)} />
+          <span aria-current="page" {...stylex.attrs(styles.breadcrumbCurrent)}>
             <span lang="en">About</span>
           </span>
         </nav>
         <nav
           aria-label="On this page"
           ref={chipsRef}
-          {...stylex.props(styles.barRight, styles.chips)}
+          {...stylex.attrs(styles.barRight, styles.chips)}
         >
           {ABOUT_HERO.navChips.map((chip) => (
             <a
-              key={chip.id}
               href={`#${chip.id}`}
-              aria-current={active === chip.id ? "location" : undefined}
-              {...stylex.props(
+              aria-current={active() === chip.id ? "location" : undefined}
+              {...stylex.attrs(
                 styles.chip,
-                active === chip.id && styles.chipActive,
+                active() === chip.id && styles.chipActive,
                 layout.focusRing,
               )}
             >

@@ -1,5 +1,5 @@
 import * as stylex from "@stylexjs/stylex";
-import { useState } from "react";
+import { createSignal } from "solid-js";
 
 import { corridorGeometry } from "./corridor-geometry";
 import { LAKE, WORKS, srOnly, ui } from "./shared";
@@ -152,69 +152,67 @@ const styles = stylex.create({
   },
 });
 
-export function CorridorPlan({ onOpen }: { onOpen: (index: number) => void }) {
-  const [hovered, setHovered] = useState<number | null>(null);
+export function CorridorPlan(props: { onOpen: (index: number) => void }) {
+  const [hovered, setHovered] = createSignal<number | null>(null);
   return (
-    <div {...stylex.props(styles.plan)}>
-      <div {...stylex.props(styles.field)}>
-        <div aria-hidden="true" {...stylex.props(styles.corridor)}>
-          <span {...stylex.props(styles.sight)} />
-          <span {...stylex.props(styles.here)} />
-          <span lang="en" {...stylex.props(ui.caps, styles.hereLabel)}>
+    <div {...stylex.attrs(styles.plan)}>
+      <div {...stylex.attrs(styles.field)}>
+        <div aria-hidden="true" {...stylex.attrs(styles.corridor)}>
+          <span {...stylex.attrs(styles.sight)} />
+          <span {...stylex.attrs(styles.here)} />
+          <span lang="en" {...stylex.attrs(ui.caps, styles.hereLabel)}>
             You are here
           </span>
           {REFERENCE.frames.map((frame, index) => (
             <span
-              key={WORKS[index].id}
               style={{
                 left: percent(frame.depth - frame.length / 2),
                 width: percent(frame.length),
               }}
-              {...stylex.props(
+              {...stylex.attrs(
                 styles.tick,
                 frame.wall === "left" ? styles.tickLeft : styles.tickRight,
-                hovered === index && styles.tickActive,
+                hovered() === index && styles.tickActive,
               )}
             />
           ))}
-          <span style={LAKE_TICK} {...stylex.props(styles.lakeTick)} />
+          <span style={LAKE_TICK} {...stylex.attrs(styles.lakeTick)} />
         </div>
-        <ol {...stylex.props(styles.list)}>
+        <ol {...stylex.attrs(styles.list)}>
           {WORKS.map((work, index) => (
             <li
-              key={work.id}
               style={{ left: percent(REFERENCE.frames[index].depth) }}
-              {...stylex.props(
+              {...stylex.attrs(
                 styles.item,
                 work.wall === "left" ? styles.itemLeft : styles.itemRight,
               )}
             >
               <button
                 type="button"
-                onClick={() => onOpen(index)}
+                onClick={() => props.onOpen(index)}
                 onMouseEnter={() => setHovered(index)}
                 onMouseLeave={() => setHovered(null)}
                 onFocus={() => setHovered(index)}
                 onBlur={() => setHovered(null)}
-                {...stylex.props(ui.button, ui.focus, styles.work)}
+                {...stylex.attrs(ui.button, ui.focus, styles.work)}
               >
-                <span lang="en" {...stylex.props(ui.number, styles.number)}>
+                <span lang="en" {...stylex.attrs(ui.number, styles.number)}>
                   {work.number}
                 </span>
-                <span {...stylex.props(styles.caption)}>{work.caption}</span>
+                <span {...stylex.attrs(styles.caption)}>{work.caption}</span>
                 <span {...srOnly}>, View larger</span>
               </button>
             </li>
           ))}
         </ol>
-        <p {...stylex.props(styles.lakeLabel)}>
-          <span {...stylex.props(styles.lakeTitle)}>
-            <span lang="en" {...stylex.props(ui.number, styles.number)}>
+        <p {...stylex.attrs(styles.lakeLabel)}>
+          <span {...stylex.attrs(styles.lakeTitle)}>
+            <span lang="en" {...stylex.attrs(ui.number, styles.number)}>
               {LAKE.number}
             </span>
-            <span {...stylex.props(styles.caption)}>{LAKE.title}</span>
+            <span {...stylex.attrs(styles.caption)}>{LAKE.title}</span>
           </span>
-          <span lang="en" {...stylex.props(ui.italic, styles.lakeNote)}>
+          <span lang="en" {...stylex.attrs(ui.italic, styles.lakeNote)}>
             facing you
           </span>
         </p>

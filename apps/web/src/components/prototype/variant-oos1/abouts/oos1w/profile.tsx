@@ -119,31 +119,31 @@ const styles = stylex.create({
 
 export function Profile() {
   return (
-    <section id="about-profile" aria-labelledby="oos1w-profile" {...stylex.props(ui.section)}>
-      <div {...stylex.props(ui.shell)}>
-        <div {...stylex.props(ui.grid, ui.ruled)}>
-          <div {...stylex.props(ui.headCol)}>
+    <section id="about-profile" aria-labelledby="oos1w-profile" {...stylex.attrs(ui.section)}>
+      <div {...stylex.attrs(ui.shell)}>
+        <div {...stylex.attrs(ui.grid, ui.ruled)}>
+          <div {...stylex.attrs(ui.headCol)}>
             <SectionHead num="01" word="Abstract" title={PROFILE_LABEL} titleId="oos1w-profile" />
           </div>
 
-          <div {...stylex.props(styles.abstract)}>
-            <h3 {...stylex.props(styles.company)}>{ABOUT_HERO.title}</h3>
-            <p lang="en" {...stylex.props(ui.english, styles.english)}>
+          <div {...stylex.attrs(styles.abstract)}>
+            <h3 {...stylex.attrs(styles.company)}>{ABOUT_HERO.title}</h3>
+            <p lang="en" {...stylex.attrs(ui.english, styles.english)}>
               {ABOUT_HERO.englishTitle}
             </p>
-            <p {...stylex.props(styles.lead)}>{ABOUT_HERO.lead}</p>
+            <p {...stylex.attrs(styles.lead)}>{ABOUT_HERO.lead}</p>
 
-            <div {...stylex.props(styles.network)}>
-              <p {...stylex.props(styles.networkCaption)}>
-                <span lang="en" {...stylex.props(ui.micro)}>
+            <div {...stylex.attrs(styles.network)}>
+              <p {...stylex.attrs(styles.networkCaption)}>
+                <span lang="en" {...stylex.attrs(ui.micro)}>
                   Table 1
                 </span>
                 <span>{ABOUT_HERO.networkLabel}</span>
               </p>
-              <ol {...stylex.props(styles.countries)}>
+              <ol {...stylex.attrs(styles.countries)}>
                 {ABOUT_HERO.countries.map((country, index) => (
-                  <li key={country} {...stylex.props(styles.country)}>
-                    <span aria-hidden="true" {...stylex.props(ui.micro, styles.index)}>
+                  <li {...stylex.attrs(styles.country)}>
+                    <span aria-hidden="true" {...stylex.attrs(ui.micro, styles.index)}>
                       {String(index + 1).padStart(2, "0")}
                     </span>
                     {country}
@@ -153,21 +153,21 @@ export function Profile() {
             </div>
           </div>
 
-          <figure {...stylex.props(styles.lobby)}>
-            <div {...stylex.props(styles.lobbyFrame)}>
+          <figure {...stylex.attrs(styles.lobby)}>
+            <div {...stylex.attrs(styles.lobbyFrame)}>
               <img
                 src={ABOUT_HERO.lobbyImage}
                 alt={ABOUT_HERO.lobbyEnglish}
                 loading="lazy"
                 decoding="async"
-                {...stylex.props(styles.lobbyImage)}
+                {...stylex.attrs(styles.lobbyImage)}
               />
             </div>
-            <figcaption {...stylex.props(ui.micro, styles.figCaption)}>
-              <span lang="en" {...stylex.props(styles.figNum)}>
+            <figcaption {...stylex.attrs(ui.micro, styles.figCaption)}>
+              <span lang="en" {...stylex.attrs(styles.figNum)}>
                 Fig. 1
               </span>
-              <span {...stylex.props(styles.figText)}>{ABOUT_HERO.lobbyCaption}</span>
+              <span {...stylex.attrs(styles.figText)}>{ABOUT_HERO.lobbyCaption}</span>
             </figcaption>
           </figure>
         </div>

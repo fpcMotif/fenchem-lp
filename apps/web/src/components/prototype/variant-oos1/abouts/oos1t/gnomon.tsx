@@ -1,8 +1,9 @@
 import * as stylex from "@stylexjs/stylex";
+import { dynamic, type JSX } from "@solidjs/web";
 import type { StyleXStyles } from "@stylexjs/stylex";
-import type { CSSProperties, ReactNode } from "react";
 
 import { bp, chrome, face, tone } from "./tokens.stylex";
+import { merge } from "solid-js";
 
 const sunrise = stylex.keyframes({
   "0%": { clipPath: "inset(0 0 100% 0)", opacity: 0 },
@@ -69,32 +70,28 @@ const styles = stylex.create({
   },
 });
 
-export function Gnomon({
-  text,
-  id,
-  level,
-  rise = false,
-  sx,
-  children,
-}: {
+export function Gnomon(props: {
   text: string;
   id: string;
   level: 1 | 2;
   rise?: boolean;
   sx?: StyleXStyles;
-  children?: ReactNode;
+  children?: JSX.Element;
 }) {
-  const Heading = level === 1 ? "h1" : "h2";
-  const vars = { "--gh": `calc(var(--gfs) * ${(text.length * 1.06).toFixed(2)})` } as CSSProperties;
+  const p = merge({ rise: false }, props);
+  const Heading = dynamic(() => (p.level === 1 ? "h1" : "h2"));
+  const vars = {
+    "--gh": `calc(var(--gfs) * ${(p.text.length * 1.06).toFixed(2)})`,
+  } as JSX.CSSProperties;
   return (
-    <div style={vars} {...stylex.props(styles.box, sx)}>
-      <Heading id={id} {...stylex.props(styles.title)}>
-        {text}
+    <div style={vars} {...stylex.attrs(styles.box, p.sx)}>
+      <Heading id={p.id} {...stylex.attrs(styles.title)}>
+        {p.text}
       </Heading>
-      <span aria-hidden="true" {...stylex.props(styles.shadow, rise && styles.rise)}>
-        <span {...stylex.props(styles.flipped)}>{text}</span>
+      <span aria-hidden="true" {...stylex.attrs(styles.shadow, p.rise && styles.rise)}>
+        <span {...stylex.attrs(styles.flipped)}>{p.text}</span>
       </span>
-      <span {...stylex.props(styles.foot)}>{children}</span>
+      <span {...stylex.attrs(styles.foot)}>{p.children}</span>
     </div>
   );
 }

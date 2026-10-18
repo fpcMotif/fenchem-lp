@@ -1,5 +1,5 @@
 import * as stylex from "@stylexjs/stylex";
-import { useEffect, useRef, type RefObject } from "react";
+import { createEffect, createSignal, type Accessor } from "solid-js";
 
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
@@ -145,76 +145,78 @@ const PANE_STYLES = [styles.paneLab, styles.paneLake, styles.paneLounge] as cons
 const PHOTO_STYLES = [styles.photoLab, styles.photoLake, styles.photoLounge] as const;
 const STRIP_STYLES = [styles.stripLab, null, styles.stripLounge] as const;
 
-function useRackFocus(listRef: RefObject<HTMLOListElement | null>) {
+function useRackFocus(listRef: Accessor<HTMLOListElement | undefined>) {
   const reduce = useReducedMotion();
-  useEffect(() => {
-    const list = listRef.current;
-    if (!list || reduce) return;
-    const panes = Array.from(list.children).filter(
-      (child): child is HTMLElement => child instanceof HTMLElement,
-    );
-    let frame = 0;
-    const measure = () => {
-      frame = 0;
-      const visible = window.innerHeight - CHROME_HEIGHT;
-      const focusLine = CHROME_HEIGHT + visible / 2;
-      const reach = visible * 0.62;
-      const plateau = reach * 0.18;
-      for (const pane of panes) {
-        const box = pane.getBoundingClientRect();
-        const distance = Math.abs(box.top + box.height / 2 - focusLine);
-        const t = Math.min(1, Math.max(0, (reach - distance) / (reach - plateau)));
-        const focus = t * t * (3 - 2 * t);
-        pane.style.setProperty("--focus", focus.toFixed(3));
-        pane.style.zIndex = String(1 + Math.round(focus * 8));
-      }
-    };
-    const schedule = () => {
-      if (!frame) frame = requestAnimationFrame(measure);
-    };
-    measure();
-    window.addEventListener("scroll", schedule, { passive: true });
-    window.addEventListener("resize", schedule);
-    return () => {
-      cancelAnimationFrame(frame);
-      window.removeEventListener("scroll", schedule);
-      window.removeEventListener("resize", schedule);
-      for (const pane of panes) {
-        pane.style.removeProperty("--focus");
-        pane.style.removeProperty("z-index");
-      }
-    };
-  }, [listRef, reduce]);
+  createEffect(
+    () => [listRef(), reduce()] as const,
+    ([list, reduced]) => {
+      if (!list || reduced) return;
+      const panes = Array.from(list.children).filter(
+        (child): child is HTMLElement => child instanceof HTMLElement,
+      );
+      let frame = 0;
+      const measure = () => {
+        frame = 0;
+        const visible = window.innerHeight - CHROME_HEIGHT;
+        const focusLine = CHROME_HEIGHT + visible / 2;
+        const reach = visible * 0.62;
+        const plateau = reach * 0.18;
+        for (const pane of panes) {
+          const box = pane.getBoundingClientRect();
+          const distance = Math.abs(box.top + box.height / 2 - focusLine);
+          const t = Math.min(1, Math.max(0, (reach - distance) / (reach - plateau)));
+          const focus = t * t * (3 - 2 * t);
+          pane.style.setProperty("--focus", focus.toFixed(3));
+          pane.style.zIndex = String(1 + Math.round(focus * 8));
+        }
+      };
+      const schedule = () => {
+        if (!frame) frame = requestAnimationFrame(measure);
+      };
+      measure();
+      window.addEventListener("scroll", schedule, { passive: true });
+      window.addEventListener("resize", schedule);
+      return () => {
+        cancelAnimationFrame(frame);
+        window.removeEventListener("scroll", schedule);
+        window.removeEventListener("resize", schedule);
+        for (const pane of panes) {
+          pane.style.removeProperty("--focus");
+          pane.style.removeProperty("z-index");
+        }
+      };
+    },
+  );
 }
 
 export function CultureStory() {
-  const listRef = useRef<HTMLOListElement>(null);
+  const [listRef, setListRef] = createSignal<HTMLOListElement>();
   useRackFocus(listRef);
 
   return (
     <section
       id="about-culture"
       aria-labelledby="oos1y-culture"
-      {...stylex.props(ui.anchor, styles.section)}
+      {...stylex.attrs(ui.anchor, styles.section)}
     >
       <h2 id="oos1y-culture" {...srOnly}>
         {ABOUT_CULTURE.eyebrow}
       </h2>
-      <div {...stylex.props(ui.shell)}>
-        <ol ref={listRef} {...stylex.props(styles.scenes)}>
+      <div {...stylex.attrs(ui.shell)}>
+        <ol ref={setListRef} {...stylex.attrs(styles.scenes)}>
           {SCENES.map((scene, index) => (
-            <li key={scene.value.title} {...stylex.props(styles.pane, PANE_STYLES[index])}>
+            <li {...stylex.attrs(styles.pane, PANE_STYLES[index])}>
               <img
                 src={scene.image}
                 alt={scene.alt}
                 loading="lazy"
                 decoding="async"
-                {...stylex.props(ui.fill, PHOTO_STYLES[index])}
+                {...stylex.attrs(ui.fill, PHOTO_STYLES[index])}
               />
-              <div {...stylex.props(styles.strip, STRIP_STYLES[index])}>
-                <p {...stylex.props(styles.lead)}>{scene.lead}，</p>
-                <h3 {...stylex.props(ui.etched, styles.title)}>{scene.value.title}</h3>
-                <p {...stylex.props(styles.desc)}>{scene.value.desc}</p>
+              <div {...stylex.attrs(styles.strip, STRIP_STYLES[index])}>
+                <p {...stylex.attrs(styles.lead)}>{scene.lead}，</p>
+                <h3 {...stylex.attrs(ui.etched, styles.title)}>{scene.value.title}</h3>
+                <p {...stylex.attrs(styles.desc)}>{scene.value.desc}</p>
               </div>
             </li>
           ))}

@@ -1,6 +1,13 @@
 import * as stylex from "@stylexjs/stylex";
-import { animate, m, useInView, useMotionValue, useScroll, useTransform } from "motion/react";
-import { useEffect, useRef } from "react";
+import {
+  animate,
+  m,
+  motionValue,
+  useInView,
+  useMotionValue,
+  useScroll,
+  useTransform,
+} from "@/compat/motion";
 
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
@@ -11,6 +18,7 @@ import { SectionHead } from "./section-head";
 import { PINNED_QUERY, ui } from "./shared";
 import { bp, chrome, face, tone } from "./tokens.stylex";
 import { useMediaQuery } from "./use-media-query";
+import { createEffect, createSignal } from "solid-js";
 
 const GROWTH_END = 0.5;
 const SAPLING = 0.14;
@@ -213,10 +221,10 @@ const styles = stylex.create({
 });
 
 export function Growth() {
-  const trackRef = useRef<HTMLDivElement>(null);
-  const canvasRef = useRef<HTMLDivElement>(null);
-  const discRef = useRef<HTMLDivElement>(null);
-  const saplingRef = useRef(0);
+  const [trackRef, setTrackRef] = createSignal<HTMLDivElement>();
+  const [canvasRef, setCanvasRef] = createSignal<HTMLDivElement>();
+  const [discRef, setDiscRef] = createSignal<HTMLDivElement>();
+  const saplingRef = { current: 0 };
   const pinned = useMediaQuery(PINNED_QUERY);
   const reduce = useReducedMotion();
   const growth = useMotionValue(0);
@@ -228,93 +236,97 @@ export function Growth() {
     offset: ["start 80px", "end end"],
   });
 
-  useEffect(() => {
-    if (reduce) {
-      growth.set(1);
-      return;
-    }
-    if (pinned) {
-      const sapling = saplingRef;
-      const sync = () => {
-        const scrolled = Math.min(Math.max(scrollYProgress.get() / GROWTH_END, 0), 1);
-        growth.set(Math.min(sapling.current + (1 - SAPLING) * scrolled, 1));
-      };
-      const intro = animate(sapling.current, SAPLING, {
-        duration: 2,
-        delay: 0.4,
-        ease: [0.3, 0, 0.2, 1],
-        onUpdate: (value) => {
-          sapling.current = value;
-          sync();
-        },
-      });
-      sync();
-      const unsubscribe = scrollYProgress.on("change", sync);
-      return () => {
-        intro.stop();
-        unsubscribe();
-      };
-    }
-    if (!inView) {
-      growth.set(0);
-      return;
-    }
-    const controls = animate(growth, 1, { duration: 3.4, ease: [0.42, 0, 0.3, 1] });
-    return () => controls.stop();
-  }, [growth, inView, pinned, reduce, scrollYProgress]);
+  createEffect(
+    () => ({ reduce: reduce(), pinned: pinned(), inView: inView() }),
+    ({ reduce, pinned, inView }) => {
+      if (reduce) {
+        growth.set(1);
+        return;
+      }
+      if (pinned) {
+        const sapling = saplingRef;
+        const sync = () => {
+          const scrolled = Math.min(Math.max(scrollYProgress.get() / GROWTH_END, 0), 1);
+          growth.set(Math.min(sapling.current + (1 - SAPLING) * scrolled, 1));
+        };
+        const intro = animate(motionValue(sapling.current), SAPLING, {
+          duration: 2,
+          delay: 0.4,
+          ease: [0.3, 0, 0.2, 1],
+          onUpdate: (value: number) => {
+            sapling.current = value;
+            sync();
+          },
+        });
+        sync();
+        const unsubscribe = scrollYProgress.on("change", sync);
+        return () => {
+          intro.stop();
+          unsubscribe();
+        };
+      }
+      if (!inView) {
+        growth.set(0);
+        return;
+      }
+      const controls = animate(growth, 1, { duration: 3.4, ease: [0.42, 0, 0.3, 1] });
+      return () => controls.stop();
+    },
+  );
 
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    const disc = discRef.current;
-    if (!pinned || !canvas || !disc) return;
-    const measure = () => {
-      const width = canvas.clientWidth;
-      travel.set((5 * width) / 12 + 10);
-      fit.set(Math.min(0.86, (width - 24) / 2 / Math.max(disc.offsetWidth, 1)));
-    };
-    measure();
-    const observer = new ResizeObserver(measure);
-    observer.observe(canvas);
-    return () => observer.disconnect();
-  }, [fit, pinned, travel]);
+  createEffect(
+    () => ({ pinned: pinned(), canvas: canvasRef(), disc: discRef() }),
+    ({ pinned, canvas, disc }) => {
+      if (!pinned || !canvas || !disc) return;
+      const measure = () => {
+        const width = canvas.clientWidth;
+        travel.set((5 * width) / 12 + 10);
+        fit.set(Math.min(0.86, (width - 24) / 2 / Math.max(disc.offsetWidth, 1)));
+      };
+      measure();
+      const observer = new ResizeObserver(measure);
+      observer.observe(canvas);
+      return () => observer.disconnect();
+    },
+  );
 
   const settle = useTransform(scrollYProgress, [0.5, 0.92], [0, 1], { ease: smooth });
   const discX = useTransform([settle, travel], ([s, t]: number[]) => -s * t);
   const discScale = useTransform([settle, fit], ([s, f]: number[]) => 1 - s * (1 - f));
   const heroOpacity = useTransform(scrollYProgress, [0.4, 0.5], [1, 0]);
   const heroY = useTransform(scrollYProgress, [0.4, 0.5], [0, -24]);
-  const heroMotion = pinned ? { opacity: heroOpacity, y: heroY } : { opacity: 1, y: 0 };
+  const heroMotion = () => (pinned() ? { opacity: heroOpacity, y: heroY } : { opacity: 1, y: 0 });
 
   return (
-    <div ref={trackRef} {...stylex.props(styles.track)}>
-      <div {...stylex.props(styles.stage)}>
-        <div ref={canvasRef} {...stylex.props(styles.canvas)}>
-          <m.header style={heroMotion} {...stylex.props(styles.intro)}>
-            <h1 {...stylex.props(styles.title)}>
-              <span {...stylex.props(styles.titleWord, styles.titleLight)}>
+    <div ref={setTrackRef} {...stylex.attrs(styles.track)}>
+      <div {...stylex.attrs(styles.stage)}>
+        <div ref={setCanvasRef} {...stylex.attrs(styles.canvas)}>
+          <m.header style={heroMotion()} {...stylex.attrs(styles.intro)}>
+            <h1 {...stylex.attrs(styles.title)}>
+              <span {...stylex.attrs(styles.titleWord, styles.titleLight)}>
                 {ABOUT_BANNER.title.slice(0, 2)}
               </span>
-              <span {...stylex.props(styles.titleWord, styles.titleStrong)}>
+              <span {...stylex.attrs(styles.titleWord, styles.titleStrong)}>
                 {ABOUT_BANNER.title.slice(2)}
               </span>
             </h1>
-            <p {...stylex.props(ui.lead, styles.lead)}>{ABOUT_BANNER.lead}</p>
+            <p {...stylex.attrs(ui.lead, styles.lead)}>{ABOUT_BANNER.lead}</p>
           </m.header>
 
-          <m.div style={heroMotion} {...stylex.props(styles.motto)}>
-            <p lang="en" {...stylex.props(ui.serif, styles.tagline)}>
+          <m.div style={heroMotion()} {...stylex.attrs(styles.motto)}>
+            <p lang="en" {...stylex.attrs(ui.serif, styles.tagline)}>
               {ABOUT_BANNER.tagline}
             </p>
-            <p lang="en" {...stylex.props(ui.latin, styles.caption)}>
+            <p lang="en" {...stylex.attrs(ui.latin, styles.caption)}>
               One ring for every year since 1995.
             </p>
           </m.div>
 
-          <div {...stylex.props(styles.discSlot)}>
+          <div {...stylex.attrs(styles.discSlot)}>
             <m.div
-              ref={discRef}
-              style={pinned ? { x: discX, scale: discScale } : { x: 0, scale: 1 }}
-              {...stylex.props(styles.disc)}
+              ref={setDiscRef}
+              style={pinned() ? { x: discX, scale: discScale } : { x: 0, scale: 1 }}
+              {...stylex.attrs(styles.disc)}
             >
               <GrowthDisc growth={growth} />
             </m.div>
@@ -322,23 +334,23 @@ export function Growth() {
         </div>
       </div>
 
-      <div aria-hidden="true" {...stylex.props(styles.runway)} />
+      <div aria-hidden="true" {...stylex.attrs(styles.runway)} />
 
-      <section id="about-profile" aria-labelledby="oos1o-profile" {...stylex.props(styles.profile)}>
-        <div {...stylex.props(styles.profileCopy)}>
+      <section id="about-profile" aria-labelledby="oos1o-profile" {...stylex.attrs(styles.profile)}>
+        <div {...stylex.attrs(styles.profileCopy)}>
           <SectionHead id="oos1o-profile" label="Profile" title="企业概况" quiet />
-          <p {...stylex.props(styles.company)}>
+          <p {...stylex.attrs(styles.company)}>
             <CompanyName name={ABOUT_HERO.title} />
           </p>
-          <p lang="en" {...stylex.props(ui.latin, styles.english)}>
+          <p lang="en" {...stylex.attrs(ui.latin, styles.english)}>
             {ABOUT_HERO.englishTitle}
           </p>
-          <p {...stylex.props(ui.lead, styles.profileLead)}>{ABOUT_HERO.lead}</p>
-          <div {...stylex.props(styles.network)}>
-            <p {...stylex.props(styles.networkLabel)}>{ABOUT_HERO.networkLabel}</p>
-            <ul {...stylex.props(styles.countries)}>
+          <p {...stylex.attrs(ui.lead, styles.profileLead)}>{ABOUT_HERO.lead}</p>
+          <div {...stylex.attrs(styles.network)}>
+            <p {...stylex.attrs(styles.networkLabel)}>{ABOUT_HERO.networkLabel}</p>
+            <ul {...stylex.attrs(styles.countries)}>
               {ABOUT_HERO.countries.map((country) => (
-                <li key={country}>{country}</li>
+                <li>{country}</li>
               ))}
             </ul>
           </div>

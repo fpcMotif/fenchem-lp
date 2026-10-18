@@ -1,6 +1,6 @@
 import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight } from "@fenchem-lp/ui/components/lucide";
 
 import { PRODUCTS, PRODUCTS_INTRO } from "../../../content";
 import { Sheet } from "../sheet";
@@ -113,49 +113,49 @@ const styles = stylex.create({
   },
 });
 
-export function ProductsSheet({ onNavigateHome }: { onNavigateHome: (hash?: string) => void }) {
+export function ProductsSheet(props: { onNavigateHome: (hash?: string) => void }) {
   return (
     <Sheet def={PRODUCTS_SHEET}>
       <Reveal sx={styles.intro}>
-        <p {...stylex.props(styles.lead)}>
-          <span {...stylex.props(base.balance)}>{PRODUCTS_INTRO.lead}</span>
+        <p {...stylex.attrs(styles.lead)}>
+          <span {...stylex.attrs(base.balance)}>{PRODUCTS_INTRO.lead}</span>
         </p>
         <button
           type="button"
-          onClick={() => onNavigateHome("products")}
-          {...stylex.props(styles.more, base.focusRing)}
+          onClick={() => props.onNavigateHome("products")}
+          {...stylex.attrs(styles.more, base.focusRing)}
         >
           <span>{PRODUCTS_INTRO.cta.label}</span>
           <ArrowRight size={16} aria-hidden="true" />
         </button>
       </Reveal>
-      <ul {...stylex.props(styles.grid)}>
+      <ul {...stylex.attrs(styles.grid)}>
         {PRODUCTS.map((product, idx) => (
-          <Reveal key={product.title} as="li" step={idx}>
-            <article {...stylex.props(styles.card)}>
-              <div {...stylex.props(styles.media)}>
+          <Reveal as="li" step={idx}>
+            <article {...stylex.attrs(styles.card)}>
+              <div {...stylex.attrs(styles.media)}>
                 <img
                   src={product.image}
                   alt=""
                   loading="lazy"
                   decoding="async"
-                  {...stylex.props(base.fill)}
+                  {...stylex.attrs(base.fill)}
                 />
               </div>
               <div>
-                <h3 {...stylex.props(styles.title)}>{product.title}</h3>
-                <p {...stylex.props(styles.desc)}>{product.description}</p>
-                <ul {...stylex.props(styles.tags)}>
+                <h3 {...stylex.attrs(styles.title)}>{product.title}</h3>
+                <p {...stylex.attrs(styles.desc)}>{product.description}</p>
+                <ul {...stylex.attrs(styles.tags)}>
                   {product.tags.map((tag) => (
-                    <li key={tag}>{tag}</li>
+                    <li>{tag}</li>
                   ))}
                 </ul>
               </div>
               <button
                 type="button"
                 aria-label={`View products and applications: ${product.english}`}
-                onClick={() => onNavigateHome("products")}
-                {...stylex.props(styles.overlay)}
+                onClick={() => props.onNavigateHome("products")}
+                {...stylex.attrs(styles.overlay)}
               />
             </article>
           </Reveal>

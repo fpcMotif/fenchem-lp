@@ -2,7 +2,7 @@ import { LightboxControls } from "../../../shared/lightbox-controls";
 import { LightboxStage } from "../../../shared/lightbox-stage";
 import { LightboxDialog, type LightboxState } from "../../../shared/lightbox";
 import * as stylex from "@stylexjs/stylex";
-import { ChevronLeft, ChevronRight, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, X } from "@fenchem-lp/ui/components/lucide";
 
 import { ui } from "./shared-values";
 import { bp, chrome, face, tone } from "./tokens.stylex";
@@ -133,31 +133,29 @@ const styles = stylex.create({
   },
 });
 
-export function Lightbox({
-  lightbox,
-  photos,
-}: {
-  lightbox: LightboxState;
-  photos: readonly LightboxPhoto[];
-}) {
-  const { stepped, close: onClose, step: onStep } = lightbox;
+export function Lightbox(props: { lightbox: LightboxState; photos: readonly LightboxPhoto[] }) {
+  const onClose = () => props.lightbox.close();
+  const onStep = (delta: number) => props.lightbox.step(delta);
   return (
-    <LightboxDialog lightbox={lightbox} items={photos} sx={styles.dialog}>
+    <LightboxDialog lightbox={props.lightbox} items={props.photos} sx={styles.dialog}>
       {(photo, index) => (
         <>
           <LightboxStage onClose={onClose} sx={styles.stage}>
             <figure
-              key={photo.id}
-              {...stylex.props(styles.figure, stepped ? styles.figureStep : styles.figureOpen)}
+              {...stylex.attrs(
+                styles.figure,
+                props.lightbox.stepped ? styles.figureStep : styles.figureOpen,
+              )}
             >
-              <img src={photo.large} alt={photo.alt} {...stylex.props(styles.image)} />
-              <figcaption {...stylex.props(ui.micro, styles.caption)}>
-                <span {...stylex.props(styles.captionMain)}>
+              <img src={photo.large} alt={photo.alt} {...stylex.attrs(styles.image)} />
+              <figcaption {...stylex.attrs(ui.micro, styles.caption)}>
+                <span {...stylex.attrs(styles.captionMain)}>
                   <span lang="en">Fig. 2{photo.panel}</span>
-                  <span {...stylex.props(styles.captionText)}>{photo.caption}</span>
+                  <span {...stylex.attrs(styles.captionText)}>{photo.caption}</span>
                 </span>
-                <span aria-label={`Photo ${index + 1} of ${photos.length}`}>
-                  {String(index + 1).padStart(2, "0")} / {String(photos.length).padStart(2, "0")}
+                <span aria-label={`Photo ${index + 1} of ${props.photos.length}`}>
+                  {String(index + 1).padStart(2, "0")} /{" "}
+                  {String(props.photos.length).padStart(2, "0")}
                 </span>
               </figcaption>
             </figure>

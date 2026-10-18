@@ -1,6 +1,5 @@
 import * as stylex from "@stylexjs/stylex";
-import { m, useTransform, type MotionValue } from "motion/react";
-import { useRef } from "react";
+import { m, useTransform, type MotionValue } from "@/compat/motion";
 
 import { ABOUT_STRUCTURE } from "../../about-data";
 import { PencilRing } from "./band";
@@ -258,40 +257,44 @@ const styles = stylex.create({
   },
 });
 
-function Band({ development }: { development: Development }) {
-  const travel = useTransform(development.progress, (p) => p * SHARED_RF);
+function Band(props: { development: Development }) {
+  const travel = useTransform(props.development.progress, (p) => p * SHARED_RF);
   const x = useTransform(travel, (t) => percent(t - 1));
   const spread = useTransform(travel, (t) => Math.sqrt(t));
   const scaleY = useTransform(spread, (s) => 0.5 + 0.5 * s);
   const scaleX = useTransform(spread, (s) => 0.82 + 0.18 * s);
   return (
-    <m.div aria-hidden="true" style={{ x }} {...stylex.props(styles.mover)}>
-      <m.span style={{ scaleX: travel }} {...stylex.props(styles.tail)} />
+    <m.div aria-hidden="true" style={{ x }} {...stylex.attrs(styles.mover)}>
+      <m.span style={{ scaleX: travel }} {...stylex.attrs(styles.tail)} />
       <m.span
         style={{ scaleX, scaleY }}
-        {...stylex.props(BAND_LOOK.base, BAND_LOOK.navy.body, styles.band)}
+        {...stylex.attrs(BAND_LOOK.base, BAND_LOOK.navy.body, styles.band)}
       >
-        <PencilRing visible={development.marks} />
+        <PencilRing visible={props.development.marks} />
       </m.span>
     </m.div>
   );
 }
 
-function Front({ progress }: { progress: MotionValue<number> }) {
-  const x = useTransform(progress, (p) => percent(p - 1));
+function Front(props: { progress: MotionValue<number> }) {
+  const x = useTransform(props.progress, (p) => percent(p - 1));
   return (
-    <div {...stylex.props(styles.clip)}>
-      <m.div style={{ x }} {...stylex.props(styles.wet)}>
-        <span {...stylex.props(styles.meniscus)} />
+    <div {...stylex.attrs(styles.clip)}>
+      <m.div style={{ x }} {...stylex.attrs(styles.wet)}>
+        <span {...stylex.attrs(styles.meniscus)} />
       </m.div>
     </div>
   );
 }
 
 export function Structure() {
-  const sectionRef = useRef<HTMLElement>(null);
-  const figureRef = useRef<HTMLDivElement>(null);
-  const development = useDevelopment({ section: sectionRef, figure: figureRef, pinnable: false });
+  let sectionRef: HTMLElement | undefined;
+  let figureRef: HTMLDivElement | undefined;
+  const development = useDevelopment({
+    section: () => sectionRef,
+    figure: () => figureRef,
+    pinnable: false,
+  });
   const labelsShown = useTransform(development.progress, [0.5, 0.8], [0, 1]);
   const dryPlate = useTransform(development.marks, (mark) => 1 - 0.5 * mark);
 
@@ -300,11 +303,11 @@ export function Structure() {
       ref={sectionRef}
       id="about-structure"
       aria-labelledby="oos1w-structure"
-      {...stylex.props(ui.section)}
+      {...stylex.attrs(ui.section)}
     >
-      <div {...stylex.props(ui.shell)}>
-        <div {...stylex.props(ui.grid, ui.ruled)}>
-          <div {...stylex.props(ui.headCol)}>
+      <div {...stylex.attrs(ui.shell)}>
+        <div {...stylex.attrs(ui.grid, ui.ruled)}>
+          <div {...stylex.attrs(ui.headCol)}>
             <SectionHead
               num="06"
               word="Structure"
@@ -315,22 +318,22 @@ export function Structure() {
             />
           </div>
 
-          <div ref={figureRef} {...stylex.props(styles.figure)}>
-            <div {...stylex.props(styles.header)}>
-              <div {...stylex.props(styles.holding)}>
-                <p {...stylex.props(styles.originWord)}>
-                  <span lang="en" {...stylex.props(styles.serif)}>
+          <div ref={figureRef} {...stylex.attrs(styles.figure)}>
+            <div {...stylex.attrs(styles.header)}>
+              <div {...stylex.attrs(styles.holding)}>
+                <p {...stylex.attrs(styles.originWord)}>
+                  <span lang="en" {...stylex.attrs(styles.serif)}>
                     Origin
                   </span>
-                  <span {...stylex.props(styles.badge)}>{ABOUT_STRUCTURE.holding.badge}</span>
+                  <span {...stylex.attrs(styles.badge)}>{ABOUT_STRUCTURE.holding.badge}</span>
                 </p>
-                <h3 {...stylex.props(styles.holdingName)}>{ABOUT_STRUCTURE.holding.name}</h3>
-                <p lang="en" {...stylex.props(ui.english, styles.holdingEnglish)}>
+                <h3 {...stylex.attrs(styles.holdingName)}>{ABOUT_STRUCTURE.holding.name}</h3>
+                <p lang="en" {...stylex.attrs(ui.english, styles.holdingEnglish)}>
                   {ABOUT_STRUCTURE.holding.english}
                 </p>
-                <span aria-hidden="true" {...stylex.props(styles.holdingLeader)} />
+                <span aria-hidden="true" {...stylex.attrs(styles.holdingLeader)} />
               </div>
-              <p {...stylex.props(styles.count)}>
+              <p {...stylex.attrs(styles.count)}>
                 <span>
                   {ABOUT_STRUCTURE.subsidiaryBadge} × {LANES}
                 </span>
@@ -338,45 +341,41 @@ export function Structure() {
               </p>
             </div>
 
-            <div {...stylex.props(styles.plate)}>
-              <span aria-hidden="true" {...stylex.props(styles.foot)} />
-              <div {...stylex.props(styles.run)}>
+            <div {...stylex.attrs(styles.plate)}>
+              <span aria-hidden="true" {...stylex.attrs(styles.foot)} />
+              <div {...stylex.attrs(styles.run)}>
                 <m.div
                   aria-hidden="true"
                   style={{ opacity: dryPlate }}
-                  {...stylex.props(styles.clip)}
+                  {...stylex.attrs(styles.clip)}
                 >
                   <Front progress={development.progress} />
                 </m.div>
-                <span aria-hidden="true" {...stylex.props(styles.origin)} />
+                <span aria-hidden="true" {...stylex.attrs(styles.origin)} />
                 <m.span
                   aria-hidden="true"
                   style={{ opacity: development.marks }}
-                  {...stylex.props(styles.pencilFront)}
+                  {...stylex.attrs(styles.pencilFront)}
                 />
                 <ol
                   aria-label={ABOUT_STRUCTURE.subsidiaryBadgeEnglish}
-                  {...stylex.props(styles.lanes)}
+                  {...stylex.attrs(styles.lanes)}
                 >
                   {ABOUT_STRUCTURE.subsidiaries.map((subsidiary, lane) => (
-                    <li
-                      key={subsidiary.id}
-                      style={{ top: laneMiddle(lane) }}
-                      {...stylex.props(styles.lane)}
-                    >
-                      <span aria-hidden="true" {...stylex.props(ui.micro, styles.index)}>
+                    <li style={{ top: laneMiddle(lane) }} {...stylex.attrs(styles.lane)}>
+                      <span aria-hidden="true" {...stylex.attrs(ui.micro, styles.index)}>
                         {String(lane + 1).padStart(2, "0")}
                       </span>
-                      <span aria-hidden="true" {...stylex.props(styles.tick)} />
+                      <span aria-hidden="true" {...stylex.attrs(styles.tick)} />
                       <Band development={development} />
-                      <m.div style={{ opacity: labelsShown }} {...stylex.props(styles.label)}>
-                        <div {...stylex.props(styles.names)}>
-                          <h3 {...stylex.props(styles.name)}>{subsidiary.name}</h3>
-                          <p lang="en" {...stylex.props(ui.english, styles.english)}>
+                      <m.div style={{ opacity: labelsShown }} {...stylex.attrs(styles.label)}>
+                        <div {...stylex.attrs(styles.names)}>
+                          <h3 {...stylex.attrs(styles.name)}>{subsidiary.name}</h3>
+                          <p lang="en" {...stylex.attrs(ui.english, styles.english)}>
                             {subsidiary.english}
                           </p>
                         </div>
-                        <span aria-hidden="true" {...stylex.props(styles.leader)} />
+                        <span aria-hidden="true" {...stylex.attrs(styles.leader)} />
                       </m.div>
                     </li>
                   ))}
@@ -384,11 +383,11 @@ export function Structure() {
               </div>
             </div>
 
-            <div aria-hidden="true" {...stylex.props(styles.axis)}>
-              <span lang="en" {...stylex.props(styles.axisWord, styles.axisOrigin)}>
+            <div aria-hidden="true" {...stylex.attrs(styles.axis)}>
+              <span lang="en" {...stylex.attrs(styles.axisWord, styles.axisOrigin)}>
                 origin
               </span>
-              <span lang="en" {...stylex.props(styles.axisWord, styles.axisFront)}>
+              <span lang="en" {...stylex.attrs(styles.axisWord, styles.axisFront)}>
                 solvent front
               </span>
             </div>

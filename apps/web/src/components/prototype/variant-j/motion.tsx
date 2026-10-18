@@ -1,10 +1,10 @@
-import { useGSAP } from "@gsap/react";
 import type { StyleXStyles } from "@stylexjs/stylex";
 import * as stylex from "@stylexjs/stylex";
+import type { JSX } from "@solidjs/web";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Lenis from "lenis";
-import { createContext, use, useEffect, useRef, type ReactNode, type RefObject } from "react";
+import { createContext, createEffect, createSignal, useContext, type Accessor } from "solid-js";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
 /*
@@ -18,20 +18,20 @@ import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
  */
 
 if (typeof window !== "undefined") {
-  gsap.registerPlugin(ScrollTrigger, useGSAP);
+  gsap.registerPlugin(ScrollTrigger);
 }
 
-const ReducedMotionContext = createContext(false);
+const ReducedMotionContext = createContext<Accessor<boolean>>(() => false);
 
-export function useReducedMotionFlag(): boolean {
-  return use(ReducedMotionContext);
+export function useReducedMotionFlag(): Accessor<boolean> {
+  return useContext(ReducedMotionContext);
 }
 
 /** Page root: owns the sole Lenis instance and the ScrollTrigger wiring. */
-export function MotionRoot({ children }: { children: ReactNode }) {
+export function MotionRoot(props: { children: JSX.Element }) {
   const reduced = useReducedMotion();
 
-  useEffect(() => {
+  createEffect(reduced, (reduced) => {
     if (reduced) return;
     const lenis = new Lenis({ autoRaf: false });
     lenis.on("scroll", () => {
@@ -50,9 +50,9 @@ export function MotionRoot({ children }: { children: ReactNode }) {
       gsap.ticker.remove(raf);
       lenis.destroy();
     };
-  }, [reduced]);
+  });
 
-  return <ReducedMotionContext.Provider value={reduced}>{children}</ReducedMotionContext.Provider>;
+  return <ReducedMotionContext value={reduced}>{props.children}</ReducedMotionContext>;
 }
 
 /**
@@ -63,19 +63,20 @@ export function MotionRoot({ children }: { children: ReactNode }) {
  */
 export function useSectionAnimation<T extends HTMLElement = HTMLElement>(
   build: (root: T) => void,
-): RefObject<T | null> {
-  const ref = useRef<T>(null);
+): (el: T) => void {
+  const [root, setRoot] = createSignal<T>();
   const reduced = useReducedMotionFlag();
-  useGSAP(
-    () => {
-      if (reduced || !ref.current) return;
-      build(ref.current);
+  createEffect(
+    () => [reduced(), root()] as const,
+    ([reduced, root]) => {
+      if (reduced || !root) return;
+      const ctx = gsap.context(() => build(root), root);
+      /* revert on update: the reduce flag settles one render after hydration, so
+       * the tweens a non-reduce first pass created must revert when it flips. */
+      return () => ctx.revert();
     },
-    /* revertOnUpdate: the reduce flag settles one render after hydration, so
-     * the tweens a non-reduce first pass created must revert when it flips. */
-    { scope: ref, dependencies: [reduced], revertOnUpdate: true },
   );
-  return ref;
+  return setRoot;
 }
 
 /* ── Accessible word splitting ─────────────────────────────────────────── */
@@ -117,21 +118,16 @@ export type Segment = {
  * the visual words are aria-hidden. Never wrap links or interactive content.
  * Under no-JS the split words are simply visible in place.
  */
-export function SplitWords({ segments, sx }: { segments: Segment[]; sx?: StyleXStyles }) {
-  const plain = segments.map((segment) => segment.text).join(" ");
+export function SplitWords(props: { segments: Segment[]; sx?: StyleXStyles }) {
+  const plain = props.segments.map((segment) => segment.text).join(" ");
   return (
-    <span {...stylex.props(sx)}>
-      <span {...stylex.props(styles.srOnly)}>{plain}</span>
+    <span {...stylex.attrs(props.sx)}>
+      <span {...stylex.attrs(styles.srOnly)}>{plain}</span>
       <span aria-hidden="true">
-        {segments.map((segment, segmentIndex) =>
-          segment.text.split(/\s+/).map((word, wordIndex) => (
-            <span
-              // eslint-disable-next-line react/no-array-index-key -- static content, order never changes
-              key={`${segmentIndex}-${wordIndex}`}
-              data-word
-              {...stylex.props(styles.word)}
-            >
-              <span data-word-inner {...stylex.props(styles.wordInner, segment.sx)}>
+        {props.segments.map((segment) =>
+          segment.text.split(/\s+/).map((word) => (
+            <span data-word="" {...stylex.attrs(styles.word)}>
+              <span data-word-inner="" {...stylex.attrs(styles.wordInner, segment.sx)}>
                 {word}
                 {"\u00A0"}
               </span>

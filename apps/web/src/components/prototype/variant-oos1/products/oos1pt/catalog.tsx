@@ -1,6 +1,7 @@
-import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
+import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { useId, type ReactNode } from "react";
+import { createUniqueId } from "solid-js";
+import type { JSX } from "@solidjs/web";
 
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
@@ -19,8 +20,8 @@ const BODY_FONT =
 const NUMERAL_FONT = '"Inter Tight", "Source Han Sans SC", "Noto Sans SC", sans-serif';
 
 const TABLET = "@media (min-width: 768px) and (max-width: 1279.98px)";
-const DESKTOP = breakpoints.xl;
-const LG = breakpoints.lg;
+const DESKTOP = "@media (min-width: 1280px)";
+const LG = "@media (min-width: 1024px)";
 const MD_ONLY = "@media (min-width: 768px) and (max-width: 1023.98px)";
 const LG_ONLY = "@media (min-width: 1024px) and (max-width: 1279.98px)";
 const INSET = "min(120px, 8.333vw)";
@@ -369,91 +370,84 @@ const styles = stylex.create({
   },
 });
 
-function Inci({ text }: { text: string }) {
-  const parts: ReactNode[] = [];
+function Inci(props: { text: string }) {
+  return <>{inciParts(props.text)}</>;
+}
+
+function inciParts(text: string) {
+  const parts: JSX.Element[] = [];
   let last = 0;
   for (const match of text.matchAll(INCI_LATIN)) {
     parts.push(text.slice(last, match.index));
-    parts.push(
-      <span key={match.index} {...stylex.props(styles.keepTogether)}>
-        {match[0]}
-      </span>,
-    );
+    parts.push(<span {...stylex.attrs(styles.keepTogether)}>{match[0]}</span>);
     last = match.index + match[0].length;
   }
   parts.push(text.slice(last));
-  return <>{parts}</>;
+  return parts;
 }
 
-function ItemCells({ item, first, last }: { item: CatalogItem; first: boolean; last: boolean }) {
-  const { primary, secondary } = splitTitle(item.title);
-  const edges = [first && styles.cellFirstRow, last && styles.cellLastRow];
+function ItemCells(props: { item: CatalogItem; first: boolean; last: boolean }) {
+  const { primary, secondary } = splitTitle(props.item.title);
+  const edges = () => [props.first && styles.cellFirstRow, props.last && styles.cellLastRow];
   return (
     <>
-      <th scope="row" {...stylex.props(styles.cell, styles.nameCell, ...edges)}>
-        <span {...stylex.props(styles.name)}>{primary}</span>
-        {secondary && <span {...stylex.props(styles.nameSecondary)}>{secondary}</span>}
+      <th scope="row" {...stylex.attrs(styles.cell, styles.nameCell, ...edges())}>
+        <span {...stylex.attrs(styles.name)}>{primary}</span>
+        {secondary && <span {...stylex.attrs(styles.nameSecondary)}>{secondary}</span>}
       </th>
-      <td {...stylex.props(styles.cell, styles.inciCell, ...edges)}>
-        <p {...stylex.props(styles.inci)}>
-          <Inci text={item.inci} />
+      <td {...stylex.attrs(styles.cell, styles.inciCell, ...edges())}>
+        <p {...stylex.attrs(styles.inci)}>
+          <Inci text={props.item.inci} />
         </p>
       </td>
-      <td {...stylex.props(styles.cell, styles.featuresCell, ...edges)}>
-        <p {...stylex.props(styles.features)}>{item.features}</p>
+      <td {...stylex.attrs(styles.cell, styles.featuresCell, ...edges())}>
+        <p {...stylex.attrs(styles.features)}>{props.item.features}</p>
       </td>
     </>
   );
 }
 
-function RegionHeader({
-  group,
-  index,
-  id,
-  rowSpan,
-}: {
-  group: CatalogGroup;
-  index: number;
-  id: string;
-  rowSpan: number;
-}) {
-  const { lead, rest } = regionLabel(group);
+function RegionHeader(props: { group: CatalogGroup; index: number; id: string; rowSpan: number }) {
+  const { lead, rest } = regionLabel(props.group);
   return (
     <th
       scope="rowgroup"
-      rowSpan={rowSpan}
-      id={id}
-      tabIndex={-1}
-      {...stylex.props(styles.regionCell, index === 0 && styles.regionCellFirst)}
+      rowspan={props.rowSpan}
+      id={props.id}
+      tabindex={-1}
+      {...stylex.attrs(styles.regionCell, props.index === 0 && styles.regionCellFirst)}
     >
-      <span {...stylex.props(styles.regionSticky)}>
-        <span aria-hidden="true" {...stylex.props(styles.regionIndex)}>
-          {padIndex(index)}
+      <span {...stylex.attrs(styles.regionSticky)}>
+        <span aria-hidden="true" {...stylex.attrs(styles.regionIndex)}>
+          {padIndex(props.index)}
         </span>
-        <span {...stylex.props(styles.regionLabel)}>
+        <span {...stylex.attrs(styles.regionLabel)}>
           {lead}
-          {rest && <span {...stylex.props(styles.regionRest)}>{rest}</span>}
+          {rest && <span {...stylex.attrs(styles.regionRest)}>{rest}</span>}
         </span>
-        <span {...stylex.props(styles.regionCount)}>
-          <span {...stylex.props(styles.numeral)}>{group.items.length}</span> 款
+        <span {...stylex.attrs(styles.regionCount)}>
+          <span {...stylex.attrs(styles.numeral)}>{props.group.items.length}</span> 款
         </span>
       </span>
     </th>
   );
 }
 
-function RegionRows({ group, index, id }: { group: CatalogGroup; index: number; id: string }) {
+function RegionRows(props: { group: CatalogGroup; index: number; id: string }) {
+  const group = props.group;
   const rowSpan = group.items.length + (group.intro ? 1 : 0);
-  const header = <RegionHeader group={group} index={index} id={id} rowSpan={rowSpan} />;
+  const header = () => (
+    <RegionHeader group={group} index={props.index} id={props.id} rowSpan={rowSpan} />
+  );
   const lastIndex = group.items.length - 1;
 
   return (
-    <tbody {...stylex.props(styles.region)}>
+    <tbody {...stylex.attrs(styles.region)}>
       {group.intro && (
-        <tr {...stylex.props(styles.introRow)}>
-          {header}
-          <td colSpan={3} {...stylex.props(styles.introCell)}>
-            <p {...stylex.props(styles.introText)}>{group.intro}</p>
+        <tr {...stylex.attrs(styles.introRow)}>
+          {header()}
+          <td colspan={3} {...stylex.attrs(styles.introCell)}>
+            <p {...stylex.attrs(styles.introText)}>{group.intro}</p>
           </td>
         </tr>
       )}
@@ -461,8 +455,8 @@ function RegionRows({ group, index, id }: { group: CatalogGroup; index: number; 
         const first = !group.intro && itemIndex === 0;
         const last = itemIndex === lastIndex;
         return (
-          <tr key={item.id} {...stylex.props(styles.itemRow, last && styles.itemRowLast)}>
-            {first && header}
+          <tr {...stylex.attrs(styles.itemRow, last && styles.itemRowLast)}>
+            {first && header()}
             <ItemCells item={item} first={first} last={last} />
           </tr>
         );
@@ -473,38 +467,38 @@ function RegionRows({ group, index, id }: { group: CatalogGroup; index: number; 
 
 export function Catalog() {
   const reduce = useReducedMotion();
-  const baseId = useId();
+  const baseId = createUniqueId();
   const titleId = `${baseId}-title`;
   const regionId = (groupId: string) => `${baseId}-${groupId}`;
 
   const jumpTo = (groupId: string) => {
     const target = document.getElementById(regionId(groupId));
     if (!target) return;
-    target.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+    target.scrollIntoView({ behavior: reduce() ? "auto" : "smooth", block: "start" });
     target.focus({ preventScroll: true });
   };
 
   return (
-    <section id="products-catalog" aria-labelledby={titleId} {...stylex.props(styles.section)}>
-      <div {...stylex.props(styles.shell)}>
-        <header {...stylex.props(styles.head)}>
+    <section id="products-catalog" aria-labelledby={titleId} {...stylex.attrs(styles.section)}>
+      <div {...stylex.attrs(styles.shell)}>
+        <header {...stylex.attrs(styles.head)}>
           <div>
-            <h2 id={titleId} {...stylex.props(styles.title)}>
+            <h2 id={titleId} {...stylex.attrs(styles.title)}>
               产品目录
             </h2>
-            <p {...stylex.props(styles.lead)}>精选个人护理全形态天然油脂与经典功效配方方案</p>
+            <p {...stylex.attrs(styles.lead)}>精选个人护理全形态天然油脂与经典功效配方方案</p>
           </div>
           <nav aria-label="Origin index">
-            <ul {...stylex.props(styles.index)}>
+            <ul {...stylex.attrs(styles.index)}>
               {CATALOG_GROUPS.map((group) => (
-                <li key={group.id}>
+                <li>
                   <button
                     type="button"
                     onClick={() => jumpTo(group.id)}
-                    {...stylex.props(styles.indexButton)}
+                    {...stylex.attrs(styles.indexButton)}
                   >
                     {REGION_META[group.id]?.short ?? group.label}
-                    <span {...stylex.props(styles.indexCount)}>{group.items.length}</span>
+                    <span {...stylex.attrs(styles.indexCount)}>{group.items.length}</span>
                   </button>
                 </li>
               ))}
@@ -512,35 +506,35 @@ export function Catalog() {
           </nav>
         </header>
 
-        <table aria-labelledby={titleId} {...stylex.props(styles.table)}>
+        <table aria-labelledby={titleId} {...stylex.attrs(styles.table)}>
           <colgroup>
-            <col {...stylex.props(styles.col, styles.colRegion)} />
-            <col {...stylex.props(styles.col, styles.colName)} />
-            <col {...stylex.props(styles.col, styles.colInci)} />
-            <col {...stylex.props(styles.col)} />
+            <col {...stylex.attrs(styles.col, styles.colRegion)} />
+            <col {...stylex.attrs(styles.col, styles.colName)} />
+            <col {...stylex.attrs(styles.col, styles.colInci)} />
+            <col {...stylex.attrs(styles.col)} />
           </colgroup>
-          <thead {...stylex.props(styles.thead)}>
+          <thead {...stylex.attrs(styles.thead)}>
             <tr>
-              <th scope="col" {...stylex.props(styles.headCell)}>
+              <th scope="col" {...stylex.attrs(styles.headCell)}>
                 <span aria-hidden="true">产地</span>
-                <span {...stylex.props(styles.srOnly)}>Origin</span>
+                <span {...stylex.attrs(styles.srOnly)}>Origin</span>
               </th>
-              <th scope="col" {...stylex.props(styles.headCell)}>
+              <th scope="col" {...stylex.attrs(styles.headCell)}>
                 <span aria-hidden="true">名称</span>
-                <span {...stylex.props(styles.srOnly)}>Name</span>
+                <span {...stylex.attrs(styles.srOnly)}>Name</span>
               </th>
-              <th scope="col" {...stylex.props(styles.headCell)}>
+              <th scope="col" {...stylex.attrs(styles.headCell)}>
                 <span aria-hidden="true">INCI 名称</span>
-                <span {...stylex.props(styles.srOnly)}>INCI name</span>
+                <span {...stylex.attrs(styles.srOnly)}>INCI name</span>
               </th>
-              <th scope="col" {...stylex.props(styles.headCell, styles.headCellLast)}>
+              <th scope="col" {...stylex.attrs(styles.headCell, styles.headCellLast)}>
                 <span aria-hidden="true">特性&应用</span>
-                <span {...stylex.props(styles.srOnly)}>Features & applications</span>
+                <span {...stylex.attrs(styles.srOnly)}>Features & applications</span>
               </th>
             </tr>
           </thead>
           {CATALOG_GROUPS.map((group, index) => (
-            <RegionRows key={group.id} group={group} index={index} id={regionId(group.id)} />
+            <RegionRows group={group} index={index} id={regionId(group.id)} />
           ))}
         </table>
       </div>

@@ -1,11 +1,11 @@
 import { breakpoints } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { useId, useState } from "react";
 
 import { ABOUT_HERO, ABOUT_STRUCTURE } from "../../about-data";
 import { Reveal, Section } from "./shared";
 import { ui } from "./shared-values";
 import { font, motionCss, step, tone } from "./tokens.stylex";
+import { createSignal, createUniqueId } from "solid-js";
 
 const fadeRise = stylex.keyframes({
   "0%": { opacity: 0, transform: "translateY(12px)" },
@@ -105,51 +105,51 @@ const s = stylex.create({
 
 export function Structure() {
   const chip = ABOUT_HERO.navChips[5];
-  const [showDiagram, setShowDiagram] = useState(false);
-  const diagramId = useId();
+  const [showDiagram, setShowDiagram] = createSignal(false);
+  const diagramId = createUniqueId();
 
   return (
     <Section id={chip.id} label={ABOUT_STRUCTURE.eyebrow} background={ui.onPage}>
-      <div {...stylex.props(ui.grid)}>
+      <div {...stylex.attrs(ui.grid)}>
         <Reveal sx={s.holding}>
-          <p {...stylex.props(s.label)}>{ABOUT_STRUCTURE.holding.badge}</p>
-          <h3 {...stylex.props(s.holdingName)}>{ABOUT_STRUCTURE.holding.name}</h3>
-          <p lang="en" {...stylex.props(s.holdingEnglish)}>
+          <p {...stylex.attrs(s.label)}>{ABOUT_STRUCTURE.holding.badge}</p>
+          <h3 {...stylex.attrs(s.holdingName)}>{ABOUT_STRUCTURE.holding.name}</h3>
+          <p lang="en" {...stylex.attrs(s.holdingEnglish)}>
             {ABOUT_STRUCTURE.holding.english}
           </p>
         </Reveal>
-        <div {...stylex.props(s.subs)}>
-          <p {...stylex.props(s.label)}>{ABOUT_STRUCTURE.subsidiaryBadge}</p>
-          <ul aria-label={ABOUT_STRUCTURE.subsidiaryBadgeEnglish} {...stylex.props(s.list)}>
+        <div {...stylex.attrs(s.subs)}>
+          <p {...stylex.attrs(s.label)}>{ABOUT_STRUCTURE.subsidiaryBadge}</p>
+          <ul aria-label={ABOUT_STRUCTURE.subsidiaryBadgeEnglish} {...stylex.attrs(s.list)}>
             {ABOUT_STRUCTURE.subsidiaries.map((sub, idx) => (
-              <Reveal key={sub.id} as="li" step={idx} sx={s.row}>
-                <h4 {...stylex.props(s.name)}>{sub.name}</h4>
-                <span lang="en" {...stylex.props(s.english)}>
+              <Reveal as="li" step={idx} sx={s.row}>
+                <h4 {...stylex.attrs(s.name)}>{sub.name}</h4>
+                <span lang="en" {...stylex.attrs(s.english)}>
                   {sub.english}
                 </span>
               </Reveal>
             ))}
           </ul>
-          <div {...stylex.props(s.toggleWrap)}>
+          <div {...stylex.attrs(s.toggleWrap)}>
             <button
               type="button"
-              aria-expanded={showDiagram}
+              aria-expanded={showDiagram() ? "true" : "false"}
               aria-controls={diagramId}
               onClick={() => setShowDiagram((prev) => !prev)}
-              {...stylex.props(ui.button, ui.buttonQuiet, ui.focusRing)}
+              {...stylex.attrs(ui.button, ui.buttonQuiet, ui.focusRing)}
             >
-              {showDiagram ? "收起组织架构图" : "查看官方组织架构图"}
+              {showDiagram() ? "收起组织架构图" : "查看官方组织架构图"}
             </button>
           </div>
         </div>
       </div>
-      <div id={diagramId} hidden={!showDiagram} {...stylex.props(s.diagram)}>
+      <div id={diagramId} hidden={!showDiagram()} {...stylex.attrs(s.diagram)}>
         <img
           src={ABOUT_STRUCTURE.chartImage}
           alt="Official organizational chart of Nanjing Fenchem International Holdings Corporation Limited"
           loading="lazy"
           decoding="async"
-          {...stylex.props(s.diagramImage)}
+          {...stylex.attrs(s.diagramImage)}
         />
       </div>
     </Section>

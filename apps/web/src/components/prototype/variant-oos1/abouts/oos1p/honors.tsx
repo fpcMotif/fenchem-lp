@@ -1,5 +1,5 @@
 import * as stylex from "@stylexjs/stylex";
-import type { CSSProperties } from "react";
+import type { JSX } from "@solidjs/web";
 
 import { ABOUT_HONORS } from "../../about-data";
 import { ui } from "./layout";
@@ -98,52 +98,43 @@ const styles = stylex.create({
 
 const DOT_STEP = 11;
 
-function ExposureMark({
-  exposures,
-  phase,
-  delay,
-}: {
-  exposures: number;
-  phase: Phase;
-  delay: number;
-}) {
-  const echoes = echoIndexes(exposures - 1);
+function ExposureMark(props: { exposures: number; phase: Phase; delay: number }) {
+  const echoes = echoIndexes(props.exposures - 1);
   const landingX = (LEVELS.national.exposures - 1) * DOT_STEP;
   return (
-    <span aria-hidden="true" {...stylex.props(styles.mark)}>
+    <span aria-hidden="true" {...stylex.attrs(styles.mark)}>
       {echoes.map((k) => (
         <span
-          key={k}
-          {...stylex.props(
+          {...stylex.attrs(
             styles.dot,
-            phase === "armed" && strobe.hidden,
-            phase === "fire" && strobe.pop,
+            props.phase === "armed" && strobe.hidden,
+            props.phase === "fire" && strobe.pop,
           )}
           style={
             {
               "--x": `${landingX - k * DOT_STEP}px`,
-              "--o": trailOpacity(k, exposures - 1, MARK_TRAIL_BRIGHTEST).toFixed(3),
-              "--pop-at": `${delay + (exposures - 1 - k) * TICK}ms`,
-            } as CSSProperties
+              "--o": trailOpacity(k, props.exposures - 1, MARK_TRAIL_BRIGHTEST).toFixed(3),
+              "--pop-at": `${props.delay + (props.exposures - 1 - k) * TICK}ms`,
+            } as JSX.CSSProperties
           }
         >
-          <span {...stylex.props(styles.dotInk, styles.dotEcho)} />
+          <span {...stylex.attrs(styles.dotInk, styles.dotEcho)} />
         </span>
       ))}
       <span
-        {...stylex.props(
+        {...stylex.attrs(
           styles.dot,
-          phase === "armed" && strobe.hidden,
-          phase === "fire" && strobe.pop,
+          props.phase === "armed" && strobe.hidden,
+          props.phase === "fire" && strobe.pop,
         )}
         style={
           {
             "--x": `${landingX}px`,
-            "--pop-at": `${delay + (exposures - 1) * TICK}ms`,
-          } as CSSProperties
+            "--pop-at": `${props.delay + (props.exposures - 1) * TICK}ms`,
+          } as JSX.CSSProperties
         }
       >
-        <span {...stylex.props(styles.dotInk)} />
+        <span {...stylex.attrs(styles.dotInk)} />
       </span>
     </span>
   );
@@ -152,28 +143,28 @@ function ExposureMark({
 export function Honors() {
   const [sequenceRef, phase] = useEntry<HTMLOListElement>();
   return (
-    <section id="about-honor" aria-labelledby="oos1p-honor" {...stylex.props(ui.plate)}>
+    <section id="about-honor" aria-labelledby="oos1p-honor" {...stylex.attrs(ui.plate)}>
       <PlateHead plate={5} english="Honors" title={ABOUT_HONORS.title} titleId="oos1p-honor" />
-      <div {...stylex.props(ui.shell)}>
-        <ol ref={sequenceRef} {...stylex.props(styles.sequence)}>
+      <div {...stylex.attrs(ui.shell)}>
+        <ol ref={sequenceRef} {...stylex.attrs(styles.sequence)}>
           {ABOUT_HONORS.items.map((item, index) => {
             const level = LEVELS[item.level];
             return (
-              <li key={item.id} {...stylex.props(styles.frame)}>
-                <div {...stylex.props(styles.head)}>
+              <li {...stylex.attrs(styles.frame)}>
+                <div {...stylex.attrs(styles.head)}>
                   <ExposureMark
                     exposures={level.exposures}
-                    phase={phase}
+                    phase={phase()}
                     delay={index * FRAME_STAGGER}
                   />
-                  <p {...stylex.props(styles.level)}>
-                    <span {...stylex.props(styles.levelLabel)}>{level.label}</span>
-                    <span lang="en" {...stylex.props(ui.eyebrow, styles.levelEnglish)}>
+                  <p {...stylex.attrs(styles.level)}>
+                    <span {...stylex.attrs(styles.levelLabel)}>{level.label}</span>
+                    <span lang="en" {...stylex.attrs(ui.eyebrow, styles.levelEnglish)}>
                       {level.english}
                     </span>
                   </p>
                 </div>
-                <p {...stylex.props(styles.title)}>{item.title}</p>
+                <p {...stylex.attrs(styles.title)}>{item.title}</p>
               </li>
             );
           })}

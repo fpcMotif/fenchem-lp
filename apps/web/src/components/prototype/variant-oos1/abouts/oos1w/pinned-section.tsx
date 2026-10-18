@@ -1,5 +1,5 @@
 import * as stylex from "@stylexjs/stylex";
-import type { ReactNode, RefObject } from "react";
+import type { JSX } from "@solidjs/web";
 
 import { ui } from "./shared-values";
 import { bp, chrome } from "./tokens.stylex";
@@ -32,27 +32,26 @@ const styles = stylex.create({
   },
 });
 
-export function PinnedSection({
-  id,
-  titleId,
-  sectionRef,
-  head,
-  children,
-}: {
+export function PinnedSection(props: {
   id: string;
   titleId: string;
-  sectionRef: RefObject<HTMLElement | null>;
-  head: ReactNode;
-  children: ReactNode;
+  sectionRef: (element: HTMLElement) => void;
+  head: JSX.Element;
+  children: JSX.Element;
 }) {
   return (
-    <section ref={sectionRef} id={id} aria-labelledby={titleId} {...stylex.props(styles.section)}>
-      <div {...stylex.props(styles.track)}>
-        <div {...stylex.props(styles.stage)}>
-          <div {...stylex.props(ui.shell)}>
-            <div {...stylex.props(ui.grid, ui.ruled)}>
-              <div {...stylex.props(ui.headCol, styles.head)}>{head}</div>
-              <div {...stylex.props(ui.bodyCol, styles.figure)}>{children}</div>
+    <section
+      ref={props.sectionRef}
+      id={props.id}
+      aria-labelledby={props.titleId}
+      {...stylex.attrs(styles.section)}
+    >
+      <div {...stylex.attrs(styles.track)}>
+        <div {...stylex.attrs(styles.stage)}>
+          <div {...stylex.attrs(ui.shell)}>
+            <div {...stylex.attrs(ui.grid, ui.ruled)}>
+              <div {...stylex.attrs(ui.headCol, styles.head)}>{props.head}</div>
+              <div {...stylex.attrs(ui.bodyCol, styles.figure)}>{props.children}</div>
             </div>
           </div>
         </div>

@@ -1,4 +1,4 @@
-import { createFileRoute, notFound } from "@tanstack/react-router";
+import { createFileRoute, notFound } from "@tanstack/solid-router";
 
 import { ContactDialogLab } from "@/components/prototype/contact-dialog-lab/harness";
 
@@ -20,6 +20,8 @@ export const Route = createFileRoute("/prototypes/contact-dialog")({
 });
 
 function ContactDialogLabRoute() {
-  const { v = 1, __state = "pristine" } = Route.useSearch();
-  return <ContactDialogLab initial={v - 1} state={__state} />;
+  const search = Route.useSearch();
+  return (
+    <ContactDialogLab initial={(search().v ?? 1) - 1} state={search().__state ?? "pristine"} />
+  );
 }

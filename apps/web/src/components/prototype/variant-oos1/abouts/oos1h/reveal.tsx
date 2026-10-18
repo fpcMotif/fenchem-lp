@@ -1,7 +1,6 @@
-import { breakpoints } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { useInView } from "motion/react";
-import { type ReactNode, useRef } from "react";
+import { useInView } from "@/compat/motion";
+import { dynamic as dynamicTag, type JSX } from "@solidjs/web";
 
 import { layout } from "./theme.stylex";
 
@@ -10,8 +9,11 @@ const MAX_STEPS = 4;
 
 const styles = stylex.create({
   rise: {
-    opacity: { default: 0, [breakpoints.motionReduce]: 1 },
-    transform: { default: null, [breakpoints.motionOk]: "translateY(24px)" },
+    opacity: { default: 0, ["@media (prefers-reduced-motion: reduce)"]: 1 },
+    transform: {
+      default: null,
+      ["@media (prefers-reduced-motion: no-preference)"]: "translateY(24px)",
+    },
     transitionProperty: "opacity, transform",
     transitionDuration: "800ms",
     transitionTimingFunction: layout.easeOut,
@@ -23,30 +25,26 @@ const styles = stylex.create({
   delay: (ms: number) => ({ transitionDelay: `${ms}ms` }),
 });
 
-export function Reveal({
-  children,
-  step = 0,
-  sx,
-  as: Tag = "div",
-}: {
-  children: ReactNode;
+export function Reveal(props: {
+  children: JSX.Element;
   step?: number;
   sx?: stylex.StyleXStyles;
   as?: "div" | "li" | "figure" | "article";
 }) {
-  const ref = useRef<HTMLDivElement & HTMLLIElement>(null);
-  const shown = useInView(ref, { once: true, margin: "0px 0px -8% 0px" });
+  const Tag = dynamicTag(() => props.as ?? "div");
+  let ref: HTMLElement | undefined;
+  const shown = useInView(() => ref, { once: true, margin: "0px 0px -8% 0px" });
   return (
     <Tag
-      ref={ref}
-      {...stylex.props(
+      ref={(el: HTMLElement) => (ref = el)}
+      {...stylex.attrs(
         styles.rise,
-        shown && styles.shown,
-        styles.delay(Math.min(step, MAX_STEPS) * STEP_MS),
-        sx,
+        shown() && styles.shown,
+        styles.delay(Math.min(props.step ?? 0, MAX_STEPS) * STEP_MS),
+        props.sx,
       )}
     >
-      {children}
+      {props.children}
     </Tag>
   );
 }

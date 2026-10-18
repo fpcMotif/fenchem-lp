@@ -1,6 +1,6 @@
 import { CurrentYear } from "./shared/current-year";
 import { SpecificationNavActions } from "./shared/corporate-content-sections";
-import { LayoutGroup } from "motion/react";
+import { LayoutGroup } from "@/compat/motion";
 import { FooterDirectory } from "./shared/footer-directory";
 import { Collapse } from "./shared/collapse";
 /*
@@ -30,9 +30,16 @@ import { Collapse } from "./shared/collapse";
  * gradient (the finale glow), Intro/Reveal + EASE + STAGGER only. Corners are
  * sharp (radii.none) except pill chips.
  */
-import { useEffect, useId, useRef, useState } from "react";
-import { LazyMotion, domMax, m, useScroll, useTransform } from "motion/react";
-import { ArrowRight, ArrowUpRight, ChevronRight, ChevronsDown, Leaf } from "lucide-react";
+import { createSignal, createEffect, createUniqueId, Show } from "solid-js";
+import type { JSX } from "@solidjs/web";
+import { LazyMotion, domMax, m, useScroll, useTransform } from "@/compat/motion";
+import {
+  ArrowRight,
+  ArrowUpRight,
+  ChevronRight,
+  ChevronsDown,
+  Leaf,
+} from "@fenchem-lp/ui/components/lucide";
 import * as stylex from "@stylexjs/stylex";
 import { breakpoints, colors, radii, typography } from "@fenchem-lp/ui/tokens.stylex";
 import { EASE, STAGGER } from "@/components/prototype/motion-constants";
@@ -1396,17 +1403,19 @@ const DOT_STYLE: Record<DivisionKey, keyof typeof styles> = {
   nutrition: "dot_nutrition",
 };
 
-function DivisionDot({ division }: { division: DivisionKey }) {
-  return <span aria-hidden {...stylex.props(styles.dot, styles[DOT_STYLE[division]])} />;
+function DivisionDot(props: { division: DivisionKey }) {
+  return (
+    <span aria-hidden="true" {...stylex.attrs(styles.dot, styles[DOT_STYLE[props.division]])} />
+  );
 }
 
 /** A hairline broken by the seed's V at the centre. */
 function ChevronDivider() {
   return (
-    <div aria-hidden {...stylex.props(styles.divider)}>
-      <span {...stylex.props(styles.dividerLine)} />
-      <span {...stylex.props(styles.dividerGlyph)}>V</span>
-      <span {...stylex.props(styles.dividerLine)} />
+    <div aria-hidden="true" {...stylex.attrs(styles.divider)}>
+      <span {...stylex.attrs(styles.dividerLine)} />
+      <span {...stylex.attrs(styles.dividerGlyph)}>V</span>
+      <span {...stylex.attrs(styles.dividerLine)} />
     </div>
   );
 }
@@ -1414,36 +1423,36 @@ function ChevronDivider() {
 /* ─────────────────────────────── Nav ─────────────────────────────── */
 
 function NavBar() {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = createSignal(false);
   const reduce = useReducedMotion();
   const { scrollYProgress } = useScroll();
-  const panelId = useId();
+  const panelId = createUniqueId();
 
-  useEffect(() => {
-    if (!open) return;
+  createEffect(open, (value) => {
+    if (!value) return;
     const onKey = (event: KeyboardEvent) => {
       if (event.key === "Escape") setOpen(false);
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [open]);
+  });
 
   const links = [{ label: "Portfolio", href: "#portfolio" }].concat(
     navLinks.map((link) => ({ label: link.label, href: toAnchor(link.section) })),
   );
 
   return (
-    <header {...stylex.props(styles.header)}>
-      <div {...stylex.props(styles.container)}>
-        <nav aria-label="Primary navigation" {...stylex.props(styles.navRow)}>
-          <a href="#top" aria-label="Fenchem home" {...stylex.props(styles.brand)}>
-            <span {...stylex.props(styles.brandWord)}>FENCHEM</span>
-            <Leaf aria-hidden strokeWidth={1.5} {...stylex.props(styles.brandLeaf)} />
+    <header {...stylex.attrs(styles.header)}>
+      <div {...stylex.attrs(styles.container)}>
+        <nav aria-label="Primary navigation" {...stylex.attrs(styles.navRow)}>
+          <a href="#top" aria-label="Fenchem home" {...stylex.attrs(styles.brand)}>
+            <span {...stylex.attrs(styles.brandWord)}>FENCHEM</span>
+            <Leaf aria-hidden="true" strokeWidth={1.5} {...stylex.attrs(styles.brandLeaf)} />
           </a>
-          <div {...stylex.props(styles.navLinks)}>
+          <div {...stylex.attrs(styles.navLinks)}>
             {links.map((link) => (
-              <a key={link.href} href={link.href} {...stylex.props(styles.navLink)}>
-                <ChevronRight aria-hidden size={12} />
+              <a href={link.href} {...stylex.attrs(styles.navLink)}>
+                <ChevronRight aria-hidden="true" size={12} />
                 {link.label}
               </a>
             ))}
@@ -1456,7 +1465,7 @@ function NavBar() {
               navCta: styles.navCta,
               menuButton: styles.menuButton,
             }}
-            open={open}
+            open={open()}
             panelId={panelId}
             setOpen={setOpen}
           />
@@ -1464,21 +1473,21 @@ function NavBar() {
       </div>
       <Collapse
         id={panelId}
-        open={open}
+        open={open()}
 
-        transition={{ duration: reduce ? 0 : 0.36, ease: EASE }}
-        {...stylex.props(styles.mobilePanel)}
+        transition={{ duration: reduce() ? 0 : 0.36, ease: EASE }}
+        class={stylex.attrs(styles.mobilePanel).class}
       >
-        <div {...stylex.props(styles.container)}>
-          <ul {...stylex.props(styles.mobileList)}>
+        <div {...stylex.attrs(styles.container)}>
+          <ul {...stylex.attrs(styles.mobileList)}>
             {links.map((link) => (
-              <li key={link.href}>
+              <li>
                 <a
                   href={link.href}
                   onClick={() => setOpen(false)}
-                  {...stylex.props(styles.mobileLink)}
+                  {...stylex.attrs(styles.mobileLink)}
                 >
-                  <ChevronRight aria-hidden size={18} />
+                  <ChevronRight aria-hidden="true" size={18} />
                   {link.label}
                 </a>
               </li>
@@ -1487,17 +1496,21 @@ function NavBar() {
               <a
                 href={createInquiryHref("contact")}
                 onClick={() => setOpen(false)}
-                {...stylex.props(styles.ctaPrimary)}
+                {...stylex.attrs(styles.ctaPrimary)}
               >
                 Request a specification
-                <ArrowRight aria-hidden size={14} />
+                <ArrowRight aria-hidden="true" size={14} />
               </a>
             </li>
           </ul>
         </div>
       </Collapse>
-      {reduce ? null : (
-        <m.div aria-hidden style={{ scaleX: scrollYProgress }} {...stylex.props(styles.progress)} />
+      {reduce() ? null : (
+        <m.div
+          aria-hidden="true"
+          style={{ scaleX: scrollYProgress }}
+          {...stylex.attrs(styles.progress)}
+        />
       )}
     </header>
   );
@@ -1507,7 +1520,7 @@ function NavBar() {
 
 function HeroSection() {
   const reduce = useReducedMotion();
-  const panelRef = useRef<HTMLDivElement>(null);
+  const [panelRef, setPanelRef] = createSignal<HTMLDivElement>();
   const { scrollYProgress } = useScroll({
     target: panelRef,
     offset: ["start start", "end start"],
@@ -1515,84 +1528,83 @@ function HeroSection() {
   const imgY = useTransform(scrollYProgress, [0, 1], ["0%", "14%"]);
 
   return (
-    <section id="top" aria-label="Introduction" {...stylex.props(styles.hero)}>
-      <div {...stylex.props(styles.heroGrid)}>
-        <div {...stylex.props(styles.heroLeft)}>
+    <section id="top" aria-label="Introduction" {...stylex.attrs(styles.hero)}>
+      <div {...stylex.attrs(styles.heroGrid)}>
+        <div {...stylex.attrs(styles.heroLeft)}>
           <m.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: reduce ? 0 : 0.6, ease: EASE }}
-            {...stylex.props(styles.eyebrow)}
+            transition={{ duration: reduce() ? 0 : 0.6, ease: EASE }}
+            {...stylex.attrs(styles.eyebrow)}
           >
             Botanical intelligence since 1995
           </m.p>
-          <h1 {...stylex.props(styles.poster, styles.heroTitle)}>
+          <h1 {...stylex.attrs(styles.poster, styles.heroTitle)}>
             {HEADLINE.map((part, i) => (
               <m.span
-                key={part.word}
-                initial={reduce ? { opacity: 0 } : { opacity: 0, y: 28 }}
+                initial={reduce() ? { opacity: 0 } : { opacity: 0, y: 28 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{
-                  duration: reduce ? 0 : 0.8,
-                  delay: reduce ? 0 : 0.2 + i * STAGGER * 1.5,
+                  duration: reduce() ? 0 : 0.8,
+                  delay: reduce() ? 0 : 0.2 + i * STAGGER * 1.5,
                   ease: EASE,
                 }}
-                {...stylex.props(styles.heroWord, part.italic && styles.posterItalic)}
+                {...stylex.attrs(styles.heroWord, part.italic && styles.posterItalic)}
               >
                 {part.word}
               </m.span>
             ))}
           </h1>
           <Reveal delay={STAGGER * 6} margin="0px">
-            <p {...stylex.props(styles.lead)}>
+            <p {...stylex.attrs(styles.lead)}>
               Fenchem turns raw botanical complexity into standardized, documented actives —
               supplied at industrial scale to formulators in more than forty countries.
             </p>
           </Reveal>
           <Reveal delay={STAGGER * 7} margin="0px">
-            <div {...stylex.props(styles.heroActions)}>
-              <a href="#portfolio" {...stylex.props(styles.ctaPrimary)}>
+            <div {...stylex.attrs(styles.heroActions)}>
+              <a href="#portfolio" {...stylex.attrs(styles.ctaPrimary)}>
                 See the portfolio
-                <ArrowRight aria-hidden size={16} />
+                <ArrowRight aria-hidden="true" size={16} />
               </a>
-              <a href={createInquiryHref("contact")} {...stylex.props(styles.ctaOutline)}>
+              <a href={createInquiryHref("contact")} {...stylex.attrs(styles.ctaOutline)}>
                 Request a specification
               </a>
             </div>
           </Reveal>
           <Reveal delay={STAGGER * 8} margin="0px">
-            <div {...stylex.props(styles.heroMeta)}>
-              <span {...stylex.props(styles.techLabel)}>ISO 9001 · GMP · FSSC 22000</span>
-              <span {...stylex.props(styles.techLabel)}>Response &lt; 24h</span>
-              <span {...stylex.props(styles.heroScrollCue)}>
-                <ChevronsDown aria-hidden size={14} />
-                <span {...stylex.props(styles.techLabel)}>Scroll</span>
+            <div {...stylex.attrs(styles.heroMeta)}>
+              <span {...stylex.attrs(styles.techLabel)}>ISO 9001 · GMP · FSSC 22000</span>
+              <span {...stylex.attrs(styles.techLabel)}>Response &lt; 24h</span>
+              <span {...stylex.attrs(styles.heroScrollCue)}>
+                <ChevronsDown aria-hidden="true" size={14} />
+                <span {...stylex.attrs(styles.techLabel)}>Scroll</span>
               </span>
             </div>
           </Reveal>
         </div>
 
-        <div ref={panelRef} {...stylex.props(styles.heroRight)}>
+        <div ref={setPanelRef} {...stylex.attrs(styles.heroRight)}>
           <m.div
-            initial={reduce ? false : { opacity: 0, x: 40 }}
+            initial={reduce() ? false : { opacity: 0, x: 40 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: reduce ? 0 : 1.1, delay: reduce ? 0 : 0.15, ease: EASE }}
-            {...stylex.props(styles.heroPanel)}
+            transition={{ duration: reduce() ? 0 : 1.1, delay: reduce() ? 0 : 0.15, ease: EASE }}
+            {...stylex.attrs(styles.heroPanel)}
           >
             <m.img
               src={heroImage.src}
               alt={heroImage.alt}
               loading="eager"
-              style={{ y: reduce ? 0 : imgY }}
-              {...stylex.props(styles.heroImg)}
+              style={{ y: reduce() ? 0 : imgY }}
+              {...stylex.attrs(styles.heroImg)}
             />
           </m.div>
-          <div aria-hidden {...stylex.props(styles.heroStripe)} />
+          <div aria-hidden="true" {...stylex.attrs(styles.heroStripe)} />
           <Reveal delay={STAGGER * 6} y={12} margin="0px">
-            <div {...stylex.props(styles.heroTag)}>
-              <span {...stylex.props(styles.techLabel)}>{company.since}</span>
-              <span {...stylex.props(styles.heroTagBig)}>{company.tagline}</span>
-              <span {...stylex.props(styles.techLabel)}>{company.hq.coords}</span>
+            <div {...stylex.attrs(styles.heroTag)}>
+              <span {...stylex.attrs(styles.techLabel)}>{company.since}</span>
+              <span {...stylex.attrs(styles.heroTagBig)}>{company.tagline}</span>
+              <span {...stylex.attrs(styles.techLabel)}>{company.hq.coords}</span>
             </div>
           </Reveal>
         </div>
@@ -1605,17 +1617,17 @@ function HeroSection() {
 
 function DivisionMarquee() {
   const items = DIVISION_ORDER.map((division) => (
-    <li key={division} {...stylex.props(styles.marqueeItem)}>
+    <li {...stylex.attrs(styles.marqueeItem)}>
       <DivisionDot division={division} />
       {DIVISION_LABEL[division]}
-      <ChevronRight aria-hidden size={16} {...stylex.props(styles.marqueeChevron)} />
+      <ChevronRight aria-hidden="true" size={16} {...stylex.attrs(styles.marqueeChevron)} />
     </li>
   ));
   return (
-    <div aria-label="Divisions" {...stylex.props(styles.marquee)}>
-      <div {...stylex.props(styles.marqueeTrack)}>
-        <ul {...stylex.props(styles.marqueeList)}>{items}</ul>
-        <ul aria-hidden {...stylex.props(styles.marqueeList)}>
+    <div aria-label="Divisions" {...stylex.attrs(styles.marquee)}>
+      <div {...stylex.attrs(styles.marqueeTrack)}>
+        <ul {...stylex.attrs(styles.marqueeList)}>{items}</ul>
+        <ul aria-hidden="true" {...stylex.attrs(styles.marqueeList)}>
           {items}
         </ul>
       </div>
@@ -1625,39 +1637,35 @@ function DivisionMarquee() {
 
 /* ─────────────────────────────── Section head ─────────────────────────────── */
 
-function SectionHead({
-  index,
-  eyebrow,
-  title,
-  aside,
-  mirror,
-}: {
+function SectionHead(props: {
   index: string;
   eyebrow: string;
-  title: React.ReactNode;
-  aside?: React.ReactNode;
+  title: JSX.Element;
+  aside?: JSX.Element;
   mirror?: boolean;
 }) {
   return (
-    <div {...stylex.props(styles.sectionHead)}>
-      <div {...stylex.props(styles.sectionHeadMain)}>
+    <div {...stylex.attrs(styles.sectionHead)}>
+      <div {...stylex.attrs(styles.sectionHeadMain)}>
         <Reveal>
-          <p {...stylex.props(styles.eyebrow)}>
-            <span {...stylex.props(styles.numeral)}>{index}</span> — {eyebrow}
+          <p {...stylex.attrs(styles.eyebrow)}>
+            <span {...stylex.attrs(styles.numeral)}>{props.index}</span> — {props.eyebrow}
           </p>
         </Reveal>
         <Reveal delay={STAGGER}>
-          <h2 {...stylex.props(styles.poster, styles.h2)}>{title}</h2>
+          <h2 {...stylex.attrs(styles.poster, styles.h2)}>{props.title}</h2>
         </Reveal>
       </div>
-      {aside ? (
-        <Reveal
-          delay={STAGGER * 2}
-          sx={[styles.sectionHeadAside, mirror && styles.sectionHeadAsideMirror]}
-        >
-          {aside}
-        </Reveal>
-      ) : null}
+      <Show when={props.aside}>
+        {(aside) => (
+          <Reveal
+            delay={STAGGER * 2}
+            sx={[styles.sectionHeadAside, props.mirror && styles.sectionHeadAsideMirror]}
+          >
+            {aside()}
+          </Reveal>
+        )}
+      </Show>
     </div>
   );
 }
@@ -1667,60 +1675,59 @@ function SectionHead({
 function IndustriesSection() {
   const reduce = useReducedMotion();
   return (
-    <section id="industries" aria-labelledby="industries-title" {...stylex.props(styles.section)}>
-      <div {...stylex.props(styles.container)}>
+    <section id="industries" aria-labelledby="industries-title" {...stylex.attrs(styles.section)}>
+      <div {...stylex.attrs(styles.container)}>
         <SectionHead
           index="01"
           eyebrow="Industries · 03 markets"
           title={
             <span id="industries-title">
-              Three markets, <span {...stylex.props(styles.posterItalic)}>one</span> chain of
+              Three markets, <span {...stylex.attrs(styles.posterItalic)}>one</span> chain of
               custody
             </span>
           }
           aside={
-            <p {...stylex.props(styles.prose)}>
+            <p {...stylex.attrs(styles.prose)}>
               Standardized for potency, stability and dose accuracy — from field to finished
               extract.
             </p>
           }
         />
-        <div {...stylex.props(styles.chapterList)}>
+        <div {...stylex.attrs(styles.chapterList)}>
           {industries.map((industry, i) => {
             const mirror = i % 2 === 1;
             const fromX = mirror ? 24 : -24;
             return (
               <m.article
-                key={industry.title}
-                initial={reduce ? { opacity: 0 } : { opacity: 0, x: fromX }}
+                initial={reduce() ? { opacity: 0 } : { opacity: 0, x: fromX }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true, margin: "-80px" }}
-                transition={{ duration: reduce ? 0 : 0.9, ease: EASE }}
-                {...stylex.props(styles.chapterRow)}
+                transition={{ duration: reduce() ? 0 : 0.9, ease: EASE }}
+                {...stylex.attrs(styles.chapterRow)}
               >
                 <figure
-                  {...stylex.props(styles.chapterFigure, mirror && styles.chapterFigureMirror)}
+                  {...stylex.attrs(styles.chapterFigure, mirror && styles.chapterFigureMirror)}
                 >
                   <img
                     src={industry.image.src}
                     alt={industry.image.alt}
                     loading="lazy"
                     decoding="async"
-                    {...stylex.props(styles.chapterImg)}
+                    {...stylex.attrs(styles.chapterImg)}
                   />
-                  <figcaption {...stylex.props(styles.chapterNumeralBadge)}>
+                  <figcaption {...stylex.attrs(styles.chapterNumeralBadge)}>
                     {String(i + 1).padStart(2, "0")}
                   </figcaption>
                 </figure>
-                <div {...stylex.props(styles.chapterBody, mirror && styles.chapterBodyMirror)}>
-                  <span {...stylex.props(styles.techLabel)}>
+                <div {...stylex.attrs(styles.chapterBody, mirror && styles.chapterBodyMirror)}>
+                  <span {...stylex.attrs(styles.techLabel)}>
                     {String(i + 1).padStart(2, "0")} / 03
                   </span>
-                  <h3 {...stylex.props(styles.chapterTitle)}>{industry.title}</h3>
-                  <p {...stylex.props(styles.lead)}>{industry.copy}</p>
-                  <a href={createInquiryHref("industries")} {...stylex.props(styles.textLink)}>
+                  <h3 {...stylex.attrs(styles.chapterTitle)}>{industry.title}</h3>
+                  <p {...stylex.attrs(styles.lead)}>{industry.copy}</p>
+                  <a href={createInquiryHref("industries")} {...stylex.attrs(styles.textLink)}>
                     Explore actives
-                    <ArrowUpRight aria-hidden size={12} />
+                    <ArrowUpRight aria-hidden="true" size={12} />
                   </a>
                 </div>
               </m.article>
@@ -1734,9 +1741,9 @@ function IndustriesSection() {
 
 /* ─────────────────────────────── Portfolio poster grid ─────────────────────────────── */
 
-function PosterCard({ ingredient, index }: { ingredient: Ingredient; index: number }) {
-  const [active, setActive] = useState(false);
-  const division = divisionForApplication(ingredient.application);
+function PosterCard(props: { ingredient: Ingredient; index: number }) {
+  const [active, setActive] = createSignal(false);
+  const division = divisionForApplication(props.ingredient.application);
   const on = () => setActive(true);
   const off = () => setActive(false);
   return (
@@ -1745,38 +1752,41 @@ function PosterCard({ ingredient, index }: { ingredient: Ingredient; index: numb
       onPointerLeave={off}
       onFocus={on}
       onBlur={off}
-      aria-label={`${ingredient.name}, ${ingredient.latin}`}
-      {...stylex.props(styles.card)}
+      aria-label={`${props.ingredient.name}, ${props.ingredient.latin}`}
+      {...stylex.attrs(styles.card)}
     >
-      <figure {...stylex.props(styles.cardFigure)}>
+      <figure {...stylex.attrs(styles.cardFigure)}>
         <img
-          src={ingredient.image.src}
-          alt={ingredient.image.alt}
+          src={props.ingredient.image.src}
+          alt={props.ingredient.image.alt}
           loading="lazy"
           decoding="async"
-          {...stylex.props(styles.cardImg, active && styles.cardImgActive)}
+          {...stylex.attrs(styles.cardImg, active() && styles.cardImgActive)}
         />
-        <figcaption {...stylex.props(styles.cardCode)}>
-          {ingredient.code} · {String(index + 1).padStart(2, "0")} / 06
+        <figcaption {...stylex.attrs(styles.cardCode)}>
+          {props.ingredient.code} · {String(props.index + 1).padStart(2, "0")} / 06
         </figcaption>
       </figure>
-      <div {...stylex.props(styles.cardBody)}>
-        <span {...stylex.props(styles.cardNameWrap)}>
-          <h3 {...stylex.props(styles.cardName)}>{ingredient.name}</h3>
-          <span aria-hidden {...stylex.props(styles.cardSweep, active && styles.cardSweepActive)} />
+      <div {...stylex.attrs(styles.cardBody)}>
+        <span {...stylex.attrs(styles.cardNameWrap)}>
+          <h3 {...stylex.attrs(styles.cardName)}>{props.ingredient.name}</h3>
+          <span
+            aria-hidden="true"
+            {...stylex.attrs(styles.cardSweep, active() && styles.cardSweepActive)}
+          />
         </span>
-        <span {...stylex.props(styles.cardLatin)}>{ingredient.latin}</span>
-        <span {...stylex.props(styles.cardSpec)}>
-          {ingredient.purity} · {ingredient.form}
+        <span {...stylex.attrs(styles.cardLatin)}>{props.ingredient.latin}</span>
+        <span {...stylex.attrs(styles.cardSpec)}>
+          {props.ingredient.purity} · {props.ingredient.form}
         </span>
-        <div {...stylex.props(styles.cardFoot)}>
-          <span {...stylex.props(styles.chip)}>
+        <div {...stylex.attrs(styles.cardFoot)}>
+          <span {...stylex.attrs(styles.chip)}>
             <DivisionDot division={division} />
             {DIVISION_LABEL[division]}
           </span>
-          <a href={createInquiryHref("industries")} {...stylex.props(styles.textLink)}>
+          <a href={createInquiryHref("industries")} {...stylex.attrs(styles.textLink)}>
             Spec sheet
-            <ArrowUpRight aria-hidden size={12} />
+            <ArrowUpRight aria-hidden="true" size={12} />
           </a>
         </div>
       </div>
@@ -1786,35 +1796,35 @@ function PosterCard({ ingredient, index }: { ingredient: Ingredient; index: numb
 
 function PortfolioSection() {
   return (
-    <section id="portfolio" aria-labelledby="portfolio-title" {...stylex.props(styles.section)}>
-      <div {...stylex.props(styles.container)}>
+    <section id="portfolio" aria-labelledby="portfolio-title" {...stylex.attrs(styles.section)}>
+      <div {...stylex.attrs(styles.container)}>
         <ChevronDivider />
-        <div style={{ height: 48 }} />
+        <div style={{ height: "48px" }} />
         <SectionHead
           index="02"
           eyebrow="Portfolio · 06 featured actives"
           mirror
           title={
             <span id="portfolio-title">
-              Specified to the <span {...stylex.props(styles.posterItalic)}>decimal</span>
+              Specified to the <span {...stylex.attrs(styles.posterItalic)}>decimal</span>
             </span>
           }
           aside={
             <>
-              <p {...stylex.props(styles.prose)}>
+              <p {...stylex.attrs(styles.prose)}>
                 Every active ships with assay, form and a dossier prepared before sampling.
               </p>
-              <a href={createInquiryHref("industries")} {...stylex.props(styles.textLink)}>
+              <a href={createInquiryHref("industries")} {...stylex.attrs(styles.textLink)}>
                 Full portfolio
-                <ArrowUpRight aria-hidden size={12} />
+                <ArrowUpRight aria-hidden="true" size={12} />
               </a>
             </>
           }
         />
         <Reveal>
-          <div {...stylex.props(styles.posterGrid)}>
+          <div {...stylex.attrs(styles.posterGrid)}>
             {FEATURED.map((ingredient, i) => (
-              <PosterCard key={ingredient.code} ingredient={ingredient} index={i} />
+              <PosterCard ingredient={ingredient} index={i} />
             ))}
           </div>
         </Reveal>
@@ -1827,23 +1837,23 @@ function PortfolioSection() {
 
 function StatsBeat() {
   return (
-    <section aria-label="Key figures" {...stylex.props(styles.dark, styles.section)}>
-      <div {...stylex.props(styles.container)}>
+    <section aria-label="Key figures" {...stylex.attrs(styles.dark, styles.section)}>
+      <div {...stylex.attrs(styles.container)}>
         <Reveal>
-          <div {...stylex.props(styles.darkHead)}>
-            <p {...stylex.props(styles.eyebrow, styles.darkEyebrow)}>
+          <div {...stylex.attrs(styles.darkHead)}>
+            <p {...stylex.attrs(styles.eyebrow, styles.darkEyebrow)}>
               Figures a formulator can check
             </p>
-            <span {...stylex.props(styles.techLabel, styles.darkEyebrow)}>
+            <span {...stylex.attrs(styles.techLabel, styles.darkEyebrow)}>
               {company.legalName} · {company.since}
             </span>
           </div>
         </Reveal>
-        <dl {...stylex.props(styles.statGrid)}>
+        <dl {...stylex.attrs(styles.statGrid)}>
           {stats.map((stat, i) => (
-            <Reveal key={stat.label} delay={STAGGER * i} sx={styles.statCell}>
-              <dt {...stylex.props(styles.statValue)}>{stat.value}</dt>
-              <dd {...stylex.props(styles.statLabel)}>{stat.label}</dd>
+            <Reveal delay={STAGGER * i} sx={styles.statCell}>
+              <dt {...stylex.attrs(styles.statValue)}>{stat.value}</dt>
+              <dd {...stylex.attrs(styles.statLabel)}>{stat.label}</dd>
             </Reveal>
           ))}
         </dl>
@@ -1856,42 +1866,42 @@ function StatsBeat() {
 
 function QualitySection() {
   return (
-    <section id="quality" aria-labelledby="quality-title" {...stylex.props(styles.section)}>
-      <div {...stylex.props(styles.container)}>
+    <section id="quality" aria-labelledby="quality-title" {...stylex.attrs(styles.section)}>
+      <div {...stylex.attrs(styles.container)}>
         <SectionHead
           index="03"
           eyebrow="Quality · 03 pillars · 06 certifications"
           title={
             <span id="quality-title">
               Trust is argued with{" "}
-              <span {...stylex.props(styles.posterItalic)}>specifications</span>
+              <span {...stylex.attrs(styles.posterItalic)}>specifications</span>
             </span>
           }
           aside={
-            <p {...stylex.props(styles.prose)}>
+            <p {...stylex.attrs(styles.prose)}>
               Identity, potency and stability validated on every lot; third-party verification on
               request.
             </p>
           }
         />
         <Reveal>
-          <div {...stylex.props(styles.pillarGrid)}>
+          <div {...stylex.attrs(styles.pillarGrid)}>
             {pillars.map((pillar, i) => (
-              <div key={pillar.title} {...stylex.props(styles.pillarCell)}>
-                <span {...stylex.props(styles.numeral)}>{String(i + 1).padStart(2, "0")}</span>
-                <h3 {...stylex.props(styles.pillarTitle)}>{pillar.title}</h3>
-                <p {...stylex.props(styles.prose)}>{pillar.copy}</p>
+              <div {...stylex.attrs(styles.pillarCell)}>
+                <span {...stylex.attrs(styles.numeral)}>{String(i + 1).padStart(2, "0")}</span>
+                <h3 {...stylex.attrs(styles.pillarTitle)}>{pillar.title}</h3>
+                <p {...stylex.attrs(styles.prose)}>{pillar.copy}</p>
               </div>
             ))}
           </div>
-          <ul aria-label="Certifications" {...stylex.props(styles.certStrip)}>
+          <ul aria-label="Certifications" {...stylex.attrs(styles.certStrip)}>
             {certificationDetails.map((cert) => (
-              <li key={cert.name} {...stylex.props(styles.certCell)}>
-                <span {...stylex.props(styles.certName)}>
-                  <span aria-hidden {...stylex.props(styles.certDot)} />
+              <li {...stylex.attrs(styles.certCell)}>
+                <span {...stylex.attrs(styles.certName)}>
+                  <span aria-hidden="true" {...stylex.attrs(styles.certDot)} />
                   {cert.name}
                 </span>
-                <span {...stylex.props(styles.certSub)}>{cert.sub}</span>
+                <span {...stylex.attrs(styles.certSub)}>{cert.sub}</span>
               </li>
             ))}
           </ul>
@@ -1903,89 +1913,88 @@ function QualitySection() {
 
 /* ─────────────────────────────── Global staircase ─────────────────────────────── */
 
-function StaircasePath({ rows }: { rows: number }) {
+function StaircasePath(props: { rows: number }) {
   const reduce = useReducedMotion();
   // One step per row: right by STAIR_STEP, down by one row (1000 × rows*100 plane).
   const rowH = 100;
   const points: string[] = [];
-  for (let i = 0; i < rows; i++) {
+  for (let i = 0; i < props.rows; i++) {
     const x = i * STAIR_STEP + 24;
     const y = i * rowH + rowH / 2;
     points.push(`${x},${y}`);
-    if (i < rows - 1) points.push(`${x},${y + rowH}`);
+    if (i < props.rows - 1) points.push(`${x},${y + rowH}`);
   }
   const d = `M${points.join(" L")}`;
   return (
     <svg
-      viewBox={`0 0 1000 ${rows * rowH}`}
+      viewBox={`0 0 1000 ${props.rows * rowH}`}
       preserveAspectRatio="none"
-      aria-hidden
-      {...stylex.props(styles.stairSvg)}
+      aria-hidden="true"
+      {...stylex.attrs(styles.stairSvg)}
     >
       <m.path
         d={d}
         fill="none"
         stroke="var(--color-brand-green-500)"
-        strokeWidth={2}
-        vectorEffect="non-scaling-stroke"
-        initial={reduce ? { pathLength: 1 } : { pathLength: 0 }}
+        stroke-width={2}
+        {...{ "vector-effect": "non-scaling-stroke" }}
+        initial={reduce() ? { pathLength: 1 } : { pathLength: 0 }}
         whileInView={{ pathLength: 1 }}
         viewport={{ once: true, margin: "-80px" }}
-        transition={{ duration: reduce ? 0 : 1.6, ease: EASE }}
+        transition={{ duration: reduce() ? 0 : 1.6, ease: EASE }}
       />
     </svg>
   );
 }
 
 function GlobalSection() {
-  const [active, setActive] = useState<number | null>(null);
+  const [active, setActive] = createSignal<number | null>(null);
   return (
-    <section id="global-supply" aria-labelledby="global-title" {...stylex.props(styles.section)}>
-      <div {...stylex.props(styles.container)}>
+    <section id="global-supply" aria-labelledby="global-title" {...stylex.attrs(styles.section)}>
+      <div {...stylex.attrs(styles.container)}>
         <ChevronDivider />
-        <div style={{ height: 48 }} />
+        <div style={{ height: "48px" }} />
         <SectionHead
           index="04"
           eyebrow="Global supply · 06 bases"
           mirror
           title={
             <span id="global-title">
-              Sourced at origin, <span {...stylex.props(styles.posterItalic)}>traced</span> from
+              Sourced at origin, <span {...stylex.attrs(styles.posterItalic)}>traced</span> from
               Nanjing
             </span>
           }
           aside={
-            <p {...stylex.props(styles.prose)}>
+            <p {...stylex.attrs(styles.prose)}>
               Six bases on three continents keep documentation, compliance and lead times local.
             </p>
           }
         />
         <Reveal sx={styles.stairWrap}>
           <StaircasePath rows={regions.length} />
-          <ol aria-label="Regions" {...stylex.props(styles.stairList)}>
+          <ol aria-label="Regions" {...stylex.attrs(styles.stairList)}>
             {regions.map((region, i) => (
               <li
-                key={region.city}
-                tabIndex={0}
+                tabindex={0}
                 onPointerEnter={() => setActive(i)}
                 onPointerLeave={() => setActive(null)}
                 onFocus={() => setActive(i)}
                 onBlur={() => setActive(null)}
                 aria-label={`${region.city}, ${region.country}: ${region.role}`}
-                {...stylex.props(
+                {...stylex.attrs(
                   styles.stairRow,
                   STAIR_STYLE[i] ?? styles.stair0,
-                  active === i && styles.stairRowActive,
+                  active() === i && styles.stairRowActive,
                 )}
               >
-                <span {...stylex.props(styles.stairIndex)}>{String(i + 1).padStart(2, "0")}</span>
+                <span {...stylex.attrs(styles.stairIndex)}>{String(i + 1).padStart(2, "0")}</span>
                 <div>
-                  <p {...stylex.props(styles.stairCity)}>
+                  <p {...stylex.attrs(styles.stairCity)}>
                     {region.city}, {region.country}
                   </p>
-                  <p {...stylex.props(styles.stairRole)}>{region.role}</p>
+                  <p {...stylex.attrs(styles.stairRole)}>{region.role}</p>
                 </div>
-                <span {...stylex.props(styles.stairCoords)}>{region.coords}</span>
+                <span {...stylex.attrs(styles.stairCoords)}>{region.coords}</span>
               </li>
             ))}
           </ol>
@@ -1999,31 +2008,31 @@ function GlobalSection() {
 
 function FinaleSection() {
   return (
-    <section id="contact" aria-labelledby="contact-title" {...stylex.props(styles.finale)}>
-      <div aria-hidden {...stylex.props(styles.finaleGlow)} />
-      <div {...stylex.props(styles.container)}>
-        <div {...stylex.props(styles.finaleGrid)}>
-          <div {...stylex.props(styles.finaleMain)}>
+    <section id="contact" aria-labelledby="contact-title" {...stylex.attrs(styles.finale)}>
+      <div aria-hidden="true" {...stylex.attrs(styles.finaleGlow)} />
+      <div {...stylex.attrs(styles.container)}>
+        <div {...stylex.attrs(styles.finaleGrid)}>
+          <div {...stylex.attrs(styles.finaleMain)}>
             <Reveal>
-              <p {...stylex.props(styles.eyebrow, styles.darkEyebrow)}>
-                <span {...stylex.props(styles.numeral, styles.finaleItalic)}>05</span> — Contact
+              <p {...stylex.attrs(styles.eyebrow, styles.darkEyebrow)}>
+                <span {...stylex.attrs(styles.numeral, styles.finaleItalic)}>05</span> — Contact
               </p>
             </Reveal>
             <Reveal delay={STAGGER}>
-              <h2 id="contact-title" {...stylex.props(styles.poster, styles.finaleTitle)}>
+              <h2 id="contact-title" {...stylex.attrs(styles.poster, styles.finaleTitle)}>
                 Send the target.{" "}
-                <span {...stylex.props(styles.posterItalic, styles.finaleItalic)}>
+                <span {...stylex.attrs(styles.posterItalic, styles.finaleItalic)}>
                   We send the specification.
                 </span>
               </h2>
             </Reveal>
             <Reveal delay={STAGGER * 2}>
-              <div {...stylex.props(styles.finaleActions)}>
-                <a href={createInquiryHref("contact")} {...stylex.props(styles.ctaPrimary)}>
+              <div {...stylex.attrs(styles.finaleActions)}>
+                <a href={createInquiryHref("contact")} {...stylex.attrs(styles.ctaPrimary)}>
                   Request a specification
-                  <ArrowRight aria-hidden size={16} />
+                  <ArrowRight aria-hidden="true" size={16} />
                 </a>
-                <a href={`mailto:${company.email}`} {...stylex.props(styles.finaleMail)}>
+                <a href={`mailto:${company.email}`} {...stylex.attrs(styles.finaleMail)}>
                   {company.email}
                 </a>
               </div>
@@ -2031,9 +2040,9 @@ function FinaleSection() {
           </div>
           <Reveal delay={STAGGER * 3} sx={styles.finaleAside}>
             <span>Response &lt; 24h</span>
-            <span {...stylex.props(styles.finaleRule)} />
+            <span {...stylex.attrs(styles.finaleRule)} />
             <span>Documentation before sampling</span>
-            <span {...stylex.props(styles.finaleRule)} />
+            <span {...stylex.attrs(styles.finaleRule)} />
             <span>{company.hq.coords}</span>
           </Reveal>
         </div>
@@ -2046,8 +2055,8 @@ function FinaleSection() {
 
 function FooterSection() {
   return (
-    <footer {...stylex.props(styles.footer)}>
-      <div {...stylex.props(styles.container)}>
+    <footer {...stylex.attrs(styles.footer)}>
+      <div {...stylex.attrs(styles.container)}>
         <FooterDirectory
           styles={{
             footerGrid: styles.footerGrid,
@@ -2065,17 +2074,17 @@ function FooterSection() {
             footerColLast: styles.footerColLast,
           }}
           divisions={DIVISION_ORDER.map((division) => (
-            <li key={division} {...stylex.props(styles.footerItem)}>
+            <li {...stylex.attrs(styles.footerItem)}>
               <DivisionDot division={division} />
               {DIVISION_LABEL[division]}
             </li>
           ))}
         />
-        <div aria-hidden {...stylex.props(styles.ghostRow)}>
-          <span {...stylex.props(styles.ghostWord)}>FENCHEM</span>
-          <span {...stylex.props(styles.ghostV)}>V</span>
+        <div aria-hidden="true" {...stylex.attrs(styles.ghostRow)}>
+          <span {...stylex.attrs(styles.ghostWord)}>FENCHEM</span>
+          <span {...stylex.attrs(styles.ghostV)}>V</span>
         </div>
-        <div {...stylex.props(styles.footerBottom)}>
+        <div {...stylex.attrs(styles.footerBottom)}>
           <span>
             © <CurrentYear /> {company.legalName}
           </span>
@@ -2090,15 +2099,15 @@ function FooterSection() {
 
 function SmoothScroll() {
   const reduce = useReducedMotion();
-  useEffect(() => {
-    if (reduce) return;
+  createEffect(reduce, (value) => {
+    if (value) return;
     const root = document.documentElement;
     const previous = root.style.scrollBehavior;
     root.style.scrollBehavior = "smooth";
     return () => {
       root.style.scrollBehavior = previous;
     };
-  }, [reduce]);
+  });
   return null;
 }
 
@@ -2106,7 +2115,7 @@ export function VariantT() {
   return (
     <LazyMotion features={domMax} strict>
       <LayoutGroup>
-        <div {...stylex.props(styles.root)}>
+        <div {...stylex.attrs(styles.root)}>
           <SmoothScroll />
           <NavBar />
           <main>

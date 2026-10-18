@@ -29,26 +29,26 @@ const s = stylex.create({
   },
 });
 
-export function Cta({ onNavigateHome }: { onNavigateHome: (hash?: string) => void }) {
+export function Cta(props: { onNavigateHome: (hash?: string) => void }) {
   return (
-    <section aria-labelledby="about-cta-title" {...stylex.props(ui.section, ui.onPage)}>
-      <div {...stylex.props(ui.shell, ui.inset)}>
+    <section aria-labelledby="about-cta-title" {...stylex.attrs(ui.section, ui.onPage)}>
+      <div {...stylex.attrs(ui.shell, ui.inset)}>
         <Reveal sx={ui.grid}>
-          <h2 id="about-cta-title" {...stylex.props(s.title)}>
+          <h2 id="about-cta-title" {...stylex.attrs(s.title)}>
             {CTA.title}
           </h2>
-          <div {...stylex.props(s.actions)}>
+          <div {...stylex.attrs(s.actions)}>
             <button
               type="button"
-              onClick={() => onNavigateHome("contact")}
-              {...stylex.props(ui.button, ui.buttonPrimary, ui.focusRing)}
+              onClick={() => props.onNavigateHome("contact")}
+              {...stylex.attrs(ui.button, ui.buttonPrimary, ui.focusRing)}
             >
               {CTA.action.label}
             </button>
             <button
               type="button"
-              onClick={() => onNavigateHome("products")}
-              {...stylex.props(ui.button, ui.buttonQuiet, ui.focusRing)}
+              onClick={() => props.onNavigateHome("products")}
+              {...stylex.attrs(ui.button, ui.buttonQuiet, ui.focusRing)}
             >
               产品与应用
             </button>

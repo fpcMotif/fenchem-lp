@@ -1,6 +1,6 @@
 import * as stylex from "@stylexjs/stylex";
-import { m, useMotionValue, useMotionValueEvent, useScroll, useTransform } from "motion/react";
-import { useCallback, useEffect, useRef } from "react";
+import { createEffect } from "solid-js";
+import { m, useMotionValue, useMotionValueEvent, useScroll, useTransform } from "@/compat/motion";
 
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
@@ -70,8 +70,8 @@ const styles = stylex.create({
 });
 
 export function BalanceBeam() {
-  const barRef = useRef<HTMLDivElement>(null);
-  const beamRef = useRef<HTMLSpanElement>(null);
+  let barRef!: HTMLDivElement;
+  let beamRef!: HTMLSpanElement;
   const reduce = useReducedMotion();
   const twoColumn = useTwoColumn();
   const { scrollY } = useScroll();
@@ -80,11 +80,11 @@ export function BalanceBeam() {
   const opacity = useTransform(engage, [0, 1], [0.62, 1]);
   const weight = useTransform(engage, [0, 1], [1, 2]);
 
-  const update = useCallback(() => {
-    const bar = barRef.current;
-    const beam = beamRef.current;
+  const update = () => {
+    const bar = barRef;
+    const beam = beamRef;
     const sequence = bar?.parentElement;
-    if (!bar || !beam || !sequence || reduce || !twoColumn) return;
+    if (!bar || !beam || !sequence || reduce() || !twoColumn()) return;
     const line = readingLine(window.innerHeight);
     const distances = Array.from(
       sequence.querySelectorAll(COUNTERWEIGHT_SELECTOR),
@@ -96,25 +96,28 @@ export function BalanceBeam() {
       span > 0 ? (-Math.asin(Math.max(-1, Math.min(1, offset / span))) * 180) / Math.PI : 0,
     );
     engage.set(Math.max(0, 1 - Math.abs(distances[0] ?? 0) / ENGAGE_RANGE));
-  }, [reduce, twoColumn, rotate, engage]);
+  };
 
   useMotionValueEvent(scrollY, "change", update);
 
-  useEffect(() => {
-    update();
-    window.addEventListener("resize", update);
-    return () => window.removeEventListener("resize", update);
-  }, [update]);
+  createEffect(
+    () => [reduce(), twoColumn()],
+    () => {
+      update();
+      window.addEventListener("resize", update);
+      return () => window.removeEventListener("resize", update);
+    },
+  );
 
   return (
-    <div ref={barRef} aria-hidden="true" {...stylex.props(styles.bar)}>
-      <div {...stylex.props(ui.shell, ui.columns)}>
-        <span {...stylex.props(styles.track)}>
-          <m.span ref={beamRef} {...stylex.props(styles.beam)} style={{ rotate, opacity }}>
-            <m.span {...stylex.props(styles.stroke)} style={{ scaleY: weight }} />
+    <div ref={barRef} aria-hidden="true" {...stylex.attrs(styles.bar)}>
+      <div {...stylex.attrs(ui.shell, ui.columns)}>
+        <span {...stylex.attrs(styles.track)}>
+          <m.span ref={beamRef} {...stylex.attrs(styles.beam)} style={{ rotate, opacity }}>
+            <m.span {...stylex.attrs(styles.stroke)} style={{ scaleY: weight }} />
           </m.span>
         </span>
-        <span {...stylex.props(styles.fulcrumSlot)}>
+        <span {...stylex.attrs(styles.fulcrumSlot)}>
           <FulcrumMark />
         </span>
       </div>

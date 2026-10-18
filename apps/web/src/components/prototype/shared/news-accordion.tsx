@@ -1,6 +1,7 @@
 import * as stylex from "@stylexjs/stylex";
 import type { StyleXStyles } from "@stylexjs/stylex";
-import { useId, type ReactNode } from "react";
+import { createUniqueId, For, Show } from "solid-js";
+import type { JSX } from "@solidjs/web";
 
 import { EASE } from "../motion-constants";
 import { useReducedMotion } from "../use-reduced-motion";
@@ -29,75 +30,73 @@ function splitWithUrls(text: string) {
   });
 }
 
-function DetailText({ text }: { text: string }) {
+function DetailText(props: { text: string }) {
   return (
-    <>
-      {splitWithUrls(text).map(({ key, part, isLink }) =>
-        isLink ? (
-          <a key={key} href={part} {...stylex.props(local.link)}>
-            {part}
+    <For each={splitWithUrls(props.text)}>
+      {(segment) =>
+        segment.isLink ? (
+          <a href={segment.part} {...stylex.attrs(local.link)}>
+            {segment.part}
           </a>
         ) : (
-          part
-        ),
-      )}
-    </>
+          segment.part
+        )
+      }
+    </For>
   );
 }
 
-export function NewsAccordion({
-  item,
-  open,
-  onToggle,
-  icon,
-  styles,
-}: {
+export function NewsAccordion(props: {
   item: { title: string; details: readonly string[] };
   open: boolean;
   onToggle: () => void;
-  icon: ReactNode;
+  icon: JSX.Element;
   styles: Record<
     "newsHeading" | "newsTrigger" | "newsPanel" | "newsPanelInner" | "mutedText",
     StyleXStyles
   >;
 }) {
-  const panelId = useId();
+  const panelId = createUniqueId();
   const reduce = useReducedMotion();
-  if (item.details.length === 0) {
-    return (
-      <h3 {...stylex.props(styles.newsHeading)}>
-        <span {...stylex.props(styles.newsTrigger, local.staticTrigger)}>{item.title}</span>
-      </h3>
-    );
-  }
   return (
-    <>
-      <h3 {...stylex.props(styles.newsHeading)}>
+    <Show
+      when={props.item.details.length !== 0}
+      fallback={
+        <h3 {...stylex.attrs(props.styles.newsHeading)}>
+          <span {...stylex.attrs(props.styles.newsTrigger, local.staticTrigger)}>
+            {props.item.title}
+          </span>
+        </h3>
+      }
+    >
+      <h3 {...stylex.attrs(props.styles.newsHeading)}>
         <button
           type="button"
-          aria-expanded={open}
+          aria-expanded={props.open ? "true" : "false"}
           aria-controls={panelId}
-          onClick={onToggle}
-          {...stylex.props(styles.newsTrigger)}
+          onClick={() => props.onToggle()}
+          {...stylex.attrs(props.styles.newsTrigger)}
         >
-          <span>{item.title}</span>
-          {icon}
+          <span>{props.item.title}</span>
+          {props.icon}
         </button>
       </h3>
       <Collapse
         id={panelId}
-        open={open}
-        transition={{ duration: reduce ? 0 : 0.25, ease: EASE }}
-        {...stylex.props(styles.newsPanel)}
+        open={props.open}
+        transition={{ duration: reduce() ? 0 : 0.25, ease: EASE }}
+        class={stylex.attrs(props.styles.newsPanel).class}
       >
-        <div {...stylex.props(styles.newsPanelInner)}>
-          {item.details.map((detail) => (
-            <p key={detail} {...stylex.props(styles.mutedText)}>
-              <DetailText text={detail} />
-            </p>
-          ))}
+        <div {...stylex.attrs(props.styles.newsPanelInner)}>
+          <For each={props.item.details}>
+            {(detail) => (
+              <p {...stylex.attrs(props.styles.mutedText)}>
+                <DetailText text={detail} />
+              </p>
+            )}
+          </For>
         </div>
       </Collapse>
-    </>
+    </Show>
   );
 }

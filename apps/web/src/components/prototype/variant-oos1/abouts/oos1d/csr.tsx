@@ -1,4 +1,4 @@
-import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
+import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 
 import { ABOUT_CSR, ABOUT_HERO } from "../../about-data";
@@ -17,11 +17,11 @@ const s = stylex.create({
   body: {
     display: "flex",
     flexDirection: "column",
-    gap: { default: 32, [breakpoints.xl]: 48 },
+    gap: { default: 32, ["@media (min-width: 1280px)"]: 48 },
   },
   statement: {
     margin: 0,
-    fontSize: { default: step.title, [breakpoints.xl]: "32px" },
+    fontSize: { default: step.title, ["@media (min-width: 1280px)"]: "32px" },
     fontWeight: 500,
     lineHeight: 1.5,
     letterSpacing: "0.04em",
@@ -43,7 +43,7 @@ const s = stylex.create({
     display: "grid",
     gridTemplateColumns: {
       default: "minmax(0, 1fr)",
-      [breakpoints.md]: "repeat(3, minmax(0, 1fr))",
+      ["@media (min-width: 768px)"]: "repeat(3, minmax(0, 1fr))",
     },
     columnGap: 24,
     margin: 0,
@@ -67,23 +67,23 @@ export function Csr() {
 
   return (
     <Section id={chip.id} label="Responsibility" background={s.csr}>
-      <div {...stylex.props(ui.phi)}>
-        <div {...stylex.props(ui.asideCol)}>
+      <div {...stylex.attrs(ui.phi)}>
+        <div {...stylex.attrs(ui.asideCol)}>
           <Figure src={ABOUT_CSR.image} alt={ABOUT_CSR.imageAlt} ratio={s.ratio} />
         </div>
-        <div {...stylex.props(ui.main, s.body)}>
+        <div {...stylex.attrs(ui.main, s.body)}>
           <Reveal>
-            <p {...stylex.props(s.statement)}>
-              <span {...stylex.props(s.statementLine)}>{statementLead}</span>
-              <span {...stylex.props(s.statementLine)}>{statementClose}</span>
+            <p {...stylex.attrs(s.statement)}>
+              <span {...stylex.attrs(s.statementLine)}>{statementLead}</span>
+              <span {...stylex.attrs(s.statementLine)}>{statementClose}</span>
             </p>
           </Reveal>
           <Reveal step={1}>
-            <p {...stylex.props(s.desc)}>{ABOUT_CSR.desc}</p>
+            <p {...stylex.attrs(s.desc)}>{ABOUT_CSR.desc}</p>
           </Reveal>
-          <ul {...stylex.props(s.outcomes)}>
+          <ul {...stylex.attrs(s.outcomes)}>
             {ABOUT_CSR.outcomes.map((outcome, idx) => (
-              <Reveal key={outcome.title} as="li" step={idx + 2} sx={s.outcome}>
+              <Reveal as="li" step={idx + 2} sx={s.outcome}>
                 {outcome.title}
               </Reveal>
             ))}

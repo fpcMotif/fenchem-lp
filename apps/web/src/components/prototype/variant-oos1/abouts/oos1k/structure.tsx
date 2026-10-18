@@ -1,10 +1,10 @@
 import * as stylex from "@stylexjs/stylex";
-import { useState } from "react";
 
 import { ABOUT_STRUCTURE } from "../../about-data";
 import { ChartHeading, useDusk } from "./shared";
 import { ui } from "./shared-values";
 import { bp, face, sky } from "./tokens.stylex";
+import { createSignal } from "solid-js";
 
 const WIDTH = 1200;
 const HEIGHT = 680;
@@ -224,7 +224,7 @@ function slotPlace(slot: number, row: Row) {
 }
 
 export function Structure() {
-  const [lit, setLit] = useState<string | null>(null);
+  const [lit, setLit] = createSignal<string | null>(null);
   const [plotRef, hidden] = useDusk<HTMLDivElement>();
   const { holding, subsidiaries, subsidiaryBadge, subsidiaryBadgeEnglish } = ABOUT_STRUCTURE;
 
@@ -232,9 +232,9 @@ export function Structure() {
     <section
       id="about-structure"
       aria-labelledby="oos1k-structure"
-      {...stylex.props(ui.section, ui.shell)}
+      {...stylex.attrs(ui.section, ui.shell)}
     >
-      <div {...stylex.props(styles.head)}>
+      <div {...stylex.attrs(styles.head)}>
         <ChartHeading
           id="oos1k-structure"
           numeral="VI"
@@ -242,107 +242,105 @@ export function Structure() {
           title={ABOUT_STRUCTURE.title}
           note="A primary and five companions"
         />
-        <p {...stylex.props(styles.legend)}>
-          <span {...stylex.props(styles.legendItem)}>
-            <span aria-hidden="true" {...stylex.props(styles.legendDot, styles.legendPrimary)} />
-            <span {...stylex.props(ui.designation, styles.legendLetter)}>A</span>
+        <p {...stylex.attrs(styles.legend)}>
+          <span {...stylex.attrs(styles.legendItem)}>
+            <span aria-hidden="true" {...stylex.attrs(styles.legendDot, styles.legendPrimary)} />
+            <span {...stylex.attrs(ui.designation, styles.legendLetter)}>A</span>
             {holding.badge}
           </span>
-          <span {...stylex.props(styles.legendItem)}>
-            <span aria-hidden="true" {...stylex.props(styles.legendDot, styles.legendPlanet)} />
-            <span {...stylex.props(ui.designation, styles.legendLetter)}>b–f</span>
+          <span {...stylex.attrs(styles.legendItem)}>
+            <span aria-hidden="true" {...stylex.attrs(styles.legendDot, styles.legendPlanet)} />
+            <span {...stylex.attrs(ui.designation, styles.legendLetter)}>b–f</span>
             {subsidiaryBadge}
           </span>
         </p>
       </div>
 
-      <div ref={plotRef} {...stylex.props(styles.plot)}>
+      <div ref={plotRef} {...stylex.attrs(styles.plot)}>
         <svg
           aria-hidden="true"
           viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
           preserveAspectRatio="none"
-          {...stylex.props(styles.drawing)}
+          {...stylex.attrs(styles.drawing)}
         >
           {ORBITS.map((orbit, index) => (
             <ellipse
-              key={orbit.id}
               cx={orbit.cx}
               cy={FOCUS.y}
               rx={orbit.rx}
               ry={orbit.ry}
-              vectorEffect="non-scaling-stroke"
-              {...stylex.props(
+              vector-effect="non-scaling-stroke"
+              {...stylex.attrs(
                 styles.orbit,
-                lit === orbit.id && styles.orbitLit,
+                lit() === orbit.id && styles.orbitLit,
                 ui.dim,
-                hidden && ui.dimHidden,
+                hidden() && ui.dimHidden,
                 ui.dimDelay(200 + index * 140),
               )}
             />
           ))}
           <path
             d={`${leader(FOCUS.x, FOCUS.y, HOLDING_SLOT, "top")}${ORBITS.map((orbit) => leader(orbit.x, orbit.y, orbit.slot, orbit.row)).join("")}`}
-            vectorEffect="non-scaling-stroke"
-            {...stylex.props(styles.leader, ui.dim, hidden && ui.dimHidden, ui.dimDelay(1100))}
+            vector-effect="non-scaling-stroke"
+            {...stylex.attrs(styles.leader, ui.dim, hidden() && ui.dimHidden, ui.dimDelay(1100))}
           />
           <path
             d={ORBITS.map((orbit) => `M${orbit.x} ${orbit.y}h0`).join("")}
-            vectorEffect="non-scaling-stroke"
-            {...stylex.props(
+            vector-effect="non-scaling-stroke"
+            {...stylex.attrs(
               styles.body,
               styles.planet,
               ui.dim,
-              hidden && ui.dimHidden,
+              hidden() && ui.dimHidden,
               ui.dimDelay(900),
             )}
           />
           <path
             d={`M${FOCUS.x} ${FOCUS.y}h0`}
-            vectorEffect="non-scaling-stroke"
-            {...stylex.props(styles.body, styles.primary)}
+            vector-effect="non-scaling-stroke"
+            {...stylex.attrs(styles.body, styles.primary)}
           />
         </svg>
 
-        <p {...stylex.props(styles.label, styles.labelTop, slotPlace(HOLDING_SLOT, "top"))}>
-          <span {...stylex.props(ui.designation, styles.letter, styles.letterLit)}>A</span>
-          <span {...stylex.props(ui.label, styles.badge)}>{holding.badge}</span>
-          <span {...stylex.props(styles.name, styles.holdingName)}>{holding.name}</span>
-          <span lang="en" {...stylex.props(styles.english)}>
+        <p {...stylex.attrs(styles.label, styles.labelTop, slotPlace(HOLDING_SLOT, "top"))}>
+          <span {...stylex.attrs(ui.designation, styles.letter, styles.letterLit)}>A</span>
+          <span {...stylex.attrs(ui.label, styles.badge)}>{holding.badge}</span>
+          <span {...stylex.attrs(styles.name, styles.holdingName)}>{holding.name}</span>
+          <span lang="en" {...stylex.attrs(styles.english)}>
             {holding.english}
           </span>
         </p>
-        <ul aria-label={subsidiaryBadgeEnglish} {...stylex.props(styles.labels)}>
+        <ul aria-label={subsidiaryBadgeEnglish} {...stylex.attrs(styles.labels)}>
           {ORBITS.map((orbit) => (
             <li
-              key={orbit.id}
               onPointerEnter={() => setLit(orbit.id)}
               onPointerLeave={() => setLit(null)}
-              {...stylex.props(
+              {...stylex.attrs(
                 styles.label,
                 orbit.row === "top" ? styles.labelTop : styles.labelBottom,
                 slotPlace(orbit.slot, orbit.row),
               )}
             >
               <span
-                {...stylex.props(
+                {...stylex.attrs(
                   ui.designation,
                   styles.letter,
-                  lit === orbit.id && styles.letterLit,
+                  lit() === orbit.id && styles.letterLit,
                 )}
               >
                 {orbit.letter}
               </span>
-              <span {...stylex.props(styles.name)}>{orbit.name}</span>
-              <span lang="en" {...stylex.props(styles.english)}>
+              <span {...stylex.attrs(styles.name)}>{orbit.name}</span>
+              <span lang="en" {...stylex.attrs(styles.english)}>
                 {orbit.english}
               </span>
             </li>
           ))}
         </ul>
 
-        <ul aria-hidden="true" {...stylex.props(styles.tags)}>
+        <ul aria-hidden="true" {...stylex.attrs(styles.tags)}>
           <li
-            {...stylex.props(
+            {...stylex.attrs(
               ui.designation,
               styles.tag,
               place.tag(percentX(FOCUS.x), percentY(FOCUS.y)),
@@ -352,8 +350,7 @@ export function Structure() {
           </li>
           {ORBITS.map((orbit) => (
             <li
-              key={orbit.id}
-              {...stylex.props(
+              {...stylex.attrs(
                 ui.designation,
                 styles.tag,
                 place.tag(percentX(orbit.x), percentY(orbit.y)),
@@ -365,19 +362,19 @@ export function Structure() {
         </ul>
       </div>
 
-      <ul {...stylex.props(styles.key)}>
-        <li {...stylex.props(styles.keyItem)}>
-          <span {...stylex.props(ui.designation, styles.letter, styles.letterLit)}>A</span>
-          <span {...stylex.props(styles.name, styles.holdingName)}>{holding.name}</span>
-          <span lang="en" {...stylex.props(styles.english)}>
+      <ul {...stylex.attrs(styles.key)}>
+        <li {...stylex.attrs(styles.keyItem)}>
+          <span {...stylex.attrs(ui.designation, styles.letter, styles.letterLit)}>A</span>
+          <span {...stylex.attrs(styles.name, styles.holdingName)}>{holding.name}</span>
+          <span lang="en" {...stylex.attrs(styles.english)}>
             {holding.english}
           </span>
         </li>
         {subsidiaries.map((subsidiary, index) => (
-          <li key={subsidiary.id} {...stylex.props(styles.keyItem)}>
-            <span {...stylex.props(ui.designation, styles.letter)}>{LETTERS[index]}</span>
-            <span {...stylex.props(styles.name)}>{subsidiary.name}</span>
-            <span lang="en" {...stylex.props(styles.english)}>
+          <li {...stylex.attrs(styles.keyItem)}>
+            <span {...stylex.attrs(ui.designation, styles.letter)}>{LETTERS[index]}</span>
+            <span {...stylex.attrs(styles.name)}>{subsidiary.name}</span>
+            <span lang="en" {...stylex.attrs(styles.english)}>
               {subsidiary.english}
             </span>
           </li>

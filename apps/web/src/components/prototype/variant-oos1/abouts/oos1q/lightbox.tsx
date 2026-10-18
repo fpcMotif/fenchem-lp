@@ -4,7 +4,7 @@ import { LightboxStage } from "../../../shared/lightbox-stage";
 
 import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { ChevronLeft, ChevronRight, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, X } from "@fenchem-lp/ui/components/lucide";
 
 import { ABOUT_CAMPUS } from "../../about-data";
 import { font, motionCss, tone } from "./tokens.stylex";
@@ -124,21 +124,21 @@ const s = stylex.create({
   },
 });
 
-export function Lightbox({ lightbox }: { lightbox: LightboxState }) {
-  const { stepped, close: onClose, step: onStep } = lightbox;
+export function Lightbox(props: { lightbox: LightboxState }) {
+  const onClose = () => props.lightbox.close();
+  const onStep = (delta: number) => props.lightbox.step(delta);
   const photos = ABOUT_CAMPUS.photos;
 
   return (
-    <LightboxDialog lightbox={lightbox} items={photos} sx={s.dialog}>
+    <LightboxDialog lightbox={props.lightbox} items={photos} sx={s.dialog}>
       {(photo) => (
         <>
           <LightboxStage onClose={onClose} sx={s.stage}>
             <figure
-              key={photo.id}
-              {...stylex.props(s.figure, stepped ? s.figureStep : s.figureOpen)}
+              {...stylex.attrs(s.figure, props.lightbox.stepped ? s.figureStep : s.figureOpen)}
             >
-              <img src={photo.large} alt={photo.alt} {...stylex.props(s.image)} />
-              <figcaption {...stylex.props(s.caption)}>{photo.caption}</figcaption>
+              <img src={photo.large} alt={photo.alt} {...stylex.attrs(s.image)} />
+              <figcaption {...stylex.attrs(s.caption)}>{photo.caption}</figcaption>
             </figure>
           </LightboxStage>
           <LightboxControls

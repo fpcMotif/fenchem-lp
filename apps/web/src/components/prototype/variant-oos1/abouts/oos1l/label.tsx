@@ -14,13 +14,13 @@ const ENGLISH: Partial<Record<SectionId, string>> = {
   "about-structure": "Structure",
 };
 
-export function SectionLabel({ section, sx }: { section: SectionId; sx?: StyleXStyles }) {
-  const chip = ABOUT_HERO.navChips.find((item) => item.id === section);
+export function SectionLabel(props: { section: SectionId; sx?: StyleXStyles }) {
+  const chip = ABOUT_HERO.navChips.find((item) => item.id === props.section);
   return (
-    <h2 id={headingId(section)} {...stylex.props(ui.label, sx)}>
+    <h2 id={headingId(props.section)} {...stylex.attrs(ui.label, props.sx)}>
       <span>{chip?.label}</span>
-      <span lang="en" {...stylex.props(ui.labelEn)}>
-        {ENGLISH[section]}
+      <span lang="en" {...stylex.attrs(ui.labelEn)}>
+        {ENGLISH[props.section]}
       </span>
     </h2>
   );

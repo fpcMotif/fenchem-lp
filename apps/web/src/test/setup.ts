@@ -1,4 +1,4 @@
-import { cleanup } from "@testing-library/react";
+import { cleanup } from "./render";
 import { afterEach, vi } from "vitest";
 
 class MockIntersectionObserver {

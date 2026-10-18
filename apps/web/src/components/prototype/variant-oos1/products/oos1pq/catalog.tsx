@@ -1,6 +1,5 @@
-import { breakpoints } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { useId } from "react";
+import { createUniqueId } from "solid-js";
 
 import { CATALOG_GROUPS, type CatalogGroup } from "../../products-data";
 import { splitTitle } from "../shared/derived";
@@ -17,9 +16,9 @@ const BODY_FONT =
 const NUMERAL_FONT =
   '"Inter Tight", "Source Han Sans SC", "Noto Sans SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif';
 
-const SM = breakpoints.sm;
+const SM = "@media (min-width: 640px)";
 const TABLET = "@media (min-width: 768px) and (max-width: 1279.98px)";
-const DESKTOP = breakpoints.xl;
+const DESKTOP = "@media (min-width: 1280px)";
 const INSET = "min(120px, 8.333vw)";
 const HEADER_HEIGHT = 80;
 const MEASURE = 560;
@@ -249,50 +248,51 @@ const orderStyles = stylex.create({
   }),
 });
 
-function RegionTable({ group, position }: { group: CatalogGroup; position: number }) {
-  const captionId = useId();
+function RegionTable(props: { group: CatalogGroup; position: number }) {
+  const group = props.group;
+  const captionId = createUniqueId();
   return (
-    <div {...stylex.props(styles.panel, orderStyles.slot(position))}>
-      <table aria-labelledby={captionId} {...stylex.props(styles.table)}>
-        <caption {...stylex.props(styles.caption)}>
-          <div {...stylex.props(styles.captionRow)}>
-            <h3 id={captionId} {...stylex.props(styles.regionName)}>
+    <div {...stylex.attrs(styles.panel, orderStyles.slot(props.position))}>
+      <table aria-labelledby={captionId} {...stylex.attrs(styles.table)}>
+        <caption {...stylex.attrs(styles.caption)}>
+          <div {...stylex.attrs(styles.captionRow)}>
+            <h3 id={captionId} {...stylex.attrs(styles.regionName)}>
               {group.label}
             </h3>
-            <span {...stylex.props(styles.count)}>{group.items.length} 款</span>
+            <span {...stylex.attrs(styles.count)}>{group.items.length} 款</span>
           </div>
-          {group.intro && <p {...stylex.props(styles.intro)}>{group.intro}</p>}
+          {group.intro && <p {...stylex.attrs(styles.intro)}>{group.intro}</p>}
         </caption>
         <colgroup>
-          <col {...stylex.props(styles.colName)} />
-          <col {...stylex.props(styles.colFeatures)} />
+          <col {...stylex.attrs(styles.colName)} />
+          <col {...stylex.attrs(styles.colFeatures)} />
         </colgroup>
-        <thead {...stylex.props(styles.thead)}>
+        <thead {...stylex.attrs(styles.thead)}>
           <tr>
-            <th scope="col" {...stylex.props(styles.colHead)}>
+            <th scope="col" {...stylex.attrs(styles.colHead)}>
               <span aria-hidden="true">名称</span>
-              <span {...stylex.props(styles.srOnly)}>Name</span>
+              <span {...stylex.attrs(styles.srOnly)}>Name</span>
             </th>
-            <th scope="col" {...stylex.props(styles.colHead, styles.colHeadLast)}>
+            <th scope="col" {...stylex.attrs(styles.colHead, styles.colHeadLast)}>
               <span aria-hidden="true">特性&应用</span>
-              <span {...stylex.props(styles.srOnly)}>Features & applications</span>
+              <span {...stylex.attrs(styles.srOnly)}>Features & applications</span>
             </th>
           </tr>
         </thead>
-        <tbody {...stylex.props(styles.body)}>
+        <tbody {...stylex.attrs(styles.body)}>
           {group.items.map((item) => {
             const { primary, secondary } = splitTitle(item.title);
             return (
-              <tr key={item.id} {...stylex.props(styles.row)}>
-                <th scope="row" {...stylex.props(styles.nameCell)}>
-                  <span {...stylex.props(styles.primary)}>
+              <tr {...stylex.attrs(styles.row)}>
+                <th scope="row" {...stylex.attrs(styles.nameCell)}>
+                  <span {...stylex.attrs(styles.primary)}>
                     {primary}
-                    {secondary && <span {...stylex.props(styles.secondary)}>{secondary}</span>}
+                    {secondary && <span {...stylex.attrs(styles.secondary)}>{secondary}</span>}
                   </span>
-                  <span {...stylex.props(styles.inci)}>{item.inci}</span>
+                  <span {...stylex.attrs(styles.inci)}>{item.inci}</span>
                 </th>
-                <td {...stylex.props(styles.featureCell)}>
-                  <p {...stylex.props(styles.features)}>{item.features}</p>
+                <td {...stylex.attrs(styles.featureCell)}>
+                  <p {...stylex.attrs(styles.features)}>{item.features}</p>
                 </td>
               </tr>
             );
@@ -304,25 +304,25 @@ function RegionTable({ group, position }: { group: CatalogGroup; position: numbe
 }
 
 export function Catalog() {
-  const titleId = useId();
+  const titleId = createUniqueId();
   return (
-    <section id="products-catalog" aria-labelledby={titleId} {...stylex.props(styles.section)}>
-      <div {...stylex.props(styles.shell)}>
-        <header {...stylex.props(styles.head)}>
-          <h2 id={titleId} {...stylex.props(styles.title)}>
+    <section id="products-catalog" aria-labelledby={titleId} {...stylex.attrs(styles.section)}>
+      <div {...stylex.attrs(styles.shell)}>
+        <header {...stylex.attrs(styles.head)}>
+          <h2 id={titleId} {...stylex.attrs(styles.title)}>
             产品目录
           </h2>
-          <p {...stylex.props(styles.meta)}>
+          <p {...stylex.attrs(styles.meta)}>
             {CATALOG_GROUPS.length} 个分类 · {TOTAL_ITEMS} 款原料
           </p>
         </header>
-        <div {...stylex.props(styles.board)}>
+        <div {...stylex.attrs(styles.board)}>
           {COLUMNS.map((ids) => (
-            <div key={ids.join()} {...stylex.props(styles.column)}>
+            <div {...stylex.attrs(styles.column)}>
               {ids.map((id) => {
                 const position = CATALOG_GROUPS.findIndex((group) => group.id === id);
                 const group = CATALOG_GROUPS[position];
-                return group ? <RegionTable key={id} group={group} position={position} /> : null;
+                return group ? <RegionTable group={group} position={position} /> : null;
               })}
             </div>
           ))}

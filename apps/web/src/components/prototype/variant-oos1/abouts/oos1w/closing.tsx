@@ -1,6 +1,6 @@
 import * as stylex from "@stylexjs/stylex";
-import { ArrowRight } from "lucide-react";
-import { useState } from "react";
+import { ArrowRight } from "@fenchem-lp/ui/components/lucide";
+import { createSignal } from "solid-js";
 
 import { MixedSpot } from "./band";
 import { SectionHead } from "./shared";
@@ -139,14 +139,14 @@ const styles = stylex.create({
   },
 });
 
-export function Closing({ onNavigateHome }: { onNavigateHome: (hash?: string) => void }) {
-  const [primed, setPrimed] = useState(false);
+export function Closing(props: { onNavigateHome: (hash?: string) => void }) {
+  const [primed, setPrimed] = createSignal(false);
 
   return (
-    <section aria-labelledby="oos1w-closing" {...stylex.props(ui.section, styles.section)}>
-      <div {...stylex.props(ui.shell)}>
-        <div {...stylex.props(ui.grid, ui.ruled)}>
-          <div {...stylex.props(styles.head)}>
+    <section aria-labelledby="oos1w-closing" {...stylex.attrs(ui.section, styles.section)}>
+      <div {...stylex.attrs(ui.shell)}>
+        <div {...stylex.attrs(ui.grid, ui.ruled)}>
+          <div {...stylex.attrs(styles.head)}>
             <SectionHead
               num="07"
               word="Correspondence"
@@ -155,42 +155,42 @@ export function Closing({ onNavigateHome }: { onNavigateHome: (hash?: string) =>
             />
           </div>
 
-          <div {...stylex.props(styles.body)}>
-            <p {...stylex.props(styles.lead)}>原料与解决方案的需求，欢迎与我们联系。</p>
-            <div {...stylex.props(styles.actions)}>
+          <div {...stylex.attrs(styles.body)}>
+            <p {...stylex.attrs(styles.lead)}>原料与解决方案的需求，欢迎与我们联系。</p>
+            <div {...stylex.attrs(styles.actions)}>
               <button
                 type="button"
-                onClick={() => onNavigateHome("contact")}
+                onClick={() => props.onNavigateHome("contact")}
                 onPointerEnter={() => setPrimed(true)}
                 onPointerLeave={() => setPrimed(false)}
                 onFocus={() => setPrimed(true)}
                 onBlur={() => setPrimed(false)}
-                {...stylex.props(styles.primary, ui.focusRing)}
+                {...stylex.attrs(styles.primary, ui.focusRing)}
               >
                 联系我们
                 <ArrowRight size={18} strokeWidth={1.5} aria-hidden="true" />
               </button>
               <button
                 type="button"
-                onClick={() => onNavigateHome()}
-                {...stylex.props(styles.secondary, ui.focusRing)}
+                onClick={() => props.onNavigateHome()}
+                {...stylex.attrs(styles.secondary, ui.focusRing)}
               >
                 返回首页
               </button>
             </div>
           </div>
 
-          <div aria-hidden="true" {...stylex.props(styles.plateCol)}>
-            <div {...stylex.props(styles.plate)}>
-              <span {...stylex.props(styles.front)} />
-              <span {...stylex.props(styles.origin)} />
-              <span {...stylex.props(styles.slot)}>
-                <span {...stylex.props(styles.outline)} />
-                <span {...stylex.props(styles.sample, primed && styles.sampleOn)}>
+          <div aria-hidden="true" {...stylex.attrs(styles.plateCol)}>
+            <div {...stylex.attrs(styles.plate)}>
+              <span {...stylex.attrs(styles.front)} />
+              <span {...stylex.attrs(styles.origin)} />
+              <span {...stylex.attrs(styles.slot)}>
+                <span {...stylex.attrs(styles.outline)} />
+                <span {...stylex.attrs(styles.sample, primed() && styles.sampleOn)}>
                   <MixedSpot />
                 </span>
               </span>
-              <p lang="en" {...stylex.props(styles.laneWord)}>
+              <p lang="en" {...stylex.attrs(styles.laneWord)}>
                 your sample
               </p>
             </div>

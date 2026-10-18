@@ -1,5 +1,6 @@
 import * as stylex from "@stylexjs/stylex";
-import type { CSSProperties } from "react";
+import type { JSX } from "@solidjs/web";
+import { merge } from "solid-js";
 
 const SHADE =
   "rgba(11, 42, 92, 0.26), rgba(11, 42, 92, 0.19) 14%, rgba(11, 42, 92, 0.11) 58%, rgba(11, 42, 92, 0.035)";
@@ -73,24 +74,21 @@ const styles = stylex.create({
   },
 });
 
-export function Cast({
-  lift,
-  toward = false,
-  still = false,
-}: {
-  lift: number;
-  toward?: boolean;
-  still?: boolean;
-}) {
+export function Cast(props: { lift: number; toward?: boolean; still?: boolean }) {
+  const p = merge({ toward: false, still: false }, props);
   return (
     <span
       aria-hidden="true"
-      style={{ "--lift": lift } as CSSProperties}
-      {...stylex.props(styles.root, still ? styles.still : styles.live, toward && styles.toward)}
+      style={{ "--lift": p.lift } as JSX.CSSProperties}
+      {...stylex.attrs(
+        styles.root,
+        p.still ? styles.still : styles.live,
+        p.toward && styles.toward,
+      )}
     >
-      <span {...stylex.props(styles.trail, toward ? styles.above : styles.below)} />
-      <span {...stylex.props(styles.trail, styles.right)} />
-      <span {...stylex.props(styles.trail, styles.left)} />
+      <span {...stylex.attrs(styles.trail, p.toward ? styles.above : styles.below)} />
+      <span {...stylex.attrs(styles.trail, styles.right)} />
+      <span {...stylex.attrs(styles.trail, styles.left)} />
     </span>
   );
 }

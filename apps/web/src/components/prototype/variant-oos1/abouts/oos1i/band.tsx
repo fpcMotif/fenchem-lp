@@ -84,23 +84,23 @@ const S = stylex.create({
 
 export function Band() {
   return (
-    <section id="about-stats" aria-labelledby="about-stats-title" {...stylex.props(S.band)}>
-      <span aria-hidden="true" {...stylex.props(S.bg)} />
+    <section id="about-stats" aria-labelledby="about-stats-title" {...stylex.attrs(S.band)}>
+      <span aria-hidden="true" {...stylex.attrs(S.bg)} />
       <SectionName id="about-stats-title">Growth figures</SectionName>
       <ScrollWipe>
         <Frame src={ABOUT_MOMENT.image} alt={ABOUT_MOMENT.alt} ratio="12 / 5" position="50% 38%" />
       </ScrollWipe>
-      <div {...stylex.props(base.shell, base.inset, S.stats)}>
-        <p {...stylex.props(base.quiet, base.quietOnDark, S.caption)}>{ABOUT_MOMENT.caption}</p>
-        <ul {...stylex.props(S.list)}>
+      <div {...stylex.attrs(base.shell, base.inset, S.stats)}>
+        <p {...stylex.attrs(base.quiet, base.quietOnDark, S.caption)}>{ABOUT_MOMENT.caption}</p>
+        <ul {...stylex.attrs(S.list)}>
           {STATS.map((stat, index) => (
-            <Reveal key={stat.label} as="li" delay={index * 120} sx={S.stat}>
-              <p {...stylex.props(base.quiet, base.quietOnDark)}>{stat.label}</p>
-              <div lang="en" {...stylex.props(S.figure)}>
+            <Reveal as="li" delay={index * 120} sx={S.stat}>
+              <p {...stylex.attrs(base.quiet, base.quietOnDark)}>{stat.label}</p>
+              <div lang="en" {...stylex.attrs(S.figure)}>
                 <span>{stat.value}</span>
-                {stat.unit ? <span {...stylex.props(S.unit)}>{stat.unit}</span> : null}
+                {stat.unit ? <span {...stylex.attrs(S.unit)}>{stat.unit}</span> : null}
               </div>
-              <p {...stylex.props(S.text)}>{stat.caption}</p>
+              <p {...stylex.attrs(S.text)}>{stat.caption}</p>
             </Reveal>
           ))}
         </ul>

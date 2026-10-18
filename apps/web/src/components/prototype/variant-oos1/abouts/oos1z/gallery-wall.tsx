@@ -102,19 +102,19 @@ const photoWidth = stylex.create({
   portrait: { width: { default: "70%", [bp.tablet]: 168, [bp.desktop]: 180 } },
 });
 
-export function GalleryWall({ onOpen }: { onOpen: (index: number) => void }) {
+export function GalleryWall(props: { onOpen: (index: number) => void }) {
   return (
-    <ol {...stylex.props(styles.wall)}>
+    <ol {...stylex.attrs(styles.wall)}>
       {WORKS.map((work, index) => {
         const onLeft = work.wall === "left";
         const shape = work.aspect > 2 ? "wide" : work.aspect < 1 ? "portrait" : "landscape";
         return (
-          <li key={work.id} {...stylex.props(styles.item, onLeft ? styles.onLeft : styles.onRight)}>
-            <div {...stylex.props(styles.hang)}>
+          <li {...stylex.attrs(styles.item, onLeft ? styles.onLeft : styles.onRight)}>
+            <div {...stylex.attrs(styles.hang)}>
               <button
                 type="button"
-                onClick={() => onOpen(index)}
-                {...stylex.props(
+                onClick={() => props.onOpen(index)}
+                {...stylex.attrs(
                   styles.frame,
                   ui.focus,
                   photoWidth[shape],
@@ -126,18 +126,18 @@ export function GalleryWall({ onOpen }: { onOpen: (index: number) => void }) {
                   alt={work.alt}
                   loading="lazy"
                   decoding="async"
-                  style={{ aspectRatio: work.aspect }}
-                  {...stylex.props(styles.photo)}
+                  style={{ "aspect-ratio": String(work.aspect) }}
+                  {...stylex.attrs(styles.photo)}
                 />
                 <span {...srOnly}>View larger</span>
               </button>
             </div>
-            <p {...stylex.props(styles.label, onLeft ? styles.labelLeft : styles.labelRight)}>
-              <span lang="en" {...stylex.props(ui.number, styles.number)}>
+            <p {...stylex.attrs(styles.label, onLeft ? styles.labelLeft : styles.labelRight)}>
+              <span lang="en" {...stylex.attrs(ui.number, styles.number)}>
                 Nº {work.number}
               </span>
-              <span {...stylex.props(styles.title)}>{work.caption}</span>
-              <span lang="en" {...stylex.props(ui.italic, styles.meta)}>
+              <span {...stylex.attrs(styles.title)}>{work.caption}</span>
+              <span lang="en" {...stylex.attrs(ui.italic, styles.meta)}>
                 {work.english}, {PLACE}
               </span>
             </p>

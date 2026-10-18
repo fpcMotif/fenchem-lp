@@ -25,14 +25,14 @@ const styles = stylex.create({
   },
 });
 
-export function AboutOOS1H({ onNavigateHome }: AboutPageProps) {
+export function AboutOOS1H(props: AboutPageProps) {
   const { progress, active } = useRail();
 
   return (
-    <div id="about-top" {...stylex.props(styles.root)}>
-      <TopBar progress={progress} active={active} />
-      <Rail progress={progress} active={active} />
-      <Hero onNavigateHome={onNavigateHome} />
+    <div id="about-top" {...stylex.attrs(styles.root)}>
+      <TopBar progress={progress} active={active()} />
+      <Rail progress={progress} active={active()} />
+      <Hero onNavigateHome={props.onNavigateHome} />
       <Profile />
       <StatsBand />
       <Campus />
@@ -40,8 +40,8 @@ export function AboutOOS1H({ onNavigateHome }: AboutPageProps) {
       <Csr />
       <Honors />
       <Structure />
-      <Products onNavigateHome={onNavigateHome} />
-      <Cta onNavigateHome={onNavigateHome} />
+      <Products onNavigateHome={props.onNavigateHome} />
+      <Cta onNavigateHome={props.onNavigateHome} />
     </div>
   );
 }

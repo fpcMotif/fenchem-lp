@@ -136,48 +136,42 @@ const styles = stylex.create({
   },
 });
 
-export function PlateIndex({
-  plates,
-  onOpen,
-}: {
-  plates: readonly Plate[];
-  onOpen: (index: number) => void;
-}) {
+export function PlateIndex(props: { plates: readonly Plate[]; onOpen: (index: number) => void }) {
   return (
-    <div {...stylex.props(styles.wrap)}>
-      <div {...stylex.props(styles.head)}>
-        <h3 lang="en" {...stylex.props(ui.serif, styles.title)}>
+    <div {...stylex.attrs(styles.wrap)}>
+      <div {...stylex.attrs(styles.head)}>
+        <h3 lang="en" {...stylex.attrs(ui.serif, styles.title)}>
           Index of plates
           <span {...srOnly}> Campus photo index</span>
         </h3>
-        <p lang="en" {...stylex.props(ui.serif, styles.hint)}>
+        <p lang="en" {...stylex.attrs(ui.serif, styles.hint)}>
           Open any frame
         </p>
       </div>
-      <ul {...stylex.props(styles.list)}>
-        {plates.map((plate, index) => (
-          <li key={plate.id}>
+      <ul {...stylex.attrs(styles.list)}>
+        {props.plates.map((plate, index) => (
+          <li>
             <button
               type="button"
-              onClick={() => onOpen(index)}
-              {...stylex.props(styles.button, ui.focusRing, stylex.defaultMarker())}
+              onClick={() => props.onOpen(index)}
+              {...stylex.attrs(styles.button, ui.focusRing, stylex.defaultMarker())}
             >
-              <span {...stylex.props(styles.frame)}>
-                <span {...stylex.props(styles.bevel)}>
-                  <span {...stylex.props(styles.photoBox)}>
+              <span {...stylex.attrs(styles.frame)}>
+                <span {...stylex.attrs(styles.bevel)}>
+                  <span {...stylex.attrs(styles.photoBox)}>
                     <img
                       src={plate.src}
                       alt=""
                       loading="lazy"
                       decoding="async"
-                      {...stylex.props(ui.fill, styles.photo)}
+                      {...stylex.attrs(ui.fill, styles.photo)}
                     />
-                    <span aria-hidden="true" {...stylex.props(styles.door)} />
+                    <span aria-hidden="true" {...stylex.attrs(styles.door)} />
                   </span>
                 </span>
-                <span {...stylex.props(styles.label)}>
-                  <span {...stylex.props(styles.numeral)}>{plate.numeral}</span>
-                  <span {...stylex.props(styles.chinese)}>{plate.caption}</span>
+                <span {...stylex.attrs(styles.label)}>
+                  <span {...stylex.attrs(styles.numeral)}>{plate.numeral}</span>
+                  <span {...stylex.attrs(styles.chinese)}>{plate.caption}</span>
                   <span {...srOnly}>, {plate.alt}, View larger</span>
                 </span>
               </span>

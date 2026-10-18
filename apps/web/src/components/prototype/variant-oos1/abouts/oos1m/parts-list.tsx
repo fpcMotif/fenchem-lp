@@ -122,58 +122,58 @@ const styles = stylex.create({
   },
 });
 
-export function PartsList({
-  active,
-  onActive,
-}: {
+export function PartsList(props: {
   active: HeroPartId | null;
   onActive: (id: HeroPartId | null) => void;
 }) {
   return (
-    <div {...stylex.props(styles.root)}>
-      <p {...stylex.props(ui.caps, styles.caption)}>
+    <div {...stylex.attrs(styles.root)}>
+      <p {...stylex.attrs(ui.caps, styles.caption)}>
         <span lang="en">Parts list</span>
         <span lang="en">Fig. 1</span>
       </p>
-      <div aria-hidden="true" {...stylex.props(ui.caps, styles.row, styles.head)}>
+      <div aria-hidden="true" {...stylex.attrs(ui.caps, styles.row, styles.head)}>
         <span lang="en">Item</span>
         <span lang="en">Part</span>
-        <span lang="en" {...stylex.props(styles.center)}>
+        <span lang="en" {...stylex.attrs(styles.center)}>
           Qty
         </span>
-        <span lang="en" {...stylex.props(styles.right)}>
+        <span lang="en" {...stylex.attrs(styles.right)}>
           Seat
         </span>
       </div>
-      <ol {...stylex.props(styles.list)}>
+      <ol {...stylex.attrs(styles.list)}>
         {HERO_PARTS.map((part) => (
           <li
-            key={part.id}
-            onPointerEnter={() => onActive(part.id)}
-            onPointerLeave={() => onActive(null)}
-            {...stylex.props(styles.row, styles.item, active === part.id && styles.itemActive)}
+            onPointerEnter={() => props.onActive(part.id)}
+            onPointerLeave={() => props.onActive(null)}
+            {...stylex.attrs(
+              styles.row,
+              styles.item,
+              props.active === part.id && styles.itemActive,
+            )}
           >
-            <span {...stylex.props(ui.balloon, active === part.id && ui.balloonActive)}>
+            <span {...stylex.attrs(ui.balloon, props.active === part.id && ui.balloonActive)}>
               {part.item}
             </span>
-            <span {...stylex.props(styles.part)}>
-              <span aria-hidden="true" {...stylex.props(styles.glyph)}>
+            <span {...stylex.attrs(styles.part)}>
+              <span aria-hidden="true" {...stylex.attrs(styles.glyph)}>
                 {part.glyph}
               </span>
-              <span {...stylex.props(styles.names)}>
-                <span {...stylex.props(styles.name)}>{part.name}</span>
-                <span lang="en" {...stylex.props(ui.label)}>
+              <span {...stylex.attrs(styles.names)}>
+                <span {...stylex.attrs(styles.name)}>{part.name}</span>
+                <span lang="en" {...stylex.attrs(ui.label)}>
                   {part.english}
                 </span>
               </span>
             </span>
-            <span {...stylex.props(styles.qty)}>
+            <span {...stylex.attrs(styles.qty)}>
               <span {...srOnly}>Count </span>1
             </span>
             {part.id === "rd" ? (
-              <span {...stylex.props(styles.seat)}>
+              <span {...stylex.attrs(styles.seat)}>
                 <span {...srOnly}>Assembly: lift δ, see note 1</span>
-                <span aria-hidden="true" {...stylex.props(styles.lifted)}>
+                <span aria-hidden="true" {...stylex.attrs(styles.lifted)}>
                   +δ
                 </span>
                 <span aria-hidden="true">
@@ -181,7 +181,7 @@ export function PartsList({
                 </span>
               </span>
             ) : (
-              <span lang="en" {...stylex.props(styles.seat)}>
+              <span lang="en" {...stylex.attrs(styles.seat)}>
                 <span {...srOnly}>Assembly:</span>
                 {part.seat}
               </span>
@@ -189,7 +189,7 @@ export function PartsList({
           </li>
         ))}
       </ol>
-      <p lang="en" {...stylex.props(styles.note)}>
+      <p lang="en" {...stylex.attrs(styles.note)}>
         <span aria-hidden="true">
           <FlagNote number={1} />
         </span>

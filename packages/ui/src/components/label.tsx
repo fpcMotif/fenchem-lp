@@ -1,6 +1,7 @@
 import * as stylex from "@stylexjs/stylex";
 import type { StyleXStyles } from "@stylexjs/stylex";
-import * as React from "react";
+import type { ComponentProps } from "@solidjs/web";
+import { omit } from "solid-js";
 
 const labelStyles = stylex.create({
   base: {
@@ -19,15 +20,21 @@ const labelStyles = stylex.create({
   },
 });
 
-export interface LabelProps extends Omit<React.ComponentProps<"label">, "className"> {
+export interface LabelProps extends Omit<ComponentProps<"label">, "class"> {
   sx?: StyleXStyles;
   disabled?: boolean;
 }
 
-function Label({ sx, disabled, htmlFor, ...props }: LabelProps) {
-  const styleProps = stylex.props(labelStyles.base, disabled && labelStyles.disabled, sx);
+function Label(props: LabelProps) {
+  const rest = omit(props, "sx", "disabled");
 
-  return <label data-slot="label" htmlFor={htmlFor} {...styleProps} {...props} />;
+  return (
+    <label
+      data-slot="label"
+      {...stylex.attrs(labelStyles.base, props.disabled && labelStyles.disabled, props.sx)}
+      {...rest}
+    />
+  );
 }
 
 export { Label };

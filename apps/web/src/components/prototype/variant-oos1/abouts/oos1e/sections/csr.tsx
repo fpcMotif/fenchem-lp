@@ -70,37 +70,35 @@ export function CsrSheet() {
   const [statementLead, statementClose] = ABOUT_CSR.statement;
   return (
     <Sheet def={CSR_SHEET}>
-      <div {...stylex.props(styles.grid)}>
-        <div {...stylex.props(styles.text)}>
+      <div {...stylex.attrs(styles.grid)}>
+        <div {...stylex.attrs(styles.text)}>
           <Reveal>
-            <p {...stylex.props(styles.statement)}>
-              <span {...stylex.props(base.balance)}>{statementLead}</span>
-              <span {...stylex.props(base.balance)}>{statementClose}</span>
+            <p {...stylex.attrs(styles.statement)}>
+              <span {...stylex.attrs(base.balance)}>{statementLead}</span>
+              <span {...stylex.attrs(base.balance)}>{statementClose}</span>
             </p>
           </Reveal>
           <Reveal step={1}>
-            <p {...stylex.props(styles.desc)}>
-              <span {...stylex.props(base.balance)}>{ABOUT_CSR.desc}</span>
+            <p {...stylex.attrs(styles.desc)}>
+              <span {...stylex.attrs(base.balance)}>{ABOUT_CSR.desc}</span>
             </p>
           </Reveal>
           <Reveal step={2}>
-            <ul {...stylex.props(styles.outcomes)}>
+            <ul {...stylex.attrs(styles.outcomes)}>
               {ABOUT_CSR.outcomes.map((outcome) => (
-                <li key={outcome.title} {...stylex.props(styles.outcome)}>
-                  {outcome.title}
-                </li>
+                <li {...stylex.attrs(styles.outcome)}>{outcome.title}</li>
               ))}
             </ul>
           </Reveal>
         </div>
         <Reveal step={1}>
-          <figure {...stylex.props(styles.figure)}>
+          <figure {...stylex.attrs(styles.figure)}>
             <img
               src={ABOUT_CSR.image}
               alt={ABOUT_CSR.imageAlt}
               loading="lazy"
               decoding="async"
-              {...stylex.props(base.fill)}
+              {...stylex.attrs(base.fill)}
             />
           </figure>
         </Reveal>

@@ -13,19 +13,19 @@ import { Profile } from "./profile";
 import { ui } from "./shared-values";
 import { Structure } from "./structure";
 
-export function AboutOOS1N({ onNavigateHome }: AboutPageProps) {
+export function AboutOOS1N(props: AboutPageProps) {
   return (
-    <div id="about-top" {...stylex.props(ui.root)}>
+    <div id="about-top" {...stylex.attrs(ui.root)}>
       <Hero />
-      <SubNav onNavigateHome={onNavigateHome} />
+      <SubNav onNavigateHome={props.onNavigateHome} />
       <Profile />
       <Campus />
       <Culture />
       <Csr />
       <Honors />
       <Structure />
-      <Products onNavigateHome={onNavigateHome} />
-      <Cta onNavigateHome={onNavigateHome} />
+      <Products onNavigateHome={props.onNavigateHome} />
+      <Cta onNavigateHome={props.onNavigateHome} />
     </div>
   );
 }

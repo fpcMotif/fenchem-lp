@@ -1,5 +1,6 @@
 import * as stylex from "@stylexjs/stylex";
-import { preinit } from "react-dom";
+
+import { preinit } from "@/compat/react-dom";
 
 import type { AboutPageProps } from "../../index";
 import { BalanceBeam } from "./beam";
@@ -28,13 +29,13 @@ const styles = stylex.create({
   },
 });
 
-export function AboutOOS1X({ onNavigateHome }: AboutPageProps) {
+export function AboutOOS1X(props: AboutPageProps) {
   preinit(LIGHT_WEIGHT_FONT, { as: "style" });
   return (
-    <div id="about-top" {...stylex.props(styles.root)}>
-      <div {...stylex.props(styles.sequence)}>
+    <div id="about-top" {...stylex.attrs(styles.root)}>
+      <div {...stylex.attrs(styles.sequence)}>
         <BalanceBeam />
-        <div {...stylex.props(ui.shell)}>
+        <div {...stylex.attrs(ui.shell)}>
           <Opening />
           <Profile />
           <Campus />
@@ -42,10 +43,10 @@ export function AboutOOS1X({ onNavigateHome }: AboutPageProps) {
         </div>
       </div>
       <Csr />
-      <div {...stylex.props(ui.shell)}>
+      <div {...stylex.attrs(ui.shell)}>
         <Honors />
         <Structure />
-        <Closing onNavigateHome={onNavigateHome} />
+        <Closing onNavigateHome={props.onNavigateHome} />
       </div>
     </div>
   );

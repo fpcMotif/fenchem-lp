@@ -1,5 +1,6 @@
 import * as stylex from "@stylexjs/stylex";
-import { useState, type ReactNode } from "react";
+import { createSignal } from "solid-js";
+import type { JSX } from "@solidjs/web";
 
 import { ABOUT_CULTURE } from "../../about-data";
 import { SectionHead, Tag, useArrived } from "./shared";
@@ -172,49 +173,47 @@ const LEVEL_PLACEMENT = [
 const GLYPH_SLOT = [styles.slotTop, styles.slotBottom, styles.slotCentre] as const;
 const GLYPH_SIZE = [styles.glyph0, styles.glyph1, styles.glyph2] as const;
 
-function Level({
-  depth,
-  arrived,
-  active,
-  onPoint,
-  children,
-}: {
+function Level(props: {
   depth: number;
   arrived: boolean;
   active: number | null;
   onPoint: (depth: number) => void;
-  children?: ReactNode;
+  children?: JSX.Element;
 }) {
-  const on = active === depth;
+  const on = () => props.active === props.depth;
   return (
     <div
       onPointerOver={(event) => {
         event.stopPropagation();
-        onPoint(depth);
+        props.onPoint(props.depth);
       }}
-      {...stylex.props(styles.level, LEVEL_PLACEMENT[depth], ...stepIn(arrived, depth))}
+      {...stylex.attrs(
+        styles.level,
+        LEVEL_PLACEMENT[props.depth],
+        ...stepIn(props.arrived, props.depth),
+      )}
     >
-      <Tag numeral={ROMAN[depth]} />
-      <span {...stylex.props(styles.glyphSlot, GLYPH_SLOT[depth])}>
-        <span {...stylex.props(styles.glyph, GLYPH_SIZE[depth], on && styles.glyphOn)}>
-          {ABOUT_CULTURE.values[depth].glyph}
+      <Tag numeral={ROMAN[props.depth]} />
+      <span {...stylex.attrs(styles.glyphSlot, GLYPH_SLOT[props.depth])}>
+        <span {...stylex.attrs(styles.glyph, GLYPH_SIZE[props.depth], on() && styles.glyphOn)}>
+          {ABOUT_CULTURE.values[props.depth].glyph}
         </span>
       </span>
-      {children}
-      <span {...stylex.props(styles.ring, on && styles.ringOn)} />
+      {props.children}
+      <span {...stylex.attrs(styles.ring, on() && styles.ringOn)} />
     </div>
   );
 }
 
 export function Culture() {
   const [ref, arrived] = useArrived<HTMLDivElement>();
-  const [active, setActive] = useState<number | null>(null);
+  const [active, setActive] = createSignal<number | null>(null);
   const lastIndex = ABOUT_CULTURE.values.length - 1;
   return (
     <section
       id="about-culture"
       aria-labelledby="oos1b-culture"
-      {...stylex.props(ui.anchor, ui.section, ui.shell)}
+      {...stylex.attrs(ui.anchor, ui.section, ui.shell)}
     >
       <SectionHead
         id="oos1b-culture"
@@ -223,38 +222,37 @@ export function Culture() {
         title={ABOUT_CULTURE.title}
         note="Three values, the newest at the centre."
       />
-      <div ref={ref} {...stylex.props(styles.stage)}>
+      <div ref={ref} {...stylex.attrs(styles.stage)}>
         <div
           aria-hidden="true"
           onPointerLeave={() => setActive(null)}
-          {...stylex.props(styles.seal)}
+          {...stylex.attrs(styles.seal)}
         >
-          <Level depth={0} arrived={arrived} active={active} onPoint={setActive}>
-            <Level depth={1} arrived={arrived} active={active} onPoint={setActive}>
-              <Level depth={2} arrived={arrived} active={active} onPoint={setActive} />
+          <Level depth={0} arrived={arrived()} active={active()} onPoint={setActive}>
+            <Level depth={1} arrived={arrived()} active={active()} onPoint={setActive}>
+              <Level depth={2} arrived={arrived()} active={active()} onPoint={setActive} />
             </Level>
           </Level>
         </div>
-        <ol {...stylex.props(styles.legend)}>
+        <ol {...stylex.attrs(styles.legend)}>
           {ABOUT_CULTURE.values.map((value, index) => {
-            const on = active === index;
+            const on = () => active() === index;
             return (
               <li
-                key={value.title}
                 onPointerEnter={() => setActive(index)}
                 onPointerLeave={() => setActive(null)}
-                {...stylex.props(
+                {...stylex.attrs(
                   styles.item,
                   index === lastIndex && styles.itemLast,
-                  ...stepIn(arrived, index + 1),
+                  ...stepIn(arrived(), index + 1),
                 )}
               >
-                <span aria-hidden="true" {...stylex.props(styles.mark, on && styles.markOn)} />
-                <span lang="en" {...stylex.props(styles.numeral, on && styles.numeralOn)}>
+                <span aria-hidden="true" {...stylex.attrs(styles.mark, on() && styles.markOn)} />
+                <span lang="en" {...stylex.attrs(styles.numeral, on() && styles.numeralOn)}>
                   {ROMAN[index]}
                 </span>
-                <h3 {...stylex.props(styles.title)}>{value.title}</h3>
-                <p {...stylex.props(styles.desc)}>{value.desc}</p>
+                <h3 {...stylex.attrs(styles.title)}>{value.title}</h3>
+                <p {...stylex.attrs(styles.desc)}>{value.desc}</p>
               </li>
             );
           })}

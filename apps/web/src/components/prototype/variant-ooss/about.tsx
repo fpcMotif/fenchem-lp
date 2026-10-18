@@ -77,26 +77,26 @@ const styles = stylex.create({
 
 export function Campus() {
   return (
-    <section id="campus" aria-labelledby="oo-campus-title" {...stylex.props(layout.section)}>
-      <div {...stylex.props(layout.shell, layout.inset)}>
-        <div {...stylex.props(styles.grid)}>
-          <div {...stylex.props(styles.head)}>
+    <section id="campus" aria-labelledby="oo-campus-title" {...stylex.attrs(layout.section)}>
+      <div {...stylex.attrs(layout.shell, layout.inset)}>
+        <div {...stylex.attrs(styles.grid)}>
+          <div {...stylex.attrs(styles.head)}>
             <SectionTitle id="oo-campus-title">{CAMPUS.title}</SectionTitle>
             <Reveal as="p" index={1} sx={styles.lead}>
               {CAMPUS.lead}
             </Reveal>
           </div>
           <Reveal sx={styles.statsSlot}>
-            <dl {...stylex.props(styles.stats)}>
+            <dl {...stylex.attrs(styles.stats)}>
               {STATS.map((stat) => (
-                <div key={stat.label} {...stylex.props(styles.row)}>
-                  <dt {...stylex.props(styles.label)}>{stat.label}</dt>
-                  <dd {...stylex.props(styles.figure)}>
-                    <span {...stylex.props(layout.visuallyHidden)}>
+                <div {...stylex.attrs(styles.row)}>
+                  <dt {...stylex.attrs(styles.label)}>{stat.label}</dt>
+                  <dd {...stylex.attrs(styles.figure)}>
+                    <span {...stylex.attrs(layout.visuallyHidden)}>
                       {CAMPUS.spoken[stat.label]}
                     </span>
                     <span aria-hidden="true">{stat.value}</span>
-                    <span aria-hidden="true" {...stylex.props(styles.unit)}>
+                    <span aria-hidden="true" {...stylex.attrs(styles.unit)}>
                       {stat.unit}
                     </span>
                   </dd>

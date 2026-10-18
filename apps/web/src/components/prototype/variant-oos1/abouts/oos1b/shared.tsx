@@ -1,7 +1,15 @@
 import * as stylex from "@stylexjs/stylex";
-import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
+import { children, createSignal, onSettled, type Accessor } from "solid-js";
+import type { JSX } from "@solidjs/web";
+
+import { createExternalStore } from "@/compat/external-store";
+
 import { bp, face, space, tone } from "./tokens.stylex";
 import { ui } from "./shared-values";
+
+// stylex.attrs with reactive (accessor) arguments resolves at runtime here, because
+// the StyleX compiler tries to evaluate them at build time and throws.
+const sxProps: typeof stylex.attrs = (...args) => stylex.attrs(...args);
 
 const tagStyles = stylex.create({
   tag: {
@@ -35,19 +43,11 @@ const tagStyles = stylex.create({
   },
 });
 
-export function Tag({
-  numeral,
-  label,
-  pinned = true,
-}: {
-  numeral: string;
-  label?: ReactNode;
-  pinned?: boolean;
-}) {
+export function Tag(props: { numeral: string; label?: JSX.Element; pinned?: boolean }) {
   return (
-    <span {...stylex.props(tagStyles.tag, pinned && tagStyles.pinned)}>
-      <span>{numeral}</span>
-      {label ? <span {...stylex.props(tagStyles.muted)}>{label}</span> : null}
+    <span {...stylex.attrs(tagStyles.tag, (props.pinned ?? true) && tagStyles.pinned)}>
+      <span>{props.numeral}</span>
+      {props.label ? <span {...stylex.attrs(tagStyles.muted)}>{props.label}</span> : null}
     </span>
   );
 }
@@ -106,13 +106,7 @@ const headStyles = stylex.create({
   },
 });
 
-export function SectionHead({
-  id,
-  index,
-  eyebrow,
-  title,
-  note,
-}: {
+export function SectionHead(props: {
   id: string;
   index: number;
   eyebrow: string;
@@ -120,19 +114,19 @@ export function SectionHead({
   note?: string;
 }) {
   return (
-    <div {...stylex.props(headStyles.head)}>
-      <div aria-hidden="true" lang="en" {...stylex.props(headStyles.rule)}>
-        <span {...stylex.props(headStyles.index)}>{String(index).padStart(2, "0")}</span>
-        <span {...stylex.props(headStyles.line)} />
-        <span>{eyebrow}</span>
+    <div {...stylex.attrs(headStyles.head)}>
+      <div aria-hidden="true" lang="en" {...stylex.attrs(headStyles.rule)}>
+        <span {...stylex.attrs(headStyles.index)}>{String(props.index).padStart(2, "0")}</span>
+        <span {...stylex.attrs(headStyles.line)} />
+        <span>{props.eyebrow}</span>
       </div>
-      <div {...stylex.props(headStyles.row)}>
-        <h2 id={id} {...stylex.props(headStyles.title)}>
-          {title}
+      <div {...stylex.attrs(headStyles.row)}>
+        <h2 id={props.id} {...stylex.attrs(headStyles.title)}>
+          {props.title}
         </h2>
-        {note ? (
-          <p lang="en" {...stylex.props(ui.serif, headStyles.note)}>
-            {note}
+        {props.note ? (
+          <p lang="en" {...stylex.attrs(ui.serif, headStyles.note)}>
+            {props.note}
           </p>
         ) : null}
       </div>
@@ -180,48 +174,45 @@ const matStyles = stylex.create({
   },
 });
 
-export function Mat({
-  raised = false,
-  bare = false,
-  head,
-  foot,
-  layout,
-  children,
-}: {
+export function Mat(props: {
   raised?: boolean;
   bare?: boolean;
-  head?: ReactNode;
-  foot?: ReactNode;
+  head?: JSX.Element;
+  foot?: JSX.Element;
   layout?: stylex.StyleXStyles;
-  children: ReactNode;
+  children: JSX.Element;
 }) {
+  const raised = () => props.raised ?? false;
+  const bare = () => props.bare ?? false;
+  const head = children(() => props.head);
+  const foot = children(() => props.foot);
   return (
     <div
-      {...stylex.props(
+      {...sxProps(
         matStyles.mat,
-        raised && matStyles.raised,
-        !raised && !bare && matStyles.flat,
-        foot ? matStyles.withFoot : null,
-        layout,
+        raised() && matStyles.raised,
+        !raised() && !bare() && matStyles.flat,
+        foot() ? matStyles.withFoot : null,
+        props.layout,
       )}
     >
-      {head ? <div {...stylex.props(matStyles.head)}>{head}</div> : null}
-      {children}
-      {foot ? <div {...stylex.props(matStyles.foot)}>{foot}</div> : null}
+      {head() ? <div {...stylex.attrs(matStyles.head)}>{head()}</div> : null}
+      {props.children}
+      {foot() ? <div {...stylex.attrs(matStyles.foot)}>{foot()}</div> : null}
     </div>
   );
 }
 
-export function Bevel({ field, children }: { field?: stylex.StyleXStyles; children: ReactNode }) {
+export function Bevel(props: { field?: stylex.StyleXStyles; children: JSX.Element }) {
   return (
-    <div {...stylex.props(matStyles.bevel)}>
-      <div {...stylex.props(matStyles.core, field)}>{children}</div>
+    <div {...stylex.attrs(matStyles.bevel)}>
+      <div {...stylex.attrs(matStyles.core, props.field)}>{props.children}</div>
     </div>
   );
 }
 
-export function useMediaQuery(query: string): boolean {
-  return useSyncExternalStore(
+export function useMediaQuery(query: string): Accessor<boolean> {
+  return createExternalStore(
     (onChange) => {
       const list = window.matchMedia(query);
       list.addEventListener("change", onChange);
@@ -233,10 +224,10 @@ export function useMediaQuery(query: string): boolean {
 }
 
 export function useArrived<T extends Element>() {
-  const ref = useRef<T>(null);
-  const [arrived, setArrived] = useState(false);
-  useEffect(() => {
-    const node = ref.current;
+  let node: T | undefined;
+  const ref = (el: T) => (node = el);
+  const [arrived, setArrived] = createSignal(false);
+  onSettled(() => {
     if (!node) return;
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -248,6 +239,6 @@ export function useArrived<T extends Element>() {
     );
     observer.observe(node);
     return () => observer.disconnect();
-  }, []);
+  });
   return [ref, arrived] as const;
 }

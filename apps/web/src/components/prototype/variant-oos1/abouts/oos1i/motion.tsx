@@ -8,8 +8,9 @@ import {
   useScroll,
   useTransform,
   type MotionValue,
-} from "motion/react";
-import { type ReactNode, useEffect, useRef } from "react";
+} from "@/compat/motion";
+import { dynamic as dynamicTag, type JSX } from "@solidjs/web";
+import { createEffect, createSignal, merge } from "solid-js";
 
 import { EASE } from "@/components/prototype/motion-constants";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
@@ -43,23 +44,33 @@ const dynamic = stylex.create({
   delay: (ms: number) => ({ transitionDelay: `${ms}ms` }),
 });
 
+const sxAttrs = (...args: ReadonlyArray<stylex.StyleXStyles | false | null | undefined>) =>
+  stylex.attrs(...args);
+
 function useWipeStyle(progress: MotionValue<number>) {
   const reduce = useReducedMotion();
   const clipPath = useTransform(progress, wipeClip);
-  return { clipPath: reduce ? "none" : clipPath };
+  return () => ({ clipPath: reduce() ? "none" : clipPath });
 }
 
-function useMountProgress(delay: number, duration: number) {
+function useMountProgress(delay: () => number, duration: () => number) {
   const progress = useMotionValue(0);
   const reduce = useReducedMotion();
-  useEffect(() => {
-    if (reduce) {
-      progress.set(1);
-      return;
-    }
-    const controls = animate(progress, 1, { duration, delay, ease: EASE });
-    return () => controls.stop();
-  }, [delay, duration, progress, reduce]);
+  createEffect(
+    () => ({ reduce: reduce(), delay: delay(), duration: duration() }),
+    (deps) => {
+      if (deps.reduce) {
+        progress.set(1);
+        return;
+      }
+      const controls = animate(progress, 1, {
+        duration: deps.duration,
+        delay: deps.delay,
+        ease: EASE,
+      });
+      return () => controls.stop();
+    },
+  );
   return progress;
 }
 
@@ -67,82 +78,80 @@ type WipeBoxProps = {
   progress: MotionValue<number>;
   as?: "div" | "span";
   sx?: stylex.StyleXStyles;
-  children: ReactNode;
+  children: JSX.Element;
 };
 
-function WipeBox({ progress, as = "div", sx, children }: WipeBoxProps) {
-  const style = useWipeStyle(progress);
-  const Host = as;
-  const Inner = as === "span" ? m.span : m.div;
+function WipeBox(props: WipeBoxProps) {
+  const style = useWipeStyle(props.progress);
+  const Host = dynamicTag(() => props.as ?? "div");
+  const Inner = props.as === "span" ? m.span : m.div;
   return (
-    <Host {...stylex.props(S.host, sx)}>
-      <Inner {...stylex.props(S.inner)} style={style}>
-        {children}
+    <Host {...stylex.attrs(S.host, props.sx)}>
+      <Inner {...stylex.attrs(S.inner)} style={style()}>
+        {props.children}
       </Inner>
     </Host>
   );
 }
 
-export function MountWipe({
-  delay,
-  duration = 1.1,
-  ...rest
-}: Omit<WipeBoxProps, "progress"> & { delay: number; duration?: number }) {
-  const progress = useMountProgress(delay, duration);
-  return <WipeBox progress={progress} {...rest} />;
+export function MountWipe(
+  props: Omit<WipeBoxProps, "progress"> & { delay: number; duration?: number },
+) {
+  const progress = useMountProgress(
+    () => props.delay,
+    () => props.duration ?? 1.1,
+  );
+  return (
+    <WipeBox progress={progress} as={props.as} sx={props.sx}>
+      {props.children}
+    </WipeBox>
+  );
 }
 
-export function ScrollWipe({
-  sx,
-  start = 0.96,
-  end = 0.5,
-  children,
-}: {
+export function ScrollWipe(props: {
   sx?: stylex.StyleXStyles;
   start?: number;
   end?: number;
-  children: ReactNode;
+  children: JSX.Element;
 }) {
-  const ref = useRef<HTMLDivElement>(null);
+  const p = merge({ start: 0.96, end: 0.5 }, props);
+  const [ref, setRef] = createSignal<HTMLDivElement>();
   const { scrollYProgress } = useScroll({
     target: ref,
-    offset: [`start ${start}`, `start ${end}`] as const,
+    offset: [`start ${p.start}`, `start ${p.end}`],
   });
   const style = useWipeStyle(scrollYProgress);
   return (
-    <div ref={ref} {...stylex.props(S.host, sx)}>
-      <m.div {...stylex.props(S.inner)} style={style}>
-        {children}
+    <div ref={setRef} {...stylex.attrs(S.host, props.sx)}>
+      <m.div {...stylex.attrs(S.inner)} style={style()}>
+        {props.children}
       </m.div>
     </div>
   );
 }
 
-export function Reveal({
-  as: Tag = "div",
-  delay = 0,
-  sx,
-  children,
-}: {
+export function Reveal(props: {
   as?: "div" | "li" | "figure";
   delay?: number;
   sx?: stylex.StyleXStyles;
-  children: ReactNode;
+  children: JSX.Element;
 }) {
-  const ref = useRef<HTMLDivElement & HTMLLIElement & HTMLElement>(null);
+  const Tag = dynamicTag(() => props.as ?? "div");
+  const [ref, setRef] = createSignal<HTMLElement>();
   const inView = useInView(ref, { once: true, margin: "0px 0px -12% 0px" });
   const reduce = useReducedMotion();
+  const delay = () => props.delay ?? 0;
   return (
     <Tag
-      ref={ref}
-      {...stylex.props(
+      ref={setRef}
+      {...sxAttrs(
         S.reveal,
-        (inView || reduce) && S.revealShown,
-        delay > 0 && dynamic.delay(delay),
-        sx,
+        (inView() || reduce()) && S.revealShown,
+        delay() > 0 && dynamic.delay(delay()),
+        props.sx,
       )}
     >
-      {children}
+      {props.children}
     </Tag>
   );
 }

@@ -1,5 +1,4 @@
 import * as stylex from "@stylexjs/stylex";
-import { useMemo } from "react";
 
 import type { AboutPageProps } from "../../index";
 import { Cover } from "./cover";
@@ -30,24 +29,34 @@ const styles = stylex.create({
   },
 });
 
-export function AboutOOS1E({ onNavigateHome }: AboutPageProps) {
+export function AboutOOS1E(props: AboutPageProps) {
   const reachedId = useReachedSheet(SHEET_IDS, REACHED_LINE_TOP);
   const stacked = useStackMode();
-  const reachedIndex = reachedId ? SHEET_IDS.indexOf(reachedId) : -1;
-  const stackState = useMemo(() => ({ reachedIndex, stacked }), [reachedIndex, stacked]);
+  const reachedIndex = () => {
+    const id = reachedId();
+    return id ? SHEET_IDS.indexOf(id) : -1;
+  };
+  const stackState = {
+    get reachedIndex() {
+      return reachedIndex();
+    },
+    get stacked() {
+      return stacked();
+    },
+  };
 
   return (
     <div
       id="about-top"
-      onFocus={(event) => {
-        if (stacked && event.target instanceof HTMLElement) keepFocusClear(event.target);
+      onFocusIn={(event) => {
+        if (stacked() && event.target instanceof HTMLElement) keepFocusClear(event.target);
       }}
-      {...stylex.props(styles.root)}
+      {...stylex.attrs(styles.root)}
     >
       <InkDefs />
-      <Cover onNavigateHome={onNavigateHome} />
-      <Rail reachedIndex={reachedIndex} />
-      <StackContext.Provider value={stackState}>
+      <Cover onNavigateHome={props.onNavigateHome} />
+      <Rail reachedIndex={reachedIndex()} />
+      <StackContext value={stackState}>
         <ProfileSheet />
         <StatsSheet />
         <CampusSheet />
@@ -55,9 +64,9 @@ export function AboutOOS1E({ onNavigateHome }: AboutPageProps) {
         <CsrSheet />
         <HonorsSheet />
         <StructureSheet />
-        <ProductsSheet onNavigateHome={onNavigateHome} />
-        <ClosingSheet onNavigateHome={onNavigateHome} />
-      </StackContext.Provider>
+        <ProductsSheet onNavigateHome={props.onNavigateHome} />
+        <ClosingSheet onNavigateHome={props.onNavigateHome} />
+      </StackContext>
     </div>
   );
 }

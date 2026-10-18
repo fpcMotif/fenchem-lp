@@ -253,49 +253,49 @@ const styles = stylex.create({
   },
 });
 
-export function Stage({ onNavigateHome }: { onNavigateHome: (hash?: string) => void }) {
+export function Stage(props: { onNavigateHome: (hash?: string) => void }) {
   return (
-    <div {...stylex.props(styles.stage)}>
-      <div {...stylex.props(styles.pin)}>
+    <div {...stylex.attrs(styles.stage)}>
+      <div {...stylex.attrs(styles.pin)}>
         <img
           src={ABOUT_BANNER.image}
           alt={ABOUT_BANNER.alt}
-          fetchPriority="high"
+          fetchpriority="high"
           decoding="async"
-          {...stylex.props(ui.fill, styles.exterior)}
+          {...stylex.attrs(ui.fill, styles.exterior)}
         />
-        <div aria-hidden="true" {...stylex.props(styles.window)}>
+        <div aria-hidden="true" {...stylex.attrs(styles.window)}>
           <img
             src={LAB.large}
             alt=""
             decoding="async"
-            {...stylex.props(ui.fill, styles.interior)}
+            {...stylex.attrs(ui.fill, styles.interior)}
           />
           <img
             src={ABOUT_BANNER.image}
             alt=""
             decoding="async"
-            {...stylex.props(ui.fill, styles.reflection)}
+            {...stylex.attrs(ui.fill, styles.reflection)}
           />
-          <span {...stylex.props(styles.frame)} />
+          <span {...stylex.attrs(styles.frame)} />
         </div>
       </div>
 
-      <div {...stylex.props(styles.flow)}>
-        <section aria-labelledby="oos1y-title" {...stylex.props(styles.banner)}>
-          <div {...stylex.props(ui.shell)}>
-            <div {...stylex.props(ui.glass, styles.heroPane)}>
-              <div {...stylex.props(styles.etchIn)}>
+      <div {...stylex.attrs(styles.flow)}>
+        <section aria-labelledby="oos1y-title" {...stylex.attrs(styles.banner)}>
+          <div {...stylex.attrs(ui.shell)}>
+            <div {...stylex.attrs(ui.glass, styles.heroPane)}>
+              <div {...stylex.attrs(styles.etchIn)}>
                 <nav aria-label="Breadcrumb">
-                  <ol {...stylex.props(ui.label, styles.crumbs)}>
+                  <ol {...stylex.attrs(ui.label, styles.crumbs)}>
                     <li>
                       <a
                         href="#top"
                         onClick={(event) => {
                           event.preventDefault();
-                          onNavigateHome();
+                          props.onNavigateHome();
                         }}
-                        {...stylex.props(styles.crumbLink)}
+                        {...stylex.attrs(styles.crumbLink)}
                       >
                         <span lang="en">Home</span>
                       </a>
@@ -306,14 +306,14 @@ export function Stage({ onNavigateHome }: { onNavigateHome: (hash?: string) => v
                     </li>
                   </ol>
                 </nav>
-                <h1 id="oos1y-title" {...stylex.props(ui.etched, styles.title)}>
+                <h1 id="oos1y-title" {...stylex.attrs(ui.etched, styles.title)}>
                   {ABOUT_BANNER.title}
                 </h1>
-                <p lang="en" {...stylex.props(styles.tagline)}>
+                <p lang="en" {...stylex.attrs(styles.tagline)}>
                   {ABOUT_BANNER.tagline}
                 </p>
-                <p {...stylex.props(styles.lead)}>{ABOUT_BANNER.lead}</p>
-                <p {...stylex.props(ui.label, styles.meta)}>
+                <p {...stylex.attrs(styles.lead)}>{ABOUT_BANNER.lead}</p>
+                <p {...stylex.attrs(ui.label, styles.meta)}>
                   <span lang="en">{ABOUT_BANNER.established}</span>
                   <span aria-hidden="true"> · </span>
                   <span lang="en">{ABOUT_BANNER.place}</span>
@@ -326,50 +326,50 @@ export function Stage({ onNavigateHome }: { onNavigateHome: (hash?: string) => v
         <section
           id="about-profile"
           aria-labelledby="oos1y-profile"
-          {...stylex.props(ui.anchor, styles.profile)}
+          {...stylex.attrs(ui.anchor, styles.profile)}
         >
           <h2 id="oos1y-profile" {...srOnly}>
             Profile
           </h2>
-          <div {...stylex.props(ui.shell)}>
-            <div {...stylex.props(styles.composition)}>
-              <div {...stylex.props(ui.glass, styles.namePane)}>
+          <div {...stylex.attrs(ui.shell)}>
+            <div {...stylex.attrs(styles.composition)}>
+              <div {...stylex.attrs(ui.glass, styles.namePane)}>
                 <Reveal>
-                  <h3 {...stylex.props(ui.etched, styles.company)}>{ABOUT_HERO.title}</h3>
-                  <p lang="en" {...stylex.props(styles.english)}>
+                  <h3 {...stylex.attrs(ui.etched, styles.company)}>{ABOUT_HERO.title}</h3>
+                  <p lang="en" {...stylex.attrs(styles.english)}>
                     {ABOUT_HERO.englishTitle}
                   </p>
-                  <p {...stylex.props(styles.profileLead)}>{ABOUT_HERO.lead}</p>
-                  <p {...stylex.props(styles.network)}>{NETWORK_LINE}</p>
+                  <p {...stylex.attrs(styles.profileLead)}>{ABOUT_HERO.lead}</p>
+                  <p {...stylex.attrs(styles.network)}>{NETWORK_LINE}</p>
                 </Reveal>
               </div>
 
-              <figure {...stylex.props(styles.lobby)}>
+              <figure {...stylex.attrs(styles.lobby)}>
                 <img
                   src={ABOUT_HERO.lobbyImage}
                   alt={ABOUT_HERO.lobbyEnglish}
                   loading="lazy"
                   decoding="async"
-                  {...stylex.props(ui.fill)}
+                  {...stylex.attrs(ui.fill)}
                 />
-                <figcaption {...stylex.props(ui.glass, ui.label, styles.lobbyTag)}>
+                <figcaption {...stylex.attrs(ui.glass, ui.label, styles.lobbyTag)}>
                   <span lang="en">Lobby</span>
                 </figcaption>
               </figure>
 
-              <div {...stylex.props(ui.glass, styles.statsPane)}>
+              <div {...stylex.attrs(ui.glass, styles.statsPane)}>
                 <Reveal delay={120}>
-                  <dl {...stylex.props(styles.stats)}>
+                  <dl {...stylex.attrs(styles.stats)}>
                     {STATS.map((stat) => (
-                      <div key={stat.label} {...stylex.props(styles.stat)}>
-                        <dt {...stylex.props(styles.statLabel)}>
+                      <div {...stylex.attrs(styles.stat)}>
+                        <dt {...stylex.attrs(styles.statLabel)}>
                           {stat.label}
-                          <span {...stylex.props(styles.statCaption)}>{stat.caption}</span>
+                          <span {...stylex.attrs(styles.statCaption)}>{stat.caption}</span>
                         </dt>
-                        <dd {...stylex.props(ui.etched, styles.statValue)}>
+                        <dd {...stylex.attrs(ui.etched, styles.statValue)}>
                           {stat.value}
                           {stat.unit ? (
-                            <span {...stylex.props(styles.statUnit)}>{stat.unit}</span>
+                            <span {...stylex.attrs(styles.statUnit)}>{stat.unit}</span>
                           ) : null}
                         </dd>
                       </div>

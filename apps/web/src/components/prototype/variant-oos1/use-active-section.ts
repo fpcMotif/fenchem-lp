@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
+import { createSignal, onSettled, type Accessor } from "solid-js";
 
-export function useActiveSection(ids: readonly string[]) {
-  const [active, setActive] = useState<string | undefined>(ids[0]);
-  useEffect(() => {
+export function useActiveSection(ids: readonly string[]): Accessor<string | undefined> {
+  const [active, setActive] = createSignal<string | undefined>(ids[0]);
+  onSettled(() => {
     const crossing = new Set<string>();
     const observer = new IntersectionObserver(
       (entries) => {
@@ -19,6 +19,6 @@ export function useActiveSection(ids: readonly string[]) {
       if (section) observer.observe(section);
     }
     return () => observer.disconnect();
-  }, [ids]);
+  });
   return active;
 }

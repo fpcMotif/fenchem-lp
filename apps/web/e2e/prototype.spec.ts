@@ -6,7 +6,7 @@ test("production keyboard navigation stays inside product tabs", async ({ page }
   await tabs.first().waitFor();
   await page.waitForFunction(() => {
     const tab = document.querySelector("#products-solutions [role=tab]");
-    return tab && Object.keys(tab).some((key) => key.startsWith("__reactProps"));
+    return tab && Object.keys(tab).some((key) => key.includes("$$"));
   });
   await expect(page.getByLabel("Next variant")).toHaveCount(0);
   await tabs.first().focus();

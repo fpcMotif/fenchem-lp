@@ -116,7 +116,7 @@ export function Moment() {
     <section
       id="about-stats"
       aria-label="Fenchem growth figures"
-      {...stylex.props(base.section, styles.moment)}
+      {...stylex.attrs(base.section, styles.moment)}
     >
       <DriftImage
         src={ABOUT_MOMENT.image}
@@ -124,30 +124,30 @@ export function Moment() {
         reach={7}
         frame={styles.backdrop}
       />
-      <div aria-hidden="true" {...stylex.props(styles.scrim)} />
-      <div {...stylex.props(base.shell, styles.content)}>
-        <p {...stylex.props(styles.caption)}>{ABOUT_MOMENT.caption}</p>
-        <ul ref={statsRef} {...stylex.props(styles.stats)}>
+      <div aria-hidden="true" {...stylex.attrs(styles.scrim)} />
+      <div {...stylex.attrs(base.shell, styles.content)}>
+        <p {...stylex.attrs(styles.caption)}>{ABOUT_MOMENT.caption}</p>
+        <ul ref={statsRef} {...stylex.attrs(styles.stats)}>
           {STATS.map((stat, idx) => (
-            <Reveal key={stat.label} as="li" step={idx} sx={styles.stat}>
+            <Reveal as="li" step={idx} sx={styles.stat}>
               <span
                 aria-hidden="true"
-                {...stylex.props(
+                {...stylex.attrs(
                   styles.statRule,
-                  statsShown && styles.statRuleShown,
+                  statsShown() && styles.statRuleShown,
                   styles.statRuleDelay(idx),
                 )}
               />
-              <p {...stylex.props(styles.label)}>{stat.label}</p>
-              <div {...stylex.props(styles.figure)}>
+              <p {...stylex.attrs(styles.label)}>{stat.label}</p>
+              <div {...stylex.attrs(styles.figure)}>
                 <CountUp value={stat.value} sx={styles.value} />
                 {stat.unit ? (
-                  <span lang="en" {...stylex.props(styles.unit)}>
+                  <span lang="en" {...stylex.attrs(styles.unit)}>
                     {stat.unit}
                   </span>
                 ) : null}
               </div>
-              <p {...stylex.props(styles.statCaption)}>{stat.caption}</p>
+              <p {...stylex.attrs(styles.statCaption)}>{stat.caption}</p>
             </Reveal>
           ))}
         </ul>

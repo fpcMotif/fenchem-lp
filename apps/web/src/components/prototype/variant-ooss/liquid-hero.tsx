@@ -1,6 +1,6 @@
 import * as stylex from "@stylexjs/stylex";
 import type { StyleXStyles } from "@stylexjs/stylex";
-import { useEffect, useRef, useState, type RefObject } from "react";
+import { createEffect, createSignal, untrack, type Accessor } from "solid-js";
 
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
@@ -101,140 +101,144 @@ const styles = stylex.create({
 type LiquidImageProps = {
   src: string;
   focus: readonly [number, number];
-  hostRef: RefObject<HTMLElement | null>;
+  host: Accessor<HTMLElement | undefined>;
   paused?: boolean;
   sx?: StyleXStyles;
 };
 
-export function LiquidImage({ src, focus, hostRef, paused = false, sx }: LiquidImageProps) {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const pausedRef = useRef(paused);
-  const kickRef = useRef<() => void>(() => undefined);
-  const [ready, setReady] = useState(false);
+export function LiquidImage(props: LiquidImageProps) {
+  let canvasEl: HTMLCanvasElement | undefined;
+  let pausedNow = untrack(() => props.paused ?? false);
+  let kickNow: () => void = () => undefined;
+  const [ready, setReady] = createSignal(false);
   const reduce = useReducedMotion();
-  const [focusX, focusY] = focus;
 
-  useEffect(() => {
-    pausedRef.current = paused;
-    if (!paused) kickRef.current();
-  }, [paused]);
+  createEffect(
+    () => props.paused ?? false,
+    (paused) => {
+      pausedNow = paused;
+      if (!paused) kickNow();
+    },
+  );
 
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    const host = hostRef.current;
-    if (!canvas || !host || reduce) return;
-    const gl = canvas.getContext("webgl", { antialias: false, premultipliedAlpha: false });
-    if (!gl) return;
-    const shader = createFullscreenProgram(gl, FRAGMENT);
-    if (!shader) return;
-    const { program } = shader;
+  createEffect(
+    () => [props.src, reduce(), props.host(), props.focus[0], props.focus[1]] as const,
+    ([src, reduce, host, focusX, focusY]) => {
+      const canvas = canvasEl;
+      if (!canvas || !host || reduce) return;
+      const gl = canvas.getContext("webgl", { antialias: false, premultipliedAlpha: false });
+      if (!gl) return;
+      const shader = createFullscreenProgram(gl, FRAGMENT);
+      if (!shader) return;
+      const { program } = shader;
 
-    const uTex = gl.getUniformLocation(program, "uTex");
-    const uRes = gl.getUniformLocation(program, "uRes");
-    const uImg = gl.getUniformLocation(program, "uImg");
-    const uFocus = gl.getUniformLocation(program, "uFocus");
-    const uTime = gl.getUniformLocation(program, "uTime");
-    const uPointer = gl.getUniformLocation(program, "uPointer");
-    const uPointerAmt = gl.getUniformLocation(program, "uPointerAmt");
+      const uTex = gl.getUniformLocation(program, "uTex");
+      const uRes = gl.getUniformLocation(program, "uRes");
+      const uImg = gl.getUniformLocation(program, "uImg");
+      const uFocus = gl.getUniformLocation(program, "uFocus");
+      const uTime = gl.getUniformLocation(program, "uTime");
+      const uPointer = gl.getUniformLocation(program, "uPointer");
+      const uPointerAmt = gl.getUniformLocation(program, "uPointerAmt");
 
-    let texture: WebGLTexture | null = null;
-    let frame = 0;
-    let visible = true;
-    let disposed = false;
-    const start = performance.now();
-    const pointer = { x: 0.5, y: 0.8, tx: 0.5, ty: 0.8, amt: 0, target: 0 };
+      let texture: WebGLTexture | null = null;
+      let frame = 0;
+      let visible = true;
+      let disposed = false;
+      const start = performance.now();
+      const pointer = { x: 0.5, y: 0.8, tx: 0.5, ty: 0.8, amt: 0, target: 0 };
 
-    const resize = () => {
-      const size = sizeCanvas(canvas, gl);
-      gl.uniform2f(uRes, size.width, size.height);
-    };
+      const resize = () => {
+        const size = sizeCanvas(canvas, gl);
+        gl.uniform2f(uRes, size.width, size.height);
+      };
 
-    const draw = (now: number) => {
-      if (!texture) return;
-      pointer.x += (pointer.tx - pointer.x) * 0.08;
-      pointer.y += (pointer.ty - pointer.y) * 0.08;
-      pointer.amt += (pointer.target - pointer.amt) * 0.05;
-      gl.uniform1f(uTime, (now - start) / 1000);
-      gl.uniform2f(uPointer, pointer.x, pointer.y);
-      gl.uniform1f(uPointerAmt, pointer.amt);
-      gl.drawArrays(gl.TRIANGLES, 0, 3);
-    };
+      const draw = (now: number) => {
+        if (!texture) return;
+        pointer.x += (pointer.tx - pointer.x) * 0.08;
+        pointer.y += (pointer.ty - pointer.y) * 0.08;
+        pointer.amt += (pointer.target - pointer.amt) * 0.05;
+        gl.uniform1f(uTime, (now - start) / 1000);
+        gl.uniform2f(uPointer, pointer.x, pointer.y);
+        gl.uniform1f(uPointerAmt, pointer.amt);
+        gl.drawArrays(gl.TRIANGLES, 0, 3);
+      };
 
-    const loop = (now: number) => {
-      if (disposed) return;
-      draw(now);
-      if (visible && !pausedRef.current && !document.hidden) frame = requestAnimationFrame(loop);
-      else frame = 0;
-    };
-
-    const kick = () => {
-      if (!frame && !disposed) frame = requestAnimationFrame(loop);
-    };
-    kickRef.current = kick;
-
-    loadTexture(gl, src, 0, gl.RGB)
-      .then((loaded) => {
+      const loop = (now: number) => {
         if (disposed) return;
-        texture = loaded.texture;
-        gl.uniform1i(uTex, 0);
-        gl.uniform2f(uImg, loaded.width, loaded.height);
-        gl.uniform2f(uFocus, focusX, focusY);
-        resize();
-        draw(performance.now());
-        setReady(true);
+        draw(now);
+        if (visible && !pausedNow && !document.hidden) frame = requestAnimationFrame(loop);
+        else frame = 0;
+      };
+
+      const kick = () => {
+        if (!frame && !disposed) frame = requestAnimationFrame(loop);
+      };
+      kickNow = kick;
+
+      loadTexture(gl, src, 0, gl.RGB)
+        .then((loaded) => {
+          if (disposed) return;
+          texture = loaded.texture;
+          gl.uniform1i(uTex, 0);
+          gl.uniform2f(uImg, loaded.width, loaded.height);
+          gl.uniform2f(uFocus, focusX, focusY);
+          resize();
+          draw(performance.now());
+          setReady(true);
+          kick();
+        })
+        .catch(() => undefined);
+
+      const onPointerMove = (event: PointerEvent) => {
+        const rect = canvas.getBoundingClientRect();
+        pointer.tx = (event.clientX - rect.left) / rect.width;
+        pointer.ty = (event.clientY - rect.top) / rect.height;
+        pointer.target = 1;
         kick();
-      })
-      .catch(() => undefined);
+      };
+      const onPointerLeave = () => {
+        pointer.target = 0;
+      };
+      host.addEventListener("pointermove", onPointerMove);
+      host.addEventListener("pointerleave", onPointerLeave);
 
-    const onPointerMove = (event: PointerEvent) => {
-      const rect = canvas.getBoundingClientRect();
-      pointer.tx = (event.clientX - rect.left) / rect.width;
-      pointer.ty = (event.clientY - rect.top) / rect.height;
-      pointer.target = 1;
-      kick();
-    };
-    const onPointerLeave = () => {
-      pointer.target = 0;
-    };
-    host.addEventListener("pointermove", onPointerMove);
-    host.addEventListener("pointerleave", onPointerLeave);
+      const resizeObserver = new ResizeObserver(() => {
+        resize();
+        kick();
+      });
+      resizeObserver.observe(canvas);
 
-    const resizeObserver = new ResizeObserver(() => {
-      resize();
-      kick();
-    });
-    resizeObserver.observe(canvas);
+      const visibility = new IntersectionObserver(([entry]) => {
+        visible = entry?.isIntersecting ?? true;
+        if (visible) kick();
+      });
+      visibility.observe(canvas);
 
-    const visibility = new IntersectionObserver(([entry]) => {
-      visible = entry?.isIntersecting ?? true;
-      if (visible) kick();
-    });
-    visibility.observe(canvas);
+      const onVisibilityChange = () => {
+        if (!document.hidden) kick();
+      };
+      document.addEventListener("visibilitychange", onVisibilityChange);
 
-    const onVisibilityChange = () => {
-      if (!document.hidden) kick();
-    };
-    document.addEventListener("visibilitychange", onVisibilityChange);
-
-    return () => {
-      disposed = true;
-      kickRef.current = () => undefined;
-      if (frame) cancelAnimationFrame(frame);
-      host.removeEventListener("pointermove", onPointerMove);
-      host.removeEventListener("pointerleave", onPointerLeave);
-      document.removeEventListener("visibilitychange", onVisibilityChange);
-      resizeObserver.disconnect();
-      visibility.disconnect();
-      if (texture) gl.deleteTexture(texture);
-      shader.dispose();
-    };
-  }, [src, reduce, hostRef, focusX, focusY]);
+      return () => {
+        disposed = true;
+        kickNow = () => undefined;
+        if (frame) cancelAnimationFrame(frame);
+        host.removeEventListener("pointermove", onPointerMove);
+        host.removeEventListener("pointerleave", onPointerLeave);
+        document.removeEventListener("visibilitychange", onVisibilityChange);
+        resizeObserver.disconnect();
+        visibility.disconnect();
+        if (texture) gl.deleteTexture(texture);
+        shader.dispose();
+      };
+    },
+  );
 
   return (
     <canvas
-      ref={canvasRef}
+      ref={canvasEl}
       aria-hidden="true"
-      {...stylex.props(styles.canvas, ready && styles.ready, sx)}
+      {...stylex.attrs(styles.canvas, ready() && styles.ready, props.sx)}
     />
   );
 }

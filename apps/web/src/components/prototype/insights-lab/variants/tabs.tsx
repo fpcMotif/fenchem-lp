@@ -1,8 +1,11 @@
 import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { ArrowRight, ChevronDown, ChevronUp } from "lucide-react";
-import { AnimatePresence, m } from "motion/react";
-import { useRef, useState, type KeyboardEvent } from "react";
+import type { StyleXStyles } from "@stylexjs/stylex";
+import { ArrowRight, ChevronDown, ChevronUp } from "@fenchem-lp/ui/components/lucide";
+import { createMemo, createSignal, flush, For, onCleanup, Show, untrack } from "solid-js";
+import type { JSX } from "@solidjs/web";
+
+import { AnimatePresence, m } from "@/compat/motion";
 
 import { EASE } from "../../motion-constants";
 import { useReducedMotion } from "../../use-reduced-motion";
@@ -26,6 +29,9 @@ import {
 import { lab } from "../tokens.stylex";
 
 const DESKTOP = breakpoints.xl;
+
+const sxProps = (...args: ReadonlyArray<StyleXStyles | false | null | undefined>) =>
+  stylex.attrs(...args);
 
 const styles = stylex.create({
   tablist: {
@@ -150,28 +156,31 @@ const styles = stylex.create({
   },
 });
 
-export function TabsVariant({ onNavigateHome }: SubPageProps) {
+export function TabsVariant(props: SubPageProps) {
   const articles = useLabArticles();
-  const [activeId, setActiveId] = useState(articles[0]?.id ?? "");
-  const [expanded, setExpanded] = useState<ReadonlySet<string>>(() => new Set());
-  const tablistRef = useRef<HTMLDivElement>(null);
-  const tabRefs = useRef(new Map<string, HTMLButtonElement>());
-  const activeIndex = Math.max(
-    0,
-    articles.findIndex((article) => article.id === activeId),
+  const [activeId, setActiveId] = createSignal(untrack(() => articles()[0]?.id ?? ""));
+  const [expanded, setExpanded] = createSignal<ReadonlySet<string>>(new Set());
+  let tablist: HTMLDivElement | undefined;
+  const tabs = new Map<string, HTMLButtonElement>();
+  const activeIndex = createMemo(() =>
+    Math.max(
+      0,
+      articles().findIndex((article) => article.id === activeId()),
+    ),
   );
-  const active = articles[activeIndex];
+  const active = () => articles()[activeIndex()];
 
   const select = (id: string, { focus = false } = {}) => {
-    const tablist = tablistRef.current;
     if (tablist && isAboveReadingLine(tablist)) jumpTo(tablist);
     setActiveId(id);
-    if (focus) tabRefs.current.get(id)?.focus();
+    if (focus) {
+      flush();
+      tabs.get(id)?.focus();
+    }
   };
 
   const setOpen = (id: string, open: boolean) => {
     if (!open) {
-      const tablist = tablistRef.current;
       if (tablist && isAboveReadingLine(tablist)) jumpTo(tablist);
     }
     setExpanded((ids) => {
@@ -182,17 +191,18 @@ export function TabsVariant({ onNavigateHome }: SubPageProps) {
     });
   };
 
-  const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-    const last = articles.length - 1;
+  const onKeyDown: JSX.EventHandler<HTMLDivElement, KeyboardEvent> = (event) => {
+    const last = articles().length - 1;
+    const activeIndexNow = activeIndex();
     const target =
       event.key === "ArrowRight"
-        ? activeIndex === last
+        ? activeIndexNow === last
           ? 0
-          : activeIndex + 1
+          : activeIndexNow + 1
         : event.key === "ArrowLeft"
-          ? activeIndex === 0
+          ? activeIndexNow === 0
             ? last
-            : activeIndex - 1
+            : activeIndexNow - 1
           : event.key === "Home"
             ? 0
             : event.key === "End"
@@ -200,90 +210,92 @@ export function TabsVariant({ onNavigateHome }: SubPageProps) {
               : null;
     if (target === null) return;
     event.preventDefault();
-    const article = articles[target];
+    const article = articles()[target];
     if (article) select(article.id, { focus: true });
   };
 
-  if (!active) return null;
-
   return (
-    <LabPage
-      onNavigateHome={onNavigateHome}
-      chips={articleIdChips(articles)}
-      activeChip={active.id}
-      onSelectChip={(id) => select(id)}
-    >
-      <div {...stylex.props(labStyles.column)}>
-        <div
-          ref={tablistRef}
-          role="tablist"
-          aria-label="行业洞察文章"
-          onKeyDown={onKeyDown}
-          {...stylex.props(styles.tablist, kitStyles.anchor)}
+    <Show when={active()}>
+      {(current) => (
+        <LabPage
+          onNavigateHome={props.onNavigateHome}
+          chips={articleIdChips(articles())}
+          activeChip={current().id}
+          onSelectChip={(id) => select(id)}
         >
-          {articles.map((article, index) => {
-            const selected = article.id === active.id;
-            return (
-              <button
-                key={article.id}
-                ref={(node) => {
-                  if (node) tabRefs.current.set(article.id, node);
-                  else tabRefs.current.delete(article.id);
+          <div {...stylex.attrs(labStyles.column)}>
+            <div
+              ref={tablist}
+              role="tablist"
+              aria-label="行业洞察文章"
+              onKeyDown={onKeyDown}
+              {...stylex.attrs(styles.tablist, kitStyles.anchor)}
+            >
+              <For each={articles()}>
+                {(article, index) => {
+                  const selected = () => article.id === current().id;
+                  onCleanup(() => tabs.delete(article.id));
+                  return (
+                    <button
+                      ref={(node) => {
+                        tabs.set(article.id, node);
+                      }}
+                      type="button"
+                      role="tab"
+                      id={`${article.id}-tab`}
+                      aria-selected={selected() ? "true" : "false"}
+                      aria-controls={`${article.id}-tabpanel`}
+                      tabindex={selected() ? 0 : -1}
+                      onClick={() => select(article.id)}
+                      {...sxProps(styles.tab, selected() && styles.tabActive, kitStyles.focusRing)}
+                    >
+                      <span
+                        {...sxProps(
+                          styles.tabIndex,
+                          labStyles.displayNumber,
+                          selected() && styles.tabIndexActive,
+                        )}
+                      >
+                        {padIndex(index())}
+                      </span>
+                      <span {...stylex.attrs(styles.tabLabel)}>
+                        {article.navLabel ?? article.title}
+                      </span>
+                      <span {...stylex.attrs(styles.tabMeta)}>
+                        {`${article.category} · ${readMinutes(article)} 分钟`}
+                      </span>
+                      <Show when={selected()}>
+                        <m.span
+                          layoutId="insights-tabs-indicator"
+                          transition={{ duration: 0.25, ease: EASE }}
+                          {...stylex.attrs(styles.indicator)}
+                        />
+                      </Show>
+                    </button>
+                  );
                 }}
-                type="button"
-                role="tab"
-                id={`${article.id}-tab`}
-                aria-selected={selected}
-                aria-controls={`${article.id}-tabpanel`}
-                tabIndex={selected ? 0 : -1}
-                onClick={() => select(article.id)}
-                {...stylex.props(styles.tab, selected && styles.tabActive, kitStyles.focusRing)}
-              >
-                <span
-                  {...stylex.props(
-                    styles.tabIndex,
-                    labStyles.displayNumber,
-                    selected && styles.tabIndexActive,
-                  )}
-                >
-                  {padIndex(index)}
-                </span>
-                <span {...stylex.props(styles.tabLabel)}>{article.navLabel ?? article.title}</span>
-                <span {...stylex.props(styles.tabMeta)}>
-                  {`${article.category} · ${readMinutes(article)} 分钟`}
-                </span>
-                {selected ? (
-                  <m.span
-                    layoutId="insights-tabs-indicator"
-                    transition={{ duration: 0.25, ease: EASE }}
-                    {...stylex.props(styles.indicator)}
-                  />
-                ) : null}
-              </button>
-            );
-          })}
-        </div>
+              </For>
+            </div>
 
-        <TabPanel
-          key={active.id}
-          article={active}
-          open={expanded.has(active.id)}
-          next={articles[activeIndex + 1]}
-          onToggle={(open) => setOpen(active.id, open)}
-          onNext={(id) => select(id, { focus: true })}
-        />
-      </div>
-    </LabPage>
+            <Show when={current()} keyed>
+              {(article) => (
+                <TabPanel
+                  article={article}
+                  open={expanded().has(article.id)}
+                  next={articles()[activeIndex() + 1]}
+                  onToggle={(open) => setOpen(article.id, open)}
+                  onNext={(id) => select(id, { focus: true })}
+                />
+              )}
+            </Show>
+          </div>
+        </LabPage>
+      )}
+    </Show>
   );
 }
 
-function TabPanel({
-  article,
-  open,
-  next,
-  onToggle,
-  onNext,
-}: {
+function TabPanel(props: {
   article: LabArticle;
   open: boolean;
   next: LabArticle | undefined;
@@ -291,7 +303,8 @@ function TabPanel({
   onNext: (id: string) => void;
 }) {
   const reduce = useReducedMotion();
-  const toggleRef = useRef<HTMLButtonElement>(null);
+  let toggle: HTMLButtonElement | undefined;
+  const article = untrack(() => props.article);
   const titleId = `${article.id}-tabs-title`;
   const bodyId = `${article.id}-tabs-body`;
 
@@ -300,95 +313,98 @@ function TabPanel({
       role="tabpanel"
       id={`${article.id}-tabpanel`}
       aria-labelledby={`${article.id}-tab`}
-      tabIndex={0}
+      tabindex={0}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.18, ease: EASE }}
-      {...stylex.props(styles.panel)}
+      {...stylex.attrs(styles.panel)}
     >
-      <article aria-labelledby={titleId} {...stylex.props(labStyles.stack)}>
-        <header {...stylex.props(styles.head)}>
+      <article aria-labelledby={titleId} {...stylex.attrs(labStyles.stack)}>
+        <header {...stylex.attrs(styles.head)}>
           <ArticleMeta article={article} />
-          <h2 id={titleId} {...stylex.props(labStyles.docTitle)}>
+          <h2 id={titleId} {...stylex.attrs(labStyles.docTitle)}>
             {article.title}
           </h2>
-          {article.lead ? <p {...stylex.props(labStyles.docLead)}>{article.lead}</p> : null}
+          <Show when={article.lead}>
+            <p {...stylex.attrs(labStyles.docLead)}>{article.lead}</p>
+          </Show>
         </header>
 
         <ArticlePreview article={article} />
 
-        <div {...stylex.props(styles.toggleRow)}>
+        <div {...stylex.attrs(styles.toggleRow)}>
           <button
-            ref={toggleRef}
+            ref={toggle}
             type="button"
-            aria-expanded={open}
+            aria-expanded={props.open ? "true" : "false"}
             aria-controls={bodyId}
-            onClick={() => onToggle(!open)}
-            {...stylex.props(
+            onClick={() => props.onToggle(!props.open)}
+            {...sxProps(
               labStyles.pillButton,
-              !open && labStyles.pillSolid,
+              !props.open && labStyles.pillSolid,
               kitStyles.focusRing,
             )}
           >
-            {open ? "收起全文" : "展开全文"}
+            {props.open ? "收起全文" : "展开全文"}
             <ChevronDown
               size={18}
               strokeWidth={2}
               aria-hidden="true"
-              {...stylex.props(labStyles.chevron, open && labStyles.chevronUp)}
+              {...sxProps(labStyles.chevron, props.open && labStyles.chevronUp)}
             />
           </button>
-          {open ? null : (
-            <span {...stylex.props(styles.toggleHint)}>
+          <Show when={!props.open}>
+            <span {...stylex.attrs(styles.toggleHint)}>
               {`${article.sections.length} 个章节 · 约 ${readMinutes(article)} 分钟`}
             </span>
-          )}
+          </Show>
         </div>
 
         <AnimatePresence initial={false}>
-          {open ? (
+          <Show when={props.open}>
             <m.div
-              key={bodyId}
               id={bodyId}
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
               exit={{
                 opacity: 0,
                 height: 0,
-                transition: { duration: reduce ? 0 : 0.22, ease: EASE },
+                transition: { duration: reduce() ? 0 : 0.22, ease: EASE },
               }}
-              transition={{ duration: reduce ? 0 : 0.32, ease: EASE }}
-              {...stylex.props(styles.expanded)}
+              transition={{ duration: reduce() ? 0 : 0.32, ease: EASE }}
+              {...stylex.attrs(styles.expanded)}
             >
-              <div {...stylex.props(styles.expandedInner)}>
+              <div {...stylex.attrs(styles.expandedInner)}>
                 <ArticleSections article={article} />
-                <div {...stylex.props(styles.endRow)}>
+                <div {...stylex.attrs(styles.endRow)}>
                   <button
                     type="button"
                     onClick={() => {
-                      onToggle(false);
-                      toggleRef.current?.focus({ preventScroll: true });
+                      props.onToggle(false);
+                      toggle?.focus({ preventScroll: true });
                     }}
-                    {...stylex.props(labStyles.pillButton, kitStyles.focusRing)}
+                    {...stylex.attrs(labStyles.pillButton, kitStyles.focusRing)}
                   >
                     收起全文
                     <ChevronUp size={18} strokeWidth={2} aria-hidden="true" />
                   </button>
-                  {next ? (
-                    <button
-                      type="button"
-                      onClick={() => onNext(next.id)}
-                      {...stylex.props(labStyles.textButton, kitStyles.focusRing)}
-                    >
-                      <span {...stylex.props(styles.nextLabel)}>下一篇</span>
-                      {next.navLabel ?? next.title}
-                      <ArrowRight size={16} strokeWidth={2} aria-hidden="true" />
-                    </button>
-                  ) : null}
+                  <Show when={props.next}>
+                    {(next) => (
+                      <button
+                        type="button"
+                        onClick={() => props.onNext(next().id)}
+                        {...stylex.attrs(labStyles.textButton, kitStyles.focusRing)}
+                      >
+                        <span {...stylex.attrs(styles.nextLabel)}>下一篇</span>
+                        {next().navLabel ?? next().title}
+                        <ArrowRight size={16} strokeWidth={2} aria-hidden="true" />
+                      </button>
+                    )}
+                  </Show>
                 </div>
               </div>
             </m.div>
-          ) : null}
+          </Show>
         </AnimatePresence>
       </article>
     </m.div>

@@ -1,6 +1,7 @@
-import { useRef, useState, type ReactNode } from "react";
-import { m, useScroll, useTransform } from "motion/react";
-import { ArrowRight, CheckCircle2, Leaf } from "lucide-react";
+import { children, createEffect, createMemo, createSignal, For, Show } from "solid-js";
+import type { JSX } from "@solidjs/web";
+import { m, useScroll, useTransform } from "@/compat/motion";
+import { ArrowRight, CheckCircle2, Leaf } from "@fenchem-lp/ui/components/lucide";
 import * as stylex from "@stylexjs/stylex";
 import type { StyleXStyles } from "@stylexjs/stylex";
 import { colors } from "@fenchem-lp/ui/tokens.stylex";
@@ -148,109 +149,107 @@ type ProductionStyles = Record<
   | "chipUnselected",
   StyleXStyles
 >;
-export function NavBar({
-  styles,
-  portfolioMenu,
-  mobileNav,
-}: {
+export function NavBar(props: {
   styles: ProductionStyles;
-  portfolioMenu: ReactNode;
-  mobileNav: ReactNode;
+  portfolioMenu: JSX.Element;
+  mobileNav: JSX.Element;
 }) {
+  const styles = props.styles;
   const { scrollYProgress } = useScroll();
   const reduce = useReducedMotion();
   return (
-    <header {...stylex.props(styles.header)}>
-      <div {...stylex.props(styles.container)}>
+    <header {...stylex.attrs(styles.header)}>
+      <div {...stylex.attrs(styles.container)}>
         {/* Micro-strip */}
-        <div {...stylex.props(styles.microStrip)}>
-          <span {...stylex.props(styles.microStripItem)}>
-            <span {...stylex.props(styles.liveDotOuter)}>
-              <span {...stylex.props(styles.liveDotPing)} />
-              <span {...stylex.props(styles.liveDotInner)} />
+        <div {...stylex.attrs(styles.microStrip)}>
+          <span {...stylex.attrs(styles.microStripItem)}>
+            <span {...stylex.attrs(styles.liveDotOuter)}>
+              <span {...stylex.attrs(styles.liveDotPing)} />
+              <span {...stylex.attrs(styles.liveDotInner)} />
             </span>
             Botanical Intelligence Since 1995
           </span>
-          <span {...stylex.props(styles.techLabel)}>ISO 9001 · GMP · HACCP</span>
-          <span {...stylex.props(styles.techLabel)}>{company.hq.coords} — Nanjing HQ</span>
+          <span {...stylex.attrs(styles.techLabel)}>ISO 9001 · GMP · HACCP</span>
+          <span {...stylex.attrs(styles.techLabel)}>{company.hq.coords} — Nanjing HQ</span>
         </div>
         {/* Main nav */}
-        <nav aria-label="Main navigation" {...stylex.props(styles.navInner)}>
-          <a href="#top" aria-label="Fenchem home" {...stylex.props(styles.brandLink)}>
-            <span {...stylex.props(styles.brandText)}>FENCHEM</span>
-            <Leaf aria-hidden strokeWidth={1.5} {...stylex.props(styles.brandLeaf)} />
+        <nav aria-label="Main navigation" {...stylex.attrs(styles.navInner)}>
+          <a href="#top" aria-label="Fenchem home" {...stylex.attrs(styles.brandLink)}>
+            <span {...stylex.attrs(styles.brandText)}>FENCHEM</span>
+            <Leaf aria-hidden="true" strokeWidth={1.5} {...stylex.attrs(styles.brandLeaf)} />
           </a>
-          <div {...stylex.props(styles.navDesktopLinks)}>
-            <a href="#industries" {...stylex.props(styles.navLink)}>
+          <div {...stylex.attrs(styles.navDesktopLinks)}>
+            <a href="#industries" {...stylex.attrs(styles.navLink)}>
               Industries
             </a>
-            {portfolioMenu}
-            <a href="#formulation" {...stylex.props(styles.navLink)}>
+            {props.portfolioMenu}
+            <a href="#formulation" {...stylex.attrs(styles.navLink)}>
               Formulation
             </a>
-            <a href="#standards" {...stylex.props(styles.navLink)}>
+            <a href="#standards" {...stylex.attrs(styles.navLink)}>
               Standards
             </a>
           </div>
-          <div {...stylex.props(styles.navRight)}>
-            {mobileNav}
-            <a href="#contact" {...stylex.props(styles.ctaPrimaryCompact)}>
+          <div {...stylex.attrs(styles.navRight)}>
+            {props.mobileNav}
+            <a href="#contact" {...stylex.attrs(styles.ctaPrimaryCompact)}>
               Request a Specification
-              <ArrowRight aria-hidden size={14} />
+              <ArrowRight aria-hidden="true" size={14} />
             </a>
           </div>
         </nav>
       </div>
-      {!reduce && (
+      <Show when={!reduce()}>
         <m.div
-          aria-hidden
+          aria-hidden="true"
+          {...stylex.attrs(styles.progressHairline)}
           style={{
             scaleX: scrollYProgress,
           }}
-          {...stylex.props(styles.progressHairline)}
         />
-      )}
+      </Show>
     </header>
   );
 }
-export function HeroSection({ styles }: { styles: ProductionStyles }) {
+export function HeroSection(props: { styles: ProductionStyles }) {
+  const styles = props.styles;
   const reduce = useReducedMotion();
-  const imgRef = useRef<HTMLDivElement>(null);
+  const [imgEl, setImgEl] = createSignal<HTMLDivElement>();
   const { scrollYProgress } = useScroll({
-    target: imgRef,
+    target: imgEl,
     offset: ["start start", "end start"],
   });
   const imgY = useTransform(scrollYProgress, [0, 1], ["0%", "18%"]);
   return (
-    <section id="top" aria-label="Hero" {...stylex.props(styles.heroSection)}>
-      <div {...stylex.props(styles.container)}>
-        <div {...stylex.props(styles.heroGrid)}>
+    <section id="top" aria-label="Hero" {...stylex.attrs(styles.heroSection)}>
+      <div {...stylex.attrs(styles.container)}>
+        <div {...stylex.attrs(styles.heroGrid)}>
           {/* Left: Headline block */}
-          <div {...stylex.props(styles.heroLeft)}>
+          <div {...stylex.attrs(styles.heroLeft)}>
             <Reveal>
-              <p {...stylex.props(styles.heroBadge)}>Botanical Intelligence Since 1995</p>
+              <p {...stylex.attrs(styles.heroBadge)}>Botanical Intelligence Since 1995</p>
             </Reveal>
             <Reveal delay={STAGGER}>
-              <h1 {...stylex.props(styles.heroHeading)}>
+              <h1 {...stylex.attrs(styles.heroHeading)}>
                 Nurturing Vitality
                 <br />
-                through <span {...stylex.props(styles.textGreen600)}>Botanical Excellence</span>
+                through <span {...stylex.attrs(styles.textGreen600)}>Botanical Excellence</span>
               </h1>
             </Reveal>
             <Reveal delay={STAGGER * 2}>
-              <p {...stylex.props(styles.heroLead)}>
+              <p {...stylex.attrs(styles.heroLead)}>
                 Fenchem converts raw botanical complexity into precisely specified, clinically
                 validated actives — supplied at industrial scale to formulators in more than forty
                 countries.
               </p>
             </Reveal>
             <Reveal delay={STAGGER * 3}>
-              <div {...stylex.props(styles.heroActions)}>
-                <a href="#matrix" {...stylex.props(styles.ctaPrimary)}>
+              <div {...stylex.attrs(styles.heroActions)}>
+                <a href="#matrix" {...stylex.attrs(styles.ctaPrimary)}>
                   Explore Portfolio
-                  <ArrowRight aria-hidden size={16} />
+                  <ArrowRight aria-hidden="true" size={16} />
                 </a>
-                <a href="#formulation" {...stylex.props(styles.ctaOutlineBlue)}>
+                <a href="#formulation" {...stylex.attrs(styles.ctaOutlineBlue)}>
                   Build a Formulation
                 </a>
               </div>
@@ -258,18 +257,18 @@ export function HeroSection({ styles }: { styles: ProductionStyles }) {
 
             {/* Stat band */}
             <Reveal delay={STAGGER * 4}>
-              <dl {...stylex.props(styles.heroStatGrid)}>
+              <dl {...stylex.attrs(styles.heroStatGrid)}>
                 {STATS.map((s) => (
-                  <div key={s.unit} {...stylex.props(styles.heroStatItem)}>
-                    <dt {...stylex.props(styles.heroStatUnit)}>{s.unit}</dt>
+                  <div {...stylex.attrs(styles.heroStatItem)}>
+                    <dt {...stylex.attrs(styles.heroStatUnit)}>{s.unit}</dt>
                     <dd
                       style={{
                         margin: 0,
-                        marginTop: 6,
+                        "margin-top": "6px",
                       }}
                     >
-                      <span {...stylex.props(styles.heroStatValue)}>{s.value}</span>
-                      <p {...stylex.props(styles.heroStatDesc)}>{s.desc}</p>
+                      <span {...stylex.attrs(styles.heroStatValue)}>{s.value}</span>
+                      <p {...stylex.attrs(styles.heroStatDesc)}>{s.desc}</p>
                     </dd>
                   </div>
                 ))}
@@ -278,16 +277,17 @@ export function HeroSection({ styles }: { styles: ProductionStyles }) {
           </div>
 
           {/* Right: botanical image */}
-          <div {...stylex.props(styles.heroRight)}>
-            <div ref={imgRef} {...stylex.props(styles.heroImgContainer)}>
+          <div {...stylex.attrs(styles.heroRight)}>
+            <div ref={setImgEl} {...stylex.attrs(styles.heroImgContainer)}>
               <m.img
                 src={IMG.hero}
                 alt="Lush green botanical leaves in morning light — representing Fenchem's natural ingredient sourcing"
+                {...stylex.attrs(styles.heroImg)}
                 style={{
-                  y: reduce ? 0 : imgY,
+                  y: reduce() ? 0 : imgY,
                 }}
                 initial={
-                  reduce
+                  reduce()
                     ? false
                     : {
                         scale: 1.06,
@@ -301,14 +301,13 @@ export function HeroSection({ styles }: { styles: ProductionStyles }) {
                   ease: EASE,
                 }}
                 loading="eager"
-                {...stylex.props(styles.heroImg)}
               />
-              <div aria-hidden {...stylex.props(styles.heroImgScrim)} />
+              <div aria-hidden="true" {...stylex.attrs(styles.heroImgScrim)} />
             </div>
             {/* Caption badge */}
-            <div {...stylex.props(styles.heroCaptionBadge)}>
-              <span {...stylex.props(styles.techLabel)}>{company.tagline}</span>
-              <span {...stylex.props(styles.eyebrowGreen)}>{company.since}</span>
+            <div {...stylex.attrs(styles.heroCaptionBadge)}>
+              <span {...stylex.attrs(styles.techLabel)}>{company.tagline}</span>
+              <span {...stylex.attrs(styles.eyebrowGreen)}>{company.since}</span>
             </div>
           </div>
         </div>
@@ -316,12 +315,13 @@ export function HeroSection({ styles }: { styles: ProductionStyles }) {
     </section>
   );
 }
-export function FormulationSection({ styles }: { styles: ProductionStyles }) {
-  const [application, setApplication] = useState<IngredientApplication>("Nutrition");
-  const [form, setForm] = useState<(typeof FORM_OPTIONS)[number]>("Beadlet");
-  const [regulatory, setRegulatory] = useState<string[]>(["ISO 9001", "GMP"]);
-  const regulatoryNames = new Set(regulatory);
-  const matches = getIngredientsByApplication(application);
+export function FormulationSection(props: { styles: ProductionStyles }) {
+  const styles = props.styles;
+  const [application, setApplication] = createSignal<IngredientApplication>("Nutrition");
+  const [form, setForm] = createSignal<(typeof FORM_OPTIONS)[number]>("Beadlet");
+  const [regulatory, setRegulatory] = createSignal<string[]>(["ISO 9001", "GMP"]);
+  const regulatoryNames = createMemo(() => new Set(regulatory()));
+  const matches = createMemo(() => getIngredientsByApplication(application()));
   const toggleRegulatory = (name: string) =>
     setRegulatory((current) =>
       current.includes(name) ? current.filter((c) => c !== name) : [...current, name],
@@ -330,9 +330,9 @@ export function FormulationSection({ styles }: { styles: ProductionStyles }) {
     <section
       id="formulation"
       aria-labelledby="formulation-heading"
-      {...stylex.props(styles.formulationSection)}
+      {...stylex.attrs(styles.formulationSection)}
     >
-      <div {...stylex.props(styles.container)}>
+      <div {...stylex.attrs(styles.container)}>
         <SectionHeader
           styles={styles}
           id="formulation-heading"
@@ -341,53 +341,52 @@ export function FormulationSection({ styles }: { styles: ProductionStyles }) {
           title="Your target spec,"
           accent="engineered back to you"
           aside={
-            <p {...stylex.props(styles.sectionAsideLead)}>
+            <p {...stylex.attrs(styles.sectionAsideLead)}>
               Pick the shape of your formulation — our laboratory returns a validated proposal
               within one business day.
             </p>
           }
         />
 
-        <div {...stylex.props(styles.formulationGrid)}>
+        <div {...stylex.attrs(styles.formulationGrid)}>
           {/* Pickers */}
-          <div {...stylex.props(styles.formulationLeft)}>
+          <div {...stylex.attrs(styles.formulationLeft)}>
             <div>
-              <p id="formulation-application-label" {...stylex.props(styles.techLabel)}>
+              <p id="formulation-application-label" {...stylex.attrs(styles.techLabel)}>
                 Application
               </p>
               <RadioChips
                 styles={styles}
                 label="Application"
                 options={MENU_APPLICATIONS}
-                value={application}
+                value={application()}
                 onChange={setApplication}
               />
             </div>
 
             <div
               style={{
-                marginTop: 32,
+                "margin-top": "32px",
               }}
             >
-              <p {...stylex.props(styles.techLabel)}>Delivery form</p>
+              <p {...stylex.attrs(styles.techLabel)}>Delivery form</p>
               <RadioChips
                 styles={styles}
                 label="Delivery form"
                 options={FORM_OPTIONS}
-                value={form}
+                value={form()}
                 onChange={setForm}
               />
             </div>
 
-            <fieldset {...stylex.props(styles.formulationFieldset)}>
-              <legend {...stylex.props(styles.techLabel)}>Regulatory map</legend>
-              <div {...stylex.props(styles.chipsWrapRow)}>
+            <fieldset {...stylex.attrs(styles.formulationFieldset)}>
+              <legend {...stylex.attrs(styles.techLabel)}>Regulatory map</legend>
+              <div {...stylex.attrs(styles.chipsWrapRow)}>
                 {certificationDetails.map((cert) => (
                   <Chip
                     styles={styles}
-                    key={cert.name}
                     label={cert.name}
-                    selected={regulatoryNames.has(cert.name)}
+                    selected={regulatoryNames().has(cert.name)}
                     onClick={() => toggleRegulatory(cert.name)}
                   />
                 ))}
@@ -395,17 +394,17 @@ export function FormulationSection({ styles }: { styles: ProductionStyles }) {
             </fieldset>
 
             {/* Process strip */}
-            <div {...stylex.props(styles.processStripOuter)}>
-              <p {...stylex.props(styles.techLabel)}>What happens next</p>
-              <ol {...stylex.props(styles.processOl)}>
+            <div {...stylex.attrs(styles.processStripOuter)}>
+              <p {...stylex.attrs(styles.techLabel)}>What happens next</p>
+              <ol {...stylex.attrs(styles.processOl)}>
                 {processSteps.map((step, i) => (
-                  <li key={step.title} {...stylex.props(styles.processLi)}>
-                    <span {...stylex.props(styles.processIndex)}>
+                  <li {...stylex.attrs(styles.processLi)}>
+                    <span {...stylex.attrs(styles.processIndex)}>
                       {String(i + 1).padStart(2, "0")}
                     </span>
                     <div>
-                      <p {...stylex.props(styles.processTitle)}>{step.title}</p>
-                      <p {...stylex.props(styles.processCopy)}>{step.copy}</p>
+                      <p {...stylex.attrs(styles.processTitle)}>{step.title}</p>
+                      <p {...stylex.attrs(styles.processCopy)}>{step.copy}</p>
                     </div>
                   </li>
                 ))}
@@ -414,51 +413,59 @@ export function FormulationSection({ styles }: { styles: ProductionStyles }) {
           </div>
 
           {/* Live spec sheet */}
-          <div {...stylex.props(styles.formulationRight)}>
-            <div {...stylex.props(styles.specDraftHeader)}>
-              <span {...stylex.props(styles.specDraftLabel)}>Draft Specification</span>
-              <span {...stylex.props(styles.specDraftCode)}>FN-REQ / 2026</span>
+          <div {...stylex.attrs(styles.formulationRight)}>
+            <div {...stylex.attrs(styles.specDraftHeader)}>
+              <span {...stylex.attrs(styles.specDraftLabel)}>Draft Specification</span>
+              <span {...stylex.attrs(styles.specDraftCode)}>FN-REQ / 2026</span>
             </div>
             <div aria-live="polite">
-              <dl {...stylex.props(styles.specDraftDl)}>
-                {[
-                  ["Application", application],
-                  ["Delivery form", form],
-                  ["Regulatory", regulatory.length ? regulatory.join(" · ") : "—"],
-                  ["Matching actives", `${matches.length} of ${ingredients.length} in portfolio`],
-                  ["Response", "< 24h with full documentation"],
-                ].map(([label, value]) => (
-                  <div key={label} {...stylex.props(styles.specDraftDlRow)}>
-                    <dt {...stylex.props(styles.specDraftDt)}>{label}</dt>
-                    <dd {...stylex.props(styles.specDraftDd)}>{value}</dd>
+              <dl {...stylex.attrs(styles.specDraftDl)}>
+                {(
+                  [
+                    ["Application", () => application()],
+                    ["Delivery form", () => form()],
+                    ["Regulatory", () => (regulatory().length ? regulatory().join(" · ") : "—")],
+                    [
+                      "Matching actives",
+                      () => `${matches().length} of ${ingredients.length} in portfolio`,
+                    ],
+                    ["Response", () => "< 24h with full documentation"],
+                  ] as const
+                ).map(([label, value]) => (
+                  <div {...stylex.attrs(styles.specDraftDlRow)}>
+                    <dt {...stylex.attrs(styles.specDraftDt)}>{label}</dt>
+                    <dd {...stylex.attrs(styles.specDraftDd)}>{value()}</dd>
                   </div>
                 ))}
               </dl>
-              <ul {...stylex.props(styles.specMatchesList)}>
-                {matches.slice(0, 3).map((item) => (
-                  <li key={item.code} {...stylex.props(styles.specMatchItem)}>
-                    <CheckCircle2 aria-hidden size={12} color={colors.brandGreen400} />
-                    {item.name} — {item.purity}
-                  </li>
-                ))}
+              <ul {...stylex.attrs(styles.specMatchesList)}>
+                <For each={matches().slice(0, 3)}>
+                  {(item) => (
+                    <li {...stylex.attrs(styles.specMatchItem)}>
+                      <CheckCircle2 aria-hidden="true" size={12} color={colors.brandGreen400} />
+                      {item.name} — {item.purity}
+                    </li>
+                  )}
+                </For>
               </ul>
             </div>
-            <a href={createInquiryHref("formulation")} {...stylex.props(styles.specSubmitBtn)}>
+            <a href={createInquiryHref("formulation")} {...stylex.attrs(styles.specSubmitBtn)}>
               Submit this specification
-              <ArrowRight aria-hidden size={16} />
+              <ArrowRight aria-hidden="true" size={16} />
             </a>
-            <p {...stylex.props(styles.specDossiersRequestNote)}>Technical dossiers on request</p>
+            <p {...stylex.attrs(styles.specDossiersRequestNote)}>Technical dossiers on request</p>
           </div>
         </div>
       </div>
     </section>
   );
 }
-export function StandardsSection({ styles }: { styles: ProductionStyles }) {
+export function StandardsSection(props: { styles: ProductionStyles }) {
+  const styles = props.styles;
   const reduce = useReducedMotion();
-  const imgRef = useRef<HTMLDivElement>(null);
+  const [imgEl, setImgEl] = createSignal<HTMLDivElement>();
   const { scrollYProgress } = useScroll({
-    target: imgRef,
+    target: imgEl,
     offset: ["start end", "end start"],
   });
   const imgY = useTransform(scrollYProgress, [0, 1], ["-7%", "7%"]);
@@ -466,39 +473,39 @@ export function StandardsSection({ styles }: { styles: ProductionStyles }) {
     <section
       id="standards"
       aria-labelledby="standards-heading"
-      {...stylex.props(styles.standardsSection)}
+      {...stylex.attrs(styles.standardsSection)}
     >
-      <div {...stylex.props(styles.container)}>
+      <div {...stylex.attrs(styles.container)}>
         {/* Origin editorial beat */}
-        <div {...stylex.props(styles.originGrid)}>
-          <div {...stylex.props(styles.originImgCol)}>
+        <div {...stylex.attrs(styles.originGrid)}>
+          <div {...stylex.attrs(styles.originImgCol)}>
             <img
               src={IMG.origin}
               alt="Rows of cultivated green crops on a partner farm at golden hour"
               loading="lazy"
-              {...stylex.props(styles.originImg)}
+              {...stylex.attrs(styles.originImg)}
             />
           </div>
-          <div {...stylex.props(styles.originTextCol)}>
+          <div {...stylex.attrs(styles.originTextCol)}>
             <Reveal>
-              <p {...stylex.props(styles.eyebrowGreen)}>Origin</p>
-              <h2 {...stylex.props(styles.originTitle)}>
+              <p {...stylex.attrs(styles.eyebrowGreen)}>Origin</p>
+              <h2 {...stylex.attrs(styles.originTitle)}>
                 Grown with{" "}
                 <em
                   style={{
-                    fontStyle: "italic",
+                    "font-style": "italic",
                     color: colors.brandGreen600,
                   }}
                 >
                   patience.
                 </em>
               </h2>
-              <p {...stylex.props(styles.heroLead)}>
+              <p {...stylex.attrs(styles.heroLead)}>
                 Our botanicals begin in soil we know by name — a global network of partner farms
                 cultivated over decades, where harvests are timed to the plant, never to the
                 quarter.
               </p>
-              <blockquote {...stylex.props(styles.originQuote)}>
+              <blockquote {...stylex.attrs(styles.originQuote)}>
                 "Nature holds the keys to human vitality. We simply refuse to lose them in
                 translation."
               </blockquote>
@@ -514,53 +521,53 @@ export function StandardsSection({ styles }: { styles: ProductionStyles }) {
           title="Science-backed"
           accent="standards"
           aside={
-            <p {...stylex.props(styles.sectionAsideLead)}>
+            <p {...stylex.attrs(styles.sectionAsideLead)}>
               Every lot. Every market. Every release — documented to your regulatory map.
             </p>
           }
         />
 
-        <div {...stylex.props(styles.standardsGrid)}>
+        <div {...stylex.attrs(styles.standardsGrid)}>
           {/* Image */}
-          <div {...stylex.props(styles.labImgCol)}>
-            <div ref={imgRef} {...stylex.props(styles.labImgContainer)}>
+          <div {...stylex.attrs(styles.labImgCol)}>
+            <div ref={setImgEl} {...stylex.attrs(styles.labImgContainer)}>
               <m.img
                 src={IMG.lab}
                 alt="Dense botanical foliage awaiting quality-control intake at the Nanjing laboratory"
+                {...stylex.attrs(styles.labImg)}
                 style={{
-                  y: reduce ? 0 : imgY,
+                  y: reduce() ? 0 : imgY,
                 }}
                 loading="lazy"
-                {...stylex.props(styles.labImg)}
               />
-              <div aria-hidden {...stylex.props(styles.labImgScrim)} />
-              <div {...stylex.props(styles.labCaptionBadge)}>
-                <span {...stylex.props(styles.techLabel)}>QC Program — Nanjing</span>
-                <span {...stylex.props(styles.eyebrowGreen)}>Identity · Potency · Stability</span>
+              <div aria-hidden="true" {...stylex.attrs(styles.labImgScrim)} />
+              <div {...stylex.attrs(styles.labCaptionBadge)}>
+                <span {...stylex.attrs(styles.techLabel)}>QC Program — Nanjing</span>
+                <span {...stylex.attrs(styles.eyebrowGreen)}>Identity · Potency · Stability</span>
               </div>
             </div>
           </div>
 
           {/* Pillars */}
-          <div {...stylex.props(styles.pillarsCol)}>
+          <div {...stylex.attrs(styles.pillarsCol)}>
             {pillars.map((pillar, i) => {
               const Icon = PILLAR_ICONS[i];
               return (
-                <Reveal key={pillar.title} delay={i * STAGGER}>
+                <Reveal delay={i * STAGGER}>
                   <div
-                    {...stylex.props(
+                    {...stylex.attrs(
                       styles.pillarInner,
                       i < pillars.length - 1 && styles.pillarRowBorder,
                     )}
                   >
-                    <div {...stylex.props(styles.pillarIconBox)}>
-                      <Icon aria-hidden strokeWidth={1.5} size={24} />
+                    <div {...stylex.attrs(styles.pillarIconBox)}>
+                      <Icon aria-hidden="true" strokeWidth={1.5} size={24} />
                     </div>
                     <div>
-                      <h3 {...stylex.props(styles.pillarTitle)}>{pillar.title}</h3>
-                      <p {...stylex.props(styles.pillarCopy)}>{pillar.copy}</p>
-                      <div {...stylex.props(styles.pillarCert)}>
-                        <CheckCircle2 aria-hidden size={14} />
+                      <h3 {...stylex.attrs(styles.pillarTitle)}>{pillar.title}</h3>
+                      <p {...stylex.attrs(styles.pillarCopy)}>{pillar.copy}</p>
+                      <div {...stylex.attrs(styles.pillarCert)}>
+                        <CheckCircle2 aria-hidden="true" size={14} />
                         ISO 9001 · GMP Certified
                       </div>
                     </div>
@@ -574,23 +581,24 @@ export function StandardsSection({ styles }: { styles: ProductionStyles }) {
     </section>
   );
 }
-export function FinaleSection({ styles }: { styles: ProductionStyles }) {
+export function FinaleSection(props: { styles: ProductionStyles }) {
+  const styles = props.styles;
   const reduce = useReducedMotion();
-  const ref = useRef<HTMLElement>(null);
+  const [sectionEl, setSectionEl] = createSignal<HTMLElement>();
   const { scrollYProgress } = useScroll({
-    target: ref,
+    target: sectionEl,
     offset: ["start end", "end start"],
   });
   const bgY = useTransform(scrollYProgress, [0, 1], ["-6%", "6%"]);
   return (
     <section
       id="contact"
-      ref={ref}
+      ref={setSectionEl}
       aria-labelledby="contact-heading"
-      {...stylex.props(styles.finaleSection)}
+      {...stylex.attrs(styles.finaleSection)}
     >
       <m.div
-        aria-hidden
+        aria-hidden="true"
         style={{
           pointerEvents: "none",
           position: "absolute",
@@ -598,17 +606,17 @@ export function FinaleSection({ styles }: { styles: ProductionStyles }) {
           left: 0,
           right: 0,
           bottom: 0,
-          y: reduce ? 0 : bgY,
+          y: reduce() ? 0 : bgY,
         }}
       >
-        <img src={IMG.heroThumb} alt="" loading="lazy" {...stylex.props(styles.finaleThumbImg)} />
+        <img src={IMG.heroThumb} alt="" loading="lazy" {...stylex.attrs(styles.finaleThumbImg)} />
       </m.div>
-      <div aria-hidden {...stylex.props(styles.finaleScrim)} />
+      <div aria-hidden="true" {...stylex.attrs(styles.finaleScrim)} />
 
-      <div {...stylex.props(styles.container, styles.finaleInner)}>
+      <div {...stylex.attrs(styles.container, styles.finaleInner)}>
         <Reveal>
-          <p {...stylex.props(styles.eyebrowGreen400)}>06 — Partner with Fenchem</p>
-          <h2 id="contact-heading" {...stylex.props(styles.finaleHeading)}>
+          <p {...stylex.attrs(styles.eyebrowGreen400)}>06 — Partner with Fenchem</p>
+          <h2 id="contact-heading" {...stylex.attrs(styles.finaleHeading)}>
             Your next formulation,{" "}
             <span
               style={{
@@ -618,43 +626,43 @@ export function FinaleSection({ styles }: { styles: ProductionStyles }) {
               engineered to specification
             </span>
           </h2>
-          <p {...stylex.props(styles.finaleLead)}>
+          <p {...stylex.attrs(styles.finaleLead)}>
             Submit a target spec — purity, form, matrix, regulatory map — and our laboratory returns
             a validated proposal with full documentation within one business day.
           </p>
         </Reveal>
 
         <Reveal delay={STAGGER * 2}>
-          <div {...stylex.props(styles.finaleActions)}>
-            <a href={createInquiryHref("contact")} {...stylex.props(styles.ctaPrimaryDark)}>
+          <div {...stylex.attrs(styles.finaleActions)}>
+            <a href={createInquiryHref("contact")} {...stylex.attrs(styles.ctaPrimaryDark)}>
               Partner with Fenchem
-              <ArrowRight aria-hidden size={16} />
+              <ArrowRight aria-hidden="true" size={16} />
             </a>
-            <a href="#matrix" {...stylex.props(styles.finaleSecondaryBtn)}>
+            <a href="#matrix" {...stylex.attrs(styles.finaleSecondaryBtn)}>
               Explore Portfolio
             </a>
           </div>
         </Reveal>
 
         <Reveal delay={STAGGER * 3}>
-          <p {...stylex.props(styles.finaleResponseTime)}>
+          <p {...stylex.attrs(styles.finaleResponseTime)}>
             Response Time &lt; 24h — Technical Dossiers on Request
           </p>
         </Reveal>
 
         {/* Office nodes */}
-        <div {...stylex.props(styles.officesOuter)}>
+        <div {...stylex.attrs(styles.officesOuter)}>
           <Reveal>
-            <p {...stylex.props(styles.eyebrowGreen400)}>6 Global Bases — 40+ Countries Served</p>
+            <p {...stylex.attrs(styles.eyebrowGreen400)}>6 Global Bases — 40+ Countries Served</p>
           </Reveal>
-          <div {...stylex.props(styles.officesGrid)}>
+          <div {...stylex.attrs(styles.officesGrid)}>
             {regions.map((region, i) => (
-              <Reveal key={region.city} delay={i * (STAGGER * 0.75)}>
-                <div {...stylex.props(styles.officeCardBg)}>
-                  <div {...stylex.props(styles.officeCardInner)}>
-                    <p {...stylex.props(styles.officeCity)}>{region.city}</p>
-                    <p {...stylex.props(styles.officeShort)}>{region.short}</p>
-                    <p {...stylex.props(styles.officeCoords)}>{region.coords}</p>
+              <Reveal delay={i * (STAGGER * 0.75)}>
+                <div {...stylex.attrs(styles.officeCardBg)}>
+                  <div {...stylex.attrs(styles.officeCardInner)}>
+                    <p {...stylex.attrs(styles.officeCity)}>{region.city}</p>
+                    <p {...stylex.attrs(styles.officeShort)}>{region.short}</p>
+                    <p {...stylex.attrs(styles.officeCoords)}>{region.coords}</p>
                   </div>
                 </div>
               </Reveal>
@@ -665,40 +673,39 @@ export function FinaleSection({ styles }: { styles: ProductionStyles }) {
     </section>
   );
 }
-export function FooterSection({ styles }: { styles: ProductionStyles }) {
+export function FooterSection(props: { styles: ProductionStyles }) {
+  const styles = props.styles;
   return (
-    <footer {...stylex.props(styles.footer)}>
-      <div {...stylex.props(styles.container)}>
-        <div {...stylex.props(styles.footerGrid)}>
+    <footer {...stylex.attrs(styles.footer)}>
+      <div {...stylex.attrs(styles.container)}>
+        <div {...stylex.attrs(styles.footerGrid)}>
           {/* Brand block */}
-          <div {...stylex.props(styles.footerBrandCol)}>
-            <div {...stylex.props(styles.footerBrandRow)}>
-              <span {...stylex.props(styles.brandText)}>FENCHEM</span>
-              <Leaf aria-hidden strokeWidth={1.5} size={20} color={colors.brandGreen500} />
+          <div {...stylex.attrs(styles.footerBrandCol)}>
+            <div {...stylex.attrs(styles.footerBrandRow)}>
+              <span {...stylex.attrs(styles.brandText)}>FENCHEM</span>
+              <Leaf aria-hidden="true" strokeWidth={1.5} size={20} color={colors.brandGreen500} />
             </div>
-            <p {...stylex.props(styles.footerBrandTagline)}>{company.tagline}.</p>
-            <p {...stylex.props(styles.footerEst)}>
+            <p {...stylex.attrs(styles.footerBrandTagline)}>{company.tagline}.</p>
+            <p {...stylex.attrs(styles.footerEst)}>
               ISO 9001 : 2015 · GMP · HACCP
               <br />
               Est. {company.founded} — {company.hq.city}, {company.hq.country}
             </p>
-            <div {...stylex.props(styles.footerCertsList)}>
+            <div {...stylex.attrs(styles.footerCertsList)}>
               {certifications.map((cert) => (
-                <span key={cert} {...stylex.props(styles.footerCertBadge)}>
-                  {cert}
-                </span>
+                <span {...stylex.attrs(styles.footerCertBadge)}>{cert}</span>
               ))}
             </div>
           </div>
 
           {/* Nav columns */}
           {FOOTER_COLS.map((col) => (
-            <div key={col.head} {...stylex.props(styles.footerNavCol)}>
-              <p {...stylex.props(styles.techLabel)}>{col.head}</p>
-              <ul {...stylex.props(styles.footerNavList)}>
+            <div {...stylex.attrs(styles.footerNavCol)}>
+              <p {...stylex.attrs(styles.techLabel)}>{col.head}</p>
+              <ul {...stylex.attrs(styles.footerNavList)}>
                 {col.links.map((link) => (
-                  <li key={link.label}>
-                    <a href={link.href} {...stylex.props(styles.footerNavLink)}>
+                  <li>
+                    <a href={link.href} {...stylex.attrs(styles.footerNavLink)}>
                       {link.label}
                     </a>
                   </li>
@@ -709,16 +716,16 @@ export function FooterSection({ styles }: { styles: ProductionStyles }) {
         </div>
 
         {/* Wordmark watermark */}
-        <p aria-hidden {...stylex.props(styles.footerWordmark)}>
+        <p aria-hidden="true" {...stylex.attrs(styles.footerWordmark)}>
           FENCHEM
         </p>
 
         {/* Legal strip */}
-        <div {...stylex.props(styles.footerLegal)}>
+        <div {...stylex.attrs(styles.footerLegal)}>
           <span>© 2026 {company.legalName} — All Rights Reserved</span>
           <span
             style={{
-              fontVariantNumeric: "tabular-nums",
+              "font-variant-numeric": "tabular-nums",
             }}
           >
             {company.hq.coords} — Nanjing, China
@@ -735,43 +742,33 @@ export function FooterSection({ styles }: { styles: ProductionStyles }) {
     </footer>
   );
 }
-export function SectionHeader({
-  styles,
-  id,
-  number,
-  label,
-  title,
-  accent,
-  aside,
-}: {
+export function SectionHeader(props: {
   styles: ProductionStyles;
   id: string;
   number: string;
   label: string;
   title: string;
   accent: string;
-  aside?: ReactNode;
+  aside?: JSX.Element;
 }) {
+  const aside = children(() => props.aside);
   return (
-    <div {...stylex.props(styles.sectionHeaderRow)}>
+    <div {...stylex.attrs(props.styles.sectionHeaderRow)}>
       <Reveal>
-        <p {...stylex.props(styles.eyebrowGreen)}>
-          {number} — {label}
+        <p {...stylex.attrs(props.styles.eyebrowGreen)}>
+          {props.number} — {props.label}
         </p>
-        <h2 id={id} {...stylex.props(styles.sectionHeading)}>
-          {title} <span {...stylex.props(styles.textGreen600)}>{accent}</span>
+        <h2 id={props.id} {...stylex.attrs(props.styles.sectionHeading)}>
+          {props.title} <span {...stylex.attrs(props.styles.textGreen600)}>{props.accent}</span>
         </h2>
       </Reveal>
-      {aside && <Reveal delay={STAGGER}>{aside}</Reveal>}
+      <Show when={aside()}>
+        <Reveal delay={STAGGER}>{aside()}</Reveal>
+      </Show>
     </div>
   );
 }
-export function Chip({
-  styles,
-  label,
-  selected,
-  onClick,
-}: {
+export function Chip(props: {
   styles: ProductionStyles;
   label: string;
   selected: boolean;
@@ -780,50 +777,51 @@ export function Chip({
   return (
     <button
       type="button"
-      aria-pressed={selected}
-      onClick={onClick}
-      {...stylex.props(styles.chipBase, selected ? styles.chipSelected : styles.chipUnselected)}
+      aria-pressed={props.selected ? "true" : "false"}
+      onClick={() => props.onClick()}
+      {...stylex.attrs(
+        props.styles.chipBase,
+        props.selected ? props.styles.chipSelected : props.styles.chipUnselected,
+      )}
     >
-      {label}
+      {props.label}
     </button>
   );
 }
-export function RadioChips<T extends string>({
-  styles,
-  label,
-  options,
-  value,
-  onChange,
-}: {
+export function RadioChips<T extends string>(props: {
   styles: ProductionStyles;
   label: string;
   options: readonly T[];
   value: T;
   onChange: (next: T) => void;
 }) {
+  let group!: HTMLDivElement;
   const move = (delta: number) => {
-    const next = options[(options.indexOf(value) + delta + options.length) % options.length];
-    onChange(next);
+    const options = props.options;
+    const next = options[(options.indexOf(props.value) + delta + options.length) % options.length];
+    props.onChange(next);
   };
+  createEffect(
+    () => props.value,
+    () => {
+      if (!group.contains(document.activeElement)) return;
+      group.querySelector<HTMLButtonElement>('[aria-checked="true"]')?.focus();
+    },
+  );
   return (
-    <div role="radiogroup" aria-label={label} {...stylex.props(styles.chipsWrapRow)}>
-      {options.map((option) => (
+    <div
+      ref={group}
+      role="radiogroup"
+      aria-label={props.label}
+      {...stylex.attrs(props.styles.chipsWrapRow)}
+    >
+      {props.options.map((option) => (
         <button
-          key={option}
           type="button"
           role="radio"
-          aria-checked={value === option}
-          tabIndex={value === option ? 0 : -1}
-          ref={(node) => {
-            if (
-              node &&
-              value === option &&
-              node.closest('[role="radiogroup"]')?.contains(document.activeElement)
-            ) {
-              node.focus();
-            }
-          }}
-          onClick={() => onChange(option)}
+          aria-checked={props.value === option ? "true" : "false"}
+          tabindex={props.value === option ? 0 : -1}
+          onClick={() => props.onChange(option)}
           onKeyDown={(event) => {
             if (event.key.startsWith("Arrow")) event.stopPropagation();
             if (event.key === "ArrowRight" || event.key === "ArrowDown") {
@@ -834,9 +832,9 @@ export function RadioChips<T extends string>({
               move(-1);
             }
           }}
-          {...stylex.props(
-            styles.chipBase,
-            value === option ? styles.chipSelected : styles.chipUnselected,
+          {...stylex.attrs(
+            props.styles.chipBase,
+            props.value === option ? props.styles.chipSelected : props.styles.chipUnselected,
           )}
         >
           {option}

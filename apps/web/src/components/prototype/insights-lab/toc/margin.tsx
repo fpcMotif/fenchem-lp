@@ -1,8 +1,10 @@
 import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { ListTree, X } from "lucide-react";
-import { m, type MotionValue } from "motion/react";
-import { useEffect, useRef, useState, type AnimationEvent, type SyntheticEvent } from "react";
+import type { StyleXStyles } from "@stylexjs/stylex";
+import { ListTree, X } from "@fenchem-lp/ui/components/lucide";
+import { createMemo, createSignal, For, onSettled, Show, untrack } from "solid-js";
+
+import { m, type MotionValue } from "@/compat/motion";
 
 import { color, font } from "../../variant-oos1/tokens.stylex";
 import { lab } from "../tokens.stylex";
@@ -31,6 +33,9 @@ const DESKTOP = breakpoints.xl;
 const RAIL_TOP = STICKY_OFFSET + READING_GAP;
 const BACKDROP = "rgba(6, 20, 44, 0.36)";
 const EXIT_FALLBACK_MS = 260;
+
+const sxProps = (...args: ReadonlyArray<StyleXStyles | false | null | undefined>) =>
+  stylex.attrs(...args);
 
 const fadeIn = stylex.keyframes({ "0%": { opacity: 0 }, "100%": { opacity: 1 } });
 const fadeOut = stylex.keyframes({ "0%": { opacity: 1 }, "100%": { opacity: 0 } });
@@ -361,179 +366,172 @@ const styles = stylex.create({
   },
 });
 
-export function MarginVariant({ onNavigateHome }: SubPageProps) {
+export function MarginVariant(props: SubPageProps) {
   const articles = useLabArticles();
   const { position, articleProgress } = useReadingPosition(articles, RAIL_TOP);
-  const [sheetOpen, setSheetOpen] = useState(false);
-  const where = locationLabel(articles, position);
+  const [sheetOpen, setSheetOpen] = createSignal(false);
+  const where = createMemo(() => locationLabel(articles(), position()));
 
   return (
     <TocPage
-      onNavigateHome={onNavigateHome}
+      onNavigateHome={props.onNavigateHome}
       bar={
         <button
           type="button"
           aria-haspopup="dialog"
-          aria-expanded={sheetOpen}
+          aria-expanded={sheetOpen() ? "true" : "false"}
           onClick={() => setSheetOpen(true)}
-          {...stylex.props(styles.trigger, kitStyles.focusRing)}
+          {...stylex.attrs(styles.trigger, kitStyles.focusRing)}
         >
           <ListTree
             size={16}
             strokeWidth={2}
             aria-hidden="true"
-            {...stylex.props(styles.triggerIcon)}
+            {...stylex.attrs(styles.triggerIcon)}
           />
           目录
-          {where ? (
-            <span {...stylex.props(styles.triggerWhere)}>
-              {where.section
-                ? `${where.section.numeral} ${where.section.text}`
-                : shortTitle(where.article)}
-            </span>
-          ) : null}
+          <Show when={where()}>
+            {(current) => (
+              <span {...stylex.attrs(styles.triggerWhere)}>
+                {current().section
+                  ? `${current().section!.numeral} ${current().section!.text}`
+                  : shortTitle(current().article)}
+              </span>
+            )}
+          </Show>
         </button>
       }
     >
-      <div {...stylex.props(styles.layout)}>
-        <nav aria-label="本页目录" {...stylex.props(styles.rail)}>
+      <div {...stylex.attrs(styles.layout)}>
+        <nav aria-label="本页目录" {...stylex.attrs(styles.rail)}>
           <ContentsTree
-            articles={articles}
-            position={position}
+            articles={articles()}
+            position={position()}
             progress={articleProgress}
             mode="rail"
           />
         </nav>
-        <ArticleFlow articles={articles} sx={styles.flow} />
+        <ArticleFlow articles={articles()} sx={styles.flow} />
       </div>
-      {sheetOpen ? (
+      <Show when={sheetOpen()}>
         <TreeSheet
-          articles={articles}
-          position={position}
+          articles={articles()}
+          position={position()}
           progress={articleProgress}
           onClosed={() => setSheetOpen(false)}
         />
-      ) : null}
+      </Show>
     </TocPage>
   );
 }
 
-function ContentsTree({
-  articles,
-  position,
-  progress,
-  mode,
-  onNavigate,
-}: {
+function ContentsTree(props: {
   articles: readonly LabArticle[];
   position: ReadingPosition;
   progress: MotionValue<number>;
   mode: "rail" | "sheet";
   onNavigate?: () => void;
 }) {
-  const sheet = mode === "sheet";
-  const focusIndex = Math.max(position.article, 0);
+  const sheet = untrack(() => props.mode === "sheet");
+  const focusIndex = () => Math.max(props.position.article, 0);
+  const navigate = () => props.onNavigate?.();
   return (
     <>
-      {sheet ? null : (
-        <div {...stylex.props(styles.head)}>
-          <p {...stylex.props(styles.headLabel)}>目录</p>
-          <span {...stylex.props(styles.headCount, labStyles.displayNumber)}>
-            {`${articles.length} 篇`}
+      <Show when={!sheet}>
+        <div {...stylex.attrs(styles.head)}>
+          <p {...stylex.attrs(styles.headLabel)}>目录</p>
+          <span {...stylex.attrs(styles.headCount, labStyles.displayNumber)}>
+            {`${props.articles.length} 篇`}
           </span>
         </div>
-      )}
-      <ol {...stylex.props(styles.list)}>
-        {articles.map((article, index) => {
-          const open = sheet || index === focusIndex;
-          const here = index === position.article;
-          return (
-            <li key={article.id} {...stylex.props(styles.item)}>
-              <a
-                href={`#${articleAnchor(article)}`}
-                aria-current={here && position.chapter < 0 ? "location" : undefined}
-                onClick={onNavigate}
-                {...stylex.props(
-                  styles.articleLink,
-                  sheet && styles.articleLinkSheet,
-                  open && styles.articleLinkOpen,
-                  kitStyles.focusRing,
-                )}
-              >
-                <span
-                  {...stylex.props(
-                    styles.number,
-                    labStyles.displayNumber,
-                    here && styles.numberOpen,
+      </Show>
+      <ol {...stylex.attrs(styles.list)}>
+        <For each={props.articles}>
+          {(article, index) => {
+            const open = () => sheet || index() === focusIndex();
+            const here = () => index() === props.position.article;
+            return (
+              <li {...stylex.attrs(styles.item)}>
+                <a
+                  href={`#${articleAnchor(article)}`}
+                  aria-current={here() && props.position.chapter < 0 ? "location" : undefined}
+                  onClick={navigate}
+                  {...sxProps(
+                    styles.articleLink,
+                    sheet && styles.articleLinkSheet,
+                    open() && styles.articleLinkOpen,
+                    kitStyles.focusRing,
                   )}
                 >
-                  {padIndex(index)}
-                </span>
-                <span>{shortTitle(article)}</span>
-              </a>
-              <div {...stylex.props(styles.collapse, open && styles.collapseOpen)}>
-                <div {...stylex.props(styles.clip)}>
-                  <div {...stylex.props(styles.chapters)}>
-                    <span aria-hidden="true" {...stylex.props(styles.track)} />
-                    {here ? (
-                      <m.span
-                        aria-hidden="true"
-                        style={{ scaleY: progress }}
-                        {...stylex.props(styles.fill)}
-                      />
-                    ) : null}
-                    <ol {...stylex.props(styles.list)}>
-                      {article.sections.map((section, chapter) => {
-                        const { numeral, text } = splitNumeral(section.navLabel);
-                        const active = here && chapter === position.chapter;
-                        return (
-                          <li key={section.slug}>
-                            <a
-                              href={`#${sectionAnchor(article, section)}`}
-                              aria-current={active ? "location" : undefined}
-                              onClick={onNavigate}
-                              {...stylex.props(
-                                styles.chapterLink,
-                                sheet && styles.chapterLinkSheet,
-                                active && styles.chapterActive,
-                                kitStyles.focusRing,
-                              )}
-                            >
-                              <span>{numeral}</span>
-                              <span>{text}</span>
-                            </a>
-                          </li>
-                        );
-                      })}
-                    </ol>
+                  <span
+                    {...sxProps(
+                      styles.number,
+                      labStyles.displayNumber,
+                      here() && styles.numberOpen,
+                    )}
+                  >
+                    {padIndex(index())}
+                  </span>
+                  <span>{shortTitle(article)}</span>
+                </a>
+                <div {...sxProps(styles.collapse, open() && styles.collapseOpen)}>
+                  <div {...stylex.attrs(styles.clip)}>
+                    <div {...stylex.attrs(styles.chapters)}>
+                      <span aria-hidden="true" {...stylex.attrs(styles.track)} />
+                      <Show when={here()}>
+                        <m.span
+                          aria-hidden="true"
+                          style={{ scaleY: props.progress }}
+                          {...stylex.attrs(styles.fill)}
+                        />
+                      </Show>
+                      <ol {...stylex.attrs(styles.list)}>
+                        {article.sections.map((section, chapter) => {
+                          const { numeral, text } = splitNumeral(section.navLabel);
+                          const active = () => here() && chapter === props.position.chapter;
+                          return (
+                            <li>
+                              <a
+                                href={`#${sectionAnchor(article, section)}`}
+                                aria-current={active() ? "location" : undefined}
+                                onClick={navigate}
+                                {...sxProps(
+                                  styles.chapterLink,
+                                  sheet && styles.chapterLinkSheet,
+                                  active() && styles.chapterActive,
+                                  kitStyles.focusRing,
+                                )}
+                              >
+                                <span>{numeral}</span>
+                                <span>{text}</span>
+                              </a>
+                            </li>
+                          );
+                        })}
+                      </ol>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </li>
-          );
-        })}
+              </li>
+            );
+          }}
+        </For>
       </ol>
     </>
   );
 }
 
-function TreeSheet({
-  articles,
-  position,
-  progress,
-  onClosed,
-}: {
+function TreeSheet(props: {
   articles: readonly LabArticle[];
   position: ReadingPosition;
   progress: MotionValue<number>;
   onClosed: () => void;
 }) {
-  const dialogRef = useRef<HTMLDialogElement>(null);
-  const [closing, setClosing] = useState(false);
+  let dialog: HTMLDialogElement | undefined;
+  const [closing, setClosing] = createSignal(false);
   const setPickerHost = usePickerHost();
 
-  useEffect(() => {
-    const dialog = dialogRef.current;
+  onSettled(() => {
     if (!dialog) return;
     if (!dialog.open) dialog.showModal();
     setPickerHost(dialog);
@@ -544,62 +542,62 @@ function TreeSheet({
       root.style.overflow = previous;
       setPickerHost(null);
     };
-  }, [setPickerHost]);
+  });
 
   const finish = () => {
-    if (dialogRef.current?.open) dialogRef.current.close();
+    if (dialog?.open) dialog.close();
   };
 
   const requestClose = () => {
-    if (closing) return;
+    if (closing()) return;
     setClosing(true);
     window.setTimeout(finish, EXIT_FALLBACK_MS);
   };
 
   return (
     <dialog
-      ref={dialogRef}
+      ref={dialog}
       lang="zh-CN"
       aria-labelledby="margin-sheet-title"
-      onCancel={(event: SyntheticEvent<HTMLDialogElement>) => {
+      onCancel={(event: Event) => {
         event.preventDefault();
         requestClose();
       }}
-      onClose={onClosed}
-      {...stylex.props(styles.dialog, closing && styles.dialogClosing)}
+      onClose={() => props.onClosed()}
+      {...sxProps(styles.dialog, closing() && styles.dialogClosing)}
     >
       <button
         type="button"
-        tabIndex={-1}
+        tabindex={-1}
         aria-hidden="true"
         onClick={requestClose}
-        {...stylex.props(styles.dismiss)}
+        {...stylex.attrs(styles.dismiss)}
       />
       <section
-        onAnimationEnd={(event: AnimationEvent<HTMLElement>) => {
-          if (closing && event.target === event.currentTarget) finish();
+        onAnimationEnd={(event: AnimationEvent & { currentTarget: HTMLElement }) => {
+          if (closing() && event.target === event.currentTarget) finish();
         }}
-        {...stylex.props(styles.sheet, closing && styles.sheetClosing)}
+        {...sxProps(styles.sheet, closing() && styles.sheetClosing)}
       >
-        <span aria-hidden="true" {...stylex.props(styles.grabber)} />
-        <div {...stylex.props(styles.sheetBar)}>
-          <h2 id="margin-sheet-title" {...stylex.props(styles.sheetTitle)}>
+        <span aria-hidden="true" {...stylex.attrs(styles.grabber)} />
+        <div {...stylex.attrs(styles.sheetBar)}>
+          <h2 id="margin-sheet-title" {...stylex.attrs(styles.sheetTitle)}>
             本页目录
           </h2>
           <button
             type="button"
             aria-label="关闭"
             onClick={requestClose}
-            {...stylex.props(styles.close, kitStyles.focusRing)}
+            {...stylex.attrs(styles.close, kitStyles.focusRing)}
           >
             <X size={18} strokeWidth={2} aria-hidden="true" />
           </button>
         </div>
-        <nav aria-label="本页目录" {...stylex.props(styles.sheetBody)}>
+        <nav aria-label="本页目录" {...stylex.attrs(styles.sheetBody)}>
           <ContentsTree
-            articles={articles}
-            position={position}
-            progress={progress}
+            articles={props.articles}
+            position={props.position}
+            progress={props.progress}
             mode="sheet"
             onNavigate={finish}
           />

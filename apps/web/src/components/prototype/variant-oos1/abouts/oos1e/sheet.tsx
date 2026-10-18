@@ -1,13 +1,18 @@
-import { m } from "motion/react";
+import { m } from "@/compat/motion";
 import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { useScroll, useTransform } from "motion/react";
-import { type CSSProperties, type ReactNode, type RefObject, useContext, useRef } from "react";
+import { useScroll, useTransform } from "@/compat/motion";
+import { createSignal, useContext, type Accessor } from "solid-js";
+import type { JSX } from "@solidjs/web";
 import { useBoxHeight } from "./hooks";
 import { base } from "./shared-values";
 import type { SheetDef } from "./sheets";
 import { color, font, media, metric } from "./tokens.stylex";
 import { StackContext } from "./sheet-values";
+
+// stylex.attrs with reactive (accessor) arguments resolves at runtime here, because
+// the StyleX compiler tries to evaluate them at build time and throws.
+const sxProps: typeof stylex.attrs = (...args) => stylex.attrs(...args);
 
 const styles = stylex.create({
   slot: {
@@ -76,76 +81,69 @@ const SHEET_TONES = {
 const COVERED_RANGE = [0.25, 0.75];
 const COVERED_OPACITY = [1, 0.16];
 
-function CoveredBody({
-  runwayRef,
-  stacked,
-  children,
-}: {
-  runwayRef: RefObject<HTMLDivElement | null>;
+function CoveredBody(props: {
+  runway: Accessor<HTMLDivElement | undefined>;
   stacked: boolean;
-  children: ReactNode;
+  children: JSX.Element;
 }) {
-  const { scrollYProgress } = useScroll({ target: runwayRef, offset: ["start end", "end end"] });
+  const { scrollYProgress } = useScroll({ target: props.runway, offset: ["start end", "end end"] });
   const opacity = useTransform(scrollYProgress, COVERED_RANGE, COVERED_OPACITY);
   return (
-    <m.div style={stacked ? { opacity } : undefined} {...stylex.props(styles.body)}>
-      {children}
+    <m.div style={props.stacked ? { opacity } : undefined} {...stylex.attrs(styles.body)}>
+      {props.children}
     </m.div>
   );
 }
 
-export function Sheet({
-  def,
-  headingId,
-  runway = true,
-  children,
-}: {
+export function Sheet(props: {
   def: SheetDef;
   headingId?: string;
   runway?: boolean;
-  children: ReactNode;
+  children: JSX.Element;
 }) {
-  const { reachedIndex, stacked } = useContext(StackContext);
+  const stack = useContext(StackContext);
   const [ref, height] = useBoxHeight<HTMLDivElement>();
-  const runwayRef = useRef<HTMLDivElement>(null);
-  const nameId = headingId ?? `${def.id}-name`;
-  const vars = { "--oos1e-h": `${height}px` } as CSSProperties;
+  const [runwayEl, setRunwayEl] = createSignal<HTMLDivElement>();
+  const runway = () => props.runway ?? true;
+  const nameId = () => props.headingId ?? `${props.def.id}-name`;
   const content = (
     <>
-      {headingId ? null : (
-        <h2 id={nameId} {...stylex.props(base.srOnly)}>
-          {def.english}
+      {props.headingId ? null : (
+        <h2 id={nameId()} {...stylex.attrs(base.srOnly)}>
+          {props.def.english}
         </h2>
       )}
-      {children}
+      {props.children}
     </>
   );
 
   return (
     <section
-      id={def.id}
-      aria-labelledby={nameId}
-      style={vars}
-      {...stylex.props(
+      id={props.def.id}
+      aria-labelledby={nameId()}
+      {...sxProps(
         styles.slot,
-        def.index > 0 && styles.slotOverlap,
-        !runway && styles.slotLast,
+        props.def.index > 0 && styles.slotOverlap,
+        !runway() && styles.slotLast,
       )}
+      style={{ "--oos1e-h": `${height()}px` }}
     >
       <div
         ref={ref}
-        inert={stacked && reachedIndex > def.index}
-        {...stylex.props(styles.sheet, SHEET_TONES[def.tone])}
+        inert={stack.stacked && stack.reachedIndex > props.def.index}
+        {...stylex.attrs(styles.sheet, SHEET_TONES[props.def.tone])}
       >
-        {runway ? (
-          <CoveredBody runwayRef={runwayRef} stacked={stacked}>
+        {runway() ? (
+          <CoveredBody runway={runwayEl} stacked={stack.stacked}>
             {content}
           </CoveredBody>
         ) : (
-          <div {...stylex.props(styles.body)}>{content}</div>
+          <div {...stylex.attrs(styles.body)}>{content}</div>
         )}
       </div>
-      {runway ? <div ref={runwayRef} aria-hidden="true" {...stylex.props(styles.runway)} /> : null}
+      {runway() ? (
+        <div ref={setRunwayEl} aria-hidden="true" {...stylex.attrs(styles.runway)} />
+      ) : null}
     </section>
   );
 }

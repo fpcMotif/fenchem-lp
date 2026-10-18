@@ -1,4 +1,4 @@
-import { Sprout, FlaskConical, Globe } from "lucide-react";
+import { Sprout, FlaskConical, Globe } from "@fenchem-lp/ui/components/lucide";
 import type { IngredientApplication } from "@/components/landing/landing-content";
 export const IMG = {
   hero: "https://images.unsplash.com/photo-1530013526807-2ec93afddab9?auto=format&fit=crop&w=1600&q=80",

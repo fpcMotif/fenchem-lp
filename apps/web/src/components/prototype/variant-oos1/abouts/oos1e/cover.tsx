@@ -1,6 +1,6 @@
 import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight } from "@fenchem-lp/ui/components/lucide";
 
 import { ABOUT_BANNER } from "../../about-data";
 import { base } from "./shared-values";
@@ -123,48 +123,48 @@ const styles = stylex.create({
   },
 });
 
-export function Cover({ onNavigateHome }: { onNavigateHome: (hash?: string) => void }) {
+export function Cover(props: { onNavigateHome: (hash?: string) => void }) {
   const [leadYear, leadFocus] = ABOUT_BANNER.lead.split(" · ");
   return (
-    <section aria-labelledby="about-banner-title" {...stylex.props(styles.cover)}>
-      <div {...stylex.props(styles.photo)}>
+    <section aria-labelledby="about-banner-title" {...stylex.attrs(styles.cover)}>
+      <div {...stylex.attrs(styles.photo)}>
         <img
           src={ABOUT_BANNER.image}
           alt={ABOUT_BANNER.alt}
-          fetchPriority="high"
+          fetchpriority="high"
           decoding="async"
-          {...stylex.props(base.fill, styles.image)}
+          {...stylex.attrs(base.fill, styles.image)}
         />
-        <div aria-hidden="true" {...stylex.props(base.fill, styles.scrim)} />
+        <div aria-hidden="true" {...stylex.attrs(base.fill, styles.scrim)} />
       </div>
-      <div {...stylex.props(styles.paper)}>
-        <nav aria-label="Breadcrumb" {...stylex.props(styles.breadcrumb)}>
+      <div {...stylex.attrs(styles.paper)}>
+        <nav aria-label="Breadcrumb" {...stylex.attrs(styles.breadcrumb)}>
           <button
             type="button"
-            onClick={() => onNavigateHome("top")}
-            {...stylex.props(styles.breadcrumbLink, base.focusRing)}
+            onClick={() => props.onNavigateHome("top")}
+            {...stylex.attrs(styles.breadcrumbLink, base.focusRing)}
           >
             首页
           </button>
           <ChevronRight size={14} aria-hidden="true" />
-          <span aria-current="page" {...stylex.props(styles.breadcrumbCurrent)}>
+          <span aria-current="page" {...stylex.attrs(styles.breadcrumbCurrent)}>
             关于我们
           </span>
         </nav>
-        <div {...stylex.props(styles.heading)}>
-          <h1 id="about-banner-title" {...stylex.props(styles.title)}>
+        <div {...stylex.attrs(styles.heading)}>
+          <h1 id="about-banner-title" {...stylex.attrs(styles.title)}>
             {ABOUT_BANNER.title}
           </h1>
-          <p lang="en" {...stylex.props(styles.tagline)}>
+          <p lang="en" {...stylex.attrs(styles.tagline)}>
             {ABOUT_BANNER.tagline}
           </p>
         </div>
-        <p {...stylex.props(styles.lead)}>
-          <span {...stylex.props(base.balance, styles.leadYear)}>
+        <p {...stylex.attrs(styles.lead)}>
+          <span {...stylex.attrs(base.balance, styles.leadYear)}>
             {leadYear}
-            <span {...stylex.props(base.srOnly)}>, </span>
+            <span {...stylex.attrs(base.srOnly)}>, </span>
           </span>
-          <span {...stylex.props(base.balance)}>{leadFocus}</span>
+          <span {...stylex.attrs(base.balance)}>{leadFocus}</span>
         </p>
       </div>
       <Stamp kind="year" ring="FENCHEM · EST. 1995 · NANJING · " tilt={-9} sx={styles.stamp} />

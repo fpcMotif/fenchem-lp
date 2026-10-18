@@ -47,21 +47,21 @@ export function Campus() {
     <section
       id="about-campus"
       aria-labelledby="oos1z-campus"
-      {...stylex.props(ui.anchor, styles.section)}
+      {...stylex.attrs(ui.anchor, styles.section)}
     >
-      <div {...stylex.props(ui.shell, styles.head)}>
+      <div {...stylex.attrs(ui.shell, styles.head)}>
         <RoomSign
           numeral="II"
           id="oos1z-campus"
           title={sectionTitle("about-campus")}
           english="Campus"
         >
-          <p {...stylex.props(styles.note)}>
-            <span {...stylex.props(styles.balanced)}>
+          <p {...stylex.attrs(styles.note)}>
+            <span {...stylex.attrs(styles.balanced)}>
               七幅园区影像分列走廊两侧；尽头的一幅，正对着你。
             </span>
           </p>
-          <p lang="en" {...stylex.props(ui.italic, styles.noteEnglish)}>
+          <p lang="en" {...stylex.attrs(ui.italic, styles.noteEnglish)}>
             Seven works line the corridor. One, at the end, faces you.
           </p>
         </RoomSign>

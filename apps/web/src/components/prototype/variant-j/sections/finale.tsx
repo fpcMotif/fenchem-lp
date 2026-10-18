@@ -1,6 +1,6 @@
 import { breakpoints, colors, radii, typography } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight } from "@fenchem-lp/ui/components/lucide";
 import { createInquiryHref, regions } from "@/components/landing/landing-content";
 import { SplitWords, useSectionAnimation } from "../motion";
 import { drawRule, revealWords, riseIn } from "../motion-values";
@@ -194,16 +194,16 @@ export function FinaleSection() {
       ref={ref}
       id="global-supply"
       aria-labelledby="finale-heading"
-      {...stylex.props(styles.section)}
+      {...stylex.attrs(styles.section)}
     >
-      <div aria-hidden="true" {...stylex.props(styles.glow)} />
+      <div aria-hidden="true" {...stylex.attrs(styles.glow)} />
 
-      <div {...stylex.props(styles.content)}>
-        <p data-finale-rise {...stylex.props(sharedStyles.techLabelDark)}>
+      <div {...stylex.attrs(styles.content)}>
+        <p data-finale-rise="" {...stylex.attrs(sharedStyles.techLabelDark)}>
           Partner with Fenchem
         </p>
 
-        <h2 id="finale-heading" data-finale-heading {...stylex.props(styles.heading)}>
+        <h2 id="finale-heading" data-finale-heading="" {...stylex.attrs(styles.heading)}>
           <SplitWords
             segments={[
               { text: "Your next formulation," },
@@ -212,36 +212,36 @@ export function FinaleSection() {
           />
         </h2>
 
-        <p data-finale-rise {...stylex.props(styles.lede)}>
+        <p data-finale-rise="" {...stylex.attrs(styles.lede)}>
           Submit a target spec — purity, form, matrix, regulatory map — and our laboratory returns a
           validated proposal with full documentation within one business day.
         </p>
 
-        <div data-finale-rise {...stylex.props(styles.ctas)}>
-          <a href={createInquiryHref("contact")} {...stylex.props(styles.primaryCta)}>
+        <div data-finale-rise="" {...stylex.attrs(styles.ctas)}>
+          <a href={createInquiryHref("contact")} {...stylex.attrs(styles.primaryCta)}>
             Request a Specification
-            <ArrowRight aria-hidden="true" {...stylex.props(styles.ctaIcon)} />
+            <ArrowRight aria-hidden="true" {...stylex.attrs(styles.ctaIcon)} />
           </a>
-          <a href="#ingredients" {...stylex.props(styles.secondaryCta)}>
+          <a href="#ingredients" {...stylex.attrs(styles.secondaryCta)}>
             Explore the Portfolio
           </a>
         </div>
 
-        <p data-finale-rise {...stylex.props(sharedStyles.techLabelDark, styles.responseTime)}>
+        <p data-finale-rise="" {...stylex.attrs(sharedStyles.techLabelDark, styles.responseTime)}>
           Response time under 24h — technical dossiers on request
         </p>
       </div>
 
-      <div {...stylex.props(styles.basesWrap)}>
-        <div aria-hidden="true" data-finale-rule {...stylex.props(styles.basesRule)} />
-        <h3 id="finale-bases" {...stylex.props(sharedStyles.techLabelDark, styles.basesTitle)}>
+      <div {...stylex.attrs(styles.basesWrap)}>
+        <div aria-hidden="true" data-finale-rule="" {...stylex.attrs(styles.basesRule)} />
+        <h3 id="finale-bases" {...stylex.attrs(sharedStyles.techLabelDark, styles.basesTitle)}>
           6 Global Bases — 40+ Countries Served
         </h3>
-        <ul aria-labelledby="finale-bases" {...stylex.props(styles.basesGrid)}>
+        <ul aria-labelledby="finale-bases" {...stylex.attrs(styles.basesGrid)}>
           {regions.map((region) => (
-            <li key={region.city} data-finale-node {...stylex.props(styles.baseItem)}>
-              <p {...stylex.props(styles.city)}>{region.city}</p>
-              <p {...stylex.props(sharedStyles.techLabelDark, styles.country)}>{region.country}</p>
+            <li data-finale-node="" {...stylex.attrs(styles.baseItem)}>
+              <p {...stylex.attrs(styles.city)}>{region.city}</p>
+              <p {...stylex.attrs(sharedStyles.techLabelDark, styles.country)}>{region.country}</p>
             </li>
           ))}
         </ul>

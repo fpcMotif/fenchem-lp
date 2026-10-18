@@ -3,6 +3,7 @@ import type { StyleXStyles } from "@stylexjs/stylex";
 
 import { ui } from "./shared";
 import { bp, face, tone } from "./tokens.stylex";
+import { merge } from "solid-js";
 
 const styles = stylex.create({
   head: {
@@ -37,26 +38,21 @@ const styles = stylex.create({
   },
 });
 
-export function SectionHead({
-  id,
-  label,
-  title,
-  quiet = false,
-  sx,
-}: {
+export function SectionHead(props: {
   id: string;
   label: string;
   title: string;
   quiet?: boolean;
   sx?: StyleXStyles;
 }) {
+  const p = merge({ quiet: false }, props);
   return (
-    <div {...stylex.props(styles.head, sx)}>
-      <p lang="en" {...stylex.props(ui.serif, styles.label)}>
-        {label}
+    <div {...stylex.attrs(styles.head, p.sx)}>
+      <p lang="en" {...stylex.attrs(ui.serif, styles.label)}>
+        {p.label}
       </p>
-      <h2 id={id} {...stylex.props(quiet ? styles.quiet : styles.display)}>
-        {title}
+      <h2 id={p.id} {...stylex.attrs(p.quiet ? styles.quiet : styles.display)}>
+        {p.title}
       </h2>
     </div>
   );

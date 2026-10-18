@@ -82,15 +82,15 @@ export function Culture() {
 
   return (
     <Section id={chip.id} label={chip.english}>
-      <ul {...stylex.props(s.list)}>
+      <ul {...stylex.attrs(s.list)}>
         {ABOUT_CULTURE.values.map((value, idx) => (
-          <Reveal key={value.title} as="li" sx={[s.line, PLACEMENT[idx]]}>
-            <span aria-hidden="true" {...stylex.props(s.glyph, TONES[value.tone])}>
+          <Reveal as="li" sx={[s.line, PLACEMENT[idx]]}>
+            <span aria-hidden="true" {...stylex.attrs(s.glyph, TONES[value.tone])}>
               {value.glyph}
             </span>
-            <div {...stylex.props(s.text)}>
-              <h3 {...stylex.props(s.title)}>{value.title}</h3>
-              <p {...stylex.props(s.desc)}>{value.desc}</p>
+            <div {...stylex.attrs(s.text)}>
+              <h3 {...stylex.attrs(s.title)}>{value.title}</h3>
+              <p {...stylex.attrs(s.desc)}>{value.desc}</p>
             </div>
           </Reveal>
         ))}

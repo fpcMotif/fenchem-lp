@@ -138,52 +138,52 @@ const styles = stylex.create({
 
 export function Hero() {
   return (
-    <section aria-labelledby="oos1k-title" {...stylex.props(styles.hero)}>
-      <div {...stylex.props(ui.shell)}>
-        <div {...stylex.props(styles.stage)}>
-          <div {...stylex.props(styles.margin)}>
-            <p lang="en" {...stylex.props(ui.label)}>
+    <section aria-labelledby="oos1k-title" {...stylex.attrs(styles.hero)}>
+      <div {...stylex.attrs(ui.shell)}>
+        <div {...stylex.attrs(styles.stage)}>
+          <div {...stylex.attrs(styles.margin)}>
+            <p lang="en" {...stylex.attrs(ui.label)}>
               Atlas of Fenchem
             </p>
-            <p lang="en" {...stylex.props(ui.label)}>
+            <p lang="en" {...stylex.attrs(ui.label)}>
               {ABOUT_BANNER.established} · {ABOUT_BANNER.place}
             </p>
           </div>
 
-          <div {...stylex.props(styles.upper)}>
-            <p {...stylex.props(ui.label)}>泛成星图</p>
-            <h1 id="oos1k-title" {...stylex.props(styles.title)}>
+          <div {...stylex.attrs(styles.upper)}>
+            <p {...stylex.attrs(ui.label)}>泛成星图</p>
+            <h1 id="oos1k-title" {...stylex.attrs(styles.title)}>
               {ABOUT_BANNER.title}
             </h1>
           </div>
 
-          <div {...stylex.props(styles.poleRow)}>
+          <div {...stylex.attrs(styles.poleRow)}>
             <PoleMark />
-            <p {...stylex.props(styles.poleLabel)}>
-              <span {...stylex.props(styles.poleName)}>天极 · 南京</span>
-              <span lang="en" {...stylex.props(ui.label)}>
+            <p {...stylex.attrs(styles.poleLabel)}>
+              <span {...stylex.attrs(styles.poleName)}>天极 · 南京</span>
+              <span lang="en" {...stylex.attrs(ui.label)}>
                 Pole · 32°03′ N 118°47′ E
               </span>
             </p>
           </div>
 
-          <div {...stylex.props(styles.lower)}>
-            <p lang="en" {...stylex.props(styles.tagline)}>
+          <div {...stylex.attrs(styles.lower)}>
+            <p lang="en" {...stylex.attrs(styles.tagline)}>
               {ABOUT_BANNER.tagline}
             </p>
-            <p {...stylex.props(ui.body, styles.lead)}>
+            <p {...stylex.attrs(ui.body, styles.lead)}>
               {LEAD_SINCE}
-              <span {...stylex.props(styles.leadBreak)}> · </span>
+              <span {...stylex.attrs(styles.leadBreak)}> · </span>
               {LEAD_FOCUS}
             </p>
           </div>
 
-          <nav aria-label="Star chart index" {...stylex.props(styles.index)}>
-            <ol {...stylex.props(styles.list)}>
+          <nav aria-label="Star chart index" {...stylex.attrs(styles.index)}>
+            <ol {...stylex.attrs(styles.list)}>
               {ABOUT_HERO.navChips.map((chip, index) => (
-                <li key={chip.id}>
-                  <a href={`#${chip.id}`} {...stylex.props(styles.link, ui.focusable)}>
-                    <span aria-hidden="true" {...stylex.props(ui.designation, styles.linkNumeral)}>
+                <li>
+                  <a href={`#${chip.id}`} {...stylex.attrs(styles.link, ui.focusable)}>
+                    <span aria-hidden="true" {...stylex.attrs(ui.designation, styles.linkNumeral)}>
                       {NUMERALS[index]}
                     </span>
                     <span {...srOnly}>Figure {index + 1} </span>

@@ -1,8 +1,8 @@
 import { LightboxDialog, type LightboxState, useLightbox } from "../../../shared/lightbox";
 import { LightboxStage } from "../../../shared/lightbox-stage";
-import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
+import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { ChevronLeft, ChevronRight, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, X } from "@fenchem-lp/ui/components/lucide";
 
 import { ABOUT_CAMPUS } from "../../about-data";
 import { NodeMarker, Reveal, Section, Shell } from "./layout";
@@ -25,24 +25,33 @@ const styles = stylex.create({
     display: "grid",
     gridTemplateColumns: {
       default: "minmax(0, 1fr)",
-      [breakpoints.md]: "repeat(12, minmax(0, 1fr))",
+      ["@media (min-width: 768px)"]: "repeat(12, minmax(0, 1fr))",
     },
-    columnGap: { default: 0, [breakpoints.md]: 24, [breakpoints.xl]: 32 },
-    rowGap: { default: 40, [breakpoints.md]: 56 },
+    columnGap: {
+      default: 0,
+      ["@media (min-width: 768px)"]: 24,
+      ["@media (min-width: 1280px)"]: 32,
+    },
+    rowGap: { default: 40, ["@media (min-width: 768px)"]: 56 },
     alignItems: "start",
   },
   aerial: {
-    gridColumn: { default: "auto", [breakpoints.md]: "1 / span 8" },
+    gridColumn: { default: "auto", ["@media (min-width: 768px)"]: "1 / span 8" },
   },
   grounds: {
-    gridColumn: { default: "auto", [breakpoints.md]: "9 / span 4" },
-    marginTop: { default: 0, [media.mdOnly]: 48, [media.lgOnly]: 72, [breakpoints.xl]: 96 },
+    gridColumn: { default: "auto", ["@media (min-width: 768px)"]: "9 / span 4" },
+    marginTop: {
+      default: 0,
+      [media.mdOnly]: 48,
+      [media.lgOnly]: 72,
+      ["@media (min-width: 1280px)"]: 96,
+    },
   },
   wide: {
-    gridColumn: { default: "auto", [breakpoints.md]: "1 / -1" },
+    gridColumn: { default: "auto", ["@media (min-width: 768px)"]: "1 / -1" },
   },
   half: {
-    gridColumn: { default: "auto", [breakpoints.md]: "span 6" },
+    gridColumn: { default: "auto", ["@media (min-width: 768px)"]: "span 6" },
   },
   figure: {
     margin: 0,
@@ -67,8 +76,8 @@ const styles = stylex.create({
     backgroundColor: color.hairline,
   },
   ratioAerial: { aspectRatio: "3 / 2" },
-  ratioGrounds: { aspectRatio: { default: "4 / 5", [breakpoints.md]: "2 / 3" } },
-  ratioWide: { aspectRatio: { default: "3 / 2", [breakpoints.md]: "2.4 / 1" } },
+  ratioGrounds: { aspectRatio: { default: "4 / 5", ["@media (min-width: 768px)"]: "2 / 3" } },
+  ratioWide: { aspectRatio: { default: "3 / 2", ["@media (min-width: 768px)"]: "2.4 / 1" } },
   ratioHalf: { aspectRatio: "3 / 2" },
   caption: {
     marginTop: 12,
@@ -106,7 +115,7 @@ const styles = stylex.create({
     width: "100%",
     height: "100%",
     boxSizing: "border-box",
-    padding: { default: "64px 12px", [breakpoints.md]: "72px 104px" },
+    padding: { default: "64px 12px", ["@media (min-width: 768px)"]: "72px 104px" },
   },
   lightFigure: {
     display: "flex",
@@ -118,7 +127,7 @@ const styles = stylex.create({
     animationTimingFunction: ease.out,
   },
   lightFigureOpen: {
-    animationName: { default: fadeIn, [breakpoints.motionOk]: zoomIn },
+    animationName: { default: fadeIn, ["@media (prefers-reduced-motion: no-preference)"]: zoomIn },
     animationDuration: "260ms",
   },
   lightFigureStep: {
@@ -166,17 +175,17 @@ const styles = stylex.create({
   },
   lightPrev: {
     top: "50%",
-    insetInlineStart: { default: 12, [breakpoints.md]: 32 },
+    insetInlineStart: { default: 12, ["@media (min-width: 768px)"]: 32 },
     marginTop: -24,
   },
   lightNext: {
     top: "50%",
-    insetInlineEnd: { default: 12, [breakpoints.md]: 32 },
+    insetInlineEnd: { default: 12, ["@media (min-width: 768px)"]: 32 },
     marginTop: -24,
   },
   lightClose: {
-    top: { default: 12, [breakpoints.md]: 24 },
-    insetInlineEnd: { default: 12, [breakpoints.md]: 32 },
+    top: { default: 12, ["@media (min-width: 768px)"]: 24 },
+    insetInlineEnd: { default: 12, ["@media (min-width: 768px)"]: 32 },
   },
 });
 
@@ -202,29 +211,28 @@ const PHOTO_ORDER: readonly PhotoId[] = [
 
 const gallery = PHOTO_ORDER.flatMap((id) => ABOUT_CAMPUS.photos.filter((photo) => photo.id === id));
 
-function Lightbox({ lightbox }: { lightbox: LightboxState }) {
-  const { stepped, close: onClose, step: onStep } = lightbox;
+function Lightbox(props: { lightbox: LightboxState }) {
+  const { close: onClose, step: onStep } = props.lightbox;
   return (
-    <LightboxDialog lightbox={lightbox} items={gallery} sx={styles.lightbox}>
+    <LightboxDialog lightbox={props.lightbox} items={gallery} sx={styles.lightbox}>
       {(photo) => (
         <>
           <LightboxStage onClose={onClose} sx={styles.stage}>
             <figure
-              key={photo.id}
-              {...stylex.props(
+              {...stylex.attrs(
                 styles.lightFigure,
-                stepped ? styles.lightFigureStep : styles.lightFigureOpen,
+                props.lightbox.stepped ? styles.lightFigureStep : styles.lightFigureOpen,
               )}
             >
-              <img src={photo.large} alt={photo.alt} {...stylex.props(styles.lightImage)} />
-              <figcaption {...stylex.props(styles.lightCaption)}>{photo.caption}</figcaption>
+              <img src={photo.large} alt={photo.alt} {...stylex.attrs(styles.lightImage)} />
+              <figcaption {...stylex.attrs(styles.lightCaption)}>{photo.caption}</figcaption>
             </figure>
           </LightboxStage>
           <button
             type="button"
             aria-label="Previous photo"
             onClick={() => onStep(-1)}
-            {...stylex.props(styles.lightButton, styles.lightPrev)}
+            {...stylex.attrs(styles.lightButton, styles.lightPrev)}
           >
             <ChevronLeft size={22} aria-hidden="true" />
           </button>
@@ -232,7 +240,7 @@ function Lightbox({ lightbox }: { lightbox: LightboxState }) {
             type="button"
             aria-label="Next photo"
             onClick={() => onStep(1)}
-            {...stylex.props(styles.lightButton, styles.lightNext)}
+            {...stylex.attrs(styles.lightButton, styles.lightNext)}
           >
             <ChevronRight size={22} aria-hidden="true" />
           </button>
@@ -240,7 +248,7 @@ function Lightbox({ lightbox }: { lightbox: LightboxState }) {
             type="button"
             aria-label="Close"
             onClick={onClose}
-            {...stylex.props(styles.lightButton, styles.lightClose)}
+            {...stylex.attrs(styles.lightButton, styles.lightClose)}
           >
             <X size={22} aria-hidden="true" />
           </button>
@@ -257,24 +265,24 @@ export function Campus() {
     <Section id="about-campus" name={ABOUT_CAMPUS.eyebrow}>
       <Shell>
         <NodeMarker />
-        <div {...stylex.props(styles.grid)}>
+        <div {...stylex.attrs(styles.grid)}>
           {gallery.map((photo, position) => (
-            <Reveal key={photo.id} as="figure" sx={[styles.figure, PLACEMENT[photo.id][0]]}>
+            <Reveal as="figure" sx={[styles.figure, PLACEMENT[photo.id][0]]}>
               <button
                 type="button"
                 aria-label={`View larger: ${photo.english}`}
                 onClick={() => lightbox.open(position)}
-                {...stylex.props(styles.button)}
+                {...stylex.attrs(styles.button)}
               >
                 <img
                   src={photo.src}
                   alt={photo.alt}
                   loading="lazy"
                   decoding="async"
-                  {...stylex.props(styles.image, PLACEMENT[photo.id][1])}
+                  {...stylex.attrs(styles.image, PLACEMENT[photo.id][1])}
                 />
               </button>
-              <figcaption {...stylex.props(styles.caption)}>{photo.caption}</figcaption>
+              <figcaption {...stylex.attrs(styles.caption)}>{photo.caption}</figcaption>
             </Reveal>
           ))}
         </div>

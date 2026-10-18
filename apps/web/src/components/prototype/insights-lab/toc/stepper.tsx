@@ -1,7 +1,9 @@
 import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { m, type MotionValue } from "motion/react";
-import { useEffect, useLayoutEffect, useRef } from "react";
+import type { StyleXStyles } from "@stylexjs/stylex";
+import { createEffect, For, onSettled, Show } from "solid-js";
+
+import { m, type MotionValue } from "@/compat/motion";
 
 import { color } from "../../variant-oos1/tokens.stylex";
 import { lab } from "../tokens.stylex";
@@ -28,6 +30,9 @@ import {
 
 const STRIP_HEIGHT = 48;
 const READING_LINE = STICKY_OFFSET + STRIP_HEIGHT + READING_GAP;
+
+const sxProps = (...args: ReadonlyArray<StyleXStyles | false | null | undefined>) =>
+  stylex.attrs(...args);
 
 const styles = stylex.create({
   tabsNav: {
@@ -223,179 +228,188 @@ const styles = stylex.create({
   },
 });
 
-export function StepperVariant({ onNavigateHome }: SubPageProps) {
+export function StepperVariant(props: SubPageProps) {
   const articles = useLabArticles();
   const { position, chapterProgress } = useReadingPosition(articles, READING_LINE);
 
-  useEffect(() => {
+  onSettled(() => {
     const root = document.documentElement;
     const previous = root.style.scrollPaddingTop;
     root.style.scrollPaddingTop = `${STRIP_HEIGHT}px`;
     return () => {
       root.style.scrollPaddingTop = previous;
     };
-  }, []);
+  });
 
   return (
     <TocPage
-      onNavigateHome={onNavigateHome}
-      bar={<ArticleTabs articles={articles} position={position} />}
-      under={<ChapterStrip articles={articles} position={position} progress={chapterProgress} />}
+      onNavigateHome={props.onNavigateHome}
+      bar={<ArticleTabs articles={articles()} position={position()} />}
+      under={
+        <ChapterStrip articles={articles()} position={position()} progress={chapterProgress} />
+      }
     >
-      <ArticleFlow articles={articles} />
+      <ArticleFlow articles={articles()} />
     </TocPage>
   );
 }
 
-function ArticleTabs({
-  articles,
-  position,
-}: {
-  articles: readonly LabArticle[];
-  position: ReadingPosition;
-}) {
-  const navRef = useRef<HTMLElement>(null);
-  const listRef = useRef<HTMLOListElement>(null);
-  const indicatorRef = useRef<HTMLSpanElement>(null);
+function ArticleTabs(props: { articles: readonly LabArticle[]; position: ReadingPosition }) {
+  let nav: HTMLElement | undefined;
+  let list: HTMLOListElement | undefined;
+  let indicator: HTMLSpanElement | undefined;
 
-  useLayoutEffect(() => {
-    const nav = navRef.current;
-    const indicator = indicatorRef.current;
-    if (!nav || !indicator) return;
-    const place = () => {
-      const tab = listRef.current?.querySelector<HTMLElement>(`[data-tab="${position.article}"]`);
-      indicator.style.opacity = tab ? "1" : "0";
-      if (!tab) return;
-      indicator.style.width = `${tab.offsetWidth}px`;
-      indicator.style.transform = `translateX(${tab.offsetLeft}px)`;
-      const hidden =
-        tab.offsetLeft < nav.scrollLeft ||
-        tab.offsetLeft + tab.offsetWidth > nav.scrollLeft + nav.clientWidth;
-      if (hidden) nav.scrollTo({ left: tab.offsetLeft - 16, behavior: "instant" });
-    };
-    place();
-    window.addEventListener("resize", place);
-    return () => window.removeEventListener("resize", place);
-  }, [position.article, articles]);
+  createEffect(
+    () => [props.position.article, props.articles] as const,
+    ([article]) => {
+      if (!nav || !indicator) return;
+      const navElement = nav;
+      const indicatorElement = indicator;
+      const place = () => {
+        const tab = list?.querySelector<HTMLElement>(`[data-tab="${article}"]`);
+        indicatorElement.style.opacity = tab ? "1" : "0";
+        if (!tab) return;
+        indicatorElement.style.width = `${tab.offsetWidth}px`;
+        indicatorElement.style.transform = `translateX(${tab.offsetLeft}px)`;
+        const hidden =
+          tab.offsetLeft < navElement.scrollLeft ||
+          tab.offsetLeft + tab.offsetWidth > navElement.scrollLeft + navElement.clientWidth;
+        if (hidden) navElement.scrollTo({ left: tab.offsetLeft - 16, behavior: "instant" });
+      };
+      place();
+      window.addEventListener("resize", place);
+      return () => window.removeEventListener("resize", place);
+    },
+  );
 
-  useEffect(() => {
-    const indicator = indicatorRef.current;
-    if (!indicator || !window.matchMedia("(prefers-reduced-motion: no-preference)").matches) return;
+  onSettled(() => {
+    const element = indicator;
+    if (!element || !window.matchMedia("(prefers-reduced-motion: no-preference)").matches) return;
     const frame = requestAnimationFrame(() => {
-      indicator.style.transition =
+      element.style.transition =
         "transform 260ms cubic-bezier(0.23, 1, 0.32, 1), width 260ms cubic-bezier(0.23, 1, 0.32, 1), opacity 160ms ease-out";
     });
     return () => cancelAnimationFrame(frame);
-  }, []);
+  });
 
   return (
-    <nav ref={navRef} aria-label="本页文章" {...stylex.props(styles.tabsNav)}>
-      <ol ref={listRef} {...stylex.props(styles.tabs)}>
-        {articles.map((article, index) => {
-          const current = index === position.article;
-          return (
-            <li key={article.id}>
-              <a
-                href={`#${articleAnchor(article)}`}
-                data-tab={index}
-                aria-current={current ? "location" : undefined}
-                {...stylex.props(styles.tab, current && styles.tabCurrent)}
-              >
-                <span
-                  {...stylex.props(
-                    styles.tabNumber,
-                    labStyles.displayNumber,
-                    current && styles.tabNumberCurrent,
-                  )}
-                >
-                  {padIndex(index)}
-                </span>
-                <span {...stylex.props(styles.tabLabel, current && styles.tabLabelCurrent)}>
-                  {shortTitle(article)}
-                </span>
-              </a>
-            </li>
-          );
-        })}
-      </ol>
-      <span ref={indicatorRef} aria-hidden="true" {...stylex.props(styles.indicator)} />
-    </nav>
-  );
-}
-
-function ChapterStrip({
-  articles,
-  position,
-  progress,
-}: {
-  articles: readonly LabArticle[];
-  position: ReadingPosition;
-  progress: MotionValue<number>;
-}) {
-  const shown = position.article >= 0;
-  const article = articles[Math.max(position.article, 0)];
-  if (!article) return null;
-  const active = shown ? position.chapter + 1 : -1;
-  const steps = [
-    { id: articleAnchor(article), numeral: "", text: "导读", weight: introChars(article) },
-    ...article.sections.map((section) => ({
-      id: sectionAnchor(article, section),
-      ...splitNumeral(section.navLabel),
-      weight: sectionChars(section),
-    })),
-  ];
-  const now = steps[Math.max(active, 0)];
-
-  return (
-    <div inert={!shown} {...stylex.props(styles.strip, shown && styles.stripShown)}>
-      <div {...stylex.props(kitStyles.shell, kitStyles.inset120, styles.stripInner)}>
-        {now ? (
-          <p {...stylex.props(styles.now)}>
-            {now.numeral ? <span {...stylex.props(styles.nowNumeral)}>{now.numeral}</span> : null}
-            <span {...stylex.props(styles.nowText)}>{now.text}</span>
-          </p>
-        ) : null}
-        <ol aria-label={`${shortTitle(article)} 章节`} {...stylex.props(styles.segments)}>
-          {steps.map((step, index) => {
-            const current = index === active;
+    <nav ref={nav} aria-label="本页文章" {...stylex.attrs(styles.tabsNav)}>
+      <ol ref={list} {...stylex.attrs(styles.tabs)}>
+        <For each={props.articles}>
+          {(article, index) => {
+            const current = () => index() === props.position.article;
             return (
-              <li
-                key={step.id}
-                style={{ flexGrow: step.weight }}
-                {...stylex.props(styles.segmentItem)}
-              >
+              <li>
                 <a
-                  href={`#${step.id}`}
-                  aria-current={current ? "location" : undefined}
-                  aria-label={step.numeral ? `${step.numeral} ${step.text}` : step.text}
-                  {...stylex.props(styles.segment, current && styles.segmentCurrent)}
+                  href={`#${articleAnchor(article)}`}
+                  data-tab={index()}
+                  aria-current={current() ? "location" : undefined}
+                  {...sxProps(styles.tab, current() && styles.tabCurrent)}
                 >
-                  <span {...stylex.props(styles.track)}>
-                    {current ? (
-                      <m.span style={{ scaleX: progress }} {...stylex.props(styles.fill)} />
-                    ) : (
-                      <span
-                        {...stylex.props(
-                          styles.fill,
-                          index < active ? styles.fillDone : styles.fillAhead,
-                        )}
-                      />
-                    )}
-                  </span>
                   <span
-                    {...stylex.props(styles.segmentLabel, current && styles.segmentLabelCurrent)}
+                    {...sxProps(
+                      styles.tabNumber,
+                      labStyles.displayNumber,
+                      current() && styles.tabNumberCurrent,
+                    )}
                   >
-                    {step.numeral ? (
-                      <span {...stylex.props(styles.segmentNumeral)}>{step.numeral}</span>
-                    ) : null}
-                    <span {...stylex.props(styles.segmentText)}>{step.text}</span>
+                    {padIndex(index())}
+                  </span>
+                  <span {...sxProps(styles.tabLabel, current() && styles.tabLabelCurrent)}>
+                    {shortTitle(article)}
                   </span>
                 </a>
               </li>
             );
-          })}
-        </ol>
-      </div>
-    </div>
+          }}
+        </For>
+      </ol>
+      <span ref={indicator} aria-hidden="true" {...stylex.attrs(styles.indicator)} />
+    </nav>
+  );
+}
+
+function ChapterStrip(props: {
+  articles: readonly LabArticle[];
+  position: ReadingPosition;
+  progress: MotionValue<number>;
+}) {
+  const shown = () => props.position.article >= 0;
+  const article = () => props.articles[Math.max(props.position.article, 0)];
+  const active = () => (shown() ? props.position.chapter + 1 : -1);
+
+  return (
+    <Show when={article()} keyed>
+      {(article) => {
+        const steps = [
+          { id: articleAnchor(article), numeral: "", text: "导读", weight: introChars(article) },
+          ...article.sections.map((section) => ({
+            id: sectionAnchor(article, section),
+            ...splitNumeral(section.navLabel),
+            weight: sectionChars(section),
+          })),
+        ];
+        const now = () => steps[Math.max(active(), 0)];
+
+        return (
+          <div inert={!shown()} {...sxProps(styles.strip, shown() && styles.stripShown)}>
+            <div {...stylex.attrs(kitStyles.shell, kitStyles.inset120, styles.stripInner)}>
+              <Show when={now()}>
+                {(step) => (
+                  <p {...stylex.attrs(styles.now)}>
+                    <Show when={step().numeral}>
+                      <span {...stylex.attrs(styles.nowNumeral)}>{step().numeral}</span>
+                    </Show>
+                    <span {...stylex.attrs(styles.nowText)}>{step().text}</span>
+                  </p>
+                )}
+              </Show>
+              <ol aria-label={`${shortTitle(article)} 章节`} {...stylex.attrs(styles.segments)}>
+                {steps.map((step, index) => {
+                  const current = () => index === active();
+                  return (
+                    <li style={{ "flex-grow": step.weight }} {...stylex.attrs(styles.segmentItem)}>
+                      <a
+                        href={`#${step.id}`}
+                        aria-current={current() ? "location" : undefined}
+                        aria-label={step.numeral ? `${step.numeral} ${step.text}` : step.text}
+                        {...sxProps(styles.segment, current() && styles.segmentCurrent)}
+                      >
+                        <span {...stylex.attrs(styles.track)}>
+                          <Show
+                            when={current()}
+                            fallback={
+                              <span
+                                {...sxProps(
+                                  styles.fill,
+                                  index < active() ? styles.fillDone : styles.fillAhead,
+                                )}
+                              />
+                            }
+                          >
+                            <m.span
+                              style={{ scaleX: props.progress }}
+                              {...stylex.attrs(styles.fill)}
+                            />
+                          </Show>
+                        </span>
+                        <span
+                          {...sxProps(styles.segmentLabel, current() && styles.segmentLabelCurrent)}
+                        >
+                          <Show when={step.numeral}>
+                            <span {...stylex.attrs(styles.segmentNumeral)}>{step.numeral}</span>
+                          </Show>
+                          <span {...stylex.attrs(styles.segmentText)}>{step.text}</span>
+                        </span>
+                      </a>
+                    </li>
+                  );
+                })}
+              </ol>
+            </div>
+          </div>
+        );
+      }}
+    </Show>
   );
 }

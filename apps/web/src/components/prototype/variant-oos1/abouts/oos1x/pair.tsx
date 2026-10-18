@@ -1,7 +1,8 @@
 import * as stylex from "@stylexjs/stylex";
+import type { JSX } from "@solidjs/web";
 import type { StyleXStyles } from "@stylexjs/stylex";
-import { m, type MotionValue } from "motion/react";
-import type { CSSProperties, ReactNode } from "react";
+import { merge, Show } from "solid-js";
+import { m, type MotionValue } from "@/compat/motion";
 
 import { compressionPadding, useCounterweight } from "./counterweight";
 import { type, ui } from "./shared";
@@ -134,157 +135,137 @@ const styles = stylex.create({
 
 type BeamPlacement = "always" | "phone" | "spacer";
 
-function Beam({
-  engage,
-  placement = "always",
-}: {
-  engage: MotionValue<number>;
-  placement?: BeamPlacement;
-}) {
+function Beam(props: { engage: MotionValue<number>; placement?: BeamPlacement }) {
+  const p = merge({ placement: "always" }, props);
   return (
     <span
       aria-hidden="true"
-      {...stylex.props(
+      {...stylex.attrs(
         styles.beam,
-        placement === "phone" && styles.beamPhoneOnly,
-        placement === "spacer" && styles.beamSpacerOnly,
+        p.placement === "phone" && styles.beamPhoneOnly,
+        p.placement === "spacer" && styles.beamSpacerOnly,
       )}
     >
-      <m.span {...stylex.props(styles.beamEngaged)} style={{ opacity: engage }} />
+      <m.span {...stylex.attrs(styles.beamEngaged)} style={{ opacity: p.engage }} />
     </span>
   );
 }
 
-export function FulcrumMark({ sx }: { sx?: StyleXStyles }) {
+export function FulcrumMark(props: { sx?: StyleXStyles }) {
   return (
-    <svg aria-hidden="true" viewBox="0 0 12 8" {...stylex.props(styles.fulcrum, sx)}>
+    <svg aria-hidden="true" viewBox="0 0 12 8" {...stylex.attrs(styles.fulcrum, props.sx)}>
       <path d="M6 0 12 8H0Z" fill="currentColor" />
     </svg>
   );
 }
 
-export function StandingTitle({
-  id,
-  en,
-  children,
-}: {
-  id: string;
-  en: string;
-  children: ReactNode;
-}) {
+export function StandingTitle(props: { id: string; en: string; children: JSX.Element }) {
   return (
     <>
       <p
         lang="en"
         aria-hidden="true"
-        {...stylex.props(type.counterweight, type.counterHeading, styles.standLabel, ui.knockout)}
+        {...stylex.attrs(type.counterweight, type.counterHeading, styles.standLabel, ui.knockout)}
       >
-        {en}
+        {props.en}
       </p>
-      <h2 id={id} {...stylex.props(type.light, type.heading, styles.standHeading, ui.knockout)}>
-        {children}
+      <h2
+        id={props.id}
+        {...stylex.attrs(type.light, type.heading, styles.standHeading, ui.knockout)}
+      >
+        {props.children}
       </h2>
     </>
   );
 }
 
-export function Pair({
-  lever,
-  standing,
-  standingSx,
-  tag,
-  children,
-  load,
-  loadRatio,
-  loadLine = false,
-  loadFirstOnPhone = false,
-  offset,
-}: {
+export function Pair(props: {
   lever: number;
-  standing?: ReactNode;
+  standing?: JSX.Element;
   standingSx?: StyleXStyles;
-  tag?: ReactNode;
-  children: ReactNode;
-  load: ReactNode;
+  tag?: JSX.Element;
+  children: JSX.Element;
+  load: JSX.Element;
   loadRatio?: number;
   loadLine?: boolean;
   loadFirstOnPhone?: boolean;
   offset?: "start" | "end";
 }) {
-  const { beamRef, arm, load: loadY, engage } = useCounterweight<HTMLDivElement>(lever);
-  const atRest = lever === 0;
+  const p = merge({ loadLine: false, loadFirstOnPhone: false }, props);
+  const { beamRef, arm, load: loadY, engage } = useCounterweight<HTMLDivElement>(p.lever);
+  const atRest = p.lever === 0;
   const padding =
-    loadRatio && !atRest
-      ? ({ "--oos1x-pad": compressionPadding(loadRatio) } as CSSProperties)
+    p.loadRatio && !atRest
+      ? ({ "--oos1x-pad": compressionPadding(p.loadRatio) } as JSX.CSSProperties)
       : undefined;
-  const armBeam: BeamPlacement = !atRest ? "always" : loadFirstOnPhone ? "spacer" : "phone";
+  const armBeam: BeamPlacement = !atRest ? "always" : p.loadFirstOnPhone ? "spacer" : "phone";
 
   return (
-    <div {...stylex.props(ui.columns, styles.pair)}>
-      {standing ? (
-        <m.div
-          {...stylex.props(styles.standing, styles.standingFirst, standingSx)}
-          style={{ y: arm }}
-        >
-          {standing}
-        </m.div>
-      ) : null}
+    <div {...stylex.attrs(ui.columns, styles.pair)}>
+      <Show when={p.standing}>
+        {(standing) => (
+          <m.div
+            {...stylex.attrs(styles.standing, styles.standingFirst, p.standingSx)}
+            style={{ y: arm }}
+          >
+            {standing()}
+          </m.div>
+        )}
+      </Show>
       {atRest ? (
-        <span aria-hidden="true" {...stylex.props(styles.restBeam)}>
-          <m.span {...stylex.props(styles.beamEngaged)} style={{ opacity: engage }} />
+        <span aria-hidden="true" {...stylex.attrs(styles.restBeam)}>
+          <m.span {...stylex.attrs(styles.beamEngaged)} style={{ opacity: engage }} />
         </span>
       ) : null}
       <div
-        {...stylex.props(
+        {...stylex.attrs(
           styles.armCell,
           atRest && styles.armCellAtRest,
-          loadFirstOnPhone && styles.armCellAfterLoad,
+          p.loadFirstOnPhone && styles.armCellAfterLoad,
         )}
       >
-        <m.div {...stylex.props(styles.arm)} style={{ y: arm }}>
+        <m.div {...stylex.attrs(styles.arm)} style={{ y: arm }}>
           <Beam engage={engage} placement={armBeam} />
-          {tag ? <div {...stylex.props(styles.tag, ui.knockout)}>{tag}</div> : null}
-          <div {...stylex.props(styles.content, ui.knockout)}>{children}</div>
+          <Show when={p.tag}>
+            {(tag) => <div {...stylex.attrs(styles.tag, ui.knockout)}>{tag()}</div>}
+          </Show>
+          <div {...stylex.attrs(styles.content, ui.knockout)}>{p.children}</div>
         </m.div>
       </div>
       <div
         ref={beamRef}
         data-counterweight={atRest ? undefined : ""}
-        {...stylex.props(
+        {...stylex.attrs(
           styles.loadCell,
           atRest && styles.loadCellAtRest,
-          loadFirstOnPhone && styles.loadCellFirst,
-          offset === "start" && styles.loadStart,
-          offset === "end" && styles.loadEnd,
+          p.loadFirstOnPhone && styles.loadCellFirst,
+          p.offset === "start" && styles.loadStart,
+          p.offset === "end" && styles.loadEnd,
         )}
         style={padding}
       >
-        <LoadContent atRest={atRest} loadLine={loadLine} loadY={loadY} engage={engage}>
-          {load}
+        <LoadContent atRest={atRest} loadLine={p.loadLine} loadY={loadY} engage={engage}>
+          {p.load}
         </LoadContent>
       </div>
     </div>
   );
 }
 
-function LoadContent({
-  atRest,
-  loadLine,
-  loadY,
-  engage,
-  children,
-}: {
+function LoadContent(props: {
   atRest: boolean;
   loadLine: boolean;
   loadY: MotionValue<number>;
   engage: MotionValue<number>;
-  children: ReactNode;
+  children: JSX.Element;
 }) {
   return (
-    <m.div {...stylex.props(styles.load)} style={{ y: loadY }}>
-      {loadLine ? <Beam engage={engage} placement={atRest ? "phone" : "always"} /> : null}
-      <FulcrumMark sx={atRest ? undefined : styles.fulcrumWhenStill} />
-      {children}
+    <m.div {...stylex.attrs(styles.load)} style={{ y: props.loadY }}>
+      {props.loadLine ? (
+        <Beam engage={props.engage} placement={props.atRest ? "phone" : "always"} />
+      ) : null}
+      <FulcrumMark sx={props.atRest ? undefined : styles.fulcrumWhenStill} />
+      {props.children}
     </m.div>
   );
 }

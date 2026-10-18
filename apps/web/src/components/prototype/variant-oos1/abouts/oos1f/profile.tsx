@@ -1,4 +1,4 @@
-import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
+import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 
 import { ABOUT_HERO } from "../../about-data";
@@ -12,16 +12,16 @@ const styles = stylex.create({
     display: "grid",
     gridTemplateColumns: {
       default: "minmax(0, 1fr)",
-      [breakpoints.lg]: "minmax(0, 6fr) minmax(0, 5fr)",
+      ["@media (min-width: 1024px)"]: "minmax(0, 6fr) minmax(0, 5fr)",
     },
-    columnGap: { default: 0, [breakpoints.lg]: 80 },
+    columnGap: { default: 0, ["@media (min-width: 1024px)"]: 80 },
     rowGap: 48,
     alignItems: "center",
   },
   copy: {
     display: "flex",
     flexDirection: "column",
-    gap: { default: 24, [breakpoints.lg]: 32 },
+    gap: { default: 24, ["@media (min-width: 1024px)"]: 32 },
     minWidth: 0,
     fontFamily: font.cjk,
   },
@@ -31,7 +31,7 @@ const styles = stylex.create({
       default: 26,
       [media.mdOnly]: 36,
       [media.lgOnly]: 30,
-      [breakpoints.xl]: 40,
+      ["@media (min-width: 1280px)"]: 40,
     },
     fontWeight: 500,
     lineHeight: 1.3,
@@ -49,7 +49,7 @@ const styles = stylex.create({
   lead: {
     margin: 0,
     maxWidth: "34em",
-    fontSize: { default: 16, [breakpoints.lg]: 17 },
+    fontSize: { default: 16, ["@media (min-width: 1024px)"]: 17 },
     fontWeight: 400,
     lineHeight: 2,
     letterSpacing: "0.04em",
@@ -75,7 +75,7 @@ const styles = stylex.create({
   },
   networkFigure: {
     fontFamily: font.display,
-    fontSize: { default: 40, [breakpoints.lg]: 48 },
+    fontSize: { default: 40, ["@media (min-width: 1024px)"]: 48 },
     fontWeight: 500,
     lineHeight: 1,
     letterSpacing: "-0.02em",
@@ -101,7 +101,7 @@ const styles = stylex.create({
   image: {
     display: "block",
     width: "100%",
-    aspectRatio: { default: "4 / 3", [breakpoints.lg]: "5 / 4" },
+    aspectRatio: { default: "4 / 3", ["@media (min-width: 1024px)"]: "5 / 4" },
     objectFit: "cover",
     borderRadius: 2,
   },
@@ -121,44 +121,44 @@ export function Profile() {
     <Section id="about-profile" name={ABOUT_HERO.navChips[0].english}>
       <Shell>
         <NodeMarker />
-        <div {...stylex.props(styles.grid)}>
+        <div {...stylex.attrs(styles.grid)}>
           <Reveal sx={styles.copy}>
             <div>
-              <h3 {...stylex.props(styles.name)}>{ABOUT_HERO.title}</h3>
-              <div lang="en" {...stylex.props(styles.english)}>
+              <h3 {...stylex.attrs(styles.name)}>{ABOUT_HERO.title}</h3>
+              <div lang="en" {...stylex.attrs(styles.english)}>
                 {ABOUT_HERO.englishTitle}
               </div>
             </div>
-            <p {...stylex.props(styles.lead)}>{ABOUT_HERO.lead}</p>
-            <div {...stylex.props(styles.network)}>
-              <p {...stylex.props(styles.networkLabel)}>
-                {ABOUT_HERO.networkLabel.split(NUMBER_RUN).map((part) =>
-                  /^\d+$/.test(part) ? (
-                    <span key={part} {...stylex.props(styles.networkFigure)}>
-                      {part}
-                    </span>
-                  ) : (
-                    <span key={part}>{part.trim()}</span>
-                  ),
-                )}
+            <p {...stylex.attrs(styles.lead)}>{ABOUT_HERO.lead}</p>
+            <div {...stylex.attrs(styles.network)}>
+              <p {...stylex.attrs(styles.networkLabel)}>
+                {ABOUT_HERO.networkLabel
+                  .split(NUMBER_RUN)
+                  .map((part) =>
+                    /^\d+$/.test(part) ? (
+                      <span {...stylex.attrs(styles.networkFigure)}>{part}</span>
+                    ) : (
+                      <span>{part.trim()}</span>
+                    ),
+                  )}
               </p>
-              <ul {...stylex.props(styles.countries)}>
+              <ul {...stylex.attrs(styles.countries)}>
                 {countries.map((country) => (
-                  <li key={country}>{country}</li>
+                  <li>{country}</li>
                 ))}
               </ul>
             </div>
           </Reveal>
           <Reveal>
-            <figure {...stylex.props(styles.figure)}>
+            <figure {...stylex.attrs(styles.figure)}>
               <img
                 src={ABOUT_HERO.lobbyImage}
                 alt="Fenchem headquarters lobby with a curved ceiling and marble floor"
                 loading="lazy"
                 decoding="async"
-                {...stylex.props(styles.image)}
+                {...stylex.attrs(styles.image)}
               />
-              <figcaption {...stylex.props(styles.caption)}>{ABOUT_HERO.lobbyCaption}</figcaption>
+              <figcaption {...stylex.attrs(styles.caption)}>{ABOUT_HERO.lobbyCaption}</figcaption>
             </figure>
           </Reveal>
         </div>

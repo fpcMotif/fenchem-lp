@@ -81,26 +81,26 @@ export function Profile() {
     <section
       id="about-profile"
       aria-labelledby="oos1z-profile"
-      {...stylex.props(ui.anchor, ui.room)}
+      {...stylex.attrs(ui.anchor, ui.room)}
     >
-      <div {...stylex.props(ui.shell)}>
+      <div {...stylex.attrs(ui.shell)}>
         <RoomSign
           numeral="I"
           id="oos1z-profile"
           title={sectionTitle("about-profile")}
           english="Introduction"
         />
-        <div {...stylex.props(styles.text)}>
-          <p {...stylex.props(styles.company)}>{ABOUT_HERO.title}</p>
-          <p lang="en" {...stylex.props(ui.italic, styles.english)}>
+        <div {...stylex.attrs(styles.text)}>
+          <p {...stylex.attrs(styles.company)}>{ABOUT_HERO.title}</p>
+          <p lang="en" {...stylex.attrs(ui.italic, styles.english)}>
             {ABOUT_HERO.englishTitle}
           </p>
-          <p {...stylex.props(styles.lead)}>{ABOUT_HERO.lead}</p>
-          <div {...stylex.props(styles.network)}>
-            <p {...stylex.props(styles.networkLabel)}>{ABOUT_HERO.networkLabel}</p>
-            <ul {...stylex.props(styles.countries)}>
+          <p {...stylex.attrs(styles.lead)}>{ABOUT_HERO.lead}</p>
+          <div {...stylex.attrs(styles.network)}>
+            <p {...stylex.attrs(styles.networkLabel)}>{ABOUT_HERO.networkLabel}</p>
+            <ul {...stylex.attrs(styles.countries)}>
               {ABOUT_HERO.countries.map((country) => (
-                <li key={country}>{country}</li>
+                <li>{country}</li>
               ))}
             </ul>
           </div>

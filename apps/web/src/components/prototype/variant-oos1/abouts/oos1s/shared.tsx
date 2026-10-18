@@ -1,6 +1,7 @@
 import * as stylex from "@stylexjs/stylex";
-import { useInView } from "motion/react";
-import { type ReactNode, useEffect, useRef, useState } from "react";
+import { dynamic as dynamicTag, type JSX } from "@solidjs/web";
+import { createEffect, createSignal, merge } from "solid-js";
+import { useInView } from "@/compat/motion";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 import {} from "./tokens.stylex";
 import { ui } from "./shared-values";
@@ -14,62 +15,60 @@ const dynamic = stylex.create({
   delay: (ms: number) => ({ transitionDelay: `${ms}ms` }),
 });
 
-export function Reveal({
-  children,
-  step: stagger = 0,
-  sx,
-  as: Tag = "div",
-}: {
-  children: ReactNode;
+export function Reveal(props: {
+  children: JSX.Element;
   step?: number;
   sx?: stylex.StyleXStyles;
   as?: "div" | "li" | "figure" | "article";
 }) {
-  const ref = useRef<HTMLDivElement & HTMLLIElement>(null);
+  const p = merge({ step: 0, as: "div" }, props);
+  const Tag = dynamicTag(() => p.as);
+  let ref: (HTMLDivElement & HTMLLIElement) | undefined;
   const reduce = useReducedMotion();
-  const [armed, setArmed] = useState(false);
-  const seen = useInView(ref, { once: true, margin: "0px 0px -8% 0px" });
+  const [armed, setArmed] = createSignal(false);
+  const seen = useInView(() => ref, { once: true, margin: "0px 0px -8% 0px" });
 
-  useEffect(() => {
-    const box = ref.current?.getBoundingClientRect();
-    if (!reduce && box && box.top > window.innerHeight) setArmed(true);
-  }, [reduce]);
+  createEffect(
+    () => reduce(),
+    (reduced) => {
+      const box = ref?.getBoundingClientRect();
+      if (!reduced && box && box.top > window.innerHeight) setArmed(true);
+    },
+  );
 
   return (
     <Tag
       ref={ref}
-      {...stylex.props(
+      {...stylex.attrs(
         ui.reveal,
-        armed && !seen && !reduce && ui.revealHidden,
-        dynamic.delay(revealDelay(stagger)),
-        sx,
+        armed() && !seen() && !reduce() && ui.revealHidden,
+        dynamic.delay(revealDelay(p.step)),
+        p.sx,
       )}
     >
-      {children}
+      {p.children}
     </Tag>
   );
 }
 
-export function Section({
-  id,
-  label,
-  background,
-  sx,
-  children,
-}: {
+export function Section(props: {
   id: string;
   label: string;
   background: stylex.StyleXStyles;
   sx?: stylex.StyleXStyles;
-  children: ReactNode;
+  children: JSX.Element;
 }) {
-  const nameId = `${id}-name`;
+  const nameId = `${props.id}-name`;
   return (
-    <section id={id} aria-labelledby={nameId} {...stylex.props(ui.section, background, sx)}>
-      <h2 id={nameId} {...stylex.props(ui.srOnly)}>
-        {label}
+    <section
+      id={props.id}
+      aria-labelledby={nameId}
+      {...stylex.attrs(ui.section, props.background, props.sx)}
+    >
+      <h2 id={nameId} {...stylex.attrs(ui.srOnly)}>
+        {props.label}
       </h2>
-      <div {...stylex.props(ui.shell, ui.inset)}>{children}</div>
+      <div {...stylex.attrs(ui.shell, ui.inset)}>{props.children}</div>
     </section>
   );
 }

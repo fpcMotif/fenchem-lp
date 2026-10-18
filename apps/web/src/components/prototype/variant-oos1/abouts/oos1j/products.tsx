@@ -1,13 +1,13 @@
 import { breakpoints } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { ArrowRight } from "lucide-react";
-import { useId } from "react";
+import { ArrowRight } from "@fenchem-lp/ui/components/lucide";
 
 import { PRODUCTS, PRODUCTS_INTRO } from "../../content";
 import { Reveal, SectionName, useInViewOnce } from "./parts";
 import { wipe } from "./parts-values";
 import { base, ty } from "./shared";
 import { hue, size } from "./theme.stylex";
+import { createUniqueId } from "solid-js";
 
 const styles = stylex.create({
   products: {
@@ -135,69 +135,67 @@ const styles = stylex.create({
   },
 });
 
-function ProductPhoto({ src, index }: { src: string; index: number }) {
+function ProductPhoto(props: { src: string; index: number }) {
   const [ref, shown] = useInViewOnce<HTMLDivElement>();
   return (
-    <div ref={ref} {...stylex.props(styles.photo)}>
-      <div {...stylex.props(styles.zoom)}>
+    <div ref={ref} {...stylex.attrs(styles.photo)}>
+      <div {...stylex.attrs(styles.zoom)}>
         <img
-          src={src}
+          src={props.src}
           alt=""
           loading="lazy"
           decoding="async"
-          {...stylex.props(base.fill, wipe.hidden, shown && wipe.shown, wipe.delay(index * 110))}
+          {...stylex.attrs(
+            base.fill,
+            wipe.hidden,
+            shown() && wipe.shown,
+            wipe.delay(props.index * 110),
+          )}
         />
       </div>
     </div>
   );
 }
 
-export function Products({ onNavigateHome }: { onNavigateHome: (hash?: string) => void }) {
-  const titleId = useId();
+export function Products(props: { onNavigateHome: (hash?: string) => void }) {
+  const titleId = createUniqueId();
   return (
     <section
       id="about-products"
       aria-labelledby="about-products-title"
-      {...stylex.props(base.section, styles.products)}
+      {...stylex.attrs(base.section, styles.products)}
     >
       <SectionName id="about-products-title">Products and applications</SectionName>
-      <div {...stylex.props(base.shell)}>
+      <div {...stylex.attrs(base.shell)}>
         <Reveal sx={styles.intro}>
-          <p {...stylex.props(styles.lead)}>{PRODUCTS_INTRO.lead}</p>
+          <p {...stylex.attrs(styles.lead)}>{PRODUCTS_INTRO.lead}</p>
           <button
             type="button"
-            onClick={() => onNavigateHome("products")}
-            {...stylex.props(styles.link, base.focus)}
+            onClick={() => props.onNavigateHome("products")}
+            {...stylex.attrs(styles.link, base.focus)}
           >
             <span>{PRODUCTS_INTRO.cta.label}</span>
             <ArrowRight size={16} aria-hidden="true" />
           </button>
         </Reveal>
-        <ul {...stylex.props(styles.grid)}>
+        <ul {...stylex.attrs(styles.grid)}>
           {PRODUCTS.map((product, idx) => (
-            <Reveal
-              key={product.title}
-              as="li"
-              step={idx}
-              sx={[styles.tile, stylex.defaultMarker()]}
-            >
+            <Reveal as="li" step={idx} sx={[styles.tile, stylex.defaultMarker()]}>
               <ProductPhoto src={product.image} index={idx} />
-              <h3 id={`${titleId}-${idx}`} {...stylex.props(styles.title)}>
+              <h3 id={`${titleId}-${idx}`} {...stylex.attrs(styles.title)}>
                 {product.title}
               </h3>
-              <p {...stylex.props(ty.quiet)}>{product.description}</p>
-              <ul {...stylex.props(styles.tags)}>
+              <p {...stylex.attrs(ty.quiet)}>{product.description}</p>
+              <ul {...stylex.attrs(styles.tags)}>
                 {product.tags.map((tag) => (
-                  <li key={tag} {...stylex.props(ty.quiet, styles.tag)}>
-                    {tag}
-                  </li>
+                  <li {...stylex.attrs(ty.quiet, styles.tag)}>{tag}</li>
                 ))}
               </ul>
               <button
                 type="button"
                 aria-labelledby={`${titleId}-${idx}`}
-                onClick={() => onNavigateHome("products")}
-                {...stylex.props(styles.cover)}
+                onClick={() => props.onNavigateHome("products")}
+                {...stylex.attrs(styles.cover)}
               />
             </Reveal>
           ))}

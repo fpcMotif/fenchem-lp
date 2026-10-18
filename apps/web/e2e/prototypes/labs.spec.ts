@@ -22,7 +22,7 @@ for (const lab of labs) {
     await variants.first().waitFor();
     await page.waitForFunction(() => {
       const item = document.querySelector(".proto-picker-item");
-      return item && Object.keys(item).some((key) => key.startsWith("__reactProps"));
+      return item && Object.keys(item).some((key) => key.includes("$$"));
     });
 
     const count = await variants.count();

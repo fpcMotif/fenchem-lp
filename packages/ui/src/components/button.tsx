@@ -1,4 +1,3 @@
-import { Button as ButtonPrimitive } from "@base-ui/react/button";
 import {
   buttonStyles,
   type ButtonSize,
@@ -6,25 +5,32 @@ import {
 } from "@fenchem-lp/ui/lib/button-variants";
 import * as stylex from "@stylexjs/stylex";
 import type { StyleXStyles } from "@stylexjs/stylex";
+import type { ComponentProps } from "@solidjs/web";
+import { omit } from "solid-js";
 
-export interface ButtonProps extends Omit<ButtonPrimitive.Props, "className"> {
+export interface ButtonProps extends Omit<ComponentProps<"button">, "class"> {
   variant?: ButtonVariant;
   size?: ButtonSize;
   sx?: StyleXStyles;
 }
 
-function Button({ variant = "default", size = "default", sx, ...props }: ButtonProps) {
-  const variantKey = `variant_${variant}` as keyof typeof buttonStyles;
-  const sizeKey = `size_${size.replace("-", "_")}` as keyof typeof buttonStyles;
+// The StyleX compiler cannot evaluate a computed style key; resolve it at runtime instead.
+const sxProps = (...args: ReadonlyArray<StyleXStyles | undefined>) => stylex.attrs(...args);
 
-  const styleProps = stylex.props(
-    buttonStyles.base,
-    buttonStyles[variantKey],
-    buttonStyles[sizeKey],
-    sx,
+function Button(props: ButtonProps) {
+  const rest = omit(props, "variant", "size", "sx");
+  const variantKey = () => `variant_${props.variant ?? "default"}` as keyof typeof buttonStyles;
+  const sizeKey = () =>
+    `size_${(props.size ?? "default").replace("-", "_")}` as keyof typeof buttonStyles;
+
+  return (
+    <button
+      type="button"
+      data-slot="button"
+      {...sxProps(buttonStyles.base, buttonStyles[variantKey()], buttonStyles[sizeKey()], props.sx)}
+      {...rest}
+    />
   );
-
-  return <ButtonPrimitive data-slot="button" {...styleProps} {...props} />;
 }
 
 export { Button };

@@ -1,4 +1,4 @@
-import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
+import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 
 import { useLightbox } from "@/components/prototype/shared/lightbox";
@@ -21,15 +21,15 @@ const styles = stylex.create({
     display: "grid",
     gridTemplateColumns: {
       default: "repeat(2, minmax(0, 1fr))",
-      [breakpoints.md]: "repeat(12, minmax(0, 1fr))",
+      ["@media (min-width: 768px)"]: "repeat(12, minmax(0, 1fr))",
     },
     gridAutoRows: {
       default: "calc((100vw - 32px) * 0.44)",
       [mq.tablet]: "calc((100vw - 80px) * 0.1)",
-      [breakpoints.xl]: "100px",
+      ["@media (min-width: 1280px)"]: "100px",
     },
     gridAutoFlow: "dense",
-    gap: { default: 8, [mq.tablet]: 16, [breakpoints.xl]: 24 },
+    gap: { default: 8, [mq.tablet]: 16, ["@media (min-width: 1280px)"]: 24 },
   },
   tile: {
     display: "flex",
@@ -38,20 +38,24 @@ const styles = stylex.create({
     margin: 0,
   },
   tileAerial: {
-    gridColumn: { default: "span 2", [breakpoints.md]: "span 8" },
-    gridRow: { default: "span 2", [breakpoints.md]: "span 5" },
+    gridColumn: { default: "span 2", ["@media (min-width: 768px)"]: "span 8" },
+    gridRow: { default: "span 2", ["@media (min-width: 768px)"]: "span 5" },
   },
   tileGrounds: {
-    gridColumn: { default: "span 1", [breakpoints.md]: "span 4" },
-    gridRow: { default: "span 2", [breakpoints.md]: "span 5" },
+    gridColumn: { default: "span 1", ["@media (min-width: 768px)"]: "span 4" },
+    gridRow: { default: "span 2", ["@media (min-width: 768px)"]: "span 5" },
   },
   tileLab: {
-    gridColumn: { default: "span 2", [breakpoints.md]: "span 12" },
-    gridRow: { default: "span 1", [breakpoints.md]: "span 4" },
+    gridColumn: { default: "span 2", ["@media (min-width: 768px)"]: "span 12" },
+    gridRow: { default: "span 1", ["@media (min-width: 768px)"]: "span 4" },
   },
   tileSmall: {
-    gridColumn: { default: "span 1", [mq.tablet]: "span 6", [breakpoints.xl]: "span 3" },
-    gridRow: { default: "span 1", [mq.tablet]: "span 3", [breakpoints.xl]: "span 2" },
+    gridColumn: {
+      default: "span 1",
+      [mq.tablet]: "span 6",
+      ["@media (min-width: 1280px)"]: "span 3",
+    },
+    gridRow: { default: "span 1", [mq.tablet]: "span 3", ["@media (min-width: 1280px)"]: "span 2" },
   },
   frame: {
     position: "relative",
@@ -109,37 +113,32 @@ export function Campus() {
     <section
       id="about-campus"
       aria-labelledby="about-campus-title"
-      {...stylex.props(shared.anchor, shared.section, styles.section)}
+      {...stylex.attrs(shared.anchor, shared.section, styles.section)}
     >
-      <h2 id="about-campus-title" {...stylex.props(shared.srOnly)}>
+      <h2 id="about-campus-title" {...stylex.attrs(shared.srOnly)}>
         {ABOUT_CAMPUS.eyebrow}
       </h2>
-      <div {...stylex.props(shared.shell, shared.inset)}>
-        <div {...stylex.props(styles.grid)}>
+      <div {...stylex.attrs(shared.shell, shared.inset)}>
+        <div {...stylex.attrs(styles.grid)}>
           {PHOTOS.map((photo, position) => (
-            <Reveal
-              key={photo.id}
-              as="figure"
-              step={position % 3}
-              sx={[styles.tile, spanFor(photo.id)]}
-            >
-              <div {...stylex.props(styles.frame)}>
+            <Reveal as="figure" step={position % 3} sx={[styles.tile, spanFor(photo.id)]}>
+              <div {...stylex.attrs(styles.frame)}>
                 <button
                   type="button"
                   aria-label={`View larger: ${photo.english}`}
                   onClick={() => lightbox.open(position)}
-                  {...stylex.props(styles.button)}
+                  {...stylex.attrs(styles.button)}
                 >
                   <img
                     src={photo.src}
                     alt={photo.alt}
                     loading="lazy"
                     decoding="async"
-                    {...stylex.props(styles.image)}
+                    {...stylex.attrs(styles.image)}
                   />
                 </button>
               </div>
-              <figcaption {...stylex.props(styles.caption)}>{photo.caption}</figcaption>
+              <figcaption {...stylex.attrs(styles.caption)}>{photo.caption}</figcaption>
             </Reveal>
           ))}
         </div>

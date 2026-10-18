@@ -1,9 +1,9 @@
 import * as stylex from "@stylexjs/stylex";
-import { ArrowDown } from "lucide-react";
+import { ArrowDown } from "@fenchem-lp/ui/components/lucide";
 
 import { ABOUT_STRUCTURE } from "../../about-data";
 import { RoomSign } from "./room-sign";
-import { sectionTitle, ui } from "./shared";
+import { sectionTitle, UNFOCUSABLE, ui } from "./shared";
 import { bp, face, tone } from "./tokens.stylex";
 
 const styles = stylex.create({
@@ -206,10 +206,10 @@ const styles = stylex.create({
 
 function Door() {
   return (
-    <svg viewBox="0 0 40 40" aria-hidden="true" focusable="false" {...stylex.props(styles.door)}>
-      <rect x="0.5" y="37" width="39" height="5" {...stylex.props(styles.doorGap)} />
-      <path d="M0.5 40V0.5" {...stylex.props(styles.doorLeaf)} />
-      <path d="M0.5 0.5A39.5 39.5 0 0 1 40 40" {...stylex.props(styles.doorSwing)} />
+    <svg viewBox="0 0 40 40" aria-hidden="true" {...UNFOCUSABLE} {...stylex.attrs(styles.door)}>
+      <rect x="0.5" y="37" width="39" height="5" {...stylex.attrs(styles.doorGap)} />
+      <path d="M0.5 40V0.5" {...stylex.attrs(styles.doorLeaf)} />
+      <path d="M0.5 0.5A39.5 39.5 0 0 1 40 40" {...stylex.attrs(styles.doorSwing)} />
     </svg>
   );
 }
@@ -220,46 +220,46 @@ export function Structure() {
     <section
       id="about-structure"
       aria-labelledby="oos1z-structure"
-      {...stylex.props(ui.anchor, ui.room)}
+      {...stylex.attrs(ui.anchor, ui.room)}
     >
-      <div {...stylex.props(ui.shell)}>
+      <div {...stylex.attrs(ui.shell)}>
         <RoomSign
           numeral="VI"
           id="oos1z-structure"
           title={sectionTitle("about-structure")}
           english="The floor plan"
         />
-        <div {...stylex.props(styles.plan)}>
-          <div {...stylex.props(styles.hall)}>
-            <span lang="en" {...stylex.props(ui.caps, styles.hallNumber)}>
+        <div {...stylex.attrs(styles.plan)}>
+          <div {...stylex.attrs(styles.hall)}>
+            <span lang="en" {...stylex.attrs(ui.caps, styles.hallNumber)}>
               100
             </span>
-            <p {...stylex.props(ui.caps, styles.badge)}>{holding.badge}</p>
-            <h3 {...stylex.props(styles.hallName)}>{holding.name}</h3>
-            <p lang="en" {...stylex.props(ui.italic, styles.hallEnglish)}>
+            <p {...stylex.attrs(ui.caps, styles.badge)}>{holding.badge}</p>
+            <h3 {...stylex.attrs(styles.hallName)}>{holding.name}</h3>
+            <p lang="en" {...stylex.attrs(ui.italic, styles.hallEnglish)}>
               {holding.english}
             </p>
-            <span lang="en" aria-hidden="true" {...stylex.props(ui.caps, styles.here)}>
-              <span {...stylex.props(styles.hereDot)} />
+            <span lang="en" aria-hidden="true" {...stylex.attrs(ui.caps, styles.here)}>
+              <span {...stylex.attrs(styles.hereDot)} />
               You are here
             </span>
-            <span aria-hidden="true" {...stylex.props(styles.exitGap)} />
-            <a href="#oos1z-exit" {...stylex.props(ui.caps, ui.focus, styles.exit)}>
+            <span aria-hidden="true" {...stylex.attrs(styles.exitGap)} />
+            <a href="#oos1z-exit" {...stylex.attrs(ui.caps, ui.focus, styles.exit)}>
               出口 Exit
               <ArrowDown size={13} strokeWidth={1.5} aria-hidden="true" />
             </a>
           </div>
-          <ol {...stylex.props(styles.galleries)}>
+          <ol {...stylex.attrs(styles.galleries)}>
             {subsidiaries.map((subsidiary, index) => (
-              <li key={subsidiary.id} {...stylex.props(styles.gallery)}>
-                <span {...stylex.props(styles.roomHead)}>
-                  <span lang="en" {...stylex.props(ui.caps, styles.roomNumber)}>
+              <li {...stylex.attrs(styles.gallery)}>
+                <span {...stylex.attrs(styles.roomHead)}>
+                  <span lang="en" {...stylex.attrs(ui.caps, styles.roomNumber)}>
                     {101 + index}
                   </span>
-                  <span {...stylex.props(styles.roomBadge)}>{subsidiaryBadge}</span>
+                  <span {...stylex.attrs(styles.roomBadge)}>{subsidiaryBadge}</span>
                 </span>
-                <span {...stylex.props(styles.name)}>{subsidiary.name}</span>
-                <span lang="en" {...stylex.props(ui.italic, styles.english)}>
+                <span {...stylex.attrs(styles.name)}>{subsidiary.name}</span>
+                <span lang="en" {...stylex.attrs(ui.italic, styles.english)}>
                   {subsidiary.english}
                 </span>
                 <Door />

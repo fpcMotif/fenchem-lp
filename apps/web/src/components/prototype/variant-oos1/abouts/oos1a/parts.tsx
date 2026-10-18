@@ -1,7 +1,7 @@
-import { breakpoints } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { useInView } from "motion/react";
-import { type ReactNode, useRef } from "react";
+import { useInView } from "@/compat/motion";
+import { For } from "solid-js";
+import { dynamic as dynamicTag, type JSX } from "@solidjs/web";
 import { ease, media, palette } from "./lattice.stylex";
 import { shared } from "./parts-values";
 
@@ -16,6 +16,10 @@ const REVEAL_MAX_STEPS = 4;
 
 const ALL_LINES = Array.from({ length: LINE_COUNT }, (_, index) => index);
 const MAJOR_LINES = [0, 4, 8, 12, 16] as const;
+
+// stylex.attrs with reactive (accessor) arguments resolves at runtime here, because
+// the StyleX compiler tries to evaluate them at build time and throws.
+const sxProps: typeof stylex.attrs = (...args) => stylex.attrs(...args);
 
 const dynamic = stylex.create({
   delay: (ms: number) => ({ transitionDelay: `${ms}ms` }),
@@ -32,7 +36,7 @@ const styles = stylex.create({
       default: 16,
       [media.mdOnly]: 32,
       [media.lgOnly]: 56,
-      [breakpoints.xl]: "min(124px, 8.611vw)",
+      ["@media (min-width: 1280px)"]: "min(124px, 8.611vw)",
     },
   },
   frameInner: {
@@ -55,7 +59,7 @@ const styles = stylex.create({
     width: 1,
   },
   lineMinor: {
-    display: { default: "none", [breakpoints.lg]: "block" },
+    display: { default: "none", ["@media (min-width: 1024px)"]: "block" },
   },
   lineDraw: {
     transformOrigin: "top",
@@ -64,7 +68,7 @@ const styles = stylex.create({
     transitionTimingFunction: ease.out,
   },
   lineHidden: {
-    transform: { default: null, [breakpoints.motionOk]: "scaleY(0)" },
+    transform: { default: null, ["@media (prefers-reduced-motion: no-preference)"]: "scaleY(0)" },
   },
   lineLight: { backgroundColor: palette.inkHair },
   lineLightMajor: { backgroundColor: palette.inkRule },
@@ -72,8 +76,11 @@ const styles = stylex.create({
   lineDarkMajor: { backgroundColor: palette.paleRule },
   lineSlip: { backgroundColor: palette.blueLine },
   reveal: {
-    opacity: { default: null, [breakpoints.motionOk]: 0 },
-    transform: { default: null, [breakpoints.motionOk]: "translateY(24px)" },
+    opacity: { default: null, ["@media (prefers-reduced-motion: no-preference)"]: 0 },
+    transform: {
+      default: null,
+      ["@media (prefers-reduced-motion: no-preference)"]: "translateY(24px)",
+    },
     transitionProperty: "opacity, transform",
     transitionDuration: "800ms",
     transitionTimingFunction: ease.out,
@@ -84,136 +91,127 @@ const styles = stylex.create({
   },
 });
 
-export function Lattice({
-  strength = "quiet",
-  tone = "light",
-  slip = false,
-}: {
+export function Lattice(props: {
   strength?: Exclude<Strength, "none">;
   tone?: Tone;
   slip?: boolean;
 }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const shown = useInView(ref, { once: true, margin: "0px 0px -12% 0px" });
-  const full = strength === "full";
-  const dark = tone === "dark";
-  const lines = full ? ALL_LINES : MAJOR_LINES;
+  let ref: HTMLDivElement | undefined;
+  const shown = useInView(() => ref, { once: true, margin: "0px 0px -12% 0px" });
+  const full = () => (props.strength ?? "quiet") === "full";
+  const dark = () => (props.tone ?? "light") === "dark";
+  const lines = () => (full() ? ALL_LINES : MAJOR_LINES);
 
   return (
-    <div ref={ref} aria-hidden="true" {...stylex.props(styles.lattice)}>
-      {lines.map((index) => {
-        const major = index % 4 === 0;
-        const slipped = full && slip && index === SLIP_LINE;
-        const edge = index === LINE_COUNT - 1 ? "calc(100% - 1px)" : `${(index / 16) * 100}%`;
-        return (
-          <span
-            key={index}
-            {...stylex.props(
-              styles.line,
-              !major && styles.lineMinor,
-              dark
-                ? major
-                  ? styles.lineDarkMajor
-                  : styles.lineDark
-                : major
-                  ? styles.lineLightMajor
-                  : styles.lineLight,
-              full && styles.lineDraw,
-              full && !shown && styles.lineHidden,
-              slipped && styles.lineSlip,
-              dynamic.line(slipped ? `calc(${edge} + 3px)` : edge, full ? index * LINE_STEP_MS : 0),
-            )}
-          />
-        );
-      })}
+    <div ref={ref} aria-hidden="true" {...stylex.attrs(styles.lattice)}>
+      <For each={lines()}>
+        {(index) => {
+          const major = index % 4 === 0;
+          const slipped = () => full() && (props.slip ?? false) && index === SLIP_LINE;
+          const edge = index === LINE_COUNT - 1 ? "calc(100% - 1px)" : `${(index / 16) * 100}%`;
+          return (
+            <span
+              {...sxProps(
+                styles.line,
+                !major && styles.lineMinor,
+                dark()
+                  ? major
+                    ? styles.lineDarkMajor
+                    : styles.lineDark
+                  : major
+                    ? styles.lineLightMajor
+                    : styles.lineLight,
+                full() && styles.lineDraw,
+                full() && !shown() && styles.lineHidden,
+                slipped() && styles.lineSlip,
+                dynamic.line(
+                  slipped() ? `calc(${edge} + 3px)` : edge,
+                  full() ? index * LINE_STEP_MS : 0,
+                ),
+              )}
+            />
+          );
+        }}
+      </For>
     </div>
   );
 }
 
-export function Frame({
-  lattice = "none",
-  tone = "light",
-  slip = false,
-  sx,
-  innerSx,
-  children,
-}: {
+export function Frame(props: {
   lattice?: Strength;
   tone?: Tone;
   slip?: boolean;
   sx?: stylex.StyleXStyles;
   innerSx?: stylex.StyleXStyles;
-  children?: ReactNode;
+  children?: JSX.Element;
 }) {
+  const lattice = () => props.lattice ?? "none";
   return (
-    <div {...stylex.props(styles.frameShell, sx)}>
-      <div {...stylex.props(styles.frameInner, innerSx)}>
-        {lattice === "none" ? null : <Lattice strength={lattice} tone={tone} slip={slip} />}
-        {children}
+    <div {...stylex.attrs(styles.frameShell, props.sx)}>
+      <div {...stylex.attrs(styles.frameInner, props.innerSx)}>
+        {lattice() === "none" ? null : (
+          <Lattice
+            strength={lattice() as Exclude<Strength, "none">}
+            tone={props.tone ?? "light"}
+            slip={props.slip ?? false}
+          />
+        )}
+        {props.children}
       </div>
     </div>
   );
 }
 
-export function Reveal({
-  children,
-  step = 0,
-  as: Tag = "div",
-  sx,
-}: {
-  children: ReactNode;
+export function Reveal(props: {
+  children: JSX.Element;
   step?: number;
   as?: "div" | "li" | "article" | "figure";
   sx?: stylex.StyleXStyles;
 }) {
-  const ref = useRef<HTMLDivElement & HTMLLIElement & HTMLElement>(null);
-  const shown = useInView(ref, { once: true, margin: "0px 0px -10% 0px" });
+  const Tag = dynamicTag(() => props.as ?? "div");
+  let ref: HTMLElement | undefined;
+  const shown = useInView(() => ref, { once: true, margin: "0px 0px -10% 0px" });
   return (
     <Tag
-      ref={ref}
-      {...stylex.props(
+      ref={(el: HTMLElement) => (ref = el)}
+      {...stylex.attrs(
         styles.reveal,
-        shown && styles.revealShown,
-        dynamic.delay(Math.min(step, REVEAL_MAX_STEPS) * REVEAL_STEP_MS),
-        sx,
+        shown() && styles.revealShown,
+        dynamic.delay(Math.min(props.step ?? 0, REVEAL_MAX_STEPS) * REVEAL_STEP_MS),
+        props.sx,
       )}
     >
-      {children}
+      {props.children}
     </Tag>
   );
 }
 
-export function SectionName({ id, children }: { id: string; children: string }) {
+export function SectionName(props: { id: string; children: string }) {
   return (
-    <h2 id={id} {...stylex.props(shared.srOnly)}>
-      {children}
+    <h2 id={props.id} {...stylex.attrs(shared.srOnly)}>
+      {props.children}
     </h2>
   );
 }
 
-export function Action({
-  kind = "primary",
-  onClick,
-  children,
-  icon,
-}: {
+export function Action(props: {
   kind?: "primary" | "outline";
   onClick: () => void;
-  children: ReactNode;
-  icon?: ReactNode;
+  children: JSX.Element;
+  icon?: JSX.Element;
 }) {
   return (
     <button
       type="button"
-      onClick={onClick}
-      {...stylex.props(
+      onClick={() => props.onClick()}
+      {...stylex.attrs(
         shared.button,
-        kind === "primary" ? shared.buttonPrimary : shared.buttonOutline,
+        (props.kind ?? "primary") === "primary" ? shared.buttonPrimary : shared.buttonOutline,
         shared.focusRing,
       )}
     >
-      <span>{children}</span>
-      {icon}
+      <span>{props.children}</span>
+      {props.icon}
     </button>
   );
 }

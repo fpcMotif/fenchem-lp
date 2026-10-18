@@ -70,7 +70,7 @@ export function Structure() {
     <section
       id="about-structure"
       aria-labelledby="oos1x-structure"
-      {...stylex.props(ui.anchor, styles.section)}
+      {...stylex.attrs(ui.anchor, styles.section)}
     >
       <Pair
         lever={AT_REST}
@@ -82,21 +82,21 @@ export function Structure() {
           </StandingTitle>
         }
         load={
-          <div {...stylex.props(styles.holding)}>
-            <p {...stylex.props(type.note)}>{holding.badge}</p>
-            <p {...stylex.props(styles.holdingName)}>{holding.name}</p>
-            <p lang="en" {...stylex.props(styles.holdingEnglish)}>
+          <div {...stylex.attrs(styles.holding)}>
+            <p {...stylex.attrs(type.note)}>{holding.badge}</p>
+            <p {...stylex.attrs(styles.holdingName)}>{holding.name}</p>
+            <p lang="en" {...stylex.attrs(styles.holdingEnglish)}>
               {holding.english}
             </p>
           </div>
         }
       >
-        <p {...stylex.props(type.note, styles.badge)}>{ABOUT_STRUCTURE.subsidiaryBadge}</p>
-        <ul {...stylex.props(styles.subsidiaries)}>
+        <p {...stylex.attrs(type.note, styles.badge)}>{ABOUT_STRUCTURE.subsidiaryBadge}</p>
+        <ul {...stylex.attrs(styles.subsidiaries)}>
           {ABOUT_STRUCTURE.subsidiaries.map((subsidiary) => (
-            <li key={subsidiary.id} {...stylex.props(styles.subsidiary)}>
-              <span {...stylex.props(type.light, styles.name)}>{subsidiary.name}</span>
-              <span lang="en" {...stylex.props(styles.english)}>
+            <li {...stylex.attrs(styles.subsidiary)}>
+              <span {...stylex.attrs(type.light, styles.name)}>{subsidiary.name}</span>
+              <span lang="en" {...stylex.attrs(styles.english)}>
                 {subsidiary.english}
               </span>
             </li>

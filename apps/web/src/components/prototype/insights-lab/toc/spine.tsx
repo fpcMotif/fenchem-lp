@@ -1,7 +1,19 @@
 import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { m, useMotionValue } from "motion/react";
-import { useEffect, useRef, useState, type PointerEvent, type RefObject } from "react";
+import type { StyleXStyles } from "@stylexjs/stylex";
+import {
+  createEffect,
+  createMemo,
+  createSignal,
+  For,
+  onCleanup,
+  onSettled,
+  Show,
+  type Accessor,
+} from "solid-js";
+import type { JSX } from "@solidjs/web";
+
+import { m, useMotionValue } from "@/compat/motion";
 
 import { color } from "../../variant-oos1/tokens.stylex";
 import { lab } from "../tokens.stylex";
@@ -38,6 +50,9 @@ type Mark = {
 };
 
 type FlowBox = { top: number; height: number };
+
+const sxProps = (...args: ReadonlyArray<StyleXStyles | false | null | undefined>) =>
+  stylex.attrs(...args);
 
 const styles = stylex.create({
   flow: {
@@ -251,257 +266,271 @@ const placeLabels = (marks: readonly Mark[], height: number) => {
   return placed;
 };
 
-function useFlowMarks(flowRef: RefObject<HTMLDivElement | null>, articles: readonly LabArticle[]) {
-  const [marks, setMarks] = useState<Mark[]>([]);
-  const box = useRef<FlowBox>({ top: 0, height: 1 });
+function useFlowMarks(
+  flowRef: Accessor<HTMLDivElement | undefined>,
+  articleList: Accessor<readonly LabArticle[]>,
+) {
+  const [marks, setMarks] = createSignal<Mark[]>([]);
+  const box: { current: FlowBox } = { current: { top: 0, height: 1 } };
 
-  useEffect(() => {
-    const flow = flowRef.current;
-    if (!flow) return;
-    const measure = () => {
-      const flowBox = flow.getBoundingClientRect();
-      const top = flowBox.top + window.scrollY;
-      const height = Math.max(1, flowBox.height);
-      box.current = { top, height };
-      const at = (id: string) => {
-        const element = document.getElementById(id);
-        return element ? (element.getBoundingClientRect().top + window.scrollY - top) / height : 0;
-      };
-      setMarks(
-        articles.flatMap((article, articleIndex) => [
-          {
-            id: articleAnchor(article),
-            article: articleIndex,
-            chapter: -1,
-            numeral: padIndex(articleIndex),
-            label: shortTitle(article),
-            at: at(articleAnchor(article)),
-          },
-          ...article.sections.map((section, chapter) => {
-            const { numeral, text } = splitNumeral(section.navLabel);
-            return {
-              id: sectionAnchor(article, section),
+  createEffect(
+    () => [flowRef(), articleList()] as const,
+    ([flow, articles]) => {
+      if (!flow) return;
+      const measure = () => {
+        const flowBox = flow.getBoundingClientRect();
+        const top = flowBox.top + window.scrollY;
+        const height = Math.max(1, flowBox.height);
+        box.current = { top, height };
+        const at = (id: string) => {
+          const element = document.getElementById(id);
+          return element
+            ? (element.getBoundingClientRect().top + window.scrollY - top) / height
+            : 0;
+        };
+        setMarks(
+          articles.flatMap((article, articleIndex) => [
+            {
+              id: articleAnchor(article),
               article: articleIndex,
-              chapter,
-              numeral,
-              label: text,
-              at: at(sectionAnchor(article, section)),
-            };
-          }),
-        ]),
-      );
-    };
-    measure();
-    const observer = new ResizeObserver(measure);
-    observer.observe(flow);
-    window.addEventListener("resize", measure);
-    return () => {
-      observer.disconnect();
-      window.removeEventListener("resize", measure);
-    };
-  }, [flowRef, articles]);
+              chapter: -1,
+              numeral: padIndex(articleIndex),
+              label: shortTitle(article),
+              at: at(articleAnchor(article)),
+            },
+            ...article.sections.map((section, chapter) => {
+              const { numeral, text } = splitNumeral(section.navLabel);
+              return {
+                id: sectionAnchor(article, section),
+                article: articleIndex,
+                chapter,
+                numeral,
+                label: text,
+                at: at(sectionAnchor(article, section)),
+              };
+            }),
+          ]),
+        );
+      };
+      measure();
+      const observer = new ResizeObserver(measure);
+      observer.observe(flow);
+      window.addEventListener("resize", measure);
+      return () => {
+        observer.disconnect();
+        window.removeEventListener("resize", measure);
+      };
+    },
+  );
 
   return { marks, box };
 }
 
-export function SpineVariant({ onNavigateHome }: SubPageProps) {
+export function SpineVariant(props: SubPageProps) {
   const articles = useLabArticles();
   const { position } = useReadingPosition(articles, READING_LINE);
-  const flowRef = useRef<HTMLDivElement>(null);
-  const stripRef = useRef<HTMLDivElement>(null);
+  const [flowRef, setFlowRef] = createSignal<HTMLDivElement>();
+  let strip: HTMLDivElement | undefined;
   const { marks, box } = useFlowMarks(flowRef, articles);
-  const [stripHeight, setStripHeight] = useState(0);
-  const [shown, setShown] = useState(false);
-  const [hovered, setHovered] = useState(false);
-  const [focused, setFocused] = useState(false);
-  const [scrubbing, setScrubbing] = useState(false);
-  const [lingering, setLingering] = useState(false);
+  const [stripHeight, setStripHeight] = createSignal(0);
+  const [shown, setShown] = createSignal(false);
+  const [hovered, setHovered] = createSignal(false);
+  const [focused, setFocused] = createSignal(false);
+  const [scrubbing, setScrubbing] = createSignal(false);
+  const [lingering, setLingering] = createSignal(false);
   const markerY = useMotionValue(0);
-  const lastScrub = useRef(-1);
-  const linger = useRef(0);
-  const expanded = hovered || focused || scrubbing || lingering;
+  let lastScrub = -1;
+  let linger = 0;
+  const expanded = createMemo(() => hovered() || focused() || scrubbing() || lingering());
 
-  useEffect(() => {
-    const strip = stripRef.current;
-    if (!strip) return;
-    const observer = new ResizeObserver(() => setStripHeight(strip.clientHeight));
-    observer.observe(strip);
+  onSettled(() => {
+    const element = strip;
+    if (!element) return;
+    const observer = new ResizeObserver(() => setStripHeight(element.clientHeight));
+    observer.observe(element);
     return () => observer.disconnect();
-  }, []);
+  });
 
-  useEffect(() => {
-    let frame = 0;
-    const update = () => {
-      frame = 0;
-      const { top, height } = box.current;
-      const reading = window.scrollY + READING_LINE - top;
-      markerY.set(Math.min(1, Math.max(0, reading / height)) * stripHeight);
-      setShown(
-        window.scrollY + window.innerHeight > top + 160 &&
-          window.scrollY + READING_LINE < top + height,
-      );
-    };
-    const schedule = () => {
-      if (!frame) frame = requestAnimationFrame(update);
-    };
-    update();
-    window.addEventListener("scroll", schedule, { passive: true });
-    window.addEventListener("resize", schedule);
-    return () => {
-      window.removeEventListener("scroll", schedule);
-      window.removeEventListener("resize", schedule);
-      if (frame) cancelAnimationFrame(frame);
-    };
-  }, [box, markerY, stripHeight, marks]);
-
-  useEffect(() => () => window.clearTimeout(linger.current), []);
-
-  const hereIndex = marks.findIndex(
-    (mark) => mark.article === position.article && mark.chapter === position.chapter,
+  createEffect(
+    () => [stripHeight(), marks()] as const,
+    ([currentStripHeight]) => {
+      let frame = 0;
+      const update = () => {
+        frame = 0;
+        const { top, height } = box.current;
+        const reading = window.scrollY + READING_LINE - top;
+        markerY.set(Math.min(1, Math.max(0, reading / height)) * currentStripHeight);
+        setShown(
+          window.scrollY + window.innerHeight > top + 160 &&
+            window.scrollY + READING_LINE < top + height,
+        );
+      };
+      const schedule = () => {
+        if (!frame) frame = requestAnimationFrame(update);
+      };
+      update();
+      window.addEventListener("scroll", schedule, { passive: true });
+      window.addEventListener("resize", schedule);
+      return () => {
+        window.removeEventListener("scroll", schedule);
+        window.removeEventListener("resize", schedule);
+        if (frame) cancelAnimationFrame(frame);
+      };
+    },
   );
-  const placed = placeLabels(marks, stripHeight);
+
+  onCleanup(() => window.clearTimeout(linger));
+
+  const hereIndex = createMemo(() =>
+    marks().findIndex(
+      (mark) => mark.article === position().article && mark.chapter === position().chapter,
+    ),
+  );
+  const placed = createMemo(() => placeLabels(marks(), stripHeight()));
 
   const scrubTo = (clientY: number) => {
-    const strip = stripRef.current;
-    if (!strip || marks.length === 0) return;
+    const list = marks();
+    const height = stripHeight();
+    if (!strip || list.length === 0) return;
     const y = clientY - strip.getBoundingClientRect().top;
     let nearest = 0;
-    marks.forEach((mark, index) => {
-      const best = marks[nearest];
-      if (best && Math.abs(mark.at * stripHeight - y) < Math.abs(best.at * stripHeight - y))
-        nearest = index;
+    list.forEach((mark, index) => {
+      const best = list[nearest];
+      if (best && Math.abs(mark.at * height - y) < Math.abs(best.at * height - y)) nearest = index;
     });
-    if (nearest === lastScrub.current) return;
-    lastScrub.current = nearest;
-    const target = marks[nearest];
+    if (nearest === lastScrub) return;
+    lastScrub = nearest;
+    const target = list[nearest];
     if (target)
       document.getElementById(target.id)?.scrollIntoView({ block: "start", behavior: "instant" });
   };
 
-  const onPointerDown = (event: PointerEvent<HTMLDivElement>) => {
+  const onPointerDown: JSX.EventHandler<HTMLDivElement, PointerEvent> = (event) => {
     event.preventDefault();
     event.currentTarget.setPointerCapture(event.pointerId);
-    window.clearTimeout(linger.current);
+    window.clearTimeout(linger);
     setLingering(false);
     setScrubbing(true);
-    lastScrub.current = -1;
+    lastScrub = -1;
     scrubTo(event.clientY);
   };
 
-  const endScrub = (event: PointerEvent<HTMLDivElement>) => {
-    if (!scrubbing) return;
+  const endScrub: JSX.EventHandler<HTMLDivElement, PointerEvent> = (event) => {
+    if (!scrubbing()) return;
     event.currentTarget.releasePointerCapture(event.pointerId);
     setScrubbing(false);
     if (event.pointerType !== "mouse") {
       setLingering(true);
-      linger.current = window.setTimeout(() => setLingering(false), LINGER_MS);
+      linger = window.setTimeout(() => setLingering(false), LINGER_MS);
     }
   };
 
   return (
-    <TocPage onNavigateHome={onNavigateHome}>
+    <TocPage onNavigateHome={props.onNavigateHome}>
       <nav
         aria-label="本页目录"
-        data-expanded={expanded ? "" : undefined}
+        data-expanded={expanded() ? "" : undefined}
         onPointerEnter={(event) => {
           if (event.pointerType === "mouse") setHovered(true);
         }}
         onPointerLeave={(event) => {
           if (event.pointerType === "mouse") setHovered(false);
         }}
-        onFocus={() => setFocused(true)}
-        onBlur={(event) => {
-          if (!event.currentTarget.contains(event.relatedTarget)) setFocused(false);
+        onFocusIn={() => setFocused(true)}
+        onFocusOut={(event) => {
+          if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setFocused(false);
         }}
-        {...stylex.props(styles.spine, (shown || focused) && styles.spineShown)}
+        {...sxProps(styles.spine, (shown() || focused()) && styles.spineShown)}
       >
-        <div aria-hidden="true" {...stylex.props(styles.sheet, expanded && styles.expanded)} />
-        <ol {...stylex.props(styles.labels, expanded && styles.expanded)}>
-          {marks.map((mark, index) => {
-            const isArticle = mark.chapter < 0;
-            return (
-              <li
-                key={mark.id}
-                style={{ transform: `translateY(${placed[index] ?? 0}px)` }}
-                {...stylex.props(styles.labelItem)}
-              >
-                <a
-                  href={`#${mark.id}`}
-                  aria-current={index === hereIndex ? "location" : undefined}
-                  onClick={(event) => {
-                    event.currentTarget.blur();
-                    setHovered(false);
-                    setLingering(false);
-                  }}
-                  {...stylex.props(
-                    styles.label,
-                    isArticle ? styles.labelArticle : styles.labelChapter,
-                    index < hereIndex && styles.labelPassed,
-                    index === hereIndex && styles.labelHere,
-                  )}
+        <div aria-hidden="true" {...sxProps(styles.sheet, expanded() && styles.expanded)} />
+        <ol {...sxProps(styles.labels, expanded() && styles.expanded)}>
+          <For each={marks()} keyed={false}>
+            {(mark, index) => {
+              const isArticle = () => mark().chapter < 0;
+              return (
+                <li
+                  style={{ transform: `translateY(${placed()[index] ?? 0}px)` }}
+                  {...stylex.attrs(styles.labelItem)}
                 >
-                  <span
-                    {...stylex.props(
-                      styles.labelNumeral,
-                      isArticle && labStyles.displayNumber,
-                      isArticle && styles.labelArticleNumeral,
+                  <a
+                    href={`#${mark().id}`}
+                    aria-current={index === hereIndex() ? "location" : undefined}
+                    onClick={(event) => {
+                      event.currentTarget.blur();
+                      setHovered(false);
+                      setLingering(false);
+                    }}
+                    {...sxProps(
+                      styles.label,
+                      isArticle() ? styles.labelArticle : styles.labelChapter,
+                      index < hereIndex() && styles.labelPassed,
+                      index === hereIndex() && styles.labelHere,
                     )}
                   >
-                    {mark.numeral}
-                  </span>
-                  <span {...stylex.props(styles.labelText)}>{mark.label}</span>
-                </a>
-              </li>
-            );
-          })}
+                    <span
+                      {...sxProps(
+                        styles.labelNumeral,
+                        isArticle() && labStyles.displayNumber,
+                        isArticle() && styles.labelArticleNumeral,
+                      )}
+                    >
+                      {mark().numeral}
+                    </span>
+                    <span {...stylex.attrs(styles.labelText)}>{mark().label}</span>
+                  </a>
+                </li>
+              );
+            }}
+          </For>
         </ol>
         <div
-          ref={stripRef}
+          ref={strip}
           aria-hidden="true"
           onPointerDown={onPointerDown}
           onPointerMove={(event) => {
-            if (scrubbing) scrubTo(event.clientY);
+            if (scrubbing()) scrubTo(event.clientY);
           }}
           onPointerUp={endScrub}
           onPointerCancel={endScrub}
-          {...stylex.props(styles.strip)}
+          {...stylex.attrs(styles.strip)}
         >
-          <span {...stylex.props(styles.rail)} />
-          {marks.map((mark, index) => {
-            const isArticle = mark.chapter < 0;
-            const passed = hereIndex >= 0 && index <= hereIndex;
-            return (
-              <span
-                key={mark.id}
-                style={{ transform: `translateY(${mark.at * stripHeight}px)` }}
-                {...stylex.props(
-                  styles.tick,
-                  isArticle && styles.tickArticle,
-                  passed && (isArticle ? styles.tickArticlePassed : styles.tickPassed),
-                )}
-              >
-                {isArticle ? (
-                  <span
-                    {...stylex.props(
-                      styles.tickNumber,
-                      labStyles.displayNumber,
-                      expanded && styles.tickNumberHidden,
-                    )}
-                  >
-                    {mark.numeral}
-                  </span>
-                ) : null}
-              </span>
-            );
-          })}
-          <m.span style={{ y: markerY }} {...stylex.props(styles.marker)}>
-            <span {...stylex.props(styles.markerDot)} />
-            <span {...stylex.props(styles.markerLine)} />
+          <span {...stylex.attrs(styles.rail)} />
+          <For each={marks()} keyed={false}>
+            {(mark, index) => {
+              const isArticle = () => mark().chapter < 0;
+              const passed = () => hereIndex() >= 0 && index <= hereIndex();
+              return (
+                <span
+                  style={{ transform: `translateY(${mark().at * stripHeight()}px)` }}
+                  {...sxProps(
+                    styles.tick,
+                    isArticle() && styles.tickArticle,
+                    passed() && (isArticle() ? styles.tickArticlePassed : styles.tickPassed),
+                  )}
+                >
+                  <Show when={isArticle()}>
+                    <span
+                      {...sxProps(
+                        styles.tickNumber,
+                        labStyles.displayNumber,
+                        expanded() && styles.tickNumberHidden,
+                      )}
+                    >
+                      {mark().numeral}
+                    </span>
+                  </Show>
+                </span>
+              );
+            }}
+          </For>
+          <m.span style={{ y: markerY }} {...stylex.attrs(styles.marker)}>
+            <span {...stylex.attrs(styles.markerDot)} />
+            <span {...stylex.attrs(styles.markerLine)} />
           </m.span>
         </div>
       </nav>
-      <div ref={flowRef}>
-        <ArticleFlow articles={articles} sx={styles.flow} />
+      <div ref={setFlowRef}>
+        <ArticleFlow articles={articles()} sx={styles.flow} />
       </div>
     </TocPage>
   );

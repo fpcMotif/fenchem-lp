@@ -1,7 +1,7 @@
-import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
+import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { Check, ChevronDown } from "lucide-react";
-import { useId, useState } from "react";
+import { Check, ChevronDown } from "@fenchem-lp/ui/components/lucide";
+import { createMemo, createSignal, createUniqueId, For } from "solid-js";
 
 import { CATALOG_GROUPS } from "../../products-data";
 import { FLAT_ITEMS, FORM_LABEL, REGION_META, padIndex, type FlatItem } from "../shared/derived";
@@ -23,8 +23,8 @@ const SERIF_FONT =
 const NUMERAL_FONT = '"Inter Tight", "Source Han Sans SC", "Noto Sans SC", sans-serif';
 
 const TABLET = "@media (min-width: 768px) and (max-width: 1279.98px)";
-const DESKTOP = breakpoints.xl;
-const MD = breakpoints.md;
+const DESKTOP = "@media (min-width: 1280px)";
+const MD = "@media (min-width: 768px)";
 const INSET = "min(120px, 8.333vw)";
 const HEADER_HEIGHT = 80;
 const NAME_INDENT = 36;
@@ -166,7 +166,7 @@ const styles = stylex.create({
   disclosureIcon: {
     display: "block",
     transitionProperty: "transform",
-    transitionDuration: { default: "200ms", [breakpoints.motionReduce]: "0ms" },
+    transitionDuration: { default: "200ms", ["@media (prefers-reduced-motion: reduce)"]: "0ms" },
     transitionTimingFunction: EASE_OUT_CSS,
   },
   disclosureIconOpen: {
@@ -185,7 +185,7 @@ const styles = stylex.create({
     flexBasis: { default: "100%", [MD]: "auto" },
     paddingBlock: { default: 8, [MD]: 0 },
     animationName: { default: fadeIn, [MD]: "none" },
-    animationDuration: { default: "180ms", [breakpoints.motionReduce]: "0ms" },
+    animationDuration: { default: "180ms", ["@media (prefers-reduced-motion: reduce)"]: "0ms" },
     animationTimingFunction: "ease-out",
   },
   optionsLegend: {
@@ -327,7 +327,7 @@ const styles = stylex.create({
     letterSpacing: "0.08em",
     color: MUTED,
     animationName: fadeIn,
-    animationDuration: { default: "200ms", [breakpoints.motionReduce]: "0ms" },
+    animationDuration: { default: "200ms", ["@media (prefers-reduced-motion: reduce)"]: "0ms" },
     animationTimingFunction: "ease-out",
   },
   headCellName: {
@@ -415,7 +415,7 @@ const styles = stylex.create({
     fontWeight: 400,
     overflowWrap: "anywhere",
     animationName: fadeIn,
-    animationDuration: { default: "200ms", [breakpoints.motionReduce]: "0ms" },
+    animationDuration: { default: "200ms", ["@media (prefers-reduced-motion: reduce)"]: "0ms" },
     animationTimingFunction: "ease-out",
   },
   nameCell: {
@@ -487,112 +487,103 @@ const styles = stylex.create({
 
 function Dash() {
   return (
-    <span {...stylex.props(styles.dash)}>
+    <span {...stylex.attrs(styles.dash)}>
       <span aria-hidden="true">—</span>
-      <span {...stylex.props(styles.srOnly)}>None</span>
+      <span {...stylex.attrs(styles.srOnly)}>None</span>
     </span>
   );
 }
 
-function CellValue({ column, item }: { column: ColumnId; item: FlatItem }) {
-  switch (column) {
+function CellValue(props: { column: ColumnId; item: FlatItem }) {
+  const item = props.item;
+  switch (props.column) {
     case "name":
       return (
         <>
-          <span {...stylex.props(styles.namePrimary)}>{item.primary}</span>
-          {item.secondary && <span {...stylex.props(styles.nameSecondary)}>{item.secondary}</span>}
+          <span {...stylex.attrs(styles.namePrimary)}>{item.primary}</span>
+          {item.secondary && <span {...stylex.attrs(styles.nameSecondary)}>{item.secondary}</span>}
         </>
       );
     case "latin":
       if (item.latin.length === 0) return <Dash />;
       return (
-        <span lang="la" {...stylex.props(styles.latinList)}>
+        <span lang="la" {...stylex.attrs(styles.latinList)}>
           {item.latin.map((name) => (
-            <span key={name} {...stylex.props(styles.latin)}>
-              {name}
-            </span>
+            <span {...stylex.attrs(styles.latin)}>{name}</span>
           ))}
         </span>
       );
     case "inci":
-      return <span {...stylex.props(styles.inci)}>{item.inci}</span>;
+      return <span {...stylex.attrs(styles.inci)}>{item.inci}</span>;
     case "features":
-      return <span {...stylex.props(styles.features)}>{item.features}</span>;
+      return <span {...stylex.attrs(styles.features)}>{item.features}</span>;
     case "origin": {
       const origin = originOf(item);
-      return origin ? <span {...stylex.props(styles.plain)}>{origin}</span> : <Dash />;
+      return origin ? <span {...stylex.attrs(styles.plain)}>{origin}</span> : <Dash />;
     }
     case "form":
-      return <span {...stylex.props(styles.plain)}>{FORM_LABEL[item.traits.form]}</span>;
+      return <span {...stylex.attrs(styles.plain)}>{FORM_LABEL[item.traits.form]}</span>;
     case "tags":
       if (item.traits.tags.length === 0) return <Dash />;
       return (
-        <span {...stylex.props(styles.plain, styles.tagList)}>
+        <span {...stylex.attrs(styles.plain, styles.tagList)}>
           {item.traits.tags.map((tag) => (
-            <span key={tag}>{tag}</span>
+            <span>{tag}</span>
           ))}
         </span>
       );
   }
 }
 
-function ColumnOption({
-  column,
-  checked,
-  onToggle,
-}: {
-  column: Column;
-  checked: boolean;
-  onToggle: () => void;
-}) {
-  const locked = column.id === LOCKED_COLUMN;
+function ColumnOption(props: { column: Column; checked: boolean; onToggle: () => void }) {
+  const locked = props.column.id === LOCKED_COLUMN;
   return (
     <label
-      {...stylex.props(
+      {...stylex.attrs(
         styles.option,
-        checked && styles.optionOn,
+        props.checked && styles.optionOn,
         locked && styles.optionLocked,
         stylex.defaultMarker(),
       )}
     >
-      <span {...stylex.props(styles.box)}>
+      <span {...stylex.attrs(styles.box)}>
         <input
           type="checkbox"
-          checked={checked}
+          checked={props.checked}
           disabled={locked}
-          onChange={onToggle}
-          {...stylex.props(
+          onChange={() => props.onToggle()}
+          {...stylex.attrs(
             styles.checkbox,
-            checked && styles.checkboxOn,
+            props.checked && styles.checkboxOn,
             locked && styles.checkboxLocked,
           )}
         />
-        {checked && (
+        {props.checked && (
           <Check
             size={12}
             strokeWidth={2.5}
             absoluteStrokeWidth
             aria-hidden="true"
-            {...stylex.props(styles.checkMark)}
+            {...stylex.attrs(styles.checkMark)}
           />
         )}
       </span>
-      {column.label}
+      {props.column.label}
     </label>
   );
 }
 
 export function Catalog() {
-  const titleId = useId();
-  const optionsId = useId();
-  const legendId = useId();
-  const [shownIds, setShownIds] = useState<ReadonlySet<ColumnId>>(DEFAULT_COLUMNS);
-  const [optionsOpen, setOptionsOpen] = useState(false);
+  const titleId = createUniqueId();
+  const optionsId = createUniqueId();
+  const legendId = createUniqueId();
+  const [shownIds, setShownIds] = createSignal<ReadonlySet<ColumnId>>(DEFAULT_COLUMNS);
+  const [optionsOpen, setOptionsOpen] = createSignal(false);
 
-  const shown = COLUMNS.filter((column) => shownIds.has(column.id));
-  const widths = columnWidths(shown);
-  const minWidth = shown.reduce((sum, column) => sum + column.minWidth, 0);
-  const showsInferred = INFERRED_COLUMNS.some((id) => shownIds.has(id));
+  const shown = createMemo(() => COLUMNS.filter((column) => shownIds().has(column.id)));
+  const widths = createMemo(() => columnWidths(shown()));
+  const minWidth = () => shown().reduce((sum, column) => sum + column.minWidth, 0);
+  const showsInferred = () => INFERRED_COLUMNS.some((id) => shownIds().has(id));
 
   const toggleColumn = (id: ColumnId) => {
     if (id === LOCKED_COLUMN) return;
@@ -605,121 +596,118 @@ export function Catalog() {
   };
 
   return (
-    <section id="products-catalog" aria-labelledby={titleId} {...stylex.props(styles.section)}>
-      <div {...stylex.props(styles.shell)}>
-        <header {...stylex.props(styles.head)}>
-          <h2 id={titleId} {...stylex.props(styles.title)}>
+    <section id="products-catalog" aria-labelledby={titleId} {...stylex.attrs(styles.section)}>
+      <div {...stylex.attrs(styles.shell)}>
+        <header {...stylex.attrs(styles.head)}>
+          <h2 id={titleId} {...stylex.attrs(styles.title)}>
             产品目录
           </h2>
         </header>
 
-        <div {...stylex.props(styles.controls)}>
+        <div {...stylex.attrs(styles.controls)}>
           <button
             type="button"
-            aria-expanded={optionsOpen}
+            aria-expanded={optionsOpen() ? "true" : "false"}
             aria-controls={optionsId}
             onClick={() => setOptionsOpen((open) => !open)}
-            {...stylex.props(styles.disclosure)}
+            {...stylex.attrs(styles.disclosure)}
           >
             <span>
-              显示列 <span {...stylex.props(styles.disclosureCount)}>({shown.length})</span>
+              显示列 <span {...stylex.attrs(styles.disclosureCount)}>({shown().length})</span>
             </span>
             <ChevronDown
               size={16}
               strokeWidth={1.5}
               absoluteStrokeWidth
               aria-hidden="true"
-              {...stylex.props(styles.disclosureIcon, optionsOpen && styles.disclosureIconOpen)}
+              {...stylex.attrs(styles.disclosureIcon, optionsOpen() && styles.disclosureIconOpen)}
             />
           </button>
           <div
             id={optionsId}
             role="group"
             aria-labelledby={legendId}
-            {...stylex.props(styles.options, optionsOpen && styles.optionsOpen)}
+            {...stylex.attrs(styles.options, optionsOpen() && styles.optionsOpen)}
           >
-            <span id={legendId} {...stylex.props(styles.optionsLegend)}>
+            <span id={legendId} {...stylex.attrs(styles.optionsLegend)}>
               显示列
             </span>
             {COLUMNS.map((column) => (
               <ColumnOption
-                key={column.id}
                 column={column}
-                checked={shownIds.has(column.id)}
+                checked={shownIds().has(column.id)}
                 onToggle={() => toggleColumn(column.id)}
               />
             ))}
           </div>
-          {showsInferred && <p {...stylex.props(styles.note)}>形态、功效依据原料描述整理</p>}
+          {showsInferred() && <p {...stylex.attrs(styles.note)}>形态、功效依据原料描述整理</p>}
         </div>
 
-        <div {...stylex.props(styles.scroller)}>
+        <div {...stylex.attrs(styles.scroller)}>
           <table
             aria-labelledby={titleId}
-            {...stylex.props(styles.table, styles.tableMinWidth(minWidth))}
+            {...stylex.attrs(styles.table, styles.tableMinWidth(minWidth()))}
           >
-            <colgroup {...stylex.props(styles.colgroup)}>
-              {shown.map((column, index) => (
-                <col
-                  key={column.id}
-                  {...stylex.props(styles.columnWidth(widths[index] ?? "auto"))}
-                />
-              ))}
+            <colgroup {...stylex.attrs(styles.colgroup)}>
+              <For each={shown()}>
+                {(_column, index) => (
+                  <col {...stylex.attrs(styles.columnWidth(widths()[index()] ?? "auto"))} />
+                )}
+              </For>
             </colgroup>
-            <thead {...stylex.props(styles.thead)}>
+            <thead {...stylex.attrs(styles.thead)}>
               <tr>
-                {shown.map((column) => (
-                  <th
-                    key={column.id}
-                    scope="col"
-                    {...stylex.props(
-                      styles.headCell,
-                      column.id === LOCKED_COLUMN && styles.headCellName,
-                    )}
-                  >
-                    {column.label}
-                  </th>
-                ))}
+                <For each={shown()}>
+                  {(column) => (
+                    <th
+                      scope="col"
+                      {...stylex.attrs(
+                        styles.headCell,
+                        column.id === LOCKED_COLUMN && styles.headCellName,
+                      )}
+                    >
+                      {column.label}
+                    </th>
+                  )}
+                </For>
               </tr>
             </thead>
             {GROUPS.map(({ group, index, items }) => (
-              <tbody key={group.id} {...stylex.props(styles.tbody)}>
-                <tr {...stylex.props(styles.groupRow)}>
+              <tbody {...stylex.attrs(styles.tbody)}>
+                <tr {...stylex.attrs(styles.groupRow)}>
                   <th
                     scope="rowgroup"
-                    colSpan={shown.length}
-                    {...stylex.props(styles.groupCell, index === 0 && styles.groupCellFirst)}
+                    colspan={shown().length}
+                    {...stylex.attrs(styles.groupCell, index === 0 && styles.groupCellFirst)}
                   >
-                    <span {...stylex.props(styles.groupHead)}>
-                      <span aria-hidden="true" {...stylex.props(styles.groupIndex)}>
+                    <span {...stylex.attrs(styles.groupHead)}>
+                      <span aria-hidden="true" {...stylex.attrs(styles.groupIndex)}>
                         {padIndex(index)}
                       </span>
-                      <span {...stylex.props(styles.groupLabel)}>{group.label}</span>
-                      <span {...stylex.props(styles.groupCount)}>{items.length} 款原料</span>
+                      <span {...stylex.attrs(styles.groupLabel)}>{group.label}</span>
+                      <span {...stylex.attrs(styles.groupCount)}>{items.length} 款原料</span>
                     </span>
-                    {group.intro && <p {...stylex.props(styles.groupIntro)}>{group.intro}</p>}
+                    {group.intro && <p {...stylex.attrs(styles.groupIntro)}>{group.intro}</p>}
                   </th>
                 </tr>
                 {items.map((item) => (
-                  <tr key={item.id} {...stylex.props(styles.row)}>
-                    {shown.map((column) =>
-                      column.id === LOCKED_COLUMN ? (
-                        <th
-                          key={column.id}
-                          scope="row"
-                          {...stylex.props(styles.cell, styles.nameCell)}
-                        >
-                          <CellValue column={column.id} item={item} />
-                        </th>
-                      ) : (
-                        <td key={column.id} {...stylex.props(styles.cell)}>
-                          <span {...stylex.props(styles.cellLabel)}>{column.label}</span>
-                          <span>
+                  <tr {...stylex.attrs(styles.row)}>
+                    <For each={shown()}>
+                      {(column) =>
+                        column.id === LOCKED_COLUMN ? (
+                          <th scope="row" {...stylex.attrs(styles.cell, styles.nameCell)}>
                             <CellValue column={column.id} item={item} />
-                          </span>
-                        </td>
-                      ),
-                    )}
+                          </th>
+                        ) : (
+                          <td {...stylex.attrs(styles.cell)}>
+                            <span {...stylex.attrs(styles.cellLabel)}>{column.label}</span>
+                            <span>
+                              <CellValue column={column.id} item={item} />
+                            </span>
+                          </td>
+                        )
+                      }
+                    </For>
                   </tr>
                 ))}
               </tbody>

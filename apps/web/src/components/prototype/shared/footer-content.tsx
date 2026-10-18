@@ -1,12 +1,9 @@
 import * as stylex from "@stylexjs/stylex";
 import type { StyleXStyles } from "@stylexjs/stylex";
-import type { ReactNode } from "react";
+import { For } from "solid-js";
+import type { JSX } from "@solidjs/web";
 
-export function FooterNavigation({
-  logo,
-  columns,
-  styles,
-}: {
+export function FooterNavigation(props: {
   logo: { src: string; alt: string };
   columns: readonly { heading: string; links: readonly string[] }[];
   styles: Record<
@@ -21,49 +18,49 @@ export function FooterNavigation({
   >;
 }) {
   return (
-    <div {...stylex.props(styles.footerTop)}>
+    <div {...stylex.attrs(props.styles.footerTop)}>
       <img
-        src={logo.src}
-        alt={logo.alt}
+        src={props.logo.src}
+        alt={props.logo.alt}
         width={225}
         height={73}
         loading="lazy"
         decoding="async"
-        {...stylex.props(styles.footerLogo)}
+        {...stylex.attrs(props.styles.footerLogo)}
       />
-      <nav aria-label="Footer" {...stylex.props(styles.footerColumns)}>
-        {columns.map((column) => (
-          <div key={column.heading} {...stylex.props(styles.footerColumn)}>
-            <h3 {...stylex.props(styles.footerHeading)}>{column.heading}</h3>
-            <ul {...stylex.props(styles.footerLinks)}>
-              {column.links.map((link) => (
-                <li key={link}>
-                  <a href="#top" {...stylex.props(styles.footerLink)}>
-                    {link}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))}
+      <nav aria-label="Footer" {...stylex.attrs(props.styles.footerColumns)}>
+        <For each={props.columns}>
+          {(column) => (
+            <div {...stylex.attrs(props.styles.footerColumn)}>
+              <h3 {...stylex.attrs(props.styles.footerHeading)}>{column.heading}</h3>
+              <ul {...stylex.attrs(props.styles.footerLinks)}>
+                <For each={column.links}>
+                  {(link) => (
+                    <li>
+                      <a href="#top" {...stylex.attrs(props.styles.footerLink)}>
+                        {link}
+                      </a>
+                    </li>
+                  )}
+                </For>
+              </ul>
+            </div>
+          )}
+        </For>
       </nav>
     </div>
   );
 }
 
-export function FooterLegal({
-  copyright,
-  children,
-  styles,
-}: {
+export function FooterLegal(props: {
   copyright: string;
-  children: ReactNode;
+  children: JSX.Element;
   styles: Record<"footerBottom" | "copyright" | "social", StyleXStyles>;
 }) {
   return (
-    <div {...stylex.props(styles.footerBottom)}>
-      <p {...stylex.props(styles.copyright)}>{copyright}</p>
-      <div {...stylex.props(styles.social)}>{children}</div>
+    <div {...stylex.attrs(props.styles.footerBottom)}>
+      <p {...stylex.attrs(props.styles.copyright)}>{props.copyright}</p>
+      <div {...stylex.attrs(props.styles.social)}>{props.children}</div>
     </div>
   );
 }

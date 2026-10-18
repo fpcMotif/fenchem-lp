@@ -1,6 +1,5 @@
 import * as stylex from "@stylexjs/stylex";
-import { m, useTransform, type MotionValue } from "motion/react";
-import { useRef } from "react";
+import { m, useTransform, type MotionValue } from "@/compat/motion";
 
 import { ABOUT_CULTURE } from "../../about-data";
 import { Camera, Drawing, GroundPlane, GroundShadow, IsoBox } from "./iso";
@@ -10,6 +9,7 @@ import { SheetHeader } from "./sheet-header";
 import { pad2, ui } from "./shared";
 import { bp, face, tone } from "./tokens.stylex";
 import { useViewAssembly } from "./use-assembly-progress";
+import { createSignal } from "solid-js";
 
 const ENGLISH = ["Expertise", "Steadiness", "Innovation"] as const;
 
@@ -137,27 +137,27 @@ const styles = stylex.create({
 const STROKE = {
   fill: "none",
   stroke: "rgba(11, 42, 92, 0.88)",
-  strokeWidth: 1,
-  vectorEffect: "non-scaling-stroke",
+  "stroke-width": 1,
+  "vector-effect": "non-scaling-stroke",
 } as const;
 
-function Component({ progress, index }: { progress: MotionValue<number>; index: number }) {
-  const value = ABOUT_CULTURE.values[index];
-  const topZ = useTransform(progress, (p) => cq(THICK + liftOf(p, index) * LIFT));
-  const guides = useTransform(progress, (p) => guidesFor(liftOf(p, index)));
-  const leader = useTransform(progress, (p) => leaderFor(liftOf(p, index)));
-  const dotX = useTransform(progress, (p) => leaderAnchor(liftOf(p, index)).x);
-  const dotY = useTransform(progress, (p) => leaderAnchor(liftOf(p, index)).y);
+function Component(props: { progress: MotionValue<number>; index: number }) {
+  const value = ABOUT_CULTURE.values[props.index];
+  const topZ = useTransform(props.progress, (p) => cq(THICK + liftOf(p, props.index) * LIFT));
+  const guides = useTransform(props.progress, (p) => guidesFor(liftOf(p, props.index)));
+  const leader = useTransform(props.progress, (p) => leaderFor(liftOf(p, props.index)));
+  const dotX = useTransform(props.progress, (p) => leaderAnchor(liftOf(p, props.index)).x);
+  const dotY = useTransform(props.progress, (p) => leaderAnchor(liftOf(p, props.index)).y);
 
   return (
-    <li {...stylex.props(styles.component)}>
+    <li {...stylex.attrs(styles.component)}>
       <Drawing
         heightUnits={SHEET_HEIGHT}
-        label={`Exploded view: ${ENGLISH[index]} component lifted off its base`}
+        label={`Exploded view: ${ENGLISH[props.index]} component lifted off its base`}
       >
         <Camera>
           <GroundPlane width={TILE} depth={TILE} centerX={ORIGIN.x} centerY={ORIGIN.y}>
-            <span {...stylex.props(styles.footprint)} />
+            <span {...stylex.attrs(styles.footprint)} />
             <GroundShadow x={TILE * 0.06} y={TILE * 0.12} w={TILE * 0.94} d={TILE * 0.94} />
             <IsoBox
               x={0}
@@ -166,7 +166,7 @@ function Component({ progress, index }: { progress: MotionValue<number>; index: 
               d={TILE}
               t={THICK}
               topZ={topZ}
-              etch={`C-${pad2(index + 1)} — ${ENGLISH[index]}`}
+              etch={`C-${pad2(props.index + 1)} — ${ENGLISH[props.index]}`}
             >
               <PlateFace glyph={value.glyph} glyphSize={cq(TILE * 0.44)} />
             </IsoBox>
@@ -175,32 +175,32 @@ function Component({ progress, index }: { progress: MotionValue<number>; index: 
         <svg
           viewBox={`0 0 1000 ${SHEET_HEIGHT}`}
           aria-hidden="true"
-          {...stylex.props(styles.overlay)}
+          {...stylex.attrs(styles.overlay)}
         >
-          <m.path d={guides} {...STROKE} stroke="rgba(11, 42, 92, 0.5)" strokeDasharray="5 4" />
-          <m.path d={leader} {...STROKE} />
-          <m.circle cx={dotX} cy={dotY} r={6} fill="rgba(11, 42, 92, 0.92)" />
+          <m.path d={guides()} {...STROKE} stroke="rgba(11, 42, 92, 0.5)" stroke-dasharray="5 4" />
+          <m.path d={leader()} {...STROKE} />
+          <m.circle cx={dotX()} cy={dotY()} r={6} fill="rgba(11, 42, 92, 0.92)" />
         </svg>
         <span
           style={{ left: cq(BALLOON.x), top: cq(BALLOON.y) }}
-          {...stylex.props(ui.balloon, styles.balloon)}
+          {...stylex.attrs(ui.balloon, styles.balloon)}
         >
-          {index + 1}
+          {props.index + 1}
         </span>
       </Drawing>
-      <div {...stylex.props(styles.spec)}>
-        <p {...stylex.props(ui.caps, styles.specHead)}>
-          <span lang="en">Component C-{pad2(index + 1)}</span>
-          <span lang="en" {...stylex.props(ui.label)}>
-            {ENGLISH[index]}
+      <div {...stylex.attrs(styles.spec)}>
+        <p {...stylex.attrs(ui.caps, styles.specHead)}>
+          <span lang="en">Component C-{pad2(props.index + 1)}</span>
+          <span lang="en" {...stylex.attrs(ui.label)}>
+            {ENGLISH[props.index]}
           </span>
         </p>
-        <h3 {...stylex.props(styles.name)}>{value.title}</h3>
-        <p {...stylex.props(styles.row)}>
-          <span lang="en" {...stylex.props(ui.caps, styles.rowLabel)}>
+        <h3 {...stylex.attrs(styles.name)}>{value.title}</h3>
+        <p {...stylex.attrs(styles.row)}>
+          <span lang="en" {...stylex.attrs(ui.caps, styles.rowLabel)}>
             Spec.
           </span>
-          <span {...stylex.props(styles.desc)}>{value.desc}</span>
+          <span {...stylex.attrs(styles.desc)}>{value.desc}</span>
         </p>
       </div>
     </li>
@@ -208,14 +208,14 @@ function Component({ progress, index }: { progress: MotionValue<number>; index: 
 }
 
 export function Culture() {
-  const listRef = useRef<HTMLOListElement>(null);
+  const [listRef, setListRef] = createSignal<HTMLOListElement>();
   const progress = useViewAssembly(listRef, 2.2);
 
   return (
     <section
       id="about-culture"
       aria-labelledby="oos1m-culture"
-      {...stylex.props(ui.shell, ui.section, ui.anchor)}
+      {...stylex.attrs(ui.shell, ui.section, ui.anchor)}
     >
       <SheetHeader
         sheet={3}
@@ -223,9 +223,9 @@ export function Culture() {
         english="Components, exploded"
         titleId="oos1m-culture"
       />
-      <ol ref={listRef} {...stylex.props(styles.list)}>
-        {ABOUT_CULTURE.values.map((value, index) => (
-          <Component key={value.glyph} progress={progress} index={index} />
+      <ol ref={setListRef} {...stylex.attrs(styles.list)}>
+        {ABOUT_CULTURE.values.map((_, index) => (
+          <Component progress={progress} index={index} />
         ))}
       </ol>
     </section>

@@ -1,7 +1,7 @@
 import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { AnimatePresence, m } from "motion/react";
-import { useId, useRef, useState, type KeyboardEvent } from "react";
+import { AnimatePresence, m } from "@/compat/motion";
+import { createSignal, createUniqueId, flush, Show, untrack } from "solid-js";
 
 import { EASE } from "@/components/prototype/motion-constants";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
@@ -366,54 +366,50 @@ const styles = stylex.create({
   },
 });
 
-function ItemRow({
-  item,
-  index,
-  origin,
-  showOrigin,
-}: {
+function ItemRow(props: {
   item: CatalogItem;
   index: number;
   origin: string | null;
   showOrigin: boolean;
 }) {
+  const item = props.item;
   const { primary, secondary } = splitTitle(item.title);
   const latin = latinNames(item.inci);
   return (
-    <tr {...stylex.props(styles.row)}>
-      <th scope="row" {...stylex.props(styles.cell)}>
-        <span {...stylex.props(styles.nameLine)}>
-          <span {...stylex.props(styles.rowIndex)}>{padIndex(index)}</span>
-          <span {...stylex.props(styles.names)}>
-            <span {...stylex.props(styles.primary)}>{primary}</span>
-            {secondary && <span {...stylex.props(styles.secondary)}>{secondary}</span>}
+    <tr {...stylex.attrs(styles.row)}>
+      <th scope="row" {...stylex.attrs(styles.cell)}>
+        <span {...stylex.attrs(styles.nameLine)}>
+          <span {...stylex.attrs(styles.rowIndex)}>{padIndex(props.index)}</span>
+          <span {...stylex.attrs(styles.names)}>
+            <span {...stylex.attrs(styles.primary)}>{primary}</span>
+            {secondary && <span {...stylex.attrs(styles.secondary)}>{secondary}</span>}
           </span>
         </span>
       </th>
-      <td {...stylex.props(styles.cell, styles.dataCell)}>
-        <span aria-hidden="true" {...stylex.props(styles.stackLabel)}>
+      <td {...stylex.attrs(styles.cell, styles.dataCell)}>
+        <span aria-hidden="true" {...stylex.attrs(styles.stackLabel)}>
           INCI 名称
         </span>
-        <span {...stylex.props(styles.inci)}>{inciWithoutLatin(item.inci)}</span>
+        <span {...stylex.attrs(styles.inci)}>{inciWithoutLatin(item.inci)}</span>
         {latin.length > 0 && (
-          <span lang="la" {...stylex.props(styles.latin)}>
+          <span lang="la" {...stylex.attrs(styles.latin)}>
             {latin.join(", ")}
           </span>
         )}
       </td>
-      <td {...stylex.props(styles.cell, styles.dataCell, !showOrigin && styles.lastCell)}>
-        <span aria-hidden="true" {...stylex.props(styles.stackLabel)}>
+      <td {...stylex.attrs(styles.cell, styles.dataCell, !props.showOrigin && styles.lastCell)}>
+        <span aria-hidden="true" {...stylex.attrs(styles.stackLabel)}>
           特性&应用
         </span>
-        <span {...stylex.props(styles.features)}>{item.features}</span>
+        <span {...stylex.attrs(styles.features)}>{item.features}</span>
       </td>
-      {showOrigin && (
-        <td {...stylex.props(styles.cell, styles.dataCell, styles.lastCell)}>
-          <span aria-hidden="true" {...stylex.props(styles.stackLabel)}>
+      {props.showOrigin && (
+        <td {...stylex.attrs(styles.cell, styles.dataCell, styles.lastCell)}>
+          <span aria-hidden="true" {...stylex.attrs(styles.stackLabel)}>
             产地
           </span>
-          <span {...stylex.props(styles.origin, origin === null && styles.originMissing)}>
-            {origin ?? "—"}
+          <span {...stylex.attrs(styles.origin, props.origin === null && styles.originMissing)}>
+            {props.origin ?? "—"}
           </span>
         </td>
       )}
@@ -421,82 +417,78 @@ function ItemRow({
   );
 }
 
-function TableContent({ tabId, reduce }: { tabId: string; reduce: boolean }) {
+function TableContent(props: { tabId: string; reduce: boolean }) {
+  const tabId = untrack(() => props.tabId);
   const showAll = tabId === ALL_ID;
   const groups = showAll ? CATALOG_GROUPS : CATALOG_GROUPS.filter((group) => group.id === tabId);
   const single = showAll ? null : (groups[0] ?? null);
-  const fade = {
+  const fade = () => ({
     initial: { opacity: 0 },
-    animate: { opacity: 1, transition: { duration: reduce ? 0 : 0.2, ease: EASE } },
-    exit: { opacity: 0, transition: { duration: reduce ? 0 : 0.1, ease: EASE } },
-  };
+    animate: { opacity: 1, transition: { duration: props.reduce ? 0 : 0.2, ease: EASE } },
+    exit: { opacity: 0, transition: { duration: props.reduce ? 0 : 0.1, ease: EASE } },
+  });
 
   return (
     <>
-      <caption {...stylex.props(styles.caption)}>
-        <m.div {...fade}>
-          <div {...stylex.props(styles.captionLine)}>
-            <span {...stylex.props(styles.captionTitle)}>{single ? single.label : "全部原料"}</span>
-            <span {...stylex.props(styles.captionCount)}>
+      {/* The fade sits on the caption itself: the presence compat only keeps top-level m.* nodes during an exit. */}
+      <m.caption {...fade()} {...stylex.attrs(styles.caption)}>
+        <div>
+          <div {...stylex.attrs(styles.captionLine)}>
+            <span {...stylex.attrs(styles.captionTitle)}>{single ? single.label : "全部原料"}</span>
+            <span {...stylex.attrs(styles.captionCount)}>
               {single ? single.items.length : TOTAL_ITEMS} 款
             </span>
           </div>
-          {single?.intro && <p {...stylex.props(styles.captionIntro)}>{single.intro}</p>}
-        </m.div>
-      </caption>
+          {single?.intro && <p {...stylex.attrs(styles.captionIntro)}>{single.intro}</p>}
+        </div>
+      </m.caption>
       <colgroup>
-        <col {...stylex.props(styles.colName)} />
-        <col {...stylex.props(styles.colInci)} />
+        <col {...stylex.attrs(styles.colName)} />
+        <col {...stylex.attrs(styles.colInci)} />
         <col />
-        {showAll && <col {...stylex.props(styles.colOrigin)} />}
+        {showAll && <col {...stylex.attrs(styles.colOrigin)} />}
       </colgroup>
-      <thead {...stylex.props(styles.thead)}>
+      <thead {...stylex.attrs(styles.thead)}>
         <tr>
-          <th scope="col" {...stylex.props(styles.headCell, styles.headCellName)}>
+          <th scope="col" {...stylex.attrs(styles.headCell, styles.headCellName)}>
             <span aria-hidden="true">名称</span>
-            <span {...stylex.props(ui.srOnly)}>Name</span>
+            <span {...stylex.attrs(ui.srOnly)}>Name</span>
           </th>
-          <th scope="col" {...stylex.props(styles.headCell)}>
+          <th scope="col" {...stylex.attrs(styles.headCell)}>
             <span aria-hidden="true">INCI 名称</span>
-            <span {...stylex.props(ui.srOnly)}>INCI name</span>
+            <span {...stylex.attrs(ui.srOnly)}>INCI name</span>
           </th>
-          <th scope="col" {...stylex.props(styles.headCell, !showAll && styles.lastCell)}>
+          <th scope="col" {...stylex.attrs(styles.headCell, !showAll && styles.lastCell)}>
             <span aria-hidden="true">特性&应用</span>
-            <span {...stylex.props(ui.srOnly)}>Features & applications</span>
+            <span {...stylex.attrs(ui.srOnly)}>Features & applications</span>
           </th>
           {showAll && (
-            <th scope="col" {...stylex.props(styles.headCell, styles.lastCell)}>
+            <th scope="col" {...stylex.attrs(styles.headCell, styles.lastCell)}>
               <span aria-hidden="true">产地</span>
-              <span {...stylex.props(ui.srOnly)}>Origin</span>
+              <span {...stylex.attrs(ui.srOnly)}>Origin</span>
             </th>
           )}
         </tr>
       </thead>
       {groups.map((group, groupIndex) => (
-        <m.tbody key={group.id} {...fade} {...stylex.props(styles.body)}>
+        <m.tbody {...fade()} {...stylex.attrs(styles.body)}>
           {showAll && (
-            <tr {...stylex.props(styles.groupRow)}>
+            <tr {...stylex.attrs(styles.groupRow)}>
               <th
                 scope="rowgroup"
-                colSpan={ALL_COLUMNS}
-                {...stylex.props(styles.groupCell, groupIndex === 0 && styles.groupCellFirst)}
+                colspan={ALL_COLUMNS}
+                {...stylex.attrs(styles.groupCell, groupIndex === 0 && styles.groupCellFirst)}
               >
-                <span {...stylex.props(styles.groupLine)}>
-                  <span {...stylex.props(styles.groupIndex)}>{padIndex(groupIndex)}</span>
-                  <span {...stylex.props(styles.groupLabel)}>{group.label}</span>
-                  <span {...stylex.props(styles.groupCount)}>{group.items.length} 款</span>
+                <span {...stylex.attrs(styles.groupLine)}>
+                  <span {...stylex.attrs(styles.groupIndex)}>{padIndex(groupIndex)}</span>
+                  <span {...stylex.attrs(styles.groupLabel)}>{group.label}</span>
+                  <span {...stylex.attrs(styles.groupCount)}>{group.items.length} 款</span>
                 </span>
               </th>
             </tr>
           )}
           {group.items.map((item, index) => (
-            <ItemRow
-              key={item.id}
-              item={item}
-              index={index}
-              origin={originOf(group)}
-              showOrigin={showAll}
-            />
+            <ItemRow item={item} index={index} origin={originOf(group)} showOrigin={showAll} />
           ))}
         </m.tbody>
       ))}
@@ -506,19 +498,19 @@ function TableContent({ tabId, reduce }: { tabId: string; reduce: boolean }) {
 
 export function Catalog() {
   const reduce = useReducedMotion();
-  const baseId = useId();
+  const baseId = createUniqueId();
   const titleId = `${baseId}-title`;
   const panelId = `${baseId}-panel`;
   const tabDomId = (id: string) => `${baseId}-tab-${id}`;
-  const [selected, setSelected] = useState<string>(ALL_ID);
-  const barRef = useRef<HTMLDivElement>(null);
-  const panelRef = useRef<HTMLDivElement>(null);
-  const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const [selected, setSelected] = createSignal<string>(ALL_ID);
+  let barEl!: HTMLDivElement;
+  let panelEl!: HTMLDivElement;
+  const tabRefs: (HTMLButtonElement | undefined)[] = [];
 
   const select = (id: string) => {
-    if (id === selected) return;
-    const bar = barRef.current;
-    const panel = panelRef.current;
+    if (id === selected()) return;
+    const bar = barEl;
+    const panel = panelEl;
     if (bar && panel) {
       const overlap = bar.getBoundingClientRect().bottom - panel.getBoundingClientRect().top;
       if (overlap > 0) window.scrollBy({ top: -overlap, behavior: "instant" });
@@ -526,8 +518,8 @@ export function Catalog() {
     setSelected(id);
   };
 
-  const onTabKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-    const current = TABS.findIndex((tab) => tab.id === selected);
+  const onTabKeyDown = (event: KeyboardEvent) => {
+    const current = TABS.findIndex((tab) => tab.id === selected());
     const last = TABS.length - 1;
     const next =
       event.key === "ArrowRight"
@@ -543,47 +535,47 @@ export function Catalog() {
     if (!target) return;
     event.preventDefault();
     select(target.id);
-    tabRefs.current[next]?.focus();
+    flush();
+    tabRefs[next]?.focus();
   };
 
   return (
     <section
       id="products-catalog"
       aria-labelledby={titleId}
-      {...stylex.props(ui.section, styles.ground)}
+      {...stylex.attrs(ui.section, styles.ground)}
     >
-      <div {...stylex.props(ui.shell)}>
-        <header {...stylex.props(styles.head)}>
-          <h2 id={titleId} {...stylex.props(ui.title)}>
+      <div {...stylex.attrs(ui.shell)}>
+        <header {...stylex.attrs(styles.head)}>
+          <h2 id={titleId} {...stylex.attrs(ui.title)}>
             产品目录
           </h2>
         </header>
-        <div ref={barRef} {...stylex.props(styles.tabBar)}>
+        <div ref={barEl} {...stylex.attrs(styles.tabBar)}>
           <div
             role="tablist"
             aria-label="Filter by growing region"
             onKeyDown={onTabKeyDown}
-            {...stylex.props(styles.tabList)}
+            {...stylex.attrs(styles.tabList)}
           >
             {TABS.map((tab, index) => {
-              const isSelected = tab.id === selected;
+              const isSelected = () => tab.id === selected();
               return (
                 <button
-                  key={tab.id}
                   ref={(node) => {
-                    tabRefs.current[index] = node;
+                    tabRefs[index] = node;
                   }}
                   type="button"
                   role="tab"
                   id={tabDomId(tab.id)}
-                  aria-selected={isSelected}
+                  aria-selected={isSelected() ? "true" : "false"}
                   aria-controls={panelId}
-                  tabIndex={isSelected ? 0 : -1}
+                  tabindex={isSelected() ? 0 : -1}
                   onClick={() => select(tab.id)}
-                  {...stylex.props(styles.tab, isSelected && styles.tabSelected)}
+                  {...stylex.attrs(styles.tab, isSelected() && styles.tabSelected)}
                 >
                   {tab.label}
-                  <span {...stylex.props(styles.tabCount, isSelected && styles.tabCountSelected)}>
+                  <span {...stylex.attrs(styles.tabCount, isSelected() && styles.tabCountSelected)}>
                     {tab.count}
                   </span>
                 </button>
@@ -592,16 +584,18 @@ export function Catalog() {
           </div>
         </div>
         <div
-          ref={panelRef}
+          ref={panelEl}
           role="tabpanel"
           id={panelId}
-          aria-labelledby={tabDomId(selected)}
-          tabIndex={0}
-          {...stylex.props(styles.panel)}
+          aria-labelledby={tabDomId(selected())}
+          tabindex={0}
+          {...stylex.attrs(styles.panel)}
         >
-          <table {...stylex.props(styles.table)}>
+          <table {...stylex.attrs(styles.table)}>
             <AnimatePresence mode="wait" initial={false}>
-              <TableContent key={selected} tabId={selected} reduce={reduce} />
+              <Show when={selected()} keyed>
+                {(tabId) => <TableContent tabId={tabId} reduce={reduce()} />}
+              </Show>
             </AnimatePresence>
           </table>
         </div>

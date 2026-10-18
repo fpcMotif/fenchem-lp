@@ -1,7 +1,7 @@
 import * as stylex from "@stylexjs/stylex";
-import { useId } from "react";
 
 import { bp, chrome, face, tone } from "./tokens.stylex";
+import { createUniqueId } from "solid-js";
 
 export const LIGHT_WEIGHT_FONT =
   "https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300&display=swap";
@@ -89,8 +89,8 @@ export const ui = stylex.create({
   },
 });
 
-export const srOnly = stylex.props(ui.srOnly);
+export const srOnly = stylex.attrs(ui.srOnly);
 
 export function useSvgId() {
-  return `oos1o${useId().replace(/[^a-zA-Z0-9]/g, "")}`;
+  return `oos1o${createUniqueId().replace(/[^a-zA-Z0-9]/g, "")}`;
 }

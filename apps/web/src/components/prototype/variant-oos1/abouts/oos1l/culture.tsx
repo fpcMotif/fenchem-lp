@@ -31,15 +31,15 @@ export function Culture() {
     <section
       id="about-culture"
       aria-labelledby={headingId("about-culture")}
-      {...stylex.props(ui.section, styles.section)}
+      {...stylex.attrs(ui.section, styles.section)}
     >
-      <div {...stylex.props(ui.shell)}>
+      <div {...stylex.attrs(ui.shell)}>
         <SectionLabel section="about-culture" />
-        <ul {...stylex.props(styles.values)}>
+        <ul {...stylex.attrs(styles.values)}>
           {ABOUT_CULTURE.values.map((value, index) => (
-            <li key={value.glyph}>
+            <li>
               <Clause line={SENTENCE.culture[index]} />
-              <p {...stylex.props(ui.body, ui.bodyColumn, styles.desc)}>{value.desc}</p>
+              <p {...stylex.attrs(ui.body, ui.bodyColumn, styles.desc)}>{value.desc}</p>
             </li>
           ))}
         </ul>

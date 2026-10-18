@@ -73,16 +73,15 @@ export function Honors() {
 
   return (
     <Section id={chip.id} label={ABOUT_HONORS.eyebrow} background={ui.onPaper}>
-      <ul {...stylex.props(s.list)}>
+      <ul {...stylex.attrs(s.list)}>
         {ABOUT_HONORS.items.map((item, idx) => (
           <Reveal
-            key={item.id}
             as="li"
             step={idx % 4}
             sx={[s.row, idx === last && s.rowLast, idx === 3 && s.rowFirstColumnEnd]}
           >
-            <h3 {...stylex.props(s.title)}>{item.title}</h3>
-            <span {...stylex.props(s.level)}>{LEVEL_LABEL[item.level]}</span>
+            <h3 {...stylex.attrs(s.title)}>{item.title}</h3>
+            <span {...stylex.attrs(s.level)}>{LEVEL_LABEL[item.level]}</span>
           </Reveal>
         ))}
       </ul>

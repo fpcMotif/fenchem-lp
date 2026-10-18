@@ -263,45 +263,45 @@ export function FooterSection() {
   });
 
   return (
-    <footer ref={ref} id="contact" {...stylex.props(styles.footer)}>
-      <div aria-hidden="true" {...stylex.props(styles.overlay)} />
+    <footer ref={ref} id="contact" {...stylex.attrs(styles.footer)}>
+      <div aria-hidden="true" {...stylex.attrs(styles.overlay)} />
 
-      <div {...stylex.props(styles.container)}>
+      <div {...stylex.attrs(styles.container)}>
         {/* Certification record — real certifications, set as text */}
-        <h2 {...stylex.props(sharedStyles.srOnly)}>Contact Fenchem</h2>
-        <p {...stylex.props(sharedStyles.techLabelDark, styles.certHeader)}>Certified to</p>
-        <ul {...stylex.props(styles.certChips)}>
+        <h2 {...stylex.attrs(sharedStyles.srOnly)}>Contact Fenchem</h2>
+        <p {...stylex.attrs(sharedStyles.techLabelDark, styles.certHeader)}>Certified to</p>
+        <ul {...stylex.attrs(styles.certChips)}>
           {certifications.map((certification) => (
-            <li key={certification}>
-              <span data-footer-chip {...stylex.props(styles.certChip)}>
+            <li>
+              <span data-footer-chip="" {...stylex.attrs(styles.certChip)}>
                 {certification}
               </span>
             </li>
           ))}
         </ul>
 
-        <div data-rule-top {...stylex.props(styles.ruleTop)} />
+        <div data-rule-top="" {...stylex.attrs(styles.ruleTop)} />
 
         {/* Brand + wayfinding */}
-        <div {...stylex.props(styles.grid)}>
-          <div data-footer-col {...stylex.props(styles.brandCol)}>
-            <p {...stylex.props(styles.brandName)}>{company.name}</p>
-            <p {...stylex.props(sharedStyles.techLabelDark, styles.brandTagline)}>
+        <div {...stylex.attrs(styles.grid)}>
+          <div data-footer-col="" {...stylex.attrs(styles.brandCol)}>
+            <p {...stylex.attrs(styles.brandName)}>{company.name}</p>
+            <p {...stylex.attrs(sharedStyles.techLabelDark, styles.brandTagline)}>
               {company.tagline}
             </p>
-            <p {...stylex.props(styles.brandDescription)}>
+            <p {...stylex.attrs(styles.brandDescription)}>
               {company.legalName} has supplied premium botanical and functional ingredients since{" "}
               {company.founded} — six global bases across three continents, forty-plus countries
               served, and a documented chain of custody behind every lot.
             </p>
           </div>
 
-          <nav data-footer-col aria-label="Footer" {...stylex.props(styles.exploreCol)}>
-            <p {...stylex.props(sharedStyles.techLabelDark)}>Explore</p>
-            <ul {...stylex.props(styles.linksList)}>
+          <nav data-footer-col="" aria-label="Footer" {...stylex.attrs(styles.exploreCol)}>
+            <p {...stylex.attrs(sharedStyles.techLabelDark)}>Explore</p>
+            <ul {...stylex.attrs(styles.linksList)}>
               {navLinks.map((link) => (
-                <li key={link.section}>
-                  <a href={toAnchor(link.section)} {...stylex.props(styles.link)}>
+                <li>
+                  <a href={toAnchor(link.section)} {...stylex.attrs(styles.link)}>
                     {link.label}
                   </a>
                 </li>
@@ -309,51 +309,51 @@ export function FooterSection() {
             </ul>
           </nav>
 
-          <div data-footer-col {...stylex.props(styles.basesCol)}>
-            <p {...stylex.props(sharedStyles.techLabelDark)}>Global bases</p>
-            <ul {...stylex.props(styles.linksList)}>
+          <div data-footer-col="" {...stylex.attrs(styles.basesCol)}>
+            <p {...stylex.attrs(sharedStyles.techLabelDark)}>Global bases</p>
+            <ul {...stylex.attrs(styles.linksList)}>
               {regions.map((region) => (
-                <li key={region.city} {...stylex.props(styles.baseItem)}>
+                <li {...stylex.attrs(styles.baseItem)}>
                   {region.city}
-                  <span {...stylex.props(styles.countryText)}> — {region.country}</span>
+                  <span {...stylex.attrs(styles.countryText)}> — {region.country}</span>
                 </li>
               ))}
             </ul>
           </div>
 
-          <div data-footer-col {...stylex.props(styles.directCol)}>
-            <p {...stylex.props(sharedStyles.techLabelDark)}>Direct</p>
-            <ul {...stylex.props(styles.linksList)}>
+          <div data-footer-col="" {...stylex.attrs(styles.directCol)}>
+            <p {...stylex.attrs(sharedStyles.techLabelDark)}>Direct</p>
+            <ul {...stylex.attrs(styles.linksList)}>
               <li>
-                <a href={createInquiryHref("contact")} {...stylex.props(styles.emailLink)}>
+                <a href={createInquiryHref("contact")} {...stylex.attrs(styles.emailLink)}>
                   {company.email}
                 </a>
               </li>
-              <li {...stylex.props(styles.directText)}>{company.since}</li>
-              <li {...stylex.props(styles.coordsText)}>HQ {company.hq.coords}</li>
+              <li {...stylex.attrs(styles.directText)}>{company.since}</li>
+              <li {...stylex.attrs(styles.coordsText)}>HQ {company.hq.coords}</li>
             </ul>
           </div>
         </div>
       </div>
 
       {/* Ghost wordmark — decorative, half-submerged in the fold */}
-      <div data-footer-mark aria-hidden="true" {...stylex.props(styles.wordmarkWrap)}>
-        <p {...stylex.props(styles.wordmarkText)}>FENCHEM</p>
+      <div data-footer-mark="" aria-hidden="true" {...stylex.attrs(styles.wordmarkWrap)}>
+        <p {...stylex.attrs(styles.wordmarkText)}>FENCHEM</p>
       </div>
 
       {/* Legal strip */}
-      <div {...stylex.props(styles.legalWrap)}>
-        <div data-rule-legal {...stylex.props(styles.ruleLegal)} />
-        <div data-footer-legal {...stylex.props(styles.legalContent)}>
+      <div {...stylex.attrs(styles.legalWrap)}>
+        <div data-rule-legal="" {...stylex.attrs(styles.ruleLegal)} />
+        <div data-footer-legal="" {...stylex.attrs(styles.legalContent)}>
           <p>© 2026 {company.legalName} — All rights reserved.</p>
-          <ul {...stylex.props(styles.legalList)}>
+          <ul {...stylex.attrs(styles.legalList)}>
             <li>
-              <a href="/privacy" {...stylex.props(styles.link)}>
+              <a href="/privacy" {...stylex.attrs(styles.link)}>
                 Privacy
               </a>
             </li>
             <li>
-              <a href="/terms" {...stylex.props(styles.link)}>
+              <a href="/terms" {...stylex.attrs(styles.link)}>
                 Terms
               </a>
             </li>

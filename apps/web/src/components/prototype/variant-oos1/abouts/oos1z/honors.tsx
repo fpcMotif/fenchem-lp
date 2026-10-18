@@ -144,34 +144,34 @@ const styles = stylex.create({
 
 export function Honors() {
   return (
-    <section id="about-honor" aria-labelledby="oos1z-honor" {...stylex.props(ui.anchor, ui.room)}>
-      <div {...stylex.props(ui.shell)}>
+    <section id="about-honor" aria-labelledby="oos1z-honor" {...stylex.attrs(ui.anchor, ui.room)}>
+      <div {...stylex.attrs(ui.shell)}>
         <RoomSign
           numeral="V"
           id="oos1z-honor"
           title={sectionTitle("about-honor")}
           english="Honours, hung on the line"
         />
-        <div {...stylex.props(styles.wall)}>
+        <div {...stylex.attrs(styles.wall)}>
           {GROUPS.map((group) => (
-            <div key={group.level} {...stylex.props(styles.row)}>
-              <div {...stylex.props(styles.rail)}>
-                <span {...stylex.props(styles.railLabel)}>{group.label}</span>
-                <span lang="en" {...stylex.props(ui.italic, styles.railCount)}>
+            <div {...stylex.attrs(styles.row)}>
+              <div {...stylex.attrs(styles.rail)}>
+                <span {...stylex.attrs(styles.railLabel)}>{group.label}</span>
+                <span lang="en" {...stylex.attrs(ui.italic, styles.railCount)}>
                   {group.english}
                 </span>
               </div>
-              <ol {...stylex.props(styles.plaques)}>
+              <ol {...stylex.attrs(styles.plaques)}>
                 {group.items.map((item) => (
-                  <li key={item.id} {...stylex.props(styles.item)}>
-                    <span aria-hidden="true" {...stylex.props(styles.wires)} />
-                    <div {...stylex.props(styles.plaque)}>
-                      <div {...stylex.props(styles.mat)}>
-                        <span lang="en" {...stylex.props(ui.number, styles.number)}>
+                  <li {...stylex.attrs(styles.item)}>
+                    <span aria-hidden="true" {...stylex.attrs(styles.wires)} />
+                    <div {...stylex.attrs(styles.plaque)}>
+                      <div {...stylex.attrs(styles.mat)}>
+                        <span lang="en" {...stylex.attrs(ui.number, styles.number)}>
                           Nº {item.number}
                         </span>
-                        <span {...stylex.props(styles.title)}>{item.title}</span>
-                        <span lang="en" {...stylex.props(ui.italic, styles.level)}>
+                        <span {...stylex.attrs(styles.title)}>{item.title}</span>
+                        <span lang="en" {...stylex.attrs(ui.italic, styles.level)}>
                           {group.line}
                         </span>
                       </div>

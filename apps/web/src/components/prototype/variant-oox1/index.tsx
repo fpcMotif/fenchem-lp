@@ -1,13 +1,21 @@
 import { BloomHeadline } from "../shared/navigation-and-headline";
 import { CorporateHeader, HeroBackdrop, OfficeDirectory } from "../shared/corporate-sections";
 import { Flow } from "../shared/flow";
-import { LayoutGroup } from "motion/react";
+import { LayoutGroup } from "@/compat/motion";
 import { FooterNavigation, FooterLegal } from "../shared/footer-content";
 import { NewsAccordion } from "../shared/news-accordion";
 import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 import type { StyleXStyles } from "@stylexjs/stylex";
-import { ArrowUpRight, Globe, Lightbulb, Plus, Shield, Users, type LucideIcon } from "lucide-react";
+import {
+  ArrowUpRight,
+  Globe,
+  Lightbulb,
+  Plus,
+  Shield,
+  Users,
+  type LucideIcon,
+} from "@fenchem-lp/ui/components/lucide";
 import {
   LazyMotion,
   MotionConfig,
@@ -17,18 +25,11 @@ import {
   useScroll,
   useTransform,
   type MotionValue,
-} from "motion/react";
-import {
-  useEffect,
-  useId,
-  useRef,
-  useState,
-  useSyncExternalStore,
-  type CSSProperties,
-  type MouseEvent,
-  type ReactNode,
-} from "react";
-import { preinit } from "react-dom";
+} from "@/compat/motion";
+import { createMediaQuery } from "@/compat/reduced-motion";
+import { createEffect, createSignal, createUniqueId, For, merge, Show, untrack } from "solid-js";
+import { dynamic, type JSX } from "@solidjs/web";
+import { preinit } from "@/compat/react-dom";
 
 import { EASE, STAGGER } from "@/components/prototype/motion-constants";
 import { HeroGradeFilter } from "@/components/prototype/hero-grade";
@@ -1801,18 +1802,8 @@ const HERO_DECK_AT = [
   styles.heroDeckAt3,
 ] as const;
 
-function subscribeDeck(onChange: () => void) {
-  const mediaQuery = window.matchMedia(DECK_QUERY);
-  mediaQuery.addEventListener("change", onChange);
-  return () => mediaQuery.removeEventListener("change", onChange);
-}
-
 function useDeck() {
-  return useSyncExternalStore(
-    subscribeDeck,
-    () => window.matchMedia(DECK_QUERY).matches,
-    () => false,
-  );
+  return createMediaQuery(DECK_QUERY);
 }
 
 function deckStop(index: number) {
@@ -1825,7 +1816,7 @@ function deckStop(index: number) {
   return top + index * (first.offsetHeight + gap) - DECK_TOPS[index];
 }
 
-function goToCard(event: MouseEvent<HTMLAnchorElement>, index: number) {
+function goToCard(event: MouseEvent, index: number) {
   const stop = deckStop(index);
   if (stop === null) return;
   event.preventDefault();
@@ -1838,8 +1829,17 @@ function revealCard(index: number) {
   if (stop !== null && window.scrollY > stop + 8) window.scrollTo({ top: stop });
 }
 
+// `focusable` (legacy SVG attribute) is not in Solid's JSX types.
+const UNFOCUSABLE = { focusable: "false" } as JSX.SvgSVGAttributes<SVGSVGElement>;
+
+// stylex.props with reactive (accessor) arguments: the StyleX compiler tries to
+// evaluate local arrow functions at build time and throws, so these call sites
+// resolve at runtime instead.
+const sxProps = (...args: ReadonlyArray<StyleXStyles | false | null | undefined>) =>
+  stylex.attrs(...args);
+
 type ZoomProps = {
-  children: ReactNode;
+  children: JSX.Element;
   sx?: StyleXStyles;
   style?: StyleXStyles;
   delay?: number;
@@ -1847,90 +1847,73 @@ type ZoomProps = {
   scale?: number;
 };
 
-function ZoomReveal({
-  children,
-  sx,
-  style,
-  delay = 0,
-  y = 24,
-  scale = ZOOM_FROM_SCALE,
-}: ZoomProps) {
+function ZoomReveal(props: ZoomProps) {
+  const p = merge({ delay: 0, y: 24, scale: ZOOM_FROM_SCALE }, props);
   const reduce = useReducedMotion();
   return (
     <m.div
-      {...stylex.props(sx, style)}
-      initial={{ opacity: 0, transform: zoomFrom(y, scale) }}
+      {...stylex.attrs(p.sx, p.style)}
+      initial={{ opacity: 0, transform: zoomFrom(p.y, p.scale) }}
       whileInView={{ opacity: 1, transform: SETTLED }}
       viewport={{ once: true, margin: "-80px" }}
-      transition={{ duration: reduce ? 0.2 : 0.8, delay: reduce ? 0 : delay, ease: EASE }}
+      transition={{ duration: reduce() ? 0.2 : 0.8, delay: reduce() ? 0 : p.delay, ease: EASE }}
     >
-      {children}
+      {p.children}
     </m.div>
   );
 }
 
-function DoubleRule({ sx }: { sx?: StyleXStyles }) {
-  return <hr {...stylex.props(styles.doubleRule, sx)} />;
+function DoubleRule(props: { sx?: StyleXStyles }) {
+  return <hr {...stylex.attrs(styles.doubleRule, props.sx)} />;
 }
 
-function Ring({ value, sx }: { value: number; sx?: StyleXStyles }) {
+function Ring(props: { value: number; sx?: StyleXStyles }) {
   return (
-    <span aria-hidden="true" {...stylex.props(styles.ring, sx)}>
-      {twoDigits(value)}
+    <span aria-hidden="true" {...stylex.attrs(styles.ring, props.sx)}>
+      {twoDigits(props.value)}
     </span>
   );
 }
 
-function Echo({ children, sx }: { children: ReactNode; sx?: StyleXStyles }) {
+function Echo(props: { children: JSX.Element; sx?: StyleXStyles }) {
   return (
-    <span aria-hidden="true" lang="en" {...stylex.props(styles.echo, sx)}>
-      {children}
+    <span aria-hidden="true" lang="en" {...stylex.attrs(styles.echo, props.sx)}>
+      {props.children}
     </span>
   );
 }
 
-function GhostButton({
-  href,
-  label,
-  variant = "primary",
-  size = "compact",
-  sx,
-}: {
+function GhostButton(props: {
   href: string;
   label: string;
   variant?: "primary" | "secondary";
   size?: "compact" | "wide" | "hero";
   sx?: StyleXStyles;
 }) {
+  const p = merge({ variant: "primary" as const, size: "compact" as const }, props);
   return (
-    <span {...stylex.props(styles.ghostWrap, stylex.defaultMarker(), sx)}>
+    <span {...stylex.attrs(styles.ghostWrap, stylex.defaultMarker(), p.sx)}>
       <span
         aria-hidden="true"
-        {...stylex.props(styles.ghost, variant === "secondary" && styles.ghostOnDark)}
+        {...stylex.attrs(styles.ghost, p.variant === "secondary" && styles.ghostOnDark)}
       />
       <a
-        href={href}
-        {...stylex.props(
+        href={p.href}
+        {...stylex.attrs(
           styles.button,
-          variant === "primary" ? styles.buttonPrimary : styles.buttonSecondary,
-          size === "compact" && styles.buttonCompact,
-          size === "wide" && styles.buttonWide,
-          size === "hero" && styles.buttonHero,
+          p.variant === "primary" ? styles.buttonPrimary : styles.buttonSecondary,
+          p.size === "compact" && styles.buttonCompact,
+          p.size === "wide" && styles.buttonWide,
+          p.size === "hero" && styles.buttonHero,
         )}
       >
-        {label}
+        {p.label}
       </a>
     </span>
   );
 }
 
-function SectionHead({
-  id,
-  title,
-  echo,
-  lead,
-  center = false,
-}: {
+function SectionHead(props: {
   id: string;
   title: string;
   echo: string;
@@ -1938,32 +1921,24 @@ function SectionHead({
   center?: boolean;
 }) {
   return (
-    <ZoomReveal sx={[styles.head, center && styles.headCenter]}>
-      <div {...stylex.props(styles.headRow, center && styles.headRowCenter)}>
-        <h2 id={id} {...stylex.props(styles.sectionTitle)}>
-          {title}
+    <ZoomReveal sx={[styles.head, props.center && styles.headCenter]}>
+      <div {...stylex.attrs(styles.headRow, props.center && styles.headRowCenter)}>
+        <h2 id={props.id} {...stylex.attrs(styles.sectionTitle)}>
+          {props.title}
         </h2>
-        <Echo>{echo}</Echo>
+        <Echo>{props.echo}</Echo>
       </div>
-      {lead ? <p {...stylex.props(styles.sectionLead)}>{lead}</p> : null}
+      <Show when={props.lead}>
+        <p {...stylex.attrs(styles.sectionLead)}>{props.lead}</p>
+      </Show>
     </ZoomReveal>
   );
 }
 
-function VectorArt({
-  paths,
-  viewBox,
-  sx,
-}: {
-  paths: readonly VectorPath[];
-  viewBox: string;
-  sx: StyleXStyles;
-}) {
+function VectorArt(props: { paths: readonly VectorPath[]; viewBox: string; sx: StyleXStyles }) {
   return (
-    <svg viewBox={viewBox} aria-hidden="true" focusable="false" {...stylex.props(sx)}>
-      {paths.map((path) => (
-        <path key={path.d} d={path.d} fill={path.fill} />
-      ))}
+    <svg viewBox={props.viewBox} aria-hidden="true" {...UNFOCUSABLE} {...stylex.attrs(props.sx)}>
+      <For each={props.paths}>{(path) => <path d={path.d} fill={path.fill} />}</For>
     </svg>
   );
 }
@@ -2002,15 +1977,14 @@ function LogoMark() {
     <svg
       viewBox="0 0 161 52"
       aria-hidden="true"
-      focusable="false"
-      {...stylex.props(styles.logo, styles.logoAssemble)}
+      {...UNFOCUSABLE}
+      {...stylex.attrs(styles.logo, styles.logoAssemble)}
     >
       {LOGO_PATHS.map((path) => (
         <path
-          key={path.d}
           d={path.d}
           fill={path.fill}
-          {...stylex.props(styles.logoPart, styles.enterDelay(logoPartDelay(path.d)))}
+          {...stylex.attrs(styles.logoPart, styles.enterDelay(logoPartDelay(path.d)))}
         />
       ))}
     </svg>
@@ -2022,7 +1996,7 @@ function HeroDeck() {
     <a
       href="#products"
       aria-label={HERO_DECK.aria}
-      {...stylex.props(
+      {...stylex.attrs(
         styles.heroDeck,
         styles.heroRise,
         styles.enterDelay(introAfter(900)),
@@ -2030,11 +2004,11 @@ function HeroDeck() {
       )}
     >
       {MARKETS.map((market, index) => (
-        <span key={market.id} {...stylex.props(styles.heroDeckCard, HERO_DECK_AT[index])}>
-          <img src={market.image} alt="" decoding="async" {...stylex.props(styles.heroDeckImage)} />
+        <span {...stylex.attrs(styles.heroDeckCard, HERO_DECK_AT[index])}>
+          <img src={market.image} alt="" decoding="async" {...stylex.attrs(styles.heroDeckImage)} />
         </span>
       ))}
-      <span aria-hidden="true" {...stylex.props(styles.heroDeckLabel)}>
+      <span aria-hidden="true" {...stylex.attrs(styles.heroDeckLabel)}>
         <Ring value={MARKETS.length} sx={styles.ringSmall} />
         {HERO_DECK.label}
       </span>
@@ -2043,19 +2017,17 @@ function HeroDeck() {
 }
 
 function Hero() {
-  const heroRef = useRef<HTMLElement>(null);
+  let heroEl: HTMLElement | undefined;
   const reduce = useReducedMotion();
-  const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
+  const { scrollYProgress } = useScroll({
+    target: () => heroEl,
+    offset: ["start start", "end start"],
+  });
   const backdropY = useTransform(scrollYProgress, [0, 1], ["0%", "18%"]);
   const contentY = useTransform(scrollYProgress, [0, 1], [0, -120]);
   const contentOpacity = useTransform(scrollYProgress, [0, 0.75], [1, 0]);
   return (
-    <section
-      ref={heroRef}
-      id="top"
-      aria-labelledby="oox1-hero-title"
-      {...stylex.props(styles.hero)}
-    >
+    <section ref={heroEl} id="top" aria-labelledby="oox1-hero-title" {...stylex.attrs(styles.hero)}>
       <HeroGradeFilter />
       <HeroBackdrop
         styles={{
@@ -2067,14 +2039,14 @@ function Hero() {
           heroParallax: styles.heroParallax,
         }}
         source={IMAGES.hero}
-        motionStyle={reduce ? undefined : { y: backdropY }}
+        motionStyle={reduce() ? undefined : { y: backdropY }}
       />
       <m.div
-        {...stylex.props(styles.shell, styles.inset120, styles.heroContent)}
-        style={reduce ? undefined : { y: contentY, opacity: contentOpacity }}
+        {...stylex.attrs(styles.shell, styles.inset120, styles.heroContent)}
+        style={reduce() ? undefined : { y: contentY, opacity: contentOpacity }}
       >
-        <div {...stylex.props(styles.heroCopy)}>
-          <h1 id="oox1-hero-title" {...stylex.props(styles.heroTitle)}>
+        <div {...stylex.attrs(styles.heroCopy)}>
+          <h1 id="oox1-hero-title" {...stylex.attrs(styles.heroTitle)}>
             <BloomHeadline
               styles={{
                 heroHeadline: styles.heroHeadline,
@@ -2099,7 +2071,7 @@ function Hero() {
               introAfter={introAfter}
             />{" "}
             <span
-              {...stylex.props(
+              {...stylex.attrs(
                 styles.heroSubtitle,
                 styles.heroBloom,
                 styles.enterDelay(introAfter(600)),
@@ -2109,16 +2081,16 @@ function Hero() {
             </span>
           </h1>
         </div>
-        <div {...stylex.props(styles.ctaRow, styles.heroBloom, styles.enterDelay(introAfter(760)))}>
+        <div {...stylex.attrs(styles.ctaRow, styles.heroBloom, styles.enterDelay(introAfter(760)))}>
           <a
             href={HERO.primary.href}
-            {...stylex.props(styles.button, styles.buttonPrimary, styles.buttonHero)}
+            {...stylex.attrs(styles.button, styles.buttonPrimary, styles.buttonHero)}
           >
             {HERO.primary.label}
           </a>
           <a
             href={HERO.secondary.href}
-            {...stylex.props(styles.button, styles.buttonSecondary, styles.buttonHero)}
+            {...stylex.attrs(styles.button, styles.buttonSecondary, styles.buttonHero)}
           >
             {HERO.secondary.label}
           </a>
@@ -2129,17 +2101,16 @@ function Hero() {
   );
 }
 
-function IconPattern({ icon }: { icon: StrengthIcon }) {
-  const Icon = STRENGTH_ICONS[icon];
+function IconPattern(props: { icon: StrengthIcon }) {
+  const Icon = dynamic(() => STRENGTH_ICONS[props.icon]);
   return (
-    <div aria-hidden="true" {...stylex.props(styles.pattern)}>
+    <div aria-hidden="true" {...stylex.attrs(styles.pattern)}>
       {PATTERN_CELLS.map((cell) => (
         <Icon
-          key={`${cell.left}-${cell.top}`}
           size={32}
           strokeWidth={2}
           absoluteStrokeWidth
-          {...stylex.props(styles.patternCell(`${cell.left}px`, `${cell.top}px`))}
+          {...stylex.attrs(styles.patternCell(`${cell.left}px`, `${cell.top}px`))}
         />
       ))}
     </div>
@@ -2151,7 +2122,7 @@ function Strengths() {
     <section
       id="strengths"
       aria-labelledby="oox1-strengths-title"
-      {...stylex.props(styles.strengths, styles.inset120, styles.anchor)}
+      {...stylex.attrs(styles.strengths, styles.inset120, styles.anchor)}
     >
       <SectionHead
         id="oox1-strengths-title"
@@ -2160,29 +2131,28 @@ function Strengths() {
         lead={STRENGTHS_INTRO.lead}
         center
       />
-      <div {...stylex.props(styles.strengthGrid)}>
+      <div {...stylex.attrs(styles.strengthGrid)}>
         {STRENGTHS.map((strength, index) => {
           const Icon = STRENGTH_ICONS[strength.icon];
           const inverse = strength.tone === "blue";
           return (
             <ZoomReveal
-              key={strength.title}
               delay={index * STAGGER}
               sx={[styles.strengthCard, stylex.defaultMarker()]}
               style={TONE_STYLES[strength.tone]}
             >
               <IconPattern icon={strength.icon} />
-              <div {...stylex.props(styles.strengthTop, inverse && styles.strengthInverse)}>
+              <div {...stylex.attrs(styles.strengthTop, inverse && styles.strengthInverse)}>
                 <Ring value={index + 1} sx={[styles.strengthRing, inverse && styles.ringOnDark]} />
                 <Icon size={28} strokeWidth={1.5} absoluteStrokeWidth aria-hidden="true" />
               </div>
-              <div {...stylex.props(styles.strengthText, inverse && styles.strengthInverse)}>
-                <h3 {...stylex.props(styles.strengthTitle)}>{strength.title}</h3>
+              <div {...stylex.attrs(styles.strengthText, inverse && styles.strengthInverse)}>
+                <h3 {...stylex.attrs(styles.strengthTitle)}>{strength.title}</h3>
                 {strength.description ? (
-                  <p {...stylex.props(styles.strengthSmall)}>{strength.description}</p>
+                  <p {...stylex.attrs(styles.strengthSmall)}>{strength.description}</p>
                 ) : null}
                 {strength.link ? (
-                  <a href="#offices" {...stylex.props(styles.strengthLink)}>
+                  <a href="#offices" {...stylex.attrs(styles.strengthLink)}>
                     {strength.link}
                     <ArrowUpRight
                       size={12}
@@ -2206,22 +2176,22 @@ function About() {
     <section
       id="about"
       aria-labelledby="oox1-about-title"
-      {...stylex.props(styles.about, styles.anchor)}
+      {...stylex.attrs(styles.about, styles.anchor)}
     >
-      <span aria-hidden="true" lang="en" {...stylex.props(styles.aboutWord)}>
+      <span aria-hidden="true" lang="en" {...stylex.attrs(styles.aboutWord)}>
         {ABOUT.echo}
       </span>
-      <div {...stylex.props(styles.shell, styles.inset120, styles.aboutInner)}>
+      <div {...stylex.attrs(styles.shell, styles.inset120, styles.aboutInner)}>
         <DoubleRule sx={styles.doubleRuleOnDark} />
-        <div {...stylex.props(styles.aboutGrid)}>
+        <div {...stylex.attrs(styles.aboutGrid)}>
           <ZoomReveal sx={styles.headRow}>
-            <h2 id="oox1-about-title" {...stylex.props(styles.sectionTitle, styles.aboutTitle)}>
+            <h2 id="oox1-about-title" {...stylex.attrs(styles.sectionTitle, styles.aboutTitle)}>
               {ABOUT.title}
             </h2>
             <Echo sx={styles.echoOnDark}>{ABOUT.echo}</Echo>
           </ZoomReveal>
           <ZoomReveal delay={0.08} sx={styles.aboutBody}>
-            <p {...stylex.props(styles.aboutText)}>{ABOUT.body}</p>
+            <p {...stylex.attrs(styles.aboutText)}>{ABOUT.body}</p>
             <GhostButton href={ABOUT.cta.href} label={ABOUT.cta.label} variant="secondary" />
           </ZoomReveal>
         </div>
@@ -2230,36 +2200,37 @@ function About() {
   );
 }
 
-function FrameIndex({ mirrored = false }: { mirrored?: boolean }) {
+function FrameIndex(props: { mirrored?: boolean }) {
+  const mirrored = untrack(() => props.mirrored ?? false);
   const items = mirrored ? MIRRORED_MARKETS : MARKETS;
   return (
     <ul
       aria-label={mirrored ? undefined : "Four application areas"}
       aria-hidden={mirrored ? "true" : undefined}
-      {...stylex.props(styles.frameIndex)}
+      {...stylex.attrs(styles.frameIndex)}
     >
       {items.map((market) => {
         const index = MARKETS.indexOf(market);
         const body = (
           <>
             <Ring value={index + 1} />
-            <span {...stylex.props(styles.frameIndexText)}>
-              <span {...stylex.props(styles.frameIndexName)}>{market.title}</span>
-              <span lang="en" {...stylex.props(styles.frameIndexWord)}>
+            <span {...stylex.attrs(styles.frameIndexText)}>
+              <span {...stylex.attrs(styles.frameIndexName)}>{market.title}</span>
+              <span lang="en" {...stylex.attrs(styles.frameIndexWord)}>
                 {market.english}
               </span>
             </span>
           </>
         );
         return (
-          <li key={market.id}>
+          <li>
             {mirrored ? (
-              <span {...stylex.props(styles.frameIndexItem, styles.frameIndexMuted)}>{body}</span>
+              <span {...stylex.attrs(styles.frameIndexItem, styles.frameIndexMuted)}>{body}</span>
             ) : (
               <a
                 href={`#oox1-card-${market.id}`}
                 onClick={(event) => goToCard(event, index)}
-                {...stylex.props(styles.frameIndexItem)}
+                {...stylex.attrs(styles.frameIndexItem)}
               >
                 {body}
               </a>
@@ -2273,12 +2244,12 @@ function FrameIndex({ mirrored = false }: { mirrored?: boolean }) {
 
 function DeckOpen() {
   return (
-    <div {...stylex.props(styles.shell, styles.inset120, styles.frame)}>
+    <div {...stylex.attrs(styles.shell, styles.inset120, styles.frame)}>
       <DoubleRule />
-      <div {...stylex.props(styles.frameRow)}>
+      <div {...stylex.attrs(styles.frameRow)}>
         <SectionHead id="oox1-products-title" title={DECK_OPEN.title} echo={DECK_OPEN.echo} />
         <ZoomReveal delay={0.08} sx={styles.frameLead}>
-          <p {...stylex.props(styles.sectionLead)}>{DECK_OPEN.lead}</p>
+          <p {...stylex.attrs(styles.sectionLead)}>{DECK_OPEN.lead}</p>
         </ZoomReveal>
       </div>
       <FrameIndex />
@@ -2288,11 +2259,11 @@ function DeckOpen() {
 
 function DeckClose() {
   return (
-    <div {...stylex.props(styles.shell, styles.inset120, styles.frame)}>
+    <div {...stylex.attrs(styles.shell, styles.inset120, styles.frame)}>
       <FrameIndex mirrored />
-      <div {...stylex.props(styles.frameRow)}>
+      <div {...stylex.attrs(styles.frameRow)}>
         <ZoomReveal sx={styles.frameClose}>
-          <p {...stylex.props(styles.frameCloseLine)}>{DECK_CLOSE.line}</p>
+          <p {...stylex.attrs(styles.frameCloseLine)}>{DECK_CLOSE.line}</p>
           <Echo>{DECK_CLOSE.echo}</Echo>
         </ZoomReveal>
         <GhostButton
@@ -2306,90 +2277,81 @@ function DeckClose() {
   );
 }
 
-function DeckCard({
-  market,
-  index,
-  depth,
-}: {
-  market: Market;
-  index: number;
-  depth: MotionValue<number>;
-}) {
-  const titleId = useId();
+function DeckCard(props: { market: Market; index: number; depth: MotionValue<number> }) {
+  const titleId = createUniqueId();
+  const depth = untrack(() => props.depth);
   const scale = useTransform(depth, (value) => 1 - value * DECK_SCALE_STEP);
   const dim = useTransform(depth, (value) => Math.min(0.42, value * DECK_DIM_STEP));
   return (
     <m.li
-      id={`oox1-card-${market.id}`}
+      id={`oox1-card-${props.market.id}`}
       aria-labelledby={titleId}
-      onFocus={() => revealCard(index)}
-      {...stylex.props(styles.card, CARD_AT[index])}
+      onFocus={() => revealCard(props.index)}
+      {...stylex.attrs(styles.card, CARD_AT[props.index])}
       style={{ scale }}
     >
-      <div {...stylex.props(styles.cardStrip)}>
-        <span {...stylex.props(styles.cardStripName)}>
-          <span {...stylex.props(styles.cardStripNumber)}>{twoDigits(index + 1)}</span>
-          {market.title}
+      <div {...stylex.attrs(styles.cardStrip)}>
+        <span {...stylex.attrs(styles.cardStripName)}>
+          <span {...stylex.attrs(styles.cardStripNumber)}>{twoDigits(props.index + 1)}</span>
+          {props.market.title}
         </span>
-        <span lang="en" {...stylex.props(styles.cardStripWord)}>
-          {twoDigits(index + 1)} / {twoDigits(MARKETS.length)} · {market.english}
+        <span lang="en" {...stylex.attrs(styles.cardStripWord)}>
+          {twoDigits(props.index + 1)} / {twoDigits(MARKETS.length)} · {props.market.english}
         </span>
       </div>
       <DoubleRule sx={styles.doubleRuleSoft} />
-      <div {...stylex.props(styles.cardBody)}>
-        <figure {...stylex.props(styles.figure)}>
-          <span aria-hidden="true" {...stylex.props(styles.figureGhost)} />
-          <div {...stylex.props(styles.figureFrame)}>
+      <div {...stylex.attrs(styles.cardBody)}>
+        <figure {...stylex.attrs(styles.figure)}>
+          <span aria-hidden="true" {...stylex.attrs(styles.figureGhost)} />
+          <div {...stylex.attrs(styles.figureFrame)}>
             <img
-              src={market.image}
-              alt={market.english}
+              src={props.market.image}
+              alt={props.market.english}
               loading="lazy"
               decoding="async"
-              {...stylex.props(styles.figureImage)}
+              {...stylex.attrs(styles.figureImage)}
             />
           </div>
         </figure>
-        <div {...stylex.props(styles.copy)}>
-          <div {...stylex.props(styles.wordRow)}>
-            <span aria-hidden="true" lang="en" {...stylex.props(styles.word)}>
-              {market.word}
+        <div {...stylex.attrs(styles.copy)}>
+          <div {...stylex.attrs(styles.wordRow)}>
+            <span aria-hidden="true" lang="en" {...stylex.attrs(styles.word)}>
+              {props.market.word}
             </span>
-            <Ring value={index + 1} sx={styles.wordRing} />
+            <Ring value={props.index + 1} sx={styles.wordRing} />
           </div>
-          <h3 id={titleId} {...stylex.props(styles.cardTitle)}>
-            {market.title}
+          <h3 id={titleId} {...stylex.attrs(styles.cardTitle)}>
+            {props.market.title}
           </h3>
-          <p lang="en" {...stylex.props(styles.pitch)}>
-            {market.pitch}
+          <p lang="en" {...stylex.attrs(styles.pitch)}>
+            {props.market.pitch}
           </p>
-          <p {...stylex.props(styles.kicker)}>{market.kicker}</p>
-          <ul aria-label={`${market.english} segments`} {...stylex.props(styles.tags)}>
-            {market.tags.map((tag) => (
-              <li key={tag} {...stylex.props(styles.tag)}>
-                <Plus
-                  size={12}
-                  strokeWidth={1.5}
-                  absoluteStrokeWidth
-                  aria-hidden="true"
-                  {...stylex.props(styles.tagIcon)}
-                />
-                {tag}
-              </li>
-            ))}
+          <p {...stylex.attrs(styles.kicker)}>{props.market.kicker}</p>
+          <ul aria-label={`${props.market.english} segments`} {...stylex.attrs(styles.tags)}>
+            <For each={props.market.tags}>
+              {(tag) => (
+                <li {...stylex.attrs(styles.tag)}>
+                  <Plus
+                    size={12}
+                    strokeWidth={1.5}
+                    absoluteStrokeWidth
+                    aria-hidden="true"
+                    {...stylex.attrs(styles.tagIcon)}
+                  />
+                  {tag}
+                </li>
+              )}
+            </For>
           </ul>
           <GhostButton href={MARKET_CTA.href} label={MARKET_CTA.label} />
         </div>
       </div>
-      <m.span aria-hidden="true" {...stylex.props(styles.cardDim)} style={{ opacity: dim }} />
+      <m.span aria-hidden="true" {...stylex.attrs(styles.cardDim)} style={{ opacity: dim }} />
     </m.li>
   );
 }
 
-function DeckCardSlot({
-  market,
-  index,
-  metrics,
-}: {
+function DeckCardSlot(props: {
   market: Market;
   index: number;
   metrics: {
@@ -2400,7 +2362,9 @@ function DeckCardSlot({
     enabled: MotionValue<number>;
   };
 }) {
-  const depth = useTransform<number, number>(
+  const index = untrack(() => props.index);
+  const metrics = untrack(() => props.metrics);
+  const depth = useTransform(
     [metrics.progress, metrics.span, metrics.stride, metrics.cardHeight, metrics.enabled],
     ([progress, span, stride, cardHeight, enabled]) => {
       if (!enabled || !cardHeight) return 0;
@@ -2413,20 +2377,23 @@ function DeckCardSlot({
       return depthSoFar;
     },
   );
-  return <DeckCard market={market} index={index} depth={depth} />;
+  return <DeckCard market={props.market} index={props.index} depth={depth} />;
 }
 
 function Deck() {
-  const deckRef = useRef<HTMLOListElement>(null);
+  let deckEl: HTMLOListElement | undefined;
   const decking = useDeck();
   const enabled = useMotionValue(0);
   const span = useMotionValue(0);
   const stride = useMotionValue(0);
   const cardHeight = useMotionValue(0);
-  const { scrollYProgress } = useScroll({ target: deckRef, offset: ["start start", "end start"] });
-  useEffect(() => {
-    enabled.set(decking ? 1 : 0);
-    const deck = deckRef.current;
+  const { scrollYProgress } = useScroll({
+    target: () => deckEl,
+    offset: ["start start", "end start"],
+  });
+  createEffect(decking, (on) => {
+    enabled.set(on ? 1 : 0);
+    const deck = deckEl;
     if (!deck) return;
     const measure = () => {
       const first = deck.children[0] as HTMLElement | undefined;
@@ -2440,15 +2407,15 @@ function Deck() {
     const observer = new ResizeObserver(measure);
     observer.observe(deck);
     return () => observer.disconnect();
-  }, [decking, enabled, span, stride, cardHeight]);
+  });
   const metrics = { progress: scrollYProgress, span, stride, cardHeight, enabled };
   return (
-    <div {...stylex.props(styles.shell, styles.inset120)}>
-      <ol ref={deckRef} id={DECK_ID} {...stylex.props(styles.deck)}>
+    <div {...stylex.attrs(styles.shell, styles.inset120)}>
+      <ol ref={deckEl} id={DECK_ID} {...stylex.attrs(styles.deck)}>
         {MARKETS.map((market, index) => (
-          <DeckCardSlot key={market.id} market={market} index={index} metrics={metrics} />
+          <DeckCardSlot market={market} index={index} metrics={metrics} />
         ))}
-        <li aria-hidden="true" {...stylex.props(styles.deckTail)} />
+        <li aria-hidden="true" {...stylex.attrs(styles.deckTail)} />
       </ol>
     </div>
   );
@@ -2456,7 +2423,7 @@ function Deck() {
 
 function Products() {
   return (
-    <section id="products" aria-labelledby="oox1-products-title" {...stylex.props(styles.anchor)}>
+    <section id="products" aria-labelledby="oox1-products-title" {...stylex.attrs(styles.anchor)}>
       <DeckOpen />
       <Deck />
       <DeckClose />
@@ -2470,39 +2437,38 @@ function Campus() {
     <section
       id="campus"
       aria-labelledby="oox1-campus-title"
-      {...stylex.props(styles.campus, styles.anchor)}
+      {...stylex.attrs(styles.campus, styles.anchor)}
     >
-      <div {...stylex.props(styles.shell, styles.inset120, styles.campusHead)}>
+      <div {...stylex.attrs(styles.shell, styles.inset120, styles.campusHead)}>
         <SectionHead id="oox1-campus-title" title={CAMPUS.label} echo={CAMPUS.echo} />
       </div>
-      <div {...stylex.props(styles.shell, styles.inset120, styles.figures)}>
+      <div {...stylex.attrs(styles.shell, styles.inset120, styles.figures)}>
         {STATS.map((stat, index) => (
           <ZoomReveal
-            key={stat.label}
             delay={index * STAGGER}
             sx={[styles.figureItem, index === 0 && styles.figureItemFirst]}
           >
-            <p {...stylex.props(styles.figureLabel)}>{stat.label}</p>
-            <p {...stylex.props(styles.figureValue)}>
+            <p {...stylex.attrs(styles.figureLabel)}>{stat.label}</p>
+            <p {...stylex.attrs(styles.figureValue)}>
               {stat.value}
-              {stat.unit ? <span {...stylex.props(styles.figureUnit)}>{stat.unit}</span> : null}
+              {stat.unit ? <span {...stylex.attrs(styles.figureUnit)}>{stat.unit}</span> : null}
             </p>
-            <p {...stylex.props(styles.figureLabel)}>{stat.caption}</p>
+            <p {...stylex.attrs(styles.figureLabel)}>{stat.caption}</p>
           </ZoomReveal>
         ))}
       </div>
       <FigureLoop />
-      <div {...stylex.props(styles.campusFrame)}>
+      <div {...stylex.attrs(styles.campusFrame)}>
         <m.img
           src={IMAGES.campus.src}
           alt={IMAGES.campus.alt}
           loading="lazy"
           decoding="async"
-          {...stylex.props(styles.campusImage)}
+          {...stylex.attrs(styles.campusImage)}
           initial={{ scale: 1.12 }}
           whileInView={{ scale: 1 }}
           viewport={{ once: true, margin: "-80px" }}
-          transition={{ duration: reduce ? 0 : 1.6, ease: EASE }}
+          transition={{ duration: reduce() ? 0 : 1.6, ease: EASE }}
         />
       </div>
     </section>
@@ -2511,22 +2477,22 @@ function Campus() {
 
 function FigureLoop() {
   return (
-    <div aria-hidden="true" {...stylex.props(styles.marquee)}>
-      <div {...stylex.props(styles.marqueeRow)}>
-        {MARQUEE_LOOP.map((item, index) => (
-          <span key={index} {...stylex.props(styles.marqueeItem)}>
-            <span {...stylex.props(styles.marqueeFigure)}>{item.figure}</span>
-            <span {...stylex.props(styles.marqueeLabel)}>{item.label}</span>
+    <div aria-hidden="true" {...stylex.attrs(styles.marquee)}>
+      <div {...stylex.attrs(styles.marqueeRow)}>
+        {MARQUEE_LOOP.map((item) => (
+          <span {...stylex.attrs(styles.marqueeItem)}>
+            <span {...stylex.attrs(styles.marqueeFigure)}>{item.figure}</span>
+            <span {...stylex.attrs(styles.marqueeLabel)}>{item.label}</span>
           </span>
         ))}
       </div>
-      <div {...stylex.props(styles.marqueeRow, styles.marqueeRowReverse)}>
-        {MARQUEE_LOOP.map((item, index) => (
-          <span key={index} {...stylex.props(styles.marqueeItem)}>
-            <span {...stylex.props(styles.marqueeFigure, styles.marqueeFigureOutline)}>
+      <div {...stylex.attrs(styles.marqueeRow, styles.marqueeRowReverse)}>
+        {MARQUEE_LOOP.map((item) => (
+          <span {...stylex.attrs(styles.marqueeItem)}>
+            <span {...stylex.attrs(styles.marqueeFigure, styles.marqueeFigureOutline)}>
               {item.figure}
             </span>
-            <span {...stylex.props(styles.marqueeLabel)}>{item.label}</span>
+            <span {...stylex.attrs(styles.marqueeLabel)}>{item.label}</span>
           </span>
         ))}
       </div>
@@ -2536,10 +2502,10 @@ function FigureLoop() {
 
 function Offices() {
   return (
-    <section id="offices" aria-labelledby="oox1-offices-title" {...stylex.props(styles.anchor)}>
-      <div {...stylex.props(styles.globalBand)}>
+    <section id="offices" aria-labelledby="oox1-offices-title" {...stylex.attrs(styles.anchor)}>
+      <div {...stylex.attrs(styles.globalBand)}>
         <ZoomReveal sx={styles.globalRow}>
-          <div {...stylex.props(styles.mapWrap)}>
+          <div {...stylex.attrs(styles.mapWrap)}>
             <img
               src={IMAGES.officeMap.src}
               alt={IMAGES.officeMap.alt}
@@ -2547,27 +2513,26 @@ function Offices() {
               height={321}
               loading="lazy"
               decoding="async"
-              {...stylex.props(styles.mapImage)}
+              {...stylex.attrs(styles.mapImage)}
             />
             {OFFICE_MAP_PINS.map((pin, index) => (
               <span
-                key={`${pin.left}-${pin.top}`}
                 aria-hidden="true"
-                {...stylex.props(
+                {...stylex.attrs(
                   styles.mapRing,
                   styles.pinAt(`${pin.left}%`, `${pin.top}%`, `${(index * 370) % 2800}ms`),
                 )}
               />
             ))}
           </div>
-          <div {...stylex.props(styles.globalCopy)}>
-            <div {...stylex.props(styles.headRow, styles.headRowCenter)}>
-              <h2 id="oox1-offices-title" {...stylex.props(styles.sectionTitle)}>
+          <div {...stylex.attrs(styles.globalCopy)}>
+            <div {...stylex.attrs(styles.headRow, styles.headRowCenter)}>
+              <h2 id="oox1-offices-title" {...stylex.attrs(styles.sectionTitle)}>
                 {GLOBAL_INTRO.title}
               </h2>
               <Echo>{ECHO.offices}</Echo>
             </div>
-            <p {...stylex.props(styles.sectionLead)}>{GLOBAL_INTRO.lead}</p>
+            <p {...stylex.attrs(styles.sectionLead)}>{GLOBAL_INTRO.lead}</p>
           </div>
         </ZoomReveal>
       </div>
@@ -2591,14 +2556,14 @@ function Offices() {
   );
 }
 
-function AccordionIcon({ open }: { open: boolean }) {
+function AccordionIcon(props: { open: boolean }) {
   const reduce = useReducedMotion();
   return (
-    <span aria-hidden="true" {...stylex.props(styles.newsIconSlot)}>
+    <span aria-hidden="true" {...stylex.attrs(styles.newsIconSlot)}>
       <m.span
-        {...stylex.props(styles.newsIconLayer)}
-        animate={{ rotate: open ? 45 : 0 }}
-        transition={reduce ? { duration: 0 } : { type: "spring", duration: 0.3, bounce: 0 }}
+        {...stylex.attrs(styles.newsIconLayer)}
+        animate={{ rotate: props.open ? 45 : 0 }}
+        transition={reduce() ? { duration: 0 } : { type: "spring", duration: 0.3, bounce: 0 }}
       >
         <Plus size={16} strokeWidth={2} absoluteStrokeWidth />
       </m.span>
@@ -2606,21 +2571,13 @@ function AccordionIcon({ open }: { open: boolean }) {
   );
 }
 
-function NewsItem({
-  item,
-  open,
-  onToggle,
-}: {
-  item: (typeof NEWS)[number];
-  open: boolean;
-  onToggle: () => void;
-}) {
+function NewsItem(props: { item: (typeof NEWS)[number]; open: boolean; onToggle: () => void }) {
   return (
     <NewsAccordion
-      item={item}
-      open={open}
-      onToggle={onToggle}
-      icon={<AccordionIcon open={open} />}
+      item={props.item}
+      open={props.open}
+      onToggle={props.onToggle}
+      icon={<AccordionIcon open={props.open} />}
       styles={{
         mutedText: styles.mutedText,
         newsHeading: styles.newsHeading,
@@ -2633,23 +2590,23 @@ function NewsItem({
 }
 
 function News() {
-  const [openIndex, setOpenIndex] = useState<number | null>(0);
+  const [openIndex, setOpenIndex] = createSignal<number | null>(0);
   return (
     <section
       id="news"
       aria-labelledby="oox1-news-title"
-      {...stylex.props(styles.news, styles.anchor)}
+      {...stylex.attrs(styles.news, styles.anchor)}
     >
-      <div {...stylex.props(styles.shell, styles.inset120, styles.newsInner)}>
+      <div {...stylex.attrs(styles.shell, styles.inset120, styles.newsInner)}>
         <SectionHead id="oox1-news-title" title={NEWS_TITLE} echo={ECHO.news} />
-        <ul {...stylex.props(styles.accordion)}>
+        <ul {...stylex.attrs(styles.accordion)}>
           {NEWS.map((item, index) => (
-            <m.li layout="position" transition={{ duration: 0.25, ease: EASE }} key={item.title}>
+            <m.li layout="position" transition={{ duration: 0.25, ease: EASE }}>
               <ZoomReveal delay={index * STAGGER} sx={styles.newsItem}>
                 <NewsItem
                   item={item}
-                  open={openIndex === index}
-                  onToggle={() => setOpenIndex(openIndex === index ? null : index)}
+                  open={openIndex() === index}
+                  onToggle={() => setOpenIndex(openIndex() === index ? null : index)}
                 />
               </ZoomReveal>
             </m.li>
@@ -2665,24 +2622,24 @@ function ContactCta() {
     <section
       id="contact"
       aria-labelledby="oox1-contact-title"
-      {...stylex.props(styles.cta, styles.anchor)}
+      {...stylex.attrs(styles.cta, styles.anchor)}
     >
       <ZoomReveal sx={[styles.shell, styles.inset120, styles.ctaInner]}>
         <DoubleRule sx={styles.ctaRule} />
-        <div {...stylex.props(styles.headRow, styles.headRowCenter)}>
-          <h2 id="oox1-contact-title" {...stylex.props(styles.sectionTitle)}>
+        <div {...stylex.attrs(styles.headRow, styles.headRowCenter)}>
+          <h2 id="oox1-contact-title" {...stylex.attrs(styles.sectionTitle)}>
             {CONTACT.title}
           </h2>
           <Echo>{CONTACT.echo}</Echo>
         </div>
-        <p {...stylex.props(styles.sectionLead, styles.ctaLead)}>{CONTACT.lead}</p>
-        <ul aria-label="Choose an application area" {...stylex.props(styles.ctaMarkets)}>
+        <p {...stylex.attrs(styles.sectionLead, styles.ctaLead)}>{CONTACT.lead}</p>
+        <ul aria-label="Choose an application area" {...stylex.attrs(styles.ctaMarkets)}>
           {MARKETS.map((market, index) => (
-            <li key={market.id}>
+            <li>
               <a
                 href={`#oox1-card-${market.id}`}
                 onClick={(event) => goToCard(event, index)}
-                {...stylex.props(styles.ctaMarket)}
+                {...stylex.attrs(styles.ctaMarket)}
               >
                 <Ring value={index + 1} sx={styles.ringSmall} />
                 {market.title}
@@ -2704,8 +2661,8 @@ function ContactCta() {
 
 function SiteFooter() {
   return (
-    <footer {...stylex.props(styles.footer)}>
-      <div {...stylex.props(styles.shell, styles.inset120, styles.footerInner)}>
+    <footer {...stylex.attrs(styles.footer)}>
+      <div {...stylex.attrs(styles.shell, styles.inset120, styles.footerInner)}>
         <FooterNavigation
           logo={IMAGES.footerLogo}
           columns={FOOTER_COLUMNS}
@@ -2728,10 +2685,10 @@ function SiteFooter() {
             social: styles.social,
           }}
         >
-          <a href="#top" aria-label="LinkedIn" {...stylex.props(styles.socialLink)}>
+          <a href="#top" aria-label="LinkedIn" {...stylex.attrs(styles.socialLink)}>
             <VectorArt paths={LINKEDIN_PATHS} viewBox="0 0 20 20" sx={styles.socialIcon} />
           </a>
-          <a href="#top" aria-label="WeChat" {...stylex.props(styles.socialLink)}>
+          <a href="#top" aria-label="WeChat" {...stylex.attrs(styles.socialLink)}>
             <VectorArt paths={WECHAT_PATHS} viewBox="0 0 20 20" sx={styles.socialIcon} />
           </a>
         </FooterLegal>
@@ -2744,29 +2701,29 @@ export function VariantOOX1() {
   preinit(GOOGLE_FONTS, { as: "style" });
   const reduce = useReducedMotion();
   const intro = useIntro();
-  const introVars = {
-    "--oo-intro": intro === "play" ? `${INTRO_REVEAL_MS}ms` : "0ms",
-  } as CSSProperties;
-  useEffect(() => {
-    if (reduce) return;
+  const introVars = (): JSX.CSSProperties => ({
+    "--oo-intro": intro() === "play" ? `${INTRO_REVEAL_MS}ms` : "0ms",
+  });
+  createEffect(reduce, (reduced) => {
+    if (reduced) return;
     const root = document.documentElement;
     const previous = root.style.scrollBehavior;
     root.style.scrollBehavior = "smooth";
     return () => {
       root.style.scrollBehavior = previous;
     };
-  }, [reduce]);
+  });
   return (
     <LazyMotion features={domMax} strict>
       <LayoutGroup>
         <MotionConfig reducedMotion="user">
-          <div lang="zh-CN" {...stylex.props(styles.root)} style={introVars}>
-            <div {...stylex.props(styles.page, intro === "play" && introStyles.pageReveal)}>
-              <a href="#main-content" {...stylex.props(styles.skipLink)}>
+          <div lang="zh-CN" {...stylex.attrs(styles.root)} style={introVars()}>
+            <div {...sxProps(styles.page, intro() === "play" && introStyles.pageReveal)}>
+              <a href="#main-content" {...stylex.attrs(styles.skipLink)}>
                 跳到主要内容
               </a>
               <SiteHeader />
-              <main id="main-content" tabIndex={-1} {...stylex.props(styles.mainTarget)}>
+              <main id="main-content" tabindex={-1} {...stylex.attrs(styles.mainTarget)}>
                 <Hero />
                 <Strengths />
                 <Offices />

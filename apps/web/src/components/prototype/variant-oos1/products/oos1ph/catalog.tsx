@@ -1,6 +1,7 @@
 import * as stylex from "@stylexjs/stylex";
-import { m } from "motion/react";
-import { Fragment, useId, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
+import { m } from "@/compat/motion";
+import type { JSX } from "@solidjs/web";
+import { createSignal, createUniqueId, flush, For, Show, untrack } from "solid-js";
 
 import { EASE } from "@/components/prototype/motion-constants";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
@@ -312,144 +313,145 @@ function tabTarget(key: string, current: number, last: number): number | null {
   }
 }
 
-function Inci({ text }: { text: string }) {
-  const parts: ReactNode[] = [];
+function Inci(props: { text: string }) {
+  const text = untrack(() => props.text);
+  const parts: JSX.Element[] = [];
   let last = 0;
   for (const match of text.matchAll(INCI_LATIN)) {
     parts.push(text.slice(last, match.index));
-    parts.push(
-      <span key={match.index} {...stylex.props(styles.inciLatin)}>
-        {match[0]}
-      </span>,
-    );
+    parts.push(<span {...stylex.attrs(styles.inciLatin)}>{match[0]}</span>);
     last = match.index + match[0].length;
   }
   parts.push(text.slice(last));
   return <>{parts}</>;
 }
 
-function ItemCell({ column, item }: { column: ColumnId; item: FlatItem }) {
-  switch (column) {
+function ItemCell(props: { column: ColumnId; item: FlatItem }) {
+  const item = props.item;
+  switch (untrack(() => props.column)) {
     case "name":
       return (
-        <th scope="row" {...stylex.props(styles.cell, styles.nameCell)}>
-          <span {...stylex.props(styles.primary)}>{item.primary}</span>
-          {item.secondary && <span {...stylex.props(styles.secondary)}>{item.secondary}</span>}
+        <th scope="row" {...stylex.attrs(styles.cell, styles.nameCell)}>
+          <span {...stylex.attrs(styles.primary)}>{item.primary}</span>
+          {item.secondary && <span {...stylex.attrs(styles.secondary)}>{item.secondary}</span>}
         </th>
       );
     case "region":
       return (
-        <td {...stylex.props(styles.cell, styles.regionCell)}>
+        <td {...stylex.attrs(styles.cell, styles.regionCell)}>
           {REGION_META[item.group.id].short}
         </td>
       );
     case "inci":
       return (
-        <td {...stylex.props(styles.cell, styles.inciCell)}>
+        <td {...stylex.attrs(styles.cell, styles.inciCell)}>
           <Inci text={item.inci} />
         </td>
       );
     case "features":
-      return <td {...stylex.props(styles.cell, styles.featuresCell)}>{item.features}</td>;
+      return <td {...stylex.attrs(styles.cell, styles.featuresCell)}>{item.features}</td>;
     case "tags":
       return (
-        <td {...stylex.props(styles.cell, styles.tagsCell)}>
+        <td {...stylex.attrs(styles.cell, styles.tagsCell)}>
           {item.traits.tags.map((tag, tagIndex) => (
-            <Fragment key={tag}>
+            <>
               {tagIndex > 0 && " · "}
-              <span {...stylex.props(styles.keepTogether)}>{tag}</span>
-            </Fragment>
+              <span {...stylex.attrs(styles.keepTogether)}>{tag}</span>
+            </>
           ))}
         </td>
       );
   }
 }
 
-function GroupBody({ group, columns }: { group: RowGroup; columns: Column[] }) {
+function GroupBody(props: { group: RowGroup; columns: Column[] }) {
+  const group = props.group;
   return (
-    <tbody {...stylex.props(styles.tbody)}>
-      <tr {...stylex.props(styles.blockRow)}>
-        <th scope="rowgroup" colSpan={columns.length} {...stylex.props(styles.groupCell)}>
-          <span {...stylex.props(styles.groupLine)}>
-            <span {...stylex.props(styles.groupLabel)}>{group.label}</span>
-            <span {...stylex.props(styles.groupCount)}>
-              <span {...stylex.props(styles.groupNumber)}>{group.items.length}</span> 款原料
+    <tbody {...stylex.attrs(styles.tbody)}>
+      <tr {...stylex.attrs(styles.blockRow)}>
+        <th scope="rowgroup" colspan={props.columns.length} {...stylex.attrs(styles.groupCell)}>
+          <span {...stylex.attrs(styles.groupLine)}>
+            <span {...stylex.attrs(styles.groupLabel)}>{group.label}</span>
+            <span {...stylex.attrs(styles.groupCount)}>
+              <span {...stylex.attrs(styles.groupNumber)}>{group.items.length}</span> 款原料
             </span>
           </span>
         </th>
       </tr>
       {group.intro && (
-        <tr {...stylex.props(styles.blockRow)}>
-          <td colSpan={columns.length} {...stylex.props(styles.introCell)}>
-            <p {...stylex.props(styles.intro)}>{group.intro}</p>
+        <tr {...stylex.attrs(styles.blockRow)}>
+          <td colspan={props.columns.length} {...stylex.attrs(styles.introCell)}>
+            <p {...stylex.attrs(styles.intro)}>{group.intro}</p>
           </td>
         </tr>
       )}
-      {group.items.map((item) => (
-        <tr key={item.id} {...stylex.props(styles.row)}>
-          {columns.map((column) => (
-            <ItemCell key={column.id} column={column.id} item={item} />
-          ))}
-        </tr>
-      ))}
+      <For each={group.items}>
+        {(item) => (
+          <tr {...stylex.attrs(styles.row)}>
+            <For each={props.columns}>
+              {(column) => <ItemCell column={column.id} item={item} />}
+            </For>
+          </tr>
+        )}
+      </For>
     </tbody>
   );
 }
 
 export function Catalog() {
   const reduce = useReducedMotion();
-  const baseId = useId();
+  const baseId = createUniqueId();
   const titleId = `${baseId}-title`;
   const noteId = `${baseId}-note`;
   const panelId = `${baseId}-panel`;
   const tabId = (pivot: PivotId) => `${baseId}-tab-${pivot}`;
-  const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
-  const [pivotId, setPivotId] = useState<PivotId>("region");
-  const [switched, setSwitched] = useState(false);
-  const pivot = PIVOTS.find((candidate) => candidate.id === pivotId) ?? PIVOTS[0];
+  const tabRefs: (HTMLButtonElement | undefined)[] = [];
+  const [pivotId, setPivotId] = createSignal<PivotId>("region");
+  const [switched, setSwitched] = createSignal(false);
+  const pivot = () => PIVOTS.find((candidate) => candidate.id === pivotId()) ?? PIVOTS[0];
 
   const choose = (next: PivotId) => {
-    if (next === pivotId) return;
+    if (next === pivotId()) return;
     setPivotId(next);
     setSwitched(true);
   };
 
-  const onTabKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-    const current = PIVOTS.findIndex((candidate) => candidate.id === pivotId);
+  const onTabKeyDown = (event: KeyboardEvent) => {
+    const current = PIVOTS.findIndex((candidate) => candidate.id === pivotId());
     const target = tabTarget(event.key, current, PIVOTS.length - 1);
     if (target === null) return;
     event.preventDefault();
     choose(PIVOTS[target].id);
-    tabRefs.current[target]?.focus();
+    flush();
+    tabRefs[target]?.focus();
   };
 
   return (
     <section
       id="products-catalog"
       aria-labelledby={titleId}
-      {...stylex.props(ui.section, styles.ground)}
+      {...stylex.attrs(ui.section, styles.ground)}
     >
-      <div {...stylex.props(ui.shell)}>
-        <header {...stylex.props(styles.head)}>
-          <h2 id={titleId} {...stylex.props(ui.sectionTitle)}>
+      <div {...stylex.attrs(ui.shell)}>
+        <header {...stylex.attrs(styles.head)}>
+          <h2 id={titleId} {...stylex.attrs(ui.sectionTitle)}>
             产品目录
           </h2>
-          <div {...stylex.props(styles.controls)}>
+          <div {...stylex.attrs(styles.controls)}>
             <SegmentTrack role="tablist" aria-label="Group by" onKeyDown={onTabKeyDown}>
               {PIVOTS.map((candidate, index) => {
-                const selected = candidate.id === pivotId;
+                const selected = () => candidate.id === pivotId();
                 return (
                   <SegmentButton
-                    key={candidate.id}
-                    ref={(node) => {
-                      tabRefs.current[index] = node;
+                    ref={(node: HTMLButtonElement) => {
+                      tabRefs[index] = node;
                     }}
                     id={tabId(candidate.id)}
                     role="tab"
-                    aria-selected={selected}
+                    aria-selected={selected() ? "true" : "false"}
                     aria-controls={panelId}
-                    tabIndex={selected ? 0 : -1}
-                    selected={selected}
+                    tabindex={selected() ? 0 : -1}
+                    selected={selected()}
                     onClick={() => choose(candidate.id)}
                   >
                     {candidate.label}
@@ -457,7 +459,7 @@ export function Catalog() {
                 );
               })}
             </SegmentTrack>
-            <p id={noteId} {...stylex.props(styles.note)}>
+            <p id={noteId} {...stylex.attrs(styles.note)}>
               {NOTE}
             </p>
           </div>
@@ -465,39 +467,42 @@ export function Catalog() {
         <div
           id={panelId}
           role="tabpanel"
-          aria-labelledby={tabId(pivot.id)}
-          {...stylex.props(styles.panel)}
+          aria-labelledby={tabId(pivot().id)}
+          {...stylex.attrs(styles.panel)}
         >
-          <m.div
-            key={pivot.id}
-            initial={switched ? { opacity: 0 } : false}
-            animate={{ opacity: 1 }}
-            transition={{ duration: reduce ? 0 : 0.22, ease: EASE }}
-          >
-            <table
-              aria-labelledby={titleId}
-              aria-describedby={noteId}
-              {...stylex.props(styles.table)}
-            >
-              <colgroup {...stylex.props(styles.colgroup)}>
-                {pivot.columns.map((column) => (
-                  <col key={column.id} {...stylex.props(widths[column.width])} />
-                ))}
-              </colgroup>
-              <thead {...stylex.props(styles.thead)}>
-                <tr>
-                  {pivot.columns.map((column) => (
-                    <th key={column.id} scope="col" {...stylex.props(styles.headCell)}>
-                      {column.label}
-                    </th>
+          <Show when={pivot()} keyed>
+            {(current) => (
+              <m.div
+                initial={untrack(switched) ? { opacity: 0 } : false}
+                animate={{ opacity: 1 }}
+                transition={{ duration: reduce() ? 0 : 0.22, ease: EASE }}
+              >
+                <table
+                  aria-labelledby={titleId}
+                  aria-describedby={noteId}
+                  {...stylex.attrs(styles.table)}
+                >
+                  <colgroup {...stylex.attrs(styles.colgroup)}>
+                    {current.columns.map((column) => (
+                      <col {...stylex.attrs(widths[column.width])} />
+                    ))}
+                  </colgroup>
+                  <thead {...stylex.attrs(styles.thead)}>
+                    <tr>
+                      {current.columns.map((column) => (
+                        <th scope="col" {...stylex.attrs(styles.headCell)}>
+                          {column.label}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  {current.groups.map((group) => (
+                    <GroupBody group={group} columns={current.columns} />
                   ))}
-                </tr>
-              </thead>
-              {pivot.groups.map((group) => (
-                <GroupBody key={group.id} group={group} columns={pivot.columns} />
-              ))}
-            </table>
-          </m.div>
+                </table>
+              </m.div>
+            )}
+          </Show>
         </div>
       </div>
     </section>

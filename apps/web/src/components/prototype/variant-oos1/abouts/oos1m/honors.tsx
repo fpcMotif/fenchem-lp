@@ -26,7 +26,7 @@ function plateShapes(level: number) {
   };
 }
 
-function LevelStack({ plates }: { plates: number }) {
+function LevelStack(props: { plates: number }) {
   return (
     <svg
       viewBox={`0 0 ${STACK.width} ${STACK.height}`}
@@ -34,10 +34,10 @@ function LevelStack({ plates }: { plates: number }) {
       height={STACK.height}
       aria-hidden="true"
     >
-      {Array.from({ length: plates }, (_, level) => {
+      {Array.from({ length: props.plates }, (_, level) => {
         const shape = plateShapes(level);
         return (
-          <g key={level} stroke="rgba(11, 42, 92, 0.88)" strokeWidth={1} strokeLinejoin="round">
+          <g stroke="rgba(11, 42, 92, 0.88)" stroke-width={1} stroke-linejoin="round">
             <path d={shape.left} fill="#e6ecf7" />
             <path d={shape.front} fill="#d2dcee" />
             <path d={shape.top} fill="#ffffff" />
@@ -135,7 +135,7 @@ export function Honors() {
     <section
       id="about-honor"
       aria-labelledby="oos1m-honor"
-      {...stylex.props(ui.shell, ui.section, ui.anchor)}
+      {...stylex.attrs(ui.shell, ui.section, ui.anchor)}
     >
       <SheetHeader
         sheet={5}
@@ -143,31 +143,31 @@ export function Honors() {
         english="Specification"
         titleId="oos1m-honor"
       />
-      <div {...stylex.props(styles.table)}>
-        <div aria-hidden="true" {...stylex.props(ui.caps, styles.row, styles.head)}>
+      <div {...stylex.attrs(styles.table)}>
+        <div aria-hidden="true" {...stylex.attrs(ui.caps, styles.row, styles.head)}>
           <span lang="en">Item</span>
-          <span lang="en" {...stylex.props(styles.headTitle)}>
+          <span lang="en" {...stylex.attrs(styles.headTitle)}>
             Designation
           </span>
-          <span lang="en" {...stylex.props(styles.headLevel)}>
+          <span lang="en" {...stylex.attrs(styles.headLevel)}>
             Level
           </span>
         </div>
-        <ol {...stylex.props(styles.list)}>
+        <ol {...stylex.attrs(styles.list)}>
           {ABOUT_HONORS.items.map((item, index) => {
             const level = LEVELS[item.level];
             return (
-              <li key={item.id} {...stylex.props(styles.row, styles.item)}>
-                <span aria-hidden="true" lang="en" {...stylex.props(styles.number)}>
+              <li {...stylex.attrs(styles.row, styles.item)}>
+                <span aria-hidden="true" lang="en" {...stylex.attrs(styles.number)}>
                   H-{pad2(index + 1)}
                 </span>
-                <p {...stylex.props(styles.title)}>{item.title}</p>
-                <span {...stylex.props(styles.level)}>
+                <p {...stylex.attrs(styles.title)}>{item.title}</p>
+                <span {...stylex.attrs(styles.level)}>
                   <LevelStack plates={level.plates} />
-                  <span {...stylex.props(styles.levelText)}>
+                  <span {...stylex.attrs(styles.levelText)}>
                     <span {...srOnly}>Level:</span>
                     {level.label}
-                    <span lang="en" {...stylex.props(ui.label)}>
+                    <span lang="en" {...stylex.attrs(ui.label)}>
                       {level.english}
                     </span>
                   </span>

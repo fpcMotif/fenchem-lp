@@ -1,7 +1,7 @@
 import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { ArrowUpRight, Plus } from "lucide-react";
-import { useState } from "react";
+import { ArrowUpRight, Plus } from "@fenchem-lp/ui/components/lucide";
+import { createSignal } from "solid-js";
 
 import { ABOUT_CAMPUS, ABOUT_HONORS, ABOUT_STRUCTURE } from "../../about-data";
 import { CTA } from "../../content";
@@ -270,37 +270,35 @@ const styles = stylex.create({
   },
 });
 
-export function Closing({ onNavigateHome }: { onNavigateHome: (hash?: string) => void }) {
-  const [chartOpen, setChartOpen] = useState(false);
+export function Closing(props: { onNavigateHome: (hash?: string) => void }) {
+  const [chartOpen, setChartOpen] = createSignal(false);
 
   return (
-    <div {...stylex.props(styles.ground)}>
+    <div {...stylex.attrs(styles.ground)}>
       <img
         src={GROUNDS.large}
         alt=""
         loading="lazy"
         decoding="async"
-        {...stylex.props(ui.fill, styles.groundPhoto)}
+        {...stylex.attrs(ui.fill, styles.groundPhoto)}
       />
-      <div {...stylex.props(ui.shell, styles.content)}>
+      <div {...stylex.attrs(ui.shell, styles.content)}>
         <section
           id="about-honor"
           aria-labelledby="oos1y-honor"
-          {...stylex.props(ui.anchor, styles.section, styles.first, styles.toEnd)}
+          {...stylex.attrs(ui.anchor, styles.section, styles.first, styles.toEnd)}
         >
           <h2 id="oos1y-honor" {...srOnly}>
             {ABOUT_HONORS.eyebrow}
           </h2>
-          <div {...stylex.props(ui.glass, styles.honorsPane)}>
+          <div {...stylex.attrs(ui.glass, styles.honorsPane)}>
             <Reveal>
-              <dl {...stylex.props(styles.groups)}>
+              <dl {...stylex.attrs(styles.groups)}>
                 {HONOR_GROUPS.map((group) => (
-                  <div key={group.level} {...stylex.props(styles.group)}>
-                    <dt {...stylex.props(ui.label, styles.level)}>{group.label}</dt>
+                  <div {...stylex.attrs(styles.group)}>
+                    <dt {...stylex.attrs(ui.label, styles.level)}>{group.label}</dt>
                     {group.items.map((item) => (
-                      <dd key={item.id} {...stylex.props(ui.etched, styles.honor)}>
-                        {item.title}
-                      </dd>
+                      <dd {...stylex.attrs(ui.etched, styles.honor)}>{item.title}</dd>
                     ))}
                   </div>
                 ))}
@@ -312,29 +310,29 @@ export function Closing({ onNavigateHome }: { onNavigateHome: (hash?: string) =>
         <section
           id="about-structure"
           aria-labelledby="oos1y-structure"
-          {...stylex.props(ui.anchor, styles.section)}
+          {...stylex.attrs(ui.anchor, styles.section)}
         >
           <h2 id="oos1y-structure" {...srOnly}>
             {ABOUT_STRUCTURE.eyebrow}
           </h2>
-          <div {...stylex.props(ui.glass, styles.structurePane)}>
+          <div {...stylex.attrs(ui.glass, styles.structurePane)}>
             <Reveal>
-              <p {...stylex.props(ui.label)}>{ABOUT_STRUCTURE.holding.badge}</p>
-              <h3 {...stylex.props(ui.etched, styles.holdingName)}>
+              <p {...stylex.attrs(ui.label)}>{ABOUT_STRUCTURE.holding.badge}</p>
+              <h3 {...stylex.attrs(ui.etched, styles.holdingName)}>
                 {ABOUT_STRUCTURE.holding.name}
               </h3>
-              <p lang="en" {...stylex.props(styles.english)}>
+              <p lang="en" {...stylex.attrs(styles.english)}>
                 {ABOUT_STRUCTURE.holding.english}
               </p>
-              <div {...stylex.props(styles.tree)}>
-                <p {...stylex.props(ui.label, styles.treeLabel)}>
+              <div {...stylex.attrs(styles.tree)}>
+                <p {...stylex.attrs(ui.label, styles.treeLabel)}>
                   {ABOUT_STRUCTURE.subsidiaryBadge}
                 </p>
-                <ul {...stylex.props(styles.subsidiaries)}>
+                <ul {...stylex.attrs(styles.subsidiaries)}>
                   {ABOUT_STRUCTURE.subsidiaries.map((subsidiary) => (
-                    <li key={subsidiary.id} {...stylex.props(styles.subsidiary)}>
-                      <p {...stylex.props(styles.subsidiaryName)}>{subsidiary.name}</p>
-                      <p lang="en" {...stylex.props(styles.english)}>
+                    <li {...stylex.attrs(styles.subsidiary)}>
+                      <p {...stylex.attrs(styles.subsidiaryName)}>{subsidiary.name}</p>
+                      <p lang="en" {...stylex.attrs(styles.english)}>
                         {subsidiary.english}
                       </p>
                     </li>
@@ -343,16 +341,16 @@ export function Closing({ onNavigateHome }: { onNavigateHome: (hash?: string) =>
               </div>
               <button
                 type="button"
-                aria-expanded={chartOpen}
+                aria-expanded={chartOpen() ? "true" : "false"}
                 aria-controls="oos1y-chart"
                 onClick={() => setChartOpen((open) => !open)}
-                {...stylex.props(styles.chartToggle)}
+                {...stylex.attrs(styles.chartToggle)}
               >
                 <Plus
                   size={14}
                   strokeWidth={1.5}
                   aria-hidden="true"
-                  {...stylex.props(styles.toggleIcon, chartOpen && styles.toggleIconOpen)}
+                  {...stylex.attrs(styles.toggleIcon, chartOpen() && styles.toggleIconOpen)}
                 />
                 <span lang="en">Official chart</span>
                 <span {...srOnly}> Organizational chart</span>
@@ -360,29 +358,29 @@ export function Closing({ onNavigateHome }: { onNavigateHome: (hash?: string) =>
             </Reveal>
           </div>
         </section>
-        <div id="oos1y-chart" hidden={!chartOpen} {...stylex.props(styles.chartRow)}>
-          <figure {...stylex.props(ui.glass, styles.chart)}>
+        <div id="oos1y-chart" hidden={!chartOpen()} {...stylex.attrs(styles.chartRow)}>
+          <figure {...stylex.attrs(ui.glass, styles.chart)}>
             <img
               src={ABOUT_STRUCTURE.chartImage}
               alt={`Organizational chart: ${ABOUT_STRUCTURE.holding.english} and its five wholly owned subsidiaries`}
               loading="lazy"
               decoding="async"
-              {...stylex.props(styles.chartImage)}
+              {...stylex.attrs(styles.chartImage)}
             />
           </figure>
         </div>
 
-        <section aria-labelledby="oos1y-cta" {...stylex.props(styles.section, styles.toEnd)}>
-          <div {...stylex.props(ui.glass, styles.ctaPane)}>
+        <section aria-labelledby="oos1y-cta" {...stylex.attrs(styles.section, styles.toEnd)}>
+          <div {...stylex.attrs(ui.glass, styles.ctaPane)}>
             <Reveal>
-              <h2 id="oos1y-cta" {...stylex.props(ui.etched, styles.ctaTitle)}>
+              <h2 id="oos1y-cta" {...stylex.attrs(ui.etched, styles.ctaTitle)}>
                 {CTA.title}
               </h2>
-              <div {...stylex.props(styles.actions)}>
+              <div {...stylex.attrs(styles.actions)}>
                 <button
                   type="button"
-                  onClick={() => onNavigateHome("contact")}
-                  {...stylex.props(styles.primary)}
+                  onClick={() => props.onNavigateHome("contact")}
+                  {...stylex.attrs(styles.primary)}
                 >
                   {CTA.action.label}
                 </button>
@@ -390,9 +388,9 @@ export function Closing({ onNavigateHome }: { onNavigateHome: (hash?: string) =>
                   href="#products"
                   onClick={(event) => {
                     event.preventDefault();
-                    onNavigateHome("products");
+                    props.onNavigateHome("products");
                   }}
-                  {...stylex.props(styles.secondary)}
+                  {...stylex.attrs(styles.secondary)}
                 >
                   产品与应用
                   <ArrowUpRight size={16} strokeWidth={1.5} aria-hidden="true" />

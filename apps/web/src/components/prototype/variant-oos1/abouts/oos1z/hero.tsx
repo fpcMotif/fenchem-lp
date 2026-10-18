@@ -1,12 +1,12 @@
 import * as stylex from "@stylexjs/stylex";
-import { m, useScroll, useSpring, useTransform, type MotionValue } from "motion/react";
-import { useEffect, useRef } from "react";
+import { createEffect } from "solid-js";
+import { m, useScroll, useSpring, useTransform, type MotionValue } from "@/compat/motion";
 
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
 import { ABOUT_BANNER } from "../../about-data";
 import { corridorDrawing, type Drawing } from "./perspective";
-import { ui } from "./shared";
+import { NON_SCALING, UNFOCUSABLE, ui } from "./shared";
 import { bp, chrome, face, tone } from "./tokens.stylex";
 
 const PHONE = corridorDrawing(15, false);
@@ -141,70 +141,78 @@ const styles = stylex.create({
   },
 });
 
-function Lines({ drawing, sx }: { drawing: Drawing; sx: stylex.StyleXStyles }) {
+function Lines(props: { drawing: Drawing; sx: stylex.StyleXStyles }) {
   return (
     <svg
       viewBox="0 0 100 100"
       preserveAspectRatio="none"
       aria-hidden="true"
-      focusable="false"
-      {...stylex.props(styles.drawing, sx)}
+      {...UNFOCUSABLE}
+      {...stylex.attrs(styles.drawing, props.sx)}
     >
-      <path d={drawing.fine} vectorEffect="non-scaling-stroke" {...stylex.props(styles.fine)} />
-      <path d={drawing.edges} vectorEffect="non-scaling-stroke" {...stylex.props(styles.edges)} />
-      {drawing.works ? (
-        <path d={drawing.works} vectorEffect="non-scaling-stroke" {...stylex.props(styles.works)} />
+      <path d={props.drawing.fine} {...NON_SCALING} {...stylex.attrs(styles.fine)} />
+      <path d={props.drawing.edges} {...NON_SCALING} {...stylex.attrs(styles.edges)} />
+      {props.drawing.works ? (
+        <path d={props.drawing.works} {...NON_SCALING} {...stylex.attrs(styles.works)} />
       ) : null}
     </svg>
   );
 }
 
-function LookingLines({ eyeX, eyeY }: { eyeX: MotionValue<number>; eyeY: MotionValue<number> }) {
-  const fine = useTransform(() => corridorDrawing(30, true, [eyeX.get(), eyeY.get()]).fine);
-  const edges = useTransform(() => corridorDrawing(30, true, [eyeX.get(), eyeY.get()]).edges);
-  const works = useTransform(() => corridorDrawing(30, true, [eyeX.get(), eyeY.get()]).works);
+function LookingLines(props: { eyeX: MotionValue<number>; eyeY: MotionValue<number> }) {
+  const fine = useTransform(() => corridorDrawing(30, true, [props.eyeX(), props.eyeY()]).fine);
+  const edges = useTransform(() => corridorDrawing(30, true, [props.eyeX(), props.eyeY()]).edges);
+  const works = useTransform(() => corridorDrawing(30, true, [props.eyeX(), props.eyeY()]).works);
   return (
     <svg
       viewBox="0 0 100 100"
       preserveAspectRatio="none"
       aria-hidden="true"
-      focusable="false"
-      {...stylex.props(styles.drawing, styles.desktop)}
+      {...UNFOCUSABLE}
+      {...stylex.attrs(styles.drawing, styles.desktop)}
     >
-      <m.path d={fine} vectorEffect="non-scaling-stroke" {...stylex.props(styles.fine)} />
-      <m.path d={edges} vectorEffect="non-scaling-stroke" {...stylex.props(styles.edges)} />
-      <m.path d={works} vectorEffect="non-scaling-stroke" {...stylex.props(styles.works)} />
+      <m.path d={fine} {...NON_SCALING} {...stylex.attrs(styles.fine)} />
+      <m.path d={edges} {...NON_SCALING} {...stylex.attrs(styles.edges)} />
+      <m.path d={works} {...NON_SCALING} {...stylex.attrs(styles.works)} />
     </svg>
   );
 }
 
 export function Hero() {
-  const heroRef = useRef<HTMLElement>(null);
-  const lookRef = useRef(false);
+  let heroRef!: HTMLElement;
+  let lookRef = false;
   const reduce = useReducedMotion();
-  const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start 80px", "end 80px"] });
-  const dolly = useTransform(scrollYProgress, [0, 1], [1, reduce ? 1 : 1.24]);
+  const { scrollYProgress } = useScroll({
+    target: () => heroRef,
+    offset: ["start 80px", "end 80px"],
+  });
+  const dolly = useTransform(() =>
+    reduce() ? 1 : 1 + 0.24 * Math.min(1, Math.max(0, scrollYProgress())),
+  );
   const eyeX = useSpring(50, EYE_SPRING);
   const eyeY = useSpring(50, EYE_SPRING);
   const wallX = useTransform(eyeX, (x) => `${(x - 50) * 1.5}%`);
   const wallY = useTransform(eyeY, (y) => `${(y - 50) * 1.5}%`);
 
-  useEffect(() => {
-    const query = window.matchMedia(LOOK_QUERY);
-    const update = () => {
-      lookRef.current = query.matches && !reduce;
-    };
-    update();
-    query.addEventListener("change", update);
-    return () => query.removeEventListener("change", update);
-  }, [reduce]);
+  createEffect(
+    () => reduce(),
+    (reduced) => {
+      const query = window.matchMedia(LOOK_QUERY);
+      const update = () => {
+        lookRef = query.matches && !reduced;
+      };
+      update();
+      query.addEventListener("change", update);
+      return () => query.removeEventListener("change", update);
+    },
+  );
 
   return (
     <section
       ref={heroRef}
       aria-labelledby="oos1z-title"
       onPointerMove={(event) => {
-        if (!lookRef.current) return;
+        if (!lookRef) return;
         const box = event.currentTarget.getBoundingClientRect();
         eyeX.set(50 + ((event.clientX - box.left) / box.width - 0.5) * 2 * EYE_RANGE);
         eyeY.set(50 + ((event.clientY - box.top) / box.height - 0.5) * 2 * EYE_RANGE * 0.6);
@@ -213,24 +221,24 @@ export function Hero() {
         eyeX.set(50);
         eyeY.set(50);
       }}
-      {...stylex.props(styles.hero)}
+      {...stylex.attrs(styles.hero)}
     >
-      <m.div style={{ scale: dolly }} {...stylex.props(styles.stage)}>
+      <m.div style={{ scale: dolly }} {...stylex.attrs(styles.stage)}>
         <Lines drawing={PHONE} sx={styles.phone} />
         <Lines drawing={TABLET} sx={styles.tablet} />
         <LookingLines eyeX={eyeX} eyeY={eyeY} />
-        <m.div style={{ x: wallX, y: wallY }} {...stylex.props(styles.farWall)}>
-          <p lang="en" {...stylex.props(ui.caps, styles.eyebrow)}>
+        <m.div style={{ x: wallX, y: wallY }} {...stylex.attrs(styles.farWall)}>
+          <p lang="en" {...stylex.attrs(ui.caps, styles.eyebrow)}>
             {ABOUT_BANNER.established} — {ABOUT_BANNER.place}
           </p>
-          <h1 id="oos1z-title" {...stylex.props(styles.title)}>
+          <h1 id="oos1z-title" {...stylex.attrs(styles.title)}>
             {ABOUT_BANNER.title}
           </h1>
-          <p lang="en" {...stylex.props(ui.italic, styles.tagline)}>
+          <p lang="en" {...stylex.attrs(ui.italic, styles.tagline)}>
             {ABOUT_BANNER.tagline}
           </p>
-          <p {...stylex.props(styles.lead)}>
-            <span {...stylex.props(styles.balanced)}>{ABOUT_BANNER.lead}</span>
+          <p {...stylex.attrs(styles.lead)}>
+            <span {...stylex.attrs(styles.balanced)}>{ABOUT_BANNER.lead}</span>
           </p>
         </m.div>
       </m.div>

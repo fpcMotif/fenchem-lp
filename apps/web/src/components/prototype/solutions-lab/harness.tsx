@@ -1,6 +1,6 @@
 import * as stylex from "@stylexjs/stylex";
-import { LazyMotion, MotionConfig, domMax } from "motion/react";
-import { useEffect, useLayoutEffect, useRef, useState, type ComponentType } from "react";
+import { LazyMotion, MotionConfig, domMax } from "@/compat/motion";
+import { createEffect, createSignal, onSettled, Show, untrack, type Component } from "solid-js";
 
 import { face, tone } from "./tokens.stylex";
 import { AtlasVariant } from "./variants/atlas";
@@ -15,7 +15,7 @@ import { RibbonVariant } from "./variants/ribbon";
 import { SpotlightVariant } from "./variants/spotlight";
 import { StudioVariant } from "./variants/studio";
 
-const VARIANTS: { name: string; Component: ComponentType }[] = [
+const VARIANTS: { name: string; Component: Component }[] = [
   { name: "Margin", Component: MarginVariant },
   { name: "Ribbon", Component: RibbonVariant },
   { name: "Folder", Component: FolderVariant },
@@ -150,36 +150,34 @@ const styles = stylex.create({
 
 const clampIndex = (index: number) => Math.min(Math.max(index, 0), VARIANTS.length - 1);
 
-export function SolutionsLab({ initial }: { initial: number }) {
-  const [current, setCurrent] = useState(() => clampIndex(initial));
-  const [mountKey, setMountKey] = useState(0);
-  const [ready, setReady] = useState(false);
-  const highlightRef = useRef<HTMLSpanElement>(null);
-  const itemRefs = useRef<(HTMLButtonElement | null)[]>([]);
+export function SolutionsLab(props: { initial: number }) {
+  const [current, setCurrent] = createSignal(untrack(() => clampIndex(props.initial)));
+  const [mountKey, setMountKey] = createSignal(0);
+  const [ready, setReady] = createSignal(false);
+  let highlight: HTMLSpanElement | undefined;
+  const items: (HTMLButtonElement | undefined)[] = [];
 
   const moveHighlight = () => {
-    const item = itemRefs.current[current];
-    const highlight = highlightRef.current;
+    const item = items[current()];
     if (!item || !highlight) return;
     highlight.style.width = `${item.offsetWidth}px`;
     highlight.style.transform = `translateX(${item.offsetLeft}px)`;
   };
 
-  useLayoutEffect(moveHighlight);
-
-  useLayoutEffect(() => {
-    const item = itemRefs.current[current];
+  createEffect(current, (index) => {
+    moveHighlight();
+    const item = items[index];
     const picker = item?.parentElement;
     if (!item || !picker) return;
     picker.scrollTo({ left: item.offsetLeft - (picker.clientWidth - item.offsetWidth) / 2 });
-  }, [current]);
+  });
 
-  useEffect(() => {
+  onSettled(() => {
     window.addEventListener("resize", moveHighlight);
     return () => window.removeEventListener("resize", moveHighlight);
   });
 
-  useEffect(() => {
+  onSettled(() => {
     let second = 0;
     const first = requestAnimationFrame(() => {
       second = requestAnimationFrame(() => setReady(true));
@@ -188,7 +186,7 @@ export function SolutionsLab({ initial }: { initial: number }) {
       cancelAnimationFrame(first);
       cancelAnimationFrame(second);
     };
-  }, []);
+  });
 
   const setActive = (index: number) => {
     if (index < 0 || index >= VARIANTS.length) return;
@@ -199,59 +197,61 @@ export function SolutionsLab({ initial }: { initial: number }) {
     window.history.replaceState(window.history.state, "", url);
   };
 
-  useEffect(() => {
+  onSettled(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       const target = event.target as HTMLElement;
       if (/^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName) || target.isContentEditable) return;
       if (event.metaKey || event.ctrlKey || event.altKey) return;
       const digit = Number.parseInt(event.key, 10);
       if (!Number.isNaN(digit)) setActive(digit === 0 ? 9 : digit - 1);
-      else if (event.key === "ArrowRight") setActive((current + 1) % VARIANTS.length);
+      else if (event.key === "ArrowRight") setActive((current() + 1) % VARIANTS.length);
       else if (event.key === "ArrowLeft")
-        setActive((current - 1 + VARIANTS.length) % VARIANTS.length);
+        setActive((current() - 1 + VARIANTS.length) % VARIANTS.length);
       else if (event.key === "r" || event.key === "R") setMountKey((key) => key + 1);
     };
     document.addEventListener("keydown", onKeyDown);
     return () => document.removeEventListener("keydown", onKeyDown);
   });
 
-  const Variant = VARIANTS[current]?.Component;
-
   return (
     <LazyMotion features={domMax} strict>
       <MotionConfig reducedMotion="user">
         <style>{PICKER_CSS}</style>
-        <div lang="zh-CN" {...stylex.props(styles.root)}>
-          <div aria-hidden="true" {...stylex.props(styles.band)} />
-          <div {...stylex.props(styles.stage)}>
-            {Variant && <Variant key={`${current}-${mountKey}`} />}
+        <div lang="zh-CN" {...stylex.attrs(styles.root)}>
+          <div aria-hidden="true" {...stylex.attrs(styles.band)} />
+          <div {...stylex.attrs(styles.stage)}>
+            <Show when={`${current()}-${mountKey()}`} keyed>
+              {(_key) => {
+                const Variant = VARIANTS[untrack(current)]?.Component;
+                return Variant ? <Variant /> : null;
+              }}
+            </Show>
           </div>
         </div>
         <nav
-          className="proto-picker"
+          class="proto-picker"
           aria-label="Prototype variants"
-          data-ready={ready ? "" : undefined}
+          data-ready={ready() ? "" : undefined}
         >
-          <span ref={highlightRef} className="proto-picker-highlight" aria-hidden="true" />
+          <span ref={highlight} class="proto-picker-highlight" aria-hidden="true" />
           {VARIANTS.map((variant, index) => (
             <button
-              key={variant.name}
               ref={(node) => {
-                itemRefs.current[index] = node;
+                items[index] = node;
               }}
               type="button"
-              className="proto-picker-item"
-              data-active={index === current ? "" : undefined}
-              aria-current={index === current ? "true" : undefined}
+              class="proto-picker-item"
+              data-active={index === current() ? "" : undefined}
+              aria-current={index === current() ? "true" : undefined}
               onClick={() => setActive(index)}
             >
               {variant.name}
             </button>
           ))}
-          <span className="proto-picker-divider" aria-hidden="true" />
+          <span class="proto-picker-divider" aria-hidden="true" />
           <button
             type="button"
-            className="proto-picker-item proto-picker-replay"
+            class="proto-picker-item proto-picker-replay"
             aria-label="Replay animation (R)"
             onClick={() => setMountKey((key) => key + 1)}
           >

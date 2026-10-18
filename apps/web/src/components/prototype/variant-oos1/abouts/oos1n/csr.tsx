@@ -85,37 +85,35 @@ export function Csr() {
 
   return (
     <Section id={chip.id} label="Responsibility" background={ui.onNavy}>
-      <div {...stylex.props(ui.grid)}>
+      <div {...stylex.attrs(ui.grid)}>
         <Reveal sx={s.statementCell}>
-          <h3 {...stylex.props(s.statement)}>
+          <h3 {...stylex.attrs(s.statement)}>
             {ABOUT_CSR.statement.map((line) => (
-              <span key={line} {...stylex.props(s.statementLine)}>
-                {line}
-              </span>
+              <span {...stylex.attrs(s.statementLine)}>{line}</span>
             ))}
           </h3>
         </Reveal>
       </div>
-      <div {...stylex.props(ui.grid, s.body)}>
+      <div {...stylex.attrs(ui.grid, s.body)}>
         <Reveal sx={s.descCell} step={1}>
-          <p {...stylex.props(s.desc)}>{ABOUT_CSR.desc}</p>
+          <p {...stylex.attrs(s.desc)}>{ABOUT_CSR.desc}</p>
         </Reveal>
         <Reveal as="figure" step={2} sx={s.figure}>
-          <div {...stylex.props(ui.frame, s.ratio)}>
+          <div {...stylex.attrs(ui.frame, s.ratio)}>
             <img
               src={ABOUT_CSR.image}
               alt={ABOUT_CSR.imageAlt}
               loading="lazy"
               decoding="async"
-              {...stylex.props(ui.fill)}
+              {...stylex.attrs(ui.fill)}
             />
           </div>
         </Reveal>
       </div>
-      <ul {...stylex.props(s.outcomes)}>
+      <ul {...stylex.attrs(s.outcomes)}>
         {ABOUT_CSR.outcomes.map((outcome, idx) => (
-          <Reveal key={outcome.title} as="li" step={idx} sx={s.outcome}>
-            <span aria-hidden="true" {...stylex.props(s.dot)} />
+          <Reveal as="li" step={idx} sx={s.outcome}>
+            <span aria-hidden="true" {...stylex.attrs(s.dot)} />
             {outcome.title}
           </Reveal>
         ))}

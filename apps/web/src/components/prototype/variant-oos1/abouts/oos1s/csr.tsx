@@ -80,34 +80,34 @@ export function Csr() {
 
   return (
     <Section id={chip.id} label={chip.english} background={ui.onPaper}>
-      <div {...stylex.props(s.cols)}>
-        <div {...stylex.props(s.copy)}>
+      <div {...stylex.attrs(s.cols)}>
+        <div {...stylex.attrs(s.copy)}>
           <Reveal>
-            <p {...stylex.props(s.statement)}>
-              <span {...stylex.props(s.statementLine)}>{statementLead}</span>
-              <span {...stylex.props(s.statementLine)}>{statementClose}</span>
+            <p {...stylex.attrs(s.statement)}>
+              <span {...stylex.attrs(s.statementLine)}>{statementLead}</span>
+              <span {...stylex.attrs(s.statementLine)}>{statementClose}</span>
             </p>
           </Reveal>
           <Reveal step={1}>
-            <p {...stylex.props(s.desc)}>{ABOUT_CSR.desc}</p>
+            <p {...stylex.attrs(s.desc)}>{ABOUT_CSR.desc}</p>
           </Reveal>
-          <ul {...stylex.props(s.outcomes)}>
+          <ul {...stylex.attrs(s.outcomes)}>
             {ABOUT_CSR.outcomes.map((outcome, idx) => (
-              <Reveal key={outcome.title} as="li" step={idx + 2} sx={s.outcome}>
+              <Reveal as="li" step={idx + 2} sx={s.outcome}>
                 {outcome.title}
               </Reveal>
             ))}
           </ul>
         </div>
-        <div {...stylex.props(s.photo)}>
+        <div {...stylex.attrs(s.photo)}>
           <Reveal as="figure" step={1} sx={ui.figure}>
-            <div {...stylex.props(ui.frame, s.frame)}>
+            <div {...stylex.attrs(ui.frame, s.frame)}>
               <img
                 src={ABOUT_CSR.image}
                 alt={ABOUT_CSR.imageAlt}
                 loading="lazy"
                 decoding="async"
-                {...stylex.props(ui.fill, s.image)}
+                {...stylex.attrs(ui.fill, s.image)}
               />
             </div>
           </Reveal>

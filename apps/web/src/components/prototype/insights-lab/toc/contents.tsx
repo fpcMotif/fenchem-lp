@@ -1,6 +1,7 @@
 import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { ArrowUp } from "lucide-react";
+import { ArrowUp } from "@fenchem-lp/ui/components/lucide";
+import { createMemo, For, Show } from "solid-js";
 
 import { ArticleMeta } from "../kit";
 import { color, font } from "../../variant-oos1/tokens.stylex";
@@ -277,12 +278,12 @@ const styles = stylex.create({
   },
 });
 
-export function ContentsVariant({ onNavigateHome }: SubPageProps) {
+export function ContentsVariant(props: SubPageProps) {
   const articles = useLabArticles();
   const { position } = useReadingPosition(articles, READING_LINE);
   const reduce = useReducedMotion();
-  const where = locationLabel(articles, position);
-  const totalMinutes = articles.reduce((sum, article) => sum + readMinutes(article), 0);
+  const where = createMemo(() => locationLabel(articles(), position()));
+  const totalMinutes = () => articles().reduce((sum, article) => sum + readMinutes(article), 0);
 
   const flashAfterScroll = (article: LabArticle) => {
     const layer = document.getElementById(entryId(article))?.querySelector("[data-flash]");
@@ -293,7 +294,7 @@ export function ContentsVariant({ onNavigateHome }: SubPageProps) {
       window.removeEventListener("scrollend", play);
       layer.getAnimations().forEach((animation) => animation.cancel());
       layer.animate(
-        reduce
+        reduce()
           ? [{ opacity: 1 }, { opacity: 1 }]
           : [{ opacity: 1 }, { opacity: 1, offset: 0.3 }, { opacity: 0 }],
         { duration: 1400, easing: "ease-in-out" },
@@ -305,108 +306,114 @@ export function ContentsVariant({ onNavigateHome }: SubPageProps) {
 
   return (
     <TocPage
-      onNavigateHome={onNavigateHome}
+      onNavigateHome={props.onNavigateHome}
       bar={
-        <div {...stylex.props(styles.running, where && styles.runningShown)}>
-          {where ? (
-            <>
-              <p {...stylex.props(styles.runningText)}>
-                <span {...stylex.props(styles.runningNumber, labStyles.displayNumber)}>
-                  {padIndex(position.article)}
-                </span>
-                <span {...stylex.props(styles.runningTitle)}>{shortTitle(where.article)}</span>
-                {where.section ? (
-                  <>
-                    <span aria-hidden="true" {...stylex.props(styles.runningSlash)}>
-                      /
-                    </span>
-                    <span {...stylex.props(styles.runningChapter)}>
-                      {`${where.section.numeral} ${where.section.text}`}
-                    </span>
-                  </>
-                ) : null}
-              </p>
-              <a
-                href={`#${entryId(where.article)}`}
-                onClick={() => flashAfterScroll(where.article)}
-                {...stylex.props(styles.back, kitStyles.focusRing)}
-              >
-                目录
-                <ArrowUp size={14} strokeWidth={2} aria-hidden="true" />
-              </a>
-            </>
-          ) : null}
+        <div {...stylex.attrs(styles.running, where() && styles.runningShown)}>
+          <Show when={where()}>
+            {(current) => (
+              <>
+                <p {...stylex.attrs(styles.runningText)}>
+                  <span {...stylex.attrs(styles.runningNumber, labStyles.displayNumber)}>
+                    {padIndex(position().article)}
+                  </span>
+                  <span {...stylex.attrs(styles.runningTitle)}>
+                    {shortTitle(current().article)}
+                  </span>
+                  <Show when={current().section}>
+                    {(section) => (
+                      <>
+                        <span aria-hidden="true" {...stylex.attrs(styles.runningSlash)}>
+                          /
+                        </span>
+                        <span {...stylex.attrs(styles.runningChapter)}>
+                          {`${section().numeral} ${section().text}`}
+                        </span>
+                      </>
+                    )}
+                  </Show>
+                </p>
+                <a
+                  href={`#${entryId(current().article)}`}
+                  onClick={() => flashAfterScroll(current().article)}
+                  {...stylex.attrs(styles.back, kitStyles.focusRing)}
+                >
+                  目录
+                  <ArrowUp size={14} strokeWidth={2} aria-hidden="true" />
+                </a>
+              </>
+            )}
+          </Show>
         </div>
       }
     >
       <section
         id={CONTENTS_ID}
         aria-labelledby="insights-contents-title"
-        {...stylex.props(styles.contents, kitStyles.anchor)}
+        {...stylex.attrs(styles.contents, kitStyles.anchor)}
       >
-        <header {...stylex.props(styles.head)}>
-          <h2 id="insights-contents-title" {...stylex.props(styles.title)}>
+        <header {...stylex.attrs(styles.head)}>
+          <h2 id="insights-contents-title" {...stylex.attrs(styles.title)}>
             目录
-            <span lang="en" {...stylex.props(styles.titleLatin)}>
+            <span lang="en" {...stylex.attrs(styles.titleLatin)}>
               Contents
             </span>
           </h2>
-          <p {...stylex.props(styles.meta, labStyles.displayNumber)}>
-            {`共 ${articles.length} 篇 · 约 ${totalMinutes} 分钟`}
+          <p {...stylex.attrs(styles.meta, labStyles.displayNumber)}>
+            {`共 ${articles().length} 篇 · 约 ${totalMinutes()} 分钟`}
           </p>
         </header>
-        <ol {...stylex.props(styles.entries)}>
-          {articles.map((article, index) => (
-            <li
-              key={article.id}
-              id={entryId(article)}
-              {...stylex.props(styles.entry, kitStyles.anchor)}
-            >
-              <span data-flash="" aria-hidden="true" {...stylex.props(styles.flash)} />
-              <span aria-hidden="true" {...stylex.props(styles.number)}>
-                {padIndex(index)}
-              </span>
-              <div {...stylex.props(styles.main)}>
-                <ArticleMeta article={article} />
-                <h3 {...stylex.props(styles.entryTitle)}>
-                  <a
-                    href={`#${articleAnchor(article)}`}
-                    {...stylex.props(styles.entryLink, kitStyles.focusRing)}
-                  >
-                    {article.title}
-                  </a>
-                </h3>
-                {article.lead ? <p {...stylex.props(styles.lead)}>{article.lead}</p> : null}
-              </div>
-              <ol aria-label={`${shortTitle(article)} 章节`} {...stylex.props(styles.chapters)}>
-                {article.sections.map((section) => {
-                  const { numeral, text } = splitNumeral(section.title);
-                  return (
-                    <li key={section.slug}>
-                      <a
-                        href={`#${sectionAnchor(article, section)}`}
-                        {...stylex.props(
-                          styles.chapter,
-                          kitStyles.focusRing,
-                          stylex.defaultMarker(),
-                        )}
-                      >
-                        <span {...stylex.props(styles.numeral)}>{numeral}</span>
-                        <span {...stylex.props(styles.chapterText)}>{text}</span>
-                        <span aria-hidden="true" {...stylex.props(styles.leader)} />
-                        <span {...stylex.props(styles.chars, labStyles.displayNumber)}>
-                          {formatChars(sectionChars(section))}
-                        </span>
-                      </a>
-                    </li>
-                  );
-                })}
-              </ol>
-            </li>
-          ))}
+        <ol {...stylex.attrs(styles.entries)}>
+          <For each={articles()}>
+            {(article, index) => (
+              <li id={entryId(article)} {...stylex.attrs(styles.entry, kitStyles.anchor)}>
+                <span data-flash="" aria-hidden="true" {...stylex.attrs(styles.flash)} />
+                <span aria-hidden="true" {...stylex.attrs(styles.number)}>
+                  {padIndex(index())}
+                </span>
+                <div {...stylex.attrs(styles.main)}>
+                  <ArticleMeta article={article} />
+                  <h3 {...stylex.attrs(styles.entryTitle)}>
+                    <a
+                      href={`#${articleAnchor(article)}`}
+                      {...stylex.attrs(styles.entryLink, kitStyles.focusRing)}
+                    >
+                      {article.title}
+                    </a>
+                  </h3>
+                  <Show when={article.lead}>
+                    <p {...stylex.attrs(styles.lead)}>{article.lead}</p>
+                  </Show>
+                </div>
+                <ol aria-label={`${shortTitle(article)} 章节`} {...stylex.attrs(styles.chapters)}>
+                  {article.sections.map((section) => {
+                    const { numeral, text } = splitNumeral(section.title);
+                    return (
+                      <li>
+                        <a
+                          href={`#${sectionAnchor(article, section)}`}
+                          {...stylex.attrs(
+                            styles.chapter,
+                            kitStyles.focusRing,
+                            stylex.defaultMarker(),
+                          )}
+                        >
+                          <span {...stylex.attrs(styles.numeral)}>{numeral}</span>
+                          <span {...stylex.attrs(styles.chapterText)}>{text}</span>
+                          <span aria-hidden="true" {...stylex.attrs(styles.leader)} />
+                          <span {...stylex.attrs(styles.chars, labStyles.displayNumber)}>
+                            {formatChars(sectionChars(section))}
+                          </span>
+                        </a>
+                      </li>
+                    );
+                  })}
+                </ol>
+              </li>
+            )}
+          </For>
         </ol>
       </section>
-      <ArticleFlow articles={articles} />
+      <ArticleFlow articles={articles()} />
     </TocPage>
   );
 }

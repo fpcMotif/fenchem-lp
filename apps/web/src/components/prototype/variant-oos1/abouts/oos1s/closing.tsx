@@ -1,7 +1,7 @@
 import { breakpoints } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { m, useMotionValue, useScroll, useTransform } from "motion/react";
-import { useEffect, useRef } from "react";
+import { createEffect } from "solid-js";
+import { m, useMotionValue, useScroll, useTransform } from "@/compat/motion";
 
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
@@ -53,19 +53,22 @@ const s = stylex.create({
   },
 });
 
-export function Closing({ onNavigateHome }: { onNavigateHome: (hash?: string) => void }) {
-  const ref = useRef<HTMLElement>(null);
+export function Closing(props: { onNavigateHome: (hash?: string) => void }) {
+  let ref: HTMLElement | undefined;
   const reduce = useReducedMotion();
   const held = useMotionValue(1);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start 0.75", "end 0.85"] });
+  const { scrollYProgress } = useScroll({ target: () => ref, offset: ["start 0.75", "end 0.85"] });
   const progress = useTransform([scrollYProgress, held], ([scrolled, hold]: number[]) =>
     Math.max(scrolled, hold),
   );
   const clipPath = useTransform(progress, [0, 1], [slit.closingOpen, slit.closingShut]);
 
-  useEffect(() => {
-    held.set(reduce ? 1 : 0);
-  }, [held, reduce]);
+  createEffect(
+    () => reduce(),
+    (reduced) => {
+      held.set(reduced ? 1 : 0);
+    },
+  );
 
   return (
     <section
@@ -75,38 +78,39 @@ export function Closing({ onNavigateHome }: { onNavigateHome: (hash?: string) =>
         if (event.target.matches(":focus-visible")) held.set(1);
       }}
       onBlur={(event) => {
-        if (!event.currentTarget.contains(event.relatedTarget)) held.set(reduce ? 1 : 0);
+        if (!event.currentTarget.contains(event.relatedTarget as Node | null))
+          held.set(reduce() ? 1 : 0);
       }}
-      {...stylex.props(s.closing, ui.onPaper)}
+      {...stylex.attrs(s.closing, ui.onPaper)}
     >
-      <div {...stylex.props(ui.shell, ui.inset, s.copy)}>
-        <h2 id="about-cta-title" {...stylex.props(s.title)}>
+      <div {...stylex.attrs(ui.shell, ui.inset, s.copy)}>
+        <h2 id="about-cta-title" {...stylex.attrs(s.title)}>
           {CTA.title}
         </h2>
-        <div {...stylex.props(s.actions)}>
+        <div {...stylex.attrs(s.actions)}>
           <button
             type="button"
-            onClick={() => onNavigateHome("contact")}
-            {...stylex.props(ui.button, ui.buttonPrimary, ui.focusRing)}
+            onClick={() => props.onNavigateHome("contact")}
+            {...stylex.attrs(ui.button, ui.buttonPrimary, ui.focusRing)}
           >
             {CTA.action.label}
           </button>
           <button
             type="button"
-            onClick={() => onNavigateHome("products")}
-            {...stylex.props(ui.button, ui.buttonSecondary, ui.focusRing)}
+            onClick={() => props.onNavigateHome("products")}
+            {...stylex.attrs(ui.button, ui.buttonSecondary, ui.focusRing)}
           >
             产品与应用
           </button>
         </div>
       </div>
-      <m.div aria-hidden="true" style={{ clipPath }} {...stylex.props(s.curtain)}>
+      <m.div aria-hidden="true" style={{ clipPath }} {...stylex.attrs(s.curtain)}>
         <img
           src={ABOUT_CSR.image}
           alt=""
           loading="lazy"
           decoding="async"
-          {...stylex.props(ui.fill, s.image)}
+          {...stylex.attrs(ui.fill, s.image)}
         />
       </m.div>
     </section>

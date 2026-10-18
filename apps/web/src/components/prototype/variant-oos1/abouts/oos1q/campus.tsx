@@ -110,26 +110,26 @@ export function Campus() {
 
   return (
     <Section id={chip.id} label={chip.english} sx={s.afterBand}>
-      <ul {...stylex.props(s.field)}>
+      <ul {...stylex.attrs(s.field)}>
         {photos.map((photo, idx) => (
-          <Reveal key={photo.id} as="li" sx={[s.item, PLACEMENT[idx]]}>
-            <div {...stylex.props(ui.frame, RATIO[idx])}>
+          <Reveal as="li" sx={[s.item, PLACEMENT[idx]]}>
+            <div {...stylex.attrs(ui.frame, RATIO[idx])}>
               <button
                 type="button"
                 aria-label={`View larger: ${photo.english}`}
                 onClick={() => lightbox.open(idx)}
-                {...stylex.props(s.tile)}
+                {...stylex.attrs(s.tile)}
               >
                 <img
                   src={photo.src}
                   alt={photo.alt}
                   loading="lazy"
                   decoding="async"
-                  {...stylex.props(ui.fill)}
+                  {...stylex.attrs(ui.fill)}
                 />
               </button>
             </div>
-            <p {...stylex.props(ui.caption)}>{photo.caption}</p>
+            <p {...stylex.attrs(ui.caption)}>{photo.caption}</p>
           </Reveal>
         ))}
       </ul>

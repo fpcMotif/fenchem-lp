@@ -1,6 +1,7 @@
-import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
+import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { useId, type MouseEvent, type ReactNode } from "react";
+import { createUniqueId } from "solid-js";
+import type { JSX } from "@solidjs/web";
 
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
@@ -17,9 +18,9 @@ const BODY_FONT =
 const LATIN_FONT = '"Inter Tight", "Source Han Sans SC", "Noto Sans SC", sans-serif';
 
 const TABLET = "@media (min-width: 768px) and (max-width: 1279.98px)";
-const DESKTOP = breakpoints.xl;
-const MD = breakpoints.md;
-const LG = breakpoints.lg;
+const DESKTOP = "@media (min-width: 1280px)";
+const MD = "@media (min-width: 768px)";
+const LG = "@media (min-width: 1024px)";
 const INSET = "min(120px, 8.333vw)";
 const HEADER_HEIGHT = 80;
 const STICKY_TOP = 112;
@@ -281,81 +282,82 @@ const styles = stylex.create({
   },
 });
 
-function Inci({ text }: { text: string }) {
-  const parts: ReactNode[] = [];
+function Inci(props: { text: string }) {
+  return <>{inciParts(props.text)}</>;
+}
+
+function inciParts(text: string) {
+  const parts: JSX.Element[] = [];
   let last = 0;
   for (const match of text.matchAll(INCI_LATIN)) {
     parts.push(text.slice(last, match.index));
-    parts.push(
-      <span key={match.index} {...stylex.props(styles.keepTogether)}>
-        {match[0]}
-      </span>,
-    );
+    parts.push(<span {...stylex.attrs(styles.keepTogether)}>{match[0]}</span>);
     last = match.index + match[0].length;
   }
   parts.push(text.slice(last));
-  return <>{parts}</>;
+  return parts;
 }
 
-function RegionBlock({ group }: { group: CatalogGroup }) {
-  const headingId = useId();
+function RegionBlock(props: { group: CatalogGroup }) {
+  const group = props.group;
+  const headingId = createUniqueId();
   const meta = REGION_META[group.id];
 
   return (
-    <div id={blockId(group.id)} {...stylex.props(styles.block)}>
-      <div {...stylex.props(styles.head)}>
+    <div id={blockId(group.id)} {...stylex.attrs(styles.block)}>
+      <div {...stylex.attrs(styles.head)}>
         {meta && (
-          <p lang="en" {...stylex.props(styles.english)}>
+          <p lang="en" {...stylex.attrs(styles.english)}>
             {meta.english}
           </p>
         )}
-        <h3 id={headingId} tabIndex={-1} {...stylex.props(styles.heading)}>
+        <h3 id={headingId} tabindex={-1} {...stylex.attrs(styles.heading)}>
           {group.label}
         </h3>
-        <p {...stylex.props(styles.count)}>
-          <span {...stylex.props(styles.countNumber)}>{group.items.length}</span>款原料
+        <p {...stylex.attrs(styles.count)}>
+          <span {...stylex.attrs(styles.countNumber)}>{group.items.length}</span>款原料
         </p>
-        {group.intro && <p {...stylex.props(styles.intro)}>{group.intro}</p>}
+        {group.intro && <p {...stylex.attrs(styles.intro)}>{group.intro}</p>}
       </div>
-      <div {...stylex.props(styles.tableWrap)}>
-        <table aria-labelledby={headingId} {...stylex.props(styles.table)}>
+      <div {...stylex.attrs(styles.tableWrap)}>
+        <table aria-labelledby={headingId} {...stylex.attrs(styles.table)}>
           <colgroup>
-            <col {...stylex.props(styles.nameColumn)} />
+            <col {...stylex.attrs(styles.nameColumn)} />
             <col />
           </colgroup>
-          <thead {...stylex.props(styles.thead)}>
+          <thead {...stylex.attrs(styles.thead)}>
             <tr>
-              <th scope="col" {...stylex.props(styles.colHead, styles.colHeadName)}>
+              <th scope="col" {...stylex.attrs(styles.colHead, styles.colHeadName)}>
                 <span aria-hidden="true">
                   名称
-                  <span aria-hidden="true" {...stylex.props(styles.colHeadSlash)}>
+                  <span aria-hidden="true" {...stylex.attrs(styles.colHeadSlash)}>
                     /
                   </span>
                   INCI 名称
                 </span>
-                <span {...stylex.props(styles.srOnly)}>Name / INCI name</span>
+                <span {...stylex.attrs(styles.srOnly)}>Name / INCI name</span>
               </th>
-              <th scope="col" {...stylex.props(styles.colHead)}>
+              <th scope="col" {...stylex.attrs(styles.colHead)}>
                 <span aria-hidden="true">特性&应用</span>
-                <span {...stylex.props(styles.srOnly)}>Features & applications</span>
+                <span {...stylex.attrs(styles.srOnly)}>Features & applications</span>
               </th>
             </tr>
           </thead>
-          <tbody {...stylex.props(styles.tbody)}>
+          <tbody {...stylex.attrs(styles.tbody)}>
             {group.items.map((item) => {
               const { primary, secondary } = splitTitle(item.title);
               return (
-                <tr key={item.id} {...stylex.props(styles.row)}>
-                  <th scope="row" {...stylex.props(styles.nameCell)}>
-                    <span {...stylex.props(styles.primary)}>
+                <tr {...stylex.attrs(styles.row)}>
+                  <th scope="row" {...stylex.attrs(styles.nameCell)}>
+                    <span {...stylex.attrs(styles.primary)}>
                       {primary}
-                      {secondary && <span {...stylex.props(styles.secondary)}>{secondary}</span>}
+                      {secondary && <span {...stylex.attrs(styles.secondary)}>{secondary}</span>}
                     </span>
-                    <span {...stylex.props(styles.inci)}>
+                    <span {...stylex.attrs(styles.inci)}>
                       <Inci text={item.inci} />
                     </span>
                   </th>
-                  <td {...stylex.props(styles.featureCell)}>{item.features}</td>
+                  <td {...stylex.attrs(styles.featureCell)}>{item.features}</td>
                 </tr>
               );
             })}
@@ -368,44 +370,44 @@ function RegionBlock({ group }: { group: CatalogGroup }) {
 
 export function Catalog() {
   const reduce = useReducedMotion();
-  const titleId = useId();
+  const titleId = createUniqueId();
 
-  const jumpTo = (event: MouseEvent<HTMLAnchorElement>, groupId: string) => {
+  const jumpTo = (event: MouseEvent, groupId: string) => {
     const block = document.getElementById(blockId(groupId));
     if (!block) return;
     event.preventDefault();
-    block.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+    block.scrollIntoView({ behavior: reduce() ? "auto" : "smooth", block: "start" });
     block.querySelector<HTMLElement>("h3")?.focus({ preventScroll: true });
   };
 
   return (
-    <section id="products-catalog" aria-labelledby={titleId} {...stylex.props(styles.section)}>
-      <div {...stylex.props(styles.shell)}>
-        <h2 id={titleId} {...stylex.props(styles.title)}>
+    <section id="products-catalog" aria-labelledby={titleId} {...stylex.attrs(styles.section)}>
+      <div {...stylex.attrs(styles.shell)}>
+        <h2 id={titleId} {...stylex.attrs(styles.title)}>
           产品目录
         </h2>
-        <nav aria-label="Catalog sections" {...stylex.props(styles.indexNav)}>
-          <ol {...stylex.props(styles.indexList)}>
+        <nav aria-label="Catalog sections" {...stylex.attrs(styles.indexNav)}>
+          <ol {...stylex.attrs(styles.indexList)}>
             {CATALOG_GROUPS.map((group) => (
-              <li key={group.id}>
+              <li>
                 <a
                   href={`#${blockId(group.id)}`}
                   onClick={(event) => jumpTo(event, group.id)}
-                  {...stylex.props(styles.indexLink)}
+                  {...stylex.attrs(styles.indexLink)}
                 >
                   {REGION_META[group.id]?.short ?? group.label}
-                  <span {...stylex.props(styles.indexCount)}>
+                  <span {...stylex.attrs(styles.indexCount)}>
                     {group.items.length}
-                    <span {...stylex.props(styles.srOnly)}> ingredients</span>
+                    <span {...stylex.attrs(styles.srOnly)}> ingredients</span>
                   </span>
                 </a>
               </li>
             ))}
           </ol>
         </nav>
-        <div {...stylex.props(styles.blocks)}>
+        <div {...stylex.attrs(styles.blocks)}>
           {CATALOG_GROUPS.map((group) => (
-            <RegionBlock key={group.id} group={group} />
+            <RegionBlock group={group} />
           ))}
         </div>
       </div>

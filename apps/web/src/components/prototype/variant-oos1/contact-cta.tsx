@@ -1,6 +1,6 @@
-import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
+import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { useId } from "react";
+import { createUniqueId, For, merge, Show } from "solid-js";
 
 import { CTA } from "./content";
 import { RiseReveal } from "./rise-reveal";
@@ -11,7 +11,7 @@ const PAPER_HOVER = "#f6f6f6";
 const OOX_WORD_ON_TINT = "#d7e1f1";
 const WORD_ON_TINT = `color-mix(in srgb, ${OOX_WORD_ON_TINT} 80%, ${TINT})`;
 const WORD_TRACKING = "0.06em";
-const DESKTOP = breakpoints.xl;
+const DESKTOP = "@media (min-width: 1280px)";
 
 export type ContactCtaAction = {
   label: string;
@@ -107,7 +107,10 @@ const styles = stylex.create({
     cursor: "pointer",
     transform: {
       default: null,
-      ":active": { default: null, [breakpoints.motionOk]: "scale(0.96)" },
+      ":active": {
+        default: null,
+        ["@media (prefers-reduced-motion: no-preference)"]: "scale(0.96)",
+      },
     },
     transitionProperty: "background-color, color, transform",
     transitionDuration: "160ms",
@@ -127,49 +130,49 @@ const styles = stylex.create({
   },
 });
 
-export function ContactCta({
-  id,
-  title = CTA.title,
-  subtitle,
-  actions = [CTA.action],
-}: {
+export function ContactCta(rawProps: {
   id?: string;
   title?: string;
   subtitle?: string;
   actions?: ContactCtaActions;
 }) {
-  const titleId = useId();
+  const props = merge({ title: CTA.title, actions: [CTA.action] as ContactCtaActions }, rawProps);
+  const titleId = createUniqueId();
   return (
-    <section id={id} aria-labelledby={titleId} {...stylex.props(styles.section)}>
-      <span aria-hidden="true" lang="en" {...stylex.props(styles.word)}>
+    <section id={props.id} aria-labelledby={titleId} {...stylex.attrs(styles.section)}>
+      <span aria-hidden="true" lang="en" {...stylex.attrs(styles.word)}>
         Fenchem
       </span>
       <RiseReveal sx={styles.inner}>
-        <div {...stylex.props(styles.heading)}>
-          <h2 id={titleId} {...stylex.props(styles.title)}>
-            {title}
+        <div {...stylex.attrs(styles.heading)}>
+          <h2 id={titleId} {...stylex.attrs(styles.title)}>
+            {props.title}
           </h2>
-          {subtitle && <p {...stylex.props(styles.subtitle)}>{subtitle}</p>}
+          <Show when={props.subtitle}>
+            <p {...stylex.attrs(styles.subtitle)}>{props.subtitle}</p>
+          </Show>
         </div>
-        {actions.length > 0 && (
-          <div {...stylex.props(styles.actions)}>
-            {actions.map((action) => {
-              const sx = stylex.props(
-                styles.button,
-                action.tone === "secondary" ? styles.secondary : styles.primary,
-              );
-              return action.href === undefined ? (
-                <button key={action.label} type="button" onClick={action.onClick} {...sx}>
-                  {action.label}
-                </button>
-              ) : (
-                <a key={action.label} href={action.href} {...sx}>
-                  {action.label}
-                </a>
-              );
-            })}
+        <Show when={props.actions.length > 0}>
+          <div {...stylex.attrs(styles.actions)}>
+            <For each={props.actions}>
+              {(action) => {
+                const sx = stylex.attrs(
+                  styles.button,
+                  action.tone === "secondary" ? styles.secondary : styles.primary,
+                );
+                return action.href === undefined ? (
+                  <button type="button" onClick={action.onClick} {...sx}>
+                    {action.label}
+                  </button>
+                ) : (
+                  <a href={action.href} {...sx}>
+                    {action.label}
+                  </a>
+                );
+              }}
+            </For>
           </div>
-        )}
+        </Show>
       </RiseReveal>
     </section>
   );

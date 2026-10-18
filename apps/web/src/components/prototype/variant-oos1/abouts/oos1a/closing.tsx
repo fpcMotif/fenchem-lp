@@ -1,6 +1,5 @@
-import { breakpoints } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight } from "@fenchem-lp/ui/components/lucide";
 
 import { CTA } from "../../content";
 import { media, palette } from "./lattice.stylex";
@@ -12,18 +11,18 @@ const styles = stylex.create({
     backgroundColor: palette.page,
   },
   inner: {
-    paddingTop: { default: 72, [media.tablet]: 112, [breakpoints.xl]: 144 },
-    paddingBottom: { default: 80, [media.tablet]: 128, [breakpoints.xl]: 160 },
+    paddingTop: { default: 72, [media.tablet]: 112, ["@media (min-width: 1280px)"]: 144 },
+    paddingBottom: { default: 80, [media.tablet]: 128, ["@media (min-width: 1280px)"]: 160 },
   },
   content: {
     display: "flex",
     flexDirection: "column",
     alignItems: "flex-start",
-    gap: { default: 32, [breakpoints.xl]: 40 },
-    marginInlineStart: { default: 0, [breakpoints.lg]: "25%" },
+    gap: { default: 32, ["@media (min-width: 1280px)"]: 40 },
+    marginInlineStart: { default: 0, ["@media (min-width: 1024px)"]: "25%" },
   },
   title: {
-    fontSize: { default: 36, [media.tablet]: 56, [breakpoints.xl]: 72 },
+    fontSize: { default: 36, [media.tablet]: 56, ["@media (min-width: 1280px)"]: 72 },
   },
   buttons: {
     display: "flex",
@@ -33,22 +32,22 @@ const styles = stylex.create({
   },
 });
 
-export function Closing({ onNavigateHome }: { onNavigateHome: (hash?: string) => void }) {
+export function Closing(props: { onNavigateHome: (hash?: string) => void }) {
   return (
-    <section aria-labelledby="about-cta-title" {...stylex.props(styles.section)}>
+    <section aria-labelledby="about-cta-title" {...stylex.attrs(styles.section)}>
       <Frame innerSx={styles.inner}>
         <Reveal sx={styles.content}>
-          <h2 id="about-cta-title" {...stylex.props(shared.headline, styles.title)}>
+          <h2 id="about-cta-title" {...stylex.attrs(shared.headline, styles.title)}>
             {CTA.title}
           </h2>
-          <div {...stylex.props(styles.buttons)}>
+          <div {...stylex.attrs(styles.buttons)}>
             <Action
-              onClick={() => onNavigateHome("contact")}
+              onClick={() => props.onNavigateHome("contact")}
               icon={<ArrowRight size={16} aria-hidden="true" />}
             >
               {CTA.action.label}
             </Action>
-            <Action kind="outline" onClick={() => onNavigateHome("products")}>
+            <Action kind="outline" onClick={() => props.onNavigateHome("products")}>
               产品与应用
             </Action>
           </div>

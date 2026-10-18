@@ -1,6 +1,6 @@
 import * as stylex from "@stylexjs/stylex";
-import { m, useScroll, useTransform } from "motion/react";
-import { useId, useRef } from "react";
+import { createUniqueId } from "solid-js";
+import { m, useScroll, useTransform } from "@/compat/motion";
 
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
@@ -226,18 +226,18 @@ const styles = stylex.create({
   },
 });
 
-function ThreadLayer({ clipId, over }: { clipId: string; over: boolean }) {
+function ThreadLayer(props: { clipId: string; over: boolean }) {
   const threadProps = {
     fill: "none",
     stroke: "currentColor",
-    strokeWidth: 1,
-    vectorEffect: "non-scaling-stroke",
+    "stroke-width": 1,
+    "vector-effect": "non-scaling-stroke",
   } as const;
-  const haloProps = { ...threadProps, stroke: "#ffffff", strokeWidth: 7 } as const;
+  const haloProps = { ...threadProps, stroke: "#ffffff", "stroke-width": 7 } as const;
 
-  if (!over) {
+  if (!props.over) {
     return (
-      <svg viewBox={VIEWBOX} preserveAspectRatio="none" {...stylex.props(styles.svg)}>
+      <svg viewBox={VIEWBOX} preserveAspectRatio="none" {...stylex.attrs(styles.svg)}>
         <path d={THREAD_A} {...threadProps} />
         <path d={THREAD_B} {...threadProps} />
         <path d={THREAD_C} {...threadProps} />
@@ -246,9 +246,9 @@ function ThreadLayer({ clipId, over }: { clipId: string; over: boolean }) {
   }
 
   const rects = (key: string, boxes: readonly Rect[]) => (
-    <clipPath id={`${clipId}-${key}`}>
+    <clipPath id={`${props.clipId}-${key}`}>
       {boxes.map((box) => (
-        <rect key={`${box.x}-${box.y}`} x={box.x} y={box.y} width={box.w} height={box.h} />
+        <rect x={box.x} y={box.y} width={box.w} height={box.h} />
       ))}
     </clipPath>
   );
@@ -257,7 +257,7 @@ function ThreadLayer({ clipId, over }: { clipId: string; over: boolean }) {
   const knotC = knotBox(SCENE_PARTNERSHIP.knot);
 
   return (
-    <svg viewBox={VIEWBOX} preserveAspectRatio="none" {...stylex.props(styles.svg)}>
+    <svg viewBox={VIEWBOX} preserveAspectRatio="none" {...stylex.attrs(styles.svg)}>
       <defs>
         {rects("a", [SCENE_FOCUS.rect, SCENE_PARTNERSHIP.rect, knotA])}
         {rects("b", [knotB])}
@@ -265,12 +265,12 @@ function ThreadLayer({ clipId, over }: { clipId: string; over: boolean }) {
         {rects("ha", [knotA])}
         {rects("hc", [knotC])}
       </defs>
-      <path d={THREAD_A} clipPath={`url(#${clipId}-ha)`} {...haloProps} />
-      <path d={THREAD_B} clipPath={`url(#${clipId}-b)`} {...haloProps} />
-      <path d={THREAD_C} clipPath={`url(#${clipId}-hc)`} {...haloProps} />
-      <path d={THREAD_A} clipPath={`url(#${clipId}-a)`} {...threadProps} />
-      <path d={THREAD_B} clipPath={`url(#${clipId}-b)`} {...threadProps} />
-      <path d={THREAD_C} clipPath={`url(#${clipId}-c)`} {...threadProps} />
+      <path d={THREAD_A} clip-path={`url(#${props.clipId}-ha)`} {...haloProps} />
+      <path d={THREAD_B} clip-path={`url(#${props.clipId}-b)`} {...haloProps} />
+      <path d={THREAD_C} clip-path={`url(#${props.clipId}-hc)`} {...haloProps} />
+      <path d={THREAD_A} clip-path={`url(#${props.clipId}-a)`} {...threadProps} />
+      <path d={THREAD_B} clip-path={`url(#${props.clipId}-b)`} {...threadProps} />
+      <path d={THREAD_C} clip-path={`url(#${props.clipId}-c)`} {...threadProps} />
     </svg>
   );
 }
@@ -286,32 +286,30 @@ function Swatch() {
       aria-hidden="true"
       viewBox={`${SWATCH_LEFT} ${SWATCH_TOP} ${SWATCH_WIDTH} ${SWATCH_HEIGHT}`}
       preserveAspectRatio="none"
-      {...stylex.props(styles.swatch)}
+      {...stylex.attrs(styles.swatch)}
     >
       {WARP_COLUMNS.map((column) => (
         <line
-          key={`warp-${column}`}
           x1={columnX(column)}
           x2={columnX(column)}
           y1={SWATCH_TOP}
           y2={bottom}
           stroke="currentColor"
-          strokeOpacity={TIED_COLUMNS.has(column) ? 0.9 : 0.38}
-          strokeDasharray="26 6"
-          strokeDashoffset={column % 2 === 0 ? 17 : 1}
+          stroke-opacity={TIED_COLUMNS.has(column) ? 0.9 : 0.38}
+          stroke-dasharray="26 6"
+          stroke-dashoffset={column % 2 === 0 ? 17 : 1}
         />
       ))}
       {WEFT_ROWS.map((row) => (
         <line
-          key={`weft-${row}`}
           x1={SWATCH_LEFT}
           x2={SWATCH_LEFT + SWATCH_WIDTH}
           y1={rowY(row)}
           y2={rowY(row)}
           stroke="currentColor"
-          strokeOpacity={0.62}
-          strokeDasharray="34 6"
-          strokeDashoffset={row % 2 === 0 ? 7 : 27}
+          stroke-opacity={0.62}
+          stroke-dasharray="34 6"
+          stroke-dashoffset={row % 2 === 0 ? 7 : 27}
         />
       ))}
     </svg>
@@ -319,42 +317,42 @@ function Swatch() {
 }
 
 export function CultureStory() {
-  const clipId = `weave${useId().replace(/[^a-zA-Z0-9]/g, "")}`;
-  const canvasRef = useRef<HTMLDivElement>(null);
+  const clipId = `weave${createUniqueId().replace(/[^a-zA-Z0-9]/g, "")}`;
+  let canvasRef: HTMLDivElement | undefined;
   const reduce = useReducedMotion();
   const { scrollYProgress } = useScroll({
-    target: canvasRef,
+    target: () => canvasRef,
     offset: ["start 70%", "end 70%"],
   });
   const drawn = useTransform(
     scrollYProgress,
     (progress) => `inset(0px 0px ${((1 - Math.min(1, progress * 1.08)) * 100).toFixed(2)}% 0px)`,
   );
-  const layerStyle = { clipPath: reduce ? "none" : drawn };
+  const layerStyle = () => ({ clipPath: reduce() ? "none" : drawn });
 
   return (
     <section
       id="about-culture"
       aria-labelledby="about-culture-title"
-      {...stylex.props(ui.section, ui.anchor, styles.section)}
+      {...stylex.attrs(ui.section, ui.anchor, styles.section)}
     >
-      <h2 id="about-culture-title" {...stylex.props(ui.srOnly)}>
+      <h2 id="about-culture-title" {...stylex.attrs(ui.srOnly)}>
         {ABOUT_CULTURE.eyebrow}
       </h2>
-      <div {...stylex.props(ui.shell)}>
-        <div ref={canvasRef} {...stylex.props(styles.canvas)}>
+      <div {...stylex.attrs(ui.shell)}>
+        <div ref={canvasRef} {...stylex.attrs(styles.canvas)}>
           <m.div
             aria-hidden="true"
-            {...stylex.props(styles.layer, styles.under, threadInk.ink)}
-            style={layerStyle}
+            {...stylex.attrs(styles.layer, styles.under, threadInk.ink)}
+            style={layerStyle()}
           >
             <ThreadLayer clipId={clipId} over={false} />
           </m.div>
-          <ol {...stylex.props(styles.scenes)}>
+          <ol {...stylex.attrs(styles.scenes)}>
             {SCENES.map((scene) => {
               const textTop = scene.knot.y - TEXT_LIFT;
               return (
-                <li key={scene.value.title} {...stylex.props(styles.scene)}>
+                <li {...stylex.attrs(styles.scene)}>
                   <Reveal
                     sx={[
                       styles.text,
@@ -366,15 +364,15 @@ export function CultureStory() {
                           ],
                     ]}
                   >
-                    <p {...stylex.props(styles.narration)}>{narration(scene.photo.caption)}</p>
-                    <h3 {...stylex.props(styles.title)}>
-                      <span aria-hidden="true" {...stylex.props(styles.knotMark)} />
+                    <p {...stylex.attrs(styles.narration)}>{narration(scene.photo.caption)}</p>
+                    <h3 {...stylex.attrs(styles.title)}>
+                      <span aria-hidden="true" {...stylex.attrs(styles.knotMark)} />
                       {scene.value.title}
                     </h3>
-                    <p {...stylex.props(styles.desc)}>{scene.value.desc}</p>
+                    <p {...stylex.attrs(styles.desc)}>{scene.value.desc}</p>
                   </Reveal>
                   <figure
-                    {...stylex.props(
+                    {...stylex.attrs(
                       styles.photo,
                       styles.placeStart(`${scene.rect.x / 10}%`, scene.rect.y),
                     )}
@@ -384,7 +382,7 @@ export function CultureStory() {
                       alt={scene.photo.alt}
                       loading="lazy"
                       decoding="async"
-                      {...stylex.props(styles.photoImage)}
+                      {...stylex.attrs(styles.photoImage)}
                     />
                   </figure>
                 </li>
@@ -393,14 +391,14 @@ export function CultureStory() {
           </ol>
           <m.div
             aria-hidden="true"
-            {...stylex.props(styles.layer, styles.over, threadInk.ink)}
-            style={layerStyle}
+            {...stylex.attrs(styles.layer, styles.over, threadInk.ink)}
+            style={layerStyle()}
           >
             <ThreadLayer clipId={clipId} over />
           </m.div>
-          <div {...stylex.props(styles.ending)}>
+          <div {...stylex.attrs(styles.ending)}>
             <Swatch />
-            <p {...stylex.props(styles.endingLine)}>织成同一块布</p>
+            <p {...stylex.attrs(styles.endingLine)}>织成同一块布</p>
           </div>
         </div>
       </div>

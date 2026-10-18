@@ -1,17 +1,9 @@
-import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
+import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { ChevronDown } from "lucide-react";
-import { AnimatePresence, m } from "motion/react";
-import {
-  useCallback,
-  useEffect,
-  useId,
-  useRef,
-  useState,
-  type FocusEvent,
-  type KeyboardEvent,
-  type ReactNode,
-} from "react";
+import { ChevronDown } from "@fenchem-lp/ui/components/lucide";
+import { AnimatePresence, m } from "@/compat/motion";
+import { createEffect, createSignal, createUniqueId, For, onSettled, Show } from "solid-js";
+import type { JSX } from "@solidjs/web";
 
 import { EASE } from "@/components/prototype/motion-constants";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
@@ -42,10 +34,10 @@ const BODY_FONT =
 const NUMERAL_FONT = '"Inter Tight", "Source Han Sans SC", "Noto Sans SC", sans-serif';
 
 const TABLET = "@media (min-width: 768px) and (max-width: 1279.98px)";
-const DESKTOP = breakpoints.xl;
+const DESKTOP = "@media (min-width: 1280px)";
 const SM = "@media (min-width: 640px) and (max-width: 1023.98px)";
-const LG = breakpoints.lg;
-const MOTION_OK = breakpoints.motionOk;
+const LG = "@media (min-width: 1024px)";
+const MOTION_OK = "@media (prefers-reduced-motion: no-preference)";
 const INSET = "min(120px, 8.333vw)";
 const HEADER_HEIGHT = 80;
 const JUMP_BAR_HEIGHT = 52;
@@ -418,70 +410,62 @@ const styles = stylex.create({
   },
 });
 
-function Field({ label, children }: { label: string; children: ReactNode }) {
+function Field(props: { label: string; children: JSX.Element }) {
   return (
-    <div {...stylex.props(styles.field)}>
-      <dt {...stylex.props(styles.fieldLabel)}>{label}</dt>
-      <dd {...stylex.props(styles.fieldValue)}>{children}</dd>
+    <div {...stylex.attrs(styles.field)}>
+      <dt {...stylex.attrs(styles.fieldLabel)}>{props.label}</dt>
+      <dd {...stylex.attrs(styles.fieldValue)}>{props.children}</dd>
     </div>
   );
 }
 
-function Lines({ lines }: { lines: string[] }) {
+function Lines(props: { lines: string[] }) {
   return (
-    <ul {...stylex.props(styles.lines)}>
-      {lines.map((line) => (
-        <li key={line} {...stylex.props(styles.line)}>
-          {line}
-        </li>
-      ))}
+    <ul {...stylex.attrs(styles.lines)}>
+      <For each={props.lines}>{(line) => <li {...stylex.attrs(styles.line)}>{line}</li>}</For>
     </ul>
   );
 }
 
-function Inline({ items }: { items: string[] }) {
+function Inline(props: { items: string[] }) {
   return (
-    <ul {...stylex.props(styles.inline)}>
-      {items.map((entry) => (
-        <li key={entry}>{entry}</li>
-      ))}
+    <ul {...stylex.attrs(styles.inline)}>
+      <For each={props.items}>{(entry) => <li>{entry}</li>}</For>
     </ul>
   );
 }
 
-function Sheet({
-  item,
-  index,
-  current,
-  sheetRef,
-}: {
+function Sheet(props: {
   item: SolutionItem;
   index: number;
   current: boolean;
-  sheetRef: (node: HTMLElement | null) => void;
+  sheetRef: (node: HTMLElement) => void;
 }) {
-  const titleId = useId();
+  const titleId = createUniqueId();
+  const item = props.item;
   return (
     <article
-      ref={sheetRef}
-      tabIndex={-1}
+      ref={props.sheetRef}
+      tabindex={-1}
       aria-labelledby={titleId}
-      data-sheet-index={index}
-      {...stylex.props(styles.sheet)}
+      data-sheet-index={props.index}
+      {...stylex.attrs(styles.sheet)}
     >
-      <header {...stylex.props(styles.sheetHead)}>
-        <span {...stylex.props(styles.sheetNumber)}>
-          <span {...stylex.props(current && styles.sheetNumberCurrent)}>{padIndex(index)}</span>
+      <header {...stylex.attrs(styles.sheetHead)}>
+        <span {...stylex.attrs(styles.sheetNumber)}>
+          <span {...stylex.attrs(props.current && styles.sheetNumberCurrent)}>
+            {padIndex(props.index)}
+          </span>
           {` / ${TOTAL_LABEL}`}
         </span>
         <div>
-          <h3 id={titleId} {...stylex.props(styles.sheetTitle)}>
+          <h3 id={titleId} {...stylex.attrs(styles.sheetTitle)}>
             {item.title}
           </h3>
-          <p {...stylex.props(styles.sheetSubtitle)}>{item.subtitle}</p>
+          <p {...stylex.attrs(styles.sheetSubtitle)}>{item.subtitle}</p>
         </div>
       </header>
-      <dl {...stylex.props(styles.fields)}>
+      <dl {...stylex.attrs(styles.fields)}>
         <Field label="概述">
           <Lines lines={item.overview} />
         </Field>
@@ -489,14 +473,14 @@ function Sheet({
           <Inline items={item.functions} />
         </Field>
         <Field label="功能性成分">
-          <ul {...stylex.props(styles.lines)}>
+          <ul {...stylex.attrs(styles.lines)}>
             {item.keyIngredients.map((ingredient) => {
               const part = splitTitle(ingredient);
               return (
-                <li key={ingredient} {...stylex.props(styles.ingredient)}>
+                <li {...stylex.attrs(styles.ingredient)}>
                   <span>{part.primary}</span>
                   {part.secondary && (
-                    <span {...stylex.props(styles.ingredientNote)}>{part.secondary}</span>
+                    <span {...stylex.attrs(styles.ingredientNote)}>{part.secondary}</span>
                   )}
                 </li>
               );
@@ -527,109 +511,108 @@ const optionTarget = (key: string, focused: number, last: number): number | null
   return null;
 };
 
-function JumpBar({ active, onJump }: { active: number; onJump: (index: number) => void }) {
+function JumpBar(props: { active: number; onJump: (index: number) => void }) {
   const reduce = useReducedMotion();
-  const panelId = useId();
-  const [openedAt, setOpenedAt] = useState<number | null>(null);
-  const open = openedAt !== null;
-  const wrapRef = useRef<HTMLDivElement>(null);
-  const triggerRef = useRef<HTMLButtonElement>(null);
-  const optionRefs = useRef<(HTMLButtonElement | null)[]>([]);
-  const current = SOLUTION_ITEMS[active];
+  const panelId = createUniqueId();
+  const [openedAt, setOpenedAt] = createSignal<number | null>(null);
+  const open = () => openedAt() !== null;
+  let wrap: HTMLDivElement | undefined;
+  let trigger: HTMLButtonElement | undefined;
+  const options: (HTMLButtonElement | undefined)[] = [];
+  const current = () => SOLUTION_ITEMS[props.active];
 
-  const close = useCallback((returnFocus: boolean) => {
+  const close = (returnFocus: boolean) => {
     setOpenedAt(null);
-    if (returnFocus) triggerRef.current?.focus();
-  }, []);
+    if (returnFocus) trigger?.focus();
+  };
 
-  useEffect(() => {
-    if (openedAt === null) return;
-    optionRefs.current[openedAt]?.focus({ preventScroll: true });
+  createEffect(openedAt, (at) => {
+    if (at === null) return;
+    options[at]?.focus({ preventScroll: true });
     const onPointerDown = (event: PointerEvent) => {
-      if (event.target instanceof Node && wrapRef.current?.contains(event.target)) return;
+      if (event.target instanceof Node && wrap?.contains(event.target)) return;
       close(false);
     };
     document.addEventListener("pointerdown", onPointerDown);
     return () => document.removeEventListener("pointerdown", onPointerDown);
-  }, [openedAt, close]);
+  });
 
-  const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-    if (!open) return;
+  const onKeyDown = (event: KeyboardEvent) => {
+    if (!open()) return;
     if (event.key === "Escape") {
       event.preventDefault();
       close(true);
       return;
     }
-    const options = optionRefs.current.filter((node): node is HTMLButtonElement => node !== null);
-    const focused = options.findIndex((node) => node === document.activeElement);
-    const target = optionTarget(event.key, focused, options.length - 1);
+    const mounted = options.filter((node): node is HTMLButtonElement => node?.isConnected === true);
+    const focused = mounted.findIndex((node) => node === document.activeElement);
+    const target = optionTarget(event.key, focused, mounted.length - 1);
     if (target === null) return;
     event.preventDefault();
-    options[target]?.focus();
+    mounted[target]?.focus();
   };
 
-  const onBlur = (event: FocusEvent<HTMLDivElement>) => {
-    if (!open) return;
+  const onBlur = (event: FocusEvent) => {
+    if (!open()) return;
     const next = event.relatedTarget;
-    if (next instanceof Node && wrapRef.current?.contains(next)) return;
+    if (next instanceof Node && wrap?.contains(next)) return;
     if (next === null) return;
     close(false);
   };
 
   return (
-    <div ref={wrapRef} onKeyDown={onKeyDown} onBlur={onBlur} {...stylex.props(styles.jump)}>
+    <div ref={wrap} onKeyDown={onKeyDown} onFocusOut={onBlur} {...stylex.attrs(styles.jump)}>
       <button
-        ref={triggerRef}
+        ref={trigger}
         type="button"
-        aria-expanded={open}
+        aria-expanded={open() ? "true" : "false"}
         aria-controls={panelId}
-        onClick={() => setOpenedAt(open ? null : active)}
-        {...stylex.props(styles.jumpButton)}
+        onClick={() => setOpenedAt(open() ? null : props.active)}
+        {...stylex.attrs(styles.jumpButton)}
       >
-        <span {...stylex.props(styles.jumpCount)}>
-          <span {...stylex.props(styles.jumpCurrent)}>{padIndex(active)}</span>
+        <span {...stylex.attrs(styles.jumpCount)}>
+          <span {...stylex.attrs(styles.jumpCurrent)}>{padIndex(props.active)}</span>
           {` / ${TOTAL_LABEL}`}
         </span>
-        <span aria-hidden="true" {...stylex.props(styles.jumpDivider)}>
+        <span aria-hidden="true" {...stylex.attrs(styles.jumpDivider)}>
           ·
         </span>
-        <span {...stylex.props(styles.jumpTitle)}>{current?.title}</span>
-        <span aria-hidden="true" {...stylex.props(styles.jumpIcon, open && styles.jumpIconOpen)}>
+        <span {...stylex.attrs(styles.jumpTitle)}>{current()?.title}</span>
+        <span aria-hidden="true" {...stylex.attrs(styles.jumpIcon, open() && styles.jumpIconOpen)}>
           <ChevronDown size={18} strokeWidth={1.5} absoluteStrokeWidth />
         </span>
       </button>
       <AnimatePresence initial={false}>
-        {open && (
+        <Show when={open()}>
           <m.div
-            key="panel"
             id={panelId}
             initial={{ opacity: 0, y: -4 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -4 }}
-            transition={{ duration: reduce ? 0 : 0.18, ease: EASE }}
-            {...stylex.props(styles.jumpPanel)}
+            transition={{ duration: reduce() ? 0 : 0.18, ease: EASE }}
+            {...stylex.attrs(styles.jumpPanel)}
           >
-            <ol aria-label="Application solution list" {...stylex.props(styles.jumpList)}>
+            <ol aria-label="Application solution list" {...stylex.attrs(styles.jumpList)}>
               {SOLUTION_ITEMS.map((item, index) => {
-                const isActive = index === active;
+                const isActive = () => index === props.active;
                 return (
-                  <li key={item.id}>
+                  <li>
                     <button
                       ref={(node) => {
-                        optionRefs.current[index] = node;
+                        options[index] = node;
                       }}
                       type="button"
-                      aria-current={isActive ? "true" : undefined}
+                      aria-current={isActive() ? "true" : undefined}
                       onClick={() => {
                         setOpenedAt(null);
-                        onJump(index);
+                        props.onJump(index);
                       }}
-                      {...stylex.props(styles.jumpOption, isActive && styles.jumpOptionActive)}
+                      {...stylex.attrs(styles.jumpOption, isActive() && styles.jumpOptionActive)}
                     >
-                      <span {...stylex.props(styles.navNumber, isActive && styles.numberActive)}>
+                      <span {...stylex.attrs(styles.navNumber, isActive() && styles.numberActive)}>
                         {padIndex(index)}
                       </span>
-                      <span {...stylex.props(styles.navTitle, isActive && styles.titleActive)}>
+                      <span {...stylex.attrs(styles.navTitle, isActive() && styles.titleActive)}>
                         {item.title}
                       </span>
                     </button>
@@ -638,25 +621,24 @@ function JumpBar({ active, onJump }: { active: number; onJump: (index: number) =
               })}
             </ol>
           </m.div>
-        )}
+        </Show>
       </AnimatePresence>
     </div>
   );
 }
 
 export function Solutions() {
-  const headingId = useId();
+  const headingId = createUniqueId();
   const reduce = useReducedMotion();
-  const [active, setActive] = useState(0);
-  const sheetRefs = useRef<(HTMLElement | null)[]>([]);
-  const visibleRef = useRef(new Set<number>());
-  const lockedRef = useRef(false);
-  const releaseRef = useRef<(() => void) | null>(null);
+  const [active, setActive] = createSignal(0);
+  const sheets: (HTMLElement | undefined)[] = [];
+  const visible = new Set<number>();
+  let locked = false;
+  let releaseScroll: (() => void) | null = null;
 
-  useEffect(() => {
-    const visible = visibleRef.current;
+  onSettled(() => {
     const sheetIndexes = new Map<Element, number>();
-    sheetRefs.current.forEach((sheet, index) => {
+    sheets.forEach((sheet, index) => {
       if (sheet && !sheetIndexes.has(sheet)) sheetIndexes.set(sheet, index);
     });
     const observer = new IntersectionObserver(
@@ -667,63 +649,63 @@ export function Solutions() {
           if (entry.isIntersecting) visible.add(index);
           else visible.delete(index);
         }
-        if (lockedRef.current || visible.size === 0) return;
+        if (locked || visible.size === 0) return;
         setActive(Math.min(...visible));
       },
       { rootMargin: SPY_BAND },
     );
-    for (const sheet of sheetRefs.current) if (sheet) observer.observe(sheet);
+    for (const sheet of sheets) if (sheet) observer.observe(sheet);
     return () => {
       observer.disconnect();
-      releaseRef.current?.();
+      releaseScroll?.();
     };
-  }, []);
+  });
 
   const jumpTo = (index: number) => {
-    const sheet = sheetRefs.current[index];
+    const sheet = sheets[index];
     if (!sheet) return;
-    releaseRef.current?.();
-    lockedRef.current = true;
+    releaseScroll?.();
+    locked = true;
     setActive(index);
     const release = () => {
-      lockedRef.current = false;
+      locked = false;
       window.clearTimeout(timer);
       window.removeEventListener("scrollend", release);
-      releaseRef.current = null;
+      releaseScroll = null;
     };
     const timer = window.setTimeout(release, 1200);
     window.addEventListener("scrollend", release, { once: true });
-    releaseRef.current = release;
+    releaseScroll = release;
     sheet.focus({ preventScroll: true });
-    sheet.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+    sheet.scrollIntoView({ behavior: reduce() ? "auto" : "smooth", block: "start" });
   };
 
   return (
-    <section id="products-solutions" aria-labelledby={headingId} {...stylex.props(styles.section)}>
-      <div {...stylex.props(styles.shell)}>
-        <header {...stylex.props(styles.head)}>
-          <h2 id={headingId} {...stylex.props(styles.title)}>
+    <section id="products-solutions" aria-labelledby={headingId} {...stylex.attrs(styles.section)}>
+      <div {...stylex.attrs(styles.shell)}>
+        <header {...stylex.attrs(styles.head)}>
+          <h2 id={headingId} {...stylex.attrs(styles.title)}>
             应用方案
           </h2>
         </header>
-        <JumpBar active={active} onJump={jumpTo} />
-        <div {...stylex.props(styles.layout)}>
-          <nav aria-label="Application solution index" {...stylex.props(styles.nav)}>
-            <ol {...stylex.props(styles.navList)}>
+        <JumpBar active={active()} onJump={jumpTo} />
+        <div {...stylex.attrs(styles.layout)}>
+          <nav aria-label="Application solution index" {...stylex.attrs(styles.nav)}>
+            <ol {...stylex.attrs(styles.navList)}>
               {SOLUTION_ITEMS.map((item, index) => {
-                const isActive = index === active;
+                const isActive = () => index === active();
                 return (
-                  <li key={item.id}>
+                  <li>
                     <button
                       type="button"
-                      aria-current={isActive ? "true" : undefined}
+                      aria-current={isActive() ? "true" : undefined}
                       onClick={() => jumpTo(index)}
-                      {...stylex.props(styles.navButton, isActive && styles.navButtonActive)}
+                      {...stylex.attrs(styles.navButton, isActive() && styles.navButtonActive)}
                     >
-                      <span {...stylex.props(styles.navNumber, isActive && styles.numberActive)}>
+                      <span {...stylex.attrs(styles.navNumber, isActive() && styles.numberActive)}>
                         {padIndex(index)}
                       </span>
-                      <span {...stylex.props(styles.navTitle, isActive && styles.titleActive)}>
+                      <span {...stylex.attrs(styles.navTitle, isActive() && styles.titleActive)}>
                         {item.title}
                       </span>
                     </button>
@@ -732,15 +714,14 @@ export function Solutions() {
               })}
             </ol>
           </nav>
-          <div {...stylex.props(styles.sheets)}>
+          <div {...stylex.attrs(styles.sheets)}>
             {SOLUTION_ITEMS.map((item, index) => (
               <Sheet
-                key={item.id}
                 item={item}
                 index={index}
-                current={index === active}
+                current={index === active()}
                 sheetRef={(node) => {
-                  sheetRefs.current[index] = node;
+                  sheets[index] = node;
                 }}
               />
             ))}

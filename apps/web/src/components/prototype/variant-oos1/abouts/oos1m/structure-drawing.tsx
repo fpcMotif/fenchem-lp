@@ -1,5 +1,5 @@
 import * as stylex from "@stylexjs/stylex";
-import { m, useTransform, type MotionValue } from "motion/react";
+import { m, useTransform, type MotionValue } from "@/compat/motion";
 
 import { ABOUT_STRUCTURE } from "../../about-data";
 import { Camera, Drawing, GroundPlane, GroundShadow, IsoBox } from "./iso";
@@ -94,46 +94,56 @@ const styles = stylex.create({
 const STROKE = {
   fill: "none",
   stroke: "rgba(11, 42, 92, 0.88)",
-  strokeWidth: 1,
-  vectorEffect: "non-scaling-stroke",
+  "stroke-width": 1,
+  "vector-effect": "non-scaling-stroke",
 } as const;
 
-function Block({ progress, index }: { progress: MotionValue<number>; index: number }) {
-  const left = useTransform(progress, (value) => cq(blockX(index, pose(value).spread)));
+function Block(props: { progress: MotionValue<number>; index: number }) {
+  const left = useTransform(props.progress, (value) => cq(blockX(props.index, pose(value).spread)));
   return (
     <m.div
       style={{ x: left, width: cq(BLOCK), height: cq(DEPTH) }}
-      {...stylex.props(styles.blockTrack)}
+      {...stylex.attrs(styles.blockTrack)}
     >
-      <IsoBox x={0} y={0} w={BLOCK} d={DEPTH} t={BLOCK_T} topZ={cq(BLOCK_T)} etch={pad2(index + 2)}>
-        <span {...stylex.props(styles.blockRecess)} />
+      <IsoBox
+        x={0}
+        y={0}
+        w={BLOCK}
+        d={DEPTH}
+        t={BLOCK_T}
+        topZ={cq(BLOCK_T)}
+        etch={pad2(props.index + 2)}
+      >
+        <span {...stylex.attrs(styles.blockRecess)} />
       </IsoBox>
     </m.div>
   );
 }
 
-function BlockCallout({ progress, index }: { progress: MotionValue<number>; index: number }) {
-  const d = useTransform(progress, (value) => blockLeader(index, pose(value).spread).d);
-  const left = useTransform(progress, (value) => cq(blockLeader(index, pose(value).spread).x));
+function BlockCallout(props: { progress: MotionValue<number>; index: number }) {
+  const d = useTransform(props.progress, (value) => blockLeader(props.index, pose(value).spread).d);
+  const left = useTransform(props.progress, (value) =>
+    cq(blockLeader(props.index, pose(value).spread).x),
+  );
   return (
     <>
       <svg
         viewBox={`0 0 1000 ${SHEET_HEIGHT}`}
         aria-hidden="true"
-        {...stylex.props(styles.overlay)}
+        {...stylex.attrs(styles.overlay)}
       >
-        <m.path d={d} {...STROKE} />
+        <m.path d={d()} {...STROKE} />
       </svg>
-      <m.span style={{ left, y: cq(BALLOON_ROW_Y) }} {...stylex.props(ui.balloon, styles.balloon)}>
-        {index + 2}
+      <m.span style={{ left, y: cq(BALLOON_ROW_Y) }} {...stylex.attrs(ui.balloon, styles.balloon)}>
+        {props.index + 2}
       </m.span>
     </>
   );
 }
 
-export function StructureDrawing({ progress }: { progress: MotionValue<number> }) {
-  const slabTop = useTransform(progress, (value) => cq(pose(value).slabTop));
-  const holding = useTransform(progress, (value) => holdingLeader(pose(value).slabTop));
+export function StructureDrawing(props: { progress: MotionValue<number> }) {
+  const slabTop = useTransform(props.progress, (value) => cq(pose(value).slabTop));
+  const holding = useTransform(props.progress, (value) => holdingLeader(pose(value).slabTop));
 
   return (
     <Drawing
@@ -143,12 +153,12 @@ export function StructureDrawing({ progress }: { progress: MotionValue<number> }
       <Camera>
         <GroundPlane width={LENGTH} depth={DEPTH} centerX={ORIGIN.x} centerY={ORIGIN.y}>
           <GroundShadow x={10} y={DEPTH * 0.14} w={LENGTH} d={DEPTH} />
-          {ABOUT_STRUCTURE.subsidiaries.map((subsidiary, index) => (
-            <Block key={subsidiary.id} progress={progress} index={index} />
+          {ABOUT_STRUCTURE.subsidiaries.map((_, index) => (
+            <Block progress={props.progress} index={index} />
           ))}
           <IsoBox x={0} y={0} w={LENGTH} d={DEPTH} t={SLAB_T} topZ={slabTop} etch="01 — Holding">
-            <span {...stylex.props(styles.recess)}>
-              <span {...stylex.props(styles.engraving)}>Fenchem Holdings</span>
+            <span {...stylex.attrs(styles.recess)}>
+              <span {...stylex.attrs(styles.engraving)}>Fenchem Holdings</span>
             </span>
           </IsoBox>
         </GroundPlane>
@@ -156,18 +166,18 @@ export function StructureDrawing({ progress }: { progress: MotionValue<number> }
       <svg
         viewBox={`0 0 1000 ${SHEET_HEIGHT}`}
         aria-hidden="true"
-        {...stylex.props(styles.overlay)}
+        {...stylex.attrs(styles.overlay)}
       >
-        <m.path d={holding} {...STROKE} />
+        <m.path d={holding()} {...STROKE} />
       </svg>
       <span
         style={{ left: cq(HOLDING_BALLOON.x), top: cq(HOLDING_BALLOON.y) }}
-        {...stylex.props(ui.balloon, styles.balloon)}
+        {...stylex.attrs(ui.balloon, styles.balloon)}
       >
         1
       </span>
-      {ABOUT_STRUCTURE.subsidiaries.map((subsidiary, index) => (
-        <BlockCallout key={subsidiary.id} progress={progress} index={index} />
+      {ABOUT_STRUCTURE.subsidiaries.map((_, index) => (
+        <BlockCallout progress={props.progress} index={index} />
       ))}
     </Drawing>
   );

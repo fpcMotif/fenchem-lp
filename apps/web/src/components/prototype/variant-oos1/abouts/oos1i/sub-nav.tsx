@@ -1,6 +1,6 @@
 import { breakpoints } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { useEffect, useRef } from "react";
+import { createEffect } from "solid-js";
 
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
@@ -116,53 +116,55 @@ const S = stylex.create({
   },
 });
 
-export function SubNav({ onNavigateHome }: { onNavigateHome: (hash?: string) => void }) {
+export function SubNav(props: { onNavigateHome: (hash?: string) => void }) {
   const active = useActiveSection(SECTION_IDS);
-  const tabsRef = useRef<HTMLElement>(null);
+  let tabsRef!: HTMLElement;
   const reduce = useReducedMotion();
 
-  useEffect(() => {
-    const list = tabsRef.current;
-    const tab = active ? list?.querySelector<HTMLElement>(`[href="#${active}"]`) : null;
-    if (!list || !tab) return;
-    const listBox = list.getBoundingClientRect();
-    const tabBox = tab.getBoundingClientRect();
-    if (tabBox.left < listBox.left || tabBox.right > listBox.right) {
-      list.scrollBy({
-        left: tabBox.left - listBox.left - 16,
-        behavior: reduce ? "auto" : "smooth",
-      });
-    }
-  }, [active, reduce]);
+  createEffect(
+    () => ({ active: active(), reduce: reduce() }),
+    ({ active, reduce }) => {
+      const list = tabsRef;
+      const tab = active ? list?.querySelector<HTMLElement>(`[href="#${active}"]`) : null;
+      if (!list || !tab) return;
+      const listBox = list.getBoundingClientRect();
+      const tabBox = tab.getBoundingClientRect();
+      if (tabBox.left < listBox.left || tabBox.right > listBox.right) {
+        list.scrollBy({
+          left: tabBox.left - listBox.left - 16,
+          behavior: reduce ? "auto" : "smooth",
+        });
+      }
+    },
+  );
 
   return (
-    <div {...stylex.props(S.bar)}>
-      <div {...stylex.props(base.shell, base.inset, S.inner)}>
-        <nav aria-label="Breadcrumb" {...stylex.props(S.crumbs)}>
+    <div {...stylex.attrs(S.bar)}>
+      <div {...stylex.attrs(base.shell, base.inset, S.inner)}>
+        <nav aria-label="Breadcrumb" {...stylex.attrs(S.crumbs)}>
           <button
             type="button"
-            onClick={() => onNavigateHome("top")}
-            {...stylex.props(S.crumbLink, base.focusRing)}
+            onClick={() => props.onNavigateHome("top")}
+            {...stylex.attrs(S.crumbLink, base.focusRing)}
           >
             首页
           </button>
-          <span aria-hidden="true" {...stylex.props(S.crumbSlash)}>
+          <span aria-hidden="true" {...stylex.attrs(S.crumbSlash)}>
             /
           </span>
           <span aria-current="page">关于我们</span>
         </nav>
-        <nav aria-label="On this page" ref={tabsRef} {...stylex.props(S.tabs)}>
+        <nav aria-label="On this page" ref={tabsRef} {...stylex.attrs(S.tabs)}>
           {LINKS.map((link) => (
             <a
-              key={link.id}
               href={`#${link.id}`}
-              aria-current={active === link.id ? "location" : undefined}
-              {...stylex.props(S.tab, active === link.id && S.tabActive, base.focusRing)}
+              aria-current={active() === link.id ? "location" : undefined}
+              {...stylex.attrs(S.tab, active() === link.id && S.tabActive, base.focusRing)}
             >
               <span lang="en">{ENGLISH[link.id]}</span>
               <span
                 aria-hidden="true"
-                {...stylex.props(S.tick, active === link.id && S.tickActive)}
+                {...stylex.attrs(S.tick, active() === link.id && S.tickActive)}
               />
             </a>
           ))}

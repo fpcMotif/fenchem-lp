@@ -110,16 +110,16 @@ const S = stylex.create({
 export function Hero() {
   const lines = [ABOUT_BANNER.title.slice(0, 2), ABOUT_BANNER.title.slice(2)];
   return (
-    <section aria-labelledby="about-banner-title" {...stylex.props(S.hero)}>
-      <div {...stylex.props(base.shell, base.inset, S.stage)}>
-        <div aria-hidden="true" {...stylex.props(S.cross)}>
-          <span {...stylex.props(S.line, S.lineUp)} />
-          <span {...stylex.props(S.line, S.lineDown)} />
+    <section aria-labelledby="about-banner-title" {...stylex.attrs(S.hero)}>
+      <div {...stylex.attrs(base.shell, base.inset, S.stage)}>
+        <div aria-hidden="true" {...stylex.attrs(S.cross)}>
+          <span {...stylex.attrs(S.line, S.lineUp)} />
+          <span {...stylex.attrs(S.line, S.lineDown)} />
         </div>
-        <div {...stylex.props(S.copy)}>
-          <h1 id="about-banner-title" {...stylex.props(S.title)}>
+        <div {...stylex.attrs(S.copy)}>
+          <h1 id="about-banner-title" {...stylex.attrs(S.title)}>
             {lines.map((line, index) => (
-              <span key={line} {...stylex.props(index === 0 ? S.line1 : S.line2)}>
+              <span {...stylex.attrs(index === 0 ? S.line1 : S.line2)}>
                 <MountWipe as="span" delay={0.3 + index * 0.18} duration={1.2}>
                   {line}
                 </MountWipe>
@@ -127,21 +127,19 @@ export function Hero() {
             ))}
           </h1>
           <MountWipe delay={0.8}>
-            <p lang="en" {...stylex.props(S.tagline)}>
+            <p lang="en" {...stylex.attrs(S.tagline)}>
               {ABOUT_BANNER.tagline}
             </p>
           </MountWipe>
           <MountWipe delay={0.95}>
-            <p {...stylex.props(S.lead)}>
+            <p {...stylex.attrs(S.lead)}>
               {ABOUT_BANNER.lead.split(" · ").map((part) => (
-                <span key={part} {...stylex.props(S.leadLine)}>
-                  {part}
-                </span>
+                <span {...stylex.attrs(S.leadLine)}>{part}</span>
               ))}
             </p>
           </MountWipe>
         </div>
-        <div {...stylex.props(S.visual)}>
+        <div {...stylex.attrs(S.visual)}>
           <MountWipe delay={0.25} duration={1.5}>
             <Frame
               src={ABOUT_BANNER.image}
@@ -151,7 +149,7 @@ export function Hero() {
               priority
             />
           </MountWipe>
-          <p lang="en" {...stylex.props(base.quiet, S.caption)}>
+          <p lang="en" {...stylex.attrs(base.quiet, S.caption)}>
             {ABOUT_BANNER.established} · {ABOUT_BANNER.place}
           </p>
         </div>

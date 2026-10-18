@@ -96,7 +96,7 @@ export function Profile() {
       id="about-profile"
       aria-labelledby="oos1t-profile"
       data-hour={SECTION_HOURS.profile}
-      {...stylex.props(ui.section, ui.shell, styles.section)}
+      {...stylex.attrs(ui.section, ui.shell, styles.section)}
     >
       <SectionHead
         titleId="oos1t-profile"
@@ -104,38 +104,38 @@ export function Profile() {
         title="企业概况"
         english="Profile"
       />
-      <div {...stylex.props(ui.grid, styles.body)}>
-        <div {...stylex.props(styles.text)}>
-          <h3 {...stylex.props(styles.name)}>
+      <div {...stylex.attrs(ui.grid, styles.body)}>
+        <div {...stylex.attrs(styles.text)}>
+          <h3 {...stylex.attrs(styles.name)}>
             <Phrase text={ABOUT_HERO.title} />
-            <span lang="en" {...stylex.props(styles.english)}>
+            <span lang="en" {...stylex.attrs(styles.english)}>
               {ABOUT_HERO.englishTitle}
             </span>
           </h3>
-          <p {...stylex.props(ui.body, styles.lead)}>{ABOUT_HERO.lead}</p>
-          <div {...stylex.props(styles.network)}>
-            <p {...stylex.props(styles.label)}>{ABOUT_HERO.networkLabel}</p>
-            <ul {...stylex.props(styles.countries)}>
+          <p {...stylex.attrs(ui.body, styles.lead)}>{ABOUT_HERO.lead}</p>
+          <div {...stylex.attrs(styles.network)}>
+            <p {...stylex.attrs(styles.label)}>{ABOUT_HERO.networkLabel}</p>
+            <ul {...stylex.attrs(styles.countries)}>
               {ABOUT_HERO.countries.map((country) => (
-                <li key={country}>{country}</li>
+                <li>{country}</li>
               ))}
             </ul>
           </div>
         </div>
-        <figure {...stylex.props(styles.figure)}>
-          <div {...stylex.props(ui.plate)}>
+        <figure {...stylex.attrs(styles.figure)}>
+          <div {...stylex.attrs(ui.plate)}>
             <Cast lift={LIFT.block} still />
-            <div {...stylex.props(ui.face, styles.photo)}>
+            <div {...stylex.attrs(ui.face, styles.photo)}>
               <img
                 src={ABOUT_HERO.lobbyImage}
                 alt={ABOUT_HERO.lobbyEnglish}
                 loading="lazy"
                 decoding="async"
-                {...stylex.props(ui.fill)}
+                {...stylex.attrs(ui.fill)}
               />
             </div>
           </div>
-          <figcaption {...stylex.props(styles.caption)}>{ABOUT_HERO.lobbyCaption}</figcaption>
+          <figcaption {...stylex.attrs(styles.caption)}>{ABOUT_HERO.lobbyCaption}</figcaption>
         </figure>
       </div>
     </section>

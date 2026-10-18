@@ -1,7 +1,6 @@
-import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
-import { breakpoints } from "@fenchem-lp/ui/tokens.stylex";
+import { useReducedMotion } from "../use-reduced-motion";
 import * as stylex from "@stylexjs/stylex";
-import { useEffect, useState } from "react";
+import { createSignal, onSettled, type Accessor } from "solid-js";
 
 export const INTRO_REVEAL_MS = 500;
 
@@ -14,7 +13,7 @@ const circleReveal = stylex.keyframes({
 
 const styles = stylex.create({
   pageReveal: {
-    animationName: { default: circleReveal, [breakpoints.motionReduce]: "none" },
+    animationName: { default: circleReveal, ["@media (prefers-reduced-motion: reduce)"]: "none" },
     animationDuration: "1100ms",
     animationDelay: "200ms",
     animationTimingFunction: REVEAL_EASE,
@@ -26,10 +25,10 @@ export const introStyles = { pageReveal: styles.pageReveal };
 
 export type IntroState = "play" | "skip";
 
-export function useIntro(): IntroState {
+export function useIntro(): Accessor<IntroState> {
   const reduce = useReducedMotion();
-  const [state, setState] = useState<IntroState>("play");
-  useEffect(() => {
+  const [state, setState] = createSignal<IntroState>("play");
+  onSettled(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       return;
     }
@@ -43,6 +42,6 @@ export function useIntro(): IntroState {
       window.clearTimeout(finished);
       for (const name of events) window.removeEventListener(name, skip);
     };
-  }, []);
-  return reduce ? "skip" : state;
+  });
+  return () => (reduce() ? "skip" : state());
 }

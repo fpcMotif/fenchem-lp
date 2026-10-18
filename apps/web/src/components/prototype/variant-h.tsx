@@ -30,9 +30,9 @@ import { SectionHeader } from "./shared/production-sections";
  *   Nav (portfolio menu) → Hero (stat band) → Ticker → Industries → Matrix
  *   → Product Dossier → Formulation Presenter → Origin + Standards → Finale → Footer
  */
-import { useEffect } from "react";
+import { createEffect } from "solid-js";
 
-import { ArrowRight, ArrowUpRight } from "lucide-react";
+import { ArrowRight, ArrowUpRight } from "@fenchem-lp/ui/components/lucide";
 import * as stylex from "@stylexjs/stylex";
 import { breakpoints, colors, radii, typography } from "@fenchem-lp/ui/tokens.stylex";
 import { STAGGER } from "@/components/prototype/motion-constants";
@@ -2471,9 +2471,9 @@ function IndustriesSection() {
     <section
       id="industries"
       aria-labelledby="industries-heading"
-      {...stylex.props(styles.industriesSection)}
+      {...stylex.attrs(styles.industriesSection)}
     >
-      <div {...stylex.props(styles.container)}>
+      <div {...stylex.attrs(styles.container)}>
         <SectionHeader
           styles={{
             container: styles.container,
@@ -2601,7 +2601,7 @@ function IndustriesSection() {
           title="Built for three"
           accent="industries"
           aside={
-            <p {...stylex.props(styles.sectionAsideLead)}>
+            <p {...stylex.attrs(styles.sectionAsideLead)}>
               Clinically supported actives engineered for the precise demands of each formulation
               discipline.
             </p>
@@ -2611,40 +2611,39 @@ function IndustriesSection() {
         <div>
           {industries.map((industry, i) => (
             <a
-              key={industry.title}
               href="#matrix"
               aria-label={`${industry.title} — view in the ingredient matrix`}
-              {...stylex.props(
+              {...stylex.attrs(
                 styles.industryRowLink,
                 i === industries.length - 1 && styles.industryRowLinkLast,
               )}
             >
               <Reveal delay={i * STAGGER}>
-                <div {...stylex.props(styles.industryRowGrid)}>
-                  <div {...stylex.props(styles.industryColIndex)}>
-                    <span {...stylex.props(styles.industryIndexText)}>
+                <div {...stylex.attrs(styles.industryRowGrid)}>
+                  <div {...stylex.attrs(styles.industryColIndex)}>
+                    <span {...stylex.attrs(styles.industryIndexText)}>
                       {String(i + 1).padStart(2, "0")}
                     </span>
                   </div>
-                  <div {...stylex.props(styles.industryColTitle)}>
-                    <h3 {...stylex.props(styles.industryTitle)}>{industry.title}</h3>
+                  <div {...stylex.attrs(styles.industryColTitle)}>
+                    <h3 {...stylex.attrs(styles.industryTitle)}>{industry.title}</h3>
                   </div>
-                  <div {...stylex.props(styles.industryColCopy)}>
-                    <p {...stylex.props(styles.industryCopy)}>{INDUSTRY_COPY[i]}</p>
+                  <div {...stylex.attrs(styles.industryColCopy)}>
+                    <p {...stylex.attrs(styles.industryCopy)}>{INDUSTRY_COPY[i]}</p>
                   </div>
-                  <div {...stylex.props(styles.industryColImg)}>
+                  <div {...stylex.attrs(styles.industryColImg)}>
                     <img
                       src={industry.image.src}
                       alt={industry.image.alt}
                       loading="lazy"
-                      {...stylex.props(styles.industryImg)}
+                      {...stylex.attrs(styles.industryImg)}
                     />
                   </div>
-                  <div {...stylex.props(styles.industryColArrow)}>
+                  <div {...stylex.attrs(styles.industryColArrow)}>
                     <ArrowUpRight
-                      aria-hidden
+                      aria-hidden="true"
                       size={20}
-                      {...stylex.props(styles.industryArrowIcon)}
+                      {...stylex.attrs(styles.industryArrowIcon)}
                     />
                   </div>
                 </div>
@@ -2661,8 +2660,8 @@ function IndustriesSection() {
 
 function MatrixSection() {
   return (
-    <section id="matrix" aria-labelledby="matrix-heading" {...stylex.props(styles.matrixSection)}>
-      <div {...stylex.props(styles.container)}>
+    <section id="matrix" aria-labelledby="matrix-heading" {...stylex.attrs(styles.matrixSection)}>
+      <div {...stylex.attrs(styles.container)}>
         <SectionHeader
           styles={{
             container: styles.container,
@@ -2790,23 +2789,23 @@ function MatrixSection() {
           title="Ingredient"
           accent="matrix"
           aside={
-            <a href="#contact" {...stylex.props(styles.ctaOutlineBlueCompact)}>
+            <a href="#contact" {...stylex.attrs(styles.ctaOutlineBlueCompact)}>
               Request Full Specifications
-              <ArrowRight aria-hidden size={14} />
+              <ArrowRight aria-hidden="true" size={14} />
             </a>
           }
         />
 
-        <div {...stylex.props(styles.matrixGrid)}>
+        <div {...stylex.attrs(styles.matrixGrid)}>
           {getFeaturedIngredients().map((item, i) => (
-            <Reveal key={item.code} delay={(i % 3) * STAGGER}>
-              <article {...stylex.props(styles.matrixCardBg)}>
-                <div {...stylex.props(styles.matrixCardImgBox)}>
+            <Reveal delay={(i % 3) * STAGGER}>
+              <article {...stylex.attrs(styles.matrixCardBg)}>
+                <div {...stylex.attrs(styles.matrixCardImgBox)}>
                   <img
                     src={imgFor(item).src}
                     alt={imgFor(item).alt}
                     loading="lazy"
-                    {...stylex.props(styles.matrixCardImg)}
+                    {...stylex.attrs(styles.matrixCardImg)}
                   />
                   <DivisionBadge
                     styles={{
@@ -2850,7 +2849,7 @@ function MatrixSection() {
                     }}
                     ingredient={item}
                   />
-                  <div aria-hidden {...stylex.props(styles.matrixCardHoverOverlay)} />
+                  <div aria-hidden="true" {...stylex.attrs(styles.matrixCardHoverOverlay)} />
                 </div>
                 <IngredientCardDetails
                   styles={{
@@ -2910,9 +2909,9 @@ function DossierSection() {
     <section
       id="product"
       aria-labelledby="product-heading"
-      {...stylex.props(styles.dossierSection)}
+      {...stylex.attrs(styles.dossierSection)}
     >
-      <div {...stylex.props(styles.container)}>
+      <div {...stylex.attrs(styles.container)}>
         <SectionHeader
           styles={{
             container: styles.container,
@@ -3040,35 +3039,35 @@ function DossierSection() {
           title="One active,"
           accent="documented to the lot"
           aside={
-            <p {...stylex.props(styles.sectionAsideLead)}>
+            <p {...stylex.attrs(styles.sectionAsideLead)}>
               Every compound in the matrix carries this depth of documentation — {DOSSIER.name}{" "}
               shown as the working example.
             </p>
           }
         />
 
-        <div {...stylex.props(styles.dossierGrid)}>
+        <div {...stylex.attrs(styles.dossierGrid)}>
           {/* Image */}
-          <div {...stylex.props(styles.dossierImgCol)}>
+          <div {...stylex.attrs(styles.dossierImgCol)}>
             <img
               src={imgFor(DOSSIER).src}
               alt={imgFor(DOSSIER).alt}
               loading="lazy"
-              {...stylex.props(styles.dossierImg)}
+              {...stylex.attrs(styles.dossierImg)}
             />
-            <div aria-hidden {...stylex.props(styles.dossierImgScrim)} />
-            <span {...stylex.props(styles.dossierBadgeTopLeft)}>
+            <div aria-hidden="true" {...stylex.attrs(styles.dossierImgScrim)} />
+            <span {...stylex.attrs(styles.dossierBadgeTopLeft)}>
               <span
-                aria-hidden
-                {...stylex.props(styles.dotBase, styles[DIVISION_DOT_KEYS[division]])}
+                aria-hidden="true"
+                {...stylex.attrs(styles.dotBase, styles[DIVISION_DOT_KEYS[division]])}
               />
               {DOSSIER.application}
             </span>
-            <div {...stylex.props(styles.dossierBadgeBottom)}>
-              <span {...stylex.props(styles.techLabel)}>
+            <div {...stylex.attrs(styles.dossierBadgeBottom)}>
+              <span {...stylex.attrs(styles.techLabel)}>
                 {DOSSIER.category} · {DOSSIER.specification}
               </span>
-              <span {...stylex.props(styles.eyebrowGreen)}>{DOSSIER.code}</span>
+              <span {...stylex.attrs(styles.eyebrowGreen)}>{DOSSIER.code}</span>
             </div>
           </div>
 
@@ -3110,15 +3109,15 @@ function DossierSection() {
 
 function SmoothScroll() {
   const reduce = useReducedMotion();
-  useEffect(() => {
-    if (reduce) return;
+  createEffect(reduce, (reduced) => {
+    if (reduced) return;
     const root = document.documentElement;
     const previous = root.style.scrollBehavior;
     root.style.scrollBehavior = "smooth";
     return () => {
       root.style.scrollBehavior = previous;
     };
-  }, [reduce]);
+  });
   return null;
 }
 export function VariantH() {

@@ -1,6 +1,7 @@
 import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import type { ComponentProps } from "react";
+import type { JSX } from "@solidjs/web";
+import { omit } from "solid-js";
 import { media, tone } from "./tokens.stylex";
 
 const segment = stylex.create({
@@ -57,26 +58,33 @@ const segment = stylex.create({
   },
 });
 
-type TrackProps = Omit<ComponentProps<"div">, "className" | "style"> & { stretch?: boolean };
+type TrackProps = Omit<JSX.HTMLAttributes<HTMLDivElement>, "class" | "style"> & {
+  stretch?: boolean;
+};
 
-export function SegmentTrack({ stretch = false, ...rest }: TrackProps) {
-  return <div {...rest} {...stylex.props(segment.track, stretch && segment.trackStretch)} />;
+export function SegmentTrack(props: TrackProps) {
+  const rest = omit(props, "stretch");
+  return <div {...rest} {...stylex.attrs(segment.track, props.stretch && segment.trackStretch)} />;
 }
 
-type SegmentButtonProps = Omit<ComponentProps<"button">, "className" | "style" | "type"> & {
+type SegmentButtonProps = Omit<
+  JSX.ButtonHTMLAttributes<HTMLButtonElement>,
+  "class" | "style" | "type"
+> & {
   selected: boolean;
   stretch?: boolean;
 };
 
-export function SegmentButton({ selected, stretch = false, ...rest }: SegmentButtonProps) {
+export function SegmentButton(props: SegmentButtonProps) {
+  const rest = omit(props, "selected", "stretch");
   return (
     <button
       type="button"
       {...rest}
-      {...stylex.props(
+      {...stylex.attrs(
         segment.button,
-        selected && segment.selected,
-        stretch && segment.buttonStretch,
+        props.selected && segment.selected,
+        props.stretch && segment.buttonStretch,
       )}
     />
   );

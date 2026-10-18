@@ -1,8 +1,9 @@
 import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { ChevronLeft, ChevronRight, X } from "lucide-react";
-import { AnimatePresence, m, type Variants } from "motion/react";
-import { useEffect, useId, useRef, type KeyboardEvent, type ReactNode } from "react";
+import { ChevronLeft, ChevronRight, X } from "@fenchem-lp/ui/components/lucide";
+import { AnimatePresence, m, type Variants } from "@/compat/motion";
+import type { JSX } from "@solidjs/web";
+import { createEffect, createUniqueId, For, Show } from "solid-js";
 
 import { EASE } from "@/components/prototype/motion-constants";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
@@ -23,9 +24,9 @@ const riseIn = stylex.keyframes({
 });
 
 const swap: Variants = {
-  enter: (direction: number) => ({ opacity: 0, x: 16 * direction }),
+  enter: (direction) => ({ opacity: 0, x: 16 * (direction as number) }),
   center: { opacity: 1, x: 0 },
-  exit: (direction: number) => ({ opacity: 0, x: -10 * direction }),
+  exit: (direction) => ({ opacity: 0, x: -10 * (direction as number) }),
 };
 
 const styles = stylex.create({
@@ -341,68 +342,55 @@ const styles = stylex.create({
   },
 });
 
-function Lines({ lines }: { lines: string[] }) {
+function Lines(props: { lines: string[] }) {
   return (
-    <ul {...stylex.props(styles.lines)}>
-      {lines.map((line) => (
-        <li key={line}>{line}</li>
-      ))}
+    <ul {...stylex.attrs(styles.lines)}>
+      <For each={props.lines}>{(line) => <li>{line}</li>}</For>
     </ul>
   );
 }
 
-function Field({ label, lines }: { label: string; lines: string[] }) {
+function Field(props: { label: string; lines: string[] }) {
   return (
-    <div {...stylex.props(styles.row)}>
-      <dt {...stylex.props(styles.label)}>{label}</dt>
-      <dd {...stylex.props(styles.value)}>
-        {lines.length > 0 ? (
-          <Lines lines={lines} />
-        ) : (
-          <>
-            <span aria-hidden="true" {...stylex.props(styles.empty)}>
-              —
-            </span>
-            <span {...stylex.props(styles.visuallyHidden)}>None</span>
-          </>
-        )}
+    <div {...stylex.attrs(styles.row)}>
+      <dt {...stylex.attrs(styles.label)}>{props.label}</dt>
+      <dd {...stylex.attrs(styles.value)}>
+        <Show
+          when={props.lines.length > 0}
+          fallback={
+            <>
+              <span aria-hidden="true" {...stylex.attrs(styles.empty)}>
+                —
+              </span>
+              <span {...stylex.attrs(styles.visuallyHidden)}>None</span>
+            </>
+          }
+        >
+          <Lines lines={props.lines} />
+        </Show>
       </dd>
     </div>
   );
 }
 
-function Sheet({
-  letter,
-  title,
-  children,
-}: {
-  letter: string;
-  title: string;
-  children: ReactNode;
-}) {
-  const headingId = useId();
+function Sheet(props: { letter: string; title: string; children: JSX.Element }) {
+  const headingId = createUniqueId();
   return (
-    <section aria-labelledby={headingId} {...stylex.props(styles.sheet)}>
-      <header {...stylex.props(styles.sheetHead)}>
-        <span aria-hidden="true" {...stylex.props(styles.sheetLetter)}>
-          {letter}
+    <section aria-labelledby={headingId} {...stylex.attrs(styles.sheet)}>
+      <header {...stylex.attrs(styles.sheetHead)}>
+        <span aria-hidden="true" {...stylex.attrs(styles.sheetLetter)}>
+          {props.letter}
         </span>
-        <h4 id={headingId} {...stylex.props(styles.sheetTitle)}>
-          {title}
+        <h4 id={headingId} {...stylex.attrs(styles.sheetTitle)}>
+          {props.title}
         </h4>
       </header>
-      <dl {...stylex.props(styles.rows)}>{children}</dl>
+      <dl {...stylex.attrs(styles.rows)}>{props.children}</dl>
     </section>
   );
 }
 
-export function SheetDialog({
-  id,
-  index,
-  direction,
-  onRoute,
-  onClose,
-}: {
+export function SheetDialog(props: {
   id: string;
   index: number | null;
   direction: 1 | -1;
@@ -410,171 +398,184 @@ export function SheetDialog({
   onClose: () => void;
 }) {
   const reduce = useReducedMotion();
-  const titleId = useId();
-  const dialogRef = useRef<HTMLDialogElement>(null);
-  const bodyRef = useRef<HTMLDivElement>(null);
-  const isOpen = index !== null;
-  const item = index === null ? null : FLAT_FORMULAS[index];
+  const titleId = createUniqueId();
+  let dialog!: HTMLDialogElement;
+  let body!: HTMLDivElement;
+  const isOpen = () => props.index !== null;
+  const item = () => (props.index === null ? null : FLAT_FORMULAS[props.index]);
 
-  useEffect(() => {
-    const dialog = dialogRef.current;
-    if (!dialog) return;
-    if (isOpen && !dialog.open) {
+  createEffect(isOpen, (open) => {
+    if (open && !dialog.open) {
       dialog.showModal();
       dialog.focus();
     }
-    if (!isOpen && dialog.open) dialog.close();
-  }, [isOpen]);
+    if (!open && dialog.open) dialog.close();
+  });
 
-  useEffect(() => {
-    if (!isOpen) return;
+  createEffect(isOpen, (open) => {
+    if (!open) return;
     const root = document.documentElement;
     const previous = root.style.overflow;
     root.style.overflow = "hidden";
     return () => {
       root.style.overflow = previous;
     };
-  }, [isOpen]);
+  });
 
-  const requestClose = () => dialogRef.current?.close();
+  const requestClose = () => dialog.close();
 
-  const handleKeyDown = (event: KeyboardEvent<HTMLDialogElement>) => {
+  const handleKeyDown = (event: KeyboardEvent) => {
     if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
     if (event.key !== "ArrowRight" && event.key !== "ArrowLeft") return;
     event.preventDefault();
     event.stopPropagation();
-    onRoute(event.key === "ArrowRight" ? 1 : -1);
+    props.onRoute(event.key === "ArrowRight" ? 1 : -1);
   };
 
-  const transition = { duration: reduce ? 0 : 0.2, ease: EASE };
-  const previous = item ? FLAT_FORMULAS[(item.index - 1 + COUNT) % COUNT] : null;
-  const next = item ? FLAT_FORMULAS[(item.index + 1) % COUNT] : null;
+  const transition = () => ({ duration: reduce() ? 0 : 0.2, ease: EASE });
+  const previous = () => {
+    const current = item();
+    return current ? FLAT_FORMULAS[(current.index - 1 + COUNT) % COUNT] : null;
+  };
+  const next = () => {
+    const current = item();
+    return current ? FLAT_FORMULAS[(current.index + 1) % COUNT] : null;
+  };
 
   return (
     <dialog
-      ref={dialogRef}
-      id={id}
+      ref={(el) => {
+        dialog = el;
+        // Solid's JSX types forbid `tabindex` on <dialog>; showModal() then focus() needs it.
+        el.tabIndex = -1;
+      }}
+      id={props.id}
       aria-labelledby={titleId}
-      tabIndex={-1}
-      onClose={onClose}
+      onClose={() => props.onClose()}
       onKeyDown={handleKeyDown}
-      {...stylex.props(styles.dialog)}
+      {...stylex.attrs(styles.dialog)}
     >
       <button
         type="button"
-        tabIndex={-1}
+        tabindex={-1}
         aria-label="Close dialog"
         onClick={requestClose}
-        {...stylex.props(styles.dismiss)}
+        {...stylex.attrs(styles.dismiss)}
       />
-      <div {...stylex.props(styles.frame)}>
-        <header {...stylex.props(styles.head)}>
-          <div {...stylex.props(styles.headText)}>
-            <AnimatePresence mode="wait" initial={false} custom={direction}>
-              {item && (
-                <m.div
-                  key={item.id}
-                  custom={direction}
-                  variants={swap}
-                  initial="enter"
-                  animate="center"
-                  exit="exit"
-                  transition={transition}
-                >
-                  <span {...stylex.props(styles.index)}>{padIndex(item.index)}</span>
-                  <h3 id={titleId} {...stylex.props(styles.title)}>
-                    {item.title}
-                  </h3>
-                  <p {...stylex.props(styles.subtitle)}>{item.subtitle}</p>
-                </m.div>
-              )}
+      <div {...stylex.attrs(styles.frame)}>
+        <header {...stylex.attrs(styles.head)}>
+          <div {...stylex.attrs(styles.headText)}>
+            <AnimatePresence mode="wait" initial={false} custom={props.direction}>
+              <Show when={item()} keyed>
+                {(current) => (
+                  <m.div
+                    custom={props.direction}
+                    variants={swap}
+                    initial="enter"
+                    animate="center"
+                    exit="exit"
+                    transition={transition()}
+                  >
+                    <span {...stylex.attrs(styles.index)}>{padIndex(current.index)}</span>
+                    <h3 id={titleId} {...stylex.attrs(styles.title)}>
+                      {current.title}
+                    </h3>
+                    <p {...stylex.attrs(styles.subtitle)}>{current.subtitle}</p>
+                  </m.div>
+                )}
+              </Show>
             </AnimatePresence>
           </div>
           <button
             type="button"
             aria-label="Close"
             onClick={requestClose}
-            {...stylex.props(styles.close)}
+            {...stylex.attrs(styles.close)}
           >
             <X size={20} strokeWidth={1.5} absoluteStrokeWidth aria-hidden="true" />
           </button>
         </header>
 
-        <div ref={bodyRef} {...stylex.props(styles.body)}>
+        <div ref={body} {...stylex.attrs(styles.body)}>
           <AnimatePresence
             mode="wait"
             initial={false}
-            custom={direction}
-            onExitComplete={() => bodyRef.current?.scrollTo({ top: 0 })}
+            custom={props.direction}
+            onExitComplete={() => body.scrollTo({ top: 0 })}
           >
-            {item && (
-              <m.div
-                key={item.id}
-                custom={direction}
-                variants={swap}
-                initial="enter"
-                animate="center"
-                exit="exit"
-                transition={transition}
-                {...stylex.props(styles.sheets)}
-              >
-                <Sheet letter="A" title="是什么">
-                  <Field label="概述" lines={item.overview} />
-                  <Field label="功能" lines={item.functions} />
-                  <Field label="功能性成分" lines={item.keyIngredients} />
-                </Sheet>
-                <Sheet letter="B" title="怎么做">
-                  <Field label="配方挑战" lines={item.challenges} />
-                  <Field label="质地" lines={item.texture} />
-                  <Field label="应用" lines={item.applications} />
-                </Sheet>
-              </m.div>
-            )}
+            <Show when={item()} keyed>
+              {(current) => (
+                <m.div
+                  custom={props.direction}
+                  variants={swap}
+                  initial="enter"
+                  animate="center"
+                  exit="exit"
+                  transition={transition()}
+                  {...stylex.attrs(styles.sheets)}
+                >
+                  <Sheet letter="A" title="是什么">
+                    <Field label="概述" lines={current.overview} />
+                    <Field label="功能" lines={current.functions} />
+                    <Field label="功能性成分" lines={current.keyIngredients} />
+                  </Sheet>
+                  <Sheet letter="B" title="怎么做">
+                    <Field label="配方挑战" lines={current.challenges} />
+                    <Field label="质地" lines={current.texture} />
+                    <Field label="应用" lines={current.applications} />
+                  </Sheet>
+                </m.div>
+              )}
+            </Show>
           </AnimatePresence>
         </div>
 
-        {item && previous && next && (
-          <footer {...stylex.props(styles.foot)}>
-            <button
-              type="button"
-              aria-label={`Previous: ${previous.englishName}`}
-              onClick={() => onRoute(-1)}
-              {...stylex.props(styles.navButton, styles.navPrev, stylex.defaultMarker())}
-            >
-              <ChevronLeft
-                size={18}
-                strokeWidth={1.5}
-                absoluteStrokeWidth
-                aria-hidden="true"
-                {...stylex.props(styles.navIcon)}
-              />
-              <span>上一个</span>
-              <span {...stylex.props(styles.neighbor)}>{previous.title}</span>
-            </button>
-            <p aria-hidden="true" {...stylex.props(styles.counter)}>
-              {padIndex(item.index)}
-              <span {...stylex.props(styles.counterTotal)}> / {padIndex(COUNT - 1)}</span>
-            </p>
-            <button
-              type="button"
-              aria-label={`Next: ${next.englishName}`}
-              onClick={() => onRoute(1)}
-              {...stylex.props(styles.navButton, styles.navNext, stylex.defaultMarker())}
-            >
-              <span {...stylex.props(styles.neighbor)}>{next.title}</span>
-              <span>下一个</span>
-              <ChevronRight
-                size={18}
-                strokeWidth={1.5}
-                absoluteStrokeWidth
-                aria-hidden="true"
-                {...stylex.props(styles.navIcon)}
-              />
-            </button>
-          </footer>
-        )}
-        <p aria-live="polite" {...stylex.props(styles.visuallyHidden)}>
-          {item ? `${padIndex(item.index)} / ${padIndex(COUNT - 1)} ${item.englishName}` : ""}
+        <Show when={item()}>
+          {(current) => (
+            <footer {...stylex.attrs(styles.foot)}>
+              <button
+                type="button"
+                aria-label={`Previous: ${previous()!.englishName}`}
+                onClick={() => props.onRoute(-1)}
+                {...stylex.attrs(styles.navButton, styles.navPrev, stylex.defaultMarker())}
+              >
+                <ChevronLeft
+                  size={18}
+                  strokeWidth={1.5}
+                  absoluteStrokeWidth
+                  aria-hidden="true"
+                  {...stylex.attrs(styles.navIcon)}
+                />
+                <span>上一个</span>
+                <span {...stylex.attrs(styles.neighbor)}>{previous()!.title}</span>
+              </button>
+              <p aria-hidden="true" {...stylex.attrs(styles.counter)}>
+                {padIndex(current().index)}
+                <span {...stylex.attrs(styles.counterTotal)}> / {padIndex(COUNT - 1)}</span>
+              </p>
+              <button
+                type="button"
+                aria-label={`Next: ${next()!.englishName}`}
+                onClick={() => props.onRoute(1)}
+                {...stylex.attrs(styles.navButton, styles.navNext, stylex.defaultMarker())}
+              >
+                <span {...stylex.attrs(styles.neighbor)}>{next()!.title}</span>
+                <span>下一个</span>
+                <ChevronRight
+                  size={18}
+                  strokeWidth={1.5}
+                  absoluteStrokeWidth
+                  aria-hidden="true"
+                  {...stylex.attrs(styles.navIcon)}
+                />
+              </button>
+            </footer>
+          )}
+        </Show>
+        <p aria-live="polite" {...stylex.attrs(styles.visuallyHidden)}>
+          {item()
+            ? `${padIndex(item()!.index)} / ${padIndex(COUNT - 1)} ${item()!.englishName}`
+            : ""}
         </p>
       </div>
     </dialog>

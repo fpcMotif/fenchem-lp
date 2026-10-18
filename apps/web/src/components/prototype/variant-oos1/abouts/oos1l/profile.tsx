@@ -52,47 +52,47 @@ export function Profile() {
     <section
       id="about-profile"
       aria-labelledby={headingId("about-profile")}
-      {...stylex.props(ui.section, styles.section)}
+      {...stylex.attrs(ui.section, styles.section)}
     >
-      <div {...stylex.props(ui.shell)}>
+      <div {...stylex.attrs(ui.shell)}>
         <SectionLabel section="about-profile" />
         {founding.map((line) => (
-          <Clause key={line.id} line={line} sx={styles.lead} />
+          <Clause line={line} sx={styles.lead} />
         ))}
-        <div {...stylex.props(styles.stanza)}>
+        <div {...stylex.attrs(styles.stanza)}>
           {focus.map((line) => (
-            <Clause key={line.id} line={line} />
+            <Clause line={line} />
           ))}
         </div>
-        <div {...stylex.props(styles.stanza)}>
+        <div {...stylex.attrs(styles.stanza)}>
           {chain.map((line) => (
-            <Clause key={line.id} line={line} />
+            <Clause line={line} />
           ))}
         </div>
-        <figure {...stylex.props(styles.lobby)}>
-          <div {...stylex.props(styles.frame)}>
+        <figure {...stylex.attrs(styles.lobby)}>
+          <div {...stylex.attrs(styles.frame)}>
             <img
               src={ABOUT_HERO.lobbyImage}
               alt={ABOUT_HERO.lobbyEnglish}
               loading="lazy"
               decoding="async"
-              {...stylex.props(ui.photo)}
+              {...stylex.attrs(ui.photo)}
             />
           </div>
-          <figcaption {...stylex.props(styles.caption)}>
+          <figcaption {...stylex.attrs(styles.caption)}>
             <span>{ABOUT_HERO.lobbyCaption}</span>
-            <span lang="en" {...stylex.props(ui.note)}>
+            <span lang="en" {...stylex.attrs(ui.note)}>
               Lobby
             </span>
           </figcaption>
         </figure>
-        <div {...stylex.props(styles.stanza)}>
+        <div {...stylex.attrs(styles.stanza)}>
           {branches.map((line) => (
-            <Clause key={line.id} line={line} />
+            <Clause line={line} />
           ))}
-          <div {...stylex.props(styles.countries)}>
+          <div {...stylex.attrs(styles.countries)}>
             {countries.map((line) => (
-              <Clause key={line.id} line={line} />
+              <Clause line={line} />
             ))}
           </div>
         </div>

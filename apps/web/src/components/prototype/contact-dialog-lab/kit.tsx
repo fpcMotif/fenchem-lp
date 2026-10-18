@@ -1,16 +1,17 @@
-import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
+import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 import {
   createContext,
+  createEffect,
+  createSignal,
+  Match,
+  onSettled,
+  Show,
+  Switch,
   useContext,
-  useEffect,
-  useRef,
-  useState,
-  type AnimationEvent,
-  type ReactNode,
-  type SyntheticEvent,
-} from "react";
-import { Clock, Mail, MapPin, Phone } from "lucide-react";
+} from "solid-js";
+import type { JSX } from "@solidjs/web";
+import { Clock, Mail, MapPin, Phone } from "@fenchem-lp/ui/components/lucide";
 
 import { ABOUT_HERO } from "../variant-oos1/about-data";
 import {
@@ -76,34 +77,38 @@ export const SUBJECT_ROUTES: Record<
   },
 };
 
-export function ContactIcon({
-  detail,
-  size = 15,
-  strokeWidth = 1.75,
-}: {
+export function ContactIcon(props: {
   detail: { href?: string | null; icon?: string };
   size?: number;
   strokeWidth?: number;
 }) {
-  const icon =
-    detail.icon ??
-    (detail.href?.startsWith("tel:")
+  const size = () => props.size ?? 15;
+  const strokeWidth = () => props.strokeWidth ?? 1.75;
+  const icon = () =>
+    props.detail.icon ??
+    (props.detail.href?.startsWith("tel:")
       ? "phone"
-      : detail.href?.startsWith("mailto:")
+      : props.detail.href?.startsWith("mailto:")
         ? "mail"
         : "map-pin");
 
-  switch (icon) {
-    case "phone":
-      return <Phone size={size} strokeWidth={strokeWidth} nonScalingStroke aria-hidden="true" />;
-    case "mail":
-      return <Mail size={size} strokeWidth={strokeWidth} nonScalingStroke aria-hidden="true" />;
-    case "clock":
-      return <Clock size={size} strokeWidth={strokeWidth} nonScalingStroke aria-hidden="true" />;
-    case "map-pin":
-    default:
-      return <MapPin size={size} strokeWidth={strokeWidth} nonScalingStroke aria-hidden="true" />;
-  }
+  return (
+    <Switch
+      fallback={
+        <MapPin size={size()} strokeWidth={strokeWidth()} nonScalingStroke aria-hidden="true" />
+      }
+    >
+      <Match when={icon() === "phone"}>
+        <Phone size={size()} strokeWidth={strokeWidth()} nonScalingStroke aria-hidden="true" />
+      </Match>
+      <Match when={icon() === "mail"}>
+        <Mail size={size()} strokeWidth={strokeWidth()} nonScalingStroke aria-hidden="true" />
+      </Match>
+      <Match when={icon() === "clock"}>
+        <Clock size={size()} strokeWidth={strokeWidth()} nonScalingStroke aria-hidden="true" />
+      </Match>
+    </Switch>
+  );
 }
 
 export const subjectById = (id: InquirySubjectId) =>
@@ -114,12 +119,11 @@ export const PickerHostContext = createContext<(host: HTMLElement | null) => voi
 const EXIT_FALLBACK_MS = 400;
 
 export function useLabDialog(onClose: () => void) {
-  const ref = useRef<HTMLDialogElement>(null);
-  const [closing, setClosing] = useState(false);
+  let dialog: HTMLDialogElement | undefined;
+  const [closing, setClosing] = createSignal(false);
   const setPickerHost = useContext(PickerHostContext);
 
-  useEffect(() => {
-    const dialog = ref.current;
+  onSettled(() => {
     if (!dialog) return;
     if (!dialog.open) {
       dialog.showModal();
@@ -133,10 +137,10 @@ export function useLabDialog(onClose: () => void) {
       root.style.overflow = previous;
       setPickerHost(null);
     };
-  }, [setPickerHost]);
+  });
 
   const finish = () => {
-    if (ref.current?.open) ref.current.close();
+    if (dialog?.open) dialog.close();
   };
 
   const requestClose = () => {
@@ -148,10 +152,13 @@ export function useLabDialog(onClose: () => void) {
     closing,
     requestClose,
     dialogProps: {
-      ref,
+      ref: (el: HTMLDialogElement) => {
+        dialog = el;
+      },
       lang: "zh-CN",
-      tabIndex: -1,
-      onCancel: (event: SyntheticEvent<HTMLDialogElement>) => {
+      // Solid's dialog typings forbid tabindex; the React original sets it.
+      tabindex: -1 as unknown as undefined,
+      onCancel: (event: Event) => {
         event.preventDefault();
         requestClose();
       },
@@ -162,8 +169,8 @@ export function useLabDialog(onClose: () => void) {
       },
     },
     panelProps: {
-      onAnimationEnd: (event: AnimationEvent<HTMLElement>) => {
-        if (closing && event.target === event.currentTarget) finish();
+      onAnimationEnd: (event: AnimationEvent & { currentTarget: HTMLElement }) => {
+        if (closing() && event.target === event.currentTarget) finish();
       },
     },
   };
@@ -172,13 +179,13 @@ export function useLabDialog(onClose: () => void) {
 const COPIED_MS = 1600;
 
 export function useCopy() {
-  const [copied, setCopied] = useState<string | null>(null);
+  const [copied, setCopied] = createSignal<string | null>(null);
 
-  useEffect(() => {
-    if (copied === null) return;
+  createEffect(copied, (value) => {
+    if (value === null) return;
     const timer = window.setTimeout(() => setCopied(null), COPIED_MS);
     return () => window.clearTimeout(timer);
-  }, [copied]);
+  });
 
   const copy = (text: string, selectOnFailure: HTMLElement | null) => {
     navigator.clipboard.writeText(text).then(
@@ -198,13 +205,12 @@ const FIELD_BORDER = "#8a93a3";
 const REQUIRED_MARK = "#b91c1c";
 const CONTROL_RADIUS = 8;
 
-const motionKeys = {
-  fadeIn: stylex.keyframes({ "0%": { opacity: 0 }, "100%": { opacity: 1 } }),
-  swapIn: stylex.keyframes({
-    "0%": { opacity: 0, transform: "translateY(8px)" },
-    "100%": { opacity: 1, transform: "none" },
-  }),
-};
+const fadeInKeyframes = stylex.keyframes({ "0%": { opacity: 0 }, "100%": { opacity: 1 } });
+const swapInKeyframes = stylex.keyframes({
+  "0%": { opacity: 0, transform: "translateY(8px)" },
+  "100%": { opacity: 1, transform: "none" },
+});
+const motionKeys = { fadeIn: fadeInKeyframes, swapIn: swapInKeyframes };
 
 export const labStyles = stylex.create({
   dialog: {
@@ -254,7 +260,10 @@ export const labStyles = stylex.create({
     outlineOffset: 2,
   },
   swapIn: {
-    animationName: { default: motionKeys.fadeIn, [breakpoints.motionOk]: motionKeys.swapIn },
+    animationName: {
+      default: motionKeys.fadeIn,
+      ["@media (prefers-reduced-motion: no-preference)"]: motionKeys.swapIn,
+    },
     animationDuration: "240ms",
     animationTimingFunction: ease.out,
   },
@@ -359,7 +368,10 @@ export const labStyles = stylex.create({
     cursor: "pointer",
     transform: {
       default: null,
-      ":enabled:active": { default: null, [breakpoints.motionOk]: "scale(0.96)" },
+      ":enabled:active": {
+        default: null,
+        ["@media (prefers-reduced-motion: no-preference)"]: "scale(0.96)",
+      },
     },
     transitionProperty: "background-color, transform",
     transitionDuration: "150ms",
@@ -396,7 +408,10 @@ export const labStyles = stylex.create({
     opacity: { default: 0.72, ":hover": { default: null, [HOVER]: 1 }, ":focus-visible": 1 },
     transform: {
       default: null,
-      ":enabled:active": { default: null, [breakpoints.motionOk]: "scale(0.96)" },
+      ":enabled:active": {
+        default: null,
+        ["@media (prefers-reduced-motion: no-preference)"]: "scale(0.96)",
+      },
     },
     transitionProperty: "opacity, transform",
     transitionDuration: "150ms",
@@ -411,52 +426,39 @@ export const labStyles = stylex.create({
 
 export const fieldAria = (id: string, error?: string) => ({
   "aria-describedby": error ? `${id}-error` : undefined,
-  "aria-invalid": error ? true : undefined,
+  "aria-invalid": error ? ("true" as const) : undefined,
 });
 
-export function FieldError({
-  id,
-  error,
-  sx,
-}: {
-  id: string;
-  error?: string;
-  sx?: stylex.StyleXStyles;
-}) {
-  return error ? (
-    <p id={`${id}-error`} {...stylex.props(labStyles.error, sx)}>
-      {error}
-    </p>
-  ) : null;
+export function FieldError(props: { id: string; error?: string; sx?: stylex.StyleXStyles }) {
+  return (
+    <Show when={props.error}>
+      <p id={`${props.id}-error`} {...stylex.attrs(labStyles.error, props.sx)}>
+        {props.error}
+      </p>
+    </Show>
+  );
 }
 
-export function Field({
-  id,
-  label,
-  required = false,
-  error,
-  sx,
-  children,
-}: {
+export function Field(props: {
   id: string;
   label: string;
   required?: boolean;
   error?: string;
   sx?: stylex.StyleXStyles;
-  children: ReactNode;
+  children: JSX.Element;
 }) {
   return (
-    <div {...stylex.props(labStyles.field, sx)}>
-      <label htmlFor={id} {...stylex.props(labStyles.label)}>
-        {label}
-        {required ? (
-          <span aria-hidden="true" {...stylex.props(labStyles.requiredMark)}>
+    <div {...stylex.attrs(labStyles.field, props.sx)}>
+      <label for={props.id} {...stylex.attrs(labStyles.label)}>
+        {props.label}
+        {props.required ? (
+          <span aria-hidden="true" {...stylex.attrs(labStyles.requiredMark)}>
             *
           </span>
         ) : null}
       </label>
-      {children}
-      <FieldError id={id} error={error} />
+      {props.children}
+      <FieldError id={props.id} error={props.error} />
     </div>
   );
 }

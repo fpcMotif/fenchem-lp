@@ -8,16 +8,17 @@ import {
 import { CorporateHeaderActions, CampusStatistic } from "../shared/navigation-and-headline";
 import { CorporateNews } from "../shared/corporate-sections";
 import { Flow } from "../shared/flow";
-import { LayoutGroup } from "motion/react";
+import { LayoutGroup } from "@/compat/motion";
 import { FooterLegal } from "../shared/footer-content";
 import { NewsAccordion } from "../shared/news-accordion";
 import { ProductSummary } from "../shared/product-summary";
 import { SplitDialog } from "../contact-dialog-lab/variants/split";
-import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
+import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 import type { StyleXStyles } from "@stylexjs/stylex";
-import { useSearch } from "@tanstack/react-router";
-import { Globe, Lightbulb, Plus, Shield, Users, type LucideIcon } from "lucide-react";
+import { useSearch } from "@tanstack/solid-router";
+import { Globe, Lightbulb, Plus, Shield, Users } from "@fenchem-lp/ui/components/lucide";
+import type { LucideIcon } from "@fenchem-lp/ui/components/lucide";
 import {
   AnimatePresence,
   LazyMotion,
@@ -28,28 +29,31 @@ import {
   useScroll,
   useTransform,
   type MotionValue,
-} from "motion/react";
+} from "@/compat/motion";
+import { createMediaQuery } from "@/compat/reduced-motion";
+import { preinit } from "@/compat/react-dom";
 import {
-  Fragment,
-  useEffect,
-  useId,
-  useRef,
-  useState,
-  useSyncExternalStore,
-  type ComponentType,
-  type CSSProperties,
-  type KeyboardEvent,
-  type ReactNode,
-  type RefObject,
-} from "react";
-import { preinit } from "react-dom";
+  createEffect,
+  createSignal,
+  createUniqueId,
+  For,
+  Match,
+  merge,
+  onSettled,
+  Show,
+  untrack,
+  Switch,
+  type Accessor,
+  type Component,
+} from "solid-js";
+import { dynamic, type JSX } from "@solidjs/web";
 
-import { EASE } from "@/components/prototype/motion-constants";
+import { EASE } from "../motion-constants";
 
-import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
+import { useReducedMotion } from "../use-reduced-motion";
 
 import { LINKEDIN_PATHS, LOGO_PATHS, WECHAT_PATHS, type VectorPath } from "../variant-o/vectors";
-import { INTRO_REVEAL_MS, introStyles, useIntro } from "@/components/prototype/shared/intro";
+import { INTRO_REVEAL_MS, introStyles, useIntro } from "../shared/intro";
 
 import { AboutView } from "./about-view";
 import { ContactCta } from "./contact-cta";
@@ -93,7 +97,7 @@ const SURFACE = "#f6f6f6";
 const PANEL_ALT = "#e8e8e8";
 const FOOTER_BLUE = "#294f92";
 const HERO_OVERLAY = "#0743a9";
-const DESKTOP = breakpoints.xl;
+const DESKTOP = "@media (min-width: 1280px)";
 const HOVER_MOTION =
   "@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)";
 
@@ -130,18 +134,8 @@ const QUADRANT_DIRECTIONS = [
 const RING_RADIUS = 62;
 const RING_LENGTH = Math.round(2 * Math.PI * RING_RADIUS);
 
-const subscribeQuadrants = (onChange: () => void) => {
-  const media = window.matchMedia(QUADRANT_QUERY);
-  media.addEventListener("change", onChange);
-  return () => media.removeEventListener("change", onChange);
-};
-
 function useQuadrantMotion() {
-  return useSyncExternalStore(
-    subscribeQuadrants,
-    () => window.matchMedia(QUADRANT_QUERY).matches,
-    () => false,
-  );
+  return createMediaQuery(QUADRANT_QUERY);
 }
 
 const RISE_STAGGER = 0.06;
@@ -256,6 +250,12 @@ const PATTERN_TILE = {
   ],
 } as const;
 
+// stylex.props with reactive (accessor) arguments: the StyleX compiler tries to
+// evaluate local arrow functions at build time and throws, so these call sites
+// resolve at runtime instead.
+const sxProps = (...args: ReadonlyArray<StyleXStyles | false | null | undefined>) =>
+  stylex.attrs(...args);
+
 const styles = stylex.create({
   root: {
     position: "relative",
@@ -349,7 +349,10 @@ const styles = stylex.create({
     textDecoration: "none",
     transform: {
       default: null,
-      ":active": { default: null, [breakpoints.motionOk]: "scale(0.96)" },
+      ":active": {
+        default: null,
+        ["@media (prefers-reduced-motion: no-preference)"]: "scale(0.96)",
+      },
     },
     transitionProperty: "background-color, color, transform",
     transitionDuration: "160ms",
@@ -411,8 +414,8 @@ const styles = stylex.create({
   logoPart: {
     transformBox: "fill-box",
     transformOrigin: "50% 50%",
-    animationName: { default: logoPartRise, [breakpoints.motionReduce]: fadeIn },
-    animationDuration: { default: "280ms", [breakpoints.motionReduce]: "200ms" },
+    animationName: { default: logoPartRise, ["@media (prefers-reduced-motion: reduce)"]: fadeIn },
+    animationDuration: { default: "280ms", ["@media (prefers-reduced-motion: reduce)"]: "200ms" },
     animationTimingFunction: ease.out,
     animationFillMode: "both",
   },
@@ -465,7 +468,7 @@ const styles = stylex.create({
     marginTop: 25,
   },
   searchPill: {
-    display: { default: "none", [breakpoints.md]: "flex" },
+    display: { default: "none", ["@media (min-width: 768px)"]: "flex" },
     alignItems: "center",
     gap: 8,
     width: 170,
@@ -582,7 +585,7 @@ const styles = stylex.create({
     position: "absolute",
     inset: 0,
     filter: "url(#fenchem-hero-grade)",
-    animationName: { default: revealZoom, [breakpoints.motionReduce]: "none" },
+    animationName: { default: revealZoom, ["@media (prefers-reduced-motion: reduce)"]: "none" },
     animationDuration: "2000ms",
     animationDelay: "var(--oo-intro, 0ms)",
     animationTimingFunction: ease.out,
@@ -593,14 +596,14 @@ const styles = stylex.create({
     inset: 0,
   },
   heroRise: {
-    animationName: { default: lineRise, [breakpoints.motionReduce]: fadeIn },
-    animationDuration: { default: "600ms", [breakpoints.motionReduce]: "300ms" },
+    animationName: { default: lineRise, ["@media (prefers-reduced-motion: reduce)"]: fadeIn },
+    animationDuration: { default: "600ms", ["@media (prefers-reduced-motion: reduce)"]: "300ms" },
     animationTimingFunction: LINE_RISE_EASE,
     animationFillMode: "both",
   },
   heroFade: {
     animationName: fadeIn,
-    animationDuration: { default: "400ms", [breakpoints.motionReduce]: "300ms" },
+    animationDuration: { default: "400ms", ["@media (prefers-reduced-motion: reduce)"]: "300ms" },
     animationTimingFunction: ease.out,
     animationFillMode: "both",
   },
@@ -608,7 +611,7 @@ const styles = stylex.create({
     display: "inline-block",
     marginInlineStart: "0.04em",
     translate: CRACK_GAP,
-    animationName: { default: crackOpen, [breakpoints.motionReduce]: "none" },
+    animationName: { default: crackOpen, ["@media (prefers-reduced-motion: reduce)"]: "none" },
     animationDuration: "900ms",
     animationDelay: "calc(var(--oo-intro, 0ms) + 920ms)",
     animationTimingFunction: "cubic-bezier(0.2, 1.4, 0.4, 1)",
@@ -621,8 +624,8 @@ const styles = stylex.create({
     borderRadius: "50%",
     backgroundColor: colors.brandBlue700,
     transformOrigin: "50% 100%",
-    animationName: { default: dotBounce, [breakpoints.motionReduce]: fadeIn },
-    animationDuration: { default: "1000ms", [breakpoints.motionReduce]: "400ms" },
+    animationName: { default: dotBounce, ["@media (prefers-reduced-motion: reduce)"]: fadeIn },
+    animationDuration: { default: "1000ms", ["@media (prefers-reduced-motion: reduce)"]: "400ms" },
     animationDelay: "calc(var(--oo-intro, 0ms) + 520ms)",
     animationTimingFunction: "linear",
     animationFillMode: "both",
@@ -730,7 +733,7 @@ const styles = stylex.create({
     left: 0,
     clipPath: "polygon(42.7% -20%, 105% -20%, 105% 120%, 34.3% 120%)",
     translate: CRACK_GAP,
-    animationName: { default: crackOpen, [breakpoints.motionReduce]: "none" },
+    animationName: { default: crackOpen, ["@media (prefers-reduced-motion: reduce)"]: "none" },
     animationDuration: "900ms",
     animationDelay: "calc(var(--oo-intro, 0ms) + 920ms)",
     animationTimingFunction: "cubic-bezier(0.2, 1.4, 0.4, 1)",
@@ -802,11 +805,11 @@ const styles = stylex.create({
   },
   statsBand: {
     display: "flex",
-    flexDirection: { default: "column", [breakpoints.md]: "row" },
-    alignItems: { default: "stretch", [breakpoints.md]: "center" },
-    gap: { default: 32, [breakpoints.md]: 15.5 },
-    minHeight: { default: 0, [breakpoints.md]: 184 },
-    paddingBlock: { default: 48, [breakpoints.md]: 0 },
+    flexDirection: { default: "column", ["@media (min-width: 768px)"]: "row" },
+    alignItems: { default: "stretch", ["@media (min-width: 768px)"]: "center" },
+    gap: { default: 32, ["@media (min-width: 768px)"]: 15.5 },
+    minHeight: { default: 0, ["@media (min-width: 768px)"]: 184 },
+    paddingBlock: { default: 48, ["@media (min-width: 768px)"]: 0 },
   },
   stat: {
     flexGrow: 1,
@@ -869,7 +872,7 @@ const styles = stylex.create({
     color: colors.brandBlue700,
   },
   statDivider: {
-    display: { default: "none", [breakpoints.md]: "block" },
+    display: { default: "none", ["@media (min-width: 768px)"]: "block" },
     flexShrink: 0,
     width: 1,
     height: 70,
@@ -897,7 +900,7 @@ const styles = stylex.create({
     display: "grid",
     gridTemplateColumns: {
       default: "minmax(0, 1fr)",
-      [breakpoints.md]: "repeat(2, minmax(0, 1fr))",
+      ["@media (min-width: 768px)"]: "repeat(2, minmax(0, 1fr))",
     },
     gap: 2,
     width: "100%",
@@ -911,17 +914,17 @@ const styles = stylex.create({
     flexDirection: "column",
     justifyContent: "space-between",
     gap: 48,
-    minHeight: { default: 200, [breakpoints.md]: 280 },
+    minHeight: { default: 200, ["@media (min-width: 768px)"]: 280 },
     padding: { default: 24, [DESKTOP]: 40 },
     boxSizing: "border-box",
     color: color.ink,
   },
   quadrantUpper: {
-    flexDirection: { default: "column", [breakpoints.md]: "column-reverse" },
+    flexDirection: { default: "column", ["@media (min-width: 768px)"]: "column-reverse" },
   },
   quadrantRight: {
-    alignItems: { default: "stretch", [breakpoints.md]: "flex-end" },
-    textAlign: { default: "start", [breakpoints.md]: "end" },
+    alignItems: { default: "stretch", ["@media (min-width: 768px)"]: "flex-end" },
+    textAlign: { default: "start", ["@media (min-width: 768px)"]: "end" },
   },
   toneBlue: { backgroundColor: "#4668a5", color: "#e6ecf7" },
   toneGray: { backgroundColor: "#e3e3e3", color: "#f1f1f1" },
@@ -990,7 +993,7 @@ const styles = stylex.create({
     outlineOffset: -2,
   },
   badge: {
-    display: { default: "none", [breakpoints.md]: "block" },
+    display: { default: "none", ["@media (min-width: 768px)"]: "block" },
     position: "absolute",
     top: "50%",
     left: "50%",
@@ -1145,7 +1148,7 @@ const styles = stylex.create({
     pointerEvents: "none",
   },
   mapRingPulse: {
-    animationName: { default: pinPulse, [breakpoints.motionReduce]: "none" },
+    animationName: { default: pinPulse, ["@media (prefers-reduced-motion: reduce)"]: "none" },
     animationDuration: "1600ms",
     animationTimingFunction: ease.out,
   },
@@ -1160,10 +1163,18 @@ const styles = stylex.create({
     height: "auto",
   },
   mapWrapEnter: {
-    translate: { default: "0px 0px", [DESKTOP]: "-120px 0px", [breakpoints.motionReduce]: null },
+    translate: {
+      default: "0px 0px",
+      [DESKTOP]: "-120px 0px",
+      ["@media (prefers-reduced-motion: reduce)"]: null,
+    },
   },
   mapWrapEnterRun: {
-    animationName: { default: fadeIn, [DESKTOP]: mapSlideIn, [breakpoints.motionReduce]: "none" },
+    animationName: {
+      default: fadeIn,
+      [DESKTOP]: mapSlideIn,
+      ["@media (prefers-reduced-motion: reduce)"]: "none",
+    },
     animationDuration: `${MAP_SWEEP_MS}ms`,
     animationTimingFunction: MAP_SWEEP_EASE,
     animationFillMode: "both",
@@ -1171,31 +1182,41 @@ const styles = stylex.create({
   mapSweep: {
     maskImage: {
       default: "linear-gradient(to right, #000 43.5%, transparent 56.5%)",
-      [breakpoints.motionReduce]: "none",
+      ["@media (prefers-reduced-motion: reduce)"]: "none",
     },
     maskSize: "230% 100%",
     maskRepeat: "no-repeat",
     maskPosition: "100% 0%",
-    opacity: { default: null, [breakpoints.motionReduce]: 0 },
+    opacity: { default: null, ["@media (prefers-reduced-motion: reduce)"]: 0 },
   },
   mapSweepRun: {
-    animationName: { default: mapSweep, [breakpoints.motionReduce]: fadeIn },
-    animationDuration: { default: `${MAP_SWEEP_MS}ms`, [breakpoints.motionReduce]: "300ms" },
+    animationName: { default: mapSweep, ["@media (prefers-reduced-motion: reduce)"]: fadeIn },
+    animationDuration: {
+      default: `${MAP_SWEEP_MS}ms`,
+      ["@media (prefers-reduced-motion: reduce)"]: "300ms",
+    },
     animationTimingFunction: MAP_SWEEP_EASE,
     animationFillMode: "both",
   },
   globalCopyEnter: {
     opacity: 0,
-    translate: { default: "0px 0px", [DESKTOP]: "-80px 0px", [breakpoints.motionReduce]: null },
+    translate: {
+      default: "0px 0px",
+      [DESKTOP]: "-80px 0px",
+      ["@media (prefers-reduced-motion: reduce)"]: null,
+    },
   },
   globalCopyEnterRun: {
     animationName: {
       default: fadeIn,
       [DESKTOP]: slideFromLeft,
-      [breakpoints.motionReduce]: fadeIn,
+      ["@media (prefers-reduced-motion: reduce)"]: fadeIn,
     },
-    animationDuration: { default: "700ms", [breakpoints.motionReduce]: "300ms" },
-    animationDelay: { default: `${MAP_SWEEP_MS / 2}ms`, [breakpoints.motionReduce]: "0ms" },
+    animationDuration: { default: "700ms", ["@media (prefers-reduced-motion: reduce)"]: "300ms" },
+    animationDelay: {
+      default: `${MAP_SWEEP_MS / 2}ms`,
+      ["@media (prefers-reduced-motion: reduce)"]: "0ms",
+    },
     animationTimingFunction: ease.out,
     animationFillMode: "both",
   },
@@ -1446,7 +1467,7 @@ const SETTLED = "translateY(0px) scale(1)";
 const zoomFrom = (y: number, scale: number) => `translateY(${y}px) scale(${scale})`;
 
 type ZoomProps = {
-  children: ReactNode;
+  children: JSX.Element;
   sx?: StyleXStyles;
   style?: StyleXStyles;
   delay?: number;
@@ -1454,67 +1475,54 @@ type ZoomProps = {
   scale?: number;
 };
 
-function ZoomReveal({
-  children,
-  sx,
-  style,
-  delay = 0,
-  y = 24,
-  scale = ZOOM_FROM_SCALE,
-}: ZoomProps) {
+function ZoomReveal(props: ZoomProps) {
+  const p = merge({ delay: 0, y: 24, scale: ZOOM_FROM_SCALE }, props);
   const reduce = useReducedMotion();
   return (
     <m.div
-      {...stylex.props(sx, style)}
-      initial={{ opacity: 0, transform: zoomFrom(y, scale) }}
+      {...stylex.attrs(p.sx, p.style)}
+      initial={{ opacity: 0, transform: zoomFrom(p.y, p.scale) }}
       whileInView={{ opacity: 1, transform: SETTLED }}
       viewport={{ once: true, margin: "-80px" }}
-      transition={{ duration: reduce ? 0.2 : 0.8, delay: reduce ? 0 : delay, ease: EASE }}
+      transition={{ duration: reduce() ? 0.2 : 0.8, delay: reduce() ? 0 : p.delay, ease: EASE }}
     >
-      {children}
+      {p.children}
     </m.div>
   );
 }
 
-function VectorArt({
-  paths,
-  viewBox,
-  sx,
-}: {
-  paths: readonly VectorPath[];
-  viewBox: string;
-  sx: StyleXStyles;
-}) {
+function VectorArt(props: { paths: readonly VectorPath[]; viewBox: string; sx: StyleXStyles }) {
   return (
-    <svg viewBox={viewBox} aria-hidden="true" focusable="false" {...stylex.props(sx)}>
-      {paths.map((path) => (
-        <path key={path.d} d={path.d} fill={path.fill} />
-      ))}
+    <svg viewBox={props.viewBox} aria-hidden="true" {...UNFOCUSABLE} {...stylex.attrs(props.sx)}>
+      <For each={props.paths}>{(path) => <path d={path.d} fill={path.fill} />}</For>
     </svg>
   );
 }
 
 function useScrolledPastTop() {
-  const [scrolled, setScrolled] = useState(false);
-  useEffect(() => {
+  const [scrolled, setScrolled] = createSignal(false);
+  onSettled(() => {
     const update = () => setScrolled(window.scrollY > 8);
     update();
     window.addEventListener("scroll", update, { passive: true });
     return () => window.removeEventListener("scroll", update);
-  }, []);
+  });
   return scrolled;
 }
+
+// `focusable` (legacy SVG attribute) is not in Solid's JSX types.
+const UNFOCUSABLE = { focusable: "false" } as JSX.SvgSVGAttributes<SVGSVGElement>;
 
 const NAV_CLEARANCE = 12;
 
 function useNavFits(
-  innerRef: RefObject<HTMLDivElement | null>,
-  navRef: RefObject<HTMLElement | null>,
+  innerRef: Accessor<HTMLDivElement | undefined>,
+  navRef: Accessor<HTMLElement | undefined>,
 ) {
-  const [fits, setFits] = useState(true);
-  useEffect(() => {
-    const inner = innerRef.current;
-    const nav = navRef.current;
+  const [fits, setFits] = createSignal(true);
+  onSettled(() => {
+    const inner = innerRef();
+    const nav = navRef();
     if (!inner || !nav) return;
     const measure = () => {
       const style = getComputedStyle(inner);
@@ -1535,7 +1543,7 @@ function useNavFits(
     observer.observe(nav);
     void document.fonts?.ready.then(measure);
     return () => observer.disconnect();
-  }, [innerRef, navRef]);
+  });
   return fits;
 }
 
@@ -1543,27 +1551,27 @@ export type View = "home" | "about" | "products" | "rd" | "insights" | "news" | 
 export type AboutPageProps = { onNavigateHome: (hash?: string) => void };
 export type SubPageProps = AboutPageProps;
 
-function SiteHeader({
-  currentView,
-  onNavigate,
-  onOpenContactDialog,
-}: {
+function SiteHeader(props: {
   currentView?: View;
   onNavigate?: (view: View, targetId?: string) => void;
   onOpenContactDialog?: () => void;
 }) {
-  const [menuOpen, setMenuOpen] = useState(false);
-  const menuId = useId();
+  const [menuOpen, setMenuOpen] = createSignal(false);
+  const menuId = createUniqueId();
   const reduce = useReducedMotion();
   const scrolled = useScrolledPastTop();
   const activeId = useActiveSection(NAV_SECTION_IDS);
-  const innerRef = useRef<HTMLDivElement>(null);
-  const navRef = useRef<HTMLElement>(null);
-  const navFits = useNavFits(innerRef, navRef);
-  const closeOnEscape = (event: KeyboardEvent<HTMLElement>) => {
-    if (event.key === "Escape" && menuOpen) setMenuOpen(false);
+  let innerEl: HTMLDivElement | undefined;
+  let navEl: HTMLElement | undefined;
+  const navFits = useNavFits(
+    () => innerEl,
+    () => navEl,
+  );
+  const closeOnEscape = (event: KeyboardEvent) => {
+    if (event.key === "Escape" && menuOpen()) setMenuOpen(false);
   };
   const isActive = (href: string) => {
+    const currentView = props.currentView;
     if (href === "#about") {
       return currentView === "about";
     }
@@ -1585,10 +1593,12 @@ function SiteHeader({
     if (currentView !== "home") {
       return false;
     }
-    return href.slice(1) === activeId;
+    return href.slice(1) === activeId();
   };
 
-  const handleItemClick = (event: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+  const handleItemClick = (event: MouseEvent, href: string) => {
+    const onNavigate = props.onNavigate;
+    const currentView = props.currentView;
     if (!onNavigate) return;
     if (href === "#about") {
       event.preventDefault();
@@ -1622,8 +1632,8 @@ function SiteHeader({
     }
     if (href === "#contact") {
       event.preventDefault();
-      if (onOpenContactDialog) {
-        onOpenContactDialog();
+      if (props.onOpenContactDialog) {
+        props.onOpenContactDialog();
       } else if (onNavigate) {
         onNavigate("contact", "contact-top");
       }
@@ -1647,34 +1657,33 @@ function SiteHeader({
   return (
     <header
       onKeyDown={closeOnEscape}
-      {...stylex.props(styles.header, (scrolled || menuOpen) && styles.headerSolid)}
+      {...sxProps(styles.header, (scrolled() || menuOpen()) && styles.headerSolid)}
     >
-      <div ref={innerRef} {...stylex.props(styles.shell, styles.headerInner)}>
+      <div ref={innerEl} {...stylex.attrs(styles.shell, styles.headerInner)}>
         <a
           href="#top"
           aria-label="FENCHEM home"
           onClick={(event) => {
-            if (currentView !== "home" && onNavigate) {
+            if (props.currentView !== "home" && props.onNavigate) {
               event.preventDefault();
-              onNavigate("home", "top");
+              props.onNavigate("home", "top");
             }
           }}
-          {...stylex.props(styles.logoLink)}
+          {...stylex.attrs(styles.logoLink)}
         >
           <LogoMark />
         </a>
         <nav
-          ref={navRef}
+          ref={navEl}
           aria-label="Main"
-          {...stylex.props(styles.nav, !navFits && styles.navCollapsed)}
+          {...sxProps(styles.nav, !navFits() && styles.navCollapsed)}
         >
           {NAV_ITEMS.map((item) => (
             <a
-              key={item.href}
               href={item.href}
               aria-current={isActive(item.href) ? "location" : undefined}
               onClick={(event) => handleItemClick(event, item.href)}
-              {...stylex.props(styles.navLink, isActive(item.href) && styles.navLinkActive)}
+              {...stylex.attrs(styles.navLink, isActive(item.href) && styles.navLinkActive)}
             >
               {item.label}
             </a>
@@ -1686,33 +1695,32 @@ function SiteHeader({
             searchPill: styles.searchPill,
             searchPlaceholder: styles.searchPlaceholder,
             langButton: styles.langButton,
-            menuButton: [styles.menuButton, !navFits && styles.menuButtonShown],
+            menuButton: [styles.menuButton, !navFits() && styles.menuButtonShown],
           }}
-          menuOpen={menuOpen}
+          menuOpen={menuOpen()}
           menuId={menuId}
           setMenuOpen={setMenuOpen}
         />
       </div>
       <AnimatePresence initial={false}>
-        {menuOpen ? (
+        <Show when={menuOpen()}>
           <m.nav
-            key="menu"
             id={menuId}
             aria-label="Main"
-            {...stylex.props(styles.menuPanel)}
+            {...stylex.attrs(styles.menuPanel)}
             initial={{ opacity: 0, transform: "translateY(-8px)" }}
             animate={{ opacity: 1, transform: "translateY(0px)" }}
             exit={{ opacity: 0, transform: "translateY(-8px)" }}
-            transition={{ duration: reduce ? 0.15 : 0.2, ease: EASE }}
+            transition={{ duration: reduce() ? 0.15 : 0.2, ease: EASE }}
           >
-            <ul {...stylex.props(styles.menuList)}>
+            <ul {...stylex.attrs(styles.menuList)}>
               {NAV_ITEMS.map((item) => (
-                <li key={item.href}>
+                <li>
                   <a
                     href={item.href}
                     aria-current={isActive(item.href) ? "location" : undefined}
                     onClick={(event) => handleItemClick(event, item.href)}
-                    {...stylex.props(styles.menuLink, isActive(item.href) && styles.menuLinkActive)}
+                    {...stylex.attrs(styles.menuLink, isActive(item.href) && styles.menuLinkActive)}
                   >
                     {item.label}
                   </a>
@@ -1720,7 +1728,7 @@ function SiteHeader({
               ))}
             </ul>
           </m.nav>
-        ) : null}
+        </Show>
       </AnimatePresence>
     </header>
   );
@@ -1728,29 +1736,31 @@ function SiteHeader({
 
 function LogoMark() {
   return (
-    <svg viewBox="0 0 161 52" aria-hidden="true" focusable="false" {...stylex.props(styles.logo)}>
+    <svg viewBox="0 0 161 52" aria-hidden="true" {...UNFOCUSABLE} {...stylex.attrs(styles.logo)}>
       {LOGO_PATHS.map((path) => (
         <path
-          key={path.d}
           d={path.d}
           fill={path.fill}
-          {...stylex.props(styles.logoPart, styles.enterDelay(logoPartDelay(path.d)))}
+          {...stylex.attrs(styles.logoPart, styles.enterDelay(logoPartDelay(path.d)))}
         />
       ))}
     </svg>
   );
 }
 
-function Hero({ onOpenContactDialog }: { onOpenContactDialog?: () => void }) {
-  const heroRef = useRef<HTMLElement>(null);
+function Hero(props: { onOpenContactDialog?: () => void }) {
+  let heroEl: HTMLElement | undefined;
   const reduce = useReducedMotion();
-  const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
+  const { scrollYProgress } = useScroll({
+    target: () => heroEl,
+    offset: ["start start", "end start"],
+  });
   const backdropY = useTransform(scrollYProgress, [0, 1], ["0%", "18%"]);
   const contentY = useTransform(scrollYProgress, [0, 1], [0, -120]);
   const contentOpacity = useTransform(scrollYProgress, [0, 0.75], [1, 0]);
   const blobScroll = useTransform(scrollYProgress, (progress) => {
     const t = clamp01(progress / BLOB_SCROLL_END);
-    return t * t * (3 - 2 * t) * (reduce ? BLOB_SCROLL_REDUCED : 1);
+    return t * t * (3 - 2 * t) * (reduce() ? BLOB_SCROLL_REDUCED : 1);
   });
   return (
     <RisingHero
@@ -1792,8 +1802,8 @@ function Hero({ onOpenContactDialog }: { onOpenContactDialog?: () => void }) {
       }}
       backdropFragment={HERO_BLOB_TWIST}
       backdropProgress={blobScroll}
-      heroRef={heroRef}
-      reduce={reduce}
+      heroRef={(el: HTMLElement) => (heroEl = el)}
+      reduce={reduce()}
       backdropY={backdropY}
       contentY={contentY}
       contentOpacity={contentOpacity}
@@ -1804,67 +1814,66 @@ function Hero({ onOpenContactDialog }: { onOpenContactDialog?: () => void }) {
       CLOSING_LEAD={CLOSING_LEAD}
       CLOSING_WORD={CLOSING_WORD}
       introAfter={introAfter}
-      onSecondaryClick={onOpenContactDialog}
+      onSecondaryClick={props.onOpenContactDialog}
     />
   );
 }
 
-function InkPhrase({
-  progress,
-  range,
-  children,
-}: {
+function InkPhrase(props: {
   progress: MotionValue<number>;
   range: [number, number];
-  children: ReactNode;
+  children: JSX.Element;
 }) {
   const reduce = useReducedMotion();
-  const opacity = useTransform(progress, range, [0.48, 1]);
+  const opacity = useTransform(props.progress, props.range, [0.48, 1]);
   return (
-    <m.span {...stylex.props(styles.inkPhrase)} style={reduce ? undefined : { opacity }}>
-      {children}
+    <m.span {...stylex.attrs(styles.inkPhrase)} style={reduce() ? undefined : { opacity }}>
+      {props.children}
     </m.span>
   );
 }
 
-function About({ onOpenAboutPage }: { onOpenAboutPage?: () => void }) {
-  const textRef = useRef<HTMLParagraphElement>(null);
-  const { scrollYProgress } = useScroll({ target: textRef, offset: ["start 0.85", "end 0.45"] });
+function About(props: { onOpenAboutPage?: () => void }) {
+  let textEl: HTMLParagraphElement | undefined;
+  const { scrollYProgress } = useScroll({
+    target: () => textEl,
+    offset: ["start 0.85", "end 0.45"],
+  });
   return (
     <section
       id="about"
       aria-labelledby="oo-about-title"
-      {...stylex.props(styles.about, styles.inset124, styles.anchor)}
+      {...stylex.attrs(styles.about, styles.inset124, styles.anchor)}
     >
       <RiseReveal sx={styles.aboutInner}>
-        <h2 id="oo-about-title" {...stylex.props(styles.sectionTitle)}>
+        <h2 id="oo-about-title" {...stylex.attrs(styles.sectionTitle)}>
           {ABOUT.title}
         </h2>
-        <p ref={textRef} {...stylex.props(styles.aboutBody)}>
+        <p ref={textEl} {...stylex.attrs(styles.aboutBody)}>
           {ABOUT_INK_LINES.map((segments, lineIndex) => (
-            <Fragment key={segments[0].text}>
+            <>
               {lineIndex > 0 ? <br /> : null}
               {segments.map((segment) => (
-                <InkPhrase key={segment.text} progress={scrollYProgress} range={segment.range}>
+                <InkPhrase progress={scrollYProgress} range={segment.range}>
                   {segment.text}
                 </InkPhrase>
               ))}
-            </Fragment>
+            </>
           ))}
         </p>
-        <div style={{ display: "flex", justifyContent: "center" }}>
-          {onOpenAboutPage ? (
+        <div style={{ display: "flex", "justify-content": "center" }}>
+          {props.onOpenAboutPage ? (
             <button
               type="button"
-              onClick={onOpenAboutPage}
-              {...stylex.props(styles.button, styles.buttonPrimary, styles.buttonCompact)}
+              onClick={() => props.onOpenAboutPage?.()}
+              {...stylex.attrs(styles.button, styles.buttonPrimary, styles.buttonCompact)}
             >
               更多
             </button>
           ) : (
             <a
               href={ABOUT.cta.href}
-              {...stylex.props(styles.button, styles.buttonPrimary, styles.buttonCompact)}
+              {...stylex.attrs(styles.button, styles.buttonPrimary, styles.buttonCompact)}
             >
               {ABOUT.cta.label}
             </a>
@@ -1876,15 +1885,18 @@ function About({ onOpenAboutPage }: { onOpenAboutPage?: () => void }) {
 }
 
 function Campus() {
-  const stageRef = useRef<HTMLDivElement>(null);
+  let stageEl: HTMLDivElement | undefined;
   const reduce = useReducedMotion();
-  const maxProgressRef = useRef(0);
-  const { scrollYProgress } = useScroll({ target: stageRef, offset: ["start end", "center 0.55"] });
+  let maxProgress = 0;
+  const { scrollYProgress } = useScroll({
+    target: () => stageEl,
+    offset: ["start end", "center 0.55"],
+  });
   const windowClip = useTransform(scrollYProgress, (progress) => {
-    if (progress > maxProgressRef.current) {
-      maxProgressRef.current = progress;
+    if (progress > maxProgress) {
+      maxProgress = progress;
     }
-    const t = revealProgress(maxProgressRef.current);
+    const t = revealProgress(maxProgress);
     const top = lerp(CLIP_FROM.top, CLIP_TO.top, t);
     const side = lerp(CLIP_FROM.side, CLIP_TO.side, t);
     const bottom = lerp(CLIP_FROM.bottom, CLIP_TO.bottom, t);
@@ -1892,10 +1904,10 @@ function Campus() {
     return `inset(${top}% ${side}% ${bottom}% ${side}% round ${radius}px)`;
   });
   const photoScale = useTransform(scrollYProgress, (progress) => {
-    if (progress > maxProgressRef.current) {
-      maxProgressRef.current = progress;
+    if (progress > maxProgress) {
+      maxProgress = progress;
     }
-    return lerp(1.22, 1, revealProgress(maxProgressRef.current));
+    return lerp(1.22, 1, revealProgress(maxProgress));
   });
 
   return (
@@ -1909,8 +1921,8 @@ function Campus() {
         inset132: styles.inset132,
         statsBand: styles.statsBand,
       }}
-      stageRef={stageRef}
-      reduce={reduce}
+      stageRef={(el: HTMLDivElement) => (stageEl = el)}
+      reduce={reduce()}
       windowClip={windowClip}
       photoScale={photoScale}
       IMAGES={IMAGES}
@@ -1920,48 +1932,42 @@ function Campus() {
   );
 }
 
-function DigitWheel({ digit, delay }: { digit: number; delay: number }) {
+function DigitWheel(props: { digit: number; delay: number }) {
   const reduce = useReducedMotion();
   return (
-    <span {...stylex.props(styles.wheel)}>
+    <span {...stylex.attrs(styles.wheel)}>
       <m.span
-        {...stylex.props(styles.wheelColumn)}
+        {...stylex.attrs(styles.wheelColumn)}
         initial={{ transform: "translateY(0%)" }}
-        whileInView={{ transform: `translateY(${-(10 + digit) * 5}%)` }}
+        whileInView={{ transform: `translateY(${-(10 + props.digit) * 5}%)` }}
         viewport={{ once: true, margin: "-60px" }}
-        transition={{ duration: reduce ? 0 : 1.6, delay: reduce ? 0 : delay, ease: EASE }}
+        transition={{ duration: reduce() ? 0 : 1.6, delay: reduce() ? 0 : props.delay, ease: EASE }}
       >
-        {DIGIT_CELLS.map((cell, index) => (
-          <span key={index} {...stylex.props(styles.wheelCell)}>
-            {cell}
-          </span>
+        {DIGIT_CELLS.map((cell) => (
+          <span {...stylex.attrs(styles.wheelCell)}>{cell}</span>
         ))}
       </m.span>
     </span>
   );
 }
 
-function Odometer({ value, offset }: { value: string; offset: number }) {
+function Odometer(props: { value: string; offset: number }) {
   return (
-    <span aria-hidden="true" {...stylex.props(styles.statValue)}>
-      {value
-        .split("")
-        .map((character, index) =>
+    <span aria-hidden="true" {...stylex.attrs(styles.statValue)}>
+      <For each={props.value.split("")}>
+        {(character, index) =>
           /\d/.test(character) ? (
-            <DigitWheel
-              key={index}
-              digit={Number(character)}
-              delay={offset + index * DIGIT_STAGGER}
-            />
+            <DigitWheel digit={Number(character)} delay={props.offset + index() * DIGIT_STAGGER} />
           ) : (
-            <span key={index}>{character}</span>
-          ),
-        )}
+            <span>{character}</span>
+          )
+        }
+      </For>
     </span>
   );
 }
 
-function StatItem({ stat, index }: { stat: (typeof STATS)[number]; index: number }) {
+function StatItem(props: { stat: (typeof STATS)[number]; index: number }) {
   return (
     <CampusStatistic
       styles={{
@@ -1972,8 +1978,8 @@ function StatItem({ stat, index }: { stat: (typeof STATS)[number]; index: number
         statUnit: styles.statUnit,
         visuallyHidden: styles.visuallyHidden,
       }}
-      index={index}
-      stat={stat}
+      index={props.index}
+      stat={props.stat}
       RiseReveal={RiseReveal}
       Odometer={Odometer}
       riseDelay={riseDelay}
@@ -1982,11 +1988,11 @@ function StatItem({ stat, index }: { stat: (typeof STATS)[number]; index: number
   );
 }
 
-function IconPattern({ icon }: { icon: StrengthIcon }) {
-  const Icon = STRENGTH_ICONS[icon];
-  const tileId = useId();
+function IconPattern(props: { icon: StrengthIcon }) {
+  const Icon = dynamic(() => STRENGTH_ICONS[props.icon]);
+  const tileId = createUniqueId();
   return (
-    <svg aria-hidden="true" {...stylex.props(styles.pattern)}>
+    <svg aria-hidden="true" {...stylex.attrs(styles.pattern)}>
       <defs>
         <pattern
           id={tileId}
@@ -1996,7 +2002,7 @@ function IconPattern({ icon }: { icon: StrengthIcon }) {
           patternUnits="userSpaceOnUse"
         >
           {PATTERN_TILE.cells.map(([x, y]) => (
-            <Icon key={`${x}-${y}`} x={x} y={y} size={32} strokeWidth={2} absoluteStrokeWidth />
+            <Icon x={x} y={y} size={32} strokeWidth={2} absoluteStrokeWidth />
           ))}
         </pattern>
       </defs>
@@ -2005,33 +2011,35 @@ function IconPattern({ icon }: { icon: StrengthIcon }) {
   );
 }
 
-function Quadrant({
-  strength,
-  index,
-  apart,
-}: {
+function Quadrant(props: {
   strength: (typeof STRENGTHS)[number];
   index: number;
   apart: MotionValue<number>;
 }) {
-  const [dx, dy] = QUADRANT_DIRECTIONS[index % QUADRANT_DIRECTIONS.length];
-  const x = useTransform(apart, (value) => value * dx * 56);
-  const y = useTransform(apart, (value) => value * dy * 40);
-  const inverse = strength.tone === "blue";
-  const right = dx === 1;
+  const direction = () => QUADRANT_DIRECTIONS[props.index % QUADRANT_DIRECTIONS.length];
+  const x = useTransform(
+    untrack(() => props.apart),
+    (value) => value * direction()[0] * 56,
+  );
+  const y = useTransform(
+    untrack(() => props.apart),
+    (value) => value * direction()[1] * 40,
+  );
+  const inverse = () => props.strength.tone === "blue";
+  const right = () => direction()[0] === 1;
   return (
     <m.article
-      aria-labelledby={`oos1-strength-${index}`}
-      {...stylex.props(
+      aria-labelledby={`oos1-strength-${props.index}`}
+      {...sxProps(
         styles.quadrant,
-        TONE_STYLES[strength.tone],
-        dy === -1 && styles.quadrantUpper,
-        right && styles.quadrantRight,
+        TONE_STYLES[props.strength.tone],
+        direction()[1] === -1 && styles.quadrantUpper,
+        right() && styles.quadrantRight,
         stylex.defaultMarker(),
       )}
       style={{ x, y }}
     >
-      <IconPattern icon={strength.icon} />
+      <IconPattern icon={props.strength.icon} />
       <StrengthQuadrantCopy
         styles={{
           quadrantText: styles.quadrantText,
@@ -2041,9 +2049,9 @@ function Quadrant({
           quadrantSmall: styles.quadrantSmall,
           quadrantLink: styles.quadrantLink,
         }}
-        inverse={inverse}
-        index={index}
-        strength={{ ...strength, link: null }}
+        inverse={inverse()}
+        index={props.index}
+        strength={{ ...props.strength, link: null }}
         idPrefix="oos1"
       />
     </m.article>
@@ -2051,17 +2059,17 @@ function Quadrant({
 }
 
 function Strengths() {
-  const gridRef = useRef<HTMLDivElement>(null);
+  let gridEl: HTMLDivElement | undefined;
   const converge = useQuadrantMotion();
   const { scrollYProgress: approach } = useScroll({
-    target: gridRef,
+    target: () => gridEl,
     offset: ["start end", "center 0.6"],
   });
   const { scrollYProgress: pass } = useScroll({
-    target: gridRef,
+    target: () => gridEl,
     offset: ["start end", "end start"],
   });
-  const apart = useTransform(approach, (value) => (converge ? 1 - value : 0));
+  const apart = useTransform(approach, (value) => (converge() ? 1 - value : 0));
   const rotate = useTransform(pass, [0, 1], [0, 180]);
   return (
     <QuadrantStrengths
@@ -2080,7 +2088,7 @@ function Strengths() {
       }}
       RiseReveal={RiseReveal}
       STRENGTHS_INTRO={STRENGTHS_INTRO}
-      gridRef={gridRef}
+      gridRef={(el: HTMLDivElement) => (gridEl = el)}
       STRENGTHS={STRENGTHS}
       Quadrant={Quadrant}
       apart={apart}
@@ -2091,25 +2099,25 @@ function Strengths() {
   );
 }
 
-function ProductCard({ product, index }: { product: (typeof PRODUCTS)[number]; index: number }) {
-  const [imageFailed, setImageFailed] = useState(false);
+function ProductCard(props: { product: (typeof PRODUCTS)[number]; index: number }) {
+  const [imageFailed, setImageFailed] = createSignal(false);
   return (
-    <RiseReveal delay={riseDelay(index)} sx={styles.productCard}>
-      <div {...stylex.props(styles.productImageFrame)}>
-        {imageFailed ? null : (
+    <RiseReveal delay={riseDelay(props.index)} sx={styles.productCard}>
+      <div {...stylex.attrs(styles.productImageFrame)}>
+        {imageFailed() ? null : (
           <img
-            src={product.image}
-            alt={product.english}
+            src={props.product.image}
+            alt={props.product.english}
             loading="lazy"
             decoding="async"
             onError={() => setImageFailed(true)}
-            {...stylex.props(styles.productImage)}
+            {...stylex.attrs(styles.productImage)}
           />
         )}
       </div>
       <ProductSummary
-        product={product}
-        sx={[styles.productPanel, index % 2 === 1 && styles.productPanelAlt]}
+        product={props.product}
+        sx={[styles.productPanel, props.index % 2 === 1 && styles.productPanelAlt]}
         styles={{
           mutedText: styles.mutedText,
           productTitleBlock: styles.productTitleBlock,
@@ -2122,45 +2130,45 @@ function ProductCard({ product, index }: { product: (typeof PRODUCTS)[number]; i
   );
 }
 
-function Products({ onOpenProductsPage }: { onOpenProductsPage?: () => void }) {
+function Products(props: { onOpenProductsPage?: () => void }) {
   return (
     <section
       id="products"
       aria-labelledby="oo-products-title"
-      {...stylex.props(styles.products, styles.inset120, styles.anchor)}
+      {...stylex.attrs(styles.products, styles.inset120, styles.anchor)}
     >
       <RiseReveal sx={styles.introBlock}>
-        <h2 id="oo-products-title" {...stylex.props(styles.sectionTitle)}>
+        <h2 id="oo-products-title" {...stylex.attrs(styles.sectionTitle)}>
           {PRODUCTS_INTRO.title}
         </h2>
-        <p {...stylex.props(styles.sectionLead)}>{PRODUCTS_INTRO.lead}</p>
+        <p {...stylex.attrs(styles.sectionLead)}>{PRODUCTS_INTRO.lead}</p>
       </RiseReveal>
       <RiseReveal delay={riseDelay(1)} sx={styles.productsCta}>
         <a
           href="#products-top"
           onClick={(event) => {
-            if (onOpenProductsPage) {
+            if (props.onOpenProductsPage) {
               event.preventDefault();
-              onOpenProductsPage();
+              props.onOpenProductsPage();
             }
           }}
-          {...stylex.props(styles.button, styles.buttonPrimary, styles.buttonCompact)}
+          {...stylex.attrs(styles.button, styles.buttonPrimary, styles.buttonCompact)}
         >
           {PRODUCTS_INTRO.cta.label}
         </a>
       </RiseReveal>
-      <div id="product-list" {...stylex.props(styles.productGrid)}>
-        {PRODUCTS.map((product, index) => (
-          <ProductCard key={product.title} product={product} index={index} />
-        ))}
+      <div id="product-list" {...stylex.attrs(styles.productGrid)}>
+        <For each={PRODUCTS}>
+          {(product, index) => <ProductCard product={product} index={index()} />}
+        </For>
       </div>
     </section>
   );
 }
 
 function Offices() {
-  const rowRef = useRef<HTMLDivElement>(null);
-  const rowInView = useInView(rowRef, { once: true, amount: 0.5 });
+  let rowEl: HTMLDivElement | undefined;
+  const rowInView = useInView(() => rowEl, { once: true, amount: 0.5 });
   return (
     <SweepingOffices
       styles={{
@@ -2192,8 +2200,8 @@ function Offices() {
         regionBody: styles.regionBody,
         mutedText: styles.mutedText,
       }}
-      rowRef={rowRef}
-      rowInView={rowInView}
+      rowRef={(el: HTMLDivElement) => (rowEl = el)}
+      rowInView={rowInView()}
       IMAGES={IMAGES}
       OFFICE_MAP_PINS={OFFICE_MAP_PINS}
       MAP_SWEEP_MS={MAP_SWEEP_MS}
@@ -2206,14 +2214,14 @@ function Offices() {
   );
 }
 
-function AccordionIcon({ open }: { open: boolean }) {
+function AccordionIcon(props: { open: boolean }) {
   const reduce = useReducedMotion();
   return (
-    <span aria-hidden="true" {...stylex.props(styles.newsIconSlot)}>
+    <span aria-hidden="true" {...stylex.attrs(styles.newsIconSlot)}>
       <m.span
-        {...stylex.props(styles.newsIconLayer)}
-        animate={{ rotate: open ? 45 : 0 }}
-        transition={reduce ? { duration: 0 } : { type: "spring", duration: 0.3, bounce: 0 }}
+        {...stylex.attrs(styles.newsIconLayer)}
+        animate={{ rotate: props.open ? 45 : 0 }}
+        transition={reduce() ? { duration: 0 } : { type: "spring", duration: 0.3, bounce: 0 }}
       >
         <Plus size={16} strokeWidth={2} absoluteStrokeWidth />
       </m.span>
@@ -2221,21 +2229,13 @@ function AccordionIcon({ open }: { open: boolean }) {
   );
 }
 
-function NewsItem({
-  item,
-  open,
-  onToggle,
-}: {
-  item: (typeof NEWS)[number];
-  open: boolean;
-  onToggle: () => void;
-}) {
+function NewsItem(props: { item: (typeof NEWS)[number]; open: boolean; onToggle: () => void }) {
   return (
     <NewsAccordion
-      item={item}
-      open={open}
-      onToggle={onToggle}
-      icon={<AccordionIcon open={open} />}
+      item={props.item}
+      open={props.open}
+      onToggle={props.onToggle}
+      icon={<AccordionIcon open={props.open} />}
       styles={{
         mutedText: styles.mutedText,
         newsHeading: styles.newsHeading,
@@ -2268,11 +2268,11 @@ function News() {
   );
 }
 
-function SiteFooter({ onNavigate }: { onNavigate?: (view: View, targetId?: string) => void }) {
+function SiteFooter(props: { onNavigate?: (view: View, targetId?: string) => void }) {
   return (
-    <footer {...stylex.props(styles.footer)}>
-      <div {...stylex.props(styles.shell, styles.inset120, styles.footerInner)}>
-        <div {...stylex.props(styles.footerTop)}>
+    <footer {...stylex.attrs(styles.footer)}>
+      <div {...stylex.attrs(styles.shell, styles.inset120, styles.footerInner)}>
+        <div {...stylex.attrs(styles.footerTop)}>
           <img
             src={IMAGES.footerLogo.src}
             alt={IMAGES.footerLogo.alt}
@@ -2280,24 +2280,24 @@ function SiteFooter({ onNavigate }: { onNavigate?: (view: View, targetId?: strin
             height={73}
             loading="lazy"
             decoding="async"
-            {...stylex.props(styles.footerLogo)}
+            {...stylex.attrs(styles.footerLogo)}
           />
-          <nav aria-label="Footer" {...stylex.props(styles.footerColumns)}>
+          <nav aria-label="Footer" {...stylex.attrs(styles.footerColumns)}>
             {FOOTER_COLUMNS.map((column) => (
-              <div key={column.heading} {...stylex.props(styles.footerColumn)}>
-                <h3 {...stylex.props(styles.footerHeading)}>{column.heading}</h3>
-                <ul {...stylex.props(styles.footerLinks)}>
+              <div {...stylex.attrs(styles.footerColumn)}>
+                <h3 {...stylex.attrs(styles.footerHeading)}>{column.heading}</h3>
+                <ul {...stylex.attrs(styles.footerLinks)}>
                   {column.links.map((link) => (
-                    <li key={link.label}>
+                    <li>
                       <a
                         href={link.page ? `#${link.page}-top` : "#top"}
                         onClick={(event) => {
-                          if (link.page && onNavigate) {
+                          if (link.page && props.onNavigate) {
                             event.preventDefault();
-                            onNavigate(link.page, `${link.page}-top`);
+                            props.onNavigate(link.page, `${link.page}-top`);
                           }
                         }}
-                        {...stylex.props(styles.footerLink)}
+                        {...stylex.attrs(styles.footerLink)}
                       >
                         {link.label}
                       </a>
@@ -2308,7 +2308,7 @@ function SiteFooter({ onNavigate }: { onNavigate?: (view: View, targetId?: strin
             ))}
           </nav>
         </div>
-        <hr {...stylex.props(styles.footerRule)} />
+        <hr {...stylex.attrs(styles.footerRule)} />
         <FooterLegal
           copyright={COPYRIGHT}
           styles={{
@@ -2317,10 +2317,10 @@ function SiteFooter({ onNavigate }: { onNavigate?: (view: View, targetId?: strin
             social: styles.social,
           }}
         >
-          <a href="#top" aria-label="LinkedIn" {...stylex.props(styles.socialLink)}>
+          <a href="#top" aria-label="LinkedIn" {...stylex.attrs(styles.socialLink)}>
             <VectorArt paths={LINKEDIN_PATHS} viewBox="0 0 20 20" sx={styles.socialIcon} />
           </a>
-          <a href="#top" aria-label="WeChat" {...stylex.props(styles.socialLink)}>
+          <a href="#top" aria-label="WeChat" {...stylex.attrs(styles.socialLink)}>
             <VectorArt paths={WECHAT_PATHS} viewBox="0 0 20 20" sx={styles.socialIcon} />
           </a>
         </FooterLegal>
@@ -2339,55 +2339,68 @@ const viewFromPage = (page: unknown, startView: View): View => {
   return startView;
 };
 
-export function VariantOOS1({
-  AboutPage = AboutView,
-  ProductsPage = ProductsView,
-  RdPage = RdView,
-  InsightsPage = InsightsView,
-  NewsPage = NewsView,
-  ContactPage = ContactView,
-  startView = "home",
-}: {
-  AboutPage?: ComponentType<SubPageProps>;
-  ProductsPage?: ComponentType<SubPageProps>;
-  RdPage?: ComponentType<SubPageProps>;
-  InsightsPage?: ComponentType<SubPageProps>;
-  NewsPage?: ComponentType<SubPageProps>;
-  ContactPage?: ComponentType<SubPageProps>;
+export function VariantOOS1(props: {
+  AboutPage?: Component<SubPageProps>;
+  ProductsPage?: Component<SubPageProps>;
+  RdPage?: Component<SubPageProps>;
+  InsightsPage?: Component<SubPageProps>;
+  NewsPage?: Component<SubPageProps>;
+  ContactPage?: Component<SubPageProps>;
   startView?: View;
 }) {
+  const p = merge(
+    {
+      AboutPage: AboutView as Component<SubPageProps>,
+      ProductsPage: ProductsView as Component<SubPageProps>,
+      RdPage: RdView as Component<SubPageProps>,
+      InsightsPage: InsightsView as Component<SubPageProps>,
+      NewsPage: NewsView as Component<SubPageProps>,
+      ContactPage: ContactView as Component<SubPageProps>,
+      startView: "home" as View,
+    },
+    props,
+  );
   preinit(GOOGLE_FONTS, { as: "style" });
+  const AboutPage = dynamic(() => p.AboutPage);
+  const ProductsPage = dynamic(() => p.ProductsPage);
+  const RdPage = dynamic(() => p.RdPage);
+  const InsightsPage = dynamic(() => p.InsightsPage);
+  const NewsPage = dynamic(() => p.NewsPage);
+  const ContactPage = dynamic(() => p.ContactPage);
   const reduce = useReducedMotion();
   const intro = useIntro();
-  const introVars = {
-    "--oo-intro": intro === "play" ? `${INTRO_REVEAL_MS}ms` : "0ms",
-  } as CSSProperties;
-  useEffect(() => {
-    if (reduce) return;
+  const introVars = () =>
+    ({
+      "--oo-intro": intro() === "play" ? `${INTRO_REVEAL_MS}ms` : "0ms",
+    }) as JSX.CSSProperties;
+  createEffect(reduce, (reduced) => {
+    if (reduced) return;
     const root = document.documentElement;
     const previous = root.style.scrollBehavior;
     root.style.scrollBehavior = "smooth";
     return () => {
       root.style.scrollBehavior = previous;
     };
-  }, [reduce]);
+  });
 
-  const { page } = useSearch({ strict: false });
-  const [view, setView] = useState<View>(() => viewFromPage(page, startView));
-  const [contactModalOpen, setContactModalOpen] = useState(false);
+  const search = useSearch({ strict: false });
+  const [view, setView] = createSignal<View>(
+    untrack(() => viewFromPage(search().page, p.startView)),
+  );
+  const [contactModalOpen, setContactModalOpen] = createSignal(false);
 
   const handleNavigate = (targetView: View, targetId?: string) => {
     setView(targetView);
     if (typeof window !== "undefined") {
       const url = new URL(window.location.href);
-      if (targetView === startView) {
+      if (targetView === p.startView) {
         url.searchParams.delete("page");
       } else {
         url.searchParams.set("page", targetView);
       }
       url.hash = targetId ? `#${targetId}` : "";
       window.history.pushState({}, "", url.toString());
-      const behavior: ScrollBehavior = reduce ? "auto" : "smooth";
+      const behavior: ScrollBehavior = reduce() ? "auto" : "smooth";
       if (targetId) {
         setTimeout(() => {
           const el = document.getElementById(targetId);
@@ -2399,98 +2412,111 @@ export function VariantOOS1({
     }
   };
 
-  useEffect(() => {
+  onSettled(() => {
     const onPopState = () => {
       const params = new URLSearchParams(window.location.search);
-      setView(viewFromPage(params.get("page"), startView));
+      setView(viewFromPage(params.get("page"), p.startView));
     };
     window.addEventListener("popstate", onPopState);
     return () => window.removeEventListener("popstate", onPopState);
-  }, [startView]);
+  });
 
   return (
     <LazyMotion features={domMax} strict>
       <LayoutGroup>
         <MotionConfig reducedMotion="user">
-          <div lang="zh-CN" {...stylex.props(styles.root)} style={introVars}>
-            <a href="#main-content" {...stylex.props(styles.skipLink)}>
+          <div lang="zh-CN" {...stylex.attrs(styles.root)} style={introVars()}>
+            <a href="#main-content" {...stylex.attrs(styles.skipLink)}>
               跳到主要内容
             </a>
             <SiteHeader
-              currentView={view}
+              currentView={view()}
               onNavigate={handleNavigate}
               onOpenContactDialog={() => setContactModalOpen(true)}
             />
-            <div {...stylex.props(styles.page, intro === "play" && introStyles.pageReveal)}>
-              <main id="main-content" tabIndex={-1} {...stylex.props(styles.mainTarget)}>
-                {view === "about" ? (
-                  <AboutPage
-                    onNavigateHome={(target) =>
-                      handleNavigate(target === "products" ? "products" : "home", target)
-                    }
-                  />
-                ) : view === "products" ? (
-                  <ProductsPage onNavigateHome={(target) => handleNavigate("home", target)} />
-                ) : view === "rd" ? (
-                  <RdPage
-                    onNavigateHome={(target) =>
-                      handleNavigate(target === "contact" ? "contact" : "home", target)
-                    }
-                  />
-                ) : view === "insights" ? (
-                  <InsightsPage
-                    onNavigateHome={(target) =>
-                      handleNavigate(
-                        target === "contact"
-                          ? "contact"
-                          : target === "products"
-                            ? "products"
-                            : "home",
-                        target,
-                      )
-                    }
-                  />
-                ) : view === "news" ? (
-                  <NewsPage
-                    onNavigateHome={(target) =>
-                      handleNavigate(target === "contact" ? "contact" : "home", target)
-                    }
-                  />
-                ) : view === "contact" ? (
-                  <ContactPage onNavigateHome={(target) => handleNavigate("home", target)} />
-                ) : (
-                  <>
-                    <Hero onOpenContactDialog={() => setContactModalOpen(true)} />
-                    <About onOpenAboutPage={() => handleNavigate("about", "about-top")} />
-                    <Campus />
-                    <Strengths />
-                    <Products
-                      onOpenProductsPage={() => handleNavigate("products", "products-top")}
-                    />
-                    <Offices />
-                    <News />
-                    <Flow>
-                      <ContactCta
-                        id="contact"
-                        actions={[
-                          {
-                            label: "联系我们",
-                            tone: "primary",
-                            onClick: () => setContactModalOpen(true),
-                          },
-                        ]}
+            <div {...sxProps(styles.page, intro() === "play" && introStyles.pageReveal)}>
+              <main id="main-content" tabindex={-1} {...stylex.attrs(styles.mainTarget)}>
+                <Switch
+                  fallback={
+                    <>
+                      <Hero onOpenContactDialog={() => setContactModalOpen(true)} />
+                      <About onOpenAboutPage={() => handleNavigate("about", "about-top")} />
+                      <Campus />
+                      <Strengths />
+                      <Products
+                        onOpenProductsPage={() => handleNavigate("products", "products-top")}
                       />
-                    </Flow>
-                  </>
-                )}
+                      <Offices />
+                      <News />
+                      <Flow>
+                        <ContactCta
+                          id="contact"
+                          actions={[
+                            {
+                              label: "联系我们",
+                              tone: "primary",
+                              onClick: () => setContactModalOpen(true),
+                            },
+                          ]}
+                        />
+                      </Flow>
+                    </>
+                  }
+                >
+                  <Match when={view() === "about"}>
+                    <AboutPage
+                      onNavigateHome={(target?: string) =>
+                        handleNavigate(target === "products" ? "products" : "home", target)
+                      }
+                    />
+                  </Match>
+                  <Match when={view() === "products"}>
+                    <ProductsPage
+                      onNavigateHome={(target?: string) => handleNavigate("home", target)}
+                    />
+                  </Match>
+                  <Match when={view() === "rd"}>
+                    <RdPage
+                      onNavigateHome={(target?: string) =>
+                        handleNavigate(target === "contact" ? "contact" : "home", target)
+                      }
+                    />
+                  </Match>
+                  <Match when={view() === "insights"}>
+                    <InsightsPage
+                      onNavigateHome={(target?: string) =>
+                        handleNavigate(
+                          target === "contact"
+                            ? "contact"
+                            : target === "products"
+                              ? "products"
+                              : "home",
+                          target,
+                        )
+                      }
+                    />
+                  </Match>
+                  <Match when={view() === "news"}>
+                    <NewsPage
+                      onNavigateHome={(target?: string) =>
+                        handleNavigate(target === "contact" ? "contact" : "home", target)
+                      }
+                    />
+                  </Match>
+                  <Match when={view() === "contact"}>
+                    <ContactPage
+                      onNavigateHome={(target?: string) => handleNavigate("home", target)}
+                    />
+                  </Match>
+                </Switch>
               </main>
               <Flow>
                 <SiteFooter onNavigate={handleNavigate} />
               </Flow>
             </div>
-            {contactModalOpen ? (
+            <Show when={contactModalOpen()}>
               <SplitDialog subject={null} onClose={() => setContactModalOpen(false)} />
-            ) : null}
+            </Show>
           </div>
         </MotionConfig>
       </LayoutGroup>

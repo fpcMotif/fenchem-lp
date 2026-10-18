@@ -1,5 +1,4 @@
 import * as stylex from "@stylexjs/stylex";
-import { useRef } from "react";
 
 import { useLightbox } from "@/components/prototype/shared/lightbox";
 
@@ -133,13 +132,7 @@ const POSITION_BY_ID = new Map<string, (typeof positions)[keyof typeof positions
   ["grounds", positions.grounds],
 ]);
 
-function Panel({
-  photo,
-  index,
-  lead,
-  onOpen,
-  registerTrigger,
-}: {
+function Panel(props: {
   photo: (typeof PHOTOS)[number];
   index: number;
   lead: boolean;
@@ -147,29 +140,31 @@ function Panel({
   registerTrigger: (index: number, node: HTMLButtonElement | null) => void;
 }) {
   return (
-    <figure {...stylex.props(styles.figure)}>
+    <figure {...stylex.attrs(styles.figure)}>
       <button
-        ref={(node) => registerTrigger(index, node)}
+        ref={(node) => props.registerTrigger(props.index, node)}
         type="button"
-        aria-label={`${photo.english}, view larger`}
-        onClick={() => onOpen(index)}
-        {...stylex.props(styles.button, ui.focusRing, stylex.defaultMarker())}
+        aria-label={`${props.photo.english}, view larger`}
+        onClick={() => props.onOpen(props.index)}
+        {...stylex.attrs(styles.button, ui.focusRing, stylex.defaultMarker())}
       >
         <img
-          src={lead ? photo.large : photo.src}
-          alt={photo.alt}
+          src={props.lead ? props.photo.large : props.photo.src}
+          alt={props.photo.alt}
           loading="lazy"
           decoding="async"
-          {...stylex.props(styles.image, POSITION_BY_ID.get(photo.id))}
+          {...stylex.attrs(styles.image, POSITION_BY_ID.get(props.photo.id))}
         />
       </button>
-      <figcaption {...stylex.props(styles.legend)}>
-        <span lang="en" {...stylex.props(ui.micro, styles.figNum)}>
-          Fig. 2{photo.panel}
+      <figcaption {...stylex.attrs(styles.legend)}>
+        <span lang="en" {...stylex.attrs(ui.micro, styles.figNum)}>
+          Fig. 2{props.photo.panel}
         </span>
-        <span {...stylex.props(styles.caption, lead && styles.captionLead)}>{photo.caption}</span>
-        <span aria-hidden="true" {...stylex.props(styles.detail, lead && styles.detailLead)}>
-          {photo.description}
+        <span {...stylex.attrs(styles.caption, props.lead && styles.captionLead)}>
+          {props.photo.caption}
+        </span>
+        <span aria-hidden="true" {...stylex.attrs(styles.detail, props.lead && styles.detailLead)}>
+          {props.photo.description}
         </span>
       </figcaption>
     </figure>
@@ -178,23 +173,23 @@ function Panel({
 
 export function Campus() {
   const lightbox = useLightbox(PHOTOS.length);
-  const triggers = useRef<(HTMLButtonElement | null)[]>([]);
+  let triggers: (HTMLButtonElement | null)[] = [];
   const [lead, ...series] = PHOTOS;
 
   const registerTrigger = (index: number, node: HTMLButtonElement | null) => {
-    triggers.current[index] = node;
+    triggers[index] = node;
   };
   const close = () => {
     const returnTo = lightbox.index;
     lightbox.close();
-    if (returnTo !== null) triggers.current[returnTo]?.focus();
+    if (returnTo !== null) triggers[returnTo]?.focus();
   };
 
   return (
-    <section id="about-campus" aria-labelledby="oos1w-campus" {...stylex.props(ui.section)}>
-      <div {...stylex.props(ui.shell)}>
-        <div {...stylex.props(ui.grid, ui.ruled)}>
-          <div {...stylex.props(ui.headCol)}>
+    <section id="about-campus" aria-labelledby="oos1w-campus" {...stylex.attrs(ui.section)}>
+      <div {...stylex.attrs(ui.shell)}>
+        <div {...stylex.attrs(ui.grid, ui.ruled)}>
+          <div {...stylex.attrs(ui.headCol)}>
             <SectionHead
               num="02"
               word="Site"
@@ -205,7 +200,7 @@ export function Campus() {
             />
           </div>
 
-          <div {...stylex.props(styles.lead)}>
+          <div {...stylex.attrs(styles.lead)}>
             <Panel
               photo={lead}
               index={0}
@@ -215,9 +210,9 @@ export function Campus() {
             />
           </div>
 
-          <ul {...stylex.props(styles.series)}>
+          <ul {...stylex.attrs(styles.series)}>
             {series.map((photo, offset) => (
-              <li key={photo.id}>
+              <li>
                 <Panel
                   photo={photo}
                   index={offset + 1}

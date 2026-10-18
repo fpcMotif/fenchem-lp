@@ -1,7 +1,6 @@
-import { breakpoints } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { m, type MotionValue } from "motion/react";
-import { useEffect, useRef } from "react";
+import { m, type MotionValue } from "@/compat/motion";
+import { createEffect } from "solid-js";
 
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
@@ -20,7 +19,7 @@ const styles = stylex.create({
     bottom: 0,
     left: 0,
     width: 80,
-    display: { default: "none", [breakpoints.xl]: "block" },
+    display: { default: "none", ["@media (min-width: 1280px)"]: "block" },
     pointerEvents: "none",
   },
   plate: {
@@ -110,7 +109,7 @@ const styles = stylex.create({
     position: "sticky",
     top: layout.header,
     zIndex: 1,
-    display: { default: "block", [breakpoints.xl]: "none" },
+    display: { default: "block", ["@media (min-width: 1280px)"]: "none" },
     backgroundColor: "rgba(255, 255, 255, 0.94)",
     backdropFilter: "blur(14px)",
     boxShadow: `0 1px 0 0 ${ui.hairlineSoft}`,
@@ -176,29 +175,31 @@ const styles = stylex.create({
   },
 });
 
-export function Rail({ progress, active }: { progress: MotionValue<number>; active: number }) {
+export function Rail(props: { progress: MotionValue<number>; active: number }) {
   return (
-    <div {...stylex.props(styles.column)}>
-      <nav aria-label="On this page" {...stylex.props(styles.plate)}>
-        <div {...stylex.props(styles.readout)}>
-          <YearReadout progress={progress} sx={styles.readoutDigits} />
+    <div {...stylex.attrs(styles.column)}>
+      <nav aria-label="On this page" {...stylex.attrs(styles.plate)}>
+        <div {...stylex.attrs(styles.readout)}>
+          <YearReadout progress={props.progress} sx={styles.readoutDigits} />
         </div>
-        <div {...stylex.props(styles.track)}>
-          <span aria-hidden="true" {...stylex.props(styles.spine)} />
+        <div {...stylex.attrs(styles.track)}>
+          <span aria-hidden="true" {...stylex.attrs(styles.spine)} />
           {RAIL_STOPS.map((stop, position) => (
             <a
-              key={stop.id}
               href={`#${stop.id}`}
-              aria-current={active === position ? "location" : undefined}
-              {...stylex.props(styles.stop, styles.stopAt(stop.at), shared.focusRing)}
+              aria-current={props.active === position ? "location" : undefined}
+              {...stylex.attrs(styles.stop, styles.stopAt(stop.at), shared.focusRing)}
             >
               <span
                 aria-hidden="true"
-                {...stylex.props(styles.stopTick, active === position && styles.stopTickActive)}
+                {...stylex.attrs(
+                  styles.stopTick,
+                  props.active === position && styles.stopTickActive,
+                )}
               />
               <span
                 lang="en"
-                {...stylex.props(styles.label, active === position && styles.labelShown)}
+                {...stylex.attrs(styles.label, props.active === position && styles.labelShown)}
               >
                 {stop.label}
               </span>
@@ -210,43 +211,45 @@ export function Rail({ progress, active }: { progress: MotionValue<number>; acti
   );
 }
 
-export function TopBar({ progress, active }: { progress: MotionValue<number>; active: number }) {
-  const listRef = useRef<HTMLElement>(null);
+export function TopBar(props: { progress: MotionValue<number>; active: number }) {
+  let listRef: HTMLElement | undefined;
   const reduce = useReducedMotion();
 
-  useEffect(() => {
-    const list = listRef.current;
-    const stop = RAIL_STOPS[active];
-    const chip = stop ? list?.querySelector<HTMLElement>(`[href="#${stop.id}"]`) : null;
-    if (!list || !chip) return;
-    const listBox = list.getBoundingClientRect();
-    const chipBox = chip.getBoundingClientRect();
-    if (chipBox.left < listBox.left || chipBox.right > listBox.right) {
-      list.scrollBy({
-        left: chipBox.left - listBox.left - 16,
-        behavior: reduce ? "auto" : "smooth",
-      });
-    }
-  }, [active, reduce]);
+  createEffect(
+    () => [props.active, reduce()] as const,
+    ([activeNow, reduceNow]) => {
+      const list = listRef;
+      const stop = RAIL_STOPS[activeNow];
+      const chip = stop ? list?.querySelector<HTMLElement>(`[href="#${stop.id}"]`) : null;
+      if (!list || !chip) return;
+      const listBox = list.getBoundingClientRect();
+      const chipBox = chip.getBoundingClientRect();
+      if (chipBox.left < listBox.left || chipBox.right > listBox.right) {
+        list.scrollBy({
+          left: chipBox.left - listBox.left - 16,
+          behavior: reduceNow ? "auto" : "smooth",
+        });
+      }
+    },
+  );
 
   return (
-    <div {...stylex.props(styles.bar)}>
-      <div {...stylex.props(shared.shell, shared.inset, styles.barRow)}>
-        <div {...stylex.props(styles.barYear)}>
-          <YearReadout progress={progress} sx={styles.barYearDigits} />
-          <span aria-hidden="true" {...stylex.props(styles.barYearUnit)}>
+    <div {...stylex.attrs(styles.bar)}>
+      <div {...stylex.attrs(shared.shell, shared.inset, styles.barRow)}>
+        <div {...stylex.attrs(styles.barYear)}>
+          <YearReadout progress={props.progress} sx={styles.barYearDigits} />
+          <span aria-hidden="true" {...stylex.attrs(styles.barYearUnit)}>
             年
           </span>
         </div>
-        <nav aria-label="On this page" ref={listRef} {...stylex.props(styles.chips)}>
+        <nav aria-label="On this page" ref={listRef} {...stylex.attrs(styles.chips)}>
           {RAIL_STOPS.map((stop, position) => (
             <a
-              key={stop.id}
               href={`#${stop.id}`}
-              aria-current={active === position ? "location" : undefined}
-              {...stylex.props(
+              aria-current={props.active === position ? "location" : undefined}
+              {...stylex.attrs(
                 styles.chip,
-                active === position && styles.chipActive,
+                props.active === position && styles.chipActive,
                 shared.focusRing,
               )}
             >
@@ -255,7 +258,11 @@ export function TopBar({ progress, active }: { progress: MotionValue<number>; ac
           ))}
         </nav>
       </div>
-      <m.div aria-hidden="true" {...stylex.props(styles.barFill)} style={{ scaleX: progress }} />
+      <m.div
+        aria-hidden="true"
+        {...stylex.attrs(styles.barFill)}
+        style={{ scaleX: props.progress }}
+      />
     </div>
   );
 }

@@ -1,14 +1,16 @@
 import * as stylex from "@stylexjs/stylex";
-import { Check, ChevronDown, ChevronLeft, ChevronRight, ListFilter } from "lucide-react";
-import { m, useReducedMotion } from "motion/react";
+import type { StyleXStyles } from "@stylexjs/stylex";
 import {
-  useEffect,
-  useId,
-  useRef,
-  useState,
-  useSyncExternalStore,
-  type KeyboardEvent,
-} from "react";
+  Check,
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  ListFilter,
+} from "@fenchem-lp/ui/components/lucide";
+import { createExternalStore } from "@/compat/external-store";
+import { m, useReducedMotion } from "@/compat/motion";
+import { createEffect, createSignal, createUniqueId, For, Show, untrack } from "solid-js";
+import type { JSX } from "@solidjs/web";
 
 import {
   LabSection,
@@ -71,6 +73,9 @@ const subscribeWide = (onChange: () => void) => {
 const readWide = () => window.matchMedia(WIDE_QUERY).matches;
 
 const readWideOnServer = () => true;
+
+const sxProps = (...args: ReadonlyArray<StyleXStyles | false | null | undefined>) =>
+  stylex.attrs(...args);
 
 const hasMoreBelow = (element: HTMLElement) =>
   element.scrollTop + element.clientHeight < element.scrollHeight - 1;
@@ -610,29 +615,30 @@ const styles = stylex.create({
   },
 });
 
-function AreaSelect({ browser }: { browser: SolutionsBrowser }) {
-  const { area, chips, chooseArea } = browser;
-  const baseId = useId();
+function AreaSelect(props: { browser: SolutionsBrowser }) {
+  const chips = props.browser.chips;
+  const baseId = createUniqueId();
   const listId = `${baseId}-list`;
   const optionId = (index: number) => `${baseId}-option-${index}`;
-  const rootRef = useRef<HTMLDivElement>(null);
-  const selectedIndex = Math.max(
-    0,
-    chips.findIndex((chip) => chip.id === area),
-  );
-  const [open, setOpen] = useState(false);
-  const [activeIndex, setActiveIndex] = useState(selectedIndex);
-  const selected = chips[selectedIndex];
+  let root: HTMLDivElement | undefined;
+  const selectedIndex = () =>
+    Math.max(
+      0,
+      chips.findIndex((chip) => chip.id === props.browser.area),
+    );
+  const [open, setOpen] = createSignal(false);
+  const [activeIndex, setActiveIndex] = createSignal(untrack(selectedIndex));
+  const selected = () => chips[selectedIndex()];
   const last = chips.length - 1;
 
-  useEffect(() => {
-    if (!open) return;
+  createEffect(open, (isOpen) => {
+    if (!isOpen) return;
     const closeOnOutside = (event: PointerEvent) => {
-      if (!rootRef.current?.contains(event.target as Node)) setOpen(false);
+      if (!root?.contains(event.target as Node)) setOpen(false);
     };
     document.addEventListener("pointerdown", closeOnOutside);
     return () => document.removeEventListener("pointerdown", closeOnOutside);
-  }, [open]);
+  });
 
   const openAt = (index: number) => {
     setActiveIndex(index);
@@ -641,15 +647,15 @@ function AreaSelect({ browser }: { browser: SolutionsBrowser }) {
 
   const choose = (index: number) => {
     const chip = chips[index];
-    if (chip) chooseArea(chip.id);
+    if (chip) props.browser.chooseArea(chip.id);
     setOpen(false);
   };
 
-  const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-    if (!open) {
+  const handleKeyDown: JSX.EventHandler<HTMLDivElement, KeyboardEvent> = (event) => {
+    if (!open()) {
       if (["ArrowDown", "ArrowUp", "Enter", " "].includes(event.key)) {
         event.preventDefault();
-        openAt(selectedIndex);
+        openAt(selectedIndex());
       } else if (event.key === "Home" || event.key === "End") {
         event.preventDefault();
         openAt(event.key === "Home" ? 0 : last);
@@ -677,7 +683,7 @@ function AreaSelect({ browser }: { browser: SolutionsBrowser }) {
       case "Enter":
       case " ":
         event.preventDefault();
-        choose(activeIndex);
+        choose(activeIndex());
         break;
       case "Escape":
         event.preventDefault();
@@ -689,346 +695,371 @@ function AreaSelect({ browser }: { browser: SolutionsBrowser }) {
     }
   };
 
-  if (!selected) return null;
-
   return (
-    <div ref={rootRef} {...stylex.props(styles.select)}>
-      <div
-        role="combobox"
-        tabIndex={0}
-        aria-label={FILTER_LABEL}
-        aria-expanded={open}
-        aria-controls={listId}
-        aria-activedescendant={open ? optionId(activeIndex) : undefined}
-        onClick={() => (open ? setOpen(false) : openAt(selectedIndex))}
-        onKeyDown={handleKeyDown}
-        {...stylex.props(styles.trigger, open && styles.triggerOpen)}
-      >
-        <ListFilter
-          size={16}
-          strokeWidth={1.75}
-          aria-hidden="true"
-          {...stylex.props(styles.filterIcon)}
-        />
-        <span {...stylex.props(styles.triggerValue)}>{areaName(selected)}</span>
-        <Count value={selected.count} />
-        <ChevronDown
-          size={16}
-          strokeWidth={1.75}
-          aria-hidden="true"
-          {...stylex.props(styles.chevron, open && styles.chevronOpen)}
-        />
-      </div>
-      <ul
-        id={listId}
-        role="listbox"
-        aria-label={FILTER_LABEL}
-        hidden={!open}
-        {...stylex.props(styles.listbox)}
-      >
-        {chips.map((chip, index) => {
-          const isSelected = index === selectedIndex;
-          return (
-            <li
-              key={chip.id}
-              id={optionId(index)}
-              role="option"
-              aria-selected={isSelected}
-              onPointerDown={(event) => event.preventDefault()}
-              onPointerMove={() => setActiveIndex(index)}
-              onClick={() => choose(index)}
-              {...stylex.props(
-                styles.option,
-                index === activeIndex && styles.optionActive,
-                isSelected && styles.optionSelected,
-              )}
-            >
-              <span>{areaName(chip)}</span>
-              <Count value={chip.count} />
-              {isSelected ? (
-                <Check
-                  size={16}
-                  strokeWidth={2}
-                  aria-hidden="true"
-                  {...stylex.props(styles.optionCheck)}
-                />
-              ) : null}
-            </li>
-          );
-        })}
-      </ul>
-    </div>
+    <Show when={selected()}>
+      {(current) => (
+        <div ref={root} {...stylex.attrs(styles.select)}>
+          <div
+            role="combobox"
+            tabindex={0}
+            aria-label={FILTER_LABEL}
+            aria-expanded={open() ? "true" : "false"}
+            aria-controls={listId}
+            aria-activedescendant={open() ? optionId(activeIndex()) : undefined}
+            onClick={() => (open() ? setOpen(false) : openAt(selectedIndex()))}
+            onKeyDown={handleKeyDown}
+            {...stylex.attrs(styles.trigger, open() && styles.triggerOpen)}
+          >
+            <ListFilter
+              size={16}
+              strokeWidth={1.75}
+              aria-hidden="true"
+              {...stylex.attrs(styles.filterIcon)}
+            />
+            <span {...stylex.attrs(styles.triggerValue)}>{areaName(current())}</span>
+            <Count value={current().count} />
+            <ChevronDown
+              size={16}
+              strokeWidth={1.75}
+              aria-hidden="true"
+              {...stylex.attrs(styles.chevron, open() && styles.chevronOpen)}
+            />
+          </div>
+          <ul
+            id={listId}
+            role="listbox"
+            aria-label={FILTER_LABEL}
+            hidden={!open()}
+            {...stylex.attrs(styles.listbox)}
+          >
+            {chips.map((chip, index) => {
+              const isSelected = () => index === selectedIndex();
+              return (
+                <li
+                  id={optionId(index)}
+                  role="option"
+                  aria-selected={isSelected() ? "true" : "false"}
+                  onPointerDown={(event) => event.preventDefault()}
+                  onPointerMove={() => setActiveIndex(index)}
+                  onClick={() => choose(index)}
+                  {...stylex.attrs(
+                    styles.option,
+                    index === activeIndex() && styles.optionActive,
+                    isSelected() && styles.optionSelected,
+                  )}
+                >
+                  <span>{areaName(chip)}</span>
+                  <Count value={chip.count} />
+                  <Show when={isSelected()}>
+                    <Check
+                      size={16}
+                      strokeWidth={2}
+                      aria-hidden="true"
+                      {...stylex.attrs(styles.optionCheck)}
+                    />
+                  </Show>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      )}
+    </Show>
   );
 }
 
-function Count({ value }: { value: number }) {
+function Count(props: { value: number }) {
   return (
-    <span {...stylex.props(styles.count)}>
-      <span {...stylex.props(styles.countNumber)}>{value}</span> 款
+    <span {...stylex.attrs(styles.count)}>
+      <span {...stylex.attrs(styles.countNumber)}>{props.value}</span> 款
     </span>
   );
 }
 
-function RowValue({ row }: { row: SheetRow }) {
-  if (row.values.length === 0) return <>无</>;
-  if (row.kind === "lines") {
+function RowValue(props: { row: SheetRow }) {
+  if (props.row.values.length === 0) return <>无</>;
+  if (props.row.kind === "lines") {
     return (
-      <ul {...stylex.props(styles.lines)}>
-        {row.values.map((line) => (
-          <li key={line}>{line}</li>
+      <ul {...stylex.attrs(styles.lines)}>
+        {props.row.values.map((line) => (
+          <li>{line}</li>
         ))}
       </ul>
     );
   }
-  if (row.kind === "strong") {
+  if (props.row.kind === "strong") {
     return (
-      <span {...stylex.props(styles.strong, styles.keepWords)}>
-        {row.values.join(DOT_SEPARATOR)}
+      <span {...stylex.attrs(styles.strong, styles.keepWords)}>
+        {props.row.values.join(DOT_SEPARATOR)}
       </span>
     );
   }
-  if (row.kind === "list") {
+  if (props.row.kind === "list") {
     return (
-      <ul {...stylex.props(styles.lines)}>
-        {row.values.map((entry) => {
+      <ul {...stylex.attrs(styles.lines)}>
+        {props.row.values.map((entry) => {
           const { primary, note } = splitNote(entry);
           return (
-            <li key={entry} {...stylex.props(styles.keepWords)}>
-              <span {...stylex.props(styles.strong)}>
+            <li {...stylex.attrs(styles.keepWords)}>
+              <span {...stylex.attrs(styles.strong)}>
                 {primary.replaceAll(" / ", `${NO_BREAK_SPACE}/ `)}
               </span>
-              {note && <span {...stylex.props(styles.note)}>{note}</span>}
+              {note && <span {...stylex.attrs(styles.note)}>{note}</span>}
             </li>
           );
         })}
       </ul>
     );
   }
-  return <>{row.values.join("、")}</>;
+  return <>{props.row.values.join("、")}</>;
 }
 
 export function DropdownVariant() {
   const browser = useSolutionsBrowser();
-  const { area, scope, groups, selected, position, select } = browser;
-  const uid = useId();
+  const uid = createUniqueId();
   const reduce = useReducedMotion();
-  const wide = useSyncExternalStore(subscribeWide, readWide, readWideOnServer);
-  const listRef = useRef<HTMLDivElement>(null);
-  const panelRef = useRef<HTMLDivElement>(null);
-  const [listHasMore, setListHasMore] = useState(false);
-  const [panelHasMore, setPanelHasMore] = useState(false);
-  const selectedId = selected?.id;
-  const selectionTransition = reduce
-    ? { duration: 0 }
-    : { type: "spring" as const, duration: 0.35, bounce: 0.15 };
+  const wide = createExternalStore(subscribeWide, readWide, readWideOnServer);
+  let list: HTMLDivElement | undefined;
+  let panel: HTMLDivElement | undefined;
+  const [listHasMore, setListHasMore] = createSignal(false);
+  const [panelHasMore, setPanelHasMore] = createSignal(false);
+  const selectedId = () => browser.selected?.id;
+  const selectionTransition = () =>
+    reduce() ? { duration: 0 } : { type: "spring" as const, duration: 0.35, bounce: 0.15 };
 
   const syncListMore = () => {
-    const list = listRef.current;
     if (list) setListHasMore(hasMoreBelow(list));
   };
 
   const syncPanelMore = () => {
-    const panel = panelRef.current;
     if (panel) setPanelHasMore(hasMoreBelow(panel));
   };
 
-  useEffect(syncListMore, [area, wide]);
+  createEffect(() => [browser.area, wide()] as const, syncListMore);
 
-  useEffect(() => {
-    const list = listRef.current;
-    const tab = list?.querySelector<HTMLElement>('[aria-selected="true"]');
-    if (!list || !tab) return;
-    const behavior: ScrollBehavior = reduce ? "auto" : "smooth";
-    if (!wide) {
-      if (list.scrollWidth <= list.clientWidth) return;
-      const left = tab.offsetLeft - (list.clientWidth - tab.offsetWidth) / 2;
-      list.scrollTo({ left: Math.max(0, left), behavior });
-      return;
-    }
-    const top = tab.offsetTop - SCROLL_INSET;
-    const bottom = tab.offsetTop + tab.offsetHeight + FADE_EDGE - list.clientHeight;
-    if (list.scrollTop > top) list.scrollTo({ top: Math.max(0, top), behavior });
-    else if (list.scrollTop < bottom) list.scrollTo({ top: bottom, behavior });
-  }, [area, selectedId, wide, reduce]);
+  createEffect(
+    () => [browser.area, selectedId(), wide(), reduce()] as const,
+    ([, , isWide, reduced]) => {
+      const tab = list?.querySelector<HTMLElement>('[aria-selected="true"]');
+      if (!list || !tab) return;
+      const behavior: ScrollBehavior = reduced ? "auto" : "smooth";
+      if (!isWide) {
+        if (list.scrollWidth <= list.clientWidth) return;
+        const left = tab.offsetLeft - (list.clientWidth - tab.offsetWidth) / 2;
+        list.scrollTo({ left: Math.max(0, left), behavior });
+        return;
+      }
+      const top = tab.offsetTop - SCROLL_INSET;
+      const bottom = tab.offsetTop + tab.offsetHeight + FADE_EDGE - list.clientHeight;
+      if (list.scrollTop > top) list.scrollTo({ top: Math.max(0, top), behavior });
+      else if (list.scrollTop < bottom) list.scrollTo({ top: bottom, behavior });
+    },
+  );
 
-  useEffect(() => {
-    panelRef.current?.scrollTo({ top: 0 });
-    syncPanelMore();
-  }, [selectedId, wide]);
+  createEffect(
+    () => [selectedId(), wide()] as const,
+    () => {
+      panel?.scrollTo({ top: 0 });
+      syncPanelMore();
+    },
+  );
 
-  const handleListKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-    const step = (wide ? VERTICAL_STEPS : HORIZONTAL_STEPS)[event.key];
-    if (!step || scope.length === 0) return;
+  const handleListKeyDown: JSX.EventHandler<HTMLDivElement, KeyboardEvent> = (event) => {
+    const step = (wide() ? VERTICAL_STEPS : HORIZONTAL_STEPS)[event.key];
+    if (!step || browser.scope.length === 0) return;
     event.preventDefault();
     event.stopPropagation();
-    const next = step(position, scope.length);
-    const nextItem = scope[next];
+    const next = step(browser.position, browser.scope.length);
+    const nextItem = browser.scope[next];
     if (!nextItem) return;
-    select(nextItem.id);
+    browser.select(nextItem.id);
     event.currentTarget
       .querySelectorAll<HTMLElement>('[role="tab"]')
       [next]?.focus({ preventScroll: true });
   };
 
-  if (!selected) {
-    return (
-      <LabSection>
-        <AreaSelect browser={browser} />
-        <p {...stylex.props(styles.empty)}>该领域暂无应用方案</p>
-      </LabSection>
-    );
-  }
-
-  const grouped = area === "all";
-  const selectedArea = areaOf(selected.area);
-  const areaItems = groups.find((group) => group.id === selected.area)?.items ?? [];
-  const previous = scope[position - 1];
-  const next = scope[position + 1];
+  const grouped = () => browser.area === "all";
+  const selectedArea = () => areaOf(browser.selected.area);
+  const areaItems = () =>
+    browser.groups.find((group) => group.id === browser.selected.area)?.items ?? [];
+  const previous = () => browser.scope[browser.position - 1];
+  const next = () => browser.scope[browser.position + 1];
 
   return (
-    <LabSection>
-      <div {...stylex.props(styles.workspace)}>
-        <div {...stylex.props(styles.listPane)}>
-          <div {...stylex.props(styles.paneHead)}>
-            <AreaSelect browser={browser} />
-          </div>
-          <m.div
-            ref={listRef}
-            layoutScroll
-            role="tablist"
-            aria-label="应用方案"
-            aria-orientation={wide ? "vertical" : "horizontal"}
-            onKeyDown={handleListKeyDown}
-            onScroll={wide ? syncListMore : undefined}
-            {...stylex.props(
-              styles.list,
-              grouped && styles.listGrouped,
-              wide && listHasMore && styles.listMore,
-            )}
-          >
-            {groups.map((group) => (
-              <div key={group.id} {...stylex.props(styles.group)}>
-                {grouped && (
-                  <p aria-hidden="true" {...stylex.props(styles.groupHead)}>
-                    <span>{group.label}</span>
-                    <Count value={group.items.length} />
-                  </p>
-                )}
-                {group.items.map((item, index) => {
-                  const isSelected = item.id === selected.id;
-                  return (
-                    <button
-                      key={item.id}
-                      type="button"
-                      role="tab"
-                      id={`${uid}-tab-${item.id}`}
-                      aria-selected={isSelected}
-                      aria-controls={`${uid}-panel`}
-                      tabIndex={isSelected ? 0 : -1}
-                      onClick={() => select(item.id)}
-                      {...stylex.props(
-                        styles.tab,
-                        isSelected && styles.tabSelected,
-                        stylex.defaultMarker(),
-                      )}
-                    >
-                      {isSelected && (
-                        <m.span
-                          layoutId={`${uid}-selection`}
-                          aria-hidden="true"
-                          transition={selectionTransition}
-                          {...stylex.props(styles.selection)}
-                        >
-                          <m.span
-                            layout
-                            transition={selectionTransition}
-                            {...stylex.props(styles.selectionFrame)}
-                          />
-                        </m.span>
-                      )}
-                      <span
-                        {...stylex.props(styles.tabIndex, isSelected && styles.tabIndexSelected)}
-                      >
-                        {padIndex(index)}
-                      </span>
-                      <span {...stylex.props(styles.tabText)}>
-                        <span
-                          {...stylex.props(styles.tabName, isSelected && styles.tabNameSelected)}
-                        >
-                          {item.title}
-                        </span>
-                        <span {...stylex.props(styles.tabMeta)}>
-                          {item.functions.join(DOT_SEPARATOR)}
-                        </span>
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-            ))}
-          </m.div>
-        </div>
-        <div
-          ref={panelRef}
-          role="tabpanel"
-          id={`${uid}-panel`}
-          aria-labelledby={`${uid}-tab-${selected.id}`}
-          tabIndex={0}
-          onScroll={wide ? syncPanelMore : undefined}
-          {...stylex.props(styles.panel, wide && panelHasMore && styles.panelMore)}
-        >
-          <div {...stylex.props(styles.sheetMeta)}>
-            <p {...stylex.props(styles.eyebrow)}>
-              <span>{selectedArea?.label}</span>
-              <span lang="en" {...stylex.props(styles.english)}>
-                {selectedArea?.englishLabel}
-              </span>
-            </p>
-            <div {...stylex.props(styles.stepper)}>
-              <span {...stylex.props(styles.counter)}>
-                <span {...stylex.props(styles.counterCurrent)}>
-                  {padIndex(areaItems.indexOf(selected))}
-                </span>{" "}
-                / {padIndex(areaItems.length - 1)}
-              </span>
-              <button
-                type="button"
-                aria-label="上一个方案"
-                disabled={!previous}
-                onClick={() => previous && select(previous.id)}
-                {...stylex.props(styles.stepButton, !previous && styles.stepButtonDisabled)}
-              >
-                <ChevronLeft size={16} strokeWidth={1.75} aria-hidden="true" />
-              </button>
-              <button
-                type="button"
-                aria-label="下一个方案"
-                disabled={!next}
-                onClick={() => next && select(next.id)}
-                {...stylex.props(styles.stepButton, !next && styles.stepButtonDisabled)}
-              >
-                <ChevronRight size={16} strokeWidth={1.75} aria-hidden="true" />
-              </button>
+    <Show
+      when={browser.selected}
+      fallback={
+        <LabSection>
+          <AreaSelect browser={browser} />
+          <p {...stylex.attrs(styles.empty)}>该领域暂无应用方案</p>
+        </LabSection>
+      }
+    >
+      <LabSection>
+        <div {...stylex.attrs(styles.workspace)}>
+          <div {...stylex.attrs(styles.listPane)}>
+            <div {...stylex.attrs(styles.paneHead)}>
+              <AreaSelect browser={browser} />
             </div>
+            <m.div
+              ref={(el: HTMLElement) => {
+                list = el as HTMLDivElement;
+              }}
+              layoutScroll
+              role="tablist"
+              aria-label="应用方案"
+              aria-orientation={wide() ? "vertical" : "horizontal"}
+              onKeyDown={handleListKeyDown}
+              onScroll={() => wide() && syncListMore()}
+              {...stylex.attrs(
+                styles.list,
+                grouped() && styles.listGrouped,
+                wide() && listHasMore() && styles.listMore,
+              )}
+            >
+              <For each={browser.groups}>
+                {(group) => (
+                  <div {...stylex.attrs(styles.group)}>
+                    <Show when={grouped()}>
+                      <p aria-hidden="true" {...stylex.attrs(styles.groupHead)}>
+                        <span>{group.label}</span>
+                        <Count value={group.items.length} />
+                      </p>
+                    </Show>
+                    <For each={group.items}>
+                      {(item, index) => {
+                        const isSelected = () => item.id === browser.selected.id;
+                        return (
+                          <button
+                            type="button"
+                            role="tab"
+                            id={`${uid}-tab-${item.id}`}
+                            aria-selected={isSelected() ? "true" : "false"}
+                            aria-controls={`${uid}-panel`}
+                            tabindex={isSelected() ? 0 : -1}
+                            onClick={() => browser.select(item.id)}
+                            {...stylex.attrs(
+                              styles.tab,
+                              isSelected() && styles.tabSelected,
+                              stylex.defaultMarker(),
+                            )}
+                          >
+                            <Show when={isSelected()}>
+                              <m.span
+                                layoutId={`${uid}-selection`}
+                                aria-hidden="true"
+                                transition={selectionTransition()}
+                                {...stylex.attrs(styles.selection)}
+                              >
+                                <m.span
+                                  layout
+                                  transition={selectionTransition()}
+                                  {...stylex.attrs(styles.selectionFrame)}
+                                />
+                              </m.span>
+                            </Show>
+                            <span
+                              {...stylex.attrs(
+                                styles.tabIndex,
+                                isSelected() && styles.tabIndexSelected,
+                              )}
+                            >
+                              {padIndex(index())}
+                            </span>
+                            <span {...stylex.attrs(styles.tabText)}>
+                              <span
+                                {...stylex.attrs(
+                                  styles.tabName,
+                                  isSelected() && styles.tabNameSelected,
+                                )}
+                              >
+                                {item.title}
+                              </span>
+                              <span {...stylex.attrs(styles.tabMeta)}>
+                                {item.functions.join(DOT_SEPARATOR)}
+                              </span>
+                            </span>
+                          </button>
+                        );
+                      }}
+                    </For>
+                  </div>
+                )}
+              </For>
+            </m.div>
           </div>
-          <div key={selected.id} {...stylex.props(styles.fade)}>
-            <header>
-              <h3 {...stylex.props(styles.title)}>{selected.title}</h3>
-              <p {...stylex.props(styles.subtitle)}>{selected.subtitle}</p>
-            </header>
-            <dl {...stylex.props(styles.fields)}>
-              {sheetRows(selected).map((row) => (
-                <div key={row.label} {...stylex.props(styles.field)}>
-                  <dt {...stylex.props(styles.fieldLabel)}>{row.label}</dt>
-                  <dd {...stylex.props(styles.fieldValue)}>
-                    <RowValue row={row} />
-                  </dd>
+          <div
+            ref={panel}
+            role="tabpanel"
+            id={`${uid}-panel`}
+            aria-labelledby={`${uid}-tab-${browser.selected.id}`}
+            tabindex={0}
+            onScroll={() => wide() && syncPanelMore()}
+            {...stylex.attrs(styles.panel, wide() && panelHasMore() && styles.panelMore)}
+          >
+            <div {...stylex.attrs(styles.sheetMeta)}>
+              <p {...stylex.attrs(styles.eyebrow)}>
+                <span>{selectedArea()?.label}</span>
+                <span lang="en" {...stylex.attrs(styles.english)}>
+                  {selectedArea()?.englishLabel}
+                </span>
+              </p>
+              <div {...stylex.attrs(styles.stepper)}>
+                <span {...stylex.attrs(styles.counter)}>
+                  <span {...stylex.attrs(styles.counterCurrent)}>
+                    {padIndex(areaItems().indexOf(browser.selected))}
+                  </span>{" "}
+                  / {padIndex(areaItems().length - 1)}
+                </span>
+                <button
+                  type="button"
+                  aria-label="上一个方案"
+                  disabled={!previous()}
+                  onClick={() => {
+                    const item = previous();
+                    if (item) browser.select(item.id);
+                  }}
+                  {...sxProps(styles.stepButton, !previous() && styles.stepButtonDisabled)}
+                >
+                  <ChevronLeft size={16} strokeWidth={1.75} aria-hidden="true" />
+                </button>
+                <button
+                  type="button"
+                  aria-label="下一个方案"
+                  disabled={!next()}
+                  onClick={() => {
+                    const item = next();
+                    if (item) browser.select(item.id);
+                  }}
+                  {...sxProps(styles.stepButton, !next() && styles.stepButtonDisabled)}
+                >
+                  <ChevronRight size={16} strokeWidth={1.75} aria-hidden="true" />
+                </button>
+              </div>
+            </div>
+            <Show when={browser.selected} keyed>
+              {(selected) => (
+                <div {...stylex.attrs(styles.fade)}>
+                  <header>
+                    <h3 {...stylex.attrs(styles.title)}>{selected.title}</h3>
+                    <p {...stylex.attrs(styles.subtitle)}>{selected.subtitle}</p>
+                  </header>
+                  <dl {...stylex.attrs(styles.fields)}>
+                    {sheetRows(selected).map((row) => (
+                      <div {...stylex.attrs(styles.field)}>
+                        <dt {...stylex.attrs(styles.fieldLabel)}>{row.label}</dt>
+                        <dd {...stylex.attrs(styles.fieldValue)}>
+                          <RowValue row={row} />
+                        </dd>
+                      </div>
+                    ))}
+                  </dl>
                 </div>
-              ))}
-            </dl>
+              )}
+            </Show>
           </div>
         </div>
-      </div>
-    </LabSection>
+      </LabSection>
+    </Show>
   );
 }

@@ -1,3 +1,6 @@
+import { createEffect, createMemo, type Accessor } from "solid-js";
+
+import { createExternalStore } from "@/compat/external-store";
 import {
   animate,
   useInView,
@@ -5,8 +8,7 @@ import {
   useMotionValueEvent,
   useScroll,
   type MotionValue,
-} from "motion/react";
-import { useEffect, useSyncExternalStore, type RefObject } from "react";
+} from "@/compat/motion";
 
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
@@ -19,7 +21,7 @@ function subscribe(onChange: () => void) {
 }
 
 function usePinnedLayout() {
-  return useSyncExternalStore(
+  return createExternalStore(
     subscribe,
     () => window.matchMedia(PIN_QUERY).matches,
     () => false,
@@ -39,45 +41,47 @@ function followCapillaryRise(scroll: number, { progress, marks }: Development) {
   marks.set(clamp01((scroll - 0.8) / 0.1));
 }
 
-export function useDevelopment({
-  section,
-  figure,
-  pinnable,
-}: {
-  section: RefObject<HTMLElement | null>;
-  figure: RefObject<HTMLElement | null>;
+export function useDevelopment(props: {
+  section: Accessor<HTMLElement | undefined>;
+  figure: Accessor<HTMLElement | undefined>;
   pinnable: boolean;
 }): Development {
   const reduce = useReducedMotion();
   const pinLayout = usePinnedLayout();
-  const pinned = pinnable && pinLayout && !reduce;
+  const pinned = createMemo(() => props.pinnable && pinLayout() && !reduce());
   const progress = useMotionValue(0);
   const marks = useMotionValue(0);
-  const inView = useInView(figure, { amount: 0.4, once: true });
-  const { scrollYProgress } = useScroll({ target: section, offset: ["start start", "end end"] });
-
-  useMotionValueEvent(scrollYProgress, "change", (scroll) => {
-    if (pinned) followCapillaryRise(scroll, { progress, marks });
+  const inView = useInView(props.figure, { amount: 0.4, once: true });
+  const { scrollYProgress } = useScroll({
+    target: props.section,
+    offset: ["start start", "end end"],
   });
 
-  useEffect(() => {
-    if (reduce) {
-      progress.set(1);
-      marks.set(1);
-      return;
-    }
-    if (pinned) {
-      followCapillaryRise(scrollYProgress.get(), { progress, marks });
-      return;
-    }
-    if (!inView) return;
-    const develop = animate(progress, 1, { duration: 3.4, ease: [0.3, 0.75, 0.4, 1] });
-    const mark = animate(marks, 1, { duration: 0.9, delay: 3.2, ease: "easeOut" });
-    return () => {
-      develop.stop();
-      mark.stop();
-    };
-  }, [reduce, pinned, inView, progress, marks, scrollYProgress]);
+  useMotionValueEvent(scrollYProgress, "change", (scroll) => {
+    if (pinned()) followCapillaryRise(scroll, { progress, marks });
+  });
+
+  createEffect(
+    () => [reduce(), pinned(), inView()] as const,
+    ([reduced, isPinned, visible]) => {
+      if (reduced) {
+        progress.set(1);
+        marks.set(1);
+        return;
+      }
+      if (isPinned) {
+        followCapillaryRise(scrollYProgress.get(), { progress, marks });
+        return;
+      }
+      if (!visible) return;
+      const develop = animate(progress, 1, { duration: 3.4, ease: [0.3, 0.75, 0.4, 1] });
+      const mark = animate(marks, 1, { duration: 0.9, delay: 3.2, ease: "easeOut" });
+      return () => {
+        develop.stop();
+        mark.stop();
+      };
+    },
+  );
 
   return { progress, marks };
 }

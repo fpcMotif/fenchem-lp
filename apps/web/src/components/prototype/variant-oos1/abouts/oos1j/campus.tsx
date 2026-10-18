@@ -1,7 +1,6 @@
 import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { m, useInView } from "motion/react";
-import { useRef } from "react";
+import { m, useInView } from "@/compat/motion";
 
 import { useLightbox } from "@/components/prototype/shared/lightbox";
 
@@ -11,6 +10,7 @@ import { CropMarks, Reveal, SectionName, useDrift } from "./parts";
 import { wipe } from "./parts-values";
 import { base, ty } from "./shared";
 import { font, hue, size } from "./theme.stylex";
+import { createSignal } from "solid-js";
 
 const PHOTO_COUNT = ABOUT_CAMPUS.photos.length;
 
@@ -103,45 +103,45 @@ const styles = stylex.create({
   },
 });
 
-function Tile({ photo, index, onOpen }: { photo: Photo; index: number; onOpen: () => void }) {
-  const frameRef = useRef<HTMLDivElement>(null);
-  const isLead = index === 0;
+function Tile(props: { photo: Photo; index: number; onOpen: () => void }) {
+  const [frameRef, setFrameRef] = createSignal<HTMLDivElement>();
+  const isLead = props.index === 0;
   const drift = useDrift(frameRef, isLead ? 6 : 0);
   const shown = useInView(frameRef, { once: true, margin: "0px 0px -8% 0px" });
   return (
-    <Reveal as="li" step={index % 3} sx={[isLead && styles.lead, stylex.defaultMarker()]}>
-      <figure {...stylex.props(styles.figure)}>
-        <div {...stylex.props(styles.frameWrap)}>
-          <div ref={frameRef} {...stylex.props(styles.frame, isLead && styles.frameLead)}>
-            <div {...stylex.props(styles.zoom)}>
+    <Reveal as="li" step={props.index % 3} sx={[isLead && styles.lead, stylex.defaultMarker()]}>
+      <figure {...stylex.attrs(styles.figure)}>
+        <div {...stylex.attrs(styles.frameWrap)}>
+          <div ref={setFrameRef} {...stylex.attrs(styles.frame, isLead && styles.frameLead)}>
+            <div {...stylex.attrs(styles.zoom)}>
               <m.img
-                src={photo.src}
-                alt={photo.alt}
+                src={props.photo.src}
+                alt={props.photo.alt}
                 loading="lazy"
                 decoding="async"
-                {...stylex.props(
+                {...stylex.attrs(
                   styles.image,
                   wipe.hidden,
-                  shown && wipe.shown,
-                  wipe.delay((index % 3) * 120 + 80),
+                  shown() && wipe.shown,
+                  wipe.delay((props.index % 3) * 120 + 80),
                 )}
                 style={isLead ? drift : undefined}
               />
             </div>
             <button
               type="button"
-              aria-label={`View larger: ${photo.english}`}
-              onClick={onOpen}
-              {...stylex.props(styles.open)}
+              aria-label={`View larger: ${props.photo.english}`}
+              onClick={props.onOpen}
+              {...stylex.attrs(styles.open)}
             />
           </div>
           <CropMarks hover />
         </div>
-        <figcaption {...stylex.props(ty.quiet, styles.caption)}>
-          <span aria-hidden="true" lang="en" {...stylex.props(styles.numeral)}>
-            {String(index + 1).padStart(2, "0")}
+        <figcaption {...stylex.attrs(ty.quiet, styles.caption)}>
+          <span aria-hidden="true" lang="en" {...stylex.attrs(styles.numeral)}>
+            {String(props.index + 1).padStart(2, "0")}
           </span>
-          <span>{photo.caption}</span>
+          <span>{props.photo.caption}</span>
         </figcaption>
       </figure>
     </Reveal>
@@ -155,13 +155,13 @@ export function Campus() {
     <section
       id="about-campus"
       aria-labelledby="about-campus-title"
-      {...stylex.props(base.section, base.anchor, styles.campus)}
+      {...stylex.attrs(base.section, base.anchor, styles.campus)}
     >
       <SectionName id="about-campus-title">{ABOUT_CAMPUS.eyebrow}</SectionName>
-      <div {...stylex.props(base.shell)}>
-        <ul {...stylex.props(styles.grid)}>
+      <div {...stylex.attrs(base.shell)}>
+        <ul {...stylex.attrs(styles.grid)}>
           {ABOUT_CAMPUS.photos.map((photo, idx) => (
-            <Tile key={photo.id} photo={photo} index={idx} onOpen={() => lightbox.open(idx)} />
+            <Tile photo={photo} index={idx} onOpen={() => lightbox.open(idx)} />
           ))}
         </ul>
       </div>

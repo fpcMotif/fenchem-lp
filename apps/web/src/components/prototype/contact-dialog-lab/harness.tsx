@@ -1,7 +1,7 @@
 import * as stylex from "@stylexjs/stylex";
-import { LazyMotion, MotionConfig, domMax } from "motion/react";
-import { useEffect, useLayoutEffect, useRef, useState, type ComponentType } from "react";
-import { createPortal } from "react-dom";
+import { LazyMotion, MotionConfig, domMax } from "@/compat/motion";
+import { createEffect, createSignal, onSettled, Show, untrack, type Component } from "solid-js";
+import { Portal } from "@solidjs/web";
 
 import { VariantOOS1 } from "../variant-oos1/index";
 import { PickerHostContext, type DialogVariantProps, type InquirySubjectId } from "./kit";
@@ -10,7 +10,7 @@ import { LetterDialog } from "./variants/letter";
 import { RouteDialog } from "./variants/route";
 import { SplitDialog } from "./variants/split";
 
-const VARIANTS: { name: string; Component: ComponentType<DialogVariantProps> }[] = [
+const VARIANTS: { name: string; Component: Component<DialogVariantProps> }[] = [
   { name: "Split", Component: SplitDialog },
   { name: "Drawer", Component: DrawerDialog },
   { name: "Route", Component: RouteDialog },
@@ -170,57 +170,60 @@ const SPLIT_STATES = [
   { id: "long-text", label: "Long Text" },
 ] as const;
 
-export function ContactDialogLab({
-  initial,
-  state = "pristine",
-}: {
-  initial: number;
-  state?: string;
-}) {
-  const [current, setCurrent] = useState(() => clampIndex(initial));
-  const [activeState, setActiveState] = useState(() =>
-    SPLIT_STATES.some((s) => s.id === state) ? state : "pristine",
+export function ContactDialogLab(props: { initial: number; state?: string }) {
+  const [current, setCurrent] = createSignal(untrack(() => clampIndex(props.initial)));
+  const [activeState, setActiveState] = createSignal<string>(
+    untrack(() => {
+      const state = props.state ?? "pristine";
+      return SPLIT_STATES.some((s) => s.id === state) ? state : "pristine";
+    }),
   );
-  const [switcherVisible, setSwitcherVisible] = useState(true);
-  const [mountKey, setMountKey] = useState(0);
-  const [open, setOpen] = useState(true);
-  const [subject, setSubject] = useState<InquirySubjectId | null>(null);
-  const [mounted, setMounted] = useState(false);
-  const [pickerHost, setPickerHost] = useState<HTMLElement | null>(null);
-  const [readyHost, setReadyHost] = useState<HTMLElement | null | undefined>(undefined);
-  const highlightRef = useRef<HTMLSpanElement>(null);
-  const itemRefs = useRef<(HTMLButtonElement | null)[]>([]);
-  useEffect(() => {
+  const [switcherVisible, setSwitcherVisible] = createSignal(true);
+  const [mountKey, setMountKey] = createSignal(0);
+  const [open, setOpen] = createSignal(true);
+  const [subject, setSubject] = createSignal<InquirySubjectId | null>(null);
+  const [mounted, setMounted] = createSignal(false);
+  const [pickerHost, setPickerHost] = createSignal<HTMLElement | null>(null);
+  const [readyHost, setReadyHost] = createSignal<HTMLElement | null | undefined>(undefined);
+  let highlightEl: HTMLSpanElement | undefined;
+  const itemEls: (HTMLButtonElement | undefined)[] = [];
+  onSettled(() => {
     const id = setTimeout(() => setMounted(true), 0);
     return () => clearTimeout(id);
-  }, []);
+  });
 
   const moveHighlight = () => {
-    const item = itemRefs.current[current];
-    const highlight = highlightRef.current;
+    const item = itemEls[untrack(current)];
+    const highlight = highlightEl;
     if (!item || !highlight) return;
     highlight.style.width = `${item.offsetWidth}px`;
     highlight.style.transform = `translateX(${item.offsetLeft}px)`;
   };
 
-  useLayoutEffect(moveHighlight);
+  createEffect(
+    () => [current(), mounted(), pickerHost()],
+    () => moveHighlight(),
+  );
 
-  useEffect(() => {
+  onSettled(() => {
     window.addEventListener("resize", moveHighlight);
     return () => window.removeEventListener("resize", moveHighlight);
   });
 
-  useEffect(() => {
-    if (!mounted) return;
-    let second = 0;
-    const first = requestAnimationFrame(() => {
-      second = requestAnimationFrame(() => setReadyHost(pickerHost));
-    });
-    return () => {
-      cancelAnimationFrame(first);
-      cancelAnimationFrame(second);
-    };
-  }, [mounted, pickerHost]);
+  createEffect(
+    () => [mounted(), pickerHost()] as const,
+    ([isMounted, host]) => {
+      if (!isMounted) return;
+      let second = 0;
+      const first = requestAnimationFrame(() => {
+        second = requestAnimationFrame(() => setReadyHost(host));
+      });
+      return () => {
+        cancelAnimationFrame(first);
+        cancelAnimationFrame(second);
+      };
+    },
+  );
 
   const openDialog = (nextSubject: InquirySubjectId | null) => {
     setSubject(nextSubject);
@@ -244,13 +247,13 @@ export function ContactDialogLab({
     window.history.replaceState(window.history.state, "", url);
   };
 
-  useEffect(() => {
+  onSettled(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       const target = event.target as HTMLElement;
       if (/^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName) || target.isContentEditable) return;
       if (event.metaKey || event.ctrlKey || event.altKey) return;
 
-      if (current === 0) {
+      if (current() === 0) {
         if (event.key === "h" || event.key === "H") {
           setSwitcherVisible((v) => !v);
           return;
@@ -260,7 +263,7 @@ export function ContactDialogLab({
           switchState(SPLIT_STATES[digit - 1].id);
           return;
         }
-        const currentIndex = SPLIT_STATES.findIndex((s) => s.id === activeState);
+        const currentIndex = SPLIT_STATES.findIndex((s) => s.id === activeState());
         if (event.key === "ArrowRight") {
           switchState(SPLIT_STATES[(currentIndex + 1) % SPLIT_STATES.length].id);
           return;
@@ -273,13 +276,13 @@ export function ContactDialogLab({
         }
       }
 
-      if (event.key === "r" || event.key === "R") openDialog(subject);
+      if (event.key === "r" || event.key === "R") openDialog(subject());
     };
     document.addEventListener("keydown", onKeyDown);
     return () => document.removeEventListener("keydown", onKeyDown);
   });
 
-  useEffect(() => {
+  onSettled(() => {
     const onClick = (event: MouseEvent) => {
       if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey)
         return;
@@ -291,83 +294,83 @@ export function ContactDialogLab({
     };
     document.addEventListener("click", onClick, true);
     return () => document.removeEventListener("click", onClick, true);
-  }, []);
+  });
 
-  const Variant = VARIANTS[current].Component;
-
-  const picker = (
-    <nav
-      className="proto-picker"
-      aria-label="Prototype variants"
-      data-position="top"
-      data-ready={readyHost === pickerHost ? "" : undefined}
-    >
-      <span ref={highlightRef} className="proto-picker-highlight" aria-hidden="true" />
-      {VARIANTS.map((variant, index) => (
-        <button
-          key={variant.name}
-          ref={(node) => {
-            itemRefs.current[index] = node;
-          }}
-          type="button"
-          className="proto-picker-item"
-          data-active={index === current ? "" : undefined}
-          aria-current={index === current ? "true" : undefined}
-          onClick={() => setActive(index)}
-        >
-          {variant.name}
-        </button>
-      ))}
-      <span className="proto-picker-divider" aria-hidden="true" />
-      <button
-        type="button"
-        className="proto-picker-item proto-picker-replay"
-        aria-label="Replay animation (R)"
-        onClick={() => openDialog(subject)}
-      >
-        ↻
-      </button>
-    </nav>
-  );
+  // React remounted the dialog through `key`; a keyed Show does the same here.
+  const variantKey = () => (open() ? `${current()}-${mountKey()}-${activeState()}` : false);
 
   return (
     <LazyMotion features={domMax} strict>
       <MotionConfig reducedMotion="user">
         <style>{PICKER_CSS}</style>
-        <div {...stylex.props(styles.page)}>
+        <div {...stylex.attrs(styles.page)}>
           <VariantOOS1 startView="contact" />
         </div>
-        {mounted ? (
+        <Show when={mounted()}>
           <PickerHostContext value={setPickerHost}>
-            {open ? (
-              <Variant
-                key={`${current}-${mountKey}-${activeState}`}
-                subject={subject}
-                onClose={() => setOpen(false)}
-                state={activeState}
-              />
-            ) : null}
-            {current === 0 && switcherVisible
-              ? createPortal(
-                  <nav className="state-switcher" aria-label="States">
-                    {SPLIT_STATES.map((s) => (
-                      <button
-                        key={s.id}
-                        type="button"
-                        data-state={s.id}
-                        aria-pressed={activeState === s.id ? "true" : "false"}
-                        onClick={() => switchState(s.id)}
-                      >
-                        {s.label}
-                      </button>
-                    ))}
-                  </nav>,
-                  document.body,
-                )
-              : null}
-            {createPortal(picker, pickerHost ?? document.body)}
+            <Show when={variantKey()} keyed>
+              {(_key) => {
+                const Variant = untrack(() => VARIANTS[current()].Component);
+                return (
+                  <Variant
+                    subject={subject()}
+                    onClose={() => setOpen(false)}
+                    state={activeState()}
+                  />
+                );
+              }}
+            </Show>
+            <Show when={current() === 0 && switcherVisible()}>
+              <Portal mount={document.body}>
+                <nav class="state-switcher" aria-label="States">
+                  {SPLIT_STATES.map((s) => (
+                    <button
+                      type="button"
+                      data-state={s.id}
+                      aria-pressed={activeState() === s.id ? "true" : "false"}
+                      onClick={() => switchState(s.id)}
+                    >
+                      {s.label}
+                    </button>
+                  ))}
+                </nav>
+              </Portal>
+            </Show>
+            <Portal mount={pickerHost() ?? document.body}>
+              <nav
+                class="proto-picker"
+                aria-label="Prototype variants"
+                data-position="top"
+                data-ready={readyHost() === pickerHost() ? "" : undefined}
+              >
+                <span ref={highlightEl} class="proto-picker-highlight" aria-hidden="true" />
+                {VARIANTS.map((variant, index) => (
+                  <button
+                    ref={(node) => {
+                      itemEls[index] = node;
+                    }}
+                    type="button"
+                    class="proto-picker-item"
+                    data-active={index === current() ? "" : undefined}
+                    aria-current={index === current() ? "true" : undefined}
+                    onClick={() => setActive(index)}
+                  >
+                    {variant.name}
+                  </button>
+                ))}
+                <span class="proto-picker-divider" aria-hidden="true" />
+                <button
+                  type="button"
+                  class="proto-picker-item proto-picker-replay"
+                  aria-label="Replay animation (R)"
+                  onClick={() => openDialog(subject())}
+                >
+                  ↻
+                </button>
+              </nav>
+            </Portal>
           </PickerHostContext>
-        ) : null}
+        </Show>
       </MotionConfig>
     </LazyMotion>
   );

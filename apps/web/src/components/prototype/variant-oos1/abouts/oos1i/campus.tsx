@@ -86,32 +86,31 @@ export function Campus() {
   return (
     <Section id="about-campus" labelledBy="about-campus-title" surface="page" band="below">
       <SectionName id="about-campus-title">{ABOUT_CAMPUS.eyebrow}</SectionName>
-      <div {...stylex.props(base.shell, base.inset)}>
-        <div {...stylex.props(S.grid)}>
+      <div {...stylex.attrs(base.shell, base.inset)}>
+        <div {...stylex.attrs(S.grid)}>
           {ABOUT_CAMPUS.photos.map((photo, index) => (
             <Reveal
-              key={photo.id}
               as="figure"
               delay={(index % 4) * 80}
               sx={[S.tile, photo.span === "feature" && S.feature, photo.span === "wide" && S.wide]}
             >
-              <div {...stylex.props(S.holder, photo.span === "feature" && S.holderCut)}>
+              <div {...stylex.attrs(S.holder, photo.span === "feature" && S.holderCut)}>
                 <button
                   type="button"
                   aria-label={`View larger: ${photo.english}`}
                   onClick={() => lightbox.open(index)}
-                  {...stylex.props(S.button)}
+                  {...stylex.attrs(S.button)}
                 >
                   <img
                     src={photo.src}
                     alt={photo.alt}
                     loading="lazy"
                     decoding="async"
-                    {...stylex.props(S.image)}
+                    {...stylex.attrs(S.image)}
                   />
                 </button>
               </div>
-              <figcaption {...stylex.props(base.quiet)}>{photo.caption}</figcaption>
+              <figcaption {...stylex.attrs(base.quiet)}>{photo.caption}</figcaption>
             </Reveal>
           ))}
         </div>

@@ -124,28 +124,26 @@ export function Hero() {
   const [taglineLead, taglineClose] = ABOUT_BANNER.tagline.split(", ");
 
   return (
-    <section aria-labelledby="about-banner-title" {...stylex.props(s.hero, ui.onPage)}>
-      <div {...stylex.props(ui.shell, ui.inset, ui.grid)}>
-        <div {...stylex.props(s.copy)}>
-          <h1 id="about-banner-title" {...stylex.props(s.title, s.enter, dynamic.delay(150))}>
+    <section aria-labelledby="about-banner-title" {...stylex.attrs(s.hero, ui.onPage)}>
+      <div {...stylex.attrs(ui.shell, ui.inset, ui.grid)}>
+        <div {...stylex.attrs(s.copy)}>
+          <h1 id="about-banner-title" {...stylex.attrs(s.title, s.enter, dynamic.delay(150))}>
             {ABOUT_BANNER.title}
           </h1>
-          <div {...stylex.props(s.lower, s.enter, dynamic.delay(350))}>
-            <p lang="en" {...stylex.props(s.tagline)}>
-              <span {...stylex.props(s.taglineLine)}>{taglineLead},</span>
-              <span {...stylex.props(s.taglineLine)}>{taglineClose}</span>
+          <div {...stylex.attrs(s.lower, s.enter, dynamic.delay(350))}>
+            <p lang="en" {...stylex.attrs(s.tagline)}>
+              <span {...stylex.attrs(s.taglineLine)}>{taglineLead},</span>
+              <span {...stylex.attrs(s.taglineLine)}>{taglineClose}</span>
             </p>
-            <p {...stylex.props(s.lead)}>
+            <p {...stylex.attrs(s.lead)}>
               {ABOUT_BANNER.lead.split(" · ").map((part) => (
-                <span key={part} {...stylex.props(s.leadLine)}>
-                  {part}
-                </span>
+                <span {...stylex.attrs(s.leadLine)}>{part}</span>
               ))}
             </p>
           </div>
         </div>
-        <figure {...stylex.props(ui.figure, s.figure)}>
-          <div {...stylex.props(s.vesselWrap)}>
+        <figure {...stylex.attrs(ui.figure, s.figure)}>
+          <div {...stylex.attrs(s.vesselWrap)}>
             <ArchPhoto
               src={ABOUT_BANNER.image}
               alt={ABOUT_BANNER.alt}
@@ -154,9 +152,9 @@ export function Hero() {
               ratio={s.ratio}
               position={s.photo}
             />
-            <span aria-hidden="true" {...stylex.props(s.drop)} />
+            <span aria-hidden="true" {...stylex.attrs(s.drop)} />
           </div>
-          <figcaption lang="en" {...stylex.props(s.meta)}>
+          <figcaption lang="en" {...stylex.attrs(s.meta)}>
             <span>{ABOUT_BANNER.established}</span>
             <span aria-hidden="true">/</span>
             <span>{ABOUT_BANNER.place}</span>

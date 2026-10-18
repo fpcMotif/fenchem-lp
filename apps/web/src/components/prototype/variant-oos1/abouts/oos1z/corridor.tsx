@@ -1,5 +1,7 @@
 import * as stylex from "@stylexjs/stylex";
-import { ArrowUpRight } from "lucide-react";
+import { transform } from "motion";
+import { createMemo, createSignal, For, onSettled, Show } from "solid-js";
+import { ArrowUpRight } from "@fenchem-lp/ui/components/lucide";
 import {
   m,
   useMotionValueEvent,
@@ -7,8 +9,7 @@ import {
   useSpring,
   useTransform,
   type MotionValue,
-} from "motion/react";
-import { useEffect, useMemo, useRef, useState } from "react";
+} from "@/compat/motion";
 
 import { activeStop, corridorGeometry, linger, STOP_PROGRESS } from "./corridor-geometry";
 import { CorridorScene } from "./corridor-scene";
@@ -108,53 +109,55 @@ const styles = stylex.create({
   },
 });
 
-function Caption({
-  active,
-  opacity,
-  onOpen,
-}: {
+function Caption(props: {
   active: number;
   opacity: MotionValue<number>;
   onOpen: (index: number) => void;
 }) {
-  const work = active < WORKS.length ? WORKS[active] : null;
   return (
-    <m.div style={{ opacity }} {...stylex.props(styles.dock)}>
-      <div key={active} {...stylex.props(styles.plate, work === null && styles.plateLake)}>
-        <span lang="en" {...stylex.props(ui.number, styles.number)}>
-          Nº {work ? work.number : LAKE.number}
-        </span>
-        <span aria-hidden="true" {...stylex.props(styles.rule)} />
-        <span {...stylex.props(styles.title)}>{work ? work.caption : LAKE.title}</span>
-        <span lang="en" {...stylex.props(ui.italic, styles.english)}>
-          {work ? work.english : LAKE.facing}
-        </span>
-        {work ? (
-          <button
-            type="button"
-            onClick={() => onOpen(active)}
-            {...stylex.props(ui.button, ui.focus, styles.view)}
-          >
-            查看<span {...srOnly}>Large view: {work.englishCaption}</span>
-            <ArrowUpRight size={14} strokeWidth={1.5} aria-hidden="true" />
-          </button>
-        ) : null}
-      </div>
+    <m.div style={{ opacity: props.opacity }} {...stylex.attrs(styles.dock)}>
+      <For each={[props.active]}>
+        {(active) => {
+          const work = active < WORKS.length ? WORKS[active] : null;
+          return (
+            <div {...stylex.attrs(styles.plate, work === null && styles.plateLake)}>
+              <span lang="en" {...stylex.attrs(ui.number, styles.number)}>
+                Nº {work ? work.number : LAKE.number}
+              </span>
+              <span aria-hidden="true" {...stylex.attrs(styles.rule)} />
+              <span {...stylex.attrs(styles.title)}>{work ? work.caption : LAKE.title}</span>
+              <span lang="en" {...stylex.attrs(ui.italic, styles.english)}>
+                {work ? work.english : LAKE.facing}
+              </span>
+              {work ? (
+                <button
+                  type="button"
+                  onClick={() => props.onOpen(active)}
+                  {...stylex.attrs(ui.button, ui.focus, styles.view)}
+                >
+                  查看<span {...srOnly}>Large view: {work.englishCaption}</span>
+                  <ArrowUpRight size={14} strokeWidth={1.5} aria-hidden="true" />
+                </button>
+              ) : null}
+            </div>
+          );
+        }}
+      </For>
     </m.div>
   );
 }
 
-export function Corridor({ onOpen }: { onOpen: (index: number) => void }) {
-  const trackRef = useRef<HTMLDivElement>(null);
-  const stageRef = useRef<HTMLDivElement>(null);
-  const activeRef = useRef(0);
-  const [size, setSize] = useState({ width: 1440, height: 820 });
-  const [dwell, setDwell] = useState(0.1);
-  const [active, setActive] = useState(0);
+export function Corridor(props: { onOpen: (index: number) => void }) {
+  let trackRef!: HTMLDivElement;
+  let stageRef!: HTMLDivElement;
+  let activeRef = 0;
+  const [size, setSize] = createSignal({ width: 1440, height: 820 });
+  const [dwell, setDwell] = createSignal(0.1);
+  const [active, setActive] = createSignal(0);
 
-  useEffect(() => {
-    const track = trackRef.current;
-    const stage = stageRef.current;
+  onSettled(() => {
+    const track = trackRef;
+    const stage = stageRef;
     if (!track || !stage) return;
     const measure = () => {
       const width = stage.clientWidth;
@@ -170,23 +173,28 @@ export function Corridor({ onOpen }: { onOpen: (index: number) => void }) {
     const observer = new ResizeObserver(measure);
     observer.observe(stage);
     return () => observer.disconnect();
-  }, []);
+  });
 
-  const geometry = useMemo(() => corridorGeometry(size.width, size.height), [size]);
-  const fadeStart = 1 - dwell;
-  const fillAt = fadeStart - 0.02;
+  const geometry = createMemo(() => corridorGeometry(size().width, size().height));
+  const fadeStart = () => 1 - dwell();
   const lakeAt = STOP_PROGRESS[STOP_PROGRESS.length - 1];
 
-  const { scrollYProgress } = useScroll({ target: trackRef, offset: ["start 80px", "end end"] });
+  const { scrollYProgress } = useScroll({
+    target: () => trackRef,
+    offset: ["start 80px", "end end"],
+  });
   const walk = useSpring(scrollYProgress, { stiffness: 170, damping: 34, mass: 0.6 });
-  const camera = useTransform(
-    walk,
-    [0, ...STOP_PROGRESS, fillAt, 1],
-    [0, ...geometry.stops, geometry.fill, geometry.fill],
-    { ease: [...STOP_PROGRESS.map(() => linger), linger, (x: number) => x] },
+  // The ranges follow the measured stage, so the mapper is rebuilt when they change.
+  const cameraMap = createMemo(() =>
+    transform(
+      [0, ...STOP_PROGRESS, fadeStart() - 0.02, 1],
+      [0, ...geometry().stops, geometry().fill, geometry().fill],
+      { ease: [...STOP_PROGRESS.map(() => linger), linger, (x: number) => x] },
+    ),
   );
-  const veil = useTransform(scrollYProgress, (progress) =>
-    Math.min(1, Math.max(0, 1 - (progress - fadeStart) / (dwell * 0.7))),
+  const camera = useTransform(() => cameraMap()(walk()));
+  const veil = useTransform(() =>
+    Math.min(1, Math.max(0, 1 - (scrollYProgress() - fadeStart()) / (dwell() * 0.7))),
   );
   const reach = useTransform(veil, (value) => (value < 0.05 ? "none" : "auto"));
   const captionOpacity = useTransform(scrollYProgress, (progress) =>
@@ -194,30 +202,32 @@ export function Corridor({ onOpen }: { onOpen: (index: number) => void }) {
   );
 
   useMotionValueEvent(camera, "change", (value) => {
-    const next = activeStop(geometry.stops, value);
-    if (next !== activeRef.current) {
-      activeRef.current = next;
+    const next = activeStop(geometry().stops, value);
+    if (next !== activeRef) {
+      activeRef = next;
       setActive(next);
     }
   });
 
   return (
-    <div ref={trackRef} data-track="" {...stylex.props(styles.track)}>
+    <div ref={trackRef} data-track="" {...stylex.attrs(styles.track)}>
       <m.div
         ref={stageRef}
         style={{ opacity: veil, pointerEvents: reach }}
-        {...stylex.props(styles.stage)}
+        {...stylex.attrs(styles.stage)}
       >
         <div
           aria-hidden="true"
-          style={{ perspective: geometry.perspective }}
-          {...stylex.props(styles.scene)}
+          style={{ perspective: `${geometry().perspective}px` }}
+          {...stylex.attrs(styles.scene)}
         >
-          <m.div style={{ z: camera }} {...stylex.props(styles.world)}>
-            <CorridorScene geometry={geometry} onOpen={onOpen} />
+          <m.div style={{ z: camera }} {...stylex.attrs(styles.world)}>
+            <Show when={geometry()} keyed>
+              {(current) => <CorridorScene geometry={current} onOpen={props.onOpen} />}
+            </Show>
           </m.div>
         </div>
-        <Caption active={active} opacity={captionOpacity} onOpen={onOpen} />
+        <Caption active={active()} opacity={captionOpacity} onOpen={props.onOpen} />
       </m.div>
     </div>
   );

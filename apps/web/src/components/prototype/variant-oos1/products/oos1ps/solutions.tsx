@@ -1,16 +1,10 @@
 import { Collapse } from "../../../shared/collapse";
-import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
+import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { Plus } from "lucide-react";
-import { m } from "motion/react";
-import {
-  useId,
-  useLayoutEffect,
-  useRef,
-  useState,
-  type KeyboardEvent,
-  type ReactNode,
-} from "react";
+import { Plus } from "@fenchem-lp/ui/components/lucide";
+import { m } from "@/compat/motion";
+import { createEffect, createSignal, createUniqueId, For } from "solid-js";
+import type { JSX } from "@solidjs/web";
 
 import { EASE } from "@/components/prototype/motion-constants";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
@@ -19,9 +13,9 @@ import { SOLUTION_ITEMS, type SolutionItem } from "../../products-data";
 import { padIndex } from "../shared/derived";
 import { font, ink, layout, mq, sheetTone } from "./theme.stylex";
 
-const MD = breakpoints.md;
-const LG = breakpoints.lg;
-const DESKTOP = breakpoints.xl;
+const MD = "@media (min-width: 768px)";
+const LG = "@media (min-width: 1024px)";
+const DESKTOP = "@media (min-width: 1280px)";
 const HEADER_HEIGHT = 80;
 const OPEN_SECONDS = 0.28;
 const HOLD_MS = 380;
@@ -288,73 +282,76 @@ const styles = stylex.create({
   },
 });
 
-function Field({ label, children }: { label: string; children: ReactNode }) {
+function Field(props: { label: string; children: JSX.Element }) {
   return (
-    <div {...stylex.props(styles.field)}>
-      <dt {...stylex.props(styles.fieldLabel)}>{label}</dt>
-      <dd {...stylex.props(styles.fieldValue)}>{children}</dd>
+    <div {...stylex.attrs(styles.field)}>
+      <dt {...stylex.attrs(styles.fieldLabel)}>{props.label}</dt>
+      <dd {...stylex.attrs(styles.fieldValue)}>{props.children}</dd>
     </div>
   );
 }
 
-function Lines({ lines }: { lines: string[] }) {
+function Lines(props: { lines: string[] }) {
   return (
-    <ul {...stylex.props(styles.lines)}>
-      {lines.map((line) => (
-        <m.li
-          layout="position"
-          transition={{ duration: 0.26, ease: EASE }}
-          key={line}
-          {...stylex.props(styles.line)}
-        >
-          {line}
-        </m.li>
-      ))}
+    <ul {...stylex.attrs(styles.lines)}>
+      <For each={props.lines}>
+        {(line) => (
+          <m.li
+            layout="position"
+            transition={{ duration: 0.26, ease: EASE }}
+            {...stylex.attrs(styles.line)}
+          >
+            {line}
+          </m.li>
+        )}
+      </For>
     </ul>
   );
 }
 
-function Phrases({ phrases }: { phrases: string[] }) {
+function Phrases(props: { phrases: string[] }) {
   return (
-    <ul {...stylex.props(styles.phrases)}>
-      {phrases.map((phrase, index) => (
-        <m.li
-          layout="position"
-          transition={{ duration: 0.26, ease: EASE }}
-          key={phrase}
-          {...stylex.props(styles.phrase)}
-        >
-          {index > 0 && (
-            <span aria-hidden="true" {...stylex.props(styles.phraseDot)}>
-              ·
-            </span>
-          )}
-          {phrase}
-        </m.li>
-      ))}
+    <ul {...stylex.attrs(styles.phrases)}>
+      <For each={props.phrases}>
+        {(phrase, index) => (
+          <m.li
+            layout="position"
+            transition={{ duration: 0.26, ease: EASE }}
+            {...stylex.attrs(styles.phrase)}
+          >
+            {index() > 0 && (
+              <span aria-hidden="true" {...stylex.attrs(styles.phraseDot)}>
+                ·
+              </span>
+            )}
+            {phrase}
+          </m.li>
+        )}
+      </For>
     </ul>
   );
 }
 
-function ToggleIcon({ open, reduce }: { open: boolean; reduce: boolean }) {
+function ToggleIcon(props: { open: boolean; reduce: boolean }) {
   return (
     <m.span
       aria-hidden="true"
       initial={false}
-      animate={{ rotate: open ? 45 : 0 }}
-      transition={reduce ? { duration: 0 } : { type: "spring", duration: 0.3, bounce: 0 }}
-      {...stylex.props(styles.icon)}
+      animate={{ rotate: props.open ? 45 : 0 }}
+      transition={props.reduce ? { duration: 0 } : { type: "spring", duration: 0.3, bounce: 0 }}
+      {...stylex.attrs(styles.icon)}
     >
-      <Plus size={20} strokeWidth={open ? 1.25 : 1.5} absoluteStrokeWidth />
+      <Plus size={20} strokeWidth={props.open ? 1.25 : 1.5} absoluteStrokeWidth />
     </m.span>
   );
 }
 
-function Spread({ item }: { item: SolutionItem }) {
+function Spread(props: { item: SolutionItem }) {
+  const item = props.item;
   return (
-    <div {...stylex.props(styles.spread)}>
-      <div {...stylex.props(styles.sheet, styles.sheetLeft)}>
-        <dl {...stylex.props(styles.fields)}>
+    <div {...stylex.attrs(styles.spread)}>
+      <div {...stylex.attrs(styles.sheet, styles.sheetLeft)}>
+        <dl {...stylex.attrs(styles.fields)}>
           <Field label="概述">
             <Lines lines={item.overview} />
           </Field>
@@ -366,8 +363,8 @@ function Spread({ item }: { item: SolutionItem }) {
           </Field>
         </dl>
       </div>
-      <div {...stylex.props(styles.sheet, styles.sheetRight)}>
-        <dl {...stylex.props(styles.fields)}>
+      <div {...stylex.attrs(styles.sheet, styles.sheetRight)}>
+        <dl {...stylex.attrs(styles.fields)}>
           {item.challenges.length > 0 && (
             <Field label="配方挑战">
               <Lines lines={item.challenges} />
@@ -385,64 +382,58 @@ function Spread({ item }: { item: SolutionItem }) {
   );
 }
 
-function SheetStrip({
-  item,
-  index,
-  open,
-  reduce,
-  triggerRef,
-  onToggle,
-  onKeyDown,
-}: {
+function SheetStrip(props: {
   item: SolutionItem;
   index: number;
   open: boolean;
   reduce: boolean;
-  triggerRef: (node: HTMLButtonElement | null) => void;
+  triggerRef: (node: HTMLButtonElement) => void;
   onToggle: () => void;
-  onKeyDown: (event: KeyboardEvent<HTMLButtonElement>) => void;
+  onKeyDown: (event: KeyboardEvent) => void;
 }) {
-  const triggerId = useId();
-  const panelId = useId();
+  const item = props.item;
+  const triggerId = createUniqueId();
+  const panelId = createUniqueId();
 
   return (
     <m.li
       layout="position"
       transition={{ duration: 0.26, ease: EASE }}
-      {...stylex.props(styles.strip, open && styles.stripOpen)}
+      {...stylex.attrs(styles.strip, props.open && styles.stripOpen)}
     >
-      <h3 {...stylex.props(styles.heading)}>
+      <h3 {...stylex.attrs(styles.heading)}>
         <button
-          ref={triggerRef}
+          ref={props.triggerRef}
           id={triggerId}
           type="button"
-          aria-expanded={open}
-          aria-controls={open ? panelId : undefined}
-          onClick={onToggle}
-          onKeyDown={onKeyDown}
-          {...stylex.props(styles.trigger)}
+          aria-expanded={props.open ? "true" : "false"}
+          aria-controls={props.open ? panelId : undefined}
+          onClick={() => props.onToggle()}
+          onKeyDown={(event) => props.onKeyDown(event)}
+          {...stylex.attrs(styles.trigger)}
         >
-          <span aria-hidden="true" {...stylex.props(styles.number, open && styles.numberOpen)}>
-            {padIndex(index)}
+          <span
+            aria-hidden="true"
+            {...stylex.attrs(styles.number, props.open && styles.numberOpen)}
+          >
+            {padIndex(props.index)}
           </span>
-          <span {...stylex.props(styles.name)}>{item.title}</span>
-          <span {...stylex.props(styles.subtitle)}>{item.subtitle}</span>
-          <span {...stylex.props(styles.texture)}>
-            <span {...stylex.props(styles.textureLabel)}>质地</span>
-            <span {...stylex.props(styles.textureValue)}>{item.texture.join(" · ")}</span>
+          <span {...stylex.attrs(styles.name)}>{item.title}</span>
+          <span {...stylex.attrs(styles.subtitle)}>{item.subtitle}</span>
+          <span {...stylex.attrs(styles.texture)}>
+            <span {...stylex.attrs(styles.textureLabel)}>质地</span>
+            <span {...stylex.attrs(styles.textureValue)}>{item.texture.join(" · ")}</span>
           </span>
-          <ToggleIcon open={open} reduce={reduce} />
+          <ToggleIcon open={props.open} reduce={props.reduce} />
         </button>
       </h3>
       <Collapse
-        key="spread"
         id={panelId}
         role="region"
         aria-labelledby={triggerId}
-        open={open}
-
-        transition={{ duration: reduce ? 0 : OPEN_SECONDS, ease: EASE }}
-        {...stylex.props(styles.clip)}
+        open={props.open}
+        transition={{ duration: props.reduce ? 0 : OPEN_SECONDS, ease: EASE }}
+        {...stylex.attrs(styles.clip)}
       >
         <Spread item={item} />
       </Collapse>
@@ -451,54 +442,57 @@ function SheetStrip({
 }
 
 export function Solutions() {
-  const titleId = useId();
+  const titleId = createUniqueId();
   const reduce = useReducedMotion();
-  const [openIndex, setOpenIndex] = useState<number | null>(0);
-  const triggers = useRef<(HTMLButtonElement | null)[]>([]);
-  const anchor = useRef<{ index: number; top: number } | null>(null);
+  const [openIndex, setOpenIndex] = createSignal<number | null>(0);
+  const triggers: (HTMLButtonElement | undefined)[] = [];
+  let anchor: { index: number; top: number } | null = null;
 
-  useLayoutEffect(() => {
-    const pinned = anchor.current;
-    anchor.current = null;
-    const trigger = pinned ? triggers.current[pinned.index] : null;
-    if (!pinned || !trigger) return;
+  createEffect(
+    () => [openIndex(), reduce()] as const,
+    ([, reduced]) => {
+      const pinned = anchor;
+      anchor = null;
+      const trigger = pinned ? triggers[pinned.index] : undefined;
+      if (!pinned || !trigger) return;
 
-    const hold = () => {
-      const drift = trigger.getBoundingClientRect().top - pinned.top;
-      if (Math.abs(drift) >= 1) window.scrollBy({ top: drift, behavior: "instant" });
-    };
-    const reveal = () => {
-      const top = trigger.getBoundingClientRect().top;
-      const floor = HEADER_HEIGHT + VIEW_MARGIN;
-      if (top < floor) window.scrollBy({ top: top - floor, behavior: "instant" });
-    };
+      const hold = () => {
+        const drift = trigger.getBoundingClientRect().top - pinned.top;
+        if (Math.abs(drift) >= 1) window.scrollBy({ top: drift, behavior: "instant" });
+      };
+      const reveal = () => {
+        const top = trigger.getBoundingClientRect().top;
+        const floor = HEADER_HEIGHT + VIEW_MARGIN;
+        if (top < floor) window.scrollBy({ top: top - floor, behavior: "instant" });
+      };
 
-    hold();
-    if (reduce) {
-      reveal();
-      return;
-    }
-    const until = performance.now() + HOLD_MS;
-    let frame = 0;
-    const tick = () => {
       hold();
-      if (performance.now() < until) {
-        frame = requestAnimationFrame(tick);
-      } else {
+      if (reduced) {
         reveal();
+        return;
       }
-    };
-    frame = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(frame);
-  }, [openIndex, reduce]);
+      const until = performance.now() + HOLD_MS;
+      let frame = 0;
+      const tick = () => {
+        hold();
+        if (performance.now() < until) {
+          frame = requestAnimationFrame(tick);
+        } else {
+          reveal();
+        }
+      };
+      frame = requestAnimationFrame(tick);
+      return () => cancelAnimationFrame(frame);
+    },
+  );
 
   const toggle = (index: number) => {
-    const trigger = triggers.current[index];
-    anchor.current = trigger ? { index, top: trigger.getBoundingClientRect().top } : null;
+    const trigger = triggers[index];
+    anchor = trigger ? { index, top: trigger.getBoundingClientRect().top } : null;
     setOpenIndex((current) => (current === index ? null : index));
   };
 
-  const moveFocus = (event: KeyboardEvent<HTMLButtonElement>, index: number) => {
+  const moveFocus = (event: KeyboardEvent, index: number) => {
     const last = SOLUTION_ITEMS.length - 1;
     const target =
       event.key === "ArrowDown"
@@ -512,7 +506,7 @@ export function Solutions() {
               : null;
     if (target === null) return;
     event.preventDefault();
-    triggers.current[target]?.focus();
+    triggers[target]?.focus();
   };
 
   return (
@@ -520,27 +514,26 @@ export function Solutions() {
       id="products-solutions"
       aria-labelledby={titleId}
       lang="zh-CN"
-      {...stylex.props(styles.section)}
+      {...stylex.attrs(styles.section)}
     >
-      <div {...stylex.props(styles.shell)}>
-        <header {...stylex.props(styles.head)}>
-          <h2 id={titleId} {...stylex.props(styles.title)}>
+      <div {...stylex.attrs(styles.shell)}>
+        <header {...stylex.attrs(styles.head)}>
+          <h2 id={titleId} {...stylex.attrs(styles.title)}>
             应用方案
           </h2>
-          <p {...stylex.props(styles.meta)}>
-            <span {...stylex.props(styles.metaCount)}>{SOLUTION_ITEMS.length}</span> 款配方
+          <p {...stylex.attrs(styles.meta)}>
+            <span {...stylex.attrs(styles.metaCount)}>{SOLUTION_ITEMS.length}</span> 款配方
           </p>
         </header>
-        <ol {...stylex.props(styles.stack)}>
+        <ol {...stylex.attrs(styles.stack)}>
           {SOLUTION_ITEMS.map((item, index) => (
             <SheetStrip
-              key={item.id}
               item={item}
               index={index}
-              open={openIndex === index}
-              reduce={reduce}
+              open={openIndex() === index}
+              reduce={reduce()}
               triggerRef={(node) => {
-                triggers.current[index] = node;
+                triggers[index] = node;
               }}
               onToggle={() => toggle(index)}
               onKeyDown={(event) => moveFocus(event, index)}

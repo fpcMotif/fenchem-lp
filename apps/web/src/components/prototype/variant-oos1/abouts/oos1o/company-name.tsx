@@ -11,12 +11,12 @@ const styles = stylex.create({
   },
 });
 
-export function CompanyName({ name }: { name: string }) {
-  if (!name.endsWith(SUFFIX)) return name;
+export function CompanyName(props: { name: string }) {
+  if (!props.name.endsWith(SUFFIX)) return props.name;
   return (
-    <span {...stylex.props(styles.name)}>
-      {name.slice(0, -SUFFIX.length)}
-      <span {...stylex.props(styles.suffix)}>{SUFFIX}</span>
+    <span {...stylex.attrs(styles.name)}>
+      {props.name.slice(0, -SUFFIX.length)}
+      <span {...stylex.attrs(styles.suffix)}>{SUFFIX}</span>
     </span>
   );
 }

@@ -1,7 +1,7 @@
 import { breakpoints, colors, radii, typography } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { ArrowRight, CheckCircle2 } from "lucide-react";
-import { useState } from "react";
+import { ArrowRight, CheckCircle2 } from "@fenchem-lp/ui/components/lucide";
+import { For, Show, createMemo, createSignal } from "solid-js";
 import {
   createInquiryHref,
   getIngredientsByApplication,
@@ -272,47 +272,33 @@ const styles = stylex.create({
     transition: "transform 300ms ease",
   },
 });
-function Chip({
-  label,
-  selected,
-  onSelect,
-}: {
-  label: string;
-  selected: boolean;
-  onSelect: () => void;
-}) {
+function Chip(props: { label: string; selected: boolean; onSelect: () => void }) {
   return (
     <button
       type="button"
-      aria-pressed={selected}
-      onClick={onSelect}
-      {...stylex.props(styles.chip, selected ? styles.chipSelected : styles.chipUnselected)}
+      aria-pressed={props.selected ? "true" : "false"}
+      onClick={props.onSelect}
+      {...stylex.attrs(styles.chip, props.selected ? styles.chipSelected : styles.chipUnselected)}
     >
-      {label}
+      {props.label}
     </button>
   );
 }
-function ChipGroup<T extends string>({
-  legend,
-  options,
-  value,
-  onChange,
-}: {
+function ChipGroup<T extends string>(props: {
   legend: string;
   options: readonly T[];
   value: T;
   onChange: (next: T) => void;
 }) {
   return (
-    <fieldset data-vj-field {...stylex.props(styles.fieldset)}>
-      <legend {...stylex.props(styles.legend)}>{legend}</legend>
-      <div {...stylex.props(styles.chipList)}>
-        {options.map((option) => (
+    <fieldset data-vj-field="" {...stylex.attrs(styles.fieldset)}>
+      <legend {...stylex.attrs(styles.legend)}>{props.legend}</legend>
+      <div {...stylex.attrs(styles.chipList)}>
+        {props.options.map((option) => (
           <Chip
-            key={option}
             label={option}
-            selected={option === value}
-            onSelect={() => onChange(option)}
+            selected={option === props.value}
+            onSelect={() => props.onChange(option)}
           />
         ))}
       </div>
@@ -320,11 +306,11 @@ function ChipGroup<T extends string>({
   );
 }
 export function PresenterSection() {
-  const [application, setApplication] = useState<IngredientApplication>("Nutrition");
-  const [format, setFormat] = useState<(typeof FORMATS)[number]>("Beadlet");
-  const [standard, setStandard] = useState<(typeof STANDARDS)[number]>("ISO 9001 + GMP");
-  const matches = getIngredientsByApplication(application);
-  const shortlist = matches.slice(0, 3);
+  const [application, setApplication] = createSignal<IngredientApplication>("Nutrition");
+  const [format, setFormat] = createSignal<(typeof FORMATS)[number]>("Beadlet");
+  const [standard, setStandard] = createSignal<(typeof STANDARDS)[number]>("ISO 9001 + GMP");
+  const matches = createMemo(() => getIngredientsByApplication(application()));
+  const shortlist = () => matches().slice(0, 3);
   const ref = useSectionAnimation<HTMLElement>((root) => {
     revealWords(root, "[data-vj-heading]");
     riseIn(root, "[data-vj-intro]", {
@@ -338,7 +324,7 @@ export function PresenterSection() {
   });
   const rows: {
     label: string;
-    value: string;
+    value: () => string;
   }[] = [
     {
       label: "Application",
@@ -354,11 +340,11 @@ export function PresenterSection() {
     },
     {
       label: "Matching actives",
-      value: `${matches.length} of ${ingredients.length} in portfolio`,
+      value: () => `${matches().length} of ${ingredients.length} in portfolio`,
     },
     {
       label: "Response",
-      value: "< 24h with full documentation",
+      value: () => "< 24h with full documentation",
     },
   ];
   return (
@@ -366,13 +352,13 @@ export function PresenterSection() {
       ref={ref}
       id="formulation"
       aria-labelledby="formulation-heading"
-      {...stylex.props(styles.section)}
+      {...stylex.attrs(styles.section)}
     >
-      <div {...stylex.props(styles.container)}>
-        <p data-vj-intro {...stylex.props(sharedStyles.techLabel)}>
+      <div {...stylex.attrs(styles.container)}>
+        <p data-vj-intro="" {...stylex.attrs(sharedStyles.techLabel)}>
           04 — Formulation
         </p>
-        <h2 data-vj-heading id="formulation-heading" {...stylex.props(styles.heading)}>
+        <h2 data-vj-heading="" id="formulation-heading" {...stylex.attrs(styles.heading)}>
           <SplitWords
             segments={[
               {
@@ -385,68 +371,73 @@ export function PresenterSection() {
             ]}
           />
         </h2>
-        <p data-vj-intro {...stylex.props(styles.intro)}>
+        <p data-vj-intro="" {...stylex.attrs(styles.intro)}>
           Pick the shape of your formulation — our laboratory returns a validated proposal within
           one business day.
         </p>
 
-        <span data-vj-rule aria-hidden="true" {...stylex.props(styles.rule)} />
+        <span data-vj-rule="" aria-hidden="true" {...stylex.attrs(styles.rule)} />
 
-        <div {...stylex.props(styles.card)}>
-          <div {...stylex.props(styles.groupsGrid)}>
+        <div {...stylex.attrs(styles.card)}>
+          <div {...stylex.attrs(styles.groupsGrid)}>
             <ChipGroup
               legend="Application"
               options={APPLICATIONS}
-              value={application}
+              value={application()}
               onChange={setApplication}
             />
-            <ChipGroup legend="Format" options={FORMATS} value={format} onChange={setFormat} />
+            <ChipGroup legend="Format" options={FORMATS} value={format()} onChange={setFormat} />
             <ChipGroup
               legend="Standard"
               options={STANDARDS}
-              value={standard}
+              value={standard()}
               onChange={setStandard}
             />
           </div>
 
-          <div data-vj-sheet {...stylex.props(styles.sheet)}>
-            <div {...stylex.props(styles.sheetHeader)}>
-              <p {...stylex.props(styles.sheetTitle)}>Formulation brief — live</p>
-              <p {...stylex.props(styles.sheetRef)}>FN-REQ / 2026</p>
+          <div data-vj-sheet="" {...stylex.attrs(styles.sheet)}>
+            <div {...stylex.attrs(styles.sheetHeader)}>
+              <p {...stylex.attrs(styles.sheetTitle)}>Formulation brief — live</p>
+              <p {...stylex.attrs(styles.sheetRef)}>FN-REQ / 2026</p>
             </div>
 
             <div aria-live="polite">
               <dl>
                 {rows.map((row) => (
-                  <div key={row.label} {...stylex.props(styles.row)}>
-                    <dt {...stylex.props(styles.rowLabel)}>{row.label}</dt>
-                    <dd key={row.value} {...stylex.props(styles.rowValue)}>
-                      {row.value}
-                    </dd>
+                  <div {...stylex.attrs(styles.row)}>
+                    <dt {...stylex.attrs(styles.rowLabel)}>{row.label}</dt>
+                    <Show when={row.value()} keyed>
+                      {(value) => <dd {...stylex.attrs(styles.rowValue)}>{value}</dd>}
+                    </Show>
                   </div>
                 ))}
               </dl>
 
-              <ul key={application} {...stylex.props(styles.shortlist)}>
-                {shortlist.map((item, index) => (
-                  <li
-                    key={item.code}
-                    style={{
-                      transitionDelay: `${index * 70}ms`,
-                    }}
-                    {...stylex.props(styles.shortlistItem)}
-                  >
-                    <CheckCircle2 aria-hidden="true" {...stylex.props(styles.checkIcon)} />
-                    <span {...stylex.props(styles.shortlistCode)}>{item.code}</span>
-                    <span {...stylex.props(styles.shortlistName)}>{item.name}</span>
-                  </li>
-                ))}
-              </ul>
+              <Show when={application()} keyed>
+                <>
+                  <ul {...stylex.attrs(styles.shortlist)}>
+                    <For each={shortlist()}>
+                      {(item, index) => (
+                        <li
+                          style={{
+                            "transition-delay": `${index() * 70}ms`,
+                          }}
+                          {...stylex.attrs(styles.shortlistItem)}
+                        >
+                          <CheckCircle2 aria-hidden="true" {...stylex.attrs(styles.checkIcon)} />
+                          <span {...stylex.attrs(styles.shortlistCode)}>{item.code}</span>
+                          <span {...stylex.attrs(styles.shortlistName)}>{item.name}</span>
+                        </li>
+                      )}
+                    </For>
+                  </ul>
+                </>
+              </Show>
             </div>
 
-            <a href={createInquiryHref("contact")} {...stylex.props(styles.submitCta)}>
+            <a href={createInquiryHref("contact")} {...stylex.attrs(styles.submitCta)}>
               Submit this specification
-              <ArrowRight aria-hidden="true" {...stylex.props(styles.submitArrowIcon)} />
+              <ArrowRight aria-hidden="true" {...stylex.attrs(styles.submitArrowIcon)} />
             </a>
           </div>
         </div>

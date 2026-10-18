@@ -1,5 +1,6 @@
 import * as stylex from "@stylexjs/stylex";
-import { useEffect, useId, useRef, type KeyboardEvent } from "react";
+import { createEffect, createUniqueId, For, Show } from "solid-js";
+import type { JSX } from "@solidjs/web";
 
 import { useReducedMotion } from "../../use-reduced-motion";
 import {
@@ -362,23 +363,23 @@ const styles = stylex.create({
   },
 });
 
-function RowValue({ row }: { row: SheetRow }) {
-  if (row.values.length === 0) return <span {...stylex.props(styles.absent)}>无</span>;
-  if (row.kind === "strong") {
-    return <span {...stylex.props(styles.strong)}>{row.values.join(" · ")}</span>;
+function RowValue(props: { row: SheetRow }) {
+  if (props.row.values.length === 0) return <span {...stylex.attrs(styles.absent)}>无</span>;
+  if (props.row.kind === "strong") {
+    return <span {...stylex.attrs(styles.strong)}>{props.row.values.join(" · ")}</span>;
   }
-  if (row.kind === "plain") return <>{row.values.join("、")}</>;
-  if (row.kind === "list") {
+  if (props.row.kind === "plain") return <>{props.row.values.join("、")}</>;
+  if (props.row.kind === "list") {
     return (
-      <ul {...stylex.props(styles.lines)}>
-        {row.values.map((value) => {
+      <ul {...stylex.attrs(styles.lines)}>
+        {props.row.values.map((value) => {
           const { primary, note } = splitNote(value);
           return (
-            <li key={value} {...stylex.props(styles.keepWords)}>
-              <span {...stylex.props(styles.strong)}>
+            <li {...stylex.attrs(styles.keepWords)}>
+              <span {...stylex.attrs(styles.strong)}>
                 {primary.replaceAll(" / ", `${NO_BREAK_SPACE}/ `)}
               </span>
-              {note && <span {...stylex.props(styles.note)}>{note}</span>}
+              {note && <span {...stylex.attrs(styles.note)}>{note}</span>}
             </li>
           );
         })}
@@ -386,38 +387,38 @@ function RowValue({ row }: { row: SheetRow }) {
     );
   }
   return (
-    <ul {...stylex.props(styles.lines, styles.quiet)}>
-      {row.values.map((value) => (
-        <li key={value}>{value}</li>
+    <ul {...stylex.attrs(styles.lines, styles.quiet)}>
+      {props.row.values.map((value) => (
+        <li>{value}</li>
       ))}
     </ul>
   );
 }
 
-function Sheet({ item, position, total }: { item: SolutionItem; position: number; total: number }) {
-  const area = areaOf(item.area);
+function Sheet(props: { item: SolutionItem; position: number; total: number }) {
+  const area = areaOf(props.item.area);
   return (
     <>
       <header>
-        <p {...stylex.props(styles.eyebrow)}>
-          <span {...stylex.props(styles.areaLabel)}>{area?.label}</span>
+        <p {...stylex.attrs(styles.eyebrow)}>
+          <span {...stylex.attrs(styles.areaLabel)}>{area?.label}</span>
           {area && (
-            <span lang="en" {...stylex.props(styles.areaEnglish)}>
+            <span lang="en" {...stylex.attrs(styles.areaEnglish)}>
               {area.englishLabel}
             </span>
           )}
-          <span aria-hidden="true" {...stylex.props(styles.counter)}>
-            {padIndex(position)} / {String(total).padStart(2, "0")}
+          <span aria-hidden="true" {...stylex.attrs(styles.counter)}>
+            {padIndex(props.position)} / {String(props.total).padStart(2, "0")}
           </span>
         </p>
-        <h3 {...stylex.props(styles.title)}>{item.title}</h3>
-        <p {...stylex.props(styles.subtitle)}>{item.subtitle}</p>
+        <h3 {...stylex.attrs(styles.title)}>{props.item.title}</h3>
+        <p {...stylex.attrs(styles.subtitle)}>{props.item.subtitle}</p>
       </header>
-      <dl {...stylex.props(styles.rows)}>
-        {sheetRows(item).map((row) => (
-          <div key={row.label} {...stylex.props(styles.row)}>
-            <dt {...stylex.props(styles.label)}>{row.label}</dt>
-            <dd {...stylex.props(styles.value)}>
+      <dl {...stylex.attrs(styles.rows)}>
+        {sheetRows(props.item).map((row) => (
+          <div {...stylex.attrs(styles.row)}>
+            <dt {...stylex.attrs(styles.label)}>{row.label}</dt>
+            <dd {...stylex.attrs(styles.value)}>
               <RowValue row={row} />
             </dd>
           </div>
@@ -429,141 +430,154 @@ function Sheet({ item, position, total }: { item: SolutionItem; position: number
 
 export function MarginVariant() {
   const browser = useSolutionsBrowser();
-  const { area, scope, groups, selected, position, select } = browser;
-  const uid = useId();
+  const uid = createUniqueId();
   const reduce = useReducedMotion();
-  const indexRef = useRef<HTMLDivElement>(null);
+  let list!: HTMLDivElement;
 
-  useEffect(() => {
-    const list = indexRef.current;
-    const tab = list?.querySelector<HTMLElement>('[aria-selected="true"]');
-    if (!list || !tab) return;
-    const behavior = reduce ? "auto" : "smooth";
-    if (getComputedStyle(list).overflowX === "auto") {
-      if (list.scrollWidth <= list.clientWidth) return;
-      const left = tab.offsetLeft - (list.clientWidth - tab.offsetWidth) / 2;
-      list.scrollTo({ left: Math.max(0, left), behavior });
-      return;
-    }
-    if (list.scrollHeight <= list.clientHeight) return;
-    const computed = getComputedStyle(list);
-    const visibleTop = list.scrollTop + (Number.parseFloat(computed.scrollPaddingTop) || 0);
-    const visibleBottom =
-      list.scrollTop + list.clientHeight - (Number.parseFloat(computed.paddingBottom) || 0);
-    if (tab.offsetTop >= visibleTop && tab.offsetTop + tab.offsetHeight <= visibleBottom) return;
-    const top = tab.offsetTop - (list.clientHeight - tab.offsetHeight) / 2;
-    list.scrollTo({ top: Math.max(0, top), behavior });
-  }, [area, selected.id, reduce]);
+  createEffect(
+    () => [browser.area, browser.selected.id, reduce()] as const,
+    ([, , reduced]) => {
+      const tab = list.querySelector<HTMLElement>('[aria-selected="true"]');
+      if (!tab) return;
+      const behavior = reduced ? "auto" : "smooth";
+      if (getComputedStyle(list).overflowX === "auto") {
+        if (list.scrollWidth <= list.clientWidth) return;
+        const left = tab.offsetLeft - (list.clientWidth - tab.offsetWidth) / 2;
+        list.scrollTo({ left: Math.max(0, left), behavior });
+        return;
+      }
+      if (list.scrollHeight <= list.clientHeight) return;
+      const computed = getComputedStyle(list);
+      const visibleTop = list.scrollTop + (Number.parseFloat(computed.scrollPaddingTop) || 0);
+      const visibleBottom =
+        list.scrollTop + list.clientHeight - (Number.parseFloat(computed.paddingBottom) || 0);
+      if (tab.offsetTop >= visibleTop && tab.offsetTop + tab.offsetHeight <= visibleBottom) return;
+      const top = tab.offsetTop - (list.clientHeight - tab.offsetHeight) / 2;
+      list.scrollTo({ top: Math.max(0, top), behavior });
+    },
+  );
 
-  const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+  const handleKeyDown: JSX.EventHandler<HTMLDivElement, KeyboardEvent> = (event) => {
     const step = TAB_STEPS[event.key];
     if (!step) return;
     event.preventDefault();
     event.stopPropagation();
-    const next = step(position, scope.length);
-    const nextItem = scope[next];
+    const next = step(browser.position, browser.scope.length);
+    const nextItem = browser.scope[next];
     if (!nextItem) return;
-    select(nextItem.id);
+    browser.select(nextItem.id);
     event.currentTarget
       .querySelectorAll<HTMLElement>('[role="tab"]')
       [next]?.focus({ preventScroll: true });
   };
 
-  const showHeadings = groups.length > 1;
+  const showHeadings = () => browser.groups.length > 1;
 
   return (
     <LabSection>
       <AreaChips browser={browser} />
-      <div {...stylex.props(styles.layout)}>
-        <div {...stylex.props(styles.indexFrame)}>
+      <div {...stylex.attrs(styles.layout)}>
+        <div {...stylex.attrs(styles.indexFrame)}>
           <div
-            ref={indexRef}
+            ref={list}
             role="tablist"
             aria-label="应用方案"
             aria-orientation="vertical"
             onKeyDown={handleKeyDown}
-            {...stylex.props(styles.index)}
+            {...stylex.attrs(styles.index)}
           >
-            {groups.map((group, groupIndex) => (
-              <div
-                key={group.id}
-                {...stylex.props(styles.group, groupIndex > 0 && styles.groupFollow)}
-              >
-                {showHeadings && (
-                  <p
-                    aria-hidden="true"
-                    {...stylex.props(
-                      styles.groupHeading,
-                      groupIndex > 0 && styles.groupHeadingFollow,
-                    )}
-                  >
-                    {group.label}
-                    <span {...stylex.props(styles.groupCount)}>{group.items.length} 款</span>
-                  </p>
-                )}
-                {group.items.map((item) => {
-                  const isSelected = item.id === selected.id;
-                  return (
-                    <button
-                      key={item.id}
-                      type="button"
-                      role="tab"
-                      id={`${uid}-tab-${item.id}`}
-                      aria-selected={isSelected}
-                      aria-controls={`${uid}-panel`}
-                      tabIndex={isSelected ? 0 : -1}
-                      onClick={() => select(item.id)}
-                      {...stylex.props(
-                        styles.tab,
-                        isSelected && styles.tabSelected,
-                        stylex.defaultMarker(),
+            <For each={browser.groups}>
+              {(group, groupIndex) => (
+                <div {...stylex.attrs(styles.group, groupIndex() > 0 && styles.groupFollow)}>
+                  <Show when={showHeadings()}>
+                    <p
+                      aria-hidden="true"
+                      {...stylex.attrs(
+                        styles.groupHeading,
+                        groupIndex() > 0 && styles.groupHeadingFollow,
                       )}
                     >
-                      <span {...stylex.props(styles.nameRow)}>
-                        <span
-                          aria-hidden="true"
-                          {...stylex.props(styles.number, isSelected && styles.numberSelected)}
+                      {group.label}
+                      <span {...stylex.attrs(styles.groupCount)}>{group.items.length} 款</span>
+                    </p>
+                  </Show>
+                  <For each={group.items}>
+                    {(item) => {
+                      const isSelected = () => item.id === browser.selected.id;
+                      return (
+                        <button
+                          type="button"
+                          role="tab"
+                          id={`${uid}-tab-${item.id}`}
+                          aria-selected={isSelected() ? "true" : "false"}
+                          aria-controls={`${uid}-panel`}
+                          tabindex={isSelected() ? 0 : -1}
+                          onClick={() => browser.select(item.id)}
+                          {...stylex.attrs(
+                            styles.tab,
+                            isSelected() && styles.tabSelected,
+                            stylex.defaultMarker(),
+                          )}
                         >
-                          {padIndex(scope.indexOf(item))}
-                        </span>
-                        <span {...stylex.props(styles.nameBox)}>
-                          <span {...stylex.props(styles.nameStack)}>
+                          <span {...stylex.attrs(styles.nameRow)}>
                             <span
-                              {...stylex.props(
-                                styles.nameText,
-                                isSelected && styles.nameTextSelected,
+                              aria-hidden="true"
+                              {...stylex.attrs(
+                                styles.number,
+                                isSelected() && styles.numberSelected,
                               )}
                             >
-                              {item.title}
+                              {padIndex(browser.scope.indexOf(item))}
                             </span>
-                            <span aria-hidden="true" {...stylex.props(styles.nameGhost)}>
-                              {item.title}
+                            <span {...stylex.attrs(styles.nameBox)}>
+                              <span {...stylex.attrs(styles.nameStack)}>
+                                <span
+                                  {...stylex.attrs(
+                                    styles.nameText,
+                                    isSelected() && styles.nameTextSelected,
+                                  )}
+                                >
+                                  {item.title}
+                                </span>
+                                <span aria-hidden="true" {...stylex.attrs(styles.nameGhost)}>
+                                  {item.title}
+                                </span>
+                              </span>
+                              <span
+                                aria-hidden="true"
+                                {...stylex.attrs(
+                                  styles.leader,
+                                  isSelected() && styles.leaderSelected,
+                                )}
+                              />
                             </span>
                           </span>
-                          <span
-                            aria-hidden="true"
-                            {...stylex.props(styles.leader, isSelected && styles.leaderSelected)}
-                          />
-                        </span>
-                      </span>
-                      <span {...stylex.props(styles.functions)}>{item.functions.join(" · ")}</span>
-                    </button>
-                  );
-                })}
-              </div>
-            ))}
+                          <span {...stylex.attrs(styles.functions)}>
+                            {item.functions.join(" · ")}
+                          </span>
+                        </button>
+                      );
+                    }}
+                  </For>
+                </div>
+              )}
+            </For>
           </div>
         </div>
         <div
           role="tabpanel"
           id={`${uid}-panel`}
-          aria-labelledby={`${uid}-tab-${selected.id}`}
-          tabIndex={0}
-          {...stylex.props(styles.sheet)}
+          aria-labelledby={`${uid}-tab-${browser.selected.id}`}
+          tabindex={0}
+          {...stylex.attrs(styles.sheet)}
         >
-          <div key={selected.id} {...stylex.props(styles.panel)}>
-            <Sheet item={selected} position={position} total={scope.length} />
-          </div>
+          <Show when={browser.selected} keyed>
+            {(item) => (
+              <div {...stylex.attrs(styles.panel)}>
+                <Sheet item={item} position={browser.position} total={browser.scope.length} />
+              </div>
+            )}
+          </Show>
         </div>
       </div>
     </LabSection>

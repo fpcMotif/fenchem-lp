@@ -14,7 +14,13 @@ const styles = stylex.create({
 
 export function InkDefs() {
   return (
-    <svg aria-hidden="true" focusable="false" width="0" height="0" {...stylex.props(styles.defs)}>
+    <svg
+      aria-hidden="true"
+      {...{ focusable: "false" }}
+      width="0"
+      height="0"
+      {...stylex.attrs(styles.defs)}
+    >
       <defs>
         <filter
           id={INK_FILTER_ID}
@@ -22,7 +28,7 @@ export function InkDefs() {
           y="-8%"
           width="116%"
           height="116%"
-          colorInterpolationFilters="sRGB"
+          color-interpolation-filters="sRGB"
         >
           <feTurbulence
             type="fractalNoise"

@@ -1,7 +1,7 @@
-import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
+import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
-import { useId, useState } from "react";
+import { ChevronDown, ChevronLeft, ChevronRight } from "@fenchem-lp/ui/components/lucide";
+import { createSignal, createUniqueId, For } from "solid-js";
 
 import { SOLUTION_ITEMS, type SolutionItem } from "../../products-data";
 import { padIndex } from "../shared/derived";
@@ -23,9 +23,9 @@ const BODY_FONT =
 const NUMERAL_FONT = '"Inter Tight", "Source Han Sans SC", "Noto Sans SC", sans-serif';
 
 const TABLET = "@media (min-width: 768px) and (max-width: 1279.98px)";
-const DESKTOP = breakpoints.xl;
-const MD = breakpoints.md;
-const LG = breakpoints.lg;
+const DESKTOP = "@media (min-width: 1280px)";
+const MD = "@media (min-width: 768px)";
+const LG = "@media (min-width: 1024px)";
 const INSET = "min(120px, 8.333vw)";
 const HEADER_HEIGHT = 80;
 const SHEET_PAD = { default: 20, [MD]: 32, [DESKTOP]: 48 } as const;
@@ -134,7 +134,10 @@ const styles = stylex.create({
     cursor: "pointer",
     transform: {
       default: null,
-      ":active": { default: null, [breakpoints.motionOk]: "scale(0.96)" },
+      ":active": {
+        default: null,
+        ["@media (prefers-reduced-motion: no-preference)"]: "scale(0.96)",
+      },
     },
     transitionProperty: "color, border-color, transform",
     transitionDuration: "150ms",
@@ -229,7 +232,7 @@ const styles = stylex.create({
     opacity: 0,
     visibility: "hidden",
     transitionProperty: "opacity, visibility",
-    transitionDuration: { default: "140ms", [breakpoints.motionReduce]: "0ms" },
+    transitionDuration: { default: "140ms", ["@media (prefers-reduced-motion: reduce)"]: "0ms" },
     transitionTimingFunction: "ease",
   },
   pageActive: {
@@ -237,8 +240,8 @@ const styles = stylex.create({
     opacity: 1,
     visibility: "visible",
     animationName: fadeIn,
-    animationDuration: { default: "240ms", [breakpoints.motionReduce]: "0ms" },
-    animationDelay: { default: "60ms", [breakpoints.motionReduce]: "0ms" },
+    animationDuration: { default: "240ms", ["@media (prefers-reduced-motion: reduce)"]: "0ms" },
+    animationDelay: { default: "60ms", ["@media (prefers-reduced-motion: reduce)"]: "0ms" },
     animationFillMode: "backwards",
     animationTimingFunction: EASE_OUT_CSS,
   },
@@ -341,23 +344,21 @@ const styles = stylex.create({
   },
 });
 
-function FieldRow({ label, values }: { label: string; values: string[] }) {
+function FieldRow(props: { label: string; values: string[] }) {
   return (
-    <div {...stylex.props(styles.field)}>
-      <dt {...stylex.props(styles.fieldLabel)}>{label}</dt>
-      <dd {...stylex.props(styles.fieldValue)}>
-        {values.length > 0 ? (
-          <ul {...stylex.props(styles.lines)}>
-            {values.map((value) => (
-              <li key={value} {...stylex.props(styles.line)}>
-                {value}
-              </li>
-            ))}
+    <div {...stylex.attrs(styles.field)}>
+      <dt {...stylex.attrs(styles.fieldLabel)}>{props.label}</dt>
+      <dd {...stylex.attrs(styles.fieldValue)}>
+        {props.values.length > 0 ? (
+          <ul {...stylex.attrs(styles.lines)}>
+            <For each={props.values}>
+              {(value) => <li {...stylex.attrs(styles.line)}>{value}</li>}
+            </For>
           </ul>
         ) : (
-          <span {...stylex.props(styles.empty)}>
+          <span {...stylex.attrs(styles.empty)}>
             <span aria-hidden="true">—</span>
-            <span {...stylex.props(styles.srOnly)}>Not provided</span>
+            <span {...stylex.attrs(styles.srOnly)}>Not provided</span>
           </span>
         )}
       </dd>
@@ -365,27 +366,23 @@ function FieldRow({ label, values }: { label: string; values: string[] }) {
   );
 }
 
-function SheetPage({
-  item,
-  index,
-  active,
-}: {
-  item: SolutionItem;
-  index: number;
-  active: boolean;
-}) {
+function SheetPage(props: { item: SolutionItem; index: number; active: boolean }) {
+  const item = props.item;
   return (
-    <article inert={!active} {...stylex.props(styles.page, active && styles.pageActive)}>
-      <header {...stylex.props(styles.sheetHead)}>
-        <p {...stylex.props(styles.sheetIndex)}>{padIndex(index)}</p>
-        <h3 {...stylex.props(styles.sheetTitle)}>{item.title}</h3>
-        <p {...stylex.props(styles.sheetSubtitle)}>{item.subtitle}</p>
+    <article
+      inert={!props.active}
+      {...stylex.attrs(styles.page, props.active && styles.pageActive)}
+    >
+      <header {...stylex.attrs(styles.sheetHead)}>
+        <p {...stylex.attrs(styles.sheetIndex)}>{padIndex(props.index)}</p>
+        <h3 {...stylex.attrs(styles.sheetTitle)}>{item.title}</h3>
+        <p {...stylex.attrs(styles.sheetSubtitle)}>{item.subtitle}</p>
       </header>
-      <div {...stylex.props(styles.split)}>
+      <div {...stylex.attrs(styles.split)}>
         {SPLIT.map((fields, half) => (
-          <dl key={fields[0]?.key} {...stylex.props(styles.half, half === 1 && styles.halfSecond)}>
+          <dl {...stylex.attrs(styles.half, half === 1 && styles.halfSecond)}>
             {fields.map((field) => (
-              <FieldRow key={field.key} label={field.label} values={item[field.key]} />
+              <FieldRow label={field.label} values={item[field.key]} />
             ))}
           </dl>
         ))}
@@ -395,55 +392,57 @@ function SheetPage({
 }
 
 export function Solutions() {
-  const titleId = useId();
-  const sheetId = useId();
-  const selectId = useId();
-  const [activeIndex, setActiveIndex] = useState(0);
-  const atStart = activeIndex === 0;
-  const atEnd = activeIndex === TOTAL - 1;
-  const activeItem = SOLUTION_ITEMS[activeIndex];
+  const titleId = createUniqueId();
+  const sheetId = createUniqueId();
+  const selectId = createUniqueId();
+  const [activeIndex, setActiveIndex] = createSignal(0);
+  const atStart = () => activeIndex() === 0;
+  const atEnd = () => activeIndex() === TOTAL - 1;
+  const activeItem = () => SOLUTION_ITEMS[activeIndex()];
 
   const goTo = (index: number) => {
     setActiveIndex(Math.min(Math.max(index, 0), TOTAL - 1));
   };
 
   return (
-    <section id="products-solutions" aria-labelledby={titleId} {...stylex.props(styles.section)}>
-      <div {...stylex.props(styles.shell)}>
-        <header {...stylex.props(styles.head)}>
-          <h2 id={titleId} {...stylex.props(styles.title)}>
+    <section id="products-solutions" aria-labelledby={titleId} {...stylex.attrs(styles.section)}>
+      <div {...stylex.attrs(styles.shell)}>
+        <header {...stylex.attrs(styles.head)}>
+          <h2 id={titleId} {...stylex.attrs(styles.title)}>
             应用方案
           </h2>
         </header>
 
-        <div {...stylex.props(styles.route)}>
+        <div {...stylex.attrs(styles.route)}>
           <button
             type="button"
             aria-label="Previous"
             aria-controls={sheetId}
-            aria-disabled={atStart}
+            aria-disabled={atStart() ? "true" : "false"}
             onClick={() => {
-              if (!atStart) goTo(activeIndex - 1);
+              if (!atStart()) goTo(activeIndex() - 1);
             }}
-            {...stylex.props(styles.iconButton, styles.prev, atStart && styles.iconButtonDisabled)}
+            {...stylex.attrs(
+              styles.iconButton,
+              styles.prev,
+              atStart() && styles.iconButtonDisabled,
+            )}
           >
             <ChevronLeft size={18} strokeWidth={1.5} absoluteStrokeWidth aria-hidden="true" />
           </button>
-          <div {...stylex.props(styles.selectWrap)}>
-            <label htmlFor={selectId} {...stylex.props(styles.srOnly)}>
+          <div {...stylex.attrs(styles.selectWrap)}>
+            <label for={selectId} {...stylex.attrs(styles.srOnly)}>
               Choose an application solution
             </label>
             <select
               id={selectId}
-              value={activeIndex}
+              value={activeIndex()}
               aria-controls={sheetId}
-              onChange={(event) => goTo(Number(event.target.value))}
-              {...stylex.props(styles.select)}
+              onChange={(event) => goTo(Number(event.currentTarget.value))}
+              {...stylex.attrs(styles.select)}
             >
               {SOLUTION_ITEMS.map((item, index) => (
-                <option key={item.id} value={index}>
-                  {`${padIndex(index)} ${item.title}`}
-                </option>
+                <option value={index}>{`${padIndex(index)} ${item.title}`}</option>
               ))}
             </select>
             <ChevronDown
@@ -451,32 +450,32 @@ export function Solutions() {
               strokeWidth={1.5}
               absoluteStrokeWidth
               aria-hidden="true"
-              {...stylex.props(styles.selectIcon)}
+              {...stylex.attrs(styles.selectIcon)}
             />
           </div>
           <button
             type="button"
             aria-label="Next"
             aria-controls={sheetId}
-            aria-disabled={atEnd}
+            aria-disabled={atEnd() ? "true" : "false"}
             onClick={() => {
-              if (!atEnd) goTo(activeIndex + 1);
+              if (!atEnd()) goTo(activeIndex() + 1);
             }}
-            {...stylex.props(styles.iconButton, styles.next, atEnd && styles.iconButtonDisabled)}
+            {...stylex.attrs(styles.iconButton, styles.next, atEnd() && styles.iconButtonDisabled)}
           >
             <ChevronRight size={18} strokeWidth={1.5} absoluteStrokeWidth aria-hidden="true" />
           </button>
-          <p aria-live="polite" {...stylex.props(styles.counter)}>
-            <span {...stylex.props(styles.counterCurrent)}>{padIndex(activeIndex)}</span>
+          <p aria-live="polite" {...stylex.attrs(styles.counter)}>
+            <span {...stylex.attrs(styles.counterCurrent)}>{padIndex(activeIndex())}</span>
             {` / ${padIndex(TOTAL - 1)}`}
-            <span {...stylex.props(styles.srOnly)}>{activeItem?.englishName}</span>
+            <span {...stylex.attrs(styles.srOnly)}>{activeItem()?.englishName}</span>
           </p>
         </div>
 
-        <div id={sheetId} {...stylex.props(styles.sheet)}>
-          <div {...stylex.props(styles.stack)}>
+        <div id={sheetId} {...stylex.attrs(styles.sheet)}>
+          <div {...stylex.attrs(styles.stack)}>
             {SOLUTION_ITEMS.map((item, index) => (
-              <SheetPage key={item.id} item={item} index={index} active={index === activeIndex} />
+              <SheetPage item={item} index={index} active={index === activeIndex()} />
             ))}
           </div>
         </div>

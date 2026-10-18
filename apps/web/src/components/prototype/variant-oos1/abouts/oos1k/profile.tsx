@@ -4,6 +4,8 @@ import { ABOUT_HERO } from "../../about-data";
 import { ChartHeading, useDusk } from "./shared";
 import { srOnly, ui } from "./shared-values";
 import { bp, face, sky } from "./tokens.stylex";
+import { dynamic } from "@solidjs/web";
+import { merge } from "solid-js";
 
 type Country = (typeof ABOUT_HERO.countries)[number];
 type Side = "end" | "start";
@@ -212,15 +214,7 @@ const anchor = stylex.create({
   start: (right: string, top: string) => ({ right, top }),
 });
 
-function Label({
-  point,
-  number,
-  zh,
-  en,
-  hub = false,
-  hidden,
-  delay,
-}: {
+function Label(props: {
   point: Point;
   number: number;
   zh: string;
@@ -229,31 +223,32 @@ function Label({
   hidden: boolean;
   delay: number;
 }) {
-  const Tag = hub ? "p" : "li";
-  const end = point.side === "end";
-  const numeral = (
-    <span aria-hidden="true" {...stylex.props(ui.designation, styles.number)}>
-      {number}
+  const p = merge({ hub: false }, props);
+  const Tag = dynamic(() => (p.hub ? "p" : "li"));
+  const end = p.point.side === "end";
+  const numeral = () => (
+    <span aria-hidden="true" {...stylex.attrs(ui.designation, styles.number)}>
+      {p.number}
     </span>
   );
   return (
     <Tag
-      {...stylex.props(
+      {...stylex.attrs(
         styles.label,
         end ? styles.labelEnd : styles.labelStart,
         end
-          ? anchor.end(`${point.x}%`, `${point.y}%`)
-          : anchor.start(`${100 - point.x}%`, `${point.y}%`),
+          ? anchor.end(`${p.point.x}%`, `${p.point.y}%`)
+          : anchor.start(`${100 - p.point.x}%`, `${p.point.y}%`),
         ui.dim,
-        hidden && ui.dimHidden,
-        ui.dimDelay(delay),
+        p.hidden && ui.dimHidden,
+        ui.dimDelay(p.delay),
       )}
     >
-      {end ? numeral : null}
-      <span {...stylex.props(styles.zh, hub && styles.hubZh)}>{zh}</span>
-      {end ? null : numeral}
-      <span lang="en" {...stylex.props(ui.label, styles.en, end ? styles.enEnd : styles.enStart)}>
-        {en}
+      {end ? numeral() : null}
+      <span {...stylex.attrs(styles.zh, p.hub && styles.hubZh)}>{p.zh}</span>
+      {end ? null : numeral()}
+      <span lang="en" {...stylex.attrs(ui.label, styles.en, end ? styles.enEnd : styles.enStart)}>
+        {p.en}
       </span>
     </Tag>
   );
@@ -266,10 +261,10 @@ export function Profile() {
     <section
       id="about-profile"
       aria-labelledby="oos1k-profile"
-      {...stylex.props(ui.section, ui.shell)}
+      {...stylex.attrs(ui.section, ui.shell)}
     >
-      <div {...stylex.props(styles.grid)}>
-        <div {...stylex.props(styles.text)}>
+      <div {...stylex.attrs(styles.grid)}>
+        <div {...stylex.attrs(styles.text)}>
           <ChartHeading
             id="oos1k-profile"
             numeral="I"
@@ -277,66 +272,63 @@ export function Profile() {
             title="企业概况"
             note="The constellation Fenchem"
           />
-          <p {...stylex.props(styles.company)}>
-            <span {...stylex.props(styles.companyName)}>{ABOUT_HERO.title}</span>
-            <span lang="en" {...stylex.props(styles.companyEnglish)}>
+          <p {...stylex.attrs(styles.company)}>
+            <span {...stylex.attrs(styles.companyName)}>{ABOUT_HERO.title}</span>
+            <span lang="en" {...stylex.attrs(styles.companyEnglish)}>
               {ABOUT_HERO.englishTitle}
             </span>
           </p>
-          <p {...stylex.props(ui.body)}>{ABOUT_HERO.lead}</p>
+          <p {...stylex.attrs(ui.body)}>{ABOUT_HERO.lead}</p>
         </div>
 
-        <figure {...stylex.props(styles.chart)}>
-          <figcaption {...stylex.props(styles.caption)}>
+        <figure {...stylex.attrs(styles.chart)}>
+          <figcaption {...stylex.attrs(styles.caption)}>
             <span>{LEAD_IN.trim()}</span>
-            <span {...stylex.props(styles.count)}>{BRANCH_COUNT}</span>
+            <span {...stylex.attrs(styles.count)}>{BRANCH_COUNT}</span>
             <span>{LEAD_OUT.trim()}</span>
-            <span lang="en" aria-hidden="true" {...stylex.props(styles.constellationName)}>
+            <span lang="en" aria-hidden="true" {...stylex.attrs(styles.constellationName)}>
               泛成座 · Fenchem
             </span>
           </figcaption>
-          <div ref={plotRef} {...stylex.props(styles.plot)}>
+          <div ref={plotRef} {...stylex.attrs(styles.plot)}>
             <svg
               aria-hidden="true"
               viewBox="0 0 100 100"
               preserveAspectRatio="none"
-              {...stylex.props(styles.lines, ui.dim, hidden && ui.dimHidden, ui.dimDelay(500))}
+              {...stylex.attrs(styles.lines, ui.dim, hidden() && ui.dimHidden, ui.dimDelay(500))}
             >
               {FIGURE.map(([from, to]) => (
                 <line
-                  key={`${from}-${to}`}
                   x1={at(from).x}
                   y1={at(from).y}
                   x2={at(to).x}
                   y2={at(to).y}
-                  vectorEffect="non-scaling-stroke"
-                  {...stylex.props(styles.segment)}
+                  vector-effect="non-scaling-stroke"
+                  {...stylex.attrs(styles.segment)}
                 />
               ))}
               {ABOUT_HERO.countries.map((country) => (
                 <path
-                  key={country}
                   d={`M${PLACES[country].x} ${PLACES[country].y}h0`}
-                  vectorEffect="non-scaling-stroke"
-                  {...stylex.props(styles.point, styles.countryPoint)}
+                  vector-effect="non-scaling-stroke"
+                  {...stylex.attrs(styles.point, styles.countryPoint)}
                 />
               ))}
               <path
                 d={`M${HUB.x} ${HUB.y}h0`}
-                vectorEffect="non-scaling-stroke"
-                {...stylex.props(styles.point, styles.hubPoint)}
+                vector-effect="non-scaling-stroke"
+                {...stylex.attrs(styles.point, styles.hubPoint)}
               />
             </svg>
-            <Label point={HUB} number={1} zh="南京" en="Nanjing" hub hidden={hidden} delay={0} />
-            <ol {...stylex.props(styles.labels)}>
+            <Label point={HUB} number={1} zh="南京" en="Nanjing" hub hidden={hidden()} delay={0} />
+            <ol {...stylex.attrs(styles.labels)}>
               {ABOUT_HERO.countries.map((country, index) => (
                 <Label
-                  key={country}
                   point={PLACES[country]}
                   number={index + 2}
                   zh={country}
                   en={ENGLISH[country]}
-                  hidden={hidden}
+                  hidden={hidden()}
                   delay={260 + index * 70}
                 />
               ))}

@@ -1,7 +1,8 @@
 import { colors, radii } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 import type { StyleXStyles } from "@stylexjs/stylex";
-import * as React from "react";
+import type { ComponentProps } from "@solidjs/web";
+import { omit } from "solid-js";
 
 const cardStyles = stylex.create({
   card: {
@@ -69,78 +70,109 @@ const cardStyles = stylex.create({
   },
 });
 
-export interface CardProps extends Omit<React.ComponentProps<"div">, "className"> {
+export interface CardProps extends Omit<ComponentProps<"div">, "class"> {
   size?: "default" | "sm";
   sx?: StyleXStyles;
 }
 
-function Card({ sx, size = "default", ...props }: CardProps) {
-  const styleProps = stylex.props(cardStyles.card, size === "sm" && cardStyles.card_sm, sx);
+function Card(props: CardProps) {
+  const rest = omit(props, "sx", "size");
 
-  return <div data-slot="card" data-size={size} {...styleProps} {...props} />;
+  return (
+    <div
+      data-slot="card"
+      data-size={props.size ?? "default"}
+      {...stylex.attrs(cardStyles.card, props.size === "sm" && cardStyles.card_sm, props.sx)}
+      {...rest}
+    />
+  );
 }
 
-export interface CardHeaderProps extends Omit<React.ComponentProps<"div">, "className"> {
+export interface CardHeaderProps extends Omit<ComponentProps<"div">, "class"> {
   size?: "default" | "sm";
   sx?: StyleXStyles;
 }
 
-function CardHeader({ sx, size, ...props }: CardHeaderProps) {
-  const styleProps = stylex.props(cardStyles.header, size === "sm" && cardStyles.header_sm, sx);
+function CardHeader(props: CardHeaderProps) {
+  const rest = omit(props, "sx", "size");
 
-  return <div data-slot="card-header" {...styleProps} {...props} />;
+  return (
+    <div
+      data-slot="card-header"
+      {...stylex.attrs(cardStyles.header, props.size === "sm" && cardStyles.header_sm, props.sx)}
+      {...rest}
+    />
+  );
 }
 
-export interface CardTitleProps extends Omit<React.ComponentProps<"div">, "className"> {
+export interface CardTitleProps extends Omit<ComponentProps<"div">, "class"> {
   sx?: StyleXStyles;
 }
 
-function CardTitle({ sx, ...props }: CardTitleProps) {
-  const styleProps = stylex.props(cardStyles.title, sx);
+function CardTitle(props: CardTitleProps) {
+  const rest = omit(props, "sx");
 
-  return <div data-slot="card-title" {...styleProps} {...props} />;
+  return <div data-slot="card-title" {...stylex.attrs(cardStyles.title, props.sx)} {...rest} />;
 }
 
-export interface CardDescriptionProps extends Omit<React.ComponentProps<"div">, "className"> {
+export interface CardDescriptionProps extends Omit<ComponentProps<"div">, "class"> {
   sx?: StyleXStyles;
 }
 
-function CardDescription({ sx, ...props }: CardDescriptionProps) {
-  const styleProps = stylex.props(cardStyles.description, sx);
+function CardDescription(props: CardDescriptionProps) {
+  const rest = omit(props, "sx");
 
-  return <div data-slot="card-description" {...styleProps} {...props} />;
+  return (
+    <div
+      data-slot="card-description"
+      {...stylex.attrs(cardStyles.description, props.sx)}
+      {...rest}
+    />
+  );
 }
 
-export interface CardActionProps extends Omit<React.ComponentProps<"div">, "className"> {
+export interface CardActionProps extends Omit<ComponentProps<"div">, "class"> {
   sx?: StyleXStyles;
 }
 
-function CardAction({ sx, ...props }: CardActionProps) {
-  const styleProps = stylex.props(cardStyles.action, sx);
+function CardAction(props: CardActionProps) {
+  const rest = omit(props, "sx");
 
-  return <div data-slot="card-action" {...styleProps} {...props} />;
+  return <div data-slot="card-action" {...stylex.attrs(cardStyles.action, props.sx)} {...rest} />;
 }
 
-export interface CardContentProps extends Omit<React.ComponentProps<"div">, "className"> {
+export interface CardContentProps extends Omit<ComponentProps<"div">, "class"> {
   size?: "default" | "sm";
   sx?: StyleXStyles;
 }
 
-function CardContent({ sx, size, ...props }: CardContentProps) {
-  const styleProps = stylex.props(cardStyles.content, size === "sm" && cardStyles.content_sm, sx);
+function CardContent(props: CardContentProps) {
+  const rest = omit(props, "sx", "size");
 
-  return <div data-slot="card-content" {...styleProps} {...props} />;
+  return (
+    <div
+      data-slot="card-content"
+      {...stylex.attrs(cardStyles.content, props.size === "sm" && cardStyles.content_sm, props.sx)}
+      {...rest}
+    />
+  );
 }
 
-export interface CardFooterProps extends Omit<React.ComponentProps<"div">, "className"> {
+export interface CardFooterProps extends Omit<ComponentProps<"div">, "class"> {
   size?: "default" | "sm";
   sx?: StyleXStyles;
 }
 
-function CardFooter({ sx, size, ...props }: CardFooterProps) {
-  const styleProps = stylex.props(cardStyles.footer, size === "sm" && cardStyles.footer_sm, sx);
+function CardFooter(props: CardFooterProps) {
+  const rest = omit(props, "sx", "size");
 
-  return <div data-slot="card-footer" {...styleProps} {...props} />;
+  return (
+    <div
+      data-slot="card-footer"
+      {...stylex.attrs(cardStyles.footer, props.size === "sm" && cardStyles.footer_sm, props.sx)}
+      {...rest}
+    />
+  );
 }
 
 export { Card, CardHeader, CardFooter, CardTitle, CardAction, CardDescription, CardContent };

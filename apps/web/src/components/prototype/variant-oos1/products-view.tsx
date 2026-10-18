@@ -1,9 +1,10 @@
 import { Flow } from "../shared/flow";
-import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
+import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { useSearch } from "@tanstack/react-router";
-import { ChevronRight } from "lucide-react";
-import { useState, type ComponentType, type ReactNode } from "react";
+import { ChevronRight } from "@fenchem-lp/ui/components/lucide";
+import { createMemo, createSignal, For, Show, type Component } from "solid-js";
+import { dynamic, type JSX } from "@solidjs/web";
+import { useSearch } from "@tanstack/solid-router";
 
 import { ContactCta } from "./contact-cta";
 import { CTA, PRODUCTS_CTA_SUBTITLE } from "./content";
@@ -17,8 +18,8 @@ const PHOTO_OUTLINE = "rgba(0, 0, 0, 0.1)";
 const ACCENT = "#78598d";
 const HERO_LEAD = "#595959";
 
-const DESKTOP = breakpoints.xl;
-const LG = breakpoints.lg;
+const DESKTOP = "@media (min-width: 1280px)";
+const LG = "@media (min-width: 1024px)";
 
 const styles = stylex.create({
   root: {
@@ -33,7 +34,7 @@ const styles = stylex.create({
     width: "100%",
     display: "flex",
     alignItems: "flex-end",
-    height: { default: 240, [breakpoints.md]: "clamp(300px, 31vw, 480px)" },
+    height: { default: 240, ["@media (min-width: 768px)"]: "clamp(300px, 31vw, 480px)" },
     overflow: "hidden",
     backgroundColor: color.navyDeep,
     color: colors.paper,
@@ -54,11 +55,11 @@ const styles = stylex.create({
   },
   bannerContent: {
     position: "relative",
-    paddingBottom: { default: 24, [breakpoints.md]: 40 },
+    paddingBottom: { default: 24, ["@media (min-width: 768px)"]: 40 },
   },
   bannerTitle: {
     margin: 0,
-    fontSize: { default: 34, [breakpoints.md]: 48, [DESKTOP]: 60 },
+    fontSize: { default: 34, ["@media (min-width: 768px)"]: 48, [DESKTOP]: 60 },
     fontWeight: 700,
     lineHeight: 1.2,
     letterSpacing: "0.072em",
@@ -66,8 +67,8 @@ const styles = stylex.create({
   },
   bannerLead: {
     margin: 0,
-    marginTop: { default: 8, [breakpoints.md]: 20 },
-    fontSize: { default: 15, [breakpoints.md]: 20 },
+    marginTop: { default: 8, ["@media (min-width: 768px)"]: 20 },
+    fontSize: { default: 15, ["@media (min-width: 768px)"]: 20 },
     lineHeight: 1.53,
     color: HERO_LEAD,
   },
@@ -82,12 +83,12 @@ const styles = stylex.create({
   },
   subBarInner: {
     display: "flex",
-    alignItems: { default: "stretch", [breakpoints.md]: "center" },
-    flexDirection: { default: "column", [breakpoints.md]: "row" },
+    alignItems: { default: "stretch", ["@media (min-width: 768px)"]: "center" },
+    flexDirection: { default: "column", ["@media (min-width: 768px)"]: "row" },
     justifyContent: "space-between",
-    gap: { default: 12, [breakpoints.md]: 24 },
-    paddingBlock: { default: 12, [breakpoints.md]: 0 },
-    height: { default: "auto", [breakpoints.md]: layout.subBarHeight },
+    gap: { default: 12, ["@media (min-width: 768px)"]: 24 },
+    paddingBlock: { default: 12, ["@media (min-width: 768px)"]: 0 },
+    height: { default: "auto", ["@media (min-width: 768px)"]: layout.subBarHeight },
   },
   breadcrumb: {
     display: "flex",
@@ -126,19 +127,19 @@ const styles = stylex.create({
   chipList: {
     display: "flex",
     alignItems: "center",
-    justifyContent: { default: "flex-start", [breakpoints.lg]: "flex-end" },
-    gap: { default: 10, [breakpoints.md]: 12 },
+    justifyContent: { default: "flex-start", ["@media (min-width: 1024px)"]: "flex-end" },
+    gap: { default: 10, ["@media (min-width: 768px)"]: 12 },
     flexGrow: 1,
     minWidth: 0,
-    marginInline: { default: -16, [breakpoints.md]: 0 },
-    paddingInlineStart: { default: 16, [breakpoints.md]: 0 },
-    paddingInlineEnd: { default: 24, [breakpoints.md]: 0 },
+    marginInline: { default: -16, ["@media (min-width: 768px)"]: 0 },
+    paddingInlineStart: { default: 16, ["@media (min-width: 768px)"]: 0 },
+    paddingInlineEnd: { default: 24, ["@media (min-width: 768px)"]: 0 },
     paddingBlock: 4,
     overflowX: "auto",
     scrollbarWidth: "none",
     maskImage: {
       default: "linear-gradient(to right, #000 calc(100% - 24px), transparent)",
-      [breakpoints.md]: "none",
+      ["@media (min-width: 768px)"]: "none",
     },
   },
   chip: {
@@ -161,7 +162,10 @@ const styles = stylex.create({
     whiteSpace: "nowrap",
     transform: {
       default: null,
-      ":active": { default: null, [breakpoints.motionOk]: "scale(0.96)" },
+      ":active": {
+        default: null,
+        ["@media (prefers-reduced-motion: no-preference)"]: "scale(0.96)",
+      },
     },
     "::before": {
       content: '""',
@@ -220,7 +224,7 @@ const styles = stylex.create({
     display: "grid",
     gridTemplateColumns: {
       default: "repeat(2, minmax(0, 1fr))",
-      [breakpoints.sm]: "repeat(3, minmax(0, 1fr))",
+      ["@media (min-width: 640px)"]: "repeat(3, minmax(0, 1fr))",
     },
     gap: { default: 8, [LG]: 10 },
   },
@@ -239,7 +243,10 @@ const styles = stylex.create({
     cursor: "pointer",
     transform: {
       default: null,
-      ":active": { default: null, [breakpoints.motionOk]: "scale(0.98)" },
+      ":active": {
+        default: null,
+        ["@media (prefers-reduced-motion: no-preference)"]: "scale(0.98)",
+      },
     },
     outlineStyle: "solid",
     outlineWidth: { default: 1, ":focus-visible": 3 },
@@ -314,161 +321,179 @@ const styles = stylex.create({
   },
 });
 
-function CardImage({ src, alt, eager }: { src: string; alt: string; eager: boolean }) {
-  const [failed, setFailed] = useState(false);
-  return failed ? (
-    <span aria-hidden="true" {...stylex.props(styles.cardImg, styles.cardImgMissing)} />
-  ) : (
-    <img
-      src={src}
-      alt={alt}
-      loading={eager ? "eager" : "lazy"}
-      decoding="async"
-      onError={() => setFailed(true)}
-      {...stylex.props(styles.cardImg)}
-    />
+function CardImage(props: { src: string; alt: string; eager: boolean }) {
+  const [failed, setFailed] = createSignal(false);
+  return (
+    <>
+      {failed() ? (
+        <span aria-hidden="true" {...stylex.attrs(styles.cardImg, styles.cardImgMissing)} />
+      ) : (
+        <img
+          src={props.src}
+          alt={props.alt}
+          loading={props.eager ? "eager" : "lazy"}
+          decoding="async"
+          onError={() => setFailed(true)}
+          {...stylex.attrs(styles.cardImg)}
+        />
+      )}
+    </>
   );
 }
 
-export function ProductsView({
-  onNavigateHome,
-  CatalogSection,
-  SolutionsSection,
-  renderHero,
-  renderSpotlight,
-}: {
+export function ProductsView(props: {
   onNavigateHome: (hash?: string) => void;
-  CatalogSection?: ComponentType;
-  SolutionsSection?: ComponentType;
-  renderHero?: (category: Category) => ReactNode;
-  renderSpotlight?: (category: Category) => ReactNode;
+  CatalogSection?: Component;
+  SolutionsSection?: Component;
+  renderHero?: (category: Category) => JSX.Element;
+  renderSpotlight?: (category: Category) => JSX.Element;
 }) {
-  const [activeTab, setActiveTab] = useState<string>("personal-care");
-  const [activeProductIndex, setActiveProductIndex] = useState<number>(0);
-  const { compare } = useSearch({ strict: false });
-  const activeCategory = CATEGORIES.find((cat) => cat.id === activeTab) ?? CATEGORIES[0];
+  const [activeTab, setActiveTab] = createSignal<string>("personal-care");
+  const [activeProductIndex, setActiveProductIndex] = createSignal<number>(0);
+  const search = useSearch({ strict: false });
+  const compare = () => search().compare;
+  const CatalogSection = dynamic(() => props.CatalogSection);
+  const SolutionsSection = dynamic(() => props.SolutionsSection);
+  const activeCategory = createMemo(
+    () => CATEGORIES.find((cat) => cat.id === activeTab()) ?? CATEGORIES[0],
+  );
+  const hero = createMemo(() => props.renderHero?.(activeCategory()));
+  const spotlight = createMemo(() => props.renderSpotlight?.(activeCategory()));
 
   return (
-    <div id="products-top" lang="zh-CN" {...stylex.props(styles.root)}>
-      {renderHero?.(activeCategory) ?? (
-        <section
-          aria-label="Products and applications panorama banner"
-          {...stylex.props(styles.bannerWrap)}
-        >
-          <figure {...stylex.props(styles.bannerFigure)}>
-            <img
-              src={FEATURED_PRODUCT.bannerImage}
-              alt="Panorama of Fenchem products and applications in their natural form"
-              fetchPriority="high"
-              decoding="async"
-              {...stylex.props(styles.bannerImg)}
-            />
-          </figure>
-          <div {...stylex.props(kitStyles.shell, kitStyles.inset120, styles.bannerContent)}>
-            <h1 {...stylex.props(styles.bannerTitle)}>{activeCategory.label}</h1>
-            <p {...stylex.props(styles.bannerLead)}>{PRODUCTS_HERO_LEAD}</p>
-          </div>
-        </section>
-      )}
+    <div id="products-top" lang="zh-CN" {...stylex.attrs(styles.root)}>
+      <Show
+        when={hero() != null}
+        fallback={
+          <section
+            aria-label="Products and applications panorama banner"
+            {...stylex.attrs(styles.bannerWrap)}
+          >
+            <figure {...stylex.attrs(styles.bannerFigure)}>
+              <img
+                src={FEATURED_PRODUCT.bannerImage}
+                alt="Panorama of Fenchem products and applications in their natural form"
+                fetchpriority="high"
+                decoding="async"
+                {...stylex.attrs(styles.bannerImg)}
+              />
+            </figure>
+            <div {...stylex.attrs(kitStyles.shell, kitStyles.inset120, styles.bannerContent)}>
+              <h1 {...stylex.attrs(styles.bannerTitle)}>{activeCategory().label}</h1>
+              <p {...stylex.attrs(styles.bannerLead)}>{PRODUCTS_HERO_LEAD}</p>
+            </div>
+          </section>
+        }
+      >
+        {hero()}
+      </Show>
 
-      <div {...stylex.props(styles.subBar)}>
-        <div {...stylex.props(kitStyles.shell, kitStyles.inset120, styles.subBarInner)}>
-          <nav aria-label="Breadcrumb" {...stylex.props(styles.breadcrumb)}>
+      <div {...stylex.attrs(styles.subBar)}>
+        <div {...stylex.attrs(kitStyles.shell, kitStyles.inset120, styles.subBarInner)}>
+          <nav aria-label="Breadcrumb" {...stylex.attrs(styles.breadcrumb)}>
             <button
               type="button"
-              onClick={() => onNavigateHome("top")}
-              {...stylex.props(styles.breadcrumbLink)}
+              onClick={() => props.onNavigateHome("top")}
+              {...stylex.attrs(styles.breadcrumbLink)}
             >
               首页
             </button>
             <ChevronRight size={13} strokeWidth={1.5} absoluteStrokeWidth aria-hidden="true" />
-            <span aria-current="page" {...stylex.props(styles.breadcrumbCurrent)}>
+            <span aria-current="page" {...stylex.attrs(styles.breadcrumbCurrent)}>
               产品与应用
             </span>
           </nav>
-          <div role="group" aria-label="Categories" {...stylex.props(styles.chipList)}>
-            {CATEGORIES.map((cat) => {
-              const isActive = activeTab === cat.id;
-              return (
-                <button
-                  key={cat.id}
-                  type="button"
-                  aria-pressed={isActive}
-                  onClick={() => setActiveTab(cat.id)}
-                  {...stylex.props(styles.chip, isActive && styles.chipActive)}
-                >
-                  {cat.label}
-                </button>
-              );
-            })}
+          <div role="group" aria-label="Categories" {...stylex.attrs(styles.chipList)}>
+            <For each={CATEGORIES}>
+              {(cat) => {
+                const isActive = () => activeTab() === cat.id;
+                return (
+                  <button
+                    type="button"
+                    aria-pressed={isActive() ? "true" : "false"}
+                    onClick={() => setActiveTab(cat.id)}
+                    {...stylex.attrs(styles.chip, isActive() && styles.chipActive)}
+                  >
+                    {cat.label}
+                  </button>
+                );
+              }}
+            </For>
           </div>
         </div>
       </div>
 
-      {renderSpotlight?.(activeCategory) ?? (
-        <section
-          aria-labelledby="spotlight-title"
-          {...stylex.props(kitStyles.shell, kitStyles.inset120, styles.spotlightSection)}
-        >
-          <div {...stylex.props(styles.spotlightGrid)}>
-            <div {...stylex.props(styles.spotlightText)}>
-              <h2 id="spotlight-title" {...stylex.props(styles.spotlightBrand)}>
-                {FEATURED_PRODUCT.brand}
-              </h2>
-              <p {...stylex.props(styles.spotlightTagline)}>{FEATURED_PRODUCT.tagline}</p>
-              <div {...stylex.props(styles.productList)}>
-                {FEATURED_PRODUCT.items.slice(0, 2).map((item, idx) => (
-                  <button
-                    key={item.id}
-                    type="button"
-                    aria-pressed={activeProductIndex === idx}
-                    onClick={() => setActiveProductIndex(idx)}
-                    onMouseEnter={() => setActiveProductIndex(idx)}
-                    {...stylex.props(
-                      styles.productText,
-                      activeProductIndex === idx && styles.productTextActive,
+      <Show
+        when={spotlight() != null}
+        fallback={
+          <section
+            aria-labelledby="spotlight-title"
+            {...stylex.attrs(kitStyles.shell, kitStyles.inset120, styles.spotlightSection)}
+          >
+            <div {...stylex.attrs(styles.spotlightGrid)}>
+              <div {...stylex.attrs(styles.spotlightText)}>
+                <h2 id="spotlight-title" {...stylex.attrs(styles.spotlightBrand)}>
+                  {FEATURED_PRODUCT.brand}
+                </h2>
+                <p {...stylex.attrs(styles.spotlightTagline)}>{FEATURED_PRODUCT.tagline}</p>
+                <div {...stylex.attrs(styles.productList)}>
+                  <For each={FEATURED_PRODUCT.items.slice(0, 2)}>
+                    {(item, idx) => (
+                      <button
+                        type="button"
+                        aria-pressed={activeProductIndex() === idx() ? "true" : "false"}
+                        onClick={() => setActiveProductIndex(idx())}
+                        onMouseEnter={() => setActiveProductIndex(idx())}
+                        {...stylex.attrs(
+                          styles.productText,
+                          activeProductIndex() === idx() && styles.productTextActive,
+                        )}
+                      >
+                        <span {...stylex.attrs(styles.cardBody)}>
+                          <span {...stylex.attrs(styles.cardName)}>{item.englishName}</span>
+                          <span {...stylex.attrs(styles.cardDesc)}>{item.desc}</span>
+                        </span>
+                      </button>
                     )}
-                  >
-                    <span {...stylex.props(styles.cardBody)}>
-                      <span {...stylex.props(styles.cardName)}>{item.englishName}</span>
-                      <span {...stylex.props(styles.cardDesc)}>{item.desc}</span>
-                    </span>
-                  </button>
-                ))}
+                  </For>
+                </div>
+              </div>
+              <div
+                role="group"
+                aria-label={`${FEATURED_PRODUCT.items.length} core oil ingredient cards`}
+                {...stylex.attrs(styles.spotlightCardsWrap)}
+              >
+                <For each={FEATURED_PRODUCT.items}>
+                  {(item, idx) => (
+                    <button
+                      type="button"
+                      aria-pressed={activeProductIndex() === idx() ? "true" : "false"}
+                      aria-label={item.englishName}
+                      onClick={() => setActiveProductIndex(idx())}
+                      onMouseEnter={() => setActiveProductIndex(idx())}
+                      {...stylex.attrs(
+                        styles.productCard,
+                        activeProductIndex() === idx() && styles.productCardActive,
+                      )}
+                    >
+                      <CardImage src={item.cardImage} alt={item.cardAlt} eager={idx() < 3} />
+                    </button>
+                  )}
+                </For>
               </div>
             </div>
-            <div
-              role="group"
-              aria-label={`${FEATURED_PRODUCT.items.length} core oil ingredient cards`}
-              {...stylex.props(styles.spotlightCardsWrap)}
-            >
-              {FEATURED_PRODUCT.items.map((item, idx) => (
-                <button
-                  key={item.id}
-                  type="button"
-                  aria-pressed={activeProductIndex === idx}
-                  aria-label={item.englishName}
-                  onClick={() => setActiveProductIndex(idx)}
-                  onMouseEnter={() => setActiveProductIndex(idx)}
-                  {...stylex.props(
-                    styles.productCard,
-                    activeProductIndex === idx && styles.productCardActive,
-                  )}
-                >
-                  <CardImage src={item.cardImage} alt={item.cardAlt} eager={idx < 3} />
-                </button>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
+          </section>
+        }
+      >
+        {spotlight()}
+      </Show>
 
-      {CatalogSection && compare !== "baseline" && compare !== "solutions" ? (
+      {props.CatalogSection && compare() !== "baseline" && compare() !== "solutions" ? (
         <CatalogSection />
       ) : (
-        <ProductCatalog categoryId={activeTab} />
+        <ProductCatalog categoryId={activeTab()} />
       )}
-      {SolutionsSection && compare !== "baseline" && compare !== "catalog" ? (
+      {props.SolutionsSection && compare() !== "baseline" && compare() !== "catalog" ? (
         <Flow>
           <SolutionsSection />
         </Flow>
@@ -481,7 +506,7 @@ export function ProductsView({
       <Flow>
         <ContactCta
           subtitle={PRODUCTS_CTA_SUBTITLE}
-          actions={[{ label: CTA.action.label, onClick: () => onNavigateHome("contact") }]}
+          actions={[{ label: CTA.action.label, onClick: () => props.onNavigateHome("contact") }]}
         />
       </Flow>
     </div>

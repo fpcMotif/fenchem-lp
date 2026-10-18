@@ -1,5 +1,5 @@
-import { useMotionValue, useMotionValueEvent, useScroll, type MotionValue } from "motion/react";
-import { createContext, useContext, useEffect, useRef, type RefObject } from "react";
+import { useMotionValue, useMotionValueEvent, useScroll, type MotionValue } from "@/compat/motion";
+import { createContext, createEffect, untrack, useContext, type Accessor } from "solid-js";
 
 export const DAY_START = 9;
 export const DAY_END = 13;
@@ -80,34 +80,36 @@ function measureStops(root: HTMLElement): Stop[] {
   return stops;
 }
 
-export function useSunClock(root: RefObject<HTMLElement | null>, still: boolean) {
+export function useSunClock(root: Accessor<HTMLElement | undefined>, still: Accessor<boolean>) {
   const hour = useMotionValue(DAY_START);
-  const stops = useRef<Stop[]>([]);
+  let stops: Stop[] = [];
   const { scrollY } = useScroll();
 
-  useEffect(() => {
-    const element = root.current;
-    if (!element) return;
-    if (still) {
-      hour.set(STILL_HOUR);
-      paint(element, STILL_HOUR);
-      return;
-    }
-    const measure = () => {
-      stops.current = measureStops(element);
-      hour.set(hourFromStops(stops.current, window.scrollY));
-      paint(element, hour.get());
-    };
-    measure();
-    const observer = new ResizeObserver(measure);
-    observer.observe(element);
-    return () => observer.disconnect();
-  }, [root, still, hour]);
+  createEffect(
+    () => [root(), still()] as const,
+    ([element, isStill]) => {
+      if (!element) return;
+      if (isStill) {
+        hour.set(STILL_HOUR);
+        paint(element, STILL_HOUR);
+        return;
+      }
+      const measure = () => {
+        stops = measureStops(element);
+        hour.set(hourFromStops(stops, window.scrollY));
+        paint(element, hour.get());
+      };
+      measure();
+      const observer = new ResizeObserver(measure);
+      observer.observe(element);
+      return () => observer.disconnect();
+    },
+  );
 
   useMotionValueEvent(scrollY, "change", (y) => {
-    if (!still) hour.set(hourFromStops(stops.current, y));
+    if (!untrack(still)) hour.set(hourFromStops(stops, y));
   });
-  useMotionValueEvent(hour, "change", (value) => paint(root.current, value));
+  useMotionValueEvent(hour, "change", (value) => paint(root() ?? null, value));
 
   return hour;
 }

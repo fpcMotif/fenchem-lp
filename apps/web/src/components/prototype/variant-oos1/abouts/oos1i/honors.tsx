@@ -75,23 +75,22 @@ export function Honors() {
   return (
     <Section id="about-honor" labelledBy="about-honor-title" surface="paper">
       <SectionName id="about-honor-title">{ABOUT_HONORS.eyebrow}</SectionName>
-      <div {...stylex.props(base.shell, base.inset)}>
-        <ul {...stylex.props(S.groups)}>
+      <div {...stylex.attrs(base.shell, base.inset)}>
+        <ul {...stylex.attrs(S.groups)}>
           {LEVELS.map((group, groupIndex) => {
             const honors = ABOUT_HONORS.items.filter((item) => item.level === group.level);
             const national = group.level === "national";
             return (
               <Reveal
-                key={group.level}
                 as="li"
                 delay={groupIndex * 100}
                 sx={[S.group, groupIndex === LEVELS.length - 1 && S.groupLast]}
               >
-                <h3 {...stylex.props(base.quiet)}>{group.label}</h3>
-                <ul {...stylex.props(S.items, national && S.itemsNational)}>
+                <h3 {...stylex.attrs(base.quiet)}>{group.label}</h3>
+                <ul {...stylex.attrs(S.items, national && S.itemsNational)}>
                   {honors.map((honor) => (
-                    <li key={honor.id}>
-                      <p {...stylex.props(S.title, national && S.titleNational)}>{honor.title}</p>
+                    <li>
+                      <p {...stylex.attrs(S.title, national && S.titleNational)}>{honor.title}</p>
                     </li>
                   ))}
                 </ul>

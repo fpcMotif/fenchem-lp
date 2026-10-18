@@ -1,5 +1,5 @@
 import * as stylex from "@stylexjs/stylex";
-import type { ReactNode } from "react";
+import type { JSX } from "@solidjs/web";
 
 import { ABOUT_HONORS } from "../../about-data";
 import { SectionHead, Tag, useArrived } from "./shared";
@@ -122,37 +122,29 @@ const EDGE_STYLES = {
 } as const;
 const SIZES = [styles.size0, styles.size1, styles.size2] as const;
 
-function Tier({
-  depth,
-  arrived,
-  children,
-}: {
-  depth: number;
-  arrived: boolean;
-  children: ReactNode;
-}) {
-  const tier = TIERS[depth];
+function Tier(props: { depth: number; arrived: boolean; children: JSX.Element }) {
+  const tier = TIERS[props.depth];
   const items = ABOUT_HONORS.items.filter((item) => item.level === tier.level);
   return (
     <div
-      {...stylex.props(
+      {...stylex.attrs(
         styles.tier,
-        depth === 0 ? styles.raised : bevel.edge,
-        ...stepIn(arrived, depth),
+        props.depth === 0 ? styles.raised : bevel.edge,
+        ...stepIn(props.arrived, props.depth),
       )}
     >
       <h3 {...srOnly}>{tier.english} honors</h3>
       <span aria-hidden="true">
-        <Tag numeral={ROMAN[depth]} label={`${tier.english} · ${tier.label}`} />
+        <Tag numeral={ROMAN[props.depth]} label={`${tier.english} · ${tier.label}`} />
       </span>
-      <ul {...stylex.props(styles.list)}>
+      <ul {...stylex.attrs(styles.list)}>
         {items.map((item, index) => (
-          <li key={item.id} {...stylex.props(styles.edge, EDGE_STYLES[tier.edges[index] ?? "top"])}>
-            <span {...stylex.props(styles.title, SIZES[depth])}>{item.title}</span>
+          <li {...stylex.attrs(styles.edge, EDGE_STYLES[tier.edges[index] ?? "top"])}>
+            <span {...stylex.attrs(styles.title, SIZES[props.depth])}>{item.title}</span>
           </li>
         ))}
       </ul>
-      {children}
+      {props.children}
     </div>
   );
 }
@@ -163,7 +155,7 @@ export function Honors() {
     <section
       id="about-honor"
       aria-labelledby="oos1b-honor"
-      {...stylex.props(ui.anchor, ui.section, ui.shell)}
+      {...stylex.attrs(ui.anchor, ui.section, ui.shell)}
     >
       <SectionHead
         id="oos1b-honor"
@@ -173,14 +165,14 @@ export function Honors() {
         note="From the nation inward to the city."
       />
       <div ref={ref}>
-        <Tier depth={0} arrived={arrived}>
-          <Tier depth={1} arrived={arrived}>
-            <Tier depth={2} arrived={arrived}>
-              <p {...stylex.props(ui.reset, styles.core, bevel.edge, ...stepIn(arrived, 3))}>
-                <span lang="en" {...stylex.props(ui.serif, styles.count)}>
+        <Tier depth={0} arrived={arrived()}>
+          <Tier depth={1} arrived={arrived()}>
+            <Tier depth={2} arrived={arrived()}>
+              <p {...stylex.attrs(ui.reset, styles.core, bevel.edge, ...stepIn(arrived(), 3))}>
+                <span lang="en" {...stylex.attrs(ui.serif, styles.count)}>
                   {ABOUT_HONORS.items.length}
                 </span>
-                <span {...stylex.props(styles.countLabel)}>项企业荣誉</span>
+                <span {...stylex.attrs(styles.countLabel)}>项企业荣誉</span>
               </p>
             </Tier>
           </Tier>

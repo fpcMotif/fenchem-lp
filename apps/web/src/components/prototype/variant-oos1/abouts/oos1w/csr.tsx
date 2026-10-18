@@ -137,10 +137,10 @@ const styles = stylex.create({
 
 export function Csr() {
   return (
-    <section id="about-csr" aria-labelledby="oos1w-csr" {...stylex.props(ui.section)}>
-      <div {...stylex.props(ui.shell)}>
-        <div {...stylex.props(ui.grid, ui.ruled)}>
-          <div {...stylex.props(ui.headCol)}>
+    <section id="about-csr" aria-labelledby="oos1w-csr" {...stylex.attrs(ui.section)}>
+      <div {...stylex.attrs(ui.shell)}>
+        <div {...stylex.attrs(ui.grid, ui.ruled)}>
+          <div {...stylex.attrs(ui.headCol)}>
             <SectionHead
               num="04"
               word="Responsibility"
@@ -149,19 +149,17 @@ export function Csr() {
             />
           </div>
 
-          <div {...stylex.props(styles.text)}>
-            <p {...stylex.props(styles.statement)}>
+          <div {...stylex.attrs(styles.text)}>
+            <p {...stylex.attrs(styles.statement)}>
               {ABOUT_CSR.statement.map((line) => (
-                <span key={line} {...stylex.props(styles.line)}>
-                  {line}
-                </span>
+                <span {...stylex.attrs(styles.line)}>{line}</span>
               ))}
             </p>
-            <p {...stylex.props(styles.desc)}>{ABOUT_CSR.desc}</p>
-            <ul {...stylex.props(styles.outcomes)}>
+            <p {...stylex.attrs(styles.desc)}>{ABOUT_CSR.desc}</p>
+            <ul {...stylex.attrs(styles.outcomes)}>
               {ABOUT_CSR.outcomes.map((outcome, index) => (
-                <li key={outcome.title} {...stylex.props(styles.outcome)}>
-                  <span lang="en" aria-hidden="true" {...stylex.props(styles.numeral)}>
+                <li {...stylex.attrs(styles.outcome)}>
+                  <span lang="en" aria-hidden="true" {...stylex.attrs(styles.numeral)}>
                     {NUMERALS[index]}
                   </span>
                   {outcome.title}
@@ -170,28 +168,28 @@ export function Csr() {
             </ul>
           </div>
 
-          <figure {...stylex.props(styles.figure)}>
-            <div {...stylex.props(styles.frame)}>
-              <div {...stylex.props(styles.crop)}>
+          <figure {...stylex.attrs(styles.figure)}>
+            <div {...stylex.attrs(styles.frame)}>
+              <div {...stylex.attrs(styles.crop)}>
                 <img
                   src={ABOUT_CSR.image}
                   alt={ABOUT_CSR.imageAlt}
                   loading="lazy"
                   decoding="async"
-                  {...stylex.props(styles.image)}
+                  {...stylex.attrs(styles.image)}
                 />
               </div>
-              <span aria-hidden="true" {...stylex.props(styles.tick, styles.tickStart)} />
-              <span aria-hidden="true" {...stylex.props(styles.tick, styles.tickEnd)} />
-              <span lang="en" aria-hidden="true" {...stylex.props(styles.tickWord)}>
+              <span aria-hidden="true" {...stylex.attrs(styles.tick, styles.tickStart)} />
+              <span aria-hidden="true" {...stylex.attrs(styles.tick, styles.tickEnd)} />
+              <span lang="en" aria-hidden="true" {...stylex.attrs(styles.tickWord)}>
                 front
               </span>
             </div>
-            <figcaption {...stylex.props(ui.micro, styles.caption)}>
-              <span lang="en" {...stylex.props(styles.captionNum)}>
+            <figcaption {...stylex.attrs(ui.micro, styles.caption)}>
+              <span lang="en" {...stylex.attrs(styles.captionNum)}>
                 Fig. 4
               </span>
-              <span lang="en" {...stylex.props(styles.captionItalic)}>
+              <span lang="en" {...stylex.attrs(styles.captionItalic)}>
                 The waterline, read as a solvent front.
               </span>
             </figcaption>

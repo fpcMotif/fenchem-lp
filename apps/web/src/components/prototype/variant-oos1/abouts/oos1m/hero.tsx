@@ -1,6 +1,5 @@
 import * as stylex from "@stylexjs/stylex";
-import { ArrowDown } from "lucide-react";
-import { useRef, useState } from "react";
+import { ArrowDown } from "@fenchem-lp/ui/components/lucide";
 
 import { ABOUT_BANNER, ABOUT_HERO } from "../../about-data";
 import { AssemblySteps } from "./assembly-steps";
@@ -10,6 +9,7 @@ import { PartsList } from "./parts-list";
 import { pad2, SHEET_COUNT, ui } from "./shared";
 import { bp, chrome, face, tone } from "./tokens.stylex";
 import { useScrollAssembly } from "./use-assembly-progress";
+import { createSignal } from "solid-js";
 
 const CHAIN = "集研产销于一体";
 const [LEAD_BEFORE, LEAD_AFTER] = ABOUT_HERO.lead.split(CHAIN);
@@ -203,39 +203,39 @@ const styles = stylex.create({
 });
 
 export function HeroAssembly() {
-  const trackRef = useRef<HTMLDivElement>(null);
-  const drawingRef = useRef<HTMLDivElement>(null);
+  const [trackRef, setTrackRef] = createSignal<HTMLDivElement>();
+  const [drawingRef, setDrawingRef] = createSignal<HTMLDivElement>();
   const progress = useScrollAssembly(trackRef, drawingRef);
-  const [active, setActive] = useState<HeroPartId | null>(null);
+  const [active, setActive] = createSignal<HeroPartId | null>(null);
 
   return (
-    <div ref={trackRef} {...stylex.props(ui.shell, styles.track)}>
-      <section aria-labelledby="oos1m-title" {...stylex.props(styles.textCell, styles.heroCell)}>
-        <div {...stylex.props(styles.heroText)}>
-          <h1 id="oos1m-title" {...stylex.props(styles.title)}>
+    <div ref={setTrackRef} {...stylex.attrs(ui.shell, styles.track)}>
+      <section aria-labelledby="oos1m-title" {...stylex.attrs(styles.textCell, styles.heroCell)}>
+        <div {...stylex.attrs(styles.heroText)}>
+          <h1 id="oos1m-title" {...stylex.attrs(styles.title)}>
             {ABOUT_BANNER.title}
           </h1>
-          <p lang="en" {...stylex.props(ui.serif, styles.tagline)}>
+          <p lang="en" {...stylex.attrs(ui.serif, styles.tagline)}>
             {ABOUT_BANNER.tagline}
           </p>
-          <p {...stylex.props(styles.lead)}>{ABOUT_BANNER.lead}</p>
-          <dl {...stylex.props(styles.titleBlock)}>
-            <div {...stylex.props(styles.titleCell)}>
-              <dt lang="en" {...stylex.props(ui.caps)}>
+          <p {...stylex.attrs(styles.lead)}>{ABOUT_BANNER.lead}</p>
+          <dl {...stylex.attrs(styles.titleBlock)}>
+            <div {...stylex.attrs(styles.titleCell)}>
+              <dt lang="en" {...stylex.attrs(ui.caps)}>
                 Est.
               </dt>
-              <dd {...stylex.props(styles.titleValue)}>{EST_YEAR}</dd>
+              <dd {...stylex.attrs(styles.titleValue)}>{EST_YEAR}</dd>
             </div>
-            <div {...stylex.props(styles.titleCell)}>
-              <dt lang="en" {...stylex.props(ui.caps)}>
+            <div {...stylex.attrs(styles.titleCell)}>
+              <dt lang="en" {...stylex.attrs(ui.caps)}>
                 Place
               </dt>
-              <dd lang="en" {...stylex.props(styles.titleValue)}>
+              <dd lang="en" {...stylex.attrs(styles.titleValue)}>
                 {ABOUT_BANNER.place}
               </dd>
             </div>
           </dl>
-          <p aria-hidden="true" {...stylex.props(ui.caps, styles.cue)}>
+          <p aria-hidden="true" {...stylex.attrs(ui.caps, styles.cue)}>
             <ArrowDown size={14} strokeWidth={1.25} />
             <span lang="en">Scroll to assemble</span>
           </p>
@@ -243,10 +243,10 @@ export function HeroAssembly() {
         <AssemblySteps progress={progress} />
       </section>
 
-      <div ref={drawingRef} {...stylex.props(styles.stageCell)}>
-        <div {...stylex.props(styles.stage)}>
-          <div {...stylex.props(styles.drawingFrame)}>
-            <HeroDrawing progress={progress} active={active} onActive={setActive} />
+      <div ref={setDrawingRef} {...stylex.attrs(styles.stageCell)}>
+        <div {...stylex.attrs(styles.stage)}>
+          <div {...stylex.attrs(styles.drawingFrame)}>
+            <HeroDrawing progress={progress} active={active()} onActive={setActive} />
           </div>
         </div>
       </div>
@@ -254,27 +254,27 @@ export function HeroAssembly() {
       <section
         id="about-profile"
         aria-labelledby="oos1m-profile"
-        {...stylex.props(ui.anchor, styles.textCell, styles.profileCell)}
+        {...stylex.attrs(ui.anchor, styles.textCell, styles.profileCell)}
       >
-        <div {...stylex.props(styles.profileText)}>
-          <p aria-hidden="true" lang="en" {...stylex.props(ui.caps, styles.sheetLine)}>
+        <div {...stylex.attrs(styles.profileText)}>
+          <p aria-hidden="true" lang="en" {...stylex.attrs(ui.caps, styles.sheetLine)}>
             Sheet 01 / {pad2(SHEET_COUNT)} · Profile
           </p>
-          <h2 id="oos1m-profile" {...stylex.props(styles.profileTitle)}>
+          <h2 id="oos1m-profile" {...stylex.attrs(styles.profileTitle)}>
             企业概况
           </h2>
-          <p {...stylex.props(styles.company)}>{ABOUT_HERO.title}</p>
-          <p lang="en" {...stylex.props(ui.label, styles.english)}>
+          <p {...stylex.attrs(styles.company)}>{ABOUT_HERO.title}</p>
+          <p lang="en" {...stylex.attrs(ui.label, styles.english)}>
             {ABOUT_HERO.englishTitle}
           </p>
-          <p {...stylex.props(styles.profileLead)}>
+          <p {...stylex.attrs(styles.profileLead)}>
             {LEAD_BEFORE}
-            <strong {...stylex.props(styles.chain)}>{CHAIN}</strong>
+            <strong {...stylex.attrs(styles.chain)}>{CHAIN}</strong>
             {LEAD_AFTER}
           </p>
-          <PartsList active={active} onActive={setActive} />
-          <p {...stylex.props(styles.network)}>
-            <span aria-hidden="true" {...stylex.props(ui.balloon, styles.networkBalloon)}>
+          <PartsList active={active()} onActive={setActive} />
+          <p {...stylex.attrs(styles.network)}>
+            <span aria-hidden="true" {...stylex.attrs(ui.balloon, styles.networkBalloon)}>
               3
             </span>
             <span>

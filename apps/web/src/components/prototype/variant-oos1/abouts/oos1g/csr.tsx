@@ -1,4 +1,3 @@
-import { breakpoints } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 
 import { ABOUT_CSR } from "../../about-data";
@@ -6,7 +5,7 @@ import { layout } from "./layout";
 import { media, palette } from "./palette.stylex";
 import { Reveal } from "./reveal";
 
-const LG = breakpoints.lg;
+const LG = "@media (min-width: 1024px)";
 const EDGE = "min(72px, 5.2vw)";
 const SCRIM =
   "linear-gradient(to bottom, rgba(6, 28, 66, 0.72) 0%, rgba(6, 28, 66, 0.84) 50%, rgba(6, 28, 66, 0.94) 100%)";
@@ -40,7 +39,12 @@ const styles = stylex.create({
     gridTemplateColumns: { default: "none", [LG]: "minmax(0, 1fr) minmax(0, 1fr)" },
     margin: 0,
     boxSizing: "border-box",
-    paddingInline: { default: 20, [breakpoints.sm]: 28, [media.tablet]: 40, [LG]: EDGE },
+    paddingInline: {
+      default: 20,
+      ["@media (min-width: 640px)"]: 28,
+      [media.tablet]: 40,
+      [LG]: EDGE,
+    },
     paddingBlock: { default: 0, [LG]: "0.5em" },
     fontFamily: palette.fontBody,
     fontSize: {
@@ -97,9 +101,9 @@ export function Csr() {
     <section
       id="about-csr"
       aria-labelledby="about-csr-title"
-      {...stylex.props(styles.section, layout.anchor)}
+      {...stylex.attrs(styles.section, layout.anchor)}
     >
-      <h2 id="about-csr-title" {...stylex.props(layout.srOnly)}>
+      <h2 id="about-csr-title" {...stylex.attrs(layout.srOnly)}>
         Responsibility
       </h2>
       <img
@@ -107,26 +111,24 @@ export function Csr() {
         alt={ABOUT_CSR.imageAlt}
         loading="lazy"
         decoding="async"
-        {...stylex.props(layout.fill, styles.media)}
+        {...stylex.attrs(layout.fill, styles.media)}
       />
-      <div aria-hidden="true" {...stylex.props(layout.fillBox, styles.scrim)} />
-      <div {...stylex.props(layout.shell, styles.inner)}>
+      <div aria-hidden="true" {...stylex.attrs(layout.fillBox, styles.scrim)} />
+      <div {...stylex.attrs(layout.shell, styles.inner)}>
         <Reveal>
-          <p {...stylex.props(styles.statement)}>
-            <span {...stylex.props(styles.statementLead)}>{statementLead}</span>
-            <span {...stylex.props(styles.statementClose)}>{statementClose}</span>
+          <p {...stylex.attrs(styles.statement)}>
+            <span {...stylex.attrs(styles.statementLead)}>{statementLead}</span>
+            <span {...stylex.attrs(styles.statementClose)}>{statementClose}</span>
           </p>
         </Reveal>
-        <div {...stylex.props(layout.split)}>
+        <div {...stylex.attrs(layout.split)}>
           <Reveal sx={[layout.padLeft, layout.seam]}>
-            <p {...stylex.props(styles.desc)}>{ABOUT_CSR.desc}</p>
+            <p {...stylex.attrs(styles.desc)}>{ABOUT_CSR.desc}</p>
           </Reveal>
           <Reveal step={1} sx={layout.padRight}>
-            <ul {...stylex.props(styles.outcomes)}>
+            <ul {...stylex.attrs(styles.outcomes)}>
               {ABOUT_CSR.outcomes.map((outcome) => (
-                <li key={outcome.title} {...stylex.props(styles.outcome)}>
-                  {outcome.title}
-                </li>
+                <li {...stylex.attrs(styles.outcome)}>{outcome.title}</li>
               ))}
             </ul>
           </Reveal>

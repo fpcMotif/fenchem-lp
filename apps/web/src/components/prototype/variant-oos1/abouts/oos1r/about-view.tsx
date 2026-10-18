@@ -13,10 +13,10 @@ import { ui } from "./shared-values";
 import { Structure } from "./structure";
 import { SubNav } from "./subnav";
 
-export function AboutOOS1R({ onNavigateHome }: AboutPageProps) {
+export function AboutOOS1R(props: AboutPageProps) {
   return (
-    <div id="about-top" {...stylex.props(ui.root)}>
-      <SubNav onNavigateHome={onNavigateHome} />
+    <div id="about-top" {...stylex.attrs(ui.root)}>
+      <SubNav onNavigateHome={props.onNavigateHome} />
       <Banner />
       <Profile />
       <Campus />
@@ -24,8 +24,8 @@ export function AboutOOS1R({ onNavigateHome }: AboutPageProps) {
       <Csr />
       <Honors />
       <Structure />
-      <Products onNavigateHome={onNavigateHome} />
-      <Cta onNavigateHome={onNavigateHome} />
+      <Products onNavigateHome={props.onNavigateHome} />
+      <Cta onNavigateHome={props.onNavigateHome} />
     </div>
   );
 }

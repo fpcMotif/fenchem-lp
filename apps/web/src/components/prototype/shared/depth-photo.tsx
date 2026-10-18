@@ -1,7 +1,7 @@
 import * as stylex from "@stylexjs/stylex";
 import type { StyleXStyles } from "@stylexjs/stylex";
-import type { MotionValue } from "motion/react";
-import { useEffect, useRef, useState, type RefObject } from "react";
+import type { MotionValue } from "@/compat/motion";
+import { createEffect, createSignal, type Accessor } from "solid-js";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 import { COVER_UV, createFullscreenProgram, loadTexture, sizeCanvas } from "./webgl";
 import { GLYPH_SWEEP, PHOTO_INSET } from "./depth-photo-values";
@@ -212,244 +212,246 @@ function paintGlyphs(
   };
 }
 
-export function DepthPhoto({
-  src,
-  depthSrc,
-  progress,
-  waterline = 1,
-  glyphRoot,
-  rise,
-  onGlyphsReady,
-  sx,
-}: {
+type GlyphRoot = HTMLElement | null | undefined;
+
+export function DepthPhoto(props: {
   src: string;
   depthSrc: string;
   progress: MotionValue<number>;
   waterline?: number;
-  glyphRoot?: RefObject<HTMLElement | null>;
+  glyphRoot?: GlyphRoot | Accessor<GlyphRoot>;
   rise?: MotionValue<number>;
   onGlyphsReady?: () => void;
   sx?: StyleXStyles;
 }) {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [ready, setReady] = useState(false);
-  const reduce = useReducedMotion();
-  const glyphsReadyRef = useRef(onGlyphsReady);
-  useEffect(() => {
-    glyphsReadyRef.current = onGlyphsReady;
-  }, [onGlyphsReady]);
+  let canvas!: HTMLCanvasElement;
+  const [ready, setReady] = createSignal(false);
+  const reduceMotion = useReducedMotion();
 
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    const host = canvas?.parentElement?.parentElement;
-    if (!canvas || !host) return;
-    const gl = canvas.getContext("webgl", { antialias: false, premultipliedAlpha: false });
-    if (!gl) return;
-    const shader = createFullscreenProgram(gl, FRAGMENT);
-    if (!shader) return;
-    const { program } = shader;
-
-    const uColor = gl.getUniformLocation(program, "uColor");
-    const uDepth = gl.getUniformLocation(program, "uDepth");
-    const uGlyphs = gl.getUniformLocation(program, "uGlyphs");
-    const uRes = gl.getUniformLocation(program, "uRes");
-    const uImg = gl.getUniformLocation(program, "uImg");
-    const uOffset = gl.getUniformLocation(program, "uOffset");
-    const uTime = gl.getUniformLocation(program, "uTime");
-    const uWater = gl.getUniformLocation(program, "uWater");
-    const uSeed = gl.getUniformLocation(program, "uSeed");
-    const uGlyphRect = gl.getUniformLocation(program, "uGlyphRect");
-    const uGlyphsOn = gl.getUniformLocation(program, "uGlyphsOn");
-    const uRise = gl.getUniformLocation(program, "uRise");
-    const uPointer = gl.getUniformLocation(program, "uPointer");
-    const uPointerOn = gl.getUniformLocation(program, "uPointerOn");
-    gl.uniform1f(uWater, waterline);
-    gl.uniform1f(uSeed, Math.random() * 100);
-    gl.uniform1f(uGlyphsOn, 0);
-    gl.uniform4f(uGlyphRect, 0, 0, 1, 1);
-
-    const textures: WebGLTexture[] = [];
-    const animatesWater = waterline < 1 && !reduce;
-    const start = performance.now();
-    let loaded = false;
-    let frame = 0;
-    let visible = true;
-    let disposed = false;
-    const offset = { x: 0, y: 0 };
-    const pointer = { x: 0, y: 0, u: 0.5, v: 0.5, inside: false, strength: 0 };
-
-    const glyphs = glyphRoot?.current ?? null;
-    const glyphCanvas = glyphs ? document.createElement("canvas") : null;
-    const glyphContext = glyphCanvas?.getContext("2d") ?? null;
-    const glyphTexture = glyphContext ? gl.createTexture() : null;
-    let glyphsDirty = Boolean(glyphTexture);
-    let glyphsAnnounced = false;
-    if (glyphTexture) {
-      textures.push(glyphTexture);
-      gl.activeTexture(gl.TEXTURE2);
-      gl.bindTexture(gl.TEXTURE_2D, glyphTexture);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-      gl.uniform1i(uGlyphs, 2);
-    }
-
-    const target = () => {
-      if (reduce) return { x: 0, y: 0 };
-      const swing = Math.min(ORBIT_LIMIT, Math.max(-ORBIT_LIMIT, progress.get() - 0.5));
+  createEffect(
+    () => {
+      const root = props.glyphRoot;
       return {
-        x: swing * ORBIT_X + pointer.x,
-        y: -swing * ORBIT_Y + pointer.y,
+        src: props.src,
+        depthSrc: props.depthSrc,
+        progress: props.progress,
+        waterline: props.waterline ?? 1,
+        glyphs: (typeof root === "function" ? root() : root) ?? null,
+        rise: props.rise,
+        reduce: reduceMotion(),
       };
-    };
+    },
+    ({ src, depthSrc, progress, waterline, glyphs, rise, reduce }) => {
+      const host = canvas.parentElement?.parentElement;
+      if (!host) return;
+      const gl = canvas.getContext("webgl", { antialias: false, premultipliedAlpha: false });
+      if (!gl) return;
+      const shader = createFullscreenProgram(gl, FRAGMENT);
+      if (!shader) return;
+      const { program } = shader;
 
-    const resize = () => {
-      const size = sizeCanvas(canvas, gl);
-      gl.uniform2f(uRes, size.width, size.height);
-      glyphsDirty = Boolean(glyphTexture);
-    };
+      const uColor = gl.getUniformLocation(program, "uColor");
+      const uDepth = gl.getUniformLocation(program, "uDepth");
+      const uGlyphs = gl.getUniformLocation(program, "uGlyphs");
+      const uRes = gl.getUniformLocation(program, "uRes");
+      const uImg = gl.getUniformLocation(program, "uImg");
+      const uOffset = gl.getUniformLocation(program, "uOffset");
+      const uTime = gl.getUniformLocation(program, "uTime");
+      const uWater = gl.getUniformLocation(program, "uWater");
+      const uSeed = gl.getUniformLocation(program, "uSeed");
+      const uGlyphRect = gl.getUniformLocation(program, "uGlyphRect");
+      const uGlyphsOn = gl.getUniformLocation(program, "uGlyphsOn");
+      const uRise = gl.getUniformLocation(program, "uRise");
+      const uPointer = gl.getUniformLocation(program, "uPointer");
+      const uPointerOn = gl.getUniformLocation(program, "uPointerOn");
+      gl.uniform1f(uWater, waterline);
+      gl.uniform1f(uSeed, Math.random() * 100);
+      gl.uniform1f(uGlyphsOn, 0);
+      gl.uniform4f(uGlyphRect, 0, 0, 1, 1);
 
-    const uploadGlyphs = () => {
-      glyphsDirty = false;
-      if (!glyphs || !glyphCanvas || !glyphContext || !glyphTexture) return;
-      const painted = paintGlyphs(glyphs, canvas, glyphCanvas, glyphContext);
-      if (!painted) return;
-      for (const font of painted.fonts) {
-        if (!document.fonts.check(font)) {
-          void document.fonts.load(font).then(() => {
-            glyphsDirty = true;
-          });
+      const textures: WebGLTexture[] = [];
+      const animatesWater = waterline < 1 && !reduce;
+      const start = performance.now();
+      let loaded = false;
+      let frame = 0;
+      let visible = true;
+      let disposed = false;
+      const offset = { x: 0, y: 0 };
+      const pointer = { x: 0, y: 0, u: 0.5, v: 0.5, inside: false, strength: 0 };
+
+      const glyphCanvas = glyphs ? document.createElement("canvas") : null;
+      const glyphContext = glyphCanvas?.getContext("2d") ?? null;
+      const glyphTexture = glyphContext ? gl.createTexture() : null;
+      let glyphsDirty = Boolean(glyphTexture);
+      let glyphsAnnounced = false;
+      if (glyphTexture) {
+        textures.push(glyphTexture);
+        gl.activeTexture(gl.TEXTURE2);
+        gl.bindTexture(gl.TEXTURE_2D, glyphTexture);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+        gl.uniform1i(uGlyphs, 2);
+      }
+
+      const target = () => {
+        if (reduce) return { x: 0, y: 0 };
+        const swing = Math.min(ORBIT_LIMIT, Math.max(-ORBIT_LIMIT, progress.get() - 0.5));
+        return {
+          x: swing * ORBIT_X + pointer.x,
+          y: -swing * ORBIT_Y + pointer.y,
+        };
+      };
+
+      const resize = () => {
+        const size = sizeCanvas(canvas, gl);
+        gl.uniform2f(uRes, size.width, size.height);
+        glyphsDirty = Boolean(glyphTexture);
+      };
+
+      const uploadGlyphs = () => {
+        glyphsDirty = false;
+        if (!glyphs || !glyphCanvas || !glyphContext || !glyphTexture) return;
+        const painted = paintGlyphs(glyphs, canvas, glyphCanvas, glyphContext);
+        if (!painted) return;
+        for (const font of painted.fonts) {
+          if (!document.fonts.check(font)) {
+            void document.fonts.load(font).then(() => {
+              glyphsDirty = true;
+            });
+          }
         }
-      }
-      gl.activeTexture(gl.TEXTURE2);
-      gl.bindTexture(gl.TEXTURE_2D, glyphTexture);
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.ALPHA, gl.ALPHA, gl.UNSIGNED_BYTE, glyphCanvas);
-      gl.uniform4f(uGlyphRect, ...painted.rect);
-      gl.uniform1f(uGlyphsOn, 1);
-      if (!glyphsAnnounced) {
-        glyphsAnnounced = true;
-        glyphsReadyRef.current?.();
-      }
-    };
+        gl.activeTexture(gl.TEXTURE2);
+        gl.bindTexture(gl.TEXTURE_2D, glyphTexture);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.ALPHA, gl.ALPHA, gl.UNSIGNED_BYTE, glyphCanvas);
+        gl.uniform4f(uGlyphRect, ...painted.rect);
+        gl.uniform1f(uGlyphsOn, 1);
+        if (!glyphsAnnounced) {
+          glyphsAnnounced = true;
+          props.onGlyphsReady?.();
+        }
+      };
 
-    const draw = () => {
-      if (glyphsDirty) uploadGlyphs();
-      gl.uniform2f(uOffset, offset.x, offset.y);
-      gl.uniform1f(uTime, reduce ? 4 : (performance.now() - start) / 1000);
-      gl.uniform1f(uRise, rise ? rise.get() : 0);
-      gl.uniform2f(uPointer, pointer.u, pointer.v);
-      gl.uniform1f(uPointerOn, pointer.strength);
-      gl.drawArrays(gl.TRIANGLES, 0, 3);
-    };
+      const draw = () => {
+        if (glyphsDirty) uploadGlyphs();
+        gl.uniform2f(uOffset, offset.x, offset.y);
+        gl.uniform1f(uTime, reduce ? 4 : (performance.now() - start) / 1000);
+        gl.uniform1f(uRise, rise ? rise.get() : 0);
+        gl.uniform2f(uPointer, pointer.u, pointer.v);
+        gl.uniform1f(uPointerOn, pointer.strength);
+        gl.drawArrays(gl.TRIANGLES, 0, 3);
+      };
 
-    const loop = () => {
-      frame = 0;
-      if (disposed || !loaded) return;
-      const goal = target();
-      offset.x += (goal.x - offset.x) * 0.12;
-      offset.y += (goal.y - offset.y) * 0.12;
-      pointer.strength += ((pointer.inside ? 1 : 0) - pointer.strength) * 0.05;
-      draw();
-      const settled = Math.abs(goal.x - offset.x) < 0.0002 && Math.abs(goal.y - offset.y) < 0.0002;
-      if ((animatesWater || !settled) && visible && !document.hidden) {
-        frame = requestAnimationFrame(loop);
-      }
-    };
-
-    const kick = () => {
-      if (!frame && !disposed) frame = requestAnimationFrame(loop);
-    };
-
-    const markGlyphsDirty = () => {
-      glyphsDirty = Boolean(glyphTexture);
-      kick();
-    };
-
-    Promise.all([loadTexture(gl, src, 0, gl.RGB), loadTexture(gl, depthSrc, 1, gl.LUMINANCE)])
-      .then(([color, depth]) => {
-        if (disposed) return;
-        textures.push(color.texture, depth.texture);
-        gl.uniform1i(uColor, 0);
-        gl.uniform1i(uDepth, 1);
-        gl.uniform2f(uImg, color.width, color.height);
+      const loop = () => {
+        frame = 0;
+        if (disposed || !loaded) return;
         const goal = target();
-        offset.x = goal.x;
-        offset.y = goal.y;
-        loaded = true;
-        resize();
+        offset.x += (goal.x - offset.x) * 0.12;
+        offset.y += (goal.y - offset.y) * 0.12;
+        pointer.strength += ((pointer.inside ? 1 : 0) - pointer.strength) * 0.05;
         draw();
-        setReady(true);
+        const settled =
+          Math.abs(goal.x - offset.x) < 0.0002 && Math.abs(goal.y - offset.y) < 0.0002;
+        if ((animatesWater || !settled) && visible && !document.hidden) {
+          frame = requestAnimationFrame(loop);
+        }
+      };
+
+      const kick = () => {
+        if (!frame && !disposed) frame = requestAnimationFrame(loop);
+      };
+
+      const markGlyphsDirty = () => {
+        glyphsDirty = Boolean(glyphTexture);
         kick();
-      })
-      .catch(() => undefined);
+      };
 
-    const unsubscribe = progress.on("change", kick);
-    const unsubscribeRise = rise?.on("change", kick);
+      Promise.all([loadTexture(gl, src, 0, gl.RGB), loadTexture(gl, depthSrc, 1, gl.LUMINANCE)])
+        .then(([color, depth]) => {
+          if (disposed) return;
+          textures.push(color.texture, depth.texture);
+          gl.uniform1i(uColor, 0);
+          gl.uniform1i(uDepth, 1);
+          gl.uniform2f(uImg, color.width, color.height);
+          const goal = target();
+          offset.x = goal.x;
+          offset.y = goal.y;
+          loaded = true;
+          resize();
+          draw();
+          setReady(true);
+          kick();
+        })
+        .catch(() => undefined);
 
-    const onPointerMove = (event: PointerEvent) => {
-      const rect = host.getBoundingClientRect();
-      pointer.x = ((event.clientX - rect.left) / rect.width - 0.5) * POINTER_X;
-      pointer.y = ((event.clientY - rect.top) / rect.height - 0.5) * POINTER_Y;
-      const surface = canvas.getBoundingClientRect();
-      pointer.u = (event.clientX - surface.left) / surface.width;
-      pointer.v = (event.clientY - surface.top) / surface.height;
-      pointer.inside = true;
-      kick();
-    };
-    const onPointerLeave = () => {
-      pointer.x = 0;
-      pointer.y = 0;
-      pointer.inside = false;
-      kick();
-    };
-    host.addEventListener("pointermove", onPointerMove);
-    host.addEventListener("pointerleave", onPointerLeave);
+      const unsubscribe = progress.on("change", kick);
+      const unsubscribeRise = rise?.on("change", kick);
 
-    const resizeObserver = new ResizeObserver(() => {
-      resize();
-      if (loaded) draw();
-    });
-    resizeObserver.observe(canvas);
-    if (glyphs) resizeObserver.observe(glyphs);
+      const onPointerMove = (event: PointerEvent) => {
+        const rect = host.getBoundingClientRect();
+        pointer.x = ((event.clientX - rect.left) / rect.width - 0.5) * POINTER_X;
+        pointer.y = ((event.clientY - rect.top) / rect.height - 0.5) * POINTER_Y;
+        const surface = canvas.getBoundingClientRect();
+        pointer.u = (event.clientX - surface.left) / surface.width;
+        pointer.v = (event.clientY - surface.top) / surface.height;
+        pointer.inside = true;
+        kick();
+      };
+      const onPointerLeave = () => {
+        pointer.x = 0;
+        pointer.y = 0;
+        pointer.inside = false;
+        kick();
+      };
+      host.addEventListener("pointermove", onPointerMove);
+      host.addEventListener("pointerleave", onPointerLeave);
 
-    const glyphObserver = new MutationObserver(markGlyphsDirty);
-    if (glyphs) {
-      glyphObserver.observe(glyphs, {
-        subtree: true,
-        attributes: true,
-        attributeFilter: ["data-lake-glyph"],
+      const resizeObserver = new ResizeObserver(() => {
+        resize();
+        if (loaded) draw();
       });
-    }
-    document.fonts.addEventListener("loadingdone", markGlyphsDirty);
+      resizeObserver.observe(canvas);
+      if (glyphs) resizeObserver.observe(glyphs);
 
-    const visibility = new IntersectionObserver(([entry]) => {
-      visible = entry?.isIntersecting ?? true;
-      if (visible) kick();
-    });
-    visibility.observe(canvas);
+      const glyphObserver = new MutationObserver(markGlyphsDirty);
+      if (glyphs) {
+        glyphObserver.observe(glyphs, {
+          subtree: true,
+          attributes: true,
+          attributeFilter: ["data-lake-glyph"],
+        });
+      }
+      document.fonts.addEventListener("loadingdone", markGlyphsDirty);
 
-    return () => {
-      disposed = true;
-      if (frame) cancelAnimationFrame(frame);
-      unsubscribe();
-      unsubscribeRise?.();
-      host.removeEventListener("pointermove", onPointerMove);
-      host.removeEventListener("pointerleave", onPointerLeave);
-      resizeObserver.disconnect();
-      glyphObserver.disconnect();
-      document.fonts.removeEventListener("loadingdone", markGlyphsDirty);
-      visibility.disconnect();
-      for (const texture of textures) gl.deleteTexture(texture);
-      shader.dispose();
-    };
-  }, [src, depthSrc, progress, waterline, glyphRoot, rise, reduce]);
+      const visibility = new IntersectionObserver(([entry]) => {
+        visible = entry?.isIntersecting ?? true;
+        if (visible) kick();
+      });
+      visibility.observe(canvas);
+
+      return () => {
+        disposed = true;
+        if (frame) cancelAnimationFrame(frame);
+        unsubscribe();
+        unsubscribeRise?.();
+        host.removeEventListener("pointermove", onPointerMove);
+        host.removeEventListener("pointerleave", onPointerLeave);
+        resizeObserver.disconnect();
+        glyphObserver.disconnect();
+        document.fonts.removeEventListener("loadingdone", markGlyphsDirty);
+        visibility.disconnect();
+        for (const texture of textures) gl.deleteTexture(texture);
+        shader.dispose();
+      };
+    },
+  );
 
   return (
     <canvas
-      ref={canvasRef}
+      ref={canvas}
       aria-hidden="true"
-      {...stylex.props(styles.canvas, ready && styles.ready, sx)}
+      {...stylex.attrs(styles.canvas, ready() && styles.ready, props.sx)}
     />
   );
 }

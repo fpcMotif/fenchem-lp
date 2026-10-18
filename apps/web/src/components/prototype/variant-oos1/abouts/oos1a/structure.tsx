@@ -1,7 +1,7 @@
-import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
+import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { ChevronDown } from "lucide-react";
-import { useId, useState } from "react";
+import { ChevronDown } from "@fenchem-lp/ui/components/lucide";
+import { createSignal, createUniqueId } from "solid-js";
 
 import { ABOUT_STRUCTURE } from "../../about-data";
 import { ease, fonts, palette } from "./lattice.stylex";
@@ -21,32 +21,32 @@ const styles = stylex.create({
     display: "grid",
     gridTemplateColumns: {
       default: "minmax(0, 1fr)",
-      [breakpoints.lg]: "repeat(16, minmax(0, 1fr))",
+      ["@media (min-width: 1024px)"]: "repeat(16, minmax(0, 1fr))",
     },
     rowGap: 40,
   },
   holding: {
-    gridColumn: { default: null, [breakpoints.lg]: "1 / span 6" },
+    gridColumn: { default: null, ["@media (min-width: 1024px)"]: "1 / span 6" },
     display: "flex",
     flexDirection: "column",
     alignItems: "flex-start",
     gap: 12,
-    paddingInlineEnd: { default: 0, [breakpoints.lg]: 32 },
+    paddingInlineEnd: { default: 0, ["@media (min-width: 1024px)"]: 32 },
   },
   holdingName: {
     margin: 0,
     fontFamily: fonts.cjk,
-    fontSize: { default: 26, [breakpoints.xl]: 32 },
+    fontSize: { default: 26, ["@media (min-width: 1280px)"]: 32 },
     fontWeight: 500,
     lineHeight: 1.3,
     letterSpacing: "0.03em",
     color: palette.ink,
   },
   holdingEnglish: {
-    fontSize: { default: 20, [breakpoints.xl]: 24 },
+    fontSize: { default: 20, ["@media (min-width: 1280px)"]: 24 },
   },
   branches: {
-    gridColumn: { default: null, [breakpoints.lg]: "8 / span 9" },
+    gridColumn: { default: null, ["@media (min-width: 1024px)"]: "8 / span 9" },
     display: "flex",
     flexDirection: "column",
     gap: 12,
@@ -58,10 +58,10 @@ const styles = stylex.create({
   },
   branch: {
     display: "flex",
-    flexDirection: { default: "column", [breakpoints.md]: "row" },
-    alignItems: { default: "flex-start", [breakpoints.md]: "baseline" },
+    flexDirection: { default: "column", ["@media (min-width: 768px)"]: "row" },
+    alignItems: { default: "flex-start", ["@media (min-width: 768px)"]: "baseline" },
     justifyContent: "space-between",
-    gap: { default: 4, [breakpoints.md]: 24 },
+    gap: { default: 4, ["@media (min-width: 768px)"]: 24 },
     paddingBlock: 20,
     borderTopWidth: 1,
     borderTopStyle: "solid",
@@ -70,7 +70,7 @@ const styles = stylex.create({
   branchName: {
     margin: 0,
     fontFamily: fonts.cjk,
-    fontSize: { default: 17, [breakpoints.xl]: 19 },
+    fontSize: { default: 17, ["@media (min-width: 1280px)"]: 19 },
     fontWeight: 500,
     lineHeight: 1.4,
     letterSpacing: "0.04em",
@@ -81,7 +81,7 @@ const styles = stylex.create({
     flexDirection: "column",
     alignItems: "flex-start",
     gap: 28,
-    marginTop: { default: 48, [breakpoints.lg]: 72 },
+    marginTop: { default: 48, ["@media (min-width: 1024px)"]: 72 },
   },
   toggleIcon: {
     transitionProperty: "transform",
@@ -95,9 +95,9 @@ const styles = stylex.create({
     width: "100%",
     maxWidth: 1000,
     boxSizing: "border-box",
-    padding: { default: 8, [breakpoints.md]: 16 },
+    padding: { default: 8, ["@media (min-width: 768px)"]: 16 },
     backgroundColor: colors.paper,
-    animationName: { default: null, [breakpoints.motionOk]: fadeIn },
+    animationName: { default: null, ["@media (prefers-reduced-motion: no-preference)"]: fadeIn },
     animationDuration: "400ms",
     animationTimingFunction: ease.out,
   },
@@ -109,34 +109,34 @@ const styles = stylex.create({
 });
 
 export function Structure() {
-  const [showDiagram, setShowDiagram] = useState(false);
-  const diagramId = useId();
+  const [showDiagram, setShowDiagram] = createSignal(false);
+  const diagramId = createUniqueId();
 
   return (
     <section
       id="about-structure"
       aria-labelledby="about-structure-title"
-      {...stylex.props(styles.section, shared.anchor)}
+      {...stylex.attrs(styles.section, shared.anchor)}
     >
       <SectionName id="about-structure-title">{ABOUT_STRUCTURE.eyebrow}</SectionName>
       <Frame innerSx={shared.sectionPad}>
-        <div {...stylex.props(styles.tree)}>
+        <div {...stylex.attrs(styles.tree)}>
           <Reveal sx={styles.holding}>
-            <p {...stylex.props(shared.small)}>{ABOUT_STRUCTURE.holding.badge}</p>
-            <h3 {...stylex.props(styles.holdingName)}>{ABOUT_STRUCTURE.holding.name}</h3>
-            <p lang="en" {...stylex.props(shared.serifLine, styles.holdingEnglish)}>
+            <p {...stylex.attrs(shared.small)}>{ABOUT_STRUCTURE.holding.badge}</p>
+            <h3 {...stylex.attrs(styles.holdingName)}>{ABOUT_STRUCTURE.holding.name}</h3>
+            <p lang="en" {...stylex.attrs(shared.serifLine, styles.holdingEnglish)}>
               {ABOUT_STRUCTURE.holding.english}
             </p>
           </Reveal>
           <Reveal step={1} sx={styles.branches}>
-            <p id="about-structure-subsidiaries" {...stylex.props(shared.small)}>
+            <p id="about-structure-subsidiaries" {...stylex.attrs(shared.small)}>
               {ABOUT_STRUCTURE.subsidiaryBadge}
             </p>
-            <ul aria-labelledby="about-structure-subsidiaries" {...stylex.props(styles.branchList)}>
+            <ul aria-labelledby="about-structure-subsidiaries" {...stylex.attrs(styles.branchList)}>
               {ABOUT_STRUCTURE.subsidiaries.map((sub) => (
-                <li key={sub.id} {...stylex.props(styles.branch)}>
-                  <h3 {...stylex.props(styles.branchName)}>{sub.name}</h3>
-                  <span lang="en" {...stylex.props(shared.small)}>
+                <li {...stylex.attrs(styles.branch)}>
+                  <h3 {...stylex.attrs(styles.branchName)}>{sub.name}</h3>
+                  <span lang="en" {...stylex.attrs(shared.small)}>
                     {sub.english}
                   </span>
                 </li>
@@ -144,28 +144,28 @@ export function Structure() {
             </ul>
           </Reveal>
         </div>
-        <div {...stylex.props(styles.toggleRow)}>
+        <div {...stylex.attrs(styles.toggleRow)}>
           <button
             type="button"
-            aria-expanded={showDiagram}
+            aria-expanded={showDiagram() ? "true" : "false"}
             aria-controls={diagramId}
             onClick={() => setShowDiagram((previous) => !previous)}
-            {...stylex.props(shared.button, shared.buttonOutline, shared.focusRing)}
+            {...stylex.attrs(shared.button, shared.buttonOutline, shared.focusRing)}
           >
-            <span>{showDiagram ? "收起组织架构图" : "查看官方组织架构图"}</span>
+            <span>{showDiagram() ? "收起组织架构图" : "查看官方组织架构图"}</span>
             <ChevronDown
               size={16}
               aria-hidden="true"
-              {...stylex.props(styles.toggleIcon, showDiagram && styles.toggleIconOpen)}
+              {...stylex.attrs(styles.toggleIcon, showDiagram() && styles.toggleIconOpen)}
             />
           </button>
-          <div id={diagramId} hidden={!showDiagram} {...stylex.props(styles.diagram)}>
+          <div id={diagramId} hidden={!showDiagram()} {...stylex.attrs(styles.diagram)}>
             <img
               src={ABOUT_STRUCTURE.chartImage}
               alt="Official organizational chart of Nanjing Fenchem International Holdings Corporation Limited"
               loading="lazy"
               decoding="async"
-              {...stylex.props(styles.diagramImage)}
+              {...stylex.attrs(styles.diagramImage)}
             />
           </div>
         </div>

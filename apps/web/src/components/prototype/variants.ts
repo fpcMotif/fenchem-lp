@@ -1,10 +1,10 @@
-import { createElement, lazy, type ComponentType } from "react";
+import { createComponent, lazy, merge, type Component } from "solid-js";
 
 import type { SubPageProps } from "./variant-oos1/index";
 
 /*
  * PROTOTYPE — single source of truth for the Fenchem landing variants.
- * Code-split with React.lazy so heavy prototype dependencies (Three.js for
+ * Code-split with Solid's lazy so heavy prototype dependencies (Three.js for
  * Waterfall, GSAP for Variant J, and individual prototype stylesheets)
  * are loaded strictly on-demand per active variant, minimizing initial JS bundle.
  *
@@ -20,7 +20,7 @@ type VariantEntry = {
   name: string;
   /** "page" renders on its own; "about" and "products" render inside the oos1 shell. */
   family: "page" | "about" | "products";
-  Component: ComponentType;
+  Component: Component;
   /** Brand variant → the original editorial prototype it reinterprets. */
   twinOf?: string;
 };
@@ -79,17 +79,13 @@ const PRODUCT_NAMES: Record<string, string> = {
 
 type Loader<T> = () => Promise<T>;
 
-const aboutViews = import.meta.glob<Record<string, ComponentType<SubPageProps>>>(
+const aboutViews = import.meta.glob<Record<string, Component<SubPageProps>>>(
   "./variant-oos1/abouts/*/about-view.tsx",
 );
-const catalogs = import.meta.glob<{ Catalog: ComponentType }>(
-  "./variant-oos1/products/*/catalog.tsx",
-);
-const solutions = import.meta.glob<{ Solutions: ComponentType }>(
+const catalogs = import.meta.glob<{ Catalog: Component }>("./variant-oos1/products/*/catalog.tsx");
+const solutions = import.meta.glob<{ Solutions: Component }>(
   "./variant-oos1/products/*/solutions.tsx",
 );
-
-const loadShell = () => import("./variant-oos1/index").then((m) => m.VariantOOS1);
 
 function byFolder<T>(modules: Record<string, Loader<T>>): [key: string, load: Loader<T>][] {
   return Object.entries(modules)
@@ -97,10 +93,13 @@ function byFolder<T>(modules: Record<string, Loader<T>>): [key: string, load: Lo
     .sort(([a], [b]) => a.localeCompare(b));
 }
 
+// Each lazy() resolves to the real module and names its export, so SSR can read the
+// module's $$moduleUrl and the client preloads it before hydration.
 function page(
   key: string,
   name: string,
-  load: Loader<ComponentType>,
+  load: Loader<Record<string, Component>>,
+  exportName: string,
   twinOf?: string,
 ): VariantEntry {
   return {
@@ -108,163 +107,149 @@ function page(
     name,
     family: "page",
     twinOf,
-    Component: lazy(() => load().then((Page) => ({ default: Page }))),
+    Component: lazy(load, { export: exportName }),
   };
 }
 
-const ABOUT_VARIANTS = byFolder(aboutViews).map(([key, loadView]): VariantEntry => ({
-  key,
-  name: `O campus about · ${ABOUT_NAMES[key] ?? key}`,
-  family: "about",
-  twinOf: "oos1",
-  Component: lazy(async () => {
-    const [VariantOOS1, view] = await Promise.all([loadShell(), loadView()]);
-    const exportName = `About${key.toUpperCase()}`;
-    const AboutPage = view[exportName];
-    if (!AboutPage) throw new Error(`abouts/${key}/about-view.tsx must export ${exportName}`);
-    return { default: () => createElement(VariantOOS1, { AboutPage, startView: "about" }) };
-  }),
-}));
+const Shell = lazy(() => import("./variant-oos1/index"), { export: "VariantOOS1" });
+const ProductsView = lazy(() => import("./variant-oos1/products-view"), {
+  export: "ProductsView",
+});
 
-const PRODUCT_VARIANTS = byFolder(catalogs).map(([key, loadCatalog]): VariantEntry => ({
-  key,
-  name: `O campus products · ${PRODUCT_NAMES[key] ?? key}`,
-  family: "products",
-  twinOf: "oos1",
-  Component: lazy(async () => {
-    const [VariantOOS1, { ProductsView }, { Catalog }, solutionsModule] = await Promise.all([
-      loadShell(),
-      import("./variant-oos1/products-view"),
-      loadCatalog(),
-      solutions[`./variant-oos1/products/${key}/solutions.tsx`]?.(),
-    ]);
-    const ProductsPage = (props: SubPageProps) =>
-      createElement(ProductsView, {
-        ...props,
-        CatalogSection: Catalog,
-        SolutionsSection: solutionsModule?.Solutions,
-      });
-    return { default: () => createElement(VariantOOS1, { ProductsPage, startView: "products" }) };
-  }),
-}));
+const ABOUT_VARIANTS = byFolder(aboutViews).map(([key, loadView]): VariantEntry => {
+  const AboutPage = lazy(loadView, { export: `About${key.toUpperCase()}` });
+  return {
+    key,
+    name: `O campus about · ${ABOUT_NAMES[key] ?? key}`,
+    family: "about",
+    twinOf: "oos1",
+    Component: () => createComponent(Shell, { AboutPage, startView: "about" }),
+  };
+});
+
+const PRODUCT_VARIANTS = byFolder(catalogs).map(([key, loadCatalog]): VariantEntry => {
+  const loadSolutions = solutions[`./variant-oos1/products/${key}/solutions.tsx`];
+  const CatalogSection = lazy(loadCatalog, { export: "Catalog" });
+  const SolutionsSection = loadSolutions && lazy(loadSolutions, { export: "Solutions" });
+  const ProductsPage = (props: SubPageProps) =>
+    createComponent(ProductsView, merge(props, { CatalogSection, SolutionsSection }));
+  return {
+    key,
+    name: `O campus products · ${PRODUCT_NAMES[key] ?? key}`,
+    family: "products",
+    twinOf: "oos1",
+    Component: () => createComponent(Shell, { ProductsPage, startView: "products" }),
+  };
+});
 
 export const VARIANTS: readonly VariantEntry[] = [
-  page("a", "Botanical Editorial · original", () => import("./variant-a").then((m) => m.VariantA)),
-  page(
-    "d",
-    "Botanical Editorial · brand",
-    () => import("./variant-d").then((m) => m.VariantD),
-    "a",
-  ),
-  page("b", "Innovation Lab · original", () => import("./variant-b").then((m) => m.VariantB)),
-  page("e", "Innovation Lab · brand", () => import("./variant-e").then((m) => m.VariantE), "b"),
-  page("c", "Deep Forest · original", () => import("./variant-c").then((m) => m.VariantC)),
-  page("f", "Deep Green · brand", () => import("./variant-f").then((m) => m.VariantF), "c"),
-  page("g", "Hybrid · brand", () => import("./variant-g").then((m) => m.VariantG)),
-  page("h", "Production · recommended", () => import("./variant-h").then((m) => m.VariantH)),
-  page("i", "Market Portal · Seppic-style", () => import("./variant-i").then((m) => m.VariantI)),
-  page("j", "Greenhouse Ledger · motion", () =>
-    import("./variant-j/index").then((m) => m.VariantJ),
-  ),
-  page("k", "Color Block · campaign", () => import("./variant-k").then((m) => m.VariantK)),
-  page("v", "Production · vivid", () => import("./variant-v").then((m) => m.VariantV), "h"),
-  page("s", "Strontium · periodic index", () => import("./variant-s").then((m) => m.VariantS), "v"),
-  page("t", "Chevron · kinetic poster", () => import("./variant-t").then((m) => m.VariantT)),
-  page("u", "Ledger · Stitch corporate", () => import("./variant-u").then((m) => m.VariantU)),
-  page("x", "Folio · magazine spread", () => import("./variant-x").then((m) => m.VariantX)),
-  page("y", "Atlas · dark globe hero", () => import("./variant-y").then((m) => m.VariantY)),
-  page("o", "Official site · Figma 官网设计", () =>
-    import("./variant-o/index").then((m) => m.VariantO),
-  ),
-  page(
-    "oo",
-    "Official site · refined",
-    () => import("./variant-oo/index").then((m) => m.VariantOO),
-    "o",
-  ),
+  page("a", "Botanical Editorial · original", () => import("./variant-a"), "VariantA"),
+  page("d", "Botanical Editorial · brand", () => import("./variant-d"), "VariantD", "a"),
+  page("b", "Innovation Lab · original", () => import("./variant-b"), "VariantB"),
+  page("e", "Innovation Lab · brand", () => import("./variant-e"), "VariantE", "b"),
+  page("c", "Deep Forest · original", () => import("./variant-c"), "VariantC"),
+  page("f", "Deep Green · brand", () => import("./variant-f"), "VariantF", "c"),
+  page("g", "Hybrid · brand", () => import("./variant-g"), "VariantG"),
+  page("h", "Production · recommended", () => import("./variant-h"), "VariantH"),
+  page("i", "Market Portal · Seppic-style", () => import("./variant-i"), "VariantI"),
+  page("j", "Greenhouse Ledger · motion", () => import("./variant-j/index"), "VariantJ"),
+  page("k", "Color Block · campaign", () => import("./variant-k"), "VariantK"),
+  page("v", "Production · vivid", () => import("./variant-v"), "VariantV", "h"),
+  page("s", "Strontium · periodic index", () => import("./variant-s"), "VariantS", "v"),
+  page("t", "Chevron · kinetic poster", () => import("./variant-t"), "VariantT"),
+  page("u", "Ledger · Stitch corporate", () => import("./variant-u"), "VariantU"),
+  page("x", "Folio · magazine spread", () => import("./variant-x"), "VariantX"),
+  page("y", "Atlas · dark globe hero", () => import("./variant-y"), "VariantY"),
+  page("o", "Official site · Figma 官网设计", () => import("./variant-o/index"), "VariantO"),
+  page("oo", "Official site · refined", () => import("./variant-oo/index"), "VariantOO", "o"),
   page(
     "oo1",
     "Official site · candidate 1",
-    () => import("./variant-oo1/index").then((m) => m.VariantOO1),
+    () => import("./variant-oo1/index"),
+    "VariantOO1",
     "o",
   ),
   page(
     "oo2",
     "Official site · candidate 2",
-    () => import("./variant-oo2/index").then((m) => m.VariantOO2),
+    () => import("./variant-oo2/index"),
+    "VariantOO2",
     "o",
   ),
-  page(
-    "oos",
-    "Official site · O campus",
-    () => import("./variant-oos/index").then((m) => m.VariantOOS),
-    "o",
-  ),
+  page("oos", "Official site · O campus", () => import("./variant-oos/index"), "VariantOOS", "o"),
   page(
     "oos1",
     "Official site · O campus quadrants",
-    () => import("./variant-oos1/index").then((m) => m.VariantOOS1),
+    () => import("./variant-oos1/index"),
+    "VariantOOS1",
     "oos",
   ),
   ...ABOUT_VARIANTS,
   page(
     "oos1doubao",
     "O campus products · Doubao / title banner + underline tabs",
-    () => import("./variant-oos1/products/oos1doubao/index").then((m) => m.VariantOOS1Doubao),
+    () => import("./variant-oos1/products/oos1doubao/index"),
+    "VariantOOS1Doubao",
     "oos1",
   ),
   page(
     "oos1figma",
     "O campus products · Figma per-tab hero + In fiber spotlight",
-    () => import("./variant-oos1/products/oos1figma/index").then((m) => m.VariantOOS1Figma),
+    () => import("./variant-oos1/products/oos1figma/index"),
+    "VariantOOS1Figma",
     "oos1",
   ),
   ...PRODUCT_VARIANTS,
   page(
     "oos2",
     "Official site · O campus keep-open",
-    () => import("./variant-oos/index").then((m) => m.VariantOOS),
+    () => import("./variant-oos/index"),
+    "VariantOOS",
     "oos",
   ),
   page(
     "oos3",
     "Official site · O campus quadrants keep-open",
-    () => import("./variant-oos3/index").then((m) => m.VariantOOS3),
+    () => import("./variant-oos3/index"),
+    "VariantOOS3",
     "oos1",
   ),
   page(
     "ooss",
     "Official site · O campus polish",
-    () => import("./variant-ooss/index").then((m) => m.VariantOOSS),
+    () => import("./variant-ooss/index"),
+    "VariantOOSS",
     "o",
   ),
   page(
     "oox",
     "Official site · Crosscut markets",
-    () => import("./variant-oox/index").then((m) => m.VariantOOX),
+    () => import("./variant-oox/index"),
+    "VariantOOX",
     "oos",
   ),
   page(
     "oox1",
     "Official site · Deck markets",
-    () => import("./variant-oox1/index").then((m) => m.VariantOOX1),
+    () => import("./variant-oox1/index"),
+    "VariantOOX1",
     "oos",
   ),
   page(
     "oox2",
     "Official site · Fork markets",
-    () => import("./variant-oox2/index").then((m) => m.VariantOOX2),
+    () => import("./variant-oox2/index"),
+    "VariantOOX2",
     "oos",
   ),
   page(
     "oox3",
     "Official site · Aperture markets",
-    () => import("./variant-oox3/index").then((m) => m.VariantOOX3),
+    () => import("./variant-oox3/index"),
+    "VariantOOX3",
     "oos",
   ),
-  page("w", "Three.js Waterfall Fountain", () =>
-    import("./variant-waterfall").then((m) => m.VariantWaterfall),
-  ),
+  page("w", "Three.js Waterfall Fountain", () => import("./variant-waterfall"), "VariantWaterfall"),
 ];
 
 export type VariantKey = VariantEntry["key"];

@@ -1,7 +1,6 @@
-import { breakpoints } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { ChevronDown } from "lucide-react";
-import { useId, useState } from "react";
+import { ChevronDown } from "@fenchem-lp/ui/components/lucide";
+import { createSignal, createUniqueId } from "solid-js";
 
 import { ABOUT_STRUCTURE } from "../../../about-data";
 import { Sheet } from "../sheet";
@@ -108,7 +107,7 @@ const styles = stylex.create({
   diagram: {
     width: "100%",
     maxWidth: 920,
-    animationName: { default: null, [breakpoints.motionOk]: fadeIn },
+    animationName: { default: null, ["@media (prefers-reduced-motion: no-preference)"]: fadeIn },
     animationDuration: "260ms",
     animationTimingFunction: EASE_OUT_CSS,
   },
@@ -121,31 +120,31 @@ const styles = stylex.create({
 });
 
 export function StructureSheet() {
-  const [showDiagram, setShowDiagram] = useState(false);
-  const diagramId = useId();
+  const [showDiagram, setShowDiagram] = createSignal(false);
+  const diagramId = createUniqueId();
 
   return (
     <Sheet def={STRUCTURE_SHEET}>
-      <div {...stylex.props(styles.chart)}>
+      <div {...stylex.attrs(styles.chart)}>
         <Reveal sx={styles.holding}>
-          <span {...stylex.props(base.quiet, styles.holdingBadge)}>
+          <span {...stylex.attrs(base.quiet, styles.holdingBadge)}>
             {ABOUT_STRUCTURE.holding.badge}
           </span>
-          <h3 {...stylex.props(styles.holdingName)}>{ABOUT_STRUCTURE.holding.name}</h3>
-          <div lang="en" {...stylex.props(styles.holdingEnglish)}>
+          <h3 {...stylex.attrs(styles.holdingName)}>{ABOUT_STRUCTURE.holding.name}</h3>
+          <div lang="en" {...stylex.attrs(styles.holdingEnglish)}>
             {ABOUT_STRUCTURE.holding.english}
           </div>
         </Reveal>
         <Reveal step={1} sx={styles.branches}>
-          <span {...stylex.props(base.quiet)}>{ABOUT_STRUCTURE.subsidiaryBadge}</span>
+          <span {...stylex.attrs(base.quiet)}>{ABOUT_STRUCTURE.subsidiaryBadge}</span>
           <ul
             aria-label={ABOUT_STRUCTURE.subsidiaryBadgeEnglish}
-            {...stylex.props(styles.branchList)}
+            {...stylex.attrs(styles.branchList)}
           >
             {ABOUT_STRUCTURE.subsidiaries.map((sub) => (
-              <li key={sub.id} {...stylex.props(styles.branch)}>
-                <h4 {...stylex.props(styles.branchName)}>{sub.name}</h4>
-                <span lang="en" {...stylex.props(styles.branchEnglish)}>
+              <li {...stylex.attrs(styles.branch)}>
+                <h4 {...stylex.attrs(styles.branchName)}>{sub.name}</h4>
+                <span lang="en" {...stylex.attrs(styles.branchEnglish)}>
                   {sub.english}
                 </span>
               </li>
@@ -153,28 +152,28 @@ export function StructureSheet() {
           </ul>
         </Reveal>
       </div>
-      <div {...stylex.props(styles.toggleWrap)}>
+      <div {...stylex.attrs(styles.toggleWrap)}>
         <button
           type="button"
-          aria-expanded={showDiagram}
+          aria-expanded={showDiagram() ? "true" : "false"}
           aria-controls={diagramId}
           onClick={() => setShowDiagram((previous) => !previous)}
-          {...stylex.props(base.button, base.buttonOutline, base.focusRing)}
+          {...stylex.attrs(base.button, base.buttonOutline, base.focusRing)}
         >
-          <span>{showDiagram ? "收起组织架构图" : "查看官方组织架构图"}</span>
+          <span>{showDiagram() ? "收起组织架构图" : "查看官方组织架构图"}</span>
           <ChevronDown
             size={16}
             aria-hidden="true"
-            {...stylex.props(styles.toggleIcon, showDiagram && styles.toggleIconOpen)}
+            {...stylex.attrs(styles.toggleIcon, showDiagram() && styles.toggleIconOpen)}
           />
         </button>
-        <div id={diagramId} hidden={!showDiagram} {...stylex.props(styles.diagram)}>
+        <div id={diagramId} hidden={!showDiagram()} {...stylex.attrs(styles.diagram)}>
           <img
             src={ABOUT_STRUCTURE.chartImage}
             alt="Official organizational chart of Nanjing Fenchem International Holdings Corporation Limited"
             loading="lazy"
             decoding="async"
-            {...stylex.props(styles.diagramImage)}
+            {...stylex.attrs(styles.diagramImage)}
           />
         </div>
       </div>

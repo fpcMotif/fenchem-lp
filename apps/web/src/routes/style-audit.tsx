@@ -30,9 +30,16 @@ import { Label } from "@fenchem-lp/ui/components/label";
 import { Skeleton } from "@fenchem-lp/ui/components/skeleton";
 import { breakpoints, colors, radii, typography } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { createFileRoute } from "@tanstack/react-router";
-import { ArrowRight, ChevronRight, Download, Mail, Plus, Trash2 } from "lucide-react";
-import * as React from "react";
+import { createFileRoute } from "@tanstack/solid-router";
+import {
+  ArrowRight,
+  ChevronRight,
+  Download,
+  Mail,
+  Plus,
+  Trash2,
+} from "@fenchem-lp/ui/components/lucide";
+import { createSignal } from "solid-js";
 
 export const Route = createFileRoute("/style-audit")({
   component: StyleAuditComponent,
@@ -169,39 +176,39 @@ const auditStyles = stylex.create({
 });
 
 function StyleAuditComponent() {
-  const [checked, setChecked] = React.useState(true);
-  const [radioVal, setRadioVal] = React.useState("option1");
+  const [checked, setChecked] = createSignal(true);
+  const [radioVal, setRadioVal] = createSignal("option1");
 
   return (
-    <div {...stylex.props(auditStyles.page)}>
-      <header {...stylex.props(auditStyles.header)}>
-        <h1 {...stylex.props(auditStyles.title)}>Design System Style Audit Matrix</h1>
-        <p {...stylex.props(auditStyles.desc)}>
+    <div {...stylex.attrs(auditStyles.page)}>
+      <header {...stylex.attrs(auditStyles.header)}>
+        <h1 {...stylex.attrs(auditStyles.title)}>Design System Style Audit Matrix</h1>
+        <p {...stylex.attrs(auditStyles.desc)}>
           Visual verification and computed-style comparison matrix for UI primitives in light & dark
           polarity.
         </p>
       </header>
 
       {/* Light & Dark Matrix side-by-side or stacked */}
-      <div {...stylex.props(auditStyles.matrixGrid)}>
+      <div {...stylex.attrs(auditStyles.matrixGrid)}>
         {/* Light Polarity */}
-        <div id="audit-light" {...stylex.props(auditStyles.panel)}>
-          <h2 {...stylex.props(auditStyles.panelTitle)}>Light Theme Polarity</h2>
+        <div id="audit-light" {...stylex.attrs(auditStyles.panel)}>
+          <h2 {...stylex.attrs(auditStyles.panelTitle)}>Light Theme Polarity</h2>
           <ComponentMatrix
-            checked={checked}
+            checked={checked()}
             setChecked={setChecked}
-            radioVal={radioVal}
+            radioVal={radioVal()}
             setRadioVal={setRadioVal}
           />
         </div>
 
         {/* Dark Polarity */}
-        <div id="audit-dark" className="dark" {...stylex.props(auditStyles.panel)}>
-          <h2 {...stylex.props(auditStyles.panelTitle)}>Dark Theme Polarity</h2>
+        <div id="audit-dark" class="dark" {...stylex.attrs(auditStyles.panel)}>
+          <h2 {...stylex.attrs(auditStyles.panelTitle)}>Dark Theme Polarity</h2>
           <ComponentMatrix
-            checked={checked}
+            checked={checked()}
             setChecked={setChecked}
-            radioVal={radioVal}
+            radioVal={radioVal()}
             setRadioVal={setRadioVal}
           />
         </div>
@@ -229,25 +236,20 @@ const BUTTON_SIZES = [
   "icon-lg",
 ] as const;
 
-function ComponentMatrix({
-  checked,
-  setChecked,
-  radioVal,
-  setRadioVal,
-}: {
+function ComponentMatrix(props: {
   checked: boolean;
   setChecked: (v: boolean) => void;
   radioVal: string;
   setRadioVal: (v: string) => void;
 }) {
   return (
-    <div {...stylex.props(auditStyles.section)}>
+    <div {...stylex.attrs(auditStyles.section)}>
       {/* Buttons */}
-      <section {...stylex.props(auditStyles.section)}>
-        <h3 {...stylex.props(auditStyles.sectionTitle)}>1. Buttons</h3>
-        <div {...stylex.props(auditStyles.flexRow)}>
+      <section {...stylex.attrs(auditStyles.section)}>
+        <h3 {...stylex.attrs(auditStyles.sectionTitle)}>1. Buttons</h3>
+        <div {...stylex.attrs(auditStyles.flexRow)}>
           {BUTTON_VARIANTS.map((v) => (
-            <Button key={v} variant={v} id={`btn-variant-${v}`}>
+            <Button variant={v} id={`btn-variant-${v}`}>
               {v.toUpperCase()}
             </Button>
           ))}
@@ -261,9 +263,9 @@ function ComponentMatrix({
           </Button>
         </div>
 
-        <div {...stylex.props(auditStyles.flexRow)}>
+        <div {...stylex.attrs(auditStyles.flexRow)}>
           {BUTTON_SIZES.map((s) => (
-            <Button key={s} size={s} variant="outline" id={`btn-size-${s}`}>
+            <Button size={s} variant="outline" id={`btn-size-${s}`}>
               {s.includes("icon") ? <Plus size={16} /> : s}
             </Button>
           ))}
@@ -271,59 +273,59 @@ function ComponentMatrix({
       </section>
 
       {/* Inputs & Labels */}
-      <section {...stylex.props(auditStyles.section)}>
-        <h3 {...stylex.props(auditStyles.sectionTitle)}>2. Inputs & Labels</h3>
-        <div {...stylex.props(auditStyles.formGrid)}>
-          <div {...stylex.props(auditStyles.formField)}>
-            <Label htmlFor="input-default">Default Input</Label>
+      <section {...stylex.attrs(auditStyles.section)}>
+        <h3 {...stylex.attrs(auditStyles.sectionTitle)}>2. Inputs & Labels</h3>
+        <div {...stylex.attrs(auditStyles.formGrid)}>
+          <div {...stylex.attrs(auditStyles.formField)}>
+            <Label for="input-default">Default Input</Label>
             <Input id="input-default" placeholder="Enter text..." />
           </div>
-          <div {...stylex.props(auditStyles.formField)}>
-            <Label htmlFor="input-disabled">Disabled Input</Label>
+          <div {...stylex.attrs(auditStyles.formField)}>
+            <Label for="input-disabled">Disabled Input</Label>
             <Input id="input-disabled" disabled placeholder="Disabled field" />
           </div>
-          <div {...stylex.props(auditStyles.formField)}>
-            <Label htmlFor="input-invalid">Invalid State</Label>
-            <Input id="input-invalid" aria-invalid="true" defaultValue="invalid@value" />
+          <div {...stylex.attrs(auditStyles.formField)}>
+            <Label for="input-invalid">Invalid State</Label>
+            <Input id="input-invalid" aria-invalid="true" value="invalid@value" />
           </div>
-          <div {...stylex.props(auditStyles.formField)}>
-            <Label htmlFor="input-file">File Input</Label>
+          <div {...stylex.attrs(auditStyles.formField)}>
+            <Label for="input-file">File Input</Label>
             <Input id="input-file" type="file" />
           </div>
         </div>
       </section>
 
       {/* Checkboxes */}
-      <section {...stylex.props(auditStyles.section)}>
-        <h3 {...stylex.props(auditStyles.sectionTitle)}>3. Checkboxes</h3>
-        <div {...stylex.props(auditStyles.flexRowGap6)}>
-          <div {...stylex.props(auditStyles.fieldRow)}>
+      <section {...stylex.attrs(auditStyles.section)}>
+        <h3 {...stylex.attrs(auditStyles.sectionTitle)}>3. Checkboxes</h3>
+        <div {...stylex.attrs(auditStyles.flexRowGap6)}>
+          <div {...stylex.attrs(auditStyles.fieldRow)}>
             <Checkbox
               id="chk-default"
-              checked={checked}
-              onCheckedChange={(c) => setChecked(Boolean(c))}
+              checked={props.checked}
+              onCheckedChange={(c) => props.setChecked(Boolean(c))}
             />
-            <Label htmlFor="chk-default">Interactive ({checked ? "Checked" : "Unchecked"})</Label>
+            <Label for="chk-default">Interactive ({props.checked ? "Checked" : "Unchecked"})</Label>
           </div>
-          <div {...stylex.props(auditStyles.fieldRow)}>
+          <div {...stylex.attrs(auditStyles.fieldRow)}>
             <Checkbox id="chk-unchecked" checked={false} />
-            <Label htmlFor="chk-unchecked">Unchecked</Label>
+            <Label for="chk-unchecked">Unchecked</Label>
           </div>
-          <div {...stylex.props(auditStyles.fieldRow)}>
+          <div {...stylex.attrs(auditStyles.fieldRow)}>
             <Checkbox id="chk-disabled" disabled checked={true} />
-            <Label htmlFor="chk-disabled">Disabled Checked</Label>
+            <Label for="chk-disabled">Disabled Checked</Label>
           </div>
-          <div {...stylex.props(auditStyles.fieldRow)}>
+          <div {...stylex.attrs(auditStyles.fieldRow)}>
             <Checkbox id="chk-invalid" aria-invalid="true" checked={false} />
-            <Label htmlFor="chk-invalid">Aria Invalid</Label>
+            <Label for="chk-invalid">Aria Invalid</Label>
           </div>
         </div>
       </section>
 
       {/* Cards */}
-      <section {...stylex.props(auditStyles.section)}>
-        <h3 {...stylex.props(auditStyles.sectionTitle)}>4. Cards</h3>
-        <div {...stylex.props(auditStyles.formGrid)}>
+      <section {...stylex.attrs(auditStyles.section)}>
+        <h3 {...stylex.attrs(auditStyles.sectionTitle)}>4. Cards</h3>
+        <div {...stylex.attrs(auditStyles.formGrid)}>
           <Card id="card-default">
             <CardHeader>
               <CardTitle>Standard Card Title</CardTitle>
@@ -335,12 +337,12 @@ function ComponentMatrix({
               </CardAction>
             </CardHeader>
             <CardContent>
-              <p {...stylex.props(auditStyles.footerText)}>
+              <p {...stylex.attrs(auditStyles.footerText)}>
                 Card content body demonstrating typography and padding behavior under standard size.
               </p>
             </CardContent>
             <CardFooter sx={auditStyles.footerEnd}>
-              <span {...stylex.props(auditStyles.footerText)}>Card footer</span>
+              <span {...stylex.attrs(auditStyles.footerText)}>Card footer</span>
               <Button size="sm">Action</Button>
             </CardFooter>
           </Card>
@@ -351,7 +353,7 @@ function ComponentMatrix({
               <CardDescription>Smaller margins and tighter text rhythm.</CardDescription>
             </CardHeader>
             <CardContent>
-              <p {...stylex.props(auditStyles.footerText)}>Compact layout content area.</p>
+              <p {...stylex.attrs(auditStyles.footerText)}>Compact layout content area.</p>
             </CardContent>
             <CardFooter>
               <Button size="xs" variant="outline">
@@ -363,14 +365,14 @@ function ComponentMatrix({
       </section>
 
       {/* Skeleton */}
-      <section {...stylex.props(auditStyles.section)}>
-        <h3 {...stylex.props(auditStyles.sectionTitle)}>5. Skeleton</h3>
-        <div {...stylex.props(auditStyles.section)}>
+      <section {...stylex.attrs(auditStyles.section)}>
+        <h3 {...stylex.attrs(auditStyles.sectionTitle)}>5. Skeleton</h3>
+        <div {...stylex.attrs(auditStyles.section)}>
           <Skeleton sx={auditStyles.skeletonLine} id="skel-line" />
           <Skeleton sx={auditStyles.skeletonBlock} id="skel-block" />
-          <div {...stylex.props(auditStyles.fieldRow)}>
+          <div {...stylex.attrs(auditStyles.fieldRow)}>
             <Skeleton sx={auditStyles.skeletonCircle} id="skel-circle" />
-            <div {...stylex.props(auditStyles.formField)}>
+            <div {...stylex.attrs(auditStyles.formField)}>
               <Skeleton sx={auditStyles.skeletonSmall1} />
               <Skeleton sx={auditStyles.skeletonSmall2} />
             </div>
@@ -379,9 +381,9 @@ function ComponentMatrix({
       </section>
 
       {/* Dropdown Menu */}
-      <section {...stylex.props(auditStyles.section)}>
-        <h3 {...stylex.props(auditStyles.sectionTitle)}>6. Dropdown Menu</h3>
-        <div {...stylex.props(auditStyles.flexRow)}>
+      <section {...stylex.attrs(auditStyles.section)}>
+        <h3 {...stylex.attrs(auditStyles.sectionTitle)}>6. Dropdown Menu</h3>
+        <div {...stylex.attrs(auditStyles.flexRow)}>
           <DropdownMenu>
             <DropdownMenuTrigger
               render={
@@ -402,8 +404,8 @@ function ComponentMatrix({
               <DropdownMenuGroup>
                 <DropdownMenuLabel>Preferences</DropdownMenuLabel>
                 <DropdownMenuCheckboxItem
-                  checked={checked}
-                  onCheckedChange={(c) => setChecked(Boolean(c))}
+                  checked={props.checked}
+                  onCheckedChange={(c) => props.setChecked(Boolean(c))}
                 >
                   Enable Notifications
                 </DropdownMenuCheckboxItem>
@@ -412,7 +414,7 @@ function ComponentMatrix({
               <DropdownMenuSub>
                 <DropdownMenuSubTrigger>More Options</DropdownMenuSubTrigger>
                 <DropdownMenuSubContent>
-                  <DropdownMenuRadioGroup value={radioVal} onValueChange={setRadioVal}>
+                  <DropdownMenuRadioGroup value={props.radioVal} onValueChange={props.setRadioVal}>
                     <DropdownMenuRadioItem value="option1">Option 1</DropdownMenuRadioItem>
                     <DropdownMenuRadioItem value="option2">Option 2</DropdownMenuRadioItem>
                   </DropdownMenuRadioGroup>

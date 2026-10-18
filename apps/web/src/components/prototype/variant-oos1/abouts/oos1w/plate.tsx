@@ -1,7 +1,8 @@
 import * as stylex from "@stylexjs/stylex";
+import type { JSX } from "@solidjs/web";
+import { Show } from "solid-js";
 import type { StyleXStyles } from "@stylexjs/stylex";
-import { m, useTransform, type MotionValue } from "motion/react";
-import type { ReactNode } from "react";
+import { m, useTransform, type MotionValue } from "@/compat/motion";
 
 import { PencilRing } from "./band";
 import { BAND_LOOK } from "./band-values";
@@ -195,108 +196,93 @@ function useBandMotion(band: PlateBand, development: Development) {
   return { travel, y, reveal };
 }
 
-function Front({ development }: { development: Development }) {
-  const y = useTransform(development.progress, (p) => percent(1 - p));
-  const wetLine = useTransform(development.marks, (mark) => 1 - mark);
+function Front(props: { development: Development }) {
+  const y = useTransform(props.development.progress, (p) => percent(1 - p));
+  const wetLine = useTransform(props.development.marks, (mark) => 1 - mark);
   return (
-    <m.div style={{ y }} {...stylex.props(styles.mover)}>
-      <svg viewBox="0 0 100 10" preserveAspectRatio="none" {...stylex.props(styles.curve)}>
+    <m.div style={{ y }} {...stylex.attrs(styles.mover)}>
+      <svg viewBox="0 0 100 10" preserveAspectRatio="none" {...stylex.attrs(styles.curve)}>
         <path d="M0 1.5 C 20 7, 80 7, 100 1.5 L 100 10 L 0 10 Z" fill="rgba(7, 67, 169, 0.06)" />
         <m.path
           d="M0 1.5 C 20 7, 80 7, 100 1.5"
           fill="none"
           stroke="rgba(7, 67, 169, 0.55)"
-          strokeWidth={1}
-          vectorEffect="non-scaling-stroke"
+          stroke-width={1}
+          vector-effect="non-scaling-stroke"
           style={{ opacity: wetLine }}
         />
       </svg>
-      <span {...stylex.props(styles.meniscus)} />
-      <span {...stylex.props(styles.wetBody)} />
+      <span {...stylex.attrs(styles.meniscus)} />
+      <span {...stylex.attrs(styles.wetBody)} />
     </m.div>
   );
 }
 
-function BandMark({
-  band,
-  lanes,
-  development,
-  geometry,
-  glyph,
-}: {
+function BandMark(props: {
   band: PlateBand;
   lanes: number;
   development: Development;
   geometry: Pick<PlateGeometry, "band" | "tail">;
-  glyph?: ReactNode;
+  glyph?: JSX.Element;
 }) {
-  const { travel, y, reveal } = useBandMotion(band, development);
+  const { travel, y, reveal } = useBandMotion(props.band, props.development);
   const spread = useTransform(travel, (t) => Math.sqrt(Math.min(1.1, t)));
   const scaleX = useTransform(spread, (s) => 0.46 + 0.54 * s);
   const scaleY = useTransform(spread, (s) => 0.8 + 0.2 * s);
   const density = useTransform(spread, (s) => 1 - 0.16 * s);
-  const left = laneCenter(band.lane, lanes);
-  const look = BAND_LOOK[band.ahead ? "ahead" : band.tone];
+  const left = laneCenter(props.band.lane, props.lanes);
+  const look = BAND_LOOK[props.band.ahead ? "ahead" : props.band.tone];
 
   return (
-    <m.div aria-hidden="true" style={{ y }} {...stylex.props(styles.mover)}>
+    <m.div aria-hidden="true" style={{ y }} {...stylex.attrs(styles.mover)}>
       <m.span
         style={{ left, scaleY: travel }}
-        {...stylex.props(styles.tail, geometry.tail, look.tail)}
+        {...stylex.attrs(styles.tail, props.geometry.tail, look.tail)}
       />
       <m.span
         style={{ left, scaleX, scaleY, opacity: density }}
-        {...stylex.props(BAND_LOOK.base, geometry.band, look.body)}
+        {...stylex.attrs(BAND_LOOK.base, props.geometry.band, look.body)}
       >
-        <PencilRing visible={development.marks} ahead={band.ahead} />
+        <PencilRing visible={props.development.marks} ahead={props.band.ahead} />
       </m.span>
-      {glyph ? (
-        <m.span style={{ left, opacity: reveal }} {...stylex.props(BAND_LOOK.glyphSlot)}>
-          {glyph}
-        </m.span>
-      ) : null}
+      <Show when={props.glyph}>
+        {(glyph) => (
+          <m.span style={{ left, opacity: reveal }} {...stylex.attrs(BAND_LOOK.glyphSlot)}>
+            {glyph()}
+          </m.span>
+        )}
+      </Show>
     </m.div>
   );
 }
 
-function BandNote({
-  band,
-  development,
-  geometry,
-  children,
-}: {
+function BandNote(props: {
   band: PlateBand;
   development: Development;
   geometry: PlateGeometry;
-  children: ReactNode;
+  children: JSX.Element;
 }) {
-  const { y, reveal } = useBandMotion(band, development);
+  const { y, reveal } = useBandMotion(props.band, props.development);
   return (
-    <m.li style={{ y }} {...stylex.props(styles.mover)}>
+    <m.li style={{ y }} {...stylex.attrs(styles.mover)}>
       <m.div style={{ opacity: reveal }}>
-        <span aria-hidden="true" {...stylex.props(styles.leader, geometry.leader)} />
-        <div {...stylex.props(styles.annotation, geometry.label)}>{children}</div>
+        <span aria-hidden="true" {...stylex.attrs(styles.leader, props.geometry.leader)} />
+        <div {...stylex.attrs(styles.annotation, props.geometry.label)}>{props.children}</div>
       </m.div>
     </m.li>
   );
 }
 
-function FrontExtension({
-  progress,
-  geometry,
-}: {
-  progress: MotionValue<number>;
-  geometry: PlateGeometry;
-}) {
-  const y = useTransform(progress, (p) => percent(1 - p));
-  const named = useTransform(progress, [0.04, 0.14], [0, 1]);
+function FrontExtension(props: { progress: MotionValue<number>; geometry: PlateGeometry }) {
+  const y = useTransform(props.progress, (p) => percent(1 - p));
+  const named = useTransform(props.progress, [0.04, 0.14], [0, 1]);
   return (
-    <m.div aria-hidden="true" style={{ y }} {...stylex.props(styles.mover)}>
-      <span {...stylex.props(styles.dashed, styles.dashedFront, geometry.afterPlate)} />
+    <m.div aria-hidden="true" style={{ y }} {...stylex.attrs(styles.mover)}>
+      <span {...stylex.attrs(styles.dashed, styles.dashedFront, props.geometry.afterPlate)} />
       <m.span
         lang="en"
         style={{ opacity: named }}
-        {...stylex.props(styles.axisWord, styles.axisFront)}
+        {...stylex.attrs(styles.axisWord, styles.axisFront)}
       >
         solvent front
       </m.span>
@@ -304,118 +290,99 @@ function FrontExtension({
   );
 }
 
-function PlateBody({
-  lanes,
-  development,
-  run,
-  sx,
-  children,
-}: {
+function PlateBody(props: {
   lanes: number;
   development: Development;
   run: StyleXStyles;
   sx?: StyleXStyles;
-  children: ReactNode;
+  children: JSX.Element;
 }) {
-  const dryPlate = useTransform(development.marks, (mark) => 1 - 0.5 * mark);
+  const dryPlate = useTransform(props.development.marks, (mark) => 1 - 0.5 * mark);
   return (
-    <div {...stylex.props(styles.plate, sx)}>
-      <div aria-hidden="true" {...stylex.props(styles.surface)}>
-        <m.div style={{ opacity: dryPlate }} {...stylex.props(styles.fill)}>
-          <div {...stylex.props(styles.run, run)}>
-            <span {...stylex.props(styles.foot)} />
-            <div {...stylex.props(styles.clip)}>
-              <Front development={development} />
+    <div {...stylex.attrs(styles.plate, props.sx)}>
+      <div aria-hidden="true" {...stylex.attrs(styles.surface)}>
+        <m.div style={{ opacity: dryPlate }} {...stylex.attrs(styles.fill)}>
+          <div {...stylex.attrs(styles.run, props.run)}>
+            <span {...stylex.attrs(styles.foot)} />
+            <div {...stylex.attrs(styles.clip)}>
+              <Front development={props.development} />
             </div>
           </div>
         </m.div>
       </div>
 
-      <div {...stylex.props(styles.run, run)}>
-        <span aria-hidden="true" {...stylex.props(styles.origin)} />
-        {Array.from({ length: lanes }, (_, lane) => (
+      <div {...stylex.attrs(styles.run, props.run)}>
+        <span aria-hidden="true" {...stylex.attrs(styles.origin)} />
+        {Array.from({ length: props.lanes }, (_, lane) => (
           <span
-            key={lane}
             aria-hidden="true"
-            style={{ left: laneCenter(lane, lanes) }}
-            {...stylex.props(styles.tick)}
+            style={{ left: laneCenter(lane, props.lanes) }}
+            {...stylex.attrs(styles.tick)}
           />
         ))}
         <m.span
           aria-hidden="true"
-          style={{ opacity: development.marks }}
-          {...stylex.props(styles.pencilFront)}
+          style={{ opacity: props.development.marks }}
+          {...stylex.attrs(styles.pencilFront)}
         />
-        {children}
+        {props.children}
       </div>
     </div>
   );
 }
 
-export function Plate({
-  lanes,
-  bands,
-  development,
-  geometry,
-  renderLabel,
-  renderGlyph,
-  laneLabels,
-  plateOverlay,
-  noteOverlay,
-  listLabel,
-  sx,
-}: {
+export function Plate(props: {
   lanes: number;
   bands: readonly PlateBand[];
   development: Development;
   geometry: PlateGeometry;
-  renderLabel: (band: PlateBand) => ReactNode;
-  renderGlyph?: (band: PlateBand) => ReactNode;
-  laneLabels?: readonly ReactNode[];
-  plateOverlay?: ReactNode;
-  noteOverlay?: ReactNode;
+  renderLabel: (band: PlateBand) => JSX.Element;
+  renderGlyph?: (band: PlateBand) => JSX.Element;
+  laneLabels?: readonly JSX.Element[];
+  plateOverlay?: JSX.Element;
+  noteOverlay?: JSX.Element;
   listLabel: string;
   sx?: StyleXStyles;
 }) {
   return (
-    <div {...stylex.props(styles.figure, geometry.figure, sx)}>
-      <PlateBody lanes={lanes} development={development} run={geometry.run} sx={geometry.plate}>
-        {plateOverlay}
-        {bands.map((band) => (
+    <div {...stylex.attrs(styles.figure, props.geometry.figure, props.sx)}>
+      <PlateBody
+        lanes={props.lanes}
+        development={props.development}
+        run={props.geometry.run}
+        sx={props.geometry.plate}
+      >
+        {props.plateOverlay}
+        {props.bands.map((band) => (
           <BandMark
-            key={band.id}
             band={band}
-            lanes={lanes}
-            development={development}
-            geometry={geometry}
-            glyph={renderGlyph?.(band)}
+            lanes={props.lanes}
+            development={props.development}
+            geometry={props.geometry}
+            glyph={props.renderGlyph?.(band)}
           />
         ))}
-        {laneLabels?.map((label, lane) => (
-          <div
-            key={lane}
-            style={{ left: laneCenter(lane, lanes) }}
-            {...stylex.props(styles.laneLabel)}
-          >
+        {props.laneLabels?.map((label, lane) => (
+          <div style={{ left: laneCenter(lane, props.lanes) }} {...stylex.attrs(styles.laneLabel)}>
             {label}
           </div>
         ))}
       </PlateBody>
 
-      <div {...stylex.props(styles.run, styles.inert, geometry.run)}>
-        <FrontExtension progress={development.progress} geometry={geometry} />
+      <div {...stylex.attrs(styles.run, styles.inert, props.geometry.run)}>
+        <FrontExtension progress={props.development.progress} geometry={props.geometry} />
         <span
           aria-hidden="true"
-          {...stylex.props(styles.dashed, styles.dashedOrigin, geometry.afterPlate)}
+          {...stylex.attrs(styles.dashed, styles.dashedOrigin, props.geometry.afterPlate)}
         />
-        <span lang="en" aria-hidden="true" {...stylex.props(styles.axisWord, styles.axisOrigin)}>
+        <span lang="en" aria-hidden="true" {...stylex.attrs(styles.axisWord, styles.axisOrigin)}>
           origin
         </span>
-        {noteOverlay}
-        <ul {...stylex.props(styles.nativeList)} aria-label={listLabel}>
-          {bands.map((band) => (
-            <BandNote key={band.id} band={band} development={development} geometry={geometry}>
-              {renderLabel(band)}
+        {props.noteOverlay}
+        <ul {...stylex.attrs(styles.nativeList)} aria-label={props.listLabel}>
+          {props.bands.map((band) => (
+            <BandNote band={band} development={props.development} geometry={props.geometry}>
+              {props.renderLabel(band)}
             </BandNote>
           ))}
         </ul>

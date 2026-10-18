@@ -1,7 +1,7 @@
 import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { ArrowRight, ChevronDown, X } from "lucide-react";
-import { useId, useRef, useState, type SubmitEvent } from "react";
+import { ArrowRight, ChevronDown, X } from "@fenchem-lp/ui/components/lucide";
+import { createSignal, createUniqueId, untrack } from "solid-js";
 
 import { color, ease, font } from "../../variant-oos1/tokens.stylex";
 import {
@@ -383,21 +383,23 @@ const styles = stylex.create({
 const ZH_DATE_FORMAT = new Intl.DateTimeFormat("zh-CN", { dateStyle: "long" });
 const today = () => ZH_DATE_FORMAT.format(new Date());
 
-export function LetterDialog({ subject, onClose }: DialogVariantProps) {
-  const { closing, requestClose, dialogProps, panelProps } = useLabDialog(onClose);
-  const titleId = useId();
-  const fieldId = useId();
-  const [subjectId, setSubjectId] = useState<InquirySubjectId>(subject ?? INQUIRY_SUBJECTS[0].id);
-  const [sent, setSent] = useState(false);
-  const [lockedHeight, setLockedHeight] = useState(0);
-  const [date] = useState(today);
-  const bodyRef = useRef<HTMLDivElement>(null);
-  const route = SUBJECT_ROUTES[subjectId];
-  const active = subjectById(subjectId);
+export function LetterDialog(props: DialogVariantProps) {
+  const { closing, requestClose, dialogProps, panelProps } = useLabDialog(() => props.onClose());
+  const titleId = createUniqueId();
+  const fieldId = createUniqueId();
+  const [subjectId, setSubjectId] = createSignal<InquirySubjectId>(
+    untrack(() => props.subject ?? INQUIRY_SUBJECTS[0].id),
+  );
+  const [sent, setSent] = createSignal(false);
+  const [lockedHeight, setLockedHeight] = createSignal(0);
+  const date = today();
+  let bodyEl: HTMLDivElement | undefined;
+  const route = () => SUBJECT_ROUTES[subjectId()];
+  const active = () => subjectById(subjectId());
 
-  const handleSubmit = (event: SubmitEvent<HTMLFormElement>) => {
+  const handleSubmit = (event: SubmitEvent) => {
     event.preventDefault();
-    setLockedHeight(bodyRef.current?.offsetHeight ?? 0);
+    setLockedHeight(bodyEl?.offsetHeight ?? 0);
     setSent(true);
   };
 
@@ -405,92 +407,89 @@ export function LetterDialog({ subject, onClose }: DialogVariantProps) {
     <dialog
       aria-labelledby={titleId}
       {...dialogProps}
-      {...stylex.props(labStyles.dialog, styles.dialog, closing && styles.dialogClosing)}
+      {...stylex.attrs(labStyles.dialog, styles.dialog, closing() && styles.dialogClosing)}
     >
       <button
         type="button"
-        tabIndex={-1}
+        tabindex={-1}
         aria-label="关闭"
         onClick={requestClose}
-        {...stylex.props(labStyles.dismiss)}
+        {...stylex.attrs(labStyles.dismiss)}
       />
-      <div {...panelProps} {...stylex.props(styles.panel, closing && styles.panelClosing)}>
+      <div {...panelProps} {...stylex.attrs(styles.panel, closing() && styles.panelClosing)}>
         <button
           type="button"
           aria-label="关闭"
           onClick={requestClose}
-          {...stylex.props(labStyles.closeButton, styles.close)}
+          {...stylex.attrs(labStyles.closeButton, styles.close)}
         >
           <X size={20} strokeWidth={1.75} aria-hidden="true" />
         </button>
 
-        <header {...stylex.props(styles.masthead)}>
+        <header {...stylex.attrs(styles.masthead)}>
           <div>
-            <p lang="en" aria-hidden="true" {...stylex.props(styles.wordmark)}>
+            <p lang="en" aria-hidden="true" {...stylex.attrs(styles.wordmark)}>
               FENCHEM
             </p>
-            <p {...stylex.props(styles.companyName)}>{COMPANY.name}</p>
+            <p {...stylex.attrs(styles.companyName)}>{COMPANY.name}</p>
           </div>
-          <div {...stylex.props(styles.englishBlock)}>
-            <p lang="en" {...stylex.props(styles.english)}>
+          <div {...stylex.attrs(styles.englishBlock)}>
+            <p lang="en" {...stylex.attrs(styles.english)}>
               {COMPANY.english}
             </p>
-            <p lang="en" {...stylex.props(styles.since)}>
+            <p lang="en" {...stylex.attrs(styles.since)}>
               Est. {COMPANY.established} · Nanjing
             </p>
           </div>
         </header>
-        <address {...stylex.props(styles.letterhead)}>
+        <address {...stylex.attrs(styles.letterhead)}>
           {CONTACT_DETAILS.map((detail) =>
             detail.href ? (
-              <a
-                key={detail.term}
-                href={detail.href}
-                {...stylex.props(styles.letterheadLink, labStyles.focusRing)}
-              >
+              <a href={detail.href} {...stylex.attrs(styles.letterheadLink, labStyles.focusRing)}>
                 {detail.value}
               </a>
             ) : (
-              <span key={detail.term}>{detail.value}</span>
+              <span>{detail.value}</span>
             ),
           )}
         </address>
 
         <div
-          ref={bodyRef}
-          {...stylex.props(
+          ref={bodyEl}
+          {...stylex.attrs(
             styles.body,
-            sent && styles.bodySent,
-            sent && dynamic.minHeight(lockedHeight),
+            sent() && styles.bodySent,
+            sent() && dynamic.minHeight(lockedHeight()),
           )}
         >
-          {sent ? (
-            <div role="status" {...stylex.props(styles.sent, labStyles.swapIn)}>
-              <div aria-hidden="true" {...stylex.props(styles.stamp)}>
-                <span lang="en" {...stylex.props(styles.stampWord)}>
+          {sent() ? (
+            <div role="status" {...stylex.attrs(styles.sent, labStyles.swapIn)}>
+              <div aria-hidden="true" {...stylex.attrs(styles.stamp)}>
+                <span lang="en" {...stylex.attrs(styles.stampWord)}>
                   SENT
                 </span>
-                <span {...stylex.props(styles.stampDate)}>{date}</span>
+                <span {...stylex.attrs(styles.stampDate)}>{date}</span>
               </div>
               <div>
-                <h2 id={titleId} {...stylex.props(styles.sentTitle)}>
-                  信已寄出，{route.team}已收到
+                <h2 id={titleId} {...stylex.attrs(styles.sentTitle)}>
+                  信已寄出，{route().team}已收到
                 </h2>
-                <p {...stylex.props(styles.sentText)}>
-                  关于「{active.label}」的来信已登记，{route.reply}。回复将发送至您留下的工作邮箱。
+                <p {...stylex.attrs(styles.sentText)}>
+                  关于「{active().label}」的来信已登记，{route().reply}
+                  。回复将发送至您留下的工作邮箱。
                 </p>
-                <div {...stylex.props(styles.sentActions)}>
+                <div {...stylex.attrs(styles.sentActions)}>
                   <button
                     type="button"
                     onClick={requestClose}
-                    {...stylex.props(labStyles.primaryButton, labStyles.focusRing)}
+                    {...stylex.attrs(labStyles.primaryButton, labStyles.focusRing)}
                   >
                     完成
                   </button>
                   <button
                     type="button"
                     onClick={() => setSent(false)}
-                    {...stylex.props(styles.link, labStyles.focusRing)}
+                    {...stylex.attrs(styles.link, labStyles.focusRing)}
                   >
                     再写一封
                   </button>
@@ -499,45 +498,47 @@ export function LetterDialog({ subject, onClose }: DialogVariantProps) {
             </div>
           ) : (
             <form onSubmit={handleSubmit}>
-              <p {...stylex.props(styles.date)}>{date}</p>
-              <h2 id={titleId} {...stylex.props(styles.salutation)}>
-                致 泛成<span {...stylex.props(styles.team)}>{route.team}</span>：
+              <p {...stylex.attrs(styles.date)}>{date}</p>
+              <h2 id={titleId} {...stylex.attrs(styles.salutation)}>
+                致 泛成<span {...stylex.attrs(styles.team)}>{route().team}</span>：
               </h2>
-              <p {...stylex.props(styles.prose)}>
+              <p {...stylex.attrs(styles.prose)}>
                 您好！我是
-                <span {...stylex.props(styles.keep)}>
+                <span {...stylex.attrs(styles.keep)}>
                   <input
                     name="contactName"
                     aria-label="联系人姓名"
                     placeholder="姓名"
                     required
-                    autoComplete="name"
-                    {...stylex.props(styles.inline, styles.wName)}
+                    autocomplete="name"
+                    {...stylex.attrs(styles.inline, styles.wName)}
                   />
                   ，来自
                 </span>
-                <span {...stylex.props(styles.keep)}>
+                <span {...stylex.attrs(styles.keep)}>
                   <input
                     name="company"
                     aria-label="公司或机构名称"
                     placeholder="公司或机构名称"
                     required
-                    autoComplete="organization"
-                    {...stylex.props(styles.inline, styles.wCompany)}
+                    autocomplete="organization"
+                    {...stylex.attrs(styles.inline, styles.wCompany)}
                   />
                   ，想就
                 </span>
-                <span {...stylex.props(styles.keep)}>
-                  <span {...stylex.props(styles.selectWrap)}>
+                <span {...stylex.attrs(styles.keep)}>
+                  <span {...stylex.attrs(styles.selectWrap)}>
                     <select
                       name="subject"
                       aria-label="咨询主题"
-                      value={subjectId}
-                      onChange={(event) => setSubjectId(event.target.value as InquirySubjectId)}
-                      {...stylex.props(styles.inline, styles.select)}
+                      value={subjectId()}
+                      onChange={(event) =>
+                        setSubjectId(event.currentTarget.value as InquirySubjectId)
+                      }
+                      {...stylex.attrs(styles.inline, styles.select)}
                     >
                       {INQUIRY_SUBJECTS.map((item) => (
-                        <option key={item.id} value={item.id}>
+                        <option value={item.id} selected={item.id === subjectId()}>
                           {item.label}
                         </option>
                       ))}
@@ -547,68 +548,68 @@ export function LetterDialog({ subject, onClose }: DialogVariantProps) {
                       strokeWidth={2}
                       nonScalingStroke
                       aria-hidden="true"
-                      {...stylex.props(styles.selectIcon)}
+                      {...stylex.attrs(styles.selectIcon)}
                     />
                   </span>
                   与贵司联系。
                 </span>
                 具体需求如下：
               </p>
-              <label htmlFor={`${fieldId}-message`} {...stylex.props(labStyles.srOnly)}>
+              <label for={`${fieldId}-message`} {...stylex.attrs(labStyles.srOnly)}>
                 需求描述
               </label>
               <textarea
                 id={`${fieldId}-message`}
                 name="message"
                 required
-                placeholder={active.placeholder}
-                {...stylex.props(styles.ruled)}
+                placeholder={active().placeholder}
+                {...stylex.attrs(styles.ruled)}
               />
-              <p {...stylex.props(styles.prose, styles.proseFlush)}>
+              <p {...stylex.attrs(styles.prose, styles.proseFlush)}>
                 请通过邮箱
-                <span {...stylex.props(styles.keep)}>
+                <span {...stylex.attrs(styles.keep)}>
                   <input
                     name="email"
                     type="email"
                     aria-label="工作邮箱"
                     placeholder="name@company.com"
                     required
-                    autoComplete="email"
-                    spellCheck={false}
-                    {...stylex.props(styles.inline, styles.wEmail)}
+                    autocomplete="email"
+                    spellcheck={false}
+                    {...stylex.attrs(styles.inline, styles.wEmail)}
                   />
                   或电话
                 </span>
-                <span {...stylex.props(styles.keep)}>
+                <span {...stylex.attrs(styles.keep)}>
                   <input
                     name="phone"
                     type="tel"
                     aria-label="手机号"
                     placeholder="手机号"
                     required
-                    autoComplete="tel"
-                    inputMode="tel"
-                    {...stylex.props(styles.inline, styles.wPhone)}
+                    autocomplete="tel"
+                    inputmode="tel"
+                    {...stylex.attrs(styles.inline, styles.wPhone)}
                   />
                   回复我。
                 </span>
               </p>
-              <div {...stylex.props(styles.sign)}>
+              <div {...stylex.attrs(styles.sign)}>
                 <div>
-                  <p {...stylex.props(styles.closing)}>此致　敬礼</p>
-                  <label {...stylex.props(labStyles.consent, styles.consent)}>
+                  <p {...stylex.attrs(styles.closing)}>此致　敬礼</p>
+                  <label {...stylex.attrs(labStyles.consent, styles.consent)}>
                     <input
                       type="checkbox"
                       name="consent"
                       required
-                      {...stylex.props(labStyles.checkbox)}
+                      {...stylex.attrs(labStyles.checkbox)}
                     />
                     <span>同意泛成就本次来信联系我，信息严格保密</span>
                   </label>
                 </div>
                 <button
                   type="submit"
-                  {...stylex.props(
+                  {...stylex.attrs(
                     labStyles.primaryButton,
                     labStyles.trailingIcon,
                     labStyles.focusRing,
@@ -621,7 +622,7 @@ export function LetterDialog({ subject, onClose }: DialogVariantProps) {
                     strokeWidth={2}
                     nonScalingStroke
                     aria-hidden="true"
-                    {...stylex.props(labStyles.buttonArrow)}
+                    {...stylex.attrs(labStyles.buttonArrow)}
                   />
                 </button>
               </div>

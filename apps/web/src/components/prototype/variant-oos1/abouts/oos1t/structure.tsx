@@ -132,7 +132,7 @@ export function Structure() {
       id="about-structure"
       aria-labelledby="oos1t-structure"
       data-hour={SECTION_HOURS.structure}
-      {...stylex.props(ui.section, ui.shell)}
+      {...stylex.attrs(ui.section, ui.shell)}
     >
       <SectionHead
         titleId="oos1t-structure"
@@ -140,36 +140,36 @@ export function Structure() {
         title={ABOUT_STRUCTURE.title}
         english="Structure"
       />
-      <div {...stylex.props(styles.body)}>
-        <div {...stylex.props(styles.holding)}>
+      <div {...stylex.attrs(styles.body)}>
+        <div {...stylex.attrs(styles.holding)}>
           <Cast lift={LIFT.block} />
-          <div {...stylex.props(styles.block, styles.holdingFace)}>
-            <p {...stylex.props(styles.badge)}>{holding.badge}</p>
-            <h3 {...stylex.props(styles.holdingName)}>
+          <div {...stylex.attrs(styles.block, styles.holdingFace)}>
+            <p {...stylex.attrs(styles.badge)}>{holding.badge}</p>
+            <h3 {...stylex.attrs(styles.holdingName)}>
               <Phrase text={holding.name} />
-              <span lang="en" {...stylex.props(styles.holdingEnglish)}>
+              <span lang="en" {...stylex.attrs(styles.holdingEnglish)}>
                 {holding.english}
               </span>
             </h3>
           </div>
         </div>
-        <p {...stylex.props(styles.rowLabel)}>
+        <p {...stylex.attrs(styles.rowLabel)}>
           <span>{subsidiaryBadge}</span>
-          <span lang="en" {...stylex.props(styles.rowEnglish)}>
+          <span lang="en" {...stylex.attrs(styles.rowEnglish)}>
             Wholly owned
           </span>
         </p>
-        <ul {...stylex.props(styles.row)}>
+        <ul {...stylex.attrs(styles.row)}>
           {subsidiaries.map((company, index) => (
-            <li key={company.id} {...stylex.props(styles.subsidiary)}>
+            <li {...stylex.attrs(styles.subsidiary)}>
               <Cast lift={LIFT.block} />
-              <div {...stylex.props(styles.block, styles.subFace)}>
-                <span aria-hidden="true" {...stylex.props(styles.index)}>
+              <div {...stylex.attrs(styles.block, styles.subFace)}>
+                <span aria-hidden="true" {...stylex.attrs(styles.index)}>
                   {String(index + 1).padStart(2, "0")}
                 </span>
-                <h4 {...stylex.props(styles.subName)}>
+                <h4 {...stylex.attrs(styles.subName)}>
                   <Phrase text={company.name} />
-                  <span lang="en" {...stylex.props(styles.subEnglish)}>
+                  <span lang="en" {...stylex.attrs(styles.subEnglish)}>
                     {company.english}
                   </span>
                 </h4>

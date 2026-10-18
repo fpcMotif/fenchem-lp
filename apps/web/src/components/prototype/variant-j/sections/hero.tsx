@@ -1,7 +1,7 @@
 import { colors, typography } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 import gsap from "gsap";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown } from "@fenchem-lp/ui/components/lucide";
 import { HERO, IMAGES } from "../content";
 import { SplitWords, useSectionAnimation } from "../motion";
 import { EASE_OUT } from "../motion-values";
@@ -145,24 +145,24 @@ export function HeroSection() {
   });
 
   return (
-    <section ref={ref} id="top" {...stylex.props(styles.section)}>
-      <div data-hero-img {...stylex.props(styles.imgWrap)}>
+    <section ref={ref} id="top" {...stylex.attrs(styles.section)}>
+      <div data-hero-img="" {...stylex.attrs(styles.imgWrap)}>
         <img
           src={IMAGES.hero.src}
           alt={IMAGES.hero.alt}
-          {...stylex.props(styles.img)}
+          {...stylex.attrs(styles.img)}
           loading="eager"
-          fetchPriority="high"
+          fetchpriority="high"
         />
       </div>
-      <div aria-hidden="true" {...stylex.props(styles.scrim)} />
-      <div aria-hidden="true" data-hero-deepen {...stylex.props(styles.deepen)} />
+      <div aria-hidden="true" {...stylex.attrs(styles.scrim)} />
+      <div aria-hidden="true" data-hero-deepen="" {...stylex.attrs(styles.deepen)} />
 
-      <div {...stylex.props(styles.content)}>
-        <p data-hero-eyebrow {...stylex.props(sharedStyles.techLabelDark)}>
+      <div {...stylex.attrs(styles.content)}>
+        <p data-hero-eyebrow="" {...stylex.attrs(sharedStyles.techLabelDark)}>
           {HERO.eyebrow}
         </p>
-        <h1 {...stylex.props(styles.heading)}>
+        <h1 {...stylex.attrs(styles.heading)}>
           <SplitWords
             segments={[
               { text: "Rooted in Nature," },
@@ -170,26 +170,26 @@ export function HeroSection() {
             ]}
           />
         </h1>
-        <p data-hero-lede {...stylex.props(styles.lede)}>
+        <p data-hero-lede="" {...stylex.attrs(styles.lede)}>
           {HERO.lede}
         </p>
-        <div data-hero-ctas {...stylex.props(styles.ctas)}>
-          <a href="#ingredients" {...stylex.props(sharedStyles.primaryCta)}>
+        <div data-hero-ctas="" {...stylex.attrs(styles.ctas)}>
+          <a href="#ingredients" {...stylex.attrs(sharedStyles.primaryCta)}>
             {HERO.primaryCta}
           </a>
-          <a href="#global-supply" {...stylex.props(sharedStyles.secondaryCta)}>
+          <a href="#global-supply" {...stylex.attrs(sharedStyles.secondaryCta)}>
             {HERO.secondaryCta}
           </a>
         </div>
       </div>
 
       <a
-        data-hero-scroll
+        data-hero-scroll=""
         href="#ticker"
         aria-label="Scroll to content"
-        {...stylex.props(styles.scrollButton)}
+        {...stylex.attrs(styles.scrollButton)}
       >
-        <ChevronDown aria-hidden="true" {...stylex.props(styles.chevronIcon)} />
+        <ChevronDown aria-hidden="true" {...stylex.attrs(styles.chevronIcon)} />
       </a>
     </section>
   );

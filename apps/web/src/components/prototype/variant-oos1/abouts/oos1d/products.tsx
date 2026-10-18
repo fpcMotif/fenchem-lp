@@ -1,4 +1,3 @@
-import { breakpoints } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 
 import { PRODUCTS, PRODUCTS_INTRO } from "../../content";
@@ -28,10 +27,10 @@ const s = stylex.create({
     display: "grid",
     gridTemplateColumns: {
       default: "minmax(0, 1fr)",
-      [breakpoints.md]: "repeat(2, minmax(0, 1fr))",
+      ["@media (min-width: 768px)"]: "repeat(2, minmax(0, 1fr))",
     },
-    columnGap: { default: 24, [breakpoints.xl]: 40 },
-    rowGap: { default: 48, [breakpoints.xl]: 64 },
+    columnGap: { default: 24, ["@media (min-width: 1280px)"]: 40 },
+    rowGap: { default: 48, ["@media (min-width: 1280px)"]: 64 },
     margin: 0,
     padding: 0,
     listStyle: "none",
@@ -51,7 +50,7 @@ const s = stylex.create({
   },
   desc: {
     margin: 0,
-    fontSize: { default: "15px", [breakpoints.xl]: step.body },
+    fontSize: { default: "15px", ["@media (min-width: 1280px)"]: step.body },
     lineHeight: 1.8,
     letterSpacing: "0.04em",
     color: tone.body,
@@ -77,46 +76,44 @@ const s = stylex.create({
   },
 });
 
-export function Products({ onNavigateHome }: { onNavigateHome: (hash?: string) => void }) {
+export function Products(props: { onNavigateHome: (hash?: string) => void }) {
   return (
     <Section id="about-products" label="Products and application solutions" background={ui.onPage}>
-      <div {...stylex.props(ui.phi)}>
-        <div {...stylex.props(ui.asideCol)}>
+      <div {...stylex.attrs(ui.phi)}>
+        <div {...stylex.attrs(ui.asideCol)}>
           <Reveal sx={s.lead}>
-            <p {...stylex.props(s.leadText)}>
+            <p {...stylex.attrs(s.leadText)}>
               {PRODUCTS_INTRO.lead.split(/(?<=，)/).map((clause) => (
-                <span key={clause} {...stylex.props(s.clause)}>
-                  {clause}
-                </span>
+                <span {...stylex.attrs(s.clause)}>{clause}</span>
               ))}
             </p>
             <button
               type="button"
-              onClick={() => onNavigateHome("products")}
-              {...stylex.props(ui.button, ui.buttonPrimary, ui.focusRing)}
+              onClick={() => props.onNavigateHome("products")}
+              {...stylex.attrs(ui.button, ui.buttonPrimary, ui.focusRing)}
             >
               {PRODUCTS_INTRO.cta.label}
             </button>
           </Reveal>
         </div>
-        <ul {...stylex.props(ui.main, s.grid)}>
+        <ul {...stylex.attrs(ui.main, s.grid)}>
           {PRODUCTS.map((product, idx) => (
-            <Reveal key={product.title} as="li" step={idx % 2}>
+            <Reveal as="li" step={idx % 2}>
               <article>
-                <div {...stylex.props(ui.frame, s.frame)}>
+                <div {...stylex.attrs(ui.frame, s.frame)}>
                   <img
                     src={product.image}
                     alt={product.english}
                     loading="lazy"
                     decoding="async"
-                    {...stylex.props(ui.fill)}
+                    {...stylex.attrs(ui.fill)}
                   />
                 </div>
-                <h3 {...stylex.props(s.name)}>{product.title}</h3>
-                <p {...stylex.props(s.desc)}>{product.description}</p>
-                <ul {...stylex.props(s.tags)}>
+                <h3 {...stylex.attrs(s.name)}>{product.title}</h3>
+                <p {...stylex.attrs(s.desc)}>{product.description}</p>
+                <ul {...stylex.attrs(s.tags)}>
                   {product.tags.map((tag) => (
-                    <li key={tag}>{tag}</li>
+                    <li>{tag}</li>
                   ))}
                 </ul>
               </article>

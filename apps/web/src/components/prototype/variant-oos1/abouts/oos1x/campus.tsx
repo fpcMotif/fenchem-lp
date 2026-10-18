@@ -106,10 +106,9 @@ export function Campus() {
   const lightbox = useLightbox(CAMPUS_PHOTOS.length);
 
   return (
-    <section id="about-campus" aria-labelledby="oos1x-campus" {...stylex.props(ui.anchor)}>
+    <section id="about-campus" aria-labelledby="oos1x-campus" {...stylex.attrs(ui.anchor)}>
       {ABOUT_CAMPUS.photos.map((photo, index) => (
         <Pair
-          key={photo.id}
           lever={LEVER}
           loadRatio={CAMPUS_FRAME[photo.id].ratio}
           offset={index % 2 === 0 ? "end" : "start"}
@@ -121,14 +120,14 @@ export function Campus() {
             ) : undefined
           }
           tag={
-            <p aria-hidden="true" {...stylex.props(styles.plate)}>
-              <span lang="en" {...stylex.props(type.serif, styles.plateLabel)}>
+            <p aria-hidden="true" {...stylex.attrs(styles.plate)}>
+              <span lang="en" {...stylex.attrs(type.serif, styles.plateLabel)}>
                 Plate
               </span>
-              <span {...stylex.props(type.counterweight, type.counterTitle)}>
+              <span {...stylex.attrs(type.counterweight, type.counterTitle)}>
                 {String(index + 1).padStart(2, "0")}
               </span>
-              <span {...stylex.props(styles.plateCount)}>
+              <span {...stylex.attrs(styles.plateCount)}>
                 / {String(CAMPUS_PHOTOS.length).padStart(2, "0")}
               </span>
             </p>
@@ -137,7 +136,7 @@ export function Campus() {
             <button
               type="button"
               onClick={() => lightbox.open(index)}
-              {...stylex.props(
+              {...stylex.attrs(
                 styles.button,
                 ratios[photo.id],
                 ui.focusRing,
@@ -149,17 +148,17 @@ export function Campus() {
                 alt={photo.alt}
                 loading="lazy"
                 decoding="async"
-                {...stylex.props(ui.fill, styles.image, positions[photo.id])}
+                {...stylex.attrs(ui.fill, styles.image, positions[photo.id])}
               />
               <span {...srOnly}>, View larger</span>
             </button>
           }
         >
-          <p {...stylex.props(type.light, type.display, styles.caption)}>{photo.caption}</p>
-          <p lang="en" {...stylex.props(type.serif, styles.english)}>
+          <p {...stylex.attrs(type.light, type.display, styles.caption)}>{photo.caption}</p>
+          <p lang="en" {...stylex.attrs(type.serif, styles.english)}>
             {CAMPUS_FRAME[photo.id].english}
           </p>
-          <p aria-hidden="true" {...stylex.props(type.body, styles.description)}>
+          <p aria-hidden="true" {...stylex.attrs(type.body, styles.description)}>
             {photo.description}
           </p>
         </Pair>

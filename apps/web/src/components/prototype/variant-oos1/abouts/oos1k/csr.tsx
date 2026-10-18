@@ -140,26 +140,26 @@ export function Csr() {
   const [beltRef, hidden] = useDusk<HTMLDivElement>();
 
   return (
-    <section id="about-csr" aria-labelledby="oos1k-csr" {...stylex.props(ui.section, ui.shell)}>
-      <div {...stylex.props(styles.grid)}>
-        <figure {...stylex.props(styles.plate)}>
+    <section id="about-csr" aria-labelledby="oos1k-csr" {...stylex.attrs(ui.section, ui.shell)}>
+      <div {...stylex.attrs(styles.grid)}>
+        <figure {...stylex.attrs(styles.plate)}>
           <img
             src={ABOUT_CSR.image}
             alt={ABOUT_CSR.imageAlt}
             loading="lazy"
             decoding="async"
-            {...stylex.props(styles.image)}
+            {...stylex.attrs(styles.image)}
           />
-          <figcaption {...stylex.props(styles.strip)}>
-            <span lang="en" {...stylex.props(ui.label, styles.plateName)}>
+          <figcaption {...stylex.attrs(styles.strip)}>
+            <span lang="en" {...stylex.attrs(ui.label, styles.plateName)}>
               Plate
-              <span {...stylex.props(ui.designation, styles.numeral)}>VIII</span>
+              <span {...stylex.attrs(ui.designation, styles.numeral)}>VIII</span>
             </span>
-            <span {...stylex.props(styles.plateCaption)}>园区水景</span>
+            <span {...stylex.attrs(styles.plateCaption)}>园区水景</span>
           </figcaption>
         </figure>
 
-        <div {...stylex.props(styles.text)}>
+        <div {...stylex.attrs(styles.text)}>
           <ChartHeading
             id="oos1k-csr"
             numeral="IV"
@@ -167,51 +167,48 @@ export function Csr() {
             title={ABOUT_CSR.title}
             note="A belt of three stars"
           />
-          <p {...stylex.props(styles.statement)}>
+          <p {...stylex.attrs(styles.statement)}>
             {ABOUT_CSR.statement.map((line) => (
-              <span key={line} {...stylex.props(styles.line)}>
-                {line}
-              </span>
+              <span {...stylex.attrs(styles.line)}>{line}</span>
             ))}
           </p>
-          <p {...stylex.props(ui.body)}>{ABOUT_CSR.desc}</p>
-          <div ref={beltRef} {...stylex.props(styles.beltWrap)}>
+          <p {...stylex.attrs(ui.body)}>{ABOUT_CSR.desc}</p>
+          <div ref={beltRef} {...stylex.attrs(styles.beltWrap)}>
             <svg
               aria-hidden="true"
               viewBox="0 0 100 20"
               preserveAspectRatio="none"
-              {...stylex.props(styles.beltLine, ui.dim, hidden && ui.dimHidden, ui.dimDelay(700))}
+              {...stylex.attrs(styles.beltLine, ui.dim, hidden() && ui.dimHidden, ui.dimDelay(700))}
             >
               <line
                 x1={0}
                 y1={BELT_CENTER - BELT_RISE[0]}
                 x2={100}
                 y2={BELT_CENTER - BELT_RISE[2]}
-                vectorEffect="non-scaling-stroke"
-                {...stylex.props(styles.beltStroke)}
+                vector-effect="non-scaling-stroke"
+                {...stylex.attrs(styles.beltStroke)}
               />
             </svg>
-            <ol {...stylex.props(styles.belt)}>
+            <ol {...stylex.attrs(styles.belt)}>
               {ABOUT_CSR.outcomes.map((outcome, index) => (
                 <li
-                  key={outcome.title}
-                  {...stylex.props(
+                  {...stylex.attrs(
                     styles.star,
                     rise.offset(BELT_RISE[index]),
                     ui.dim,
-                    hidden && ui.dimHidden,
+                    hidden() && ui.dimHidden,
                     ui.dimDelay(index * 220),
                   )}
                 >
-                  <span aria-hidden="true" {...stylex.props(styles.point)} />
-                  <span {...stylex.props(styles.outcome)}>
+                  <span aria-hidden="true" {...stylex.attrs(styles.point)} />
+                  <span {...stylex.attrs(styles.outcome)}>
                     <span
                       aria-hidden="true"
-                      {...stylex.props(ui.designation, styles.outcomeNumeral)}
+                      {...stylex.attrs(ui.designation, styles.outcomeNumeral)}
                     >
                       {NUMERALS[index]}
                     </span>
-                    <span {...stylex.props(styles.outcomeTitle)}>{outcome.title}</span>
+                    <span {...stylex.attrs(styles.outcomeTitle)}>{outcome.title}</span>
                   </span>
                 </li>
               ))}

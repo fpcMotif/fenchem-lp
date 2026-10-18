@@ -1,5 +1,6 @@
 import * as stylex from "@stylexjs/stylex";
-import type { ReactNode } from "react";
+import type { JSX } from "@solidjs/web";
+import { children } from "solid-js";
 
 import { ui } from "./shared";
 import { bp, face, tone } from "./tokens.stylex";
@@ -47,33 +48,28 @@ const styles = stylex.create({
   },
 });
 
-export function RoomSign({
-  numeral,
-  id,
-  title,
-  english,
-  children,
-}: {
+export function RoomSign(props: {
   numeral: string;
   id: string;
   title: string;
   english: string;
-  children?: ReactNode;
+  children?: JSX.Element;
 }) {
+  const note = children(() => props.children);
   return (
-    <header {...stylex.props(styles.sign)}>
-      <p lang="en" {...stylex.props(ui.caps, styles.gallery)}>
-        <span aria-hidden="true" {...stylex.props(styles.rule)} />
-        Gallery {numeral}
-        <span aria-hidden="true" {...stylex.props(styles.rule)} />
+    <header {...stylex.attrs(styles.sign)}>
+      <p lang="en" {...stylex.attrs(ui.caps, styles.gallery)}>
+        <span aria-hidden="true" {...stylex.attrs(styles.rule)} />
+        Gallery {props.numeral}
+        <span aria-hidden="true" {...stylex.attrs(styles.rule)} />
       </p>
-      <h2 id={id} {...stylex.props(styles.title)}>
-        {title}
+      <h2 id={props.id} {...stylex.attrs(styles.title)}>
+        {props.title}
       </h2>
-      <p lang="en" {...stylex.props(ui.italic, styles.english)}>
-        {english}
+      <p lang="en" {...stylex.attrs(ui.italic, styles.english)}>
+        {props.english}
       </p>
-      {children ? <div {...stylex.props(styles.note)}>{children}</div> : null}
+      {note() ? <div {...stylex.attrs(styles.note)}>{note()}</div> : null}
     </header>
   );
 }

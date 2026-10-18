@@ -1,4 +1,4 @@
-import { useSyncExternalStore } from "react";
+import { createExternalStore } from "@/compat/external-store";
 
 const FLASH_MS = 2000;
 
@@ -30,7 +30,7 @@ export function flashCatalogItem(itemId: string) {
 }
 
 export function useFlashedCatalogItem() {
-  return useSyncExternalStore(
+  return createExternalStore<string | null>(
     subscribe,
     () => flashedItemId,
     () => null,

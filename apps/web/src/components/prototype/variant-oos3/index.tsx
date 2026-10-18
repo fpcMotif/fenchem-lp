@@ -17,19 +17,27 @@ import { ProductSummary } from "../shared/product-summary";
 import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 import type { StyleXStyles } from "@stylexjs/stylex";
-import { Globe, Lightbulb, Plus, Shield, Users, type LucideIcon } from "lucide-react";
-import { m, useInView, useScroll, useTransform, type MotionValue } from "motion/react";
 import {
-  useEffect,
-  useId,
-  useRef,
-  useState,
-  useSyncExternalStore,
-  type CSSProperties,
-  type KeyboardEvent,
-  type ReactNode,
-} from "react";
-import { preinit } from "react-dom";
+  Globe,
+  Lightbulb,
+  Plus,
+  Shield,
+  Users,
+  type LucideIcon,
+} from "@fenchem-lp/ui/components/lucide";
+import { m, useInView, useScroll, useTransform, type MotionValue } from "@/compat/motion";
+import { createMediaQuery } from "@/compat/reduced-motion";
+import {
+  createEffect,
+  createSignal,
+  createUniqueId,
+  For,
+  merge,
+  onSettled,
+  untrack,
+} from "solid-js";
+import type { JSX } from "@solidjs/web";
+import { preinit } from "@/compat/react-dom";
 
 import { EASE } from "@/components/prototype/motion-constants";
 
@@ -118,18 +126,8 @@ const QUADRANT_DIRECTIONS = [
 const RING_RADIUS = 62;
 const RING_LENGTH = Math.round(2 * Math.PI * RING_RADIUS);
 
-const subscribeQuadrants = (onChange: () => void) => {
-  const media = window.matchMedia(QUADRANT_QUERY);
-  media.addEventListener("change", onChange);
-  return () => media.removeEventListener("change", onChange);
-};
-
 function useQuadrantMotion() {
-  return useSyncExternalStore(
-    subscribeQuadrants,
-    () => window.matchMedia(QUADRANT_QUERY).matches,
-    () => false,
-  );
+  return createMediaQuery(QUADRANT_QUERY);
 }
 
 const RISE_STAGGER = 0.06;
@@ -1445,7 +1443,7 @@ const SETTLED = "translateY(0px) scale(1)";
 const zoomFrom = (y: number, scale: number) => `translateY(${y}px) scale(${scale})`;
 
 type ZoomProps = {
-  children: ReactNode;
+  children: JSX.Element;
   sx?: StyleXStyles;
   style?: StyleXStyles;
   delay?: number;
@@ -1453,67 +1451,54 @@ type ZoomProps = {
   scale?: number;
 };
 
-function ZoomReveal({
-  children,
-  sx,
-  style,
-  delay = 0,
-  y = 24,
-  scale = ZOOM_FROM_SCALE,
-}: ZoomProps) {
+function ZoomReveal(props: ZoomProps) {
+  const p = merge({ delay: 0, y: 24, scale: ZOOM_FROM_SCALE }, props);
   const reduce = useReducedMotion();
   return (
     <m.div
-      {...stylex.props(sx, style)}
-      initial={{ opacity: 0, transform: zoomFrom(y, scale) }}
+      {...stylex.attrs(p.sx, p.style)}
+      initial={{ opacity: 0, transform: zoomFrom(p.y, p.scale) }}
       whileInView={{ opacity: 1, transform: SETTLED }}
       viewport={{ once: true, margin: "-80px" }}
-      transition={{ duration: reduce ? 0.2 : 0.8, delay: reduce ? 0 : delay, ease: EASE }}
+      transition={{ duration: reduce() ? 0.2 : 0.8, delay: reduce() ? 0 : p.delay, ease: EASE }}
     >
-      {children}
+      {p.children}
     </m.div>
   );
 }
 
-function VectorArt({
-  paths,
-  viewBox,
-  sx,
-}: {
-  paths: readonly VectorPath[];
-  viewBox: string;
-  sx: StyleXStyles;
-}) {
+function VectorArt(props: { paths: readonly VectorPath[]; viewBox: string; sx: StyleXStyles }) {
   return (
-    <svg viewBox={viewBox} aria-hidden="true" focusable="false" {...stylex.props(sx)}>
-      {paths.map((path) => (
-        <path key={path.d} d={path.d} fill={path.fill} />
-      ))}
+    <svg viewBox={props.viewBox} aria-hidden="true" {...UNFOCUSABLE} {...stylex.attrs(props.sx)}>
+      <For each={props.paths}>{(path) => <path d={path.d} fill={path.fill} />}</For>
     </svg>
   );
 }
 
+// `focusable` (legacy SVG attribute) is not in Solid's JSX types.
+const UNFOCUSABLE = { focusable: "false" } as JSX.SvgSVGAttributes<SVGSVGElement>;
+
 function useScrolledPastTop() {
-  const [scrolled, setScrolled] = useState(false);
-  useEffect(() => {
+  const [scrolled, setScrolled] = createSignal(false);
+  onSettled(() => {
     const update = () => setScrolled(window.scrollY > 8);
     update();
     window.addEventListener("scroll", update, { passive: true });
     return () => window.removeEventListener("scroll", update);
-  }, []);
+  });
   return scrolled;
 }
 
 function SiteHeader() {
-  const [menuOpen, setMenuOpen] = useState(false);
-  const menuId = useId();
+  const [menuOpen, setMenuOpen] = createSignal(false);
+  const menuId = createUniqueId();
   const reduce = useReducedMotion();
   const scrolled = useScrolledPastTop();
   const activeId = useActiveSection(NAV_SECTION_IDS);
-  const closeOnEscape = (event: KeyboardEvent<HTMLElement>) => {
-    if (event.key === "Escape" && menuOpen) setMenuOpen(false);
+  const closeOnEscape = (event: KeyboardEvent) => {
+    if (event.key === "Escape" && menuOpen()) setMenuOpen(false);
   };
-  const isActive = (href: string) => href.slice(1) === activeId;
+  const isActive = (href: string) => href.slice(1) === activeId();
   return (
     <CorporateMenu
       styles={{
@@ -1538,10 +1523,10 @@ function SiteHeader() {
         menuButton: styles.menuButton,
       }}
       closeOnEscape={closeOnEscape}
-      scrolled={scrolled}
-      menuOpen={menuOpen}
+      scrolled={scrolled()}
+      menuOpen={menuOpen()}
       menuId={menuId}
-      reduce={reduce}
+      reduce={reduce()}
       setMenuOpen={setMenuOpen}
       LogoMark={LogoMark}
       NAV_ITEMS={NAV_ITEMS}
@@ -1552,13 +1537,12 @@ function SiteHeader() {
 
 function LogoMark() {
   return (
-    <svg viewBox="0 0 161 52" aria-hidden="true" focusable="false" {...stylex.props(styles.logo)}>
+    <svg viewBox="0 0 161 52" aria-hidden="true" {...UNFOCUSABLE} {...stylex.attrs(styles.logo)}>
       {LOGO_PATHS.map((path) => (
         <path
-          key={path.d}
           d={path.d}
           fill={path.fill}
-          {...stylex.props(styles.logoPart, styles.enterDelay(logoPartDelay(path.d)))}
+          {...stylex.attrs(styles.logoPart, styles.enterDelay(logoPartDelay(path.d)))}
         />
       ))}
     </svg>
@@ -1566,9 +1550,12 @@ function LogoMark() {
 }
 
 function Hero() {
-  const heroRef = useRef<HTMLElement>(null);
+  let heroEl: HTMLElement | undefined;
   const reduce = useReducedMotion();
-  const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
+  const { scrollYProgress } = useScroll({
+    target: () => heroEl,
+    offset: ["start start", "end start"],
+  });
   const backdropY = useTransform(scrollYProgress, [0, 1], ["0%", "18%"]);
   const contentY = useTransform(scrollYProgress, [0, 1], [0, -120]);
   const contentOpacity = useTransform(scrollYProgress, [0, 0.75], [1, 0]);
@@ -1610,8 +1597,8 @@ function Hero() {
         heroTintScreen: styles.heroTintScreen,
         heroParallax: styles.heroParallax,
       }}
-      heroRef={heroRef}
-      reduce={reduce}
+      heroRef={(el: HTMLElement) => (heroEl = el)}
+      reduce={reduce()}
       backdropY={backdropY}
       contentY={contentY}
       contentOpacity={contentOpacity}
@@ -1626,27 +1613,26 @@ function Hero() {
   );
 }
 
-function InkPhrase({
-  progress,
-  range,
-  children,
-}: {
+function InkPhrase(props: {
   progress: MotionValue<number>;
   range: [number, number];
-  children: ReactNode;
+  children: JSX.Element;
 }) {
   const reduce = useReducedMotion();
-  const opacity = useTransform(progress, range, [0.16, 1]);
+  const opacity = useTransform(props.progress, props.range, [0.16, 1]);
   return (
-    <m.span {...stylex.props(styles.inkPhrase)} style={reduce ? undefined : { opacity }}>
-      {children}
+    <m.span {...stylex.attrs(styles.inkPhrase)} style={reduce() ? undefined : { opacity }}>
+      {props.children}
     </m.span>
   );
 }
 
 function About() {
-  const textRef = useRef<HTMLParagraphElement>(null);
-  const { scrollYProgress } = useScroll({ target: textRef, offset: ["start 0.85", "end 0.45"] });
+  let textEl: HTMLParagraphElement | undefined;
+  const { scrollYProgress } = useScroll({
+    target: () => textEl,
+    offset: ["start 0.85", "end 0.45"],
+  });
   return (
     <InkedAbout
       styles={{
@@ -1662,7 +1648,7 @@ function About() {
       }}
       RiseReveal={RiseReveal}
       ABOUT={ABOUT}
-      textRef={textRef}
+      textRef={(el: HTMLParagraphElement) => (textEl = el)}
       ABOUT_INK_LINES={ABOUT_INK_LINES}
       scrollYProgress={scrollYProgress}
       InkPhrase={InkPhrase}
@@ -1671,15 +1657,18 @@ function About() {
 }
 
 function Campus() {
-  const stageRef = useRef<HTMLDivElement>(null);
+  let stageEl: HTMLDivElement | undefined;
   const reduce = useReducedMotion();
-  const maxProgressRef = useRef(0);
-  const { scrollYProgress } = useScroll({ target: stageRef, offset: ["start end", "center 0.55"] });
+  let maxProgress = 0;
+  const { scrollYProgress } = useScroll({
+    target: () => stageEl,
+    offset: ["start end", "center 0.55"],
+  });
   const windowClip = useTransform(scrollYProgress, (progress) => {
-    if (progress > maxProgressRef.current) {
-      maxProgressRef.current = progress;
+    if (progress > maxProgress) {
+      maxProgress = progress;
     }
-    const t = revealProgress(maxProgressRef.current);
+    const t = revealProgress(maxProgress);
     const top = lerp(CLIP_FROM.top, CLIP_TO.top, t);
     const side = lerp(CLIP_FROM.side, CLIP_TO.side, t);
     const bottom = lerp(CLIP_FROM.bottom, CLIP_TO.bottom, t);
@@ -1687,10 +1676,10 @@ function Campus() {
     return `inset(${top}% ${side}% ${bottom}% ${side}% round ${radius}px)`;
   });
   const photoScale = useTransform(scrollYProgress, (progress) => {
-    if (progress > maxProgressRef.current) {
-      maxProgressRef.current = progress;
+    if (progress > maxProgress) {
+      maxProgress = progress;
     }
-    return lerp(1.22, 1, revealProgress(maxProgressRef.current));
+    return lerp(1.22, 1, revealProgress(maxProgress));
   });
 
   return (
@@ -1704,8 +1693,8 @@ function Campus() {
         inset132: styles.inset132,
         statsBand: styles.statsBand,
       }}
-      stageRef={stageRef}
-      reduce={reduce}
+      stageRef={(el: HTMLDivElement) => (stageEl = el)}
+      reduce={reduce()}
       windowClip={windowClip}
       photoScale={photoScale}
       IMAGES={IMAGES}
@@ -1715,48 +1704,42 @@ function Campus() {
   );
 }
 
-function DigitWheel({ digit, delay }: { digit: number; delay: number }) {
+function DigitWheel(props: { digit: number; delay: number }) {
   const reduce = useReducedMotion();
   return (
-    <span {...stylex.props(styles.wheel)}>
+    <span {...stylex.attrs(styles.wheel)}>
       <m.span
-        {...stylex.props(styles.wheelColumn)}
+        {...stylex.attrs(styles.wheelColumn)}
         initial={{ transform: "translateY(0%)" }}
-        whileInView={{ transform: `translateY(${-(10 + digit) * 5}%)` }}
+        whileInView={{ transform: `translateY(${-(10 + props.digit) * 5}%)` }}
         viewport={{ once: true, margin: "-60px" }}
-        transition={{ duration: reduce ? 0 : 1.6, delay: reduce ? 0 : delay, ease: EASE }}
+        transition={{ duration: reduce() ? 0 : 1.6, delay: reduce() ? 0 : props.delay, ease: EASE }}
       >
-        {DIGIT_CELLS.map((cell, index) => (
-          <span key={index} {...stylex.props(styles.wheelCell)}>
-            {cell}
-          </span>
+        {DIGIT_CELLS.map((cell) => (
+          <span {...stylex.attrs(styles.wheelCell)}>{cell}</span>
         ))}
       </m.span>
     </span>
   );
 }
 
-function Odometer({ value, offset }: { value: string; offset: number }) {
+function Odometer(props: { value: string; offset: number }) {
   return (
-    <span aria-hidden="true" {...stylex.props(styles.statValue)}>
-      {value
+    <span aria-hidden="true" {...stylex.attrs(styles.statValue)}>
+      {props.value
         .split("")
         .map((character, index) =>
           /\d/.test(character) ? (
-            <DigitWheel
-              key={index}
-              digit={Number(character)}
-              delay={offset + index * DIGIT_STAGGER}
-            />
+            <DigitWheel digit={Number(character)} delay={props.offset + index * DIGIT_STAGGER} />
           ) : (
-            <span key={index}>{character}</span>
+            <span>{character}</span>
           ),
         )}
     </span>
   );
 }
 
-function StatItem({ stat, index }: { stat: (typeof STATS)[number]; index: number }) {
+function StatItem(props: { stat: (typeof STATS)[number]; index: number }) {
   return (
     <CampusStatistic
       styles={{
@@ -1767,8 +1750,8 @@ function StatItem({ stat, index }: { stat: (typeof STATS)[number]; index: number
         statUnit: styles.statUnit,
         visuallyHidden: styles.visuallyHidden,
       }}
-      index={index}
-      stat={stat}
+      index={props.index}
+      stat={props.stat}
       RiseReveal={RiseReveal}
       Odometer={Odometer}
       riseDelay={riseDelay}
@@ -1777,50 +1760,51 @@ function StatItem({ stat, index }: { stat: (typeof STATS)[number]; index: number
   );
 }
 
-function IconPattern({ icon }: { icon: StrengthIcon }) {
-  const Icon = STRENGTH_ICONS[icon];
+function IconPattern(props: { icon: StrengthIcon }) {
+  const Icon = STRENGTH_ICONS[props.icon];
   return (
-    <div aria-hidden="true" {...stylex.props(styles.pattern)}>
+    <div aria-hidden="true" {...stylex.attrs(styles.pattern)}>
       {PATTERN_CELLS.map((cell) => (
         <Icon
-          key={`${cell.left}-${cell.top}`}
           size={32}
           strokeWidth={2}
           absoluteStrokeWidth
-          {...stylex.props(styles.patternCell(`${cell.left}px`, `${cell.top}px`))}
+          {...stylex.attrs(styles.patternCell(`${cell.left}px`, `${cell.top}px`))}
         />
       ))}
     </div>
   );
 }
 
-function Quadrant({
-  strength,
-  index,
-  apart,
-}: {
+function Quadrant(props: {
   strength: (typeof STRENGTHS)[number];
   index: number;
   apart: MotionValue<number>;
 }) {
-  const [dx, dy] = QUADRANT_DIRECTIONS[index];
-  const x = useTransform(apart, (value) => value * dx * 56);
-  const y = useTransform(apart, (value) => value * dy * 40);
-  const inverse = strength.tone === "blue";
+  const [dx, dy] = untrack(() => QUADRANT_DIRECTIONS[props.index]);
+  const x = useTransform(
+    untrack(() => props.apart),
+    (value) => value * dx * 56,
+  );
+  const y = useTransform(
+    untrack(() => props.apart),
+    (value) => value * dy * 40,
+  );
+  const inverse = () => props.strength.tone === "blue";
   const right = dx === 1;
   return (
     <m.article
-      aria-labelledby={`oos1-strength-${index}`}
-      {...stylex.props(
+      aria-labelledby={`oos1-strength-${props.index}`}
+      {...stylex.attrs(
         styles.quadrant,
-        TONE_STYLES[strength.tone],
+        TONE_STYLES[props.strength.tone],
         dy === -1 && styles.quadrantUpper,
         right && styles.quadrantRight,
         stylex.defaultMarker(),
       )}
       style={{ x, y }}
     >
-      <IconPattern icon={strength.icon} />
+      <IconPattern icon={props.strength.icon} />
       <StrengthQuadrantCopy
         styles={{
           quadrantText: styles.quadrantText,
@@ -1830,9 +1814,9 @@ function Quadrant({
           quadrantSmall: styles.quadrantSmall,
           quadrantLink: styles.quadrantLink,
         }}
-        inverse={inverse}
-        index={index}
-        strength={strength}
+        inverse={inverse()}
+        index={props.index}
+        strength={props.strength}
         idPrefix="oos1"
       />
     </m.article>
@@ -1840,17 +1824,17 @@ function Quadrant({
 }
 
 function Strengths() {
-  const gridRef = useRef<HTMLDivElement>(null);
+  let gridEl: HTMLDivElement | undefined;
   const converge = useQuadrantMotion();
   const { scrollYProgress: approach } = useScroll({
-    target: gridRef,
+    target: () => gridEl,
     offset: ["start end", "center 0.6"],
   });
   const { scrollYProgress: pass } = useScroll({
-    target: gridRef,
+    target: () => gridEl,
     offset: ["start end", "end start"],
   });
-  const apart = useTransform(approach, (value) => (converge ? 1 - value : 0));
+  const apart = useTransform(approach, (value) => (converge() ? 1 - value : 0));
   const rotate = useTransform(pass, [0, 1], [0, 180]);
   return (
     <QuadrantStrengths
@@ -1869,7 +1853,7 @@ function Strengths() {
       }}
       RiseReveal={RiseReveal}
       STRENGTHS_INTRO={STRENGTHS_INTRO}
-      gridRef={gridRef}
+      gridRef={(el: HTMLDivElement) => (gridEl = el)}
       STRENGTHS={STRENGTHS}
       Quadrant={Quadrant}
       apart={apart}
@@ -1880,21 +1864,21 @@ function Strengths() {
   );
 }
 
-function ProductCard({ product, index }: { product: (typeof PRODUCTS)[number]; index: number }) {
+function ProductCard(props: { product: (typeof PRODUCTS)[number]; index: number }) {
   return (
-    <RiseReveal delay={riseDelay(index)} sx={styles.productCard}>
-      <div {...stylex.props(styles.productImageFrame)}>
+    <RiseReveal delay={riseDelay(props.index)} sx={styles.productCard}>
+      <div {...stylex.attrs(styles.productImageFrame)}>
         <img
-          src={product.image}
-          alt={product.english}
+          src={props.product.image}
+          alt={props.product.english}
           loading="lazy"
           decoding="async"
-          {...stylex.props(styles.productImage)}
+          {...stylex.attrs(styles.productImage)}
         />
       </div>
       <ProductSummary
-        product={product}
-        sx={[styles.productPanel, index % 2 === 1 && styles.productPanelAlt]}
+        product={props.product}
+        sx={[styles.productPanel, props.index % 2 === 1 && styles.productPanelAlt]}
         styles={{
           mutedText: styles.mutedText,
           productTitleBlock: styles.productTitleBlock,
@@ -1927,15 +1911,15 @@ function Products() {
       PRODUCTS_INTRO={PRODUCTS_INTRO}
       delay={riseDelay(1)}
       cards={PRODUCTS.map((product, index) => (
-        <ProductCard key={product.title} product={product} index={index} />
+        <ProductCard product={product} index={index} />
       ))}
     />
   );
 }
 
 function Offices() {
-  const rowRef = useRef<HTMLDivElement>(null);
-  const rowInView = useInView(rowRef, { once: true, amount: 0.5 });
+  let rowEl: HTMLDivElement | undefined;
+  const rowInView = useInView(() => rowEl, { once: true, amount: 0.5 });
   return (
     <SweepingOffices
       styles={{
@@ -1967,8 +1951,8 @@ function Offices() {
         regionBody: styles.regionBody,
         mutedText: styles.mutedText,
       }}
-      rowRef={rowRef}
-      rowInView={rowInView}
+      rowRef={(el: HTMLDivElement) => (rowEl = el)}
+      rowInView={rowInView()}
       IMAGES={IMAGES}
       OFFICE_MAP_PINS={OFFICE_MAP_PINS}
       MAP_SWEEP_MS={MAP_SWEEP_MS}
@@ -1981,14 +1965,14 @@ function Offices() {
   );
 }
 
-function AccordionIcon({ open }: { open: boolean }) {
+function AccordionIcon(props: { open: boolean }) {
   const reduce = useReducedMotion();
   return (
-    <span aria-hidden="true" {...stylex.props(styles.newsIconSlot)}>
+    <span aria-hidden="true" {...stylex.attrs(styles.newsIconSlot)}>
       <m.span
-        {...stylex.props(styles.newsIconLayer)}
-        animate={{ rotate: open ? 45 : 0 }}
-        transition={reduce ? { duration: 0 } : { type: "spring", duration: 0.3, bounce: 0 }}
+        {...stylex.attrs(styles.newsIconLayer)}
+        animate={{ rotate: props.open ? 45 : 0 }}
+        transition={reduce() ? { duration: 0 } : { type: "spring", duration: 0.3, bounce: 0 }}
       >
         <Plus size={16} strokeWidth={2} absoluteStrokeWidth />
       </m.span>
@@ -1996,21 +1980,13 @@ function AccordionIcon({ open }: { open: boolean }) {
   );
 }
 
-function NewsItem({
-  item,
-  open,
-  onToggle,
-}: {
-  item: (typeof NEWS)[number];
-  open: boolean;
-  onToggle: () => void;
-}) {
+function NewsItem(props: { item: (typeof NEWS)[number]; open: boolean; onToggle: () => void }) {
   return (
     <NewsAccordion
-      item={item}
-      open={open}
-      onToggle={onToggle}
-      icon={<AccordionIcon open={open} />}
+      item={props.item}
+      open={props.open}
+      onToggle={props.onToggle}
+      icon={<AccordionIcon open={props.open} />}
       styles={{
         mutedText: styles.mutedText,
         newsHeading: styles.newsHeading,
@@ -2048,18 +2024,18 @@ function ContactCta() {
     <section
       id="contact"
       aria-labelledby="oo-contact-title"
-      {...stylex.props(styles.cta, styles.inset124, styles.anchor)}
+      {...stylex.attrs(styles.cta, styles.inset124, styles.anchor)}
     >
-      <span aria-hidden="true" lang="en" {...stylex.props(styles.ctaWord)}>
+      <span aria-hidden="true" lang="en" {...stylex.attrs(styles.ctaWord)}>
         Fenchem
       </span>
       <RiseReveal sx={styles.ctaInner}>
-        <h2 id="oo-contact-title" {...stylex.props(styles.sectionTitle)}>
+        <h2 id="oo-contact-title" {...stylex.attrs(styles.sectionTitle)}>
           {CTA.title}
         </h2>
         <a
           href={CTA.action.href}
-          {...stylex.props(styles.button, styles.buttonPrimary, styles.buttonWide)}
+          {...stylex.attrs(styles.button, styles.buttonPrimary, styles.buttonWide)}
         >
           {CTA.action.label}
         </a>
@@ -2092,10 +2068,10 @@ function SiteFooter() {
       columns={FOOTER_COLUMNS}
       copyright={COPYRIGHT}
     >
-      <a href="#top" aria-label="LinkedIn" {...stylex.props(styles.socialLink)}>
+      <a href="#top" aria-label="LinkedIn" {...stylex.attrs(styles.socialLink)}>
         <VectorArt paths={LINKEDIN_PATHS} viewBox="0 0 20 20" sx={styles.socialIcon} />
       </a>
-      <a href="#top" aria-label="WeChat" {...stylex.props(styles.socialLink)}>
+      <a href="#top" aria-label="WeChat" {...stylex.attrs(styles.socialLink)}>
         <VectorArt paths={WECHAT_PATHS} viewBox="0 0 20 20" sx={styles.socialIcon} />
       </a>
     </CorporateFooter>
@@ -2106,23 +2082,25 @@ export function VariantOOS3() {
   preinit(GOOGLE_FONTS, { as: "style" });
   const reduce = useReducedMotion();
   const intro = useIntro();
-  const introVars = {
-    "--oo-intro": intro === "play" ? `${INTRO_REVEAL_MS}ms` : "0ms",
-  } as CSSProperties;
-  useEffect(() => {
-    if (reduce) return;
-    const root = document.documentElement;
-    const previous = root.style.scrollBehavior;
-    root.style.scrollBehavior = "smooth";
-    return () => {
-      root.style.scrollBehavior = previous;
-    };
-  }, [reduce]);
+  createEffect(
+    () => reduce(),
+    (reduced) => {
+      if (reduced) return;
+      const root = document.documentElement;
+      const previous = root.style.scrollBehavior;
+      root.style.scrollBehavior = "smooth";
+      return () => {
+        root.style.scrollBehavior = previous;
+      };
+    },
+  );
   return (
     <FixedHeaderCorporatePage
       styles={{ root: styles.root, skipLink: styles.skipLink, page: styles.page }}
-      introVars={introVars}
-      intro={intro}
+      introVars={
+        { "--oo-intro": intro() === "play" ? `${INTRO_REVEAL_MS}ms` : "0ms" } as JSX.CSSProperties
+      }
+      intro={intro()}
       SiteHeader={SiteHeader}
       main={
         <CorporateMain

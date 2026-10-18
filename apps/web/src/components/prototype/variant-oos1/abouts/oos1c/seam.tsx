@@ -36,19 +36,25 @@ const styles = stylex.create({
   },
 });
 
-export function Cross({ size = 8 }: { size?: number }) {
+export function Cross(props: { size?: number }) {
   return (
-    <svg aria-hidden="true" width={size} height={size} viewBox="0 0 8 8" fill="none">
-      <path d="M1 1 7 7M7 1 1 7" stroke="currentColor" strokeWidth="1" strokeLinecap="round" />
+    <svg
+      aria-hidden="true"
+      width={props.size ?? 8}
+      height={props.size ?? 8}
+      viewBox="0 0 8 8"
+      fill="none"
+    >
+      <path d="M1 1 7 7M7 1 1 7" stroke="currentColor" stroke-width="1" stroke-linecap="round" />
     </svg>
   );
 }
 
 export function Seam() {
   return (
-    <div aria-hidden="true" {...stylex.props(styles.seam)}>
-      <span {...stylex.props(styles.thread)} />
-      <span {...stylex.props(styles.knot)}>
+    <div aria-hidden="true" {...stylex.attrs(styles.seam)}>
+      <span {...stylex.attrs(styles.thread)} />
+      <span {...stylex.attrs(styles.knot)}>
         <Cross />
       </span>
     </div>

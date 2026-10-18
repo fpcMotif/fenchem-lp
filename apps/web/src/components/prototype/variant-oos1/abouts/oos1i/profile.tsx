@@ -74,22 +74,22 @@ export function Profile() {
   return (
     <Section id="about-profile" labelledBy="about-profile-title" surface="paper" band="above">
       <SectionName id="about-profile-title">{ABOUT_HERO.navChips[0].english}</SectionName>
-      <div {...stylex.props(base.shell, base.inset, S.grid)}>
+      <div {...stylex.attrs(base.shell, base.inset, S.grid)}>
         <Reveal sx={S.copy}>
           <div>
-            <h3 {...stylex.props(S.name)}>{ABOUT_HERO.title}</h3>
-            <p lang="en" {...stylex.props(base.quiet, S.english)}>
+            <h3 {...stylex.attrs(S.name)}>{ABOUT_HERO.title}</h3>
+            <p lang="en" {...stylex.attrs(base.quiet, S.english)}>
               {ABOUT_HERO.englishTitle}
             </p>
           </div>
-          <p {...stylex.props(base.prose, S.lead)}>{ABOUT_HERO.lead}</p>
+          <p {...stylex.attrs(base.prose, S.lead)}>{ABOUT_HERO.lead}</p>
           <div>
-            <p {...stylex.props(base.quiet)}>{ABOUT_HERO.networkLabel}</p>
-            <ul {...stylex.props(S.countries)}>
+            <p {...stylex.attrs(base.quiet)}>{ABOUT_HERO.networkLabel}</p>
+            <ul {...stylex.attrs(S.countries)}>
               {ABOUT_HERO.countries.map((country) => (
-                <li key={country}>{country}</li>
+                <li>{country}</li>
               ))}
-              <li {...stylex.props(base.quiet)}>等地</li>
+              <li {...stylex.attrs(base.quiet)}>等地</li>
             </ul>
           </div>
         </Reveal>
@@ -99,9 +99,9 @@ export function Profile() {
             alt="Fenchem headquarters lobby with a curved ceiling and marble floor"
             loading="lazy"
             decoding="async"
-            {...stylex.props(S.photo)}
+            {...stylex.attrs(S.photo)}
           />
-          <figcaption {...stylex.props(base.quiet, S.caption)}>
+          <figcaption {...stylex.attrs(base.quiet, S.caption)}>
             {ABOUT_HERO.lobbyCaption}
           </figcaption>
         </Reveal>

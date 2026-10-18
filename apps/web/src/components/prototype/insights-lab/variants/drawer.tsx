@@ -1,8 +1,10 @@
 import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { ArrowRight, ChevronLeft, ChevronRight, X } from "lucide-react";
-import { m } from "motion/react";
-import { useEffect, useRef, useState, type AnimationEvent, type SyntheticEvent } from "react";
+import type { StyleXStyles } from "@stylexjs/stylex";
+import { ArrowRight, ChevronLeft, ChevronRight, X } from "@fenchem-lp/ui/components/lucide";
+import { createEffect, createMemo, createSignal, For, onCleanup, onSettled, Show } from "solid-js";
+
+import { m } from "@/compat/motion";
 
 import { EASE } from "../../motion-constants";
 import { color, font } from "../../variant-oos1/tokens.stylex";
@@ -26,6 +28,9 @@ import { lab } from "../tokens.stylex";
 const DESKTOP = breakpoints.xl;
 const BACKDROP = "rgba(6, 20, 44, 0.36)";
 const EXIT_FALLBACK_MS = 320;
+
+const sxProps = (...args: ReadonlyArray<StyleXStyles | false | null | undefined>) =>
+  stylex.attrs(...args);
 
 const fadeIn = stylex.keyframes({ "0%": { opacity: 0 }, "100%": { opacity: 1 } });
 const fadeOut = stylex.keyframes({ "0%": { opacity: 1 }, "100%": { opacity: 0 } });
@@ -383,106 +388,106 @@ const styles = stylex.create({
   },
 });
 
-export function DrawerVariant({ onNavigateHome }: SubPageProps) {
+export function DrawerVariant(props: SubPageProps) {
   const articles = useLabArticles();
-  const [openId, setOpenId] = useState<string | null>(null);
-  const triggers = useRef(new Map<string, HTMLButtonElement>());
-  const lastTrigger = useRef<string | null>(null);
-  const openIndex = articles.findIndex((article) => article.id === openId);
-  const opened = openIndex >= 0 ? articles[openIndex] : undefined;
+  const [openId, setOpenId] = createSignal<string | null>(null);
+  const triggers = new Map<string, HTMLButtonElement>();
+  let lastTrigger: string | null = null;
+  const openIndex = createMemo(() => articles().findIndex((article) => article.id === openId()));
+  const opened = createMemo(() => (openIndex() >= 0 ? articles()[openIndex()] : undefined));
 
   const open = (id: string) => {
-    lastTrigger.current = id;
+    lastTrigger = id;
     setOpenId(id);
   };
 
   return (
     <LabPage
-      onNavigateHome={onNavigateHome}
-      chips={articleIdChips(articles)}
-      activeChip={openId ?? undefined}
+      onNavigateHome={props.onNavigateHome}
+      chips={articleIdChips(articles())}
+      activeChip={openId() ?? undefined}
       onSelectChip={open}
     >
-      <div {...stylex.props(labStyles.column)}>
-        <div {...stylex.props(labStyles.listHeader)}>
-          <p {...stylex.props(labStyles.listLabel)}>全部洞察</p>
-          <p {...stylex.props(labStyles.listCount)}>{`共 ${articles.length} 篇`}</p>
+      <div {...stylex.attrs(labStyles.column)}>
+        <div {...stylex.attrs(labStyles.listHeader)}>
+          <p {...stylex.attrs(labStyles.listLabel)}>全部洞察</p>
+          <p {...stylex.attrs(labStyles.listCount)}>{`共 ${articles().length} 篇`}</p>
         </div>
-        <ul {...stylex.props(styles.list)}>
-          {articles.map((article) => (
-            <li
-              key={article.id}
-              {...stylex.props(
-                styles.row,
-                styles.rowFocus,
-                article.id === openId && styles.rowActive,
-                stylex.defaultMarker(),
-              )}
-            >
-              <div {...stylex.props(styles.thumb)}>
-                <img
-                  src={article.image}
-                  alt=""
-                  loading="lazy"
-                  decoding="async"
-                  {...stylex.props(styles.thumbImage)}
-                />
-              </div>
-              <div {...stylex.props(styles.rowText)}>
-                <ArticleMeta article={article} />
-                <h2 {...stylex.props(styles.rowTitle)}>
-                  <button
-                    ref={(node) => {
-                      if (node) triggers.current.set(article.id, node);
-                      else triggers.current.delete(article.id);
-                    }}
-                    type="button"
-                    aria-haspopup="dialog"
-                    onClick={() => open(article.id)}
-                    {...stylex.props(styles.rowButton)}
-                  >
-                    {article.title}
-                  </button>
-                </h2>
-                {article.lead ? <p {...stylex.props(styles.rowLead)}>{article.lead}</p> : null}
-              </div>
-              <span aria-hidden="true" {...stylex.props(styles.rowArrow)}>
-                <ArrowRight size={18} strokeWidth={2} />
-              </span>
-            </li>
-          ))}
+        <ul {...stylex.attrs(styles.list)}>
+          <For each={articles()}>
+            {(article) => {
+              onCleanup(() => triggers.delete(article.id));
+              return (
+                <li
+                  {...sxProps(
+                    styles.row,
+                    styles.rowFocus,
+                    article.id === openId() && styles.rowActive,
+                    stylex.defaultMarker(),
+                  )}
+                >
+                  <div {...stylex.attrs(styles.thumb)}>
+                    <img
+                      src={article.image}
+                      alt=""
+                      loading="lazy"
+                      decoding="async"
+                      {...stylex.attrs(styles.thumbImage)}
+                    />
+                  </div>
+                  <div {...stylex.attrs(styles.rowText)}>
+                    <ArticleMeta article={article} />
+                    <h2 {...stylex.attrs(styles.rowTitle)}>
+                      <button
+                        ref={(node) => {
+                          triggers.set(article.id, node);
+                        }}
+                        type="button"
+                        aria-haspopup="dialog"
+                        onClick={() => open(article.id)}
+                        {...stylex.attrs(styles.rowButton)}
+                      >
+                        {article.title}
+                      </button>
+                    </h2>
+                    <Show when={article.lead}>
+                      <p {...stylex.attrs(styles.rowLead)}>{article.lead}</p>
+                    </Show>
+                  </div>
+                  <span aria-hidden="true" {...stylex.attrs(styles.rowArrow)}>
+                    <ArrowRight size={18} strokeWidth={2} />
+                  </span>
+                </li>
+              );
+            }}
+          </For>
         </ul>
       </div>
 
-      {opened ? (
-        <ReaderDrawer
-          article={opened}
-          index={openIndex}
-          total={articles.length}
-          next={articles[openIndex + 1]}
-          onGo={(offset) => {
-            const target = articles[openIndex + offset];
-            if (target) setOpenId(target.id);
-          }}
-          onClosed={() => {
-            setOpenId(null);
-            const trigger = lastTrigger.current ? triggers.current.get(lastTrigger.current) : null;
-            trigger?.focus({ preventScroll: true });
-          }}
-        />
-      ) : null}
+      <Show when={opened()}>
+        {(article) => (
+          <ReaderDrawer
+            article={article()}
+            index={openIndex()}
+            total={articles().length}
+            next={articles()[openIndex() + 1]}
+            onGo={(offset) => {
+              const target = articles()[openIndex() + offset];
+              if (target) setOpenId(target.id);
+            }}
+            onClosed={() => {
+              setOpenId(null);
+              const trigger = lastTrigger ? triggers.get(lastTrigger) : null;
+              trigger?.focus({ preventScroll: true });
+            }}
+          />
+        )}
+      </Show>
     </LabPage>
   );
 }
 
-function ReaderDrawer({
-  article,
-  index,
-  total,
-  next,
-  onGo,
-  onClosed,
-}: {
+function ReaderDrawer(props: {
   article: LabArticle;
   index: number;
   total: number;
@@ -490,15 +495,14 @@ function ReaderDrawer({
   onGo: (offset: number) => void;
   onClosed: () => void;
 }) {
-  const dialogRef = useRef<HTMLDialogElement>(null);
-  const scrollerRef = useRef<HTMLDivElement>(null);
-  const titleRef = useRef<HTMLHeadingElement>(null);
-  const [closing, setClosing] = useState(false);
+  let dialog: HTMLDialogElement | undefined;
+  let scroller: HTMLDivElement | undefined;
+  let title: HTMLHeadingElement | undefined;
+  const [closing, setClosing] = createSignal(false);
   const setPickerHost = usePickerHost();
-  const titleId = `${article.id}-drawer-title`;
+  const titleId = () => `${props.article.id}-drawer-title`;
 
-  useEffect(() => {
-    const dialog = dialogRef.current;
+  onSettled(() => {
     if (!dialog) return;
     if (!dialog.open) dialog.showModal();
     setPickerHost(dialog);
@@ -509,79 +513,82 @@ function ReaderDrawer({
       root.style.overflow = previous;
       setPickerHost(null);
     };
-  }, [setPickerHost]);
+  });
 
-  useEffect(() => {
-    scrollerRef.current?.scrollTo({ top: 0, behavior: "instant" });
-    titleRef.current?.focus({ preventScroll: true });
-  }, [article.id]);
+  createEffect(
+    () => props.article.id,
+    () => {
+      scroller?.scrollTo({ top: 0, behavior: "instant" });
+      title?.focus({ preventScroll: true });
+    },
+  );
 
   const finish = () => {
-    if (dialogRef.current?.open) dialogRef.current.close();
+    if (dialog?.open) dialog.close();
   };
 
   const requestClose = () => {
-    if (closing) return;
+    if (closing()) return;
     setClosing(true);
     window.setTimeout(finish, EXIT_FALLBACK_MS);
   };
 
   return (
     <dialog
-      ref={dialogRef}
+      ref={dialog}
       lang="zh-CN"
-      aria-labelledby={titleId}
-      onCancel={(event: SyntheticEvent<HTMLDialogElement>) => {
+      aria-labelledby={titleId()}
+      onCancel={(event: Event) => {
         event.preventDefault();
         requestClose();
       }}
-      onClose={onClosed}
+      onClose={() => props.onClosed()}
       onKeyDown={(event) => {
         if (event.key !== "Escape") return;
         event.preventDefault();
         requestClose();
       }}
-      {...stylex.props(styles.dialog, closing && styles.dialogClosing)}
+      {...sxProps(styles.dialog, closing() && styles.dialogClosing)}
     >
       <button
         type="button"
-        tabIndex={-1}
+        tabindex={-1}
         aria-hidden="true"
         onClick={requestClose}
-        {...stylex.props(styles.dismiss)}
+        {...stylex.attrs(styles.dismiss)}
       />
       <section
-        onAnimationEnd={(event: AnimationEvent<HTMLElement>) => {
-          if (closing && event.target === event.currentTarget) finish();
+        onAnimationEnd={(event: AnimationEvent & { currentTarget: HTMLElement }) => {
+          if (closing() && event.target === event.currentTarget) finish();
         }}
-        {...stylex.props(styles.panel, closing && styles.panelClosing)}
+        {...sxProps(styles.panel, closing() && styles.panelClosing)}
       >
-        <span aria-hidden="true" {...stylex.props(styles.grabber)} />
-        <div {...stylex.props(styles.bar)}>
-          <p {...stylex.props(styles.barLeft)}>
-            <span {...stylex.props(styles.barPosition, labStyles.displayNumber)}>
-              {`${padIndex(index)} / ${padIndex(total - 1)}`}
+        <span aria-hidden="true" {...stylex.attrs(styles.grabber)} />
+        <div {...stylex.attrs(styles.bar)}>
+          <p {...stylex.attrs(styles.barLeft)}>
+            <span {...stylex.attrs(styles.barPosition, labStyles.displayNumber)}>
+              {`${padIndex(props.index)} / ${padIndex(props.total - 1)}`}
             </span>
-            <span {...stylex.props(styles.barCategory)}>
-              {article.navLabel ?? article.category}
+            <span {...stylex.attrs(styles.barCategory)}>
+              {props.article.navLabel ?? props.article.category}
             </span>
           </p>
-          <div {...stylex.props(styles.barRight)}>
+          <div {...stylex.attrs(styles.barRight)}>
             <button
               type="button"
               aria-label="上一篇"
-              disabled={index === 0}
-              onClick={() => onGo(-1)}
-              {...stylex.props(styles.iconButton, kitStyles.focusRing)}
+              disabled={props.index === 0}
+              onClick={() => props.onGo(-1)}
+              {...stylex.attrs(styles.iconButton, kitStyles.focusRing)}
             >
               <ChevronLeft size={18} strokeWidth={2} aria-hidden="true" />
             </button>
             <button
               type="button"
               aria-label="下一篇"
-              disabled={index === total - 1}
-              onClick={() => onGo(1)}
-              {...stylex.props(styles.iconButton, kitStyles.focusRing)}
+              disabled={props.index === props.total - 1}
+              onClick={() => props.onGo(1)}
+              {...stylex.attrs(styles.iconButton, kitStyles.focusRing)}
             >
               <ChevronRight size={18} strokeWidth={2} aria-hidden="true" />
             </button>
@@ -589,53 +596,65 @@ function ReaderDrawer({
               type="button"
               aria-label="关闭"
               onClick={requestClose}
-              {...stylex.props(styles.iconButton, styles.closeButton, kitStyles.focusRing)}
+              {...stylex.attrs(styles.iconButton, styles.closeButton, kitStyles.focusRing)}
             >
               <X size={18} strokeWidth={2} aria-hidden="true" />
             </button>
           </div>
         </div>
 
-        <div ref={scrollerRef} {...stylex.props(styles.scroller)}>
-          <m.div
-            key={article.id}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.18, ease: EASE }}
-            {...stylex.props(styles.scrollerInner)}
-          >
-            <header {...stylex.props(styles.head)}>
-              <ArticleMeta article={article} />
-              <h2 ref={titleRef} id={titleId} tabIndex={-1} {...stylex.props(styles.title)}>
-                {article.title}
-              </h2>
-              {article.lead ? <p {...stylex.props(labStyles.docLead)}>{article.lead}</p> : null}
-            </header>
-            <ArticlePreview article={article} />
-            <div {...stylex.props(styles.sectionsGap)}>
-              <ArticleSections article={article} />
-            </div>
-            {next ? (
-              <button
-                type="button"
-                onClick={() => onGo(1)}
-                {...stylex.props(styles.next, kitStyles.focusRing)}
+        <div ref={scroller} {...stylex.attrs(styles.scroller)}>
+          <Show when={props.article} keyed>
+            {(article) => (
+              <m.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.18, ease: EASE }}
+                {...stylex.attrs(styles.scrollerInner)}
               >
-                <span {...stylex.props(styles.nextText)}>
-                  <span {...stylex.props(styles.nextLabel)}>
-                    {`下一篇 · 约 ${readMinutes(next)} 分钟`}
-                  </span>
-                  <span {...stylex.props(styles.nextTitle)}>{next.title}</span>
-                </span>
-                <ArrowRight
-                  size={20}
-                  strokeWidth={2}
-                  aria-hidden="true"
-                  {...stylex.props(styles.nextArrow)}
-                />
-              </button>
-            ) : null}
-          </m.div>
+                <header {...stylex.attrs(styles.head)}>
+                  <ArticleMeta article={article} />
+                  <h2
+                    ref={title}
+                    id={`${article.id}-drawer-title`}
+                    tabindex={-1}
+                    {...stylex.attrs(styles.title)}
+                  >
+                    {article.title}
+                  </h2>
+                  <Show when={article.lead}>
+                    <p {...stylex.attrs(labStyles.docLead)}>{article.lead}</p>
+                  </Show>
+                </header>
+                <ArticlePreview article={article} />
+                <div {...stylex.attrs(styles.sectionsGap)}>
+                  <ArticleSections article={article} />
+                </div>
+                <Show when={props.next}>
+                  {(next) => (
+                    <button
+                      type="button"
+                      onClick={() => props.onGo(1)}
+                      {...stylex.attrs(styles.next, kitStyles.focusRing)}
+                    >
+                      <span {...stylex.attrs(styles.nextText)}>
+                        <span {...stylex.attrs(styles.nextLabel)}>
+                          {`下一篇 · 约 ${readMinutes(next())} 分钟`}
+                        </span>
+                        <span {...stylex.attrs(styles.nextTitle)}>{next().title}</span>
+                      </span>
+                      <ArrowRight
+                        size={20}
+                        strokeWidth={2}
+                        aria-hidden="true"
+                        {...stylex.attrs(styles.nextArrow)}
+                      />
+                    </button>
+                  )}
+                </Show>
+              </m.div>
+            )}
+          </Show>
         </div>
       </section>
     </dialog>

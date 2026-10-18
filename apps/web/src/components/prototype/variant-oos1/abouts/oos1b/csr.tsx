@@ -101,7 +101,7 @@ export function Csr() {
     <section
       id="about-csr"
       aria-labelledby="oos1b-csr"
-      {...stylex.props(ui.anchor, ui.section, ui.shell)}
+      {...stylex.attrs(ui.anchor, ui.section, ui.shell)}
     >
       <SectionHead
         id="oos1b-csr"
@@ -110,20 +110,17 @@ export function Csr() {
         title={ABOUT_CSR.title}
         note="Ecology and demand, kept in balance."
       />
-      <div ref={ref} {...stylex.props(...stepIn(arrived, 0))}>
+      <div ref={ref} {...stylex.attrs(...stepIn(arrived(), 0))}>
         <Mat
           raised
           foot={
-            <ul {...stylex.props(styles.outcomes)}>
+            <ul {...stylex.attrs(styles.outcomes)}>
               {ABOUT_CSR.outcomes.map((outcome, index) => (
-                <li
-                  key={outcome.title}
-                  {...stylex.props(styles.outcome, index === 0 && styles.outcomeFirst)}
-                >
-                  <span lang="en" {...stylex.props(styles.numeral)}>
+                <li {...stylex.attrs(styles.outcome, index === 0 && styles.outcomeFirst)}>
+                  <span lang="en" {...stylex.attrs(styles.numeral)}>
                     {ROMAN[index].toLowerCase()}
                   </span>
-                  <span {...stylex.props(styles.outcomeTitle)}>{outcome.title}</span>
+                  <span {...stylex.attrs(styles.outcomeTitle)}>{outcome.title}</span>
                 </li>
               ))}
             </ul>
@@ -131,26 +128,24 @@ export function Csr() {
         >
           <Tag numeral="I" />
           <Bevel>
-            <div {...stylex.props(styles.plate)}>
-              <div {...stylex.props(styles.photo)}>
+            <div {...stylex.attrs(styles.plate)}>
+              <div {...stylex.attrs(styles.photo)}>
                 <img
                   src={ABOUT_CSR.image}
                   alt={ABOUT_CSR.imageAlt}
                   loading="lazy"
                   decoding="async"
-                  {...stylex.props(ui.fill, styles.image)}
+                  {...stylex.attrs(ui.fill, styles.image)}
                 />
               </div>
-              <div {...stylex.props(styles.window, bevel.edge, ...stepIn(arrived, 2))}>
+              <div {...stylex.attrs(styles.window, bevel.edge, ...stepIn(arrived(), 2))}>
                 <Tag numeral="II" />
-                <p {...stylex.props(styles.statement)}>
+                <p {...stylex.attrs(styles.statement)}>
                   {ABOUT_CSR.statement.map((line) => (
-                    <span key={line} {...stylex.props(styles.line)}>
-                      {line}
-                    </span>
+                    <span {...stylex.attrs(styles.line)}>{line}</span>
                   ))}
                 </p>
-                <p {...stylex.props(styles.desc)}>{ABOUT_CSR.desc}</p>
+                <p {...stylex.attrs(styles.desc)}>{ABOUT_CSR.desc}</p>
               </div>
             </div>
           </Bevel>

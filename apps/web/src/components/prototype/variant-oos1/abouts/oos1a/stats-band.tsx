@@ -1,4 +1,4 @@
-import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
+import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 
 import { STATS } from "../../content";
@@ -11,14 +11,14 @@ const styles = stylex.create({
     color: colors.paper,
   },
   inner: {
-    paddingTop: { default: 64, [media.tablet]: 96, [breakpoints.xl]: 120 },
-    paddingBottom: { default: 72, [media.tablet]: 104, [breakpoints.xl]: 136 },
+    paddingTop: { default: 64, [media.tablet]: 96, ["@media (min-width: 1280px)"]: 120 },
+    paddingBottom: { default: 72, [media.tablet]: 104, ["@media (min-width: 1280px)"]: 136 },
   },
   list: {
     display: "grid",
     gridTemplateColumns: {
       default: "minmax(0, 1fr)",
-      [breakpoints.lg]: "repeat(16, minmax(0, 1fr))",
+      ["@media (min-width: 1024px)"]: "repeat(16, minmax(0, 1fr))",
     },
     margin: 0,
     padding: 0,
@@ -29,12 +29,12 @@ const styles = stylex.create({
     flexDirection: "column",
     gap: 12,
     boxSizing: "border-box",
-    paddingBlock: { default: 20, [breakpoints.lg]: 0 },
-    paddingInlineStart: { default: 0, [breakpoints.lg]: 16 },
+    paddingBlock: { default: 20, ["@media (min-width: 1024px)"]: 0 },
+    paddingInlineStart: { default: 0, ["@media (min-width: 1024px)"]: 16 },
   },
-  one: { gridColumn: { default: null, [breakpoints.lg]: "1 / span 4" } },
-  two: { gridColumn: { default: null, [breakpoints.lg]: "5 / span 4" } },
-  three: { gridColumn: { default: null, [breakpoints.lg]: "9 / span 8" } },
+  one: { gridColumn: { default: null, ["@media (min-width: 1024px)"]: "1 / span 4" } },
+  two: { gridColumn: { default: null, ["@media (min-width: 1024px)"]: "5 / span 4" } },
+  three: { gridColumn: { default: null, ["@media (min-width: 1024px)"]: "9 / span 8" } },
   label: {
     margin: 0,
     fontFamily: fonts.cjk,
@@ -49,7 +49,7 @@ const styles = stylex.create({
     fontSize: {
       default: 76,
       [media.mdOnly]: 120,
-      [breakpoints.lg]: "clamp(88px, 9.6vw, 144px)",
+      ["@media (min-width: 1024px)"]: "clamp(88px, 9.6vw, 144px)",
     },
     fontWeight: 500,
     lineHeight: 0.95,
@@ -77,22 +77,22 @@ const COLUMN_STYLES = [styles.one, styles.two, styles.three] as const;
 
 export function StatsBand() {
   return (
-    <section id="about-stats" aria-labelledby="about-stats-title" {...stylex.props(styles.band)}>
+    <section id="about-stats" aria-labelledby="about-stats-title" {...stylex.attrs(styles.band)}>
       <SectionName id="about-stats-title">Growth figures</SectionName>
       <Frame lattice="quiet" tone="dark" innerSx={styles.inner}>
-        <ul {...stylex.props(styles.list)}>
+        <ul {...stylex.attrs(styles.list)}>
           {STATS.map((stat, index) => (
-            <Reveal key={stat.label} as="li" step={index} sx={[styles.stat, COLUMN_STYLES[index]]}>
-              <p {...stylex.props(styles.label)}>{stat.label}</p>
-              <p {...stylex.props(styles.figure)}>
+            <Reveal as="li" step={index} sx={[styles.stat, COLUMN_STYLES[index]]}>
+              <p {...stylex.attrs(styles.label)}>{stat.label}</p>
+              <p {...stylex.attrs(styles.figure)}>
                 <span>{stat.value}</span>
                 {stat.unit ? (
-                  <span lang="en" {...stylex.props(styles.unit)}>
+                  <span lang="en" {...stylex.attrs(styles.unit)}>
                     {stat.unit}
                   </span>
                 ) : null}
               </p>
-              <p {...stylex.props(styles.caption)}>{stat.caption}</p>
+              <p {...stylex.attrs(styles.caption)}>{stat.caption}</p>
             </Reveal>
           ))}
         </ul>

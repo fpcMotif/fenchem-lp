@@ -1,13 +1,14 @@
 import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import type { ReactNode } from "react";
+import type { JSX } from "@solidjs/web";
 import { ease, font, layout, media, shear, tone } from "./shear.stylex";
 import { base } from "./primitives-values";
+import { merge } from "solid-js";
 
-export function SectionName({ id, children }: { id: string; children: string }) {
+export function SectionName(props: { id: string; children: string }) {
   return (
-    <h2 id={id} {...stylex.props(base.srOnly)}>
-      {children}
+    <h2 id={props.id} {...stylex.attrs(base.srOnly)}>
+      {props.children}
     </h2>
   );
 }
@@ -38,31 +39,25 @@ const section = stylex.create({
 
 const SECTION_SURFACES = { paper: section.paper, page: section.page } as const;
 
-export function Section({
-  id,
-  labelledBy,
-  surface,
-  band,
-  children,
-}: {
+export function Section(props: {
   id?: string;
   labelledBy: string;
   surface: keyof typeof SECTION_SURFACES;
   band?: "above" | "below";
-  children: ReactNode;
+  children: JSX.Element;
 }) {
   return (
     <section
-      id={id}
-      aria-labelledby={labelledBy}
-      {...stylex.props(
+      id={props.id}
+      aria-labelledby={props.labelledBy}
+      {...stylex.attrs(
         section.root,
-        SECTION_SURFACES[surface],
-        band === "above" && section.aboveBand,
-        band === "below" && section.belowBand,
+        SECTION_SURFACES[props.surface],
+        props.band === "above" && section.aboveBand,
+        props.band === "below" && section.belowBand,
       )}
     >
-      {children}
+      {props.children}
     </section>
   );
 }
@@ -99,29 +94,24 @@ const frameDynamic = stylex.create({
   position: (value: string) => ({ objectPosition: value }),
 });
 
-export function Frame({
-  src,
-  alt,
-  ratio,
-  position = "center",
-  priority = false,
-}: {
+export function Frame(props: {
   src: string;
   alt: string;
   ratio: string;
   position?: string;
   priority?: boolean;
 }) {
+  const p = merge({ position: "center", priority: false }, props);
   return (
-    <div {...stylex.props(frame.host, frameDynamic.ratio(ratio))}>
-      <div {...stylex.props(frame.clip)}>
+    <div {...stylex.attrs(frame.host, frameDynamic.ratio(p.ratio))}>
+      <div {...stylex.attrs(frame.clip)}>
         <img
-          src={src}
-          alt={alt}
-          loading={priority ? undefined : "lazy"}
-          fetchPriority={priority ? "high" : undefined}
+          src={p.src}
+          alt={p.alt}
+          loading={p.priority ? undefined : "lazy"}
+          fetchpriority={p.priority ? "high" : undefined}
           decoding="async"
-          {...stylex.props(frame.image, frameDynamic.position(position))}
+          {...stylex.attrs(frame.image, frameDynamic.position(p.position))}
         />
       </div>
     </div>
@@ -164,22 +154,18 @@ const button = stylex.create({
 
 const BUTTON_VARIANTS = { primary: button.primary, secondary: button.secondary } as const;
 
-export function Button({
-  variant,
-  onClick,
-  children,
-}: {
+export function Button(props: {
   variant: keyof typeof BUTTON_VARIANTS;
   onClick: () => void;
-  children: ReactNode;
+  children: JSX.Element;
 }) {
   return (
     <button
       type="button"
-      onClick={onClick}
-      {...stylex.props(button.root, BUTTON_VARIANTS[variant], base.focusRing)}
+      onClick={props.onClick}
+      {...stylex.attrs(button.root, BUTTON_VARIANTS[props.variant], base.focusRing)}
     >
-      {children}
+      {props.children}
     </button>
   );
 }

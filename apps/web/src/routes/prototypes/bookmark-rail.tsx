@@ -1,4 +1,4 @@
-import { createFileRoute, notFound } from "@tanstack/react-router";
+import { createFileRoute, notFound } from "@tanstack/solid-router";
 
 import {
   BookmarkRailLab,
@@ -32,12 +32,12 @@ export const Route = createFileRoute("/prototypes/bookmark-rail")({
 });
 
 function BookmarkRailLabRoute() {
-  const { v = 1 } = Route.useSearch();
+  const search = Route.useSearch();
   const navigate = Route.useNavigate();
   return (
     <BookmarkRailLab
       variants={VARIANTS}
-      initial={v - 1}
+      initial={(search().v ?? 1) - 1}
       onVariantChange={(next) =>
         navigate({
           search: (previous) => ({ ...previous, v: next }),

@@ -1,8 +1,17 @@
-import { configure, fireEvent, render, waitFor } from "@testing-library/react";
+import { configure } from "@testing-library/dom";
+import { fireEvent, render, waitFor } from "@/test/render";
+import type { Component as SolidComponent } from "solid-js";
 import { describe, expect, test, vi } from "vitest";
 
 import { DEFAULT_VARIANT } from "@/components/prototype/variants";
 import { Route } from "./index";
+
+// The compat preinit registers a head resource that suspends the jsdom mount; stub it out.
+vi.mock("@/compat/react-dom", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/compat/react-dom")>()),
+  preinit: () => {},
+  preload: () => {},
+}));
 
 configure({ asyncUtilTimeout: 5000 });
 describe("home route", () => {
@@ -33,68 +42,68 @@ describe("home route", () => {
     expect(validate({ variant: 42 as unknown as string })).toEqual({ variant: DEFAULT_VARIANT });
   });
   test("renders the active variant and prototype switcher", () => {
-    const Component = Route.options.component as React.ComponentType;
-    vi.spyOn(Route, "useSearch").mockReturnValue({ variant: "d" } as never);
+    const Component = Route.options.component as SolidComponent;
+    vi.spyOn(Route, "useSearch").mockReturnValue((() => ({ variant: "d" })) as never);
 
-    const { container } = render(<Component />);
+    const { container } = render(() => <Component />);
     expect(container).toBeTruthy();
   });
 
   test("renders the vivid production variant (k)", async () => {
-    const Component = Route.options.component as React.ComponentType;
-    vi.spyOn(Route, "useSearch").mockReturnValue({ variant: "k" } as never);
+    const Component = Route.options.component as SolidComponent;
+    vi.spyOn(Route, "useSearch").mockReturnValue((() => ({ variant: "k" })) as never);
 
-    const { container } = render(<Component />);
+    const { container } = render(() => <Component />);
     await waitFor(() => {
       expect(container.textContent).toContain("FENCHEM");
     });
   });
 
   test("renders the chevron variant (t)", async () => {
-    const Component = Route.options.component as React.ComponentType;
-    vi.spyOn(Route, "useSearch").mockReturnValue({ variant: "t" } as never);
+    const Component = Route.options.component as SolidComponent;
+    vi.spyOn(Route, "useSearch").mockReturnValue((() => ({ variant: "t" })) as never);
 
-    const { container } = render(<Component />);
+    const { container } = render(() => <Component />);
     await waitFor(() => {
       expect(container.textContent).toContain("FENCHEM");
     });
   });
 
   test("renders the ledger variant (u)", async () => {
-    const Component = Route.options.component as React.ComponentType;
-    vi.spyOn(Route, "useSearch").mockReturnValue({ variant: "u" } as never);
+    const Component = Route.options.component as SolidComponent;
+    vi.spyOn(Route, "useSearch").mockReturnValue((() => ({ variant: "u" })) as never);
 
-    const { container } = render(<Component />);
+    const { container } = render(() => <Component />);
     await waitFor(() => {
       expect(container.textContent).toContain("FENCHEM");
     });
   });
 
   test("renders the folio variant (x)", async () => {
-    const Component = Route.options.component as React.ComponentType;
-    vi.spyOn(Route, "useSearch").mockReturnValue({ variant: "x" } as never);
+    const Component = Route.options.component as SolidComponent;
+    vi.spyOn(Route, "useSearch").mockReturnValue((() => ({ variant: "x" })) as never);
 
-    const { container } = render(<Component />);
+    const { container } = render(() => <Component />);
     await waitFor(() => {
       expect(container.textContent).toContain("FENCHEM");
     });
   });
 
   test("renders the atlas variant (y)", async () => {
-    const Component = Route.options.component as React.ComponentType;
-    vi.spyOn(Route, "useSearch").mockReturnValue({ variant: "y" } as never);
+    const Component = Route.options.component as SolidComponent;
+    vi.spyOn(Route, "useSearch").mockReturnValue((() => ({ variant: "y" })) as never);
 
-    const { container } = render(<Component />);
+    const { container } = render(() => <Component />);
     await waitFor(() => {
       expect(container.textContent).toContain("FENCHEM");
     });
   });
 
   test("renders the official site Figma variant (o)", async () => {
-    const Component = Route.options.component as React.ComponentType;
-    vi.spyOn(Route, "useSearch").mockReturnValue({ variant: "o" } as never);
+    const Component = Route.options.component as SolidComponent;
+    vi.spyOn(Route, "useSearch").mockReturnValue((() => ({ variant: "o" })) as never);
 
-    const { container } = render(<Component />);
+    const { container } = render(() => <Component />);
     await waitFor(() => {
       expect(container.textContent).toContain("链接全球优质原料，打造创新解决方案。");
     });
@@ -104,10 +113,10 @@ describe("home route", () => {
   });
 
   test("renders the refined official site variant (oo) with a working news accordion", async () => {
-    const Component = Route.options.component as React.ComponentType;
-    vi.spyOn(Route, "useSearch").mockReturnValue({ variant: "oo" } as never);
+    const Component = Route.options.component as SolidComponent;
+    vi.spyOn(Route, "useSearch").mockReturnValue((() => ({ variant: "oo" })) as never);
 
-    const { container, getByRole } = render(<Component />);
+    const { container, getByRole } = render(() => <Component />);
     await waitFor(() => {
       expect(
         getByRole("heading", {
@@ -141,10 +150,10 @@ describe("home route", () => {
   });
 
   test("renders the strontium periodic index variant (s)", async () => {
-    const Component = Route.options.component as React.ComponentType;
-    vi.spyOn(Route, "useSearch").mockReturnValue({ variant: "s" } as never);
+    const Component = Route.options.component as SolidComponent;
+    vi.spyOn(Route, "useSearch").mockReturnValue((() => ({ variant: "s" })) as never);
 
-    const { container } = render(<Component />);
+    const { container } = render(() => <Component />);
     await waitFor(() => {
       expect(container.textContent).toContain("Periodic index");
     });
@@ -154,50 +163,50 @@ describe("home route", () => {
   });
 
   test("renders the vivid duotone variant (v)", async () => {
-    const Component = Route.options.component as React.ComponentType;
-    vi.spyOn(Route, "useSearch").mockReturnValue({ variant: "v" } as never);
+    const Component = Route.options.component as SolidComponent;
+    vi.spyOn(Route, "useSearch").mockReturnValue((() => ({ variant: "v" })) as never);
 
-    const { container } = render(<Component />);
+    const { container } = render(() => <Component />);
     await waitFor(() => {
       expect(container.textContent).toContain("FENCHEM");
     });
   });
 
   test("renders production variant (h)", async () => {
-    const Component = Route.options.component as React.ComponentType;
-    vi.spyOn(Route, "useSearch").mockReturnValue({ variant: "h" } as never);
+    const Component = Route.options.component as SolidComponent;
+    vi.spyOn(Route, "useSearch").mockReturnValue((() => ({ variant: "h" })) as never);
 
-    const { container } = render(<Component />);
+    const { container } = render(() => <Component />);
     await waitFor(() => {
       expect(container.textContent).toContain("FENCHEM");
     });
   });
 
   test("renders portal variant (i)", async () => {
-    const Component = Route.options.component as React.ComponentType;
-    vi.spyOn(Route, "useSearch").mockReturnValue({ variant: "i" } as never);
+    const Component = Route.options.component as SolidComponent;
+    vi.spyOn(Route, "useSearch").mockReturnValue((() => ({ variant: "i" })) as never);
 
-    const { container } = render(<Component />);
+    const { container } = render(() => <Component />);
     await waitFor(() => {
       expect(container.textContent).toContain("FENCHEM");
     });
   });
 
   test("renders greenhouse ledger variant (j)", async () => {
-    const Component = Route.options.component as React.ComponentType;
-    vi.spyOn(Route, "useSearch").mockReturnValue({ variant: "j" } as never);
+    const Component = Route.options.component as SolidComponent;
+    vi.spyOn(Route, "useSearch").mockReturnValue((() => ({ variant: "j" })) as never);
 
-    const { container } = render(<Component />);
+    const { container } = render(() => <Component />);
     await waitFor(() => {
       expect(container).toBeTruthy();
     });
   });
 
   test("renders the waterfall fountain variant (w)", async () => {
-    const Component = Route.options.component as React.ComponentType;
-    vi.spyOn(Route, "useSearch").mockReturnValue({ variant: "w" } as never);
+    const Component = Route.options.component as SolidComponent;
+    vi.spyOn(Route, "useSearch").mockReturnValue((() => ({ variant: "w" })) as never);
 
-    const { container } = render(<Component />);
+    const { container } = render(() => <Component />);
     await waitFor(() => {
       expect(container.textContent).toContain("Botanical actives, documented to the lot.");
     });
@@ -205,10 +214,10 @@ describe("home route", () => {
     expect(container.querySelector("#contact")).toBeTruthy();
   });
   test("handles variant without matching component", () => {
-    const Component = Route.options.component as React.ComponentType;
-    vi.spyOn(Route, "useSearch").mockReturnValue({ variant: "unknown" } as never);
+    const Component = Route.options.component as SolidComponent;
+    vi.spyOn(Route, "useSearch").mockReturnValue((() => ({ variant: "unknown" })) as never);
 
-    const { container } = render(<Component />);
+    const { container } = render(() => <Component />);
     expect(container).toBeTruthy();
   });
 });

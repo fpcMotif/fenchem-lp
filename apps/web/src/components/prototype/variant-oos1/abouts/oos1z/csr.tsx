@@ -1,5 +1,5 @@
 import * as stylex from "@stylexjs/stylex";
-import { Factory, Leaf, Recycle, type LucideIcon } from "lucide-react";
+import { Factory, Leaf, Recycle, type LucideIcon } from "@fenchem-lp/ui/components/lucide";
 
 import { ABOUT_CSR } from "../../about-data";
 import { RoomSign } from "./room-sign";
@@ -136,57 +136,55 @@ const styles = stylex.create({
 
 export function Csr() {
   return (
-    <section id="about-csr" aria-labelledby="oos1z-csr" {...stylex.props(styles.section)}>
-      <div {...stylex.props(styles.lakeWrap)}>
-        <figure {...stylex.props(styles.lake)}>
+    <section id="about-csr" aria-labelledby="oos1z-csr" {...stylex.attrs(styles.section)}>
+      <div {...stylex.attrs(styles.lakeWrap)}>
+        <figure {...stylex.attrs(styles.lake)}>
           <img
             src={ABOUT_CSR.image}
             alt={ABOUT_CSR.imageAlt}
             loading="lazy"
             decoding="async"
-            {...stylex.props(ui.fill)}
+            {...stylex.attrs(ui.fill)}
           />
-          <figcaption {...stylex.props(styles.dock)}>
-            <span {...stylex.props(styles.plate)}>
-              <span lang="en" {...stylex.props(ui.number, styles.number)}>
+          <figcaption {...stylex.attrs(styles.dock)}>
+            <span {...stylex.attrs(styles.plate)}>
+              <span lang="en" {...stylex.attrs(ui.number, styles.number)}>
                 Nº {LAKE.number}
               </span>
-              <span {...stylex.props(styles.title)}>{LAKE.title}</span>
-              <span lang="en" {...stylex.props(ui.italic, styles.meta)}>
+              <span {...stylex.attrs(styles.title)}>{LAKE.title}</span>
+              <span lang="en" {...stylex.attrs(ui.italic, styles.meta)}>
                 {LAKE.english}, {PLACE}
               </span>
             </span>
           </figcaption>
         </figure>
       </div>
-      <div {...stylex.props(ui.shell, ui.room)}>
-        <div {...stylex.props(styles.wall)}>
+      <div {...stylex.attrs(ui.shell, ui.room)}>
+        <div {...stylex.attrs(styles.wall)}>
           <RoomSign
             numeral="III"
             id="oos1z-csr"
             title={sectionTitle("about-csr")}
             english="Responsibility"
           />
-          <p {...stylex.props(styles.statement)}>
+          <p {...stylex.attrs(styles.statement)}>
             {ABOUT_CSR.statement.map((line) => (
-              <span key={line} {...stylex.props(styles.line)}>
-                {line}
-              </span>
+              <span {...stylex.attrs(styles.line)}>{line}</span>
             ))}
           </p>
-          <p {...stylex.props(styles.desc)}>
-            <span {...stylex.props(styles.balanced)}>{ABOUT_CSR.desc}</span>
+          <p {...stylex.attrs(styles.desc)}>
+            <span {...stylex.attrs(styles.balanced)}>{ABOUT_CSR.desc}</span>
           </p>
-          <ul {...stylex.props(styles.outcomes)}>
+          <ul {...stylex.attrs(styles.outcomes)}>
             {ABOUT_CSR.outcomes.map((outcome) => {
               const Icon = ICONS[outcome.icon];
               return (
-                <li key={outcome.icon} {...stylex.props(styles.outcome)}>
+                <li {...stylex.attrs(styles.outcome)}>
                   <Icon
                     size={22}
                     strokeWidth={1.25}
                     aria-hidden="true"
-                    {...stylex.props(styles.icon)}
+                    {...stylex.attrs(styles.icon)}
                   />
                   {outcome.title}
                 </li>

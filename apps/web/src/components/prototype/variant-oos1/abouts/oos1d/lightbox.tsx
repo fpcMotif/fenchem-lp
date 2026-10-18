@@ -2,9 +2,9 @@ import { LightboxDialog, type LightboxState } from "../../../shared/lightbox";
 import { LightboxControls } from "../../../shared/lightbox-controls";
 import { LightboxStage } from "../../../shared/lightbox-stage";
 
-import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
+import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { ChevronLeft, ChevronRight, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, X } from "@fenchem-lp/ui/components/lucide";
 
 import { ABOUT_CAMPUS } from "../../about-data";
 import { font, motionCss } from "./tokens.stylex";
@@ -48,7 +48,7 @@ const s = stylex.create({
     width: "100%",
     height: "100%",
     boxSizing: "border-box",
-    padding: { default: "64px 12px", [breakpoints.md]: "72px 104px" },
+    padding: { default: "64px 12px", ["@media (min-width: 768px)"]: "72px 104px" },
   },
   figure: {
     display: "flex",
@@ -60,7 +60,7 @@ const s = stylex.create({
     animationTimingFunction: motionCss.out,
   },
   figureOpen: {
-    animationName: { default: fadeIn, [breakpoints.motionOk]: zoomIn },
+    animationName: { default: fadeIn, ["@media (prefers-reduced-motion: no-preference)"]: zoomIn },
     animationDuration: "260ms",
   },
   figureStep: {
@@ -95,7 +95,10 @@ const s = stylex.create({
     cursor: "pointer",
     transform: {
       default: null,
-      ":active": { default: null, [breakpoints.motionOk]: "scale(0.96)" },
+      ":active": {
+        default: null,
+        ["@media (prefers-reduced-motion: no-preference)"]: "scale(0.96)",
+      },
     },
     transitionProperty: "background-color, transform",
     transitionDuration: "160ms",
@@ -107,33 +110,32 @@ const s = stylex.create({
   },
   prev: {
     top: "50%",
-    insetInlineStart: { default: 12, [breakpoints.md]: 32 },
+    insetInlineStart: { default: 12, ["@media (min-width: 768px)"]: 32 },
     marginTop: -24,
   },
   next: {
     top: "50%",
-    insetInlineEnd: { default: 12, [breakpoints.md]: 32 },
+    insetInlineEnd: { default: 12, ["@media (min-width: 768px)"]: 32 },
     marginTop: -24,
   },
   close: {
-    top: { default: 12, [breakpoints.md]: 24 },
-    insetInlineEnd: { default: 12, [breakpoints.md]: 32 },
+    top: { default: 12, ["@media (min-width: 768px)"]: 24 },
+    insetInlineEnd: { default: 12, ["@media (min-width: 768px)"]: 32 },
   },
 });
 
-export function Lightbox({ lightbox }: { lightbox: LightboxState }) {
-  const { stepped, close, step } = lightbox;
+export function Lightbox(props: { lightbox: LightboxState }) {
+  const { close, step } = props.lightbox;
   return (
-    <LightboxDialog lightbox={lightbox} items={ABOUT_CAMPUS.photos} sx={s.dialog}>
+    <LightboxDialog lightbox={props.lightbox} items={ABOUT_CAMPUS.photos} sx={s.dialog}>
       {(photo) => (
         <>
           <LightboxStage onClose={close} sx={s.stage}>
             <figure
-              key={photo.id}
-              {...stylex.props(s.figure, stepped ? s.figureStep : s.figureOpen)}
+              {...stylex.attrs(s.figure, props.lightbox.stepped ? s.figureStep : s.figureOpen)}
             >
-              <img src={photo.large} alt={photo.alt} {...stylex.props(s.image)} />
-              <figcaption {...stylex.props(s.caption)}>{photo.caption}</figcaption>
+              <img src={photo.large} alt={photo.alt} {...stylex.attrs(s.image)} />
+              <figcaption {...stylex.attrs(s.caption)}>{photo.caption}</figcaption>
             </figure>
           </LightboxStage>
           <LightboxControls

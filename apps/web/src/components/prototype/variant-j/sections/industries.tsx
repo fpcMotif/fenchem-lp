@@ -1,6 +1,6 @@
 import { breakpoints, colors, typography } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight } from "@fenchem-lp/ui/components/lucide";
 import { industries } from "@/components/landing/landing-content";
 import { imgForIndustry, INDUSTRY_COPY } from "../content";
 import { SplitWords, useSectionAnimation } from "../motion";
@@ -210,15 +210,15 @@ export function IndustriesSection() {
       ref={ref}
       id="industries"
       aria-labelledby="industries-heading"
-      {...stylex.props(styles.section)}
+      {...stylex.attrs(styles.section)}
     >
-      <div {...stylex.props(styles.container)}>
-        <div {...stylex.props(styles.headerGrid)}>
-          <div {...stylex.props(styles.headerCol)}>
-            <p data-ind-eyebrow {...stylex.props(sharedStyles.techLabel)}>
+      <div {...stylex.attrs(styles.container)}>
+        <div {...stylex.attrs(styles.headerGrid)}>
+          <div {...stylex.attrs(styles.headerCol)}>
+            <p data-ind-eyebrow="" {...stylex.attrs(sharedStyles.techLabel)}>
               01 — Application Domains
             </p>
-            <h2 id="industries-heading" data-ind-heading {...stylex.props(styles.heading)}>
+            <h2 id="industries-heading" data-ind-heading="" {...stylex.attrs(styles.heading)}>
               <SplitWords
                 segments={[
                   { text: "Built for three" },
@@ -230,45 +230,49 @@ export function IndustriesSection() {
               />
             </h2>
           </div>
-          <p data-ind-intro {...stylex.props(styles.intro)}>
+          <p data-ind-intro="" {...stylex.attrs(styles.intro)}>
             Clinically supported actives engineered for the precise demands of each formulation
             discipline.
           </p>
         </div>
 
-        <ul {...stylex.props(styles.list)}>
+        <ul {...stylex.attrs(styles.list)}>
           {industries.map((industry, index) => (
-            <li key={industry.title}>
+            <li>
               <a
                 href="#ingredients"
                 aria-label={`${industry.title} — explore the matching ingredients`}
-                {...stylex.props(styles.link)}
+                {...stylex.attrs(styles.link)}
               >
-                <span data-ind-rule aria-hidden="true" {...stylex.props(sharedStyles.ruleLine)} />
-                <div data-ind-row {...stylex.props(styles.row)}>
-                  <span {...stylex.props(styles.index)}>{String(index + 1).padStart(2, "0")}</span>
-                  <h3 {...stylex.props(styles.title)}>{industry.title}</h3>
-                  <p {...stylex.props(styles.copy)}>
+                <span
+                  data-ind-rule=""
+                  aria-hidden="true"
+                  {...stylex.attrs(sharedStyles.ruleLine)}
+                />
+                <div data-ind-row="" {...stylex.attrs(styles.row)}>
+                  <span {...stylex.attrs(styles.index)}>{String(index + 1).padStart(2, "0")}</span>
+                  <h3 {...stylex.attrs(styles.title)}>{industry.title}</h3>
+                  <p {...stylex.attrs(styles.copy)}>
                     {INDUSTRY_COPY[industry.title] ?? industry.copy}
                   </p>
-                  <div {...stylex.props(styles.mediaWrap)}>
-                    <span {...stylex.props(styles.thumbWrap)}>
+                  <div {...stylex.attrs(styles.mediaWrap)}>
+                    <span {...stylex.attrs(styles.thumbWrap)}>
                       <img
-                        data-ind-thumb
+                        data-ind-thumb=""
                         src={imgForIndustry(industry).src}
                         alt={imgForIndustry(industry).alt}
                         loading="lazy"
-                        {...stylex.props(styles.thumbImg)}
+                        {...stylex.attrs(styles.thumbImg)}
                       />
                     </span>
-                    <ArrowUpRight aria-hidden="true" {...stylex.props(styles.arrowIcon)} />
+                    <ArrowUpRight aria-hidden="true" {...stylex.attrs(styles.arrowIcon)} />
                   </div>
                 </div>
               </a>
             </li>
           ))}
         </ul>
-        <span data-ind-rule aria-hidden="true" {...stylex.props(sharedStyles.ruleLine)} />
+        <span data-ind-rule="" aria-hidden="true" {...stylex.attrs(sharedStyles.ruleLine)} />
       </div>
     </section>
   );

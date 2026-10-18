@@ -1,6 +1,5 @@
 import * as stylex from "@stylexjs/stylex";
-import { m, useTransform } from "motion/react";
-import { useRef } from "react";
+import { m, useTransform } from "@/compat/motion";
 
 import { ABOUT_CULTURE } from "../../about-data";
 import { PinnedSection } from "./pinned-section";
@@ -215,50 +214,54 @@ const styles = stylex.create({
 
 function Formula() {
   return (
-    <div {...stylex.props(styles.legendTail)}>
-      <p aria-hidden="true" {...stylex.props(styles.formula)}>
+    <div {...stylex.attrs(styles.legendTail)}>
+      <p aria-hidden="true" {...stylex.attrs(styles.formula)}>
         <span>
-          R<span {...stylex.props(styles.sub)}>f</span>
+          R<span {...stylex.attrs(styles.sub)}>f</span>
         </span>
         <span>=</span>
-        <span {...stylex.props(styles.fraction)}>
-          <span {...stylex.props(styles.numerator)}>
-            d<span {...stylex.props(styles.sub)}>s</span>
+        <span {...stylex.attrs(styles.fraction)}>
+          <span {...stylex.attrs(styles.numerator)}>
+            d<span {...stylex.attrs(styles.sub)}>s</span>
           </span>
-          <span {...stylex.props(styles.denominator)}>
-            d<span {...stylex.props(styles.sub)}>f</span>
+          <span {...stylex.attrs(styles.denominator)}>
+            d<span {...stylex.attrs(styles.sub)}>f</span>
           </span>
         </span>
       </p>
-      <p lang="en" {...stylex.props(ui.note, styles.formulaNote)}>
+      <p lang="en" {...stylex.attrs(ui.note, styles.formulaNote)}>
         Retention factor: how far a band travels, over how far the solvent front travels.
       </p>
     </div>
   );
 }
 
-function Dimensions({ development }: { development: Development }) {
+function Dimensions(props: { development: Development }) {
   return (
-    <m.div aria-hidden="true" style={{ opacity: development.marks }} {...stylex.props(styles.dims)}>
-      <span {...stylex.props(styles.dim, styles.dimFront)} />
-      <span {...stylex.props(styles.dim, styles.dimSpot)} />
-      <span {...stylex.props(styles.dimWord, styles.dimWordFront)}>
-        d<span {...stylex.props(styles.sub)}>f</span>
+    <m.div
+      aria-hidden="true"
+      style={{ opacity: props.development.marks }}
+      {...stylex.attrs(styles.dims)}
+    >
+      <span {...stylex.attrs(styles.dim, styles.dimFront)} />
+      <span {...stylex.attrs(styles.dim, styles.dimSpot)} />
+      <span {...stylex.attrs(styles.dimWord, styles.dimWordFront)}>
+        d<span {...stylex.attrs(styles.sub)}>f</span>
       </span>
-      <span {...stylex.props(styles.dimWord, styles.dimWordSpot)}>
-        d<span {...stylex.props(styles.sub)}>s</span>
+      <span {...stylex.attrs(styles.dimWord, styles.dimWordSpot)}>
+        d<span {...stylex.attrs(styles.sub)}>s</span>
       </span>
     </m.div>
   );
 }
 
-function Sample({ development }: { development: Development }) {
-  const opacity = useTransform(development.progress, [0.02, 0.14], [1, 0]);
+function Sample(props: { development: Development }) {
+  const opacity = useTransform(props.development.progress, [0.02, 0.14], [1, 0]);
   return (
     <m.p
       aria-hidden="true"
       style={{ opacity }}
-      {...stylex.props(ui.note, geometry.label, styles.sample)}
+      {...stylex.attrs(ui.note, geometry.label, styles.sample)}
     >
       泛成 · 1995 · 南京 — <span lang="en">one spot at the origin</span>
     </m.p>
@@ -266,15 +269,19 @@ function Sample({ development }: { development: Development }) {
 }
 
 export function Culture() {
-  const sectionRef = useRef<HTMLElement>(null);
-  const figureRef = useRef<HTMLDivElement>(null);
-  const development = useDevelopment({ section: sectionRef, figure: figureRef, pinnable: true });
+  let sectionRef: HTMLElement | undefined;
+  let figureRef: HTMLDivElement | undefined;
+  const development = useDevelopment({
+    section: () => sectionRef,
+    figure: () => figureRef,
+    pinnable: true,
+  });
 
   return (
     <PinnedSection
       id="about-culture"
       titleId="oos1w-culture"
-      sectionRef={sectionRef}
+      sectionRef={(element) => (sectionRef = element)}
       head={
         <>
           <SectionHead
@@ -296,15 +303,15 @@ export function Culture() {
           development={development}
           geometry={GEOMETRY}
           listLabel={ABOUT_CULTURE.eyebrow}
-          renderGlyph={(band) => <span {...stylex.props(styles.glyph)}>{valueOf(band).glyph}</span>}
+          renderGlyph={(band) => <span {...stylex.attrs(styles.glyph)}>{valueOf(band).glyph}</span>}
           renderLabel={(band) => {
             const value = valueOf(band);
             return (
-              <div {...stylex.props(styles.label)}>
+              <div {...stylex.attrs(styles.label)}>
                 <Rf value={band.rf} />
-                <div {...stylex.props(styles.pair)}>
-                  <h3 {...stylex.props(styles.title)}>{value.title}</h3>
-                  <p {...stylex.props(styles.desc)}>{value.desc}</p>
+                <div {...stylex.attrs(styles.pair)}>
+                  <h3 {...stylex.attrs(styles.title)}>{value.title}</h3>
+                  <p {...stylex.attrs(styles.desc)}>{value.desc}</p>
                 </div>
               </div>
             );

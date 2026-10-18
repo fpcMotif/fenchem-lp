@@ -27,7 +27,14 @@ import { NewsAccordion } from "../shared/news-accordion";
 import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 import type { StyleXStyles } from "@stylexjs/stylex";
-import { Globe, Lightbulb, Plus, Shield, Users, type LucideIcon } from "lucide-react";
+import {
+  Globe,
+  Lightbulb,
+  Plus,
+  Shield,
+  Users,
+  type LucideIcon,
+} from "@fenchem-lp/ui/components/lucide";
 import {
   m,
   useInView,
@@ -35,17 +42,11 @@ import {
   useScroll,
   useTransform,
   type MotionValue,
-} from "motion/react";
-import {
-  useEffect,
-  useRef,
-  useSyncExternalStore,
-  useState,
-  type CSSProperties,
-  type ReactNode,
-  type RefObject,
-} from "react";
-import { preinit } from "react-dom";
+} from "@/compat/motion";
+import { createMediaQuery } from "@/compat/reduced-motion";
+import { createEffect, createSignal, For, merge, onSettled, Show, untrack } from "solid-js";
+import type { JSX } from "@solidjs/web";
+import { preinit } from "@/compat/react-dom";
 
 import { EASE, STAGGER } from "@/components/prototype/motion-constants";
 import { HeroGradeFilter } from "@/components/prototype/hero-grade";
@@ -1408,7 +1409,7 @@ const TONE_STYLES: Record<StrengthTone, StyleXStyles> = {
 };
 
 type ZoomProps = {
-  children: ReactNode;
+  children: JSX.Element;
   sx?: StyleXStyles;
   style?: StyleXStyles;
   delay?: number;
@@ -1416,45 +1417,32 @@ type ZoomProps = {
   scale?: number;
 };
 
-function ZoomReveal({
-  children,
-  sx,
-  style,
-  delay = 0,
-  y = 24,
-  scale = ZOOM_FROM_SCALE,
-}: ZoomProps) {
+function ZoomReveal(props: ZoomProps) {
+  const p = merge({ delay: 0, y: 24, scale: ZOOM_FROM_SCALE }, props);
   const reduce = useReducedMotion();
   return (
     <m.div
-      {...stylex.props(sx, style)}
-      initial={{ opacity: 0, transform: zoomFrom(y, scale) }}
+      {...stylex.attrs(p.sx, p.style)}
+      initial={{ opacity: 0, transform: zoomFrom(p.y, p.scale) }}
       whileInView={{ opacity: 1, transform: SETTLED }}
       viewport={{ once: true, margin: "-80px" }}
-      transition={{ duration: reduce ? 0.2 : 0.8, delay: reduce ? 0 : delay, ease: EASE }}
+      transition={{ duration: reduce() ? 0.2 : 0.8, delay: reduce() ? 0 : p.delay, ease: EASE }}
     >
-      {children}
+      {p.children}
     </m.div>
   );
 }
 
-function VectorArt({
-  paths,
-  viewBox,
-  sx,
-}: {
-  paths: readonly VectorPath[];
-  viewBox: string;
-  sx: StyleXStyles;
-}) {
+function VectorArt(props: { paths: readonly VectorPath[]; viewBox: string; sx: StyleXStyles }) {
   return (
-    <svg viewBox={viewBox} aria-hidden="true" focusable="false" {...stylex.props(sx)}>
-      {paths.map((path) => (
-        <path key={path.d} d={path.d} fill={path.fill} />
-      ))}
+    <svg viewBox={props.viewBox} aria-hidden="true" {...UNFOCUSABLE} {...stylex.attrs(props.sx)}>
+      <For each={props.paths}>{(path) => <path d={path.d} fill={path.fill} />}</For>
     </svg>
   );
 }
+
+// `focusable` (legacy SVG attribute) is not in Solid's JSX types.
+const UNFOCUSABLE = { focusable: "false" } as JSX.SvgSVGAttributes<SVGSVGElement>;
 
 function SiteHeader() {
   return (
@@ -1490,15 +1478,14 @@ function LogoMark() {
     <svg
       viewBox="0 0 161 52"
       aria-hidden="true"
-      focusable="false"
-      {...stylex.props(styles.logo, styles.logoAssemble)}
+      {...UNFOCUSABLE}
+      {...stylex.attrs(styles.logo, styles.logoAssemble)}
     >
       {LOGO_PATHS.map((path) => (
         <path
-          key={path.d}
           d={path.d}
           fill={path.fill}
-          {...stylex.props(styles.logoPart, styles.enterDelay(logoPartDelay(path.d)))}
+          {...stylex.attrs(styles.logoPart, styles.enterDelay(logoPartDelay(path.d)))}
         />
       ))}
     </svg>
@@ -1506,14 +1493,17 @@ function LogoMark() {
 }
 
 function Hero() {
-  const heroRef = useRef<HTMLElement>(null);
+  let heroEl: HTMLElement | undefined;
   const reduce = useReducedMotion();
-  const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
+  const { scrollYProgress } = useScroll({
+    target: () => heroEl,
+    offset: ["start start", "end start"],
+  });
   const backdropY = useTransform(scrollYProgress, [0, 1], ["0%", "18%"]);
   const contentY = useTransform(scrollYProgress, [0, 1], [0, -120]);
   const contentOpacity = useTransform(scrollYProgress, [0, 0.75], [1, 0]);
   return (
-    <section ref={heroRef} id="top" aria-labelledby="oo-hero-title" {...stylex.props(styles.hero)}>
+    <section ref={heroEl} id="top" aria-labelledby="oo-hero-title" {...stylex.attrs(styles.hero)}>
       <HeroGradeFilter />
       <HeroBackdrop
         styles={{
@@ -1525,7 +1515,7 @@ function Hero() {
           heroParallax: styles.heroParallax,
         }}
         source={IMAGES.hero}
-        motionStyle={reduce ? undefined : { y: backdropY }}
+        motionStyle={reduce() ? undefined : { y: backdropY }}
       />
       <BloomHeroCopy
         styles={{
@@ -1543,7 +1533,7 @@ function Hero() {
           buttonHero: styles.buttonHero,
           buttonSecondary: styles.buttonSecondary,
         }}
-        reduce={reduce}
+        reduce={reduce()}
         contentY={contentY}
         contentOpacity={contentOpacity}
         HERO={HERO}
@@ -1583,13 +1573,13 @@ function About() {
     <section
       id="about"
       aria-labelledby="oo-about-title"
-      {...stylex.props(styles.about, styles.inset124, styles.anchor)}
+      {...stylex.attrs(styles.about, styles.inset124, styles.anchor)}
     >
       <ZoomReveal sx={styles.aboutInner}>
-        <h2 id="oo-about-title" {...stylex.props(styles.sectionTitle)}>
+        <h2 id="oo-about-title" {...stylex.attrs(styles.sectionTitle)}>
           {ABOUT.title}
         </h2>
-        <p {...stylex.props(styles.aboutBody)}>
+        <p {...stylex.attrs(styles.aboutBody)}>
           {ABOUT.lines[0]}
           <br />
           {ABOUT.lines[1]}
@@ -1598,7 +1588,7 @@ function About() {
         </p>
         <a
           href={ABOUT.cta.href}
-          {...stylex.props(styles.button, styles.buttonPrimary, styles.buttonCompact)}
+          {...stylex.attrs(styles.button, styles.buttonPrimary, styles.buttonCompact)}
         >
           {ABOUT.cta.label}
         </a>
@@ -1624,23 +1614,15 @@ const riseProgress = (progress: number) => {
 };
 
 function useMediaQuery(query: string) {
-  return useSyncExternalStore(
-    (onChange) => {
-      const list = window.matchMedia(query);
-      list.addEventListener("change", onChange);
-      return () => list.removeEventListener("change", onChange);
-    },
-    () => window.matchMedia(query).matches,
-    () => false,
-  );
+  return createMediaQuery(query);
 }
 
 function Campus() {
-  const trackRef = useRef<HTMLDivElement>(null);
-  const lakeRef = useRef<HTMLDivElement>(null);
+  const [trackEl, setTrackEl] = createSignal<HTMLDivElement>();
+  const [lakeEl, setLakeEl] = createSignal<HTMLDivElement>();
   const pinned = useMediaQuery(PINNED_QUERY);
-  const [glyphsDrawn, setGlyphsDrawn] = useState(false);
-  const { scrollYProgress } = useScroll({ target: trackRef, offset: ["start start", "end end"] });
+  const [glyphsDrawn, setGlyphsDrawn] = createSignal(false);
+  const { scrollYProgress } = useScroll({ target: trackEl, offset: ["start start", "end end"] });
   const windowClip = useTransform(scrollYProgress, (progress) => {
     const t = revealProgress(progress);
     const top = lerp(CLIP_FROM.top, CLIP_TO.top, t);
@@ -1666,8 +1648,8 @@ function Campus() {
         inset132: styles.inset132,
         statsBand: styles.statsBand,
       }}
-      trackRef={trackRef}
-      pinned={pinned}
+      trackRef={setTrackEl}
+      pinned={pinned()}
       windowClip={windowClip}
       photoScale={photoScale}
       CAMPUS_LAKE={CAMPUS_LAKE}
@@ -1678,32 +1660,31 @@ function Campus() {
             depthSrc={CAMPUS_LAKE.depth}
             waterline={CAMPUS_LAKE.waterline}
             progress={scrollYProgress}
-            glyphRoot={pinned ? lakeRef : undefined}
-            rise={pinned ? rise : undefined}
+            glyphRoot={pinned() ? lakeEl : undefined}
+            rise={pinned() ? rise : undefined}
             onGlyphsReady={() => setGlyphsDrawn(true)}
           />
-          {pinned ? <LakeStats rootRef={lakeRef} rise={rise} drawn={glyphsDrawn} /> : null}
+          <Show when={pinned()}>
+            <LakeStats rootRef={setLakeEl} rise={rise} drawn={glyphsDrawn()} />
+          </Show>
         </>
       }
       statistics={STATS.map((stat, index) => (
-        <StatItem key={stat.label} stat={stat} index={index} />
+        <StatItem stat={stat} index={index} />
       ))}
     />
   );
 }
 
-function LakeStats({
-  rootRef,
-  rise,
-  drawn,
-}: {
-  rootRef: RefObject<HTMLDivElement | null>;
+function LakeStats(props: {
+  rootRef: (el: HTMLDivElement) => void;
   rise: MotionValue<number>;
   drawn: boolean;
 }) {
-  const [top, setTop] = useState("72%");
-  useEffect(() => {
-    const stage = rootRef.current?.parentElement;
+  let rootEl: HTMLDivElement | undefined;
+  const [top, setTop] = createSignal("72%");
+  onSettled(() => {
+    const stage = rootEl?.parentElement;
     if (!stage) return;
     const measure = () => {
       const waterline = screenWaterline(
@@ -1718,47 +1699,44 @@ function LakeStats({
     const observer = new ResizeObserver(measure);
     observer.observe(stage);
     return () => observer.disconnect();
-  }, [rootRef]);
+  });
 
   return (
     <div
-      ref={rootRef}
-      {...stylex.props(
+      ref={(el) => {
+        rootEl = el;
+        props.rootRef(el);
+      }}
+      {...stylex.attrs(
         styles.lake,
-        styles.lakeFrame(top, `${LAKE_FRAME.side}%`, `${LAKE_FRAME.bottom}%`),
+        styles.lakeFrame(top(), `${LAKE_FRAME.side}%`, `${LAKE_FRAME.bottom}%`),
       )}
     >
       {STATS.map((stat, index) => (
         <LakeStat
-          key={stat.label}
           stat={stat}
-          rise={rise}
+          rise={props.rise}
           at={(index + 0.5) / STATS.length}
-          drawn={drawn}
+          drawn={props.drawn}
         />
       ))}
     </div>
   );
 }
 
-function LakeStat({
-  stat,
-  rise,
-  at,
-  drawn,
-}: {
+function LakeStat(props: {
   stat: (typeof STATS)[number];
   rise: MotionValue<number>;
   at: number;
   drawn: boolean;
 }) {
-  const surfacing = useTransform(rise, (value) => glyphRise(value, at));
+  const surfacing = useTransform(props.rise, (value) => glyphRise(value, props.at));
   const lift = useTransform(surfacing, (value) => (1 - value) * 16);
-  const [surfaced, setSurfaced] = useState(() => surfacing.get() > 0.05);
+  const [surfaced, setSurfaced] = createSignal(untrack(() => surfacing.get() > 0.05));
   useMotionValueEvent(surfacing, "change", (value) => {
     if (value > 0.05) setSurfaced(true);
   });
-  const display = useCountUp(stat.value, surfaced);
+  const display = useCountUp(() => props.stat.value, surfaced);
 
   return (
     <LakeStatistic
@@ -1771,29 +1749,32 @@ function LakeStat({
         lakeUnit: styles.lakeUnit,
         lakeCaption: styles.lakeCaption,
       }}
-      stat={stat}
+      stat={props.stat}
       surfacing={surfacing}
       lift={lift}
-      display={display}
-      drawn={drawn}
+      display={display()}
+      drawn={props.drawn}
     />
   );
 }
 
-function CountUp({ value }: { value: string }) {
-  const ref = useRef<HTMLSpanElement>(null);
-  const inView = useInView(ref, { once: true, margin: "-80px" });
-  const display = useCountUp(value, inView);
+function CountUp(props: { value: string }) {
+  let el: HTMLSpanElement | undefined;
+  const inView = useInView(() => el, { once: true, margin: "-80px" });
+  const display = useCountUp(() => props.value, inView);
 
   return (
-    <span ref={ref} {...stylex.props(styles.statValue, styles.statValueWidth(`${value.length}ch`))}>
-      <span aria-hidden="true">{display}</span>
-      <span {...stylex.props(styles.visuallyHidden)}>{value}</span>
+    <span
+      ref={el}
+      {...stylex.attrs(styles.statValue, styles.statValueWidth(`${props.value.length}ch`))}
+    >
+      <span aria-hidden="true">{display()}</span>
+      <span {...stylex.attrs(styles.visuallyHidden)}>{props.value}</span>
     </span>
   );
 }
 
-function StatItem({ stat, index }: { stat: (typeof STATS)[number]; index: number }) {
+function StatItem(props: { stat: (typeof STATS)[number]; index: number }) {
   return (
     <CountedStatistic
       styles={{
@@ -1803,25 +1784,24 @@ function StatItem({ stat, index }: { stat: (typeof STATS)[number]; index: number
         statFigure: styles.statFigure,
         statUnit: styles.statUnit,
       }}
-      index={index}
-      stat={stat}
+      index={props.index}
+      stat={props.stat}
       ZoomReveal={ZoomReveal}
       CountUp={CountUp}
     />
   );
 }
 
-function IconPattern({ icon }: { icon: StrengthIcon }) {
-  const Icon = STRENGTH_ICONS[icon];
+function IconPattern(props: { icon: StrengthIcon }) {
+  const Icon = STRENGTH_ICONS[props.icon];
   return (
-    <div aria-hidden="true" {...stylex.props(styles.pattern)}>
+    <div aria-hidden="true" {...stylex.attrs(styles.pattern)}>
       {PATTERN_CELLS.map((cell) => (
         <Icon
-          key={`${cell.left}-${cell.top}`}
           size={32}
           strokeWidth={2}
           absoluteStrokeWidth
-          {...stylex.props(styles.patternCell(`${cell.left}px`, `${cell.top}px`))}
+          {...stylex.attrs(styles.patternCell(`${cell.left}px`, `${cell.top}px`))}
         />
       ))}
     </div>
@@ -1844,7 +1824,6 @@ function Strengths() {
       STRENGTHS_INTRO={STRENGTHS_INTRO}
       cards={STRENGTHS.map((strength, index) => (
         <ZoomReveal
-          key={strength.title}
           delay={index * STAGGER}
           sx={[styles.strengthCard, stylex.defaultMarker()]}
           style={TONE_STYLES[strength.tone]}
@@ -1868,50 +1847,52 @@ function Strengths() {
 }
 
 function useTilt<T extends HTMLElement>() {
-  const ref = useRef<T>(null);
+  const [cardEl, setCardEl] = createSignal<T>();
   const reduce = useReducedMotion();
-  useEffect(() => {
-    const card = ref.current;
-    if (!card || reduce) return;
-    if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
-    const image = card.querySelector("img");
-    let frame = 0;
-    let rotateX = 0;
-    let rotateY = 0;
-    const apply = () => {
-      frame = 0;
-      card.style.transform = `perspective(900px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
-      if (image) image.style.translate = `${rotateY * -1.4}px ${rotateX * 1.4}px`;
-    };
-    const onMove = (event: PointerEvent) => {
-      const rect = card.getBoundingClientRect();
-      const x = (event.clientX - rect.left) / rect.width;
-      const y = (event.clientY - rect.top) / rect.height;
-      rotateY = (x - 0.5) * 9;
-      rotateX = (0.5 - y) * 7;
-      card.style.setProperty("--glare-x", `${Math.round(x * 100)}%`);
-      card.style.setProperty("--glare-y", `${Math.round(y * 100)}%`);
-      if (!frame) frame = requestAnimationFrame(apply);
-    };
-    const onLeave = () => {
-      rotateX = 0;
-      rotateY = 0;
-      if (!frame) frame = requestAnimationFrame(apply);
-    };
-    card.addEventListener("pointermove", onMove);
-    card.addEventListener("pointerleave", onLeave);
-    return () => {
-      if (frame) cancelAnimationFrame(frame);
-      card.removeEventListener("pointermove", onMove);
-      card.removeEventListener("pointerleave", onLeave);
-      card.style.transform = "";
-      if (image) image.style.translate = "";
-    };
-  }, [reduce]);
-  return ref;
+  createEffect(
+    () => [cardEl(), reduce()] as const,
+    ([card, reduced]) => {
+      if (!card || reduced) return;
+      if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
+      const image = card.querySelector("img");
+      let frame = 0;
+      let rotateX = 0;
+      let rotateY = 0;
+      const apply = () => {
+        frame = 0;
+        card.style.transform = `perspective(900px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+        if (image) image.style.translate = `${rotateY * -1.4}px ${rotateX * 1.4}px`;
+      };
+      const onMove = (event: PointerEvent) => {
+        const rect = card.getBoundingClientRect();
+        const x = (event.clientX - rect.left) / rect.width;
+        const y = (event.clientY - rect.top) / rect.height;
+        rotateY = (x - 0.5) * 9;
+        rotateX = (0.5 - y) * 7;
+        card.style.setProperty("--glare-x", `${Math.round(x * 100)}%`);
+        card.style.setProperty("--glare-y", `${Math.round(y * 100)}%`);
+        if (!frame) frame = requestAnimationFrame(apply);
+      };
+      const onLeave = () => {
+        rotateX = 0;
+        rotateY = 0;
+        if (!frame) frame = requestAnimationFrame(apply);
+      };
+      card.addEventListener("pointermove", onMove);
+      card.addEventListener("pointerleave", onLeave);
+      return () => {
+        if (frame) cancelAnimationFrame(frame);
+        card.removeEventListener("pointermove", onMove);
+        card.removeEventListener("pointerleave", onLeave);
+        card.style.transform = "";
+        if (image) image.style.translate = "";
+      };
+    },
+  );
+  return setCardEl;
 }
 
-function ProductCard({ product, index }: { product: (typeof PRODUCTS)[number]; index: number }) {
+function ProductCard(props: { product: (typeof PRODUCTS)[number]; index: number }) {
   const tiltRef = useTilt<HTMLDivElement>();
   return (
     <TiltedProductCard
@@ -1931,8 +1912,8 @@ function ProductCard({ product, index }: { product: (typeof PRODUCTS)[number]; i
         rule: styles.rule,
         list: styles.list,
       }}
-      index={index}
-      product={product}
+      index={props.index}
+      product={props.product}
       ZoomReveal={ZoomReveal}
       tiltRef={tiltRef}
     />
@@ -1959,7 +1940,7 @@ function Products() {
       PRODUCTS_INTRO={PRODUCTS_INTRO}
       delay={0.1}
       cards={PRODUCTS.map((product, index) => (
-        <ProductCard key={product.title} product={product} index={index} />
+        <ProductCard product={product} index={index} />
       ))}
     />
   );
@@ -1967,7 +1948,7 @@ function Products() {
 
 function Offices() {
   return (
-    <section id="offices" aria-labelledby="oo-offices-title" {...stylex.props(styles.anchor)}>
+    <section id="offices" aria-labelledby="oo-offices-title" {...stylex.attrs(styles.anchor)}>
       <OfficeMapOverview
         styles={{
           globalBand: styles.globalBand,
@@ -2005,14 +1986,14 @@ function Offices() {
   );
 }
 
-function AccordionIcon({ open }: { open: boolean }) {
+function AccordionIcon(props: { open: boolean }) {
   const reduce = useReducedMotion();
   return (
-    <span aria-hidden="true" {...stylex.props(styles.newsIconSlot)}>
+    <span aria-hidden="true" {...stylex.attrs(styles.newsIconSlot)}>
       <m.span
-        {...stylex.props(styles.newsIconLayer)}
-        animate={{ rotate: open ? 45 : 0 }}
-        transition={reduce ? { duration: 0 } : { type: "spring", duration: 0.3, bounce: 0 }}
+        {...stylex.attrs(styles.newsIconLayer)}
+        animate={{ rotate: props.open ? 45 : 0 }}
+        transition={reduce() ? { duration: 0 } : { type: "spring", duration: 0.3, bounce: 0 }}
       >
         <Plus size={16} strokeWidth={2} absoluteStrokeWidth />
       </m.span>
@@ -2020,21 +2001,13 @@ function AccordionIcon({ open }: { open: boolean }) {
   );
 }
 
-function NewsItem({
-  item,
-  open,
-  onToggle,
-}: {
-  item: (typeof NEWS)[number];
-  open: boolean;
-  onToggle: () => void;
-}) {
+function NewsItem(props: { item: (typeof NEWS)[number]; open: boolean; onToggle: () => void }) {
   return (
     <NewsAccordion
-      item={item}
-      open={open}
-      onToggle={onToggle}
-      icon={<AccordionIcon open={open} />}
+      item={props.item}
+      open={props.open}
+      onToggle={props.onToggle}
+      icon={<AccordionIcon open={props.open} />}
       styles={{
         mutedText: styles.mutedText,
         newsHeading: styles.newsHeading,
@@ -2072,15 +2045,15 @@ function ContactCta() {
     <section
       id="contact"
       aria-labelledby="oo-contact-title"
-      {...stylex.props(styles.cta, styles.inset124, styles.anchor)}
+      {...stylex.attrs(styles.cta, styles.inset124, styles.anchor)}
     >
       <ZoomReveal sx={styles.ctaInner}>
-        <h2 id="oo-contact-title" {...stylex.props(styles.sectionTitle)}>
+        <h2 id="oo-contact-title" {...stylex.attrs(styles.sectionTitle)}>
           {CTA.title}
         </h2>
         <a
           href={CTA.action.href}
-          {...stylex.props(styles.button, styles.buttonPrimary, styles.buttonWide)}
+          {...stylex.attrs(styles.button, styles.buttonPrimary, styles.buttonWide)}
         >
           {CTA.action.label}
         </a>
@@ -2113,10 +2086,10 @@ function SiteFooter() {
       columns={FOOTER_COLUMNS}
       copyright={COPYRIGHT}
     >
-      <a href="#top" aria-label="LinkedIn" {...stylex.props(styles.socialLink)}>
+      <a href="#top" aria-label="LinkedIn" {...stylex.attrs(styles.socialLink)}>
         <VectorArt paths={LINKEDIN_PATHS} viewBox="0 0 20 20" sx={styles.socialIcon} />
       </a>
-      <a href="#top" aria-label="WeChat" {...stylex.props(styles.socialLink)}>
+      <a href="#top" aria-label="WeChat" {...stylex.attrs(styles.socialLink)}>
         <VectorArt paths={WECHAT_PATHS} viewBox="0 0 20 20" sx={styles.socialIcon} />
       </a>
     </CorporateFooter>
@@ -2127,23 +2100,25 @@ export function VariantOO() {
   preinit(GOOGLE_FONTS, { as: "style" });
   const reduce = useReducedMotion();
   const intro = useIntro();
-  const introVars = {
-    "--oo-intro": intro === "play" ? `${INTRO_REVEAL_MS}ms` : "0ms",
-  } as CSSProperties;
-  useEffect(() => {
-    if (reduce) return;
-    const root = document.documentElement;
-    const previous = root.style.scrollBehavior;
-    root.style.scrollBehavior = "smooth";
-    return () => {
-      root.style.scrollBehavior = previous;
-    };
-  }, [reduce]);
+  createEffect(
+    () => reduce(),
+    (reduced) => {
+      if (reduced) return;
+      const root = document.documentElement;
+      const previous = root.style.scrollBehavior;
+      root.style.scrollBehavior = "smooth";
+      return () => {
+        root.style.scrollBehavior = previous;
+      };
+    },
+  );
   return (
     <BloomCorporatePage
       styles={{ root: styles.root, page: styles.page, skipLink: styles.skipLink }}
-      introVars={introVars}
-      intro={intro}
+      introVars={
+        { "--oo-intro": intro() === "play" ? `${INTRO_REVEAL_MS}ms` : "0ms" } as JSX.CSSProperties
+      }
+      intro={intro()}
       SiteHeader={SiteHeader}
       main={
         <CorporateMain

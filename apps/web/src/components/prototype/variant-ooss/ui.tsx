@@ -1,9 +1,10 @@
-import { ArrowRight } from "lucide-react";
+import { ArrowRight } from "@fenchem-lp/ui/components/lucide";
 import { Reveal } from "./motion";
 import { MaskLine } from "./motion";
 import * as stylex from "@stylexjs/stylex";
 import type { StyleXStyles } from "@stylexjs/stylex";
-import type { ReactNode } from "react";
+import { children, merge, Show } from "solid-js";
+import type { JSX } from "@solidjs/web";
 import { color, ease, font, layout as layoutTokens, media } from "./tokens.stylex";
 
 const styles = stylex.create({
@@ -150,39 +151,33 @@ const styles = stylex.create({
 
 type Tone = "light" | "dark";
 
-export function SectionTitle({
-  id,
-  children,
-  tone = "light",
-  index = 1,
-  sx,
-}: {
+export function SectionTitle(props: {
   id: string;
-  children: ReactNode;
+  children: JSX.Element;
   tone?: Tone;
   index?: number;
   sx?: StyleXStyles;
 }) {
+  const p = merge({ tone: "light" as Tone, index: 1 }, props);
   return (
-    <h2 id={id} {...stylex.props(styles.title, tone === "dark" && styles.titleDark, sx)}>
-      <MaskLine index={index}>{children}</MaskLine>
+    <h2 id={p.id} {...stylex.attrs(styles.title, p.tone === "dark" && styles.titleDark, p.sx)}>
+      <MaskLine index={p.index}>{p.children}</MaskLine>
     </h2>
   );
 }
 
-export function Eyebrow({
-  label,
-  tone = "light",
-  sx,
-}: {
+export function Eyebrow(props: {
   number?: string;
   label?: string;
   tone?: Tone;
   sx?: StyleXStyles;
 }) {
-  if (!label) return null;
   return (
-    <p {...stylex.props(styles.eyebrow, tone === "dark" && styles.eyebrowDark, sx)}>{label}</p>
+    <Show when={props.label}>
+      <p {...stylex.attrs(styles.eyebrow, props.tone === "dark" && styles.eyebrowDark, props.sx)}>
+        {props.label}
+      </p>
+    </Show>
   );
 }
 
@@ -192,30 +187,32 @@ type SectionHeaderProps = {
   label?: string;
   title: string;
   lead?: string;
-  action?: ReactNode;
+  action?: JSX.Element;
   tone?: Tone;
   sx?: StyleXStyles;
 };
 
-export function SectionHeader({ id, title, lead, action, tone = "light", sx }: SectionHeaderProps) {
-  const dark = tone === "dark";
+export function SectionHeader(props: SectionHeaderProps) {
+  const p = merge({ tone: "light" as Tone }, props);
+  const action = children(() => p.action);
+  const dark = () => p.tone === "dark";
   return (
-    <div {...stylex.props(styles.header, sx)}>
+    <div {...stylex.attrs(styles.header, p.sx)}>
       <SectionTitle
-        id={id}
-        tone={tone}
-        sx={[styles.titlePlace, action ? styles.titleBaseline : null]}
+        id={p.id}
+        tone={p.tone}
+        sx={[styles.titlePlace, action() ? styles.titleBaseline : null]}
       >
-        {title}
+        {p.title}
       </SectionTitle>
-      {lead ? (
-        <Reveal as="p" index={1} sx={[styles.lead, dark && styles.leadDark]}>
-          {lead}
+      {p.lead ? (
+        <Reveal as="p" index={1} sx={[styles.lead, dark() && styles.leadDark]}>
+          {p.lead}
         </Reveal>
       ) : null}
-      {action ? (
+      {action() ? (
         <Reveal index={1} sx={styles.action}>
-          {action}
+          {action()}
         </Reveal>
       ) : null}
     </div>
@@ -224,35 +221,29 @@ export function SectionHeader({ id, title, lead, action, tone = "light", sx }: S
 
 type ButtonProps = {
   href: string;
-  children: ReactNode;
+  children: JSX.Element;
   onDark?: boolean;
   tone?: "royal" | "white";
   size?: "regular" | "large";
   sx?: StyleXStyles;
 };
 
-export function Button({
-  href,
-  children,
-  onDark = false,
-  tone = "royal",
-  size = "regular",
-  sx,
-}: ButtonProps) {
-  const white = tone === "white";
+export function Button(props: ButtonProps) {
+  const p = merge({ onDark: false, tone: "royal" as const, size: "regular" as const }, props);
+  const white = () => p.tone === "white";
   return (
     <a
-      href={href}
-      {...stylex.props(
+      href={p.href}
+      {...stylex.attrs(
         styles.button,
-        onDark && styles.buttonOnDark,
-        white && styles.buttonWhite,
-        size === "large" && styles.buttonLarge,
-        sx,
+        p.onDark && styles.buttonOnDark,
+        white() && styles.buttonWhite,
+        p.size === "large" && styles.buttonLarge,
+        p.sx,
       )}
     >
-      <span {...stylex.props(styles.buttonLabel, white && styles.buttonLabelWhite)}>
-        {children}
+      <span {...stylex.attrs(styles.buttonLabel, white() && styles.buttonLabelWhite)}>
+        {p.children}
       </span>
     </a>
   );
@@ -260,29 +251,30 @@ export function Button({
 
 type TextLinkProps = {
   href: string;
-  children: ReactNode;
+  children: JSX.Element;
   tone?: "ink" | "white";
   sx?: StyleXStyles;
 };
 
-export function TextLink({ href, children, tone = "ink", sx }: TextLinkProps) {
+export function TextLink(props: TextLinkProps) {
+  const p = merge({ tone: "ink" as const }, props);
   return (
     <a
-      href={href}
-      {...stylex.props(
+      href={p.href}
+      {...stylex.attrs(
         styles.textLink,
-        tone === "white" ? styles.textLinkWhite : styles.textLinkInk,
+        p.tone === "white" ? styles.textLinkWhite : styles.textLinkInk,
         stylex.defaultMarker(),
-        sx,
+        p.sx,
       )}
     >
-      {children}
+      {p.children}
       <ArrowRight
         size={16}
         strokeWidth={2}
         absoluteStrokeWidth
         aria-hidden="true"
-        {...stylex.props(styles.arrow)}
+        {...stylex.attrs(styles.arrow)}
       />
     </a>
   );

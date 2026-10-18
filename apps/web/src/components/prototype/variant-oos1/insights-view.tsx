@@ -1,9 +1,9 @@
 import { Flow } from "../shared/flow";
-import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
+import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { ChevronDown } from "lucide-react";
-import { AnimatePresence, m } from "motion/react";
-import { useMemo, useState } from "react";
+import { ChevronDown } from "@fenchem-lp/ui/components/lucide";
+import { AnimatePresence, m } from "@/compat/motion";
+import { createMemo, createSignal, Show } from "solid-js";
 
 import { EASE } from "@/components/prototype/motion-constants";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
@@ -27,7 +27,7 @@ import { color, ease, layout, media } from "./tokens.stylex";
 
 const HAIRLINE = "rgba(26, 26, 26, 0.12)";
 const SURFACE_ALT = "#f3f5fa";
-const DESKTOP = breakpoints.xl;
+const DESKTOP = "@media (min-width: 1280px)";
 
 const styles = stylex.create({
   pageSection: {
@@ -115,9 +115,9 @@ const styles = stylex.create({
     display: "grid",
     gridTemplateColumns: {
       default: "minmax(0, 1fr)",
-      [breakpoints.md]: "minmax(0, 1fr) auto",
+      ["@media (min-width: 768px)"]: "minmax(0, 1fr) auto",
     },
-    alignItems: { default: "start", [breakpoints.md]: "center" },
+    alignItems: { default: "start", ["@media (min-width: 768px)"]: "center" },
     columnGap: 48,
     rowGap: 20,
   },
@@ -323,7 +323,7 @@ const styles = stylex.create({
     display: "grid",
     gridTemplateColumns: {
       default: "1fr",
-      [breakpoints.md]: "220px minmax(0, 1fr)",
+      ["@media (min-width: 768px)"]: "220px minmax(0, 1fr)",
     },
     columnGap: 32,
     rowGap: 6,
@@ -429,25 +429,25 @@ function buildBookmarkItems(
   return items;
 }
 
-export function InsightsView({ onNavigateHome }: { onNavigateHome: (target?: string) => void }) {
+export function InsightsView(props: { onNavigateHome: (target?: string) => void }) {
   const articles = INSIGHTS_ARTICLES;
   const [featured, ...more] = articles;
-  const [openId, setOpenId] = useState<string | null>(null);
-  const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [openId, setOpenId] = createSignal<string | null>(null);
+  const [expandedId, setExpandedId] = createSignal<string | null>(null);
   const reduceMotion = useReducedMotion();
-  const railVisible = expandedId !== null && expandedId === openId;
+  const railVisible = () => expandedId() !== null && expandedId() === openId();
 
   const toggleArticle = (id: string) => {
     setExpandedId(null);
     setOpenId((current) => (current === id ? null : id));
   };
 
-  const bookmarkItems = useMemo(() => buildBookmarkItems(articles, openId), [articles, openId]);
-  const bookmarkIds = useMemo(() => bookmarkItems.map((item) => item.id), [bookmarkItems]);
+  const bookmarkItems = createMemo(() => buildBookmarkItems(articles, openId()));
+  const bookmarkIds = createMemo(() => bookmarkItems().map((item) => item.id));
   const activeBookmarkId = useBookmarkActive(bookmarkIds);
 
   const handleSelectBookmark = (id: string) => {
-    if (featured && openId !== featured.id) {
+    if (featured && openId() !== featured.id) {
       setExpandedId(null);
       setOpenId(featured.id);
       requestAnimationFrame(() => {
@@ -460,7 +460,7 @@ export function InsightsView({ onNavigateHome }: { onNavigateHome: (target?: str
     }
   };
   return (
-    <div id="insights-top" lang="zh-CN" {...stylex.props(kitStyles.root)}>
+    <div id="insights-top" lang="zh-CN" {...stylex.attrs(kitStyles.root)}>
       <SubPageBanner
         eyebrow={INSIGHTS_PAGE.eyebrow}
         title="行业洞察"
@@ -472,60 +472,58 @@ export function InsightsView({ onNavigateHome }: { onNavigateHome: (target?: str
         titleId="insights-banner-title"
       />
 
-      <SubPageNav current="行业洞察" chips={[]} onNavigateHome={onNavigateHome} />
+      <SubPageNav current="行业洞察" chips={[]} onNavigateHome={props.onNavigateHome} />
 
-      <div {...stylex.props(styles.pageSection)}>
-        <div {...stylex.props(kitStyles.shell, kitStyles.inset120)}>
-          <div {...stylex.props(styles.articleWrapper)}>
+      <div {...stylex.attrs(styles.pageSection)}>
+        <div {...stylex.attrs(kitStyles.shell, kitStyles.inset120)}>
+          <div {...stylex.attrs(styles.articleWrapper)}>
             <AnimatePresence>
-              {railVisible && bookmarkItems.length > 0 ? (
+              <Show when={railVisible() && bookmarkItems().length > 0}>
                 <m.aside
-                  key="bookmark-rail"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{
                     opacity: 0,
-                    transition: { duration: reduceMotion ? 0 : 0.12, ease: EASE },
+                    transition: { duration: reduceMotion() ? 0 : 0.12, ease: EASE },
                   }}
-                  transition={{ duration: reduceMotion ? 0 : 0.2, ease: EASE }}
-                  {...stylex.props(styles.railAside)}
+                  transition={{ duration: reduceMotion() ? 0 : 0.2, ease: EASE }}
+                  {...stylex.attrs(styles.railAside)}
                   aria-label="文章书签"
                 >
-                  <div {...stylex.props(styles.railSticky)}>
+                  <div {...stylex.attrs(styles.railSticky)}>
                     <CodexBookmarkRail
-                      items={bookmarkItems}
-                      activeId={activeBookmarkId}
+                      items={bookmarkItems()}
+                      activeId={activeBookmarkId()}
                       onSelect={handleSelectBookmark}
                     />
                   </div>
                 </m.aside>
-              ) : null}
+              </Show>
             </AnimatePresence>
 
-            <div {...stylex.props(styles.articleMain)}>
+            <div {...stylex.attrs(styles.articleMain)}>
               {featured ? (
                 <InsightArticleView
                   article={featured}
                   featured
-                  open={openId === featured.id}
+                  open={openId() === featured.id}
                   onToggle={() => toggleArticle(featured.id)}
                   onExpanded={() => setExpandedId(featured.id)}
                 />
               ) : null}
               {more.length > 0 ? (
-                <div {...stylex.props(styles.moreList, more.length === 1 && styles.moreListSingle)}>
+                <div {...stylex.attrs(styles.moreList, more.length === 1 && styles.moreListSingle)}>
                   {more.length > 1 ? (
-                    <div {...stylex.props(styles.moreHeader)}>
-                      <p {...stylex.props(styles.moreLabel)}>更多洞察</p>
-                      <p {...stylex.props(styles.moreCount)}>{`共 ${more.length} 篇`}</p>
+                    <div {...stylex.attrs(styles.moreHeader)}>
+                      <p {...stylex.attrs(styles.moreLabel)}>更多洞察</p>
+                      <p {...stylex.attrs(styles.moreCount)}>{`共 ${more.length} 篇`}</p>
                     </div>
                   ) : null}
                   {more.map((article) => (
                     <InsightArticleView
-                      key={article.id}
                       article={article}
                       featured={false}
-                      open={openId === article.id}
+                      open={openId() === article.id}
                       onToggle={() => toggleArticle(article.id)}
                       onExpanded={() => setExpandedId(article.id)}
                     />
@@ -541,7 +539,7 @@ export function InsightsView({ onNavigateHome }: { onNavigateHome: (target?: str
           id="insights-bottom-cta"
           title="需要索取样品或技术资料？"
           subtitle="我们的应用团队随时为您提供添加量指导与配方参考。"
-          actions={[{ label: "联系我们", onClick: () => onNavigateHome("contact") }]}
+          actions={[{ label: "联系我们", onClick: () => props.onNavigateHome("contact") }]}
         />
       </Flow>
     </div>
@@ -580,62 +578,59 @@ function isFullyOpen(definition: unknown) {
   );
 }
 
-function InsightArticleView({
-  article,
-  featured,
-  open,
-  onToggle,
-  onExpanded,
-}: {
+function InsightArticleView(props: {
   article: InsightArticle;
   featured: boolean;
   open: boolean;
   onToggle: () => void;
   onExpanded: () => void;
 }) {
+  const article = props.article;
+  const featured = props.featured;
   const reduce = useReducedMotion();
   const titleId = `${article.id}-article-title`;
   const bodyId = `${article.id}-full-article`;
 
-  const toggleButton = (
+  // Functions, not nodes: the compact preview remounts with each expansion.
+  const toggleButton = () => (
     <button
       type="button"
-      aria-expanded={open}
+      aria-expanded={props.open ? "true" : "false"}
       aria-controls={bodyId}
-      onClick={onToggle}
-      {...stylex.props(
+      onClick={() => props.onToggle()}
+      {...stylex.attrs(
         styles.expandButton,
-        (open || !featured) && styles.expandButtonOutline,
+        (props.open || !featured) && styles.expandButtonOutline,
         !featured && styles.compactButton,
       )}
     >
-      <span>{open ? "收起阅读" : "展开阅读"}</span>
+      <span>{props.open ? "收起阅读" : "展开阅读"}</span>
       <ChevronDown
         size={16}
         strokeWidth={2}
         aria-hidden="true"
-        {...stylex.props(styles.expandIcon, open && styles.expandIconRotated)}
+        {...stylex.attrs(styles.expandIcon, props.open && styles.expandIconRotated)}
       />
     </button>
   );
 
-  const preview = (
+  const preview = () => (
     <>
       {article.thesis ? (
-        <div {...stylex.props(styles.coreViewBox)}>
-          <p {...stylex.props(styles.coreViewParagraph)}>
-            <strong {...stylex.props(styles.coreViewLabel)}>{article.thesis.label}</strong>
+        <div {...stylex.attrs(styles.coreViewBox)}>
+          <p {...stylex.attrs(styles.coreViewParagraph)}>
+            <strong {...stylex.attrs(styles.coreViewLabel)}>{article.thesis.label}</strong>
             {article.thesis.statement}
           </p>
         </div>
       ) : null}
 
-      <div {...stylex.props(styles.paragraphStack)}>
+      <div {...stylex.attrs(styles.paragraphStack)}>
         {article.intro.map((paragraph, index) => (
-          <p key={paragraph} {...stylex.props(styles.bodyParagraph)}>
+          <p {...stylex.attrs(styles.bodyParagraph)}>
             {index === 0 ? (
               <>
-                <span {...stylex.props(styles.dropCap)}>{paragraph.slice(0, 1)}</span>
+                <span {...stylex.attrs(styles.dropCap)}>{paragraph.slice(0, 1)}</span>
                 {paragraph.slice(1)}
               </>
             ) : (
@@ -651,132 +646,124 @@ function InsightArticleView({
     <article
       id={articleAnchor(article)}
       aria-labelledby={titleId}
-      {...stylex.props(featured ? styles.article : styles.compactArticle, kitStyles.anchor)}
+      {...stylex.attrs(featured ? styles.article : styles.compactArticle, kitStyles.anchor)}
     >
       {featured ? (
         <>
-          <p {...stylex.props(styles.docCategory)}>{article.category}</p>
+          <p {...stylex.attrs(styles.docCategory)}>{article.category}</p>
 
-          <h2 id={titleId} {...stylex.props(styles.docTitle)}>
+          <h2 id={titleId} {...stylex.attrs(styles.docTitle)}>
             {article.title}
           </h2>
 
-          {article.lead ? <p {...stylex.props(styles.docSubtitle)}>{article.lead}</p> : null}
+          {article.lead ? <p {...stylex.attrs(styles.docSubtitle)}>{article.lead}</p> : null}
 
-          {preview}
+          {preview()}
 
-          <div {...stylex.props(styles.expandRow)}>
-            <p {...stylex.props(styles.expandMeta)}>
+          <div {...stylex.attrs(styles.expandRow)}>
+            <p {...stylex.attrs(styles.expandMeta)}>
               {`全文 ${article.sections.length} 节 · 约 ${readMinutes(article)} 分钟`}
             </p>
-            {toggleButton}
+            {toggleButton()}
           </div>
         </>
       ) : (
-        <div {...stylex.props(styles.compactHead)}>
-          <div {...stylex.props(styles.compactText)}>
-            <p {...stylex.props(styles.docCategory)}>{article.category}</p>
-            <h2 id={titleId} {...stylex.props(styles.compactTitle)}>
+        <div {...stylex.attrs(styles.compactHead)}>
+          <div {...stylex.attrs(styles.compactText)}>
+            <p {...stylex.attrs(styles.docCategory)}>{article.category}</p>
+            <h2 id={titleId} {...stylex.attrs(styles.compactTitle)}>
               {article.title}
             </h2>
-            {article.lead ? <p {...stylex.props(styles.compactLead)}>{article.lead}</p> : null}
+            {article.lead ? <p {...stylex.attrs(styles.compactLead)}>{article.lead}</p> : null}
           </div>
-          {toggleButton}
+          {toggleButton()}
         </div>
       )}
 
       <AnimatePresence initial={false}>
-        {open ? (
+        <Show when={props.open}>
           <m.div
             id={bodyId}
-            key={bodyId}
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: reduce ? 0.15 : 0.4, ease: EASE }}
+            transition={{ duration: reduce() ? 0.15 : 0.4, ease: EASE }}
             onAnimationComplete={(definition) => {
-              if (isFullyOpen(definition)) onExpanded();
+              if (isFullyOpen(definition)) props.onExpanded();
             }}
-            {...stylex.props(styles.expandedWrap)}
+            {...stylex.attrs(styles.expandedWrap)}
           >
-            {featured ? null : <div {...stylex.props(styles.compactPreview)}>{preview}</div>}
-            <div {...stylex.props(styles.expandedInner)}>
+            {featured ? null : <div {...stylex.attrs(styles.compactPreview)}>{preview()}</div>}
+            <div {...stylex.attrs(styles.expandedInner)}>
               {article.sections.map((section) => (
-                <InsightSectionView
-                  key={section.slug}
-                  id={sectionAnchor(article, section)}
-                  section={section}
-                />
+                <InsightSectionView id={sectionAnchor(article, section)} section={section} />
               ))}
             </div>
           </m.div>
-        ) : null}
+        </Show>
       </AnimatePresence>
     </article>
   );
 }
 
-function InsightSectionView({ id, section }: { id: string; section: InsightSection }) {
-  const titleId = `${id}-title`;
+function InsightSectionView(props: { id: string; section: InsightSection }) {
+  const titleId = `${props.id}-title`;
   return (
     <section
-      id={id}
+      id={props.id}
       aria-labelledby={titleId}
-      {...stylex.props(styles.chapterSection, kitStyles.anchor)}
+      {...stylex.attrs(styles.chapterSection, kitStyles.anchor)}
     >
-      <h3 id={titleId} {...stylex.props(styles.chapterHeading)}>
-        {section.title}
+      <h3 id={titleId} {...stylex.attrs(styles.chapterHeading)}>
+        {props.section.title}
       </h3>
-      {section.blocks.map((block, index) => (
-        <InsightBlockView key={`${block.kind}-${index}`} block={block} />
+      {props.section.blocks.map((block) => (
+        <InsightBlockView block={block} />
       ))}
     </section>
   );
 }
 
-function InsightBlockView({ block }: { block: InsightBlock }) {
+function InsightBlockView(props: { block: InsightBlock }) {
+  const block = props.block;
   switch (block.kind) {
     case "paragraphs":
       return (
-        <div {...stylex.props(styles.paragraphStack)}>
+        <div {...stylex.attrs(styles.paragraphStack)}>
           {block.items.map((paragraph) => (
-            <p key={paragraph} {...stylex.props(styles.bodyParagraph)}>
-              {paragraph}
-            </p>
+            <p {...stylex.attrs(styles.bodyParagraph)}>{paragraph}</p>
           ))}
         </div>
       );
     case "bullets":
       return (
-        <ul {...stylex.props(styles.bulletList)}>
+        <ul {...stylex.attrs(styles.bulletList)}>
           {block.items.map((item) => (
-            <li key={item} {...stylex.props(styles.bulletItem)}>
-              {item}
-            </li>
+            <li {...stylex.attrs(styles.bulletItem)}>{item}</li>
           ))}
         </ul>
       );
     case "terms":
       return (
-        <ul {...stylex.props(styles.editorialList)}>
+        <ul {...stylex.attrs(styles.editorialList)}>
           {block.items.map((item) => (
-            <li key={item.term} {...stylex.props(styles.editorialRow)}>
-              <h4 {...stylex.props(styles.editorialTerm)}>{item.term}</h4>
-              <p {...stylex.props(styles.bodyParagraph)}>{item.desc}</p>
+            <li {...stylex.attrs(styles.editorialRow)}>
+              <h4 {...stylex.attrs(styles.editorialTerm)}>{item.term}</h4>
+              <p {...stylex.attrs(styles.bodyParagraph)}>{item.desc}</p>
             </li>
           ))}
         </ul>
       );
     case "note":
       return (
-        <div {...stylex.props(styles.devPromptBox)}>
-          <p {...stylex.props(styles.devPromptParagraph)}>
-            <strong {...stylex.props(styles.devPromptLabel)}>{block.label}</strong>
+        <div {...stylex.attrs(styles.devPromptBox)}>
+          <p {...stylex.attrs(styles.devPromptParagraph)}>
+            <strong {...stylex.attrs(styles.devPromptLabel)}>{block.label}</strong>
             {block.text}
           </p>
         </div>
       );
     case "disclaimer":
-      return <p {...stylex.props(styles.disclaimer)}>{block.text}</p>;
+      return <p {...stylex.attrs(styles.disclaimer)}>{block.text}</p>;
   }
 }

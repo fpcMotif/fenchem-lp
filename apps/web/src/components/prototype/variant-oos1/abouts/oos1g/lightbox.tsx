@@ -2,9 +2,9 @@ import { LightboxControls } from "../../../shared/lightbox-controls";
 import { LightboxDialog, type LightboxState } from "../../../shared/lightbox";
 import { LightboxStage } from "../../../shared/lightbox-stage";
 
-import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
+import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { ChevronLeft, ChevronRight, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, X } from "@fenchem-lp/ui/components/lucide";
 
 import { ABOUT_CAMPUS } from "../../about-data";
 import { palette } from "./palette.stylex";
@@ -33,7 +33,7 @@ const styles = stylex.create({
     borderWidth: 0,
     backgroundColor: "rgba(6, 12, 24, 0.95)",
     color: colors.paper,
-    animationName: { default: null, [breakpoints.motionOk]: fadeIn },
+    animationName: { default: null, ["@media (prefers-reduced-motion: no-preference)"]: fadeIn },
     animationDuration: "240ms",
     animationTimingFunction: palette.easeOut,
     "::backdrop": { backgroundColor: "transparent" },
@@ -48,7 +48,7 @@ const styles = stylex.create({
     width: "100%",
     height: "100%",
     boxSizing: "border-box",
-    padding: { default: "72px 28px", [breakpoints.md]: "80px 120px" },
+    padding: { default: "72px 28px", ["@media (min-width: 768px)"]: "80px 120px" },
   },
   figure: {
     display: "flex",
@@ -60,11 +60,11 @@ const styles = stylex.create({
     animationTimingFunction: palette.easeOut,
   },
   figureOpen: {
-    animationName: { default: null, [breakpoints.motionOk]: zoomIn },
+    animationName: { default: null, ["@media (prefers-reduced-motion: no-preference)"]: zoomIn },
     animationDuration: "260ms",
   },
   figureStep: {
-    animationName: { default: null, [breakpoints.motionOk]: fadeIn },
+    animationName: { default: null, ["@media (prefers-reduced-motion: no-preference)"]: fadeIn },
     animationDuration: "180ms",
   },
   image: {
@@ -96,7 +96,10 @@ const styles = stylex.create({
     cursor: "pointer",
     transform: {
       default: null,
-      ":active": { default: null, [breakpoints.motionOk]: "scale(0.96)" },
+      ":active": {
+        default: null,
+        ["@media (prefers-reduced-motion: no-preference)"]: "scale(0.96)",
+      },
     },
     transitionProperty: "background-color, transform",
     transitionDuration: "160ms",
@@ -108,35 +111,37 @@ const styles = stylex.create({
   },
   prev: {
     top: "50%",
-    insetInlineStart: { default: 10, [breakpoints.md]: 32 },
+    insetInlineStart: { default: 10, ["@media (min-width: 768px)"]: 32 },
     marginTop: -24,
   },
   next: {
     top: "50%",
-    insetInlineEnd: { default: 10, [breakpoints.md]: 32 },
+    insetInlineEnd: { default: 10, ["@media (min-width: 768px)"]: 32 },
     marginTop: -24,
   },
   close: {
-    top: { default: 12, [breakpoints.md]: 24 },
-    insetInlineEnd: { default: 10, [breakpoints.md]: 32 },
+    top: { default: 12, ["@media (min-width: 768px)"]: 24 },
+    insetInlineEnd: { default: 10, ["@media (min-width: 768px)"]: 32 },
   },
 });
 
-export function Lightbox({ lightbox }: { lightbox: LightboxState }) {
-  const { stepped, close: onClose, step: onStep } = lightbox;
+export function Lightbox(props: { lightbox: LightboxState }) {
+  const { close: onClose, step: onStep } = props.lightbox;
   const photos = ABOUT_CAMPUS.photos;
 
   return (
-    <LightboxDialog lightbox={lightbox} items={photos} sx={styles.dialog}>
+    <LightboxDialog lightbox={props.lightbox} items={photos} sx={styles.dialog}>
       {(photo) => (
         <>
           <LightboxStage onClose={onClose} sx={styles.stage}>
             <figure
-              key={photo.id}
-              {...stylex.props(styles.figure, stepped ? styles.figureStep : styles.figureOpen)}
+              {...stylex.attrs(
+                styles.figure,
+                props.lightbox.stepped ? styles.figureStep : styles.figureOpen,
+              )}
             >
-              <img src={photo.large} alt={photo.alt} {...stylex.props(styles.image)} />
-              <figcaption {...stylex.props(styles.caption)}>{photo.caption}</figcaption>
+              <img src={photo.large} alt={photo.alt} {...stylex.attrs(styles.image)} />
+              <figcaption {...stylex.attrs(styles.caption)}>{photo.caption}</figcaption>
             </figure>
           </LightboxStage>
           <LightboxControls

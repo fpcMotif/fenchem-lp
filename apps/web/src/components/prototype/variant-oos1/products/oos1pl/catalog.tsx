@@ -1,7 +1,8 @@
-import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
+import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { ChevronDown, ChevronsDownUp, ChevronsUpDown } from "lucide-react";
-import { useId, useState, type ReactNode } from "react";
+import { ChevronDown, ChevronsDownUp, ChevronsUpDown } from "@fenchem-lp/ui/components/lucide";
+import { createSignal, createUniqueId } from "solid-js";
+import type { JSX } from "@solidjs/web";
 
 import { CATALOG_GROUPS, type CatalogGroup } from "../../products-data";
 import { padIndex, splitTitle } from "../shared/derived";
@@ -20,10 +21,10 @@ const BODY_FONT =
 const NUMERAL_FONT = '"Inter Tight", "Source Han Sans SC", "Noto Sans SC", sans-serif';
 
 const TABLET = "@media (min-width: 768px) and (max-width: 1279.98px)";
-const DESKTOP = breakpoints.xl;
+const DESKTOP = "@media (min-width: 1280px)";
 const SM = "@media (min-width: 640px) and (max-width: 1023.98px)";
-const LG = breakpoints.lg;
-const MOTION_OK = breakpoints.motionOk;
+const LG = "@media (min-width: 1024px)";
+const MOTION_OK = "@media (prefers-reduced-motion: no-preference)";
 const INSET = "min(120px, 8.333vw)";
 const HEADER_HEIGHT = 80;
 
@@ -429,42 +430,38 @@ const styles = stylex.create({
   },
 });
 
-function Inci({ text }: { text: string }) {
-  const parts: ReactNode[] = [];
+function Inci(props: { text: string }) {
+  return <>{inciParts(props.text)}</>;
+}
+
+function inciParts(text: string) {
+  const parts: JSX.Element[] = [];
   let last = 0;
   for (const match of text.matchAll(INCI_LATIN)) {
     parts.push(text.slice(last, match.index));
-    parts.push(
-      <span key={match.index} {...stylex.props(styles.keepTogether)}>
-        {match[0]}
-      </span>,
-    );
+    parts.push(<span {...stylex.attrs(styles.keepTogether)}>{match[0]}</span>);
     last = match.index + match[0].length;
   }
   parts.push(text.slice(last));
-  return <>{parts}</>;
+  return parts;
 }
 
-function Fold({ open, children }: { open: boolean; children: ReactNode }) {
+function Fold(props: { open: boolean; children: JSX.Element }) {
   return (
-    <div {...stylex.props(styles.fold, open && styles.foldOpen)}>
-      <div {...stylex.props(styles.foldInner)}>{children}</div>
+    <div {...stylex.attrs(styles.fold, props.open && styles.foldOpen)}>
+      <div {...stylex.attrs(styles.foldInner)}>{props.children}</div>
     </div>
   );
 }
 
-function GroupBody({
-  group,
-  index,
-  open,
-  onToggle,
-}: {
+function GroupBody(props: {
   group: CatalogGroup;
   index: number;
   open: boolean;
   onToggle: () => void;
 }) {
-  const baseId = useId();
+  const group = props.group;
+  const baseId = createUniqueId();
   const introId = `${baseId}-intro`;
   const rowId = (itemIndex: number) => `${baseId}-row-${itemIndex}`;
   const controlled = [
@@ -472,42 +469,42 @@ function GroupBody({
     ...group.items.map((_, itemIndex) => rowId(itemIndex)),
   ].join(" ");
   const preview = group.items.map((item) => splitTitle(item.title).primary).join("、");
-  const hiddenWhenClosed = open ? undefined : true;
+  const hiddenWhenClosed = () => (props.open ? undefined : "true");
 
   return (
-    <tbody {...stylex.props(styles.tbody)}>
-      <tr {...stylex.props(styles.groupRow)}>
+    <tbody {...stylex.attrs(styles.tbody)}>
+      <tr {...stylex.attrs(styles.groupRow)}>
         <th
           scope="rowgroup"
-          colSpan={3}
-          {...stylex.props(styles.groupCell, index === 0 && styles.groupCellFirst)}
+          colspan={3}
+          {...stylex.attrs(styles.groupCell, props.index === 0 && styles.groupCellFirst)}
         >
           <button
             type="button"
-            aria-expanded={open}
+            aria-expanded={props.open ? "true" : "false"}
             aria-controls={controlled}
-            onClick={onToggle}
-            {...stylex.props(styles.groupButton)}
+            onClick={() => props.onToggle()}
+            {...stylex.attrs(styles.groupButton)}
           >
             <span
               aria-hidden="true"
-              {...stylex.props(styles.groupIndex, open && styles.groupIndexOpen)}
+              {...stylex.attrs(styles.groupIndex, props.open && styles.groupIndexOpen)}
             >
-              {padIndex(index)}
+              {padIndex(props.index)}
             </span>
-            <span {...stylex.props(styles.groupName)}>
-              <span {...stylex.props(styles.groupLabel)}>{group.label}</span>
-              <span {...stylex.props(styles.groupCount)}>{group.items.length} 款</span>
+            <span {...stylex.attrs(styles.groupName)}>
+              <span {...stylex.attrs(styles.groupLabel)}>{group.label}</span>
+              <span {...stylex.attrs(styles.groupCount)}>{group.items.length} 款</span>
             </span>
             <span
               aria-hidden="true"
-              {...stylex.props(styles.groupPreview, open && styles.groupPreviewHidden)}
+              {...stylex.attrs(styles.groupPreview, props.open && styles.groupPreviewHidden)}
             >
               {preview}
             </span>
             <span
               aria-hidden="true"
-              {...stylex.props(styles.groupIcon, open && styles.groupIconOpen)}
+              {...stylex.attrs(styles.groupIcon, props.open && styles.groupIconOpen)}
             >
               <ChevronDown size={18} strokeWidth={1.5} absoluteStrokeWidth />
             </span>
@@ -515,11 +512,11 @@ function GroupBody({
         </th>
       </tr>
       {group.intro && (
-        <tr id={introId} aria-hidden={hiddenWhenClosed} {...stylex.props(styles.introRow)}>
-          <td colSpan={3} {...stylex.props(styles.introCell)}>
-            <Fold open={open}>
-              <div {...stylex.props(styles.introPad)}>
-                <p {...stylex.props(styles.intro)}>{group.intro}</p>
+        <tr id={introId} aria-hidden={hiddenWhenClosed()} {...stylex.attrs(styles.introRow)}>
+          <td colspan={3} {...stylex.attrs(styles.introCell)}>
+            <Fold open={props.open}>
+              <div {...stylex.attrs(styles.introPad)}>
+                <p {...stylex.attrs(styles.intro)}>{group.intro}</p>
               </div>
             </Fold>
           </td>
@@ -529,24 +526,23 @@ function GroupBody({
         const { primary, secondary } = splitTitle(item.title);
         return (
           <tr
-            key={item.id}
             id={rowId(itemIndex)}
-            aria-hidden={hiddenWhenClosed}
-            {...stylex.props(styles.itemRow)}
+            aria-hidden={hiddenWhenClosed()}
+            {...stylex.attrs(styles.itemRow)}
           >
-            <th scope="row" {...stylex.props(styles.cell, styles.nameCell)}>
-              <Fold open={open}>
-                <div {...stylex.props(styles.namePad)}>
-                  <span {...stylex.props(styles.namePrimary)}>{primary}</span>
-                  {secondary && <span {...stylex.props(styles.nameSecondary)}>{secondary}</span>}
+            <th scope="row" {...stylex.attrs(styles.cell, styles.nameCell)}>
+              <Fold open={props.open}>
+                <div {...stylex.attrs(styles.namePad)}>
+                  <span {...stylex.attrs(styles.namePrimary)}>{primary}</span>
+                  {secondary && <span {...stylex.attrs(styles.nameSecondary)}>{secondary}</span>}
                 </div>
               </Fold>
             </th>
-            <td {...stylex.props(styles.cell)}>
-              <Fold open={open}>
-                <div {...stylex.props(styles.inciPad)}>
-                  <p {...stylex.props(styles.inci)}>
-                    <span aria-hidden="true" {...stylex.props(styles.inciTag)}>
+            <td {...stylex.attrs(styles.cell)}>
+              <Fold open={props.open}>
+                <div {...stylex.attrs(styles.inciPad)}>
+                  <p {...stylex.attrs(styles.inci)}>
+                    <span aria-hidden="true" {...stylex.attrs(styles.inciTag)}>
                       INCI
                     </span>
                     <Inci text={item.inci} />
@@ -554,10 +550,10 @@ function GroupBody({
                 </div>
               </Fold>
             </td>
-            <td {...stylex.props(styles.cell)}>
-              <Fold open={open}>
-                <div {...stylex.props(styles.featuresPad)}>
-                  <p {...stylex.props(styles.features)}>{item.features}</p>
+            <td {...stylex.attrs(styles.cell)}>
+              <Fold open={props.open}>
+                <div {...stylex.attrs(styles.featuresPad)}>
+                  <p {...stylex.attrs(styles.features)}>{item.features}</p>
                 </div>
               </Fold>
             </td>
@@ -569,12 +565,12 @@ function GroupBody({
 }
 
 export function Catalog() {
-  const headingId = useId();
-  const tableId = useId();
-  const [openIds, setOpenIds] = useState<ReadonlySet<string>>(
-    () => new Set(ALL_GROUP_IDS.slice(0, 1)),
+  const headingId = createUniqueId();
+  const tableId = createUniqueId();
+  const [openIds, setOpenIds] = createSignal<ReadonlySet<string>>(
+    new Set(ALL_GROUP_IDS.slice(0, 1)),
   );
-  const allOpen = ALL_GROUP_IDS.every((id) => openIds.has(id));
+  const allOpen = () => ALL_GROUP_IDS.every((id) => openIds().has(id));
 
   const toggleGroup = (id: string) => {
     setOpenIds((previous) => {
@@ -586,65 +582,64 @@ export function Catalog() {
   };
 
   const toggleAll = () => {
-    setOpenIds(allOpen ? new Set() : new Set(ALL_GROUP_IDS));
+    setOpenIds(allOpen() ? new Set<string>() : new Set(ALL_GROUP_IDS));
   };
 
   return (
-    <section id="products-catalog" aria-labelledby={headingId} {...stylex.props(styles.section)}>
-      <div {...stylex.props(styles.shell)}>
-        <header {...stylex.props(styles.head)}>
-          <h2 id={headingId} {...stylex.props(styles.title)}>
+    <section id="products-catalog" aria-labelledby={headingId} {...stylex.attrs(styles.section)}>
+      <div {...stylex.attrs(styles.shell)}>
+        <header {...stylex.attrs(styles.head)}>
+          <h2 id={headingId} {...stylex.attrs(styles.title)}>
             产品目录
           </h2>
-          <p {...stylex.props(styles.lead)}>精选个人护理全形态天然油脂与经典功效配方方案</p>
+          <p {...stylex.attrs(styles.lead)}>精选个人护理全形态天然油脂与经典功效配方方案</p>
         </header>
-        <div {...stylex.props(styles.toolbar)}>
-          <span {...stylex.props(styles.meta)}>
+        <div {...stylex.attrs(styles.toolbar)}>
+          <span {...stylex.attrs(styles.meta)}>
             {CATALOG_GROUPS.length} 个分类 · {TOTAL_ITEMS} 款原料
           </span>
           <button
             type="button"
             aria-controls={tableId}
             onClick={toggleAll}
-            {...stylex.props(styles.toggleAll)}
+            {...stylex.attrs(styles.toggleAll)}
           >
-            {allOpen ? (
+            {allOpen() ? (
               <ChevronsDownUp size={16} strokeWidth={1.5} absoluteStrokeWidth aria-hidden="true" />
             ) : (
               <ChevronsUpDown size={16} strokeWidth={1.5} absoluteStrokeWidth aria-hidden="true" />
             )}
-            {allOpen ? "收起全部" : "展开全部"}
+            {allOpen() ? "收起全部" : "展开全部"}
           </button>
         </div>
-        <div {...stylex.props(styles.frame)}>
-          <table id={tableId} aria-labelledby={headingId} {...stylex.props(styles.table)}>
-            <colgroup {...stylex.props(styles.colgroup)}>
-              <col {...stylex.props(styles.colName)} />
-              <col {...stylex.props(styles.colInci)} />
-              <col {...stylex.props(styles.colFeatures)} />
+        <div {...stylex.attrs(styles.frame)}>
+          <table id={tableId} aria-labelledby={headingId} {...stylex.attrs(styles.table)}>
+            <colgroup {...stylex.attrs(styles.colgroup)}>
+              <col {...stylex.attrs(styles.colName)} />
+              <col {...stylex.attrs(styles.colInci)} />
+              <col {...stylex.attrs(styles.colFeatures)} />
             </colgroup>
-            <thead {...stylex.props(styles.thead)}>
+            <thead {...stylex.attrs(styles.thead)}>
               <tr>
-                <th scope="col" {...stylex.props(styles.columnHead, styles.columnHeadFirst)}>
+                <th scope="col" {...stylex.attrs(styles.columnHead, styles.columnHeadFirst)}>
                   <span aria-hidden="true">名称</span>
-                  <span {...stylex.props(styles.srOnly)}>Name</span>
+                  <span {...stylex.attrs(styles.srOnly)}>Name</span>
                 </th>
-                <th scope="col" {...stylex.props(styles.columnHead)}>
+                <th scope="col" {...stylex.attrs(styles.columnHead)}>
                   <span aria-hidden="true">INCI 名称</span>
-                  <span {...stylex.props(styles.srOnly)}>INCI name</span>
+                  <span {...stylex.attrs(styles.srOnly)}>INCI name</span>
                 </th>
-                <th scope="col" {...stylex.props(styles.columnHead)}>
+                <th scope="col" {...stylex.attrs(styles.columnHead)}>
                   <span aria-hidden="true">特性&amp;应用</span>
-                  <span {...stylex.props(styles.srOnly)}>Features & applications</span>
+                  <span {...stylex.attrs(styles.srOnly)}>Features & applications</span>
                 </th>
               </tr>
             </thead>
             {CATALOG_GROUPS.map((group, index) => (
               <GroupBody
-                key={group.id}
                 group={group}
                 index={index}
-                open={openIds.has(group.id)}
+                open={openIds().has(group.id)}
                 onToggle={() => toggleGroup(group.id)}
               />
             ))}

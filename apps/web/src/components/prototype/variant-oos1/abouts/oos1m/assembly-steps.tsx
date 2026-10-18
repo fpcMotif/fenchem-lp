@@ -1,5 +1,5 @@
 import * as stylex from "@stylexjs/stylex";
-import { m, useTransform, type MotionValue } from "motion/react";
+import { m, useTransform, type MotionValue } from "@/compat/motion";
 
 import { span } from "./iso-values";
 import { ui } from "./shared";
@@ -76,33 +76,33 @@ const styles = stylex.create({
   },
 });
 
-function Step({ progress, index }: { progress: MotionValue<number>; index: number }) {
-  const step = STEPS[index];
-  const opacity = useTransform(progress, (value) => {
+function Step(props: { progress: MotionValue<number>; index: number }) {
+  const step = STEPS[props.index];
+  const opacity = useTransform(props.progress, (value) => {
     const [start, end] = step.window;
     const inside = span(value, start - 0.04, start) * (1 - span(value, end, end + 0.04));
     return 0.32 + inside * 0.68;
   });
   return (
-    <m.li style={{ opacity }} {...stylex.props(styles.step)}>
-      <span {...stylex.props(styles.number)}>{index + 1}</span>
-      <span {...stylex.props(styles.mark, step.mark === "δ" && styles.delta)}>{step.mark}</span>
-      <span lang="en" {...stylex.props(styles.text)}>
+    <m.li style={{ opacity }} {...stylex.attrs(styles.step)}>
+      <span {...stylex.attrs(styles.number)}>{props.index + 1}</span>
+      <span {...stylex.attrs(styles.mark, step.mark === "δ" && styles.delta)}>{step.mark}</span>
+      <span lang="en" {...stylex.attrs(styles.text)}>
         {step.text}
       </span>
     </m.li>
   );
 }
 
-export function AssemblySteps({ progress }: { progress: MotionValue<number> }) {
+export function AssemblySteps(props: { progress: MotionValue<number> }) {
   return (
-    <div aria-hidden="true" {...stylex.props(styles.root)}>
-      <p lang="en" {...stylex.props(ui.caps, styles.caption)}>
+    <div aria-hidden="true" {...stylex.attrs(styles.root)}>
+      <p lang="en" {...stylex.attrs(ui.caps, styles.caption)}>
         Assembly sequence
       </p>
-      <ol {...stylex.props(styles.list)}>
-        {STEPS.map((step, index) => (
-          <Step key={step.mark} progress={progress} index={index} />
+      <ol {...stylex.attrs(styles.list)}>
+        {STEPS.map((_, index) => (
+          <Step progress={props.progress} index={index} />
         ))}
       </ol>
     </div>

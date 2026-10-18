@@ -7,6 +7,10 @@ const WIDTH = 60;
 const HEIGHT = 36;
 const STEP = 3.5;
 
+// stylex.attrs with reactive (accessor) arguments resolves at runtime here, because
+// the StyleX compiler tries to evaluate them at build time and throws.
+const sxProps: typeof stylex.attrs = (...args) => stylex.attrs(...args);
+
 const styles = stylex.create({
   gauge: {
     display: "flex",
@@ -37,27 +41,26 @@ const styles = stylex.create({
   },
 });
 
-export function DepthGauge({ depth }: { depth: number }) {
-  const outside = depth >= ROOM_COUNT;
+export function DepthGauge(props: { depth: number }) {
+  const outside = () => props.depth >= ROOM_COUNT;
   return (
-    <div {...stylex.props(styles.gauge)}>
-      <span lang="en" {...stylex.props(styles.label)}>
-        {outside ? "From above" : `Room ${depth + 1} of ${ROOM_COUNT}`}
+    <div {...stylex.attrs(styles.gauge)}>
+      <span lang="en" {...stylex.attrs(styles.label)}>
+        {outside() ? "From above" : `Room ${props.depth + 1} of ${ROOM_COUNT}`}
       </span>
       <svg width={WIDTH} height={HEIGHT} viewBox={`0 0 ${WIDTH} ${HEIGHT}`}>
         {Array.from({ length: ROOM_COUNT }, (_, level) => {
           const inset = 0.5 + level * STEP;
           return (
             <rect
-              key={level}
               x={inset}
               y={inset}
               width={WIDTH - inset * 2}
               height={HEIGHT - inset * 2}
-              {...stylex.props(
+              {...sxProps(
                 styles.rect,
-                (outside || level < depth) && styles.passed,
-                (outside || level === depth) && styles.current,
+                (outside() || level < props.depth) && styles.passed,
+                (outside() || level === props.depth) && styles.current,
               )}
             />
           );

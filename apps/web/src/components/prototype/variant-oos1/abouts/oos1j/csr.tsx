@@ -88,37 +88,37 @@ export function Csr() {
     <section
       id="about-csr"
       aria-labelledby="about-csr-title"
-      {...stylex.props(base.section, base.anchor, styles.csr)}
+      {...stylex.attrs(base.section, base.anchor, styles.csr)}
     >
       <SectionName id="about-csr-title">Responsibility</SectionName>
-      <div {...stylex.props(base.shell, styles.grid)}>
-        <div ref={textRef} {...stylex.props(styles.text)}>
-          <p {...stylex.props(styles.statement)}>
-            <RiseLines lines={ABOUT_CSR.statement} play={textShown} />
+      <div {...stylex.attrs(base.shell, styles.grid)}>
+        <div ref={textRef} {...stylex.attrs(styles.text)}>
+          <p {...stylex.attrs(styles.statement)}>
+            <RiseLines lines={ABOUT_CSR.statement} play={textShown()} />
           </p>
           <Reveal step={2}>
-            <p {...stylex.props(ty.body)}>{ABOUT_CSR.desc}</p>
+            <p {...stylex.attrs(ty.body)}>{ABOUT_CSR.desc}</p>
           </Reveal>
-          <ul {...stylex.props(styles.outcomes)}>
+          <ul {...stylex.attrs(styles.outcomes)}>
             {ABOUT_CSR.outcomes.map((outcome, index) => (
-              <li key={outcome.title} {...stylex.props(styles.outcome)}>
+              <li {...stylex.attrs(styles.outcome)}>
                 <span
                   aria-hidden="true"
-                  {...stylex.props(
+                  {...stylex.attrs(
                     styles.outcomeRule,
-                    textShown && styles.outcomeRuleShown,
+                    textShown() && styles.outcomeRuleShown,
                     styles.outcomeDelay(index),
                   )}
                 />
                 <span>{outcome.title}</span>
-                <span aria-hidden="true" lang="en" {...stylex.props(styles.numeral)}>
+                <span aria-hidden="true" lang="en" {...stylex.attrs(styles.numeral)}>
                   {String(index + 1).padStart(2, "0")}
                 </span>
               </li>
             ))}
           </ul>
         </div>
-        <div {...stylex.props(styles.photoWrap)}>
+        <div {...stylex.attrs(styles.photoWrap)}>
           <DriftImage
             src={ABOUT_CSR.image}
             alt={ABOUT_CSR.imageAlt}

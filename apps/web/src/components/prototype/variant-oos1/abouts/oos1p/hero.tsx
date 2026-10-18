@@ -1,6 +1,6 @@
 import * as stylex from "@stylexjs/stylex";
-import { useMotionValueEvent, useScroll } from "motion/react";
-import { useEffect, useRef, type CSSProperties, type RefObject } from "react";
+import { useMotionValueEvent, useScroll } from "@/compat/motion";
+import type { JSX } from "@solidjs/web";
 
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
@@ -9,6 +9,7 @@ import { ui } from "./layout";
 import { TICK, echoIndexes, trailOpacity } from "./strobe-values";
 import { frameLabel } from "./time-grid-values";
 import { bp, face, tone } from "./tokens.stylex";
+import { createEffect, createSignal, type Accessor } from "solid-js";
 
 const EXPOSURES = 7;
 const ECHOES = EXPOSURES - 1;
@@ -218,31 +219,31 @@ const styles = stylex.create({
 });
 
 type ScrubRefs = {
-  title: RefObject<HTMLHeadingElement | null>;
-  count: RefObject<HTMLSpanElement | null>;
-  travel: RefObject<number>;
-  echoes: RefObject<number>;
+  title: Accessor<HTMLHeadingElement | undefined>;
+  count: Accessor<HTMLSpanElement | undefined>;
+  travel: { current: number };
+  echoes: { current: number };
 };
 
 function mergeExposures(scrollTop: number, refs: ScrubRefs) {
-  const title = refs.title.current;
+  const title = refs.title();
   if (!title) return;
   const echoes = refs.echoes.current;
   const merged = Math.min(1, Math.max(0, scrollTop / refs.travel.current)) * echoes;
   title.style.setProperty("--m", merged.toFixed(3));
   const visible = 1 + echoIndexes(echoes).filter((k) => k - merged > 0.5).length;
   const label = frameLabel(visible);
-  const count = refs.count.current;
+  const count = refs.count();
   if (count && count.textContent !== label) count.textContent = label;
 }
 
-function useHeroScrub(reduce: boolean) {
-  const sectionRef = useRef<HTMLElement>(null);
-  const frameRef = useRef<HTMLDivElement>(null);
-  const titleRef = useRef<HTMLHeadingElement>(null);
-  const countRef = useRef<HTMLSpanElement>(null);
-  const travelRef = useRef(1);
-  const echoesRef = useRef(ECHOES);
+function useHeroScrub(reduce: Accessor<boolean>) {
+  const [sectionRef, setSectionRef] = createSignal<HTMLElement>();
+  const [frameRef, setFrameRef] = createSignal<HTMLDivElement>();
+  const [titleRef, setTitleRef] = createSignal<HTMLHeadingElement>();
+  const [countRef, setCountRef] = createSignal<HTMLSpanElement>();
+  const travelRef = { current: 1 };
+  const echoesRef = { current: ECHOES };
   const refs: ScrubRefs = {
     title: titleRef,
     count: countRef,
@@ -252,105 +253,101 @@ function useHeroScrub(reduce: boolean) {
   const { scrollY } = useScroll();
 
   useMotionValueEvent(scrollY, "change", (scrollTop) => {
-    if (!reduce) mergeExposures(scrollTop, refs);
+    if (!reduce()) mergeExposures(scrollTop, refs);
   });
 
-  useEffect(() => {
-    const section = sectionRef.current;
-    const frame = frameRef.current;
-    const title = titleRef.current;
-    if (!section || !frame || !title) return;
-    const scrubRefs: ScrubRefs = {
-      title: titleRef,
-      count: countRef,
-      travel: travelRef,
-      echoes: echoesRef,
-    };
-    if (reduce) {
-      title.style.setProperty("--m", "0");
-      if (countRef.current) countRef.current.textContent = frameLabel(2);
-      return;
-    }
-    const measure = () => {
-      const pinned = window.matchMedia(DESKTOP_QUERY).matches;
-      echoesRef.current = window.matchMedia(PHONE_QUERY).matches ? PHONE_ECHOES : ECHOES;
-      travelRef.current = Math.max(
-        1,
-        pinned ? (section.offsetHeight - frame.offsetHeight) * 0.9 : frame.offsetHeight * 0.5,
-      );
-      mergeExposures(window.scrollY, scrubRefs);
-    };
-    measure();
-    const observer = new ResizeObserver(measure);
-    observer.observe(section);
-    return () => observer.disconnect();
-  }, [reduce]);
+  createEffect(
+    () => ({ section: sectionRef(), frame: frameRef(), title: titleRef(), reduce: reduce() }),
+    ({ section, frame, title, reduce }) => {
+      if (!section || !frame || !title) return;
+      const scrubRefs: ScrubRefs = {
+        title: titleRef,
+        count: countRef,
+        travel: travelRef,
+        echoes: echoesRef,
+      };
+      if (reduce) {
+        title.style.setProperty("--m", "0");
+        const count = countRef();
+        if (count) count.textContent = frameLabel(2);
+        return;
+      }
+      const measure = () => {
+        const pinned = window.matchMedia(DESKTOP_QUERY).matches;
+        echoesRef.current = window.matchMedia(PHONE_QUERY).matches ? PHONE_ECHOES : ECHOES;
+        travelRef.current = Math.max(
+          1,
+          pinned ? (section.offsetHeight - frame.offsetHeight) * 0.9 : frame.offsetHeight * 0.5,
+        );
+        mergeExposures(window.scrollY, scrubRefs);
+      };
+      measure();
+      const observer = new ResizeObserver(measure);
+      observer.observe(section);
+      return () => observer.disconnect();
+    },
+  );
 
-  return { sectionRef, frameRef, titleRef, countRef };
+  return { setSectionRef, setFrameRef, setTitleRef, setCountRef };
 }
 
 function NameLines() {
-  return NAME_LINES.map((line) => (
-    <span key={line} {...stylex.props(styles.nameLine)}>
-      {line}
-    </span>
-  ));
+  return NAME_LINES.map((line) => <span {...stylex.attrs(styles.nameLine)}>{line}</span>);
 }
 
 export function Hero() {
   const reduce = useReducedMotion();
-  const { sectionRef, frameRef, titleRef, countRef } = useHeroScrub(reduce);
-  const echoes = reduce ? [1] : echoIndexes(ECHOES);
+  const { setSectionRef, setFrameRef, setTitleRef, setCountRef } = useHeroScrub(reduce);
+  const echoes = () => (reduce() ? [1] : echoIndexes(ECHOES));
 
   return (
-    <section ref={sectionRef} aria-labelledby="oos1p-title" {...stylex.props(styles.section)}>
-      <div ref={frameRef} {...stylex.props(styles.frame)}>
-        <div {...stylex.props(ui.shell)}>
-          <div {...stylex.props(ui.grid, styles.topRow)}>
-            <p {...stylex.props(ui.q1to2, styles.kicker)}>
-              <span {...stylex.props(styles.kickerTitle)}>{ABOUT_BANNER.title}</span>
-              <span lang="en" {...stylex.props(ui.eyebrow, styles.kickerEnglish)}>
+    <section ref={setSectionRef} aria-labelledby="oos1p-title" {...stylex.attrs(styles.section)}>
+      <div ref={setFrameRef} {...stylex.attrs(styles.frame)}>
+        <div {...stylex.attrs(ui.shell)}>
+          <div {...stylex.attrs(ui.grid, styles.topRow)}>
+            <p {...stylex.attrs(ui.q1to2, styles.kicker)}>
+              <span {...stylex.attrs(styles.kickerTitle)}>{ABOUT_BANNER.title}</span>
+              <span lang="en" {...stylex.attrs(ui.eyebrow, styles.kickerEnglish)}>
                 About Fenchem
               </span>
             </p>
-            <p lang="en" {...stylex.props(ui.q3to4, styles.place)}>
+            <p lang="en" {...stylex.attrs(ui.q3to4, styles.place)}>
               {ABOUT_BANNER.place}
             </p>
           </div>
         </div>
 
-        <div {...stylex.props(ui.shell, styles.middle)}>
-          <div {...stylex.props(ui.grid, styles.plate)}>
+        <div {...stylex.attrs(ui.shell, styles.middle)}>
+          <div {...stylex.attrs(ui.grid, styles.plate)}>
             <h1
-              ref={titleRef}
+              ref={setTitleRef}
               id="oos1p-title"
-              {...stylex.props(ui.q2to4, styles.title, reduce && styles.titleReduced)}
-              style={{ "--m": 0 } as CSSProperties}
+              {...stylex.attrs(ui.q2to4, styles.title, reduce() && styles.titleReduced)}
+              style={{ "--m": 0 } as JSX.CSSProperties}
             >
-              <span {...stylex.props(styles.stack)}>
+              <span {...stylex.attrs(styles.stack)}>
                 <span
-                  {...stylex.props(styles.finalName)}
-                  style={{ "--pop-at": `${LOAD_DELAY_MS + ECHOES * TICK}ms` } as CSSProperties}
+                  {...stylex.attrs(styles.finalName)}
+                  style={{ "--pop-at": `${LOAD_DELAY_MS + ECHOES * TICK}ms` } as JSX.CSSProperties}
                 >
                   <NameLines />
                 </span>
-                {echoes.map((k) => (
+                {echoes().map((k) => (
                   <span
-                    key={k}
                     aria-hidden="true"
-                    {...stylex.props(styles.echo)}
+                    {...stylex.attrs(styles.echo)}
                     style={
                       {
                         "--k": k,
-                        "--o": reduce
+                        "--o": reduce()
                           ? REDUCED_ECHO_OPACITY
                           : trailOpacity(k, ECHOES, BRIGHTEST_ECHO).toFixed(3),
                         "--pop-at": `${LOAD_DELAY_MS + (ECHOES - k) * TICK}ms`,
-                      } as CSSProperties
+                      } as JSX.CSSProperties
                     }
                   >
                     <span
-                      {...stylex.props(
+                      {...stylex.attrs(
                         styles.echoInner,
                         k > PHONE_ECHOES && styles.echoBeyondPhone,
                       )}
@@ -360,34 +357,34 @@ export function Hero() {
                   </span>
                 ))}
               </span>
-              <span lang="en" {...stylex.props(styles.english)}>
+              <span lang="en" {...stylex.attrs(styles.english)}>
                 {ABOUT_HERO.englishTitle}
               </span>
             </h1>
           </div>
         </div>
 
-        <div {...stylex.props(ui.shell)}>
-          <div {...stylex.props(ui.grid, styles.bottomRow)}>
-            <p {...stylex.props(ui.q1, styles.year)}>
-              <span lang="en" {...stylex.props(styles.yearLabel)}>
+        <div {...stylex.attrs(ui.shell)}>
+          <div {...stylex.attrs(ui.grid, styles.bottomRow)}>
+            <p {...stylex.attrs(ui.q1, styles.year)}>
+              <span lang="en" {...stylex.attrs(styles.yearLabel)}>
                 Est.
               </span>
-              <span {...stylex.props(styles.yearDigits)}>
-                1<span {...stylex.props(styles.yearEcho)}>9</span>95
+              <span {...stylex.attrs(styles.yearDigits)}>
+                1<span {...stylex.attrs(styles.yearEcho)}>9</span>95
               </span>
             </p>
-            <p {...stylex.props(ui.q2to3, styles.lead)}>{ABOUT_BANNER.lead}</p>
-            <p aria-hidden="true" {...stylex.props(ui.q4, styles.readout)}>
-              <span {...stylex.props(ui.frameNumber, styles.readoutLine)}>
+            <p {...stylex.attrs(ui.q2to3, styles.lead)}>{ABOUT_BANNER.lead}</p>
+            <p aria-hidden="true" {...stylex.attrs(ui.q4, styles.readout)}>
+              <span {...stylex.attrs(ui.frameNumber, styles.readoutLine)}>
                 <span>Exposures</span>
-                <span ref={countRef} {...stylex.props(styles.readoutValue)}>
+                <span ref={setCountRef} {...stylex.attrs(styles.readoutValue)}>
                   {frameLabel(EXPOSURES)}
                 </span>
               </span>
-              <span {...stylex.props(ui.frameNumber, styles.readoutLine)}>
+              <span {...stylex.attrs(ui.frameNumber, styles.readoutLine)}>
                 <span>Interval</span>
-                <span {...stylex.props(styles.readoutValue)}>1/12 s</span>
+                <span {...stylex.attrs(styles.readoutValue)}>1/12 s</span>
               </span>
             </p>
           </div>

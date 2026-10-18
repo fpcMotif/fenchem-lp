@@ -1,9 +1,13 @@
 import * as stylex from "@stylexjs/stylex";
 import type { StyleXStyles } from "@stylexjs/stylex";
-import { Fragment, type ReactNode } from "react";
+import { dynamic, type JSX } from "@solidjs/web";
 
 import type { Phrase, Segment, Unit } from "./sentence";
 import { bp, chrome, face, size, tone } from "./tokens.stylex";
+import { children, merge } from "solid-js";
+
+const sxAttrs = (...args: ReadonlyArray<StyleXStyles | false | null | undefined>) =>
+  stylex.attrs(...args);
 
 const styles = stylex.create({
   line: {
@@ -68,75 +72,65 @@ const styles = stylex.create({
   },
 });
 
-export function Hinge({ mark, sx }: { mark: string; sx?: StyleXStyles }) {
-  return <span {...stylex.props(styles.hinge, sx)}>{mark}</span>;
+export function Hinge(props: { mark: string; sx?: StyleXStyles }) {
+  return <span {...stylex.attrs(styles.hinge, props.sx)}>{props.mark}</span>;
 }
 
-export function Words({
-  segments,
-  heavy = styles.heavy,
-  light = styles.light,
-  tail,
-}: {
+export function Words(props: {
   segments: readonly Segment[];
   heavy?: StyleXStyles;
   light?: StyleXStyles;
-  tail?: ReactNode;
+  tail?: JSX.Element;
 }) {
+  const p = merge({ heavy: styles.heavy, light: styles.light }, props);
+  const tail = children(() => props.tail);
   return (
     <>
-      {segments.map((segment, index) => {
+      {p.segments.map((segment, index) => {
         const pieces = segment.text.split(/(?<=、)/u);
-        const carriesTail = tail != null && index === segments.length - 1;
+        const carriesTail = tail() != null && index === p.segments.length - 1;
         return (
-          <Fragment key={segment.text}>
+          <>
             {index > 0 ? <wbr /> : null}
-            <span {...stylex.props(segment.heavy ? heavy : light)}>
+            <span {...stylex.attrs(segment.heavy ? p.heavy : p.light)}>
               {pieces.map((piece, at) => (
-                <Fragment key={`${at}-${piece}`}>
+                <>
                   {at > 0 ? <wbr /> : null}
                   {carriesTail && at === pieces.length - 1 ? (
                     <>
                       {piece.slice(0, -1)}
-                      <span {...stylex.props(styles.tail)}>
+                      <span {...stylex.attrs(styles.tail)}>
                         {piece.slice(-1)}
-                        {tail}
+                        {tail()}
                       </span>
                     </>
                   ) : (
                     piece
                   )}
-                </Fragment>
+                </>
               ))}
             </span>
-          </Fragment>
+          </>
         );
       })}
     </>
   );
 }
 
-export function Clause({
-  line,
-  as: Tag = "p",
-  sx,
-}: {
-  line: Phrase | Unit;
-  as?: "p" | "span";
-  sx?: StyleXStyles;
-}) {
-  const unit = "id" in line ? line : null;
+export function Clause(props: { line: Phrase | Unit; as?: "p" | "span"; sx?: StyleXStyles }) {
+  const Tag = dynamic(() => props.as ?? "p");
+  const unit = () => ("id" in props.line ? props.line : null);
   return (
     <Tag
-      id={unit?.id}
-      data-unit={unit?.index}
-      data-hinge={line.hinge ? "true" : undefined}
-      {...stylex.props(styles.line, styles[line.size], unit && styles.anchor, sx)}
+      id={unit()?.id}
+      data-unit={unit()?.index}
+      data-hinge={props.line.hinge ? "true" : undefined}
+      {...sxAttrs(styles.line, styles[props.line.size], unit() && styles.anchor, props.sx)}
     >
-      <span {...stylex.props(styles.ink, unit && styles.condense)}>
+      <span {...sxAttrs(styles.ink, unit() && styles.condense)}>
         <Words
-          segments={line.segments}
-          tail={line.hinge ? <Hinge mark={line.hinge} /> : undefined}
+          segments={props.line.segments}
+          tail={props.line.hinge ? <Hinge mark={props.line.hinge} /> : undefined}
         />
       </span>
     </Tag>

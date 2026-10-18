@@ -31,10 +31,6 @@ function splitName(name: string) {
   return parts;
 }
 
-export function Phrase({ text }: { text: string }) {
-  return splitName(text).map((part, index) => (
-    <span key={`${index}-${part}`} {...stylex.props(styles.segment)}>
-      {part}
-    </span>
-  ));
+export function Phrase(props: { text: string }) {
+  return splitName(props.text).map((part) => <span {...stylex.attrs(styles.segment)}>{part}</span>);
 }

@@ -60,27 +60,27 @@ export function Honors() {
     <section
       id="about-honor"
       aria-labelledby={headingId("about-honor")}
-      {...stylex.props(ui.section, styles.section)}
+      {...stylex.attrs(ui.section, styles.section)}
     >
-      <div {...stylex.props(ui.shell)}>
+      <div {...stylex.attrs(ui.shell)}>
         <SectionLabel section="about-honor" />
-        <ul {...stylex.props(styles.groups)}>
+        <ul {...stylex.attrs(styles.groups)}>
           {LEVELS.map(({ level, english }) => (
-            <li key={level} {...stylex.props(styles.group)}>
+            <li {...stylex.attrs(styles.group)}>
               <p
                 lang="en"
                 data-follows={
                   SENTENCE.honors[ABOUT_HONORS.items.findIndex((item) => item.level === level)]
                     .index
                 }
-                {...stylex.props(styles.level)}
+                {...stylex.attrs(styles.level)}
               >
                 {english}
               </p>
-              <ul {...stylex.props(styles.list)}>
+              <ul {...stylex.attrs(styles.list)}>
                 {ABOUT_HONORS.items.map((item, index) =>
                   item.level === level ? (
-                    <li key={item.id}>
+                    <li>
                       <Clause line={SENTENCE.honors[index]} />
                     </li>
                   ) : null,

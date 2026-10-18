@@ -1,6 +1,6 @@
 import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { Loader2 } from "lucide-react";
+import { Loader2 } from "@fenchem-lp/ui/components/lucide";
 
 const spin = stylex.keyframes({
   from: {
@@ -30,8 +30,8 @@ const styles = stylex.create({
 
 export default function Loader() {
   return (
-    <div {...stylex.props(styles.container)}>
-      <Loader2 {...stylex.props(styles.spinner)} />
+    <div {...stylex.attrs(styles.container)}>
+      <Loader2 {...stylex.attrs(styles.spinner)} />
     </div>
   );
 }

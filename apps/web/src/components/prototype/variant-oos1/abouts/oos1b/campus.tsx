@@ -23,9 +23,9 @@ export function Campus() {
     <section
       id="about-campus"
       aria-labelledby="oos1b-campus"
-      {...stylex.props(ui.anchor, ui.section)}
+      {...stylex.attrs(ui.anchor, ui.section)}
     >
-      <div {...stylex.props(ui.shell)}>
+      <div {...stylex.attrs(ui.shell)}>
         <SectionHead
           id="oos1b-campus"
           index={2}
@@ -38,15 +38,15 @@ export function Campus() {
         </p>
       </div>
 
-      {portal ? (
+      {portal() ? (
         <PortalStage />
       ) : (
-        <div {...stylex.props(ui.shell)}>
+        <div {...stylex.attrs(ui.shell)}>
           <NestedSequence />
         </div>
       )}
 
-      <div {...stylex.props(ui.shell)}>
+      <div {...stylex.attrs(ui.shell)}>
         <PlateIndex plates={plates} onOpen={lightbox.open} />
       </div>
 

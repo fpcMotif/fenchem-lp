@@ -1,6 +1,6 @@
-import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
+import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight } from "@fenchem-lp/ui/components/lucide";
 
 import { ABOUT_BANNER } from "../../about-data";
 import { HairlineScale } from "./hairline-scale";
@@ -15,14 +15,14 @@ const INTRO_HOLD_SECONDS = 1.25;
 const styles = stylex.create({
   hero: {
     paddingTop: 24,
-    paddingBottom: { default: 80, [breakpoints.xl]: 144 },
+    paddingBottom: { default: 80, ["@media (min-width: 1280px)"]: 144 },
     backgroundColor: ui.page,
   },
   breadcrumb: {
     display: "flex",
     alignItems: "center",
     gap: 8,
-    marginBottom: { default: 32, [breakpoints.xl]: 56 },
+    marginBottom: { default: 32, ["@media (min-width: 1280px)"]: 56 },
     fontSize: 13,
     letterSpacing: "0.04em",
     color: ui.body,
@@ -44,21 +44,25 @@ const styles = stylex.create({
     display: "grid",
     gridTemplateColumns: {
       default: "minmax(0, 1fr)",
-      [breakpoints.xl]: "minmax(0, 1fr) auto",
+      ["@media (min-width: 1280px)"]: "minmax(0, 1fr) auto",
     },
     columnGap: 56,
     rowGap: 40,
     alignItems: "end",
-    marginBottom: { default: 56, [breakpoints.xl]: 96 },
+    marginBottom: { default: 56, ["@media (min-width: 1280px)"]: 96 },
   },
   text: {
     display: "flex",
     flexDirection: "column",
-    gap: { default: 16, [breakpoints.xl]: 24 },
+    gap: { default: 16, ["@media (min-width: 1280px)"]: 24 },
   },
   title: {
     margin: 0,
-    fontSize: { default: 64, [mq.tablet]: 96, [breakpoints.xl]: "clamp(88px, 8vw, 116px)" },
+    fontSize: {
+      default: 64,
+      [mq.tablet]: 96,
+      ["@media (min-width: 1280px)"]: "clamp(88px, 8vw, 116px)",
+    },
     fontWeight: 700,
     lineHeight: 1,
     letterSpacing: "0.03em",
@@ -67,7 +71,7 @@ const styles = stylex.create({
   tagline: {
     margin: 0,
     fontFamily: font.serif,
-    fontSize: { default: 24, [mq.tablet]: 30, [breakpoints.xl]: 32 },
+    fontSize: { default: 24, [mq.tablet]: 30, ["@media (min-width: 1280px)"]: 32 },
     fontStyle: "italic",
     fontWeight: 400,
     lineHeight: 1.2,
@@ -76,7 +80,7 @@ const styles = stylex.create({
   lead: {
     margin: 0,
     maxWidth: "36em",
-    fontSize: { default: 16, [breakpoints.xl]: 17 },
+    fontSize: { default: 16, ["@media (min-width: 1280px)"]: 17 },
     lineHeight: 1.9,
     letterSpacing: "0.05em",
     color: ui.body,
@@ -96,7 +100,7 @@ const styles = stylex.create({
     fontSize: {
       default: "27vw",
       [mq.tablet]: 188,
-      [breakpoints.xl]: "clamp(150px, 13.6vw, 200px)",
+      ["@media (min-width: 1280px)"]: "clamp(150px, 13.6vw, 200px)",
     },
     lineHeight: 1,
   },
@@ -119,66 +123,66 @@ const styles = stylex.create({
     display: "block",
     width: "100%",
     height: "auto",
-    aspectRatio: { default: "4 / 3", [breakpoints.md]: "2400 / 1150" },
+    aspectRatio: { default: "4 / 3", ["@media (min-width: 768px)"]: "2400 / 1150" },
     objectFit: "cover",
     objectPosition: "center 58%",
   },
 });
 
-export function Hero({ onNavigateHome }: { onNavigateHome: (hash?: string) => void }) {
+export function Hero(props: { onNavigateHome: (hash?: string) => void }) {
   return (
-    <section aria-labelledby="about-banner-title" {...stylex.props(styles.hero)}>
-      <div {...stylex.props(shared.shell, shared.inset)}>
-        <nav aria-label="Breadcrumb" {...stylex.props(styles.breadcrumb)}>
+    <section aria-labelledby="about-banner-title" {...stylex.attrs(styles.hero)}>
+      <div {...stylex.attrs(shared.shell, shared.inset)}>
+        <nav aria-label="Breadcrumb" {...stylex.attrs(styles.breadcrumb)}>
           <button
             type="button"
-            onClick={() => onNavigateHome("top")}
-            {...stylex.props(styles.breadcrumbLink, shared.focusRing)}
+            onClick={() => props.onNavigateHome("top")}
+            {...stylex.attrs(styles.breadcrumbLink, shared.focusRing)}
           >
             首页
           </button>
           <ChevronRight size={13} aria-hidden="true" />
-          <span aria-current="page" {...stylex.props(styles.breadcrumbCurrent)}>
+          <span aria-current="page" {...stylex.attrs(styles.breadcrumbCurrent)}>
             关于我们
           </span>
         </nav>
 
-        <div {...stylex.props(styles.grid)}>
-          <div {...stylex.props(styles.text)}>
+        <div {...stylex.attrs(styles.grid)}>
+          <div {...stylex.attrs(styles.text)}>
             <Reveal>
-              <h1 id="about-banner-title" {...stylex.props(styles.title)}>
+              <h1 id="about-banner-title" {...stylex.attrs(styles.title)}>
                 {ABOUT_BANNER.title}
               </h1>
             </Reveal>
             <Reveal step={1}>
-              <p lang="en" {...stylex.props(styles.tagline)}>
+              <p lang="en" {...stylex.attrs(styles.tagline)}>
                 {ABOUT_BANNER.tagline}
               </p>
             </Reveal>
             <Reveal step={2}>
-              <p {...stylex.props(styles.lead)}>{ABOUT_BANNER.lead}</p>
+              <p {...stylex.attrs(styles.lead)}>{ABOUT_BANNER.lead}</p>
             </Reveal>
           </div>
 
-          <div {...stylex.props(styles.year)}>
-            <div {...stylex.props(styles.yearFigure)}>
+          <div {...stylex.attrs(styles.year)}>
+            <div {...stylex.attrs(styles.yearFigure)}>
               <Odometer value={FOUNDING_YEAR} delay={INTRO_HOLD_SECONDS} />
-              <span {...stylex.props(styles.yearUnit)}>年</span>
+              <span {...stylex.attrs(styles.yearUnit)}>年</span>
             </div>
             <HairlineScale />
-            <span lang="en" {...stylex.props(styles.place)}>
+            <span lang="en" {...stylex.attrs(styles.place)}>
               {ABOUT_BANNER.place}
             </span>
           </div>
         </div>
 
-        <figure {...stylex.props(styles.figure)}>
+        <figure {...stylex.attrs(styles.figure)}>
           <img
             src={ABOUT_BANNER.image}
             alt={ABOUT_BANNER.alt}
-            fetchPriority="high"
+            fetchpriority="high"
             decoding="async"
-            {...stylex.props(styles.image)}
+            {...stylex.attrs(styles.image)}
           />
         </figure>
       </div>

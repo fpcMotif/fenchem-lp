@@ -56,20 +56,15 @@ export function Culture() {
   return (
     <Section id="about-culture" labelledBy="about-culture-title" surface="paper">
       <SectionName id="about-culture-title">{ABOUT_CULTURE.eyebrow}</SectionName>
-      <div {...stylex.props(base.shell, base.inset)}>
-        <ul {...stylex.props(S.grid)}>
+      <div {...stylex.attrs(base.shell, base.inset)}>
+        <ul {...stylex.attrs(S.grid)}>
           {ABOUT_CULTURE.values.map((value, index) => (
-            <Reveal
-              key={value.title}
-              as="li"
-              delay={index * 100}
-              sx={[S.value, index > 0 && S.divided]}
-            >
-              <span aria-hidden="true" {...stylex.props(S.glyph, GLYPH_TONES[value.tone])}>
+            <Reveal as="li" delay={index * 100} sx={[S.value, index > 0 && S.divided]}>
+              <span aria-hidden="true" {...stylex.attrs(S.glyph, GLYPH_TONES[value.tone])}>
                 {value.glyph}
               </span>
-              <h3 {...stylex.props(base.headline)}>{value.title}</h3>
-              <p {...stylex.props(base.prose)}>{value.desc}</p>
+              <h3 {...stylex.attrs(base.headline)}>{value.title}</h3>
+              <p {...stylex.attrs(base.prose)}>{value.desc}</p>
             </Reveal>
           ))}
         </ul>

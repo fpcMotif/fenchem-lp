@@ -212,14 +212,14 @@ const styles = stylex.create({
   },
 });
 
-function ViewMarker({ letter }: { letter: string }) {
+function ViewMarker(props: { letter: string }) {
   return (
-    <span aria-hidden="true" {...stylex.props(styles.marker)}>
-      <span {...stylex.props(styles.stem)} />
-      <svg viewBox="0 0 12 8" {...stylex.props(styles.pointer)}>
+    <span aria-hidden="true" {...stylex.attrs(styles.marker)}>
+      <span {...stylex.attrs(styles.stem)} />
+      <svg viewBox="0 0 12 8" {...stylex.attrs(styles.pointer)}>
         <path d="M6 0L12 8H0Z" fill="#0b2a5c" />
       </svg>
-      <span {...stylex.props(styles.ring)}>{letter}</span>
+      <span {...stylex.attrs(styles.ring)}>{props.letter}</span>
     </span>
   );
 }
@@ -231,7 +231,7 @@ export function Campus() {
     <section
       id="about-campus"
       aria-labelledby="oos1m-campus"
-      {...stylex.props(ui.shell, ui.section, ui.anchor)}
+      {...stylex.attrs(ui.shell, ui.section, ui.anchor)}
     >
       <SheetHeader
         sheet={2}
@@ -239,46 +239,46 @@ export function Campus() {
         english="Site views A–G"
         titleId="oos1m-campus"
       />
-      <ul {...stylex.props(styles.grid)}>
+      <ul {...stylex.attrs(styles.grid)}>
         {VIEWS.map((view, index) => (
-          <li key={view.id} {...stylex.props(styles.view, stylex.defaultMarker())}>
+          <li {...stylex.attrs(styles.view, stylex.defaultMarker())}>
             <button
               type="button"
               onClick={() => lightbox.open(index)}
-              {...stylex.props(styles.photo, ui.focusRing)}
+              {...stylex.attrs(styles.photo, ui.focusRing)}
             >
               <img
                 src={view.src}
                 alt={view.alt}
                 loading="lazy"
                 decoding="async"
-                {...stylex.props(styles.image, styles[view.id])}
+                {...stylex.attrs(styles.image, styles[view.id])}
               />
-              <span aria-hidden="true" {...stylex.props(styles.frame)} />
+              <span aria-hidden="true" {...stylex.attrs(styles.frame)} />
               <span {...srOnly}>
                 View larger: view {view.letter}, {view.english}
               </span>
             </button>
-            <div aria-hidden="true" {...stylex.props(styles.caption)}>
+            <div aria-hidden="true" {...stylex.attrs(styles.caption)}>
               <ViewMarker letter={view.letter} />
-              <span {...stylex.props(styles.text)}>
-                <span {...stylex.props(styles.name)}>{view.caption}</span>
-                <span lang="en" {...stylex.props(ui.label)}>
+              <span {...stylex.attrs(styles.text)}>
+                <span {...stylex.attrs(styles.name)}>{view.caption}</span>
+                <span lang="en" {...stylex.attrs(ui.label)}>
                   View {view.letter} · {view.english}
                 </span>
               </span>
             </div>
           </li>
         ))}
-        <li {...stylex.props(styles.notes)}>
-          <p lang="en" {...stylex.props(ui.caps, styles.notesHead)}>
+        <li {...stylex.attrs(styles.notes)}>
+          <p lang="en" {...stylex.attrs(ui.caps, styles.notesHead)}>
             Notes
           </p>
-          <ol lang="en" {...stylex.props(styles.notesList)}>
+          <ol lang="en" {...stylex.attrs(styles.notesList)}>
             {NOTES.map((note, index) => (
-              <li key={note} {...stylex.props(styles.note)}>
-                <span {...stylex.props(styles.noteNumber)}>{index + 1}</span>
-                <span {...stylex.props(ui.serif, styles.noteText)}>{note}</span>
+              <li {...stylex.attrs(styles.note)}>
+                <span {...stylex.attrs(styles.noteNumber)}>{index + 1}</span>
+                <span {...stylex.attrs(ui.serif, styles.noteText)}>{note}</span>
               </li>
             ))}
           </ol>

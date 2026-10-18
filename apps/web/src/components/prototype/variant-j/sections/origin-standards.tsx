@@ -1,7 +1,7 @@
 import { breakpoints, colors, radii, typography } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 import gsap from "gsap";
-import { FlaskConical, Globe, Sprout } from "lucide-react";
+import { FlaskConical, Globe, Sprout } from "@fenchem-lp/ui/components/lucide";
 import { certifications, pillars } from "@/components/landing/landing-content";
 import { IMAGES, ORIGIN_QUOTE } from "../content";
 import { useSectionAnimation } from "../motion";
@@ -215,21 +215,20 @@ export function OriginStandardsSection() {
       ref={ref}
       id="quality"
       aria-labelledby="quality-heading"
-      {...stylex.props(styles.section)}
+      {...stylex.attrs(styles.section)}
     >
-      <div {...stylex.props(styles.container)}>
+      <div {...stylex.attrs(styles.container)}>
         {/* Origin — the pull-quote, inked in line by line on scroll */}
-        <div {...stylex.props(styles.quoteWrap)}>
-          <p data-quote-eyebrow {...stylex.props(sharedStyles.techLabelDark)}>
+        <div {...stylex.attrs(styles.quoteWrap)}>
+          <p data-quote-eyebrow="" {...stylex.attrs(sharedStyles.techLabelDark)}>
             {ORIGIN_QUOTE.eyebrow}
           </p>
-          <blockquote data-quote {...stylex.props(styles.blockquote)}>
-            <p {...stylex.props(styles.quoteText)}>
+          <blockquote data-quote="" {...stylex.attrs(styles.blockquote)}>
+            <p {...stylex.attrs(styles.quoteText)}>
               {ORIGIN_QUOTE.lines.map((line, index) => (
                 <span
-                  key={line}
-                  data-quote-line
-                  {...stylex.props(
+                  data-quote-line=""
+                  {...stylex.attrs(
                     index === ORIGIN_QUOTE.lines.length - 1
                       ? styles.quoteLineLast
                       : styles.quoteLine,
@@ -239,59 +238,59 @@ export function OriginStandardsSection() {
                 </span>
               ))}
             </p>
-            <footer data-quote-attribution {...stylex.props(styles.quoteAttribution)}>
+            <footer data-quote-attribution="" {...stylex.attrs(styles.quoteAttribution)}>
               {ORIGIN_QUOTE.attribution}
             </footer>
           </blockquote>
         </div>
 
         {/* The canopy the record starts under */}
-        <div {...stylex.props(styles.canopyFrame)}>
+        <div {...stylex.attrs(styles.canopyFrame)}>
           <img
-            data-standards-img
+            data-standards-img=""
             src={IMAGES.standards.src}
             alt={IMAGES.standards.alt}
-            {...stylex.props(styles.canopyImg)}
+            {...stylex.attrs(styles.canopyImg)}
             loading="lazy"
           />
         </div>
 
         {/* Standards — the three pillars of the quality program */}
-        <div data-standards-head {...stylex.props(styles.standardsHead)}>
-          <h2 id="quality-heading" {...stylex.props(styles.standardsTitle)}>
-            Science-backed <span {...stylex.props(styles.standardsTitleAccent)}>standards.</span>
+        <div data-standards-head="" {...stylex.attrs(styles.standardsHead)}>
+          <h2 id="quality-heading" {...stylex.attrs(styles.standardsTitle)}>
+            Science-backed <span {...stylex.attrs(styles.standardsTitleAccent)}>standards.</span>
           </h2>
-          <p {...stylex.props(styles.standardsIntro)}>
+          <p {...stylex.attrs(styles.standardsIntro)}>
             Every lot. Every market. Every release — documented to your regulatory map before you
             ask for it.
           </p>
         </div>
 
-        <div {...stylex.props(styles.pillarsGrid)}>
+        <div {...stylex.attrs(styles.pillarsGrid)}>
           {pillars.map((pillar, index) => {
             const Icon = PILLAR_ICONS[index];
             return (
-              <div key={pillar.title} data-pillar>
-                <span {...stylex.props(styles.iconWrap)}>
-                  <Icon aria-hidden="true" {...stylex.props(styles.icon)} strokeWidth={1.5} />
+              <div data-pillar="">
+                <span {...stylex.attrs(styles.iconWrap)}>
+                  <Icon aria-hidden="true" {...stylex.attrs(styles.icon)} strokeWidth={1.5} />
                 </span>
-                <h3 {...stylex.props(styles.pillarTitle)}>{pillar.title}</h3>
-                <p {...stylex.props(styles.pillarCopy)}>{pillar.copy}</p>
+                <h3 {...stylex.attrs(styles.pillarTitle)}>{pillar.title}</h3>
+                <p {...stylex.attrs(styles.pillarCopy)}>{pillar.copy}</p>
               </div>
             );
           })}
         </div>
 
         {/* Certification ledger strip */}
-        <div {...stylex.props(styles.certStrip)}>
-          <div data-cert-rule {...stylex.props(sharedStyles.ruleLineDark)} />
-          <div {...stylex.props(styles.certRow)}>
-            <p data-cert-line {...stylex.props(styles.certTitle)}>
+        <div {...stylex.attrs(styles.certStrip)}>
+          <div data-cert-rule="" {...stylex.attrs(sharedStyles.ruleLineDark)} />
+          <div {...stylex.attrs(styles.certRow)}>
+            <p data-cert-line="" {...stylex.attrs(styles.certTitle)}>
               Certified quality systems
             </p>
-            <ul data-cert-line {...stylex.props(styles.certList)}>
+            <ul data-cert-line="" {...stylex.attrs(styles.certList)}>
               {certifications.map((certification) => (
-                <li key={certification}>{certification}</li>
+                <li>{certification}</li>
               ))}
             </ul>
           </div>

@@ -1,5 +1,5 @@
 import * as stylex from "@stylexjs/stylex";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight } from "@fenchem-lp/ui/components/lucide";
 
 import type { AboutPageProps } from "../../index";
 import { AT_REST } from "./counterweight";
@@ -56,9 +56,9 @@ const styles = stylex.create({
   },
 });
 
-export function Closing({ onNavigateHome }: AboutPageProps) {
+export function Closing(props: AboutPageProps) {
   return (
-    <section aria-labelledby="oos1x-closing" {...stylex.props(styles.section)}>
+    <section aria-labelledby="oos1x-closing" {...stylex.attrs(styles.section)}>
       <Pair
         lever={AT_REST}
         loadLine
@@ -66,23 +66,21 @@ export function Closing({ onNavigateHome }: AboutPageProps) {
           <div>
             <button
               type="button"
-              onClick={() => onNavigateHome("contact")}
-              {...stylex.props(styles.action, ui.focusRing, stylex.defaultMarker())}
+              onClick={() => props.onNavigateHome("contact")}
+              {...stylex.attrs(styles.action, ui.focusRing, stylex.defaultMarker())}
             >
               联系泛成
-              <ArrowRight strokeWidth={2.75} aria-hidden="true" {...stylex.props(styles.arrow)} />
+              <ArrowRight strokeWidth={2.75} aria-hidden="true" {...stylex.attrs(styles.arrow)} />
             </button>
           </div>
         }
       >
-        <h2 id="oos1x-closing" {...stylex.props(type.light, styles.title)}>
+        <h2 id="oos1x-closing" {...stylex.attrs(type.light, styles.title)}>
           {CLOSING_LINES.map((line) => (
-            <span key={line} {...stylex.props(styles.line)}>
-              {line}
-            </span>
+            <span {...stylex.attrs(styles.line)}>{line}</span>
           ))}
         </h2>
-        <p lang="en" {...stylex.props(type.serif, styles.english)}>
+        <p lang="en" {...stylex.attrs(type.serif, styles.english)}>
           Balance begins with a conversation.
         </p>
       </Pair>

@@ -1,9 +1,18 @@
-import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
+import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { ArrowRight, Check, CheckCircle2, Copy, Download, MapPin, Plus } from "lucide-react";
-import { AnimatePresence, m } from "motion/react";
-import { useEffect, useRef, useState, type ReactNode, type SubmitEvent } from "react";
-import { toast } from "sonner";
+import {
+  ArrowRight,
+  Check,
+  CheckCircle2,
+  Copy,
+  Download,
+  MapPin,
+  Plus,
+} from "@fenchem-lp/ui/components/lucide";
+import { AnimatePresence, m } from "@/compat/motion";
+import type { JSX } from "@solidjs/web";
+import { createSignal, onSettled, Show } from "solid-js";
+import { toast } from "@fenchem-lp/ui/components/sonner";
 
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
@@ -44,7 +53,7 @@ const MAP_HIGHWAY = "#f2d896";
 const MAP_HIGHWAY_CASING = "#e0bf72";
 const MAP_SHADOW = "0 18px 40px -18px rgba(11, 42, 92, 0.35)";
 
-const DESKTOP = breakpoints.xl;
+const DESKTOP = "@media (min-width: 1280px)";
 const HOVER = "@media (hover: hover)";
 
 const RISE_STAGGER = 0.06;
@@ -137,13 +146,13 @@ const styles = stylex.create({
     display: "grid",
     gridTemplateColumns: {
       default: "1fr",
-      [breakpoints.lg]: "minmax(0, 0.82fr) minmax(0, 1.18fr)",
+      ["@media (min-width: 1024px)"]: "minmax(0, 0.82fr) minmax(0, 1.18fr)",
     },
     gap: { default: 48, [DESKTOP]: 96 },
     alignItems: "start",
   },
   inquiryAside: {
-    position: { default: "static", [breakpoints.lg]: "sticky" },
+    position: { default: "static", ["@media (min-width: 1024px)"]: "sticky" },
     top: `calc(${layout.headerHeight} + ${layout.subBarHeight} + 40px)`,
   },
   details: {
@@ -227,7 +236,7 @@ const styles = stylex.create({
 
   formPanel: {
     backgroundColor: TINT,
-    padding: { default: "32px 20px", [breakpoints.md]: 40, [DESKTOP]: 48 },
+    padding: { default: "32px 20px", ["@media (min-width: 768px)"]: 40, [DESKTOP]: 48 },
   },
   form: {
     display: "flex",
@@ -272,7 +281,10 @@ const styles = stylex.create({
     userSelect: "none",
     transform: {
       default: null,
-      ":active": { default: null, [breakpoints.motionOk]: "scale(0.96)" },
+      ":active": {
+        default: null,
+        ["@media (prefers-reduced-motion: no-preference)"]: "scale(0.96)",
+      },
     },
     transitionProperty: "background-color, border-color, color, transform",
     transitionDuration: "150ms",
@@ -298,7 +310,10 @@ const styles = stylex.create({
   },
   fieldGrid: {
     display: "grid",
-    gridTemplateColumns: { default: "1fr", [breakpoints.md]: "repeat(2, minmax(0, 1fr))" },
+    gridTemplateColumns: {
+      default: "1fr",
+      ["@media (min-width: 768px)"]: "repeat(2, minmax(0, 1fr))",
+    },
     columnGap: 20,
     rowGap: 24,
   },
@@ -356,10 +371,10 @@ const styles = stylex.create({
   },
   formFooter: {
     display: "flex",
-    flexDirection: { default: "column", [breakpoints.md]: "row" },
-    alignItems: { default: "stretch", [breakpoints.md]: "center" },
+    flexDirection: { default: "column", ["@media (min-width: 768px)"]: "row" },
+    alignItems: { default: "stretch", ["@media (min-width: 768px)"]: "center" },
     justifyContent: "space-between",
-    gap: { default: 20, [breakpoints.md]: 32 },
+    gap: { default: 20, ["@media (min-width: 768px)"]: 32 },
     marginTop: 8,
     paddingTop: 24,
     borderTopWidth: 1,
@@ -371,7 +386,7 @@ const styles = stylex.create({
     alignItems: "flex-start",
     gap: 12,
     minWidth: 0,
-    maxWidth: { default: "none", [breakpoints.md]: "26em" },
+    maxWidth: { default: "none", ["@media (min-width: 768px)"]: "26em" },
     fontSize: 13,
     lineHeight: 1.7,
     color: color.bodyText,
@@ -409,7 +424,10 @@ const styles = stylex.create({
     cursor: "pointer",
     transform: {
       default: null,
-      ":active": { default: null, [breakpoints.motionOk]: "scale(0.96)" },
+      ":active": {
+        default: null,
+        ["@media (prefers-reduced-motion: no-preference)"]: "scale(0.96)",
+      },
     },
     transitionProperty: "background-color, transform",
     transitionDuration: "150ms",
@@ -515,7 +533,10 @@ const styles = stylex.create({
     cursor: "pointer",
     transform: {
       default: null,
-      ":active": { default: null, [breakpoints.motionOk]: "scale(0.96)" },
+      ":active": {
+        default: null,
+        ["@media (prefers-reduced-motion: no-preference)"]: "scale(0.96)",
+      },
     },
     transitionProperty: "background-color, transform",
     transitionDuration: "150ms",
@@ -536,7 +557,11 @@ const styles = stylex.create({
     position: "relative",
     overflow: "hidden",
     isolation: "isolate",
-    aspectRatio: { default: "4 / 3", [breakpoints.md]: "16 / 9", [breakpoints.lg]: "2 / 1" },
+    aspectRatio: {
+      default: "4 / 3",
+      ["@media (min-width: 768px)"]: "16 / 9",
+      ["@media (min-width: 1024px)"]: "2 / 1",
+    },
     borderWidth: 1,
     borderStyle: "solid",
     borderColor: HAIRLINE,
@@ -562,8 +587,8 @@ const styles = stylex.create({
     transform: "translate(-50%, -50%)",
     borderRadius: "50%",
     backgroundColor: `color-mix(in srgb, ${colors.brandBlue700} 30%, transparent)`,
-    opacity: { default: 0.5, [breakpoints.motionOk]: 0 },
-    animationName: { default: null, [breakpoints.motionOk]: pinPulse },
+    opacity: { default: 0.5, ["@media (prefers-reduced-motion: no-preference)"]: 0 },
+    animationName: { default: null, ["@media (prefers-reduced-motion: no-preference)"]: pinPulse },
     animationDuration: "2400ms",
     animationTimingFunction: ease.out,
     animationIterationCount: "infinite",
@@ -609,7 +634,7 @@ const styles = stylex.create({
     backgroundColor: colors.paper,
   },
   visitCard: {
-    position: { default: "static", [breakpoints.lg]: "absolute" },
+    position: { default: "static", ["@media (min-width: 1024px)"]: "absolute" },
     top: 24,
     left: 24,
     zIndex: 1,
@@ -617,10 +642,10 @@ const styles = stylex.create({
     flexDirection: "column",
     gap: 14,
     boxSizing: "border-box",
-    width: { default: "100%", [breakpoints.lg]: 380 },
+    width: { default: "100%", ["@media (min-width: 1024px)"]: 380 },
     padding: { default: 24, [DESKTOP]: 28 },
     backgroundColor: colors.paper,
-    boxShadow: { default: "none", [breakpoints.lg]: MAP_SHADOW },
+    boxShadow: { default: "none", ["@media (min-width: 1024px)"]: MAP_SHADOW },
   },
   visitName: {
     margin: 0,
@@ -676,7 +701,10 @@ const styles = stylex.create({
     textDecoration: "none",
     transform: {
       default: null,
-      ":active": { default: null, [breakpoints.motionOk]: "scale(0.96)" },
+      ":active": {
+        default: null,
+        ["@media (prefers-reduced-motion: no-preference)"]: "scale(0.96)",
+      },
     },
     transitionProperty: "background-color, transform",
     transitionDuration: "150ms",
@@ -691,7 +719,7 @@ const styles = stylex.create({
     display: "grid",
     gridTemplateColumns: {
       default: "1fr",
-      [breakpoints.lg]: "minmax(0, 0.82fr) minmax(0, 1.18fr)",
+      ["@media (min-width: 1024px)"]: "minmax(0, 0.82fr) minmax(0, 1.18fr)",
     },
     gap: { default: 8, [DESKTOP]: 96 },
     alignItems: "start",
@@ -743,7 +771,10 @@ const styles = stylex.create({
     backgroundColor: CHIP_BG,
     color: color.ink,
     transitionProperty: "transform, background-color, color",
-    transitionDuration: { default: "0s", [breakpoints.motionOk]: "200ms" },
+    transitionDuration: {
+      default: "0s",
+      ["@media (prefers-reduced-motion: no-preference)"]: "200ms",
+    },
     transitionTimingFunction: ease.out,
   },
   faqIconOpen: {
@@ -755,7 +786,7 @@ const styles = stylex.create({
     margin: 0,
     maxWidth: "38em",
     paddingBottom: 24,
-    paddingInlineEnd: { default: 0, [breakpoints.md]: 56 },
+    paddingInlineEnd: { default: 0, ["@media (min-width: 768px)"]: 56 },
     fontSize: 15,
     lineHeight: 1.9,
     color: color.bodyText,
@@ -764,7 +795,7 @@ const styles = stylex.create({
       default: null,
       [stylex.when.ancestor(":open")]: {
         default: answerFade,
-        [breakpoints.motionOk]: answerRise,
+        ["@media (prefers-reduced-motion: no-preference)"]: answerRise,
       },
     },
     animationDuration: "200ms",
@@ -772,101 +803,94 @@ const styles = stylex.create({
   },
 });
 
-function SectionHead({
-  eyebrow,
-  title,
-  titleId,
-  lead,
-  tight = false,
-}: {
+function SectionHead(props: {
   eyebrow: string;
   title: string;
   titleId: string;
-  lead?: ReactNode;
+  lead?: JSX.Element;
   tight?: boolean;
 }) {
   return (
-    <RiseReveal sx={[styles.sectionHead, tight && styles.sectionHeadTight]}>
-      <p lang="en" {...stylex.props(styles.sectionEyebrow)}>
-        {eyebrow}
+    <RiseReveal sx={[styles.sectionHead, props.tight && styles.sectionHeadTight]}>
+      <p lang="en" {...stylex.attrs(styles.sectionEyebrow)}>
+        {props.eyebrow}
       </p>
-      <h2 id={titleId} {...stylex.props(styles.sectionTitle)}>
-        {title}
+      <h2 id={props.titleId} {...stylex.attrs(styles.sectionTitle)}>
+        {props.title}
       </h2>
-      {lead ? <p {...stylex.props(styles.sectionLead)}>{lead}</p> : null}
+      <Show when={props.lead}>
+        {(lead) => <p {...stylex.attrs(styles.sectionLead)}>{lead()}</p>}
+      </Show>
     </RiseReveal>
   );
 }
 
-function Field({
-  id,
-  label,
-  required = false,
-  full = false,
-  children,
-}: {
+function Field(props: {
   id: string;
   label: string;
   required?: boolean;
   full?: boolean;
-  children: ReactNode;
+  children: JSX.Element;
 }) {
   return (
-    <div {...stylex.props(styles.field, full && styles.fieldFull)}>
-      <label htmlFor={id} {...stylex.props(styles.label)}>
-        {label}
-        {required ? (
-          <span aria-hidden="true" {...stylex.props(styles.requiredMark)}>
+    <div {...stylex.attrs(styles.field, props.full && styles.fieldFull)}>
+      <label for={props.id} {...stylex.attrs(styles.label)}>
+        {props.label}
+        <Show when={props.required}>
+          <span aria-hidden="true" {...stylex.attrs(styles.requiredMark)}>
             *
           </span>
-        ) : null}
+        </Show>
       </label>
-      {children}
+      {props.children}
     </div>
   );
 }
 
-function InquiryFields({
-  subjectId,
-  onSubjectChange,
-  onSubmit,
-  focusOnMount,
-}: {
+// The swapped-in panel mounts before AnimatePresence inserts it, so focus waits for insertion.
+const focusWhenConnected = (node: HTMLElement | undefined, frames = 60) => {
+  if (!node) return;
+  if (node.isConnected) node.focus();
+  else if (frames > 0) requestAnimationFrame(() => focusWhenConnected(node, frames - 1));
+};
+
+function InquiryFields(props: {
   subjectId: InquirySubjectId;
   onSubjectChange: (id: InquirySubjectId) => void;
   onSubmit: () => void;
   focusOnMount: boolean;
 }) {
-  const nameRef = useRef<HTMLInputElement>(null);
-  const subject = INQUIRY_SUBJECTS.find((item) => item.id === subjectId) ?? INQUIRY_SUBJECTS[0];
+  let nameInput: HTMLInputElement | undefined;
+  const subject = () =>
+    INQUIRY_SUBJECTS.find((item) => item.id === props.subjectId) ?? INQUIRY_SUBJECTS[0];
 
-  useEffect(() => {
-    if (focusOnMount) nameRef.current?.focus();
-  }, [focusOnMount]);
+  onSettled(() => {
+    if (props.focusOnMount) focusWhenConnected(nameInput);
+  });
 
-  const handleSubmit = (event: SubmitEvent<HTMLFormElement>) => {
+  const handleSubmit = (event: SubmitEvent) => {
     event.preventDefault();
-    onSubmit();
+    props.onSubmit();
   };
 
   return (
-    <form method="post" onSubmit={handleSubmit} {...stylex.props(styles.form)}>
-      <fieldset {...stylex.props(styles.fieldset)}>
-        <legend {...stylex.props(styles.label, styles.legend)}>咨询主题</legend>
-        <div {...stylex.props(styles.subjectList)}>
+    <form method="post" onSubmit={handleSubmit} {...stylex.attrs(styles.form)}>
+      <fieldset {...stylex.attrs(styles.fieldset)}>
+        <legend {...stylex.attrs(styles.label, styles.legend)}>咨询主题</legend>
+        <div {...stylex.attrs(styles.subjectList)}>
           {INQUIRY_SUBJECTS.map((item) => {
-            const isActive = item.id === subjectId;
+            const isActive = () => item.id === props.subjectId;
             return (
-              <label key={item.id} {...stylex.props(styles.subjectOption)}>
+              <label {...stylex.attrs(styles.subjectOption)}>
                 <input
                   type="radio"
                   name="subject"
                   value={item.id}
-                  checked={isActive}
-                  onChange={() => onSubjectChange(item.id)}
-                  {...stylex.props(styles.srOnly, stylex.defaultMarker())}
+                  checked={isActive()}
+                  onChange={() => props.onSubjectChange(item.id)}
+                  {...stylex.attrs(styles.srOnly, stylex.defaultMarker())}
                 />
-                <span {...stylex.props(styles.subjectChip, isActive && styles.subjectChipActive)}>
+                <span {...stylex.attrs(styles.subjectChip, isActive() && styles.subjectChipActive)}>
                   {item.label}
                 </span>
               </label>
@@ -875,24 +899,24 @@ function InquiryFields({
         </div>
       </fieldset>
 
-      <div {...stylex.props(styles.fieldGrid)}>
+      <div {...stylex.attrs(styles.fieldGrid)}>
         <Field id="contact-name" label="联系人姓名" required>
           <input
-            ref={nameRef}
+            ref={nameInput}
             id="contact-name"
             name="contactName"
             required
-            autoComplete="name"
-            {...stylex.props(styles.input)}
+            autocomplete="name"
+            {...stylex.attrs(styles.input)}
           />
         </Field>
         <Field id="contact-role" label="职务">
           <input
             id="contact-role"
             name="jobTitle"
-            autoComplete="organization-title"
+            autocomplete="organization-title"
             placeholder="如：配方工程师、采购经理"
-            {...stylex.props(styles.input)}
+            {...stylex.attrs(styles.input)}
           />
         </Field>
         <Field id="contact-phone" label="手机号" required>
@@ -901,10 +925,10 @@ function InquiryFields({
             name="phone"
             type="tel"
             required
-            autoComplete="tel"
-            inputMode="tel"
+            autocomplete="tel"
+            inputmode="tel"
             placeholder="用于物流通知与技术对接"
-            {...stylex.props(styles.input)}
+            {...stylex.attrs(styles.input)}
           />
         </Field>
         <Field id="contact-email" label="工作邮箱" required>
@@ -913,10 +937,10 @@ function InquiryFields({
             name="email"
             type="email"
             required
-            autoComplete="email"
-            spellCheck={false}
+            autocomplete="email"
+            spellcheck={false}
             placeholder="name@company.com"
-            {...stylex.props(styles.input)}
+            {...stylex.attrs(styles.input)}
           />
         </Field>
         <Field id="contact-company" label="公司或机构名称" required full>
@@ -924,9 +948,9 @@ function InquiryFields({
             id="contact-company"
             name="company"
             required
-            autoComplete="organization"
+            autocomplete="organization"
             placeholder="品牌方、代工厂或研发机构全称"
-            {...stylex.props(styles.input)}
+            {...stylex.attrs(styles.input)}
           />
         </Field>
         <Field id="contact-message" label="需求描述" required full>
@@ -934,20 +958,20 @@ function InquiryFields({
             id="contact-message"
             name="message"
             required
-            placeholder={subject.placeholder}
-            {...stylex.props(styles.input, styles.textarea)}
+            placeholder={subject().placeholder}
+            {...stylex.attrs(styles.input, styles.textarea)}
           />
         </Field>
       </div>
 
-      <div {...stylex.props(styles.formFooter)}>
-        <label {...stylex.props(styles.consent)}>
-          <input type="checkbox" name="consent" required {...stylex.props(styles.checkbox)} />
+      <div {...stylex.attrs(styles.formFooter)}>
+        <label {...stylex.attrs(styles.consent)}>
+          <input type="checkbox" name="consent" required {...stylex.attrs(styles.checkbox)} />
           <span>我同意泛成就本次咨询与我联系。您提交的配方信息将严格保密。</span>
         </label>
         <button
           type="submit"
-          {...stylex.props(styles.submit, kitStyles.focusRing, stylex.defaultMarker())}
+          {...stylex.attrs(styles.submit, kitStyles.focusRing, stylex.defaultMarker())}
         >
           提交
           <ArrowRight
@@ -955,7 +979,7 @@ function InquiryFields({
             strokeWidth={2}
             nonScalingStroke
             aria-hidden="true"
-            {...stylex.props(styles.submitArrow)}
+            {...stylex.attrs(styles.submitArrow)}
           />
         </button>
       </div>
@@ -963,32 +987,32 @@ function InquiryFields({
   );
 }
 
-function InquirySubmitted({ onReset }: { onReset: () => void }) {
-  const headingRef = useRef<HTMLHeadingElement>(null);
+function InquirySubmitted(props: { onReset: () => void }) {
+  let heading: HTMLHeadingElement | undefined;
 
-  useEffect(() => {
-    headingRef.current?.focus();
-  }, []);
+  onSettled(() => {
+    focusWhenConnected(heading);
+  });
 
   return (
-    <div role="status" {...stylex.props(styles.done)}>
+    <div role="status" {...stylex.attrs(styles.done)}>
       <CheckCircle2
         size={40}
         strokeWidth={2.5}
         nonScalingStroke
         aria-hidden="true"
-        {...stylex.props(styles.doneIcon)}
+        {...stylex.attrs(styles.doneIcon)}
       />
-      <h3 ref={headingRef} tabIndex={-1} {...stylex.props(styles.doneTitle)}>
+      <h3 ref={heading} tabindex={-1} {...stylex.attrs(styles.doneTitle)}>
         需求已提交
       </h3>
-      <p {...stylex.props(styles.doneText)}>
+      <p {...stylex.attrs(styles.doneText)}>
         感谢您的咨询！专属客户经理与应用工程师将在工作日 24 小时内与您联系。
       </p>
-      <ol aria-label="接下来" {...stylex.props(styles.list, styles.doneSteps)}>
+      <ol aria-label="接下来" {...stylex.attrs(styles.list, styles.doneSteps)}>
         {NEXT_STEPS.map((step, index) => (
-          <li key={step} {...stylex.props(styles.doneStep)}>
-            <span aria-hidden="true" {...stylex.props(styles.doneStepIndex)}>
+          <li {...stylex.attrs(styles.doneStep)}>
+            <span aria-hidden="true" {...stylex.attrs(styles.doneStepIndex)}>
               {indexLabel(index)}
             </span>
             {step}
@@ -997,8 +1021,8 @@ function InquirySubmitted({ onReset }: { onReset: () => void }) {
       </ol>
       <button
         type="button"
-        onClick={onReset}
-        {...stylex.props(styles.againButton, kitStyles.focusRing)}
+        onClick={() => props.onReset()}
+        {...stylex.attrs(styles.againButton, kitStyles.focusRing)}
       >
         提交另一条需求
       </button>
@@ -1007,49 +1031,56 @@ function InquirySubmitted({ onReset }: { onReset: () => void }) {
 }
 
 function InquiryForm() {
-  const [subjectId, setSubjectId] = useState<InquirySubjectId>(INQUIRY_SUBJECTS[0].id);
-  const [submitted, setSubmitted] = useState(false);
-  const [returning, setReturning] = useState(false);
-  const [lockedHeight, setLockedHeight] = useState(0);
-  const frameRef = useRef<HTMLDivElement>(null);
+  const [subjectId, setSubjectId] = createSignal<InquirySubjectId>(INQUIRY_SUBJECTS[0].id);
+  const [submitted, setSubmitted] = createSignal(false);
+  const [returning, setReturning] = createSignal(false);
+  const [lockedHeight, setLockedHeight] = createSignal(0);
+  let frame: HTMLDivElement | undefined;
   const reduce = useReducedMotion();
 
   const offset = (px: number) =>
-    reduce ? {} : { transform: `translateY(${px}px)`, filter: "blur(4px)" };
+    reduce() ? {} : { transform: `translateY(${px}px)`, filter: "blur(4px)" };
 
   return (
     <div
-      ref={frameRef}
-      {...stylex.props(styles.swapFrame, submitted && dynamic.minHeight(lockedHeight))}
+      ref={frame}
+      {...stylex.attrs(styles.swapFrame, submitted() && dynamic.minHeight(lockedHeight()))}
     >
       <AnimatePresence mode="wait" initial={false}>
-        <m.div
-          key={submitted ? "submitted" : "form"}
-          initial={{ opacity: 0, ...offset(12) }}
-          animate={{ opacity: 1, transform: "translateY(0px)", filter: "blur(0px)" }}
-          exit={{ opacity: 0, ...offset(-12), transition: { duration: 0.15, ease: "easeOut" } }}
-          transition={{ duration: 0.3, ease: "easeOut" }}
-          {...stylex.props(styles.swapItem)}
-        >
-          {submitted ? (
-            <InquirySubmitted
-              onReset={() => {
-                setReturning(true);
-                setSubmitted(false);
+        <Show when={submitted() ? "submitted" : "form"} keyed>
+          {(state) => (
+            <m.div
+              initial={{ opacity: 0, ...offset(12) }}
+              animate={{ opacity: 1, transform: "translateY(0px)", filter: "blur(0px)" }}
+              exit={{
+                opacity: 0,
+                ...offset(-12),
+                transition: { duration: 0.15, ease: "easeOut" },
               }}
-            />
-          ) : (
-            <InquiryFields
-              subjectId={subjectId}
-              onSubjectChange={setSubjectId}
-              onSubmit={() => {
-                setLockedHeight(frameRef.current?.offsetHeight ?? 0);
-                setSubmitted(true);
-              }}
-              focusOnMount={returning}
-            />
+              transition={{ duration: 0.3, ease: "easeOut" }}
+              {...stylex.attrs(styles.swapItem)}
+            >
+              {state === "submitted" ? (
+                <InquirySubmitted
+                  onReset={() => {
+                    setReturning(true);
+                    setSubmitted(false);
+                  }}
+                />
+              ) : (
+                <InquiryFields
+                  subjectId={subjectId()}
+                  onSubjectChange={(id) => setSubjectId(id)}
+                  onSubmit={() => {
+                    setLockedHeight(frame?.offsetHeight ?? 0);
+                    setSubmitted(true);
+                  }}
+                  focusOnMount={returning()}
+                />
+              )}
+            </m.div>
           )}
-        </m.div>
+        </Show>
       </AnimatePresence>
     </div>
   );
@@ -1060,10 +1091,10 @@ function Inquiry() {
     <section
       id="contact"
       aria-labelledby="contact-inquiry-title"
-      {...stylex.props(kitStyles.section, kitStyles.anchor)}
+      {...stylex.attrs(kitStyles.section, kitStyles.anchor)}
     >
-      <div {...stylex.props(kitStyles.shell, kitStyles.inset120, styles.inquiryLayout)}>
-        <div {...stylex.props(styles.inquiryAside)}>
+      <div {...stylex.attrs(kitStyles.shell, kitStyles.inset120, styles.inquiryLayout)}>
+        <div {...stylex.attrs(styles.inquiryAside)}>
           <SectionHead
             eyebrow={INQUIRY_INTRO.eyebrow}
             title={INQUIRY_INTRO.title}
@@ -1072,15 +1103,15 @@ function Inquiry() {
             tight
           />
           <RiseReveal delay={riseDelay(1)}>
-            <dl {...stylex.props(styles.details)}>
+            <dl {...stylex.attrs(styles.details)}>
               {CONTACT_DETAILS.map((detail) => (
-                <div key={detail.term} {...stylex.props(styles.detailRow)}>
-                  <dt {...stylex.props(styles.detailTerm)}>{detail.term}</dt>
-                  <dd {...stylex.props(styles.detailValue)}>
+                <div {...stylex.attrs(styles.detailRow)}>
+                  <dt {...stylex.attrs(styles.detailTerm)}>{detail.term}</dt>
+                  <dd {...stylex.attrs(styles.detailValue)}>
                     {detail.href ? (
                       <a
                         href={detail.href}
-                        {...stylex.props(styles.detailLink, kitStyles.focusRing)}
+                        {...stylex.attrs(styles.detailLink, kitStyles.focusRing)}
                       >
                         {detail.value}
                       </a>
@@ -1091,15 +1122,15 @@ function Inquiry() {
                 </div>
               ))}
             </dl>
-            <ul aria-label="服务承诺" {...stylex.props(styles.list, styles.promises)}>
+            <ul aria-label="服务承诺" {...stylex.attrs(styles.list, styles.promises)}>
               {SERVICE_PROMISES.map((promise) => (
-                <li key={promise} {...stylex.props(styles.promise)}>
+                <li {...stylex.attrs(styles.promise)}>
                   <Check
                     size={16}
                     strokeWidth={2}
                     nonScalingStroke
                     aria-hidden="true"
-                    {...stylex.props(styles.promiseIcon)}
+                    {...stylex.attrs(styles.promiseIcon)}
                   />
                   {promise}
                 </li>
@@ -1112,14 +1143,14 @@ function Inquiry() {
                   description: "可在表单中备注索取，我们会通过邮件发送最新版本。",
                 })
               }
-              {...stylex.props(styles.brochureButton, kitStyles.focusRing)}
+              {...stylex.attrs(styles.brochureButton, kitStyles.focusRing)}
             >
               <Download size={16} strokeWidth={2} nonScalingStroke aria-hidden="true" />
               {INQUIRY_INTRO.brochureLabel}
             </button>
           </RiseReveal>
         </div>
-        <div {...stylex.props(styles.formPanel)}>
+        <div {...stylex.attrs(styles.formPanel)}>
           <InquiryForm />
         </div>
       </div>
@@ -1134,7 +1165,7 @@ function MapPlaceholder() {
         viewBox="0 0 1200 600"
         preserveAspectRatio="xMidYMid slice"
         aria-hidden="true"
-        {...stylex.props(styles.fill)}
+        {...stylex.attrs(styles.fill)}
       >
         <rect width="1200" height="600" fill={MAP_LAND} />
         <g fill={MAP_PARK}>
@@ -1152,36 +1183,40 @@ function MapPlaceholder() {
           <rect x="1040" y="340" width="160" height="70" rx="6" />
           <rect x="880" y="200" width="100" height="80" rx="6" />
         </g>
-        <g fill="none" strokeLinecap="round" strokeLinejoin="round">
+        <g fill="none" stroke-linecap="round" stroke-linejoin="round">
           <path
             d="M110 -10C150 120 60 220 140 330C210 430 380 470 440 610"
             stroke={MAP_WATER}
-            strokeWidth="30"
+            stroke-width="30"
           />
           <g stroke={MAP_ROAD_CASING}>
-            <path d="M-10 262C200 250 380 300 520 380C640 450 760 462 1210 422" strokeWidth="13" />
-            <path d="M820 -10L862 610" strokeWidth="13" />
-            <path d="M985 -10C960 200 1012 400 1000 610" strokeWidth="13" />
-            <path d="M520 380L560 610" strokeWidth="13" />
-            <path d="M300 -10C380 160 470 262 600 300C760 350 980 330 1210 298" strokeWidth="20" />
+            <path d="M-10 262C200 250 380 300 520 380C640 450 760 462 1210 422" stroke-width="13" />
+            <path d="M820 -10L862 610" stroke-width="13" />
+            <path d="M985 -10C960 200 1012 400 1000 610" stroke-width="13" />
+            <path d="M520 380L560 610" stroke-width="13" />
+            <path d="M300 -10C380 160 470 262 600 300C760 350 980 330 1210 298" stroke-width="20" />
           </g>
           <g stroke={MAP_ROAD}>
-            <path d="M-10 262C200 250 380 300 520 380C640 450 760 462 1210 422" strokeWidth="9" />
-            <path d="M820 -10L862 610" strokeWidth="9" />
-            <path d="M985 -10C960 200 1012 400 1000 610" strokeWidth="9" />
-            <path d="M520 380L560 610" strokeWidth="9" />
-            <path d="M300 -10C380 160 470 262 600 300C760 350 980 330 1210 298" strokeWidth="15" />
+            <path d="M-10 262C200 250 380 300 520 380C640 450 760 462 1210 422" stroke-width="9" />
+            <path d="M820 -10L862 610" stroke-width="9" />
+            <path d="M985 -10C960 200 1012 400 1000 610" stroke-width="9" />
+            <path d="M520 380L560 610" stroke-width="9" />
+            <path d="M300 -10C380 160 470 262 600 300C760 350 980 330 1210 298" stroke-width="15" />
           </g>
-          <path d="M540 -10C610 180 700 380 770 610" stroke={MAP_HIGHWAY_CASING} strokeWidth="28" />
-          <path d="M540 -10C610 180 700 380 770 610" stroke={MAP_HIGHWAY} strokeWidth="22" />
+          <path
+            d="M540 -10C610 180 700 380 770 610"
+            stroke={MAP_HIGHWAY_CASING}
+            stroke-width="28"
+          />
+          <path d="M540 -10C610 180 700 380 770 610" stroke={MAP_HIGHWAY} stroke-width="22" />
         </g>
       </svg>
-      <span aria-hidden="true" {...stylex.props(styles.mapGlow)} />
-      <span aria-hidden="true" {...stylex.props(styles.mapPulse)} />
-      <span aria-hidden="true" {...stylex.props(styles.mapPin)}>
-        <span {...stylex.props(styles.mapPinLabel)}>{VISIT_LOCATION.pinLabel}</span>
-        <span {...stylex.props(styles.mapPinHead)}>
-          <span {...stylex.props(styles.mapPinDot)} />
+      <span aria-hidden="true" {...stylex.attrs(styles.mapGlow)} />
+      <span aria-hidden="true" {...stylex.attrs(styles.mapPulse)} />
+      <span aria-hidden="true" {...stylex.attrs(styles.mapPin)}>
+        <span {...stylex.attrs(styles.mapPinLabel)}>{VISIT_LOCATION.pinLabel}</span>
+        <span {...stylex.attrs(styles.mapPinHead)}>
+          <span {...stylex.attrs(styles.mapPinDot)} />
         </span>
       </span>
     </>
@@ -1202,9 +1237,9 @@ function Visit() {
     <section
       id="contact-visit"
       aria-labelledby="contact-visit-title"
-      {...stylex.props(kitStyles.section, styles.visitSection, kitStyles.anchor)}
+      {...stylex.attrs(kitStyles.section, styles.visitSection, kitStyles.anchor)}
     >
-      <div {...stylex.props(kitStyles.shell, kitStyles.inset120)}>
+      <div {...stylex.attrs(kitStyles.shell, kitStyles.inset120)}>
         <SectionHead
           eyebrow={VISIT_INTRO.eyebrow}
           title={VISIT_INTRO.title}
@@ -1212,27 +1247,27 @@ function Visit() {
           lead={VISIT_INTRO.lead}
         />
         <RiseReveal delay={riseDelay(1)} sx={styles.visitStage}>
-          <div {...stylex.props(styles.mapFrame)}>
+          <div {...stylex.attrs(styles.mapFrame)}>
             <MapPlaceholder />
           </div>
-          <div {...stylex.props(styles.visitCard)}>
-            <h3 {...stylex.props(styles.visitName)}>{VISIT_LOCATION.name}</h3>
-            <ul {...stylex.props(styles.list, styles.visitFacts)}>
-              <li {...stylex.props(styles.visitFact)}>
+          <div {...stylex.attrs(styles.visitCard)}>
+            <h3 {...stylex.attrs(styles.visitName)}>{VISIT_LOCATION.name}</h3>
+            <ul {...stylex.attrs(styles.list, styles.visitFacts)}>
+              <li {...stylex.attrs(styles.visitFact)}>
                 <MapPin
                   size={16}
                   strokeWidth={2}
                   nonScalingStroke
                   aria-hidden="true"
-                  {...stylex.props(styles.visitFactIcon)}
+                  {...stylex.attrs(styles.visitFactIcon)}
                 />
                 {VISIT_LOCATION.address}
               </li>
             </ul>
-            <div {...stylex.props(styles.visitActions)}>
+            <div {...stylex.attrs(styles.visitActions)}>
               <a
                 href="#contact"
-                {...stylex.props(styles.visitBook, kitStyles.focusRing, stylex.defaultMarker())}
+                {...stylex.attrs(styles.visitBook, kitStyles.focusRing, stylex.defaultMarker())}
               >
                 预约到访
                 <ArrowRight
@@ -1240,13 +1275,13 @@ function Visit() {
                   strokeWidth={2}
                   nonScalingStroke
                   aria-hidden="true"
-                  {...stylex.props(styles.submitArrow)}
+                  {...stylex.attrs(styles.submitArrow)}
                 />
               </a>
               <button
                 type="button"
-                onClick={copyAddress}
-                {...stylex.props(styles.brochureButton, styles.visitCopy, kitStyles.focusRing)}
+                onClick={() => void copyAddress()}
+                {...stylex.attrs(styles.brochureButton, styles.visitCopy, kitStyles.focusRing)}
               >
                 <Copy size={16} strokeWidth={2} nonScalingStroke aria-hidden="true" />
                 复制地址
@@ -1259,22 +1294,22 @@ function Visit() {
   );
 }
 
-function FaqItem({ question, answer }: { question: string; answer: string }) {
-  const [open, setOpen] = useState(false);
+function FaqItem(props: { question: string; answer: string }) {
+  const [open, setOpen] = createSignal(false);
   return (
-    <li {...stylex.props(styles.faqItem)}>
+    <li {...stylex.attrs(styles.faqItem)}>
       <details
         name="contact-faq"
         onToggle={(event) => setOpen(event.currentTarget.open)}
-        {...stylex.props(stylex.defaultMarker())}
+        {...stylex.attrs(stylex.defaultMarker())}
       >
-        <summary {...stylex.props(styles.faqSummary)}>
-          {question}
-          <span aria-hidden="true" {...stylex.props(styles.faqIcon, open && styles.faqIconOpen)}>
+        <summary {...stylex.attrs(styles.faqSummary)}>
+          {props.question}
+          <span aria-hidden="true" {...stylex.attrs(styles.faqIcon, open() && styles.faqIconOpen)}>
             <Plus size={16} strokeWidth={2.5} nonScalingStroke />
           </span>
         </summary>
-        <p {...stylex.props(styles.faqAnswer)}>{answer}</p>
+        <p {...stylex.attrs(styles.faqAnswer)}>{props.answer}</p>
       </details>
     </li>
   );
@@ -1285,9 +1320,9 @@ function Faq() {
     <section
       id="contact-faq"
       aria-labelledby="contact-faq-title"
-      {...stylex.props(kitStyles.section, kitStyles.anchor)}
+      {...stylex.attrs(kitStyles.section, kitStyles.anchor)}
     >
-      <div {...stylex.props(kitStyles.shell, kitStyles.inset120, styles.faqLayout)}>
+      <div {...stylex.attrs(kitStyles.shell, kitStyles.inset120, styles.faqLayout)}>
         <SectionHead
           eyebrow={CONTACT_FAQ_INTRO.eyebrow}
           title={CONTACT_FAQ_INTRO.title}
@@ -1295,7 +1330,7 @@ function Faq() {
           lead={
             <>
               没有找到答案？欢迎致电{" "}
-              <a href="tel:+862584218888" {...stylex.props(styles.faqPhone, kitStyles.focusRing)}>
+              <a href="tel:+862584218888" {...stylex.attrs(styles.faqPhone, kitStyles.focusRing)}>
                 025-8421 8888
               </a>
               ，或直接在上方提交需求。
@@ -1303,9 +1338,9 @@ function Faq() {
           }
         />
         <RiseReveal delay={riseDelay(1)}>
-          <ul {...stylex.props(styles.list, styles.faqList)}>
+          <ul {...stylex.attrs(styles.list, styles.faqList)}>
             {CONTACT_FAQ.map((item) => (
-              <FaqItem key={item.question} question={item.question} answer={item.answer} />
+              <FaqItem question={item.question} answer={item.answer} />
             ))}
           </ul>
         </RiseReveal>
@@ -1314,9 +1349,9 @@ function Faq() {
   );
 }
 
-export function ContactView({ onNavigateHome }: { onNavigateHome: (target?: string) => void }) {
+export function ContactView(props: { onNavigateHome: (target?: string) => void }) {
   return (
-    <div id="contact-top" lang="zh-CN" {...stylex.props(kitStyles.root)}>
+    <div id="contact-top" lang="zh-CN" {...stylex.attrs(kitStyles.root)}>
       <SubPageBanner
         size="compact"
         title={CONTACT_BANNER.title}
@@ -1331,7 +1366,7 @@ export function ContactView({ onNavigateHome }: { onNavigateHome: (target?: stri
         current={CONTACT_BANNER.title}
         chips={CONTACT_NAV_CHIPS}
         chipsLabel="本页导航"
-        onNavigateHome={onNavigateHome}
+        onNavigateHome={props.onNavigateHome}
       />
       <Inquiry />
       <Visit />

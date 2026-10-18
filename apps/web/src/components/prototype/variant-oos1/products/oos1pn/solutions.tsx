@@ -1,18 +1,11 @@
-import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
+import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react";
-import { AnimatePresence, m, type Variants } from "motion/react";
-import {
-  useCallback,
-  useLayoutEffect,
-  useId,
-  useRef,
-  useState,
-  type KeyboardEvent,
-  type ReactNode,
-  type Ref,
-} from "react";
-import { flushSync } from "react-dom";
+import { ArrowLeft, ChevronLeft, ChevronRight } from "@fenchem-lp/ui/components/lucide";
+import { AnimatePresence, m, type Variants } from "@/compat/motion";
+import { createEffect, createSignal, createUniqueId, For, Show } from "solid-js";
+import type { JSX } from "@solidjs/web";
+
+import { flushSync } from "@/compat/react-dom";
 
 import { EASE } from "@/components/prototype/motion-constants";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
@@ -35,9 +28,9 @@ const BODY_FONT =
 const LATIN_FONT = '"Inter Tight", "Source Han Sans SC", "Noto Sans SC", sans-serif';
 
 const TABLET = "@media (min-width: 768px) and (max-width: 1279.98px)";
-const DESKTOP = breakpoints.xl;
-const MD = breakpoints.md;
-const LG = breakpoints.lg;
+const DESKTOP = "@media (min-width: 1280px)";
+const MD = "@media (min-width: 768px)";
+const LG = "@media (min-width: 1024px)";
 const INSET = "min(120px, 8.333vw)";
 const HEADER_HEIGHT = 80;
 const GUTTER = 24;
@@ -46,9 +39,9 @@ const SHEET_PAD = { default: 20, [MD]: 32, [DESKTOP]: 40 } as const;
 const LAST_INDEX = SOLUTION_ITEMS.length - 1;
 
 const CONTENT_VARIANTS: Variants = {
-  enter: (direction: number) => ({ opacity: 0, x: 16 * direction }),
+  enter: (direction) => ({ opacity: 0, x: 16 * (direction as number) }),
   center: { opacity: 1, x: 0 },
-  exit: (direction: number) => ({ opacity: 0, x: -16 * direction }),
+  exit: (direction) => ({ opacity: 0, x: -16 * (direction as number) }),
 };
 
 const styles = stylex.create({
@@ -381,67 +374,68 @@ const styles = stylex.create({
 });
 
 function useElementHeight() {
-  const [node, setNode] = useState<HTMLElement | null>(null);
-  const [height, setHeight] = useState<number | null>(null);
+  const [node, setNode] = createSignal<HTMLElement>();
+  const [height, setHeight] = createSignal<number | null>(null);
 
-  const measureRef = useCallback((node: HTMLElement | null) => {
-    setNode(node);
-    setHeight(node?.offsetHeight ?? null);
-  }, []);
-
-  useLayoutEffect(() => {
-    if (!node) return;
-    const observer = new ResizeObserver(() => setHeight(node.offsetHeight));
-    observer.observe(node);
+  createEffect(node, (current) => {
+    if (!current) return;
+    setHeight(current.offsetHeight);
+    const observer = new ResizeObserver(() => setHeight(current.offsetHeight));
+    observer.observe(current);
     return () => observer.disconnect();
-  }, [node]);
+  });
 
-  return [measureRef, height] as const;
+  return [setNode, height] as const;
 }
 
-function Field({ label, children }: { label: string; children: ReactNode }) {
+// A replacement heading mounts before AnimatePresence inserts it, so focus waits for insertion.
+const focusWhenConnected = (node: HTMLElement, frames = 60) => {
+  if (node.isConnected) node.focus({ preventScroll: true });
+  else if (frames > 0) requestAnimationFrame(() => focusWhenConnected(node, frames - 1));
+};
+
+function Field(props: { label: string; children: JSX.Element }) {
   return (
-    <div {...stylex.props(styles.field)}>
-      <dt {...stylex.props(styles.fieldLabel)}>{label}</dt>
-      <dd {...stylex.props(styles.fieldValue)}>{children}</dd>
+    <div {...stylex.attrs(styles.field)}>
+      <dt {...stylex.attrs(styles.fieldLabel)}>{props.label}</dt>
+      <dd {...stylex.attrs(styles.fieldValue)}>{props.children}</dd>
     </div>
   );
 }
 
-function Lines({ lines, inline = false }: { lines: string[]; inline?: boolean }) {
+function Lines(props: { lines: string[]; inline?: boolean }) {
   return (
-    <ul {...stylex.props(inline ? styles.inlineList : styles.lineList)}>
-      {lines.map((line) => (
-        <li key={line}>{line}</li>
-      ))}
+    <ul {...stylex.attrs(props.inline ? styles.inlineList : styles.lineList)}>
+      <For each={props.lines}>{(line) => <li>{line}</li>}</For>
     </ul>
   );
 }
 
-function DetailBody({
-  item,
-  index,
-  headingId,
-  headingRef,
-}: {
+function DetailBody(props: {
   item: SolutionItem;
   index: number;
   headingId: string;
-  headingRef: Ref<HTMLHeadingElement>;
+  headingRef: (node: HTMLHeadingElement) => void;
 }) {
+  const item = props.item;
   return (
-    <div {...stylex.props(styles.detailBody)}>
-      <header {...stylex.props(styles.detailHead)}>
-        <p {...stylex.props(styles.detailIndex)}>
-          <span {...stylex.props(styles.detailIndexCurrent)}>{padIndex(index)}</span> /{" "}
+    <div {...stylex.attrs(styles.detailBody)}>
+      <header {...stylex.attrs(styles.detailHead)}>
+        <p {...stylex.attrs(styles.detailIndex)}>
+          <span {...stylex.attrs(styles.detailIndexCurrent)}>{padIndex(props.index)}</span> /{" "}
           {padIndex(LAST_INDEX)}
         </p>
-        <h3 id={headingId} ref={headingRef} tabIndex={-1} {...stylex.props(styles.detailTitle)}>
+        <h3
+          id={props.headingId}
+          ref={props.headingRef}
+          tabindex={-1}
+          {...stylex.attrs(styles.detailTitle)}
+        >
           {item.title}
         </h3>
-        <p {...stylex.props(styles.detailSubtitle)}>{item.subtitle}</p>
+        <p {...stylex.attrs(styles.detailSubtitle)}>{item.subtitle}</p>
       </header>
-      <dl {...stylex.props(styles.fields)}>
+      <dl {...stylex.attrs(styles.fields)}>
         <Field label="概述">
           <Lines lines={item.overview} />
         </Field>
@@ -469,145 +463,146 @@ function DetailBody({
 
 export function Solutions() {
   const reduce = useReducedMotion();
-  const titleId = useId();
-  const headingId = useId();
-  const [openIndex, setOpenIndex] = useState<number | null>(null);
-  const [lastIndex, setLastIndex] = useState<number | null>(null);
-  const [direction, setDirection] = useState<1 | -1>(1);
+  const titleId = createUniqueId();
+  const headingId = createUniqueId();
+  const [openIndex, setOpenIndex] = createSignal<number | null>(null);
+  const [lastIndex, setLastIndex] = createSignal<number | null>(null);
+  const [direction, setDirection] = createSignal<1 | -1>(1);
   const [setSummaryNode, summaryHeight] = useElementHeight();
   const [setDetailNode, detailHeight] = useElementHeight();
-  const frameRef = useRef<HTMLDivElement>(null);
-  const headingRef = useRef<HTMLHeadingElement | null>(null);
-  const focusedHeadingBeingReplaced = useRef<HTMLHeadingElement | null>(null);
-  const rowRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  let frame: HTMLDivElement | undefined;
+  let heading: HTMLHeadingElement | undefined;
+  let focusedHeadingBeingReplaced: HTMLHeadingElement | null = null;
+  const rows: (HTMLButtonElement | undefined)[] = [];
 
-  const attachHeading = (node: HTMLHeadingElement | null) => {
-    headingRef.current = node;
-    const replaced = focusedHeadingBeingReplaced.current;
-    if (node && replaced && node !== replaced) {
-      focusedHeadingBeingReplaced.current = null;
-      node.focus({ preventScroll: true });
+  const attachHeading = (node: HTMLHeadingElement) => {
+    heading = node;
+    const replaced = focusedHeadingBeingReplaced;
+    if (replaced && node !== replaced) {
+      focusedHeadingBeingReplaced = null;
+      focusWhenConnected(node);
     }
   };
 
-  const active = openIndex === null ? null : SOLUTION_ITEMS[openIndex];
-  const isOpen = active !== null && active !== undefined;
-  const frameHeight = isOpen ? detailHeight : summaryHeight;
-  const slide = { duration: reduce ? 0 : 0.32, ease: EASE };
-  const behavior: ScrollBehavior = reduce ? "auto" : "smooth";
+  const active = () => {
+    const index = openIndex();
+    return index === null ? null : SOLUTION_ITEMS[index];
+  };
+  const isOpen = () => active() !== null && active() !== undefined;
+  const frameHeight = () => (isOpen() ? detailHeight() : summaryHeight());
+  const slide = () => ({ duration: reduce() ? 0 : 0.32, ease: EASE });
+  const behavior = (): ScrollBehavior => (reduce() ? "auto" : "smooth");
 
   const openAt = (index: number) => {
     flushSync(() => {
       setDirection(1);
       setOpenIndex(index);
     });
-    headingRef.current?.focus({ preventScroll: true });
-    const frame = frameRef.current;
+    heading?.focus({ preventScroll: true });
     if (!frame) return;
     const top = frame.getBoundingClientRect().top;
     if (top < HEADER_HEIGHT + 8) {
-      window.scrollTo({ top: window.scrollY + top - HEADER_HEIGHT - 24, behavior });
+      window.scrollTo({ top: window.scrollY + top - HEADER_HEIGHT - 24, behavior: behavior() });
     }
   };
 
   const close = () => {
-    if (openIndex === null) return;
-    const index = openIndex;
+    const index = openIndex();
+    if (index === null) return;
     flushSync(() => {
       setOpenIndex(null);
       setLastIndex(index);
     });
-    const row = rowRefs.current[index];
+    const row = rows[index];
     if (!row) return;
     row.focus({ preventScroll: true });
     const rect = row.getBoundingClientRect();
     if (rect.top < HEADER_HEIGHT || rect.bottom > window.innerHeight) {
-      row.scrollIntoView({ block: "center", behavior });
+      row.scrollIntoView({ block: "center", behavior: behavior() });
     }
   };
 
   const step = (delta: 1 | -1) => {
-    if (openIndex === null) return;
-    const next = openIndex + delta;
+    const index = openIndex();
+    if (index === null) return;
+    const next = index + delta;
     if (next < 0 || next > LAST_INDEX) return;
-    const heading = headingRef.current;
-    focusedHeadingBeingReplaced.current =
-      heading && document.activeElement === heading ? heading : null;
+    focusedHeadingBeingReplaced = heading && document.activeElement === heading ? heading : null;
     setDirection(delta);
     setOpenIndex(next);
   };
 
-  const onDetailKeyDown = (event: KeyboardEvent<HTMLElement>) => {
+  const onDetailKeyDown = (event: KeyboardEvent) => {
     if (event.key !== "Escape") return;
     event.preventDefault();
     close();
   };
 
   return (
-    <section id="products-solutions" aria-labelledby={titleId} {...stylex.props(styles.section)}>
-      <div {...stylex.props(styles.shell)}>
-        <h2 id={titleId} {...stylex.props(styles.title)}>
+    <section id="products-solutions" aria-labelledby={titleId} {...stylex.attrs(styles.section)}>
+      <div {...stylex.attrs(styles.shell)}>
+        <h2 id={titleId} {...stylex.attrs(styles.title)}>
           应用方案
         </h2>
-        <div ref={frameRef} {...stylex.props(styles.frame)}>
+        <div ref={frame} {...stylex.attrs(styles.frame)}>
           <m.div
-            {...stylex.props(styles.clip)}
+            {...stylex.attrs(styles.clip)}
             initial={false}
-            layout={!reduce}
-            style={{ height: frameHeight ?? "auto" }}
-            transition={slide}
+            layout={!reduce()}
+            style={{ height: frameHeight() ?? "auto" }}
+            transition={slide()}
           >
             <m.div
               ref={setSummaryNode}
               layout="position"
-              inert={isOpen}
-              {...stylex.props(styles.summary)}
+              inert={isOpen()}
+              {...stylex.attrs(styles.summary)}
               initial={false}
-              animate={{ x: isOpen ? -48 : 0 }}
-              transition={slide}
+              animate={{ x: isOpen() ? -48 : 0 }}
+              transition={slide()}
             >
-              <div aria-hidden="true" {...stylex.props(styles.summaryGrid, styles.summaryHead)}>
+              <div aria-hidden="true" {...stylex.attrs(styles.summaryGrid, styles.summaryHead)}>
                 <span>编号</span>
                 <span>方案</span>
                 <span>质地</span>
                 <span>应用</span>
               </div>
-              <ol {...stylex.props(styles.rows)}>
+              <ol {...stylex.attrs(styles.rows)}>
                 {SOLUTION_ITEMS.map((item, index) => (
-                  <li key={item.id} {...stylex.props(styles.rowItem)}>
+                  <li {...stylex.attrs(styles.rowItem)}>
                     <button
                       type="button"
                       ref={(node) => {
-                        rowRefs.current[index] = node;
+                        rows[index] = node;
                       }}
                       onClick={() => openAt(index)}
-                      {...stylex.props(styles.summaryGrid, styles.row, stylex.defaultMarker())}
+                      {...stylex.attrs(styles.summaryGrid, styles.row, stylex.defaultMarker())}
                     >
                       <span
-                        {...stylex.props(
+                        {...stylex.attrs(
                           styles.rowIndex,
-                          lastIndex === index && styles.rowIndexLast,
+                          lastIndex() === index && styles.rowIndexLast,
                         )}
                       >
                         {padIndex(index)}
                       </span>
-                      <span {...stylex.props(styles.rowMain)}>
-                        <span {...stylex.props(styles.rowTitle)}>{item.title}</span>
-                        <span {...stylex.props(styles.rowSubtitle)}>{item.subtitle}</span>
+                      <span {...stylex.attrs(styles.rowMain)}>
+                        <span {...stylex.attrs(styles.rowTitle)}>{item.title}</span>
+                        <span {...stylex.attrs(styles.rowSubtitle)}>{item.subtitle}</span>
                       </span>
-                      <span {...stylex.props(styles.rowCell)}>
-                        <span {...stylex.props(styles.srOnly)}>Texture</span>
+                      <span {...stylex.attrs(styles.rowCell)}>
+                        <span {...stylex.attrs(styles.srOnly)}>Texture</span>
                         {item.texture.map((line) => (
-                          <span key={line}>{line}</span>
+                          <span>{line}</span>
                         ))}
                       </span>
-                      <span {...stylex.props(styles.rowCell)}>
-                        <span {...stylex.props(styles.srOnly)}>Applications</span>
+                      <span {...stylex.attrs(styles.rowCell)}>
+                        <span {...stylex.attrs(styles.srOnly)}>Applications</span>
                         {item.applications.map((line) => (
-                          <span key={line}>{line}</span>
+                          <span>{line}</span>
                         ))}
                       </span>
-                      <span aria-hidden="true" {...stylex.props(styles.rowArrow)}>
+                      <span aria-hidden="true" {...stylex.attrs(styles.rowArrow)}>
                         <ChevronRight size={16} strokeWidth={1.5} absoluteStrokeWidth />
                       </span>
                     </button>
@@ -617,30 +612,29 @@ export function Solutions() {
             </m.div>
             <m.div
               aria-hidden="true"
-              {...stylex.props(styles.scrim)}
+              {...stylex.attrs(styles.scrim)}
               initial={false}
-              animate={{ opacity: isOpen ? 1 : 0 }}
-              transition={slide}
+              animate={{ opacity: isOpen() ? 1 : 0 }}
+              transition={slide()}
             />
             <AnimatePresence initial={false}>
-              {isOpen && openIndex !== null && (
+              <Show when={isOpen() && openIndex() !== null}>
                 <m.section
-                  key="detail"
                   layout="position"
                   ref={setDetailNode}
                   aria-labelledby={headingId}
                   onKeyDown={onDetailKeyDown}
-                  {...stylex.props(styles.detail)}
+                  {...stylex.attrs(styles.detail)}
                   initial={{ x: "100%" }}
                   animate={{ x: 0 }}
                   exit={{ x: "100%" }}
-                  transition={slide}
+                  transition={slide()}
                 >
-                  <div {...stylex.props(styles.toolbar)}>
+                  <div {...stylex.attrs(styles.toolbar)}>
                     <button
                       type="button"
                       onClick={close}
-                      {...stylex.props(styles.toolButton, styles.backButton)}
+                      {...stylex.attrs(styles.toolButton, styles.backButton)}
                     >
                       <ArrowLeft
                         size={16}
@@ -653,13 +647,16 @@ export function Solutions() {
                     <div
                       role="group"
                       aria-label="Switch solution"
-                      {...stylex.props(styles.stepper)}
+                      {...stylex.attrs(styles.stepper)}
                     >
                       <button
                         type="button"
-                        aria-disabled={openIndex === 0}
+                        aria-disabled={openIndex() === 0 ? "true" : "false"}
                         onClick={() => step(-1)}
-                        {...stylex.props(styles.toolButton, openIndex === 0 && styles.toolDisabled)}
+                        {...stylex.attrs(
+                          styles.toolButton,
+                          openIndex() === 0 && styles.toolDisabled,
+                        )}
                       >
                         <ChevronLeft
                           size={16}
@@ -671,11 +668,11 @@ export function Solutions() {
                       </button>
                       <button
                         type="button"
-                        aria-disabled={openIndex === LAST_INDEX}
+                        aria-disabled={openIndex() === LAST_INDEX ? "true" : "false"}
                         onClick={() => step(1)}
-                        {...stylex.props(
+                        {...stylex.attrs(
                           styles.toolButton,
-                          openIndex === LAST_INDEX && styles.toolDisabled,
+                          openIndex() === LAST_INDEX && styles.toolDisabled,
                         )}
                       >
                         下一个
@@ -688,26 +685,29 @@ export function Solutions() {
                       </button>
                     </div>
                   </div>
-                  <AnimatePresence mode="wait" initial={false} custom={direction}>
-                    <m.div
-                      key={active.id}
-                      custom={direction}
-                      variants={CONTENT_VARIANTS}
-                      initial="enter"
-                      animate="center"
-                      exit="exit"
-                      transition={{ duration: reduce ? 0 : 0.2, ease: EASE }}
-                    >
-                      <DetailBody
-                        item={active}
-                        index={openIndex}
-                        headingId={headingId}
-                        headingRef={attachHeading}
-                      />
-                    </m.div>
+                  <AnimatePresence mode="wait" initial={false} custom={direction()}>
+                    <Show when={active()} keyed>
+                      {(item) => (
+                        <m.div
+                          custom={direction()}
+                          variants={CONTENT_VARIANTS}
+                          initial="enter"
+                          animate="center"
+                          exit="exit"
+                          transition={{ duration: reduce() ? 0 : 0.2, ease: EASE }}
+                        >
+                          <DetailBody
+                            item={item}
+                            index={SOLUTION_ITEMS.indexOf(item)}
+                            headingId={headingId}
+                            headingRef={attachHeading}
+                          />
+                        </m.div>
+                      )}
+                    </Show>
                   </AnimatePresence>
                 </m.section>
-              )}
+              </Show>
             </AnimatePresence>
           </m.div>
         </div>

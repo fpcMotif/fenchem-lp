@@ -3,7 +3,7 @@ import * as stylex from "@stylexjs/stylex";
 import { ABOUT_CULTURE } from "../../about-data";
 import { ROOM_BOX, roomDrawing } from "./perspective";
 import { RoomSign } from "./room-sign";
-import { sectionTitle, ui } from "./shared";
+import { NON_SCALING, sectionTitle, UNFOCUSABLE, ui } from "./shared";
 import { bp, face, tone } from "./tokens.stylex";
 
 const ROOM = roomDrawing();
@@ -131,68 +131,56 @@ export function Culture() {
     <section
       id="about-culture"
       aria-labelledby="oos1z-culture"
-      {...stylex.props(ui.anchor, ui.room)}
+      {...stylex.attrs(ui.anchor, ui.room)}
     >
-      <div {...stylex.props(ui.shell)}>
+      <div {...stylex.attrs(ui.shell)}>
         <RoomSign
           numeral="IV"
           id="oos1z-culture"
           title={sectionTitle("about-culture")}
           english="Culture, in three rooms"
         />
-        <ol {...stylex.props(styles.rooms)}>
+        <ol {...stylex.attrs(styles.rooms)}>
           {ABOUT_CULTURE.values.map((value, index) => (
-            <li key={value.glyph} {...stylex.props(styles.room)}>
+            <li {...stylex.attrs(styles.room)}>
               <div
-                style={{ aspectRatio: `${ROOM_BOX.width} / ${ROOM_BOX.height}` }}
-                {...stylex.props(styles.doorway)}
+                style={{ "aspect-ratio": `${ROOM_BOX.width} / ${ROOM_BOX.height}` }}
+                {...stylex.attrs(styles.doorway)}
               >
                 <svg
                   viewBox={`0 0 ${ROOM_BOX.width} ${ROOM_BOX.height}`}
                   aria-hidden="true"
-                  focusable="false"
-                  {...stylex.props(styles.drawing)}
+                  {...UNFOCUSABLE}
+                  {...stylex.attrs(styles.drawing)}
                 >
-                  <path
-                    d={ROOM.fine}
-                    vectorEffect="non-scaling-stroke"
-                    {...stylex.props(styles.fine)}
-                  />
-                  <path
-                    d={ROOM.edges}
-                    vectorEffect="non-scaling-stroke"
-                    {...stylex.props(styles.edges)}
-                  />
+                  <path d={ROOM.fine} {...NON_SCALING} {...stylex.attrs(styles.fine)} />
+                  <path d={ROOM.edges} {...NON_SCALING} {...stylex.attrs(styles.edges)} />
                   <rect
                     width={ROOM_BOX.width}
                     height={ROOM_BOX.height}
-                    vectorEffect="non-scaling-stroke"
-                    {...stylex.props(styles.door)}
+                    {...NON_SCALING}
+                    {...stylex.attrs(styles.door)}
                   />
-                  <path
-                    d={ROOM.works}
-                    vectorEffect="non-scaling-stroke"
-                    {...stylex.props(styles.plinth)}
-                  />
+                  <path d={ROOM.works} {...NON_SCALING} {...stylex.attrs(styles.plinth)} />
                 </svg>
                 <p
                   aria-hidden="true"
-                  style={{ fontSize: `${ROOM.glyphSize}cqi`, bottom: `${ROOM.glyphBottom}%` }}
-                  {...stylex.props(styles.glyph)}
+                  style={{ "font-size": `${ROOM.glyphSize}cqi`, bottom: `${ROOM.glyphBottom}%` }}
+                  {...stylex.attrs(styles.glyph)}
                 >
                   {value.glyph}
                 </p>
               </div>
-              <div {...stylex.props(styles.label)}>
-                <span lang="en" {...stylex.props(ui.number, styles.number)}>
+              <div {...stylex.attrs(styles.label)}>
+                <span lang="en" {...stylex.attrs(ui.number, styles.number)}>
                   Nº {String(FIRST_NUMBER + index).padStart(2, "0")}
                 </span>
-                <h3 {...stylex.props(styles.title)}>{value.title}</h3>
-                <p lang="en" {...stylex.props(ui.italic, styles.english)}>
+                <h3 {...stylex.attrs(styles.title)}>{value.title}</h3>
+                <p lang="en" {...stylex.attrs(ui.italic, styles.english)}>
                   {ENGLISH[index]}
                 </p>
-                <p {...stylex.props(styles.desc)}>
-                  <span {...stylex.props(styles.balanced)}>{value.desc}</span>
+                <p {...stylex.attrs(styles.desc)}>
+                  <span {...stylex.attrs(styles.balanced)}>{value.desc}</span>
                 </p>
               </div>
             </li>

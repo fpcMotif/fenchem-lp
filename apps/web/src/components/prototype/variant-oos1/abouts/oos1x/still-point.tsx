@@ -1,6 +1,7 @@
 import * as stylex from "@stylexjs/stylex";
-import { m, useMotionValue, useMotionValueEvent, useScroll } from "motion/react";
-import { useCallback, useEffect, useRef, type CSSProperties } from "react";
+import type { JSX } from "@solidjs/web";
+import { createEffect } from "solid-js";
+import { m, useMotionValue, useMotionValueEvent, useScroll } from "@/compat/motion";
 
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
@@ -19,7 +20,7 @@ const PHONE_LEVEL_SHARE = 0.5;
 const BAND_GEOMETRY = {
   "--oos1x-band": String(1 + HOLD),
   "--oos1x-entry": String(READING_LINE_RATIO - APPROACH / 2),
-} as CSSProperties;
+} as JSX.CSSProperties;
 
 function restOffset(travel: number, approach: number, hold: number, arrive: number) {
   const leave = arrive + hold;
@@ -124,8 +125,8 @@ const styles = stylex.create({
 });
 
 export function StillPoint() {
-  const bandRef = useRef<HTMLDivElement>(null);
-  const probeRef = useRef<HTMLSpanElement>(null);
+  let bandRef!: HTMLDivElement;
+  let probeRef!: HTMLSpanElement;
   const reduce = useReducedMotion();
   const twoColumn = useTwoColumn();
   const { scrollY } = useScroll();
@@ -135,11 +136,11 @@ export function StillPoint() {
   const trailX = useMotionValue(0);
   const trailY = useMotionValue(0);
 
-  const update = useCallback(() => {
-    const band = bandRef.current;
-    const probe = probeRef.current;
+  const update = () => {
+    const band = bandRef;
+    const probe = probeRef;
     if (!band || !probe) return;
-    if (reduce) {
+    if (reduce()) {
       for (const value of [rest, leadX, leadY, trailX, trailY]) value.set(0);
       return;
     }
@@ -149,50 +150,57 @@ export function StillPoint() {
     rest.set(restOffset(travel, APPROACH * visible, HOLD * visible, visible));
     const remaining = Math.min(1, Math.max(0, (visible - travel) / (LEVEL_SPAN * visible)));
     const depth = LEVEL_DEPTH * visible * remaining * remaining;
-    leadY.set(twoColumn ? depth : 0);
-    trailY.set(twoColumn ? -depth : 0);
-    leadX.set(twoColumn ? 0 : -depth * PHONE_LEVEL_SHARE);
-    trailX.set(twoColumn ? 0 : depth * PHONE_LEVEL_SHARE);
-  }, [reduce, twoColumn, rest, leadX, leadY, trailX, trailY]);
+    const wide = twoColumn();
+    leadY.set(wide ? depth : 0);
+    trailY.set(wide ? -depth : 0);
+    leadX.set(wide ? 0 : -depth * PHONE_LEVEL_SHARE);
+    trailX.set(wide ? 0 : depth * PHONE_LEVEL_SHARE);
+  };
 
   useMotionValueEvent(scrollY, "change", update);
 
-  useEffect(() => {
-    update();
-    window.addEventListener("resize", update);
-    return () => window.removeEventListener("resize", update);
-  }, [update]);
+  createEffect(
+    () => [reduce(), twoColumn()],
+    () => {
+      update();
+      window.addEventListener("resize", update);
+      return () => window.removeEventListener("resize", update);
+    },
+  );
 
   return (
     <div
       ref={bandRef}
-      {...stylex.props(styles.band, reduce ? styles.bandStill : styles.bandMoving)}
+      {...stylex.attrs(styles.band, reduce() ? styles.bandStill : styles.bandMoving)}
       style={BAND_GEOMETRY}
     >
-      <span ref={probeRef} aria-hidden="true" {...stylex.props(styles.probe)} />
-      <m.div {...stylex.props(reduce ? styles.blockStill : styles.blockMoving)} style={{ y: rest }}>
-        <div {...stylex.props(ui.shell)}>
-          <div {...stylex.props(styles.measure)}>
-            <div {...stylex.props(ui.columns, styles.standing)}>
+      <span ref={probeRef} aria-hidden="true" {...stylex.attrs(styles.probe)} />
+      <m.div
+        {...stylex.attrs(reduce() ? styles.blockStill : styles.blockMoving)}
+        style={{ y: rest }}
+      >
+        <div {...stylex.attrs(ui.shell)}>
+          <div {...stylex.attrs(styles.measure)}>
+            <div {...stylex.attrs(ui.columns, styles.standing)}>
               <p
                 lang="en"
                 aria-hidden="true"
-                {...stylex.props(type.counterweight, type.counterHeading, styles.label)}
+                {...stylex.attrs(type.counterweight, type.counterHeading, styles.label)}
               >
                 Responsibility
               </p>
-              <h2 id="oos1x-csr" {...stylex.props(type.light, type.heading, styles.heading)}>
+              <h2 id="oos1x-csr" {...stylex.attrs(type.light, type.heading, styles.heading)}>
                 {ABOUT_CSR.title}
               </h2>
             </div>
-            <p {...stylex.props(ui.columns, type.light, styles.sentence)}>
-              <m.span {...stylex.props(styles.lead)} style={{ x: leadX, y: leadY }}>
+            <p {...stylex.attrs(ui.columns, type.light, styles.sentence)}>
+              <m.span {...stylex.attrs(styles.lead)} style={{ x: leadX, y: leadY }}>
                 {ABOUT_CSR.statement[0]}
               </m.span>
-              <m.span {...stylex.props(styles.trail)} style={{ x: trailX, y: trailY }}>
+              <m.span {...stylex.attrs(styles.trail)} style={{ x: trailX, y: trailY }}>
                 {ABOUT_CSR.statement[1]}
               </m.span>
-              <span aria-hidden="true" {...stylex.props(styles.pivotSlot)}>
+              <span aria-hidden="true" {...stylex.attrs(styles.pivotSlot)}>
                 <FulcrumMark sx={styles.pivot} />
               </span>
             </p>

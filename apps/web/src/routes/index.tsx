@@ -1,5 +1,6 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { Suspense } from "react";
+import { createFileRoute } from "@tanstack/solid-router";
+import { Loading } from "solid-js";
+import { dynamic } from "@solidjs/web";
 
 import { PrototypeSwitcher } from "@/components/prototype/prototype-switcher";
 import {
@@ -38,12 +39,14 @@ export const Route = createFileRoute("/")({
 });
 
 function HomeComponent() {
-  const { variant, compare } = Route.useSearch();
-  const Active = VARIANTS.find((v) => v.key === variant)?.Component;
+  const search = Route.useSearch();
+  const Active = dynamic(() => VARIANTS.find((v) => v.key === search().variant)?.Component);
   return (
     <>
-      <Suspense fallback={null}>{Active ? <Active /> : null}</Suspense>
-      <PrototypeSwitcher current={variant} compare={compare} />
+      <Loading fallback={null}>
+        <Active />
+      </Loading>
+      <PrototypeSwitcher current={search().variant} compare={search().compare} />
     </>
   );
 }

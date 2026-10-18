@@ -1,8 +1,8 @@
 import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { ArrowLeft, ArrowRight } from "lucide-react";
-import { m } from "motion/react";
-import { useEffect, useId, useRef, useState, type KeyboardEvent } from "react";
+import { ArrowLeft, ArrowRight } from "@fenchem-lp/ui/components/lucide";
+import { m } from "@/compat/motion";
+import { createEffect, createSignal, createUniqueId, flush, For, Show, untrack } from "solid-js";
 
 import { EASE } from "@/components/prototype/motion-constants";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
@@ -57,6 +57,10 @@ const KEY_STEPS: Partial<Record<string, (index: number) => number>> = {
   Home: () => 0,
   End: () => LAST_INDEX,
 };
+
+// stylex.attrs with reactive (accessor) arguments resolves at runtime here, because
+// the StyleX compiler tries to evaluate them at build time and throws.
+const sxProps: typeof stylex.attrs = (...args) => stylex.attrs(...args);
 
 const styles = stylex.create({
   section: {
@@ -375,57 +379,57 @@ const styles = stylex.create({
   },
 });
 
-function FieldRow({ label, lines }: { label: string; lines: string[] }) {
+function FieldRow(props: { label: string; lines: string[] }) {
   return (
-    <div {...stylex.props(styles.field)}>
-      <dt {...stylex.props(styles.fieldLabel)}>{label}</dt>
-      <dd {...stylex.props(styles.fieldValue)}>
-        {lines.length > 0 ? (
-          <ul {...stylex.props(styles.lines)}>
-            {lines.map((line) => (
-              <li key={line} {...stylex.props(styles.line)}>
-                {line}
-              </li>
-            ))}
+    <div {...stylex.attrs(styles.field)}>
+      <dt {...stylex.attrs(styles.fieldLabel)}>{props.label}</dt>
+      <dd {...stylex.attrs(styles.fieldValue)}>
+        <Show
+          when={props.lines.length > 0}
+          fallback={
+            <>
+              <span aria-hidden="true" {...stylex.attrs(styles.absent)}>
+                —
+              </span>
+              <span {...stylex.attrs(styles.srOnly)}>None</span>
+            </>
+          }
+        >
+          <ul {...stylex.attrs(styles.lines)}>
+            <For each={props.lines}>{(line) => <li {...stylex.attrs(styles.line)}>{line}</li>}</For>
           </ul>
-        ) : (
-          <>
-            <span aria-hidden="true" {...stylex.props(styles.absent)}>
-              —
-            </span>
-            <span {...stylex.props(styles.srOnly)}>None</span>
-          </>
-        )}
+        </Show>
       </dd>
     </div>
   );
 }
 
-function TabTitle({ title }: { title: string }) {
+function TabTitle(props: { title: string }) {
+  const title = untrack(() => props.title);
   const words = title.split(" ");
   if (words.length === 1) return <>{title}</>;
   return (
     <>
       {words.map((word, index) => (
-        <span key={word}>
+        <span>
           {index > 0 && " "}
-          <span {...stylex.props(styles.titleWord)}>{word}</span>
+          <span {...stylex.attrs(styles.titleWord)}>{word}</span>
         </span>
       ))}
     </>
   );
 }
 
-function Sheet({ item }: { item: SolutionItem }) {
+function Sheet(props: { item: SolutionItem }) {
   return (
     <>
-      <header {...stylex.props(styles.sheetHead)}>
-        <h3 {...stylex.props(styles.sheetTitle)}>{item.title}</h3>
-        <p {...stylex.props(styles.sheetSubtitle)}>{item.subtitle}</p>
+      <header {...stylex.attrs(styles.sheetHead)}>
+        <h3 {...stylex.attrs(styles.sheetTitle)}>{props.item.title}</h3>
+        <p {...stylex.attrs(styles.sheetSubtitle)}>{props.item.subtitle}</p>
       </header>
-      <dl {...stylex.props(styles.fields)}>
+      <dl {...stylex.attrs(styles.fields)}>
         {FIELDS.map((field) => (
-          <FieldRow key={field.key} label={field.label} lines={item[field.key]} />
+          <FieldRow label={field.label} lines={props.item[field.key]} />
         ))}
       </dl>
     </>
@@ -434,78 +438,81 @@ function Sheet({ item }: { item: SolutionItem }) {
 
 export function Solutions() {
   const reduce = useReducedMotion();
-  const baseId = useId();
+  const baseId = createUniqueId();
   const titleId = `${baseId}-title`;
   const tabId = (index: number) => `${baseId}-tab-${index}`;
   const panelId = (index: number) => `${baseId}-panel-${index}`;
-  const [activeIndex, setActiveIndex] = useState(0);
-  const folderRef = useRef<HTMLDivElement>(null);
-  const tablistRef = useRef<HTMLDivElement>(null);
-  const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
-  const previous = activeIndex > 0 ? SOLUTION_ITEMS[activeIndex - 1] : null;
-  const next = activeIndex < LAST_INDEX ? SOLUTION_ITEMS[activeIndex + 1] : null;
+  const [activeIndex, setActiveIndex] = createSignal(0);
+  let folderEl!: HTMLDivElement;
+  let tablistEl!: HTMLDivElement;
+  const tabRefs: (HTMLButtonElement | undefined)[] = [];
+  const previous = () => (activeIndex() > 0 ? SOLUTION_ITEMS[activeIndex() - 1]! : null);
+  const next = () => (activeIndex() < LAST_INDEX ? SOLUTION_ITEMS[activeIndex() + 1]! : null);
 
-  useEffect(() => {
-    const tablist = tablistRef.current;
-    const tab = tabRefs.current[activeIndex];
-    if (!tablist || !tab || tablist.scrollWidth <= tablist.clientWidth) return;
-    const left = tab.offsetLeft - (tablist.clientWidth - tab.offsetWidth) / 2;
-    tablist.scrollTo({ left: Math.max(0, left), behavior: reduce ? "auto" : "smooth" });
-  }, [activeIndex, reduce]);
+  createEffect(
+    () => [activeIndex(), reduce()] as const,
+    ([index, reduceNow]) => {
+      const tablist = tablistEl;
+      const tab = tabRefs[index];
+      if (!tablist || !tab || tablist.scrollWidth <= tablist.clientWidth) return;
+      const left = tab.offsetLeft - (tablist.clientWidth - tab.offsetWidth) / 2;
+      tablist.scrollTo({ left: Math.max(0, left), behavior: reduceNow ? "auto" : "smooth" });
+    },
+  );
 
-  const onTabKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {
+  const onTabKeyDown = (event: KeyboardEvent) => {
     const step = KEY_STEPS[event.key];
     if (!step) return;
     event.preventDefault();
-    const target = step(activeIndex);
+    const target = step(activeIndex());
     setActiveIndex(target);
-    tabRefs.current[target]?.focus({ preventScroll: true });
+    flush();
+    tabRefs[target]?.focus({ preventScroll: true });
   };
 
   const stepTo = (index: number) => {
     if (index < 0 || index > LAST_INDEX) return;
     setActiveIndex(index);
-    const folder = folderRef.current;
+    const folder = folderEl;
     if (folder && folder.getBoundingClientRect().top < HEADER_HEIGHT) {
-      folder.scrollIntoView({ block: "start", behavior: reduce ? "auto" : "smooth" });
+      folder.scrollIntoView({ block: "start", behavior: reduce() ? "auto" : "smooth" });
     }
   };
 
   return (
-    <section id="products-solutions" aria-labelledby={titleId} {...stylex.props(styles.section)}>
-      <div {...stylex.props(styles.shell)}>
-        <h2 id={titleId} {...stylex.props(styles.title)}>
+    <section id="products-solutions" aria-labelledby={titleId} {...stylex.attrs(styles.section)}>
+      <div {...stylex.attrs(styles.shell)}>
+        <h2 id={titleId} {...stylex.attrs(styles.title)}>
           应用方案
         </h2>
-        <div ref={folderRef} {...stylex.props(styles.folder)}>
+        <div ref={folderEl} {...stylex.attrs(styles.folder)}>
           <div
-            ref={tablistRef}
+            ref={tablistEl}
             role="tablist"
             aria-labelledby={titleId}
-            {...stylex.props(styles.tablist)}
+            {...stylex.attrs(styles.tablist)}
           >
             {SOLUTION_ITEMS.map((item, index) => {
-              const isActive = index === activeIndex;
+              const isActive = () => index === activeIndex();
               return (
                 <button
-                  key={item.id}
                   ref={(node) => {
-                    tabRefs.current[index] = node;
+                    tabRefs[index] = node;
                   }}
                   id={tabId(index)}
                   type="button"
                   role="tab"
-                  aria-selected={isActive}
+                  aria-selected={isActive() ? "true" : "false"}
                   aria-controls={panelId(index)}
-                  tabIndex={isActive ? 0 : -1}
+                  tabindex={isActive() ? 0 : -1}
                   onClick={() => setActiveIndex(index)}
                   onKeyDown={onTabKeyDown}
-                  {...stylex.props(styles.tab, isActive && styles.tabActive)}
+                  {...stylex.attrs(styles.tab, isActive() && styles.tabActive)}
                 >
-                  <span {...stylex.props(styles.tabNumber, isActive && styles.tabNumberActive)}>
+                  <span {...stylex.attrs(styles.tabNumber, isActive() && styles.tabNumberActive)}>
                     {padIndex(index)}
                   </span>
-                  <span {...stylex.props(styles.tabTitle, isActive && styles.tabTitleActive)}>
+                  <span {...stylex.attrs(styles.tabTitle, isActive() && styles.tabTitleActive)}>
                     <TabTitle title={item.title} />
                   </span>
                 </button>
@@ -513,57 +520,54 @@ export function Solutions() {
             })}
           </div>
         </div>
-        <div {...stylex.props(styles.sheet)}>
-          <div {...stylex.props(styles.panels)}>
+        <div {...stylex.attrs(styles.sheet)}>
+          <div {...stylex.attrs(styles.panels)}>
             {SOLUTION_ITEMS.map((item, index) => {
-              const isActive = index === activeIndex;
+              const isActive = () => index === activeIndex();
               return (
                 <m.div
-                  key={item.id}
                   id={panelId(index)}
                   role="tabpanel"
                   aria-labelledby={tabId(index)}
-                  tabIndex={isActive ? 0 : -1}
-                  inert={!isActive}
+                  tabindex={isActive() ? 0 : -1}
+                  inert={!isActive()}
                   initial={false}
-                  animate={isActive ? { opacity: 1, y: 0 } : { opacity: 0, y: reduce ? 0 : 6 }}
+                  animate={isActive() ? { opacity: 1, y: 0 } : { opacity: 0, y: reduce() ? 0 : 6 }}
                   transition={
-                    isActive && !reduce ? { duration: 0.24, ease: EASE } : { duration: 0 }
+                    isActive() && !reduce() ? { duration: 0.24, ease: EASE } : { duration: 0 }
                   }
-                  {...stylex.props(styles.panel, !isActive && styles.panelIdle)}
+                  {...sxProps(styles.panel, !isActive() && styles.panelIdle)}
                 >
                   <Sheet item={item} />
                 </m.div>
               );
             })}
           </div>
-          <nav aria-label="Solution pages" {...stylex.props(styles.foot)}>
+          <nav aria-label="Solution pages" {...stylex.attrs(styles.foot)}>
             <button
               type="button"
-              aria-disabled={previous === null}
-              aria-controls={panelId(activeIndex)}
-              onClick={() => stepTo(activeIndex - 1)}
-              {...stylex.props(
-                styles.step,
-                styles.stepPrev,
-                previous === null && styles.stepDisabled,
-              )}
+              aria-disabled={previous() === null ? "true" : "false"}
+              aria-controls={panelId(activeIndex())}
+              onClick={() => stepTo(activeIndex() - 1)}
+              {...sxProps(styles.step, styles.stepPrev, previous() === null && styles.stepDisabled)}
             >
               <ArrowLeft size={16} strokeWidth={1.5} absoluteStrokeWidth aria-hidden="true" />
               上一个
-              {previous && <span {...stylex.props(styles.stepNeighbor)}>{previous.title}</span>}
+              {previous() && (
+                <span {...stylex.attrs(styles.stepNeighbor)}>{previous()!.title}</span>
+              )}
             </button>
-            <span aria-hidden="true" {...stylex.props(styles.counter)}>
-              {padIndex(activeIndex)} / {padIndex(LAST_INDEX)}
+            <span aria-hidden="true" {...stylex.attrs(styles.counter)}>
+              {padIndex(activeIndex())} / {padIndex(LAST_INDEX)}
             </span>
             <button
               type="button"
-              aria-disabled={next === null}
-              aria-controls={panelId(activeIndex)}
-              onClick={() => stepTo(activeIndex + 1)}
-              {...stylex.props(styles.step, styles.stepNext, next === null && styles.stepDisabled)}
+              aria-disabled={next() === null ? "true" : "false"}
+              aria-controls={panelId(activeIndex())}
+              onClick={() => stepTo(activeIndex() + 1)}
+              {...sxProps(styles.step, styles.stepNext, next() === null && styles.stepDisabled)}
             >
-              {next && <span {...stylex.props(styles.stepNeighbor)}>{next.title}</span>}
+              {next() && <span {...stylex.attrs(styles.stepNeighbor)}>{next()!.title}</span>}
               下一个
               <ArrowRight size={16} strokeWidth={1.5} absoluteStrokeWidth aria-hidden="true" />
             </button>

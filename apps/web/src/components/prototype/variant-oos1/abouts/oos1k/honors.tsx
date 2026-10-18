@@ -158,16 +158,16 @@ const scale = stylex.create({
 const magnitude = { 1: scale.dotFirst, 2: scale.dotSecond, 3: scale.dotThird } as const;
 const type = { 1: scale.nameFirst, 2: scale.nameSecond, 3: scale.nameThird } as const;
 
-function Dot({ mag, hidden }: { mag: Magnitude; hidden?: boolean }) {
+function Dot(props: { mag: Magnitude; hidden?: boolean }) {
   return (
     <span
       aria-hidden="true"
-      {...stylex.props(
+      {...stylex.attrs(
         styles.dot,
-        magnitude[mag],
+        magnitude[props.mag],
         ui.dim,
-        hidden === true && ui.dimHidden,
-        ui.dimDelay((mag - 1) * 520),
+        props.hidden === true && ui.dimHidden,
+        ui.dimDelay((props.mag - 1) * 520),
       )}
     />
   );
@@ -177,9 +177,9 @@ export function Honors() {
   const [tableRef, hidden] = useDusk<HTMLTableElement>();
 
   return (
-    <section id="about-honor" aria-labelledby="oos1k-honor" {...stylex.props(ui.section, ui.shell)}>
-      <div {...stylex.props(styles.grid)}>
-        <div {...stylex.props(styles.aside)}>
+    <section id="about-honor" aria-labelledby="oos1k-honor" {...stylex.attrs(ui.section, ui.shell)}>
+      <div {...stylex.attrs(styles.grid)}>
+        <div {...stylex.attrs(styles.aside)}>
           <ChartHeading
             id="oos1k-honor"
             numeral="V"
@@ -187,22 +187,22 @@ export function Honors() {
             title={ABOUT_HONORS.title}
             note="A catalogue by magnitude"
           />
-          <div {...stylex.props(styles.keyBox)}>
-            <p {...stylex.props(ui.label)}>
+          <div {...stylex.attrs(styles.keyBox)}>
+            <p {...stylex.attrs(ui.label)}>
               <span lang="en">Magnitude</span> · 星等
             </p>
-            <ul {...stylex.props(styles.key)}>
+            <ul {...stylex.attrs(styles.key)}>
               {LEVELS.map((level) => (
-                <li key={level} {...stylex.props(styles.keyRow)}>
-                  <span {...stylex.props(styles.dotCell)}>
+                <li {...stylex.attrs(styles.keyRow)}>
+                  <span {...stylex.attrs(styles.dotCell)}>
                     <Dot mag={CLASSES[level].magnitude} />
                   </span>
-                  <span {...stylex.props(styles.dotCell, ui.designation, styles.keyNumeral)}>
+                  <span {...stylex.attrs(styles.dotCell, ui.designation, styles.keyNumeral)}>
                     {CLASSES[level].magnitude}
                   </span>
-                  <span {...stylex.props(styles.keyName)}>
+                  <span {...stylex.attrs(styles.keyName)}>
                     {CLASSES[level].zh}
-                    <span lang="en" {...stylex.props(ui.label)}>
+                    <span lang="en" {...stylex.attrs(ui.label)}>
                       {CLASSES[level].en}
                     </span>
                   </span>
@@ -212,23 +212,23 @@ export function Honors() {
           </div>
         </div>
 
-        <table ref={tableRef} {...stylex.props(styles.table)}>
-          <caption {...stylex.props(ui.srOnly)}>Honors star catalog, sorted by magnitude</caption>
+        <table ref={tableRef} {...stylex.attrs(styles.table)}>
+          <caption {...stylex.attrs(ui.srOnly)}>Honors star catalog, sorted by magnitude</caption>
           <thead>
             <tr>
-              <th scope="col" {...stylex.props(ui.label, styles.th, styles.dotColumn)}>
-                <span {...stylex.props(ui.srOnly)}>Star</span>
+              <th scope="col" {...stylex.attrs(ui.label, styles.th, styles.dotColumn)}>
+                <span {...stylex.attrs(ui.srOnly)}>Star</span>
               </th>
-              <th scope="col" lang="en" {...stylex.props(ui.label, styles.th, styles.catalogue)}>
+              <th scope="col" lang="en" {...stylex.attrs(ui.label, styles.th, styles.catalogue)}>
                 Cat. No.
               </th>
-              <th scope="col" {...stylex.props(ui.label, styles.th)}>
+              <th scope="col" {...stylex.attrs(ui.label, styles.th)}>
                 名称 <span lang="en">· Designation</span>
               </th>
-              <th scope="col" {...stylex.props(ui.label, styles.th, styles.classColumn)}>
+              <th scope="col" {...stylex.attrs(ui.label, styles.th, styles.classColumn)}>
                 级别 <span lang="en">· Class</span>
               </th>
-              <th scope="col" lang="en" {...stylex.props(ui.label, styles.th, styles.magColumn)}>
+              <th scope="col" lang="en" {...stylex.attrs(ui.label, styles.th, styles.magColumn)}>
                 Mag.
               </th>
             </tr>
@@ -237,28 +237,28 @@ export function Honors() {
             {ABOUT_HONORS.items.map((item, index) => {
               const level = CLASSES[item.level];
               return (
-                <tr key={item.id}>
-                  <td {...stylex.props(styles.td, styles.dotColumn)}>
-                    <span {...stylex.props(styles.dotCell)}>
-                      <Dot mag={level.magnitude} hidden={hidden} />
+                <tr>
+                  <td {...stylex.attrs(styles.td, styles.dotColumn)}>
+                    <span {...stylex.attrs(styles.dotCell)}>
+                      <Dot mag={level.magnitude} hidden={hidden()} />
                     </span>
                   </td>
-                  <td lang="en" {...stylex.props(ui.label, styles.td, styles.catalogue)}>
+                  <td lang="en" {...stylex.attrs(ui.label, styles.td, styles.catalogue)}>
                     FC {String(index + 1).padStart(3, "0")}
                   </td>
-                  <td {...stylex.props(styles.td)}>
-                    <span {...stylex.props(styles.name, type[level.magnitude])}>{item.title}</span>
-                    <span aria-hidden="true" {...stylex.props(ui.label, styles.sub)}>
+                  <td {...stylex.attrs(styles.td)}>
+                    <span {...stylex.attrs(styles.name, type[level.magnitude])}>{item.title}</span>
+                    <span aria-hidden="true" {...stylex.attrs(ui.label, styles.sub)}>
                       {level.zh} · <span lang="en">{level.en}</span>
                     </span>
                   </td>
-                  <td {...stylex.props(styles.td, styles.classColumn)}>
-                    <span {...stylex.props(styles.classZh)}>{level.zh}</span>
-                    <span lang="en" {...stylex.props(ui.label)}>
+                  <td {...stylex.attrs(styles.td, styles.classColumn)}>
+                    <span {...stylex.attrs(styles.classZh)}>{level.zh}</span>
+                    <span lang="en" {...stylex.attrs(ui.label)}>
                       {level.en}
                     </span>
                   </td>
-                  <td {...stylex.props(styles.td, styles.magColumn, ui.designation, styles.mag)}>
+                  <td {...stylex.attrs(styles.td, styles.magColumn, ui.designation, styles.mag)}>
                     {level.magnitude}
                   </td>
                 </tr>

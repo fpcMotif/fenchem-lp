@@ -1,5 +1,5 @@
 import * as stylex from "@stylexjs/stylex";
-import type { CSSProperties } from "react";
+import type { JSX } from "@solidjs/web";
 
 import { ABOUT_STRUCTURE } from "../../about-data";
 import { CompanyName } from "./company-name";
@@ -164,57 +164,56 @@ export function Structure() {
     <section
       id="about-structure"
       aria-labelledby="oos1o-structure"
-      {...stylex.props(styles.section)}
+      {...stylex.attrs(styles.section)}
     >
-      <div {...stylex.props(ui.shell)}>
+      <div {...stylex.attrs(ui.shell)}>
         <SectionHead id="oos1o-structure" label="Structure" title={ABOUT_STRUCTURE.title} quiet />
-        <div {...stylex.props(styles.holding)}>
-          <p {...stylex.props(styles.badge)}>{holding.badge}</p>
-          <p {...stylex.props(styles.name)}>
+        <div {...stylex.attrs(styles.holding)}>
+          <p {...stylex.attrs(styles.badge)}>{holding.badge}</p>
+          <p {...stylex.attrs(styles.name)}>
             <CompanyName name={holding.name} />
           </p>
-          <p lang="en" {...stylex.props(ui.latin, styles.english)}>
+          <p lang="en" {...stylex.attrs(ui.latin, styles.english)}>
             {holding.english}
           </p>
         </div>
-        <p {...stylex.props(styles.ringLabel)}>
+        <p {...stylex.attrs(styles.ringLabel)}>
           {subsidiaryBadge}
-          <span lang="en" {...stylex.props(ui.serif, styles.ringNote)}>
+          <span lang="en" {...stylex.attrs(ui.serif, styles.ringNote)}>
             Wholly-owned
           </span>
         </p>
-        <div {...stylex.props(styles.ringRow)}>
+        <div {...stylex.attrs(styles.ringRow)}>
           <svg
             viewBox={`0 0 2000 ${VERTEX + 4}`}
             preserveAspectRatio="none"
             aria-hidden="true"
-            {...stylex.props(styles.arc)}
+            {...stylex.attrs(styles.arc)}
           >
             <path
               d={ARC}
               fill="none"
               stroke="#0b2a5c"
-              strokeOpacity={0.4}
-              strokeWidth={1}
-              vectorEffect="non-scaling-stroke"
+              stroke-opacity={0.4}
+              stroke-width={1}
+              vector-effect="non-scaling-stroke"
             />
           </svg>
-          <ol {...stylex.props(styles.list)}>
+          <ol {...stylex.attrs(styles.list)}>
             {subsidiaries.map((subsidiary, index) => (
               <li
-                key={subsidiary.id}
-                {...stylex.props(styles.item, styles.drop)}
-                style={{ "--oos1o-drop": `${DROP - RISE[index]}px` } as CSSProperties}
+                {...stylex.attrs(styles.item, styles.drop)}
+                style={{ "--oos1o-drop": `${DROP - RISE[index]}px` } as JSX.CSSProperties}
               >
-                <span aria-hidden="true" {...stylex.props(styles.node)} />
-                <span aria-hidden="true" {...stylex.props(styles.tick)} />
-                <span aria-hidden="true" {...stylex.props(ui.latin, styles.index)}>
+                <span aria-hidden="true" {...stylex.attrs(styles.node)} />
+                <span aria-hidden="true" {...stylex.attrs(styles.tick)} />
+                <span aria-hidden="true" {...stylex.attrs(ui.latin, styles.index)}>
                   {String(index + 1).padStart(2, "0")}
                 </span>
-                <p {...stylex.props(styles.subName)}>
+                <p {...stylex.attrs(styles.subName)}>
                   <CompanyName name={subsidiary.name} />
                 </p>
-                <p lang="en" {...stylex.props(ui.latin, styles.subEnglish)}>
+                <p lang="en" {...stylex.attrs(ui.latin, styles.subEnglish)}>
                   {subsidiary.english}
                 </p>
               </li>

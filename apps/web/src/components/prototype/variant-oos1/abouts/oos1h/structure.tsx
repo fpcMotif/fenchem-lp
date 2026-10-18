@@ -1,7 +1,7 @@
-import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
+import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { ChevronDown } from "lucide-react";
-import { useId, useState } from "react";
+import { ChevronDown } from "@fenchem-lp/ui/components/lucide";
+import { createSignal, createUniqueId } from "solid-js";
 
 import { ABOUT_STRUCTURE } from "../../about-data";
 import { Reveal } from "./reveal";
@@ -29,7 +29,7 @@ const styles = stylex.create({
   },
   holdingName: {
     margin: 0,
-    fontSize: { default: 28, [mq.tablet]: 36, [breakpoints.xl]: 44 },
+    fontSize: { default: 28, [mq.tablet]: 36, ["@media (min-width: 1280px)"]: 44 },
     fontWeight: 500,
     lineHeight: 1.3,
     letterSpacing: "0.03em",
@@ -47,12 +47,12 @@ const styles = stylex.create({
     gridTemplateColumns: {
       default: "minmax(0, 1fr)",
       [mq.mdOnly]: "repeat(2, minmax(0, 1fr))",
-      [breakpoints.lg]: "repeat(5, minmax(0, 1fr))",
+      ["@media (min-width: 1024px)"]: "repeat(5, minmax(0, 1fr))",
     },
     columnGap: 32,
     rowGap: 0,
     margin: 0,
-    marginTop: { default: 56, [breakpoints.xl]: 96 },
+    marginTop: { default: 56, ["@media (min-width: 1280px)"]: 96 },
     padding: 0,
     listStyle: "none",
   },
@@ -86,7 +86,7 @@ const styles = stylex.create({
     flexDirection: "column",
     alignItems: "flex-start",
     gap: 32,
-    marginTop: { default: 40, [breakpoints.xl]: 64 },
+    marginTop: { default: 40, ["@media (min-width: 1280px)"]: 64 },
   },
   toggle: {
     display: "inline-flex",
@@ -127,63 +127,63 @@ const styles = stylex.create({
 });
 
 export function Structure() {
-  const [showDiagram, setShowDiagram] = useState(false);
-  const diagramId = useId();
+  const [showDiagram, setShowDiagram] = createSignal(false);
+  const diagramId = createUniqueId();
 
   return (
     <section
       id="about-structure"
       aria-labelledby="about-structure-title"
-      {...stylex.props(shared.anchor, shared.section, styles.section)}
+      {...stylex.attrs(shared.anchor, shared.section, styles.section)}
     >
-      <h2 id="about-structure-title" {...stylex.props(shared.srOnly)}>
+      <h2 id="about-structure-title" {...stylex.attrs(shared.srOnly)}>
         {ABOUT_STRUCTURE.eyebrow}
       </h2>
-      <div {...stylex.props(shared.shell, shared.inset)}>
+      <div {...stylex.attrs(shared.shell, shared.inset)}>
         <Reveal sx={styles.holding}>
-          <span {...stylex.props(styles.holdingRole)}>{ABOUT_STRUCTURE.holding.badge}</span>
-          <h3 {...stylex.props(styles.holdingName)}>{ABOUT_STRUCTURE.holding.name}</h3>
-          <div lang="en" {...stylex.props(styles.english)}>
+          <span {...stylex.attrs(styles.holdingRole)}>{ABOUT_STRUCTURE.holding.badge}</span>
+          <h3 {...stylex.attrs(styles.holdingName)}>{ABOUT_STRUCTURE.holding.name}</h3>
+          <div lang="en" {...stylex.attrs(styles.english)}>
             {ABOUT_STRUCTURE.holding.english}
           </div>
         </Reveal>
 
         <ul
           aria-label={ABOUT_STRUCTURE.subsidiaryBadgeEnglish}
-          {...stylex.props(styles.subsidiaries)}
+          {...stylex.attrs(styles.subsidiaries)}
         >
           {ABOUT_STRUCTURE.subsidiaries.map((sub, position) => (
-            <Reveal key={sub.id} as="li" step={position} sx={styles.subsidiary}>
-              <h4 {...stylex.props(styles.subsidiaryName)}>{sub.name}</h4>
-              <span lang="en" {...stylex.props(styles.subsidiaryEnglish)}>
+            <Reveal as="li" step={position} sx={styles.subsidiary}>
+              <h4 {...stylex.attrs(styles.subsidiaryName)}>{sub.name}</h4>
+              <span lang="en" {...stylex.attrs(styles.subsidiaryEnglish)}>
                 {sub.english}
               </span>
             </Reveal>
           ))}
         </ul>
 
-        <div {...stylex.props(styles.toggleWrap)}>
+        <div {...stylex.attrs(styles.toggleWrap)}>
           <button
             type="button"
-            aria-expanded={showDiagram}
+            aria-expanded={showDiagram() ? "true" : "false"}
             aria-controls={diagramId}
             onClick={() => setShowDiagram((prev) => !prev)}
-            {...stylex.props(styles.toggle, shared.focusRing)}
+            {...stylex.attrs(styles.toggle, shared.focusRing)}
           >
-            <span>{showDiagram ? "收起组织架构图" : "查看官方组织架构图"}</span>
+            <span>{showDiagram() ? "收起组织架构图" : "查看官方组织架构图"}</span>
             <ChevronDown
               size={16}
               aria-hidden="true"
-              {...stylex.props(styles.toggleIcon, showDiagram && styles.toggleIconOpen)}
+              {...stylex.attrs(styles.toggleIcon, showDiagram() && styles.toggleIconOpen)}
             />
           </button>
-          <div id={diagramId} hidden={!showDiagram} {...stylex.props(styles.diagram)}>
+          <div id={diagramId} hidden={!showDiagram()} {...stylex.attrs(styles.diagram)}>
             <img
               src={ABOUT_STRUCTURE.chartImage}
               alt="Official organizational chart of Nanjing Fenchem International Holdings Corporation Limited"
               loading="lazy"
               decoding="async"
-              {...stylex.props(styles.diagramImage)}
+              {...stylex.attrs(styles.diagramImage)}
             />
           </div>
         </div>

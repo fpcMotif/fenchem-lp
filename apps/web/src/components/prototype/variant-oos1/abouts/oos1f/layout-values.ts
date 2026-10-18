@@ -1,4 +1,3 @@
-import { breakpoints } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 import { ease, media, space } from "./palette.stylex";
 
@@ -9,7 +8,7 @@ export const styles = stylex.create({
       default: space.sectionSm,
       [media.mdOnly]: space.sectionMd,
       [media.lgOnly]: space.sectionLg,
-      [breakpoints.xl]: space.sectionXl,
+      ["@media (min-width: 1280px)"]: space.sectionXl,
     },
     scrollMarginTop: space.anchor,
   },
@@ -22,18 +21,21 @@ export const styles = stylex.create({
       default: space.startSm,
       [media.mdOnly]: space.startMd,
       [media.lgOnly]: space.startLg,
-      [breakpoints.xl]: space.startXl,
+      ["@media (min-width: 1280px)"]: space.startXl,
     },
     paddingInlineEnd: {
       default: space.endSm,
       [media.mdOnly]: space.endMd,
       [media.lgOnly]: space.endLg,
-      [breakpoints.xl]: space.endXl,
+      ["@media (min-width: 1280px)"]: space.endXl,
     },
   },
   reveal: {
-    opacity: { default: 1, [breakpoints.motionOk]: 0 },
-    transform: { default: null, [breakpoints.motionOk]: "translateY(24px)" },
+    opacity: { default: 1, ["@media (prefers-reduced-motion: no-preference)"]: 0 },
+    transform: {
+      default: null,
+      ["@media (prefers-reduced-motion: no-preference)"]: "translateY(24px)",
+    },
     transitionProperty: "opacity, transform",
     transitionDuration: "800ms",
     transitionTimingFunction: ease.out,

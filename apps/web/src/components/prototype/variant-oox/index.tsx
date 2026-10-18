@@ -7,7 +7,7 @@ import {
   CorporateFooter,
 } from "../shared/corporate-sections";
 import { Flow } from "../shared/flow";
-import { LayoutGroup } from "motion/react";
+import { LayoutGroup } from "@/compat/motion";
 
 import { NewsAccordion } from "../shared/news-accordion";
 import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
@@ -22,7 +22,7 @@ import {
   Shield,
   Users,
   type LucideIcon,
-} from "lucide-react";
+} from "@fenchem-lp/ui/components/lucide";
 import {
   LazyMotion,
   MotionConfig,
@@ -33,18 +33,11 @@ import {
   useScroll,
   useTransform,
   type MotionValue,
-} from "motion/react";
-import {
-  useEffect,
-  useId,
-  useRef,
-  useState,
-  useSyncExternalStore,
-  type CSSProperties,
-  type MouseEvent,
-  type ReactNode,
-} from "react";
-import { preinit } from "react-dom";
+} from "@/compat/motion";
+import { createMediaQuery } from "@/compat/reduced-motion";
+import { createEffect, createSignal, createUniqueId, For, merge, Show, untrack } from "solid-js";
+import { dynamic, type JSX } from "@solidjs/web";
+import { preinit } from "@/compat/react-dom";
 
 import { EASE, STAGGER } from "@/components/prototype/motion-constants";
 import { HeroGradeFilter } from "@/components/prototype/hero-grade";
@@ -1976,31 +1969,12 @@ const TONE_STYLES: Record<StrengthTone, StyleXStyles> = {
   cream: styles.toneCream,
 };
 
-function subscribeToMedia(query: string) {
-  return (onChange: () => void) => {
-    const mediaQuery = window.matchMedia(query);
-    mediaQuery.addEventListener("change", onChange);
-    return () => mediaQuery.removeEventListener("change", onChange);
-  };
-}
-
-const subscribeCrossing = subscribeToMedia(CROSSING_QUERY);
-const subscribeQuadrants = subscribeToMedia(QUADRANT_QUERY);
-
 function useCrossing() {
-  return useSyncExternalStore(
-    subscribeCrossing,
-    () => window.matchMedia(CROSSING_QUERY).matches,
-    () => false,
-  );
+  return createMediaQuery(CROSSING_QUERY);
 }
 
 function useQuadrantMotion() {
-  return useSyncExternalStore(
-    subscribeQuadrants,
-    () => window.matchMedia(QUADRANT_QUERY).matches,
-    () => false,
-  );
+  return createMediaQuery(QUADRANT_QUERY);
 }
 
 function crossingStop(index: number) {
@@ -2010,7 +1984,7 @@ function crossingStop(index: number) {
   return top + HOLD_CENTERS[index] * (run.offsetHeight - window.innerHeight);
 }
 
-function goToMarket(event: MouseEvent<HTMLAnchorElement>, index: number) {
+function goToMarket(event: MouseEvent, index: number) {
   const stop = crossingStop(index);
   if (stop === null) return;
   event.preventDefault();
@@ -2022,8 +1996,17 @@ function revealMarket(index: number) {
   if (stop !== null && Math.abs(window.scrollY - stop) > 2) window.scrollTo({ top: stop });
 }
 
+// `focusable` (legacy SVG attribute) is not in Solid's JSX types.
+const UNFOCUSABLE = { focusable: "false" } as JSX.SvgSVGAttributes<SVGSVGElement>;
+
+// stylex.props with reactive (accessor) arguments: the StyleX compiler tries to
+// evaluate local arrow functions at build time and throws, so these call sites
+// resolve at runtime instead.
+const sxProps = (...args: ReadonlyArray<StyleXStyles | false | null | undefined>) =>
+  stylex.attrs(...args);
+
 type ZoomProps = {
-  children: ReactNode;
+  children: JSX.Element;
   sx?: StyleXStyles;
   style?: StyleXStyles;
   delay?: number;
@@ -2031,47 +2014,35 @@ type ZoomProps = {
   scale?: number;
 };
 
-function ZoomReveal({
-  children,
-  sx,
-  style,
-  delay = 0,
-  y = 24,
-  scale = ZOOM_FROM_SCALE,
-}: ZoomProps) {
+function ZoomReveal(props: ZoomProps) {
+  const p = merge({ delay: 0, y: 24, scale: ZOOM_FROM_SCALE }, props);
   const reduce = useReducedMotion();
   return (
     <m.div
-      {...stylex.props(sx, style)}
-      initial={{ opacity: 0, transform: zoomFrom(y, scale) }}
+      {...stylex.attrs(p.sx, p.style)}
+      initial={{ opacity: 0, transform: zoomFrom(p.y, p.scale) }}
       whileInView={{ opacity: 1, transform: SETTLED }}
       viewport={{ once: true, margin: "-80px" }}
-      transition={{ duration: reduce ? 0.2 : 0.8, delay: reduce ? 0 : delay, ease: EASE }}
+      transition={{ duration: reduce() ? 0.2 : 0.8, delay: reduce() ? 0 : p.delay, ease: EASE }}
     >
-      {children}
+      {p.children}
     </m.div>
   );
 }
 
-function RegMark({ sx }: { sx?: StyleXStyles }) {
-  return <span aria-hidden="true" {...stylex.props(styles.regMark, sx)} />;
+function RegMark(props: { sx?: StyleXStyles }) {
+  return <span aria-hidden="true" {...stylex.attrs(styles.regMark, props.sx)} />;
 }
 
-function Echo({ children, sx }: { children: ReactNode; sx?: StyleXStyles }) {
+function Echo(props: { children: JSX.Element; sx?: StyleXStyles }) {
   return (
-    <span aria-hidden="true" lang="en" {...stylex.props(styles.echo, sx)}>
-      {children}
+    <span aria-hidden="true" lang="en" {...stylex.attrs(styles.echo, props.sx)}>
+      {props.children}
     </span>
   );
 }
 
-function SectionHead({
-  id,
-  title,
-  echo,
-  lead,
-  center = false,
-}: {
+function SectionHead(props: {
   id: string;
   title: string;
   echo: string;
@@ -2079,32 +2050,24 @@ function SectionHead({
   center?: boolean;
 }) {
   return (
-    <ZoomReveal sx={[styles.head, center && styles.headCenter]}>
-      <div {...stylex.props(styles.headRow, center && styles.headRowCenter)}>
-        <h2 id={id} {...stylex.props(styles.sectionTitle)}>
-          {title}
+    <ZoomReveal sx={[styles.head, props.center && styles.headCenter]}>
+      <div {...stylex.attrs(styles.headRow, props.center && styles.headRowCenter)}>
+        <h2 id={props.id} {...stylex.attrs(styles.sectionTitle)}>
+          {props.title}
         </h2>
-        <Echo>{echo}</Echo>
+        <Echo>{props.echo}</Echo>
       </div>
-      {lead ? <p {...stylex.props(styles.sectionLead)}>{lead}</p> : null}
+      <Show when={props.lead}>
+        <p {...stylex.attrs(styles.sectionLead)}>{props.lead}</p>
+      </Show>
     </ZoomReveal>
   );
 }
 
-function VectorArt({
-  paths,
-  viewBox,
-  sx,
-}: {
-  paths: readonly VectorPath[];
-  viewBox: string;
-  sx: StyleXStyles;
-}) {
+function VectorArt(props: { paths: readonly VectorPath[]; viewBox: string; sx: StyleXStyles }) {
   return (
-    <svg viewBox={viewBox} aria-hidden="true" focusable="false" {...stylex.props(sx)}>
-      {paths.map((path) => (
-        <path key={path.d} d={path.d} fill={path.fill} />
-      ))}
+    <svg viewBox={props.viewBox} aria-hidden="true" {...UNFOCUSABLE} {...stylex.attrs(props.sx)}>
+      <For each={props.paths}>{(path) => <path d={path.d} fill={path.fill} />}</For>
     </svg>
   );
 }
@@ -2143,15 +2106,14 @@ function LogoMark() {
     <svg
       viewBox="0 0 161 52"
       aria-hidden="true"
-      focusable="false"
-      {...stylex.props(styles.logo, styles.logoAssemble)}
+      {...UNFOCUSABLE}
+      {...stylex.attrs(styles.logo, styles.logoAssemble)}
     >
       {LOGO_PATHS.map((path) => (
         <path
-          key={path.d}
           d={path.d}
           fill={path.fill}
-          {...stylex.props(styles.logoPart, styles.enterDelay(logoPartDelay(path.d)))}
+          {...stylex.attrs(styles.logoPart, styles.enterDelay(logoPartDelay(path.d)))}
         />
       ))}
     </svg>
@@ -2159,14 +2121,17 @@ function LogoMark() {
 }
 
 function Hero() {
-  const heroRef = useRef<HTMLElement>(null);
+  let heroEl: HTMLElement | undefined;
   const reduce = useReducedMotion();
-  const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
+  const { scrollYProgress } = useScroll({
+    target: () => heroEl,
+    offset: ["start start", "end start"],
+  });
   const backdropY = useTransform(scrollYProgress, [0, 1], ["0%", "18%"]);
   const contentY = useTransform(scrollYProgress, [0, 1], [0, -120]);
   const contentOpacity = useTransform(scrollYProgress, [0, 0.75], [1, 0]);
   return (
-    <section ref={heroRef} id="top" aria-labelledby="oox-hero-title" {...stylex.props(styles.hero)}>
+    <section ref={heroEl} id="top" aria-labelledby="oox-hero-title" {...stylex.attrs(styles.hero)}>
       <HeroGradeFilter />
       <HeroBackdrop
         styles={{
@@ -2178,14 +2143,14 @@ function Hero() {
           heroParallax: styles.heroParallax,
         }}
         source={IMAGES.hero}
-        motionStyle={reduce ? undefined : { y: backdropY }}
+        motionStyle={reduce() ? undefined : { y: backdropY }}
       />
       <m.div
-        {...stylex.props(styles.shell, styles.inset120, styles.heroContent)}
-        style={reduce ? undefined : { y: contentY, opacity: contentOpacity }}
+        {...stylex.attrs(styles.shell, styles.inset120, styles.heroContent)}
+        style={reduce() ? undefined : { y: contentY, opacity: contentOpacity }}
       >
-        <div {...stylex.props(styles.heroCopy)}>
-          <h1 id="oox-hero-title" {...stylex.props(styles.heroTitle)}>
+        <div {...stylex.attrs(styles.heroCopy)}>
+          <h1 id="oox-hero-title" {...stylex.attrs(styles.heroTitle)}>
             <BloomHeadline
               styles={{
                 heroHeadline: styles.heroHeadline,
@@ -2210,7 +2175,7 @@ function Hero() {
               introAfter={introAfter}
             />{" "}
             <span
-              {...stylex.props(
+              {...stylex.attrs(
                 styles.heroSubtitle,
                 styles.heroBloom,
                 styles.enterDelay(introAfter(600)),
@@ -2220,49 +2185,48 @@ function Hero() {
             </span>
           </h1>
         </div>
-        <div {...stylex.props(styles.ctaRow, styles.heroBloom, styles.enterDelay(introAfter(760)))}>
+        <div {...stylex.attrs(styles.ctaRow, styles.heroBloom, styles.enterDelay(introAfter(760)))}>
           <a
             href={HERO.primary.href}
-            {...stylex.props(styles.button, styles.buttonPrimary, styles.buttonHero)}
+            {...stylex.attrs(styles.button, styles.buttonPrimary, styles.buttonHero)}
           >
             {HERO.primary.label}
           </a>
           <a
             href={HERO.secondary.href}
-            {...stylex.props(styles.button, styles.buttonSecondary, styles.buttonHero)}
+            {...stylex.attrs(styles.button, styles.buttonSecondary, styles.buttonHero)}
           >
             {HERO.secondary.label}
           </a>
         </div>
         <div
-          {...stylex.props(styles.heroMotto, styles.heroRise, styles.enterDelay(introAfter(900)))}
+          {...stylex.attrs(styles.heroMotto, styles.heroRise, styles.enterDelay(introAfter(900)))}
         >
-          <span aria-hidden="true" {...stylex.props(styles.heroMottoRule)} />
-          <p {...stylex.props(styles.verticalLabel, styles.heroMottoText)}>{HERO.motto}</p>
+          <span aria-hidden="true" {...stylex.attrs(styles.heroMottoRule)} />
+          <p {...stylex.attrs(styles.verticalLabel, styles.heroMottoText)}>{HERO.motto}</p>
         </div>
         <nav aria-label="Four application areas">
-          <ul {...stylex.props(styles.heroIndex)}>
+          <ul {...stylex.attrs(styles.heroIndex)}>
             {MARKETS.map((market, index) => (
               <li
-                key={market.id}
-                {...stylex.props(styles.heroRise, styles.enterDelay(introAfter(900 + index * 80)))}
+                {...stylex.attrs(styles.heroRise, styles.enterDelay(introAfter(900 + index * 80)))}
               >
                 <a
                   href={`#market-${market.id}`}
                   onClick={(event) => goToMarket(event, index)}
-                  {...stylex.props(styles.heroIndexItem, stylex.defaultMarker())}
+                  {...stylex.attrs(styles.heroIndexItem, stylex.defaultMarker())}
                 >
                   <RegMark sx={styles.regTopLeft} />
-                  <span {...stylex.props(styles.heroIndexText)}>
-                    <span {...stylex.props(styles.heroIndexNumber)}>{twoDigits(index + 1)}</span>
-                    <span {...stylex.props(styles.heroIndexName)}>{market.title}</span>
+                  <span {...stylex.attrs(styles.heroIndexText)}>
+                    <span {...stylex.attrs(styles.heroIndexNumber)}>{twoDigits(index + 1)}</span>
+                    <span {...stylex.attrs(styles.heroIndexName)}>{market.title}</span>
                   </span>
                   <ArrowDownRight
                     size={20}
                     strokeWidth={1.5}
                     absoluteStrokeWidth
                     aria-hidden="true"
-                    {...stylex.props(styles.turnArrow)}
+                    {...stylex.attrs(styles.turnArrow)}
                   />
                 </a>
               </li>
@@ -2274,56 +2238,55 @@ function Hero() {
   );
 }
 
-function InkPhrase({
-  progress,
-  range,
-  children,
-}: {
+function InkPhrase(props: {
   progress: MotionValue<number>;
   range: [number, number];
-  children: ReactNode;
+  children: JSX.Element;
 }) {
   const reduce = useReducedMotion();
-  const opacity = useTransform(progress, range, [0.16, 1]);
+  const opacity = useTransform(
+    untrack(() => props.progress),
+    untrack(() => props.range),
+    [0.16, 1],
+  );
   return (
-    <m.span {...stylex.props(styles.inkPhrase)} style={reduce ? undefined : { opacity }}>
-      {children}
+    <m.span {...stylex.attrs(styles.inkPhrase)} style={reduce() ? undefined : { opacity }}>
+      {props.children}
     </m.span>
   );
 }
 
 function About() {
-  const textRef = useRef<HTMLParagraphElement>(null);
-  const { scrollYProgress } = useScroll({ target: textRef, offset: ["start 0.85", "end 0.45"] });
+  let textEl: HTMLParagraphElement | undefined;
+  const { scrollYProgress } = useScroll({
+    target: () => textEl,
+    offset: ["start 0.85", "end 0.45"],
+  });
   const share = 1 / ABOUT_PHRASES.length;
   return (
     <section
       id="about"
       aria-labelledby="oox-about-title"
-      {...stylex.props(styles.about, styles.anchor)}
+      {...stylex.attrs(styles.about, styles.anchor)}
     >
-      <div {...stylex.props(styles.shell, styles.inset120, styles.aboutGrid)}>
+      <div {...stylex.attrs(styles.shell, styles.inset120, styles.aboutGrid)}>
         <ZoomReveal sx={styles.aboutHead}>
-          <h2 id="oox-about-title" {...stylex.props(styles.sectionTitle, styles.aboutTitle)}>
+          <h2 id="oox-about-title" {...stylex.attrs(styles.sectionTitle, styles.aboutTitle)}>
             {ABOUT.title}
           </h2>
           <Echo sx={styles.aboutEcho}>{ABOUT.echo}</Echo>
         </ZoomReveal>
-        <div {...stylex.props(styles.aboutBody)}>
-          <p ref={textRef} {...stylex.props(styles.aboutText)}>
+        <div {...stylex.attrs(styles.aboutBody)}>
+          <p ref={textEl} {...stylex.attrs(styles.aboutText)}>
             {ABOUT_PHRASES.map((phrase, index) => (
-              <InkPhrase
-                key={phrase}
-                progress={scrollYProgress}
-                range={[index * share, (index + 1) * share]}
-              >
+              <InkPhrase progress={scrollYProgress} range={[index * share, (index + 1) * share]}>
                 {phrase}
               </InkPhrase>
             ))}
           </p>
           <a
             href={ABOUT.cta.href}
-            {...stylex.props(styles.button, styles.buttonPrimary, styles.buttonCompact)}
+            {...stylex.attrs(styles.button, styles.buttonPrimary, styles.buttonCompact)}
           >
             {ABOUT.cta.label}
           </a>
@@ -2334,15 +2297,18 @@ function About() {
 }
 
 function ProductsIntro() {
-  const introRef = useRef<HTMLDivElement>(null);
+  let introEl: HTMLDivElement | undefined;
   const reduce = useReducedMotion();
-  const { scrollYProgress } = useScroll({ target: introRef, offset: ["start 0.7", "end start"] });
+  const { scrollYProgress } = useScroll({
+    target: () => introEl,
+    offset: ["start 0.7", "end start"],
+  });
   const turn = useTransform(scrollYProgress, [0, 1], [0, -90]);
   return (
-    <div ref={introRef} {...stylex.props(styles.shell, styles.inset120, styles.productsIntro)}>
-      <p aria-hidden="true" {...stylex.props(styles.verticalLabel, styles.productsEyebrow)}>
+    <div ref={introEl} {...stylex.attrs(styles.shell, styles.inset120, styles.productsIntro)}>
+      <p aria-hidden="true" {...stylex.attrs(styles.verticalLabel, styles.productsEyebrow)}>
         {PRODUCTS_INTRO.eyebrow}
-        <span {...stylex.props(styles.upright)}>{twoDigits(MARKETS.length)}</span>
+        <span {...stylex.attrs(styles.upright)}>{twoDigits(MARKETS.length)}</span>
       </p>
       <SectionHead
         id="oox-products-title"
@@ -2350,12 +2316,12 @@ function ProductsIntro() {
         echo={PRODUCTS_INTRO.echo}
         lead={PRODUCTS_INTRO.lead}
       />
-      <p {...stylex.props(styles.crossHint)}>
+      <p {...stylex.attrs(styles.crossHint)}>
         {PRODUCTS_INTRO.hint}
         <m.span
           aria-hidden="true"
-          {...stylex.props(styles.crossHintArrow)}
-          style={reduce ? undefined : { rotate: turn }}
+          {...stylex.attrs(styles.crossHintArrow)}
+          style={reduce() ? undefined : { rotate: turn }}
         >
           <ArrowDown size={16} strokeWidth={1.5} absoluteStrokeWidth />
         </m.span>
@@ -2364,54 +2330,57 @@ function ProductsIntro() {
   );
 }
 
-function MarketPanel({
-  market,
-  index,
-  track,
-  enabled,
-}: {
+function MarketPanel(props: {
   market: Market;
   index: number;
   track: MotionValue<number>;
   enabled: MotionValue<number>;
 }) {
-  const titleId = useId();
-  const local = useTransform<number, number>([track, enabled], ([position, on]) =>
-    on ? position - index : 0,
+  const titleId = createUniqueId();
+  const index = untrack(() => props.index);
+  const local = useTransform(
+    untrack(() => [props.track, props.enabled]),
+    ([position, on]) => (on ? position - index : 0),
   );
   const imageX = useTransform(local, [-1, 0, 1], ["-12%", "0%", "12%"]);
   const imageScale = useTransform(local, [-1, 0, 1], [1.16, 1, 1.16]);
   const copyX = useTransform(local, [-1, 0, 1], [180, 0, -180]);
   const wordX = useTransform(local, [-1, 0, 1], [520, 0, -520]);
-  const alt = index % 2 === 1;
+  const alt = () => props.index % 2 === 1;
   return (
     <li
-      id={`market-${market.id}`}
+      id={`market-${props.market.id}`}
       aria-labelledby={titleId}
-      onFocus={() => revealMarket(index)}
-      {...stylex.props(styles.panel, index > 0 && styles.panelJoined, alt && styles.panelAlt)}
+      onFocus={() => revealMarket(props.index)}
+      {...stylex.attrs(
+        styles.panel,
+        props.index > 0 && styles.panelJoined,
+        alt() && styles.panelAlt,
+      )}
     >
-      {index > 0 ? <RegMark sx={styles.panelSeam} /> : null}
+      <Show when={props.index > 0}>
+        <RegMark sx={styles.panelSeam} />
+      </Show>
       <m.span
         aria-hidden="true"
         lang="en"
-        {...stylex.props(styles.marketWord, alt && styles.marketWordAlt)}
+        {...stylex.attrs(styles.marketWord, alt() && styles.marketWordAlt)}
         style={{ x: wordX }}
       >
-        {market.word}
+        {props.market.word}
       </m.span>
-      <p aria-hidden="true" {...stylex.props(styles.verticalLabel, styles.panelTag)}>
+      <p aria-hidden="true" {...stylex.attrs(styles.verticalLabel, styles.panelTag)}>
         应用领域
-        <span {...stylex.props(styles.upright)}>{twoDigits(index + 1)}</span>
+        <span {...stylex.attrs(styles.upright)}>{twoDigits(props.index + 1)}</span>
       </p>
-      <figure {...stylex.props(styles.marketFigure)}>
-        <div {...stylex.props(styles.marketFrame)}>
+      <figure {...stylex.attrs(styles.marketFigure)}>
+        <div {...stylex.attrs(styles.marketFrame)}>
           <m.img
-            src={market.image}
-            alt={market.english}
+            src={props.market.image}
+            alt={props.market.english}
             loading="lazy"
             decoding="async"
-            {...stylex.props(styles.marketImage)}
+            {...stylex.attrs(styles.marketImage)}
             style={{ x: imageX, scale: imageScale }}
           />
         </div>
@@ -2420,38 +2389,40 @@ function MarketPanel({
         <RegMark sx={styles.regBottomLeft} />
         <RegMark sx={styles.regBottomRight} />
       </figure>
-      <m.div {...stylex.props(styles.marketCopy)} style={{ x: copyX }}>
-        <p lang="en" {...stylex.props(styles.marketLabel)}>
-          <span {...stylex.props(styles.marketLabelNumber)}>
-            {twoDigits(index + 1)} / {twoDigits(MARKETS.length)}
+      <m.div {...stylex.attrs(styles.marketCopy)} style={{ x: copyX }}>
+        <p lang="en" {...stylex.attrs(styles.marketLabel)}>
+          <span {...stylex.attrs(styles.marketLabelNumber)}>
+            {twoDigits(props.index + 1)} / {twoDigits(MARKETS.length)}
           </span>
-          <span aria-hidden="true" {...stylex.props(styles.marketLabelRule)} />
-          <span {...stylex.props(styles.marketLabelWord)}>{market.english}</span>
+          <span aria-hidden="true" {...stylex.attrs(styles.marketLabelRule)} />
+          <span {...stylex.attrs(styles.marketLabelWord)}>{props.market.english}</span>
         </p>
-        <h3 id={titleId} {...stylex.props(styles.marketTitle)}>
-          {market.title}
+        <h3 id={titleId} {...stylex.attrs(styles.marketTitle)}>
+          {props.market.title}
         </h3>
-        <p lang="en" {...stylex.props(styles.marketPitch)}>
-          {market.pitch}
+        <p lang="en" {...stylex.attrs(styles.marketPitch)}>
+          {props.market.pitch}
         </p>
-        <p {...stylex.props(styles.marketKicker)}>{market.kicker}</p>
-        <ul aria-label={`${market.english} segments`} {...stylex.props(styles.marketTags)}>
-          {market.tags.map((tag) => (
-            <li key={tag} {...stylex.props(styles.marketTag)}>
-              <Plus
-                size={12}
-                strokeWidth={1.5}
-                absoluteStrokeWidth
-                aria-hidden="true"
-                {...stylex.props(styles.marketTagIcon)}
-              />
-              {tag}
-            </li>
-          ))}
+        <p {...stylex.attrs(styles.marketKicker)}>{props.market.kicker}</p>
+        <ul aria-label={`${props.market.english} segments`} {...stylex.attrs(styles.marketTags)}>
+          <For each={props.market.tags}>
+            {(tag) => (
+              <li {...stylex.attrs(styles.marketTag)}>
+                <Plus
+                  size={12}
+                  strokeWidth={1.5}
+                  absoluteStrokeWidth
+                  aria-hidden="true"
+                  {...stylex.attrs(styles.marketTagIcon)}
+                />
+                {tag}
+              </li>
+            )}
+          </For>
         </ul>
         <a
           href={MARKET_CTA.href}
-          {...stylex.props(styles.button, styles.buttonPrimary, styles.buttonCompact)}
+          {...stylex.attrs(styles.button, styles.buttonPrimary, styles.buttonCompact)}
         >
           {MARKET_CTA.label}
         </a>
@@ -2460,42 +2431,45 @@ function MarketPanel({
   );
 }
 
-function RailItem({
-  market,
-  index,
-  track,
-  active,
-}: {
+function RailItem(props: {
   market: Market;
   index: number;
   track: MotionValue<number>;
   active: boolean;
 }) {
-  const fill = useTransform(track, [index - 1, index], [0, 1]);
+  const index = untrack(() => props.index);
+  const fill = useTransform(
+    untrack(() => props.track),
+    [index - 1, index],
+    [0, 1],
+  );
   return (
     <a
-      href={`#market-${market.id}`}
-      aria-current={active ? "step" : undefined}
-      onClick={(event) => goToMarket(event, index)}
-      {...stylex.props(styles.railItem, active && styles.railItemActive)}
+      href={`#market-${props.market.id}`}
+      aria-current={props.active ? "step" : undefined}
+      onClick={(event) => goToMarket(event, props.index)}
+      {...stylex.attrs(styles.railItem, props.active && styles.railItemActive)}
     >
-      <span aria-hidden="true" {...stylex.props(styles.railTrack)}>
-        <m.span {...stylex.props(styles.railFill)} style={{ scaleX: fill }} />
+      <span aria-hidden="true" {...stylex.attrs(styles.railTrack)}>
+        <m.span {...stylex.attrs(styles.railFill)} style={{ scaleX: fill }} />
       </span>
-      <span {...stylex.props(styles.railLabel)}>
-        <span {...stylex.props(styles.railNumber)}>{twoDigits(index + 1)}</span>
-        {market.title}
+      <span {...stylex.attrs(styles.railLabel)}>
+        <span {...stylex.attrs(styles.railNumber)}>{twoDigits(props.index + 1)}</span>
+        {props.market.title}
       </span>
     </a>
   );
 }
 
-function MarketDial({ track, active }: { track: MotionValue<number>; active: number }) {
-  const rotate = useTransform(track, (position) => position * 90);
+function MarketDial(props: { track: MotionValue<number>; active: number }) {
+  const rotate = useTransform(
+    untrack(() => props.track),
+    (position) => position * 90,
+  );
   return (
-    <div aria-hidden="true" {...stylex.props(styles.dial)}>
-      <m.svg viewBox="0 0 64 64" {...stylex.props(styles.dialSvg)} style={{ rotate }}>
-        <g {...stylex.props(styles.dialRing)} fill="none" stroke="currentColor" strokeWidth="1">
+    <div aria-hidden="true" {...stylex.attrs(styles.dial)}>
+      <m.svg viewBox="0 0 64 64" {...stylex.attrs(styles.dialSvg)} style={{ rotate }}>
+        <g {...stylex.attrs(styles.dialRing)} fill="none" stroke="currentColor" stroke-width="1">
           <circle cx="32" cy="32" r="31" />
           <line x1="32" y1="6" x2="32" y2="58" />
           <line x1="6" y1="32" x2="58" y2="32" />
@@ -2506,133 +2480,122 @@ function MarketDial({ track, active }: { track: MotionValue<number>; active: num
           x2="32"
           y2="32"
           stroke="currentColor"
-          strokeWidth="2"
-          {...stylex.props(styles.dialArm)}
+          stroke-width="2"
+          {...stylex.attrs(styles.dialArm)}
         />
-        <circle cx="32" cy="32" r="3.5" fill="currentColor" {...stylex.props(styles.dialHub)} />
+        <circle cx="32" cy="32" r="3.5" fill="currentColor" {...stylex.attrs(styles.dialHub)} />
       </m.svg>
-      <span {...stylex.props(styles.dialCount)}>
-        <span {...stylex.props(styles.dialNumber)}>{twoDigits(active + 1)}</span>
-        <span {...stylex.props(styles.dialTotal)}>/ {twoDigits(MARKETS.length)}</span>
+      <span {...stylex.attrs(styles.dialCount)}>
+        <span {...stylex.attrs(styles.dialNumber)}>{twoDigits(props.active + 1)}</span>
+        <span {...stylex.attrs(styles.dialTotal)}>/ {twoDigits(MARKETS.length)}</span>
       </span>
     </div>
   );
 }
 
-function MarketRun({ crossX }: { crossX: MotionValue<number> }) {
-  const runRef = useRef<HTMLDivElement>(null);
+function MarketRun(props: { crossX: MotionValue<number> }) {
+  let runEl: HTMLDivElement | undefined;
   const crossing = useCrossing();
   const enabled = useMotionValue(0);
-  const [active, setActive] = useState(0);
-  const { scrollYProgress } = useScroll({ target: runRef, offset: ["start start", "end end"] });
+  const [active, setActive] = createSignal(0);
+  const { scrollYProgress } = useScroll({
+    target: () => runEl,
+    offset: ["start start", "end end"],
+  });
   const track = useTransform(scrollYProgress, CROSS_STOPS, CROSS_TRACK);
-  const trackX = useTransform<number, string>(
-    [track, enabled],
-    ([position, on]) => `${-position * 25 * on}%`,
-  );
-  useEffect(() => {
-    enabled.set(crossing ? 1 : 0);
-    crossX.set(crossing ? track.get() / LAST_MARKET : 0);
-  }, [crossing, enabled, crossX, track]);
+  const trackX = useTransform([track, enabled], ([position, on]) => `${-position * 25 * on}%`);
+  createEffect(crossing, (on) => {
+    enabled.set(on ? 1 : 0);
+    props.crossX.set(on ? track.get() / LAST_MARKET : 0);
+  });
   useMotionValueEvent(track, "change", (position) => {
     setActive(Math.round(position));
-    crossX.set((position / LAST_MARKET) * enabled.get());
+    props.crossX.set((position / LAST_MARKET) * enabled.get());
   });
   return (
-    <div ref={runRef} id={RUN_ID} {...stylex.props(styles.run)}>
-      <div {...stylex.props(styles.runViewport)}>
-        <nav aria-label="Product area progress" {...stylex.props(styles.rail)}>
+    <div ref={runEl} id={RUN_ID} {...stylex.attrs(styles.run)}>
+      <div {...stylex.attrs(styles.runViewport)}>
+        <nav aria-label="Product area progress" {...stylex.attrs(styles.rail)}>
           {MARKETS.map((market, index) => (
-            <RailItem
-              key={market.id}
-              market={market}
-              index={index}
-              track={track}
-              active={active === index}
-            />
+            <RailItem market={market} index={index} track={track} active={active() === index} />
           ))}
         </nav>
-        <m.ol {...stylex.props(styles.runTrack)} style={{ x: trackX }}>
+        <m.ol {...stylex.attrs(styles.runTrack)} style={{ x: trackX }}>
           {MARKETS.map((market, index) => (
-            <MarketPanel
-              key={market.id}
-              market={market}
-              index={index}
-              track={track}
-              enabled={enabled}
-            />
+            <MarketPanel market={market} index={index} track={track} enabled={enabled} />
           ))}
         </m.ol>
-        <MarketDial track={track} active={active} />
+        <MarketDial track={track} active={active()} />
       </div>
     </div>
   );
 }
 
-function Products({ crossX }: { crossX: MotionValue<number> }) {
+function Products(props: { crossX: MotionValue<number> }) {
   return (
-    <section id="products" aria-labelledby="oox-products-title" {...stylex.props(styles.anchor)}>
+    <section id="products" aria-labelledby="oox-products-title" {...stylex.attrs(styles.anchor)}>
       <ProductsIntro />
-      <MarketRun crossX={crossX} />
+      <MarketRun crossX={props.crossX} />
     </section>
   );
 }
 
-function IconPattern({ icon }: { icon: StrengthIcon }) {
-  const Icon = STRENGTH_ICONS[icon];
+function IconPattern(props: { icon: StrengthIcon }) {
+  const Icon = dynamic(() => STRENGTH_ICONS[props.icon]);
   return (
-    <div aria-hidden="true" {...stylex.props(styles.pattern)}>
+    <div aria-hidden="true" {...stylex.attrs(styles.pattern)}>
       {PATTERN_CELLS.map((cell) => (
         <Icon
-          key={`${cell.left}-${cell.top}`}
           size={32}
           strokeWidth={2}
           absoluteStrokeWidth
-          {...stylex.props(styles.patternCell(`${cell.left}px`, `${cell.top}px`))}
+          {...stylex.attrs(styles.patternCell(`${cell.left}px`, `${cell.top}px`))}
         />
       ))}
     </div>
   );
 }
 
-function Quadrant({
-  strength,
-  index,
-  apart,
-}: {
+function Quadrant(props: {
   strength: (typeof STRENGTHS)[number];
   index: number;
   apart: MotionValue<number>;
 }) {
-  const [dx, dy] = QUADRANT_DIRECTIONS[index];
-  const x = useTransform(apart, (value) => value * dx * 56);
-  const y = useTransform(apart, (value) => value * dy * 40);
-  const Icon = STRENGTH_ICONS[strength.icon];
-  const inverse = strength.tone === "blue";
+  const [dx, dy] = QUADRANT_DIRECTIONS[untrack(() => props.index)];
+  const x = useTransform(
+    untrack(() => props.apart),
+    (value) => value * dx * 56,
+  );
+  const y = useTransform(
+    untrack(() => props.apart),
+    (value) => value * dy * 40,
+  );
+  const Icon = dynamic(() => STRENGTH_ICONS[props.strength.icon]);
+  const inverse = () => props.strength.tone === "blue";
   const right = dx === 1;
   return (
     <m.article
-      aria-labelledby={`oox-strength-${index}`}
-      {...stylex.props(
+      aria-labelledby={`oox-strength-${props.index}`}
+      {...stylex.attrs(
         styles.quadrant,
-        TONE_STYLES[strength.tone],
+        TONE_STYLES[props.strength.tone],
         dy === -1 && styles.quadrantUpper,
         right && styles.quadrantRight,
         stylex.defaultMarker(),
       )}
       style={{ x, y }}
     >
-      <IconPattern icon={strength.icon} />
+      <IconPattern icon={props.strength.icon} />
       <div
-        {...stylex.props(
+        {...stylex.attrs(
           styles.quadrantTop,
           right && styles.quadrantTopRight,
-          inverse && styles.quadrantInverse,
+          inverse() && styles.quadrantInverse,
         )}
       >
         <Icon size={36} strokeWidth={1.5} absoluteStrokeWidth aria-hidden="true" />
-        <span aria-hidden="true" {...stylex.props(styles.quadrantNumber)}>
-          {twoDigits(index + 1)}
+        <span aria-hidden="true" {...stylex.attrs(styles.quadrantNumber)}>
+          {twoDigits(props.index + 1)}
         </span>
       </div>
       <StrengthQuadrantCopy
@@ -2644,9 +2607,9 @@ function Quadrant({
           quadrantSmall: styles.quadrantSmall,
           quadrantLink: styles.quadrantLink,
         }}
-        inverse={inverse}
-        index={index}
-        strength={strength}
+        inverse={inverse()}
+        index={props.index}
+        strength={props.strength}
         idPrefix="oox"
       />
     </m.article>
@@ -2654,23 +2617,23 @@ function Quadrant({
 }
 
 function Strengths() {
-  const gridRef = useRef<HTMLDivElement>(null);
+  let gridEl: HTMLDivElement | undefined;
   const converge = useQuadrantMotion();
   const { scrollYProgress: approach } = useScroll({
-    target: gridRef,
+    target: () => gridEl,
     offset: ["start end", "center 0.6"],
   });
   const { scrollYProgress: pass } = useScroll({
-    target: gridRef,
+    target: () => gridEl,
     offset: ["start end", "end start"],
   });
-  const apart = useTransform(approach, (value) => (converge ? 1 - value : 0));
+  const apart = useTransform(() => (converge() ? 1 - approach() : 0));
   const rotate = useTransform(pass, [0, 1], [0, 180]);
   return (
     <section
       id="strengths"
       aria-labelledby="oox-strengths-title"
-      {...stylex.props(styles.strengths, styles.inset120, styles.anchor)}
+      {...stylex.attrs(styles.strengths, styles.inset120, styles.anchor)}
     >
       <SectionHead
         id="oox-strengths-title"
@@ -2679,24 +2642,28 @@ function Strengths() {
         lead={STRENGTHS_INTRO.lead}
         center
       />
-      <div ref={gridRef} {...stylex.props(styles.quadrants)}>
+      <div ref={gridEl} {...stylex.attrs(styles.quadrants)}>
         {STRENGTHS.map((strength, index) => (
-          <Quadrant key={strength.title} strength={strength} index={index} apart={apart} />
+          <Quadrant strength={strength} index={index} apart={apart} />
         ))}
-        <m.div aria-hidden="true" {...stylex.props(styles.badge)} style={{ rotate }}>
-          <svg viewBox="0 0 160 160" {...stylex.props(styles.badgeSvg)}>
+        <m.div aria-hidden="true" {...stylex.attrs(styles.badge)} style={{ rotate }}>
+          <svg viewBox="0 0 160 160" {...stylex.attrs(styles.badgeSvg)}>
             <defs>
               <path
                 id="oox-badge-ring"
                 d={`M80,80 m-${RING_RADIUS},0 a${RING_RADIUS},${RING_RADIUS} 0 1,1 ${RING_RADIUS * 2},0 a${RING_RADIUS},${RING_RADIUS} 0 1,1 -${RING_RADIUS * 2},0`}
               />
             </defs>
-            <text {...stylex.props(styles.badgeText)}>
-              <textPath href="#oox-badge-ring" textLength={RING_LENGTH} lengthAdjust="spacing">
+            <text {...stylex.attrs(styles.badgeText)}>
+              <textPath
+                href="#oox-badge-ring"
+                // Solid's TextPath typings omit these valid SVGTextContentElement attributes.
+                {...{ textLength: RING_LENGTH, lengthAdjust: "spacing" }}
+              >
                 {ECHO.strengthsRing}
               </textPath>
             </text>
-            <g {...stylex.props(styles.badgeCross)} stroke="currentColor" strokeWidth="1">
+            <g {...stylex.attrs(styles.badgeCross)} stroke="currentColor" stroke-width="1">
               <line x1="80" y1="56" x2="80" y2="104" />
               <line x1="56" y1="80" x2="104" y2="80" />
             </g>
@@ -2707,37 +2674,35 @@ function Strengths() {
   );
 }
 
-function DigitWheel({ digit, delay }: { digit: number; delay: number }) {
+function DigitWheel(props: { digit: number; delay: number }) {
   const reduce = useReducedMotion();
   return (
-    <span {...stylex.props(styles.wheel)}>
+    <span {...stylex.attrs(styles.wheel)}>
       <m.span
-        {...stylex.props(styles.wheelColumn)}
+        {...stylex.attrs(styles.wheelColumn)}
         initial={{ y: "0%" }}
-        whileInView={{ y: `${-(10 + digit) * 5}%` }}
+        whileInView={{ y: `${-(10 + props.digit) * 5}%` }}
         viewport={{ once: true, margin: "-60px" }}
-        transition={{ duration: reduce ? 0 : 1.6, delay: reduce ? 0 : delay, ease: EASE }}
+        transition={{ duration: reduce() ? 0 : 1.6, delay: reduce() ? 0 : props.delay, ease: EASE }}
       >
-        {DIGIT_CELLS.map((cell, index) => (
-          <span key={index} {...stylex.props(styles.wheelCell)}>
-            {cell}
-          </span>
+        {DIGIT_CELLS.map((cell) => (
+          <span {...stylex.attrs(styles.wheelCell)}>{cell}</span>
         ))}
       </m.span>
     </span>
   );
 }
 
-function Odometer({ value, offset }: { value: string; offset: number }) {
+function Odometer(props: { value: string; offset: number }) {
   return (
-    <span aria-hidden="true" {...stylex.props(styles.statValue)}>
-      {value
+    <span aria-hidden="true" {...stylex.attrs(styles.statValue)}>
+      {props.value
         .split("")
         .map((character, index) =>
           /\d/.test(character) ? (
-            <DigitWheel key={index} digit={Number(character)} delay={offset + index * 0.09} />
+            <DigitWheel digit={Number(character)} delay={props.offset + index * 0.09} />
           ) : (
-            <span key={index}>{character}</span>
+            <span>{character}</span>
           ),
         )}
     </span>
@@ -2745,9 +2710,12 @@ function Odometer({ value, offset }: { value: string; offset: number }) {
 }
 
 function Campus() {
-  const stageRef = useRef<HTMLDivElement>(null);
+  let stageEl: HTMLDivElement | undefined;
   const reduce = useReducedMotion();
-  const { scrollYProgress } = useScroll({ target: stageRef, offset: ["start end", "center 0.55"] });
+  const { scrollYProgress } = useScroll({
+    target: () => stageEl,
+    offset: ["start end", "center 0.55"],
+  });
   const clipPath = useTransform(
     scrollYProgress,
     [0, 1],
@@ -2759,21 +2727,21 @@ function Campus() {
     <section
       id="campus"
       aria-labelledby="oox-campus-title"
-      {...stylex.props(styles.campus, styles.anchor)}
+      {...stylex.attrs(styles.campus, styles.anchor)}
     >
-      <div ref={stageRef} {...stylex.props(styles.campusStage)}>
-        <m.div {...stylex.props(styles.campusFrame)} style={reduce ? undefined : { clipPath }}>
+      <div ref={stageEl} {...stylex.attrs(styles.campusStage)}>
+        <m.div {...stylex.attrs(styles.campusFrame)} style={reduce() ? undefined : { clipPath }}>
           <m.img
             src={IMAGES.campus.src}
             alt={IMAGES.campus.alt}
             loading="lazy"
             decoding="async"
-            {...stylex.props(styles.campusImage)}
-            style={reduce ? undefined : { scale: imageScale }}
+            {...stylex.attrs(styles.campusImage)}
+            style={reduce() ? undefined : { scale: imageScale }}
           />
-          <div aria-hidden="true" {...stylex.props(styles.campusShade)} />
-          <div {...stylex.props(styles.campusCaption)}>
-            <h2 id="oox-campus-title" {...stylex.props(styles.sectionTitle, styles.campusTitle)}>
+          <div aria-hidden="true" {...stylex.attrs(styles.campusShade)} />
+          <div {...stylex.attrs(styles.campusCaption)}>
+            <h2 id="oox-campus-title" {...stylex.attrs(styles.sectionTitle, styles.campusTitle)}>
               {CAMPUS.label}
             </h2>
             <Echo sx={styles.campusEcho}>{CAMPUS.echo}</Echo>
@@ -2781,41 +2749,43 @@ function Campus() {
         </m.div>
         <m.span
           aria-hidden="true"
-          {...stylex.props(styles.campusCut)}
-          style={reduce ? undefined : { opacity: cutOpacity }}
+          {...stylex.attrs(styles.campusCut)}
+          style={reduce() ? undefined : { opacity: cutOpacity }}
         >
           <RegMark sx={styles.campusCutStart} />
           <RegMark sx={styles.campusCutEnd} />
         </m.span>
       </div>
-      <div {...stylex.props(styles.shell, styles.inset120, styles.statsBand)}>
+      <div {...stylex.attrs(styles.shell, styles.inset120, styles.statsBand)}>
         {STATS.map((stat, index) => (
-          <StatItem key={stat.label} stat={stat} index={index} />
+          <StatItem stat={stat} index={index} />
         ))}
       </div>
     </section>
   );
 }
 
-function StatItem({ stat, index }: { stat: (typeof STATS)[number]; index: number }) {
+function StatItem(props: { stat: (typeof STATS)[number]; index: number }) {
   return (
     <>
-      {index > 0 ? <span aria-hidden="true" {...stylex.props(styles.statDivider)} /> : null}
-      <ZoomReveal delay={index * STAGGER} sx={styles.stat}>
-        <p {...stylex.props(styles.statText)}>{stat.label}</p>
-        <p {...stylex.props(styles.statFigure)}>
-          <Odometer value={stat.value} offset={index * 0.2} />
-          {stat.unit ? (
-            <span aria-hidden="true" {...stylex.props(styles.statUnit)}>
-              {stat.unit}
+      <Show when={props.index > 0}>
+        <span aria-hidden="true" {...stylex.attrs(styles.statDivider)} />
+      </Show>
+      <ZoomReveal delay={props.index * STAGGER} sx={styles.stat}>
+        <p {...stylex.attrs(styles.statText)}>{props.stat.label}</p>
+        <p {...stylex.attrs(styles.statFigure)}>
+          <Odometer value={props.stat.value} offset={props.index * 0.2} />
+          <Show when={props.stat.unit}>
+            <span aria-hidden="true" {...stylex.attrs(styles.statUnit)}>
+              {props.stat.unit}
             </span>
-          ) : null}
-          <span {...stylex.props(styles.visuallyHidden)}>
-            {stat.value}
-            {stat.unit ?? ""}
+          </Show>
+          <span {...stylex.attrs(styles.visuallyHidden)}>
+            {props.stat.value}
+            {props.stat.unit ?? ""}
           </span>
         </p>
-        <p {...stylex.props(styles.statText)}>{stat.caption}</p>
+        <p {...stylex.attrs(styles.statText)}>{props.stat.caption}</p>
       </ZoomReveal>
     </>
   );
@@ -2823,10 +2793,10 @@ function StatItem({ stat, index }: { stat: (typeof STATS)[number]; index: number
 
 function Offices() {
   return (
-    <section id="offices" aria-labelledby="oox-offices-title" {...stylex.props(styles.anchor)}>
-      <div {...stylex.props(styles.globalBand)}>
+    <section id="offices" aria-labelledby="oox-offices-title" {...stylex.attrs(styles.anchor)}>
+      <div {...stylex.attrs(styles.globalBand)}>
         <ZoomReveal sx={styles.globalRow}>
-          <div {...stylex.props(styles.mapWrap)}>
+          <div {...stylex.attrs(styles.mapWrap)}>
             <img
               src={IMAGES.officeMap.src}
               alt={IMAGES.officeMap.alt}
@@ -2834,18 +2804,18 @@ function Offices() {
               height={321}
               loading="lazy"
               decoding="async"
-              {...stylex.props(styles.mapImage)}
+              {...stylex.attrs(styles.mapImage)}
             />
             {OFFICE_MAP_PINS.map((pin, index) => (
-              <span key={`${pin.left}-${pin.top}`} aria-hidden="true">
+              <span aria-hidden="true">
                 <span
-                  {...stylex.props(
+                  {...stylex.attrs(
                     styles.mapRing,
                     styles.pinAt(`${pin.left}%`, `${pin.top}%`, `${(index * 370) % 2800}ms`),
                   )}
                 />
                 <span
-                  {...stylex.props(
+                  {...stylex.attrs(
                     styles.regMark,
                     styles.mapCross,
                     styles.pinAt(`${pin.left}%`, `${pin.top}%`, "0ms"),
@@ -2854,14 +2824,14 @@ function Offices() {
               </span>
             ))}
           </div>
-          <div {...stylex.props(styles.globalCopy)}>
-            <div {...stylex.props(styles.headRow, styles.headRowCenter)}>
-              <h2 id="oox-offices-title" {...stylex.props(styles.sectionTitle)}>
+          <div {...stylex.attrs(styles.globalCopy)}>
+            <div {...stylex.attrs(styles.headRow, styles.headRowCenter)}>
+              <h2 id="oox-offices-title" {...stylex.attrs(styles.sectionTitle)}>
                 {GLOBAL_INTRO.title}
               </h2>
               <Echo>{ECHO.offices}</Echo>
             </div>
-            <p {...stylex.props(styles.sectionLead)}>{GLOBAL_INTRO.lead}</p>
+            <p {...stylex.attrs(styles.sectionLead)}>{GLOBAL_INTRO.lead}</p>
           </div>
         </ZoomReveal>
       </div>
@@ -2885,14 +2855,14 @@ function Offices() {
   );
 }
 
-function AccordionIcon({ open }: { open: boolean }) {
+function AccordionIcon(props: { open: boolean }) {
   const reduce = useReducedMotion();
   return (
-    <span aria-hidden="true" {...stylex.props(styles.newsIconSlot)}>
+    <span aria-hidden="true" {...stylex.attrs(styles.newsIconSlot)}>
       <m.span
-        {...stylex.props(styles.newsIconLayer)}
-        animate={{ rotate: open ? 45 : 0 }}
-        transition={reduce ? { duration: 0 } : { type: "spring", duration: 0.3, bounce: 0 }}
+        {...stylex.attrs(styles.newsIconLayer)}
+        animate={{ rotate: props.open ? 45 : 0 }}
+        transition={reduce() ? { duration: 0 } : { type: "spring", duration: 0.3, bounce: 0 }}
       >
         <Plus size={16} strokeWidth={2} absoluteStrokeWidth />
       </m.span>
@@ -2900,21 +2870,13 @@ function AccordionIcon({ open }: { open: boolean }) {
   );
 }
 
-function NewsItem({
-  item,
-  open,
-  onToggle,
-}: {
-  item: (typeof NEWS)[number];
-  open: boolean;
-  onToggle: () => void;
-}) {
+function NewsItem(props: { item: (typeof NEWS)[number]; open: boolean; onToggle: () => void }) {
   return (
     <NewsAccordion
-      item={item}
-      open={open}
-      onToggle={onToggle}
-      icon={<AccordionIcon open={open} />}
+      item={props.item}
+      open={props.open}
+      onToggle={props.onToggle}
+      icon={<AccordionIcon open={props.open} />}
       styles={{
         mutedText: styles.mutedText,
         newsHeading: styles.newsHeading,
@@ -2927,23 +2889,23 @@ function NewsItem({
 }
 
 function News() {
-  const [openIndex, setOpenIndex] = useState<number | null>(0);
+  const [openIndex, setOpenIndex] = createSignal<number | null>(0);
   return (
     <section
       id="news"
       aria-labelledby="oox-news-title"
-      {...stylex.props(styles.news, styles.anchor)}
+      {...stylex.attrs(styles.news, styles.anchor)}
     >
-      <div {...stylex.props(styles.shell, styles.inset120, styles.newsInner)}>
+      <div {...stylex.attrs(styles.shell, styles.inset120, styles.newsInner)}>
         <SectionHead id="oox-news-title" title={NEWS_TITLE} echo={ECHO.news} />
-        <ul {...stylex.props(styles.accordion)}>
+        <ul {...stylex.attrs(styles.accordion)}>
           {NEWS.map((item, index) => (
-            <m.li layout="position" transition={{ duration: 0.25, ease: EASE }} key={item.title}>
+            <m.li layout="position" transition={{ duration: 0.25, ease: EASE }}>
               <ZoomReveal delay={index * STAGGER} sx={styles.newsItem}>
                 <NewsItem
                   item={item}
-                  open={openIndex === index}
-                  onToggle={() => setOpenIndex(openIndex === index ? null : index)}
+                  open={openIndex() === index}
+                  onToggle={() => setOpenIndex(openIndex() === index ? null : index)}
                 />
               </ZoomReveal>
             </m.li>
@@ -2959,28 +2921,28 @@ function ContactCta() {
     <section
       id="contact"
       aria-labelledby="oox-contact-title"
-      {...stylex.props(styles.cta, styles.anchor)}
+      {...stylex.attrs(styles.cta, styles.anchor)}
     >
-      <span aria-hidden="true" lang="en" {...stylex.props(styles.ctaWord)}>
+      <span aria-hidden="true" lang="en" {...stylex.attrs(styles.ctaWord)}>
         Fenchem
       </span>
       <ZoomReveal sx={[styles.shell, styles.inset120, styles.ctaInner]}>
-        <div {...stylex.props(styles.headRow, styles.headRowCenter)}>
-          <h2 id="oox-contact-title" {...stylex.props(styles.sectionTitle)}>
+        <div {...stylex.attrs(styles.headRow, styles.headRowCenter)}>
+          <h2 id="oox-contact-title" {...stylex.attrs(styles.sectionTitle)}>
             {CTA.title}
           </h2>
           <Echo>{CTA.echo}</Echo>
         </div>
-        <p {...stylex.props(styles.sectionLead, styles.ctaLead)}>{CTA.lead}</p>
-        <ul aria-label="Choose an application area" {...stylex.props(styles.ctaMarkets)}>
+        <p {...stylex.attrs(styles.sectionLead, styles.ctaLead)}>{CTA.lead}</p>
+        <ul aria-label="Choose an application area" {...stylex.attrs(styles.ctaMarkets)}>
           {MARKETS.map((market, index) => (
-            <li key={market.id}>
+            <li>
               <a
                 href={`#market-${market.id}`}
                 onClick={(event) => goToMarket(event, index)}
-                {...stylex.props(styles.ctaMarket)}
+                {...stylex.attrs(styles.ctaMarket)}
               >
-                <span aria-hidden="true" {...stylex.props(styles.ctaMarketNumber)}>
+                <span aria-hidden="true" {...stylex.attrs(styles.ctaMarketNumber)}>
                   {twoDigits(index + 1)}
                 </span>
                 {market.title}
@@ -2990,7 +2952,7 @@ function ContactCta() {
         </ul>
         <a
           href={CTA.action.href}
-          {...stylex.props(styles.button, styles.buttonPrimary, styles.buttonWide)}
+          {...stylex.attrs(styles.button, styles.buttonPrimary, styles.buttonWide)}
         >
           {CTA.action.label}
         </a>
@@ -2999,25 +2961,26 @@ function ContactCta() {
   );
 }
 
-function AxisReadout({ crossX }: { crossX: MotionValue<number> }) {
+function AxisReadout(props: { crossX: MotionValue<number> }) {
+  const crossX = untrack(() => props.crossX);
   const { scrollYProgress } = useScroll();
   const dotX = useTransform(crossX, (value) => value * 40);
   const dotY = useTransform(scrollYProgress, (value) => value * 40);
   const yText = useTransform(scrollYProgress, threeDigits);
   const xText = useTransform(crossX, threeDigits);
   return (
-    <div aria-hidden="true" {...stylex.props(styles.readout)}>
-      <span {...stylex.props(styles.readoutPlane)}>
-        <m.span {...stylex.props(styles.regMark, styles.readoutDot)} style={{ x: dotX, y: dotY }} />
+    <div aria-hidden="true" {...stylex.attrs(styles.readout)}>
+      <span {...stylex.attrs(styles.readoutPlane)}>
+        <m.span {...stylex.attrs(styles.regMark, styles.readoutDot)} style={{ x: dotX, y: dotY }} />
       </span>
-      <span {...stylex.props(styles.readoutValues)}>
+      <span {...stylex.attrs(styles.readoutValues)}>
         <span>
-          <span {...stylex.props(styles.readoutAxis)}>Y </span>
-          <m.span>{yText}</m.span>
+          <span {...stylex.attrs(styles.readoutAxis)}>Y </span>
+          <m.span>{yText()}</m.span>
         </span>
         <span>
-          <span {...stylex.props(styles.readoutAxis)}>X </span>
-          <m.span>{xText}</m.span>
+          <span {...stylex.attrs(styles.readoutAxis)}>X </span>
+          <m.span>{xText()}</m.span>
         </span>
       </span>
     </div>
@@ -3048,10 +3011,10 @@ function SiteFooter() {
       columns={FOOTER_COLUMNS}
       copyright={COPYRIGHT}
     >
-      <a href="#top" aria-label="LinkedIn" {...stylex.props(styles.socialLink)}>
+      <a href="#top" aria-label="LinkedIn" {...stylex.attrs(styles.socialLink)}>
         <VectorArt paths={LINKEDIN_PATHS} viewBox="0 0 20 20" sx={styles.socialIcon} />
       </a>
-      <a href="#top" aria-label="WeChat" {...stylex.props(styles.socialLink)}>
+      <a href="#top" aria-label="WeChat" {...stylex.attrs(styles.socialLink)}>
         <VectorArt paths={WECHAT_PATHS} viewBox="0 0 20 20" sx={styles.socialIcon} />
       </a>
     </CorporateFooter>
@@ -3063,29 +3026,29 @@ export function VariantOOX() {
   const reduce = useReducedMotion();
   const intro = useIntro();
   const crossX = useMotionValue(0);
-  const introVars = {
-    "--oo-intro": intro === "play" ? `${INTRO_REVEAL_MS}ms` : "0ms",
-  } as CSSProperties;
-  useEffect(() => {
-    if (reduce) return;
+  const introVars = (): JSX.CSSProperties => ({
+    "--oo-intro": intro() === "play" ? `${INTRO_REVEAL_MS}ms` : "0ms",
+  });
+  createEffect(reduce, (reduced) => {
+    if (reduced) return;
     const root = document.documentElement;
     const previous = root.style.scrollBehavior;
     root.style.scrollBehavior = "smooth";
     return () => {
       root.style.scrollBehavior = previous;
     };
-  }, [reduce]);
+  });
   return (
     <LazyMotion features={domMax} strict>
       <LayoutGroup>
         <MotionConfig reducedMotion="user">
-          <div lang="zh-CN" {...stylex.props(styles.root)} style={introVars}>
-            <div {...stylex.props(styles.page, intro === "play" && introStyles.pageReveal)}>
-              <a href="#main-content" {...stylex.props(styles.skipLink)}>
+          <div lang="zh-CN" {...stylex.attrs(styles.root)} style={introVars()}>
+            <div {...sxProps(styles.page, intro() === "play" && introStyles.pageReveal)}>
+              <a href="#main-content" {...stylex.attrs(styles.skipLink)}>
                 跳到主要内容
               </a>
               <SiteHeader />
-              <main id="main-content" tabIndex={-1} {...stylex.props(styles.mainTarget)}>
+              <main id="main-content" tabindex={-1} {...stylex.attrs(styles.mainTarget)}>
                 <Hero />
                 <About />
                 <Products crossX={crossX} />

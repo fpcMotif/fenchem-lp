@@ -1,6 +1,7 @@
 import * as stylex from "@stylexjs/stylex";
-import { useInView } from "motion/react";
-import type { RefObject } from "react";
+import type { JSX } from "@solidjs/web";
+import type { Accessor } from "solid-js";
+import { useInView } from "@/compat/motion";
 import { shared, CYANOTYPE_ID } from "./cyanotype-values";
 
 const TONE_STOPS: readonly (readonly [number, string])[] = [
@@ -46,12 +47,15 @@ const BRUSHES = [
   },
 ] as const;
 
+// `focusable` (legacy SVG attribute) is not in Solid's JSX types.
+const UNFOCUSABLE = { focusable: "false" } as JSX.SvgSVGAttributes<SVGSVGElement>;
+
 export function CyanotypeDefs() {
   return (
-    <svg aria-hidden="true" focusable="false" {...stylex.props(shared.defs)}>
+    <svg aria-hidden="true" {...UNFOCUSABLE} {...stylex.attrs(shared.defs)}>
       <filter
         id={CYANOTYPE_ID}
-        colorInterpolationFilters="sRGB"
+        color-interpolation-filters="sRGB"
         x="0"
         y="0"
         width="100%"
@@ -65,7 +69,7 @@ export function CyanotypeDefs() {
         </feComponentTransfer>
       </filter>
       {BRUSHES.map((brush) => (
-        <filter key={brush.id} id={brush.id} x="-10%" y="-10%" width="120%" height="120%">
+        <filter id={brush.id} x="-10%" y="-10%" width="120%" height="120%">
           <feTurbulence
             type="fractalNoise"
             baseFrequency={brush.sweep}
@@ -104,20 +108,19 @@ export function CyanotypeDefs() {
 
 export function BrushCoat() {
   return (
-    <svg aria-hidden="true" focusable="false" {...stylex.props(shared.coat)}>
+    <svg aria-hidden="true" {...UNFOCUSABLE} {...stylex.attrs(shared.coat)}>
       {BRUSHES.map((brush) => (
         <rect
-          key={brush.id}
           width="100%"
           height="100%"
           filter={`url(#${brush.id})`}
-          {...stylex.props(shared.coatFill, brush.wide ? shared.wideOnly : shared.narrowOnly)}
+          {...stylex.attrs(shared.coatFill, brush.wide ? shared.wideOnly : shared.narrowOnly)}
         />
       ))}
     </svg>
   );
 }
 
-export function useDeveloped(ref: RefObject<Element | null>, amount = 0.3) {
+export function useDeveloped(ref: Accessor<Element | undefined>, amount = 0.3) {
   return useInView(ref, { once: true, amount });
 }

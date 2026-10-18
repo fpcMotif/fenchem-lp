@@ -1,6 +1,6 @@
 import { breakpoints, colors, radii, typography } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { ArrowRight, FileDown } from "lucide-react";
+import { ArrowRight, FileDown } from "@fenchem-lp/ui/components/lucide";
 import { createInquiryHref, ingredients } from "@/components/landing/landing-content";
 import { IMAGES } from "../content";
 import { SplitWords, useSectionAnimation } from "../motion";
@@ -252,33 +252,33 @@ export function DossierSection() {
       ref={ref}
       id="dossier"
       aria-labelledby="dossier-heading"
-      {...stylex.props(styles.section)}
+      {...stylex.attrs(styles.section)}
     >
-      <div {...stylex.props(styles.grid)}>
-        <div {...stylex.props(styles.leftCol)}>
-          <div {...stylex.props(styles.plateFrame)}>
+      <div {...stylex.attrs(styles.grid)}>
+        <div {...stylex.attrs(styles.leftCol)}>
+          <div {...stylex.attrs(styles.plateFrame)}>
             <img
-              data-dossier-img
+              data-dossier-img=""
               src={IMAGES.dossier.src}
               alt={IMAGES.dossier.alt}
               loading="lazy"
-              {...stylex.props(styles.plateImg)}
+              {...stylex.attrs(styles.plateImg)}
             />
           </div>
-          <div data-dossier-caption {...stylex.props(styles.captionBox)}>
-            <span {...stylex.props(sharedStyles.techLabel)}>
+          <div data-dossier-caption="" {...stylex.attrs(styles.captionBox)}>
+            <span {...stylex.attrs(sharedStyles.techLabel)}>
               {DOSSIER.code} — dossier reference
             </span>
-            <span {...stylex.props(styles.captionCategory)}>{DOSSIER.category}</span>
+            <span {...stylex.attrs(styles.captionCategory)}>{DOSSIER.category}</span>
           </div>
         </div>
 
-        <div {...stylex.props(styles.rightCol)}>
-          <p data-dossier-eyebrow {...stylex.props(sharedStyles.techLabel)}>
+        <div {...stylex.attrs(styles.rightCol)}>
+          <p data-dossier-eyebrow="" {...stylex.attrs(sharedStyles.techLabel)}>
             03 — Product Dossier
           </p>
 
-          <h2 id="dossier-heading" data-dossier-heading {...stylex.props(styles.heading)}>
+          <h2 id="dossier-heading" data-dossier-heading="" {...stylex.attrs(styles.heading)}>
             <SplitWords
               segments={[
                 { text: "One active," },
@@ -287,46 +287,46 @@ export function DossierSection() {
             />
           </h2>
 
-          <p data-dossier-intro {...stylex.props(styles.intro)}>
+          <p data-dossier-intro="" {...stylex.attrs(styles.intro)}>
             {DOSSIER.name} — {DOSSIER.latin}, supplied as a {DOSSIER.specification.toLowerCase()}{" "}
             standardised to {DOSSIER.purity}. Every compound in the matrix carries this depth of
             documentation; the {DOSSIER.category.toLowerCase()} is shown here as the working
             example.
           </p>
 
-          <div aria-hidden="true" data-dossier-rule {...stylex.props(styles.topRule)} />
-          <dl {...stylex.props(styles.dl)}>
+          <div aria-hidden="true" data-dossier-rule="" {...stylex.attrs(styles.topRule)} />
+          <dl {...stylex.attrs(styles.dl)}>
             {SPEC_ROWS.map((row) => (
-              <div key={row.label} data-dossier-row {...stylex.props(styles.specRow)}>
-                <dt {...stylex.props(sharedStyles.techLabel)}>{row.label}</dt>
-                <dd {...stylex.props(styles.specValue)}>
+              <div data-dossier-row="" {...stylex.attrs(styles.specRow)}>
+                <dt {...stylex.attrs(sharedStyles.techLabel)}>{row.label}</dt>
+                <dd {...stylex.attrs(styles.specValue)}>
                   {row.value}
                   <span
                     aria-hidden="true"
-                    data-dossier-rule
-                    {...stylex.props(styles.specRowRule)}
+                    data-dossier-rule=""
+                    {...stylex.attrs(styles.specRowRule)}
                   />
                 </dd>
               </div>
             ))}
           </dl>
 
-          <p {...stylex.props(sharedStyles.techLabel, styles.formatsTitle)}>Finished formats</p>
-          <ul {...stylex.props(styles.formatsList)}>
+          <p {...stylex.attrs(sharedStyles.techLabel, styles.formatsTitle)}>Finished formats</p>
+          <ul {...stylex.attrs(styles.formatsList)}>
             {FORMATS.map((format) => (
-              <li key={format} data-dossier-chip {...stylex.props(styles.chip)}>
+              <li data-dossier-chip="" {...stylex.attrs(styles.chip)}>
                 {format}
               </li>
             ))}
           </ul>
 
-          <div data-dossier-ctas {...stylex.props(styles.ctas)}>
-            <a href={createInquiryHref("quality")} {...stylex.props(styles.primaryCta)}>
+          <div data-dossier-ctas="" {...stylex.attrs(styles.ctas)}>
+            <a href={createInquiryHref("quality")} {...stylex.attrs(styles.primaryCta)}>
               Request this specification
-              <ArrowRight aria-hidden="true" {...stylex.props(styles.ctaIcon)} />
+              <ArrowRight aria-hidden="true" {...stylex.attrs(styles.ctaIcon)} />
             </a>
-            <a href={createInquiryHref("contact")} {...stylex.props(styles.secondaryCta)}>
-              <FileDown aria-hidden="true" {...stylex.props(styles.ctaIcon)} />
+            <a href={createInquiryHref("contact")} {...stylex.attrs(styles.secondaryCta)}>
+              <FileDown aria-hidden="true" {...stylex.attrs(styles.ctaIcon)} />
               Technical data sheet
             </a>
           </div>

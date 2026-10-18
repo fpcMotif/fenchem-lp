@@ -192,44 +192,44 @@ const styles = stylex.create({
 
 export function Hero() {
   return (
-    <section aria-labelledby="oos1w-title" {...stylex.props(styles.hero)}>
-      <div {...stylex.props(ui.shell, styles.frame)}>
-        <p lang="en" {...stylex.props(ui.english)}>
+    <section aria-labelledby="oos1w-title" {...stylex.attrs(styles.hero)}>
+      <div {...stylex.attrs(ui.shell, styles.frame)}>
+        <p lang="en" {...stylex.attrs(ui.english)}>
           {ABOUT_BANNER.established} · {ABOUT_BANNER.place}
         </p>
 
-        <div {...stylex.props(ui.grid, styles.main)}>
-          <div {...stylex.props(styles.text)}>
-            <h1 id="oos1w-title" {...stylex.props(styles.title)}>
+        <div {...stylex.attrs(ui.grid, styles.main)}>
+          <div {...stylex.attrs(styles.text)}>
+            <h1 id="oos1w-title" {...stylex.attrs(styles.title)}>
               {ABOUT_BANNER.title}
             </h1>
-            <p lang="en" {...stylex.props(styles.tagline)}>
+            <p lang="en" {...stylex.attrs(styles.tagline)}>
               {ABOUT_BANNER.tagline}
             </p>
-            <p {...stylex.props(styles.lead)}>{ABOUT_BANNER.lead}</p>
+            <p {...stylex.attrs(styles.lead)}>{ABOUT_BANNER.lead}</p>
           </div>
 
-          <div aria-hidden="true" {...stylex.props(styles.plate)}>
-            <span {...stylex.props(styles.frontMark)} />
-            <span lang="en" {...stylex.props(styles.frontWord)}>
+          <div aria-hidden="true" {...stylex.attrs(styles.plate)}>
+            <span {...stylex.attrs(styles.frontMark)} />
+            <span lang="en" {...stylex.attrs(styles.frontWord)}>
               front, not yet reached
             </span>
-            <span {...stylex.props(styles.wicking)} />
-            <span {...stylex.props(styles.pool)} />
-            <span {...stylex.props(styles.spot)}>
-              <span {...stylex.props(styles.wick)} />
-              <span {...stylex.props(styles.applied)}>
+            <span {...stylex.attrs(styles.wicking)} />
+            <span {...stylex.attrs(styles.pool)} />
+            <span {...stylex.attrs(styles.spot)}>
+              <span {...stylex.attrs(styles.wick)} />
+              <span {...stylex.attrs(styles.applied)}>
                 <MixedSpot />
               </span>
             </span>
-            <span {...stylex.props(styles.laneTag)}>泛成</span>
+            <span {...stylex.attrs(styles.laneTag)}>泛成</span>
           </div>
-          <span aria-hidden="true" {...stylex.props(styles.origin)} />
+          <span aria-hidden="true" {...stylex.attrs(styles.origin)} />
         </div>
 
-        <p aria-hidden="true" {...stylex.props(ui.micro, styles.caption)}>
-          <span {...stylex.props(styles.figNum)}>Fig. 0</span>
-          <span lang="en" {...stylex.props(styles.captionItalic)}>
+        <p aria-hidden="true" {...stylex.attrs(ui.micro, styles.caption)}>
+          <span {...stylex.attrs(styles.figNum)}>Fig. 0</span>
+          <span lang="en" {...stylex.attrs(styles.captionItalic)}>
             One sample on the origin line, before development.
           </span>
         </p>

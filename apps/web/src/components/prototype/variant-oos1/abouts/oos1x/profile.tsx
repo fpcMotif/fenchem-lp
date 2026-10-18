@@ -58,7 +58,7 @@ const styles = stylex.create({
 
 export function Profile() {
   return (
-    <section id="about-profile" aria-labelledby="oos1x-profile" {...stylex.props(ui.anchor)}>
+    <section id="about-profile" aria-labelledby="oos1x-profile" {...stylex.attrs(ui.anchor)}>
       <Pair
         lever={LEVER}
         loadRatio={3 / 2}
@@ -69,58 +69,58 @@ export function Profile() {
           </StandingTitle>
         }
         load={
-          <figure {...stylex.props(styles.figure)}>
-            <div {...stylex.props(styles.frame, styles.classic)}>
+          <figure {...stylex.attrs(styles.figure)}>
+            <div {...stylex.attrs(styles.frame, styles.classic)}>
               <img
                 src={ABOUT_HERO.lobbyImage}
                 alt={ABOUT_HERO.lobbyEnglish}
                 loading="lazy"
                 decoding="async"
-                {...stylex.props(ui.fill, styles.lobbyPosition)}
+                {...stylex.attrs(ui.fill, styles.lobbyPosition)}
               />
             </div>
-            <figcaption {...stylex.props(type.note, ui.knockout)}>
+            <figcaption {...stylex.attrs(type.note, ui.knockout)}>
               {ABOUT_HERO.lobbyCaption}
             </figcaption>
           </figure>
         }
       >
-        <p {...stylex.props(type.light, styles.name)}>{ABOUT_HERO.title}</p>
-        <p lang="en" {...stylex.props(styles.english)}>
+        <p {...stylex.attrs(type.light, styles.name)}>{ABOUT_HERO.title}</p>
+        <p lang="en" {...stylex.attrs(styles.english)}>
           {ABOUT_HERO.englishTitle}
         </p>
-        <p {...stylex.props(type.body, styles.lead)}>{ABOUT_HERO.lead}</p>
+        <p {...stylex.attrs(type.body, styles.lead)}>{ABOUT_HERO.lead}</p>
       </Pair>
       <Pair
         lever={LEVER}
         loadRatio={4 / 3}
         offset="start"
         tag={
-          <p aria-hidden="true" {...stylex.props(type.counterweight, styles.sixteen)}>
+          <p aria-hidden="true" {...stylex.attrs(type.counterweight, styles.sixteen)}>
             16
           </p>
         }
         load={
-          <figure {...stylex.props(styles.figure)}>
-            <div {...stylex.props(styles.frame, styles.panorama)}>
+          <figure {...stylex.attrs(styles.figure)}>
+            <div {...stylex.attrs(styles.frame, styles.panorama)}>
               <img
                 src={ABOUT_MOMENT.image}
                 alt={ABOUT_MOMENT.alt}
                 loading="lazy"
                 decoding="async"
-                {...stylex.props(ui.fill, styles.panoramaPosition)}
+                {...stylex.attrs(ui.fill, styles.panoramaPosition)}
               />
             </div>
-            <figcaption {...stylex.props(type.note, ui.knockout)}>
+            <figcaption {...stylex.attrs(type.note, ui.knockout)}>
               {ABOUT_MOMENT.caption}
             </figcaption>
           </figure>
         }
       >
-        <p {...stylex.props(type.body, styles.network)}>{ABOUT_HERO.networkLabel}</p>
-        <ul {...stylex.props(type.light, styles.countries)}>
+        <p {...stylex.attrs(type.body, styles.network)}>{ABOUT_HERO.networkLabel}</p>
+        <ul {...stylex.attrs(type.light, styles.countries)}>
           {ABOUT_HERO.countries.map((country) => (
-            <li key={country}>{country}</li>
+            <li>{country}</li>
           ))}
         </ul>
       </Pair>

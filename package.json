@@ -8,12 +8,7 @@
     ],
     "catalog": {
       "dotenv": "latest",
-      "typescript": "next",
-      "next-themes": "latest",
-      "react": "latest",
-      "react-dom": "latest",
-      "@types/react": "latest",
-      "@types/react-dom": "latest"
+      "typescript": "next"
     }
   },
   "type": "module",
@@ -28,7 +23,7 @@
     "build": "vp run -r build",
     "check": "bun run typecheck && bun lint && bun fmt --check",
     "check-types": "bun run typecheck",
-    "typecheck": "bun apps/web/scripts/generate-route-tree.ts && bun check -b",
+    "typecheck": "bun apps/web/scripts/generate-route-tree.ts && cd packages/config && bun check -b -p ../..",
     "check:lint": "bun lint && bun fmt && bun scripts/check-stylex-types.ts",
     "check:stylex": "bun scripts/check-stylex-types.ts",
     "lint": "bun lint",
@@ -43,7 +38,6 @@
     "dev:web:portless": "vp run --filter web dev:portless",
     "deploy": "vp run --filter @fenchem-lp/infra deploy",
     "destroy": "vp run --filter @fenchem-lp/infra destroy",
-    "doctor": "react-doctor",
     "perf": "node perf/run.mjs",
     "perf:build": "node perf/measure-build.mjs",
     "perf:assets": "node perf/measure-assets.mjs",
@@ -67,18 +61,22 @@
     "oxlint-tsgolint": "^7.0.2003",
     "pixelmatch": "^8.0.0",
     "pngjs": "^7.0.0",
-    "react-doctor": "^0.9.17",
     "rolldown": "1.2.13",
     "typescript": "next",
     "vite-plus": "0.1.24",
     "vitest": "npm:@voidzero-dev/vite-plus-test@0.1.24"
   },
   "overrides": {
+    "@solidjs/babel-plugin": "2.0.0-rc.15",
+    "@solidjs/compiler": "2.0.0-rc.15",
+    "@solidjs/signals": "2.0.0-rc.15",
+    "@solidjs/web": "2.0.0-rc.15",
+    "solid-js": "2.0.0-rc.15",
     "vite": "npm:@voidzero-dev/vite-plus-core@0.1.24",
     "vitest": "npm:@voidzero-dev/vite-plus-test@0.1.24"
   },
   "packageManager": "bun@1.4.2",
   "patchedDependencies": {
-    "@stylexswc/unplugin@0.18.5": "patches/@stylexswc%2Funplugin@0.18.5.patch"
+    "@tanstack/solid-start@2.0.0-rc.8": "patches/@tanstack%2Fsolid-start@2.0.0-rc.8.patch"
   }
 }

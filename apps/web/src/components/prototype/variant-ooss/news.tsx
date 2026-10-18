@@ -1,5 +1,5 @@
 import * as stylex from "@stylexjs/stylex";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight } from "@fenchem-lp/ui/components/lucide";
 
 import { Reveal } from "./motion";
 import { color, ease, font, layout as layoutTokens, media } from "./tokens.stylex";
@@ -134,43 +134,43 @@ function RowArrow() {
       strokeWidth={2}
       absoluteStrokeWidth
       aria-hidden="true"
-      {...stylex.props(styles.arrow)}
+      {...stylex.attrs(styles.arrow)}
     />
   );
 }
 
 export function News() {
   return (
-    <section id="news" aria-labelledby="oo-news-title" {...stylex.props(styles.section)}>
-      <div {...stylex.props(layout.shell, layout.inset)}>
+    <section id="news" aria-labelledby="oo-news-title" {...stylex.attrs(styles.section)}>
+      <div {...stylex.attrs(layout.shell, layout.inset)}>
         <SectionHeader
           id="oo-news-title"
           title="新闻资讯"
           action={<TextLink href={EVENTS_HREF}>全部资讯</TextLink>}
         />
-        <ul {...stylex.props(styles.list)}>
+        <ul {...stylex.attrs(styles.list)}>
           <Reveal as="li" sx={styles.item}>
             <a
               href={EVENTS_HREF}
-              {...stylex.props(styles.row, styles.rowFeatured, stylex.defaultMarker())}
+              {...stylex.attrs(styles.row, styles.rowFeatured, stylex.defaultMarker())}
             >
-              <div {...stylex.props(styles.featuredText)}>
-                <p {...stylex.props(styles.meta)}>{FEATURED.meta}</p>
-                <h3 {...stylex.props(styles.featuredTitle)}>{FEATURED.title}</h3>
-                <p {...stylex.props(styles.featuredBody)}>{FEATURED.body}</p>
+              <div {...stylex.attrs(styles.featuredText)}>
+                <p {...stylex.attrs(styles.meta)}>{FEATURED.meta}</p>
+                <h3 {...stylex.attrs(styles.featuredTitle)}>{FEATURED.title}</h3>
+                <p {...stylex.attrs(styles.featuredBody)}>{FEATURED.body}</p>
               </div>
               <RowArrow />
             </a>
           </Reveal>
           {UPCOMING.map((event, index) => (
-            <Reveal key={event.title} as="li" index={index + 1} sx={styles.item}>
+            <Reveal as="li" index={index + 1} sx={styles.item}>
               <a
                 href={EVENTS_HREF}
-                {...stylex.props(styles.row, styles.rowCompact, stylex.defaultMarker())}
+                {...stylex.attrs(styles.row, styles.rowCompact, stylex.defaultMarker())}
               >
-                <h3 {...stylex.props(styles.compactTitle)}>{event.title}</h3>
-                <div {...stylex.props(styles.tail)}>
-                  <p {...stylex.props(styles.meta)}>{event.year}</p>
+                <h3 {...stylex.attrs(styles.compactTitle)}>{event.title}</h3>
+                <div {...stylex.attrs(styles.tail)}>
+                  <p {...stylex.attrs(styles.meta)}>{event.year}</p>
                   <RowArrow />
                 </div>
               </a>

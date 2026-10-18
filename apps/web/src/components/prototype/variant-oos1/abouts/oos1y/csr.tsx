@@ -1,6 +1,6 @@
 import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { Factory, Leaf, Recycle, type LucideIcon } from "lucide-react";
+import { Factory, Leaf, Recycle, type LucideIcon } from "@fenchem-lp/ui/components/lucide";
 
 import { ABOUT_CSR } from "../../about-data";
 import { Reveal } from "./reveal";
@@ -94,42 +94,40 @@ export function CsrPane() {
     <section
       id="about-csr"
       aria-labelledby="oos1y-csr"
-      {...stylex.props(ui.anchor, styles.section)}
+      {...stylex.attrs(ui.anchor, styles.section)}
     >
       <h2 id="oos1y-csr" {...srOnly}>
         Responsibility
       </h2>
-      <div {...stylex.props(styles.photoBox)}>
+      <div {...stylex.attrs(styles.photoBox)}>
         <img
           src={ABOUT_CSR.image}
           alt={ABOUT_CSR.imageAlt}
           loading="lazy"
           decoding="async"
-          {...stylex.props(ui.fill, styles.photo)}
+          {...stylex.attrs(ui.fill, styles.photo)}
         />
       </div>
-      <div {...stylex.props(ui.shell, styles.paneRow)}>
-        <div {...stylex.props(ui.glass, styles.pane)}>
+      <div {...stylex.attrs(ui.shell, styles.paneRow)}>
+        <div {...stylex.attrs(ui.glass, styles.pane)}>
           <Reveal>
-            <p {...stylex.props(ui.etched, styles.statement)}>
+            <p {...stylex.attrs(ui.etched, styles.statement)}>
               {ABOUT_CSR.statement.map((line) => (
-                <span key={line} {...stylex.props(styles.line)}>
-                  {line}
-                </span>
+                <span {...stylex.attrs(styles.line)}>{line}</span>
               ))}
             </p>
-            <div {...stylex.props(styles.body)}>
-              <p {...stylex.props(styles.desc)}>{ABOUT_CSR.desc}</p>
-              <ul {...stylex.props(styles.outcomes)}>
+            <div {...stylex.attrs(styles.body)}>
+              <p {...stylex.attrs(styles.desc)}>{ABOUT_CSR.desc}</p>
+              <ul {...stylex.attrs(styles.outcomes)}>
                 {ABOUT_CSR.outcomes.map((outcome) => {
                   const Icon = ICONS[outcome.icon];
                   return (
-                    <li key={outcome.title} {...stylex.props(styles.outcome)}>
+                    <li {...stylex.attrs(styles.outcome)}>
                       <Icon
                         size={16}
                         strokeWidth={1.5}
                         aria-hidden="true"
-                        {...stylex.props(styles.icon)}
+                        {...stylex.attrs(styles.icon)}
                       />
                       {outcome.title}
                     </li>

@@ -35,10 +35,9 @@ const styles = stylex.create({
 
 export function Culture() {
   return (
-    <section id="about-culture" aria-labelledby="oos1x-culture" {...stylex.props(ui.anchor)}>
+    <section id="about-culture" aria-labelledby="oos1x-culture" {...stylex.attrs(ui.anchor)}>
       {ABOUT_CULTURE.values.map((value, index) => (
         <Pair
-          key={value.glyph}
           lever={LEVER}
           loadRatio={1 / GLYPH_SHARE}
           loadLine
@@ -51,18 +50,18 @@ export function Culture() {
             ) : undefined
           }
           tag={
-            <p aria-hidden="true" {...stylex.props(type.counterweight, type.counterDisplay)}>
+            <p aria-hidden="true" {...stylex.attrs(type.counterweight, type.counterDisplay)}>
               {String(index + 1).padStart(2, "0")}
             </p>
           }
           load={
-            <div aria-hidden="true" {...stylex.props(styles.weight)}>
-              <span {...stylex.props(styles.glyph, ui.knockout)}>{value.glyph}</span>
+            <div aria-hidden="true" {...stylex.attrs(styles.weight)}>
+              <span {...stylex.attrs(styles.glyph, ui.knockout)}>{value.glyph}</span>
             </div>
           }
         >
-          <h3 {...stylex.props(type.light, type.display, styles.title)}>{value.title}</h3>
-          <p {...stylex.props(type.body, styles.desc)}>{value.desc}</p>
+          <h3 {...stylex.attrs(type.light, type.display, styles.title)}>{value.title}</h3>
+          <p {...stylex.attrs(type.body, styles.desc)}>{value.desc}</p>
         </Pair>
       ))}
     </section>

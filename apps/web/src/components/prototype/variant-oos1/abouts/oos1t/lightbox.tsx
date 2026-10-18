@@ -2,8 +2,7 @@ import { LightboxControls } from "../../../shared/lightbox-controls";
 import { LightboxStage } from "../../../shared/lightbox-stage";
 import { LightboxDialog, type LightboxState } from "../../../shared/lightbox";
 import * as stylex from "@stylexjs/stylex";
-import { ChevronLeft, ChevronRight, X } from "lucide-react";
-import { useRef } from "react";
+import { ChevronLeft, ChevronRight, X } from "@fenchem-lp/ui/components/lucide";
 
 import { Cast } from "./cast";
 import { LIFT } from "./cast-values";
@@ -128,29 +127,29 @@ const styles = stylex.create({
   },
 });
 
-export function Lightbox({
-  lightbox,
-  photos,
-}: {
-  lightbox: LightboxState;
-  photos: readonly LightboxPhoto[];
-}) {
-  const { close: onClose, step: onStep } = lightbox;
-  const closeRef = useRef<HTMLButtonElement>(null);
+export function Lightbox(props: { lightbox: LightboxState; photos: readonly LightboxPhoto[] }) {
+  const onClose = () => props.lightbox.close();
+  const onStep = (delta: number) => props.lightbox.step(delta);
+  let closeRef: HTMLButtonElement | undefined;
 
   return (
-    <LightboxDialog lightbox={lightbox} items={photos} sx={styles.dialog} initialFocus={closeRef}>
+    <LightboxDialog
+      lightbox={props.lightbox}
+      items={props.photos}
+      sx={styles.dialog}
+      initialFocus={() => closeRef}
+    >
       {(photo) => (
         <>
           <LightboxStage onClose={onClose} sx={styles.stage}>
-            <figure key={photo.id} {...stylex.props(styles.figure)}>
-              <span {...stylex.props(styles.plate)}>
+            <figure {...stylex.attrs(styles.figure)}>
+              <span {...stylex.attrs(styles.plate)}>
                 <Cast lift={LIFT.block} />
-                <img src={photo.large} alt={photo.alt} {...stylex.props(styles.image)} />
+                <img src={photo.large} alt={photo.alt} {...stylex.attrs(styles.image)} />
               </span>
-              <figcaption {...stylex.props(styles.caption)}>
+              <figcaption {...stylex.attrs(styles.caption)}>
                 <span>{photo.caption}</span>
-                <span lang="en" {...stylex.props(styles.english)}>
+                <span lang="en" {...stylex.attrs(styles.english)}>
                   {photo.english}
                 </span>
               </figcaption>

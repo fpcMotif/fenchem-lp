@@ -1,8 +1,8 @@
 import { colors, radii, typography } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 import gsap from "gsap";
-import { Pause, Play } from "lucide-react";
-import { useRef, useState } from "react";
+import { Pause, Play } from "@fenchem-lp/ui/components/lucide";
+import { createSignal } from "solid-js";
 import { ingredients } from "@/components/landing/landing-content";
 import { useReducedMotionFlag, useSectionAnimation } from "../motion";
 import { marquee } from "../motion-values";
@@ -140,39 +140,39 @@ const TRACK_COPIES = [0, 1] as const;
 
 export function TickerSection() {
   const reduced = useReducedMotionFlag();
-  const loop = useRef<gsap.core.Tween | null>(null);
-  const [paused, setPaused] = useState(false);
+  let loop: gsap.core.Tween | null = null;
+  const [paused, setPaused] = createSignal(false);
 
   const ref = useSectionAnimation<HTMLElement>((root) => {
     marquee(root, "[data-ticker-track]", 36);
     const track = root.querySelector<HTMLElement>("[data-ticker-track]");
-    loop.current = track ? (gsap.getTweensOf(track)[0] ?? null) : null;
+    loop = track ? (gsap.getTweensOf(track)[0] ?? null) : null;
   });
 
   const togglePaused = () => {
-    const next = !paused;
+    const next = !paused();
     setPaused(next);
-    loop.current?.paused(next);
+    loop?.paused(next);
   };
 
   return (
-    <section ref={ref} id="ticker" aria-label="Ingredient index" {...stylex.props(styles.section)}>
-      <span aria-hidden="true" {...stylex.props(styles.leftFade)} />
-      <span aria-hidden="true" {...stylex.props(styles.rightFade)} />
+    <section ref={ref} id="ticker" aria-label="Ingredient index" {...stylex.attrs(styles.section)}>
+      <span aria-hidden="true" {...stylex.attrs(styles.leftFade)} />
+      <span aria-hidden="true" {...stylex.attrs(styles.rightFade)} />
 
-      <div {...stylex.props(styles.trackWrap)}>
-        <div data-ticker-track {...stylex.props(styles.track)}>
+      <div {...stylex.attrs(styles.trackWrap)}>
+        <div data-ticker-track="" {...stylex.attrs(styles.track)}>
           {TRACK_COPIES.map((copy) => (
-            <ul key={copy} aria-hidden={copy === 1} {...stylex.props(styles.list)}>
+            <ul aria-hidden={copy === 1 ? "true" : undefined} {...stylex.attrs(styles.list)}>
               {ingredients.map((ingredient, index) => (
-                <li key={ingredient.code} {...stylex.props(styles.item)}>
-                  <span {...stylex.props(styles.text)}>
-                    <span {...stylex.props(styles.index)}>
+                <li {...stylex.attrs(styles.item)}>
+                  <span {...stylex.attrs(styles.text)}>
+                    <span {...stylex.attrs(styles.index)}>
                       {String(index + 1).padStart(2, "0")}
                     </span>
-                    <span {...stylex.props(styles.name)}>{ingredient.name}</span>
+                    <span {...stylex.attrs(styles.name)}>{ingredient.name}</span>
                   </span>
-                  <span aria-hidden="true" {...stylex.props(styles.diamond)} />
+                  <span aria-hidden="true" {...stylex.attrs(styles.diamond)} />
                 </li>
               ))}
             </ul>
@@ -180,18 +180,18 @@ export function TickerSection() {
         </div>
       </div>
 
-      {reduced ? null : (
+      {reduced() ? null : (
         <button
           type="button"
           onClick={togglePaused}
-          aria-pressed={paused}
-          aria-label={paused ? "Resume the ingredient ticker" : "Pause the ingredient ticker"}
-          {...stylex.props(styles.toggleButton)}
+          aria-pressed={paused() ? "true" : "false"}
+          aria-label={paused() ? "Resume the ingredient ticker" : "Pause the ingredient ticker"}
+          {...stylex.attrs(styles.toggleButton)}
         >
-          {paused ? (
-            <Play aria-hidden="true" {...stylex.props(styles.playIcon)} />
+          {paused() ? (
+            <Play aria-hidden="true" {...stylex.attrs(styles.playIcon)} />
           ) : (
-            <Pause aria-hidden="true" {...stylex.props(styles.pauseIcon)} />
+            <Pause aria-hidden="true" {...stylex.attrs(styles.pauseIcon)} />
           )}
         </button>
       )}

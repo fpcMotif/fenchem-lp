@@ -118,7 +118,7 @@ export function Structure() {
     <section
       id="about-structure"
       aria-labelledby="oos1b-structure"
-      {...stylex.props(ui.anchor, ui.section, ui.shell)}
+      {...stylex.attrs(ui.anchor, ui.section, ui.shell)}
     >
       <SectionHead
         id="oos1b-structure"
@@ -127,49 +127,46 @@ export function Structure() {
         title={ABOUT_STRUCTURE.title}
         note="One holding, five companies within it."
       />
-      <div ref={ref} {...stylex.props(...stepIn(arrived, 0))}>
+      <div ref={ref} {...stylex.attrs(...stepIn(arrived(), 0))}>
         <Mat
           raised
           head={
-            <div {...stylex.props(styles.holdingHead)}>
+            <div {...stylex.attrs(styles.holdingHead)}>
               <Tag numeral="I" label={holding.badge} />
-              <h3 {...stylex.props(styles.holdingName)}>{holding.name}</h3>
-              <p lang="en" {...stylex.props(ui.serif, styles.holdingEnglish)}>
+              <h3 {...stylex.attrs(styles.holdingName)}>{holding.name}</h3>
+              <p lang="en" {...stylex.attrs(ui.serif, styles.holdingEnglish)}>
                 {holding.english}
               </p>
             </div>
           }
         >
           <Bevel field={styles.wall}>
-            <p {...stylex.props(styles.rowLabel)}>
+            <p {...stylex.attrs(styles.rowLabel)}>
               {subsidiaryBadge}
-              <span lang="en" {...stylex.props(ui.serif, styles.rowLabelEn)}>
+              <span lang="en" {...stylex.attrs(ui.serif, styles.rowLabelEn)}>
                 Wholly owned
               </span>
             </p>
-            <ul {...stylex.props(styles.row)}>
+            <ul {...stylex.attrs(styles.row)}>
               {subsidiaries.map((subsidiary, index) => (
-                <li
-                  key={subsidiary.id}
-                  {...stylex.props(styles.slot, ...stepIn(arrived, 1 + index * 0.35))}
-                >
+                <li {...stylex.attrs(styles.slot, ...stepIn(arrived(), 1 + index * 0.35))}>
                   <Mat
                     layout={styles.plate}
                     foot={
-                      <p {...stylex.props(styles.plateFoot, ui.reset)}>
-                        <span lang="en" {...stylex.props(styles.numeral)}>
+                      <p {...stylex.attrs(styles.plateFoot, ui.reset)}>
+                        <span lang="en" {...stylex.attrs(styles.numeral)}>
                           {ROMAN[index].toLowerCase()}
                         </span>
-                        <span lang="en" {...stylex.props(ui.serif, styles.english)}>
+                        <span lang="en" {...stylex.attrs(ui.serif, styles.english)}>
                           {subsidiary.english}
                         </span>
                       </p>
                     }
                   >
                     <Bevel field={styles.plateField}>
-                      <p {...stylex.props(styles.name)}>
+                      <p {...stylex.attrs(styles.name)}>
                         {subsidiary.name.replace(LEGAL_SUFFIX, "")}
-                        <span {...stylex.props(styles.suffix)}>
+                        <span {...stylex.attrs(styles.suffix)}>
                           {subsidiary.name.match(LEGAL_SUFFIX)?.[0]}
                         </span>
                       </p>

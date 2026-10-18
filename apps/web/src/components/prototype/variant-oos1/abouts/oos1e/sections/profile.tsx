@@ -93,41 +93,41 @@ const styles = stylex.create({
 export function ProfileSheet() {
   return (
     <Sheet def={PROFILE_SHEET}>
-      <div {...stylex.props(styles.grid)}>
-        <div {...stylex.props(styles.text)}>
+      <div {...stylex.attrs(styles.grid)}>
+        <div {...stylex.attrs(styles.text)}>
           <Reveal>
-            <h3 {...stylex.props(styles.name)}>{ABOUT_HERO.title}</h3>
-            <p lang="en" {...stylex.props(styles.english)}>
+            <h3 {...stylex.attrs(styles.name)}>{ABOUT_HERO.title}</h3>
+            <p lang="en" {...stylex.attrs(styles.english)}>
               {ABOUT_HERO.englishTitle}
             </p>
           </Reveal>
           <Reveal step={1}>
-            <p {...stylex.props(styles.lead)}>
-              <span {...stylex.props(base.balance)}>{ABOUT_HERO.lead}</span>
+            <p {...stylex.attrs(styles.lead)}>
+              <span {...stylex.attrs(base.balance)}>{ABOUT_HERO.lead}</span>
             </p>
           </Reveal>
           <Reveal step={2} sx={styles.network}>
-            <p {...stylex.props(base.quiet)}>{ABOUT_HERO.networkLabel}</p>
-            <ul {...stylex.props(styles.countries)}>
+            <p {...stylex.attrs(base.quiet)}>{ABOUT_HERO.networkLabel}</p>
+            <ul {...stylex.attrs(styles.countries)}>
               {ABOUT_HERO.countries.map((country) => (
-                <li key={country}>{country}</li>
+                <li>{country}</li>
               ))}
-              <li {...stylex.props(styles.more)}>等地</li>
+              <li {...stylex.attrs(styles.more)}>等地</li>
             </ul>
           </Reveal>
         </div>
         <Reveal step={1}>
-          <figure {...stylex.props(styles.figure)}>
-            <div {...stylex.props(styles.frame)}>
+          <figure {...stylex.attrs(styles.figure)}>
+            <div {...stylex.attrs(styles.frame)}>
               <img
                 src={ABOUT_HERO.lobbyImage}
                 alt="Fenchem headquarters lobby with a curved ceiling and marble floor"
                 loading="lazy"
                 decoding="async"
-                {...stylex.props(base.fill)}
+                {...stylex.attrs(base.fill)}
               />
             </div>
-            <figcaption {...stylex.props(base.quiet)}>{ABOUT_HERO.lobbyCaption}</figcaption>
+            <figcaption {...stylex.attrs(base.quiet)}>{ABOUT_HERO.lobbyCaption}</figcaption>
           </figure>
         </Reveal>
       </div>

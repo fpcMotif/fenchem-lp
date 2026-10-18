@@ -132,7 +132,7 @@ export function Profile() {
     <section
       id="about-profile"
       aria-labelledby="oos1b-profile"
-      {...stylex.props(ui.anchor, ui.section, ui.shell)}
+      {...stylex.attrs(ui.anchor, ui.section, ui.shell)}
     >
       <SectionHead
         id="oos1b-profile"
@@ -141,24 +141,24 @@ export function Profile() {
         title="企业概况"
         note="Thirty years of ingredients, from Nanjing."
       />
-      <div ref={ref} {...stylex.props(...stepIn(arrived, 0))}>
+      <div ref={ref} {...stylex.attrs(...stepIn(arrived(), 0))}>
         <Mat
           raised
           head={
-            <div {...stylex.props(styles.nameRow)}>
+            <div {...stylex.attrs(styles.nameRow)}>
               <Tag numeral="I" />
-              <h3 {...stylex.props(styles.company)}>{ABOUT_HERO.title}</h3>
-              <p lang="en" {...stylex.props(ui.serif, styles.english)}>
+              <h3 {...stylex.attrs(styles.company)}>{ABOUT_HERO.title}</h3>
+              <p lang="en" {...stylex.attrs(ui.serif, styles.english)}>
                 {ABOUT_HERO.englishTitle}
               </p>
             </div>
           }
           foot={
-            <div {...stylex.props(styles.network)}>
-              <p {...stylex.props(styles.networkLabel)}>{ABOUT_HERO.networkLabel}</p>
-              <ul {...stylex.props(styles.countries)}>
+            <div {...stylex.attrs(styles.network)}>
+              <p {...stylex.attrs(styles.networkLabel)}>{ABOUT_HERO.networkLabel}</p>
+              <ul {...stylex.attrs(styles.countries)}>
                 {ABOUT_HERO.countries.map((country) => (
-                  <li key={country}>{country}</li>
+                  <li>{country}</li>
                 ))}
               </ul>
             </div>
@@ -167,31 +167,31 @@ export function Profile() {
           <Bevel>
             <Mat bare layout={styles.inner}>
               <Tag numeral="II" />
-              <div {...stylex.props(styles.leadColumn, ...stepIn(arrived, 1))}>
-                <p {...stylex.props(styles.lead)}>{ABOUT_HERO.lead}</p>
-                <p {...stylex.props(styles.founded)}>
-                  <span lang="en" {...stylex.props(ui.serif, styles.year)}>
+              <div {...stylex.attrs(styles.leadColumn, ...stepIn(arrived(), 1))}>
+                <p {...stylex.attrs(styles.lead)}>{ABOUT_HERO.lead}</p>
+                <p {...stylex.attrs(styles.founded)}>
+                  <span lang="en" {...stylex.attrs(ui.serif, styles.year)}>
                     1995
                   </span>
-                  <span {...stylex.props(styles.foundedLabel)}>创立于南京</span>
+                  <span {...stylex.attrs(styles.foundedLabel)}>创立于南京</span>
                 </p>
               </div>
-              <figure {...stylex.props(ui.reset, ...stepIn(arrived, 2))}>
+              <figure {...stylex.attrs(ui.reset, ...stepIn(arrived(), 2))}>
                 <Bevel>
-                  <div {...stylex.props(styles.photo)}>
+                  <div {...stylex.attrs(styles.photo)}>
                     <img
                       src={LOBBY.large}
                       alt={ABOUT_HERO.lobbyEnglish}
                       loading="lazy"
                       decoding="async"
-                      {...stylex.props(ui.fill)}
+                      {...stylex.attrs(ui.fill)}
                     />
                   </div>
                   <Tag numeral="III" />
                 </Bevel>
-                <figcaption {...stylex.props(styles.caption)}>
-                  <span {...stylex.props(styles.captionText)}>{ABOUT_HERO.lobbyCaption}</span>
-                  <span lang="en" {...stylex.props(ui.serif, styles.captionEnglish)}>
+                <figcaption {...stylex.attrs(styles.caption)}>
+                  <span {...stylex.attrs(styles.captionText)}>{ABOUT_HERO.lobbyCaption}</span>
+                  <span lang="en" {...stylex.attrs(ui.serif, styles.captionEnglish)}>
                     {LOBBY.english}
                   </span>
                 </figcaption>

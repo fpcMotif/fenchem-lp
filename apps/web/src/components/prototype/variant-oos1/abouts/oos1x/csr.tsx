@@ -52,31 +52,31 @@ const styles = stylex.create({
 
 export function Csr() {
   return (
-    <section id="about-csr" aria-labelledby="oos1x-csr" {...stylex.props(styles.section)}>
+    <section id="about-csr" aria-labelledby="oos1x-csr" {...stylex.attrs(styles.section)}>
       <StillPoint />
-      <div {...stylex.props(ui.shell, styles.rest)}>
+      <div {...stylex.attrs(ui.shell, styles.rest)}>
         <Pair
           lever={AT_REST}
           load={
-            <figure {...stylex.props(styles.frame)}>
+            <figure {...stylex.attrs(styles.frame)}>
               <img
                 src={ABOUT_CSR.image}
                 alt={ABOUT_CSR.imageAlt}
                 loading="lazy"
                 decoding="async"
-                {...stylex.props(ui.fill, styles.image)}
+                {...stylex.attrs(ui.fill, styles.image)}
               />
             </figure>
           }
         >
-          <p {...stylex.props(type.body, styles.desc)}>{ABOUT_CSR.desc}</p>
-          <ul {...stylex.props(styles.outcomes)}>
+          <p {...stylex.attrs(type.body, styles.desc)}>{ABOUT_CSR.desc}</p>
+          <ul {...stylex.attrs(styles.outcomes)}>
             {ABOUT_CSR.outcomes.map((outcome, index) => (
-              <li key={outcome.title} {...stylex.props(styles.outcome)}>
-                <span aria-hidden="true" {...stylex.props(type.counterweight, type.counterHeading)}>
+              <li {...stylex.attrs(styles.outcome)}>
+                <span aria-hidden="true" {...stylex.attrs(type.counterweight, type.counterHeading)}>
                   {String(index + 1).padStart(2, "0")}
                 </span>
-                <span {...stylex.props(type.light, styles.outcomeTitle)}>{outcome.title}</span>
+                <span {...stylex.attrs(type.light, styles.outcomeTitle)}>{outcome.title}</span>
               </li>
             ))}
           </ul>

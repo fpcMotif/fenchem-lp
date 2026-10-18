@@ -1,9 +1,9 @@
 import { Flow } from "../shared/flow";
-import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
+import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { ArrowRight } from "lucide-react";
-import { m } from "motion/react";
-import { useState } from "react";
+import { ArrowRight } from "@fenchem-lp/ui/components/lucide";
+import { m } from "@/compat/motion";
+import { createMemo, createSignal, Show } from "solid-js";
 
 import { EASE } from "@/components/prototype/motion-constants";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
@@ -23,7 +23,7 @@ import { color, ease, font, media, texture } from "./tokens.stylex";
 
 const HAIRLINE = "rgba(26, 26, 26, 0.14)";
 
-const DESKTOP = breakpoints.xl;
+const DESKTOP = "@media (min-width: 1280px)";
 
 const FACILITY_PHOTOS = [
   {
@@ -55,7 +55,10 @@ const styles = stylex.create({
   },
   metricsGrid: {
     display: "grid",
-    gridTemplateColumns: { default: "repeat(2, 1fr)", [breakpoints.md]: "repeat(4, 1fr)" },
+    gridTemplateColumns: {
+      default: "repeat(2, 1fr)",
+      ["@media (min-width: 768px)"]: "repeat(4, 1fr)",
+    },
     columnGap: { default: 24, [DESKTOP]: 40 },
     rowGap: 40,
     paddingBlock: { default: 48, [DESKTOP]: 64 },
@@ -104,7 +107,7 @@ const styles = stylex.create({
     display: "grid",
     gridTemplateColumns: {
       default: "1fr",
-      [breakpoints.lg]: "minmax(0, 0.9fr) minmax(0, 1.1fr)",
+      ["@media (min-width: 1024px)"]: "minmax(0, 0.9fr) minmax(0, 1.1fr)",
     },
     gap: { default: 36, [DESKTOP]: 72 },
     alignItems: "start",
@@ -183,7 +186,10 @@ const styles = stylex.create({
     alignSelf: "center",
     color: colors.brandBlue700,
     opacity: 0,
-    transform: { default: null, [breakpoints.motionOk]: "translateX(-6px)" },
+    transform: {
+      default: null,
+      ["@media (prefers-reduced-motion: no-preference)"]: "translateX(-6px)",
+    },
     transitionProperty: "opacity, transform",
     transitionDuration: "200ms",
     transitionTimingFunction: ease.out,
@@ -276,7 +282,7 @@ const styles = stylex.create({
     display: "grid",
     gridTemplateColumns: {
       default: "1fr",
-      [breakpoints.lg]: "minmax(0, 1.42fr) minmax(0, 1fr)",
+      ["@media (min-width: 1024px)"]: "minmax(0, 1.42fr) minmax(0, 1fr)",
     },
     gap: { default: 24, [DESKTOP]: 32 },
   },
@@ -306,7 +312,7 @@ const styles = stylex.create({
     width: "100%",
     height: "100%",
     objectFit: "cover",
-    aspectRatio: { default: "16 / 10", [breakpoints.lg]: "auto" },
+    aspectRatio: { default: "16 / 10", ["@media (min-width: 1024px)"]: "auto" },
   },
   facilityCaptionRow: {
     display: "flex",
@@ -345,7 +351,7 @@ const styles = stylex.create({
     display: "grid",
     gridTemplateColumns: {
       default: "56px 1fr",
-      [breakpoints.md]: "120px minmax(0, 0.9fr) minmax(0, 1.1fr)",
+      ["@media (min-width: 768px)"]: "120px minmax(0, 0.9fr) minmax(0, 1.1fr)",
     },
     columnGap: { default: 16, [DESKTOP]: 40 },
     rowGap: 6,
@@ -370,7 +376,7 @@ const styles = stylex.create({
     color: color.ink,
   },
   processDesc: {
-    gridColumn: { default: "2", [breakpoints.md]: "auto" },
+    gridColumn: { default: "2", ["@media (min-width: 768px)"]: "auto" },
     margin: 0,
     fontSize: 14,
     lineHeight: 1.8,
@@ -400,7 +406,10 @@ const styles = stylex.create({
   },
   certGrid: {
     display: "grid",
-    gridTemplateColumns: { default: "repeat(2, 1fr)", [breakpoints.md]: "repeat(4, 1fr)" },
+    gridTemplateColumns: {
+      default: "repeat(2, 1fr)",
+      ["@media (min-width: 768px)"]: "repeat(4, 1fr)",
+    },
     columnGap: { default: 24, [DESKTOP]: 40 },
     rowGap: { default: 8, [DESKTOP]: 0 },
     margin: 0,
@@ -430,14 +439,15 @@ const styles = stylex.create({
   },
 });
 
-export function RdView({ onNavigateHome }: { onNavigateHome: (target?: string) => void }) {
-  const [activePlatformId, setActivePlatformId] = useState<string>(RD_PLATFORMS[0].id);
-  const activePlatform: PlatformItem =
-    RD_PLATFORMS.find((p) => p.id === activePlatformId) ?? RD_PLATFORMS[0];
+export function RdView(props: { onNavigateHome: (target?: string) => void }) {
+  const [activePlatformId, setActivePlatformId] = createSignal<string>(RD_PLATFORMS[0].id);
+  const activePlatform = createMemo<PlatformItem>(
+    () => RD_PLATFORMS.find((p) => p.id === activePlatformId()) ?? RD_PLATFORMS[0],
+  );
   const reduce = useReducedMotion();
 
   return (
-    <div id="rd-top" lang="zh-CN" {...stylex.props(kitStyles.root)}>
+    <div id="rd-top" lang="zh-CN" {...stylex.attrs(kitStyles.root)}>
       <SubPageBanner
         eyebrow="R&D & Manufacturing"
         title={RD_HEADER.chineseTitle}
@@ -449,19 +459,19 @@ export function RdView({ onNavigateHome }: { onNavigateHome: (target?: string) =
         titleId="rd-banner-title"
       />
 
-      <SubPageNav current="研发与生产" chips={RD_NAV_CHIPS} onNavigateHome={onNavigateHome} />
+      <SubPageNav current="研发与生产" chips={RD_NAV_CHIPS} onNavigateHome={props.onNavigateHome} />
 
       {/* Metrics band */}
-      <section aria-label="研发与生产关键数据" {...stylex.props(styles.metricsSection)}>
-        <div {...stylex.props(kitStyles.shell, kitStyles.inset120, styles.metricsGrid)}>
+      <section aria-label="研发与生产关键数据" {...stylex.attrs(styles.metricsSection)}>
+        <div {...stylex.attrs(kitStyles.shell, kitStyles.inset120, styles.metricsGrid)}>
           {RD_METRICS.map((metric, index) => (
-            <Reveal key={metric.label} step={index} sx={styles.metric}>
-              <span {...stylex.props(styles.metricRow)}>
-                <span {...stylex.props(styles.metricValue)}>{metric.value}</span>
-                <span {...stylex.props(styles.metricUnit)}>{metric.unit}</span>
+            <Reveal step={index} sx={styles.metric}>
+              <span {...stylex.attrs(styles.metricRow)}>
+                <span {...stylex.attrs(styles.metricValue)}>{metric.value}</span>
+                <span {...stylex.attrs(styles.metricUnit)}>{metric.unit}</span>
               </span>
-              <span {...stylex.props(styles.metricLabel)}>{metric.label}</span>
-              <span {...stylex.props(styles.metricDesc)}>{metric.desc}</span>
+              <span {...stylex.attrs(styles.metricLabel)}>{metric.label}</span>
+              <span {...stylex.attrs(styles.metricDesc)}>{metric.desc}</span>
             </Reveal>
           ))}
         </div>
@@ -471,49 +481,49 @@ export function RdView({ onNavigateHome }: { onNavigateHome: (target?: string) =
       <section
         id="rd-platforms"
         aria-labelledby="rd-platforms-title"
-        {...stylex.props(kitStyles.section, kitStyles.anchor)}
+        {...stylex.attrs(kitStyles.section, kitStyles.anchor)}
       >
-        <div {...stylex.props(kitStyles.shell, kitStyles.inset120)}>
+        <div {...stylex.attrs(kitStyles.shell, kitStyles.inset120)}>
           <SectionHead
             eyebrow="Innovation Platforms"
             title="四大研发创新平台"
             titleId="rd-platforms-title"
             lead="从微观分子包裹、细胞生物学机理到感官原型配方，打通科研与产品应用的完整闭环。"
           />
-          <div {...stylex.props(styles.platformLayout)}>
+          <div {...stylex.attrs(styles.platformLayout)}>
             <Reveal>
-              <ul role="tablist" aria-label="研发平台" {...stylex.props(styles.platformRail)}>
+              <ul role="tablist" aria-label="研发平台" {...stylex.attrs(styles.platformRail)}>
                 {RD_PLATFORMS.map((platform, index) => {
-                  const isActive = activePlatformId === platform.id;
+                  const isActive = () => activePlatformId() === platform.id;
                   return (
-                    <li key={platform.id}>
+                    <li>
                       <button
                         type="button"
                         role="tab"
-                        aria-selected={isActive}
+                        aria-selected={isActive() ? "true" : "false"}
                         onClick={() => setActivePlatformId(platform.id)}
                         onMouseEnter={() => setActivePlatformId(platform.id)}
-                        {...stylex.props(styles.platformTab)}
+                        {...stylex.attrs(styles.platformTab)}
                       >
                         <span
                           aria-hidden="true"
-                          {...stylex.props(
+                          {...stylex.attrs(
                             styles.platformIndex,
-                            isActive && styles.platformIndexActive,
+                            isActive() && styles.platformIndexActive,
                           )}
                         >
                           {String(index + 1).padStart(2, "0")}
                         </span>
-                        <span {...stylex.props(styles.platformNames)}>
+                        <span {...stylex.attrs(styles.platformNames)}>
                           <span
-                            {...stylex.props(
+                            {...stylex.attrs(
                               styles.platformName,
-                              isActive && styles.platformNameActive,
+                              isActive() && styles.platformNameActive,
                             )}
                           >
                             {platform.name}
                           </span>
-                          <span lang="en" {...stylex.props(styles.platformEnglish)}>
+                          <span lang="en" {...stylex.attrs(styles.platformEnglish)}>
                             {platform.english}
                           </span>
                         </span>
@@ -521,9 +531,9 @@ export function RdView({ onNavigateHome }: { onNavigateHome: (target?: string) =
                           size={18}
                           strokeWidth={1.75}
                           aria-hidden="true"
-                          {...stylex.props(
+                          {...stylex.attrs(
                             styles.platformArrow,
-                            isActive && styles.platformArrowVisible,
+                            isActive() && styles.platformArrowVisible,
                           )}
                         />
                       </button>
@@ -534,44 +544,44 @@ export function RdView({ onNavigateHome }: { onNavigateHome: (target?: string) =
             </Reveal>
 
             <Reveal step={1}>
-              <m.div
-                key={activePlatform.id}
-                role="tabpanel"
-                aria-label={activePlatform.name}
-                initial={{ opacity: 0, y: reduce ? 0 : 14 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: reduce ? 0.15 : 0.45, ease: EASE }}
-                {...stylex.props(styles.platformPanel)}
-              >
-                <figure {...stylex.props(styles.platformImageFrame)}>
-                  <img
-                    src={activePlatform.image}
-                    alt={activePlatform.name}
-                    loading="lazy"
-                    decoding="async"
-                    {...stylex.props(styles.platformImage)}
-                  />
-                </figure>
-                <div {...stylex.props(styles.platformStat)}>
-                  <span {...stylex.props(styles.platformStatLabel)}>
-                    {activePlatform.stat.label}
-                  </span>
-                  <span {...stylex.props(styles.platformStatValue)}>
-                    {activePlatform.stat.value}
-                  </span>
-                </div>
-                <p {...stylex.props(styles.platformSummary)}>{activePlatform.summary}</p>
-                <ul {...stylex.props(styles.platformPoints)}>
-                  {activePlatform.points.map((point) => (
-                    <li key={point} {...stylex.props(styles.platformPoint)}>
-                      <span aria-hidden="true" {...stylex.props(styles.pointMarker)}>
-                        —
-                      </span>
-                      {point}
-                    </li>
-                  ))}
-                </ul>
-              </m.div>
+              {/* Keyed so each platform switch remounts the panel and replays its entrance. */}
+              <Show when={activePlatform()} keyed>
+                {(platform) => (
+                  <m.div
+                    role="tabpanel"
+                    aria-label={platform.name}
+                    initial={{ opacity: 0, y: reduce() ? 0 : 14 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: reduce() ? 0.15 : 0.45, ease: EASE }}
+                    {...stylex.attrs(styles.platformPanel)}
+                  >
+                    <figure {...stylex.attrs(styles.platformImageFrame)}>
+                      <img
+                        src={platform.image}
+                        alt={platform.name}
+                        loading="lazy"
+                        decoding="async"
+                        {...stylex.attrs(styles.platformImage)}
+                      />
+                    </figure>
+                    <div {...stylex.attrs(styles.platformStat)}>
+                      <span {...stylex.attrs(styles.platformStatLabel)}>{platform.stat.label}</span>
+                      <span {...stylex.attrs(styles.platformStatValue)}>{platform.stat.value}</span>
+                    </div>
+                    <p {...stylex.attrs(styles.platformSummary)}>{platform.summary}</p>
+                    <ul {...stylex.attrs(styles.platformPoints)}>
+                      {platform.points.map((point) => (
+                        <li {...stylex.attrs(styles.platformPoint)}>
+                          <span aria-hidden="true" {...stylex.attrs(styles.pointMarker)}>
+                            —
+                          </span>
+                          {point}
+                        </li>
+                      ))}
+                    </ul>
+                  </m.div>
+                )}
+              </Show>
             </Reveal>
           </div>
         </div>
@@ -581,48 +591,48 @@ export function RdView({ onNavigateHome }: { onNavigateHome: (target?: string) =
       <section
         id="rd-facilities"
         aria-labelledby="rd-facilities-title"
-        {...stylex.props(kitStyles.section, kitStyles.sectionAlt, kitStyles.anchor)}
+        {...stylex.attrs(kitStyles.section, kitStyles.sectionAlt, kitStyles.anchor)}
       >
-        <div {...stylex.props(kitStyles.shell, kitStyles.inset120)}>
+        <div {...stylex.attrs(kitStyles.shell, kitStyles.inset120)}>
           <SectionHead
             eyebrow="Intelligent Manufacturing"
             title="35,000 m² 现代化生产基地"
             titleId="rd-facilities-title"
             lead="位于南京滁州核心园区，配备 100,000 级洁净车间与 DCS 全闭环数字控制系统。"
           />
-          <div {...stylex.props(styles.facilityGrid)}>
+          <div {...stylex.attrs(styles.facilityGrid)}>
             <Reveal as="figure" sx={styles.facilityFigure}>
-              <div {...stylex.props(styles.facilityImageFrame)}>
+              <div {...stylex.attrs(styles.facilityImageFrame)}>
                 <img
                   src={FACILITY_PHOTOS[0].src}
                   alt={FACILITY_PHOTOS[0].alt}
                   loading="lazy"
                   decoding="async"
-                  {...stylex.props(styles.facilityImage)}
+                  {...stylex.attrs(styles.facilityImage)}
                 />
               </div>
-              <figcaption {...stylex.props(styles.facilityCaptionRow)}>
-                <span {...stylex.props(styles.facilityCaption)}>{FACILITY_PHOTOS[0].caption}</span>
-                <span lang="en" {...stylex.props(styles.facilityEnglish)}>
+              <figcaption {...stylex.attrs(styles.facilityCaptionRow)}>
+                <span {...stylex.attrs(styles.facilityCaption)}>{FACILITY_PHOTOS[0].caption}</span>
+                <span lang="en" {...stylex.attrs(styles.facilityEnglish)}>
                   {FACILITY_PHOTOS[0].english}
                 </span>
               </figcaption>
             </Reveal>
-            <div {...stylex.props(styles.facilityStack)}>
+            <div {...stylex.attrs(styles.facilityStack)}>
               {FACILITY_PHOTOS.slice(1).map((photo, index) => (
-                <Reveal as="figure" key={photo.src} step={index + 1} sx={styles.facilityFigure}>
-                  <div {...stylex.props(styles.facilityImageFrame)}>
+                <Reveal as="figure" step={index + 1} sx={styles.facilityFigure}>
+                  <div {...stylex.attrs(styles.facilityImageFrame)}>
                     <img
                       src={photo.src}
                       alt={photo.alt}
                       loading="lazy"
                       decoding="async"
-                      {...stylex.props(styles.facilityImage)}
+                      {...stylex.attrs(styles.facilityImage)}
                     />
                   </div>
-                  <figcaption {...stylex.props(styles.facilityCaptionRow)}>
-                    <span {...stylex.props(styles.facilityCaption)}>{photo.caption}</span>
-                    <span lang="en" {...stylex.props(styles.facilityEnglish)}>
+                  <figcaption {...stylex.attrs(styles.facilityCaptionRow)}>
+                    <span {...stylex.attrs(styles.facilityCaption)}>{photo.caption}</span>
+                    <span lang="en" {...stylex.attrs(styles.facilityEnglish)}>
                       {photo.english}
                     </span>
                   </figcaption>
@@ -637,23 +647,23 @@ export function RdView({ onNavigateHome }: { onNavigateHome: (target?: string) =
       <section
         id="rd-tech"
         aria-labelledby="rd-tech-title"
-        {...stylex.props(kitStyles.section, kitStyles.anchor)}
+        {...stylex.attrs(kitStyles.section, kitStyles.anchor)}
       >
-        <div {...stylex.props(kitStyles.shell, kitStyles.inset120)}>
+        <div {...stylex.attrs(kitStyles.shell, kitStyles.inset120)}>
           <SectionHead
             eyebrow="Core Process Pipeline"
             title="五阶工艺工程矩阵"
             titleId="rd-tech-title"
             lead="遵循绿色化学标准，全程严控温度、溶剂循环与微生物指标。"
           />
-          <ol {...stylex.props(styles.processList)}>
+          <ol {...stylex.attrs(styles.processList)}>
             {RD_TECH_STEPS.map((step, index) => (
-              <Reveal as="li" key={step.step} step={index} sx={styles.processRow}>
-                <span aria-hidden="true" {...stylex.props(styles.processStep)}>
+              <Reveal as="li" step={index} sx={styles.processRow}>
+                <span aria-hidden="true" {...stylex.attrs(styles.processStep)}>
                   {step.step}
                 </span>
-                <span {...stylex.props(styles.processTitle)}>{step.title}</span>
-                <p {...stylex.props(styles.processDesc)}>{step.desc}</p>
+                <span {...stylex.attrs(styles.processTitle)}>{step.title}</span>
+                <p {...stylex.attrs(styles.processDesc)}>{step.desc}</p>
               </Reveal>
             ))}
           </ol>
@@ -664,10 +674,10 @@ export function RdView({ onNavigateHome }: { onNavigateHome: (target?: string) =
       <section
         id="rd-quality"
         aria-labelledby="rd-quality-title"
-        {...stylex.props(kitStyles.section, styles.qualitySection, kitStyles.anchor)}
+        {...stylex.attrs(kitStyles.section, styles.qualitySection, kitStyles.anchor)}
       >
-        <div aria-hidden="true" {...stylex.props(styles.qualityGrain)} />
-        <div {...stylex.props(kitStyles.shell, kitStyles.inset120)}>
+        <div aria-hidden="true" {...stylex.attrs(styles.qualityGrain)} />
+        <div {...stylex.attrs(kitStyles.shell, kitStyles.inset120)}>
           <SectionHead
             eyebrow="Certifications & Standards"
             title="质量管理与体系认证"
@@ -675,13 +685,13 @@ export function RdView({ onNavigateHome }: { onNavigateHome: (target?: string) =
             lead="满足国内外化妆品、食品安全与医药行业标准，出具全项目分析检测报告。"
             invert
           />
-          <ul {...stylex.props(styles.certGrid)}>
+          <ul {...stylex.attrs(styles.certGrid)}>
             {RD_CERTIFICATIONS.map((cert, index) => (
-              <Reveal as="li" key={cert.name} step={index} sx={styles.cert}>
-                <span lang="en" {...stylex.props(styles.certName)}>
+              <Reveal as="li" step={index} sx={styles.cert}>
+                <span lang="en" {...stylex.attrs(styles.certName)}>
                   {cert.name}
                 </span>
-                <span {...stylex.props(styles.certDesc)}>{cert.desc}</span>
+                <span {...stylex.attrs(styles.certDesc)}>{cert.desc}</span>
               </Reveal>
             ))}
           </ul>
@@ -693,7 +703,7 @@ export function RdView({ onNavigateHome }: { onNavigateHome: (target?: string) =
           id="rd-bottom-cta"
           title="需要索取样品或技术资料？"
           subtitle="我们的应用科学家随时为您提供添加量指导与原型配方参考。"
-          actions={[{ label: "联系应用团队", onClick: () => onNavigateHome("contact") }]}
+          actions={[{ label: "联系应用团队", onClick: () => props.onNavigateHome("contact") }]}
         />
       </Flow>
     </div>

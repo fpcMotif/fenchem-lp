@@ -95,32 +95,32 @@ const s = stylex.create({
 
 export function Banner() {
   return (
-    <section aria-labelledby="about-banner-title" {...stylex.props(s.banner)}>
-      <div {...stylex.props(ui.shell, ui.inset)}>
-        <div {...stylex.props(s.head)}>
-          <h1 id="about-banner-title" {...stylex.props(s.title, s.enter, dynamic.delay(120))}>
+    <section aria-labelledby="about-banner-title" {...stylex.attrs(s.banner)}>
+      <div {...stylex.attrs(ui.shell, ui.inset)}>
+        <div {...stylex.attrs(s.head)}>
+          <h1 id="about-banner-title" {...stylex.attrs(s.title, s.enter, dynamic.delay(120))}>
             {ABOUT_BANNER.title}
           </h1>
-          <p lang="en" {...stylex.props(s.tagline, s.enter, dynamic.delay(260))}>
+          <p lang="en" {...stylex.attrs(s.tagline, s.enter, dynamic.delay(260))}>
             {ABOUT_BANNER.tagline}
           </p>
         </div>
       </div>
-      <figure {...stylex.props(s.figure, s.enter, dynamic.delay(400))}>
-        <div {...stylex.props(ui.frame, s.frame)}>
+      <figure {...stylex.attrs(s.figure, s.enter, dynamic.delay(400))}>
+        <div {...stylex.attrs(ui.frame, s.frame)}>
           <img
             src={ABOUT_BANNER.image}
             alt={ABOUT_BANNER.alt}
-            fetchPriority="high"
+            fetchpriority="high"
             decoding="async"
-            {...stylex.props(ui.fill, s.image)}
+            {...stylex.attrs(ui.fill, s.image)}
           />
         </div>
-        <figcaption {...stylex.props(s.captionRow)}>
-          <p lang="en" {...stylex.props(s.place)}>
+        <figcaption {...stylex.attrs(s.captionRow)}>
+          <p lang="en" {...stylex.attrs(s.place)}>
             {ABOUT_BANNER.established} · {ABOUT_BANNER.place}
           </p>
-          <p {...stylex.props(s.lead)}>{ABOUT_BANNER.lead}</p>
+          <p {...stylex.attrs(s.lead)}>{ABOUT_BANNER.lead}</p>
         </figcaption>
       </figure>
     </section>

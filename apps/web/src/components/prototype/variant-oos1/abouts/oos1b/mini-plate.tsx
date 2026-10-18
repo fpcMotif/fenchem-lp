@@ -1,5 +1,5 @@
 import * as stylex from "@stylexjs/stylex";
-import type { ReactNode } from "react";
+import type { JSX } from "@solidjs/web";
 
 import type { Plate } from "./journey";
 import { ui } from "./shared-values";
@@ -32,21 +32,22 @@ const styles = stylex.create({
   },
 });
 
-export function MiniPlate({
-  plate,
-  photoStyle,
-  children,
-}: {
+export function MiniPlate(props: {
   plate: Plate;
   photoStyle?: stylex.StyleXStyles;
-  children?: ReactNode;
+  children?: JSX.Element;
 }) {
   return (
-    <span {...stylex.props(styles.plate)}>
-      <span {...stylex.props(styles.hairline)} />
-      <span {...stylex.props(styles.photo)}>
-        <img src={plate.src} alt="" decoding="async" {...stylex.props(ui.fill, photoStyle)} />
-        {children}
+    <span {...stylex.attrs(styles.plate)}>
+      <span {...stylex.attrs(styles.hairline)} />
+      <span {...stylex.attrs(styles.photo)}>
+        <img
+          src={props.plate.src}
+          alt=""
+          decoding="async"
+          {...stylex.attrs(ui.fill, props.photoStyle)}
+        />
+        {props.children}
       </span>
     </span>
   );

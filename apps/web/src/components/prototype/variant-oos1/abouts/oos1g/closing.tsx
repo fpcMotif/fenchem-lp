@@ -1,13 +1,12 @@
-import { breakpoints } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight } from "@fenchem-lp/ui/components/lucide";
 
 import { CTA } from "../../content";
 import { layout } from "./layout";
 import { palette } from "./palette.stylex";
 import { Reveal } from "./reveal";
 
-const LG = breakpoints.lg;
+const LG = "@media (min-width: 1024px)";
 
 const styles = stylex.create({
   section: {
@@ -22,7 +21,7 @@ const styles = stylex.create({
     fontFamily: palette.fontBody,
     fontSize: {
       default: "clamp(32px, 9vw, 44px)",
-      [breakpoints.md]: 56,
+      ["@media (min-width: 768px)"]: 56,
       [LG]: "clamp(44px, 4.6vw, 64px)",
     },
     fontWeight: 500,
@@ -38,29 +37,29 @@ const styles = stylex.create({
   },
 });
 
-export function Closing({ onNavigateHome }: { onNavigateHome: (hash?: string) => void }) {
+export function Closing(props: { onNavigateHome: (hash?: string) => void }) {
   return (
-    <section aria-labelledby="about-cta-title" {...stylex.props(styles.section, layout.sectionY)}>
-      <div {...stylex.props(layout.shell, layout.split, styles.grid)}>
+    <section aria-labelledby="about-cta-title" {...stylex.attrs(styles.section, layout.sectionY)}>
+      <div {...stylex.attrs(layout.shell, layout.split, styles.grid)}>
         <Reveal sx={[layout.padLeft, layout.seam]}>
-          <h2 id="about-cta-title" {...stylex.props(styles.title)}>
+          <h2 id="about-cta-title" {...stylex.attrs(styles.title)}>
             {CTA.title}
           </h2>
         </Reveal>
         <Reveal step={1} sx={layout.padRight}>
-          <div {...stylex.props(styles.actions)}>
+          <div {...stylex.attrs(styles.actions)}>
             <button
               type="button"
-              onClick={() => onNavigateHome("contact")}
-              {...stylex.props(layout.button, layout.buttonPrimary, layout.focusRing)}
+              onClick={() => props.onNavigateHome("contact")}
+              {...stylex.attrs(layout.button, layout.buttonPrimary, layout.focusRing)}
             >
               <span>{CTA.action.label}</span>
               <ArrowRight size={16} aria-hidden="true" />
             </button>
             <button
               type="button"
-              onClick={() => onNavigateHome("products")}
-              {...stylex.props(layout.button, layout.buttonOutline, layout.focusRing)}
+              onClick={() => props.onNavigateHome("products")}
+              {...stylex.attrs(layout.button, layout.buttonOutline, layout.focusRing)}
             >
               <span>产品与应用</span>
             </button>

@@ -1,7 +1,8 @@
 import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { Check, CheckCircle2, ChevronDown, Copy, X } from "lucide-react";
-import { useId, useRef, useState, type ReactNode, type SubmitEvent } from "react";
+import { Check, CheckCircle2, ChevronDown, Copy, X } from "@fenchem-lp/ui/components/lucide";
+import { createSignal, createUniqueId, Show, untrack } from "solid-js";
+import type { JSX } from "@solidjs/web";
 
 import { color, font } from "../../variant-oos1/tokens.stylex";
 import {
@@ -325,50 +326,43 @@ const styles = stylex.create({
   },
 });
 
-function Channel({
-  icon,
-  term,
-  value,
-  href,
-  copied,
-  onCopy,
-}: {
-  icon: ReactNode;
+function Channel(props: {
+  icon: JSX.Element;
   term: string;
   value: string;
   href: string | null;
   copied: boolean;
   onCopy: (valueNode: HTMLElement | null) => void;
 }) {
-  const valueRef = useRef<HTMLSpanElement>(null);
+  let valueEl: HTMLSpanElement | undefined;
   return (
-    <li {...stylex.props(styles.channel)}>
-      <span aria-hidden="true" {...stylex.props(styles.channelIcon)}>
-        {icon}
+    <li {...stylex.attrs(styles.channel)}>
+      <span aria-hidden="true" {...stylex.attrs(styles.channelIcon)}>
+        {props.icon}
       </span>
-      <span {...stylex.props(styles.channelText)}>
-        <span {...stylex.props(styles.channelTerm)}>{term}</span>
-        <span ref={valueRef} {...stylex.props(styles.channelValue)}>
-          {href ? (
-            <a href={href} {...stylex.props(styles.channelLink, labStyles.focusRing)}>
-              {value}
+      <span {...stylex.attrs(styles.channelText)}>
+        <span {...stylex.attrs(styles.channelTerm)}>{props.term}</span>
+        <span ref={valueEl} {...stylex.attrs(styles.channelValue)}>
+          {props.href ? (
+            <a href={props.href} {...stylex.attrs(styles.channelLink, labStyles.focusRing)}>
+              {props.value}
             </a>
           ) : (
-            value
+            props.value
           )}
         </span>
       </span>
       <button
         type="button"
-        aria-label={copied ? `${term}已复制` : `复制${term}`}
-        onClick={() => onCopy(valueRef.current)}
-        {...stylex.props(styles.copy, copied && styles.copied, labStyles.focusRing)}
+        aria-label={props.copied ? `${props.term}已复制` : `复制${props.term}`}
+        onClick={() => props.onCopy(valueEl ?? null)}
+        {...stylex.attrs(styles.copy, props.copied && styles.copied, labStyles.focusRing)}
       >
-        <span aria-hidden="true" {...stylex.props(styles.iconStack)}>
-          <span {...stylex.props(styles.iconLayer, copied && styles.iconHidden)}>
+        <span aria-hidden="true" {...stylex.attrs(styles.iconStack)}>
+          <span {...stylex.attrs(styles.iconLayer, props.copied && styles.iconHidden)}>
             <Copy size={16} strokeWidth={1.5} nonScalingStroke />
           </span>
-          <span {...stylex.props(styles.iconLayer, !copied && styles.iconHidden)}>
+          <span {...stylex.attrs(styles.iconLayer, !props.copied && styles.iconHidden)}>
             <Check size={16} strokeWidth={1.5} nonScalingStroke />
           </span>
         </span>
@@ -377,16 +371,18 @@ function Channel({
   );
 }
 
-export function DrawerDialog({ subject, onClose }: DialogVariantProps) {
-  const { closing, requestClose, dialogProps, panelProps } = useLabDialog(onClose);
-  const titleId = useId();
-  const formId = useId();
+export function DrawerDialog(props: DialogVariantProps) {
+  const { closing, requestClose, dialogProps, panelProps } = useLabDialog(() => props.onClose());
+  const titleId = createUniqueId();
+  const formId = createUniqueId();
   const { copied, copy } = useCopy();
-  const [subjectId, setSubjectId] = useState(subject ?? INQUIRY_SUBJECTS[0].id);
-  const [submitted, setSubmitted] = useState(false);
-  const active = subjectById(subjectId);
+  const [subjectId, setSubjectId] = createSignal<InquirySubjectId>(
+    untrack(() => props.subject ?? INQUIRY_SUBJECTS[0].id),
+  );
+  const [submitted, setSubmitted] = createSignal(false);
+  const active = () => subjectById(subjectId());
 
-  const handleSubmit = (event: SubmitEvent<HTMLFormElement>) => {
+  const handleSubmit = (event: SubmitEvent) => {
     event.preventDefault();
     setSubmitted(true);
   };
@@ -400,198 +396,200 @@ export function DrawerDialog({ subject, onClose }: DialogVariantProps) {
     <dialog
       aria-labelledby={titleId}
       {...dialogProps}
-      {...stylex.props(labStyles.dialog, styles.dialog, closing && styles.dialogClosing)}
+      {...stylex.attrs(labStyles.dialog, styles.dialog, closing() && styles.dialogClosing)}
     >
       <button
         type="button"
-        tabIndex={-1}
+        tabindex={-1}
         aria-label="关闭"
         onClick={requestClose}
-        {...stylex.props(labStyles.dismiss)}
+        {...stylex.attrs(labStyles.dismiss)}
       />
-      <div {...panelProps} {...stylex.props(styles.panel, closing && styles.panelClosing)}>
-        <header {...stylex.props(styles.head)}>
-          <h2 id={titleId} {...stylex.props(styles.title)}>
+      <div {...panelProps} {...stylex.attrs(styles.panel, closing() && styles.panelClosing)}>
+        <header {...stylex.attrs(styles.head)}>
+          <h2 id={titleId} {...stylex.attrs(styles.title)}>
             联系泛成
           </h2>
           <button
             type="button"
             aria-label="关闭"
             onClick={requestClose}
-            {...stylex.props(labStyles.closeButton)}
+            {...stylex.attrs(labStyles.closeButton)}
           >
             <X size={20} strokeWidth={1.75} aria-hidden="true" />
           </button>
         </header>
 
-        <div {...stylex.props(styles.body)}>
-          <section aria-label="公司信息" {...stylex.props(styles.company)}>
-            <p {...stylex.props(styles.companyName)}>{COMPANY.name}</p>
-            <p lang="en" {...stylex.props(styles.companyEnglish)}>
+        <div {...stylex.attrs(styles.body)}>
+          <section aria-label="公司信息" {...stylex.attrs(styles.company)}>
+            <p {...stylex.attrs(styles.companyName)}>{COMPANY.name}</p>
+            <p lang="en" {...stylex.attrs(styles.companyEnglish)}>
               {COMPANY.english}
             </p>
-            <ul {...stylex.props(labStyles.list, styles.channels)}>
+            <ul {...stylex.attrs(labStyles.list, styles.channels)}>
               {channels.map((channel) => (
                 <Channel
-                  key={channel.term}
                   icon={channel.icon}
                   term={channel.term}
                   value={channel.value}
                   href={channel.href}
-                  copied={copied === channel.value}
+                  copied={copied() === channel.value}
                   onCopy={(valueNode) => copy(channel.value, valueNode)}
                 />
               ))}
             </ul>
           </section>
 
-          <section aria-labelledby={`${formId}-title`} {...stylex.props(styles.section)}>
-            {submitted ? (
-              <div role="status" {...stylex.props(styles.done, labStyles.swapIn)}>
-                <CheckCircle2
-                  size={32}
-                  strokeWidth={2.5}
-                  nonScalingStroke
-                  aria-hidden="true"
-                  {...stylex.props(styles.doneIcon)}
-                />
-                <h3 id={`${formId}-title`} {...stylex.props(styles.doneTitle)}>
-                  留言已提交
-                </h3>
-                <p {...stylex.props(styles.doneText)}>
-                  「{active.label}」需求已转交对应团队，工作日 24 小时内回复。
-                </p>
-                <ol {...stylex.props(labStyles.list, styles.steps)}>
-                  {NEXT_STEPS.map((step, index) => (
-                    <li key={step} {...stylex.props(styles.step)}>
-                      <span aria-hidden="true" {...stylex.props(styles.stepIndex)}>
-                        {index + 1}
-                      </span>
-                      {step}
-                    </li>
-                  ))}
-                </ol>
-                <button
-                  type="button"
-                  onClick={() => setSubmitted(false)}
-                  {...stylex.props(styles.again, labStyles.focusRing)}
-                >
-                  再留一条
-                </button>
-              </div>
-            ) : (
-              <>
-                <h3 id={`${formId}-title`} {...stylex.props(styles.sectionHead)}>
-                  在线留言
-                </h3>
-                <p {...stylex.props(styles.sectionLead)}>
-                  不方便致电？留下需求，专属客户经理会主动联系您。
-                </p>
-                <form id={formId} onSubmit={handleSubmit} {...stylex.props(styles.form)}>
-                  <Field id={`${formId}-subject`} label="咨询主题">
-                    <div {...stylex.props(styles.selectWrap)}>
-                      <select
-                        id={`${formId}-subject`}
-                        name="subject"
-                        value={subjectId}
-                        onChange={(event) => setSubjectId(event.target.value as InquirySubjectId)}
-                        {...stylex.props(labStyles.input, styles.select)}
-                      >
-                        {INQUIRY_SUBJECTS.map((item) => (
-                          <option key={item.id} value={item.id}>
-                            {item.label}
-                          </option>
-                        ))}
-                      </select>
-                      <ChevronDown
-                        size={18}
-                        strokeWidth={1.5}
-                        nonScalingStroke
-                        aria-hidden="true"
-                        {...stylex.props(styles.selectIcon)}
-                      />
-                    </div>
-                  </Field>
-                  <div {...stylex.props(styles.pair)}>
-                    <Field id={`${formId}-name`} label="联系人姓名" required>
-                      <input
-                        id={`${formId}-name`}
-                        name="contactName"
-                        required
-                        autoComplete="name"
-                        {...stylex.props(labStyles.input)}
-                      />
-                    </Field>
-                    <Field id={`${formId}-company`} label="公司或机构" required>
-                      <input
-                        id={`${formId}-company`}
-                        name="company"
-                        required
-                        autoComplete="organization"
-                        {...stylex.props(labStyles.input)}
-                      />
-                    </Field>
+          <section aria-labelledby={`${formId}-title`} {...stylex.attrs(styles.section)}>
+            <Show
+              when={!submitted()}
+              fallback={
+                <div role="status" {...stylex.attrs(styles.done, labStyles.swapIn)}>
+                  <CheckCircle2
+                    size={32}
+                    strokeWidth={2.5}
+                    nonScalingStroke
+                    aria-hidden="true"
+                    {...stylex.attrs(styles.doneIcon)}
+                  />
+                  <h3 id={`${formId}-title`} {...stylex.attrs(styles.doneTitle)}>
+                    留言已提交
+                  </h3>
+                  <p {...stylex.attrs(styles.doneText)}>
+                    「{active().label}」需求已转交对应团队，工作日 24 小时内回复。
+                  </p>
+                  <ol {...stylex.attrs(labStyles.list, styles.steps)}>
+                    {NEXT_STEPS.map((step, index) => (
+                      <li {...stylex.attrs(styles.step)}>
+                        <span aria-hidden="true" {...stylex.attrs(styles.stepIndex)}>
+                          {index + 1}
+                        </span>
+                        {step}
+                      </li>
+                    ))}
+                  </ol>
+                  <button
+                    type="button"
+                    onClick={() => setSubmitted(false)}
+                    {...stylex.attrs(styles.again, labStyles.focusRing)}
+                  >
+                    再留一条
+                  </button>
+                </div>
+              }
+            >
+              <h3 id={`${formId}-title`} {...stylex.attrs(styles.sectionHead)}>
+                在线留言
+              </h3>
+              <p {...stylex.attrs(styles.sectionLead)}>
+                不方便致电？留下需求，专属客户经理会主动联系您。
+              </p>
+              <form id={formId} onSubmit={handleSubmit} {...stylex.attrs(styles.form)}>
+                <Field id={`${formId}-subject`} label="咨询主题">
+                  <div {...stylex.attrs(styles.selectWrap)}>
+                    <select
+                      id={`${formId}-subject`}
+                      name="subject"
+                      value={subjectId()}
+                      onChange={(event) =>
+                        setSubjectId(event.currentTarget.value as InquirySubjectId)
+                      }
+                      {...stylex.attrs(labStyles.input, styles.select)}
+                    >
+                      {INQUIRY_SUBJECTS.map((item) => (
+                        <option value={item.id} selected={item.id === subjectId()}>
+                          {item.label}
+                        </option>
+                      ))}
+                    </select>
+                    <ChevronDown
+                      size={18}
+                      strokeWidth={1.5}
+                      nonScalingStroke
+                      aria-hidden="true"
+                      {...stylex.attrs(styles.selectIcon)}
+                    />
                   </div>
-                  <div {...stylex.props(styles.pair)}>
-                    <Field id={`${formId}-phone`} label="手机号" required>
-                      <input
-                        id={`${formId}-phone`}
-                        name="phone"
-                        type="tel"
-                        required
-                        autoComplete="tel"
-                        inputMode="tel"
-                        {...stylex.props(labStyles.input)}
-                      />
-                    </Field>
-                    <Field id={`${formId}-email`} label="工作邮箱" required>
-                      <input
-                        id={`${formId}-email`}
-                        name="email"
-                        type="email"
-                        required
-                        autoComplete="email"
-                        spellCheck={false}
-                        {...stylex.props(labStyles.input)}
-                      />
-                    </Field>
-                  </div>
-                  <Field id={`${formId}-message`} label="需求描述" required>
-                    <textarea
-                      id={`${formId}-message`}
-                      name="message"
+                </Field>
+                <div {...stylex.attrs(styles.pair)}>
+                  <Field id={`${formId}-name`} label="联系人姓名" required>
+                    <input
+                      id={`${formId}-name`}
+                      name="contactName"
                       required
-                      placeholder={active.placeholder}
-                      {...stylex.props(labStyles.input, labStyles.textarea)}
+                      autocomplete="name"
+                      {...stylex.attrs(labStyles.input)}
                     />
                   </Field>
-                </form>
-              </>
-            )}
+                  <Field id={`${formId}-company`} label="公司或机构" required>
+                    <input
+                      id={`${formId}-company`}
+                      name="company"
+                      required
+                      autocomplete="organization"
+                      {...stylex.attrs(labStyles.input)}
+                    />
+                  </Field>
+                </div>
+                <div {...stylex.attrs(styles.pair)}>
+                  <Field id={`${formId}-phone`} label="手机号" required>
+                    <input
+                      id={`${formId}-phone`}
+                      name="phone"
+                      type="tel"
+                      required
+                      autocomplete="tel"
+                      inputmode="tel"
+                      {...stylex.attrs(labStyles.input)}
+                    />
+                  </Field>
+                  <Field id={`${formId}-email`} label="工作邮箱" required>
+                    <input
+                      id={`${formId}-email`}
+                      name="email"
+                      type="email"
+                      required
+                      autocomplete="email"
+                      spellcheck={false}
+                      {...stylex.attrs(labStyles.input)}
+                    />
+                  </Field>
+                </div>
+                <Field id={`${formId}-message`} label="需求描述" required>
+                  <textarea
+                    id={`${formId}-message`}
+                    name="message"
+                    required
+                    placeholder={active().placeholder}
+                    {...stylex.attrs(labStyles.input, labStyles.textarea)}
+                  />
+                </Field>
+              </form>
+            </Show>
           </section>
         </div>
 
-        {submitted ? null : (
-          <div {...stylex.props(styles.footer)}>
-            <label {...stylex.props(labStyles.consent)}>
+        <Show when={!submitted()}>
+          <div {...stylex.attrs(styles.footer)}>
+            <label {...stylex.attrs(labStyles.consent)}>
               <input
                 type="checkbox"
                 name="consent"
                 form={formId}
                 required
-                {...stylex.props(labStyles.checkbox)}
+                {...stylex.attrs(labStyles.checkbox)}
               />
               <span>同意泛成就本次咨询联系我，配方信息严格保密</span>
             </label>
             <button
               type="submit"
               form={formId}
-              {...stylex.props(labStyles.primaryButton, labStyles.focusRing, styles.submit)}
+              {...stylex.attrs(labStyles.primaryButton, labStyles.focusRing, styles.submit)}
             >
               发送留言
             </button>
           </div>
-        )}
+        </Show>
       </div>
     </dialog>
   );

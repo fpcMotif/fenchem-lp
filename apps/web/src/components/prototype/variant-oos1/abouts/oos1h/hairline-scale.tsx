@@ -53,13 +53,12 @@ const styles = stylex.create({
   },
 });
 
-export function HairlineScale({ sx }: { sx?: stylex.StyleXStyles }) {
+export function HairlineScale(props: { sx?: stylex.StyleXStyles }) {
   return (
-    <div aria-hidden="true" {...stylex.props(styles.scale, sx)}>
+    <div aria-hidden="true" {...stylex.attrs(styles.scale, props.sx)}>
       {TICKS.map((tick) => (
         <span
-          key={tick.id}
-          {...stylex.props(
+          {...stylex.attrs(
             styles.tick,
             styles.at(tick.at),
             tick.major ? styles.major : styles.minor,
@@ -68,7 +67,7 @@ export function HairlineScale({ sx }: { sx?: stylex.StyleXStyles }) {
         />
       ))}
       {TICKS.filter((tick) => tick.stray).map((tick) => (
-        <span key={`mark-${tick.id}`} {...stylex.props(styles.mark, styles.at(tick.at))} />
+        <span {...stylex.attrs(styles.mark, styles.at(tick.at))} />
       ))}
     </div>
   );

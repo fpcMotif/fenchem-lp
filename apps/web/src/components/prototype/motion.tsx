@@ -1,8 +1,8 @@
 import { breakpoints, colors, typography } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 import type { StyleXStyles } from "@stylexjs/stylex";
-import { m } from "motion/react";
-import type { ReactNode } from "react";
+import { m } from "@/compat/motion";
+import type { JSX } from "@solidjs/web";
 
 import { EASE } from "./motion-constants";
 import { useReducedMotion } from "./use-reduced-motion";
@@ -59,7 +59,7 @@ const accentMap: Record<string, StyleXStyles> = {
 };
 
 type RevealProps = {
-  children: ReactNode;
+  children: JSX.Element;
   sx?: StyleXStyles;
   style?: StyleXStyles;
   /** Entrance delay in seconds. Ignored under reduced motion. */
@@ -74,33 +74,29 @@ type RevealProps = {
 };
 
 /** Scroll-triggered reveal for below-the-fold content. Fires once. */
-export function Reveal({
-  children,
-  sx,
-  style,
-  delay = 0,
-  y = 32,
-  duration = 0.8,
-  margin = "-80px",
-  scale = 1,
-}: RevealProps) {
+export function Reveal(props: RevealProps) {
   const reduce = useReducedMotion();
-  const styleProps = stylex.props(sx, style);
   return (
     <m.div
-      {...styleProps}
-      initial={reduce ? { opacity: 0 } : { opacity: 0, y, scale }}
+      {...stylex.attrs(props.sx, props.style)}
+      initial={
+        reduce() ? { opacity: 0 } : { opacity: 0, y: props.y ?? 32, scale: props.scale ?? 1 }
+      }
       whileInView={{ opacity: 1, y: 0, scale: 1 }}
-      viewport={{ once: true, margin }}
-      transition={{ duration: reduce ? 0 : duration, delay: reduce ? 0 : delay, ease: EASE }}
+      viewport={{ once: true, margin: props.margin ?? "-80px" }}
+      transition={{
+        duration: reduce() ? 0 : (props.duration ?? 0.8),
+        delay: reduce() ? 0 : (props.delay ?? 0),
+        ease: EASE,
+      }}
     >
-      {children}
+      {props.children}
     </m.div>
   );
 }
 
 type IntroProps = {
-  children: ReactNode;
+  children: JSX.Element;
   sx?: StyleXStyles;
   style?: StyleXStyles;
   /** Entrance delay in seconds. Ignored under reduced motion. */
@@ -111,23 +107,28 @@ type IntroProps = {
 };
 
 /** Mount-time entrance for above-the-fold hero content. */
-export function Intro({ children, sx, style, delay = 0, y = 28, scale = 1 }: IntroProps) {
+export function Intro(props: IntroProps) {
   const reduce = useReducedMotion();
-  const styleProps = stylex.props(sx, style);
   return (
     <m.div
-      {...styleProps}
-      initial={reduce ? { opacity: 0 } : { opacity: 0, y, scale }}
+      {...stylex.attrs(props.sx, props.style)}
+      initial={
+        reduce() ? { opacity: 0 } : { opacity: 0, y: props.y ?? 28, scale: props.scale ?? 1 }
+      }
       animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{ duration: reduce ? 0 : 0.9, delay: reduce ? 0 : delay, ease: EASE }}
+      transition={{
+        duration: reduce() ? 0 : 0.9,
+        delay: reduce() ? 0 : (props.delay ?? 0),
+        ease: EASE,
+      }}
     >
-      {children}
+      {props.children}
     </m.div>
   );
 }
 
 type EyebrowProps = {
-  children: ReactNode;
+  children: JSX.Element;
   sx?: StyleXStyles;
   style?: StyleXStyles;
   /** StyleX style or legacy accent string / token */
@@ -135,13 +136,12 @@ type EyebrowProps = {
 };
 
 /** Static uppercase micro-label above a section heading. */
-export function Eyebrow({
-  children,
-  sx,
-  style,
-  accent = styles.accent_brandGreen600,
-}: EyebrowProps) {
-  const accentStyle = typeof accent === "string" ? accentMap[accent] : accent;
-  const styleProps = stylex.props(styles.eyebrow, accentStyle, sx, style);
-  return <p {...styleProps}>{children}</p>;
+export function Eyebrow(props: EyebrowProps) {
+  const accentStyle = () => {
+    const accent = props.accent ?? styles.accent_brandGreen600;
+    return typeof accent === "string" ? accentMap[accent] : accent;
+  };
+  return (
+    <p {...stylex.attrs(styles.eyebrow, accentStyle(), props.sx, props.style)}>{props.children}</p>
+  );
 }

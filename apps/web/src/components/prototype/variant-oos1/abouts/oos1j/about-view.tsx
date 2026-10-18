@@ -14,11 +14,11 @@ import { Profile } from "./profile";
 import { base } from "./shared";
 import { Structure } from "./structure";
 
-export function AboutOOS1J({ onNavigateHome }: AboutPageProps) {
+export function AboutOOS1J(props: AboutPageProps) {
   return (
-    <div id="about-top" {...stylex.props(base.root)}>
+    <div id="about-top" {...stylex.attrs(base.root)}>
       <Hero />
-      <IndexBar onNavigateHome={onNavigateHome} />
+      <IndexBar onNavigateHome={props.onNavigateHome} />
       <Profile />
       <Moment />
       <Campus />
@@ -26,8 +26,8 @@ export function AboutOOS1J({ onNavigateHome }: AboutPageProps) {
       <Csr />
       <Honors />
       <Structure />
-      <Products onNavigateHome={onNavigateHome} />
-      <Finale onNavigateHome={onNavigateHome} />
+      <Products onNavigateHome={props.onNavigateHome} />
+      <Finale onNavigateHome={props.onNavigateHome} />
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight } from "@fenchem-lp/ui/components/lucide";
 
 import { PRODUCTS, PRODUCTS_INTRO } from "../../content";
 import { Reveal, Section } from "./shared";
@@ -135,46 +135,46 @@ const PLACEMENT = [
   { cell: s.placePet, frame: s.frameLarge },
 ] as const;
 
-export function Products({ onNavigateHome }: { onNavigateHome: (hash?: string) => void }) {
+export function Products(props: { onNavigateHome: (hash?: string) => void }) {
   return (
     <Section id="about-products" label="Products and application solutions">
       <Reveal sx={s.intro}>
-        <p {...stylex.props(s.lead)}>{PRODUCTS_INTRO.lead}</p>
+        <p {...stylex.attrs(s.lead)}>{PRODUCTS_INTRO.lead}</p>
         <button
           type="button"
-          onClick={() => onNavigateHome("products")}
-          {...stylex.props(ui.quietButton, ui.focusRing)}
+          onClick={() => props.onNavigateHome("products")}
+          {...stylex.attrs(ui.quietButton, ui.focusRing)}
         >
           {PRODUCTS_INTRO.cta.label}
         </button>
       </Reveal>
-      <ul {...stylex.props(s.grid)}>
+      <ul {...stylex.attrs(s.grid)}>
         {PRODUCTS.map((product, idx) => (
-          <Reveal key={product.title} as="li" delay={(idx % 2) * 100} sx={PLACEMENT[idx].cell}>
-            <article {...stylex.props(s.card)}>
-              <div {...stylex.props(ui.frame, PLACEMENT[idx].frame)}>
+          <Reveal as="li" delay={(idx % 2) * 100} sx={PLACEMENT[idx].cell}>
+            <article {...stylex.attrs(s.card)}>
+              <div {...stylex.attrs(ui.frame, PLACEMENT[idx].frame)}>
                 <img
                   src={product.image}
                   alt={product.english}
                   loading="lazy"
                   decoding="async"
-                  {...stylex.props(ui.fill, s.image)}
+                  {...stylex.attrs(ui.fill, s.image)}
                 />
               </div>
-              <h3 {...stylex.props(s.name)}>
+              <h3 {...stylex.attrs(s.name)}>
                 <button
                   type="button"
-                  onClick={() => onNavigateHome("products")}
-                  {...stylex.props(s.link, ui.focusRing)}
+                  onClick={() => props.onNavigateHome("products")}
+                  {...stylex.attrs(s.link, ui.focusRing)}
                 >
                   {product.title}
-                  <ArrowUpRight size={16} aria-hidden="true" {...stylex.props(s.arrow)} />
+                  <ArrowUpRight size={16} aria-hidden="true" {...stylex.attrs(s.arrow)} />
                 </button>
               </h3>
-              <p {...stylex.props(s.desc)}>{product.description}</p>
-              <ul {...stylex.props(s.tags)}>
+              <p {...stylex.attrs(s.desc)}>{product.description}</p>
+              <ul {...stylex.attrs(s.tags)}>
                 {product.tags.map((tag) => (
-                  <li key={tag}>{tag}</li>
+                  <li>{tag}</li>
                 ))}
               </ul>
             </article>

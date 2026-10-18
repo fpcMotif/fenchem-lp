@@ -1,8 +1,11 @@
 import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { ChevronRight } from "lucide-react";
-import { useMotionValue } from "motion/react";
-import { useEffect, useState, useSyncExternalStore, type ReactNode } from "react";
+import { ChevronRight } from "@fenchem-lp/ui/components/lucide";
+import { createEffect, createSignal, For, Show, type Accessor } from "solid-js";
+import type { JSX } from "@solidjs/web";
+
+import { createExternalStore } from "@/compat/external-store";
+import { useMotionValue } from "@/compat/motion";
 
 import { Flow } from "../../shared/flow";
 import { ContactCta } from "../../variant-oos1/contact-cta";
@@ -66,12 +69,12 @@ export const shortTitle = (article: LabArticle) => article.navLabel ?? article.t
 
 const clamp01 = (value: number) => Math.min(1, Math.max(0, value));
 
-export function useReadingPosition(articles: readonly LabArticle[], line: number) {
-  const [position, setPosition] = useState<ReadingPosition>(BEFORE_FLOW);
+export function useReadingPosition(articleList: Accessor<readonly LabArticle[]>, line: number) {
+  const [position, setPosition] = createSignal<ReadingPosition>(BEFORE_FLOW);
   const articleProgress = useMotionValue(0);
   const chapterProgress = useMotionValue(0);
 
-  useEffect(() => {
+  createEffect(articleList, (articles) => {
     let frame = 0;
     const measure = () => {
       frame = 0;
@@ -118,13 +121,13 @@ export function useReadingPosition(articles: readonly LabArticle[], line: number
       window.removeEventListener("resize", schedule);
       if (frame) cancelAnimationFrame(frame);
     };
-  }, [articles, line, articleProgress, chapterProgress]);
+  });
 
   return { position, articleProgress, chapterProgress };
 }
 
 export function useMediaQuery(query: string) {
-  return useSyncExternalStore(
+  return createExternalStore(
     (onChange) => {
       const list = window.matchMedia(query);
       list.addEventListener("change", onChange);
@@ -231,96 +234,90 @@ const styles = stylex.create({
   },
 });
 
-export function TocPage({
-  onNavigateHome,
-  bar,
-  under,
-  children,
-}: SubPageProps & { bar?: ReactNode; under?: ReactNode; children: ReactNode }) {
+export function TocPage(
+  props: SubPageProps & { bar?: JSX.Element; under?: JSX.Element; children: JSX.Element },
+) {
   const articles = useLabArticles();
   return (
-    <div id="insights-top" lang="zh-CN" {...stylex.props(kitStyles.root)}>
+    <div id="insights-top" lang="zh-CN" {...stylex.attrs(kitStyles.root)}>
       <SubPageBanner
         eyebrow="Insights"
         title="行业洞察"
         tagline="Notes from the formulation bench"
         lead="来自泛成应用研发团队的原料趋势、配方方法与法规观察"
-        meta={[`${articles.length} 篇洞察 · 持续更新`]}
+        meta={[`${articles().length} 篇洞察 · 持续更新`]}
         image="/prototype/official-site/product-human-nutrition.webp"
         imageAlt="行业洞察"
         titleId="insights-banner-title"
       />
-      <div {...stylex.props(styles.subBar)}>
-        <div {...stylex.props(kitStyles.shell, kitStyles.inset120, styles.subBarInner)}>
-          <nav aria-label="Breadcrumb" {...stylex.props(styles.breadcrumb)}>
+      <div {...stylex.attrs(styles.subBar)}>
+        <div {...stylex.attrs(kitStyles.shell, kitStyles.inset120, styles.subBarInner)}>
+          <nav aria-label="Breadcrumb" {...stylex.attrs(styles.breadcrumb)}>
             <button
               type="button"
-              onClick={() => onNavigateHome("top")}
-              {...stylex.props(styles.breadcrumbLink, kitStyles.focusRing)}
+              onClick={() => props.onNavigateHome("top")}
+              {...stylex.attrs(styles.breadcrumbLink, kitStyles.focusRing)}
             >
               首页
             </button>
             <ChevronRight size={14} aria-hidden="true" />
-            <span aria-current="page" {...stylex.props(styles.breadcrumbCurrent)}>
+            <span aria-current="page" {...stylex.attrs(styles.breadcrumbCurrent)}>
               行业洞察
             </span>
           </nav>
-          <div {...stylex.props(styles.barSlot)}>{bar}</div>
+          <div {...stylex.attrs(styles.barSlot)}>{props.bar}</div>
         </div>
-        {under}
+        {props.under}
       </div>
-      <div {...stylex.props(labStyles.pageSection)}>
-        <div {...stylex.props(kitStyles.shell, kitStyles.inset120)}>{children}</div>
+      <div {...stylex.attrs(labStyles.pageSection)}>
+        <div {...stylex.attrs(kitStyles.shell, kitStyles.inset120)}>{props.children}</div>
       </div>
       <Flow>
         <ContactCta
           id="insights-bottom-cta"
           title="需要索取样品或技术资料？"
           subtitle="我们的应用团队随时为您提供添加量指导与配方参考。"
-          actions={[{ label: "联系我们", onClick: () => onNavigateHome("contact") }]}
+          actions={[{ label: "联系我们", onClick: () => props.onNavigateHome("contact") }]}
         />
       </Flow>
     </div>
   );
 }
 
-export function ArticleFlow({
-  articles,
-  sx,
-}: {
-  articles: readonly LabArticle[];
-  sx?: stylex.StyleXStyles;
-}) {
+export function ArticleFlow(props: { articles: readonly LabArticle[]; sx?: stylex.StyleXStyles }) {
   return (
-    <div {...stylex.props(styles.flow, sx)}>
-      {articles.map((article, index) => {
-        const titleId = `${article.id}-flow-title`;
-        return (
-          <article
-            key={article.id}
-            id={articleAnchor(article)}
-            aria-labelledby={titleId}
-            {...stylex.props(styles.article, kitStyles.anchor)}
-          >
-            <header {...stylex.props(styles.head)}>
-              <div {...stylex.props(styles.kicker)}>
-                <span {...stylex.props(styles.count, labStyles.displayNumber)}>
-                  {`${padIndex(index)} / ${padIndex(articles.length - 1)}`}
-                </span>
-                <ArticleMeta article={article} />
+    <div {...stylex.attrs(styles.flow, props.sx)}>
+      <For each={props.articles}>
+        {(article, index) => {
+          const titleId = `${article.id}-flow-title`;
+          return (
+            <article
+              id={articleAnchor(article)}
+              aria-labelledby={titleId}
+              {...stylex.attrs(styles.article, kitStyles.anchor)}
+            >
+              <header {...stylex.attrs(styles.head)}>
+                <div {...stylex.attrs(styles.kicker)}>
+                  <span {...stylex.attrs(styles.count, labStyles.displayNumber)}>
+                    {`${padIndex(index())} / ${padIndex(props.articles.length - 1)}`}
+                  </span>
+                  <ArticleMeta article={article} />
+                </div>
+                <h2 id={titleId} {...stylex.attrs(labStyles.docTitle)}>
+                  {article.title}
+                </h2>
+                <Show when={article.lead}>
+                  <p {...stylex.attrs(labStyles.docLead)}>{article.lead}</p>
+                </Show>
+              </header>
+              <ArticlePreview article={article} />
+              <div {...stylex.attrs(styles.sections)}>
+                <ArticleSections article={article} />
               </div>
-              <h2 id={titleId} {...stylex.props(labStyles.docTitle)}>
-                {article.title}
-              </h2>
-              {article.lead ? <p {...stylex.props(labStyles.docLead)}>{article.lead}</p> : null}
-            </header>
-            <ArticlePreview article={article} />
-            <div {...stylex.props(styles.sections)}>
-              <ArticleSections article={article} />
-            </div>
-          </article>
-        );
-      })}
+            </article>
+          );
+        }}
+      </For>
     </div>
   );
 }

@@ -1,9 +1,10 @@
 import { EngineeringStatus } from "./shared/corporate-content-sections";
-import { useRef } from "react";
-import type { ReactNode } from "react";
-import { LazyMotion, domAnimation, m, useScroll, useTransform } from "motion/react";
-import { ArrowRight, ArrowUpRight, Plus } from "lucide-react";
+import { children, createSignal, Show } from "solid-js";
+import type { JSX } from "@solidjs/web";
+import { LazyMotion, domAnimation, m, useScroll, useTransform } from "@/compat/motion";
+import { ArrowRight, ArrowUpRight, Plus } from "@fenchem-lp/ui/components/lucide";
 import * as stylex from "@stylexjs/stylex";
+import type { StyleXStyles } from "@stylexjs/stylex";
 import { breakpoints, colors, radii, typography } from "@fenchem-lp/ui/tokens.stylex";
 import { Reveal } from "@/components/prototype/motion";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
@@ -209,6 +210,10 @@ const marquee = stylex.keyframes({
     transform: "translateX(-50%)",
   },
 });
+// stylex.attrs with reactive (accessor) arguments resolves at runtime here, because
+// the StyleX compiler tries to evaluate them at build time and throws.
+const sxProps = (...args: ReadonlyArray<StyleXStyles | false | null | undefined>) =>
+  stylex.attrs(...args);
 const styles = stylex.create({
   root: {
     backgroundColor: colors.paper,
@@ -1849,43 +1854,36 @@ const DIVISION_MAP: Record<
 };
 
 /* Division color dot chip */
-function DivisionDot({ division }: { division: DivisionKey }) {
-  const info = DIVISION_MAP[division];
-  return <span aria-hidden {...stylex.props(styles.divisionDot, info.style)} />;
+function DivisionDot(props: { division: DivisionKey }) {
+  const info = () => DIVISION_MAP[props.division];
+  return <span aria-hidden="true" {...sxProps(styles.divisionDot, info().style)} />;
 }
 
 /* Division tag badge */
-function DivisionTag({ division }: { division: DivisionKey }) {
-  const info = DIVISION_MAP[division];
+function DivisionTag(props: { division: DivisionKey }) {
+  const info = () => DIVISION_MAP[props.division];
   return (
-    <span {...stylex.props(styles.divisionTag, info.style)}>
-      <span aria-hidden {...stylex.props(styles.divisionTagInnerDot)} />
-      {info.label}
+    <span {...sxProps(styles.divisionTag, info().style)}>
+      <span aria-hidden="true" {...stylex.attrs(styles.divisionTagInnerDot)} />
+      {info().label}
     </span>
   );
 }
 
 /* Section header with mono code and brand-green heading */
-function SectionHead({
-  code,
-  title,
-  sub,
-  right,
-}: {
-  code: string;
-  title: string;
-  sub: string;
-  right?: ReactNode;
-}) {
+function SectionHead(props: { code: string; title: string; sub: string; right?: JSX.Element }) {
+  const right = children(() => props.right);
   return (
-    <div {...stylex.props(styles.sectionHead)}>
+    <div {...stylex.attrs(styles.sectionHead)}>
       <Reveal>
-        <p {...stylex.props(styles.sectionCode)}>{code}</p>
-        <h2 {...stylex.props(styles.sectionH2)}>
-          {title} <span {...stylex.props(styles.greenAccentText)}>{sub}</span>
+        <p {...stylex.attrs(styles.sectionCode)}>{props.code}</p>
+        <h2 {...stylex.attrs(styles.sectionH2)}>
+          {props.title} <span {...stylex.attrs(styles.greenAccentText)}>{props.sub}</span>
         </h2>
       </Reveal>
-      {right ? <Reveal delay={0.15}>{right}</Reveal> : null}
+      <Show when={right()}>
+        <Reveal delay={0.15}>{right()}</Reveal>
+      </Show>
     </div>
   );
 }
@@ -1893,27 +1891,27 @@ function SectionHead({
 /* Protocol figure with gentle scroll parallax */
 function ProtocolFigure() {
   const reduce = useReducedMotion();
-  const ref = useRef<HTMLDivElement>(null);
+  const [ref, setRef] = createSignal<HTMLDivElement>();
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start end", "end start"],
   });
   const y = useTransform(scrollYProgress, [0, 1], ["-7%", "7%"]);
   return (
-    <div ref={ref} {...stylex.props(styles.protocolFigureBox)}>
+    <div ref={setRef} {...stylex.attrs(styles.protocolFigureBox)}>
       <m.img
         src={IMG.microscope}
         alt="Analyst working at a microscope inside the Fenchem laboratory"
         style={{
-          y: reduce ? "0%" : y,
+          y: reduce() ? "0%" : y,
           scale: 1.16,
         }}
         loading="lazy"
-        {...stylex.props(styles.protocolFigureImg)}
+        {...stylex.attrs(styles.protocolFigureImg)}
       />
-      <div {...stylex.props(styles.heroImgCaption)}>
-        <span {...stylex.props(styles.captionMono)}>FIG. 02 — ANALYTICAL LAB, NANJING</span>
-        <span {...stylex.props(styles.captionTagGreen)}>HPLC-7</span>
+      <div {...stylex.attrs(styles.heroImgCaption)}>
+        <span {...stylex.attrs(styles.captionMono)}>FIG. 02 — ANALYTICAL LAB, NANJING</span>
+        <span {...stylex.attrs(styles.captionTagGreen)}>HPLC-7</span>
       </div>
     </div>
   );
@@ -1922,91 +1920,91 @@ function ProtocolFigure() {
 /* ===== Hero section ===== */
 function HeroSection() {
   return (
-    <section {...stylex.props(styles.heroSection)}>
+    <section {...stylex.attrs(styles.heroSection)}>
       {/* Grid lines */}
-      <div aria-hidden {...stylex.props(styles.heroGridBg)} />
-      <Plus aria-hidden strokeWidth={1} {...stylex.props(styles.heroPlusTL)} />
-      <Plus aria-hidden strokeWidth={1} {...stylex.props(styles.heroPlusBR)} />
-      <div {...stylex.props(styles.heroGrid)}>
+      <div aria-hidden="true" {...stylex.attrs(styles.heroGridBg)} />
+      <Plus aria-hidden="true" strokeWidth={1} {...stylex.attrs(styles.heroPlusTL)} />
+      <Plus aria-hidden="true" strokeWidth={1} {...stylex.attrs(styles.heroPlusBR)} />
+      <div {...stylex.attrs(styles.heroGrid)}>
         {/* Left: headline block */}
-        <div {...stylex.props(styles.heroLeft)}>
+        <div {...stylex.attrs(styles.heroLeft)}>
           <Reveal>
-            <span {...stylex.props(styles.heroSysBadge)}>
-              <span {...stylex.props(styles.heroSysPingWrap)}>
-                <span {...stylex.props(styles.heroSysPingOuter)} />
-                <span {...stylex.props(styles.heroSysPingInner)} />
+            <span {...stylex.attrs(styles.heroSysBadge)}>
+              <span {...stylex.attrs(styles.heroSysPingWrap)}>
+                <span {...stylex.attrs(styles.heroSysPingOuter)} />
+                <span {...stylex.attrs(styles.heroSysPingInner)} />
               </span>
-              <span {...stylex.props(styles.heroSysText)}>
+              <span {...stylex.attrs(styles.heroSysText)}>
                 SYS.ACTIVE — Botanical Intelligence Since 1995
               </span>
             </span>
           </Reveal>
           <Reveal delay={0.1}>
-            <h1 {...stylex.props(styles.heroH1)}>
+            <h1 {...stylex.attrs(styles.heroH1)}>
               Nurturing Vitality through{" "}
-              <span {...stylex.props(styles.greenAccentText)}>Botanical Excellence</span>
+              <span {...stylex.attrs(styles.greenAccentText)}>Botanical Excellence</span>
             </h1>
           </Reveal>
           <Reveal delay={0.2}>
-            <p {...stylex.props(styles.heroP)}>
+            <p {...stylex.attrs(styles.heroP)}>
               Fenchem converts raw botanical complexity into precisely specified, clinically
               validated actives — supplied at industrial scale to formulators in more than forty
               countries.
             </p>
           </Reveal>
           <Reveal delay={0.3}>
-            <div {...stylex.props(styles.heroBtns)}>
-              <a href="#matrix" {...stylex.props(styles.heroPrimaryBtn)}>
+            <div {...stylex.attrs(styles.heroBtns)}>
+              <a href="#matrix" {...stylex.attrs(styles.heroPrimaryBtn)}>
                 Explore Portfolio
                 <ArrowRight
                   style={{
                     height: "0.875rem",
                     width: "0.875rem",
                   }}
-                  aria-hidden
+                  aria-hidden="true"
                 />
               </a>
-              <a href="#contact" {...stylex.props(styles.heroSecondaryBtn)}>
+              <a href="#contact" {...stylex.attrs(styles.heroSecondaryBtn)}>
                 Request a Specification
               </a>
             </div>
           </Reveal>
         </div>
         {/* Right: mono metadata rail */}
-        <aside aria-label="System metadata" {...stylex.props(styles.heroAside)}>
+        <aside aria-label="System metadata" {...stylex.attrs(styles.heroAside)}>
           <Reveal delay={0.25}>
             <div
               style={{
                 display: "flex",
-                flexDirection: "column",
+                "flex-direction": "column",
                 height: "100%",
               }}
             >
-              <dl {...stylex.props(styles.metaDl)}>
+              <dl {...stylex.attrs(styles.metaDl)}>
                 {HERO_META.map((row) => (
-                  <div key={row.k} {...stylex.props(styles.metaRow)}>
-                    <dt {...stylex.props(styles.metaDt)}>{row.k}</dt>
-                    <dd {...stylex.props(styles.metaDd)}>{row.v}</dd>
+                  <div {...stylex.attrs(styles.metaRow)}>
+                    <dt {...stylex.attrs(styles.metaDt)}>{row.k}</dt>
+                    <dd {...stylex.attrs(styles.metaDd)}>{row.v}</dd>
                   </div>
                 ))}
-                <div {...stylex.props(styles.metaRow)}>
-                  <dt {...stylex.props(styles.metaDt)}>STATUS</dt>
-                  <dd {...stylex.props(styles.statusDd)}>
-                    <span aria-hidden {...stylex.props(styles.statusDot)} />
+                <div {...stylex.attrs(styles.metaRow)}>
+                  <dt {...stylex.attrs(styles.metaDt)}>STATUS</dt>
+                  <dd {...stylex.attrs(styles.statusDd)}>
+                    <span aria-hidden="true" {...stylex.attrs(styles.statusDot)} />
                     OPERATIONAL
                   </dd>
                 </div>
               </dl>
-              <div {...stylex.props(styles.heroImgFrame)}>
+              <div {...stylex.attrs(styles.heroImgFrame)}>
                 <img
                   src={IMG.glassware}
                   alt="Laboratory glassware during botanical extraction work at Fenchem"
                   loading="lazy"
-                  {...stylex.props(styles.heroImg)}
+                  {...stylex.attrs(styles.heroImg)}
                 />
-                <div {...stylex.props(styles.heroImgCaption)}>
-                  <span {...stylex.props(styles.captionMono)}>FIG. 01 — EXTRACTION LAB</span>
-                  <span {...stylex.props(styles.captionTagGreen)}>BATCH 2026.06</span>
+                <div {...stylex.attrs(styles.heroImgCaption)}>
+                  <span {...stylex.attrs(styles.captionMono)}>FIG. 01 — EXTRACTION LAB</span>
+                  <span {...stylex.attrs(styles.captionTagGreen)}>BATCH 2026.06</span>
                 </div>
               </div>
             </div>
@@ -2020,20 +2018,20 @@ function HeroSection() {
 /* ===== Ingredient ticker marquee ===== */
 function TickerSection() {
   return (
-    <section aria-label="Live ingredient index" {...stylex.props(styles.tickerSection)}>
-      <div {...stylex.props(styles.tickerTrack)}>
+    <section aria-label="Live ingredient index" {...stylex.attrs(styles.tickerSection)}>
+      <div {...stylex.attrs(styles.tickerTrack)}>
         {[0, 1].map((copy) => (
-          <ul key={copy} aria-hidden={copy === 1} {...stylex.props(styles.tickerList)}>
+          <ul aria-hidden={copy === 1 ? "true" : "false"} {...stylex.attrs(styles.tickerList)}>
             {ingredients.map((ingredient, i) => (
-              <li key={ingredient.name} {...stylex.props(styles.tickerItem)}>
-                <span {...stylex.props(styles.tickerText)}>
-                  <span {...stylex.props(styles.captionTagGreen)}>
+              <li {...stylex.attrs(styles.tickerItem)}>
+                <span {...stylex.attrs(styles.tickerText)}>
+                  <span {...stylex.attrs(styles.captionTagGreen)}>
                     {String(i + 1).padStart(2, "0")}
                   </span>
                   {" — "}
                   {ingredient.name}
                 </span>
-                <span aria-hidden {...stylex.props(styles.tickerDiamond)} />
+                <span aria-hidden="true" {...stylex.attrs(styles.tickerDiamond)} />
               </li>
             ))}
           </ul>
@@ -2046,16 +2044,16 @@ function TickerSection() {
 /* ===== Stat band ===== */
 function StatBand() {
   return (
-    <section aria-label="Company metrics" {...stylex.props(styles.statBand)}>
+    <section aria-label="Company metrics" {...stylex.attrs(styles.statBand)}>
       {STATS.map((s, i) => (
-        <Reveal key={s.label} delay={i * 0.08}>
-          <div {...stylex.props(styles.statCard)}>
-            <p {...stylex.props(styles.statLabel)}>{s.label}</p>
-            <div {...stylex.props(styles.statValueRow)}>
-              <span {...stylex.props(styles.statValue)}>{s.value}</span>
-              <span {...stylex.props(styles.statUnit)}>{s.unit}</span>
+        <Reveal delay={i * 0.08}>
+          <div {...stylex.attrs(styles.statCard)}>
+            <p {...stylex.attrs(styles.statLabel)}>{s.label}</p>
+            <div {...stylex.attrs(styles.statValueRow)}>
+              <span {...stylex.attrs(styles.statValue)}>{s.value}</span>
+              <span {...stylex.attrs(styles.statUnit)}>{s.unit}</span>
             </div>
-            <p {...stylex.props(styles.statDesc)}>{s.desc}</p>
+            <p {...stylex.attrs(styles.statDesc)}>{s.desc}</p>
           </div>
         </Reveal>
       ))}
@@ -2066,79 +2064,79 @@ function StatBand() {
 /* ===== Ingredient Matrix ===== */
 function MatrixSection() {
   return (
-    <section id="matrix" {...stylex.props(styles.matrixSection)}>
+    <section id="matrix" {...stylex.attrs(styles.matrixSection)}>
       <SectionHead
         code="SYS.CAT_01 // ACTIVE COMPOUNDS"
         title="Ingredient"
         sub="matrix."
         right={
-          <a href="#contact" {...stylex.props(styles.specsButton)}>
+          <a href="#contact" {...stylex.attrs(styles.specsButton)}>
             View Full Specs
             <ArrowRight
               style={{
                 height: "0.75rem",
                 width: "0.75rem",
               }}
-              aria-hidden
+              aria-hidden="true"
             />
           </a>
         }
       />
-      <div {...stylex.props(styles.matrixGrid)}>
+      <div {...stylex.attrs(styles.matrixGrid)}>
         {getFeaturedIngredients().map((item, i) => {
           const division = divisionForApplication(item.application);
           const divInfo = DIVISION_MAP[division];
           return (
-            <Reveal key={item.code} delay={(i % 3) * 0.08}>
-              <div {...stylex.props(styles.matrixCardBg)}>
-                <div {...stylex.props(styles.matrixInner, divInfo.style)}>
-                  <div {...stylex.props(styles.matrixImgBox)}>
+            <Reveal delay={(i % 3) * 0.08}>
+              <div {...stylex.attrs(styles.matrixCardBg)}>
+                <div {...stylex.attrs(styles.matrixInner, divInfo.style)}>
+                  <div {...stylex.attrs(styles.matrixImgBox)}>
                     <img
                       src={item.image.src}
                       alt={item.image.alt}
                       loading="lazy"
-                      {...stylex.props(styles.matrixImg)}
+                      {...stylex.attrs(styles.matrixImg)}
                     />
                     {/* Division tag overlay */}
-                    <span {...stylex.props(styles.matrixTagOverlay)}>
+                    <span {...stylex.attrs(styles.matrixTagOverlay)}>
                       <DivisionDot division={division} />
-                      <span {...stylex.props(styles.matrixTagOverlayText)}>{item.category}</span>
+                      <span {...stylex.attrs(styles.matrixTagOverlayText)}>{item.category}</span>
                     </span>
                   </div>
-                  <div {...stylex.props(styles.matrixContent)}>
-                    <div {...stylex.props(styles.matrixHeaderRow)}>
-                      <span {...stylex.props(styles.matrixIndex)}>
+                  <div {...stylex.attrs(styles.matrixContent)}>
+                    <div {...stylex.attrs(styles.matrixHeaderRow)}>
+                      <span {...stylex.attrs(styles.matrixIndex)}>
                         {String(i + 1).padStart(2, "0")} —
                       </span>
-                      <span {...stylex.props(styles.matrixCode)}>{item.code}</span>
+                      <span {...stylex.attrs(styles.matrixCode)}>{item.code}</span>
                     </div>
-                    <h3 {...stylex.props(styles.matrixName)}>{item.name}</h3>
+                    <h3 {...stylex.attrs(styles.matrixName)}>{item.name}</h3>
                     {/* Division badge */}
-                    <div {...stylex.props(styles.matrixBadgeRow)}>
+                    <div {...stylex.attrs(styles.matrixBadgeRow)}>
                       <DivisionTag division={division} />
                     </div>
-                    <dl {...stylex.props(styles.matrixDl)}>
-                      <div {...stylex.props(styles.matrixDlRow)}>
-                        <dt {...stylex.props(styles.matrixDlDt)}>Purity</dt>
-                        <dd {...stylex.props(styles.matrixDlDd)}>{item.purity}</dd>
+                    <dl {...stylex.attrs(styles.matrixDl)}>
+                      <div {...stylex.attrs(styles.matrixDlRow)}>
+                        <dt {...stylex.attrs(styles.matrixDlDt)}>Purity</dt>
+                        <dd {...stylex.attrs(styles.matrixDlDd)}>{item.purity}</dd>
                       </div>
-                      <div {...stylex.props(styles.matrixDlRow)}>
-                        <dt {...stylex.props(styles.matrixDlDt)}>Form</dt>
-                        <dd {...stylex.props(styles.matrixDlDd)}>{item.form}</dd>
+                      <div {...stylex.attrs(styles.matrixDlRow)}>
+                        <dt {...stylex.attrs(styles.matrixDlDt)}>Form</dt>
+                        <dd {...stylex.attrs(styles.matrixDlDd)}>{item.form}</dd>
                       </div>
-                      <div {...stylex.props(styles.matrixDlRow)}>
-                        <dt {...stylex.props(styles.matrixDlDt)}>Application</dt>
-                        <dd {...stylex.props(styles.matrixDlDd)}>{item.useCase}</dd>
+                      <div {...stylex.attrs(styles.matrixDlRow)}>
+                        <dt {...stylex.attrs(styles.matrixDlDt)}>Application</dt>
+                        <dd {...stylex.attrs(styles.matrixDlDd)}>{item.useCase}</dd>
                       </div>
                     </dl>
-                    <a href="#contact" {...stylex.props(styles.matrixRequestSpec)}>
+                    <a href="#contact" {...stylex.attrs(styles.matrixRequestSpec)}>
                       Request Spec
                       <ArrowUpRight
                         style={{
                           height: "0.75rem",
                           width: "0.75rem",
                         }}
-                        aria-hidden
+                        aria-hidden="true"
                       />
                     </a>
                   </div>
@@ -2155,42 +2153,42 @@ function MatrixSection() {
 /* ===== Operating Protocol ===== */
 function ProtocolSection() {
   return (
-    <section id="protocol" {...stylex.props(styles.protocolSection)}>
+    <section id="protocol" {...stylex.attrs(styles.protocolSection)}>
       <SectionHead
         code="SYS.METHOD // 02"
         title="Operating"
         sub="protocol."
         right={
-          <p {...stylex.props(styles.protocolAside)}>
+          <p {...stylex.attrs(styles.protocolAside)}>
             Rooted in nature, refined by science — every lot, every market, every release.
           </p>
         }
       />
-      <div {...stylex.props(styles.protocolGrid)}>
-        <div {...stylex.props(styles.protocolFigureCol)}>
+      <div {...stylex.attrs(styles.protocolGrid)}>
+        <div {...stylex.attrs(styles.protocolFigureCol)}>
           <Reveal>
             <ProtocolFigure />
           </Reveal>
         </div>
-        <div {...stylex.props(styles.protocolRightCol)}>
+        <div {...stylex.attrs(styles.protocolRightCol)}>
           {pillars.map((pillar, i) => {
             const detail = PROTOCOL_DETAIL[i];
             const isLast = i === pillars.length - 1;
             return (
-              <Reveal key={pillar.title} delay={i * 0.08}>
+              <Reveal delay={i * 0.08}>
                 <div
-                  {...stylex.props(
+                  {...stylex.attrs(
                     styles.protocolPillarRow,
                     !isLast && styles.protocolPillarDivider,
                   )}
                 >
-                  <span {...stylex.props(styles.protocolStep)}>{detail.step} —</span>
-                  <div {...stylex.props(styles.protocolBody)}>
-                    <div {...stylex.props(styles.protocolTitleRow)}>
-                      <h3 {...stylex.props(styles.protocolH3)}>{pillar.title}</h3>
-                      <span {...stylex.props(styles.protocolTag)}>{detail.tag}</span>
+                  <span {...stylex.attrs(styles.protocolStep)}>{detail.step} —</span>
+                  <div {...stylex.attrs(styles.protocolBody)}>
+                    <div {...stylex.attrs(styles.protocolTitleRow)}>
+                      <h3 {...stylex.attrs(styles.protocolH3)}>{pillar.title}</h3>
+                      <span {...stylex.attrs(styles.protocolTag)}>{detail.tag}</span>
                     </div>
-                    <p {...stylex.props(styles.protocolDesc)}>{detail.desc}</p>
+                    <p {...stylex.attrs(styles.protocolDesc)}>{detail.desc}</p>
                   </div>
                 </div>
               </Reveal>
@@ -2205,7 +2203,7 @@ function ProtocolSection() {
 /* ===== Application Domains ===== */
 function DomainsSection() {
   return (
-    <section id="domains" {...stylex.props(styles.domainsSection)}>
+    <section id="domains" {...stylex.attrs(styles.domainsSection)}>
       <SectionHead
         code="SYS.CAT_02 // APPLICATION DOMAINS"
         title="Built for three"
@@ -2216,23 +2214,26 @@ function DomainsSection() {
           const detail = DOMAIN_DETAIL[i];
           const divInfo = DIVISION_MAP[detail.division];
           return (
-            <a key={industry.title} href="#contact" {...stylex.props(styles.domainLink)}>
+            <a href="#contact" {...stylex.attrs(styles.domainLink)}>
               <Reveal delay={i * 0.06}>
-                <div {...stylex.props(styles.domainRowGrid)}>
-                  <div {...stylex.props(styles.domainColCode)}>
-                    <div {...stylex.props(styles.domainCodeRow)}>
+                <div {...stylex.attrs(styles.domainRowGrid)}>
+                  <div {...stylex.attrs(styles.domainColCode)}>
+                    <div {...stylex.attrs(styles.domainCodeRow)}>
                       <DivisionDot division={detail.division} />
-                      <p {...stylex.props(styles.domainCode)}>{detail.code}</p>
+                      <p {...stylex.attrs(styles.domainCode)}>{detail.code}</p>
                     </div>
-                    <p {...stylex.props(styles.domainCat)}>{detail.cat}</p>
+                    <p {...stylex.attrs(styles.domainCat)}>{detail.cat}</p>
                   </div>
-                  <h3 {...stylex.props(styles.domainH3)}>{industry.title}</h3>
-                  <p {...stylex.props(styles.domainDesc)}>{detail.desc}</p>
-                  <div {...stylex.props(styles.domainArrowCol)}>
-                    <ArrowUpRight aria-hidden {...stylex.props(styles.domainArrow)} />
+                  <h3 {...stylex.attrs(styles.domainH3)}>{industry.title}</h3>
+                  <p {...stylex.attrs(styles.domainDesc)}>{detail.desc}</p>
+                  <div {...stylex.attrs(styles.domainArrowCol)}>
+                    <ArrowUpRight aria-hidden="true" {...stylex.attrs(styles.domainArrow)} />
                   </div>
                   {/* Division accent strip at bottom */}
-                  <div aria-hidden {...stylex.props(styles.domainAccentStrip, divInfo.style)} />
+                  <div
+                    aria-hidden="true"
+                    {...stylex.attrs(styles.domainAccentStrip, divInfo.style)}
+                  />
                 </div>
               </Reveal>
             </a>
@@ -2246,52 +2247,52 @@ function DomainsSection() {
 /* ===== CTA + Global Network ===== */
 function CtaNetworkSection() {
   return (
-    <section id="contact" {...stylex.props(styles.ctaNetworkSection)}>
-      <div {...stylex.props(styles.ctaTopBanner)}>
+    <section id="contact" {...stylex.attrs(styles.ctaNetworkSection)}>
+      <div {...stylex.attrs(styles.ctaTopBanner)}>
         <Reveal>
-          <p {...stylex.props(styles.ctaChannelTag)}>SYS.CONTACT // OPEN CHANNEL</p>
-          <h2 {...stylex.props(styles.ctaH2)}>
+          <p {...stylex.attrs(styles.ctaChannelTag)}>SYS.CONTACT // OPEN CHANNEL</p>
+          <h2 {...stylex.attrs(styles.ctaH2)}>
             Your next formulation,{" "}
-            <span {...stylex.props(styles.ctaH2Green)}>engineered to specification.</span>
+            <span {...stylex.attrs(styles.ctaH2Green)}>engineered to specification.</span>
           </h2>
-          <p {...stylex.props(styles.ctaP)}>
+          <p {...stylex.attrs(styles.ctaP)}>
             Submit a target spec — purity, form, matrix, regulatory map — and our laboratory returns
             a validated proposal with full documentation within one business day.
           </p>
         </Reveal>
         <Reveal delay={0.15}>
-          <div {...stylex.props(styles.ctaBtnGroup)}>
-            <a href="mailto:sales@fenchem.com" {...stylex.props(styles.ctaPrimaryBtn)}>
+          <div {...stylex.attrs(styles.ctaBtnGroup)}>
+            <a href="mailto:sales@fenchem.com" {...stylex.attrs(styles.ctaPrimaryBtn)}>
               Partner with Fenchem
               <ArrowRight
                 style={{
                   height: "0.875rem",
                   width: "0.875rem",
                 }}
-                aria-hidden
+                aria-hidden="true"
               />
             </a>
-            <a href="#matrix" {...stylex.props(styles.ctaSecondaryBtn)}>
+            <a href="#matrix" {...stylex.attrs(styles.ctaSecondaryBtn)}>
               Explore Portfolio
             </a>
           </div>
         </Reveal>
         <Reveal delay={0.25}>
-          <p {...stylex.props(styles.ctaResponseText)}>
+          <p {...stylex.attrs(styles.ctaResponseText)}>
             RESPONSE.TIME &lt; 24H — TECHNICAL DOSSIERS ON REQUEST
           </p>
         </Reveal>
       </div>
       <div id="network">
-        <div {...stylex.props(styles.networkHeader)}>
-          <span {...stylex.props(styles.networkNodesTitle)}>SYS.NET // 6 ACTIVE NODES</span>
-          <span {...stylex.props(styles.networkVerifiedText)}>LAT/LONG VERIFIED — 2026.06</span>
+        <div {...stylex.attrs(styles.networkHeader)}>
+          <span {...stylex.attrs(styles.networkNodesTitle)}>SYS.NET // 6 ACTIVE NODES</span>
+          <span {...stylex.attrs(styles.networkVerifiedText)}>LAT/LONG VERIFIED — 2026.06</span>
         </div>
-        <div {...stylex.props(styles.networkGrid)}>
+        <div {...stylex.attrs(styles.networkGrid)}>
           {regions.map((region, i) => (
-            <Reveal key={region.city} delay={(i % 3) * 0.08}>
-              <div {...stylex.props(styles.networkCard)}>
-                <div {...stylex.props(styles.networkCardMeta)}>
+            <Reveal delay={(i % 3) * 0.08}>
+              <div {...stylex.attrs(styles.networkCard)}>
+                <div {...stylex.attrs(styles.networkCardMeta)}>
                   <span>{`NODE ${String(i + 1).padStart(2, "0")}`}</span>
                   <span
                     style={{
@@ -2301,8 +2302,8 @@ function CtaNetworkSection() {
                     {region.coords}
                   </span>
                 </div>
-                <p {...stylex.props(styles.networkCity)}>{region.city}</p>
-                <p {...stylex.props(styles.networkRole)}>{region.role}</p>
+                <p {...stylex.attrs(styles.networkCity)}>{region.city}</p>
+                <p {...stylex.attrs(styles.networkRole)}>{region.role}</p>
               </div>
             </Reveal>
           ))}
@@ -2315,26 +2316,26 @@ function CtaNetworkSection() {
 /* ===== Footer ===== */
 function FooterSection() {
   return (
-    <footer {...stylex.props(styles.footer)}>
-      <div {...stylex.props(styles.footerGrid)}>
-        <div {...stylex.props(styles.footerBrandCol)}>
-          <a href="/" {...stylex.props(styles.footerLogo)}>
+    <footer {...stylex.attrs(styles.footer)}>
+      <div {...stylex.attrs(styles.footerGrid)}>
+        <div {...stylex.attrs(styles.footerBrandCol)}>
+          <a href="/" {...stylex.attrs(styles.footerLogo)}>
             FENCHEM
           </a>
-          <p {...stylex.props(styles.footerSubtitle)}>Rooted in nature, refined by science.</p>
-          <p {...stylex.props(styles.footerCerts)}>
+          <p {...stylex.attrs(styles.footerSubtitle)}>Rooted in nature, refined by science.</p>
+          <p {...stylex.attrs(styles.footerCerts)}>
             ISO 9001 : 2015 / GMP / HACCP
             <br />
             EST. 1995 — NANJING, CHINA
           </p>
         </div>
         {FOOTER_COLS.map((col) => (
-          <div key={col.head} {...stylex.props(styles.footerNavCol)}>
-            <p {...stylex.props(styles.footerHead)}>{col.head}</p>
-            <ul {...stylex.props(styles.footerList)}>
+          <div {...stylex.attrs(styles.footerNavCol)}>
+            <p {...stylex.attrs(styles.footerHead)}>{col.head}</p>
+            <ul {...stylex.attrs(styles.footerList)}>
               {col.links.map((link) => (
-                <li key={link.label}>
-                  <a href={link.href} {...stylex.props(styles.footerLink)}>
+                <li>
+                  <a href={link.href} {...stylex.attrs(styles.footerLink)}>
                     {link.label}
                   </a>
                 </li>
@@ -2344,17 +2345,17 @@ function FooterSection() {
         ))}
         <div
           style={{
-            gridColumn: "span 1",
+            "grid-column": "span 1",
           }}
         />
       </div>
-      <p aria-hidden {...stylex.props(styles.footerWatermark)}>
+      <p aria-hidden="true" {...stylex.attrs(styles.footerWatermark)}>
         FENCHEM
       </p>
-      <div {...stylex.props(styles.footerLegalRow)}>
+      <div {...stylex.attrs(styles.footerLegalRow)}>
         <span>© 2026 Fenchem — All Rights Reserved</span>
         <span>N 32.06 / E 118.79 — Nanjing</span>
-        <span {...stylex.props(styles.footerEof)}>SYS.EOF // END OF SPEC</span>
+        <span {...stylex.attrs(styles.footerEof)}>SYS.EOF // END OF SPEC</span>
       </div>
     </footer>
   );
@@ -2364,10 +2365,10 @@ export function VariantE() {
   const { scrollYProgress } = useScroll();
   return (
     <LazyMotion features={domAnimation} strict>
-      <div {...stylex.props(styles.root)}>
+      <div {...stylex.attrs(styles.root)}>
         {/* ===== Sticky top bar ===== */}
-        <header {...stylex.props(styles.header)}>
-          <div {...stylex.props(styles.framedContainer)}>
+        <header {...stylex.attrs(styles.header)}>
+          <div {...stylex.attrs(styles.framedContainer)}>
             {/* Micro-label strip */}
             <EngineeringStatus
               styles={{
@@ -2382,45 +2383,45 @@ export function VariantE() {
               last="ISO 9001 : 2015 / GMP"
             />
             {/* Nav row */}
-            <nav aria-label="Main navigation" {...stylex.props(styles.navRow)}>
-              <a href="/" {...stylex.props(styles.logoLink)}>
-                <span {...stylex.props(styles.logoWordmark)}>FENCHEM</span>
-                <span {...stylex.props(styles.logoSub)}>Innovation Lab</span>
+            <nav aria-label="Main navigation" {...stylex.attrs(styles.navRow)}>
+              <a href="/" {...stylex.attrs(styles.logoLink)}>
+                <span {...stylex.attrs(styles.logoWordmark)}>FENCHEM</span>
+                <span {...stylex.attrs(styles.logoSub)}>Innovation Lab</span>
               </a>
-              <div {...stylex.props(styles.navLinksDesktop)}>
+              <div {...stylex.attrs(styles.navLinksDesktop)}>
                 {NAV_LINKS.map((link, i) => (
-                  <a key={link.href} href={link.href} {...stylex.props(styles.navLink)}>
-                    <span {...stylex.props(styles.navLinkNum)}>
+                  <a href={link.href} {...stylex.attrs(styles.navLink)}>
+                    <span {...stylex.attrs(styles.navLinkNum)}>
                       {String(i + 1).padStart(2, "0")}
                     </span>
                     {link.label}
                   </a>
                 ))}
               </div>
-              <a href="#contact" {...stylex.props(styles.navCta)}>
+              <a href="#contact" {...stylex.attrs(styles.navCta)}>
                 Request a Specification
                 <ArrowRight
                   style={{
                     height: "0.75rem",
                     width: "0.75rem",
                   }}
-                  aria-hidden
+                  aria-hidden="true"
                 />
               </a>
             </nav>
           </div>
           {/* Scroll progress hairline — brand green */}
           <m.div
-            aria-hidden
+            aria-hidden="true"
             style={{
-              scaleX: reduce ? 0 : scrollYProgress,
+              scaleX: reduce() ? 0 : scrollYProgress,
             }}
-            {...stylex.props(styles.navHairline)}
+            {...stylex.attrs(styles.navHairline)}
           />
         </header>
 
         {/* ===== Framed spec-sheet ===== */}
-        <div {...stylex.props(styles.framedContainer)}>
+        <div {...stylex.attrs(styles.framedContainer)}>
           <main>
             <HeroSection />
             <TickerSection />

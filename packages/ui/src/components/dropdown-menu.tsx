@@ -1,11 +1,27 @@
 "use client";
 
-import { Menu as MenuPrimitive } from "@base-ui/react/menu";
+import {
+  Check as CheckIcon,
+  ChevronRight as ChevronRightIcon,
+} from "@fenchem-lp/ui/components/lucide";
 import { colors, radii } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 import type { StyleXStyles } from "@stylexjs/stylex";
-import { CheckIcon, ChevronRightIcon } from "lucide-react";
-import * as React from "react";
+import { Portal, type ComponentProps, type JSX } from "@solidjs/web";
+import {
+  children as resolveChildren,
+  createContext,
+  createEffect,
+  createSignal,
+  createUniqueId,
+  flush,
+  omit,
+  onSettled,
+  Show,
+  untrack,
+  useContext,
+  type Accessor,
+} from "solid-js";
 
 const fadeIn = stylex.keyframes({
   "0%": { opacity: 0 },
@@ -214,307 +230,795 @@ const menuStyles = stylex.create({
   },
 });
 
-export interface DropdownMenuProps extends MenuPrimitive.Root.Props {
-  sx?: StyleXStyles;
+type Side = "top" | "bottom" | "left" | "right";
+type Align = "start" | "center" | "end";
+type OpenChangeDetails = { event?: Event; reason: string };
+
+type MenuContextValue = {
+  rootId: string;
+  popupId: string;
+  parent: MenuContextValue | null;
+  open: Accessor<boolean>;
+  setOpen: (open: boolean, details: OpenChangeDetails) => void;
+  trigger: Accessor<HTMLElement | undefined>;
+  setTrigger: (el: HTMLElement | undefined) => void;
+  focusFirstOnOpen: { current: boolean };
+  subMenus: Set<MenuContextValue>;
+};
+
+const MenuContext = createContext<MenuContextValue | null>(null);
+
+function useMenu(part: string) {
+  const menu = useContext(MenuContext);
+  if (!menu) throw new Error(`${part} must be used within <DropdownMenu>`);
+  return menu;
 }
 
-function DropdownMenu({ _sx, ...props }: DropdownMenuProps & { _sx?: StyleXStyles }) {
-  return <MenuPrimitive.Root data-slot="dropdown-menu" {...props} />;
+function rootOf(menu: MenuContextValue) {
+  let current = menu;
+  while (current.parent) current = current.parent;
+  return current;
 }
 
-export interface DropdownMenuPortalProps extends MenuPrimitive.Portal.Props {
-  sx?: StyleXStyles;
+function closeTree(menu: MenuContextValue, details: OpenChangeDetails, refocus: boolean) {
+  const root = rootOf(menu);
+  root.setOpen(false, details);
+  if (refocus) {
+    flush();
+    root.trigger()?.focus();
+  }
 }
 
-function DropdownMenuPortal({ _sx, ...props }: DropdownMenuPortalProps & { _sx?: StyleXStyles }) {
-  return <MenuPrimitive.Portal data-slot="dropdown-menu-portal" {...props} />;
+function closeSubMenus(menu: MenuContextValue, except?: MenuContextValue) {
+  for (const sub of menu.subMenus) {
+    if (sub !== except && sub.open()) sub.setOpen(false, { reason: "sibling-open" });
+  }
 }
 
-export interface DropdownMenuTriggerProps extends MenuPrimitive.Trigger.Props {
-  sx?: StyleXStyles;
-}
+const ITEM_SELECTOR = '[role="menuitem"],[role="menuitemcheckbox"],[role="menuitemradio"]';
 
-function DropdownMenuTrigger({ _sx, ...props }: DropdownMenuTriggerProps & { _sx?: StyleXStyles }) {
-  return <MenuPrimitive.Trigger data-slot="dropdown-menu-trigger" {...props} />;
-}
-
-export interface DropdownMenuContentProps
-  extends
-    Omit<MenuPrimitive.Popup.Props, "className">,
-    Pick<MenuPrimitive.Positioner.Props, "align" | "alignOffset" | "side" | "sideOffset"> {
-  sx?: StyleXStyles;
-}
-
-function DropdownMenuContent({
-  align = "start",
-  alignOffset = 0,
-  side = "bottom",
-  sideOffset = 4,
-  sx,
-  ...props
-}: DropdownMenuContentProps) {
-  return (
-    <MenuPrimitive.Portal>
-      <MenuPrimitive.Positioner
-        {...stylex.props(menuStyles.positioner)}
-        align={align}
-        alignOffset={alignOffset}
-        side={side}
-        sideOffset={sideOffset}
-      >
-        <MenuPrimitive.Popup
-          data-slot="dropdown-menu-content"
-          render={(popupProps, state) => {
-            const sideKey = `side_${state.side}` as keyof typeof menuStyles;
-            const styleProps = stylex.props(
-              menuStyles.content,
-              state.open ? menuStyles[sideKey] || menuStyles.open : menuStyles.closed,
-              sx,
-            );
-            return <div {...popupProps} {...styleProps} />;
-          }}
-          {...props}
-        />
-      </MenuPrimitive.Positioner>
-    </MenuPrimitive.Portal>
+function menuItems(popup: HTMLElement) {
+  return Array.from(popup.querySelectorAll<HTMLElement>(ITEM_SELECTOR)).filter(
+    (item) => item.getAttribute("aria-disabled") !== "true",
   );
 }
 
-export interface DropdownMenuGroupProps extends MenuPrimitive.Group.Props {
+function createMenuState(
+  props: {
+    open?: boolean;
+    defaultOpen?: boolean;
+    onOpenChange?: (open: boolean, details: OpenChangeDetails) => void;
+  },
+  parent: MenuContextValue | null,
+): MenuContextValue {
+  const [uncontrolled, setUncontrolled] = createSignal(props.defaultOpen ?? false);
+  const [trigger, setTrigger] = createSignal<HTMLElement>();
+  const open = () => (props.open !== undefined ? props.open : uncontrolled());
+  const menu: MenuContextValue = {
+    rootId: parent ? parent.rootId : createUniqueId(),
+    popupId: createUniqueId(),
+    parent,
+    open,
+    trigger,
+    setTrigger: (el) => setTrigger(() => el),
+    focusFirstOnOpen: { current: false },
+    subMenus: new Set(),
+    setOpen: (next, details) => {
+      if (next === untrack(open)) return;
+      if (!next) closeSubMenus(menu);
+      if (props.open === undefined) setUncontrolled(next);
+      props.onOpenChange?.(next, details);
+    },
+  };
+  return menu;
+}
+
+export interface DropdownMenuProps {
+  open?: boolean;
+  defaultOpen?: boolean;
+  onOpenChange?: (open: boolean, details: OpenChangeDetails) => void;
+  modal?: boolean;
+  children?: JSX.Element;
   sx?: StyleXStyles;
 }
 
-function DropdownMenuGroup({ _sx, ...props }: DropdownMenuGroupProps & { _sx?: StyleXStyles }) {
-  return <MenuPrimitive.Group data-slot="dropdown-menu-group" {...props} />;
+function DropdownMenu(props: DropdownMenuProps) {
+  const menu = createMenuState(props, null);
+  return <MenuContext value={menu}>{props.children}</MenuContext>;
 }
 
-export interface DropdownMenuLabelProps extends Omit<MenuPrimitive.GroupLabel.Props, "className"> {
+export interface DropdownMenuPortalProps {
+  children?: JSX.Element;
+  container?: Element;
+  sx?: StyleXStyles;
+}
+
+function DropdownMenuPortal(props: DropdownMenuPortalProps) {
+  return <Portal mount={props.container}>{props.children}</Portal>;
+}
+
+export interface DropdownMenuTriggerProps extends Omit<ComponentProps<"button">, "class"> {
+  /** An element to use as the trigger instead of the default <button>. */
+  render?: JSX.Element;
+  sx?: StyleXStyles;
+}
+
+function DropdownMenuTrigger(props: DropdownMenuTriggerProps) {
+  const rest = omit(props, "render", "sx", "children", "onClick", "onKeyDown", "ref");
+  const menu = useMenu("DropdownMenuTrigger");
+  const usesRender = "render" in props;
+
+  const toggle = (event: MouseEvent) => {
+    if (event.defaultPrevented) return;
+    menu.focusFirstOnOpen.current = event.detail === 0;
+    menu.setOpen(!menu.open(), { event, reason: "trigger-press" });
+  };
+  const openFromKeyboard = (event: KeyboardEvent) => {
+    if (event.defaultPrevented || (event.key !== "ArrowDown" && event.key !== "ArrowUp")) return;
+    event.preventDefault();
+    menu.focusFirstOnOpen.current = true;
+    menu.setOpen(true, { event, reason: "trigger-press" });
+  };
+  const ownProps = {
+    "data-slot": "dropdown-menu-trigger",
+    "aria-haspopup": "menu" as const,
+    get "aria-expanded"() {
+      return menu.open() ? ("true" as const) : ("false" as const);
+    },
+    get "aria-controls"() {
+      return menu.open() ? menu.popupId : undefined;
+    },
+    get "data-popup-open"() {
+      return menu.open() ? "" : undefined;
+    },
+  };
+
+  // A ready-made element (render={<Button />}) cannot take props after creation, so wire it up in place.
+  const rendered = resolveChildren(() => (usesRender ? props.render : undefined));
+  onSettled(() => {
+    const el = rendered.toArray().find((node) => node instanceof HTMLElement);
+    if (!(el instanceof HTMLElement)) return;
+    menu.setTrigger(el);
+    const onClick = (event: MouseEvent) => toggle(event);
+    el.addEventListener("click", onClick);
+    el.addEventListener("keydown", openFromKeyboard);
+    return () => {
+      el.removeEventListener("click", onClick);
+      el.removeEventListener("keydown", openFromKeyboard);
+    };
+  });
+  createEffect(
+    () => ({
+      el: usesRender ? menu.trigger() : undefined,
+      attributes: Object.entries(ownProps),
+    }),
+    ({ el, attributes }) => {
+      if (!el) return;
+      for (const [name, value] of attributes) {
+        if (value === undefined) el.removeAttribute(name);
+        else el.setAttribute(name, value);
+      }
+    },
+  );
+
+  if (usesRender) return <>{rendered()}</>;
+  return (
+    <button
+      type="button"
+      {...ownProps}
+      {...rest}
+      ref={(el) => {
+        menu.setTrigger(el);
+        const ref = props.ref;
+        if (typeof ref === "function") (ref as (el: HTMLButtonElement) => void)(el);
+      }}
+      onClick={(event) => {
+        const onClick = props.onClick;
+        if (typeof onClick === "function") onClick(event);
+        toggle(event);
+      }}
+      onKeyDown={(event) => {
+        const onKeyDown = props.onKeyDown;
+        if (typeof onKeyDown === "function") onKeyDown(event);
+        openFromKeyboard(event);
+      }}
+    >
+      {props.children}
+    </button>
+  );
+}
+
+export interface DropdownMenuContentProps extends Omit<ComponentProps<"div">, "class"> {
+  align?: Align;
+  alignOffset?: number;
+  side?: Side;
+  sideOffset?: number;
+  sx?: StyleXStyles;
+}
+
+function DropdownMenuContent(props: DropdownMenuContentProps) {
+  const menu = useMenu("DropdownMenuContent");
+  return (
+    <Show when={menu.open()}>
+      <Portal>
+        <MenuPopup {...props} />
+      </Portal>
+    </Show>
+  );
+}
+
+const VIEWPORT_PADDING = 8;
+// The StyleX compiler cannot evaluate a computed style key; resolve it at runtime instead.
+const sxProps = (...args: ReadonlyArray<StyleXStyles | false | null | undefined>) =>
+  stylex.attrs(...args);
+
+function MenuPopup(props: DropdownMenuContentProps) {
+  const rest = omit(props, "align", "alignOffset", "side", "sideOffset", "sx", "onKeyDown");
+  const menu = useMenu("DropdownMenuContent");
+  const side = () => props.side ?? "bottom";
+  const align = () => props.align ?? "start";
+  const sideStyle = () => menuStyles[`side_${side()}`] || menuStyles.open;
+  let positioner!: HTMLDivElement;
+  let popup!: HTMLDivElement;
+
+  const place = () => {
+    const anchor = menu.trigger();
+    if (!anchor) return;
+    const rect = anchor.getBoundingClientRect();
+    positioner.style.setProperty("--anchor-width", `${rect.width}px`);
+    const width = popup.offsetWidth;
+    const height = popup.offsetHeight;
+    const sideOffset = props.sideOffset ?? 4;
+    const alignOffset = props.alignOffset ?? 0;
+    const vertical = side() === "top" || side() === "bottom";
+    const [start, length, extent] = vertical
+      ? [rect.left, rect.width, width]
+      : [rect.top, rect.height, height];
+    const cross =
+      align() === "start"
+        ? start + alignOffset
+        : align() === "end"
+          ? start + length - extent - alignOffset
+          : start + (length - extent) / 2;
+    let left: number;
+    let top: number;
+    let available: number;
+    if (side() === "bottom") {
+      top = rect.bottom + sideOffset;
+      left = cross;
+      available = window.innerHeight - top - VIEWPORT_PADDING;
+    } else if (side() === "top") {
+      top = rect.top - sideOffset - height;
+      left = cross;
+      available = rect.top - sideOffset - VIEWPORT_PADDING;
+    } else if (side() === "right") {
+      left = rect.right + sideOffset;
+      top = cross;
+      available = window.innerHeight - VIEWPORT_PADDING * 2;
+    } else {
+      left = rect.left - sideOffset - width;
+      top = cross;
+      available = window.innerHeight - VIEWPORT_PADDING * 2;
+    }
+    const origin = { bottom: "top", top: "bottom", right: "left", left: "right" }[side()];
+    positioner.style.left = `${Math.round(left)}px`;
+    positioner.style.top = `${Math.round(top)}px`;
+    positioner.style.setProperty("--available-height", `${Math.max(0, available)}px`);
+    positioner.style.setProperty(
+      "--transform-origin",
+      vertical ? `${align() === "end" ? "right" : "left"} ${origin}` : `${origin} top`,
+    );
+  };
+
+  onSettled(() => {
+    place();
+    if (menu.focusFirstOnOpen.current) menuItems(popup)[0]?.focus();
+    else popup.focus({ preventScroll: true });
+    menu.focusFirstOnOpen.current = false;
+
+    const onPointerDown = (event: PointerEvent) => {
+      const target = event.target as Element | null;
+      if (target?.closest(`[data-menu-root="${menu.rootId}"]`)) return;
+      if (target && rootOf(menu).trigger()?.contains(target)) return;
+      closeTree(menu, { event, reason: "outside-press" }, false);
+    };
+    const reposition = () => place();
+    if (!menu.parent) document.addEventListener("pointerdown", onPointerDown, true);
+    window.addEventListener("resize", reposition);
+    window.addEventListener("scroll", reposition, true);
+    return () => {
+      document.removeEventListener("pointerdown", onPointerDown, true);
+      window.removeEventListener("resize", reposition);
+      window.removeEventListener("scroll", reposition, true);
+    };
+  });
+
+  const onKeyDown = (event: KeyboardEvent & { currentTarget: HTMLDivElement; target: Element }) => {
+    const onKey = props.onKeyDown;
+    if (typeof onKey === "function") onKey(event);
+    if (event.defaultPrevented) return;
+    const items = menuItems(popup);
+    const current = items.indexOf(document.activeElement as HTMLElement);
+    const focusAt = (index: number) => items[(index + items.length) % items.length]?.focus();
+    switch (event.key) {
+      case "ArrowDown":
+        event.preventDefault();
+        focusAt(current + 1);
+        break;
+      case "ArrowUp":
+        event.preventDefault();
+        focusAt(current < 0 ? items.length - 1 : current - 1);
+        break;
+      case "Home":
+        event.preventDefault();
+        focusAt(0);
+        break;
+      case "End":
+        event.preventDefault();
+        focusAt(items.length - 1);
+        break;
+      case "Escape":
+        event.preventDefault();
+        event.stopPropagation();
+        closeTree(menu, { event, reason: "escape-key" }, true);
+        break;
+      case "ArrowLeft":
+        if (!menu.parent) break;
+        event.preventDefault();
+        event.stopPropagation();
+        menu.setOpen(false, { event, reason: "list-navigation" });
+        flush();
+        menu.trigger()?.focus();
+        break;
+      case "Tab":
+        closeTree(menu, { event, reason: "focus-out" }, false);
+        break;
+    }
+  };
+
+  return (
+    <div
+      ref={positioner}
+      data-menu-root={menu.rootId}
+      data-side={side()}
+      data-align={align()}
+      style={{ position: "fixed", left: "0px", top: "0px" }}
+      class={stylex.attrs(menuStyles.positioner).class}
+    >
+      <div
+        ref={popup}
+        id={menu.popupId}
+        role="menu"
+        tabindex={-1}
+        data-slot="dropdown-menu-content"
+        data-open=""
+        data-side={side()}
+        data-align={align()}
+        {...rest}
+        {...sxProps(menuStyles.content, sideStyle(), props.sx)}
+        onKeyDown={onKeyDown}
+      />
+    </div>
+  );
+}
+
+export interface DropdownMenuGroupProps extends Omit<ComponentProps<"div">, "class"> {
+  sx?: StyleXStyles;
+}
+
+function DropdownMenuGroup(props: DropdownMenuGroupProps) {
+  const rest = omit(props, "sx");
+  return <div role="group" data-slot="dropdown-menu-group" {...rest} />;
+}
+
+export interface DropdownMenuLabelProps extends Omit<ComponentProps<"div">, "class"> {
   inset?: boolean;
   sx?: StyleXStyles;
 }
 
-function DropdownMenuLabel({ inset, sx, ...props }: DropdownMenuLabelProps) {
-  const styleProps = stylex.props(menuStyles.label, inset && menuStyles.label_inset, sx);
+function DropdownMenuLabel(props: DropdownMenuLabelProps) {
+  const rest = omit(props, "inset", "sx");
 
   return (
-    <MenuPrimitive.GroupLabel
+    <div
       data-slot="dropdown-menu-label"
-      data-inset={inset}
-      {...styleProps}
-      {...props}
+      data-inset={props.inset ? "true" : undefined}
+      {...stylex.attrs(menuStyles.label, props.inset && menuStyles.label_inset, props.sx)}
+      {...rest}
     />
   );
 }
 
-export interface DropdownMenuItemProps extends Omit<MenuPrimitive.Item.Props, "className"> {
+type ItemBehaviour = {
+  disabled?: boolean;
+  closeOnClick: boolean;
+  onActivate?: (event: MouseEvent) => void;
+  onClick?: unknown;
+  onPointerMove?: unknown;
+};
+
+function createItem(menu: MenuContextValue, behaviour: () => ItemBehaviour) {
+  const [highlighted, setHighlighted] = createSignal(false);
+  return {
+    highlighted,
+    handlers: {
+      onFocus: () => setHighlighted(true),
+      onBlur: () => setHighlighted(false),
+      onPointerMove: (event: PointerEvent & { currentTarget: HTMLDivElement; target: Element }) => {
+        const onPointerMove = behaviour().onPointerMove;
+        if (typeof onPointerMove === "function") onPointerMove(event);
+        if (behaviour().disabled) return;
+        closeSubMenus(menu);
+        if (document.activeElement !== event.currentTarget) {
+          event.currentTarget.focus({ preventScroll: true });
+        }
+      },
+      onPointerLeave: (
+        event: PointerEvent & { currentTarget: HTMLDivElement; target: Element },
+      ) => {
+        if (document.activeElement === event.currentTarget) {
+          event.currentTarget.closest<HTMLElement>('[role="menu"]')?.focus({ preventScroll: true });
+        }
+      },
+      onKeyDown: (event: KeyboardEvent & { currentTarget: HTMLDivElement; target: Element }) => {
+        if (event.key !== "Enter" && event.key !== " ") return;
+        event.preventDefault();
+        event.currentTarget.click();
+      },
+      onClick: (event: MouseEvent & { currentTarget: HTMLDivElement; target: Element }) => {
+        const onClick = behaviour().onClick;
+        if (typeof onClick === "function") onClick(event);
+        if (event.defaultPrevented || behaviour().disabled) return;
+        behaviour().onActivate?.(event);
+        if (behaviour().closeOnClick) closeTree(menu, { event, reason: "item-press" }, true);
+      },
+    },
+  };
+}
+
+export interface DropdownMenuItemProps extends Omit<ComponentProps<"div">, "class"> {
   inset?: boolean;
   variant?: "default" | "destructive";
+  disabled?: boolean;
+  closeOnClick?: boolean;
   sx?: StyleXStyles;
 }
 
-function DropdownMenuItem({ inset, variant = "default", sx, ...props }: DropdownMenuItemProps) {
+function DropdownMenuItem(props: DropdownMenuItemProps) {
+  const rest = omit(
+    props,
+    "inset",
+    "variant",
+    "sx",
+    "disabled",
+    "closeOnClick",
+    "onClick",
+    "onPointerMove",
+  );
+  const menu = useMenu("DropdownMenuItem");
+  const item = createItem(menu, () => ({
+    disabled: props.disabled,
+    closeOnClick: props.closeOnClick ?? true,
+    onClick: props.onClick,
+    onPointerMove: props.onPointerMove,
+  }));
+
   return (
-    <MenuPrimitive.Item
+    <div
+      role="menuitem"
+      tabindex={-1}
       data-slot="dropdown-menu-item"
-      data-inset={inset}
-      data-variant={variant}
-      render={(itemProps, state) => {
-        const styleProps = stylex.props(
-          menuStyles.item,
-          variant === "destructive" && menuStyles.item_destructive,
-          inset && menuStyles.item_inset,
-          state.disabled && menuStyles.item_disabled,
-          state.highlighted && menuStyles.item_highlighted,
-          sx,
-        );
-        return <div {...itemProps} {...styleProps} />;
-      }}
-      {...props}
+      data-inset={props.inset ? "true" : undefined}
+      data-variant={props.variant ?? "default"}
+      aria-disabled={props.disabled ? "true" : undefined}
+      data-disabled={props.disabled ? "" : undefined}
+      data-highlighted={item.highlighted() ? "" : undefined}
+      {...rest}
+      {...stylex.attrs(
+        menuStyles.item,
+        props.variant === "destructive" && menuStyles.item_destructive,
+        props.inset && menuStyles.item_inset,
+        !!props.disabled && menuStyles.item_disabled,
+        item.highlighted() && menuStyles.item_highlighted,
+        props.sx,
+      )}
+      {...item.handlers}
     />
   );
 }
 
-export interface DropdownMenuSubProps extends MenuPrimitive.SubmenuRoot.Props {
-  sx?: StyleXStyles;
+export interface DropdownMenuSubProps extends DropdownMenuProps {}
+
+function DropdownMenuSub(props: DropdownMenuSubProps) {
+  const parent = useMenu("DropdownMenuSub");
+  const menu = createMenuState(props, parent);
+  parent.subMenus.add(menu);
+  return <MenuContext value={menu}>{props.children}</MenuContext>;
 }
 
-function DropdownMenuSub({ _sx, ...props }: DropdownMenuSubProps & { _sx?: StyleXStyles }) {
-  return <MenuPrimitive.SubmenuRoot data-slot="dropdown-menu-sub" {...props} />;
-}
-
-export interface DropdownMenuSubTriggerProps extends Omit<
-  MenuPrimitive.SubmenuTrigger.Props,
-  "className"
-> {
+export interface DropdownMenuSubTriggerProps extends Omit<ComponentProps<"div">, "class"> {
   inset?: boolean;
+  disabled?: boolean;
   sx?: StyleXStyles;
 }
 
-function DropdownMenuSubTrigger({ inset, sx, children, ...props }: DropdownMenuSubTriggerProps) {
+function DropdownMenuSubTrigger(props: DropdownMenuSubTriggerProps) {
+  const rest = omit(props, "inset", "sx", "children", "disabled");
+  const menu = useMenu("DropdownMenuSubTrigger");
+  const parent = menu.parent ?? menu;
+  const [highlighted, setHighlighted] = createSignal(false);
+  const openSub = (event: Event, keyboard: boolean) => {
+    if (props.disabled) return;
+    closeSubMenus(parent, menu);
+    menu.focusFirstOnOpen.current = keyboard;
+    menu.setOpen(true, { event, reason: keyboard ? "list-navigation" : "trigger-hover" });
+  };
+
   return (
-    <MenuPrimitive.SubmenuTrigger
+    <div
+      ref={(el) => menu.setTrigger(el)}
+      role="menuitem"
+      tabindex={-1}
+      aria-haspopup="menu"
+      aria-expanded={menu.open() ? "true" : "false"}
+      aria-controls={menu.open() ? menu.popupId : undefined}
+      aria-disabled={props.disabled ? "true" : undefined}
       data-slot="dropdown-menu-sub-trigger"
-      data-inset={inset}
-      render={(triggerProps, state) => {
-        const styleProps = stylex.props(
-          menuStyles.subTrigger,
-          inset && menuStyles.item_inset,
-          state.highlighted && menuStyles.item_highlighted,
-          sx,
-        );
-        return (
-          <div {...triggerProps} {...styleProps}>
-            {children}
-            <ChevronRightIcon size={16} style={{ marginLeft: "auto" }} />
-          </div>
-        );
+      data-inset={props.inset ? "true" : undefined}
+      data-popup-open={menu.open() ? "" : undefined}
+      data-highlighted={highlighted() ? "" : undefined}
+      {...rest}
+      {...stylex.attrs(
+        menuStyles.subTrigger,
+        props.inset && menuStyles.item_inset,
+        (highlighted() || menu.open()) && menuStyles.item_highlighted,
+        props.sx,
+      )}
+      onFocus={() => setHighlighted(true)}
+      onBlur={() => setHighlighted(false)}
+      onPointerMove={(event) => {
+        if (document.activeElement !== event.currentTarget) {
+          event.currentTarget.focus({ preventScroll: true });
+        }
+        openSub(event, false);
       }}
-      {...props}
-    />
+      onClick={(event) => openSub(event, event.detail === 0)}
+      onKeyDown={(event) => {
+        if (event.key !== "ArrowRight" && event.key !== "Enter" && event.key !== " ") return;
+        event.preventDefault();
+        event.stopPropagation();
+        openSub(event, true);
+      }}
+    >
+      {props.children}
+      <ChevronRightIcon size={16} style={{ "margin-left": "auto" }} />
+    </div>
   );
 }
 
 export interface DropdownMenuSubContentProps extends DropdownMenuContentProps {}
 
-function DropdownMenuSubContent({
-  align = "start",
-  alignOffset = -3,
-  side = "right",
-  sideOffset = 0,
-  sx,
-  ...props
-}: DropdownMenuSubContentProps) {
+function DropdownMenuSubContent(props: DropdownMenuSubContentProps) {
   return (
     <DropdownMenuContent
       data-slot="dropdown-menu-sub-content"
-      align={align}
-      alignOffset={alignOffset}
-      side={side}
-      sideOffset={sideOffset}
-      sx={sx}
+      align="start"
+      alignOffset={-3}
+      side="right"
+      sideOffset={0}
       {...props}
     />
   );
 }
 
-export interface DropdownMenuCheckboxItemProps extends Omit<
-  MenuPrimitive.CheckboxItem.Props,
-  "className"
-> {
+export interface DropdownMenuCheckboxItemProps extends Omit<ComponentProps<"div">, "class"> {
   inset?: boolean;
+  checked?: boolean;
+  defaultChecked?: boolean;
+  onCheckedChange?: (checked: boolean, event: Event) => void;
+  disabled?: boolean;
+  closeOnClick?: boolean;
   sx?: StyleXStyles;
 }
 
-function DropdownMenuCheckboxItem({
-  inset,
-  sx,
-  children,
-  checked,
-  ...props
-}: DropdownMenuCheckboxItemProps) {
+function DropdownMenuCheckboxItem(props: DropdownMenuCheckboxItemProps) {
+  const rest = omit(
+    props,
+    "inset",
+    "sx",
+    "children",
+    "checked",
+    "defaultChecked",
+    "onCheckedChange",
+    "disabled",
+    "closeOnClick",
+    "onClick",
+    "onPointerMove",
+  );
+  const menu = useMenu("DropdownMenuCheckboxItem");
+  const [uncontrolled, setUncontrolled] = createSignal(props.defaultChecked ?? false);
+  const checked = () => props.checked ?? uncontrolled();
+  const item = createItem(menu, () => ({
+    disabled: props.disabled,
+    closeOnClick: props.closeOnClick ?? false,
+    onClick: props.onClick,
+    onPointerMove: props.onPointerMove,
+    onActivate: (event) => {
+      const next = !checked();
+      if (props.checked === undefined) setUncontrolled(next);
+      props.onCheckedChange?.(next, event);
+    },
+  }));
+
   return (
-    <MenuPrimitive.CheckboxItem
+    <div
+      role="menuitemcheckbox"
+      tabindex={-1}
+      aria-checked={checked() ? "true" : "false"}
+      aria-disabled={props.disabled ? "true" : undefined}
       data-slot="dropdown-menu-checkbox-item"
-      data-inset={inset}
-      checked={checked}
-      render={(itemProps, state) => {
-        const styleProps = stylex.props(
-          menuStyles.checkboxItem,
-          inset && menuStyles.item_inset,
-          state.disabled && menuStyles.item_disabled,
-          state.highlighted && menuStyles.item_highlighted,
-          sx,
-        );
-        return (
-          <div {...itemProps} {...styleProps}>
-            {children}
-            <span
-              {...stylex.props(menuStyles.indicatorContainer)}
-              data-slot="dropdown-menu-checkbox-item-indicator"
-            >
-              <MenuPrimitive.CheckboxItemIndicator>
-                <CheckIcon size={16} />
-              </MenuPrimitive.CheckboxItemIndicator>
-            </span>
-          </div>
-        );
-      }}
-      {...props}
-    />
+      data-inset={props.inset ? "true" : undefined}
+      data-checked={checked() ? "" : undefined}
+      data-unchecked={checked() ? undefined : ""}
+      data-disabled={props.disabled ? "" : undefined}
+      data-highlighted={item.highlighted() ? "" : undefined}
+      {...rest}
+      {...stylex.attrs(
+        menuStyles.checkboxItem,
+        props.inset && menuStyles.item_inset,
+        !!props.disabled && menuStyles.item_disabled,
+        item.highlighted() && menuStyles.item_highlighted,
+        props.sx,
+      )}
+      {...item.handlers}
+    >
+      {props.children}
+      <span
+        {...stylex.attrs(menuStyles.indicatorContainer)}
+        data-slot="dropdown-menu-checkbox-item-indicator"
+      >
+        <Show when={checked()}>
+          <span>
+            <CheckIcon size={16} />
+          </span>
+        </Show>
+      </span>
+    </div>
   );
 }
 
-export interface DropdownMenuRadioGroupProps extends MenuPrimitive.RadioGroup.Props {
+type RadioGroupContextValue = {
+  value: Accessor<unknown>;
+  select: (value: unknown, event: Event) => void;
+};
+
+const RadioGroupContext = createContext<RadioGroupContextValue | null>(null);
+
+export interface DropdownMenuRadioGroupProps extends Omit<ComponentProps<"div">, "class"> {
+  value?: unknown;
+  defaultValue?: unknown;
+  onValueChange?: (value: any, event: Event) => void;
   sx?: StyleXStyles;
 }
 
-function DropdownMenuRadioGroup({
-  _sx,
-  ...props
-}: DropdownMenuRadioGroupProps & { _sx?: StyleXStyles }) {
-  return <MenuPrimitive.RadioGroup data-slot="dropdown-menu-radio-group" {...props} />;
-}
+function DropdownMenuRadioGroup(props: DropdownMenuRadioGroupProps) {
+  const rest = omit(props, "sx", "value", "defaultValue", "onValueChange");
+  const [uncontrolled, setUncontrolled] = createSignal<unknown>(props.defaultValue);
+  const group: RadioGroupContextValue = {
+    value: () => (props.value !== undefined ? props.value : uncontrolled()),
+    select: (value, event) => {
+      if (props.value === undefined) setUncontrolled(() => value);
+      props.onValueChange?.(value, event);
+    },
+  };
 
-export interface DropdownMenuRadioItemProps extends Omit<
-  MenuPrimitive.RadioItem.Props,
-  "className"
-> {
-  inset?: boolean;
-  sx?: StyleXStyles;
-}
-
-function DropdownMenuRadioItem({ inset, sx, children, ...props }: DropdownMenuRadioItemProps) {
   return (
-    <MenuPrimitive.RadioItem
+    <RadioGroupContext value={group}>
+      <div role="group" data-slot="dropdown-menu-radio-group" {...rest} />
+    </RadioGroupContext>
+  );
+}
+
+export interface DropdownMenuRadioItemProps extends Omit<ComponentProps<"div">, "class" | "value"> {
+  value: unknown;
+  inset?: boolean;
+  disabled?: boolean;
+  closeOnClick?: boolean;
+  sx?: StyleXStyles;
+}
+
+function DropdownMenuRadioItem(props: DropdownMenuRadioItemProps) {
+  const rest = omit(
+    props,
+    "inset",
+    "sx",
+    "children",
+    "value",
+    "disabled",
+    "closeOnClick",
+    "onClick",
+    "onPointerMove",
+  );
+  const menu = useMenu("DropdownMenuRadioItem");
+  const group = useContext(RadioGroupContext);
+  const checked = () => group?.value() === props.value;
+  const item = createItem(menu, () => ({
+    disabled: props.disabled,
+    closeOnClick: props.closeOnClick ?? false,
+    onClick: props.onClick,
+    onPointerMove: props.onPointerMove,
+    onActivate: (event) => group?.select(props.value, event),
+  }));
+
+  return (
+    <div
+      role="menuitemradio"
+      tabindex={-1}
+      aria-checked={checked() ? "true" : "false"}
+      aria-disabled={props.disabled ? "true" : undefined}
       data-slot="dropdown-menu-radio-item"
-      data-inset={inset}
-      render={(itemProps, state) => {
-        const styleProps = stylex.props(
-          menuStyles.checkboxItem,
-          inset && menuStyles.item_inset,
-          state.disabled && menuStyles.item_disabled,
-          state.highlighted && menuStyles.item_highlighted,
-          sx,
-        );
-        return (
-          <div {...itemProps} {...styleProps}>
-            {children}
-            <span
-              {...stylex.props(menuStyles.indicatorContainer)}
-              data-slot="dropdown-menu-radio-item-indicator"
-            >
-              <MenuPrimitive.RadioItemIndicator>
-                <CheckIcon size={16} />
-              </MenuPrimitive.RadioItemIndicator>
-            </span>
-          </div>
-        );
-      }}
-      {...props}
+      data-inset={props.inset ? "true" : undefined}
+      data-checked={checked() ? "" : undefined}
+      data-unchecked={checked() ? undefined : ""}
+      data-disabled={props.disabled ? "" : undefined}
+      data-highlighted={item.highlighted() ? "" : undefined}
+      {...rest}
+      {...stylex.attrs(
+        menuStyles.checkboxItem,
+        props.inset && menuStyles.item_inset,
+        !!props.disabled && menuStyles.item_disabled,
+        item.highlighted() && menuStyles.item_highlighted,
+        props.sx,
+      )}
+      {...item.handlers}
+    >
+      {props.children}
+      <span
+        {...stylex.attrs(menuStyles.indicatorContainer)}
+        data-slot="dropdown-menu-radio-item-indicator"
+      >
+        <Show when={checked()}>
+          <span>
+            <CheckIcon size={16} />
+          </span>
+        </Show>
+      </span>
+    </div>
+  );
+}
+
+export interface DropdownMenuSeparatorProps extends Omit<ComponentProps<"div">, "class"> {
+  sx?: StyleXStyles;
+}
+
+function DropdownMenuSeparator(props: DropdownMenuSeparatorProps) {
+  const rest = omit(props, "sx");
+
+  return (
+    <div
+      role="separator"
+      aria-orientation="horizontal"
+      data-slot="dropdown-menu-separator"
+      {...stylex.attrs(menuStyles.separator, props.sx)}
+      {...rest}
     />
   );
 }
-export interface DropdownMenuSeparatorProps extends Omit<
-  MenuPrimitive.Separator.Props,
-  "className"
-> {
+
+export interface DropdownMenuShortcutProps extends Omit<ComponentProps<"span">, "class"> {
   sx?: StyleXStyles;
 }
 
-function DropdownMenuSeparator({ sx, ...props }: DropdownMenuSeparatorProps) {
-  const styleProps = stylex.props(menuStyles.separator, sx);
+function DropdownMenuShortcut(props: DropdownMenuShortcutProps) {
+  const rest = omit(props, "sx");
 
-  return <MenuPrimitive.Separator data-slot="dropdown-menu-separator" {...styleProps} {...props} />;
-}
-
-export interface DropdownMenuShortcutProps extends Omit<React.ComponentProps<"span">, "className"> {
-  sx?: StyleXStyles;
-}
-
-function DropdownMenuShortcut({ sx, ...props }: DropdownMenuShortcutProps) {
-  const styleProps = stylex.props(menuStyles.shortcut, sx);
-
-  return <span data-slot="dropdown-menu-shortcut" {...styleProps} {...props} />;
+  return (
+    <span
+      data-slot="dropdown-menu-shortcut"
+      {...stylex.attrs(menuStyles.shortcut, props.sx)}
+      {...rest}
+    />
+  );
 }
 
 export {

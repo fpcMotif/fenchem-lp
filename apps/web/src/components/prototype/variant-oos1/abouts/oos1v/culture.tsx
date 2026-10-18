@@ -1,5 +1,4 @@
 import * as stylex from "@stylexjs/stylex";
-import { useRef } from "react";
 
 import { ABOUT_CULTURE } from "../../about-data";
 import { campusPhoto, type CampusPhoto } from "./campus-hang";
@@ -41,54 +40,51 @@ export function CultureStory() {
     <section
       id="about-culture"
       aria-labelledby="about-culture-heading"
-      {...stylex.props(styles.section)}
+      {...stylex.attrs(styles.section)}
     >
-      <h2 id="about-culture-heading" {...stylex.props(shared.srOnly)}>
+      <h2 id="about-culture-heading" {...stylex.attrs(shared.srOnly)}>
         {ABOUT_CULTURE.eyebrow}
       </h2>
-      <div {...stylex.props(styles.sheet)}>
+      <div {...stylex.attrs(styles.sheet)}>
         <BrushCoat />
         {SCENES.map((scene) => (
-          <Scene key={scene.value.title} {...scene} />
+          <Scene {...scene} />
         ))}
       </div>
     </section>
   );
 }
 
-function Scene({
-  value,
-  photo,
-  narration,
-  layout,
-}: {
+function Scene(props: {
   value: CultureValue;
   photo: CampusPhoto;
   narration: string;
   layout: SceneLayout;
 }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const developed = useDeveloped(ref, 0.3);
+  let ref: HTMLDivElement | undefined;
+  const developed = useDeveloped(() => ref, 0.3);
 
   return (
-    <div ref={ref} {...stylex.props(styles.scene)}>
-      <div {...stylex.props(styles.image, imageLayout[layout])}>
+    <div ref={ref} {...stylex.attrs(styles.scene)}>
+      <div {...stylex.attrs(styles.image, imageLayout[props.layout])}>
         <img
-          src={photo.src}
-          alt={photo.alt}
+          src={props.photo.src}
+          alt={props.photo.alt}
           loading="lazy"
           decoding="async"
-          {...stylex.props(shared.fill, shared.cyanotype, styles.feather, focus[layout])}
+          {...stylex.attrs(shared.fill, shared.cyanotype, styles.feather, focus[props.layout])}
         />
         <span
           aria-hidden="true"
-          {...stylex.props(styles.imageVeil, styles.feather, developed && styles.veilCleared)}
+          {...stylex.attrs(styles.imageVeil, styles.feather, developed() && styles.veilCleared)}
         />
       </div>
-      <div {...stylex.props(styles.words, wordsLayout[layout], developed && styles.wordsLit)}>
-        <p {...stylex.props(styles.narration)}>{narration}</p>
-        <h3 {...stylex.props(styles.title)}>{value.title}</h3>
-        <p {...stylex.props(styles.desc)}>{value.desc}</p>
+      <div
+        {...stylex.attrs(styles.words, wordsLayout[props.layout], developed() && styles.wordsLit)}
+      >
+        <p {...stylex.attrs(styles.narration)}>{props.narration}</p>
+        <h3 {...stylex.attrs(styles.title)}>{props.value.title}</h3>
+        <p {...stylex.attrs(styles.desc)}>{props.value.desc}</p>
       </div>
     </div>
   );

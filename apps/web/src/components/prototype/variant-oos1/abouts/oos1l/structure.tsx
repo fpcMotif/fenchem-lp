@@ -64,28 +64,28 @@ export function Structure() {
     <section
       id="about-structure"
       aria-labelledby={headingId("about-structure")}
-      {...stylex.props(ui.section, styles.section)}
+      {...stylex.attrs(ui.section, styles.section)}
     >
-      <div {...stylex.props(ui.shell)}>
+      <div {...stylex.attrs(ui.shell)}>
         <SectionLabel section="about-structure" />
-        <div {...stylex.props(styles.row, styles.lead)}>
-          <p data-follows={lead[0].index} {...stylex.props(styles.holding)}>
-            <span {...stylex.props(styles.badge)}>{ABOUT_STRUCTURE.holding.badge}</span>
-            <span lang="en" {...stylex.props(ui.note)}>
+        <div {...stylex.attrs(styles.row, styles.lead)}>
+          <p data-follows={lead[0].index} {...stylex.attrs(styles.holding)}>
+            <span {...stylex.attrs(styles.badge)}>{ABOUT_STRUCTURE.holding.badge}</span>
+            <span lang="en" {...stylex.attrs(ui.note)}>
               {ABOUT_STRUCTURE.holding.english}
             </span>
           </p>
           {lead.map((line) => (
-            <Clause key={line.id} line={line} />
+            <Clause line={line} />
           ))}
         </div>
-        <ol {...stylex.props(styles.list)}>
+        <ol {...stylex.attrs(styles.list)}>
           {ABOUT_STRUCTURE.subsidiaries.map((company, index) => (
-            <li key={company.id} {...stylex.props(styles.row)}>
+            <li {...stylex.attrs(styles.row)}>
               <p
                 lang="en"
                 data-follows={subsidiaries[index].index}
-                {...stylex.props(styles.english)}
+                {...stylex.attrs(styles.english)}
               >
                 {company.english}
               </p>

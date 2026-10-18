@@ -1,6 +1,6 @@
 import { breakpoints } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { useId } from "react";
+import { createUniqueId } from "solid-js";
 
 import { ABOUT_HERO } from "../../about-data";
 import { STATS } from "../../content";
@@ -175,61 +175,61 @@ const s = stylex.create({
 
 export function Profile() {
   const chip = ABOUT_HERO.navChips[0];
-  const networkId = useId();
+  const networkId = createUniqueId();
 
   return (
     <Section id={chip.id} label={chip.english}>
-      <div {...stylex.props(s.top)}>
+      <div {...stylex.attrs(s.top)}>
         <Reveal>
-          <div {...stylex.props(s.nameRow)}>
-            <h3 {...stylex.props(s.name)}>{ABOUT_HERO.title}</h3>
-            <figure {...stylex.props(s.stamp)}>
-              <div {...stylex.props(ui.frame, s.stampFrame)}>
+          <div {...stylex.attrs(s.nameRow)}>
+            <h3 {...stylex.attrs(s.name)}>{ABOUT_HERO.title}</h3>
+            <figure {...stylex.attrs(s.stamp)}>
+              <div {...stylex.attrs(ui.frame, s.stampFrame)}>
                 <img
                   src={ABOUT_HERO.lobbyImage}
                   alt={ABOUT_HERO.lobbyEnglish}
                   loading="lazy"
                   decoding="async"
-                  {...stylex.props(ui.fill, s.stampImage)}
+                  {...stylex.attrs(ui.fill, s.stampImage)}
                 />
               </div>
-              <figcaption aria-hidden="true" {...stylex.props(s.stampCaption)}>
+              <figcaption aria-hidden="true" {...stylex.attrs(s.stampCaption)}>
                 {ABOUT_HERO.lobbyCaption}
               </figcaption>
             </figure>
           </div>
-          <p lang="en" {...stylex.props(s.english)}>
+          <p lang="en" {...stylex.attrs(s.english)}>
             {ABOUT_HERO.englishTitle}
           </p>
         </Reveal>
         <Reveal delay={120} sx={s.network}>
-          <p id={networkId} {...stylex.props(s.networkLabel)}>
+          <p id={networkId} {...stylex.attrs(s.networkLabel)}>
             {ABOUT_HERO.networkLabel}
           </p>
-          <ul aria-labelledby={networkId} {...stylex.props(s.countries)}>
+          <ul aria-labelledby={networkId} {...stylex.attrs(s.countries)}>
             {ABOUT_HERO.countries.map((country) => (
-              <li key={country}>{country}</li>
+              <li>{country}</li>
             ))}
           </ul>
         </Reveal>
       </div>
-      <div {...stylex.props(s.body)}>
+      <div {...stylex.attrs(s.body)}>
         <Reveal sx={s.leadCell}>
-          <p {...stylex.props(s.lead)}>{ABOUT_HERO.lead}</p>
+          <p {...stylex.attrs(s.lead)}>{ABOUT_HERO.lead}</p>
         </Reveal>
-        <ul {...stylex.props(s.stats)}>
+        <ul {...stylex.attrs(s.stats)}>
           {STATS.map((stat, idx) => (
-            <Reveal key={stat.label} as="li" delay={idx * 100} sx={s.stat}>
-              <p {...stylex.props(s.statValue)}>
+            <Reveal as="li" delay={idx * 100} sx={s.stat}>
+              <p {...stylex.attrs(s.statValue)}>
                 {stat.value}
                 {stat.unit === "+" ? stat.unit : null}
                 {stat.unit && stat.unit !== "+" ? (
-                  <span {...stylex.props(s.statUnit)}>{stat.unit}</span>
+                  <span {...stylex.attrs(s.statUnit)}>{stat.unit}</span>
                 ) : null}
               </p>
               <div>
-                <p {...stylex.props(s.statLabel)}>{stat.label}</p>
-                <p {...stylex.props(s.statCaption)}>{stat.caption}</p>
+                <p {...stylex.attrs(s.statLabel)}>{stat.label}</p>
+                <p {...stylex.attrs(s.statCaption)}>{stat.caption}</p>
               </div>
             </Reveal>
           ))}

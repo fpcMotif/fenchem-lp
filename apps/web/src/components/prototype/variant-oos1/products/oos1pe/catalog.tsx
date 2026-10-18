@@ -1,8 +1,9 @@
 import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { ArrowDown, ArrowUp, ChevronDown, ChevronsUpDown } from "lucide-react";
-import { m } from "motion/react";
-import { useId, useMemo, useState, type ReactNode } from "react";
+import { ArrowDown, ArrowUp, ChevronDown, ChevronsUpDown } from "@fenchem-lp/ui/components/lucide";
+import { m } from "@/compat/motion";
+import { Dynamic, type JSX } from "@solidjs/web";
+import { createMemo, createSignal, createUniqueId, For, Show, untrack } from "solid-js";
 
 import { EASE } from "@/components/prototype/motion-constants";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
@@ -415,61 +416,55 @@ const styles = stylex.create({
   },
 });
 
-function Inci({ text }: { text: string }) {
-  const parts: ReactNode[] = [];
+function Inci(props: { text: string }) {
+  const text = untrack(() => props.text);
+  const parts: JSX.Element[] = [];
   let last = 0;
   for (const match of text.matchAll(INCI_LATIN)) {
     parts.push(text.slice(last, match.index));
-    parts.push(
-      <span key={match.index} {...stylex.props(styles.keepTogether)}>
-        {match[0]}
-      </span>,
-    );
+    parts.push(<span {...stylex.attrs(styles.keepTogether)}>{match[0]}</span>);
     last = match.index + match[0].length;
   }
   parts.push(text.slice(last));
   return <>{parts}</>;
 }
 
-function SortHeader({
-  sortKey,
-  activeKey,
-  direction,
-  onSort,
-  note,
-}: {
+function SortHeader(props: {
   sortKey: SortKey;
   activeKey: SortKey;
   direction: Direction;
   onSort: (key: SortKey) => void;
   note?: { id: string };
 }) {
-  const isActive = sortKey === activeKey;
-  const Glyph = !isActive ? ChevronsUpDown : direction === "asc" ? ArrowUp : ArrowDown;
-  const ariaSort = !isActive ? undefined : direction === "asc" ? "ascending" : "descending";
+  const isActive = () => props.sortKey === props.activeKey;
+  const glyph = () =>
+    !isActive() ? ChevronsUpDown : props.direction === "asc" ? ArrowUp : ArrowDown;
+  const ariaSort = () =>
+    !isActive() ? undefined : props.direction === "asc" ? "ascending" : "descending";
   return (
-    <th scope="col" aria-sort={ariaSort} {...stylex.props(styles.th)}>
+    <th scope="col" aria-sort={ariaSort()} {...stylex.attrs(styles.th)}>
       <button
         type="button"
-        onClick={() => onSort(sortKey)}
-        aria-describedby={note?.id}
-        {...stylex.props(styles.sortButton, isActive && styles.sortButtonActive)}
+        onClick={() => props.onSort(props.sortKey)}
+        aria-describedby={props.note?.id}
+        {...stylex.attrs(styles.sortButton, isActive() && styles.sortButtonActive)}
       >
         <span>
-          <span aria-hidden="true">{SORT_LABEL[sortKey]}</span>
-          <span {...stylex.props(styles.srOnly)}>{SORT_LABEL_EN[sortKey]}</span>
-          {note && (
-            <span aria-hidden="true" {...stylex.props(styles.headerMark)}>
+          <span aria-hidden="true">{SORT_LABEL[props.sortKey]}</span>
+          <span {...stylex.attrs(styles.srOnly)}>{SORT_LABEL_EN[props.sortKey]}</span>
+          {props.note && (
+            <span aria-hidden="true" {...stylex.attrs(styles.headerMark)}>
               *
             </span>
           )}
         </span>
-        <Glyph
+        <Dynamic
+          component={glyph()}
           size={12}
           strokeWidth={1.5}
           absoluteStrokeWidth
           aria-hidden="true"
-          {...stylex.props(styles.glyph, isActive && styles.glyphActive)}
+          {...stylex.attrs(styles.glyph, isActive() && styles.glyphActive)}
         />
       </button>
     </th>
@@ -478,15 +473,15 @@ function SortHeader({
 
 export function Catalog() {
   const reduce = useReducedMotion();
-  const titleId = useId();
-  const countId = useId();
-  const noteId = useId();
-  const selectId = useId();
-  const [sortKey, setSortKey] = useState<SortKey>("region");
-  const [direction, setDirection] = useState<Direction>("asc");
-  const [announcement, setAnnouncement] = useState("");
-  const [sortVersion, setSortVersion] = useState(0);
-  const rows = useMemo(() => sortItems(sortKey, direction), [sortKey, direction]);
+  const titleId = createUniqueId();
+  const countId = createUniqueId();
+  const noteId = createUniqueId();
+  const selectId = createUniqueId();
+  const [sortKey, setSortKey] = createSignal<SortKey>("region");
+  const [direction, setDirection] = createSignal<Direction>("asc");
+  const [announcement, setAnnouncement] = createSignal("");
+  const [sortVersion, setSortVersion] = createSignal(0);
+  const rows = createMemo(() => sortItems(sortKey(), direction()));
 
   const applySort = (key: SortKey, nextDirection: Direction) => {
     setSortKey(key);
@@ -498,44 +493,42 @@ export function Catalog() {
   };
 
   const sortByHeader = (key: SortKey) => {
-    const nextDirection = key === sortKey && direction === "asc" ? "desc" : "asc";
+    const nextDirection = key === sortKey() && direction() === "asc" ? "desc" : "asc";
     applySort(key, nextDirection);
   };
 
   return (
-    <section id="products-catalog" aria-labelledby={titleId} {...stylex.props(styles.section)}>
-      <div {...stylex.props(styles.shell)}>
-        <header {...stylex.props(styles.head)}>
-          <h2 id={titleId} {...stylex.props(styles.title)}>
+    <section id="products-catalog" aria-labelledby={titleId} {...stylex.attrs(styles.section)}>
+      <div {...stylex.attrs(styles.shell)}>
+        <header {...stylex.attrs(styles.head)}>
+          <h2 id={titleId} {...stylex.attrs(styles.title)}>
             产品目录
           </h2>
         </header>
 
-        <div {...stylex.props(styles.toolbar)}>
-          <p id={countId} {...stylex.props(styles.count)}>
-            共<span {...stylex.props(styles.countNumber)}>{FLAT_ITEMS.length}</span>款原料
+        <div {...stylex.attrs(styles.toolbar)}>
+          <p id={countId} {...stylex.attrs(styles.count)}>
+            共<span {...stylex.attrs(styles.countNumber)}>{FLAT_ITEMS.length}</span>款原料
           </p>
-          <p id={noteId} {...stylex.props(styles.note)}>
-            <span aria-hidden="true" {...stylex.props(styles.noteMark)}>
+          <p id={noteId} {...stylex.attrs(styles.note)}>
+            <span aria-hidden="true" {...stylex.attrs(styles.noteMark)}>
               *
             </span>
             形态依据原料描述整理
           </p>
-          <div {...stylex.props(styles.phoneSort)}>
-            <label htmlFor={selectId} {...stylex.props(styles.sortLabel)}>
+          <div {...stylex.attrs(styles.phoneSort)}>
+            <label for={selectId} {...stylex.attrs(styles.sortLabel)}>
               排序
             </label>
-            <span {...stylex.props(styles.selectWrap)}>
+            <span {...stylex.attrs(styles.selectWrap)}>
               <select
                 id={selectId}
-                value={sortKey}
-                onChange={(event) => applySort(event.target.value as SortKey, direction)}
-                {...stylex.props(styles.select)}
+                value={sortKey()}
+                onChange={(event) => applySort(event.currentTarget.value as SortKey, direction())}
+                {...stylex.attrs(styles.select)}
               >
                 {SORT_OPTIONS.map((option) => (
-                  <option key={option.key} value={option.key}>
-                    {option.label}
-                  </option>
+                  <option value={option.key}>{option.label}</option>
                 ))}
               </select>
               <ChevronDown
@@ -543,19 +536,19 @@ export function Catalog() {
                 strokeWidth={1.5}
                 absoluteStrokeWidth
                 aria-hidden="true"
-                {...stylex.props(styles.selectIcon)}
+                {...stylex.attrs(styles.selectIcon)}
               />
             </span>
             <button
               type="button"
-              aria-pressed={direction === "desc"}
-              onClick={() => applySort(sortKey, direction === "asc" ? "desc" : "asc")}
-              {...stylex.props(
+              aria-pressed={direction() === "desc" ? "true" : "false"}
+              onClick={() => applySort(sortKey(), direction() === "asc" ? "desc" : "asc")}
+              {...stylex.attrs(
                 styles.directionButton,
-                direction === "desc" && styles.directionButtonOn,
+                direction() === "desc" && styles.directionButtonOn,
               )}
             >
-              {direction === "asc" ? (
+              {direction() === "asc" ? (
                 <ArrowUp size={14} strokeWidth={1.5} absoluteStrokeWidth aria-hidden="true" />
               ) : (
                 <ArrowDown size={14} strokeWidth={1.5} absoluteStrokeWidth aria-hidden="true" />
@@ -565,90 +558,96 @@ export function Catalog() {
           </div>
         </div>
 
-        <p aria-live="polite" {...stylex.props(styles.srOnly)}>
-          {announcement}
+        <p aria-live="polite" {...stylex.attrs(styles.srOnly)}>
+          {announcement()}
         </p>
 
-        <div {...stylex.props(styles.frame)}>
+        <div {...stylex.attrs(styles.frame)}>
           <table
             aria-labelledby={titleId}
             aria-describedby={countId}
-            {...stylex.props(styles.table)}
+            {...stylex.attrs(styles.table)}
           >
             <colgroup>
-              <col {...stylex.props(styles.colName)} />
-              <col {...stylex.props(styles.colRegion)} />
-              <col {...stylex.props(styles.colForm)} />
-              <col {...stylex.props(styles.colInci)} />
-              <col {...stylex.props(styles.colFeatures)} />
+              <col {...stylex.attrs(styles.colName)} />
+              <col {...stylex.attrs(styles.colRegion)} />
+              <col {...stylex.attrs(styles.colForm)} />
+              <col {...stylex.attrs(styles.colInci)} />
+              <col {...stylex.attrs(styles.colFeatures)} />
             </colgroup>
-            <thead {...stylex.props(styles.thead)}>
+            <thead {...stylex.attrs(styles.thead)}>
               <tr>
                 <SortHeader
                   sortKey="name"
-                  activeKey={sortKey}
-                  direction={direction}
+                  activeKey={sortKey()}
+                  direction={direction()}
                   onSort={sortByHeader}
                 />
                 <SortHeader
                   sortKey="region"
-                  activeKey={sortKey}
-                  direction={direction}
+                  activeKey={sortKey()}
+                  direction={direction()}
                   onSort={sortByHeader}
                 />
                 <SortHeader
                   sortKey="form"
-                  activeKey={sortKey}
-                  direction={direction}
+                  activeKey={sortKey()}
+                  direction={direction()}
                   onSort={sortByHeader}
                   note={{ id: noteId }}
                 />
-                <th scope="col" {...stylex.props(styles.th)}>
+                <th scope="col" {...stylex.attrs(styles.th)}>
                   <span aria-hidden="true">INCI 名称</span>
-                  <span {...stylex.props(styles.srOnly)}>INCI name</span>
+                  <span {...stylex.attrs(styles.srOnly)}>INCI name</span>
                 </th>
-                <th scope="col" {...stylex.props(styles.th)}>
+                <th scope="col" {...stylex.attrs(styles.th)}>
                   <span aria-hidden="true">特性&应用</span>
-                  <span {...stylex.props(styles.srOnly)}>Features & applications</span>
+                  <span {...stylex.attrs(styles.srOnly)}>Features & applications</span>
                 </th>
               </tr>
             </thead>
-            <m.tbody
-              key={`${sortKey}-${direction}`}
-              initial={sortVersion === 0 ? false : { opacity: 0.4 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: reduce ? 0 : 0.22, ease: EASE }}
-              {...stylex.props(styles.tbody)}
-            >
-              {rows.map((item, index) => (
-                <tr key={item.id} {...stylex.props(styles.row, index % 2 === 1 && styles.rowZebra)}>
-                  <th scope="row" {...stylex.props(styles.cell, styles.cellFirst, styles.nameCell)}>
-                    <span {...stylex.props(styles.primary)}>{item.primary}</span>
-                    {item.secondary && (
-                      <span {...stylex.props(styles.secondary)}>{item.secondary}</span>
-                    )}
-                  </th>
-                  <td {...stylex.props(styles.cell, styles.metaCell, styles.regionCell)}>
-                    {regionLabel(item)}
-                  </td>
-                  <td {...stylex.props(styles.cell, styles.metaCell, styles.formCell)}>
-                    <span aria-hidden="true" {...stylex.props(styles.metaDot)}>
-                      ·
-                    </span>
-                    {FORM_LABEL[item.traits.form]}
-                  </td>
-                  <td {...stylex.props(styles.cell, styles.inciCell)}>
-                    <span aria-hidden="true" {...stylex.props(styles.inciLabel)}>
-                      INCI
-                    </span>
-                    <Inci text={item.inci} />
-                  </td>
-                  <td {...stylex.props(styles.cell, styles.cellLast, styles.featuresCell)}>
-                    {item.features}
-                  </td>
-                </tr>
-              ))}
-            </m.tbody>
+            <Show when={`${sortKey()}-${direction()}`} keyed>
+              <m.tbody
+                initial={untrack(sortVersion) === 0 ? false : { opacity: 0.4 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: reduce() ? 0 : 0.22, ease: EASE }}
+                {...stylex.attrs(styles.tbody)}
+              >
+                <For each={rows()}>
+                  {(item, index) => (
+                    <tr {...stylex.attrs(styles.row, index() % 2 === 1 && styles.rowZebra)}>
+                      <th
+                        scope="row"
+                        {...stylex.attrs(styles.cell, styles.cellFirst, styles.nameCell)}
+                      >
+                        <span {...stylex.attrs(styles.primary)}>{item.primary}</span>
+                        {item.secondary && (
+                          <span {...stylex.attrs(styles.secondary)}>{item.secondary}</span>
+                        )}
+                      </th>
+                      <td {...stylex.attrs(styles.cell, styles.metaCell, styles.regionCell)}>
+                        {regionLabel(item)}
+                      </td>
+                      <td {...stylex.attrs(styles.cell, styles.metaCell, styles.formCell)}>
+                        <span aria-hidden="true" {...stylex.attrs(styles.metaDot)}>
+                          ·
+                        </span>
+                        {FORM_LABEL[item.traits.form]}
+                      </td>
+                      <td {...stylex.attrs(styles.cell, styles.inciCell)}>
+                        <span aria-hidden="true" {...stylex.attrs(styles.inciLabel)}>
+                          INCI
+                        </span>
+                        <Inci text={item.inci} />
+                      </td>
+                      <td {...stylex.attrs(styles.cell, styles.cellLast, styles.featuresCell)}>
+                        {item.features}
+                      </td>
+                    </tr>
+                  )}
+                </For>
+              </m.tbody>
+            </Show>
           </table>
         </div>
       </div>

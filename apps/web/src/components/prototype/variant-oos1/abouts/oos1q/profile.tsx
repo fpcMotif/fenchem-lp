@@ -143,11 +143,11 @@ export function Profile() {
   const chip = ABOUT_HERO.navChips[0];
 
   return (
-    <section id={chip.id} aria-labelledby="about-profile-name" {...stylex.props(s.section)}>
-      <h2 id="about-profile-name" {...stylex.props(ui.srOnly)}>
+    <section id={chip.id} aria-labelledby="about-profile-name" {...stylex.attrs(s.section)}>
+      <h2 id="about-profile-name" {...stylex.attrs(ui.srOnly)}>
         {chip.english}
       </h2>
-      <div {...stylex.props(ui.shell, ui.inset, ui.grid, s.copy)}>
+      <div {...stylex.attrs(ui.shell, ui.inset, ui.grid, s.copy)}>
         <Figure
           src={ABOUT_HERO.lobbyImage}
           alt="Fenchem headquarters lobby with a curved ceiling and marble floor"
@@ -156,10 +156,10 @@ export function Profile() {
           fit={s.lobby}
           sx={s.photo}
         />
-        <div {...stylex.props(s.text)}>
+        <div {...stylex.attrs(s.text)}>
           <Reveal>
-            <h3 {...stylex.props(s.name)}>{ABOUT_HERO.title}</h3>
-            <div lang="en" {...stylex.props(s.english)}>
+            <h3 {...stylex.attrs(s.name)}>{ABOUT_HERO.title}</h3>
+            <div lang="en" {...stylex.attrs(s.english)}>
               {ABOUT_HERO.englishTitle}
             </div>
           </Reveal>
@@ -167,29 +167,29 @@ export function Profile() {
             {ABOUT_HERO.lead}
           </Reveal>
           <Reveal sx={s.network}>
-            <p {...stylex.props(s.networkLabel)}>{ABOUT_HERO.networkLabel}</p>
-            <ul {...stylex.props(s.countries)}>
+            <p {...stylex.attrs(s.networkLabel)}>{ABOUT_HERO.networkLabel}</p>
+            <ul {...stylex.attrs(s.countries)}>
               {ABOUT_HERO.countries.map((country) => (
-                <li key={country}>{country}</li>
+                <li>{country}</li>
               ))}
-              <li {...stylex.props(s.countriesMore)}>等地</li>
+              <li {...stylex.attrs(s.countriesMore)}>等地</li>
             </ul>
           </Reveal>
         </div>
       </div>
-      <div {...stylex.props(s.band)}>
-        <div {...stylex.props(ui.shell, ui.inset)}>
-          <h3 {...stylex.props(ui.srOnly)}>Growth figures</h3>
-          <ul {...stylex.props(s.stats)}>
+      <div {...stylex.attrs(s.band)}>
+        <div {...stylex.attrs(ui.shell, ui.inset)}>
+          <h3 {...stylex.attrs(ui.srOnly)}>Growth figures</h3>
+          <ul {...stylex.attrs(s.stats)}>
             {STATS.map((stat, idx) => (
-              <Reveal key={stat.label} as="li" step={idx} sx={[ui.grid, s.stat]}>
-                <p {...stylex.props(s.value)}>
+              <Reveal as="li" step={idx} sx={[ui.grid, s.stat]}>
+                <p {...stylex.attrs(s.value)}>
                   <span>{stat.value}</span>
-                  {stat.unit ? <span {...stylex.props(s.unit)}>{stat.unit}</span> : null}
+                  {stat.unit ? <span {...stylex.attrs(s.unit)}>{stat.unit}</span> : null}
                 </p>
-                <div {...stylex.props(s.note)}>
-                  <p {...stylex.props(s.statLabel)}>{stat.label}</p>
-                  <p {...stylex.props(s.statCaption)}>{stat.caption}</p>
+                <div {...stylex.attrs(s.note)}>
+                  <p {...stylex.attrs(s.statLabel)}>{stat.label}</p>
+                  <p {...stylex.attrs(s.statCaption)}>{stat.caption}</p>
                 </div>
               </Reveal>
             ))}

@@ -1,4 +1,4 @@
-import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
+import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 
 import { PRODUCTS, PRODUCTS_INTRO } from "../../content";
@@ -6,8 +6,8 @@ import { layout } from "./layout";
 import { palette } from "./palette.stylex";
 import { Reveal } from "./reveal";
 
-const LG = breakpoints.lg;
-const SM = breakpoints.sm;
+const LG = "@media (min-width: 1024px)";
+const SM = "@media (min-width: 640px)";
 
 const styles = stylex.create({
   section: {
@@ -111,58 +111,57 @@ const styles = stylex.create({
   },
 });
 
-export function Products({ onNavigateHome }: { onNavigateHome: (hash?: string) => void }) {
+export function Products(props: { onNavigateHome: (hash?: string) => void }) {
   return (
     <section
       id="about-products"
       aria-labelledby="about-products-title"
-      {...stylex.props(styles.section, layout.sectionY, layout.anchor)}
+      {...stylex.attrs(styles.section, layout.sectionY, layout.anchor)}
     >
-      <h2 id="about-products-title" {...stylex.props(layout.srOnly)}>
+      <h2 id="about-products-title" {...stylex.attrs(layout.srOnly)}>
         Products and applications
       </h2>
-      <div {...stylex.props(layout.shell, layout.split, styles.grid)}>
+      <div {...stylex.attrs(layout.shell, layout.split, styles.grid)}>
         <Reveal sx={[layout.padLeft, layout.seam, styles.intro]}>
-          <p {...stylex.props(styles.lead)}>{PRODUCTS_INTRO.lead}</p>
+          <p {...stylex.attrs(styles.lead)}>{PRODUCTS_INTRO.lead}</p>
           <button
             type="button"
-            onClick={() => onNavigateHome("products")}
-            {...stylex.props(layout.button, layout.buttonOutline, layout.focusRing, styles.more)}
+            onClick={() => props.onNavigateHome("products")}
+            {...stylex.attrs(layout.button, layout.buttonOutline, layout.focusRing, styles.more)}
           >
             {PRODUCTS_INTRO.cta.label}
           </button>
         </Reveal>
-        <div {...stylex.props(layout.padRight)}>
-          <ul {...stylex.props(styles.list)}>
+        <div {...stylex.attrs(layout.padRight)}>
+          <ul {...stylex.attrs(styles.list)}>
             {PRODUCTS.map((product, index) => (
               <Reveal
-                key={product.title}
                 as="li"
                 step={index % 2}
                 sx={[styles.item, index % 2 === 1 && styles.itemOffset]}
               >
-                <div {...stylex.props(styles.media)}>
+                <div {...stylex.attrs(styles.media)}>
                   <img
                     src={product.image}
                     alt=""
                     loading="lazy"
                     decoding="async"
-                    {...stylex.props(layout.fill)}
+                    {...stylex.attrs(layout.fill)}
                   />
                 </div>
-                <h3 {...stylex.props(styles.title)}>
+                <h3 {...stylex.attrs(styles.title)}>
                   <button
                     type="button"
-                    onClick={() => onNavigateHome("products")}
-                    {...stylex.props(styles.stretched)}
+                    onClick={() => props.onNavigateHome("products")}
+                    {...stylex.attrs(styles.stretched)}
                   >
                     {product.title}
                   </button>
                 </h3>
-                <p {...stylex.props(styles.desc)}>{product.description}</p>
-                <ul {...stylex.props(styles.tags)}>
+                <p {...stylex.attrs(styles.desc)}>{product.description}</p>
+                <ul {...stylex.attrs(styles.tags)}>
                   {product.tags.map((tag) => (
-                    <li key={tag}>{tag}</li>
+                    <li>{tag}</li>
                   ))}
                 </ul>
               </Reveal>

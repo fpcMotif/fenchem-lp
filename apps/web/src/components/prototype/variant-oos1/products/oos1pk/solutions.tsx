@@ -1,15 +1,10 @@
-import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
+import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { AnimatePresence, m } from "motion/react";
-import {
-  useId,
-  useRef,
-  useState,
-  useSyncExternalStore,
-  type KeyboardEvent,
-  type ReactNode,
-} from "react";
+import { AnimatePresence, m } from "@/compat/motion";
+import { createSignal, createUniqueId, For, Show } from "solid-js";
+import { Dynamic, type JSX } from "@solidjs/web";
 
+import { createExternalStore } from "@/compat/external-store";
 import { EASE } from "@/components/prototype/motion-constants";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
@@ -38,10 +33,10 @@ const NUMERAL_FONT = '"Inter Tight", "Source Han Sans SC", "Noto Sans SC", sans-
 const TABLET = "@media (min-width: 768px) and (max-width: 1279.98px)";
 const MID = "@media (min-width: 768px) and (max-width: 1023.98px)";
 const HOVER_WIDE = "@media (hover: hover) and (min-width: 1024px)";
-const DESKTOP = breakpoints.xl;
-const MD = breakpoints.md;
-const LG = breakpoints.lg;
-const MOTION_OK = breakpoints.motionOk;
+const DESKTOP = "@media (min-width: 1280px)";
+const MD = "@media (min-width: 768px)";
+const LG = "@media (min-width: 1024px)";
+const MOTION_OK = "@media (prefers-reduced-motion: no-preference)";
 const INSET = "min(120px, 8.333vw)";
 const HEADER_HEIGHT = 80;
 const GUTTER = 24;
@@ -65,7 +60,7 @@ const subscribeWide = (onChange: () => void) => {
   return () => query.removeEventListener("change", onChange);
 };
 const useWideLayout = () =>
-  useSyncExternalStore(
+  createExternalStore(
     subscribeWide,
     () => window.matchMedia(WIDE_QUERY).matches,
     () => false,
@@ -466,89 +461,73 @@ const styles = stylex.create({
   },
 });
 
-function Spec({ label, children }: { label: string; children: ReactNode }) {
+function Spec(props: { label: string; children: JSX.Element }) {
   return (
-    <div {...stylex.props(styles.specRow)}>
-      <dt {...stylex.props(styles.fieldLabel)}>{label}</dt>
-      <dd {...stylex.props(styles.specValue)}>{children}</dd>
+    <div {...stylex.attrs(styles.specRow)}>
+      <dt {...stylex.attrs(styles.fieldLabel)}>{props.label}</dt>
+      <dd {...stylex.attrs(styles.specValue)}>{props.children}</dd>
     </div>
   );
 }
 
-function Lines({ lines }: { lines: string[] }) {
+function Lines(props: { lines: string[] }) {
   return (
-    <ul {...stylex.props(styles.lineList)}>
-      {lines.map((line) => (
-        <li key={line} {...stylex.props(styles.line)}>
-          {line}
-        </li>
-      ))}
+    <ul {...stylex.attrs(styles.lineList)}>
+      <For each={props.lines}>{(line) => <li {...stylex.attrs(styles.line)}>{line}</li>}</For>
     </ul>
   );
 }
 
-function Inline({ items }: { items: string[] }) {
+function Inline(props: { items: string[] }) {
   return (
-    <ul {...stylex.props(styles.inlineList)}>
-      {items.map((item, index) => (
-        <li key={item}>
-          {index > 0 && (
-            <span aria-hidden="true" {...stylex.props(styles.separator)}>
-              ·
-            </span>
-          )}
-          {item}
-        </li>
-      ))}
+    <ul {...stylex.attrs(styles.inlineList)}>
+      <For each={props.items}>
+        {(item, index) => (
+          <li>
+            {index() > 0 && (
+              <span aria-hidden="true" {...stylex.attrs(styles.separator)}>
+                ·
+              </span>
+            )}
+            {item}
+          </li>
+        )}
+      </For>
     </ul>
   );
 }
 
-function SheetHead({
-  formula,
-  page,
-  decorative = false,
-}: {
-  formula: FlatFormula;
-  page: string;
-  decorative?: boolean;
-}) {
-  const Title = decorative ? "p" : "h3";
+function SheetHead(props: { formula: FlatFormula; page: string; decorative?: boolean }) {
   return (
     <header>
-      <p {...stylex.props(styles.headMeta)}>
-        <span {...stylex.props(styles.number)}>{padIndex(formula.index)}</span>
-        <span aria-hidden="true" {...stylex.props(styles.page)}>
-          {page}
+      <p {...stylex.attrs(styles.headMeta)}>
+        <span {...stylex.attrs(styles.number)}>{padIndex(props.formula.index)}</span>
+        <span aria-hidden="true" {...stylex.attrs(styles.page)}>
+          {props.page}
         </span>
       </p>
-      <Title {...stylex.props(styles.sheetTitle)}>{formula.title}</Title>
-      <p {...stylex.props(styles.subtitle)}>{formula.subtitle}</p>
+      <Dynamic component={props.decorative ? "p" : "h3"} {...stylex.attrs(styles.sheetTitle)}>
+        {props.formula.title}
+      </Dynamic>
+      <p {...stylex.attrs(styles.subtitle)}>{props.formula.subtitle}</p>
     </header>
   );
 }
 
-function SheetStack({
-  formula,
-  face,
-  onSwap,
-}: {
-  formula: FlatFormula;
-  face: Face;
-  onSwap: () => void;
-}) {
+function SheetStack(props: { formula: FlatFormula; face: Face; onSwap: () => void }) {
   const reduce = useReducedMotion();
-  const summaryFront = face === "summary";
+  const formula = props.formula;
+  const summaryFront = () => props.face === "summary";
   const processName = processLabel(formula);
   const processEnglish = processLabelEnglish(formula);
-  const backLabel = summaryFront ? processName : SUMMARY_LABEL;
-  const backPage = summaryFront ? "2 / 2" : "1 / 2";
+  const backLabel = () => (summaryFront() ? processName : SUMMARY_LABEL);
+  const backPage = () => (summaryFront() ? "2 / 2" : "1 / 2");
 
   return (
-    <div {...stylex.props(styles.stack)}>
-      <div {...stylex.props(styles.sheet, summaryFront ? styles.sheetFront : styles.sheetBack)}>
+    <div {...stylex.attrs(styles.stack)}>
+      <div {...stylex.attrs(styles.sheet, summaryFront() ? styles.sheetFront : styles.sheetBack)}>
         <SheetHead formula={formula} page="1 / 2" />
-        <dl {...stylex.props(styles.specs)}>
+        <dl {...stylex.attrs(styles.specs)}>
           <Spec label="概述">
             <Lines lines={formula.overview} />
           </Spec>
@@ -560,13 +539,13 @@ function SheetStack({
           </Spec>
         </dl>
       </div>
-      <div {...stylex.props(styles.sheet, summaryFront ? styles.sheetBack : styles.sheetFront)}>
-        <div aria-hidden="true" {...stylex.props(styles.wideOnly)}>
+      <div {...stylex.attrs(styles.sheet, summaryFront() ? styles.sheetBack : styles.sheetFront)}>
+        <div aria-hidden="true" {...stylex.attrs(styles.wideOnly)}>
           <SheetHead formula={formula} page="2 / 2" decorative />
         </div>
-        <h4 {...stylex.props(styles.processHeading)}>{processName}</h4>
-        <h4 {...stylex.props(styles.processHeadingEn)}>{processEnglish}</h4>
-        <dl {...stylex.props(styles.specs, styles.processSpecs)}>
+        <h4 {...stylex.attrs(styles.processHeading)}>{processName}</h4>
+        <h4 {...stylex.attrs(styles.processHeadingEn)}>{processEnglish}</h4>
+        <dl {...stylex.attrs(styles.specs, styles.processSpecs)}>
           {formula.challenges.length > 0 && (
             <Spec label="配方挑战">
               <Lines lines={formula.challenges} />
@@ -580,21 +559,24 @@ function SheetStack({
           </Spec>
         </dl>
       </div>
-      <button type="button" onClick={onSwap} {...stylex.props(styles.band)}>
+      <button type="button" onClick={() => props.onSwap()} {...stylex.attrs(styles.band)}>
         <AnimatePresence mode="wait" initial={false}>
-          <m.span
-            key={backLabel}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: reduce ? 0 : 0.12, ease: EASE }}
-            {...stylex.props(styles.bandLabel)}
-          >
-            {backLabel}
-          </m.span>
+          <Show when={backLabel()} keyed>
+            {(label) => (
+              <m.span
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: reduce() ? 0 : 0.12, ease: EASE }}
+                {...stylex.attrs(styles.bandLabel)}
+              >
+                {label}
+              </m.span>
+            )}
+          </Show>
         </AnimatePresence>
-        <span aria-hidden="true" {...stylex.props(styles.bandPage)}>
-          {backPage}
+        <span aria-hidden="true" {...stylex.attrs(styles.bandPage)}>
+          {backPage()}
         </span>
       </button>
     </div>
@@ -602,25 +584,24 @@ function SheetStack({
 }
 
 export function Solutions() {
-  const titleId = useId();
-  const baseId = useId();
+  const titleId = createUniqueId();
+  const baseId = createUniqueId();
   const reduce = useReducedMotion();
   const wide = useWideLayout();
-  const listRef = useRef<HTMLDivElement>(null);
-  const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
-  const [selected, setSelected] = useState(0);
-  const [face, setFace] = useState<Face>("summary");
+  let list: HTMLDivElement | undefined;
+  const tabs: (HTMLButtonElement | undefined)[] = [];
+  const [selected, setSelected] = createSignal(0);
+  const [face, setFace] = createSignal<Face>("summary");
 
   const tabId = (index: number) => `${baseId}-tab-${index}`;
   const panelId = (index: number) => `${baseId}-panel-${index}`;
 
   const reveal = (index: number) => {
-    const list = listRef.current;
-    const tab = tabRefs.current[index];
+    const tab = tabs[index];
     if (!list || !tab || list.scrollWidth <= list.clientWidth) return;
     list.scrollTo({
       left: tab.offsetLeft - (list.clientWidth - tab.offsetWidth) / 2,
-      behavior: reduce ? "auto" : "smooth",
+      behavior: reduce() ? "auto" : "smooth",
     });
   };
 
@@ -629,74 +610,72 @@ export function Solutions() {
     reveal(index);
   };
 
-  const onTabKeyDown = (event: KeyboardEvent<HTMLButtonElement>, index: number) => {
+  const onTabKeyDown = (event: KeyboardEvent, index: number) => {
     const target = keyTarget(event.key, index, FLAT_FORMULAS.length - 1);
     if (target === null) return;
     event.preventDefault();
     select(target);
-    tabRefs.current[target]?.focus();
+    tabs[target]?.focus();
   };
 
   const swap = () => setFace((current) => (current === "summary" ? "process" : "summary"));
 
   return (
-    <section id="products-solutions" aria-labelledby={titleId} {...stylex.props(styles.section)}>
-      <div {...stylex.props(styles.shell)}>
-        <header {...stylex.props(styles.head)}>
-          <h2 id={titleId} {...stylex.props(styles.title)}>
+    <section id="products-solutions" aria-labelledby={titleId} {...stylex.attrs(styles.section)}>
+      <div {...stylex.attrs(styles.shell)}>
+        <header {...stylex.attrs(styles.head)}>
+          <h2 id={titleId} {...stylex.attrs(styles.title)}>
             应用方案
           </h2>
         </header>
-        <div {...stylex.props(styles.layout)}>
+        <div {...stylex.attrs(styles.layout)}>
           <div
-            ref={listRef}
+            ref={list}
             role="tablist"
             aria-label="Application solutions"
-            aria-orientation={wide ? "vertical" : "horizontal"}
-            {...stylex.props(styles.tablist)}
+            aria-orientation={wide() ? "vertical" : "horizontal"}
+            {...stylex.attrs(styles.tablist)}
           >
             {FLAT_FORMULAS.map((formula) => {
-              const active = formula.index === selected;
+              const active = () => formula.index === selected();
               return (
                 <button
-                  key={formula.id}
                   ref={(node) => {
-                    tabRefs.current[formula.index] = node;
+                    tabs[formula.index] = node;
                   }}
                   type="button"
                   role="tab"
                   id={tabId(formula.index)}
-                  aria-selected={active}
+                  aria-selected={active() ? "true" : "false"}
                   aria-controls={panelId(formula.index)}
-                  tabIndex={active ? 0 : -1}
+                  tabindex={active() ? 0 : -1}
                   onClick={() => select(formula.index)}
                   onKeyDown={(event) => onTabKeyDown(event, formula.index)}
-                  {...stylex.props(styles.tab, active && styles.tabSelected)}
+                  {...stylex.attrs(styles.tab, active() && styles.tabSelected)}
                 >
-                  <span {...stylex.props(styles.tabNumber, active && styles.tabNumberSelected)}>
+                  <span {...stylex.attrs(styles.tabNumber, active() && styles.tabNumberSelected)}>
                     {padIndex(formula.index)}
                   </span>
-                  <span {...stylex.props(styles.tabTitle, active && styles.tabTitleSelected)}>
+                  <span {...stylex.attrs(styles.tabTitle, active() && styles.tabTitleSelected)}>
                     {formula.title}
                   </span>
                 </button>
               );
             })}
           </div>
-          <div {...stylex.props(styles.panels)}>
+          <div {...stylex.attrs(styles.panels)}>
             {FLAT_FORMULAS.map((formula) => {
-              const active = formula.index === selected;
+              const active = () => formula.index === selected();
               return (
                 <div
-                  key={formula.id}
                   role="tabpanel"
                   id={panelId(formula.index)}
                   aria-labelledby={tabId(formula.index)}
-                  tabIndex={active ? 0 : -1}
-                  inert={!active}
-                  {...stylex.props(styles.panel, active ? styles.panelShown : styles.panelHidden)}
+                  tabindex={active() ? 0 : -1}
+                  inert={!active()}
+                  {...stylex.attrs(styles.panel, active() ? styles.panelShown : styles.panelHidden)}
                 >
-                  <SheetStack formula={formula} face={face} onSwap={swap} />
+                  <SheetStack formula={formula} face={face()} onSwap={swap} />
                 </div>
               );
             })}

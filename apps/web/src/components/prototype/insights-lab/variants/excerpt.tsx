@@ -1,9 +1,20 @@
 import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { ChevronDown, ChevronUp } from "lucide-react";
-import { AnimatePresence, m } from "motion/react";
-import { useEffect, useRef, useState } from "react";
-import { createPortal } from "react-dom";
+import type { StyleXStyles } from "@stylexjs/stylex";
+import { ChevronDown, ChevronUp } from "@fenchem-lp/ui/components/lucide";
+import {
+  createEffect,
+  createMemo,
+  createSignal,
+  For,
+  onCleanup,
+  Show,
+  untrack,
+  type Accessor,
+} from "solid-js";
+import { Portal } from "@solidjs/web";
+
+import { AnimatePresence, m } from "@/compat/motion";
 
 import { EASE } from "../../motion-constants";
 import { useReducedMotion } from "../../use-reduced-motion";
@@ -30,6 +41,9 @@ import { lab } from "../tokens.stylex";
 const DESKTOP = breakpoints.xl;
 const CLIP_HEIGHT = 340;
 const PREVIEW_MINUTES = 1;
+
+const sxProps = (...args: ReadonlyArray<StyleXStyles | false | null | undefined>) =>
+  stylex.attrs(...args);
 
 const styles = stylex.create({
   stack: {
@@ -140,13 +154,14 @@ const styles = stylex.create({
   },
 });
 
-export function ExcerptVariant({ onNavigateHome }: SubPageProps) {
+export function ExcerptVariant(props: SubPageProps) {
   const articles = useLabArticles();
-  const [openIds, setOpenIds] = useState<ReadonlySet<string>>(() => new Set());
-  const articleRefs = useRef(new Map<string, HTMLElement>());
-  const actionRefs = useRef(new Map<string, HTMLElement>());
+  const [openIds, setOpenIds] = createSignal<ReadonlySet<string>>(new Set());
+  const articleRefs = { current: new Map<string, HTMLElement>() };
+  const actionRefs = { current: new Map<string, HTMLElement>() };
   const readingId = useReadingArticle(openIds, articleRefs, actionRefs);
-  const reading = articles.find((article) => article.id === readingId);
+  const reading = createMemo(() => articles().find((article) => article.id === readingId()));
+  const shownReading = createMemo((previous?: LabArticle) => reading() ?? previous);
   const isClient = useIsClient();
 
   const expand = (id: string) => setOpenIds((ids) => new Set(ids).add(id));
@@ -163,105 +178,106 @@ export function ExcerptVariant({ onNavigateHome }: SubPageProps) {
   };
 
   return (
-    <LabPage onNavigateHome={onNavigateHome} chips={articleChips(articles)}>
-      <div {...stylex.props(labStyles.column, styles.stack)}>
-        {articles.map((article, index) => (
-          <ExcerptArticle
-            key={article.id}
-            article={article}
-            first={index === 0}
-            open={openIds.has(article.id)}
-            articleRef={(node) => {
-              if (node) articleRefs.current.set(article.id, node);
-              else articleRefs.current.delete(article.id);
-            }}
-            actionRef={(node) => {
-              if (node) actionRefs.current.set(article.id, node);
-              else actionRefs.current.delete(article.id);
-            }}
-            onExpand={() => expand(article.id)}
-            onCollapse={() => collapse(article.id)}
-          />
-        ))}
+    <LabPage onNavigateHome={props.onNavigateHome} chips={articleChips(articles())}>
+      <div {...stylex.attrs(labStyles.column, styles.stack)}>
+        <For each={articles()}>
+          {(article, index) => {
+            onCleanup(() => {
+              articleRefs.current.delete(article.id);
+              actionRefs.current.delete(article.id);
+            });
+            return (
+              <ExcerptArticle
+                article={article}
+                first={index() === 0}
+                open={openIds().has(article.id)}
+                articleRef={(node) => {
+                  articleRefs.current.set(article.id, node);
+                }}
+                actionRef={(node) => {
+                  actionRefs.current.set(article.id, node);
+                }}
+                onExpand={() => expand(article.id)}
+                onCollapse={() => collapse(article.id)}
+              />
+            );
+          }}
+        </For>
       </div>
-      {!isClient
-        ? null
-        : createPortal(
-            <div {...stylex.props(styles.pillDock)}>
-              <AnimatePresence>
-                {reading ? (
-                  <m.button
-                    key="collapse-pill"
-                    type="button"
-                    lang="zh-CN"
-                    initial={{ opacity: 0, y: 12, scale: 0.96 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: 8, scale: 0.98, transition: { duration: 0.15 } }}
-                    transition={{ duration: 0.22, ease: EASE }}
-                    onClick={() => collapse(reading.id)}
-                    {...stylex.props(styles.pill)}
-                  >
-                    <ChevronUp size={18} strokeWidth={2} aria-hidden="true" />
-                    收起
-                    <span {...stylex.props(styles.pillTitle)}>
-                      {reading.navLabel ?? reading.title}
-                    </span>
-                  </m.button>
-                ) : null}
-              </AnimatePresence>
-            </div>,
-            document.body,
-          )}
+      <Show when={isClient()}>
+        <Portal mount={document.body}>
+          <div {...stylex.attrs(styles.pillDock)}>
+            <AnimatePresence>
+              <Show when={reading() !== undefined}>
+                <m.button
+                  type="button"
+                  lang="zh-CN"
+                  initial={{ opacity: 0, y: 12, scale: 0.96 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 8, scale: 0.98, transition: { duration: 0.15 } }}
+                  transition={{ duration: 0.22, ease: EASE }}
+                  onClick={() => {
+                    const current = reading();
+                    if (current) collapse(current.id);
+                  }}
+                  {...stylex.attrs(styles.pill)}
+                >
+                  <ChevronUp size={18} strokeWidth={2} aria-hidden="true" />
+                  收起
+                  <span {...stylex.attrs(styles.pillTitle)}>
+                    {shownReading()?.navLabel ?? shownReading()?.title}
+                  </span>
+                </m.button>
+              </Show>
+            </AnimatePresence>
+          </div>
+        </Portal>
+      </Show>
     </LabPage>
   );
 }
 
-function ExcerptArticle({
-  article,
-  first,
-  open,
-  articleRef,
-  actionRef,
-  onExpand,
-  onCollapse,
-}: {
+function ExcerptArticle(props: {
   article: LabArticle;
   first: boolean;
   open: boolean;
-  articleRef: (node: HTMLElement | null) => void;
-  actionRef: (node: HTMLElement | null) => void;
+  articleRef: (node: HTMLElement) => void;
+  actionRef: (node: HTMLElement) => void;
   onExpand: () => void;
   onCollapse: () => void;
 }) {
   const reduce = useReducedMotion();
+  const article = untrack(() => props.article);
   const titleId = `${article.id}-excerpt-title`;
   const bodyId = `${article.id}-excerpt-body`;
   const remaining = Math.max(1, readMinutes(article) - PREVIEW_MINUTES);
 
   return (
     <article
-      ref={articleRef}
+      ref={(node) => props.articleRef(node)}
       id={articleAnchor(article)}
       aria-labelledby={titleId}
-      {...stylex.props(styles.article, first && styles.articleFirst, kitStyles.anchor)}
+      {...sxProps(styles.article, props.first && styles.articleFirst, kitStyles.anchor)}
     >
       <ArticleMeta article={article} />
-      <h2 id={titleId} {...stylex.props(styles.title)}>
+      <h2 id={titleId} {...stylex.attrs(styles.title)}>
         {article.title}
       </h2>
-      {article.lead ? <p {...stylex.props(labStyles.docLead)}>{article.lead}</p> : null}
+      <Show when={article.lead}>
+        <p {...stylex.attrs(labStyles.docLead)}>{article.lead}</p>
+      </Show>
 
-      <div {...stylex.props(styles.clipWrap)}>
+      <div {...stylex.attrs(styles.clipWrap)}>
         <m.div
           id={bodyId}
           initial={false}
-          animate={{ height: open ? "auto" : CLIP_HEIGHT }}
-          transition={{ duration: reduce ? 0 : open ? 0.34 : 0.24, ease: EASE }}
-          {...stylex.props(styles.clip)}
+          animate={{ height: props.open ? "auto" : CLIP_HEIGHT }}
+          transition={{ duration: reduce() ? 0 : props.open ? 0.34 : 0.24, ease: EASE }}
+          {...stylex.attrs(styles.clip)}
         >
-          <div {...stylex.props(labStyles.stack)}>
+          <div {...stylex.attrs(labStyles.stack)}>
             <ArticlePreview article={article} />
-            <div {...stylex.props(styles.sectionsGap)}>
+            <div {...stylex.attrs(styles.sectionsGap)}>
               <ArticleSections article={article} />
             </div>
           </div>
@@ -269,44 +285,48 @@ function ExcerptArticle({
         <m.div
           aria-hidden="true"
           initial={false}
-          animate={{ opacity: open ? 0 : 1 }}
-          transition={{ duration: open ? 0.16 : 0.24, ease: EASE }}
-          {...stylex.props(styles.fade)}
+          animate={{ opacity: props.open ? 0 : 1 }}
+          transition={{ duration: props.open ? 0.16 : 0.24, ease: EASE }}
+          {...stylex.attrs(styles.fade)}
         />
       </div>
 
-      <div ref={actionRef} {...stylex.props(styles.actionRow)}>
+      <div ref={(node) => props.actionRef(node)} {...stylex.attrs(styles.actionRow)}>
         <button
           type="button"
-          aria-expanded={open}
+          aria-expanded={props.open ? "true" : "false"}
           aria-controls={bodyId}
-          onClick={open ? onCollapse : onExpand}
-          {...stylex.props(labStyles.pillButton, !open && labStyles.pillSolid, kitStyles.focusRing)}
+          onClick={() => (props.open ? props.onCollapse() : props.onExpand())}
+          {...sxProps(
+            labStyles.pillButton,
+            !props.open && labStyles.pillSolid,
+            kitStyles.focusRing,
+          )}
         >
-          {open ? "收起全文" : "继续阅读"}
+          {props.open ? "收起全文" : "继续阅读"}
           <ChevronDown
             size={18}
             strokeWidth={2}
             aria-hidden="true"
-            {...stylex.props(labStyles.chevron, open && labStyles.chevronUp)}
+            {...sxProps(labStyles.chevron, props.open && labStyles.chevronUp)}
           />
         </button>
-        {open ? null : (
-          <span {...stylex.props(styles.remaining)}>{`还有约 ${remaining} 分钟`}</span>
-        )}
+        <Show when={!props.open}>
+          <span {...stylex.attrs(styles.remaining)}>{`还有约 ${remaining} 分钟`}</span>
+        </Show>
       </div>
     </article>
   );
 }
 
 function useReadingArticle(
-  openIds: ReadonlySet<string>,
+  openIdList: Accessor<ReadonlySet<string>>,
   articleRefs: { current: Map<string, HTMLElement> },
   actionRefs: { current: Map<string, HTMLElement> },
 ) {
-  const [readingId, setReadingId] = useState<string | null>(null);
+  const [readingId, setReadingId] = createSignal<string | null>(null);
 
-  useEffect(() => {
+  createEffect(openIdList, (openIds) => {
     if (openIds.size === 0) return;
     let frame = 0;
     const update = () => {
@@ -337,7 +357,10 @@ function useReadingArticle(
       window.removeEventListener("resize", schedule);
       if (frame) cancelAnimationFrame(frame);
     };
-  }, [openIds, articleRefs, actionRefs]);
+  });
 
-  return readingId !== null && openIds.has(readingId) ? readingId : null;
+  return () => {
+    const id = readingId();
+    return id !== null && openIdList().has(id) ? id : null;
+  };
 }

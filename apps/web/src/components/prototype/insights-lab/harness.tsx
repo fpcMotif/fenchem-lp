@@ -1,20 +1,22 @@
 import {
   createContext,
-  use,
-  useEffect,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState,
-  type ComponentType,
-} from "react";
-import { createPortal } from "react-dom";
+  createEffect,
+  createMemo,
+  createSignal,
+  onSettled,
+  Show,
+  untrack,
+  useContext,
+  type Accessor,
+  type Component,
+} from "solid-js";
+import { Portal } from "@solidjs/web";
 
 import { VariantOOS1, type SubPageProps } from "../variant-oos1/index";
 import { LAB_ARTICLES } from "./articles";
 import { InsightsLabContext, useIsClient } from "./kit";
 
-export type LabVariant = { name: string; Component: ComponentType<SubPageProps> };
+export type LabVariant = { name: string; Component: Component<SubPageProps> };
 
 const COUNTS = [2, 3, 4] as const;
 
@@ -159,147 +161,149 @@ const PICKER_CSS = `
 }
 `;
 
-type ActiveVariant = { Component: ComponentType<SubPageProps>; mountKey: string };
+type ActiveVariant = { Component: Component<SubPageProps>; mountKey: string };
 
-const ActiveVariantContext = createContext<ActiveVariant | null>(null);
+const ActiveVariantContext = createContext<Accessor<ActiveVariant | null>>(() => null);
 
 function LabInsightsPage(props: SubPageProps) {
-  const active = use(ActiveVariantContext);
-  if (!active) return null;
-  const { Component, mountKey } = active;
-  return <Component key={mountKey} {...props} />;
+  const active = useContext(ActiveVariantContext);
+  return (
+    <Show when={active()?.mountKey} keyed>
+      {(_key) => {
+        const Variant = untrack(active)?.Component;
+        return Variant ? <Variant {...props} /> : null;
+      }}
+    </Show>
+  );
 }
 
 const clampCount = (count: number) =>
   COUNTS.includes(count as (typeof COUNTS)[number]) ? count : LAB_ARTICLES.length;
 
-export function InsightsLab({
-  variants,
-  initial,
-  count: initialCount,
-  onParamsChange,
-}: {
+export function InsightsLab(props: {
   variants: readonly LabVariant[];
   initial: number;
   count: number;
   onParamsChange: (params: { v?: number; n?: number }) => void;
 }) {
-  const [current, setCurrent] = useState(() => Math.min(Math.max(initial, 0), variants.length - 1));
-  const [count, setCount] = useState(() => clampCount(initialCount));
-  const [replays, setReplays] = useState(0);
+  const [current, setCurrent] = createSignal(
+    untrack(() => Math.min(Math.max(props.initial, 0), props.variants.length - 1)),
+  );
+  const [count, setCount] = createSignal(untrack(() => clampCount(props.count)));
+  const [replays, setReplays] = createSignal(0);
   const mounted = useIsClient();
-  const [pickerHost, setPickerHost] = useState<HTMLElement | null>(null);
-  const [readyHost, setReadyHost] = useState<HTMLElement | null | undefined>(undefined);
-  const highlightRef = useRef<HTMLSpanElement>(null);
-  const itemRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const [pickerHost, setPickerHost] = createSignal<HTMLElement | null>(null);
+  const [readyHost, setReadyHost] = createSignal<HTMLElement | null | undefined>(undefined);
+  let highlight: HTMLSpanElement | undefined;
+  const items: (HTMLButtonElement | undefined)[] = [];
 
   const moveHighlight = () => {
-    const item = itemRefs.current[current];
-    const highlight = highlightRef.current;
+    const item = items[untrack(current)];
     if (!item || !highlight) return;
     highlight.style.width = `${item.offsetWidth}px`;
     highlight.style.transform = `translateX(${item.offsetLeft}px)`;
   };
 
-  useLayoutEffect(moveHighlight);
+  createEffect(() => [current(), mounted(), pickerHost()] as const, moveHighlight);
 
-  useEffect(() => {
+  onSettled(() => {
     window.addEventListener("resize", moveHighlight);
     return () => window.removeEventListener("resize", moveHighlight);
   });
 
-  useEffect(() => {
-    if (!mounted) return;
-    let second = 0;
-    const first = requestAnimationFrame(() => {
-      second = requestAnimationFrame(() => setReadyHost(pickerHost));
-    });
-    return () => {
-      cancelAnimationFrame(first);
-      cancelAnimationFrame(second);
-    };
-  }, [mounted, pickerHost]);
+  createEffect(
+    () => [mounted(), pickerHost()] as const,
+    ([isMounted, host]) => {
+      if (!isMounted) return;
+      let second = 0;
+      const first = requestAnimationFrame(() => {
+        second = requestAnimationFrame(() => setReadyHost(host));
+      });
+      return () => {
+        cancelAnimationFrame(first);
+        cancelAnimationFrame(second);
+      };
+    },
+  );
 
   const setActive = (index: number) => {
-    if (index < 0 || index >= variants.length) return;
+    if (index < 0 || index >= props.variants.length) return;
     setCurrent(index);
     setReplays((value) => value + 1);
-    onParamsChange({ v: index + 1 });
+    props.onParamsChange({ v: index + 1 });
   };
 
   const switchCount = (next: number) => {
     setCount(next);
-    onParamsChange({ n: next });
+    props.onParamsChange({ n: next });
   };
 
-  useEffect(() => {
+  onSettled(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.defaultPrevented) return;
       const target = event.target as HTMLElement;
       if (/^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName) || target.isContentEditable) return;
       if (event.metaKey || event.ctrlKey || event.altKey) return;
+      const length = props.variants.length;
       const digit = Number.parseInt(event.key, 10);
-      if (digit >= 1 && digit <= variants.length) setActive(digit - 1);
-      else if (event.key === "ArrowRight") setActive((current + 1) % variants.length);
-      else if (event.key === "ArrowLeft")
-        setActive((current - 1 + variants.length) % variants.length);
+      if (digit >= 1 && digit <= length) setActive(digit - 1);
+      else if (event.key === "ArrowRight") setActive((current() + 1) % length);
+      else if (event.key === "ArrowLeft") setActive((current() - 1 + length) % length);
       else if (event.key === "r" || event.key === "R") setReplays((value) => value + 1);
     };
     document.addEventListener("keydown", onKeyDown);
     return () => document.removeEventListener("keydown", onKeyDown);
   });
 
-  const variant = variants[current] ?? variants[0];
-  const active = useMemo<ActiveVariant | null>(
-    () =>
-      variant ? { Component: variant.Component, mountKey: `${current}-${count}-${replays}` } : null,
-    [variant, current, count, replays],
-  );
-  const lab = useMemo(() => ({ count, setPickerHost }), [count]);
+  const active = createMemo<ActiveVariant | null>(() => {
+    const variant = props.variants[current()] ?? props.variants[0];
+    return variant
+      ? { Component: variant.Component, mountKey: `${current()}-${count()}-${replays()}` }
+      : null;
+  });
+  const lab = { count, setPickerHost };
 
-  const chromePosition = pickerHost ? "bottom" : "top";
+  const chromePosition = () => (pickerHost() ? "bottom" : "top");
 
-  const chrome = (
+  const chrome = () => (
     <>
       <nav
-        className="proto-picker"
+        class="proto-picker"
         aria-label="Prototype variants"
-        data-position={chromePosition}
-        data-ready={readyHost === pickerHost ? "" : undefined}
+        data-position={chromePosition()}
+        data-ready={readyHost() === pickerHost() ? "" : undefined}
       >
-        <span ref={highlightRef} className="proto-picker-highlight" aria-hidden="true" />
-        {variants.map((entry, index) => (
+        <span ref={highlight} class="proto-picker-highlight" aria-hidden="true" />
+        {props.variants.map((entry, index) => (
           <button
-            key={entry.name}
             ref={(node) => {
-              itemRefs.current[index] = node;
+              items[index] = node;
             }}
             type="button"
-            className="proto-picker-item"
-            data-active={index === current ? "" : undefined}
-            aria-current={index === current ? "true" : undefined}
+            class="proto-picker-item"
+            data-active={index === current() ? "" : undefined}
+            aria-current={index === current() ? "true" : undefined}
             onClick={() => setActive(index)}
           >
             {entry.name}
           </button>
         ))}
-        <span className="proto-picker-divider" aria-hidden="true" />
+        <span class="proto-picker-divider" aria-hidden="true" />
         <button
           type="button"
-          className="proto-picker-item proto-picker-replay"
+          class="proto-picker-item proto-picker-replay"
           aria-label="Replay animation (R)"
           onClick={() => setReplays((value) => value + 1)}
         >
           ↻
         </button>
       </nav>
-      <nav className="count-switcher" aria-label="Article count" data-position={chromePosition}>
+      <nav class="count-switcher" aria-label="Article count" data-position={chromePosition()}>
         <span>Articles</span>
         {COUNTS.map((option) => (
           <button
-            key={option}
             type="button"
-            aria-pressed={count === option ? "true" : "false"}
+            aria-pressed={count() === option ? "true" : "false"}
             onClick={() => switchCount(option)}
           >
             {option}
@@ -316,7 +320,9 @@ export function InsightsLab({
         <ActiveVariantContext value={active}>
           <VariantOOS1 startView="insights" InsightsPage={LabInsightsPage} />
         </ActiveVariantContext>
-        {mounted ? createPortal(chrome, pickerHost ?? document.body) : null}
+        <Show when={mounted() ? (pickerHost() ?? document.body) : undefined} keyed>
+          {(host) => <Portal mount={host}>{chrome()}</Portal>}
+        </Show>
       </InsightsLabContext>
     </>
   );

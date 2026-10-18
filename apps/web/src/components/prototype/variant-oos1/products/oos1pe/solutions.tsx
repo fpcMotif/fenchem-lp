@@ -1,16 +1,10 @@
 import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { ArrowLeft, ArrowRight } from "lucide-react";
-import { m } from "motion/react";
-import {
-  useCallback,
-  useEffect,
-  useId,
-  useRef,
-  useState,
-  useSyncExternalStore,
-  type KeyboardEvent,
-} from "react";
+import { ArrowLeft, ArrowRight } from "@fenchem-lp/ui/components/lucide";
+import { m } from "@/compat/motion";
+import { createEffect, createSignal, createUniqueId, flush, For, Show, untrack } from "solid-js";
+
+import { createExternalStore } from "@/compat/external-store";
 
 import { EASE } from "@/components/prototype/motion-constants";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
@@ -69,7 +63,7 @@ const subscribeWide = (notify: () => void) => {
 };
 
 const useWide = () =>
-  useSyncExternalStore(
+  createExternalStore(
     subscribeWide,
     () => window.matchMedia(WIDE_QUERY).matches,
     () => false,
@@ -472,51 +466,49 @@ const styles = stylex.create({
   },
 });
 
-function FieldValue({ lines, inline }: { lines: string[]; inline: boolean }) {
-  if (inline) {
-    return (
-      <ul {...stylex.props(styles.inline)}>
-        {lines.map((line, index) => (
-          <li key={line}>
-            {index > 0 && (
-              <span aria-hidden="true" {...stylex.props(styles.inlineDot)}>
-                ·
-              </span>
-            )}
-            {line}
-          </li>
-        ))}
-      </ul>
-    );
-  }
+function FieldValue(props: { lines: string[]; inline: boolean }) {
   return (
-    <ul {...stylex.props(styles.stack)}>
-      {lines.map((line) => (
-        <li key={line} {...stylex.props(styles.stackLine)}>
-          {line}
-        </li>
-      ))}
-    </ul>
+    <Show
+      when={props.inline}
+      fallback={
+        <ul {...stylex.attrs(styles.stack)}>
+          <For each={props.lines}>
+            {(line) => <li {...stylex.attrs(styles.stackLine)}>{line}</li>}
+          </For>
+        </ul>
+      }
+    >
+      <ul {...stylex.attrs(styles.inline)}>
+        <For each={props.lines}>
+          {(line, index) => (
+            <li>
+              {index() > 0 && (
+                <span aria-hidden="true" {...stylex.attrs(styles.inlineDot)}>
+                  ·
+                </span>
+              )}
+              {line}
+            </li>
+          )}
+        </For>
+      </ul>
+    </Show>
   );
 }
 
-function FootButton({
-  direction,
-  item,
-  onSelect,
-}: {
+function FootButton(props: {
   direction: "prev" | "next";
   item: SolutionItem;
   onSelect: () => void;
 }) {
-  const isNext = direction === "next";
+  const isNext = untrack(() => props.direction) === "next";
   return (
     <button
       type="button"
-      onClick={onSelect}
-      {...stylex.props(styles.footButton, isNext && styles.footNext)}
+      onClick={() => props.onSelect()}
+      {...stylex.attrs(styles.footButton, isNext && styles.footNext)}
     >
-      <span {...stylex.props(styles.footLabel)}>
+      <span {...stylex.attrs(styles.footLabel)}>
         {!isNext && (
           <ArrowLeft size={14} strokeWidth={1.5} absoluteStrokeWidth aria-hidden="true" />
         )}
@@ -525,7 +517,7 @@ function FootButton({
           <ArrowRight size={14} strokeWidth={1.5} absoluteStrokeWidth aria-hidden="true" />
         )}
       </span>
-      <span {...stylex.props(styles.footTitle)}>{item.title}</span>
+      <span {...stylex.attrs(styles.footTitle)}>{props.item.title}</span>
     </button>
   );
 }
@@ -538,29 +530,27 @@ function holdSpy(spy: { lockUntil: number; pinned: boolean }) {
 export function Solutions() {
   const reduce = useReducedMotion();
   const wide = useWide();
-  const baseId = useId();
+  const baseId = createUniqueId();
   const titleId = `${baseId}-title`;
   const panelId = `${baseId}-panel`;
   const tocTitleId = `${baseId}-toc`;
   const tabId = (index: number) => `${baseId}-tab-${index}`;
   const fieldId = (key: FieldKey) => `${baseId}-field-${key}`;
 
-  const [activeIndex, setActiveIndex] = useState(0);
-  const [activeField, setActiveField] = useState<FieldKey>("overview");
-  const [hasSwitched, setHasSwitched] = useState(false);
-  const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
-  const tabRowRef = useRef<HTMLDivElement>(null);
-  const layoutRef = useRef<HTMLDivElement>(null);
-  const spyRef = useRef({ lockUntil: 0, pinned: false });
+  const [activeIndex, setActiveIndex] = createSignal(0);
+  const [activeField, setActiveField] = createSignal<FieldKey>("overview");
+  const [hasSwitched, setHasSwitched] = createSignal(false);
+  const tabRefs: (HTMLButtonElement | undefined)[] = [];
+  let tabRow!: HTMLDivElement;
+  let layoutEl!: HTMLDivElement;
+  const spy = { lockUntil: 0, pinned: false };
 
-  const item = SOLUTION_ITEMS[activeIndex] ?? SOLUTION_ITEMS[0];
+  const item = () => SOLUTION_ITEMS[activeIndex()] ?? SOLUTION_ITEMS[0]!;
   const total = SOLUTION_ITEMS.length;
-  const prevItem = SOLUTION_ITEMS[activeIndex - 1];
-  const nextItem = SOLUTION_ITEMS[activeIndex + 1];
-  const visibleFields = FIELDS.filter((field) => item[field.key].length > 0);
-  const lastVisibleKey = visibleFields[visibleFields.length - 1]?.key;
+  const prevItem = () => SOLUTION_ITEMS[activeIndex() - 1];
+  const nextItem = () => SOLUTION_ITEMS[activeIndex() + 1];
 
-  const measure = useCallback(() => {
+  const measure = () => {
     const viewport = window.innerHeight;
     const remaining = document.documentElement.scrollHeight - viewport - window.scrollY;
     const reach = viewport * 0.5;
@@ -572,67 +562,74 @@ export function Solutions() {
       if (node && node.getBoundingClientRect().top <= line) current = field.key;
     }
     setActiveField(current);
-  }, [baseId]);
+  };
 
-  useEffect(() => {
-    if (!wide) return;
-    const spy = spyRef.current;
-    let frame = 0;
-    const onScroll = () => {
-      if (performance.now() < spy.lockUntil) return;
-      spy.pinned = false;
-      if (frame) return;
-      frame = requestAnimationFrame(() => {
-        frame = 0;
-        measure();
-      });
-    };
-    const onScrollEnd = () => {
-      spy.lockUntil = 0;
-    };
-    const onResize = () => {
+  createEffect(
+    () => [wide(), activeIndex()] as const,
+    ([isWide]) => {
+      if (!isWide) return;
+      let frame = 0;
+      const onScroll = () => {
+        if (performance.now() < spy.lockUntil) return;
+        spy.pinned = false;
+        if (frame) return;
+        frame = requestAnimationFrame(() => {
+          frame = 0;
+          measure();
+        });
+      };
+      const onScrollEnd = () => {
+        spy.lockUntil = 0;
+      };
+      const onResize = () => {
+        if (!spy.pinned) measure();
+      };
       if (!spy.pinned) measure();
-    };
-    if (!spy.pinned) measure();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("scrollend", onScrollEnd);
-    window.addEventListener("resize", onResize);
-    return () => {
-      if (frame) cancelAnimationFrame(frame);
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("scrollend", onScrollEnd);
-      window.removeEventListener("resize", onResize);
-    };
-  }, [wide, measure, activeIndex]);
+      window.addEventListener("scroll", onScroll, { passive: true });
+      window.addEventListener("scrollend", onScrollEnd);
+      window.addEventListener("resize", onResize);
+      return () => {
+        if (frame) cancelAnimationFrame(frame);
+        window.removeEventListener("scroll", onScroll);
+        window.removeEventListener("scrollend", onScrollEnd);
+        window.removeEventListener("resize", onResize);
+      };
+    },
+  );
 
-  useEffect(() => {
-    const row = tabRowRef.current;
-    const tab = tabRefs.current[activeIndex];
-    if (wide || !row || !tab) return;
-    const left = tab.offsetLeft - (row.clientWidth - tab.offsetWidth) / 2;
-    row.scrollTo({ left: Math.max(0, left), behavior: reduce ? "auto" : "smooth" });
-  }, [activeIndex, wide, reduce]);
+  createEffect(
+    () => [activeIndex(), wide(), reduce()] as const,
+    ([index, isWide, reduceNow]) => {
+      const row = tabRow;
+      const tab = tabRefs[index];
+      if (isWide || !row || !tab) return;
+      const left = tab.offsetLeft - (row.clientWidth - tab.offsetWidth) / 2;
+      row.scrollTo({ left: Math.max(0, left), behavior: reduceNow ? "auto" : "smooth" });
+    },
+  );
 
   const select = (index: number, options: { focusTab?: boolean; reveal?: boolean } = {}) => {
     const next = (index + total) % total;
     setActiveIndex(next);
     setActiveField("overview");
     setHasSwitched(true);
-    spyRef.current.pinned = false;
-    if (options.focusTab) tabRefs.current[next]?.focus();
-    const layout = layoutRef.current;
+    spy.pinned = false;
+    flush();
+    if (options.focusTab) tabRefs[next]?.focus();
+    const layout = layoutEl;
     if (options.reveal && layout && layout.getBoundingClientRect().top < HEADER_HEIGHT) {
-      holdSpy(spyRef.current);
-      layout.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+      holdSpy(spy);
+      layout.scrollIntoView({ behavior: reduce() ? "auto" : "smooth", block: "start" });
     }
   };
 
-  const onTabKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+  const onTabKeyDown = (event: KeyboardEvent) => {
+    const current = activeIndex();
     const moves: Record<string, number> = {
-      ArrowDown: activeIndex + 1,
-      ArrowRight: activeIndex + 1,
-      ArrowUp: activeIndex - 1,
-      ArrowLeft: activeIndex - 1,
+      ArrowDown: current + 1,
+      ArrowRight: current + 1,
+      ArrowUp: current - 1,
+      ArrowLeft: current - 1,
       Home: 0,
       End: total - 1,
     };
@@ -646,50 +643,49 @@ export function Solutions() {
     const node = document.getElementById(fieldId(key));
     if (!node) return;
     setActiveField(key);
-    holdSpy(spyRef.current);
+    holdSpy(spy);
     node.focus({ preventScroll: true });
-    node.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+    node.scrollIntoView({ behavior: reduce() ? "auto" : "smooth", block: "start" });
   };
 
   return (
-    <section id="products-solutions" aria-labelledby={titleId} {...stylex.props(styles.section)}>
-      <div {...stylex.props(styles.shell)}>
-        <header {...stylex.props(styles.head)}>
-          <h2 id={titleId} {...stylex.props(styles.title)}>
+    <section id="products-solutions" aria-labelledby={titleId} {...stylex.attrs(styles.section)}>
+      <div {...stylex.attrs(styles.shell)}>
+        <header {...stylex.attrs(styles.head)}>
+          <h2 id={titleId} {...stylex.attrs(styles.title)}>
             应用方案
           </h2>
         </header>
 
-        <div ref={layoutRef} {...stylex.props(styles.layout)}>
+        <div ref={layoutEl} {...stylex.attrs(styles.layout)}>
           <div
-            ref={tabRowRef}
+            ref={tabRow}
             role="tablist"
             aria-labelledby={titleId}
-            aria-orientation={wide ? "vertical" : "horizontal"}
+            aria-orientation={wide() ? "vertical" : "horizontal"}
             onKeyDown={onTabKeyDown}
-            {...stylex.props(styles.tablist)}
+            {...stylex.attrs(styles.tablist)}
           >
             {SOLUTION_ITEMS.map((solution, index) => {
-              const isSelected = index === activeIndex;
+              const isSelected = () => index === activeIndex();
               return (
                 <button
-                  key={solution.id}
                   ref={(node) => {
-                    tabRefs.current[index] = node;
+                    tabRefs[index] = node;
                   }}
                   id={tabId(index)}
                   type="button"
                   role="tab"
-                  aria-selected={isSelected}
+                  aria-selected={isSelected() ? "true" : "false"}
                   aria-controls={panelId}
-                  tabIndex={isSelected ? 0 : -1}
+                  tabindex={isSelected() ? 0 : -1}
                   onClick={() => select(index, { reveal: true })}
-                  {...stylex.props(styles.tab, isSelected && styles.tabSelected)}
+                  {...stylex.attrs(styles.tab, isSelected() && styles.tabSelected)}
                 >
-                  <span {...stylex.props(styles.tabIndex, isSelected && styles.tabIndexSelected)}>
+                  <span {...stylex.attrs(styles.tabIndex, isSelected() && styles.tabIndexSelected)}>
                     {padIndex(index)}
                   </span>
-                  <span {...stylex.props(styles.tabTitle, isSelected && styles.tabTitleSelected)}>
+                  <span {...stylex.attrs(styles.tabTitle, isSelected() && styles.tabTitleSelected)}>
                     {solution.title}
                   </span>
                 </button>
@@ -697,91 +693,104 @@ export function Solutions() {
             })}
           </div>
 
-          <div {...stylex.props(styles.paperColumn)}>
+          <div {...stylex.attrs(styles.paperColumn)}>
             <div
               id={panelId}
               role="tabpanel"
-              aria-labelledby={tabId(activeIndex)}
-              {...stylex.props(styles.paper)}
+              aria-labelledby={tabId(activeIndex())}
+              {...stylex.attrs(styles.paper)}
             >
-              <m.article
-                key={item.id}
-                initial={hasSwitched ? { opacity: 0, y: 6 } : false}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: reduce ? 0 : 0.24, ease: EASE }}
-                {...stylex.props(styles.sheet)}
-              >
-                <header {...stylex.props(styles.sheetHead)}>
-                  <p {...stylex.props(styles.sheetNumber)}>
-                    {padIndex(activeIndex)}
-                    <span {...stylex.props(styles.sheetTotal)}>/ {padIndex(total - 1)}</span>
-                  </p>
-                  <div>
-                    <h3 {...stylex.props(styles.sheetTitle)}>{item.title}</h3>
-                    <p {...stylex.props(styles.sheetSubtitle)}>{item.subtitle}</p>
-                  </div>
-                </header>
-
-                <div {...stylex.props(styles.fields)}>
-                  {visibleFields.map((field) => (
-                    <section
-                      key={field.key}
-                      id={fieldId(field.key)}
-                      aria-labelledby={`${fieldId(field.key)}-label`}
-                      tabIndex={-1}
-                      {...stylex.props(
-                        styles.field,
-                        field.key === lastVisibleKey && styles.fieldLast,
-                      )}
+              <Show when={item()} keyed>
+                {(current) => {
+                  const visibleFields = FIELDS.filter((field) => current[field.key].length > 0);
+                  const lastVisibleKey = visibleFields[visibleFields.length - 1]?.key;
+                  return (
+                    <m.article
+                      initial={untrack(hasSwitched) ? { opacity: 0, y: 6 } : false}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: reduce() ? 0 : 0.24, ease: EASE }}
+                      {...stylex.attrs(styles.sheet)}
                     >
-                      <h4 id={`${fieldId(field.key)}-label`} {...stylex.props(styles.fieldLabel)}>
-                        {field.label}
-                      </h4>
-                      <FieldValue lines={item[field.key]} inline={field.inline} />
-                    </section>
-                  ))}
-                </div>
+                      <header {...stylex.attrs(styles.sheetHead)}>
+                        <p {...stylex.attrs(styles.sheetNumber)}>
+                          {padIndex(activeIndex())}
+                          <span {...stylex.attrs(styles.sheetTotal)}>/ {padIndex(total - 1)}</span>
+                        </p>
+                        <div>
+                          <h3 {...stylex.attrs(styles.sheetTitle)}>{current.title}</h3>
+                          <p {...stylex.attrs(styles.sheetSubtitle)}>{current.subtitle}</p>
+                        </div>
+                      </header>
 
-                <nav aria-label="Previous and next solutions" {...stylex.props(styles.foot)}>
-                  {prevItem && (
-                    <FootButton
-                      direction="prev"
-                      item={prevItem}
-                      onSelect={() => select(activeIndex - 1, { reveal: true })}
-                    />
-                  )}
-                  {nextItem && (
-                    <FootButton
-                      direction="next"
-                      item={nextItem}
-                      onSelect={() => select(activeIndex + 1, { reveal: true })}
-                    />
-                  )}
-                </nav>
-              </m.article>
+                      <div {...stylex.attrs(styles.fields)}>
+                        {visibleFields.map((field) => (
+                          <section
+                            id={fieldId(field.key)}
+                            aria-labelledby={`${fieldId(field.key)}-label`}
+                            tabindex={-1}
+                            {...stylex.attrs(
+                              styles.field,
+                              field.key === lastVisibleKey && styles.fieldLast,
+                            )}
+                          >
+                            <h4
+                              id={`${fieldId(field.key)}-label`}
+                              {...stylex.attrs(styles.fieldLabel)}
+                            >
+                              {field.label}
+                            </h4>
+                            <FieldValue lines={current[field.key]} inline={field.inline} />
+                          </section>
+                        ))}
+                      </div>
+
+                      <nav aria-label="Previous and next solutions" {...stylex.attrs(styles.foot)}>
+                        <Show when={prevItem()}>
+                          {(prev) => (
+                            <FootButton
+                              direction="prev"
+                              item={prev()}
+                              onSelect={() => select(activeIndex() - 1, { reveal: true })}
+                            />
+                          )}
+                        </Show>
+                        <Show when={nextItem()}>
+                          {(next) => (
+                            <FootButton
+                              direction="next"
+                              item={next()}
+                              onSelect={() => select(activeIndex() + 1, { reveal: true })}
+                            />
+                          )}
+                        </Show>
+                      </nav>
+                    </m.article>
+                  );
+                }}
+              </Show>
             </div>
           </div>
 
-          <nav aria-labelledby={tocTitleId} {...stylex.props(styles.toc)}>
-            <p id={tocTitleId} {...stylex.props(styles.tocTitle)}>
+          <nav aria-labelledby={tocTitleId} {...stylex.attrs(styles.toc)}>
+            <p id={tocTitleId} {...stylex.attrs(styles.tocTitle)}>
               本页
             </p>
-            <ul {...stylex.props(styles.tocList)}>
+            <ul {...stylex.attrs(styles.tocList)}>
               {FIELDS.map((field) => {
-                const isEmpty = item[field.key].length === 0;
-                const isCurrent = !isEmpty && activeField === field.key;
+                const isEmpty = () => item()[field.key].length === 0;
+                const isCurrent = () => !isEmpty() && activeField() === field.key;
                 return (
-                  <li key={field.key}>
+                  <li>
                     <button
                       type="button"
-                      disabled={isEmpty}
-                      aria-current={isCurrent ? "location" : undefined}
-                      aria-controls={isEmpty ? undefined : fieldId(field.key)}
+                      disabled={isEmpty()}
+                      aria-current={isCurrent() ? "location" : undefined}
+                      aria-controls={isEmpty() ? undefined : fieldId(field.key)}
                       onClick={() => jumpTo(field.key)}
-                      {...stylex.props(
+                      {...stylex.attrs(
                         styles.tocItem,
-                        isCurrent && styles.tocItemCurrent,
-                        isEmpty && styles.tocItemDisabled,
+                        isCurrent() && styles.tocItemCurrent,
+                        isEmpty() && styles.tocItemDisabled,
                       )}
                     >
                       {field.label}

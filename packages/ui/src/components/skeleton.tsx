@@ -1,7 +1,8 @@
 import { colors, radii } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 import type { StyleXStyles } from "@stylexjs/stylex";
-import * as React from "react";
+import type { ComponentProps } from "@solidjs/web";
+import { omit } from "solid-js";
 
 const pulse = stylex.keyframes({
   "0%, 100%": { opacity: 1 },
@@ -19,14 +20,14 @@ const skeletonStyles = stylex.create({
   },
 });
 
-export interface SkeletonProps extends Omit<React.ComponentProps<"div">, "className"> {
+export interface SkeletonProps extends Omit<ComponentProps<"div">, "class"> {
   sx?: StyleXStyles;
 }
 
-function Skeleton({ sx, ...props }: SkeletonProps) {
-  const styleProps = stylex.props(skeletonStyles.base, sx);
+function Skeleton(props: SkeletonProps) {
+  const rest = omit(props, "sx");
 
-  return <div data-slot="skeleton" {...styleProps} {...props} />;
+  return <div data-slot="skeleton" {...stylex.attrs(skeletonStyles.base, props.sx)} {...rest} />;
 }
 
 export { Skeleton };

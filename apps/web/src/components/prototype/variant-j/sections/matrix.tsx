@@ -1,7 +1,7 @@
 import { breakpoints, colors, radii, typography } from "@fenchem-lp/ui/tokens.stylex";
 import type { StyleXStyles } from "@stylexjs/stylex";
 import * as stylex from "@stylexjs/stylex";
-import { ArrowRight, ArrowUpRight } from "lucide-react";
+import { ArrowRight, ArrowUpRight } from "@fenchem-lp/ui/components/lucide";
 import {
   type DivisionKey,
   divisionForApplication,
@@ -272,13 +272,13 @@ const FEATURED = getFeaturedIngredients();
 /** The registry curates six; fall back to the head of the portfolio. */
 const MATRIX_ITEMS: Ingredient[] = FEATURED.length === 6 ? FEATURED : ingredients.slice(0, 6);
 
-function LedgerRow({ label, value }: { label: string; value: string }) {
+function LedgerRow(props: { label: string; value: string }) {
   return (
     <>
-      <span data-rule aria-hidden="true" {...stylex.props(sharedStyles.ruleLine)} />
-      <dl {...stylex.props(styles.dl)}>
-        <dt {...stylex.props(sharedStyles.techLabel)}>{label}</dt>
-        <dd {...stylex.props(styles.dd)}>{value}</dd>
+      <span data-rule="" aria-hidden="true" {...stylex.attrs(sharedStyles.ruleLine)} />
+      <dl {...stylex.attrs(styles.dl)}>
+        <dt {...stylex.attrs(sharedStyles.techLabel)}>{props.label}</dt>
+        <dd {...stylex.attrs(styles.dd)}>{props.value}</dd>
       </dl>
     </>
   );
@@ -300,15 +300,15 @@ export function MatrixSection() {
       ref={ref}
       id="ingredients"
       aria-labelledby="ingredients-heading"
-      {...stylex.props(styles.section)}
+      {...stylex.attrs(styles.section)}
     >
-      <div {...stylex.props(styles.container)}>
-        <div {...stylex.props(styles.header)}>
+      <div {...stylex.attrs(styles.container)}>
+        <div {...stylex.attrs(styles.header)}>
           <div>
-            <p data-matrix-eyebrow {...stylex.props(sharedStyles.techLabel)}>
+            <p data-matrix-eyebrow="" {...stylex.attrs(sharedStyles.techLabel)}>
               02 — Active Compounds
             </p>
-            <h2 id="ingredients-heading" data-matrix-heading {...stylex.props(styles.heading)}>
+            <h2 id="ingredients-heading" data-matrix-heading="" {...stylex.attrs(styles.heading)}>
               <SplitWords
                 segments={[
                   { text: "The ingredient" },
@@ -317,46 +317,46 @@ export function MatrixSection() {
               />
             </h2>
           </div>
-          <a data-matrix-aside href="#contact" {...stylex.props(styles.asideLink)}>
+          <a data-matrix-aside="" href="#contact" {...stylex.attrs(styles.asideLink)}>
             Request full specifications
-            <ArrowRight aria-hidden="true" {...stylex.props(styles.arrowRightIcon)} />
+            <ArrowRight aria-hidden="true" {...stylex.attrs(styles.arrowRightIcon)} />
           </a>
         </div>
       </div>
 
-      <div {...stylex.props(styles.band)}>
-        <div {...stylex.props(styles.container)}>
-          <div {...stylex.props(styles.grid)}>
+      <div {...stylex.attrs(styles.band)}>
+        <div {...stylex.attrs(styles.container)}>
+          <div {...stylex.attrs(styles.grid)}>
             {MATRIX_ITEMS.map((item) => {
               const art = imgFor(item);
               const division = divisionForApplication(item.application);
               return (
-                <article key={item.code} data-matrix-card {...stylex.props(styles.card)}>
-                  <div {...stylex.props(styles.mediaWrap)}>
+                <article data-matrix-card="" {...stylex.attrs(styles.card)}>
+                  <div {...stylex.attrs(styles.mediaWrap)}>
                     <img
                       src={art.src}
                       alt={art.alt}
                       loading="lazy"
-                      {...stylex.props(styles.cardImg)}
+                      {...stylex.attrs(styles.cardImg)}
                     />
-                    <span {...stylex.props(styles.badge)}>
+                    <span {...stylex.attrs(styles.badge)}>
                       <span
                         aria-hidden="true"
-                        {...stylex.props(styles.dotBase, DIVISION_DOT_STYLES[division])}
+                        {...stylex.attrs(styles.dotBase, DIVISION_DOT_STYLES[division])}
                       />
                       {item.application}
                     </span>
                   </div>
 
-                  <div {...stylex.props(styles.cardBody)}>
-                    <div {...stylex.props(styles.cardHeader)}>
-                      <span {...stylex.props(sharedStyles.techLabel)}>{item.code}</span>
-                      <span {...stylex.props(sharedStyles.techLabel)}>{item.category}</span>
+                  <div {...stylex.attrs(styles.cardBody)}>
+                    <div {...stylex.attrs(styles.cardHeader)}>
+                      <span {...stylex.attrs(sharedStyles.techLabel)}>{item.code}</span>
+                      <span {...stylex.attrs(sharedStyles.techLabel)}>{item.category}</span>
                     </div>
-                    <h3 {...stylex.props(styles.cardTitle)}>{item.name}</h3>
-                    <p {...stylex.props(styles.cardLatin)}>{item.latin}</p>
+                    <h3 {...stylex.attrs(styles.cardTitle)}>{item.name}</h3>
+                    <p {...stylex.attrs(styles.cardLatin)}>{item.latin}</p>
 
-                    <div {...stylex.props(styles.ledgerWrap)}>
+                    <div {...stylex.attrs(styles.ledgerWrap)}>
                       <LedgerRow label="Purity" value={item.purity} />
                       <LedgerRow label="Form" value={item.form} />
                     </div>
@@ -364,10 +364,10 @@ export function MatrixSection() {
                     <a
                       href="#contact"
                       aria-label={`Request spec for ${item.name}`}
-                      {...stylex.props(styles.specLink)}
+                      {...stylex.attrs(styles.specLink)}
                     >
                       Request spec
-                      <ArrowUpRight aria-hidden="true" {...stylex.props(styles.specArrowIcon)} />
+                      <ArrowUpRight aria-hidden="true" {...stylex.attrs(styles.specArrowIcon)} />
                     </a>
                   </div>
                 </article>

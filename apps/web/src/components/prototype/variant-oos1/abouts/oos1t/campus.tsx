@@ -115,7 +115,7 @@ export function Campus() {
       id="about-campus"
       aria-labelledby="oos1t-campus"
       data-hour={SECTION_HOURS.campus}
-      {...stylex.props(ui.section, ui.shell)}
+      {...stylex.attrs(ui.section, ui.shell)}
     >
       <SectionHead
         titleId="oos1t-campus"
@@ -123,29 +123,29 @@ export function Campus() {
         title={ABOUT_CAMPUS.title}
         english="Campus"
       />
-      <ul {...stylex.props(ui.grid, styles.field)}>
+      <ul {...stylex.attrs(ui.grid, styles.field)}>
         {ABOUT_CAMPUS.photos.map((photo, index) => (
-          <li key={photo.id} {...stylex.props(place[photo.id])}>
+          <li {...stylex.attrs(place[photo.id])}>
             <button
               type="button"
               onClick={() => lightbox.open(index)}
-              {...stylex.props(styles.button, ui.focus)}
+              {...stylex.attrs(styles.button, ui.focus)}
             >
-              <span {...stylex.props(ui.plate, styles.plate)}>
+              <span {...stylex.attrs(ui.plate, styles.plate)}>
                 <Cast lift={LIFT.block} still />
-                <span {...stylex.props(ui.face, styles.photo)}>
+                <span {...stylex.attrs(ui.face, styles.photo)}>
                   <img
                     src={photo.src}
                     alt={photo.alt}
                     loading="lazy"
                     decoding="async"
-                    {...stylex.props(ui.fill)}
+                    {...stylex.attrs(ui.fill)}
                   />
                 </span>
               </span>
-              <span {...stylex.props(styles.caption)}>
+              <span {...stylex.attrs(styles.caption)}>
                 <span>{photo.caption}</span>
-                <span lang="en" {...stylex.props(styles.english)}>
+                <span lang="en" {...stylex.attrs(styles.english)}>
                   {ENGLISH[photo.id]}
                 </span>
                 <span {...srOnly}>View larger</span>

@@ -1,13 +1,12 @@
-import { breakpoints } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { useId, useState } from "react";
+import { createSignal, createUniqueId } from "solid-js";
 
 import { ABOUT_STRUCTURE } from "../../about-data";
 import { layout } from "./layout";
 import { palette } from "./palette.stylex";
 import { Reveal } from "./reveal";
 
-const LG = breakpoints.lg;
+const LG = "@media (min-width: 1024px)";
 
 const styles = stylex.create({
   section: {
@@ -90,36 +89,36 @@ const styles = stylex.create({
 });
 
 export function Structure() {
-  const [showDiagram, setShowDiagram] = useState(false);
-  const diagramId = useId();
+  const [showDiagram, setShowDiagram] = createSignal(false);
+  const diagramId = createUniqueId();
   const { holding, subsidiaries, subsidiaryBadge } = ABOUT_STRUCTURE;
 
   return (
     <section
       id="about-structure"
       aria-labelledby="about-structure-title"
-      {...stylex.props(styles.section, layout.sectionY, layout.anchor)}
+      {...stylex.attrs(styles.section, layout.sectionY, layout.anchor)}
     >
-      <h2 id="about-structure-title" {...stylex.props(layout.srOnly)}>
+      <h2 id="about-structure-title" {...stylex.attrs(layout.srOnly)}>
         Structure
       </h2>
-      <div {...stylex.props(layout.shell, layout.split, styles.grid)}>
+      <div {...stylex.attrs(layout.shell, layout.split, styles.grid)}>
         <Reveal sx={[layout.padLeft, layout.seam]}>
-          <div {...stylex.props(styles.holding)}>
-            <p {...stylex.props(layout.label)}>{holding.badge}</p>
-            <h3 {...stylex.props(styles.holdingName)}>{holding.name}</h3>
-            <div lang="en" {...stylex.props(styles.english)}>
+          <div {...stylex.attrs(styles.holding)}>
+            <p {...stylex.attrs(layout.label)}>{holding.badge}</p>
+            <h3 {...stylex.attrs(styles.holdingName)}>{holding.name}</h3>
+            <div lang="en" {...stylex.attrs(styles.english)}>
               {holding.english}
             </div>
           </div>
         </Reveal>
         <Reveal step={1} sx={[layout.padRight, styles.branches]}>
-          <p {...stylex.props(layout.label)}>{subsidiaryBadge}</p>
-          <ul {...stylex.props(styles.list)}>
+          <p {...stylex.attrs(layout.label)}>{subsidiaryBadge}</p>
+          <ul {...stylex.attrs(styles.list)}>
             {subsidiaries.map((sub) => (
-              <li key={sub.id} {...stylex.props(styles.branch)}>
-                <h3 {...stylex.props(styles.branchName)}>{sub.name}</h3>
-                <span lang="en" {...stylex.props(styles.english)}>
+              <li {...stylex.attrs(styles.branch)}>
+                <h3 {...stylex.attrs(styles.branchName)}>{sub.name}</h3>
+                <span lang="en" {...stylex.attrs(styles.english)}>
                   {sub.english}
                 </span>
               </li>
@@ -127,27 +126,27 @@ export function Structure() {
           </ul>
           <button
             type="button"
-            aria-expanded={showDiagram}
+            aria-expanded={showDiagram() ? "true" : "false"}
             aria-controls={diagramId}
             onClick={() => setShowDiagram((previous) => !previous)}
-            {...stylex.props(styles.toggle, layout.focusRing)}
+            {...stylex.attrs(styles.toggle, layout.focusRing)}
           >
-            {showDiagram ? "收起组织架构图" : "查看官方组织架构图"}
+            {showDiagram() ? "收起组织架构图" : "查看官方组织架构图"}
           </button>
         </Reveal>
       </div>
 
       <div
         id={diagramId}
-        hidden={!showDiagram}
-        {...stylex.props(layout.shell, layout.padBoth, styles.diagram)}
+        hidden={!showDiagram()}
+        {...stylex.attrs(layout.shell, layout.padBoth, styles.diagram)}
       >
         <img
           src={ABOUT_STRUCTURE.chartImage}
           alt="Official organizational chart of Nanjing Fenchem International Holdings Corporation Limited"
           loading="lazy"
           decoding="async"
-          {...stylex.props(styles.chart)}
+          {...stylex.attrs(styles.chart)}
         />
       </div>
     </section>

@@ -69,45 +69,43 @@ export function Opening() {
         standingSx={styles.stand}
         standing={
           <>
-            <p lang="en" {...stylex.props(type.serif, styles.tagline, ui.knockout)}>
+            <p lang="en" {...stylex.attrs(type.serif, styles.tagline, ui.knockout)}>
               {ABOUT_BANNER.tagline}
             </p>
             <h1
               id="oos1x-title"
-              {...stylex.props(type.light, type.title, styles.title, ui.knockout)}
+              {...stylex.attrs(type.light, type.title, styles.title, ui.knockout)}
             >
               {ABOUT_BANNER.title}
             </h1>
           </>
         }
         tag={
-          <p {...stylex.props(styles.established)}>
-            <span lang="en" {...stylex.props(type.serif, styles.est)}>
+          <p {...stylex.attrs(styles.established)}>
+            <span lang="en" {...stylex.attrs(type.serif, styles.est)}>
               Est.
             </span>
-            <span {...stylex.props(type.counterweight, type.counterTitle)}>1995</span>
+            <span {...stylex.attrs(type.counterweight, type.counterTitle)}>1995</span>
           </p>
         }
         load={
-          <figure {...stylex.props(styles.frame)}>
+          <figure {...stylex.attrs(styles.frame)}>
             <img
               src={ABOUT_BANNER.image}
               alt={ABOUT_BANNER.alt}
-              fetchPriority="high"
+              fetchpriority="high"
               decoding="async"
-              {...stylex.props(ui.fill, styles.image)}
+              {...stylex.attrs(ui.fill, styles.image)}
             />
           </figure>
         }
       >
-        <p {...stylex.props(type.light, styles.lead)}>
+        <p {...stylex.attrs(type.light, styles.lead)}>
           {ABOUT_BANNER.lead.split(" · ").map((half) => (
-            <span key={half} {...stylex.props(styles.leadLine)}>
-              {half}
-            </span>
+            <span {...stylex.attrs(styles.leadLine)}>{half}</span>
           ))}
         </p>
-        <p lang="en" {...stylex.props(styles.place)}>
+        <p lang="en" {...stylex.attrs(styles.place)}>
           {ABOUT_BANNER.place}
         </p>
       </Pair>

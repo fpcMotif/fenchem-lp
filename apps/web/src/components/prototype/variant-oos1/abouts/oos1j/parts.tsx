@@ -1,8 +1,17 @@
-import { m } from "motion/react";
+import { m } from "@/compat/motion";
 import { breakpoints } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { animate, useInView, useScroll, useTransform, type MotionValue } from "motion/react";
-import { useEffect, useRef, type ReactNode, type RefObject } from "react";
+import {
+  animate,
+  motionValue,
+  toCss,
+  useInView,
+  useScroll,
+  useTransform,
+  type MotionValue,
+} from "@/compat/motion";
+import { dynamic, type JSX } from "@solidjs/web";
+import { createEffect, createSignal, merge, type Accessor } from "solid-js";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 import { base } from "./shared";
 import { font, hue, size } from "./theme.stylex";
@@ -27,38 +36,38 @@ const reveal = stylex.create({
   delay: (ms: number) => ({ transitionDelay: `${ms}ms` }),
 });
 
-export function Reveal({
-  children,
-  step = 0,
-  sx,
-  as: Tag = "div",
-}: {
-  children: ReactNode;
+export function Reveal(props: {
+  children: JSX.Element;
   step?: number;
   sx?: stylex.StyleXStyles;
   as?: "div" | "li" | "figure";
 }) {
-  const ref = useRef<HTMLDivElement & HTMLLIElement>(null);
+  const Tag = dynamic(() => props.as ?? "div");
+  const [ref, setRef] = createSignal<HTMLElement>();
   const shown = useInView(ref, { once: true, margin: IN_VIEW_MARGIN });
   return (
     <Tag
-      ref={ref}
-      {...stylex.props(
+      ref={setRef}
+      {...sxAttrs(
         reveal.hidden,
-        shown && reveal.shown,
-        reveal.delay(Math.min(step, REVEAL_MAX_STEPS) * REVEAL_STEP_MS),
-        sx,
+        shown() && reveal.shown,
+        reveal.delay(Math.min(props.step ?? 0, REVEAL_MAX_STEPS) * REVEAL_STEP_MS),
+        props.sx,
       )}
     >
-      {children}
+      {props.children}
     </Tag>
   );
 }
 
-export function SectionName({ id, children }: { id: string; children: string }) {
+function sxAttrs(...args: ReadonlyArray<stylex.StyleXStyles | false | null | undefined>) {
+  return stylex.attrs(...args);
+}
+
+export function SectionName(props: { id: string; children: string }) {
   return (
-    <h2 id={id} {...stylex.props(base.srOnly)}>
-      {children}
+    <h2 id={props.id} {...stylex.attrs(base.srOnly)}>
+      {props.children}
     </h2>
   );
 }
@@ -106,14 +115,18 @@ const crop = stylex.create({
   delay: (ms: number) => ({ transitionDelay: `${ms}ms` }),
 });
 
-export function CropMarks({ delay = 0, hover = false }: { delay?: number; hover?: boolean }) {
-  const ref = useRef<HTMLSpanElement>(null);
+export function CropMarks(props: { delay?: number; hover?: boolean }) {
+  const p = merge({ delay: 0, hover: false }, props);
+  const [ref, setRef] = createSignal<HTMLSpanElement>();
   const shown = useInView(ref, { once: true, margin: IN_VIEW_MARGIN });
   return (
     <span
-      ref={ref}
+      ref={setRef}
       aria-hidden="true"
-      {...stylex.props(crop.marks, hover ? crop.onHover : [shown && crop.shown, crop.delay(delay)])}
+      {...stylex.attrs(
+        crop.marks,
+        p.hover ? crop.onHover : [shown() && crop.shown, crop.delay(p.delay)],
+      )}
     />
   );
 }
@@ -145,14 +158,7 @@ const rise = stylex.create({
   delay: (ms: number) => ({ animationDelay: `${ms}ms` }),
 });
 
-export function RiseText({
-  text,
-  srText = text,
-  play,
-  delay = 0,
-  stagger = 70,
-  charSx,
-}: {
+export function RiseText(props: {
   text: string;
   srText?: string;
   play: boolean;
@@ -160,18 +166,19 @@ export function RiseText({
   stagger?: number;
   charSx?: (index: number) => stylex.StyleXStyles;
 }) {
+  const p = merge({ delay: 0, stagger: 70 }, props);
   return (
     <>
-      <span {...stylex.props(base.srOnly)}>{srText}</span>
+      <span {...stylex.attrs(base.srOnly)}>{p.srText ?? p.text}</span>
       <span aria-hidden="true">
-        {Array.from(text).map((char, index) => (
-          <span key={`${char}-${index}`} {...stylex.props(rise.mask)}>
+        {Array.from(p.text).map((char, index) => (
+          <span {...stylex.attrs(rise.mask)}>
             <span
-              {...stylex.props(
+              {...stylex.attrs(
                 rise.char,
-                play && rise.play,
-                rise.delay(delay + index * stagger),
-                charSx?.(index),
+                p.play && rise.play,
+                rise.delay(p.delay + index * p.stagger),
+                p.charSx?.(index),
               )}
             >
               {char}
@@ -203,20 +210,15 @@ const lines = stylex.create({
   delay: (ms: number) => ({ transitionDelay: `${ms}ms` }),
 });
 
-export function RiseLines({
-  lines: text,
-  play,
-  stagger = 130,
-}: {
-  lines: readonly string[];
-  play: boolean;
-  stagger?: number;
-}) {
+export function RiseLines(props: { lines: readonly string[]; play: boolean; stagger?: number }) {
+  const p = merge({ stagger: 130 }, props);
   return (
     <>
-      {text.map((line, index) => (
-        <span key={line} {...stylex.props(lines.mask)}>
-          <span {...stylex.props(lines.line, play && lines.shown, lines.delay(index * stagger))}>
+      {p.lines.map((line, index) => (
+        <span {...stylex.attrs(lines.mask)}>
+          <span
+            {...stylex.attrs(lines.line, p.play && lines.shown, lines.delay(index * p.stagger))}
+          >
             {line}
           </span>
         </span>
@@ -226,9 +228,9 @@ export function RiseLines({
 }
 
 export function useInViewOnce<T extends Element>() {
-  const ref = useRef<T>(null);
+  const [ref, setRef] = createSignal<T>();
   const shown = useInView(ref, { once: true, margin: IN_VIEW_MARGIN });
-  return [ref, shown] as const;
+  return [setRef, shown] as const;
 }
 
 const COUNT_EASE = [0.22, 1, 0.36, 1] as const;
@@ -240,29 +242,31 @@ const count = stylex.create({
   },
 });
 
-export function CountUp({ value, sx }: { value: string; sx?: stylex.StyleXStyles }) {
-  const ref = useRef<HTMLSpanElement>(null);
+export function CountUp(props: { value: string; sx?: stylex.StyleXStyles }) {
+  const [ref, setRef] = createSignal<HTMLSpanElement>();
   const reduce = useReducedMotion();
   const near = useInView(ref, { once: true });
-  useEffect(() => {
-    const node = ref.current;
-    if (!near || reduce || !node) return;
-    const target = Number(value.replaceAll(",", ""));
-    const grouped = value.includes(",");
-    node.style.minWidth = `${node.offsetWidth}px`;
-    const controls = animate(0, target, {
-      duration: 1.8,
-      ease: COUNT_EASE,
-      onUpdate: (latest) => {
-        const whole = Math.round(latest);
-        node.textContent = grouped ? whole.toLocaleString("en-US") : String(whole);
-      },
-    });
-    return () => controls.stop();
-  }, [near, reduce, value]);
+  createEffect(
+    () => ({ near: near(), reduce: reduce(), value: props.value, node: ref() }),
+    ({ near, reduce, value, node }) => {
+      if (!near || reduce || !node) return;
+      const target = Number(value.replaceAll(",", ""));
+      const grouped = value.includes(",");
+      node.style.minWidth = `${node.offsetWidth}px`;
+      const controls = animate(motionValue(0), target, {
+        duration: 1.8,
+        ease: COUNT_EASE,
+        onUpdate: (latest: number) => {
+          const whole = Math.round(latest);
+          node.textContent = grouped ? whole.toLocaleString("en-US") : String(whole);
+        },
+      });
+      return () => controls.stop();
+    },
+  );
   return (
-    <span ref={ref} {...stylex.props(count.figure, sx)}>
-      {value}
+    <span ref={setRef} {...stylex.attrs(count.figure, props.sx)}>
+      {props.value}
     </span>
   );
 }
@@ -284,45 +288,47 @@ const drift = stylex.create({
   },
 });
 
-export function useDrift(target: RefObject<HTMLElement | null>, reach: number) {
+export function useDrift(target: Accessor<HTMLElement | undefined>, reach: number) {
   const reduce = useReducedMotion();
   const { scrollYProgress } = useScroll({ target, offset: ["start end", "end start"] });
-  const y = useTransform(
-    scrollYProgress,
-    [0, 1],
-    reduce ? ["0%", "0%"] : [`-${reach}%`, `${reach}%`],
+  const y = useTransform(() =>
+    reduce() ? "0%" : `${-reach + 2 * reach * Math.min(Math.max(scrollYProgress(), 0), 1)}%`,
   );
-  return { y, scale: reduce ? 1 : 1 + (reach * 2.4) / 100 };
+  return {
+    y,
+    get scale() {
+      return reduce() ? 1 : 1 + (reach * 2.4) / 100;
+    },
+  };
 }
 
-export function DriftImage({
-  src,
-  alt,
-  reach = 5,
-  frame,
-  wipeDelay,
-}: {
+export function DriftImage(props: {
   src: string;
   alt: string;
   reach?: number;
   frame?: stylex.StyleXStyles;
   wipeDelay?: number;
 }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const motion = useDrift(ref, reach);
+  const p = merge({ reach: 5 }, props);
+  const [ref, setRef] = createSignal<HTMLDivElement>();
+  const motion = useDrift(ref, p.reach);
   const shown = useInView(ref, { once: true, margin: IN_VIEW_MARGIN });
   return (
-    <div ref={ref} {...stylex.props(drift.frame, frame)}>
+    <div ref={setRef} {...stylex.attrs(drift.frame, p.frame)}>
       <m.img
-        src={src}
-        alt={alt}
+        src={p.src}
+        alt={p.alt}
         loading="lazy"
         decoding="async"
-        {...stylex.props(
+        {...stylex.attrs(
           drift.image,
-          wipeDelay !== undefined && [wipe.hidden, shown && wipe.shown, wipe.delay(wipeDelay)],
+          p.wipeDelay !== undefined && [
+            wipe.hidden,
+            shown() && wipe.shown,
+            wipe.delay(p.wipeDelay),
+          ],
         )}
-        style={motion}
+        style={{ y: motion.y, scale: motion.scale }}
       />
     </div>
   );
@@ -358,35 +364,30 @@ const monument = stylex.create({
   }),
 });
 
-export function Monument({
-  text,
-  sx,
-  photo,
-  style,
-}: {
+export function Monument(props: {
   text: string;
   sx: stylex.StyleXStyles;
   photo?: string;
   style?: Partial<Record<"backgroundPosition" | "x" | "y", MotionValue<string>>>;
 }) {
   const image =
-    photo === undefined
+    props.photo === undefined
       ? ""
-      : `linear-gradient(rgba(11, 42, 92, 0.28), rgba(11, 42, 92, 0.28)), url(${photo})`;
-  const styled = stylex.props(
+      : `linear-gradient(rgba(11, 42, 92, 0.28), rgba(11, 42, 92, 0.28)), url(${props.photo})`;
+  const styled = stylex.attrs(
     monument.frame,
-    photo === undefined ? monument.ghost : monument.photo,
-    photo !== undefined && monument.photoFill(image),
-    sx,
+    props.photo === undefined ? monument.ghost : monument.photo,
+    props.photo !== undefined && monument.photoFill(image),
+    props.sx,
   );
   return (
     <m.span
       aria-hidden="true"
       lang="en"
-      className={styled.className}
-      style={{ ...styled.style, ...style }}
+      class={styled.class}
+      style={{ ...toCss(styled.style), ...props.style }}
     >
-      {text}
+      {props.text}
     </m.span>
   );
 }

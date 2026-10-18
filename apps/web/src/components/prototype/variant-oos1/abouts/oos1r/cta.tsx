@@ -83,26 +83,26 @@ const s = stylex.create({
   },
 });
 
-export function Cta({ onNavigateHome }: { onNavigateHome: (hash?: string) => void }) {
+export function Cta(props: { onNavigateHome: (hash?: string) => void }) {
   return (
-    <section aria-labelledby="about-cta-title" {...stylex.props(s.band)}>
-      <div {...stylex.props(ui.shell, ui.inset)}>
+    <section aria-labelledby="about-cta-title" {...stylex.attrs(s.band)}>
+      <div {...stylex.attrs(ui.shell, ui.inset)}>
         <Reveal sx={s.grid}>
-          <h2 id="about-cta-title" {...stylex.props(s.title)}>
+          <h2 id="about-cta-title" {...stylex.attrs(s.title)}>
             {CTA.title}
           </h2>
-          <div {...stylex.props(s.actions)}>
+          <div {...stylex.attrs(s.actions)}>
             <button
               type="button"
-              onClick={() => onNavigateHome("contact")}
-              {...stylex.props(s.primary, ui.focusRing)}
+              onClick={() => props.onNavigateHome("contact")}
+              {...stylex.attrs(s.primary, ui.focusRing)}
             >
               {CTA.action.label}
             </button>
             <button
               type="button"
-              onClick={() => onNavigateHome("products")}
-              {...stylex.props(s.secondary, ui.focusRing)}
+              onClick={() => props.onNavigateHome("products")}
+              {...stylex.attrs(s.secondary, ui.focusRing)}
             >
               产品与应用
             </button>

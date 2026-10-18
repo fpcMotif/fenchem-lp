@@ -1,7 +1,7 @@
-import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
+import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { m, useScroll, useSpring } from "motion/react";
-import { type RefObject, useRef } from "react";
+import { m, useScroll, useSpring } from "@/compat/motion";
+import { createSignal, type Accessor } from "solid-js";
 
 import { useLightbox } from "@/components/prototype/shared/lightbox";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
@@ -20,27 +20,27 @@ const s = stylex.create({
     display: "grid",
     gridTemplateColumns: {
       default: "minmax(0, 1fr)",
-      [breakpoints.lg]: "repeat(22, minmax(0, 1fr))",
+      ["@media (min-width: 1024px)"]: "repeat(22, minmax(0, 1fr))",
     },
   },
   mosaic: {
     position: "relative",
     display: "grid",
-    gridColumn: { default: "auto", [breakpoints.lg]: "1 / 22" },
+    gridColumn: { default: "auto", ["@media (min-width: 1024px)"]: "1 / 22" },
     gridTemplateColumns: {
       default: "repeat(2, minmax(0, 1fr))",
-      [breakpoints.lg]: "repeat(21, minmax(0, 1fr))",
+      ["@media (min-width: 1024px)"]: "repeat(21, minmax(0, 1fr))",
     },
     gridTemplateRows: {
       default: "none",
-      [breakpoints.lg]: "repeat(13, minmax(0, 1fr))",
+      ["@media (min-width: 1024px)"]: "repeat(13, minmax(0, 1fr))",
     },
-    gap: { default: 8, [breakpoints.lg]: 0 },
-    aspectRatio: { default: "auto", [breakpoints.lg]: "21 / 13" },
+    gap: { default: 8, ["@media (min-width: 1024px)"]: 0 },
+    aspectRatio: { default: "auto", ["@media (min-width: 1024px)"]: "21 / 13" },
   },
   side: {
     gridColumn: 22,
-    display: { default: "none", [breakpoints.lg]: "flex" },
+    display: { default: "none", ["@media (min-width: 1024px)"]: "flex" },
     flexDirection: "column",
     justifyContent: "flex-end",
     minWidth: 0,
@@ -66,45 +66,45 @@ const s = stylex.create({
     overflow: "hidden",
     margin: 0,
     backgroundColor: tone.tint,
-    outlineWidth: { default: 0, [breakpoints.lg]: 3 },
+    outlineWidth: { default: 0, ["@media (min-width: 1024px)"]: 3 },
     outlineStyle: "solid",
     outlineColor: tone.page,
     outlineOffset: -3,
   },
   u13: {
-    gridColumn: { default: "span 2", [breakpoints.lg]: "1 / 14" },
-    gridRow: { default: "auto", [breakpoints.lg]: "1 / 14" },
-    aspectRatio: { default: "1 / 1", [breakpoints.lg]: "auto" },
+    gridColumn: { default: "span 2", ["@media (min-width: 1024px)"]: "1 / 14" },
+    gridRow: { default: "auto", ["@media (min-width: 1024px)"]: "1 / 14" },
+    aspectRatio: { default: "1 / 1", ["@media (min-width: 1024px)"]: "auto" },
   },
   u8: {
-    gridColumn: { default: "span 2", [breakpoints.lg]: "14 / 22" },
-    gridRow: { default: "auto", [breakpoints.lg]: "1 / 9" },
-    aspectRatio: { default: "1.618 / 1", [breakpoints.lg]: "auto" },
+    gridColumn: { default: "span 2", ["@media (min-width: 1024px)"]: "14 / 22" },
+    gridRow: { default: "auto", ["@media (min-width: 1024px)"]: "1 / 9" },
+    aspectRatio: { default: "1.618 / 1", ["@media (min-width: 1024px)"]: "auto" },
   },
   u5: {
-    gridColumn: { default: "span 1", [breakpoints.lg]: "17 / 22" },
-    gridRow: { default: "auto", [breakpoints.lg]: "9 / 14" },
-    aspectRatio: { default: "1 / 1", [breakpoints.lg]: "auto" },
+    gridColumn: { default: "span 1", ["@media (min-width: 1024px)"]: "17 / 22" },
+    gridRow: { default: "auto", ["@media (min-width: 1024px)"]: "9 / 14" },
+    aspectRatio: { default: "1 / 1", ["@media (min-width: 1024px)"]: "auto" },
   },
   u3: {
-    gridColumn: { default: "span 1", [breakpoints.lg]: "14 / 17" },
-    gridRow: { default: "auto", [breakpoints.lg]: "11 / 14" },
-    aspectRatio: { default: "1 / 1", [breakpoints.lg]: "auto" },
+    gridColumn: { default: "span 1", ["@media (min-width: 1024px)"]: "14 / 17" },
+    gridRow: { default: "auto", ["@media (min-width: 1024px)"]: "11 / 14" },
+    aspectRatio: { default: "1 / 1", ["@media (min-width: 1024px)"]: "auto" },
   },
   u2: {
-    gridColumn: { default: "span 2", [breakpoints.lg]: "14 / 16" },
-    gridRow: { default: "auto", [breakpoints.lg]: "9 / 11" },
-    aspectRatio: { default: "2 / 1", [breakpoints.lg]: "auto" },
+    gridColumn: { default: "span 2", ["@media (min-width: 1024px)"]: "14 / 16" },
+    gridRow: { default: "auto", ["@media (min-width: 1024px)"]: "9 / 11" },
+    aspectRatio: { default: "2 / 1", ["@media (min-width: 1024px)"]: "auto" },
   },
   u1a: {
-    gridColumn: { default: "span 1", [breakpoints.lg]: "16 / 17" },
-    gridRow: { default: "auto", [breakpoints.lg]: "9 / 10" },
-    aspectRatio: { default: "1 / 1", [breakpoints.lg]: "auto" },
+    gridColumn: { default: "span 1", ["@media (min-width: 1024px)"]: "16 / 17" },
+    gridRow: { default: "auto", ["@media (min-width: 1024px)"]: "9 / 10" },
+    aspectRatio: { default: "1 / 1", ["@media (min-width: 1024px)"]: "auto" },
   },
   u1b: {
-    gridColumn: { default: "span 1", [breakpoints.lg]: "16 / 17" },
-    gridRow: { default: "auto", [breakpoints.lg]: "10 / 11" },
-    aspectRatio: { default: "1 / 1", [breakpoints.lg]: "auto" },
+    gridColumn: { default: "span 1", ["@media (min-width: 1024px)"]: "16 / 17" },
+    gridRow: { default: "auto", ["@media (min-width: 1024px)"]: "10 / 11" },
+    aspectRatio: { default: "1 / 1", ["@media (min-width: 1024px)"]: "auto" },
   },
   tileButton: {
     position: "absolute",
@@ -129,7 +129,7 @@ const s = stylex.create({
     position: "absolute",
     top: 0,
     left: 0,
-    display: { default: "none", [breakpoints.lg]: "block" },
+    display: { default: "none", ["@media (min-width: 1024px)"]: "block" },
     width: "100%",
     height: "100%",
     overflow: "visible",
@@ -140,10 +140,10 @@ const s = stylex.create({
 const TILE_AREA = [s.u13, s.u8, s.u5, s.u3, s.u2, s.u1a, s.u1b] as const;
 const TILE_PHOTO = [s.photoU13, s.photoU8, null, s.photoU3, null, null, s.photoU1b] as const;
 
-function Spiral({ mosaicRef }: { mosaicRef: RefObject<HTMLDivElement | null> }) {
+function Spiral(props: { mosaic: Accessor<HTMLDivElement | undefined> }) {
   const reduce = useReducedMotion();
   const { scrollYProgress } = useScroll({
-    target: mosaicRef,
+    target: props.mosaic,
     offset: ["start 0.85", "end 0.45"],
   });
   const drawn = useSpring(scrollYProgress, { stiffness: 140, damping: 32, mass: 0.4 });
@@ -153,15 +153,15 @@ function Spiral({ mosaicRef }: { mosaicRef: RefObject<HTMLDivElement | null> }) 
       viewBox="0 0 2100 1300"
       preserveAspectRatio="none"
       aria-hidden="true"
-      {...stylex.props(s.spiral)}
+      {...stylex.attrs(s.spiral)}
     >
       <m.path
         d={SPIRAL_PATH}
         fill="none"
         stroke="#ffffff"
-        strokeWidth={3}
-        strokeLinecap="round"
-        style={reduce ? undefined : { pathLength: drawn }}
+        stroke-width={3}
+        stroke-linecap="round"
+        style={reduce() ? undefined : { pathLength: drawn }}
       />
     </svg>
   );
@@ -169,37 +169,37 @@ function Spiral({ mosaicRef }: { mosaicRef: RefObject<HTMLDivElement | null> }) 
 
 export function Campus() {
   const chip = ABOUT_HERO.navChips[1];
-  const mosaicRef = useRef<HTMLDivElement>(null);
+  const [mosaic, setMosaic] = createSignal<HTMLDivElement>();
   const photos = ABOUT_CAMPUS.photos;
   const lightbox = useLightbox(photos.length);
 
   return (
     <Section id={chip.id} label={ABOUT_CAMPUS.eyebrow} background={ui.onPage}>
-      <div {...stylex.props(s.stage)}>
-        <div ref={mosaicRef} {...stylex.props(s.mosaic)}>
+      <div {...stylex.attrs(s.stage)}>
+        <div ref={setMosaic} {...stylex.attrs(s.mosaic)}>
           {photos.map((photo, idx) => (
-            <figure key={photo.id} {...stylex.props(s.tile, TILE_AREA[idx])}>
+            <figure {...stylex.attrs(s.tile, TILE_AREA[idx])}>
               <button
                 type="button"
                 aria-label={`View larger: ${photo.english}`}
                 onClick={() => lightbox.open(idx)}
-                {...stylex.props(s.tileButton)}
+                {...stylex.attrs(s.tileButton)}
               >
                 <img
                   src={photo.src}
                   alt={photo.alt}
                   loading="lazy"
                   decoding="async"
-                  {...stylex.props(ui.fill, TILE_PHOTO[idx])}
+                  {...stylex.attrs(ui.fill, TILE_PHOTO[idx])}
                 />
               </button>
             </figure>
           ))}
-          <Spiral mosaicRef={mosaicRef} />
+          <Spiral mosaic={mosaic} />
         </div>
-        <div aria-hidden="true" {...stylex.props(s.side)}>
-          <span {...stylex.props(s.voidSlot)}>
-            <span {...stylex.props(s.voidCell)} />
+        <div aria-hidden="true" {...stylex.attrs(s.side)}>
+          <span {...stylex.attrs(s.voidSlot)}>
+            <span {...stylex.attrs(s.voidCell)} />
           </span>
         </div>
       </div>

@@ -1,7 +1,7 @@
-import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
+import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { ChevronLeft } from "lucide-react";
-import { useEffect, useRef } from "react";
+import { ChevronLeft } from "@fenchem-lp/ui/components/lucide";
+import { createEffect } from "solid-js";
 
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
@@ -34,8 +34,11 @@ const styles = stylex.create({
     boxShadow: `0 1px 0 0 ${palette.inkHair}`,
   },
   row: {
-    display: { default: "flex", [breakpoints.lg]: "grid" },
-    gridTemplateColumns: { default: null, [breakpoints.lg]: "repeat(16, minmax(0, 1fr))" },
+    display: { default: "flex", ["@media (min-width: 1024px)"]: "grid" },
+    gridTemplateColumns: {
+      default: null,
+      ["@media (min-width: 1024px)"]: "repeat(16, minmax(0, 1fr))",
+    },
     alignItems: "center",
     height: 52,
   },
@@ -43,8 +46,8 @@ const styles = stylex.create({
     display: "flex",
     alignItems: "center",
     flexShrink: 0,
-    gridColumn: { default: null, [breakpoints.lg]: "1 / span 4" },
-    paddingInlineEnd: { default: 16, [breakpoints.lg]: 0 },
+    gridColumn: { default: null, ["@media (min-width: 1024px)"]: "1 / span 4" },
+    paddingInlineEnd: { default: 16, ["@media (min-width: 1024px)"]: 0 },
     fontFamily: fonts.cjk,
     fontSize: 13,
     fontWeight: 400,
@@ -67,21 +70,24 @@ const styles = stylex.create({
     cursor: "pointer",
   },
   crumbCurrent: {
-    display: { default: "none", [breakpoints.lg]: "inline" },
+    display: { default: "none", ["@media (min-width: 1024px)"]: "inline" },
     marginInlineStart: 12,
     color: palette.ink,
   },
   list: {
-    display: { default: "flex", [breakpoints.lg]: "grid" },
-    gridTemplateColumns: { default: null, [breakpoints.lg]: "repeat(6, minmax(0, 1fr))" },
-    gridColumn: { default: null, [breakpoints.lg]: "5 / span 12" },
+    display: { default: "flex", ["@media (min-width: 1024px)"]: "grid" },
+    gridTemplateColumns: {
+      default: null,
+      ["@media (min-width: 1024px)"]: "repeat(6, minmax(0, 1fr))",
+    },
+    gridColumn: { default: null, ["@media (min-width: 1024px)"]: "5 / span 12" },
     flexGrow: 1,
     minWidth: 0,
     height: "100%",
     margin: 0,
     padding: 0,
     listStyle: "none",
-    overflowX: { default: "auto", [breakpoints.lg]: "visible" },
+    overflowX: { default: "auto", ["@media (min-width: 1024px)"]: "visible" },
     scrollbarWidth: "none",
   },
   item: {
@@ -94,7 +100,7 @@ const styles = stylex.create({
     boxSizing: "border-box",
     width: "100%",
     height: 52,
-    paddingInline: { default: 14, [breakpoints.lg]: 0 },
+    paddingInline: { default: 14, ["@media (min-width: 1024px)"]: 0 },
     fontFamily: fonts.cjk,
     fontSize: 13,
     fontWeight: 400,
@@ -139,61 +145,64 @@ const styles = stylex.create({
   },
 });
 
-export function SectionNav({ onNavigateHome }: { onNavigateHome: (hash?: string) => void }) {
+export function SectionNav(props: { onNavigateHome: (hash?: string) => void }) {
   const active = useActiveSection(SECTION_IDS);
-  const listRef = useRef<HTMLUListElement>(null);
+  let listRef: HTMLUListElement | undefined;
   const reduce = useReducedMotion();
 
-  useEffect(() => {
-    const list = listRef.current;
-    const link = active ? list?.querySelector<HTMLElement>(`[href="#${active}"]`) : null;
-    if (!list || !link) return;
-    const listBox = list.getBoundingClientRect();
-    const linkBox = link.getBoundingClientRect();
-    if (linkBox.left < listBox.left || linkBox.right > listBox.right) {
-      list.scrollBy({
-        left: linkBox.left - listBox.left - 16,
-        behavior: reduce ? "auto" : "smooth",
-      });
-    }
-  }, [active, reduce]);
+  createEffect(
+    () => [active(), reduce()] as const,
+    ([current, reduceNow]) => {
+      const list = listRef;
+      const link = current ? list?.querySelector<HTMLElement>(`[href="#${current}"]`) : null;
+      if (!list || !link) return;
+      const listBox = list.getBoundingClientRect();
+      const linkBox = link.getBoundingClientRect();
+      if (linkBox.left < listBox.left || linkBox.right > listBox.right) {
+        list.scrollBy({
+          left: linkBox.left - listBox.left - 16,
+          behavior: reduceNow ? "auto" : "smooth",
+        });
+      }
+    },
+  );
 
   return (
-    <div {...stylex.props(styles.bar)}>
+    <div {...stylex.attrs(styles.bar)}>
       <Frame>
-        <div {...stylex.props(styles.row)}>
-          <nav aria-label="Breadcrumb" {...stylex.props(styles.crumbs)}>
+        <div {...stylex.attrs(styles.row)}>
+          <nav aria-label="Breadcrumb" {...stylex.attrs(styles.crumbs)}>
             <button
               type="button"
-              onClick={() => onNavigateHome("top")}
-              {...stylex.props(styles.crumbLink, shared.focusRing)}
+              onClick={() => props.onNavigateHome("top")}
+              {...stylex.attrs(styles.crumbLink, shared.focusRing)}
             >
               <ChevronLeft size={14} aria-hidden="true" />
               <span lang="en">Home</span>
             </button>
-            <span aria-current="page" {...stylex.props(styles.crumbCurrent)}>
+            <span aria-current="page" {...stylex.attrs(styles.crumbCurrent)}>
               <span lang="en">About</span>
             </span>
           </nav>
-          <ul ref={listRef} aria-label="On this page" {...stylex.props(styles.list)}>
+          <ul ref={listRef} aria-label="On this page" {...stylex.attrs(styles.list)}>
             {ABOUT_HERO.navChips.map((chip) => {
-              const on = active === chip.id;
+              const on = () => active() === chip.id;
               return (
-                <li key={chip.id} {...stylex.props(styles.item)}>
+                <li {...stylex.attrs(styles.item)}>
                   <a
                     href={`#${chip.id}`}
-                    aria-current={on ? "location" : undefined}
-                    {...stylex.props(styles.link, shared.focusRing)}
+                    aria-current={on() ? "location" : undefined}
+                    {...stylex.attrs(styles.link, shared.focusRing)}
                   >
-                    <span lang="en" {...stylex.props(styles.label)}>
+                    <span lang="en" {...stylex.attrs(styles.label)}>
                       {ENGLISH[chip.id]}
                       <span
                         aria-hidden="true"
-                        {...stylex.props(styles.markInk, on && styles.markOn)}
+                        {...stylex.attrs(styles.markInk, on() && styles.markOn)}
                       />
                       <span
                         aria-hidden="true"
-                        {...stylex.props(styles.markBlue, on && styles.markOn)}
+                        {...stylex.attrs(styles.markBlue, on() && styles.markOn)}
                       />
                     </span>
                   </a>

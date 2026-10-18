@@ -28,14 +28,17 @@ const CORNERS = {
   small: [styles.topSmallStart, styles.topSmallEnd, styles.bottomSmallStart, styles.bottomSmallEnd],
 } as const;
 
-export function Registration({ size }: { size: "large" | "small" }) {
+export function Registration(props: { size: "large" | "small" }) {
   return (
     <>
-      {CORNERS[size].map((corner, index) => (
+      {CORNERS[props.size].map((corner) => (
         <span
-          key={index}
           aria-hidden="true"
-          {...stylex.props(styles.mark, size === "large" ? styles.large : styles.small, corner)}
+          {...stylex.attrs(
+            styles.mark,
+            props.size === "large" ? styles.large : styles.small,
+            corner,
+          )}
         />
       ))}
     </>

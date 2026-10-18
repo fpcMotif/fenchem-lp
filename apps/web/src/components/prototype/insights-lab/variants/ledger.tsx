@@ -1,8 +1,10 @@
 import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { ArrowRight, ChevronDown, ChevronUp } from "lucide-react";
-import { m, useScroll } from "motion/react";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import type { StyleXStyles } from "@stylexjs/stylex";
+import { ArrowRight, ChevronDown, ChevronUp } from "@fenchem-lp/ui/components/lucide";
+import { createEffect, createSignal, For, onCleanup, Show, untrack, type Accessor } from "solid-js";
+
+import { m, useScroll } from "@/compat/motion";
 
 import { color } from "../../variant-oos1/tokens.stylex";
 import {
@@ -27,6 +29,9 @@ import { lab } from "../tokens.stylex";
 
 const DESKTOP = breakpoints.xl;
 const TOOLBAR_HEIGHT = 52;
+
+const sxProps = (...args: ReadonlyArray<StyleXStyles | false | null | undefined>) =>
+  stylex.attrs(...args);
 
 const styles = stylex.create({
   list: {
@@ -254,207 +259,212 @@ const styles = stylex.create({
 
 type Anchor = { id: string; top: number };
 
-export function LedgerVariant({ onNavigateHome }: SubPageProps) {
+export function LedgerVariant(props: SubPageProps) {
   const articles = useLabArticles();
-  const [openId, setOpenId] = useState<string | null>(null);
-  const anchor = useRef<Anchor | null>(null);
-  const closingInstantly = useRef<HTMLElement | null>(null);
-  const rows = useRef(new Map<string, HTMLLIElement>());
+  const [openId, setOpenId] = createSignal<string | null>(null);
+  let anchor: Anchor | null = null;
+  let closingInstantly: HTMLElement | null = null;
+  const rows = new Map<string, HTMLLIElement>();
 
-  useLayoutEffect(() => {
-    const pending = anchor.current;
-    anchor.current = null;
+  createEffect(openId, () => {
+    const pending = anchor;
+    anchor = null;
     if (pending) {
-      const row = rows.current.get(pending.id);
+      const row = rows.get(pending.id);
       if (row) {
         const delta = row.getBoundingClientRect().top - pending.top;
         if (Math.abs(delta) > 0.5) window.scrollBy({ top: delta, behavior: "instant" });
       }
     }
-    if (closingInstantly.current) {
-      closingInstantly.current.style.transitionDuration = "";
-      closingInstantly.current = null;
+    if (closingInstantly) {
+      closingInstantly.style.transitionDuration = "";
+      closingInstantly = null;
     }
-  }, [openId]);
+  });
 
   const openAt = (id: string, top: number) => {
-    anchor.current = { id, top };
-    const region = openId
-      ? rows.current.get(openId)?.querySelector<HTMLElement>("[role=region]")
-      : null;
+    anchor = { id, top };
+    const current = openId();
+    const region = current ? rows.get(current)?.querySelector<HTMLElement>("[role=region]") : null;
     if (region) {
       region.style.transitionDuration = "0ms";
-      closingInstantly.current = region;
+      closingInstantly = region;
     }
     setOpenId(id);
   };
 
   const collapse = (id: string) => {
-    const row = rows.current.get(id);
+    const row = rows.get(id);
     if (row && isAboveReadingLine(row)) jumpTo(row, 0);
     row?.querySelector<HTMLButtonElement>("h2 button")?.focus({ preventScroll: true });
     setOpenId(null);
   };
 
   const toggle = (id: string) => {
-    if (openId === id) {
+    if (openId() === id) {
       collapse(id);
       return;
     }
-    const row = rows.current.get(id);
+    const row = rows.get(id);
     openAt(id, row ? row.getBoundingClientRect().top : STICKY_OFFSET);
   };
 
   return (
-    <LabPage onNavigateHome={onNavigateHome} chips={articleChips(articles)}>
-      <div {...stylex.props(labStyles.column)}>
-        <div {...stylex.props(labStyles.listHeader)}>
-          <p {...stylex.props(labStyles.listLabel)}>洞察目录</p>
-          <p {...stylex.props(labStyles.listCount)}>{`共 ${articles.length} 篇`}</p>
+    <LabPage onNavigateHome={props.onNavigateHome} chips={articleChips(articles())}>
+      <div {...stylex.attrs(labStyles.column)}>
+        <div {...stylex.attrs(labStyles.listHeader)}>
+          <p {...stylex.attrs(labStyles.listLabel)}>洞察目录</p>
+          <p {...stylex.attrs(labStyles.listCount)}>{`共 ${articles().length} 篇`}</p>
         </div>
-        <ul {...stylex.props(styles.list)}>
-          {articles.map((article, index) => {
-            const next = articles[index + 1];
-            return (
-              <LedgerRow
-                key={article.id}
-                article={article}
-                index={index}
-                open={openId === article.id}
-                next={next}
-                rowRef={(node) => {
-                  if (node) rows.current.set(article.id, node);
-                  else rows.current.delete(article.id);
-                }}
-                onToggle={() => toggle(article.id)}
-                onCollapse={() => collapse(article.id)}
-                onNext={next ? () => openAt(next.id, STICKY_OFFSET) : undefined}
-              />
-            );
-          })}
+        <ul {...stylex.attrs(styles.list)}>
+          <For each={articles()}>
+            {(article, index) => {
+              const next = () => articles()[index() + 1];
+              onCleanup(() => rows.delete(article.id));
+              return (
+                <LedgerRow
+                  article={article}
+                  index={index()}
+                  open={openId() === article.id}
+                  next={next()}
+                  rowRef={(node) => {
+                    rows.set(article.id, node);
+                  }}
+                  onToggle={() => toggle(article.id)}
+                  onCollapse={() => collapse(article.id)}
+                  onNext={() => {
+                    const target = next();
+                    if (target) openAt(target.id, STICKY_OFFSET);
+                  }}
+                />
+              );
+            }}
+          </For>
         </ul>
       </div>
     </LabPage>
   );
 }
 
-function LedgerRow({
-  article,
-  index,
-  open,
-  next,
-  rowRef,
-  onToggle,
-  onCollapse,
-  onNext,
-}: {
+function LedgerRow(props: {
   article: LabArticle;
   index: number;
   open: boolean;
   next: LabArticle | undefined;
-  rowRef: (node: HTMLLIElement | null) => void;
+  rowRef: (node: HTMLLIElement) => void;
   onToggle: () => void;
   onCollapse: () => void;
-  onNext: (() => void) | undefined;
+  onNext: () => void;
 }) {
+  const article = untrack(() => props.article);
   const bodyId = `${article.id}-ledger-body`;
   const titleId = `${article.id}-ledger-title`;
-  const contentRef = useRef<HTMLDivElement>(null);
+  const [content, setContent] = createSignal<HTMLDivElement>();
   const { scrollYProgress } = useScroll({
-    target: contentRef,
+    target: content,
     offset: [`start ${STICKY_OFFSET + TOOLBAR_HEIGHT}px`, "end end"],
   });
-  const currentSection = useCurrentSection(article, open);
+  const currentSection = useCurrentSection(article, () => props.open);
 
   return (
-    <li ref={rowRef} id={articleAnchor(article)} {...stylex.props(styles.row, kitStyles.anchor)}>
-      <h2 {...stylex.props(styles.heading)}>
+    <li
+      ref={(node) => props.rowRef(node)}
+      id={articleAnchor(article)}
+      {...stylex.attrs(styles.row, kitStyles.anchor)}
+    >
+      <h2 {...stylex.attrs(styles.heading)}>
         <button
           type="button"
-          aria-expanded={open}
+          aria-expanded={props.open ? "true" : "false"}
           aria-controls={bodyId}
-          onClick={onToggle}
-          {...stylex.props(styles.trigger, kitStyles.focusRing, stylex.defaultMarker())}
+          onClick={() => props.onToggle()}
+          {...stylex.attrs(styles.trigger, kitStyles.focusRing, stylex.defaultMarker())}
         >
           <span
-            {...stylex.props(styles.number, labStyles.displayNumber, open && styles.numberOpen)}
+            {...sxProps(styles.number, labStyles.displayNumber, props.open && styles.numberOpen)}
           >
-            {padIndex(index)}
+            {padIndex(props.index)}
           </span>
-          <span {...stylex.props(styles.text)}>
+          <span {...stylex.attrs(styles.text)}>
             <ArticleMetaSpan article={article} />
-            <span id={titleId} {...stylex.props(styles.title)}>
+            <span id={titleId} {...stylex.attrs(styles.title)}>
               {article.title}
             </span>
           </span>
-          <span {...stylex.props(styles.toggle)}>
-            <span {...stylex.props(styles.toggleLabel)}>{open ? "收起" : "阅读"}</span>
-            <span {...stylex.props(styles.circle, open && styles.circleOpen)}>
+          <span {...stylex.attrs(styles.toggle)}>
+            <span {...stylex.attrs(styles.toggleLabel)}>{props.open ? "收起" : "阅读"}</span>
+            <span {...sxProps(styles.circle, props.open && styles.circleOpen)}>
               <ChevronDown
                 size={18}
                 strokeWidth={2}
                 aria-hidden="true"
-                {...stylex.props(labStyles.chevron, open && labStyles.chevronUp)}
+                {...sxProps(labStyles.chevron, props.open && labStyles.chevronUp)}
               />
             </span>
           </span>
         </button>
       </h2>
-      {article.lead ? <p {...stylex.props(styles.lead)}>{article.lead}</p> : null}
+      <Show when={article.lead}>
+        <p {...stylex.attrs(styles.lead)}>{article.lead}</p>
+      </Show>
 
       <div
         id={bodyId}
         role="region"
         aria-labelledby={titleId}
-        inert={!open}
-        {...stylex.props(styles.collapse, open && styles.collapseOpen)}
+        inert={!props.open}
+        {...sxProps(styles.collapse, props.open && styles.collapseOpen)}
       >
-        <div {...stylex.props(styles.clip)}>
-          <div {...stylex.props(styles.body, open && styles.bodyOpen)}>
-            <div {...stylex.props(styles.toolbar)}>
-              <p {...stylex.props(styles.toolbarText)}>
-                <span {...stylex.props(styles.toolbarTitle)}>
+        <div {...stylex.attrs(styles.clip)}>
+          <div {...sxProps(styles.body, props.open && styles.bodyOpen)}>
+            <div {...stylex.attrs(styles.toolbar)}>
+              <p {...stylex.attrs(styles.toolbarText)}>
+                <span {...stylex.attrs(styles.toolbarTitle)}>
                   {article.navLabel ?? article.title}
                 </span>
-                <span {...stylex.props(styles.toolbarSection)}>{currentSection}</span>
+                <span {...stylex.attrs(styles.toolbarSection)}>{currentSection()}</span>
               </p>
               <button
                 type="button"
-                onClick={onCollapse}
-                {...stylex.props(labStyles.textButton, styles.toolbarButton, kitStyles.focusRing)}
+                onClick={() => props.onCollapse()}
+                {...stylex.attrs(labStyles.textButton, styles.toolbarButton, kitStyles.focusRing)}
               >
                 收起
                 <ChevronUp size={16} strokeWidth={2} aria-hidden="true" />
               </button>
-              <span aria-hidden="true" {...stylex.props(styles.progressTrack)}>
-                <m.span style={{ scaleX: scrollYProgress }} {...stylex.props(styles.progressBar)} />
+              <span aria-hidden="true" {...stylex.attrs(styles.progressTrack)}>
+                <m.span style={{ scaleX: scrollYProgress }} {...stylex.attrs(styles.progressBar)} />
               </span>
             </div>
-            <div ref={contentRef} {...stylex.props(styles.content)}>
+            <div ref={setContent} {...stylex.attrs(styles.content)}>
               <ArticlePreview article={article} />
-              <div {...stylex.props(styles.sectionsGap)}>
+              <div {...stylex.attrs(styles.sectionsGap)}>
                 <ArticleSections article={article} />
               </div>
-              <div {...stylex.props(styles.endRow)}>
+              <div {...stylex.attrs(styles.endRow)}>
                 <button
                   type="button"
-                  onClick={onCollapse}
-                  {...stylex.props(labStyles.pillButton, kitStyles.focusRing)}
+                  onClick={() => props.onCollapse()}
+                  {...stylex.attrs(labStyles.pillButton, kitStyles.focusRing)}
                 >
                   收起本文
                   <ChevronUp size={18} strokeWidth={2} aria-hidden="true" />
                 </button>
-                {next && onNext ? (
-                  <button
-                    type="button"
-                    onClick={onNext}
-                    {...stylex.props(labStyles.textButton, kitStyles.focusRing)}
-                  >
-                    <span {...stylex.props(styles.nextLabel)}>下一篇</span>
-                    <span {...stylex.props(styles.nextTitle)}>{next.navLabel ?? next.title}</span>
-                    <ArrowRight size={16} strokeWidth={2} aria-hidden="true" />
-                  </button>
-                ) : null}
+                <Show when={props.next}>
+                  {(next) => (
+                    <button
+                      type="button"
+                      onClick={() => props.onNext()}
+                      {...stylex.attrs(labStyles.textButton, kitStyles.focusRing)}
+                    >
+                      <span {...stylex.attrs(styles.nextLabel)}>下一篇</span>
+                      <span {...stylex.attrs(styles.nextTitle)}>
+                        {next().navLabel ?? next().title}
+                      </span>
+                      <ArrowRight size={16} strokeWidth={2} aria-hidden="true" />
+                    </button>
+                  )}
+                </Show>
               </div>
             </div>
           </div>
@@ -464,20 +474,20 @@ function LedgerRow({
   );
 }
 
-function ArticleMetaSpan({ article }: { article: LabArticle }) {
+function ArticleMetaSpan(props: { article: LabArticle }) {
   return (
-    <span {...stylex.props(labStyles.meta)}>
-      <span {...stylex.props(labStyles.metaCategory)}>{article.category}</span>
-      <span aria-hidden="true" {...stylex.props(labStyles.metaDot)} />
-      <span>{`约 ${readMinutes(article)} 分钟`}</span>
+    <span {...stylex.attrs(labStyles.meta)}>
+      <span {...stylex.attrs(labStyles.metaCategory)}>{props.article.category}</span>
+      <span aria-hidden="true" {...stylex.attrs(labStyles.metaDot)} />
+      <span>{`约 ${readMinutes(props.article)} 分钟`}</span>
     </span>
   );
 }
 
-function useCurrentSection(article: LabArticle, active: boolean) {
-  const [label, setLabel] = useState("导读");
+function useCurrentSection(article: LabArticle, isActive: Accessor<boolean>) {
+  const [label, setLabel] = createSignal("导读");
 
-  useEffect(() => {
+  createEffect(isActive, (active) => {
     if (!active) return;
     let frame = 0;
     const update = () => {
@@ -499,7 +509,7 @@ function useCurrentSection(article: LabArticle, active: boolean) {
       window.removeEventListener("scroll", onScroll);
       if (frame) cancelAnimationFrame(frame);
     };
-  }, [active, article]);
+  });
 
   return label;
 }

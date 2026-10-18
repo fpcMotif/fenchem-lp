@@ -1,12 +1,9 @@
 import * as stylex from "@stylexjs/stylex";
 import type { StyleXStyles } from "@stylexjs/stylex";
-import type { ReactNode } from "react";
-import { Leaf } from "lucide-react";
+import type { JSX } from "@solidjs/web";
+import { Leaf } from "@fenchem-lp/ui/components/lucide";
 import { company, regions } from "@/components/landing/landing-content";
-export function FooterDirectory({
-  styles,
-  divisions,
-}: {
+export function FooterDirectory(props: {
   styles: Record<
     | "footerGrid"
     | "footerIntro"
@@ -23,44 +20,45 @@ export function FooterDirectory({
     | "footerLink",
     StyleXStyles
   >;
-  divisions: ReactNode;
+  divisions: JSX.Element;
 }) {
+  const styles = props.styles;
   return (
-    <div {...stylex.props(styles.footerGrid)}>
-      <div {...stylex.props(styles.footerIntro)}>
-        <a href="#top" aria-label="Fenchem home" {...stylex.props(styles.brand)}>
-          <span {...stylex.props(styles.brandWord)}>FENCHEM</span>
-          <Leaf aria-hidden strokeWidth={1.5} {...stylex.props(styles.brandLeaf)} />
+    <div {...stylex.attrs(styles.footerGrid)}>
+      <div {...stylex.attrs(styles.footerIntro)}>
+        <a href="#top" aria-label="Fenchem home" {...stylex.attrs(styles.brand)}>
+          <span {...stylex.attrs(styles.brandWord)}>FENCHEM</span>
+          <Leaf aria-hidden="true" strokeWidth={1.5} {...stylex.attrs(styles.brandLeaf)} />
         </a>
-        <p {...stylex.props(styles.prose)}>{company.tagline}</p>
-        <span {...stylex.props(styles.techLabel)}>
+        <p {...stylex.attrs(styles.prose)}>{company.tagline}</p>
+        <span {...stylex.attrs(styles.techLabel)}>
           {company.since} · {company.hq.city}
         </span>
       </div>
-      <div {...stylex.props(styles.footerCol)}>
-        <h3 {...stylex.props(styles.footerHead)}>Divisions</h3>
-        <ul {...stylex.props(styles.footerList)}>{divisions}</ul>
+      <div {...stylex.attrs(styles.footerCol)}>
+        <h3 {...stylex.attrs(styles.footerHead)}>Divisions</h3>
+        <ul {...stylex.attrs(styles.footerList)}>{props.divisions}</ul>
       </div>
-      <div {...stylex.props(styles.footerCol)}>
-        <h3 {...stylex.props(styles.footerHead)}>Bases</h3>
-        <ul {...stylex.props(styles.footerList)}>
+      <div {...stylex.attrs(styles.footerCol)}>
+        <h3 {...stylex.attrs(styles.footerHead)}>Bases</h3>
+        <ul {...stylex.attrs(styles.footerList)}>
           {regions.map((region) => (
-            <li key={region.city} {...stylex.props(styles.footerItem)}>
+            <li {...stylex.attrs(styles.footerItem)}>
               {region.city}
-              <span {...stylex.props(styles.techLabel)}>{region.short}</span>
+              <span {...stylex.attrs(styles.techLabel)}>{region.short}</span>
             </li>
           ))}
         </ul>
       </div>
-      <div {...stylex.props(styles.footerCol, styles.footerColLast)}>
-        <h3 {...stylex.props(styles.footerHead)}>Contact</h3>
-        <ul {...stylex.props(styles.footerList)}>
+      <div {...stylex.attrs(styles.footerCol, styles.footerColLast)}>
+        <h3 {...stylex.attrs(styles.footerHead)}>Contact</h3>
+        <ul {...stylex.attrs(styles.footerList)}>
           <li>
-            <a href={`mailto:${company.email}`} {...stylex.props(styles.footerLink)}>
+            <a href={`mailto:${company.email}`} {...stylex.attrs(styles.footerLink)}>
               {company.email}
             </a>
           </li>
-          <li {...stylex.props(styles.footerItem)}>{company.hq.coords}</li>
+          <li {...stylex.attrs(styles.footerItem)}>{company.hq.coords}</li>
         </ul>
       </div>
     </div>

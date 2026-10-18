@@ -1,4 +1,3 @@
-import { breakpoints } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 
 import { ABOUT_CULTURE } from "../../about-data";
@@ -6,7 +5,7 @@ import { layout } from "./layout";
 import { palette } from "./palette.stylex";
 import { Reveal } from "./reveal";
 
-const LG = breakpoints.lg;
+const LG = "@media (min-width: 1024px)";
 
 const styles = stylex.create({
   section: {
@@ -75,27 +74,24 @@ export function Culture() {
     <section
       id="about-culture"
       aria-labelledby="about-culture-title"
-      {...stylex.props(styles.section, layout.sectionY, layout.anchor)}
+      {...stylex.attrs(styles.section, layout.sectionY, layout.anchor)}
     >
-      <h2 id="about-culture-title" {...stylex.props(layout.srOnly)}>
+      <h2 id="about-culture-title" {...stylex.attrs(layout.srOnly)}>
         Culture
       </h2>
-      <ol {...stylex.props(layout.shell, styles.list)}>
+      <ol {...stylex.attrs(layout.shell, styles.list)}>
         {ABOUT_CULTURE.values.map((value, index) => (
-          <li
-            key={value.title}
-            {...stylex.props(layout.split, styles.row, index === 0 && styles.rowFirst)}
-          >
+          <li {...stylex.attrs(layout.split, styles.row, index === 0 && styles.rowFirst)}>
             <Reveal sx={[layout.padLeft, layout.seam]}>
-              <div {...stylex.props(styles.value)}>
-                <span aria-hidden="true" {...stylex.props(styles.glyph, TONES[value.tone])}>
+              <div {...stylex.attrs(styles.value)}>
+                <span aria-hidden="true" {...stylex.attrs(styles.glyph, TONES[value.tone])}>
                   {value.glyph}
                 </span>
-                <h3 {...stylex.props(styles.title)}>{value.title}</h3>
+                <h3 {...stylex.attrs(styles.title)}>{value.title}</h3>
               </div>
             </Reveal>
             <Reveal step={1} sx={layout.padRight}>
-              <p {...stylex.props(styles.desc)}>{value.desc}</p>
+              <p {...stylex.attrs(styles.desc)}>{value.desc}</p>
             </Reveal>
           </li>
         ))}

@@ -60,30 +60,30 @@ const styles = stylex.create({
 export function Hero() {
   const [head, tail] = SENTENCE.hero;
   return (
-    <div {...stylex.props(styles.hero)}>
-      <div {...stylex.props(styles.meta)}>
-        <div {...stylex.props(ui.shell, styles.metaRow)}>
-          <p {...stylex.props(ui.label)}>
+    <div {...stylex.attrs(styles.hero)}>
+      <div {...stylex.attrs(styles.meta)}>
+        <div {...stylex.attrs(ui.shell, styles.metaRow)}>
+          <p {...stylex.attrs(ui.label)}>
             <span>{ABOUT_BANNER.title}</span>
-            <span lang="en" {...stylex.props(ui.labelEn)}>
+            <span lang="en" {...stylex.attrs(ui.labelEn)}>
               About Fenchem, in one sentence
             </span>
           </p>
-          <p lang="en" {...stylex.props(ui.note, styles.place)}>
+          <p lang="en" {...stylex.attrs(ui.note, styles.place)}>
             {ABOUT_BANNER.established} · {ABOUT_BANNER.place}
           </p>
         </div>
       </div>
-      <div {...stylex.props(ui.shell)}>
-        <h1 {...stylex.props(styles.title)}>
+      <div {...stylex.attrs(ui.shell)}>
+        <h1 {...stylex.attrs(styles.title)}>
           <Clause line={head} as="span" />
           <Clause line={tail} as="span" />
         </h1>
-        <div {...stylex.props(styles.foot)}>
-          <p lang="en" {...stylex.props(styles.english)}>
+        <div {...stylex.attrs(styles.foot)}>
+          <p lang="en" {...stylex.attrs(styles.english)}>
             {ABOUT_HERO.englishTitle}
           </p>
-          <p lang="en" {...stylex.props(styles.tagline)}>
+          <p lang="en" {...stylex.attrs(styles.tagline)}>
             {ABOUT_BANNER.tagline}
           </p>
         </div>

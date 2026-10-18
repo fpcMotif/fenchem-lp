@@ -1,6 +1,6 @@
 import * as stylex from "@stylexjs/stylex";
-import { useInView } from "motion/react";
-import { useEffect, useRef, useState, type CSSProperties, type RefObject } from "react";
+import { useInView } from "@/compat/motion";
+import type { JSX } from "@solidjs/web";
 
 import { ABOUT_CULTURE } from "../../about-data";
 import { ORIGIN_YEAR } from "./geometry";
@@ -20,12 +20,13 @@ import {
   toX,
   toY,
 } from "./wedge";
+import { createEffect, createSignal, type Accessor } from "solid-js";
 
 const NAVY = "#0b2a5c";
 const BLUE = "#0743a9";
 const PLATE_SHARE = 0.72;
 const VIEW_BOX = `${VIEW.x} ${VIEW.y} ${VIEW.width} ${VIEW.height}`;
-const APEX_VARS = { "--oos1o-apex": `${toX(0)}% ${toY(0)}%` } as CSSProperties;
+const APEX_VARS = { "--oos1o-apex": `${toX(0)}% ${toY(0)}%` } as JSX.CSSProperties;
 const APEX_POSITION = { left: `${toX(0)}%`, top: `${toY(0)}%` };
 
 const ANATOMY = [
@@ -215,20 +216,19 @@ const styles = stylex.create({
 type Leader = { path: string; cambium: boolean };
 
 function useLeaders(
-  plateRef: RefObject<HTMLDivElement | null>,
-  glyphRefs: RefObject<(HTMLSpanElement | null)[]>,
+  plateRef: Accessor<HTMLDivElement | undefined>,
+  glyphRefs: (HTMLSpanElement | null)[],
 ) {
-  const [frame, setFrame] = useState({ width: 0, height: 0, leaders: [] as Leader[] });
+  const [frame, setFrame] = createSignal({ width: 0, height: 0, leaders: [] as Leader[] });
 
-  useEffect(() => {
-    const plate = plateRef.current;
+  createEffect(plateRef, (plate) => {
     if (!plate) return;
     const measure = () => {
       const box = plate.getBoundingClientRect();
       const wedgeWidth = box.width * PLATE_SHARE;
       const knee = wedgeWidth + 18;
       const leaders = ZONES.map((zone, index) => {
-        const glyph = glyphRefs.current[index]?.getBoundingClientRect();
+        const glyph = glyphRefs[index]?.getBoundingClientRect();
         if (!glyph) return { path: "", cambium: index === 2 };
         const x = (toX(zone.anchor.x) / 100) * wedgeWidth;
         const y = (toY(zone.anchor.y) / 100) * box.height;
@@ -245,98 +245,96 @@ function useLeaders(
     void document.fonts.ready.then(measure);
     const observer = new ResizeObserver(measure);
     observer.observe(plate);
-    for (const glyph of glyphRefs.current) {
+    for (const glyph of glyphRefs) {
       if (glyph?.parentElement?.parentElement) observer.observe(glyph.parentElement.parentElement);
     }
     return () => observer.disconnect();
-  }, [glyphRefs, plateRef]);
+  });
 
   return frame;
 }
 
 export function Culture() {
-  const plateRef = useRef<HTMLDivElement>(null);
-  const glyphRefs = useRef<(HTMLSpanElement | null)[]>([]);
+  const [plateRef, setPlateRef] = createSignal<HTMLDivElement>();
+  const glyphRefs: (HTMLSpanElement | null)[] = [];
   const shown = useInView(plateRef, { once: true, amount: 0.3 });
   const leaders = useLeaders(plateRef, glyphRefs);
-  const [active, setActive] = useState<number | null>(null);
-  const emphasis = (index: number, rest: number, lit: number) => (active === index ? lit : rest);
+  const [active, setActive] = createSignal<number | null>(null);
+  const emphasis = (index: number, rest: number, lit: number) => (active() === index ? lit : rest);
 
   return (
-    <section id="about-culture" aria-labelledby="oos1o-culture" {...stylex.props(styles.section)}>
-      <div {...stylex.props(ui.shell)}>
-        <div {...stylex.props(styles.intro)}>
+    <section id="about-culture" aria-labelledby="oos1o-culture" {...stylex.attrs(styles.section)}>
+      <div {...stylex.attrs(ui.shell)}>
+        <div {...stylex.attrs(styles.intro)}>
           <SectionHead id="oos1o-culture" label="Culture" title={ABOUT_CULTURE.title} />
-          <p lang="en" {...stylex.props(ui.serif, styles.caption)}>
+          <p lang="en" {...stylex.attrs(ui.serif, styles.caption)}>
             Fig. 2 — The same section, magnified: from the pith, through the wood, to the living
             edge.
           </p>
         </div>
 
-        <div ref={plateRef} {...stylex.props(styles.plate)}>
-          <div {...stylex.props(styles.wedge, !shown && styles.wedgeHidden)} style={APEX_VARS}>
-            <svg viewBox={VIEW_BOX} aria-hidden="true" {...stylex.props(ui.svg)}>
+        <div ref={setPlateRef} {...stylex.attrs(styles.plate)}>
+          <div {...stylex.attrs(styles.wedge, !shown() && styles.wedgeHidden)} style={APEX_VARS}>
+            <svg viewBox={VIEW_BOX} aria-hidden="true" {...stylex.attrs(ui.svg)}>
               <path d={OUTLINE} fill="#ffffff" />
               <path
                 d={HEARTWOOD}
                 fill={NAVY}
-                fillOpacity={emphasis(0, 0.07, 0.15)}
-                {...stylex.props(styles.zoneFill)}
+                fill-opacity={emphasis(0, 0.07, 0.15)}
+                {...stylex.attrs(styles.zoneFill)}
               />
               <path
                 d={SAPWOOD}
                 fill={NAVY}
-                fillOpacity={emphasis(1, 0, 0.06)}
-                {...stylex.props(styles.zoneFill)}
+                fill-opacity={emphasis(1, 0, 0.06)}
+                {...stylex.attrs(styles.zoneFill)}
               />
-              <path d={LATEWOOD} fill={NAVY} fillOpacity={0.05} />
-              <path d={TEXTURE.pores} fill={NAVY} fillOpacity={0.24} />
+              <path d={LATEWOOD} fill={NAVY} fill-opacity={0.05} />
+              <path d={TEXTURE.pores} fill={NAVY} fill-opacity={0.24} />
               <path
                 d={TEXTURE.rays}
                 fill="none"
                 stroke={NAVY}
-                strokeOpacity={0.14}
-                strokeWidth={0.75}
-                vectorEffect="non-scaling-stroke"
+                stroke-opacity={0.14}
+                stroke-width={0.75}
+                vector-effect="non-scaling-stroke"
               />
               {RING_ARCS.map((ring) => (
                 <path
-                  key={ring.key}
                   d={ring.path}
                   fill="none"
                   stroke={NAVY}
-                  strokeOpacity={ring.alpha}
-                  strokeWidth={1}
-                  vectorEffect="non-scaling-stroke"
+                  stroke-opacity={ring.alpha}
+                  stroke-width={1}
+                  vector-effect="non-scaling-stroke"
                 />
               ))}
               <path
                 d={CAMBIUM}
                 fill={BLUE}
-                fillOpacity={emphasis(2, 0.85, 1)}
-                {...stylex.props(styles.zoneFill)}
+                fill-opacity={emphasis(2, 0.85, 1)}
+                {...stylex.attrs(styles.zoneFill)}
               />
               <path
                 d={OUTLINE}
                 fill="none"
                 stroke={NAVY}
-                strokeOpacity={0.55}
-                strokeWidth={1}
-                strokeLinejoin="round"
-                vectorEffect="non-scaling-stroke"
+                stroke-opacity={0.55}
+                stroke-width={1}
+                stroke-linejoin="round"
+                vector-effect="non-scaling-stroke"
               />
             </svg>
-            <span aria-hidden="true" {...stylex.props(styles.pith)} style={APEX_POSITION} />
-            <p aria-hidden="true" {...stylex.props(styles.pithLabel)} style={APEX_POSITION}>
-              <span {...stylex.props(ui.latin)}>{ORIGIN_YEAR}</span>
+            <span aria-hidden="true" {...stylex.attrs(styles.pith)} style={APEX_POSITION} />
+            <p aria-hidden="true" {...stylex.attrs(styles.pithLabel)} style={APEX_POSITION}>
+              <span {...stylex.attrs(ui.latin)}>{ORIGIN_YEAR}</span>
               <span>·</span>
               <span>南京</span>
             </p>
             {ZONES.map((zone, index) => (
               <span
-                key={zone.glyph}
                 aria-hidden="true"
-                {...stylex.props(styles.marker, index === 2 && styles.markerCambium)}
+                {...stylex.attrs(styles.marker, index === 2 && styles.markerCambium)}
                 style={{ left: `${toX(zone.anchor.x)}%`, top: `${toY(zone.anchor.y)}%` }}
               >
                 {zone.glyph}
@@ -344,55 +342,53 @@ export function Culture() {
             ))}
           </div>
 
-          <div {...stylex.props(styles.annotations, !shown && styles.annotationsHidden)}>
+          <div {...stylex.attrs(styles.annotations, !shown() && styles.annotationsHidden)}>
             <svg
-              width={leaders.width}
-              height={leaders.height}
-              viewBox={`0 0 ${leaders.width} ${leaders.height}`}
+              width={leaders().width}
+              height={leaders().height}
+              viewBox={`0 0 ${leaders().width} ${leaders().height}`}
               aria-hidden="true"
-              {...stylex.props(styles.leaders)}
+              {...stylex.attrs(styles.leaders)}
             >
-              {leaders.leaders.map((leader, index) => (
+              {leaders().leaders.map((leader, index) => (
                 <path
-                  key={ZONES[index].glyph}
                   d={leader.path}
                   fill="none"
                   stroke={leader.cambium ? BLUE : NAVY}
-                  strokeOpacity={active === index ? 0.9 : 0.42}
-                  strokeWidth={1}
-                  strokeLinejoin="round"
+                  stroke-opacity={active() === index ? 0.9 : 0.42}
+                  stroke-width={1}
+                  stroke-linejoin="round"
                 />
               ))}
             </svg>
           </div>
 
-          <ol {...stylex.props(styles.zones)}>
+          <ol {...stylex.attrs(styles.zones)}>
             {ZONES.map((zone, index) => (
               <li
-                key={zone.glyph}
                 onMouseEnter={() => setActive(index)}
                 onMouseLeave={() => setActive(null)}
-                {...stylex.props(styles.zone)}
+                {...stylex.attrs(styles.zone)}
               >
-                <p {...stylex.props(styles.zoneHead)}>
+                <p {...stylex.attrs(styles.zoneHead)}>
                   <span
                     ref={(element) => {
-                      glyphRefs.current[index] = element;
+                      glyphRefs[index] = element;
                     }}
                     aria-hidden="true"
-                    {...stylex.props(styles.glyph, index === 2 && styles.glyphCambium)}
+                    {...stylex.attrs(styles.glyph, index === 2 && styles.glyphCambium)}
                   >
                     {zone.glyph}
                   </span>
-                  <span lang="en" {...stylex.props(ui.serif, styles.anatomy)}>
+                  <span lang="en" {...stylex.attrs(ui.serif, styles.anatomy)}>
                     {zone.en}
-                    <span lang="zh-CN" {...stylex.props(styles.anatomyZh)}>
+                    <span lang="zh-CN" {...stylex.attrs(styles.anatomyZh)}>
                       {zone.zh}
                     </span>
                   </span>
                 </p>
-                <h3 {...stylex.props(styles.title)}>{zone.title}</h3>
-                <p {...stylex.props(ui.body, styles.desc)}>{zone.desc}</p>
+                <h3 {...stylex.attrs(styles.title)}>{zone.title}</h3>
+                <p {...stylex.attrs(ui.body, styles.desc)}>{zone.desc}</p>
               </li>
             ))}
           </ol>

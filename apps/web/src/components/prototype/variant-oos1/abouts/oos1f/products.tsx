@@ -1,4 +1,4 @@
-import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
+import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 
 import { PRODUCTS, PRODUCTS_INTRO } from "../../content";
@@ -11,10 +11,10 @@ const styles = stylex.create({
     gridTemplateColumns: {
       default: "minmax(0, 1fr)",
       [media.midToXl]: "repeat(2, minmax(0, 1fr))",
-      [breakpoints.xl]: "repeat(4, minmax(0, 1fr))",
+      ["@media (min-width: 1280px)"]: "repeat(4, minmax(0, 1fr))",
     },
-    columnGap: { default: 0, [media.midToXl]: 32, [breakpoints.xl]: 32 },
-    rowGap: { default: 48, [breakpoints.md]: 56 },
+    columnGap: { default: 0, [media.midToXl]: 32, ["@media (min-width: 1280px)"]: 32 },
+    rowGap: { default: 48, ["@media (min-width: 768px)"]: 56 },
     margin: 0,
     padding: 0,
     listStyle: "none",
@@ -80,7 +80,7 @@ const styles = stylex.create({
     color: color.body,
   },
   actions: {
-    marginTop: { default: 48, [breakpoints.lg]: 64 },
+    marginTop: { default: 48, ["@media (min-width: 1024px)"]: 64 },
   },
   more: {
     padding: 0,
@@ -106,48 +106,48 @@ const styles = stylex.create({
   },
 });
 
-export function Products({ onNavigateHome }: { onNavigateHome: (hash?: string) => void }) {
+export function Products(props: { onNavigateHome: (hash?: string) => void }) {
   return (
     <Section id="about-products" name="Products and application solutions">
       <Shell>
         <NodeMarker />
         <Reveal>
-          <ul {...stylex.props(styles.grid)}>
+          <ul {...stylex.attrs(styles.grid)}>
             {PRODUCTS.map((product) => (
-              <li key={product.title} {...stylex.props(styles.card)}>
+              <li {...stylex.attrs(styles.card)}>
                 <img
                   src={product.image}
                   alt={product.english}
                   loading="lazy"
                   decoding="async"
-                  {...stylex.props(styles.image)}
+                  {...stylex.attrs(styles.image)}
                 />
-                <h3 {...stylex.props(styles.title)}>
+                <h3 {...stylex.attrs(styles.title)}>
                   <a
                     href="#products"
                     onClick={(event) => {
                       event.preventDefault();
-                      onNavigateHome("products");
+                      props.onNavigateHome("products");
                     }}
-                    {...stylex.props(styles.link)}
+                    {...stylex.attrs(styles.link)}
                   >
                     {product.title}
                   </a>
                 </h3>
-                <p {...stylex.props(styles.description)}>{product.description}</p>
-                <ul aria-label="Application areas" {...stylex.props(styles.tags)}>
+                <p {...stylex.attrs(styles.description)}>{product.description}</p>
+                <ul aria-label="Application areas" {...stylex.attrs(styles.tags)}>
                   {product.tags.map((tag) => (
-                    <li key={tag}>{tag}</li>
+                    <li>{tag}</li>
                   ))}
                 </ul>
               </li>
             ))}
           </ul>
-          <div {...stylex.props(styles.actions)}>
+          <div {...stylex.attrs(styles.actions)}>
             <button
               type="button"
-              onClick={() => onNavigateHome("products")}
-              {...stylex.props(styles.more)}
+              onClick={() => props.onNavigateHome("products")}
+              {...stylex.attrs(styles.more)}
             >
               {PRODUCTS_INTRO.cta.label}
             </button>

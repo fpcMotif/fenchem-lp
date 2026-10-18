@@ -1,7 +1,6 @@
-import { breakpoints } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { MapPin } from "lucide-react";
-import { useState } from "react";
+import { MapPin } from "@fenchem-lp/ui/components/lucide";
+import { createMemo, createSignal, For } from "solid-js";
 
 import { Flow } from "../shared/flow";
 import { ContactCta } from "./contact-cta";
@@ -21,18 +20,18 @@ const MUTED_LABEL = "#64748b";
 const NAVY_DEEP = "#071e42";
 const NAVY_ACCENT = "#0743a9";
 
-const DESKTOP = breakpoints.xl;
+const DESKTOP = "@media (min-width: 1280px)";
 
 const styles = stylex.create({
   // Content Area
   mainSection: {
-    paddingBlock: { default: 36, [breakpoints.md]: 64 },
+    paddingBlock: { default: 36, ["@media (min-width: 768px)"]: 64 },
   },
 
   // Featured Story (Lucas Meyer editorial style)
   featuredCard: {
     display: "grid",
-    gridTemplateColumns: { default: "1fr", [breakpoints.lg]: "1.1fr 0.9fr" },
+    gridTemplateColumns: { default: "1fr", ["@media (min-width: 1024px)"]: "1.1fr 0.9fr" },
     borderRadius: 16,
     overflow: "hidden",
     borderWidth: 1,
@@ -40,11 +39,11 @@ const styles = stylex.create({
     borderColor: "rgba(26, 26, 26, 0.08)",
     backgroundColor: "#ffffff",
     boxShadow: "0 4px 20px rgba(0, 0, 0, 0.04)",
-    marginBottom: { default: 40, [breakpoints.md]: 56 },
+    marginBottom: { default: 40, ["@media (min-width: 768px)"]: 56 },
   },
   featuredImgWrap: {
     position: "relative",
-    minHeight: { default: 220, [breakpoints.md]: 320 },
+    minHeight: { default: 220, ["@media (min-width: 768px)"]: 320 },
     backgroundColor: "#e2e8f0",
   },
   featuredImg: {
@@ -53,7 +52,7 @@ const styles = stylex.create({
     objectFit: "cover",
   },
   featuredBody: {
-    padding: { default: 24, [breakpoints.md]: 36 },
+    padding: { default: 24, ["@media (min-width: 768px)"]: 36 },
     display: "flex",
     flexDirection: "column",
     justifyContent: "center",
@@ -74,7 +73,7 @@ const styles = stylex.create({
     gap: 12,
   },
   featuredTitle: {
-    fontSize: { default: 18, [breakpoints.md]: 22 },
+    fontSize: { default: 18, ["@media (min-width: 768px)"]: 22 },
     fontWeight: 800,
     color: color.ink,
     lineHeight: 1.35,
@@ -104,7 +103,7 @@ const styles = stylex.create({
     display: "grid",
     gridTemplateColumns: {
       default: "1fr",
-      [breakpoints.md]: "repeat(2, 1fr)",
+      ["@media (min-width: 768px)"]: "repeat(2, 1fr)",
       [DESKTOP]: "repeat(3, 1fr)",
     },
     gap: 24,
@@ -158,7 +157,7 @@ const styles = stylex.create({
 
   // Upcoming Events Strip (Lucas Meyer style)
   eventsSection: {
-    paddingBlock: { default: 40, [breakpoints.md]: 56 },
+    paddingBlock: { default: 40, ["@media (min-width: 768px)"]: 56 },
     backgroundColor: "#f8fafc",
     borderTopWidth: 1,
     borderTopStyle: "solid",
@@ -168,7 +167,7 @@ const styles = stylex.create({
     marginBottom: 24,
   },
   eventsTitle: {
-    fontSize: { default: 22, [breakpoints.md]: 26 },
+    fontSize: { default: 22, ["@media (min-width: 768px)"]: 26 },
     fontWeight: 800,
     color: color.ink,
     margin: "0 0 6px 0",
@@ -182,7 +181,7 @@ const styles = stylex.create({
     display: "grid",
     gridTemplateColumns: {
       default: "1fr",
-      [breakpoints.md]: "repeat(2, 1fr)",
+      ["@media (min-width: 768px)"]: "repeat(2, 1fr)",
       [DESKTOP]: "repeat(4, 1fr)",
     },
     gap: 16,
@@ -228,14 +227,15 @@ const styles = stylex.create({
   },
 });
 
-export function NewsView({ onNavigateHome }: { onNavigateHome: (target?: string) => void }) {
-  const [activeCat, setActiveCat] = useState<string>("all");
+export function NewsView(props: { onNavigateHome: (target?: string) => void }) {
+  const [activeCat, setActiveCat] = createSignal<string>("all");
 
-  const filteredNews: readonly NewsItem[] =
-    activeCat === "all" ? NEWS_LIST : NEWS_LIST.filter((item) => item.category === activeCat);
+  const filteredNews = createMemo<readonly NewsItem[]>(() =>
+    activeCat() === "all" ? NEWS_LIST : NEWS_LIST.filter((item) => item.category === activeCat()),
+  );
 
   return (
-    <div id="news-top" lang="zh-CN" {...stylex.props(kitStyles.root)}>
+    <div id="news-top" lang="zh-CN" {...stylex.attrs(kitStyles.root)}>
       <SubPageBanner
         eyebrow={NEWS_HEADER.title}
         title={NEWS_HEADER.chineseTitle}
@@ -250,37 +250,37 @@ export function NewsView({ onNavigateHome }: { onNavigateHome: (target?: string)
       <SubPageNav
         current="新闻资讯"
         chips={NEWS_CATEGORIES}
-        activeChip={activeCat}
+        activeChip={activeCat()}
         onSelectChip={setActiveCat}
         chipsLabel="新闻分类"
-        onNavigateHome={onNavigateHome}
+        onNavigateHome={props.onNavigateHome}
       />
 
       {/* Main News Content */}
-      <section {...stylex.props(styles.mainSection)}>
-        <div {...stylex.props(kitStyles.shell, kitStyles.inset120)}>
+      <section {...stylex.attrs(styles.mainSection)}>
+        <div {...stylex.attrs(kitStyles.shell, kitStyles.inset120)}>
           {/* Featured Headline Story */}
-          <article {...stylex.props(styles.featuredCard)}>
-            <div {...stylex.props(styles.featuredImgWrap)}>
+          <article {...stylex.attrs(styles.featuredCard)}>
+            <div {...stylex.attrs(styles.featuredImgWrap)}>
               <img
                 src={FEATURED_NEWS.image}
                 alt={FEATURED_NEWS.title}
                 loading="eager"
                 decoding="async"
-                {...stylex.props(styles.featuredImg)}
+                {...stylex.attrs(styles.featuredImg)}
               />
             </div>
-            <div {...stylex.props(styles.featuredBody)}>
-              <span {...stylex.props(styles.badge)}>{FEATURED_NEWS.categoryLabel}</span>
-              <div {...stylex.props(styles.metaText)}>
+            <div {...stylex.attrs(styles.featuredBody)}>
+              <span {...stylex.attrs(styles.badge)}>{FEATURED_NEWS.categoryLabel}</span>
+              <div {...stylex.attrs(styles.metaText)}>
                 <span>{FEATURED_NEWS.date}</span>
                 <span>·</span>
                 <span>{FEATURED_NEWS.readTime} 阅读</span>
               </div>
-              <h2 {...stylex.props(styles.featuredTitle)}>{FEATURED_NEWS.title}</h2>
-              <p {...stylex.props(styles.featuredExcerpt)}>{FEATURED_NEWS.excerpt}</p>
+              <h2 {...stylex.attrs(styles.featuredTitle)}>{FEATURED_NEWS.title}</h2>
+              <p {...stylex.attrs(styles.featuredExcerpt)}>{FEATURED_NEWS.excerpt}</p>
               {FEATURED_NEWS.location ? (
-                <div {...stylex.props(styles.locationNote)}>
+                <div {...stylex.attrs(styles.locationNote)}>
                   <MapPin size={14} color={NAVY_ACCENT} />
                   <span>
                     {FEATURED_NEWS.location} · {FEATURED_NEWS.booth}
@@ -291,52 +291,54 @@ export function NewsView({ onNavigateHome }: { onNavigateHome: (target?: string)
           </article>
 
           {/* News Cards Grid */}
-          <div {...stylex.props(styles.newsGrid)}>
-            {filteredNews.map((news) => (
-              <article key={news.id} {...stylex.props(styles.newsCard)}>
-                <div {...stylex.props(styles.newsImgWrap)}>
-                  <img
-                    src={news.image}
-                    alt={news.title}
-                    loading="lazy"
-                    decoding="async"
-                    {...stylex.props(styles.newsImg)}
-                  />
-                </div>
-                <div {...stylex.props(styles.newsBody)}>
-                  <span {...stylex.props(styles.badge)}>{news.categoryLabel}</span>
-                  <div {...stylex.props(styles.metaText)}>
-                    <span>{news.date}</span>
+          <div {...stylex.attrs(styles.newsGrid)}>
+            <For each={filteredNews()}>
+              {(news) => (
+                <article {...stylex.attrs(styles.newsCard)}>
+                  <div {...stylex.attrs(styles.newsImgWrap)}>
+                    <img
+                      src={news.image}
+                      alt={news.title}
+                      loading="lazy"
+                      decoding="async"
+                      {...stylex.attrs(styles.newsImg)}
+                    />
                   </div>
-                  <h3 {...stylex.props(styles.newsTitle)}>{news.title}</h3>
-                  <p {...stylex.props(styles.newsExcerpt)}>{news.excerpt}</p>
-                </div>
-              </article>
-            ))}
+                  <div {...stylex.attrs(styles.newsBody)}>
+                    <span {...stylex.attrs(styles.badge)}>{news.categoryLabel}</span>
+                    <div {...stylex.attrs(styles.metaText)}>
+                      <span>{news.date}</span>
+                    </div>
+                    <h3 {...stylex.attrs(styles.newsTitle)}>{news.title}</h3>
+                    <p {...stylex.attrs(styles.newsExcerpt)}>{news.excerpt}</p>
+                  </div>
+                </article>
+              )}
+            </For>
           </div>
         </div>
       </section>
 
       {/* Upcoming Events / Expos Strip */}
-      <section {...stylex.props(styles.eventsSection)}>
-        <div {...stylex.props(kitStyles.shell, kitStyles.inset120)}>
-          <div {...stylex.props(styles.eventsHeader)}>
-            <h2 {...stylex.props(styles.eventsTitle)}>2026 全球重点展会日程</h2>
-            <p {...stylex.props(styles.eventsLead)}>
+      <section {...stylex.attrs(styles.eventsSection)}>
+        <div {...stylex.attrs(kitStyles.shell, kitStyles.inset120)}>
+          <div {...stylex.attrs(styles.eventsHeader)}>
+            <h2 {...stylex.attrs(styles.eventsTitle)}>2026 全球重点展会日程</h2>
+            <p {...stylex.attrs(styles.eventsLead)}>
               欢迎在展会现场与泛成技术团队会面，交流最新配方趋势与打样需求。
             </p>
           </div>
 
-          <div {...stylex.props(styles.eventsGrid)}>
+          <div {...stylex.attrs(styles.eventsGrid)}>
             {UPCOMING_EVENTS.map((event) => (
-              <div key={event.name} {...stylex.props(styles.eventCard)}>
-                <div {...stylex.props(styles.eventDate)}>{event.date}</div>
-                <div {...stylex.props(styles.eventName)}>{event.name}</div>
-                <div {...stylex.props(styles.eventCity)}>
+              <div {...stylex.attrs(styles.eventCard)}>
+                <div {...stylex.attrs(styles.eventDate)}>{event.date}</div>
+                <div {...stylex.attrs(styles.eventName)}>{event.name}</div>
+                <div {...stylex.attrs(styles.eventCity)}>
                   <MapPin size={13} color={NAVY_ACCENT} />
                   <span>{event.city}</span>
                 </div>
-                <div {...stylex.props(styles.eventBooth)}>展位：{event.booth}</div>
+                <div {...stylex.attrs(styles.eventBooth)}>展位：{event.booth}</div>
               </div>
             ))}
           </div>
@@ -345,7 +347,7 @@ export function NewsView({ onNavigateHome }: { onNavigateHome: (target?: string)
 
       <Flow>
         <ContactCta
-          actions={[{ label: CTA.action.label, onClick: () => onNavigateHome("contact") }]}
+          actions={[{ label: CTA.action.label, onClick: () => props.onNavigateHome("contact") }]}
         />
       </Flow>
     </div>

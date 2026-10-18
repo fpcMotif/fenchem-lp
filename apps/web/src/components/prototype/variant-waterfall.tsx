@@ -18,9 +18,10 @@
  * every rule inside a section is bound to the container.
  * Middot only inside a physical-form value ("Root extract · powder").
  */
-import { Fragment, useState, type FormEvent, type MouseEvent, type ReactNode } from "react";
-import { AnimatePresence, LazyMotion, domAnimation, m } from "motion/react";
-import { Check, Menu, Search, X } from "lucide-react";
+import { For, Show, createMemo, createSignal } from "solid-js";
+import type { JSX } from "@solidjs/web";
+import { AnimatePresence, LazyMotion, domAnimation, m } from "@/compat/motion";
+import { Check, Menu, Search, X } from "@fenchem-lp/ui/components/lucide";
 import * as stylex from "@stylexjs/stylex";
 import { breakpoints, colors, typography } from "@fenchem-lp/ui/tokens.stylex";
 import { EASE } from "@/components/prototype/motion-constants";
@@ -1294,11 +1295,11 @@ const styles = stylex.create({
 const hasNumericAssay = (item: Ingredient) => /\d/.test(item.purity);
 
 /** A threshold in the mono voice, ink; only a measured result in the certificate is green. */
-function AssayValue({ item }: { item: Ingredient }) {
-  if (!hasNumericAssay(item)) {
-    return <span {...stylex.props(styles.cellDash)}>—</span>;
+function AssayValue(props: { item: Ingredient }) {
+  if (!hasNumericAssay(props.item)) {
+    return <span {...stylex.attrs(styles.cellDash)}>—</span>;
   }
-  return <span {...stylex.props(styles.mono)}>{item.purity}</span>;
+  return <span {...stylex.attrs(styles.mono)}>{props.item.purity}</span>;
 }
 
 /** Physical form; a non-numeric grade note moves here so the assay column stays numeric. */
@@ -1310,37 +1311,37 @@ const formLabel = (item: Ingredient) =>
 /* ─────────────────────────────── Navigation ─────────────────────────────── */
 
 function MobileNav() {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = createSignal(false);
   const reduce = useReducedMotion();
   return (
-    <div {...stylex.props(styles.mobileNavWrapper)}>
+    <div {...stylex.attrs(styles.mobileNavWrapper)}>
       <button
         type="button"
-        aria-expanded={open}
+        aria-expanded={open() ? "true" : "false"}
         aria-controls="mobile-menu"
-        aria-label={open ? "Close menu" : "Open menu"}
+        aria-label={open() ? "Close menu" : "Open menu"}
         onClick={() => setOpen((v) => !v)}
-        {...stylex.props(styles.mobileMenuBtn)}
+        {...stylex.attrs(styles.mobileMenuBtn)}
       >
-        {open ? <X aria-hidden size={20} /> : <Menu aria-hidden size={20} />}
+        {open() ? <X aria-hidden="true" size={20} /> : <Menu aria-hidden="true" size={20} />}
       </button>
       <AnimatePresence>
-        {open && (
+        <Show when={open()}>
           <m.div
             id="mobile-menu"
             initial={{ opacity: 0, y: -6 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -4 }}
-            transition={{ duration: reduce ? 0 : 0.2, ease: EASE }}
-            {...stylex.props(styles.mobileMenuPopover)}
+            transition={{ duration: reduce() ? 0 : 0.2, ease: EASE }}
+            {...stylex.attrs(styles.mobileMenuPopover)}
           >
-            <ul {...stylex.props(styles.mobileMenuList)}>
+            <ul {...stylex.attrs(styles.mobileMenuList)}>
               {NAV_LINKS.map((link) => (
-                <li key={link.href}>
+                <li>
                   <a
                     href={link.href}
                     onClick={() => setOpen(false)}
-                    {...stylex.props(styles.mobileNavLink)}
+                    {...stylex.attrs(styles.mobileNavLink)}
                   >
                     {link.label}
                   </a>
@@ -1348,7 +1349,7 @@ function MobileNav() {
               ))}
             </ul>
           </m.div>
-        )}
+        </Show>
       </AnimatePresence>
     </div>
   );
@@ -1357,64 +1358,63 @@ function MobileNav() {
 /* ─────────────────────────────── Certificate of analysis ─────────────────────────────── */
 
 function Certificate() {
-  const identity: readonly { term: string; value: ReactNode }[] = [
+  const identity: readonly { term: string; value: JSX.Element }[] = [
     {
       term: "Product",
-      value: <span {...stylex.props(styles.certValue)}>{dossierActive.name} root extract</span>,
+      value: <span {...stylex.attrs(styles.certValue)}>{dossierActive.name} root extract</span>,
     },
     {
       term: "Source",
       value: (
-        <span {...stylex.props(styles.certValue, styles.species, styles.speciesMd)}>
+        <span {...stylex.attrs(styles.certValue, styles.species, styles.speciesMd)}>
           {dossierActive.latin}
         </span>
       ),
     },
-    { term: "Lot", value: <span {...stylex.props(styles.mono)}>{DOSSIER_LOT}</span> },
+    { term: "Lot", value: <span {...stylex.attrs(styles.mono)}>{DOSSIER_LOT}</span> },
   ];
   const lastTest = CERTIFICATE_TESTS.length - 1;
   return (
     <figure
       aria-label={`Certificate of analysis, specimen, ${dossierActive.code} lot ${DOSSIER_LOT}`}
-      {...stylex.props(styles.cert)}
+      {...stylex.attrs(styles.cert)}
     >
-      <div {...stylex.props(styles.certHead)}>
-        <p {...stylex.props(styles.certCode)}>{dossierActive.code}</p>
+      <div {...stylex.attrs(styles.certHead)}>
+        <p {...stylex.attrs(styles.certCode)}>{dossierActive.code}</p>
       </div>
-      <dl {...stylex.props(styles.certIdentity)}>
+      <dl {...stylex.attrs(styles.certIdentity)}>
         {identity.map((row, i) => (
           <div
-            key={row.term}
-            {...stylex.props(styles.certIdRow, i === identity.length - 1 && styles.certIdRowLast)}
+            {...stylex.attrs(styles.certIdRow, i === identity.length - 1 && styles.certIdRowLast)}
           >
-            <dt {...stylex.props(styles.certTerm)}>{row.term}</dt>
-            <dd {...stylex.props(styles.certValue)}>{row.value}</dd>
+            <dt {...stylex.attrs(styles.certTerm)}>{row.term}</dt>
+            <dd {...stylex.attrs(styles.certValue)}>{row.value}</dd>
           </div>
         ))}
       </dl>
-      <div {...stylex.props(styles.certTableWrap)}>
-        <table {...stylex.props(styles.certTable)}>
+      <div {...stylex.attrs(styles.certTableWrap)}>
+        <table {...stylex.attrs(styles.certTable)}>
           <thead>
             <tr>
-              <th scope="col" {...stylex.props(styles.certTh, styles.certCellFirst)}>
+              <th scope="col" {...stylex.attrs(styles.certTh, styles.certCellFirst)}>
                 Test
               </th>
-              <th scope="col" {...stylex.props(styles.certTh)}>
+              <th scope="col" {...stylex.attrs(styles.certTh)}>
                 Method
               </th>
-              <th scope="col" {...stylex.props(styles.certTh)}>
+              <th scope="col" {...stylex.attrs(styles.certTh)}>
                 Specification
               </th>
-              <th scope="col" {...stylex.props(styles.certTh, styles.certCellLast)}>
+              <th scope="col" {...stylex.attrs(styles.certTh, styles.certCellLast)}>
                 Result
               </th>
             </tr>
           </thead>
           <tbody>
             {CERTIFICATE_TESTS.map((row, i) => (
-              <tr key={row.test}>
+              <tr>
                 <td
-                  {...stylex.props(
+                  {...stylex.attrs(
                     styles.certTd,
                     styles.certCellFirst,
                     i === lastTest && styles.certRowEnd,
@@ -1423,17 +1423,17 @@ function Certificate() {
                   {row.test}
                 </td>
                 <td
-                  {...stylex.props(styles.certTd, styles.mono, i === lastTest && styles.certRowEnd)}
+                  {...stylex.attrs(styles.certTd, styles.mono, i === lastTest && styles.certRowEnd)}
                 >
                   {row.method}
                 </td>
                 <td
-                  {...stylex.props(styles.certTd, styles.mono, i === lastTest && styles.certRowEnd)}
+                  {...stylex.attrs(styles.certTd, styles.mono, i === lastTest && styles.certRowEnd)}
                 >
                   {row.specification}
                 </td>
                 <td
-                  {...stylex.props(
+                  {...stylex.attrs(
                     styles.certTd,
                     styles.mono,
                     styles.certCellLast,
@@ -1448,11 +1448,11 @@ function Certificate() {
           </tbody>
         </table>
       </div>
-      <figcaption {...stylex.props(styles.certFoot)}>
-        <span aria-hidden {...stylex.props(styles.certStamp)}>
+      <figcaption {...stylex.attrs(styles.certFoot)}>
+        <span aria-hidden="true" {...stylex.attrs(styles.certStamp)}>
           RELEASED
         </span>
-        <span {...stylex.props(styles.srOnly)}>Released by quality control</span>
+        <span {...stylex.attrs(styles.srOnly)}>Released by quality control</span>
       </figcaption>
     </figure>
   );
@@ -1460,34 +1460,34 @@ function Certificate() {
 
 function HeroSection() {
   return (
-    <section {...stylex.props(styles.hero)}>
-      <div {...stylex.props(styles.container)}>
-        <h1 {...stylex.props(styles.heroHeading)}>
-          <span {...stylex.props(styles.heroLine)}>Botanical actives,</span>{" "}
-          <span {...stylex.props(styles.heroLine)}>documented to the lot.</span>
+    <section {...stylex.attrs(styles.hero)}>
+      <div {...stylex.attrs(styles.container)}>
+        <h1 {...stylex.attrs(styles.heroHeading)}>
+          <span {...stylex.attrs(styles.heroLine)}>Botanical actives,</span>{" "}
+          <span {...stylex.attrs(styles.heroLine)}>documented to the lot.</span>
         </h1>
-        <div {...stylex.props(styles.heroGrid)}>
-          <div {...stylex.props(styles.heroText)}>
-            <p {...stylex.props(styles.heroLead)}>
+        <div {...stylex.attrs(styles.heroGrid)}>
+          <div {...stylex.attrs(styles.heroText)}>
+            <p {...stylex.attrs(styles.heroLead)}>
               Standardized extracts with a stated assay, a stated physical form and a dossier
               prepared before sampling. Produced across six bases and supplied to formulators in
               more than forty markets.
             </p>
-            <div {...stylex.props(styles.heroDocs)}>
-              <p id="dossier-contents" {...stylex.props(styles.heroDocsTitle)}>
+            <div {...stylex.attrs(styles.heroDocs)}>
+              <p id="dossier-contents" {...stylex.attrs(styles.heroDocsTitle)}>
                 Dossier contents
               </p>
-              <ul aria-labelledby="dossier-contents" {...stylex.props(styles.heroDocList)}>
+              <ul aria-labelledby="dossier-contents" {...stylex.attrs(styles.heroDocList)}>
                 {DOCUMENTS.map((doc) => (
-                  <li key={doc.name} {...stylex.props(styles.heroDocItem)}>
+                  <li {...stylex.attrs(styles.heroDocItem)}>
                     <span>{doc.name}</span>
-                    <span {...stylex.props(styles.heroDocScope)}>{doc.scope}</span>
+                    <span {...stylex.attrs(styles.heroDocScope)}>{doc.scope}</span>
                   </li>
                 ))}
               </ul>
             </div>
-            <div {...stylex.props(styles.heroActions)}>
-              <a href={SPECIMEN_HREF} {...stylex.props(styles.btn)}>
+            <div {...stylex.attrs(styles.heroActions)}>
+              <a href={SPECIMEN_HREF} {...stylex.attrs(styles.btn)}>
                 {SPECIMEN_LABEL}
               </a>
             </div>
@@ -1507,12 +1507,12 @@ type MatrixTab = (typeof MATRIX_TABS)[number];
 /** The FN-014 record, expanded beneath its catalogue row. */
 function DossierRow() {
   const ashwa = dossierActive;
-  const fields: readonly { term: string; value: ReactNode }[] = [
-    { term: "Lot", value: <span {...stylex.props(styles.mono)}>{DOSSIER_LOT}</span> },
+  const fields: readonly { term: string; value: JSX.Element }[] = [
+    { term: "Lot", value: <span {...stylex.attrs(styles.mono)}>{DOSSIER_LOT}</span> },
     { term: "Standardization", value: <AssayValue item={ashwa} /> },
     {
       term: "Method",
-      value: <span {...stylex.props(styles.mono)}>HPLC, USP/EP parameters</span>,
+      value: <span {...stylex.attrs(styles.mono)}>HPLC, USP/EP parameters</span>,
     },
     { term: "Plant part", value: "Root only, no leaf" },
     { term: "Physical form", value: ashwa.form },
@@ -1524,23 +1524,22 @@ function DossierRow() {
   const endStart = fields.length - 2;
   return (
     <tr>
-      <td colSpan={7} id="dossier" {...stylex.props(styles.td, styles.expandedCell)}>
-        <p {...stylex.props(styles.expandedTitle)}>
+      <td colspan={7} id="dossier" {...stylex.attrs(styles.td, styles.expandedCell)}>
+        <p {...stylex.attrs(styles.expandedTitle)}>
           <span>Lot record, {ashwa.name}</span>
-          <span {...stylex.props(styles.species, styles.speciesLg)}>{ashwa.latin}</span>
+          <span {...stylex.attrs(styles.species, styles.speciesLg)}>{ashwa.latin}</span>
         </p>
-        <dl {...stylex.props(styles.expandedGrid)}>
+        <dl {...stylex.attrs(styles.expandedGrid)}>
           {fields.map((field, i) => (
             <div
-              key={field.term}
-              {...stylex.props(
+              {...stylex.attrs(
                 styles.expandedItem,
                 i >= tailStart && styles.expandedItemTail,
                 i >= endStart && styles.expandedItemEnd,
               )}
             >
-              <dt {...stylex.props(styles.expandedTerm)}>{field.term}</dt>
-              <dd {...stylex.props(styles.expandedValue)}>{field.value}</dd>
+              <dt {...stylex.attrs(styles.expandedTerm)}>{field.term}</dt>
+              <dd {...stylex.attrs(styles.expandedValue)}>{field.value}</dd>
             </div>
           ))}
         </dl>
@@ -1550,132 +1549,135 @@ function DossierRow() {
 }
 
 function MatrixSection() {
-  const [filter, setFilter] = useState<MatrixTab>("All");
-  const [search, setSearch] = useState("");
-  const [hovered, setHovered] = useState<string | null>(null);
-  const query = search.trim().toLowerCase();
-  const filterActive = filter !== "All" || query !== "";
-  const filtered = ingredients.filter((item) => {
-    const matchesTab = filter === "All" || item.application === filter;
-    const matchesQuery =
-      query === "" ||
-      item.name.toLowerCase().includes(query) ||
-      item.latin.toLowerCase().includes(query) ||
-      item.code.toLowerCase().includes(query);
-    return matchesTab && matchesQuery;
-  });
+  const [filter, setFilter] = createSignal<MatrixTab>("All");
+  const [search, setSearch] = createSignal("");
+  const [hovered, setHovered] = createSignal<string | null>(null);
+  const query = createMemo(() => search().trim().toLowerCase());
+  const filterActive = createMemo(() => filter() !== "All" || query() !== "");
+  const filtered = createMemo(() =>
+    ingredients.filter((item) => {
+      const matchesTab = filter() === "All" || item.application === filter();
+      const matchesQuery =
+        query() === "" ||
+        item.name.toLowerCase().includes(query()) ||
+        item.latin.toLowerCase().includes(query()) ||
+        item.code.toLowerCase().includes(query());
+      return matchesTab && matchesQuery;
+    }),
+  );
   const specHref = createInquiryHref("quality");
-  const openRow = (event: MouseEvent<HTMLTableRowElement>) => {
+  const openRow = (event: MouseEvent) => {
     if ((event.target as HTMLElement).closest("a")) return;
     window.location.assign(specHref);
   };
   return (
-    <section id="matrix" {...stylex.props(styles.section)}>
-      <div {...stylex.props(styles.container)}>
-        <div {...stylex.props(styles.sectionHead)}>
-          <h2 {...stylex.props(styles.h2)}>
+    <section id="matrix" {...stylex.attrs(styles.section)}>
+      <div {...stylex.attrs(styles.container)}>
+        <div {...stylex.attrs(styles.sectionHead)}>
+          <h2 {...stylex.attrs(styles.h2)}>
             Every active in the catalogue, with its assay and form
           </h2>
         </div>
 
-        <div {...stylex.props(styles.toolbar)}>
-          <div role="tablist" aria-label="Filter by application" {...stylex.props(styles.tabs)}>
+        <div {...stylex.attrs(styles.toolbar)}>
+          <div role="tablist" aria-label="Filter by application" {...stylex.attrs(styles.tabs)}>
             {MATRIX_TABS.map((tab) => (
               <button
-                key={tab}
                 type="button"
                 role="tab"
-                aria-selected={filter === tab}
+                aria-selected={filter() === tab ? "true" : "false"}
                 onClick={() => setFilter(tab)}
-                {...stylex.props(
+                {...stylex.attrs(
                   styles.tab,
-                  filter === tab ? styles.tabActive : styles.tabInactive,
+                  filter() === tab ? styles.tabActive : styles.tabInactive,
                 )}
               >
                 {tab}
               </button>
             ))}
           </div>
-          <label {...stylex.props(styles.search)}>
-            <Search aria-hidden size={15} {...stylex.props(styles.searchIcon)} />
+          <label {...stylex.attrs(styles.search)}>
+            <Search aria-hidden="true" size={15} {...stylex.attrs(styles.searchIcon)} />
             <input
               type="search"
               aria-label="Search actives by name, source, or code"
               placeholder="Search by name, source or code"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              {...stylex.props(styles.input, styles.searchInput)}
+              value={search()}
+              onInput={(e) => setSearch(e.currentTarget.value)}
+              {...stylex.attrs(styles.input, styles.searchInput)}
             />
           </label>
         </div>
 
-        <div {...stylex.props(styles.tableScroll)}>
-          <table {...stylex.props(styles.table)}>
+        <div {...stylex.attrs(styles.tableScroll)}>
+          <table {...stylex.attrs(styles.table)}>
             <thead>
               <tr>
-                <th scope="col" {...stylex.props(styles.th)}>
+                <th scope="col" {...stylex.attrs(styles.th)}>
                   Code
                 </th>
-                <th scope="col" {...stylex.props(styles.th)}>
+                <th scope="col" {...stylex.attrs(styles.th)}>
                   Active
                 </th>
-                <th scope="col" {...stylex.props(styles.th)}>
+                <th scope="col" {...stylex.attrs(styles.th)}>
                   Botanical source
                 </th>
-                <th scope="col" {...stylex.props(styles.th)}>
+                <th scope="col" {...stylex.attrs(styles.th)}>
                   Assay
                 </th>
-                <th scope="col" {...stylex.props(styles.th)}>
+                <th scope="col" {...stylex.attrs(styles.th)}>
                   Physical form
                 </th>
-                <th scope="col" {...stylex.props(styles.th)}>
+                <th scope="col" {...stylex.attrs(styles.th)}>
                   Application
                 </th>
-                <th scope="col" {...stylex.props(styles.th, styles.thRight)}>
-                  <span {...stylex.props(styles.srOnly)}>Specification</span>
+                <th scope="col" {...stylex.attrs(styles.th, styles.thRight)}>
+                  <span {...stylex.attrs(styles.srOnly)}>Specification</span>
                 </th>
               </tr>
             </thead>
             <tbody>
-              {filtered.map((item) => {
-                const isHovered = hovered === item.code;
-                return (
-                  <Fragment key={item.code}>
+              <For each={filtered()}>
+                {(item) => (
+                  <>
                     <tr
                       onClick={openRow}
                       onMouseEnter={() => setHovered(item.code)}
                       onMouseLeave={() => setHovered(null)}
-                      {...stylex.props(styles.row)}
+                      {...stylex.attrs(styles.row)}
                     >
-                      <td {...stylex.props(styles.td, styles.mono)}>{item.code}</td>
-                      <td {...stylex.props(styles.td, styles.cellName)}>{item.name}</td>
-                      <td {...stylex.props(styles.td, styles.species, styles.cellLatin)}>
+                      <td {...stylex.attrs(styles.td, styles.mono)}>{item.code}</td>
+                      <td {...stylex.attrs(styles.td, styles.cellName)}>{item.name}</td>
+                      <td {...stylex.attrs(styles.td, styles.species, styles.cellLatin)}>
                         {item.latin}
                       </td>
-                      <td {...stylex.props(styles.td)}>
+                      <td {...stylex.attrs(styles.td)}>
                         <AssayValue item={item} />
                       </td>
-                      <td {...stylex.props(styles.td)}>{formLabel(item)}</td>
-                      <td {...stylex.props(styles.td)}>{item.application}</td>
-                      <td {...stylex.props(styles.td, styles.tdRight)}>
+                      <td {...stylex.attrs(styles.td)}>{formLabel(item)}</td>
+                      <td {...stylex.attrs(styles.td)}>{item.application}</td>
+                      <td {...stylex.attrs(styles.td, styles.tdRight)}>
                         <a
                           href={specHref}
                           aria-label={`${REQUEST_LABEL}, ${item.name}`}
-                          {...stylex.props(styles.rowLink, isHovered && styles.rowLinkVisible)}
+                          {...stylex.attrs(
+                            styles.rowLink,
+                            hovered() === item.code && styles.rowLinkVisible,
+                          )}
                         >
-                          <span aria-hidden>→</span>
+                          <span aria-hidden="true">→</span>
                         </a>
                       </td>
                     </tr>
                     {item.code === DOSSIER_CODE && <DossierRow />}
-                  </Fragment>
-                );
-              })}
-              {filtered.length === 0 && (
+                  </>
+                )}
+              </For>
+              {filtered().length === 0 && (
                 <tr>
-                  <td colSpan={7} {...stylex.props(styles.td, styles.emptyCell)}>
-                    <p {...stylex.props(styles.emptyText)}>
-                      No actives match{search ? ` “${search}”` : " this filter"}.
+                  <td colspan={7} {...stylex.attrs(styles.td, styles.emptyCell)}>
+                    <p {...stylex.attrs(styles.emptyText)}>
+                      No actives match{search() ? ` “${search()}”` : " this filter"}.
                     </p>
                     <button
                       type="button"
@@ -1683,7 +1685,7 @@ function MatrixSection() {
                         setSearch("");
                         setFilter("All");
                       }}
-                      {...stylex.props(styles.clearBtn)}
+                      {...stylex.attrs(styles.clearBtn)}
                     >
                       Clear search and filters
                     </button>
@@ -1693,8 +1695,8 @@ function MatrixSection() {
             </tbody>
           </table>
         </div>
-        <p {...stylex.props(styles.tableFoot)}>
-          {filterActive && `Showing ${filtered.length} of ${ingredients.length} actives. `}
+        <p {...stylex.attrs(styles.tableFoot)}>
+          {filterActive() && `Showing ${filtered().length} of ${ingredients.length} actives. `}
           Assay values are release specifications, confirmed by HPLC on every lot. Each row requests
           a specification.
         </p>
@@ -1707,15 +1709,15 @@ function MatrixSection() {
 
 function LotBand() {
   return (
-    <section aria-label="Lot record" {...stylex.props(styles.lotBand)}>
-      <div {...stylex.props(styles.container)}>
-        <p {...stylex.props(styles.lotCaption)}>
-          Lot {DOSSIER_LOT}, {DOSSIER_CODE}. One lot, one record, printed on every drum.
+    <section aria-label="Lot record" {...stylex.attrs(styles.lotBand)}>
+      <div {...stylex.attrs(styles.container)}>
+        <p {...stylex.attrs(styles.lotCaption)}>
+          {`Lot ${DOSSIER_LOT}, ${DOSSIER_CODE}. One lot, one record, printed on every drum.`}
         </p>
       </div>
-      <div aria-hidden {...stylex.props(styles.lotCrop)}>
-        <div {...stylex.props(styles.container)}>
-          <p {...stylex.props(styles.lotFigure)}>{DOSSIER_LOT}</p>
+      <div aria-hidden="true" {...stylex.attrs(styles.lotCrop)}>
+        <div {...stylex.attrs(styles.container)}>
+          <p {...stylex.attrs(styles.lotFigure)}>{DOSSIER_LOT}</p>
         </div>
       </div>
     </section>
@@ -1724,53 +1726,52 @@ function LotBand() {
 
 /* ─────────────────────────────── Formulation Tool ─────────────────────────────── */
 
-function OptionButton({
-  label,
-  active,
-  onSelect,
-}: {
-  label: string;
-  active: boolean;
-  onSelect: () => void;
-}) {
+function OptionButton(props: { label: string; active: boolean; onSelect: () => void }) {
   return (
     <button
       type="button"
-      aria-pressed={active}
-      onClick={onSelect}
-      {...stylex.props(styles.option, active ? styles.optionActive : styles.optionInactive)}
+      aria-pressed={props.active ? "true" : "false"}
+      onClick={props.onSelect}
+      {...stylex.attrs(styles.option, props.active ? styles.optionActive : styles.optionInactive)}
     >
-      {label}
-      {active && (
-        <Check aria-hidden size={14} strokeWidth={2.5} {...stylex.props(styles.optionCheck)} />
+      {props.label}
+      {props.active && (
+        <Check
+          aria-hidden="true"
+          size={14}
+          strokeWidth={2.5}
+          {...stylex.attrs(styles.optionCheck)}
+        />
       )}
     </button>
   );
 }
 
 function FormulationSection() {
-  const [app, setApp] = useState<IngredientApplication>("Nutrition");
-  const [format, setFormat] = useState<(typeof FORMATS)[number]>("Beadlet");
+  const [app, setApp] = createSignal<IngredientApplication>("Nutrition");
+  const [format, setFormat] = createSignal<(typeof FORMATS)[number]>("Beadlet");
   const [certification, setCertification] =
-    useState<(typeof CERTIFICATION_SETS)[number]>("ISO 9001 + GMP");
-  const [name, setName] = useState("");
-  const [org, setOrg] = useState("");
-  const [email, setEmail] = useState("");
-  const matching = getIngredientsByApplication(app);
+    createSignal<(typeof CERTIFICATION_SETS)[number]>("ISO 9001 + GMP");
+  const [name, setName] = createSignal("");
+  const [org, setOrg] = createSignal("");
+  const [email, setEmail] = createSignal("");
+  const matching = createMemo(() => getIngredientsByApplication(app()));
 
-  const submit = (event: FormEvent<HTMLFormElement>) => {
+  const submit = (event: SubmitEvent) => {
     event.preventDefault();
-    const subject = encodeURIComponent(`Formulation brief, ${app}, ${format}`);
+    const subject = encodeURIComponent(`Formulation brief, ${app()}, ${format()}`);
     const body = encodeURIComponent(
       [
-        `Name: ${name}`,
-        `Company: ${org}`,
-        `Email: ${email}`,
+        `Name: ${name()}`,
+        `Company: ${org()}`,
+        `Email: ${email()}`,
         "",
-        `Application: ${app}`,
-        `Delivery format: ${format}`,
-        `Certification set: ${certification}`,
-        `Actives in scope: ${matching.map((item) => `${item.name} (${item.code}, ${item.purity})`).join("; ")}`,
+        `Application: ${app()}`,
+        `Delivery format: ${format()}`,
+        `Certification set: ${certification()}`,
+        `Actives in scope: ${matching()
+          .map((item) => `${item.name} (${item.code}, ${item.purity})`)
+          .join("; ")}`,
         "",
         "Please return a validated proposal with specification sheets.",
       ].join("\n"),
@@ -1779,144 +1780,139 @@ function FormulationSection() {
   };
 
   return (
-    <section id="formulation" {...stylex.props(styles.section)}>
-      <div {...stylex.props(styles.container)}>
-        <div {...stylex.props(styles.sectionHead)}>
-          <h2 {...stylex.props(styles.h2)}>Build the target, we return the specification</h2>
-          <p {...stylex.props(styles.lead)}>
+    <section id="formulation" {...stylex.attrs(styles.section)}>
+      <div {...stylex.attrs(styles.container)}>
+        <div {...stylex.attrs(styles.sectionHead)}>
+          <h2 {...stylex.attrs(styles.h2)}>Build the target, we return the specification</h2>
+          <p {...stylex.attrs(styles.lead)}>
             Choose the application, the delivery format and the certification set, then add your
             details. The brief lists the matching actives with their assay thresholds; the
             laboratory returns a validated proposal within one business day.
           </p>
         </div>
 
-        <div {...stylex.props(styles.formulationGrid)}>
-          <form onSubmit={submit} {...stylex.props(styles.controls)}>
-            <fieldset {...stylex.props(styles.fieldset)}>
-              <legend {...stylex.props(styles.legend)}>Application</legend>
-              <div {...stylex.props(styles.optionGrid)}>
+        <div {...stylex.attrs(styles.formulationGrid)}>
+          <form onSubmit={submit} {...stylex.attrs(styles.controls)}>
+            <fieldset {...stylex.attrs(styles.fieldset)}>
+              <legend {...stylex.attrs(styles.legend)}>Application</legend>
+              <div {...stylex.attrs(styles.optionGrid)}>
                 {APPLICATIONS.map((opt) => (
-                  <OptionButton
-                    key={opt}
-                    label={opt}
-                    active={app === opt}
-                    onSelect={() => setApp(opt)}
-                  />
+                  <OptionButton label={opt} active={app() === opt} onSelect={() => setApp(opt)} />
                 ))}
               </div>
             </fieldset>
-            <fieldset {...stylex.props(styles.fieldset)}>
-              <legend {...stylex.props(styles.legend)}>Delivery format</legend>
-              <div {...stylex.props(styles.optionGrid)}>
+            <fieldset {...stylex.attrs(styles.fieldset)}>
+              <legend {...stylex.attrs(styles.legend)}>Delivery format</legend>
+              <div {...stylex.attrs(styles.optionGrid)}>
                 {FORMATS.map((opt) => (
                   <OptionButton
-                    key={opt}
                     label={opt}
-                    active={format === opt}
+                    active={format() === opt}
                     onSelect={() => setFormat(opt)}
                   />
                 ))}
               </div>
             </fieldset>
-            <fieldset {...stylex.props(styles.fieldset)}>
-              <legend {...stylex.props(styles.legend)}>Certification set</legend>
-              <div {...stylex.props(styles.optionGrid)}>
+            <fieldset {...stylex.attrs(styles.fieldset)}>
+              <legend {...stylex.attrs(styles.legend)}>Certification set</legend>
+              <div {...stylex.attrs(styles.optionGrid)}>
                 {CERTIFICATION_SETS.map((opt) => (
                   <OptionButton
-                    key={opt}
                     label={opt}
-                    active={certification === opt}
+                    active={certification() === opt}
                     onSelect={() => setCertification(opt)}
                   />
                 ))}
               </div>
             </fieldset>
-            <fieldset {...stylex.props(styles.fieldset)}>
-              <legend {...stylex.props(styles.legend)}>Your details</legend>
-              <div {...stylex.props(styles.fields)}>
-                <label {...stylex.props(styles.field)}>
-                  <span {...stylex.props(styles.fieldLabel)}>Name</span>
+            <fieldset {...stylex.attrs(styles.fieldset)}>
+              <legend {...stylex.attrs(styles.legend)}>Your details</legend>
+              <div {...stylex.attrs(styles.fields)}>
+                <label {...stylex.attrs(styles.field)}>
+                  <span {...stylex.attrs(styles.fieldLabel)}>Name</span>
                   <input
                     type="text"
                     name="name"
-                    autoComplete="name"
+                    autocomplete="name"
                     required
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    {...stylex.props(styles.input)}
+                    value={name()}
+                    onInput={(e) => setName(e.currentTarget.value)}
+                    {...stylex.attrs(styles.input)}
                   />
                 </label>
-                <label {...stylex.props(styles.field)}>
-                  <span {...stylex.props(styles.fieldLabel)}>Company</span>
+                <label {...stylex.attrs(styles.field)}>
+                  <span {...stylex.attrs(styles.fieldLabel)}>Company</span>
                   <input
                     type="text"
                     name="organization"
-                    autoComplete="organization"
+                    autocomplete="organization"
                     required
-                    value={org}
-                    onChange={(e) => setOrg(e.target.value)}
-                    {...stylex.props(styles.input)}
+                    value={org()}
+                    onInput={(e) => setOrg(e.currentTarget.value)}
+                    {...stylex.attrs(styles.input)}
                   />
                 </label>
-                <label {...stylex.props(styles.field, styles.fieldWide)}>
-                  <span {...stylex.props(styles.fieldLabel)}>Work email</span>
+                <label {...stylex.attrs(styles.field, styles.fieldWide)}>
+                  <span {...stylex.attrs(styles.fieldLabel)}>Work email</span>
                   <input
                     type="email"
                     name="email"
-                    autoComplete="email"
+                    autocomplete="email"
                     required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    {...stylex.props(styles.input)}
+                    value={email()}
+                    onInput={(e) => setEmail(e.currentTarget.value)}
+                    {...stylex.attrs(styles.input)}
                   />
                 </label>
               </div>
             </fieldset>
-            <div {...stylex.props(styles.formActions)}>
-              <button type="submit" {...stylex.props(styles.btn)}>
+            <div {...stylex.attrs(styles.formActions)}>
+              <button type="submit" {...stylex.attrs(styles.btn)}>
                 Send this brief
               </button>
-              <p {...stylex.props(styles.formNote)}>Sent to {company.email}</p>
+              <p {...stylex.attrs(styles.formNote)}>Sent to {company.email}</p>
             </div>
           </form>
 
-          <div {...stylex.props(styles.brief)} aria-live="polite">
-            <div {...stylex.props(styles.briefHead)}>
-              <p {...stylex.props(styles.briefTitle)}>Formulation brief</p>
+          <div {...stylex.attrs(styles.brief)} aria-live="polite">
+            <div {...stylex.attrs(styles.briefHead)}>
+              <p {...stylex.attrs(styles.briefTitle)}>Formulation brief</p>
             </div>
-            <dl {...stylex.props(styles.briefRows)}>
-              <div {...stylex.props(styles.specRow)}>
-                <dt {...stylex.props(styles.specTerm)}>Application</dt>
-                <dd {...stylex.props(styles.specValue)}>{app}</dd>
+            <dl {...stylex.attrs(styles.briefRows)}>
+              <div {...stylex.attrs(styles.specRow)}>
+                <dt {...stylex.attrs(styles.specTerm)}>Application</dt>
+                <dd {...stylex.attrs(styles.specValue)}>{app()}</dd>
               </div>
-              <div {...stylex.props(styles.specRow)}>
-                <dt {...stylex.props(styles.specTerm)}>Delivery format</dt>
-                <dd {...stylex.props(styles.specValue)}>{format}</dd>
+              <div {...stylex.attrs(styles.specRow)}>
+                <dt {...stylex.attrs(styles.specTerm)}>Delivery format</dt>
+                <dd {...stylex.attrs(styles.specValue)}>{format()}</dd>
               </div>
-              <div {...stylex.props(styles.specRow)}>
-                <dt {...stylex.props(styles.specTerm)}>Certification</dt>
-                <dd {...stylex.props(styles.specValue)}>{certification}</dd>
+              <div {...stylex.attrs(styles.specRow)}>
+                <dt {...stylex.attrs(styles.specTerm)}>Certification</dt>
+                <dd {...stylex.attrs(styles.specValue)}>{certification()}</dd>
               </div>
-              <div {...stylex.props(styles.specRow)}>
-                <dt {...stylex.props(styles.specTerm)}>Lot documents</dt>
-                <dd {...stylex.props(styles.specValue)}>CoA, TDS, SDS</dd>
+              <div {...stylex.attrs(styles.specRow)}>
+                <dt {...stylex.attrs(styles.specTerm)}>Lot documents</dt>
+                <dd {...stylex.attrs(styles.specValue)}>CoA, TDS, SDS</dd>
               </div>
-              <div {...stylex.props(styles.specRow)}>
-                <dt {...stylex.props(styles.specTerm)}>Matching actives</dt>
-                <dd {...stylex.props(styles.specValue)}>{matching.length}</dd>
+              <div {...stylex.attrs(styles.specRow)}>
+                <dt {...stylex.attrs(styles.specTerm)}>Matching actives</dt>
+                <dd {...stylex.attrs(styles.specValue)}>{matching().length}</dd>
               </div>
             </dl>
-            <p {...stylex.props(styles.matchTitle)}>Actives in scope</p>
-            <ul {...stylex.props(styles.matchList)}>
-              {matching.map((item) => (
-                <li key={item.code} {...stylex.props(styles.matchRow)}>
-                  <span>
-                    <span {...stylex.props(styles.matchName)}>{item.name}</span>{" "}
-                    <span {...stylex.props(styles.species, styles.matchLatin)}>{item.latin}</span>
-                  </span>
-                  <AssayValue item={item} />
-                </li>
-              ))}
+            <p {...stylex.attrs(styles.matchTitle)}>Actives in scope</p>
+            <ul {...stylex.attrs(styles.matchList)}>
+              <For each={matching()}>
+                {(item) => (
+                  <li {...stylex.attrs(styles.matchRow)}>
+                    <span>
+                      <span {...stylex.attrs(styles.matchName)}>{item.name}</span>{" "}
+                      <span {...stylex.attrs(styles.species, styles.matchLatin)}>{item.latin}</span>
+                    </span>
+                    <AssayValue item={item} />
+                  </li>
+                )}
+              </For>
             </ul>
           </div>
         </div>
@@ -1929,10 +1925,10 @@ function FormulationSection() {
 
 function ContactSection() {
   return (
-    <section id="contact" aria-label="Contact" {...stylex.props(styles.contactBand)}>
-      <div {...stylex.props(styles.container, styles.contactRow)}>
-        <p {...stylex.props(styles.contactLine)}>
-          <a href={`mailto:${company.email}`} {...stylex.props(styles.footerLink)}>
+    <section id="contact" aria-label="Contact" {...stylex.attrs(styles.contactBand)}>
+      <div {...stylex.attrs(styles.container, styles.contactRow)}>
+        <p {...stylex.attrs(styles.contactLine)}>
+          <a href={`mailto:${company.email}`} {...stylex.attrs(styles.footerLink)}>
             {company.email}
           </a>
           <span>
@@ -1940,8 +1936,8 @@ function ContactSection() {
           </span>
           <span>A specification within one business day.</span>
         </p>
-        <a href="#top" {...stylex.props(styles.textLink)}>
-          Back to top <span aria-hidden>↑</span>
+        <a href="#top" {...stylex.attrs(styles.textLink)}>
+          Back to top <span aria-hidden="true">↑</span>
         </a>
       </div>
     </section>
@@ -1950,19 +1946,13 @@ function ContactSection() {
 
 /* ─────────────────────────────── Footer ─────────────────────────────── */
 
-function FooterRow({
-  term,
-  items,
-}: {
-  term: string;
-  items: readonly { key: string; node: ReactNode }[];
-}) {
+function FooterRow(props: { term: string; items: readonly { key: string; node: JSX.Element }[] }) {
   return (
-    <div {...stylex.props(styles.footerRow)}>
-      <dt {...stylex.props(styles.footerTerm)}>{term}</dt>
-      <dd {...stylex.props(styles.footerValue)}>
-        {items.map((item) => (
-          <span key={item.key}>{item.node}</span>
+    <div {...stylex.attrs(styles.footerRow)}>
+      <dt {...stylex.attrs(styles.footerTerm)}>{props.term}</dt>
+      <dd {...stylex.attrs(styles.footerValue)}>
+        {props.items.map((item) => (
+          <span>{item.node}</span>
         ))}
       </dd>
     </div>
@@ -1974,12 +1964,12 @@ const CURRENT_YEAR = new Date().getFullYear();
 function Footer() {
   const documentHref = createInquiryHref("quality");
   return (
-    <footer {...stylex.props(styles.footer)}>
-      <div {...stylex.props(styles.container)}>
-        <div {...stylex.props(styles.footerTop)}>
-          <p {...stylex.props(styles.wordmark)}>{company.name}</p>
+    <footer {...stylex.attrs(styles.footer)}>
+      <div {...stylex.attrs(styles.container)}>
+        <div {...stylex.attrs(styles.footerTop)}>
+          <p {...stylex.attrs(styles.wordmark)}>{company.name}</p>
         </div>
-        <dl {...stylex.props(styles.footerList)}>
+        <dl {...stylex.attrs(styles.footerList)}>
           <FooterRow
             term="Certifications"
             items={certifications.map((name) => ({ key: name, node: name }))}
@@ -1991,7 +1981,7 @@ function Footer() {
               node: (
                 <>
                   {region.city}{" "}
-                  <span {...stylex.props(styles.footerMuted)}>
+                  <span {...stylex.attrs(styles.footerMuted)}>
                     {UTC_OFFSET_BY_CITY[region.city] ?? ""}
                   </span>
                 </>
@@ -2003,14 +1993,14 @@ function Footer() {
             items={DOCUMENTS.map((doc) => ({
               key: doc.name,
               node: (
-                <a href={documentHref} {...stylex.props(styles.footerLink)}>
+                <a href={documentHref} {...stylex.attrs(styles.footerLink)}>
                   {doc.name}
                 </a>
               ),
             }))}
           />
         </dl>
-        <p {...stylex.props(styles.footerLegal)}>
+        <p {...stylex.attrs(styles.footerLegal)}>
           © {CURRENT_YEAR} {company.legalName} {company.hq.city}, {company.hq.country}.
         </p>
       </div>
@@ -2023,23 +2013,23 @@ function Footer() {
 export function VariantWaterfall() {
   return (
     <LazyMotion features={domAnimation} strict>
-      <div {...stylex.props(styles.root)}>
-        <header {...stylex.props(styles.header)}>
-          <div {...stylex.props(styles.container, styles.headerRow)}>
-            <a href="#top" {...stylex.props(styles.wordmark)}>
+      <div {...stylex.attrs(styles.root)}>
+        <header {...stylex.attrs(styles.header)}>
+          <div {...stylex.attrs(styles.container, styles.headerRow)}>
+            <a href="#top" {...stylex.attrs(styles.wordmark)}>
               {company.name}
             </a>
-            <nav aria-label="Primary" {...stylex.props(styles.navDesktop)}>
+            <nav aria-label="Primary" {...stylex.attrs(styles.navDesktop)}>
               {NAV_LINKS.map((link) => (
-                <a key={link.href} href={link.href} {...stylex.props(styles.navLink)}>
+                <a href={link.href} {...stylex.attrs(styles.navLink)}>
                   {link.label}
                 </a>
               ))}
             </nav>
-            <div {...stylex.props(styles.headerRight)}>
+            <div {...stylex.attrs(styles.headerRight)}>
               <a
                 href={createInquiryHref("contact")}
-                {...stylex.props(styles.btn, styles.headerCta)}
+                {...stylex.attrs(styles.btn, styles.headerCta)}
               >
                 {REQUEST_LABEL}
               </a>

@@ -1,7 +1,8 @@
-import { m } from "motion/react";
+import { m } from "@/compat/motion";
 import * as stylex from "@stylexjs/stylex";
-import { type MotionValue } from "motion/react";
+import { type MotionValue } from "@/compat/motion";
 import { look } from "./band-values";
+import { merge } from "solid-js";
 
 const spot = stylex.create({
   root: {
@@ -24,35 +25,30 @@ const spot = stylex.create({
 
 export function MixedSpot() {
   return (
-    <span aria-hidden="true" {...stylex.props(spot.root)}>
-      <span {...stylex.props(spot.layer, spot.upper, look.navyBody)} />
-      <span {...stylex.props(spot.layer, spot.centre, look.midBody)} />
-      <span {...stylex.props(spot.layer, spot.lower, look.blueBody)} />
+    <span aria-hidden="true" {...stylex.attrs(spot.root)}>
+      <span {...stylex.attrs(spot.layer, spot.upper, look.navyBody)} />
+      <span {...stylex.attrs(spot.layer, spot.centre, look.midBody)} />
+      <span {...stylex.attrs(spot.layer, spot.lower, look.blueBody)} />
     </span>
   );
 }
 
-export function PencilRing({
-  visible,
-  ahead = false,
-}: {
-  visible: MotionValue<number>;
-  ahead?: boolean;
-}) {
+export function PencilRing(props: { visible: MotionValue<number>; ahead?: boolean }) {
+  const p = merge({ ahead: false }, props);
   return (
     <m.svg
       viewBox="0 0 120 48"
       preserveAspectRatio="none"
-      style={{ opacity: visible }}
-      {...stylex.props(look.ring)}
+      style={{ opacity: p.visible }}
+      {...stylex.attrs(look.ring)}
     >
       <path
         d="M16 31 C 6 19, 30 6, 62 5 C 94 4, 117 13, 114 26 C 111 38, 84 44, 56 43 C 28 42, 6 35, 11 22 C 14 15, 23 10, 34 8"
         fill="none"
-        stroke={ahead ? "rgba(7, 67, 169, 0.75)" : "rgba(26, 26, 26, 0.46)"}
-        strokeWidth={1}
-        strokeLinecap="round"
-        vectorEffect="non-scaling-stroke"
+        stroke={p.ahead ? "rgba(7, 67, 169, 0.75)" : "rgba(26, 26, 26, 0.46)"}
+        stroke-width={1}
+        stroke-linecap="round"
+        {...{ "vector-effect": "non-scaling-stroke" }}
       />
     </m.svg>
   );

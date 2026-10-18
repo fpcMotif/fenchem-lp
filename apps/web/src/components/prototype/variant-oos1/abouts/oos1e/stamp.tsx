@@ -1,7 +1,7 @@
 import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { m, useInView, type Variants } from "motion/react";
-import { useId, useRef } from "react";
+import { m, useInView, type Variants } from "@/compat/motion";
+import { createUniqueId, merge } from "solid-js";
 
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
@@ -38,74 +38,75 @@ type StampProps = {
   sx?: stylex.StyleXStyles;
 };
 
-export function Stamp({ kind, ring, tilt = -6, thump = true, sx }: StampProps) {
-  const rawId = useId();
+export function Stamp(props: StampProps) {
+  const p = merge({ tilt: -6, thump: true }, props);
+  const rawId = createUniqueId();
   const pathId = `oos1e-ring-${rawId.replaceAll(":", "")}`;
-  const ref = useRef<HTMLDivElement>(null);
-  const inView = useInView(ref, { once: true, amount: 0.5 });
+  let ref: HTMLElement | undefined;
+  const inView = useInView(() => ref, { once: true, amount: 0.5 });
   const reduce = useReducedMotion();
 
-  const variants: Variants = {
-    off: { opacity: 0, scale: 1, rotate: tilt },
+  const variants = (): Variants => ({
+    off: { opacity: 0, scale: 1, rotate: p.tilt },
     on: {
       opacity: 1,
       scale: [1.3, 0.965, 1],
-      rotate: [tilt - 5, tilt + 0.8, tilt],
-      transition: reduce
+      rotate: [p.tilt - 5, p.tilt + 0.8, p.tilt],
+      transition: reduce()
         ? { duration: 0 }
         : { delay: 0.5, duration: 0.52, times: [0, 0.58, 1], ease: ["easeIn", "easeOut"] },
     },
-    still: { opacity: 1, scale: 1, rotate: tilt },
-  };
+    still: { opacity: 1, scale: 1, rotate: p.tilt },
+  });
 
   return (
     <m.div
-      ref={ref}
+      ref={(el: HTMLElement) => (ref = el)}
       aria-hidden="true"
-      variants={variants}
-      initial={thump ? "off" : "still"}
-      animate={thump ? (reduce || inView ? "on" : "off") : "still"}
-      {...stylex.props(styles.stamp, sx)}
+      variants={variants()}
+      initial={p.thump ? "off" : "still"}
+      animate={p.thump ? (reduce() || inView() ? "on" : "off") : "still"}
+      {...stylex.attrs(styles.stamp, p.sx)}
     >
-      <svg viewBox="0 0 200 200" focusable="false" {...stylex.props(styles.svg)}>
+      <svg viewBox="0 0 200 200" {...{ focusable: "false" }} {...stylex.attrs(styles.svg)}>
         <g
           fill="none"
           stroke="currentColor"
-          strokeLinecap="round"
+          stroke-linecap="round"
           filter={`url(#${INK_FILTER_ID})`}
         >
-          <circle cx="100" cy="100" r="95" strokeWidth="4.5" />
-          <circle cx="100" cy="100" r="87" strokeWidth="1.3" />
-          <circle cx="100" cy="100" r="57" strokeWidth="2" />
+          <circle cx="100" cy="100" r="95" stroke-width="4.5" />
+          <circle cx="100" cy="100" r="87" stroke-width="1.3" />
+          <circle cx="100" cy="100" r="57" stroke-width="2" />
           <path
             id={pathId}
             d={`M ${100 - RING_RADIUS} 100 a ${RING_RADIUS} ${RING_RADIUS} 0 1 1 ${2 * RING_RADIUS} 0 a ${RING_RADIUS} ${RING_RADIUS} 0 1 1 ${-2 * RING_RADIUS} 0`}
             stroke="none"
           />
           <text
-            fontFamily={DISPLAY}
-            fontSize="14"
-            fontWeight={800}
+            font-family={DISPLAY}
+            font-size="14"
+            font-weight={800}
             fill="currentColor"
             stroke="none"
           >
-            <textPath href={`#${pathId}`} textLength={RING_LENGTH} lengthAdjust="spacing">
-              {ring}
+            <textPath href={`#${pathId}`} {...{ textLength: RING_LENGTH, lengthAdjust: "spacing" }}>
+              {p.ring}
             </textPath>
           </text>
-          <g fill="currentColor" stroke="none" textAnchor="middle">
-            {kind === "year" ? (
+          <g fill="currentColor" stroke="none" text-anchor="middle">
+            {p.kind === "year" ? (
               <>
-                <text x="100" y="118" fontFamily={DISPLAY} fontSize="42" fontWeight={800}>
+                <text x="100" y="118" font-family={DISPLAY} font-size="42" font-weight={800}>
                   1995
                 </text>
                 <text
                   x="100"
                   y="150"
-                  fontFamily={CJK}
-                  fontSize="20"
-                  fontWeight={900}
-                  letterSpacing="7"
+                  font-family={CJK}
+                  font-size="20"
+                  font-weight={900}
+                  letter-spacing="7"
                 >
                   南京
                 </text>
@@ -114,10 +115,10 @@ export function Stamp({ kind, ring, tilt = -6, thump = true, sx }: StampProps) {
               <text
                 x="100"
                 y="118"
-                fontFamily={CJK}
-                fontSize="40"
-                fontWeight={900}
-                letterSpacing="2"
+                font-family={CJK}
+                font-size="40"
+                font-weight={900}
+                letter-spacing="2"
               >
                 认证
               </text>

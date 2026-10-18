@@ -1,4 +1,4 @@
-import { createFileRoute, notFound } from "@tanstack/react-router";
+import { createFileRoute, notFound } from "@tanstack/solid-router";
 
 import { SolutionsLab } from "@/components/prototype/solutions-lab/harness";
 
@@ -14,6 +14,6 @@ export const Route = createFileRoute("/prototypes/solutions")({
 });
 
 function SolutionsLabRoute() {
-  const { v = 1 } = Route.useSearch();
-  return <SolutionsLab initial={v - 1} />;
+  const search = Route.useSearch();
+  return <SolutionsLab initial={(search().v ?? 1) - 1} />;
 }

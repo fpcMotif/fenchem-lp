@@ -1,8 +1,8 @@
 import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { ChevronRight } from "lucide-react";
-import { AnimatePresence, m } from "motion/react";
-import { useId, useState } from "react";
+import { ChevronRight } from "@fenchem-lp/ui/components/lucide";
+import { AnimatePresence, m } from "@/compat/motion";
+import { createSignal, createUniqueId, Show, untrack } from "solid-js";
 
 import { EASE } from "@/components/prototype/motion-constants";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
@@ -385,88 +385,83 @@ const styles = stylex.create({
   },
 });
 
-function BrandTitle({ text }: { text: string }) {
-  const [mark, family] = text.split("™");
+function BrandTitle(props: { text: string }) {
+  const [mark, family] = untrack(() => props.text).split("™");
   return (
     <>
       {mark}
-      {family !== undefined && <sup {...stylex.props(styles.trademark)}>™</sup>}
-      {family && <span {...stylex.props(styles.serifAccent)}>{family}</span>}
+      {family !== undefined && <sup {...stylex.attrs(styles.trademark)}>™</sup>}
+      {family && <span {...stylex.attrs(styles.serifAccent)}>{family}</span>}
     </>
   );
 }
 
-function Trademarked({ text }: { text: string }) {
-  const [mark, rest] = text.split("™");
-  if (rest === undefined) return <>{text}</>;
+function Trademarked(props: { text: string }) {
+  const [mark, rest] = untrack(() => props.text).split("™");
+  if (rest === undefined) return <>{props.text}</>;
   return (
     <>
       {mark}
-      <sup {...stylex.props(styles.trademarkInline)}>™</sup>
+      <sup {...stylex.attrs(styles.trademarkInline)}>™</sup>
       {rest}
     </>
   );
 }
 
-export function ProductsOOS1Doubao({
-  onNavigateHome,
-}: {
-  onNavigateHome: (hash?: string) => void;
-}) {
+export function ProductsOOS1Doubao(props: { onNavigateHome: (hash?: string) => void }) {
   const reduce = useReducedMotion();
-  const detailId = useId();
-  const [activeTab, setActiveTab] = useState<string>("personal-care");
-  const [activeProductIndex, setActiveProductIndex] = useState<number>(0);
-  const activeProduct = FEATURED_PRODUCT.items[activeProductIndex];
+  const detailId = createUniqueId();
+  const [activeTab, setActiveTab] = createSignal<string>("personal-care");
+  const [activeProductIndex, setActiveProductIndex] = createSignal<number>(0);
+  const activeProduct = () => FEATURED_PRODUCT.items[activeProductIndex()];
 
   return (
-    <div id="products-top" lang="zh-CN" {...stylex.props(styles.root)}>
+    <div id="products-top" lang="zh-CN" {...stylex.attrs(styles.root)}>
       <section aria-labelledby="products-title">
-        <div {...stylex.props(styles.hero)}>
+        <div {...stylex.attrs(styles.hero)}>
           <img
             src={FEATURED_PRODUCT.bannerImage}
             alt="Panorama of Fenchem products and applications in their natural form"
-            fetchPriority="high"
+            fetchpriority="high"
             decoding="async"
-            {...stylex.props(styles.heroImg)}
+            {...stylex.attrs(styles.heroImg)}
           />
-          <div {...stylex.props(kitStyles.shell, kitStyles.inset120, styles.heroContent)}>
-            <nav aria-label="Breadcrumb" {...stylex.props(styles.breadcrumb)}>
+          <div {...stylex.attrs(kitStyles.shell, kitStyles.inset120, styles.heroContent)}>
+            <nav aria-label="Breadcrumb" {...stylex.attrs(styles.breadcrumb)}>
               <button
                 type="button"
-                onClick={() => onNavigateHome("top")}
-                {...stylex.props(styles.breadcrumbLink)}
+                onClick={() => props.onNavigateHome("top")}
+                {...stylex.attrs(styles.breadcrumbLink)}
               >
                 首页
               </button>
               <ChevronRight size={13} strokeWidth={1.5} absoluteStrokeWidth aria-hidden="true" />
-              <span aria-current="page" {...stylex.props(styles.breadcrumbCurrent)}>
+              <span aria-current="page" {...stylex.attrs(styles.breadcrumbCurrent)}>
                 产品与应用
               </span>
             </nav>
-            <h1 id="products-title" {...stylex.props(styles.pageTitle)}>
+            <h1 id="products-title" {...stylex.attrs(styles.pageTitle)}>
               产品与应用
             </h1>
           </div>
         </div>
-        <div {...stylex.props(styles.tabBar)}>
+        <div {...stylex.attrs(styles.tabBar)}>
           <div
             role="group"
             aria-label="Categories"
-            {...stylex.props(kitStyles.shell, kitStyles.inset120, styles.tabRow)}
+            {...stylex.attrs(kitStyles.shell, kitStyles.inset120, styles.tabRow)}
           >
             {CATEGORIES.map((cat) => {
-              const isActive = activeTab === cat.id;
+              const isActive = () => activeTab() === cat.id;
               return (
                 <button
-                  key={cat.id}
                   type="button"
-                  aria-pressed={isActive}
+                  aria-pressed={isActive() ? "true" : "false"}
                   onClick={() => setActiveTab(cat.id)}
-                  {...stylex.props(
+                  {...stylex.attrs(
                     styles.textTab,
-                    isActive && styles.barOn,
-                    isActive && styles.selectedText,
+                    isActive() && styles.barOn,
+                    isActive() && styles.selectedText,
                   )}
                 >
                   {cat.label}
@@ -479,77 +474,82 @@ export function ProductsOOS1Doubao({
 
       <section
         aria-labelledby="spotlight-title"
-        {...stylex.props(kitStyles.shell, kitStyles.inset120, styles.section)}
+        {...stylex.attrs(kitStyles.shell, kitStyles.inset120, styles.section)}
       >
-        <div {...stylex.props(styles.feature)}>
-          <div {...stylex.props(styles.featureHead)}>
-            <h2 id="spotlight-title" {...stylex.props(styles.brandTitle)}>
+        <div {...stylex.attrs(styles.feature)}>
+          <div {...stylex.attrs(styles.featureHead)}>
+            <h2 id="spotlight-title" {...stylex.attrs(styles.brandTitle)}>
               <BrandTitle text={FEATURED_PRODUCT.brand} />
             </h2>
-            <p {...stylex.props(styles.tagline)}>{FEATURED_PRODUCT.tagline}</p>
+            <p {...stylex.attrs(styles.tagline)}>{FEATURED_PRODUCT.tagline}</p>
           </div>
-          <div {...stylex.props(styles.featureMedia)}>
+          <div {...stylex.attrs(styles.featureMedia)}>
             {FEATURED_PRODUCT.items.map((item, idx) => (
               <img
-                key={item.id}
                 src={item.cardImage}
-                alt={idx === activeProductIndex ? item.cardAlt : ""}
-                aria-hidden={idx !== activeProductIndex}
+                alt={idx === activeProductIndex() ? item.cardAlt : ""}
+                aria-hidden={idx !== activeProductIndex() ? "true" : "false"}
                 decoding="async"
-                {...stylex.props(
+                {...stylex.attrs(
                   styles.featureImg,
-                  idx === activeProductIndex && styles.featureImgShown,
+                  idx === activeProductIndex() && styles.featureImgShown,
                 )}
               />
             ))}
           </div>
-          <div id={detailId} aria-live="polite" {...stylex.props(styles.featureDetail)}>
+          <div id={detailId} aria-live="polite" {...stylex.attrs(styles.featureDetail)}>
             <AnimatePresence mode="wait" initial={false}>
-              <m.div
-                key={activeProduct.id}
-                initial={{ opacity: 0, y: 6 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -3 }}
-                transition={{ duration: reduce ? 0 : 0.22, ease: EASE }}
-              >
-                <p {...stylex.props(styles.pair)}>
-                  <span {...stylex.props(styles.detailPrimary)}>{activeProduct.name}</span>
-                  <span {...stylex.props(styles.latin)}>
-                    <Trademarked text={activeProduct.englishName} />
-                  </span>
-                </p>
-                <p {...stylex.props(styles.detailDesc)}>{activeProduct.desc}</p>
-              </m.div>
+              <Show when={activeProduct()} keyed>
+                {(product) => (
+                  <m.div
+                    initial={{ opacity: 0, y: 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -3 }}
+                    transition={{ duration: reduce() ? 0 : 0.22, ease: EASE }}
+                  >
+                    <p {...stylex.attrs(styles.pair)}>
+                      <span {...stylex.attrs(styles.detailPrimary)}>{product.name}</span>
+                      <span {...stylex.attrs(styles.latin)}>
+                        <Trademarked text={product.englishName} />
+                      </span>
+                    </p>
+                    <p {...stylex.attrs(styles.detailDesc)}>{product.desc}</p>
+                  </m.div>
+                )}
+              </Show>
             </AnimatePresence>
           </div>
           <div
             role="group"
             aria-label="6 core oil ingredient cards"
-            {...stylex.props(styles.thumbs)}
+            {...stylex.attrs(styles.thumbs)}
           >
             {FEATURED_PRODUCT.items.map((item, idx) => {
-              const isActive = activeProductIndex === idx;
+              const isActive = () => activeProductIndex() === idx;
               return (
                 <button
-                  key={item.id}
                   type="button"
-                  aria-pressed={isActive}
+                  aria-pressed={isActive() ? "true" : "false"}
                   aria-controls={detailId}
                   onClick={() => setActiveProductIndex(idx)}
                   onMouseEnter={() => setActiveProductIndex(idx)}
-                  {...stylex.props(styles.thumb, isActive && styles.selectedText)}
+                  {...stylex.attrs(styles.thumb, isActive() && styles.selectedText)}
                 >
-                  <span {...stylex.props(styles.thumbFrame, isActive && styles.thumbFrameSelected)}>
-                    <span {...stylex.props(styles.thumbClip, isActive && styles.thumbClipSelected)}>
+                  <span
+                    {...stylex.attrs(styles.thumbFrame, isActive() && styles.thumbFrameSelected)}
+                  >
+                    <span
+                      {...stylex.attrs(styles.thumbClip, isActive() && styles.thumbClipSelected)}
+                    >
                       <img
                         src={item.cardImage}
                         alt=""
                         decoding="async"
-                        {...stylex.props(styles.thumbImg)}
+                        {...stylex.attrs(styles.thumbImg)}
                       />
                     </span>
                   </span>
-                  <span {...stylex.props(styles.thumbName, isActive && styles.thumbNameSelected)}>
+                  <span {...stylex.attrs(styles.thumbName, isActive() && styles.thumbNameSelected)}>
                     {item.name}
                   </span>
                 </button>
@@ -559,12 +559,12 @@ export function ProductsOOS1Doubao({
         </div>
       </section>
 
-      <ProductCatalog categoryId={activeTab} />
+      <ProductCatalog categoryId={activeTab()} />
       <ProductSolutions />
 
       <ContactCta
         subtitle={PRODUCTS_CTA_SUBTITLE}
-        actions={[{ label: CTA.action.label, onClick: () => onNavigateHome("contact") }]}
+        actions={[{ label: CTA.action.label, onClick: () => props.onNavigateHome("contact") }]}
       />
     </div>
   );

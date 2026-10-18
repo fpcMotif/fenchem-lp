@@ -1,6 +1,5 @@
 import * as stylex from "@stylexjs/stylex";
-import { m, useScroll, useTransform, type MotionValue } from "motion/react";
-import { useRef } from "react";
+import { m, useScroll, useTransform, type MotionValue } from "@/compat/motion";
 
 import { useLightbox } from "@/components/prototype/shared/lightbox";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
@@ -217,44 +216,48 @@ const styles = stylex.create({
 
 type StripProps = { index: number; weave: MotionValue<number>; still: boolean };
 
-function WarpStrip({ index, weave, still }: StripProps) {
-  const transform = useTransform(weave, (value) => warpTransform(index, (1 - value) ** 3));
+function WarpStrip(props: StripProps) {
+  const transform = useTransform(props.weave, (value) =>
+    warpTransform(props.index, (1 - value) ** 3),
+  );
   return (
-    <div {...stylex.props(styles.warp, styles.warpAt(index))}>
+    <div {...stylex.attrs(styles.warp, styles.warpAt(props.index))}>
       <m.div
-        {...stylex.props(styles.thread, styles.warpGap)}
-        style={{ transform: still ? warpTransform(index, 0) : transform }}
+        {...stylex.attrs(styles.thread, styles.warpGap)}
+        style={{ transform: props.still ? warpTransform(props.index, 0) : transform }}
       >
         <img
           src={LAB.large}
           alt=""
           loading="lazy"
           decoding="async"
-          {...stylex.props(styles.warpImage(index))}
+          {...stylex.attrs(styles.warpImage(props.index))}
         />
-        <span {...stylex.props(styles.warpShade)} />
+        <span {...stylex.attrs(styles.warpShade)} />
       </m.div>
     </div>
   );
 }
 
-function WeftRow({ index, weave, still }: StripProps) {
-  const transform = useTransform(weave, (value) => weftTransform(index, (1 - value) ** 3));
+function WeftRow(props: StripProps) {
+  const transform = useTransform(props.weave, (value) =>
+    weftTransform(props.index, (1 - value) ** 3),
+  );
   return (
-    <div {...stylex.props(styles.weft, styles.weftAt(index))}>
+    <div {...stylex.attrs(styles.weft, styles.weftAt(props.index))}>
       <m.div
-        {...stylex.props(styles.thread, styles.weftClip)}
-        style={{ transform: still ? weftTransform(index, 0) : transform }}
+        {...stylex.attrs(styles.thread, styles.weftClip)}
+        style={{ transform: props.still ? weftTransform(props.index, 0) : transform }}
       >
-        <div {...stylex.props(styles.twill, styles.twillAt(twillShift(index)))}>
+        <div {...stylex.attrs(styles.twill, styles.twillAt(twillShift(props.index)))}>
           <img
             src={GROUNDS.large}
             alt=""
             loading="lazy"
             decoding="async"
-            {...stylex.props(styles.weftImage(index))}
+            {...stylex.attrs(styles.weftImage(props.index))}
           />
-          <span {...stylex.props(styles.weftShade, styles.weftShadeAt(twillShift(index)))} />
+          <span {...stylex.attrs(styles.weftShade, styles.weftShadeAt(twillShift(props.index)))} />
         </div>
       </m.div>
     </div>
@@ -262,39 +265,39 @@ function WeftRow({ index, weave, still }: StripProps) {
 }
 
 function LoomStage() {
-  const trackRef = useRef<HTMLDivElement>(null);
+  let trackRef: HTMLDivElement | undefined;
   const reduce = useReducedMotion();
   const { scrollYProgress } = useScroll({
-    target: trackRef,
+    target: () => trackRef,
     offset: [`start ${PIN_TOP}px`, "end end"],
   });
   const weave = useTransform(scrollYProgress, [0, 0.78], [0.28, 1]);
 
   return (
-    <div ref={trackRef} {...stylex.props(styles.track)}>
-      <div {...stylex.props(styles.pinned)}>
+    <div ref={trackRef} {...stylex.attrs(styles.track)}>
+      <div {...stylex.attrs(styles.pinned)}>
         <div
           role="img"
           aria-label={`${LAB.alt}, interwoven with ${GROUNDS.alt} into one image`}
-          {...stylex.props(styles.stage)}
+          {...stylex.attrs(styles.stage)}
         >
           {Array.from({ length: WARP }, (_, index) => (
-            <WarpStrip key={`warp-${index}`} index={index} weave={weave} still={reduce} />
+            <WarpStrip index={index} weave={weave} still={reduce()} />
           ))}
           {Array.from({ length: WEFT }, (_, index) => (
-            <WeftRow key={`weft-${index}`} index={index} weave={weave} still={reduce} />
+            <WeftRow index={index} weave={weave} still={reduce()} />
           ))}
         </div>
-        <div {...stylex.props(styles.under)}>
-          <p lang="en" {...stylex.props(styles.tagline)}>
+        <div {...stylex.attrs(styles.under)}>
+          <p lang="en" {...stylex.attrs(styles.tagline)}>
             {ABOUT_BANNER.tagline}
           </p>
-          <p {...stylex.props(ui.caption)}>
+          <p {...stylex.attrs(ui.caption)}>
             {LAB.caption} × {GROUNDS.caption}
           </p>
         </div>
       </div>
-      <div aria-hidden="true" {...stylex.props(styles.runway)} />
+      <div aria-hidden="true" {...stylex.attrs(styles.runway)} />
     </div>
   );
 }
@@ -306,31 +309,31 @@ export function CampusLoom() {
     <section
       id="about-campus"
       aria-labelledby="about-campus-title"
-      {...stylex.props(ui.section, ui.anchor, styles.section)}
+      {...stylex.attrs(ui.section, ui.anchor, styles.section)}
     >
-      <h2 id="about-campus-title" {...stylex.props(ui.srOnly)}>
+      <h2 id="about-campus-title" {...stylex.attrs(ui.srOnly)}>
         {ABOUT_CAMPUS.eyebrow}
       </h2>
-      <div {...stylex.props(ui.shell)}>
+      <div {...stylex.attrs(ui.shell)}>
         <LoomStage />
-        <ul {...stylex.props(styles.fringe)}>
+        <ul {...stylex.attrs(styles.fringe)}>
           {ABOUT_CAMPUS.photos.map((photo, index) => (
-            <Reveal key={photo.id} as="li" delay={Math.min(index, 4) * 60} sx={styles.fringeItem}>
+            <Reveal as="li" delay={Math.min(index, 4) * 60} sx={styles.fringeItem}>
               <button
                 type="button"
                 aria-label={`View larger: ${photo.english}`}
                 onClick={() => lightbox.open(index)}
-                {...stylex.props(styles.fringeButton)}
+                {...stylex.attrs(styles.fringeButton)}
               >
                 <img
                   src={photo.src}
                   alt={photo.alt}
                   loading="lazy"
                   decoding="async"
-                  {...stylex.props(styles.fringeImage)}
+                  {...stylex.attrs(styles.fringeImage)}
                 />
               </button>
-              <span {...stylex.props(ui.caption)}>{photo.caption}</span>
+              <span {...stylex.attrs(ui.caption)}>{photo.caption}</span>
             </Reveal>
           ))}
         </ul>

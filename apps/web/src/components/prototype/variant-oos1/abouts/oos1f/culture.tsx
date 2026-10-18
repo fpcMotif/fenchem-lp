@@ -1,4 +1,3 @@
-import { breakpoints } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 
 import { ABOUT_CULTURE } from "../../about-data";
@@ -10,9 +9,9 @@ const styles = stylex.create({
     display: "grid",
     gridTemplateColumns: {
       default: "minmax(0, 1fr)",
-      [breakpoints.md]: "repeat(3, minmax(0, 1fr))",
+      ["@media (min-width: 768px)"]: "repeat(3, minmax(0, 1fr))",
     },
-    columnGap: { default: 0, [media.mdOnly]: 32, [breakpoints.lg]: 64 },
+    columnGap: { default: 0, [media.mdOnly]: 32, ["@media (min-width: 1024px)"]: 64 },
     rowGap: 48,
     margin: 0,
     padding: 0,
@@ -23,7 +22,7 @@ const styles = stylex.create({
     display: "block",
     marginBottom: 20,
     marginInlineStart: -4,
-    fontSize: { default: 96, [media.mdOnly]: 88, [breakpoints.lg]: 120 },
+    fontSize: { default: 96, [media.mdOnly]: 88, ["@media (min-width: 1024px)"]: 120 },
     fontWeight: 500,
     lineHeight: 1,
   },
@@ -33,7 +32,7 @@ const styles = stylex.create({
   title: {
     margin: 0,
     marginBottom: 12,
-    fontSize: { default: 22, [breakpoints.xl]: 24 },
+    fontSize: { default: 22, ["@media (min-width: 1280px)"]: 24 },
     fontWeight: 500,
     lineHeight: 1.4,
     letterSpacing: "0.08em",
@@ -63,14 +62,14 @@ export function Culture() {
       <Shell>
         <NodeMarker />
         <Reveal>
-          <ul {...stylex.props(styles.grid)}>
+          <ul {...stylex.attrs(styles.grid)}>
             {ABOUT_CULTURE.values.map((value) => (
-              <li key={value.title}>
-                <span aria-hidden="true" {...stylex.props(styles.glyph, GLYPH_TONES[value.tone])}>
+              <li>
+                <span aria-hidden="true" {...stylex.attrs(styles.glyph, GLYPH_TONES[value.tone])}>
                   {value.glyph}
                 </span>
-                <h3 {...stylex.props(styles.title)}>{value.title}</h3>
-                <p {...stylex.props(styles.desc)}>{value.desc}</p>
+                <h3 {...stylex.attrs(styles.title)}>{value.title}</h3>
+                <p {...stylex.attrs(styles.desc)}>{value.desc}</p>
               </li>
             ))}
           </ul>

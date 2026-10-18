@@ -1,4 +1,4 @@
-import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
+import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 
 import { font, layout, mq, ui } from "./theme.stylex";
@@ -11,10 +11,10 @@ export const shared = stylex.create({
     boxSizing: "border-box",
   },
   inset: {
-    paddingInline: { default: 16, [mq.tablet]: 40, [breakpoints.xl]: layout.inset },
+    paddingInline: { default: 16, [mq.tablet]: 40, ["@media (min-width: 1280px)"]: layout.inset },
   },
   section: {
-    paddingBlock: { default: 80, [breakpoints.xl]: 144 },
+    paddingBlock: { default: 80, ["@media (min-width: 1280px)"]: 144 },
   },
   srOnly: {
     position: "absolute",
@@ -31,7 +31,7 @@ export const shared = stylex.create({
     outlineOffset: 3,
   },
   anchor: {
-    scrollMarginTop: { default: 140, [breakpoints.xl]: 96 },
+    scrollMarginTop: { default: 140, ["@media (min-width: 1280px)"]: 96 },
   },
   button: {
     display: "inline-flex",

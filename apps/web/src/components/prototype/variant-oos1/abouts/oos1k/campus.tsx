@@ -38,10 +38,10 @@ export function Campus() {
     <section
       id="about-campus"
       aria-labelledby="oos1k-campus"
-      {...stylex.props(ui.section, ui.shell)}
+      {...stylex.attrs(ui.section, ui.shell)}
     >
-      <div {...stylex.props(styles.head)}>
-        <div {...stylex.props(styles.heading)}>
+      <div {...stylex.attrs(styles.head)}>
+        <div {...stylex.attrs(styles.heading)}>
           <ChartHeading
             id="oos1k-campus"
             numeral="II"
@@ -50,11 +50,11 @@ export function Campus() {
             note="An archive of seven plates"
           />
         </div>
-        <p {...stylex.props(ui.label, styles.hint)}>点击底片查看大图</p>
+        <p {...stylex.attrs(ui.label, styles.hint)}>点击底片查看大图</p>
       </div>
 
-      {reduce ? null : <PlateArc onOpen={lightbox.open} />}
-      <PlateList always={reduce} onOpen={lightbox.open} />
+      {reduce() ? null : <PlateArc onOpen={lightbox.open} />}
+      <PlateList always={reduce()} onOpen={lightbox.open} />
 
       <Lightbox lightbox={lightbox} photos={PLATES} />
     </section>

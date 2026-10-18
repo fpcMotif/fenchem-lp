@@ -2,7 +2,7 @@ import { LightboxControls } from "../../../shared/lightbox-controls";
 import { LightboxStage } from "../../../shared/lightbox-stage";
 import { LightboxDialog, type LightboxState } from "../../../shared/lightbox";
 import * as stylex from "@stylexjs/stylex";
-import { ArrowLeft, ArrowRight, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, X } from "@fenchem-lp/ui/components/lucide";
 
 import { Hinge, Words } from "./clause";
 import type { Unit } from "./sentence";
@@ -124,28 +124,22 @@ const styles = stylex.create({
   },
 });
 
-export function Lightbox({
-  lightbox,
-  photos,
-}: {
-  lightbox: LightboxState;
-  photos: readonly LightboxPhoto[];
-}) {
-  const { close: onClose, step: onStep } = lightbox;
+export function Lightbox(props: { lightbox: LightboxState; photos: readonly LightboxPhoto[] }) {
+  const { close: onClose, step: onStep } = props.lightbox;
   return (
-    <LightboxDialog lightbox={lightbox} items={photos} sx={styles.dialog}>
+    <LightboxDialog lightbox={props.lightbox} items={props.photos} sx={styles.dialog}>
       {(photo, index) => (
         <>
           <LightboxStage onClose={onClose} sx={styles.stage}>
-            <img key={photo.id} src={photo.large} alt={photo.alt} {...stylex.props(styles.image)} />
+            <img src={photo.large} alt={photo.alt} {...stylex.attrs(styles.image)} />
           </LightboxStage>
-          <p {...stylex.props(styles.caption)}>
-            <span lang="en" {...stylex.props(styles.count)}>
-              {String(index + 1).padStart(2, "0")} / {String(photos.length).padStart(2, "0")}
+          <p {...stylex.attrs(styles.caption)}>
+            <span lang="en" {...stylex.attrs(styles.count)}>
+              {String(index + 1).padStart(2, "0")} / {String(props.photos.length).padStart(2, "0")}
               {" · "}
               {photo.english}
             </span>
-            <span {...stylex.props(styles.line)}>
+            <span {...stylex.attrs(styles.line)}>
               <Words
                 segments={photo.line.segments}
                 heavy={styles.heavy}

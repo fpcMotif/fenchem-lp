@@ -1,6 +1,7 @@
 import * as stylex from "@stylexjs/stylex";
-import { AnimatePresence, m } from "motion/react";
-import { useEffect, useId, useRef, useState, type KeyboardEvent } from "react";
+import { AnimatePresence, m } from "@/compat/motion";
+import { createEffect, createMemo, createSignal, createUniqueId, For, Show } from "solid-js";
+import type { JSX } from "@solidjs/web";
 
 import {
   AreaChips,
@@ -647,59 +648,56 @@ const styles = stylex.create({
   },
 });
 
-function RowValue({ row, shared }: { row: SheetRow; shared?: Set<string> }) {
-  if (row.values.length === 0) return <span {...stylex.props(styles.absent)}>无</span>;
-  if (row.kind === "lines") {
+function RowValue(props: { row: SheetRow; shared?: Set<string> }) {
+  if (props.row.values.length === 0) return <span {...stylex.attrs(styles.absent)}>无</span>;
+  if (props.row.kind === "lines") {
     return (
-      <ul {...stylex.props(styles.lines, styles.body)}>
-        {row.values.map((line) => (
-          <li key={line}>{line}</li>
+      <ul {...stylex.attrs(styles.lines, styles.body)}>
+        {props.row.values.map((line) => (
+          <li>{line}</li>
         ))}
       </ul>
     );
   }
-  if (row.kind === "strong") {
-    return <span {...stylex.props(styles.strong)}>{row.values.join(" · ")}</span>;
+  if (props.row.kind === "strong") {
+    return <span {...stylex.attrs(styles.strong)}>{props.row.values.join(" · ")}</span>;
   }
-  if (row.kind === "list") {
+  if (props.row.kind === "list") {
     return (
-      <ul {...stylex.props(styles.lines)}>
-        {row.values.map((entry) => {
+      <ul {...stylex.attrs(styles.lines)}>
+        {props.row.values.map((entry) => {
           const { parts, note } = ingredientParts(entry);
           return (
-            <li key={entry} {...stylex.props(styles.keepWords)}>
+            <li {...stylex.attrs(styles.keepWords)}>
               {parts.map((part, index) => (
-                <span key={part}>
+                <span>
                   {index > 0 && (
-                    <span {...stylex.props(styles.separator)}>{`${NO_BREAK_SPACE}/ `}</span>
+                    <span {...stylex.attrs(styles.separator)}>{`${NO_BREAK_SPACE}/ `}</span>
                   )}
                   <span
-                    {...stylex.props(
-                      shared ? (shared.has(part) ? styles.shared : styles.unshared) : styles.strong,
+                    {...stylex.attrs(
+                      props.shared
+                        ? props.shared.has(part)
+                          ? styles.shared
+                          : styles.unshared
+                        : styles.strong,
                     )}
                   >
                     {part}
                   </span>
                 </span>
               ))}
-              {note && <span {...stylex.props(styles.note)}>{note}</span>}
+              {note && <span {...stylex.attrs(styles.note)}>{note}</span>}
             </li>
           );
         })}
       </ul>
     );
   }
-  return <>{row.values.join("、")}</>;
+  return <>{props.row.values.join("、")}</>;
 }
 
-function CompareToggle({
-  item,
-  pressed,
-  letter,
-  onToggle,
-  tabIndex,
-  inTile,
-}: {
+function CompareToggle(props: {
   item: SolutionItem;
   pressed: boolean;
   letter?: string;
@@ -710,107 +708,115 @@ function CompareToggle({
   return (
     <button
       type="button"
-      aria-pressed={pressed}
-      aria-label={`对比：${item.title}`}
-      data-tile-id={inTile ? item.id : undefined}
-      data-part={inTile ? "toggle" : undefined}
-      tabIndex={tabIndex}
-      onClick={onToggle}
-      {...stylex.props(
+      aria-pressed={props.pressed ? "true" : "false"}
+      aria-label={`对比：${props.item.title}`}
+      data-tile-id={props.inTile ? props.item.id : undefined}
+      data-part={props.inTile ? "toggle" : undefined}
+      tabindex={props.tabIndex}
+      onClick={() => props.onToggle()}
+      {...stylex.attrs(
         styles.toggle,
-        inTile ? styles.toggleCorner : styles.toggleOutlined,
-        pressed && styles.toggleOn,
+        props.inTile ? styles.toggleCorner : styles.toggleOutlined,
+        props.pressed && styles.toggleOn,
       )}
     >
-      <span aria-hidden="true" {...stylex.props(styles.box, pressed && styles.boxOn)} />
+      <span aria-hidden="true" {...stylex.attrs(styles.box, props.pressed && styles.boxOn)} />
       <span aria-hidden="true">对比</span>
-      {letter && (
-        <span aria-hidden="true" {...stylex.props(styles.toggleLetter)}>
-          {letter}
+      <Show when={props.letter}>
+        <span aria-hidden="true" {...stylex.attrs(styles.toggleLetter)}>
+          {props.letter}
         </span>
-      )}
+      </Show>
     </button>
   );
 }
 
 export function CompareVariant() {
   const browser = useSolutionsBrowser();
-  const { area, scope, groups, selected, select, solutions } = browser;
-  const uid = useId();
-  const wellRef = useRef<HTMLDivElement>(null);
-  const sheetRef = useRef<HTMLDivElement>(null);
-  const [compareIds, setCompareIds] = useState<string[]>([]);
-  const [mode, setMode] = useState<Mode>("single");
-  const [notice, setNotice] = useState<Notice | null>(null);
-  const [focusId, setFocusId] = useState<string>();
-  const [fadeBottom, setFadeBottom] = useState(false);
+  const solutions = browser.solutions;
+  const uid = createUniqueId();
+  let well: HTMLDivElement | undefined;
+  let sheet: HTMLDivElement | undefined;
+  const [compareIds, setCompareIds] = createSignal<string[]>([]);
+  const [mode, setMode] = createSignal<Mode>("single");
+  const [notice, setNotice] = createSignal<Notice | null>(null);
+  const [focusId, setFocusId] = createSignal<string>();
+  const [fadeBottom, setFadeBottom] = createSignal(false);
 
-  const pair = compareIds
-    .map((id) => solutions.find((item) => item.id === id))
-    .filter((item): item is SolutionItem => item !== undefined);
-  const [first, second] = pair;
-  const comparing = mode === "compare" && first !== undefined && second !== undefined;
-  const rovingId = scope.some((item) => item.id === focusId) ? focusId : selected?.id;
-  const grouped = area === "all";
+  const pair = createMemo(() =>
+    compareIds()
+      .map((id) => solutions.find((item) => item.id === id))
+      .filter((item): item is SolutionItem => item !== undefined),
+  );
+  const first = () => pair()[0];
+  const second = () => pair()[1];
+  const comparing = () => mode() === "compare" && first() !== undefined && second() !== undefined;
+  const rovingId = () =>
+    browser.scope.some((item) => item.id === focusId()) ? focusId() : browser.selected?.id;
+  const grouped = () => browser.area === "all";
   const sheetId = `${uid}-sheet`;
 
-  useEffect(() => {
-    const well = wellRef.current;
-    if (!well) return;
-    well.scrollTo({ top: 0, left: 0 });
-    const update = () => {
-      const overflow = well.scrollHeight - well.clientHeight;
-      setFadeBottom(overflow > 1 && well.scrollTop < overflow - 1);
-    };
-    update();
-    well.addEventListener("scroll", update, { passive: true });
-    const observer = new ResizeObserver(update);
-    observer.observe(well);
-    return () => {
-      well.removeEventListener("scroll", update);
-      observer.disconnect();
-    };
-  }, [area]);
+  createEffect(
+    () => browser.area,
+    () => {
+      if (!well) return;
+      const target = well;
+      target.scrollTo({ top: 0, left: 0 });
+      const update = () => {
+        const overflow = target.scrollHeight - target.clientHeight;
+        setFadeBottom(overflow > 1 && target.scrollTop < overflow - 1);
+      };
+      update();
+      target.addEventListener("scroll", update, { passive: true });
+      const observer = new ResizeObserver(update);
+      observer.observe(target);
+      return () => {
+        target.removeEventListener("scroll", update);
+        observer.disconnect();
+      };
+    },
+  );
 
-  useEffect(() => {
-    if (!notice) return;
+  createEffect(notice, (current) => {
+    if (!current) return;
     const timer = window.setTimeout(() => setNotice(null), NOTICE_MS);
     return () => window.clearTimeout(timer);
-  }, [notice]);
+  });
 
-  const focusSheet = () => sheetRef.current?.focus({ preventScroll: true });
+  const focusSheet = () => sheet?.focus({ preventScroll: true });
 
   const openTile = (id: string) => {
-    select(id);
+    browser.select(id);
     setFocusId(id);
     setMode("single");
   };
 
   const toggleCompare = (id: string) => {
-    if (compareIds.includes(id)) {
-      setCompareIds(compareIds.filter((entry) => entry !== id));
+    const ids = compareIds();
+    if (ids.includes(id)) {
+      setCompareIds(ids.filter((entry) => entry !== id));
       setMode("single");
       return;
     }
-    if (compareIds.length < 2) {
-      const next = [...compareIds, id];
+    if (ids.length < 2) {
+      const next = [...ids, id];
       setCompareIds(next);
       setMode(next.length === 2 ? "compare" : "single");
       return;
     }
-    const [dropped, kept] = compareIds;
-    setCompareIds([kept, id]);
+    const [dropped, kept] = ids;
+    setCompareIds([kept!, id]);
     setMode("compare");
     const droppedTitle = solutions.find((item) => item.id === dropped)?.title;
     if (droppedTitle) setNotice({ key: Date.now(), text: `已替换「${droppedTitle}」` });
   };
 
   const removeFromCompare = (id: string) => {
-    const remaining = compareIds.filter((entry) => entry !== id);
+    const remaining = compareIds().filter((entry) => entry !== id);
     setCompareIds(remaining);
     setMode("single");
     const survivor = remaining[0];
-    if (survivor && scope.some((item) => item.id === survivor)) select(survivor);
+    if (survivor && browser.scope.some((item) => item.id === survivor)) browser.select(survivor);
     focusSheet();
   };
 
@@ -825,7 +831,7 @@ export function CompareVariant() {
     focusSheet();
   };
 
-  const handleTilesKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+  const handleTilesKeyDown: JSX.EventHandler<HTMLDivElement, KeyboardEvent> = (event) => {
     const target = event.target as HTMLElement;
     const { tileId, part } = target.dataset;
     if (!tileId || !part) return;
@@ -856,247 +862,282 @@ export function CompareVariant() {
   };
 
   const statusText = () => {
-    if (notice) return notice.text;
-    if (comparing) return "共有成分以深色标示";
-    if (first && second) return "已选 2 款";
-    if (first) return `已选「${first.title}」，再选一款`;
+    const current = notice();
+    if (current) return current.text;
+    if (comparing()) return "共有成分以深色标示";
+    const a = first();
+    if (a && second()) return "已选 2 款";
+    if (a) return `已选「${a.title}」，再选一款`;
     return "勾选两款「对比」，并排查看配方";
   };
 
   const renderTile = (item: SolutionItem) => {
-    const isSelected = !comparing && item.id === selected?.id;
-    const slot = compareIds.indexOf(item.id);
-    const tabIndex = item.id === rovingId ? 0 : -1;
+    const isSelected = () => !comparing() && item.id === browser.selected?.id;
+    const slot = () => compareIds().indexOf(item.id);
+    const tabIndex = () => (item.id === rovingId() ? 0 : -1);
     return (
-      <li key={item.id} {...stylex.props(styles.tile)}>
+      <li {...stylex.attrs(styles.tile)}>
         <button
           type="button"
           data-tile-id={item.id}
           data-part="select"
-          aria-current={isSelected ? "true" : undefined}
+          aria-current={isSelected() ? "true" : undefined}
           aria-controls={sheetId}
-          tabIndex={tabIndex}
+          tabindex={tabIndex()}
           onClick={() => openTile(item.id)}
-          {...stylex.props(
+          {...stylex.attrs(
             styles.tileButton,
-            isSelected && styles.tileButtonSelected,
+            isSelected() && styles.tileButtonSelected,
             stylex.defaultMarker(),
           )}
         >
-          <span {...stylex.props(styles.tileTop)}>
-            <span {...stylex.props(styles.tileIndex, isSelected && styles.tileIndexSelected)}>
-              {padIndex(scope.indexOf(item))}
+          <span {...stylex.attrs(styles.tileTop)}>
+            <span {...stylex.attrs(styles.tileIndex, isSelected() && styles.tileIndexSelected)}>
+              {padIndex(browser.scope.indexOf(item))}
             </span>
           </span>
-          <span {...stylex.props(styles.tileName, isSelected && styles.tileNameSelected)}>
+          <span {...stylex.attrs(styles.tileName, isSelected() && styles.tileNameSelected)}>
             {item.title}
           </span>
-          <span {...stylex.props(styles.tileFunctions)}>{item.functions.join(" · ")}</span>
+          <span {...stylex.attrs(styles.tileFunctions)}>{item.functions.join(" · ")}</span>
         </button>
         <CompareToggle
           item={item}
-          pressed={slot !== -1}
-          letter={slot === -1 ? undefined : LETTERS[slot]}
+          pressed={slot() !== -1}
+          letter={slot() === -1 ? undefined : LETTERS[slot()]}
           onToggle={() => toggleCompare(item.id)}
-          tabIndex={tabIndex}
+          tabIndex={tabIndex()}
           inTile
         />
       </li>
     );
   };
 
-  if (!selected) {
-    return (
-      <LabSection>
-        <AreaChips browser={browser} />
-        <p {...stylex.props(styles.empty)}>该领域暂无应用方案</p>
-      </LabSection>
-    );
-  }
-
-  const selectedSlot = compareIds.indexOf(selected.id);
-  const pairRows = comparing ? [sheetRows(first), sheetRows(second)] : [];
-  const secondNames = comparing ? new Set(ingredientNames(second)) : new Set<string>();
-  const sharedNames = comparing
-    ? new Set(ingredientNames(first).filter((name) => secondNames.has(name)))
-    : new Set<string>();
+  const selectedSlot = () => (browser.selected ? compareIds().indexOf(browser.selected.id) : -1);
+  const pairRows = createMemo(() =>
+    comparing() ? [sheetRows(first()!), sheetRows(second()!)] : [],
+  );
+  const sharedNames = createMemo(() => {
+    if (!comparing()) return new Set<string>();
+    const secondNames = new Set(ingredientNames(second()!));
+    return new Set(ingredientNames(first()!).filter((name) => secondNames.has(name)));
+  });
 
   return (
-    <LabSection>
-      <AreaChips browser={browser} />
-      <div {...stylex.props(styles.tray)}>
-        <div
-          ref={wellRef}
-          role="group"
-          aria-label="应用方案"
-          onKeyDown={handleTilesKeyDown}
-          {...stylex.props(
-            styles.well,
-            grouped && styles.wellGrouped,
-            fadeBottom && styles.wellFade,
-          )}
-        >
-          {grouped ? (
-            groups.map((group) => (
-              <div
-                key={group.id}
-                role="group"
-                aria-labelledby={`${uid}-group-${group.id}`}
-                {...stylex.props(styles.group)}
-              >
-                <p id={`${uid}-group-${group.id}`} {...stylex.props(styles.groupHead)}>
-                  {group.label}
-                  <span {...stylex.props(styles.groupCount)}>{group.items.length} 款</span>
-                </p>
-                <ul {...stylex.props(styles.grid)}>{group.items.map(renderTile)}</ul>
-              </div>
-            ))
-          ) : (
-            <ul {...stylex.props(styles.grid)}>{scope.map(renderTile)}</ul>
-          )}
-        </div>
-      </div>
-      <div
-        ref={sheetRef}
-        id={sheetId}
-        role="region"
-        aria-labelledby={`${uid}-sheet-title`}
-        tabIndex={-1}
-        {...stylex.props(styles.sheet)}
-      >
-        <div {...stylex.props(styles.toolbar)}>
-          <p id={`${uid}-sheet-title`} {...stylex.props(styles.toolbarTitle)}>
-            {comparing ? "方案对比" : "方案详情"}
-          </p>
-          <div {...stylex.props(styles.toolbarSide)}>
-            <p aria-live="polite" {...stylex.props(styles.status)}>
-              {statusText()}
-            </p>
-            {comparing ? (
-              <button type="button" onClick={exitCompare} {...stylex.props(styles.textButton)}>
-                退出对比
-              </button>
-            ) : (
-              first &&
-              second && (
-                <button type="button" onClick={showCompare} {...stylex.props(styles.textButton)}>
-                  查看对比
-                </button>
-              )
+    <Show
+      when={browser.selected}
+      fallback={
+        <LabSection>
+          <AreaChips browser={browser} />
+          <p {...stylex.attrs(styles.empty)}>该领域暂无应用方案</p>
+        </LabSection>
+      }
+    >
+      <LabSection>
+        <AreaChips browser={browser} />
+        <div {...stylex.attrs(styles.tray)}>
+          <div
+            ref={well}
+            role="group"
+            aria-label="应用方案"
+            onKeyDown={handleTilesKeyDown}
+            {...stylex.attrs(
+              styles.well,
+              grouped() && styles.wellGrouped,
+              fadeBottom() && styles.wellFade,
             )}
+          >
+            <Show
+              when={grouped()}
+              fallback={
+                <ul {...stylex.attrs(styles.grid)}>
+                  <For each={browser.scope}>{renderTile}</For>
+                </ul>
+              }
+            >
+              <For each={browser.groups}>
+                {(group) => (
+                  <div
+                    role="group"
+                    aria-labelledby={`${uid}-group-${group.id}`}
+                    {...stylex.attrs(styles.group)}
+                  >
+                    <p id={`${uid}-group-${group.id}`} {...stylex.attrs(styles.groupHead)}>
+                      {group.label}
+                      <span {...stylex.attrs(styles.groupCount)}>{group.items.length} 款</span>
+                    </p>
+                    <ul {...stylex.attrs(styles.grid)}>
+                      <For each={group.items}>{renderTile}</For>
+                    </ul>
+                  </div>
+                )}
+              </For>
+            </Show>
           </div>
         </div>
-        <div {...stylex.props(styles.stage)}>
-          <AnimatePresence mode="popLayout" initial={false}>
-            {comparing ? (
-              <m.div
-                key="compare"
-                role="table"
-                aria-label="两款方案对比"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0, transition: { duration: 0.12, ease: EASE_OUT } }}
-                transition={{ duration: 0.18, ease: EASE_OUT }}
-                {...stylex.props(styles.view)}
+        <div
+          ref={sheet}
+          id={sheetId}
+          role="region"
+          aria-labelledby={`${uid}-sheet-title`}
+          tabindex={-1}
+          {...stylex.attrs(styles.sheet)}
+        >
+          <div {...stylex.attrs(styles.toolbar)}>
+            <p id={`${uid}-sheet-title`} {...stylex.attrs(styles.toolbarTitle)}>
+              {comparing() ? "方案对比" : "方案详情"}
+            </p>
+            <div {...stylex.attrs(styles.toolbarSide)}>
+              <p aria-live="polite" {...stylex.attrs(styles.status)}>
+                {statusText()}
+              </p>
+              <Show
+                when={comparing()}
+                fallback={
+                  <Show when={first() && second()}>
+                    <button
+                      type="button"
+                      onClick={showCompare}
+                      {...stylex.attrs(styles.textButton)}
+                    >
+                      查看对比
+                    </button>
+                  </Show>
+                }
               >
-                <div role="row" {...stylex.props(styles.row, styles.compareRow, styles.headRow)}>
-                  <div role="columnheader" {...stylex.props(styles.corner)}>
-                    <span {...stylex.props(styles.srOnly)}>项目</span>
-                  </div>
-                  {pair.map((item, index) => (
-                    <div key={item.id} role="columnheader" {...stylex.props(styles.cell)}>
-                      <div key={item.id} {...stylex.props(styles.fade)}>
-                        <div {...stylex.props(styles.columnTop)}>
-                          <span {...stylex.props(styles.letter)}>{LETTERS[index]}</span>
-                          <span {...stylex.props(styles.columnArea)}>
-                            {areaOf(item.area)?.label}
-                          </span>
-                          <button
-                            type="button"
-                            aria-label={`移出对比：${item.title}`}
-                            onClick={() => removeFromCompare(item.id)}
-                            {...stylex.props(styles.remove)}
-                          >
-                            ×
-                          </button>
-                        </div>
-                        <p {...stylex.props(styles.columnTitle)}>{item.title}</p>
-                        <p {...stylex.props(styles.columnSubtitle)}>{item.subtitle}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-                {sheetRows(first).map((row, rowIndex) => (
-                  <div key={row.label} role="row" {...stylex.props(styles.row, styles.compareRow)}>
-                    <div role="rowheader" {...stylex.props(styles.label)}>
-                      {row.label}
-                      {row.kind === "list" && (
-                        <span {...stylex.props(styles.legend)}>
-                          {sharedNames.size > 0 ? `共有 ${sharedNames.size} 项` : "无共有成分"}
-                        </span>
-                      )}
-                    </div>
-                    {pair.map((item, index) => {
-                      const cellRow = pairRows[index]?.[rowIndex];
-                      return (
-                        <div key={item.id} role="cell" {...stylex.props(styles.value, styles.cell)}>
-                          <span aria-hidden="true" {...stylex.props(styles.cellTag)}>
-                            <span {...stylex.props(styles.letter)}>{LETTERS[index]}</span>
-                            {item.title}
-                          </span>
-                          {cellRow && (
-                            <div key={item.id} {...stylex.props(styles.fade)}>
-                              <RowValue
-                                row={cellRow}
-                                shared={row.kind === "list" ? sharedNames : undefined}
-                              />
+                <button type="button" onClick={exitCompare} {...stylex.attrs(styles.textButton)}>
+                  退出对比
+                </button>
+              </Show>
+            </div>
+          </div>
+          <div {...stylex.attrs(styles.stage)}>
+            <AnimatePresence mode="popLayout" initial={false}>
+              <Show
+                when={comparing()}
+                fallback={
+                  <m.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0, transition: { duration: 0.12, ease: EASE_OUT } }}
+                    transition={{ duration: 0.18, ease: EASE_OUT }}
+                    {...stylex.attrs(styles.view)}
+                  >
+                    <Show when={browser.selected} keyed>
+                      {(selected) => (
+                        <div {...stylex.attrs(styles.fade)}>
+                          <header {...stylex.attrs(styles.singleHead)}>
+                            <div {...stylex.attrs(styles.headText)}>
+                              <p {...stylex.attrs(styles.area)}>{areaOf(selected.area)?.label}</p>
+                              <h3 {...stylex.attrs(styles.title)}>{selected.title}</h3>
+                              <p {...stylex.attrs(styles.subtitle)}>{selected.subtitle}</p>
                             </div>
-                          )}
+                            <CompareToggle
+                              item={selected}
+                              pressed={selectedSlot() !== -1}
+                              letter={selectedSlot() === -1 ? undefined : LETTERS[selectedSlot()]}
+                              onToggle={() => toggleCompare(selected.id)}
+                            />
+                          </header>
+                          <dl {...stylex.attrs(styles.rows)}>
+                            {sheetRows(selected).map((row) => (
+                              <div {...stylex.attrs(styles.row)}>
+                                <dt {...stylex.attrs(styles.label)}>{row.label}</dt>
+                                <dd {...stylex.attrs(styles.value)}>
+                                  <RowValue row={row} />
+                                </dd>
+                              </div>
+                            ))}
+                          </dl>
                         </div>
-                      );
-                    })}
-                  </div>
-                ))}
-              </m.div>
-            ) : (
-              <m.div
-                key="single"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0, transition: { duration: 0.12, ease: EASE_OUT } }}
-                transition={{ duration: 0.18, ease: EASE_OUT }}
-                {...stylex.props(styles.view)}
+                      )}
+                    </Show>
+                  </m.div>
+                }
               >
-                <div key={selected.id} {...stylex.props(styles.fade)}>
-                  <header {...stylex.props(styles.singleHead)}>
-                    <div {...stylex.props(styles.headText)}>
-                      <p {...stylex.props(styles.area)}>{areaOf(selected.area)?.label}</p>
-                      <h3 {...stylex.props(styles.title)}>{selected.title}</h3>
-                      <p {...stylex.props(styles.subtitle)}>{selected.subtitle}</p>
+                <m.div
+                  role="table"
+                  aria-label="两款方案对比"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0, transition: { duration: 0.12, ease: EASE_OUT } }}
+                  transition={{ duration: 0.18, ease: EASE_OUT }}
+                  {...stylex.attrs(styles.view)}
+                >
+                  <div role="row" {...stylex.attrs(styles.row, styles.compareRow, styles.headRow)}>
+                    <div role="columnheader" {...stylex.attrs(styles.corner)}>
+                      <span {...stylex.attrs(styles.srOnly)}>项目</span>
                     </div>
-                    <CompareToggle
-                      item={selected}
-                      pressed={selectedSlot !== -1}
-                      letter={selectedSlot === -1 ? undefined : LETTERS[selectedSlot]}
-                      onToggle={() => toggleCompare(selected.id)}
-                    />
-                  </header>
-                  <dl {...stylex.props(styles.rows)}>
-                    {sheetRows(selected).map((row) => (
-                      <div key={row.label} {...stylex.props(styles.row)}>
-                        <dt {...stylex.props(styles.label)}>{row.label}</dt>
-                        <dd {...stylex.props(styles.value)}>
-                          <RowValue row={row} />
-                        </dd>
+                    <For each={pair()}>
+                      {(item, index) => (
+                        <div role="columnheader" {...stylex.attrs(styles.cell)}>
+                          <div {...stylex.attrs(styles.fade)}>
+                            <div {...stylex.attrs(styles.columnTop)}>
+                              <span {...stylex.attrs(styles.letter)}>{LETTERS[index()]}</span>
+                              <span {...stylex.attrs(styles.columnArea)}>
+                                {areaOf(item.area)?.label}
+                              </span>
+                              <button
+                                type="button"
+                                aria-label={`移出对比：${item.title}`}
+                                onClick={() => removeFromCompare(item.id)}
+                                {...stylex.attrs(styles.remove)}
+                              >
+                                ×
+                              </button>
+                            </div>
+                            <p {...stylex.attrs(styles.columnTitle)}>{item.title}</p>
+                            <p {...stylex.attrs(styles.columnSubtitle)}>{item.subtitle}</p>
+                          </div>
+                        </div>
+                      )}
+                    </For>
+                  </div>
+                  <For each={pairRows()[0] ?? []} keyed={false}>
+                    {(row, rowIndex) => (
+                      <div role="row" {...stylex.attrs(styles.row, styles.compareRow)}>
+                        <div role="rowheader" {...stylex.attrs(styles.label)}>
+                          {row().label}
+                          <Show when={row().kind === "list"}>
+                            <span {...stylex.attrs(styles.legend)}>
+                              {sharedNames().size > 0
+                                ? `共有 ${sharedNames().size} 项`
+                                : "无共有成分"}
+                            </span>
+                          </Show>
+                        </div>
+                        <For each={pair()}>
+                          {(item, index) => {
+                            const cellRow = () => pairRows()[index()]?.[rowIndex];
+                            return (
+                              <div role="cell" {...stylex.attrs(styles.value, styles.cell)}>
+                                <span aria-hidden="true" {...stylex.attrs(styles.cellTag)}>
+                                  <span {...stylex.attrs(styles.letter)}>{LETTERS[index()]}</span>
+                                  {item.title}
+                                </span>
+                                <Show when={cellRow()} keyed>
+                                  {(shownRow) => (
+                                    <div {...stylex.attrs(styles.fade)}>
+                                      <RowValue
+                                        row={shownRow}
+                                        shared={row().kind === "list" ? sharedNames() : undefined}
+                                      />
+                                    </div>
+                                  )}
+                                </Show>
+                              </div>
+                            );
+                          }}
+                        </For>
                       </div>
-                    ))}
-                  </dl>
-                </div>
-              </m.div>
-            )}
-          </AnimatePresence>
+                    )}
+                  </For>
+                </m.div>
+              </Show>
+            </AnimatePresence>
+          </div>
         </div>
-      </div>
-    </LabSection>
+      </LabSection>
+    </Show>
   );
 }

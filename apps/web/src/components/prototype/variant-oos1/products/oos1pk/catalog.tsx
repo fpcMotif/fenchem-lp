@@ -1,7 +1,7 @@
-import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
+import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { ChevronDown, Search, X } from "lucide-react";
-import { useId, useMemo, useRef, useState, type KeyboardEvent } from "react";
+import { ChevronDown, Search, X } from "@fenchem-lp/ui/components/lucide";
+import { createMemo, createSignal, createUniqueId, For, Show } from "solid-js";
 
 import { CATALOG_GROUPS } from "../../products-data";
 import {
@@ -37,9 +37,9 @@ const NUMERAL_FONT = '"Inter Tight", "Source Han Sans SC", "Noto Sans SC", sans-
 const TABLET = "@media (min-width: 768px) and (max-width: 1279.98px)";
 const MID = "@media (min-width: 768px) and (max-width: 1023.98px)";
 const HOVER_WIDE = "@media (hover: hover) and (min-width: 1024px)";
-const DESKTOP = breakpoints.xl;
-const MD = breakpoints.md;
-const LG = breakpoints.lg;
+const DESKTOP = "@media (min-width: 1280px)";
+const MD = "@media (min-width: 768px)";
+const LG = "@media (min-width: 1024px)";
 const INSET = "min(120px, 8.333vw)";
 const HEADER_HEIGHT = 80;
 const GUTTER = 24;
@@ -113,6 +113,10 @@ const REGION_OPTIONS = CATALOG_GROUPS.map((group) => ({
 
 const matchesTerms = (row: CatalogRow, terms: string[]) =>
   terms.every((term) => row.fields.some((field) => field.includes(term)));
+
+// stylex.attrs with reactive (accessor) arguments resolves at runtime here, because
+// the StyleX compiler tries to evaluate them at build time and throws.
+const sxProps: typeof stylex.attrs = (...args) => stylex.attrs(...args);
 
 const styles = stylex.create({
   section: {
@@ -591,38 +595,39 @@ const styles = stylex.create({
   },
 });
 
-function TableRow({ row, terms }: { row: CatalogRow; terms: string[] }) {
-  const { item } = row;
-  const inciRanges: Range[] = findRanges(row.inciText, terms);
+function TableRow(props: { row: CatalogRow; terms: string[] }) {
+  const row = props.row;
+  const item = row.item;
+  const inciRanges = createMemo<Range[]>(() => findRanges(row.inciText, props.terms));
 
   return (
-    <tr {...stylex.props(styles.row)}>
-      <th scope="row" {...stylex.props(styles.cell, styles.nameCell)}>
-        <span {...stylex.props(styles.nameLine)}>
-          <span {...stylex.props(styles.number)}>{row.number}</span>
-          <span {...stylex.props(styles.names)}>
-            <span {...stylex.props(styles.primary)}>
-              <Marked text={item.primary} ranges={findRanges(item.primary, terms)} />
+    <tr {...stylex.attrs(styles.row)}>
+      <th scope="row" {...stylex.attrs(styles.cell, styles.nameCell)}>
+        <span {...stylex.attrs(styles.nameLine)}>
+          <span {...stylex.attrs(styles.number)}>{row.number}</span>
+          <span {...stylex.attrs(styles.names)}>
+            <span {...stylex.attrs(styles.primary)}>
+              <Marked text={item.primary} ranges={findRanges(item.primary, props.terms)} />
             </span>
             {item.secondary && (
-              <span {...stylex.props(styles.secondary)}>
-                <Marked text={item.secondary} ranges={findRanges(item.secondary, terms)} />
+              <span {...stylex.attrs(styles.secondary)}>
+                <Marked text={item.secondary} ranges={findRanges(item.secondary, props.terms)} />
               </span>
             )}
           </span>
         </span>
       </th>
-      <td {...stylex.props(styles.cell, styles.regionCell)}>{row.region}</td>
-      <td {...stylex.props(styles.cell, styles.inciCell)}>
+      <td {...stylex.attrs(styles.cell, styles.regionCell)}>{row.region}</td>
+      <td {...stylex.attrs(styles.cell, styles.inciCell)}>
         {row.inci.map((segment) => (
-          <span key={segment.start} {...stylex.props(segment.latin && styles.latin)}>
-            <Marked text={segment.text} ranges={inciRanges} offset={segment.start} />
+          <span {...stylex.attrs(segment.latin && styles.latin)}>
+            <Marked text={segment.text} ranges={inciRanges()} offset={segment.start} />
           </span>
         ))}
       </td>
-      <td {...stylex.props(styles.cell, styles.featuresCell, styles.lastCell)}>
-        <p {...stylex.props(styles.features)}>
-          <Marked text={item.features} ranges={findRanges(item.features, terms)} />
+      <td {...stylex.attrs(styles.cell, styles.featuresCell, styles.lastCell)}>
+        <p {...stylex.attrs(styles.features)}>
+          <Marked text={item.features} ranges={findRanges(item.features, props.terms)} />
         </p>
       </td>
     </tr>
@@ -630,31 +635,28 @@ function TableRow({ row, terms }: { row: CatalogRow; terms: string[] }) {
 }
 
 export function Catalog() {
-  const titleId = useId();
-  const searchId = useId();
-  const regionId = useId();
-  const tagsLabelId = useId();
-  const tagsNoteId = useId();
-  const searchRef = useRef<HTMLInputElement>(null);
-  const [query, setQuery] = useState("");
-  const [region, setRegion] = useState(ALL_REGIONS);
-  const [tags, setTags] = useState<FunctionTag[]>([]);
+  const titleId = createUniqueId();
+  const searchId = createUniqueId();
+  const regionId = createUniqueId();
+  const tagsLabelId = createUniqueId();
+  const tagsNoteId = createUniqueId();
+  let searchRef: HTMLInputElement | undefined;
+  const [query, setQuery] = createSignal("");
+  const [region, setRegion] = createSignal(ALL_REGIONS);
+  const [tags, setTags] = createSignal<FunctionTag[]>([]);
 
-  const terms = useMemo(() => toTerms(query), [query]);
-  const scoped = useMemo(
-    () =>
-      ROWS.filter(
-        (row) =>
-          (region === ALL_REGIONS || row.item.group.id === region) && matchesTerms(row, terms),
-      ),
-    [region, terms],
+  const terms = createMemo(() => toTerms(query()));
+  const scoped = createMemo(() =>
+    ROWS.filter(
+      (row) =>
+        (region() === ALL_REGIONS || row.item.group.id === region()) && matchesTerms(row, terms()),
+    ),
   );
-  const visible = useMemo(
-    () => scoped.filter((row) => tags.every((tag) => row.item.traits.tags.includes(tag))),
-    [scoped, tags],
+  const visible = createMemo(() =>
+    scoped().filter((row) => tags().every((tag) => row.item.traits.tags.includes(tag))),
   );
-  const filtering = terms.length > 0 || region !== ALL_REGIONS || tags.length > 0;
-  const intro = REGION_OPTIONS.find((option) => option.id === region)?.intro;
+  const filtering = () => terms().length > 0 || region() !== ALL_REGIONS || tags().length > 0;
+  const intro = () => REGION_OPTIONS.find((option) => option.id === region())?.intro;
 
   const toggleTag = (tag: FunctionTag) => {
     setTags((current) =>
@@ -666,34 +668,34 @@ export function Catalog() {
 
   const clearQuery = () => {
     setQuery("");
-    searchRef.current?.focus();
+    searchRef?.focus();
   };
 
   const clearAll = () => {
     setQuery("");
     setRegion(ALL_REGIONS);
     setTags([]);
-    searchRef.current?.focus();
+    searchRef?.focus();
   };
 
-  const onSearchKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
-    if (event.key !== "Escape" || query === "") return;
+  const onSearchKeyDown = (event: KeyboardEvent) => {
+    if (event.key !== "Escape" || query() === "") return;
     event.preventDefault();
     setQuery("");
   };
 
   return (
-    <section id="products-catalog" aria-labelledby={titleId} {...stylex.props(styles.section)}>
-      <div {...stylex.props(styles.shell)}>
-        <header {...stylex.props(styles.head)}>
-          <h2 id={titleId} {...stylex.props(styles.title)}>
+    <section id="products-catalog" aria-labelledby={titleId} {...stylex.attrs(styles.section)}>
+      <div {...stylex.attrs(styles.shell)}>
+        <header {...stylex.attrs(styles.head)}>
+          <h2 id={titleId} {...stylex.attrs(styles.title)}>
             产品目录
           </h2>
         </header>
 
-        <div {...stylex.props(styles.toolbar)}>
-          <search {...stylex.props(styles.searchField)}>
-            <label htmlFor={searchId} {...stylex.props(styles.srOnly)}>
+        <div {...stylex.attrs(styles.toolbar)}>
+          <search {...stylex.attrs(styles.searchField)}>
+            <label for={searchId} {...stylex.attrs(styles.srOnly)}>
               Search ingredients
             </label>
             <Search
@@ -701,52 +703,50 @@ export function Catalog() {
               strokeWidth={1.5}
               absoluteStrokeWidth
               aria-hidden="true"
-              {...stylex.props(styles.fieldIcon, styles.searchIcon)}
+              {...stylex.attrs(styles.fieldIcon, styles.searchIcon)}
             />
             <input
               ref={searchRef}
               id={searchId}
               type="search"
-              value={query}
+              value={query()}
               placeholder="搜索名称、INCI 或特性"
-              autoComplete="off"
-              spellCheck={false}
-              enterKeyHint="search"
-              onChange={(event) => setQuery(event.target.value)}
+              autocomplete="off"
+              spellcheck={false}
+              enterkeyhint="search"
+              onInput={(event) => setQuery(event.currentTarget.value)}
               onKeyDown={onSearchKeyDown}
-              {...stylex.props(styles.field, styles.searchInput)}
+              {...stylex.attrs(styles.field, styles.searchInput)}
             />
-            {query !== "" && (
+            {query() !== "" && (
               <button
                 type="button"
                 aria-label="Clear search"
                 onClick={clearQuery}
-                {...stylex.props(styles.searchClear)}
+                {...stylex.attrs(styles.searchClear)}
               >
                 <X size={16} strokeWidth={1.5} absoluteStrokeWidth aria-hidden="true" />
               </button>
             )}
           </search>
 
-          <div {...stylex.props(styles.regionField)}>
-            <label htmlFor={regionId} {...stylex.props(styles.srOnly)}>
+          <div {...stylex.attrs(styles.regionField)}>
+            <label for={regionId} {...stylex.attrs(styles.srOnly)}>
               Origin
             </label>
             <select
               id={regionId}
-              value={region}
-              onChange={(event) => setRegion(event.target.value)}
-              {...stylex.props(
+              value={region()}
+              onChange={(event) => setRegion(event.currentTarget.value)}
+              {...stylex.attrs(
                 styles.field,
                 styles.select,
-                region !== ALL_REGIONS && styles.selectActive,
+                region() !== ALL_REGIONS && styles.selectActive,
               )}
             >
               <option value={ALL_REGIONS}>全部产地</option>
               {REGION_OPTIONS.map((option) => (
-                <option key={option.id} value={option.id}>
-                  {option.label}
-                </option>
+                <option value={option.id}>{option.label}</option>
               ))}
             </select>
             <ChevronDown
@@ -754,7 +754,7 @@ export function Catalog() {
               strokeWidth={1.5}
               absoluteStrokeWidth
               aria-hidden="true"
-              {...stylex.props(styles.fieldIcon, styles.selectIcon)}
+              {...stylex.attrs(styles.fieldIcon, styles.selectIcon)}
             />
           </div>
 
@@ -762,43 +762,43 @@ export function Catalog() {
             role="group"
             aria-labelledby={tagsLabelId}
             aria-describedby={tagsNoteId}
-            {...stylex.props(styles.tagsBlock)}
+            {...stylex.attrs(styles.tagsBlock)}
           >
-            <p {...stylex.props(styles.tagsHead)}>
-              <span id={tagsLabelId} {...stylex.props(styles.tagsLabel)}>
+            <p {...stylex.attrs(styles.tagsHead)}>
+              <span id={tagsLabelId} {...stylex.attrs(styles.tagsLabel)}>
                 功效
               </span>
-              <span id={tagsNoteId} {...stylex.props(styles.tagsNote)}>
+              <span id={tagsNoteId} {...stylex.attrs(styles.tagsNote)}>
                 功效依据原料描述整理
               </span>
             </p>
-            <div {...stylex.props(styles.chips)}>
+            <div {...stylex.attrs(styles.chips)}>
               {FUNCTION_TAGS.map((tag) => {
-                const pressed = tags.includes(tag);
-                const count = visible.filter((row) => row.item.traits.tags.includes(tag)).length;
-                const disabled = !pressed && count === 0;
+                const pressed = () => tags().includes(tag);
+                const count = () =>
+                  visible().filter((row) => row.item.traits.tags.includes(tag)).length;
+                const disabled = () => !pressed() && count() === 0;
                 return (
                   <button
-                    key={tag}
                     type="button"
-                    aria-pressed={pressed}
-                    disabled={disabled}
+                    aria-pressed={pressed() ? "true" : "false"}
+                    disabled={disabled()}
                     onClick={() => toggleTag(tag)}
-                    {...stylex.props(
+                    {...stylex.attrs(
                       styles.chip,
-                      pressed && styles.chipPressed,
-                      disabled && styles.chipDisabled,
+                      pressed() && styles.chipPressed,
+                      disabled() && styles.chipDisabled,
                     )}
                   >
                     <span>{tag}</span>
                     <span
-                      {...stylex.props(
+                      {...stylex.attrs(
                         styles.chipCount,
-                        pressed && styles.chipCountPressed,
-                        disabled && styles.chipCountDisabled,
+                        pressed() && styles.chipCountPressed,
+                        disabled() && styles.chipCountDisabled,
                       )}
                     >
-                      {count}
+                      {count()}
                     </span>
                   </button>
                 );
@@ -806,63 +806,66 @@ export function Catalog() {
             </div>
           </div>
 
-          <div {...stylex.props(styles.status)}>
-            <p aria-live="polite" {...stylex.props(styles.count)}>
-              显示 <span {...stylex.props(styles.countNumber)}>{visible.length}</span> /{" "}
-              <span {...stylex.props(styles.countNumber)}>{TOTAL}</span>
+          <div {...stylex.attrs(styles.status)}>
+            <p aria-live="polite" {...stylex.attrs(styles.count)}>
+              显示 <span {...stylex.attrs(styles.countNumber)}>{visible().length}</span> /{" "}
+              <span {...stylex.attrs(styles.countNumber)}>{TOTAL}</span>
             </p>
             <button
               type="button"
               onClick={clearAll}
-              {...stylex.props(styles.textButton, !filtering && styles.invisible)}
+              {...sxProps(styles.textButton, !filtering() && styles.invisible)}
             >
               清除筛选
             </button>
           </div>
         </div>
 
-        {intro && <p {...stylex.props(styles.intro)}>{intro}</p>}
+        {intro() && <p {...stylex.attrs(styles.intro)}>{intro()}</p>}
 
-        <table aria-labelledby={titleId} {...stylex.props(styles.table)}>
+        <table aria-labelledby={titleId} {...stylex.attrs(styles.table)}>
           <colgroup>
-            <col {...stylex.props(styles.colName)} />
-            <col {...stylex.props(styles.colRegion)} />
-            <col {...stylex.props(styles.colInci)} />
-            <col {...stylex.props(styles.colFeatures)} />
+            <col {...stylex.attrs(styles.colName)} />
+            <col {...stylex.attrs(styles.colRegion)} />
+            <col {...stylex.attrs(styles.colInci)} />
+            <col {...stylex.attrs(styles.colFeatures)} />
           </colgroup>
-          <thead {...stylex.props(styles.thead)}>
+          <thead {...stylex.attrs(styles.thead)}>
             <tr>
-              <th scope="col" {...stylex.props(styles.th, styles.thName)}>
+              <th scope="col" {...stylex.attrs(styles.th, styles.thName)}>
                 <span aria-hidden="true">名称</span>
-                <span {...stylex.props(styles.srOnly)}>Name</span>
+                <span {...stylex.attrs(styles.srOnly)}>Name</span>
               </th>
-              <th scope="col" {...stylex.props(styles.th)}>
+              <th scope="col" {...stylex.attrs(styles.th)}>
                 <span aria-hidden="true">产地</span>
-                <span {...stylex.props(styles.srOnly)}>Origin</span>
+                <span {...stylex.attrs(styles.srOnly)}>Origin</span>
               </th>
-              <th scope="col" {...stylex.props(styles.th)}>
+              <th scope="col" {...stylex.attrs(styles.th)}>
                 <span aria-hidden="true">INCI 名称</span>
-                <span {...stylex.props(styles.srOnly)}>INCI name</span>
+                <span {...stylex.attrs(styles.srOnly)}>INCI name</span>
               </th>
-              <th scope="col" {...stylex.props(styles.th, styles.lastCell)}>
+              <th scope="col" {...stylex.attrs(styles.th, styles.lastCell)}>
                 <span aria-hidden="true">{"特性&应用"}</span>
-                <span {...stylex.props(styles.srOnly)}>Features & applications</span>
+                <span {...stylex.attrs(styles.srOnly)}>Features & applications</span>
               </th>
             </tr>
           </thead>
-          <tbody {...stylex.props(styles.tbody)}>
-            {visible.length === 0 ? (
-              <tr {...stylex.props(styles.row)}>
-                <td colSpan={4} {...stylex.props(styles.cell, styles.lastCell, styles.emptyCell)}>
-                  <p {...stylex.props(styles.emptyText)}>没有符合条件的原料</p>
-                  <button type="button" onClick={clearAll} {...stylex.props(styles.textButton)}>
-                    清除筛选
-                  </button>
-                </td>
-              </tr>
-            ) : (
-              visible.map((row) => <TableRow key={row.item.id} row={row} terms={terms} />)
-            )}
+          <tbody {...stylex.attrs(styles.tbody)}>
+            <Show
+              when={visible().length > 0}
+              fallback={
+                <tr {...stylex.attrs(styles.row)}>
+                  <td colspan={4} {...stylex.attrs(styles.cell, styles.lastCell, styles.emptyCell)}>
+                    <p {...stylex.attrs(styles.emptyText)}>没有符合条件的原料</p>
+                    <button type="button" onClick={clearAll} {...stylex.attrs(styles.textButton)}>
+                      清除筛选
+                    </button>
+                  </td>
+                </tr>
+              }
+            >
+              <For each={visible()}>{(row) => <TableRow row={row} terms={terms()} />}</For>
+            </Show>
           </tbody>
         </table>
       </div>

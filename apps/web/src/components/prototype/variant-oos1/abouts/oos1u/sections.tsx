@@ -1,6 +1,6 @@
 import * as stylex from "@stylexjs/stylex";
-import { ChevronDown, Factory, Leaf, Recycle } from "lucide-react";
-import { Fragment, useId, useState } from "react";
+import { createSignal, createUniqueId } from "solid-js";
+import { ChevronDown, Factory, Leaf, Recycle } from "@fenchem-lp/ui/components/lucide";
 
 import { ABOUT_CSR, ABOUT_HERO, ABOUT_HONORS, ABOUT_STRUCTURE } from "../../about-data";
 import { STATS } from "../../content";
@@ -444,49 +444,48 @@ export function Profile() {
     <section
       id="about-profile"
       aria-labelledby="about-profile-title"
-      {...stylex.props(ui.section, ui.anchor, styles.profile)}
+      {...stylex.attrs(ui.section, ui.anchor, styles.profile)}
     >
-      <h2 id="about-profile-title" {...stylex.props(ui.srOnly)}>
+      <h2 id="about-profile-title" {...stylex.attrs(ui.srOnly)}>
         {ABOUT_HERO.navChips[0].english}
       </h2>
-      <div {...stylex.props(ui.shell)}>
-        <div {...stylex.props(styles.profileGrid)}>
+      <div {...stylex.attrs(ui.shell)}>
+        <div {...stylex.attrs(styles.profileGrid)}>
           <Reveal sx={styles.profileText}>
-            <h3 {...stylex.props(styles.company)}>
+            <h3 {...stylex.attrs(styles.company)}>
               {ABOUT_HERO.title}
-              <span lang="en" {...stylex.props(styles.english)}>
+              <span lang="en" {...stylex.attrs(styles.english)}>
                 {ABOUT_HERO.englishTitle}
               </span>
             </h3>
-            <p {...stylex.props(styles.lead)}>{ABOUT_HERO.lead}</p>
-            <p {...stylex.props(styles.network)}>
+            <p {...stylex.attrs(styles.lead)}>{ABOUT_HERO.lead}</p>
+            <p {...stylex.attrs(styles.network)}>
               {ABOUT_HERO.networkLabel}{" "}
               {ABOUT_HERO.countries.map((country, index) => (
-                <Fragment key={country}>
+                <>
                   {index > 0 ? "、" : null}
-                  <span {...stylex.props(styles.country)}>{country}</span>
-                </Fragment>
+                  <span {...stylex.attrs(styles.country)}>{country}</span>
+                </>
               ))}
               等地。
             </p>
           </Reveal>
           <Reveal as="figure" delay={120} sx={styles.lobby}>
-            <div {...stylex.props(styles.lobbyFrame)}>
+            <div {...stylex.attrs(styles.lobbyFrame)}>
               <img
                 src={ABOUT_HERO.lobbyImage}
                 alt={LOBBY_ALT}
                 loading="lazy"
                 decoding="async"
-                {...stylex.props(styles.fill, styles.lobbyImage)}
+                {...stylex.attrs(styles.fill, styles.lobbyImage)}
               />
             </div>
-            <figcaption {...stylex.props(ui.caption)}>{ABOUT_HERO.lobbyCaption}</figcaption>
+            <figcaption {...stylex.attrs(ui.caption)}>{ABOUT_HERO.lobbyCaption}</figcaption>
           </Reveal>
         </div>
-        <dl {...stylex.props(styles.stats)}>
+        <dl {...stylex.attrs(styles.stats)}>
           {STATS.map((stat, index) => (
             <Reveal
-              key={stat.label}
               delay={index * 90}
               sx={[
                 styles.stat,
@@ -494,12 +493,12 @@ export function Profile() {
                 index === STATS.length - 1 && styles.statLast,
               ]}
             >
-              <dt {...stylex.props(ui.srOnly)}>{STAT_ENGLISH[stat.label]}</dt>
-              <dd {...stylex.props(styles.statValue)}>
+              <dt {...stylex.attrs(ui.srOnly)}>{STAT_ENGLISH[stat.label]}</dt>
+              <dd {...stylex.attrs(styles.statValue)}>
                 {stat.value}
-                {stat.unit ? <span {...stylex.props(styles.statUnit)}>{stat.unit}</span> : null}
+                {stat.unit ? <span {...stylex.attrs(styles.statUnit)}>{stat.unit}</span> : null}
               </dd>
-              <dd {...stylex.props(styles.statCaption)}>{stat.caption}</dd>
+              <dd {...stylex.attrs(styles.statCaption)}>{stat.caption}</dd>
             </Reveal>
           ))}
         </dl>
@@ -514,35 +513,35 @@ export function Responsibility() {
     <section
       id="about-csr"
       aria-labelledby="about-csr-title"
-      {...stylex.props(ui.section, ui.anchor, styles.csr)}
+      {...stylex.attrs(ui.section, ui.anchor, styles.csr)}
     >
-      <h2 id="about-csr-title" {...stylex.props(ui.srOnly)}>
+      <h2 id="about-csr-title" {...stylex.attrs(ui.srOnly)}>
         {ABOUT_HERO.navChips[3].english}
       </h2>
-      <div {...stylex.props(ui.shell, styles.csrGrid)}>
+      <div {...stylex.attrs(ui.shell, styles.csrGrid)}>
         <Reveal as="figure" sx={styles.csrPhoto}>
           <img
             src={ABOUT_CSR.image}
             alt={ABOUT_CSR.imageAlt}
             loading="lazy"
             decoding="async"
-            {...stylex.props(styles.fill, styles.csrImage)}
+            {...stylex.attrs(styles.fill, styles.csrImage)}
           />
-          <span aria-hidden="true" {...stylex.props(styles.seams)} />
+          <span aria-hidden="true" {...stylex.attrs(styles.seams)} />
         </Reveal>
         <Reveal delay={120} sx={styles.csrText}>
-          <p {...stylex.props(styles.statement)}>
-            <span {...stylex.props(styles.statementLine)}>{lead}</span>
-            <span {...stylex.props(styles.statementLine)}>{close}</span>
+          <p {...stylex.attrs(styles.statement)}>
+            <span {...stylex.attrs(styles.statementLine)}>{lead}</span>
+            <span {...stylex.attrs(styles.statementLine)}>{close}</span>
           </p>
-          <p {...stylex.props(styles.csrDesc)}>{ABOUT_CSR.desc}</p>
-          <ul {...stylex.props(styles.outcomes)}>
+          <p {...stylex.attrs(styles.csrDesc)}>{ABOUT_CSR.desc}</p>
+          <ul {...stylex.attrs(styles.outcomes)}>
             {ABOUT_CSR.outcomes.map((outcome, index) => {
               const Icon = CSR_ICONS[outcome.icon];
               return (
-                <li key={outcome.title} {...stylex.props(styles.outcome)}>
+                <li {...stylex.attrs(styles.outcome)}>
                   {index > 0 ? (
-                    <span aria-hidden="true" {...stylex.props(styles.outcomeJoin)}>
+                    <span aria-hidden="true" {...stylex.attrs(styles.outcomeJoin)}>
                       ·
                     </span>
                   ) : null}
@@ -550,7 +549,7 @@ export function Responsibility() {
                     size={16}
                     strokeWidth={1.5}
                     aria-hidden="true"
-                    {...stylex.props(styles.outcomeIcon)}
+                    {...stylex.attrs(styles.outcomeIcon)}
                   />
                   {outcome.title}
                 </li>
@@ -568,22 +567,21 @@ export function Honors() {
     <section
       id="about-honor"
       aria-labelledby="about-honor-title"
-      {...stylex.props(ui.section, ui.anchor, styles.honors)}
+      {...stylex.attrs(ui.section, ui.anchor, styles.honors)}
     >
-      <h2 id="about-honor-title" {...stylex.props(ui.srOnly)}>
+      <h2 id="about-honor-title" {...stylex.attrs(ui.srOnly)}>
         {ABOUT_HONORS.eyebrow}
       </h2>
-      <div {...stylex.props(ui.shell)}>
-        <ul {...stylex.props(styles.honorList)}>
+      <div {...stylex.attrs(ui.shell)}>
+        <ul {...stylex.attrs(styles.honorList)}>
           {ABOUT_HONORS.items.map((honor, index) => (
             <Reveal
-              key={honor.id}
               as="li"
               delay={(index % 4) * 70}
               sx={[styles.honor, HONOR_TWILL[index % HONOR_TWILL.length]]}
             >
-              <h3 {...stylex.props(styles.honorTitle)}>{honor.title}</h3>
-              <span {...stylex.props(styles.honorLevel)}>{LEVEL_LABEL[honor.level]}</span>
+              <h3 {...stylex.attrs(styles.honorTitle)}>{honor.title}</h3>
+              <span {...stylex.attrs(styles.honorLevel)}>{LEVEL_LABEL[honor.level]}</span>
             </Reveal>
           ))}
         </ul>
@@ -593,67 +591,67 @@ export function Honors() {
 }
 
 export function Structure() {
-  const [showChart, setShowChart] = useState(false);
-  const chartId = useId();
+  const [showChart, setShowChart] = createSignal(false);
+  const chartId = createUniqueId();
   return (
     <section
       id="about-structure"
       aria-labelledby="about-structure-title"
-      {...stylex.props(ui.section, ui.anchor, styles.structure)}
+      {...stylex.attrs(ui.section, ui.anchor, styles.structure)}
     >
-      <h2 id="about-structure-title" {...stylex.props(ui.srOnly)}>
+      <h2 id="about-structure-title" {...stylex.attrs(ui.srOnly)}>
         {ABOUT_STRUCTURE.eyebrow}
       </h2>
-      <div {...stylex.props(ui.shell)}>
+      <div {...stylex.attrs(ui.shell)}>
         <Reveal sx={styles.holding}>
-          <p {...stylex.props(ui.caption)}>{ABOUT_STRUCTURE.holding.badge}</p>
-          <h3 {...stylex.props(styles.holdingName)}>{ABOUT_STRUCTURE.holding.name}</h3>
-          <span lang="en" {...stylex.props(styles.holdingEnglish)}>
+          <p {...stylex.attrs(ui.caption)}>{ABOUT_STRUCTURE.holding.badge}</p>
+          <h3 {...stylex.attrs(styles.holdingName)}>{ABOUT_STRUCTURE.holding.name}</h3>
+          <span lang="en" {...stylex.attrs(styles.holdingEnglish)}>
             {ABOUT_STRUCTURE.holding.english}
           </span>
         </Reveal>
-        <div aria-hidden="true" {...stylex.props(styles.loomBeam)} />
-        <p {...stylex.props(ui.caption, styles.subsidiaryBadge)}>
+        <div aria-hidden="true" {...stylex.attrs(styles.loomBeam)} />
+        <p {...stylex.attrs(ui.caption, styles.subsidiaryBadge)}>
           {ABOUT_STRUCTURE.subsidiaryBadge}
         </p>
         <ul
           aria-label={ABOUT_STRUCTURE.subsidiaryBadgeEnglish}
-          {...stylex.props(styles.subsidiaries)}
+          {...stylex.attrs(styles.subsidiaries)}
         >
           {ABOUT_STRUCTURE.subsidiaries.map((sub, index) => (
-            <Reveal key={sub.id} as="li" delay={index * 70} sx={styles.subsidiary}>
-              <span aria-hidden="true" {...stylex.props(styles.warpEnd)} />
-              <div {...stylex.props(styles.subsidiaryText)}>
-                <h4 {...stylex.props(styles.subsidiaryName)}>{sub.name}</h4>
-                <span lang="en" {...stylex.props(styles.subsidiaryEnglish)}>
+            <Reveal as="li" delay={index * 70} sx={styles.subsidiary}>
+              <span aria-hidden="true" {...stylex.attrs(styles.warpEnd)} />
+              <div {...stylex.attrs(styles.subsidiaryText)}>
+                <h4 {...stylex.attrs(styles.subsidiaryName)}>{sub.name}</h4>
+                <span lang="en" {...stylex.attrs(styles.subsidiaryEnglish)}>
                   {sub.english}
                 </span>
               </div>
             </Reveal>
           ))}
         </ul>
-        <div {...stylex.props(styles.chartWrap)}>
+        <div {...stylex.attrs(styles.chartWrap)}>
           <button
             type="button"
-            aria-expanded={showChart}
+            aria-expanded={showChart() ? "true" : "false"}
             aria-controls={chartId}
             onClick={() => setShowChart((open) => !open)}
-            {...stylex.props(styles.chartToggle, ui.focusRing)}
+            {...stylex.attrs(styles.chartToggle, ui.focusRing)}
           >
-            {showChart ? "收起组织架构图" : "查看官方组织架构图"}
+            {showChart() ? "收起组织架构图" : "查看官方组织架构图"}
             <ChevronDown
               size={16}
               aria-hidden="true"
-              {...stylex.props(styles.chevron, showChart && styles.chevronOpen)}
+              {...stylex.attrs(styles.chevron, showChart() && styles.chevronOpen)}
             />
           </button>
-          <div id={chartId} hidden={!showChart} {...stylex.props(styles.chartFrame)}>
+          <div id={chartId} hidden={!showChart()} {...stylex.attrs(styles.chartFrame)}>
             <img
               src={ABOUT_STRUCTURE.chartImage}
               alt={CHART_ALT}
               loading="lazy"
               decoding="async"
-              {...stylex.props(styles.chartImage)}
+              {...stylex.attrs(styles.chartImage)}
             />
           </div>
         </div>

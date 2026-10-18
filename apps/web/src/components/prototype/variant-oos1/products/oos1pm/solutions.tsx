@@ -1,8 +1,9 @@
-import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
+import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import { m } from "motion/react";
-import { useEffect, useId, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
+import { ChevronLeft, ChevronRight } from "@fenchem-lp/ui/components/lucide";
+import { m } from "@/compat/motion";
+import { createEffect, createSignal, createUniqueId, For, Show } from "solid-js";
+import type { JSX } from "@solidjs/web";
 
 import { EASE } from "@/components/prototype/motion-constants";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
@@ -29,9 +30,9 @@ const FOLD_CLEAR = "rgba(52, 40, 110, 0)";
 
 const TABLET = "@media (min-width: 768px) and (max-width: 1279.98px)";
 const MD_ONLY = "@media (min-width: 768px) and (max-width: 1023.98px)";
-const DESKTOP = breakpoints.xl;
-const MD = breakpoints.md;
-const LG = breakpoints.lg;
+const DESKTOP = "@media (min-width: 1280px)";
+const MD = "@media (min-width: 768px)";
+const LG = "@media (min-width: 1024px)";
 const NO_HOVER = "@media (hover: none)";
 const INSET = "min(120px, 8.333vw)";
 const HEADER_HEIGHT = 80;
@@ -379,91 +380,80 @@ const styles = stylex.create({
   },
 });
 
-function Lines({ lines }: { lines: string[] }) {
+function Lines(props: { lines: string[] }) {
   return (
-    <ul {...stylex.props(styles.lines)}>
-      {lines.map((line) => (
-        <li key={line} {...stylex.props(styles.line)}>
-          {line}
-        </li>
-      ))}
+    <ul {...stylex.attrs(styles.lines)}>
+      <For each={props.lines}>{(line) => <li {...stylex.attrs(styles.line)}>{line}</li>}</For>
     </ul>
   );
 }
 
-function Field({ label, children }: { label: string; children: ReactNode }) {
+function Field(props: { label: string; children: JSX.Element }) {
   return (
-    <div {...stylex.props(styles.field)}>
-      <dt {...stylex.props(styles.fieldLabel)}>{label}</dt>
-      <dd {...stylex.props(styles.fieldValue)}>{children}</dd>
+    <div {...stylex.attrs(styles.field)}>
+      <dt {...stylex.attrs(styles.fieldLabel)}>{props.label}</dt>
+      <dd {...stylex.attrs(styles.fieldValue)}>{props.children}</dd>
     </div>
   );
 }
 
-function LeftPage({ formula }: { formula: FlatFormula }) {
+function LeftPage(props: { formula: FlatFormula }) {
   return (
-    <dl {...stylex.props(styles.fields)}>
+    <dl {...stylex.attrs(styles.fields)}>
       <Field label="概述">
-        <Lines lines={formula.overview} />
+        <Lines lines={props.formula.overview} />
       </Field>
       <Field label="功能">
-        <Lines lines={formula.functions} />
+        <Lines lines={props.formula.functions} />
       </Field>
       <Field label="功能性成分">
-        <Lines lines={formula.keyIngredients} />
+        <Lines lines={props.formula.keyIngredients} />
       </Field>
     </dl>
   );
 }
 
-function RightPage({ formula }: { formula: FlatFormula }) {
+function RightPage(props: { formula: FlatFormula }) {
   return (
-    <dl {...stylex.props(styles.fields)}>
+    <dl {...stylex.attrs(styles.fields)}>
       <Field label="配方挑战">
-        {formula.challenges.length > 0 ? (
-          <Lines lines={formula.challenges} />
+        {props.formula.challenges.length > 0 ? (
+          <Lines lines={props.formula.challenges} />
         ) : (
           <>
-            <span aria-hidden="true" {...stylex.props(styles.nothing)}>
+            <span aria-hidden="true" {...stylex.attrs(styles.nothing)}>
               —
             </span>
-            <span {...stylex.props(styles.srOnly)}>Not provided</span>
+            <span {...stylex.attrs(styles.srOnly)}>Not provided</span>
           </>
         )}
       </Field>
       <Field label="质地">
-        <Lines lines={formula.texture} />
+        <Lines lines={props.formula.texture} />
       </Field>
       <Field label="应用">
-        <Lines lines={formula.applications} />
+        <Lines lines={props.formula.applications} />
       </Field>
     </dl>
   );
 }
 
-function Layers({
-  active,
-  render,
-}: {
-  active: number;
-  render: (formula: FlatFormula) => ReactNode;
-}) {
+function Layers(props: { active: number; render: (formula: FlatFormula) => JSX.Element }) {
   const reduce = useReducedMotion();
   return (
-    <div {...stylex.props(styles.stack)}>
+    <div {...stylex.attrs(styles.stack)}>
       {FLAT_FORMULAS.map((formula) => {
-        const on = formula.index === active;
+        const on = () => formula.index === props.active;
         return (
           <m.div
-            key={formula.id}
-            aria-hidden={on ? undefined : true}
+            aria-hidden={on() ? undefined : "true"}
             initial={false}
-            animate={on ? { opacity: 1, y: 0 } : { opacity: 0, y: 4 }}
-            transition={{ duration: on && !reduce ? 0.24 : 0, ease: EASE }}
-            style={{ visibility: on ? "visible" : "hidden" }}
-            {...stylex.props(styles.layer)}
+            animate={on() ? { opacity: 1, y: 0 } : { opacity: 0, y: 4 }}
+            transition={{ duration: on() && !reduce() ? 0.24 : 0, ease: EASE }}
+            style={{ visibility: on() ? "visible" : "hidden" }}
+            {...stylex.attrs(styles.layer)}
           >
-            {render(formula)}
+            {props.render(formula)}
           </m.div>
         );
       })}
@@ -471,83 +461,85 @@ function Layers({
   );
 }
 
-function PageButton({
-  direction,
-  target,
-  controls,
-  onGo,
-}: {
+function PageButton(props: {
   direction: "prev" | "next";
   target: FlatFormula | undefined;
   controls: string;
   onGo: (index: number) => void;
 }) {
-  const isNext = direction === "next";
+  const isNext = props.direction === "next";
   const label = isNext ? "下一个" : "上一个";
   return (
     <button
       type="button"
-      disabled={!target}
-      aria-controls={controls}
-      onClick={() => target && onGo(target.index)}
-      {...stylex.props(
+      disabled={!props.target}
+      aria-controls={props.controls}
+      onClick={() => {
+        const target = props.target;
+        if (target) props.onGo(target.index);
+      }}
+      {...stylex.attrs(
         styles.pageButton,
         isNext && styles.pageButtonNext,
-        !target && styles.pageButtonOff,
+        !props.target && styles.pageButtonOff,
       )}
     >
-      <span {...stylex.props(styles.pageLabel)}>
+      <span {...stylex.attrs(styles.pageLabel)}>
         {!isNext && <ChevronLeft size={16} strokeWidth={1.5} aria-hidden="true" />}
         {label}
         {isNext && <ChevronRight size={16} strokeWidth={1.5} aria-hidden="true" />}
       </span>
-      {target && (
-        <span {...stylex.props(styles.pageTitle)}>
-          <span {...stylex.props(styles.pageIndex)}>{padIndex(target.index)}</span>
-          <span {...stylex.props(styles.pageTitleText)}>{target.title}</span>
-        </span>
-      )}
+      <Show when={props.target}>
+        {(target) => (
+          <span {...stylex.attrs(styles.pageTitle)}>
+            <span {...stylex.attrs(styles.pageIndex)}>{padIndex(target().index)}</span>
+            <span {...stylex.attrs(styles.pageTitleText)}>{target().title}</span>
+          </span>
+        )}
+      </Show>
     </button>
   );
 }
 
 export function Solutions() {
   const reduce = useReducedMotion();
-  const titleId = useId();
-  const baseId = useId();
+  const titleId = createUniqueId();
+  const baseId = createUniqueId();
   const panelId = `${baseId}-panel`;
   const tabId = (index: number) => `${baseId}-tab-${index}`;
-  const [active, setActive] = useState(0);
-  const rowRef = useRef<HTMLDivElement>(null);
-  const panelRef = useRef<HTMLDivElement>(null);
-  const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const [active, setActive] = createSignal(0);
+  let row: HTMLDivElement | undefined;
+  let panel: HTMLDivElement | undefined;
+  const tabs: (HTMLButtonElement | undefined)[] = [];
 
-  useEffect(() => {
-    const row = rowRef.current;
-    const tab = tabRefs.current[active];
-    if (!row || !tab || row.scrollWidth <= row.clientWidth) return;
-    const pad = Number.parseFloat(getComputedStyle(row).paddingInlineStart) || 0;
-    const start = tab.offsetLeft - pad;
-    const end = tab.offsetLeft + tab.offsetWidth + pad;
-    const behavior = reduce ? "auto" : "smooth";
-    if (start < row.scrollLeft) row.scrollTo({ left: start, behavior });
-    else if (end > row.scrollLeft + row.clientWidth) {
-      row.scrollTo({ left: end - row.clientWidth, behavior });
-    }
-  }, [active, reduce]);
+  createEffect(
+    () => [active(), reduce()] as const,
+    ([index, reduced]) => {
+      const tab = tabs[index];
+      if (!row || !tab || row.scrollWidth <= row.clientWidth) return;
+      const pad = Number.parseFloat(getComputedStyle(row).paddingInlineStart) || 0;
+      const start = tab.offsetLeft - pad;
+      const end = tab.offsetLeft + tab.offsetWidth + pad;
+      const behavior = reduced ? "auto" : "smooth";
+      if (start < row.scrollLeft) row.scrollTo({ left: start, behavior });
+      else if (end > row.scrollLeft + row.clientWidth) {
+        row.scrollTo({ left: end - row.clientWidth, behavior });
+      }
+    },
+  );
 
   const goTo = (index: number) => {
     setActive(index);
-    const panel = panelRef.current;
     if (panel && panel.getBoundingClientRect().top < HEADER_HEIGHT) {
-      panel.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+      panel.scrollIntoView({ behavior: reduce() ? "auto" : "smooth", block: "start" });
     }
   };
 
-  const onTabKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+  const onTabKeyDown = (event: KeyboardEvent) => {
+    const current = active();
     const keyTargets: Record<string, number> = {
-      ArrowRight: active === LAST_INDEX ? 0 : active + 1,
-      ArrowLeft: active === 0 ? LAST_INDEX : active - 1,
+      ArrowRight: current === LAST_INDEX ? 0 : current + 1,
+      ArrowLeft: current === 0 ? LAST_INDEX : current - 1,
       Home: 0,
       End: LAST_INDEX,
     };
@@ -555,52 +547,51 @@ export function Solutions() {
     if (next === undefined) return;
     event.preventDefault();
     setActive(next);
-    tabRefs.current[next]?.focus();
+    tabs[next]?.focus();
   };
 
-  const folio = padIndex(active);
+  const folio = () => padIndex(active());
 
   return (
-    <section id="products-solutions" aria-labelledby={titleId} {...stylex.props(styles.section)}>
-      <div {...stylex.props(styles.shell)}>
-        <header {...stylex.props(styles.head)}>
-          <h2 id={titleId} {...stylex.props(styles.title)}>
+    <section id="products-solutions" aria-labelledby={titleId} {...stylex.attrs(styles.section)}>
+      <div {...stylex.attrs(styles.shell)}>
+        <header {...stylex.attrs(styles.head)}>
+          <h2 id={titleId} {...stylex.attrs(styles.title)}>
             应用方案
           </h2>
         </header>
 
         <div
-          ref={rowRef}
+          ref={row}
           role="tablist"
           aria-label="Application solutions"
           onKeyDown={onTabKeyDown}
-          {...stylex.props(styles.tabRow)}
+          {...stylex.attrs(styles.tabRow)}
         >
           {FLAT_FORMULAS.map((formula) => {
-            const selected = formula.index === active;
+            const selected = () => formula.index === active();
             return (
               <button
-                key={formula.id}
                 ref={(node) => {
-                  tabRefs.current[formula.index] = node;
+                  tabs[formula.index] = node;
                 }}
                 id={tabId(formula.index)}
                 type="button"
                 role="tab"
-                aria-selected={selected}
+                aria-selected={selected() ? "true" : "false"}
                 aria-controls={panelId}
-                tabIndex={selected ? 0 : -1}
+                tabindex={selected() ? 0 : -1}
                 onClick={() => setActive(formula.index)}
-                {...stylex.props(
+                {...stylex.attrs(
                   styles.tab,
                   stylex.defaultMarker(),
-                  selected && styles.tabSelected,
+                  selected() && styles.tabSelected,
                 )}
               >
-                <span {...stylex.props(styles.tabNumber, selected && styles.tabNumberSelected)}>
+                <span {...stylex.attrs(styles.tabNumber, selected() && styles.tabNumberSelected)}>
                   {padIndex(formula.index)}
                 </span>
-                <span {...stylex.props(styles.tabTitle, selected && styles.tabTitleSelected)}>
+                <span {...stylex.attrs(styles.tabTitle, selected() && styles.tabTitleSelected)}>
                   {formula.title}
                 </span>
               </button>
@@ -609,50 +600,50 @@ export function Solutions() {
         </div>
 
         <div
-          ref={panelRef}
+          ref={panel}
           id={panelId}
           role="tabpanel"
-          aria-labelledby={tabId(active)}
-          tabIndex={0}
-          {...stylex.props(styles.panel)}
+          aria-labelledby={tabId(active())}
+          tabindex={0}
+          {...stylex.attrs(styles.panel)}
         >
-          <div {...stylex.props(styles.spreadHead)}>
+          <div {...stylex.attrs(styles.spreadHead)}>
             <Layers
-              active={active}
+              active={active()}
               render={(formula) => (
                 <>
-                  <h3 {...stylex.props(styles.spreadTitle)}>{formula.title}</h3>
-                  <p {...stylex.props(styles.spreadSubtitle)}>{formula.subtitle}</p>
+                  <h3 {...stylex.attrs(styles.spreadTitle)}>{formula.title}</h3>
+                  <p {...stylex.attrs(styles.spreadSubtitle)}>{formula.subtitle}</p>
                 </>
               )}
             />
           </div>
-          <div {...stylex.props(styles.spread)}>
-            <div {...stylex.props(styles.sheet, styles.sheetLeft)}>
-              <Layers active={active} render={(formula) => <LeftPage formula={formula} />} />
-              <span aria-hidden="true" {...stylex.props(styles.folio, styles.folioLeft)}>
-                {folio} · 左
+          <div {...stylex.attrs(styles.spread)}>
+            <div {...stylex.attrs(styles.sheet, styles.sheetLeft)}>
+              <Layers active={active()} render={(formula) => <LeftPage formula={formula} />} />
+              <span aria-hidden="true" {...stylex.attrs(styles.folio, styles.folioLeft)}>
+                {folio()} · 左
               </span>
             </div>
-            <div {...stylex.props(styles.sheet, styles.sheetRight)}>
-              <Layers active={active} render={(formula) => <RightPage formula={formula} />} />
-              <span aria-hidden="true" {...stylex.props(styles.folio, styles.folioRight)}>
-                {folio} · 右
+            <div {...stylex.attrs(styles.sheet, styles.sheetRight)}>
+              <Layers active={active()} render={(formula) => <RightPage formula={formula} />} />
+              <span aria-hidden="true" {...stylex.attrs(styles.folio, styles.folioRight)}>
+                {folio()} · 右
               </span>
             </div>
           </div>
         </div>
 
-        <nav aria-label="Solution pages" {...stylex.props(styles.pager)}>
+        <nav aria-label="Solution pages" {...stylex.attrs(styles.pager)}>
           <PageButton
             direction="prev"
-            target={FLAT_FORMULAS[active - 1]}
+            target={FLAT_FORMULAS[active() - 1]}
             controls={panelId}
             onGo={goTo}
           />
           <PageButton
             direction="next"
-            target={FLAT_FORMULAS[active + 1]}
+            target={FLAT_FORMULAS[active() + 1]}
             controls={panelId}
             onGo={goTo}
           />

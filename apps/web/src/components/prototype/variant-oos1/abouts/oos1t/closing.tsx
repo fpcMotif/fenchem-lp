@@ -1,5 +1,5 @@
 import * as stylex from "@stylexjs/stylex";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight } from "@fenchem-lp/ui/components/lucide";
 
 import type { AboutPageProps } from "../../index";
 import { Cast } from "./cast";
@@ -105,36 +105,36 @@ const styles = stylex.create({
   },
 });
 
-export function Closing({ onNavigateHome }: AboutPageProps) {
+export function Closing(props: AboutPageProps) {
   return (
     <section
       aria-labelledby="oos1t-closing"
       data-hour={SECTION_HOURS.closing}
-      {...stylex.props(ui.section, ui.shell, styles.section)}
+      {...stylex.attrs(ui.section, ui.shell, styles.section)}
     >
-      <div {...stylex.props(ui.grid, styles.layout)}>
-        <div {...stylex.props(styles.comp)}>
-          <div {...stylex.props(styles.anchor)}>
+      <div {...stylex.attrs(ui.grid, styles.layout)}>
+        <div {...stylex.attrs(styles.comp)}>
+          <div {...stylex.attrs(styles.anchor)}>
             <Gnomon text={TITLE} id="oos1t-closing" level={2}>
               <Dial dayOnly />
             </Gnomon>
           </div>
         </div>
-        <div {...stylex.props(styles.text)}>
-          <p {...stylex.props(styles.time)}>
-            <span {...stylex.props(styles.digits)}>{END.time}</span>
-            <span lang="en" {...stylex.props(styles.half)}>
+        <div {...stylex.attrs(styles.text)}>
+          <p {...stylex.attrs(styles.time)}>
+            <span {...stylex.attrs(styles.digits)}>{END.time}</span>
+            <span lang="en" {...stylex.attrs(styles.half)}>
               {END.half}
             </span>
           </p>
-          <p {...stylex.props(styles.line)}>从上午九时到午后一时，日影走过了泛成的每一面。</p>
+          <p {...stylex.attrs(styles.line)}>从上午九时到午后一时，日影走过了泛成的每一面。</p>
           <button
             type="button"
-            onClick={() => onNavigateHome("contact")}
-            {...stylex.props(styles.button, ui.focus)}
+            onClick={() => props.onNavigateHome("contact")}
+            {...stylex.attrs(styles.button, ui.focus)}
           >
             <Cast lift={28} />
-            <span {...stylex.props(styles.buttonFace)}>
+            <span {...stylex.attrs(styles.buttonFace)}>
               联系我们
               <ArrowRight size={18} strokeWidth={1.5} aria-hidden="true" />
             </span>

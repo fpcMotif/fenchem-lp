@@ -1,4 +1,4 @@
-import { act, fireEvent, render } from "@testing-library/react";
+import { act, fireEvent, render } from "@/test/render";
 import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 
 import { LightboxDialog, useLightbox } from "./lightbox";
@@ -41,7 +41,7 @@ afterEach(() => vi.unstubAllGlobals());
 
 describe("LightboxDialog", () => {
   it("opens on the chosen photo and steps with wrapping arrow keys", () => {
-    const { getByRole, getByText } = render(<Gallery />);
+    const { getByRole, getByText } = render(() => <Gallery />);
     const dialog = getByRole("dialog", { hidden: true });
     expect(dialog).toHaveProperty("open", false);
 
@@ -57,12 +57,12 @@ describe("LightboxDialog", () => {
     expect(dialog.textContent).toBe("hall 2 stepped");
   });
 
-  it("clears the photo when the dialog closes natively", () => {
-    const { getByRole, getByText } = render(<Gallery />);
+  it("clears the photo when the dialog closes natively", async () => {
+    const { getByRole, getByText } = render(() => <Gallery />);
     const dialog = getByRole("dialog", { hidden: true }) as HTMLDialogElement;
     fireEvent.click(getByText("open lab"));
 
-    act(() => dialog.close());
+    await act(() => dialog.close());
     expect(dialog.textContent).toBe("");
     expect(dialog.open).toBe(false);
   });
@@ -77,7 +77,7 @@ describe("LightboxDialog", () => {
         }
       },
     );
-    const { getByText } = render(<Gallery />);
+    const { getByText } = render(() => <Gallery />);
     fireEvent.click(getByText("open lab"));
     expect(sources).toEqual(["/hall.jpg", "/gate.jpg"]);
   });

@@ -1,16 +1,11 @@
 import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { ArrowLeft, ArrowRight } from "lucide-react";
-import { m } from "motion/react";
-import {
-  useEffect,
-  useId,
-  useRef,
-  useState,
-  useSyncExternalStore,
-  type KeyboardEvent,
-  type ReactNode,
-} from "react";
+import { ArrowLeft, ArrowRight } from "@fenchem-lp/ui/components/lucide";
+import { m } from "@/compat/motion";
+import type { JSX } from "@solidjs/web";
+import { createEffect, createSignal, createUniqueId, flush, For, Show } from "solid-js";
+
+import { createExternalStore } from "@/compat/external-store";
 
 import { EASE } from "@/components/prototype/motion-constants";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
@@ -48,12 +43,16 @@ function subscribeWide(onChange: () => void) {
 }
 
 function useWideLayout() {
-  return useSyncExternalStore(
+  return createExternalStore(
     subscribeWide,
     () => window.matchMedia(WIDE_QUERY).matches,
     () => true,
   );
 }
+
+// stylex.attrs with reactive (accessor) arguments resolves at runtime here, because
+// the StyleX compiler tries to evaluate them at build time and throws.
+const sxProps: typeof stylex.attrs = (...args) => stylex.attrs(...args);
 
 const styles = stylex.create({
   ground: {
@@ -442,53 +441,57 @@ const styles = stylex.create({
   },
 });
 
-function Field({ label, children }: { label: string; children: ReactNode }) {
+function Field(props: { label: string; children: JSX.Element }) {
   return (
-    <div {...stylex.props(styles.field)}>
-      <dt {...stylex.props(styles.fieldLabel)}>{label}</dt>
-      <dd {...stylex.props(styles.fieldValue)}>{children}</dd>
+    <div {...stylex.attrs(styles.field)}>
+      <dt {...stylex.attrs(styles.fieldLabel)}>{props.label}</dt>
+      <dd {...stylex.attrs(styles.fieldValue)}>{props.children}</dd>
     </div>
   );
 }
 
-function Lines({ lines, numbered = false }: { lines: string[]; numbered?: boolean }) {
+function Lines(props: { lines: string[]; numbered?: boolean }) {
   return (
-    <ul {...stylex.props(styles.lines)}>
-      {lines.map((line, index) => (
-        <li key={line} {...stylex.props(styles.line)}>
-          {numbered && <span {...stylex.props(styles.lineNumber)}>{padIndex(index)}</span>}
-          <span>{line}</span>
-        </li>
-      ))}
+    <ul {...stylex.attrs(styles.lines)}>
+      <For each={props.lines}>
+        {(line, index) => (
+          <li {...stylex.attrs(styles.line)}>
+            {props.numbered && (
+              <span {...stylex.attrs(styles.lineNumber)}>{padIndex(index())}</span>
+            )}
+            <span>{line}</span>
+          </li>
+        )}
+      </For>
     </ul>
   );
 }
 
-function SectionBody({ item, section }: { item: SolutionItem; section: SectionKey }) {
+function SectionBody(props: { item: SolutionItem; section: SectionKey }) {
   return (
-    <dl {...stylex.props(styles.fields)}>
-      {section === "overview" && (
+    <dl {...stylex.attrs(styles.fields)}>
+      {props.section === "overview" && (
         <Field label="概述">
-          <Lines lines={item.overview} />
+          <Lines lines={props.item.overview} />
         </Field>
       )}
-      {section === "ingredients" && (
+      {props.section === "ingredients" && (
         <Field label="功能性成分">
-          <Lines lines={item.keyIngredients} />
+          <Lines lines={props.item.keyIngredients} />
         </Field>
       )}
-      {section === "challenges" && (
+      {props.section === "challenges" && (
         <Field label="配方挑战">
-          <Lines lines={item.challenges} numbered />
+          <Lines lines={props.item.challenges} numbered />
         </Field>
       )}
-      {section === "usage" && (
+      {props.section === "usage" && (
         <>
           <Field label="质地">
-            <Lines lines={item.texture} />
+            <Lines lines={props.item.texture} />
           </Field>
           <Field label="应用">
-            <Lines lines={item.applications} />
+            <Lines lines={props.item.applications} />
           </Field>
         </>
       )}
@@ -499,26 +502,26 @@ function SectionBody({ item, section }: { item: SolutionItem; section: SectionKe
 export function Solutions() {
   const reduce = useReducedMotion();
   const wide = useWideLayout();
-  const baseId = useId();
-  const [activeIndex, setActiveIndex] = useState(0);
-  const [preferredSection, setPreferredSection] = useState<SectionKey>("overview");
-  const [interacted, setInteracted] = useState(false);
-  const layoutRef = useRef<HTMLDivElement>(null);
-  const listRef = useRef<HTMLDivElement>(null);
-  const listTabs = useRef<(HTMLButtonElement | null)[]>([]);
-  const sectionTabs = useRef<Partial<Record<SectionKey, HTMLButtonElement | null>>>({});
+  const baseId = createUniqueId();
+  const [activeIndex, setActiveIndex] = createSignal(0);
+  const [preferredSection, setPreferredSection] = createSignal<SectionKey>("overview");
+  const [interacted, setInteracted] = createSignal(false);
+  let layoutEl!: HTMLDivElement;
+  let listEl!: HTMLDivElement;
+  const listTabs: (HTMLButtonElement | undefined)[] = [];
+  const sectionTabs: Partial<Record<SectionKey, HTMLButtonElement>> = {};
 
-  const item = SOLUTION_ITEMS[activeIndex];
-  const section = hasSection(item, preferredSection) ? preferredSection : "overview";
-  const available = SECTIONS.filter((entry) => hasSection(item, entry.key));
-  const prev = SOLUTION_ITEMS[wrapIndex(activeIndex - 1)];
-  const next = SOLUTION_ITEMS[wrapIndex(activeIndex + 1)];
+  const item = () => SOLUTION_ITEMS[activeIndex()];
+  const section = () => (hasSection(item(), preferredSection()) ? preferredSection() : "overview");
+  const available = () => SECTIONS.filter((entry) => hasSection(item(), entry.key));
+  const prev = () => SOLUTION_ITEMS[wrapIndex(activeIndex() - 1)];
+  const next = () => SOLUTION_ITEMS[wrapIndex(activeIndex() + 1)];
   const tabId = (index: number) => `${baseId}-solution-${index}`;
   const sectionTabId = (key: SectionKey) => `${baseId}-section-${key}`;
   const sheetId = `${baseId}-sheet`;
   const panelId = `${baseId}-panel`;
-  const enter = { duration: reduce ? 0 : 0.22, ease: EASE };
-  const reveal = interacted ? { opacity: 0, y: 4 } : false;
+  const enter = () => ({ duration: reduce() ? 0 : 0.22, ease: EASE });
+  const reveal = () => (interacted() ? { opacity: 0, y: 4 } : false);
 
   const selectSolution = (index: number) => {
     setInteracted(true);
@@ -530,20 +533,24 @@ export function Solutions() {
     setPreferredSection(key);
   };
 
-  useEffect(() => {
-    const row = listRef.current;
-    const tab = listTabs.current[activeIndex];
-    if (!row || !tab || row.scrollWidth <= row.clientWidth) return;
-    const left = tab.offsetLeft - (row.clientWidth - tab.offsetWidth) / 2;
-    row.scrollTo({ left, behavior: reduce ? "auto" : "smooth" });
-  }, [activeIndex, reduce]);
+  createEffect(
+    () => [activeIndex(), reduce()] as const,
+    ([index, reduceNow]) => {
+      const row = listEl;
+      const tab = listTabs[index];
+      if (!row || !tab || row.scrollWidth <= row.clientWidth) return;
+      const left = tab.offsetLeft - (row.clientWidth - tab.offsetWidth) / 2;
+      row.scrollTo({ left, behavior: reduceNow ? "auto" : "smooth" });
+    },
+  );
 
-  const onListKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+  const onListKeyDown = (event: KeyboardEvent) => {
+    const current = activeIndex();
     const target =
       event.key === "ArrowDown" || event.key === "ArrowRight"
-        ? wrapIndex(activeIndex + 1)
+        ? wrapIndex(current + 1)
         : event.key === "ArrowUp" || event.key === "ArrowLeft"
-          ? wrapIndex(activeIndex - 1)
+          ? wrapIndex(current - 1)
           : event.key === "Home"
             ? 0
             : event.key === "End"
@@ -552,34 +559,37 @@ export function Solutions() {
     if (target === null) return;
     event.preventDefault();
     selectSolution(target);
-    listTabs.current[target]?.focus();
+    flush();
+    listTabs[target]?.focus();
   };
 
-  const onSectionKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-    const position = available.findIndex((entry) => entry.key === section);
-    const size = available.length;
+  const onSectionKeyDown = (event: KeyboardEvent) => {
+    const entries = available();
+    const position = entries.findIndex((entry) => entry.key === section());
+    const size = entries.length;
     const target =
       event.key === "ArrowRight"
-        ? available[(position + 1) % size]
+        ? entries[(position + 1) % size]
         : event.key === "ArrowLeft"
-          ? available[(position - 1 + size) % size]
+          ? entries[(position - 1 + size) % size]
           : event.key === "Home"
-            ? available[0]
+            ? entries[0]
             : event.key === "End"
-              ? available[size - 1]
+              ? entries[size - 1]
               : undefined;
     if (!target) return;
     event.preventDefault();
     selectSection(target.key);
-    sectionTabs.current[target.key]?.focus();
+    flush();
+    sectionTabs[target.key]?.focus();
   };
 
   const step = (delta: number) => {
-    selectSolution(activeIndex + delta);
-    const frameTarget = layoutRef.current;
+    selectSolution(activeIndex() + delta);
+    const frameTarget = layoutEl;
     if (!frameTarget) return;
     if (frameTarget.getBoundingClientRect().top < 80) {
-      frameTarget.scrollIntoView({ block: "start", behavior: reduce ? "auto" : "smooth" });
+      frameTarget.scrollIntoView({ block: "start", behavior: reduce() ? "auto" : "smooth" });
     }
   };
 
@@ -587,45 +597,44 @@ export function Solutions() {
     <section
       id="products-solutions"
       aria-labelledby="solutions-title"
-      {...stylex.props(frame.section, styles.ground)}
+      {...stylex.attrs(frame.section, styles.ground)}
     >
-      <div {...stylex.props(frame.shell)}>
-        <header {...stylex.props(styles.head)}>
-          <h2 id="solutions-title" {...stylex.props(frame.title)}>
+      <div {...stylex.attrs(frame.shell)}>
+        <header {...stylex.attrs(styles.head)}>
+          <h2 id="solutions-title" {...stylex.attrs(frame.title)}>
             应用方案
           </h2>
         </header>
-        <div ref={layoutRef} {...stylex.props(styles.layout)}>
+        <div ref={layoutEl} {...stylex.attrs(styles.layout)}>
           <div
-            ref={listRef}
+            ref={listEl}
             role="tablist"
             aria-labelledby="solutions-title"
-            aria-orientation={wide ? "vertical" : "horizontal"}
+            aria-orientation={wide() ? "vertical" : "horizontal"}
             onKeyDown={onListKeyDown}
-            {...stylex.props(styles.list)}
+            {...stylex.attrs(styles.list)}
           >
             {SOLUTION_ITEMS.map((solution, index) => {
-              const selected = index === activeIndex;
+              const selected = () => index === activeIndex();
               return (
                 <button
-                  key={solution.id}
                   ref={(node) => {
-                    listTabs.current[index] = node;
+                    listTabs[index] = node;
                   }}
                   id={tabId(index)}
                   type="button"
                   role="tab"
-                  aria-selected={selected}
+                  aria-selected={selected() ? "true" : "false"}
                   aria-controls={sheetId}
-                  tabIndex={selected ? 0 : -1}
+                  tabindex={selected() ? 0 : -1}
                   onClick={() => selectSolution(index)}
-                  {...stylex.props(frame.focusRing, styles.listTab, selected && styles.listTabOn)}
+                  {...stylex.attrs(frame.focusRing, styles.listTab, selected() && styles.listTabOn)}
                 >
-                  <span {...stylex.props(styles.listRow)}>
-                    <span {...stylex.props(styles.listNumber, selected && styles.listNumberOn)}>
+                  <span {...stylex.attrs(styles.listRow)}>
+                    <span {...stylex.attrs(styles.listNumber, selected() && styles.listNumberOn)}>
                       {padIndex(index)}
                     </span>
-                    <span {...stylex.props(styles.listTitle, selected && styles.listTitleOn)}>
+                    <span {...stylex.attrs(styles.listTitle, selected() && styles.listTitleOn)}>
                       {solution.title}
                     </span>
                   </span>
@@ -636,66 +645,66 @@ export function Solutions() {
           <div
             id={sheetId}
             role="tabpanel"
-            aria-labelledby={tabId(activeIndex)}
-            {...stylex.props(styles.sheet)}
+            aria-labelledby={tabId(activeIndex())}
+            {...stylex.attrs(styles.sheet)}
           >
-            <m.header
-              key={item.id}
-              initial={reveal}
-              animate={{ opacity: 1, y: 0 }}
-              transition={enter}
-              {...stylex.props(styles.sheetHead)}
-            >
-              <p {...stylex.props(styles.eyebrow)}>
-                <span {...stylex.props(styles.eyebrowNumber)}>{padIndex(activeIndex)}</span>
-                <span aria-hidden="true">/</span>
-                <span>{padIndex(COUNT - 1)}</span>
-              </p>
-              <h3 {...stylex.props(styles.sheetTitle)}>{item.title}</h3>
-              <p {...stylex.props(styles.subtitle)}>{item.subtitle}</p>
-              <dl {...stylex.props(styles.functions)}>
-                <dt {...stylex.props(styles.functionsLabel)}>功能</dt>
-                <dd {...stylex.props(styles.functionsValue)}>
-                  <ul {...stylex.props(styles.functionsList)}>
-                    {item.functions.map((entry) => (
-                      <li key={entry} {...stylex.props(styles.functionsItem)}>
-                        {entry}
-                      </li>
-                    ))}
-                  </ul>
-                </dd>
-              </dl>
-            </m.header>
+            <Show when={item()} keyed>
+              {(current) => (
+                <m.header
+                  initial={reveal()}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={enter()}
+                  {...stylex.attrs(styles.sheetHead)}
+                >
+                  <p {...stylex.attrs(styles.eyebrow)}>
+                    <span {...stylex.attrs(styles.eyebrowNumber)}>{padIndex(activeIndex())}</span>
+                    <span aria-hidden="true">/</span>
+                    <span>{padIndex(COUNT - 1)}</span>
+                  </p>
+                  <h3 {...stylex.attrs(styles.sheetTitle)}>{current.title}</h3>
+                  <p {...stylex.attrs(styles.subtitle)}>{current.subtitle}</p>
+                  <dl {...stylex.attrs(styles.functions)}>
+                    <dt {...stylex.attrs(styles.functionsLabel)}>功能</dt>
+                    <dd {...stylex.attrs(styles.functionsValue)}>
+                      <ul {...stylex.attrs(styles.functionsList)}>
+                        <For each={current.functions}>
+                          {(entry) => <li {...stylex.attrs(styles.functionsItem)}>{entry}</li>}
+                        </For>
+                      </ul>
+                    </dd>
+                  </dl>
+                </m.header>
+              )}
+            </Show>
             <div
               role="tablist"
               aria-label="Solution content"
               aria-orientation="horizontal"
               onKeyDown={onSectionKeyDown}
-              {...stylex.props(styles.sectionTabs)}
+              {...stylex.attrs(styles.sectionTabs)}
             >
               {SECTIONS.map((entry) => {
-                const selected = entry.key === section;
-                const enabled = hasSection(item, entry.key);
+                const selected = () => entry.key === section();
+                const enabled = () => hasSection(item(), entry.key);
                 return (
                   <button
-                    key={entry.key}
                     ref={(node) => {
-                      sectionTabs.current[entry.key] = node;
+                      sectionTabs[entry.key] = node;
                     }}
                     id={sectionTabId(entry.key)}
                     type="button"
                     role="tab"
-                    aria-selected={selected}
+                    aria-selected={selected() ? "true" : "false"}
                     aria-controls={panelId}
-                    aria-disabled={!enabled || undefined}
-                    disabled={!enabled}
-                    tabIndex={selected ? 0 : -1}
+                    aria-disabled={enabled() ? undefined : "true"}
+                    disabled={!enabled()}
+                    tabindex={selected() ? 0 : -1}
                     onClick={() => selectSection(entry.key)}
-                    {...stylex.props(
+                    {...sxProps(
                       frame.focusRing,
                       styles.sectionTab,
-                      selected && styles.sectionTabOn,
-                      !enabled && styles.sectionTabOff,
+                      selected() && styles.sectionTabOn,
+                      !enabled() && styles.sectionTabOff,
                     )}
                   >
                     {entry.label}
@@ -706,50 +715,47 @@ export function Solutions() {
             <div
               id={panelId}
               role="tabpanel"
-              aria-labelledby={sectionTabId(section)}
-              tabIndex={0}
-              {...stylex.props(frame.focusRing, styles.panel)}
+              aria-labelledby={sectionTabId(section())}
+              tabindex={0}
+              {...stylex.attrs(frame.focusRing, styles.panel)}
             >
-              <m.div
-                key={`${item.id}-${section}`}
-                initial={reveal}
-                animate={{ opacity: 1, y: 0 }}
-                transition={enter}
-              >
-                <SectionBody item={item} section={section} />
-              </m.div>
+              <Show when={`${item().id}-${section()}`} keyed>
+                <m.div initial={reveal()} animate={{ opacity: 1, y: 0 }} transition={enter()}>
+                  <SectionBody item={item()} section={section()} />
+                </m.div>
+              </Show>
             </div>
-            <nav aria-label="Switch solution" {...stylex.props(styles.pager)}>
+            <nav aria-label="Switch solution" {...stylex.attrs(styles.pager)}>
               <button
                 type="button"
                 onClick={() => step(-1)}
-                {...stylex.props(frame.focusRing, styles.pagerButton, styles.pagerPrev)}
+                {...stylex.attrs(frame.focusRing, styles.pagerButton, styles.pagerPrev)}
               >
-                <span {...stylex.props(styles.pagerLabel)}>
+                <span {...stylex.attrs(styles.pagerLabel)}>
                   <ArrowLeft size={14} strokeWidth={1.5} absoluteStrokeWidth aria-hidden="true" />
                   上一个
                 </span>
-                <span {...stylex.props(styles.pagerTitle)}>
-                  <span {...stylex.props(styles.pagerNumber)}>
-                    {padIndex(wrapIndex(activeIndex - 1))}
+                <span {...stylex.attrs(styles.pagerTitle)}>
+                  <span {...stylex.attrs(styles.pagerNumber)}>
+                    {padIndex(wrapIndex(activeIndex() - 1))}
                   </span>
-                  <span {...stylex.props(styles.pagerName)}>{prev.title}</span>
+                  <span {...stylex.attrs(styles.pagerName)}>{prev().title}</span>
                 </span>
               </button>
               <button
                 type="button"
                 onClick={() => step(1)}
-                {...stylex.props(frame.focusRing, styles.pagerButton, styles.pagerNext)}
+                {...stylex.attrs(frame.focusRing, styles.pagerButton, styles.pagerNext)}
               >
-                <span {...stylex.props(styles.pagerLabel)}>
+                <span {...stylex.attrs(styles.pagerLabel)}>
                   下一个
                   <ArrowRight size={14} strokeWidth={1.5} absoluteStrokeWidth aria-hidden="true" />
                 </span>
-                <span {...stylex.props(styles.pagerTitle)}>
-                  <span {...stylex.props(styles.pagerNumber)}>
-                    {padIndex(wrapIndex(activeIndex + 1))}
+                <span {...stylex.attrs(styles.pagerTitle)}>
+                  <span {...stylex.attrs(styles.pagerNumber)}>
+                    {padIndex(wrapIndex(activeIndex() + 1))}
                   </span>
-                  <span {...stylex.props(styles.pagerName)}>{next.title}</span>
+                  <span {...stylex.attrs(styles.pagerName)}>{next().title}</span>
                 </span>
               </button>
             </nav>

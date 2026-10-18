@@ -83,17 +83,17 @@ const styles = stylex.create({
 export function Profile() {
   const [figureRef, figurePhase] = useEntry<HTMLElement>();
   return (
-    <section id="about-profile" aria-labelledby="oos1p-profile" {...stylex.props(ui.plate)}>
+    <section id="about-profile" aria-labelledby="oos1p-profile" {...stylex.attrs(ui.plate)}>
       <PlateHead plate={1} english="Profile" title="企业概况" titleId="oos1p-profile" />
-      <div {...stylex.props(ui.shell)}>
-        <div {...stylex.props(ui.grid)}>
-          <p {...stylex.props(ui.q2to4, styles.lead)}>{ABOUT_HERO.lead}</p>
+      <div {...stylex.attrs(ui.shell)}>
+        <div {...stylex.attrs(ui.grid)}>
+          <p {...stylex.attrs(ui.q2to4, styles.lead)}>{ABOUT_HERO.lead}</p>
         </div>
 
-        <div {...stylex.props(ui.grid, styles.study)}>
-          <figure ref={figureRef} {...stylex.props(ui.q1to2, styles.figure)}>
+        <div {...stylex.attrs(ui.grid, styles.study)}>
+          <figure ref={figureRef} {...stylex.attrs(ui.q1to2, styles.figure)}>
             <StrobeImage
-              phase={figurePhase}
+              phase={figurePhase()}
               count={4}
               unit="5%"
               src={ABOUT_HERO.lobbyImage}
@@ -101,21 +101,19 @@ export function Profile() {
               sx={styles.lobby}
               imageSx={styles.lobbyImage}
             />
-            <figcaption {...stylex.props(styles.caption)}>
-              <span {...stylex.props(styles.captionText)}>{ABOUT_HERO.lobbyCaption}</span>
-              <span lang="en" {...stylex.props(ui.eyebrow, styles.captionEnglish)}>
+            <figcaption {...stylex.attrs(styles.caption)}>
+              <span {...stylex.attrs(styles.captionText)}>{ABOUT_HERO.lobbyCaption}</span>
+              <span lang="en" {...stylex.attrs(ui.eyebrow, styles.captionEnglish)}>
                 Lobby
               </span>
             </figcaption>
           </figure>
 
-          <div {...stylex.props(ui.q3to4, styles.network)}>
-            <p {...stylex.props(styles.networkLabel)}>{ABOUT_HERO.networkLabel}</p>
-            <ul {...stylex.props(styles.countries)}>
+          <div {...stylex.attrs(ui.q3to4, styles.network)}>
+            <p {...stylex.attrs(styles.networkLabel)}>{ABOUT_HERO.networkLabel}</p>
+            <ul {...stylex.attrs(styles.countries)}>
               {ABOUT_HERO.countries.map((country) => (
-                <li key={country} {...stylex.props(styles.country)}>
-                  {country}
-                </li>
+                <li {...stylex.attrs(styles.country)}>{country}</li>
               ))}
             </ul>
           </div>

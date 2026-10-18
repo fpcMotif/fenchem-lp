@@ -110,19 +110,19 @@ export function Profile() {
     <section
       id="about-profile"
       aria-label="Company overview"
-      {...stylex.props(base.section, base.anchor, styles.profile)}
+      {...stylex.attrs(base.section, base.anchor, styles.profile)}
     >
-      <div {...stylex.props(base.shell)}>
-        <div {...stylex.props(styles.grid)}>
+      <div {...stylex.attrs(base.shell)}>
+        <div {...stylex.attrs(styles.grid)}>
           <Reveal sx={styles.text}>
-            <h2 {...stylex.props(ty.headline)}>{ABOUT_HERO.title}</h2>
-            <p lang="en" {...stylex.props(ty.serif, styles.english)}>
+            <h2 {...stylex.attrs(ty.headline)}>{ABOUT_HERO.title}</h2>
+            <p lang="en" {...stylex.attrs(ty.serif, styles.english)}>
               {ABOUT_HERO.englishTitle}
             </p>
-            <p {...stylex.props(ty.body)}>{ABOUT_HERO.lead}</p>
+            <p {...stylex.attrs(ty.body)}>{ABOUT_HERO.lead}</p>
           </Reveal>
-          <figure {...stylex.props(styles.figure)}>
-            <div {...stylex.props(styles.photoWrap)}>
+          <figure {...stylex.attrs(styles.figure)}>
+            <div {...stylex.attrs(styles.photoWrap)}>
               <DriftImage
                 src={ABOUT_HERO.lobbyImage}
                 alt="Fenchem headquarters lobby with a curved ceiling and marble floor"
@@ -131,27 +131,26 @@ export function Profile() {
               />
               <CropMarks delay={900} />
             </div>
-            <figcaption {...stylex.props(ty.quiet, styles.caption)}>
+            <figcaption {...stylex.attrs(ty.quiet, styles.caption)}>
               {ABOUT_HERO.lobbyCaption}
             </figcaption>
           </figure>
         </div>
         <Reveal sx={styles.network}>
-          <div {...stylex.props(styles.count)}>
+          <div {...stylex.attrs(styles.count)}>
             {NETWORK_COUNT ? (
               <span aria-hidden="true">
                 <CountUp value={NETWORK_COUNT} sx={styles.countNum} />
               </span>
             ) : null}
-            <p {...stylex.props(ty.quiet)}>{ABOUT_HERO.networkLabel}</p>
+            <p {...stylex.attrs(ty.quiet)}>{ABOUT_HERO.networkLabel}</p>
           </div>
-          <ul ref={countriesRef} {...stylex.props(styles.countries)}>
+          <ul ref={countriesRef} {...stylex.attrs(styles.countries)}>
             {places.map((place, index) => (
               <li
-                key={place}
-                {...stylex.props(
+                {...stylex.attrs(
                   styles.country,
-                  countriesShown && styles.countryShown,
+                  countriesShown() && styles.countryShown,
                   styles.countryDelay(index),
                   index === places.length - 1 && styles.more,
                 )}

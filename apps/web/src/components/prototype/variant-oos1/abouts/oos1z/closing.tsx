@@ -1,8 +1,8 @@
 import * as stylex from "@stylexjs/stylex";
-import { ArrowUp, ArrowUpRight } from "lucide-react";
+import { ArrowUp, ArrowUpRight } from "@fenchem-lp/ui/components/lucide";
 
 import { corridorDrawing, type Drawing } from "./perspective";
-import { ui } from "./shared";
+import { NON_SCALING, UNFOCUSABLE, ui } from "./shared";
 import { bp, chrome, face, tone } from "./tokens.stylex";
 
 const PHONE = corridorDrawing(13, false);
@@ -139,65 +139,65 @@ const styles = stylex.create({
   },
 });
 
-function Lines({ drawing, sx }: { drawing: Drawing; sx: stylex.StyleXStyles }) {
+function Lines(props: { drawing: Drawing; sx: stylex.StyleXStyles }) {
   return (
     <svg
       viewBox="0 0 100 100"
       preserveAspectRatio="none"
       aria-hidden="true"
-      focusable="false"
-      {...stylex.props(styles.drawing, sx)}
+      {...UNFOCUSABLE}
+      {...stylex.attrs(styles.drawing, props.sx)}
     >
-      <path d={drawing.fine} vectorEffect="non-scaling-stroke" {...stylex.props(styles.fine)} />
-      <path d={drawing.edges} vectorEffect="non-scaling-stroke" {...stylex.props(styles.edges)} />
+      <path d={props.drawing.fine} {...NON_SCALING} {...stylex.attrs(styles.fine)} />
+      <path d={props.drawing.edges} {...NON_SCALING} {...stylex.attrs(styles.edges)} />
     </svg>
   );
 }
 
-export function Closing({ onNavigateHome }: { onNavigateHome: (hash?: string) => void }) {
+export function Closing(props: { onNavigateHome: (hash?: string) => void }) {
   return (
-    <section id="oos1z-exit" aria-labelledby="oos1z-closing" {...stylex.props(styles.section)}>
-      <div {...stylex.props(ui.shell, styles.head)}>
-        <p {...stylex.props(styles.sign)}>
-          <span {...stylex.props(styles.signChinese)}>出口</span>
-          <span lang="en" {...stylex.props(ui.caps)}>
+    <section id="oos1z-exit" aria-labelledby="oos1z-closing" {...stylex.attrs(styles.section)}>
+      <div {...stylex.attrs(ui.shell, styles.head)}>
+        <p {...stylex.attrs(styles.sign)}>
+          <span {...stylex.attrs(styles.signChinese)}>出口</span>
+          <span lang="en" {...stylex.attrs(ui.caps)}>
             Exit
           </span>
         </p>
-        <h2 id="oos1z-closing" {...stylex.props(styles.title)}>
+        <h2 id="oos1z-closing" {...stylex.attrs(styles.title)}>
           感谢参观
         </h2>
-        <p lang="en" {...stylex.props(ui.italic, styles.subtitle)}>
+        <p lang="en" {...stylex.attrs(ui.italic, styles.subtitle)}>
           Thank you for visiting. This way out leads to contact.
         </p>
       </div>
-      <div {...stylex.props(styles.vestibule)}>
+      <div {...stylex.attrs(styles.vestibule)}>
         <Lines drawing={PHONE} sx={styles.phone} />
         <Lines drawing={WIDE} sx={styles.wide} />
         <button
           type="button"
-          onClick={() => onNavigateHome("contact")}
-          {...stylex.props(ui.button, ui.focus, styles.door, stylex.defaultMarker())}
+          onClick={() => props.onNavigateHome("contact")}
+          {...stylex.attrs(ui.button, ui.focus, styles.door, stylex.defaultMarker())}
         >
-          <span {...stylex.props(styles.doorLabel)}>
+          <span {...stylex.attrs(styles.doorLabel)}>
             联系我们
             <ArrowUpRight
               size={24}
               strokeWidth={1.25}
               aria-hidden="true"
-              {...stylex.props(styles.arrow)}
+              {...stylex.attrs(styles.arrow)}
             />
           </span>
-          <span lang="en" {...stylex.props(ui.italic, styles.doorNote)}>
+          <span lang="en" {...stylex.attrs(ui.italic, styles.doorNote)}>
             Contact us
           </span>
         </button>
       </div>
-      <div {...stylex.props(styles.backRow)}>
-        <a href="#about-top" {...stylex.props(ui.focus, styles.back)}>
+      <div {...stylex.attrs(styles.backRow)}>
+        <a href="#about-top" {...stylex.attrs(ui.focus, styles.back)}>
           <ArrowUp size={14} strokeWidth={1.5} aria-hidden="true" />
           回到入口
-          <span lang="en" {...stylex.props(ui.italic)}>
+          <span lang="en" {...stylex.attrs(ui.italic)}>
             Back to the entrance
           </span>
         </a>

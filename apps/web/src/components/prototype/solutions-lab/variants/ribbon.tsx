@@ -1,6 +1,7 @@
 import * as stylex from "@stylexjs/stylex";
-import { m } from "motion/react";
-import { useEffect, useId, useRef, type KeyboardEvent } from "react";
+import { m } from "@/compat/motion";
+import { createEffect, createUniqueId, For, Show } from "solid-js";
+import type { JSX } from "@solidjs/web";
 
 import { useReducedMotion } from "../../use-reduced-motion";
 import {
@@ -278,23 +279,23 @@ const styles = stylex.create({
   },
 });
 
-function RowValue({ row }: { row: SheetRow }) {
-  if (row.values.length === 0) return <span {...stylex.props(styles.absent)}>无</span>;
-  if (row.kind === "strong") {
-    return <span {...stylex.props(styles.strong)}>{row.values.join(" · ")}</span>;
+function RowValue(props: { row: SheetRow }) {
+  if (props.row.values.length === 0) return <span {...stylex.attrs(styles.absent)}>无</span>;
+  if (props.row.kind === "strong") {
+    return <span {...stylex.attrs(styles.strong)}>{props.row.values.join(" · ")}</span>;
   }
-  if (row.kind === "plain") return <>{row.values.join("、")}</>;
-  if (row.kind === "list") {
+  if (props.row.kind === "plain") return <>{props.row.values.join("、")}</>;
+  if (props.row.kind === "list") {
     return (
-      <ul {...stylex.props(styles.lines)}>
-        {row.values.map((value) => {
+      <ul {...stylex.attrs(styles.lines)}>
+        {props.row.values.map((value) => {
           const { primary, note } = splitNote(value);
           return (
-            <li key={value} {...stylex.props(styles.keepWords)}>
-              <span {...stylex.props(styles.strong)}>
+            <li {...stylex.attrs(styles.keepWords)}>
+              <span {...stylex.attrs(styles.strong)}>
                 {primary.replaceAll(" / ", `${NO_BREAK_SPACE}/ `)}
               </span>
-              {note && <span {...stylex.props(styles.note)}>{note}</span>}
+              {note && <span {...stylex.attrs(styles.note)}>{note}</span>}
             </li>
           );
         })}
@@ -302,32 +303,32 @@ function RowValue({ row }: { row: SheetRow }) {
     );
   }
   return (
-    <ul {...stylex.props(styles.lines, styles.quiet)}>
-      {row.values.map((value) => (
-        <li key={value}>{value}</li>
+    <ul {...stylex.attrs(styles.lines, styles.quiet)}>
+      {props.row.values.map((value) => (
+        <li>{value}</li>
       ))}
     </ul>
   );
 }
 
-function Sheet({ item, position, total }: { item: SolutionItem; position: number; total: number }) {
+function Sheet(props: { item: SolutionItem; position: number; total: number }) {
   return (
     <>
-      <header {...stylex.props(styles.head)}>
+      <header {...stylex.attrs(styles.head)}>
         <div>
-          <p {...stylex.props(styles.eyebrow)}>{areaOf(item.area)?.label}</p>
-          <h3 {...stylex.props(styles.title)}>{item.title}</h3>
-          <p {...stylex.props(styles.subtitle)}>{item.subtitle}</p>
+          <p {...stylex.attrs(styles.eyebrow)}>{areaOf(props.item.area)?.label}</p>
+          <h3 {...stylex.attrs(styles.title)}>{props.item.title}</h3>
+          <p {...stylex.attrs(styles.subtitle)}>{props.item.subtitle}</p>
         </div>
-        <p aria-hidden="true" {...stylex.props(styles.counter)}>
-          {padIndex(position)} / {String(total).padStart(2, "0")}
+        <p aria-hidden="true" {...stylex.attrs(styles.counter)}>
+          {padIndex(props.position)} / {String(props.total).padStart(2, "0")}
         </p>
       </header>
-      <dl {...stylex.props(styles.fields)}>
-        {sheetRows(item).map((row) => (
-          <div key={row.label} {...stylex.props(styles.field)}>
-            <dt {...stylex.props(styles.label)}>{row.label}</dt>
-            <dd {...stylex.props(styles.value)}>
+      <dl {...stylex.attrs(styles.fields)}>
+        {sheetRows(props.item).map((row) => (
+          <div {...stylex.attrs(styles.field)}>
+            <dt {...stylex.attrs(styles.label)}>{row.label}</dt>
+            <dd {...stylex.attrs(styles.value)}>
               <RowValue row={row} />
             </dd>
           </div>
@@ -339,28 +340,30 @@ function Sheet({ item, position, total }: { item: SolutionItem; position: number
 
 export function RibbonVariant() {
   const browser = useSolutionsBrowser();
-  const { area, scope, groups, selected, position, select } = browser;
-  const uid = useId();
+  const uid = createUniqueId();
   const reduce = useReducedMotion();
-  const tocRef = useRef<HTMLDivElement>(null);
+  let toc!: HTMLDivElement;
 
-  useEffect(() => {
-    const tab = tocRef.current?.querySelector<HTMLElement>('[aria-selected="true"]');
-    const track = tab?.parentElement;
-    if (!tab || !track || track.scrollWidth <= track.clientWidth) return;
-    const left = tab.offsetLeft - (track.clientWidth - tab.offsetWidth) / 2;
-    track.scrollTo({ left: Math.max(0, left), behavior: reduce ? "auto" : "smooth" });
-  }, [area, selected.id, reduce]);
+  createEffect(
+    () => [browser.area, browser.selected.id, reduce()] as const,
+    ([, , reduced]) => {
+      const tab = toc.querySelector<HTMLElement>('[aria-selected="true"]');
+      const track = tab?.parentElement;
+      if (!tab || !track || track.scrollWidth <= track.clientWidth) return;
+      const left = tab.offsetLeft - (track.clientWidth - tab.offsetWidth) / 2;
+      track.scrollTo({ left: Math.max(0, left), behavior: reduced ? "auto" : "smooth" });
+    },
+  );
 
-  const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+  const handleKeyDown: JSX.EventHandler<HTMLDivElement, KeyboardEvent> = (event) => {
     const step = TAB_STEPS[event.key];
     if (!step) return;
     event.preventDefault();
     event.stopPropagation();
-    const next = step(position, scope.length);
-    const nextItem = scope[next];
+    const next = step(browser.position, browser.scope.length);
+    const nextItem = browser.scope[next];
     if (!nextItem) return;
-    select(nextItem.id);
+    browser.select(nextItem.id);
     event.currentTarget
       .querySelectorAll<HTMLElement>('[role="tab"]')
       [next]?.focus({ preventScroll: true });
@@ -370,73 +373,83 @@ export function RibbonVariant() {
     <LabSection>
       <AreaChips browser={browser} />
       <div
-        ref={tocRef}
+        ref={toc}
         role="tablist"
         aria-label="应用方案"
         aria-orientation="horizontal"
         onKeyDown={handleKeyDown}
-        {...stylex.props(styles.toc)}
+        {...stylex.attrs(styles.toc)}
       >
-        {groups.map((group) => (
-          <div key={group.id} {...stylex.props(styles.row)}>
-            <p aria-hidden="true" {...stylex.props(styles.rowLabel)}>
-              {group.label}
-              <span {...stylex.props(styles.rowCount)}>{group.items.length}</span>
-            </p>
-            <m.div layoutScroll {...stylex.props(styles.track)}>
-              {group.items.map((item) => {
-                const isSelected = item.id === selected.id;
-                return (
-                  <button
-                    key={item.id}
-                    type="button"
-                    role="tab"
-                    id={`${uid}-tab-${item.id}`}
-                    aria-selected={isSelected}
-                    aria-controls={`${uid}-panel`}
-                    tabIndex={isSelected ? 0 : -1}
-                    onClick={() => select(item.id)}
-                    {...stylex.props(
-                      styles.tab,
-                      isSelected && styles.tabSelected,
-                      stylex.defaultMarker(),
-                    )}
-                  >
-                    <span {...stylex.props(styles.nameStack)}>
-                      <span
-                        {...stylex.props(styles.nameText, isSelected && styles.nameTextSelected)}
+        <For each={browser.groups}>
+          {(group) => (
+            <div {...stylex.attrs(styles.row)}>
+              <p aria-hidden="true" {...stylex.attrs(styles.rowLabel)}>
+                {group.label}
+                <span {...stylex.attrs(styles.rowCount)}>{group.items.length}</span>
+              </p>
+              <m.div layoutScroll {...stylex.attrs(styles.track)}>
+                <For each={group.items}>
+                  {(item) => {
+                    const isSelected = () => item.id === browser.selected.id;
+                    return (
+                      <button
+                        type="button"
+                        role="tab"
+                        id={`${uid}-tab-${item.id}`}
+                        aria-selected={isSelected() ? "true" : "false"}
+                        aria-controls={`${uid}-panel`}
+                        tabindex={isSelected() ? 0 : -1}
+                        onClick={() => browser.select(item.id)}
+                        {...stylex.attrs(
+                          styles.tab,
+                          isSelected() && styles.tabSelected,
+                          stylex.defaultMarker(),
+                        )}
                       >
-                        {item.title}
-                      </span>
-                      <span aria-hidden="true" {...stylex.props(styles.nameGhost)}>
-                        {item.title}
-                      </span>
-                    </span>
-                    {isSelected && (
-                      <m.span
-                        aria-hidden="true"
-                        layoutId={`${uid}-ribbon-indicator`}
-                        transition={reduce ? { duration: 0 } : INDICATOR_TRANSITION}
-                        {...stylex.props(styles.indicator)}
-                      />
-                    )}
-                  </button>
-                );
-              })}
-            </m.div>
-          </div>
-        ))}
+                        <span {...stylex.attrs(styles.nameStack)}>
+                          <span
+                            {...stylex.attrs(
+                              styles.nameText,
+                              isSelected() && styles.nameTextSelected,
+                            )}
+                          >
+                            {item.title}
+                          </span>
+                          <span aria-hidden="true" {...stylex.attrs(styles.nameGhost)}>
+                            {item.title}
+                          </span>
+                        </span>
+                        <Show when={isSelected()}>
+                          <m.span
+                            aria-hidden="true"
+                            layoutId={`${uid}-ribbon-indicator`}
+                            transition={reduce() ? { duration: 0 } : INDICATOR_TRANSITION}
+                            {...stylex.attrs(styles.indicator)}
+                          />
+                        </Show>
+                      </button>
+                    );
+                  }}
+                </For>
+              </m.div>
+            </div>
+          )}
+        </For>
       </div>
       <div
         role="tabpanel"
         id={`${uid}-panel`}
-        aria-labelledby={`${uid}-tab-${selected.id}`}
-        tabIndex={0}
-        {...stylex.props(styles.card)}
+        aria-labelledby={`${uid}-tab-${browser.selected.id}`}
+        tabindex={0}
+        {...stylex.attrs(styles.card)}
       >
-        <div key={selected.id} {...stylex.props(styles.panel)}>
-          <Sheet item={selected} position={position} total={scope.length} />
-        </div>
+        <Show when={browser.selected} keyed>
+          {(item) => (
+            <div {...stylex.attrs(styles.panel)}>
+              <Sheet item={item} position={browser.position} total={browser.scope.length} />
+            </div>
+          )}
+        </Show>
       </div>
     </LabSection>
   );

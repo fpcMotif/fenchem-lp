@@ -1,4 +1,4 @@
-import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
+import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 import { color, font } from "./tokens.stylex";
 
@@ -47,8 +47,11 @@ export const base = stylex.create({
     textWrap: "balance",
   },
   reveal: {
-    opacity: { default: 0, [breakpoints.motionReduce]: 1 },
-    transform: { default: null, [breakpoints.motionOk]: "translateY(24px)" },
+    opacity: { default: 0, ["@media (prefers-reduced-motion: reduce)"]: 1 },
+    transform: {
+      default: null,
+      ["@media (prefers-reduced-motion: no-preference)"]: "translateY(24px)",
+    },
     transitionProperty: "opacity, transform",
     transitionDuration: "800ms",
     transitionTimingFunction: EASE_OUT_CSS,

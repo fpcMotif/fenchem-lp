@@ -1,4 +1,4 @@
-import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
+import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 import { ease, fonts, media, metrics, palette } from "./lattice.stylex";
 
@@ -31,20 +31,20 @@ export const shared = stylex.create({
     objectFit: "cover",
   },
   sectionPad: {
-    paddingTop: { default: 48, [media.tablet]: 64, [breakpoints.xl]: 72 },
-    paddingBottom: { default: 48, [media.tablet]: 64, [breakpoints.xl]: 72 },
+    paddingTop: { default: 48, [media.tablet]: 64, ["@media (min-width: 1280px)"]: 72 },
+    paddingBottom: { default: 48, [media.tablet]: 64, ["@media (min-width: 1280px)"]: 72 },
   },
   grid16: {
     display: "grid",
     gridTemplateColumns: {
       default: "minmax(0, 1fr)",
-      [breakpoints.lg]: "repeat(16, minmax(0, 1fr))",
+      ["@media (min-width: 1024px)"]: "repeat(16, minmax(0, 1fr))",
     },
   },
   headline: {
     margin: 0,
     fontFamily: fonts.cjk,
-    fontSize: { default: 30, [media.tablet]: 44, [breakpoints.xl]: 56 },
+    fontSize: { default: 30, [media.tablet]: 44, ["@media (min-width: 1280px)"]: 56 },
     fontWeight: 500,
     lineHeight: 1.2,
     letterSpacing: "0.01em",
@@ -56,7 +56,7 @@ export const shared = stylex.create({
     fontFamily: fonts.serif,
     fontStyle: "italic",
     fontWeight: 400,
-    fontSize: { default: 22, [media.tablet]: 28, [breakpoints.xl]: 34 },
+    fontSize: { default: 22, [media.tablet]: 28, ["@media (min-width: 1280px)"]: 34 },
     lineHeight: 1.2,
     color: palette.body,
   },
@@ -64,7 +64,7 @@ export const shared = stylex.create({
     margin: 0,
     maxWidth: "34em",
     fontFamily: fonts.cjk,
-    fontSize: { default: 16, [breakpoints.xl]: 17 },
+    fontSize: { default: 16, ["@media (min-width: 1280px)"]: 17 },
     fontWeight: 400,
     lineHeight: 1.95,
     letterSpacing: "0.03em",

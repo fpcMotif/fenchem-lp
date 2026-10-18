@@ -1,6 +1,6 @@
 import * as stylex from "@stylexjs/stylex";
 import type { StyleXStyles } from "@stylexjs/stylex";
-import type { ReactNode } from "react";
+import type { JSX } from "@solidjs/web";
 
 const styles = stylex.create({
   stage: { isolation: "isolate" },
@@ -17,25 +17,21 @@ const styles = stylex.create({
   },
 });
 
-export function LightboxStage({
-  children,
-  onClose,
-  sx,
-}: {
-  children: ReactNode;
+export function LightboxStage(props: {
+  children: JSX.Element;
   onClose: () => void;
   sx?: StyleXStyles;
 }) {
   return (
-    <div {...stylex.props(styles.stage, sx)}>
+    <div {...stylex.attrs(styles.stage, props.sx)}>
       <button
         type="button"
-        tabIndex={-1}
+        tabindex={-1}
         aria-label="Close photo"
-        onClick={onClose}
-        {...stylex.props(styles.backdrop)}
+        onClick={() => props.onClose()}
+        {...stylex.attrs(styles.backdrop)}
       />
-      {children}
+      {props.children}
     </div>
   );
 }

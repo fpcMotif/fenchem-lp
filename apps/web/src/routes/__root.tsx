@@ -6,8 +6,9 @@ import {
   Scripts,
   createRootRoute,
   useRouterState,
-} from "@tanstack/react-router";
-import { lazy, Suspense } from "react";
+} from "@tanstack/solid-router";
+import { Show } from "solid-js";
+import type { JSX } from "@solidjs/web";
 
 import { PERF_DEBUG_SCRIPT } from "@/lib/perf-debug";
 
@@ -15,21 +16,11 @@ import Header from "../components/header";
 
 import appCss from "../index.css?url";
 
-// Dev-only: the static import shipped the devtools event glue in the
-// production bundle; a DEV-gated lazy import lets the whole package drop out.
-const TanStackRouterDevtools = import.meta.env.DEV
-  ? lazy(() =>
-      import("@tanstack/react-router-devtools").then((m) => ({
-        default: m.TanStackRouterDevtools,
-      })),
-    )
-  : null;
-
 export const Route = createRootRoute({
   head: () => ({
     meta: [
       {
-        charSet: "utf-8",
+        charset: "utf-8",
       },
       {
         name: "viewport",
@@ -44,21 +35,21 @@ export const Route = createRootRoute({
         rel: "stylesheet",
         href: appCss,
       },
-      // Dev-only: @stylexswc/unplugin's dev middleware serves the collected
-      // atomic rules at this URL. In production the rules are spliced into
-      // index.css at the `@stylex;` marker instead (useCssPlaceholder).
+      // Dev-only: @stylexjs/unplugin serves the collected atomic rules at this URL.
+      // A production build appends them to the emitted CSS asset instead.
       ...(import.meta.env.DEV
         ? [
             {
               rel: "stylesheet",
-              href: "/stylex.css",
+              href: "/virtual:stylex.css",
             },
           ]
         : []),
     ],
   }),
 
-  component: RootDocument,
+  shellComponent: RootDocument,
+  component: RootLayout,
 });
 
 const rootStyles = stylex.create({
@@ -69,33 +60,32 @@ const rootStyles = stylex.create({
   },
 });
 
-function RootDocument() {
-  // The public landing page on "/" brings its own navigation; hide the app chrome there.
-  const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const appShell = (
-    <html lang="en" className="dark">
+function RootDocument(props: { children: JSX.Element }) {
+  return (
+    <html lang="en" class="dark">
       <head>
+        <style>{"@layer base;"}</style>
         <HeadContent />
         <script>{PERF_DEBUG_SCRIPT}</script>
       </head>
       <body>
-        {pathname === "/" ? (
-          <Outlet />
-        ) : (
-          <div {...stylex.props(rootStyles.shell)}>
-            <Header />
-            <Outlet />
-          </div>
-        )}
+        {props.children}
         <Toaster richColors />
-        {pathname === "/" || TanStackRouterDevtools === null ? null : (
-          <Suspense fallback={null}>
-            <TanStackRouterDevtools position="bottom-left" />
-          </Suspense>
-        )}
         <Scripts />
       </body>
     </html>
   );
-  return appShell;
+}
+
+function RootLayout() {
+  // The public landing page on "/" brings its own navigation; hide the app chrome there.
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  return (
+    <Show when={pathname() !== "/"} fallback={<Outlet />}>
+      <div {...stylex.attrs(rootStyles.shell)}>
+        <Header />
+        <Outlet />
+      </div>
+    </Show>
+  );
 }

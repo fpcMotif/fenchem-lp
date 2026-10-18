@@ -1,6 +1,7 @@
 import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import type { JSX } from "@solidjs/web";
+import { createEffect, createSignal, For, onSettled, untrack } from "solid-js";
 
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
@@ -383,16 +384,13 @@ const styles = stylex.create({
   },
 });
 
-function Inci({ text }: { text: string }) {
-  const parts: ReactNode[] = [];
+function Inci(props: { text: string }) {
+  const text = untrack(() => props.text);
+  const parts: JSX.Element[] = [];
   let last = 0;
   for (const match of text.matchAll(INCI_LATIN)) {
     parts.push(text.slice(last, match.index));
-    parts.push(
-      <span key={match.index} {...stylex.props(styles.keepTogether)}>
-        {match[0]}
-      </span>,
-    );
+    parts.push(<span {...stylex.attrs(styles.keepTogether)}>{match[0]}</span>);
     last = match.index + match[0].length;
   }
   parts.push(text.slice(last));
@@ -400,20 +398,20 @@ function Inci({ text }: { text: string }) {
 }
 
 function useRegionSpy(ids: readonly string[]) {
-  const [activeId, setActiveId] = useState(ids[0] ?? "");
-  const crossing = useRef(new Set<string>());
-  const holding = useRef(false);
-  const cancelHold = useRef<() => void>(() => {});
+  const [activeId, setActiveId] = createSignal(ids[0] ?? "");
+  const crossing = new Set<string>();
+  let holding = false;
+  let cancelHold: () => void = () => {};
 
-  useEffect(() => {
-    const visible = crossing.current;
+  onSettled(() => {
+    const visible = crossing;
     const observer = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
           if (entry.isIntersecting) visible.add(entry.target.id);
           else visible.delete(entry.target.id);
         }
-        if (holding.current) return;
+        if (holding) return;
         const first = ids.find((id) => visible.has(id));
         if (first) setActiveId(first);
       },
@@ -425,18 +423,18 @@ function useRegionSpy(ids: readonly string[]) {
     }
     return () => {
       observer.disconnect();
-      cancelHold.current();
+      cancelHold();
     };
-  }, [ids]);
+  });
 
   const holdOn = (id: string) => {
-    cancelHold.current();
+    cancelHold();
     setActiveId(id);
-    holding.current = true;
+    holding = true;
     const release = () => {
       stopListening();
-      holding.current = false;
-      const first = ids.find((candidate) => crossing.current.has(candidate));
+      holding = false;
+      const first = ids.find((candidate) => crossing.has(candidate));
       if (first) setActiveId(first);
     };
     const timer = setTimeout(release, HOLD_RELEASE_MS);
@@ -445,61 +443,59 @@ function useRegionSpy(ids: readonly string[]) {
       document.removeEventListener("scrollend", release);
     }
     document.addEventListener("scrollend", release);
-    cancelHold.current = stopListening;
+    cancelHold = stopListening;
   };
 
   return { activeId, holdOn };
 }
 
-function RegionRail({
-  activeId,
-  onJump,
-}: {
-  activeId: string;
-  onJump: (group: CatalogGroup) => void;
-}) {
+function RegionRail(props: { activeId: string; onJump: (group: CatalogGroup) => void }) {
   const reduce = useReducedMotion();
-  const listRef = useRef<HTMLUListElement>(null);
+  let list!: HTMLUListElement;
 
-  useEffect(() => {
-    const list = listRef.current;
-    if (!list || list.scrollWidth <= list.clientWidth) return;
-    const button = list.querySelector<HTMLElement>(`[data-region="${activeId}"]`);
-    if (!button) return;
-    list.scrollTo({
-      left: button.offsetLeft - (list.clientWidth - button.offsetWidth) / 2,
-      behavior: reduce ? "auto" : "smooth",
-    });
-  }, [activeId, reduce]);
+  createEffect(
+    () => [props.activeId, reduce()] as const,
+    ([activeId, reduceNow]) => {
+      if (!list || list.scrollWidth <= list.clientWidth) return;
+      const button = list.querySelector<HTMLElement>(`[data-region="${activeId}"]`);
+      if (!button) return;
+      list.scrollTo({
+        left: button.offsetLeft - (list.clientWidth - button.offsetWidth) / 2,
+        behavior: reduceNow ? "auto" : "smooth",
+      });
+    },
+  );
 
   return (
-    <nav aria-label="Catalog categories" {...stylex.props(styles.rail)}>
-      <ul ref={listRef} {...stylex.props(styles.railList)}>
+    <nav aria-label="Catalog categories" {...stylex.attrs(styles.rail)}>
+      <ul ref={list} {...stylex.attrs(styles.railList)}>
         {CATALOG_GROUPS.map((group, index) => {
           const id = regionId(group.id);
-          const isActive = activeId === id;
+          const isActive = () => props.activeId === id;
           return (
-            <li key={group.id} {...stylex.props(styles.railItem)}>
+            <li {...stylex.attrs(styles.railItem)}>
               <button
                 type="button"
                 data-region={id}
-                aria-current={isActive ? "location" : undefined}
-                onClick={() => onJump(group)}
-                {...stylex.props(styles.railButton, isActive && styles.railButtonActive)}
+                aria-current={isActive() ? "location" : undefined}
+                onClick={() => props.onJump(group)}
+                {...stylex.attrs(styles.railButton, isActive() && styles.railButtonActive)}
               >
                 <span
                   aria-hidden="true"
-                  {...stylex.props(styles.railIndex, isActive && styles.railIndexActive)}
+                  {...stylex.attrs(styles.railIndex, isActive() && styles.railIndexActive)}
                 >
                   {padIndex(index)}
                 </span>
-                <span {...stylex.props(styles.railLabelFull, isActive && styles.railLabelActive)}>
+                <span {...stylex.attrs(styles.railLabelFull, isActive() && styles.railLabelActive)}>
                   {group.label}
                 </span>
-                <span {...stylex.props(styles.railLabelShort, isActive && styles.railLabelActive)}>
+                <span
+                  {...stylex.attrs(styles.railLabelShort, isActive() && styles.railLabelActive)}
+                >
                   {REGION_META[group.id]?.short ?? group.label}
                 </span>
-                <span {...stylex.props(styles.railCount)}>{group.items.length}</span>
+                <span {...stylex.attrs(styles.railCount)}>{group.items.length}</span>
               </button>
             </li>
           );
@@ -509,29 +505,30 @@ function RegionRail({
   );
 }
 
-function ItemRow({ item, flashed }: { item: CatalogItem; flashed: boolean }) {
+function ItemRow(props: { item: CatalogItem; flashed: boolean }) {
+  const item = props.item;
   const { primary, secondary } = splitTitle(item.title);
   return (
     <tr
       id={catalogRowId(item.id)}
-      tabIndex={-1}
-      {...stylex.props(styles.row, flashed && styles.rowFlashed)}
+      tabindex={-1}
+      {...stylex.attrs(styles.row, props.flashed && styles.rowFlashed)}
     >
       <th
         scope="row"
-        {...stylex.props(styles.cell, styles.nameCell, flashed && styles.nameCellFlashed)}
+        {...stylex.attrs(styles.cell, styles.nameCell, props.flashed && styles.nameCellFlashed)}
       >
-        <span {...stylex.props(styles.namePrimary)}>{primary}</span>
-        {secondary && <span {...stylex.props(styles.nameSecondary)}>{secondary}</span>}
+        <span {...stylex.attrs(styles.namePrimary)}>{primary}</span>
+        {secondary && <span {...stylex.attrs(styles.nameSecondary)}>{secondary}</span>}
       </th>
-      <td {...stylex.props(styles.cell, styles.inciCell)}>
-        <span aria-hidden="true" {...stylex.props(styles.stackLabel)}>
+      <td {...stylex.attrs(styles.cell, styles.inciCell)}>
+        <span aria-hidden="true" {...stylex.attrs(styles.stackLabel)}>
           INCI 名称
         </span>
         <Inci text={item.inci} />
       </td>
-      <td {...stylex.props(styles.cell, styles.featureCell)}>
-        <span aria-hidden="true" {...stylex.props(styles.stackLabel)}>
+      <td {...stylex.attrs(styles.cell, styles.featureCell)}>
+        <span aria-hidden="true" {...stylex.attrs(styles.stackLabel)}>
           特性&应用
         </span>
         {item.features}
@@ -540,65 +537,64 @@ function ItemRow({ item, flashed }: { item: CatalogItem; flashed: boolean }) {
   );
 }
 
-function RegionTable({
-  group,
-  index,
-  isLast,
-  flashedId,
-}: {
+function RegionTable(props: {
   group: CatalogGroup;
   index: number;
   isLast: boolean;
   flashedId: string | null;
 }) {
+  const group = props.group;
   return (
-    <div id={regionId(group.id)} {...stylex.props(styles.region, isLast && styles.regionLast)}>
+    <div
+      id={regionId(group.id)}
+      {...stylex.attrs(styles.region, props.isLast && styles.regionLast)}
+    >
       <table
         aria-labelledby={regionTitleId(group.id)}
         aria-describedby={group.intro ? regionIntroId(group.id) : undefined}
-        {...stylex.props(styles.table)}
+        {...stylex.attrs(styles.table)}
       >
-        <caption {...stylex.props(styles.caption)}>
-          <div {...stylex.props(styles.captionRow)}>
-            <span aria-hidden="true" {...stylex.props(styles.captionIndex)}>
-              {padIndex(index)}
+        <caption {...stylex.attrs(styles.caption)}>
+          <div {...stylex.attrs(styles.captionRow)}>
+            <span aria-hidden="true" {...stylex.attrs(styles.captionIndex)}>
+              {padIndex(props.index)}
             </span>
-            <h3 id={regionTitleId(group.id)} tabIndex={-1} {...stylex.props(styles.captionTitle)}>
+            <h3 id={regionTitleId(group.id)} tabindex={-1} {...stylex.attrs(styles.captionTitle)}>
               {group.label}
             </h3>
-            <span {...stylex.props(styles.captionCount)}>{group.items.length} 款原料</span>
+            <span {...stylex.attrs(styles.captionCount)}>{group.items.length} 款原料</span>
           </div>
           {group.intro && (
-            <p id={regionIntroId(group.id)} {...stylex.props(styles.intro)}>
+            <p id={regionIntroId(group.id)} {...stylex.attrs(styles.intro)}>
               {group.intro}
             </p>
           )}
         </caption>
-        <colgroup {...stylex.props(styles.colgroup)}>
-          <col {...stylex.props(styles.colName)} />
-          <col {...stylex.props(styles.colInci)} />
-          <col {...stylex.props(styles.colFeatures)} />
+        <colgroup {...stylex.attrs(styles.colgroup)}>
+          <col {...stylex.attrs(styles.colName)} />
+          <col {...stylex.attrs(styles.colInci)} />
+          <col {...stylex.attrs(styles.colFeatures)} />
         </colgroup>
-        <thead {...stylex.props(styles.thead)}>
+        <thead {...stylex.attrs(styles.thead)}>
           <tr>
-            <th scope="col" {...stylex.props(styles.headCell)}>
+            <th scope="col" {...stylex.attrs(styles.headCell)}>
               <span aria-hidden="true">名称</span>
-              <span {...stylex.props(styles.srOnly)}>Name</span>
+              <span {...stylex.attrs(styles.srOnly)}>Name</span>
             </th>
-            <th scope="col" {...stylex.props(styles.headCell)}>
+            <th scope="col" {...stylex.attrs(styles.headCell)}>
               <span aria-hidden="true">INCI 名称</span>
-              <span {...stylex.props(styles.srOnly)}>INCI name</span>
+              <span {...stylex.attrs(styles.srOnly)}>INCI name</span>
             </th>
-            <th scope="col" {...stylex.props(styles.headCell)}>
+            <th scope="col" {...stylex.attrs(styles.headCell)}>
               <span aria-hidden="true">特性&应用</span>
-              <span {...stylex.props(styles.srOnly)}>Features & applications</span>
+              <span {...stylex.attrs(styles.srOnly)}>Features & applications</span>
             </th>
           </tr>
         </thead>
-        <tbody {...stylex.props(styles.tbody)}>
-          {group.items.map((item) => (
-            <ItemRow key={item.id} item={item} flashed={flashedId === item.id} />
-          ))}
+        <tbody {...stylex.attrs(styles.tbody)}>
+          <For each={group.items}>
+            {(item) => <ItemRow item={item} flashed={props.flashedId === item.id} />}
+          </For>
         </tbody>
       </table>
     </div>
@@ -614,7 +610,7 @@ export function Catalog() {
     const target = document.getElementById(regionId(group.id));
     if (!target) return;
     holdOn(regionId(group.id));
-    target.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+    target.scrollIntoView({ behavior: reduce() ? "auto" : "smooth", block: "start" });
     document.getElementById(regionTitleId(group.id))?.focus({ preventScroll: true });
   };
 
@@ -622,26 +618,27 @@ export function Catalog() {
     <section
       id="products-catalog"
       aria-labelledby="oos1pc-catalog-title"
-      {...stylex.props(styles.section)}
+      {...stylex.attrs(styles.section)}
     >
-      <div {...stylex.props(styles.shell)}>
-        <header {...stylex.props(styles.head)}>
-          <h2 id="oos1pc-catalog-title" {...stylex.props(styles.title)}>
+      <div {...stylex.attrs(styles.shell)}>
+        <header {...stylex.attrs(styles.head)}>
+          <h2 id="oos1pc-catalog-title" {...stylex.attrs(styles.title)}>
             产品目录
           </h2>
         </header>
-        <div {...stylex.props(styles.layout)}>
-          <RegionRail activeId={activeId} onJump={jumpTo} />
-          <div {...stylex.props(styles.tables)}>
-            {CATALOG_GROUPS.map((group, index) => (
-              <RegionTable
-                key={group.id}
-                group={group}
-                index={index}
-                isLast={index === CATALOG_GROUPS.length - 1}
-                flashedId={flashedId}
-              />
-            ))}
+        <div {...stylex.attrs(styles.layout)}>
+          <RegionRail activeId={activeId()} onJump={jumpTo} />
+          <div {...stylex.attrs(styles.tables)}>
+            <For each={CATALOG_GROUPS}>
+              {(group, index) => (
+                <RegionTable
+                  group={group}
+                  index={index()}
+                  isLast={index() === CATALOG_GROUPS.length - 1}
+                  flashedId={flashedId()}
+                />
+              )}
+            </For>
           </div>
         </div>
       </div>

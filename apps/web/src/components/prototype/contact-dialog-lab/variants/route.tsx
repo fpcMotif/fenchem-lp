@@ -1,8 +1,8 @@
 import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { ArrowLeft, ArrowRight, CheckCircle2, X } from "lucide-react";
-import { AnimatePresence, m } from "motion/react";
-import { useId, useLayoutEffect, useRef, useState, type SubmitEvent } from "react";
+import { ArrowLeft, ArrowRight, CheckCircle2, X } from "@fenchem-lp/ui/components/lucide";
+import { AnimatePresence, m } from "@/compat/motion";
+import { createEffect, createSignal, createUniqueId, Show, untrack } from "solid-js";
 
 import { EASE } from "@/components/prototype/motion-constants";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
@@ -365,316 +365,321 @@ const STEP_TITLE: Record<Step, string> = {
 const indexLabel = (index: number) => String(index + 1).padStart(2, "0");
 
 function useMeasuredHeight() {
-  const ref = useRef<HTMLDivElement>(null);
-  const [height, setHeight] = useState<number | "auto">("auto");
+  const [node, setNode] = createSignal<HTMLDivElement>();
+  const [height, setHeight] = createSignal<number | "auto">("auto");
 
-  useLayoutEffect(() => {
-    const node = ref.current;
-    if (!node) return;
+  createEffect(node, (current) => {
+    if (!current) return;
     const observer = new ResizeObserver(([entry]) => setHeight(entry.borderBoxSize[0].blockSize));
-    observer.observe(node);
+    observer.observe(current);
     return () => observer.disconnect();
-  }, []);
+  });
 
-  return [ref, height] as const;
+  return [setNode, height] as const;
 }
 
-export function RouteDialog({ subject, onClose }: DialogVariantProps) {
-  const { closing, requestClose, dialogProps, panelProps } = useLabDialog(onClose);
+export function RouteDialog(props: DialogVariantProps) {
+  const { closing, requestClose, dialogProps, panelProps } = useLabDialog(() => props.onClose());
   const reduce = useReducedMotion();
-  const titleId = useId();
-  const formId = useId();
-  const titleRef = useRef<HTMLHeadingElement>(null);
+  const titleId = createUniqueId();
+  const formId = createUniqueId();
+  let titleEl: HTMLHeadingElement | undefined;
   const [measureRef, height] = useMeasuredHeight();
-  const [step, setStep] = useState<Step>(subject ? "details" : "topic");
-  const [direction, setDirection] = useState<1 | -1>(1);
-  const [subjectId, setSubjectId] = useState<InquirySubjectId>(subject ?? INQUIRY_SUBJECTS[0].id);
-  const [ticket, setTicket] = useState("");
-  const route = SUBJECT_ROUTES[subjectId];
-  const active = subjectById(subjectId);
+  const [step, setStep] = createSignal<Step>(untrack(() => (props.subject ? "details" : "topic")));
+  const [direction, setDirection] = createSignal<1 | -1>(1);
+  const [subjectId, setSubjectId] = createSignal<InquirySubjectId>(
+    untrack(() => props.subject ?? INQUIRY_SUBJECTS[0].id),
+  );
+  const [ticket, setTicket] = createSignal("");
+  const route = () => SUBJECT_ROUTES[subjectId()];
+  const active = () => subjectById(subjectId());
 
   const go = (next: Step, towards: 1 | -1) => {
     setDirection(towards);
     setStep(next);
-    titleRef.current?.focus();
+    titleEl?.focus();
   };
 
-  const handleSubmit = (event: SubmitEvent<HTMLFormElement>) => {
+  const handleSubmit = (event: SubmitEvent) => {
     event.preventDefault();
     setTicket(
-      `FC-${subjectId.slice(0, 2).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`,
+      `FC-${subjectId().slice(0, 2).toUpperCase()}-${Math.floor(1000 + Math.random() * 9000)}`,
     );
     go("done", 1);
   };
 
-  const heightTransition = { duration: reduce ? 0 : 0.2, ease: EASE };
-  const stepTransition = { duration: reduce ? 0 : 0.2, ease: EASE };
-  const offset = reduce ? 0 : 24;
-  const stepIndex = step === "topic" ? 0 : 1;
+  const heightTransition = () => ({ duration: reduce() ? 0 : 0.2, ease: EASE });
+  const stepTransition = () => ({ duration: reduce() ? 0 : 0.2, ease: EASE });
+  const offset = () => (reduce() ? 0 : 24);
+  const stepIndex = () => (step() === "topic" ? 0 : 1);
 
   return (
     <dialog
       aria-labelledby={titleId}
       {...dialogProps}
-      {...stylex.props(labStyles.dialog, styles.dialog, closing && styles.dialogClosing)}
+      {...stylex.attrs(labStyles.dialog, styles.dialog, closing() && styles.dialogClosing)}
     >
       <button
         type="button"
-        tabIndex={-1}
+        tabindex={-1}
         aria-label="关闭"
         onClick={requestClose}
-        {...stylex.props(labStyles.dismiss)}
+        {...stylex.attrs(labStyles.dismiss)}
       />
-      <div {...panelProps} {...stylex.props(styles.panel, closing && styles.panelClosing)}>
-        <header {...stylex.props(styles.head)}>
+      <div {...panelProps} {...stylex.attrs(styles.panel, closing() && styles.panelClosing)}>
+        <header {...stylex.attrs(styles.head)}>
           <div>
-            <p {...stylex.props(styles.progress)}>
-              <span lang="en">{step === "done" ? "Sent" : `Step ${stepIndex + 1} / 2`}</span>
-              <span aria-hidden="true" {...stylex.props(styles.progressTrack)}>
+            <p {...stylex.attrs(styles.progress)}>
+              <span lang="en">{step() === "done" ? "Sent" : `Step ${stepIndex() + 1} / 2`}</span>
+              <span aria-hidden="true" {...stylex.attrs(styles.progressTrack)}>
                 {[0, 1].map((index) => (
                   <span
-                    key={index}
-                    {...stylex.props(
+                    {...stylex.attrs(
                       styles.progressDot,
-                      (step === "done" || index <= stepIndex) && styles.progressDotOn,
+                      (step() === "done" || index <= stepIndex()) && styles.progressDotOn,
                     )}
                   />
                 ))}
               </span>
             </p>
-            <h2 id={titleId} ref={titleRef} tabIndex={-1} {...stylex.props(styles.title)}>
-              {STEP_TITLE[step]}
+            <h2 id={titleId} ref={titleEl} tabindex={-1} {...stylex.attrs(styles.title)}>
+              {STEP_TITLE[step()]}
             </h2>
           </div>
           <button
             type="button"
             aria-label="关闭"
             onClick={requestClose}
-            {...stylex.props(labStyles.closeButton)}
+            {...stylex.attrs(labStyles.closeButton)}
           >
             <X size={20} strokeWidth={1.75} aria-hidden="true" />
           </button>
         </header>
 
-        <div {...stylex.props(styles.scroll)}>
+        <div {...stylex.attrs(styles.scroll)}>
           <m.div
-            layout={!reduce}
-            style={{ height }}
-            transition={heightTransition}
-            {...stylex.props(styles.clip)}
+            layout={!reduce()}
+            style={{ height: height() }}
+            transition={heightTransition()}
+            {...stylex.attrs(styles.clip)}
           >
-            <m.div ref={measureRef} layout="position" {...stylex.props(styles.measure)}>
-              <AnimatePresence mode="wait" initial={false} custom={direction}>
-                <m.div
-                  key={step}
-                  custom={direction}
-                  initial={{ opacity: 0, x: offset * direction }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{
-                    opacity: 0,
-                    x: (-offset / 2) * direction,
-                    transition: { duration: reduce ? 0 : 0.12, ease: EASE },
-                  }}
-                  transition={stepTransition}
-                >
-                  {step === "topic" ? (
-                    <>
-                      <ul {...stylex.props(labStyles.list, styles.options)}>
-                        {INQUIRY_SUBJECTS.map((item) => {
-                          const target = SUBJECT_ROUTES[item.id];
-                          return (
-                            <li key={item.id}>
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  setSubjectId(item.id);
-                                  go("details", 1);
-                                }}
-                                {...stylex.props(styles.option)}
+            <m.div ref={measureRef} layout="position" {...stylex.attrs(styles.measure)}>
+              <AnimatePresence mode="wait" initial={false} custom={direction()}>
+                <Show when={step()} keyed>
+                  {(current) => (
+                    <m.div
+                      custom={untrack(direction)}
+                      initial={{ opacity: 0, x: untrack(offset) * untrack(direction) }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{
+                        opacity: 0,
+                        x: (-untrack(offset) / 2) * untrack(direction),
+                        transition: { duration: untrack(reduce) ? 0 : 0.12, ease: EASE },
+                      }}
+                      transition={stepTransition()}
+                    >
+                      {current === "topic" ? (
+                        <>
+                          <ul {...stylex.attrs(labStyles.list, styles.options)}>
+                            {INQUIRY_SUBJECTS.map((item) => {
+                              const target = SUBJECT_ROUTES[item.id];
+                              return (
+                                <li>
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setSubjectId(item.id);
+                                      go("details", 1);
+                                    }}
+                                    {...stylex.attrs(styles.option)}
+                                  >
+                                    <span {...stylex.attrs(styles.optionText)}>
+                                      <span {...stylex.attrs(styles.optionLabel)}>
+                                        {item.label}
+                                      </span>
+                                      <span {...stylex.attrs(styles.optionMeta)}>
+                                        {target.team} · {target.reply}
+                                      </span>
+                                    </span>
+                                    <ArrowRight
+                                      size={18}
+                                      strokeWidth={2}
+                                      nonScalingStroke
+                                      aria-hidden="true"
+                                      {...stylex.attrs(styles.optionArrow)}
+                                    />
+                                  </button>
+                                </li>
+                              );
+                            })}
+                          </ul>
+                          <p {...stylex.attrs(styles.companyLine)}>
+                            <span>{COMPANY.name}</span>
+                            <span>
+                              急事请致电{" "}
+                              <a
+                                href={COMPANY.phone.href ?? undefined}
+                                {...stylex.attrs(styles.companyLink, labStyles.focusRing)}
                               >
-                                <span {...stylex.props(styles.optionText)}>
-                                  <span {...stylex.props(styles.optionLabel)}>{item.label}</span>
-                                  <span {...stylex.props(styles.optionMeta)}>
-                                    {target.team} · {target.reply}
-                                  </span>
+                                {COMPANY.phone.value}
+                              </a>
+                            </span>
+                          </p>
+                        </>
+                      ) : current === "details" ? (
+                        <>
+                          <div {...stylex.attrs(styles.routeCard)}>
+                            <div>
+                              <p {...stylex.attrs(styles.routeTeam)}>
+                                {route().team}
+                                <span lang="en" {...stylex.attrs(styles.routeEnglish)}>
+                                  {route().english}
                                 </span>
+                              </p>
+                              <p {...stylex.attrs(styles.routeMeta)}>
+                                {active().label} · {route().reply} ·{" "}
+                                <a
+                                  href={route().channel.href ?? undefined}
+                                  {...stylex.attrs(styles.companyLink, labStyles.focusRing)}
+                                >
+                                  {route().channel.value}
+                                </a>
+                              </p>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => go("topic", -1)}
+                              {...stylex.attrs(styles.change, labStyles.focusRing)}
+                            >
+                              <ArrowLeft
+                                size={14}
+                                strokeWidth={2}
+                                nonScalingStroke
+                                aria-hidden="true"
+                              />
+                              更换
+                            </button>
+                          </div>
+                          <form id={formId} onSubmit={handleSubmit} {...stylex.attrs(styles.form)}>
+                            <div {...stylex.attrs(styles.pair)}>
+                              <Field id={`${formId}-name`} label="联系人姓名" required>
+                                <input
+                                  id={`${formId}-name`}
+                                  name="contactName"
+                                  required
+                                  autocomplete="name"
+                                  {...stylex.attrs(labStyles.input)}
+                                />
+                              </Field>
+                              <Field id={`${formId}-company`} label="公司或机构" required>
+                                <input
+                                  id={`${formId}-company`}
+                                  name="company"
+                                  required
+                                  autocomplete="organization"
+                                  {...stylex.attrs(labStyles.input)}
+                                />
+                              </Field>
+                              <Field id={`${formId}-phone`} label="手机号" required>
+                                <input
+                                  id={`${formId}-phone`}
+                                  name="phone"
+                                  type="tel"
+                                  required
+                                  autocomplete="tel"
+                                  inputmode="tel"
+                                  {...stylex.attrs(labStyles.input)}
+                                />
+                              </Field>
+                              <Field id={`${formId}-email`} label="工作邮箱" required>
+                                <input
+                                  id={`${formId}-email`}
+                                  name="email"
+                                  type="email"
+                                  required
+                                  autocomplete="email"
+                                  spellcheck={false}
+                                  {...stylex.attrs(labStyles.input)}
+                                />
+                              </Field>
+                            </div>
+                            <Field id={`${formId}-message`} label="需求描述" required>
+                              <textarea
+                                id={`${formId}-message`}
+                                name="message"
+                                required
+                                placeholder={active().placeholder}
+                                {...stylex.attrs(labStyles.input, labStyles.textarea)}
+                              />
+                            </Field>
+                            <div {...stylex.attrs(styles.submitRow)}>
+                              <label {...stylex.attrs(labStyles.consent)}>
+                                <input
+                                  type="checkbox"
+                                  name="consent"
+                                  required
+                                  {...stylex.attrs(labStyles.checkbox)}
+                                />
+                                <span>同意泛成就本次咨询与我联系</span>
+                              </label>
+                              <button
+                                type="submit"
+                                {...stylex.attrs(
+                                  labStyles.primaryButton,
+                                  labStyles.trailingIcon,
+                                  labStyles.focusRing,
+                                  stylex.defaultMarker(),
+                                )}
+                              >
+                                发送给{route().team}
                                 <ArrowRight
                                   size={18}
                                   strokeWidth={2}
                                   nonScalingStroke
                                   aria-hidden="true"
-                                  {...stylex.props(styles.optionArrow)}
+                                  {...stylex.attrs(labStyles.buttonArrow)}
                                 />
                               </button>
-                            </li>
-                          );
-                        })}
-                      </ul>
-                      <p {...stylex.props(styles.companyLine)}>
-                        <span>{COMPANY.name}</span>
-                        <span>
-                          急事请致电{" "}
-                          <a
-                            href={COMPANY.phone.href ?? undefined}
-                            {...stylex.props(styles.companyLink, labStyles.focusRing)}
-                          >
-                            {COMPANY.phone.value}
-                          </a>
-                        </span>
-                      </p>
-                    </>
-                  ) : step === "details" ? (
-                    <>
-                      <div {...stylex.props(styles.routeCard)}>
-                        <div>
-                          <p {...stylex.props(styles.routeTeam)}>
-                            {route.team}
-                            <span lang="en" {...stylex.props(styles.routeEnglish)}>
-                              {route.english}
-                            </span>
-                          </p>
-                          <p {...stylex.props(styles.routeMeta)}>
-                            {active.label} · {route.reply} ·{" "}
-                            <a
-                              href={route.channel.href ?? undefined}
-                              {...stylex.props(styles.companyLink, labStyles.focusRing)}
-                            >
-                              {route.channel.value}
-                            </a>
-                          </p>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => go("topic", -1)}
-                          {...stylex.props(styles.change, labStyles.focusRing)}
-                        >
-                          <ArrowLeft
-                            size={14}
-                            strokeWidth={2}
+                            </div>
+                          </form>
+                        </>
+                      ) : (
+                        <div role="status" {...stylex.attrs(styles.done)}>
+                          <CheckCircle2
+                            size={32}
+                            strokeWidth={2.5}
                             nonScalingStroke
                             aria-hidden="true"
+                            {...stylex.attrs(styles.doneIcon)}
                           />
-                          更换
-                        </button>
-                      </div>
-                      <form id={formId} onSubmit={handleSubmit} {...stylex.props(styles.form)}>
-                        <div {...stylex.props(styles.pair)}>
-                          <Field id={`${formId}-name`} label="联系人姓名" required>
-                            <input
-                              id={`${formId}-name`}
-                              name="contactName"
-                              required
-                              autoComplete="name"
-                              {...stylex.props(labStyles.input)}
-                            />
-                          </Field>
-                          <Field id={`${formId}-company`} label="公司或机构" required>
-                            <input
-                              id={`${formId}-company`}
-                              name="company"
-                              required
-                              autoComplete="organization"
-                              {...stylex.props(labStyles.input)}
-                            />
-                          </Field>
-                          <Field id={`${formId}-phone`} label="手机号" required>
-                            <input
-                              id={`${formId}-phone`}
-                              name="phone"
-                              type="tel"
-                              required
-                              autoComplete="tel"
-                              inputMode="tel"
-                              {...stylex.props(labStyles.input)}
-                            />
-                          </Field>
-                          <Field id={`${formId}-email`} label="工作邮箱" required>
-                            <input
-                              id={`${formId}-email`}
-                              name="email"
-                              type="email"
-                              required
-                              autoComplete="email"
-                              spellCheck={false}
-                              {...stylex.props(labStyles.input)}
-                            />
-                          </Field>
-                        </div>
-                        <Field id={`${formId}-message`} label="需求描述" required>
-                          <textarea
-                            id={`${formId}-message`}
-                            name="message"
-                            required
-                            placeholder={active.placeholder}
-                            {...stylex.props(labStyles.input, labStyles.textarea)}
-                          />
-                        </Field>
-                        <div {...stylex.props(styles.submitRow)}>
-                          <label {...stylex.props(labStyles.consent)}>
-                            <input
-                              type="checkbox"
-                              name="consent"
-                              required
-                              {...stylex.props(labStyles.checkbox)}
-                            />
-                            <span>同意泛成就本次咨询与我联系</span>
-                          </label>
+                          <p {...stylex.attrs(styles.ticket)}>
+                            咨询编号 <span {...stylex.attrs(styles.ticketValue)}>{ticket()}</span>
+                          </p>
+                          <p {...stylex.attrs(styles.doneText)}>
+                            {route().team}已收到您的「{active().label}」需求，{route().reply}。
+                          </p>
+                          <ol aria-label="接下来" {...stylex.attrs(labStyles.list, styles.steps)}>
+                            {NEXT_STEPS.map((item, index) => (
+                              <li {...stylex.attrs(styles.step)}>
+                                <span aria-hidden="true" {...stylex.attrs(styles.stepIndex)}>
+                                  {indexLabel(index)}
+                                </span>
+                                {item}
+                              </li>
+                            ))}
+                          </ol>
                           <button
-                            type="submit"
-                            {...stylex.props(
-                              labStyles.primaryButton,
-                              labStyles.trailingIcon,
-                              labStyles.focusRing,
-                              stylex.defaultMarker(),
-                            )}
+                            type="button"
+                            onClick={requestClose}
+                            {...stylex.attrs(labStyles.primaryButton, labStyles.focusRing)}
                           >
-                            发送给{route.team}
-                            <ArrowRight
-                              size={18}
-                              strokeWidth={2}
-                              nonScalingStroke
-                              aria-hidden="true"
-                              {...stylex.props(labStyles.buttonArrow)}
-                            />
+                            完成
                           </button>
                         </div>
-                      </form>
-                    </>
-                  ) : (
-                    <div role="status" {...stylex.props(styles.done)}>
-                      <CheckCircle2
-                        size={32}
-                        strokeWidth={2.5}
-                        nonScalingStroke
-                        aria-hidden="true"
-                        {...stylex.props(styles.doneIcon)}
-                      />
-                      <p {...stylex.props(styles.ticket)}>
-                        咨询编号 <span {...stylex.props(styles.ticketValue)}>{ticket}</span>
-                      </p>
-                      <p {...stylex.props(styles.doneText)}>
-                        {route.team}已收到您的「{active.label}」需求，{route.reply}。
-                      </p>
-                      <ol aria-label="接下来" {...stylex.props(labStyles.list, styles.steps)}>
-                        {NEXT_STEPS.map((item, index) => (
-                          <li key={item} {...stylex.props(styles.step)}>
-                            <span aria-hidden="true" {...stylex.props(styles.stepIndex)}>
-                              {indexLabel(index)}
-                            </span>
-                            {item}
-                          </li>
-                        ))}
-                      </ol>
-                      <button
-                        type="button"
-                        onClick={requestClose}
-                        {...stylex.props(labStyles.primaryButton, labStyles.focusRing)}
-                      >
-                        完成
-                      </button>
-                    </div>
+                      )}
+                    </m.div>
                   )}
-                </m.div>
+                </Show>
               </AnimatePresence>
             </m.div>
           </m.div>

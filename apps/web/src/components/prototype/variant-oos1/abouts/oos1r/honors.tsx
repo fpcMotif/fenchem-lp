@@ -63,20 +63,18 @@ export function Honors() {
 
   return (
     <Section id={chip.id} label={chip.english}>
-      <ul {...stylex.props(s.groups)}>
+      <ul {...stylex.attrs(s.groups)}>
         {LEVELS.map(({ level, label }, groupIdx) => {
           const items = ABOUT_HONORS.items.filter((item) => item.level === level);
           const labelId = `about-honor-${level}`;
           return (
-            <Reveal key={level} as="li" delay={groupIdx * 80} sx={s.group}>
-              <p id={labelId} {...stylex.props(s.level)}>
+            <Reveal as="li" delay={groupIdx * 80} sx={s.group}>
+              <p id={labelId} {...stylex.attrs(s.level)}>
                 {label}
               </p>
-              <ul aria-labelledby={labelId} {...stylex.props(s.titles)}>
+              <ul aria-labelledby={labelId} {...stylex.attrs(s.titles)}>
                 {items.map((item) => (
-                  <li key={item.id} {...stylex.props(s.title)}>
-                    {item.title}
-                  </li>
+                  <li {...stylex.attrs(s.title)}>{item.title}</li>
                 ))}
               </ul>
             </Reveal>

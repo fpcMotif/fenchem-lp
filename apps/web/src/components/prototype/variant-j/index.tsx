@@ -39,7 +39,7 @@ const styles = stylex.create({
 export function VariantJ() {
   return (
     <MotionRoot>
-      <div {...stylex.props(styles.root)}>
+      <div {...stylex.attrs(styles.root)}>
         <NavBar />
         <main>
           <HeroSection />

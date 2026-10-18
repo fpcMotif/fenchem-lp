@@ -1,5 +1,5 @@
 import * as stylex from "@stylexjs/stylex";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight } from "@fenchem-lp/ui/components/lucide";
 
 import { ABOUT_BANNER } from "../../about-data";
 import { SectionHead } from "./section-head";
@@ -86,30 +86,30 @@ const styles = stylex.create({
   },
 });
 
-export function Closing({ onNavigateHome }: { onNavigateHome: (hash?: string) => void }) {
+export function Closing(props: { onNavigateHome: (hash?: string) => void }) {
   return (
-    <section aria-labelledby="oos1o-closing" {...stylex.props(styles.section)}>
-      <div {...stylex.props(ui.shell, ui.grid)}>
-        <div {...stylex.props(styles.copy)}>
+    <section aria-labelledby="oos1o-closing" {...stylex.attrs(styles.section)}>
+      <div {...stylex.attrs(ui.shell, ui.grid)}>
+        <div {...stylex.attrs(styles.copy)}>
           <SectionHead id="oos1o-closing" label="Contact" title="联系泛成" quiet />
-          <p {...stylex.props(styles.line)}>这一圈，仍在生长。</p>
-          <p lang="en" {...stylex.props(ui.serif, styles.note)}>
+          <p {...stylex.attrs(styles.line)}>这一圈，仍在生长。</p>
+          <p lang="en" {...stylex.attrs(ui.serif, styles.note)}>
             {ABOUT_BANNER.tagline}
           </p>
         </div>
-        <div {...stylex.props(styles.actions)}>
+        <div {...stylex.attrs(styles.actions)}>
           <button
             type="button"
-            onClick={() => onNavigateHome("contact")}
-            {...stylex.props(styles.primary, ui.focusRing, stylex.defaultMarker())}
+            onClick={() => props.onNavigateHome("contact")}
+            {...stylex.attrs(styles.primary, ui.focusRing, stylex.defaultMarker())}
           >
             联系我们
             <ArrowRight size={20} strokeWidth={1.5} aria-hidden="true" />
           </button>
           <button
             type="button"
-            onClick={() => onNavigateHome()}
-            {...stylex.props(styles.secondary, ui.focusRing)}
+            onClick={() => props.onNavigateHome()}
+            {...stylex.attrs(styles.secondary, ui.focusRing)}
           >
             返回首页
           </button>

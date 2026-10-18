@@ -1,6 +1,6 @@
 import * as stylex from "@stylexjs/stylex";
-import { ArrowRight } from "lucide-react";
-import { Fragment, useEffect, useId, useRef, useState } from "react";
+import { createEffect, createSignal, createUniqueId } from "solid-js";
+import { ArrowRight } from "@fenchem-lp/ui/components/lucide";
 
 import { useLightbox } from "@/components/prototype/shared/lightbox";
 
@@ -40,11 +40,11 @@ const LEVEL_LABEL = {
   municipal: "南京市级",
 } as const;
 
-export function AboutOOS1V({ onNavigateHome }: AboutPageProps) {
+export function AboutOOS1V(props: AboutPageProps) {
   return (
-    <div id="about-top" {...stylex.props(styles.root)}>
+    <div id="about-top" {...stylex.attrs(styles.root)}>
       <CyanotypeDefs />
-      <Banner onNavigateHome={onNavigateHome} />
+      <Banner onNavigateHome={props.onNavigateHome} />
       <PageNav />
       <Profile />
       <Campus />
@@ -52,63 +52,63 @@ export function AboutOOS1V({ onNavigateHome }: AboutPageProps) {
       <Responsibility />
       <Honors />
       <Structure />
-      <Closing onNavigateHome={onNavigateHome} />
+      <Closing onNavigateHome={props.onNavigateHome} />
     </div>
   );
 }
 
-function Banner({ onNavigateHome }: AboutPageProps) {
-  const printRef = useRef<HTMLDivElement>(null);
-  const developed = useDeveloped(printRef, 0.2);
+function Banner(props: AboutPageProps) {
+  let printRef: HTMLDivElement | undefined;
+  const developed = useDeveloped(() => printRef, 0.2);
 
   return (
-    <section aria-labelledby="about-title" {...stylex.props(styles.banner)}>
-      <div {...stylex.props(styles.column)}>
-        <nav aria-label="Breadcrumb" {...stylex.props(styles.crumbs)}>
+    <section aria-labelledby="about-title" {...stylex.attrs(styles.banner)}>
+      <div {...stylex.attrs(styles.column)}>
+        <nav aria-label="Breadcrumb" {...stylex.attrs(styles.crumbs)}>
           <a
             href="#top"
             onClick={(event) => {
               event.preventDefault();
-              onNavigateHome();
+              props.onNavigateHome();
             }}
-            {...stylex.props(styles.crumbLink, shared.focusRing)}
+            {...stylex.attrs(styles.crumbLink, shared.focusRing)}
           >
             <span lang="en">Home</span>
           </a>
-          <span aria-hidden="true" {...stylex.props(styles.crumbDivider)}>
+          <span aria-hidden="true" {...stylex.attrs(styles.crumbDivider)}>
             /
           </span>
           <span aria-current="page">
             <span lang="en">About</span>
           </span>
         </nav>
-        <div {...stylex.props(styles.titleRow)}>
-          <h1 id="about-title" {...stylex.props(styles.title)}>
+        <div {...stylex.attrs(styles.titleRow)}>
+          <h1 id="about-title" {...stylex.attrs(styles.title)}>
             {ABOUT_BANNER.title}
           </h1>
-          <p lang="en" {...stylex.props(styles.tagline)}>
+          <p lang="en" {...stylex.attrs(styles.tagline)}>
             {ABOUT_BANNER.tagline}
           </p>
         </div>
-        <figure {...stylex.props(styles.heroFigure)}>
+        <figure {...stylex.attrs(styles.heroFigure)}>
           <div
             ref={printRef}
-            {...stylex.props(styles.heroPrint, shared.develop, developed && shared.developed)}
+            {...stylex.attrs(styles.heroPrint, shared.develop, developed() && shared.developed)}
           >
             <BrushCoat />
-            <div {...stylex.props(styles.heroFrame)}>
+            <div {...stylex.attrs(styles.heroFrame)}>
               <img
                 src={ABOUT_BANNER.image}
                 alt={ABOUT_BANNER.alt}
-                fetchPriority="high"
+                fetchpriority="high"
                 decoding="async"
-                {...stylex.props(shared.fill, shared.cyanotype, styles.heroImage)}
+                {...stylex.attrs(shared.fill, shared.cyanotype, styles.heroImage)}
               />
             </div>
           </div>
-          <figcaption {...stylex.props(styles.heroCaption)}>
-            <span {...stylex.props(styles.heroLead)}>{ABOUT_BANNER.lead}</span>
-            <span lang="en" {...stylex.props(styles.inscription)}>
+          <figcaption {...stylex.attrs(styles.heroCaption)}>
+            <span {...stylex.attrs(styles.heroLead)}>{ABOUT_BANNER.lead}</span>
+            <span lang="en" {...stylex.attrs(styles.inscription)}>
               <span>{ABOUT_BANNER.place}</span>
               <span>{ABOUT_BANNER.established}</span>
             </span>
@@ -121,37 +121,40 @@ function Banner({ onNavigateHome }: AboutPageProps) {
 
 function PageNav() {
   const active = useActiveSection(SECTION_IDS);
-  const listRef = useRef<HTMLUListElement>(null);
+  let listRef: HTMLUListElement | undefined;
 
-  useEffect(() => {
-    const list = listRef.current;
-    const link = list?.querySelector<HTMLElement>('[aria-current="true"]');
-    if (!list || !link) return;
-    const start = link.offsetLeft - list.offsetLeft;
-    const end = start + link.offsetWidth;
-    if (start >= list.scrollLeft && end <= list.scrollLeft + list.clientWidth) return;
-    list.scrollTo({ left: Math.max(0, start - 16) });
-  }, [active]);
+  createEffect(
+    () => active(),
+    () => {
+      const list = listRef;
+      const link = list?.querySelector<HTMLElement>('[aria-current="true"]');
+      if (!list || !link) return;
+      const start = link.offsetLeft - list.offsetLeft;
+      const end = start + link.offsetWidth;
+      if (start >= list.scrollLeft && end <= list.scrollLeft + list.clientWidth) return;
+      list.scrollTo({ left: Math.max(0, start - 16) });
+    },
+  );
 
   return (
-    <nav aria-label="On this page" {...stylex.props(styles.pageNav)}>
-      <ul ref={listRef} {...stylex.props(styles.navList)}>
+    <nav aria-label="On this page" {...stylex.attrs(styles.pageNav)}>
+      <ul ref={listRef} {...stylex.attrs(styles.navList)}>
         {ABOUT_HERO.navChips.map((chip) => {
-          const current = active === chip.id;
+          const current = () => active() === chip.id;
           return (
-            <li key={chip.id} {...stylex.props(styles.navItem)}>
+            <li {...stylex.attrs(styles.navItem)}>
               <a
                 href={`#${chip.id}`}
-                aria-current={current ? "true" : undefined}
-                {...stylex.props(
+                aria-current={current() ? "true" : undefined}
+                {...stylex.attrs(
                   styles.navLink,
-                  current && styles.navLinkCurrent,
+                  current() && styles.navLinkCurrent,
                   shared.focusRing,
                 )}
               >
                 <span
                   aria-hidden="true"
-                  {...stylex.props(styles.navMark, current && styles.navMarkCurrent)}
+                  {...stylex.attrs(styles.navMark, current() && styles.navMarkCurrent)}
                 />
                 <span lang="en">{NAV_EN[chip.id]}</span>
               </a>
@@ -164,38 +167,38 @@ function PageNav() {
 }
 
 function Profile() {
-  const lobbyRef = useRef<HTMLDivElement>(null);
-  const developed = useDeveloped(lobbyRef, 0.3);
+  let lobbyRef: HTMLDivElement | undefined;
+  const developed = useDeveloped(() => lobbyRef, 0.3);
 
   return (
     <section
       id="about-profile"
       aria-labelledby="about-profile-heading"
-      {...stylex.props(styles.section)}
+      {...stylex.attrs(styles.section)}
     >
-      <h2 id="about-profile-heading" {...stylex.props(shared.srOnly)}>
+      <h2 id="about-profile-heading" {...stylex.attrs(shared.srOnly)}>
         Profile
       </h2>
-      <div {...stylex.props(styles.column, styles.grid)}>
-        <div {...stylex.props(styles.profileText)}>
-          <h3 {...stylex.props(styles.companyName)}>{ABOUT_HERO.title}</h3>
-          <p lang="en" {...stylex.props(styles.companyEnglish)}>
+      <div {...stylex.attrs(styles.column, styles.grid)}>
+        <div {...stylex.attrs(styles.profileText)}>
+          <h3 {...stylex.attrs(styles.companyName)}>{ABOUT_HERO.title}</h3>
+          <p lang="en" {...stylex.attrs(styles.companyEnglish)}>
             {ABOUT_HERO.englishTitle}
           </p>
-          <p {...stylex.props(styles.lead)}>{ABOUT_HERO.lead}</p>
-          <p {...stylex.props(styles.network)}>
+          <p {...stylex.attrs(styles.lead)}>{ABOUT_HERO.lead}</p>
+          <p {...stylex.attrs(styles.network)}>
             {ABOUT_HERO.networkLabel}
             {ABOUT_HERO.countries.join("、")}。
           </p>
         </div>
-        <figure {...stylex.props(styles.lobbyFigure)}>
+        <figure {...stylex.attrs(styles.lobbyFigure)}>
           <div
             ref={lobbyRef}
-            {...stylex.props(
+            {...stylex.attrs(
               styles.lobbySheet,
               shared.develop,
               shared.developEcho,
-              developed && shared.developed,
+              developed() && shared.developed,
             )}
           >
             <img
@@ -203,7 +206,7 @@ function Profile() {
               alt={ABOUT_HERO.lobbyEnglish}
               loading="lazy"
               decoding="async"
-              {...stylex.props(shared.fill, shared.cyanotype)}
+              {...stylex.attrs(shared.fill, shared.cyanotype)}
             />
             <img
               src={ABOUT_MOMENT.image}
@@ -211,20 +214,20 @@ function Profile() {
               aria-hidden="true"
               loading="lazy"
               decoding="async"
-              {...stylex.props(shared.fill, shared.cyanotype, styles.verso)}
+              {...stylex.attrs(shared.fill, shared.cyanotype, styles.verso)}
             />
           </div>
-          <figcaption lang="en" {...stylex.props(shared.caption)}>
+          <figcaption lang="en" {...stylex.attrs(shared.caption)}>
             Lobby, with the campus showing through from the reverse
           </figcaption>
         </figure>
-        <dl {...stylex.props(styles.strip)}>
+        <dl {...stylex.attrs(styles.strip)}>
           {STATS.map((stat, index) => (
-            <div key={stat.label} {...stylex.props(styles.band, STRIP_EXPOSURES[index])}>
-              <dt {...stylex.props(styles.bandLabel)}>{stat.label}</dt>
-              <dd {...stylex.props(styles.bandValue)}>
+            <div {...stylex.attrs(styles.band, STRIP_EXPOSURES[index])}>
+              <dt {...stylex.attrs(styles.bandLabel)}>{stat.label}</dt>
+              <dd {...stylex.attrs(styles.bandValue)}>
                 {stat.value}
-                {stat.unit ? <span {...stylex.props(styles.bandUnit)}>{stat.unit}</span> : null}
+                {stat.unit ? <span {...stylex.attrs(styles.bandUnit)}>{stat.unit}</span> : null}
               </dd>
             </div>
           ))}
@@ -241,14 +244,14 @@ function Campus() {
     <section
       id="about-campus"
       aria-labelledby="about-campus-heading"
-      {...stylex.props(styles.section)}
+      {...stylex.attrs(styles.section)}
     >
-      <h2 id="about-campus-heading" {...stylex.props(shared.srOnly)}>
+      <h2 id="about-campus-heading" {...stylex.attrs(shared.srOnly)}>
         {ABOUT_CAMPUS.eyebrow}
       </h2>
-      <ul {...stylex.props(styles.column, styles.grid, styles.campusList)}>
+      <ul {...stylex.attrs(styles.column, styles.grid, styles.campusList)}>
         {CAMPUS_HANG.map((photo, index) => (
-          <li key={photo.id} {...stylex.props(styles.campusItem, placement[photo.id])}>
+          <li {...stylex.attrs(styles.campusItem, placement[photo.id])}>
             <CampusPrint photo={photo} onOpen={() => lightbox.open(index)} />
           </li>
         ))}
@@ -258,96 +261,94 @@ function Campus() {
   );
 }
 
-function CampusPrint({ photo, onOpen }: { photo: CampusPhoto; onOpen: () => void }) {
-  const ref = useRef<HTMLSpanElement>(null);
-  const developed = useDeveloped(ref, 0.35);
+function CampusPrint(props: { photo: CampusPhoto; onOpen: () => void }) {
+  let ref: HTMLSpanElement | undefined;
+  const developed = useDeveloped(() => ref, 0.35);
 
   return (
-    <figure {...stylex.props(styles.campusFigure)}>
+    <figure {...stylex.attrs(styles.campusFigure)}>
       <button
         type="button"
-        aria-label={`View larger: ${photo.english}`}
-        onClick={onOpen}
-        {...stylex.props(styles.printButton, shared.focusRing)}
+        aria-label={`View larger: ${props.photo.english}`}
+        onClick={props.onOpen}
+        {...stylex.attrs(styles.printButton, shared.focusRing)}
       >
         <span
           ref={ref}
-          {...stylex.props(
+          {...stylex.attrs(
             styles.printSheet,
-            ratio[photo.id],
+            ratio[props.photo.id],
             shared.develop,
             shared.developEcho,
-            developed && shared.developed,
+            developed() && shared.developed,
           )}
         >
           <img
-            src={photo.src}
-            alt={photo.alt}
+            src={props.photo.src}
+            alt={props.photo.alt}
             loading="lazy"
             decoding="async"
-            {...stylex.props(shared.fill, shared.cyanotype)}
+            {...stylex.attrs(shared.fill, shared.cyanotype)}
           />
         </span>
       </button>
-      <figcaption {...stylex.props(shared.caption)}>
-        <span lang="en">{CAMPUS_CAPTION_EN[photo.id]}</span>
+      <figcaption {...stylex.attrs(shared.caption)}>
+        <span lang="en">{CAMPUS_CAPTION_EN[props.photo.id]}</span>
       </figcaption>
     </figure>
   );
 }
 
 function Responsibility() {
-  const lakeRef = useRef<HTMLDivElement>(null);
-  const alive = useDeveloped(lakeRef, 0.6);
+  let lakeRef: HTMLDivElement | undefined;
+  const alive = useDeveloped(() => lakeRef, 0.6);
 
   return (
-    <section id="about-csr" aria-labelledby="about-csr-heading" {...stylex.props(styles.section)}>
-      <h2 id="about-csr-heading" {...stylex.props(shared.srOnly)}>
+    <section id="about-csr" aria-labelledby="about-csr-heading" {...stylex.attrs(styles.section)}>
+      <h2 id="about-csr-heading" {...stylex.attrs(shared.srOnly)}>
         Responsibility
       </h2>
-      <div {...stylex.props(styles.column, styles.grid)}>
-        <h3 {...stylex.props(styles.statement)}>
+      <div {...stylex.attrs(styles.column, styles.grid)}>
+        <h3 {...stylex.attrs(styles.statement)}>
           {ABOUT_CSR.statement.map((line) => (
-            <span key={line} {...stylex.props(styles.statementLine)}>
-              {line}
-            </span>
+            <span {...stylex.attrs(styles.statementLine)}>{line}</span>
           ))}
         </h3>
-        <div {...stylex.props(styles.csrText)}>
-          <p {...stylex.props(styles.csrDesc)}>{ABOUT_CSR.desc}</p>
-          <ul {...stylex.props(styles.outcomes)}>
+        <div {...stylex.attrs(styles.csrText)}>
+          <p {...stylex.attrs(styles.csrDesc)}>{ABOUT_CSR.desc}</p>
+          <ul {...stylex.attrs(styles.outcomes)}>
             {ABOUT_CSR.outcomes.map((outcome, index) => (
-              <Fragment key={outcome.title}>
+              <>
                 {index > 0 ? (
-                  <li aria-hidden="true" {...stylex.props(styles.outcomeDot)}>
+                  <li aria-hidden="true" {...stylex.attrs(styles.outcomeDot)}>
                     ·
                   </li>
                 ) : null}
                 <li>{outcome.title}</li>
-              </Fragment>
+              </>
             ))}
           </ul>
         </div>
-        <figure {...stylex.props(styles.lakeFigure)}>
-          <div ref={lakeRef} {...stylex.props(styles.lakeFrame)}>
+        <figure {...stylex.attrs(styles.lakeFigure)}>
+          <div ref={lakeRef} {...stylex.attrs(styles.lakeFrame)}>
             <img
               src={ABOUT_CSR.image}
               alt={ABOUT_CSR.imageAlt}
               loading="lazy"
               decoding="async"
-              {...stylex.props(shared.fill, shared.cyanotype, styles.lakeFocus)}
+              {...stylex.attrs(shared.fill, shared.cyanotype, styles.lakeFocus)}
             />
-            <div aria-hidden="true" {...stylex.props(styles.rise, alive && styles.risen)}>
+            <div aria-hidden="true" {...stylex.attrs(styles.rise, alive() && styles.risen)}>
               <img
                 src={ABOUT_CSR.image}
                 alt=""
                 loading="lazy"
                 decoding="async"
-                {...stylex.props(styles.riseImage, styles.lakeFocus, alive && styles.risen)}
+                {...stylex.attrs(styles.riseImage, styles.lakeFocus, alive() && styles.risen)}
               />
             </div>
           </div>
-          <figcaption lang="en" {...stylex.props(shared.caption)}>
+          <figcaption lang="en" {...stylex.attrs(shared.caption)}>
             Campus lake, in its own color
           </figcaption>
         </figure>
@@ -361,26 +362,25 @@ function Honors() {
     <section
       id="about-honor"
       aria-labelledby="about-honor-heading"
-      {...stylex.props(styles.section)}
+      {...stylex.attrs(styles.section)}
     >
-      <h2 id="about-honor-heading" {...stylex.props(shared.srOnly)}>
+      <h2 id="about-honor-heading" {...stylex.attrs(shared.srOnly)}>
         {ABOUT_HONORS.eyebrow}
       </h2>
-      <div {...stylex.props(styles.column, styles.grid)}>
-        <ul {...stylex.props(styles.honorList)}>
+      <div {...stylex.attrs(styles.column, styles.grid)}>
+        <ul {...stylex.attrs(styles.honorList)}>
           {ABOUT_HONORS.items.map((item, index) => (
             <li
-              key={item.id}
-              {...stylex.props(
+              {...stylex.attrs(
                 styles.honor,
                 index > 0 &&
                   ABOUT_HONORS.items[index - 1].level !== item.level &&
                   styles.honorNewLevel,
               )}
             >
-              <span {...stylex.props(styles.honorTitle)}>{item.title}</span>
-              <span aria-hidden="true" {...stylex.props(styles.leader)} />
-              <span {...stylex.props(styles.honorLevel)}>{LEVEL_LABEL[item.level]}</span>
+              <span {...stylex.attrs(styles.honorTitle)}>{item.title}</span>
+              <span aria-hidden="true" {...stylex.attrs(styles.leader)} />
+              <span {...stylex.attrs(styles.honorLevel)}>{LEVEL_LABEL[item.level]}</span>
             </li>
           ))}
         </ul>
@@ -390,57 +390,57 @@ function Honors() {
 }
 
 function Structure() {
-  const [chartOpen, setChartOpen] = useState(false);
-  const chartId = useId();
+  const [chartOpen, setChartOpen] = createSignal(false);
+  const chartId = createUniqueId();
   const { holding, subsidiaries } = ABOUT_STRUCTURE;
 
   return (
     <section
       id="about-structure"
       aria-labelledby="about-structure-heading"
-      {...stylex.props(styles.section)}
+      {...stylex.attrs(styles.section)}
     >
-      <h2 id="about-structure-heading" {...stylex.props(shared.srOnly)}>
+      <h2 id="about-structure-heading" {...stylex.attrs(shared.srOnly)}>
         {ABOUT_STRUCTURE.eyebrow}
       </h2>
-      <div {...stylex.props(styles.column, styles.grid)}>
-        <div {...stylex.props(styles.holding)}>
-          <p {...stylex.props(styles.quiet)}>{holding.badge}</p>
-          <h3 {...stylex.props(styles.holdingName)}>{holding.name}</h3>
-          <p lang="en" {...stylex.props(styles.english)}>
+      <div {...stylex.attrs(styles.column, styles.grid)}>
+        <div {...stylex.attrs(styles.holding)}>
+          <p {...stylex.attrs(styles.quiet)}>{holding.badge}</p>
+          <h3 {...stylex.attrs(styles.holdingName)}>{holding.name}</h3>
+          <p lang="en" {...stylex.attrs(styles.english)}>
             {holding.english}
           </p>
           <button
             type="button"
-            aria-expanded={chartOpen}
+            aria-expanded={chartOpen() ? "true" : "false"}
             aria-controls={chartId}
             onClick={() => setChartOpen((open) => !open)}
-            {...stylex.props(styles.chartToggle, shared.focusRing)}
+            {...stylex.attrs(styles.chartToggle, shared.focusRing)}
           >
-            <span lang="en">{chartOpen ? "Hide chart" : "View chart"}</span>
-            <span {...stylex.props(shared.srOnly)}> Organizational chart</span>
+            <span lang="en">{chartOpen() ? "Hide chart" : "View chart"}</span>
+            <span {...stylex.attrs(shared.srOnly)}> Organizational chart</span>
           </button>
         </div>
-        <div {...stylex.props(styles.branches)}>
-          <p {...stylex.props(styles.quiet)}>{ABOUT_STRUCTURE.subsidiaryBadge}</p>
-          <ul {...stylex.props(styles.branchList)}>
+        <div {...stylex.attrs(styles.branches)}>
+          <p {...stylex.attrs(styles.quiet)}>{ABOUT_STRUCTURE.subsidiaryBadge}</p>
+          <ul {...stylex.attrs(styles.branchList)}>
             {subsidiaries.map((subsidiary) => (
-              <li key={subsidiary.id} {...stylex.props(styles.branch)}>
-                <span {...stylex.props(styles.branchName)}>{subsidiary.name}</span>
-                <span lang="en" {...stylex.props(styles.english)}>
+              <li {...stylex.attrs(styles.branch)}>
+                <span {...stylex.attrs(styles.branchName)}>{subsidiary.name}</span>
+                <span lang="en" {...stylex.attrs(styles.english)}>
                   {subsidiary.english}
                 </span>
               </li>
             ))}
           </ul>
         </div>
-        <figure id={chartId} hidden={!chartOpen} {...stylex.props(styles.chart)}>
+        <figure id={chartId} hidden={!chartOpen()} {...stylex.attrs(styles.chart)}>
           <img
             src={ABOUT_STRUCTURE.chartImage}
             alt="Organizational chart: Nanjing Fenchem International Holdings Corporation Limited and its five wholly owned subsidiaries"
             loading="lazy"
             decoding="async"
-            {...stylex.props(styles.chartImage, shared.cyanotype)}
+            {...stylex.attrs(styles.chartImage, shared.cyanotype)}
           />
         </figure>
       </div>
@@ -448,26 +448,26 @@ function Structure() {
   );
 }
 
-function Closing({ onNavigateHome }: AboutPageProps) {
+function Closing(props: AboutPageProps) {
   return (
-    <section aria-labelledby="about-cta-heading" {...stylex.props(styles.section, styles.closing)}>
-      <div {...stylex.props(styles.column)}>
-        <h2 id="about-cta-heading" {...stylex.props(styles.ctaTitle)}>
+    <section aria-labelledby="about-cta-heading" {...stylex.attrs(styles.section, styles.closing)}>
+      <div {...stylex.attrs(styles.column)}>
+        <h2 id="about-cta-heading" {...stylex.attrs(styles.ctaTitle)}>
           {CTA.title}
         </h2>
-        <div {...stylex.props(styles.ctaActions)}>
+        <div {...stylex.attrs(styles.ctaActions)}>
           <button
             type="button"
-            onClick={() => onNavigateHome("contact")}
-            {...stylex.props(styles.ctaPrimary, shared.focusRing)}
+            onClick={() => props.onNavigateHome("contact")}
+            {...stylex.attrs(styles.ctaPrimary, shared.focusRing)}
           >
             {CTA.action.label}
             <ArrowRight size={18} strokeWidth={1.5} aria-hidden="true" />
           </button>
           <button
             type="button"
-            onClick={() => onNavigateHome("products")}
-            {...stylex.props(styles.ctaSecondary, shared.focusRing)}
+            onClick={() => props.onNavigateHome("products")}
+            {...stylex.attrs(styles.ctaSecondary, shared.focusRing)}
           >
             产品与应用
           </button>

@@ -1,6 +1,7 @@
 import * as stylex from "@stylexjs/stylex";
-import { m, useScroll, useTransform } from "motion/react";
-import { useRef, type ReactNode } from "react";
+import { m, useScroll, useTransform } from "@/compat/motion";
+import { children } from "solid-js";
+import type { JSX } from "@solidjs/web";
 
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
@@ -113,56 +114,59 @@ const styles = stylex.create({
   },
 });
 
-function PushedPhoto({ plate }: { plate: Plate }) {
-  const ref = useRef<HTMLDivElement>(null);
+function PushedPhoto(props: { plate: Plate }) {
+  let ref: HTMLDivElement | undefined;
   const reduce = useReducedMotion();
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
-  const scale = useTransform(scrollYProgress, [0, 1], [1, reduce ? 1 : 1.08]);
+  const { scrollYProgress } = useScroll({ target: () => ref, offset: ["start end", "end start"] });
+  const scale = useTransform(() =>
+    reduce() ? 1 : 1 + 0.08 * Math.min(1, Math.max(0, scrollYProgress())),
+  );
   return (
-    <div ref={ref} {...stylex.props(styles.photoBox)}>
+    <div ref={ref} {...stylex.attrs(styles.photoBox)}>
       <m.img
-        src={plate.large}
-        alt={plate.alt}
+        src={props.plate.large}
+        alt={props.plate.alt}
         loading="lazy"
         decoding="async"
-        {...stylex.props(ui.fill)}
+        {...stylex.attrs(ui.fill)}
         style={{ scale }}
       />
     </div>
   );
 }
 
-function Level({ plate, children }: { plate: Plate; children: ReactNode }) {
+function Level(props: { plate: Plate; children: JSX.Element }) {
+  const child = children(() => props.children);
   return (
-    <div {...stylex.props(ui.frame, styles.level)}>
-      <Tag numeral={plate.numeral} />
-      <figure {...stylex.props(styles.figure)}>
-        <PushedPhoto plate={plate} />
-        <figcaption {...stylex.props(styles.caption)}>
-          <span {...stylex.props(styles.chinese)}>{plate.caption}</span>
-          <span lang="en" {...stylex.props(ui.serif, styles.english)}>
-            {plate.english}
+    <div {...stylex.attrs(ui.frame, styles.level)}>
+      <Tag numeral={props.plate.numeral} />
+      <figure {...stylex.attrs(styles.figure)}>
+        <PushedPhoto plate={props.plate} />
+        <figcaption {...stylex.attrs(styles.caption)}>
+          <span {...stylex.attrs(styles.chinese)}>{props.plate.caption}</span>
+          <span lang="en" {...stylex.attrs(ui.serif, styles.english)}>
+            {props.plate.english}
           </span>
         </figcaption>
       </figure>
-      {children ? <div {...stylex.props(styles.child)}>{children}</div> : null}
+      {child() ? <div {...stylex.attrs(styles.child)}>{child()}</div> : null}
     </div>
   );
 }
 
 function AerialRings() {
-  let node: ReactNode = (
-    <figure {...stylex.props(styles.figure)}>
-      <div {...stylex.props(styles.aerialBox)}>
+  let node: JSX.Element = (
+    <figure {...stylex.attrs(styles.figure)}>
+      <div {...stylex.attrs(styles.aerialBox)}>
         <img
           src={AERIAL_PLATE.large}
           alt={AERIAL_PLATE.alt}
           loading="lazy"
           decoding="async"
-          {...stylex.props(ui.fill)}
+          {...stylex.attrs(ui.fill)}
         />
         <div
-          {...stylex.props(
+          {...stylex.attrs(
             styles.officeMark,
             styles.officeAt(
               `${(OFFICE_ON_AERIAL.x - OFFICE_ON_AERIAL.shareOfAerialWidth / 2) * 100}%`,
@@ -171,16 +175,16 @@ function AerialRings() {
             ),
           )}
         >
-          <span {...stylex.props(styles.officeTag)}>
+          <span {...stylex.attrs(styles.officeTag)}>
             <Tag numeral={OFFICE.numeral} pinned={false} />
           </span>
-          <div {...stylex.props(styles.officePhoto)}>
+          <div {...stylex.attrs(styles.officePhoto)}>
             <img
               src={OFFICE.src}
               alt=""
               loading="lazy"
               decoding="async"
-              {...stylex.props(ui.fill)}
+              {...stylex.attrs(ui.fill)}
             />
           </div>
         </div>
@@ -190,7 +194,7 @@ function AerialRings() {
   for (let ring = 0; ring < AERIAL_RINGS; ring++) {
     node = (
       <div
-        {...stylex.props(
+        {...stylex.attrs(
           styles.ring,
           ring === AERIAL_RINGS - 1 ? styles.ringOuter : styles.ringInner,
         )}
@@ -203,20 +207,20 @@ function AerialRings() {
 }
 
 export function NestedSequence() {
-  let nested: ReactNode = null;
+  let nested: JSX.Element = null;
   for (let index = ROOMS_IN_WALKING_ORDER.length - 1; index >= 0; index--) {
     nested = <Level plate={ROOMS_IN_WALKING_ORDER[index].plate}>{nested}</Level>;
   }
   return (
     <div>
-      <div {...stylex.props(styles.funnel)}>{nested}</div>
-      <div {...stylex.props(styles.break)}>
+      <div {...stylex.attrs(styles.funnel)}>{nested}</div>
+      <div {...stylex.attrs(styles.break)}>
         <AerialRings />
       </div>
-      <p {...stylex.props(ui.reset, styles.breakCaption)}>
+      <p {...stylex.attrs(ui.reset, styles.breakCaption)}>
         <Tag numeral={AERIAL_PLATE.numeral} pinned={false} />
-        <span {...stylex.props(styles.chinese)}>{AERIAL_PLATE.caption}</span>
-        <span lang="en" {...stylex.props(ui.serif, styles.english)}>
+        <span {...stylex.attrs(styles.chinese)}>{AERIAL_PLATE.caption}</span>
+        <span lang="en" {...stylex.attrs(ui.serif, styles.english)}>
           {AERIAL_PLATE.english}
         </span>
       </p>

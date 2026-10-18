@@ -1,7 +1,9 @@
 import * as stylex from "@stylexjs/stylex";
-import { useInView } from "motion/react";
-import { type ReactNode, useRef, useSyncExternalStore } from "react";
+import { useInView } from "@/compat/motion";
+import { dynamic as dynamicTag, type JSX } from "@solidjs/web";
+import { createExternalStore } from "@/compat/external-store";
 import { ui } from "./shared-values";
+import { createSignal, merge } from "solid-js";
 
 const REVEAL_STEP_MS = 90;
 const REVEAL_MAX_STEPS = 4;
@@ -11,75 +13,70 @@ const getServerObserverFallback = () => false;
 
 const revealDelay = (index: number) => Math.min(index, REVEAL_MAX_STEPS) * REVEAL_STEP_MS;
 
+const sxAttrs = (...args: ReadonlyArray<stylex.StyleXStyles | false | null | undefined>) =>
+  stylex.attrs(...args);
+
 const dynamic = stylex.create({
   delay: (ms: number) => ({ transitionDelay: `${ms}ms` }),
 });
 
 export function useReveal<T extends HTMLElement>() {
-  const ref = useRef<T>(null);
+  const [ref, setRef] = createSignal<T>();
   const inView = useInView(ref, { once: true, margin: "0px 0px -10% 0px" });
-  const unobservable = useSyncExternalStore(
+  const unobservable = createExternalStore(
     subscribeObserverSupport,
     getObserverFallback,
     getServerObserverFallback,
   );
-  return { ref, shown: inView || unobservable };
+  return { ref: setRef, shown: () => inView() || unobservable() };
 }
 
-export function Reveal({
-  children,
-  step: stagger = 0,
-  sx,
-  as: Tag = "div",
-}: {
-  children: ReactNode;
+export function Reveal(props: {
+  children: JSX.Element;
   step?: number;
   sx?: stylex.StyleXStyles;
   as?: "div" | "li" | "figure" | "article";
 }) {
-  const { ref, shown } = useReveal<HTMLDivElement & HTMLLIElement>();
+  const Tag = dynamicTag(() => props.as ?? "div");
+  const { ref, shown } = useReveal<HTMLElement>();
   return (
     <Tag
       ref={ref}
-      {...stylex.props(ui.reveal, shown && ui.revealShown, dynamic.delay(revealDelay(stagger)), sx)}
+      {...sxAttrs(
+        ui.reveal,
+        shown() && ui.revealShown,
+        dynamic.delay(revealDelay(props.step ?? 0)),
+        props.sx,
+      )}
     >
-      {children}
+      {props.children}
     </Tag>
   );
 }
 
-export function Section({
-  id,
-  label,
-  background,
-  sx,
-  children,
-}: {
+export function Section(props: {
   id: string;
   label: string;
   background: stylex.StyleXStyles;
   sx?: stylex.StyleXStyles;
-  children: ReactNode;
+  children: JSX.Element;
 }) {
-  const nameId = `${id}-name`;
+  const nameId = `${props.id}-name`;
   return (
-    <section id={id} aria-labelledby={nameId} {...stylex.props(ui.section, background, sx)}>
-      <h2 id={nameId} {...stylex.props(ui.srOnly)}>
-        {label}
+    <section
+      id={props.id}
+      aria-labelledby={nameId}
+      {...stylex.attrs(ui.section, props.background, props.sx)}
+    >
+      <h2 id={nameId} {...stylex.attrs(ui.srOnly)}>
+        {props.label}
       </h2>
-      <div {...stylex.props(ui.shell, ui.inset)}>{children}</div>
+      <div {...stylex.attrs(ui.shell, ui.inset)}>{props.children}</div>
     </section>
   );
 }
 
-export function ArchPhoto({
-  src,
-  alt,
-  mode,
-  priority = false,
-  ratio,
-  position,
-}: {
+export function ArchPhoto(props: {
   src: string;
   alt: string;
   mode: "load" | "view";
@@ -87,23 +84,24 @@ export function ArchPhoto({
   ratio: stylex.StyleXStyles;
   position: stylex.StyleXStyles;
 }) {
+  const p = merge({ priority: false }, props);
   const { ref, shown } = useReveal<HTMLDivElement>();
   return (
-    <div ref={ref} {...stylex.props(ui.frame, ui.arch, ratio)}>
+    <div ref={ref} {...stylex.attrs(ui.frame, ui.arch, p.ratio)}>
       <img
-        src={src}
-        alt={alt}
-        loading={priority ? undefined : "lazy"}
-        fetchPriority={priority ? "high" : undefined}
+        src={p.src}
+        alt={p.alt}
+        loading={p.priority ? undefined : "lazy"}
+        fetchpriority={p.priority ? "high" : undefined}
         decoding="async"
-        {...stylex.props(ui.fill, position)}
+        {...stylex.attrs(ui.fill, p.position)}
       />
       <span
         aria-hidden="true"
-        {...stylex.props(
+        {...stylex.attrs(
           ui.veil,
-          mode === "load" ? ui.veilOnLoad : ui.veilOnView,
-          mode === "view" && shown && ui.veilLifted,
+          p.mode === "load" ? ui.veilOnLoad : ui.veilOnView,
+          p.mode === "view" && shown() && ui.veilLifted,
         )}
       />
     </div>
