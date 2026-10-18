@@ -1,6 +1,6 @@
 import * as stylex from "@stylexjs/stylex";
 import type { StyleXStyles } from "@stylexjs/stylex";
-import { For } from "solid-js";
+import { For, untrack } from "solid-js";
 
 export function ProductSummary(props: {
   product: { title: string; description: string; tags: readonly string[] };
@@ -10,17 +10,17 @@ export function ProductSummary(props: {
     StyleXStyles
   >;
 }) {
-  const styles = props.styles;
+  const styles = untrack(() => props.styles);
   return (
-    <div {...stylex.props(props.sx)}>
-      <div {...stylex.props(styles.productTitleBlock)}>
-        <h3 {...stylex.props(styles.productTitle)}>{props.product.title}</h3>
-        <hr {...stylex.props(styles.rule)} />
-        <p {...stylex.props(styles.mutedText)}>{props.product.description}</p>
+    <div {...stylex.attrs(props.sx)}>
+      <div {...stylex.attrs(styles.productTitleBlock)}>
+        <h3 {...stylex.attrs(styles.productTitle)}>{props.product.title}</h3>
+        <hr {...stylex.attrs(styles.rule)} />
+        <p {...stylex.attrs(styles.mutedText)}>{props.product.description}</p>
       </div>
-      <ul {...stylex.props(styles.list)}>
+      <ul {...stylex.attrs(styles.list)}>
         <For each={props.product.tags}>
-          {(tag) => <li {...stylex.props(styles.mutedText)}>{tag}</li>}
+          {(tag) => <li {...stylex.attrs(styles.mutedText)}>{tag}</li>}
         </For>
       </ul>
     </div>

@@ -1,7 +1,7 @@
 import * as stylex from "@stylexjs/stylex";
 import type { StyleXStyles } from "@stylexjs/stylex";
 import { m } from "../../../../compat/motion";
-import type { JSX } from "solid-js";
+import type { JSX } from "@solidjs/web";
 
 import { useReducedMotion } from "../use-reduced-motion";
 
@@ -18,7 +18,7 @@ export function RiseReveal(props: RiseProps) {
   const reduce = useReducedMotion();
   return (
     <m.div
-      {...stylex.props(props.sx, props.style)}
+      {...stylex.attrs(props.sx, props.style)}
       initial={{ opacity: 0, transform: "translateY(16px)" }}
       whileInView={{ opacity: 1, transform: "translateY(0px)" }}
       viewport={{ once: true, margin: "0px 0px -10% 0px" }}

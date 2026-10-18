@@ -1,20 +1,17 @@
-import { breakpoints, colors } from "../../../ui/tokens.stylex";
+import { colors } from "../../../ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 import {
   createContext,
   createEffect,
   createSignal,
   Match,
-  mergeProps,
-  on,
-  onCleanup,
-  onMount,
+  onSettled,
   Show,
   Switch,
   useContext,
-  type JSX,
 } from "solid-js";
-import { Clock, Mail, MapPin, Phone } from "lucide-solid";
+import type { JSX } from "@solidjs/web";
+import { Clock, Mail, MapPin, Phone } from "../../../../compat/lucide";
 
 import { ABOUT_HERO } from "../variant-oos1/about-data";
 import {
@@ -80,12 +77,13 @@ export const SUBJECT_ROUTES: Record<
   },
 };
 
-export function ContactIcon(rawProps: {
+export function ContactIcon(props: {
   detail: { href?: string | null; icon?: string };
   size?: number;
   strokeWidth?: number;
 }) {
-  const props = mergeProps({ size: 15, strokeWidth: 1.75 }, rawProps);
+  const size = () => props.size ?? 15;
+  const strokeWidth = () => props.strokeWidth ?? 1.75;
   const icon = () =>
     props.detail.icon ??
     (props.detail.href?.startsWith("tel:")
@@ -97,17 +95,17 @@ export function ContactIcon(rawProps: {
   return (
     <Switch
       fallback={
-        <MapPin size={props.size} strokeWidth={props.strokeWidth} nonScalingStroke aria-hidden="true" />
+        <MapPin size={size()} strokeWidth={strokeWidth()} nonScalingStroke aria-hidden="true" />
       }
     >
       <Match when={icon() === "phone"}>
-        <Phone size={props.size} strokeWidth={props.strokeWidth} nonScalingStroke aria-hidden="true" />
+        <Phone size={size()} strokeWidth={strokeWidth()} nonScalingStroke aria-hidden="true" />
       </Match>
       <Match when={icon() === "mail"}>
-        <Mail size={props.size} strokeWidth={props.strokeWidth} nonScalingStroke aria-hidden="true" />
+        <Mail size={size()} strokeWidth={strokeWidth()} nonScalingStroke aria-hidden="true" />
       </Match>
       <Match when={icon() === "clock"}>
-        <Clock size={props.size} strokeWidth={props.strokeWidth} nonScalingStroke aria-hidden="true" />
+        <Clock size={size()} strokeWidth={strokeWidth()} nonScalingStroke aria-hidden="true" />
       </Match>
     </Switch>
   );
@@ -125,7 +123,7 @@ export function useLabDialog(onClose: () => void) {
   const [closing, setClosing] = createSignal(false);
   const setPickerHost = useContext(PickerHostContext);
 
-  onMount(() => {
+  onSettled(() => {
     if (!dialog) return;
     if (!dialog.open) {
       dialog.showModal();
@@ -135,10 +133,10 @@ export function useLabDialog(onClose: () => void) {
     const root = document.documentElement;
     const previous = root.style.overflow;
     root.style.overflow = "hidden";
-    onCleanup(() => {
+    return () => {
       root.style.overflow = previous;
       setPickerHost(null);
-    });
+    };
   });
 
   const finish = () => {
@@ -183,13 +181,11 @@ const COPIED_MS = 1600;
 export function useCopy() {
   const [copied, setCopied] = createSignal<string | null>(null);
 
-  createEffect(
-    on(copied, (value) => {
-      if (value === null) return;
-      const timer = window.setTimeout(() => setCopied(null), COPIED_MS);
-      onCleanup(() => window.clearTimeout(timer));
-    }),
-  );
+  createEffect(copied, (value) => {
+    if (value === null) return;
+    const timer = window.setTimeout(() => setCopied(null), COPIED_MS);
+    return () => window.clearTimeout(timer);
+  });
 
   const copy = (text: string, selectOnFailure: HTMLElement | null) => {
     navigator.clipboard.writeText(text).then(
@@ -264,7 +260,10 @@ export const labStyles = stylex.create({
     outlineOffset: 2,
   },
   swapIn: {
-    animationName: { default: motionKeys.fadeIn, ["@media (prefers-reduced-motion: no-preference)"]: motionKeys.swapIn },
+    animationName: {
+      default: motionKeys.fadeIn,
+      ["@media (prefers-reduced-motion: no-preference)"]: motionKeys.swapIn,
+    },
     animationDuration: "240ms",
     animationTimingFunction: ease.out,
   },
@@ -369,7 +368,10 @@ export const labStyles = stylex.create({
     cursor: "pointer",
     transform: {
       default: null,
-      ":enabled:active": { default: null, ["@media (prefers-reduced-motion: no-preference)"]: "scale(0.96)" },
+      ":enabled:active": {
+        default: null,
+        ["@media (prefers-reduced-motion: no-preference)"]: "scale(0.96)",
+      },
     },
     transitionProperty: "background-color, transform",
     transitionDuration: "150ms",
@@ -406,7 +408,10 @@ export const labStyles = stylex.create({
     opacity: { default: 0.72, ":hover": { default: null, [HOVER]: 1 }, ":focus-visible": 1 },
     transform: {
       default: null,
-      ":enabled:active": { default: null, ["@media (prefers-reduced-motion: no-preference)"]: "scale(0.96)" },
+      ":enabled:active": {
+        default: null,
+        ["@media (prefers-reduced-motion: no-preference)"]: "scale(0.96)",
+      },
     },
     transitionProperty: "opacity, transform",
     transitionDuration: "150ms",
@@ -421,24 +426,20 @@ export const labStyles = stylex.create({
 
 export const fieldAria = (id: string, error?: string) => ({
   "aria-describedby": error ? `${id}-error` : undefined,
-  "aria-invalid": error ? true : undefined,
+  "aria-invalid": error ? ("true" as const) : undefined,
 });
 
-export function FieldError(props: {
-  id: string;
-  error?: string;
-  sx?: stylex.StyleXStyles;
-}) {
+export function FieldError(props: { id: string; error?: string; sx?: stylex.StyleXStyles }) {
   return (
     <Show when={props.error}>
-      <p id={`${props.id}-error`} {...stylex.props(labStyles.error, props.sx)}>
+      <p id={`${props.id}-error`} {...stylex.attrs(labStyles.error, props.sx)}>
         {props.error}
       </p>
     </Show>
   );
 }
 
-export function Field(rawProps: {
+export function Field(props: {
   id: string;
   label: string;
   required?: boolean;
@@ -446,13 +447,12 @@ export function Field(rawProps: {
   sx?: stylex.StyleXStyles;
   children: JSX.Element;
 }) {
-  const props = mergeProps({ required: false }, rawProps);
   return (
-    <div {...stylex.props(labStyles.field, props.sx)}>
-      <label for={props.id} {...stylex.props(labStyles.label)}>
+    <div {...stylex.attrs(labStyles.field, props.sx)}>
+      <label for={props.id} {...stylex.attrs(labStyles.label)}>
         {props.label}
         {props.required ? (
-          <span aria-hidden="true" {...stylex.props(labStyles.requiredMark)}>
+          <span aria-hidden="true" {...stylex.attrs(labStyles.requiredMark)}>
             *
           </span>
         ) : null}

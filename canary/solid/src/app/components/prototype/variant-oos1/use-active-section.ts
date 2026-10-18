@@ -1,8 +1,8 @@
-import { createSignal, onCleanup, onMount, type Accessor } from "solid-js";
+import { createSignal, onSettled, type Accessor } from "solid-js";
 
 export function useActiveSection(ids: readonly string[]): Accessor<string | undefined> {
   const [active, setActive] = createSignal<string | undefined>(ids[0]);
-  onMount(() => {
+  onSettled(() => {
     const crossing = new Set<string>();
     const observer = new IntersectionObserver(
       (entries) => {
@@ -18,7 +18,7 @@ export function useActiveSection(ids: readonly string[]): Accessor<string | unde
       const section = document.getElementById(id);
       if (section) observer.observe(section);
     }
-    onCleanup(() => observer.disconnect());
+    return () => observer.disconnect();
   });
   return active;
 }

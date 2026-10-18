@@ -3,7 +3,6 @@
 //
 //   m.div / m.span / …   initial, animate, exit, transition, whileInView, viewport,
 //                        layout ("position" | true), layoutId, motion-value style
-//   AnimatePresence      exit animations via solid-transition-group
 //   useScroll            scroll progress accessor (motion's `scroll()`)
 //   useTransform         derived accessor (motion's `transform()`, clamped)
 //   useInView            in-view accessor (motion's `inView()`)
@@ -15,19 +14,20 @@
 
 import { animate, inView, scroll, transform } from "motion";
 import {
+  children,
   createContext,
   createEffect,
+  createMemo,
   createSignal,
-  on,
-  onCleanup,
-  onMount,
-  splitProps,
+  flush,
+  omit,
+  onSettled,
+  untrack,
   useContext,
   type Accessor,
-  type JSX,
+  type Component,
 } from "solid-js";
-import { Dynamic, isServer } from "solid-js/web";
-import { Transition as SolidTransition } from "solid-transition-group";
+import { dynamic, isServer, type JSX } from "@solidjs/web";
 
 export type MotionValue<T> = Accessor<T>;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -45,21 +45,22 @@ type ScrollOffset = Array<string | [number, number]>;
 
 export function useScroll(options: { target?: ElementRef; offset?: ScrollOffset } = {}) {
   const [progress, setProgress] = createSignal(0);
-  if (!isServer) {
-    onMount(() => {
-      const target = unref(options.target);
-      const stop = scroll((value: number) => setProgress(value), {
-        target: target ?? undefined,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        offset: options.offset as any,
-      });
-      onCleanup(stop);
+  onSettled(() => {
+    const target = unref(options.target);
+    const stop = scroll((value: number) => setProgress(value), {
+      target: target ?? undefined,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      offset: options.offset as any,
     });
-  }
+    return stop;
+  });
   return { scrollYProgress: progress as MotionValue<number> };
 }
 
-export function useTransform<T>(source: MotionValue<number>, map: (value: number) => T): MotionValue<T>;
+export function useTransform<T>(
+  source: MotionValue<number>,
+  map: (value: number) => T,
+): MotionValue<T>;
 export function useTransform<T extends string | number>(
   source: MotionValue<number>,
   input: number[],
@@ -81,26 +82,24 @@ export function useInView(
   options: { once?: boolean; amount?: number | "some" | "all"; margin?: string } = {},
 ): Accessor<boolean> {
   const [visible, setVisible] = createSignal(false);
-  if (!isServer) {
-    onMount(() => {
-      const el = unref(ref);
-      if (!el) return;
-      const stop = inView(
-        el,
-        () => {
-          setVisible(true);
-          if (options.once) {
-            stop();
-            return;
-          }
-          return () => setVisible(false);
-        },
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        { amount: options.amount, margin: options.margin as any },
-      );
-      onCleanup(stop);
-    });
-  }
+  onSettled(() => {
+    const el = unref(ref);
+    if (!el) return;
+    const stop = inView(
+      el,
+      () => {
+        setVisible(true);
+        if (options.once) {
+          stop();
+          return;
+        }
+        return () => setVisible(false);
+      },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      { amount: options.amount, margin: options.margin as any },
+    );
+    return stop;
+  });
   return visible;
 }
 
@@ -131,8 +130,18 @@ const UNITLESS = new Set([
   "scaleY",
 ]);
 const TRANSFORM_KEYS = new Set(["x", "y", "rotate", "scale", "scaleX", "scaleY"]);
-const kebab = (key: string) => (key.startsWith("--") ? key : key.replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`));
+const kebab = (key: string) =>
+  key.startsWith("--") ? key : key.replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`);
 const read = (value: StyleValue) => (typeof value === "function" ? value() : value);
+
+function parseCssText(text: string): Record<string, string> {
+  const out: Record<string, string> = {};
+  for (const declaration of text.split(";")) {
+    const colon = declaration.indexOf(":");
+    if (colon > 0) out[declaration.slice(0, colon).trim()] = declaration.slice(colon + 1).trim();
+  }
+  return out;
+}
 
 function withUnit(key: string, value: string | number) {
   if (typeof value === "string") return value;
@@ -141,9 +150,10 @@ function withUnit(key: string, value: string | number) {
 }
 
 /** React/motion style object (camelCase, x/y/rotate, accessors) → Solid style object. */
-export function toCss(style: MotionStyle | undefined): JSX.CSSProperties {
+export function toCss(style: MotionStyle | string | undefined): JSX.CSSProperties {
   const out: Record<string, string> = {};
   if (!style) return out;
+  if (typeof style === "string") return parseCssText(style);
   const transforms: string[] = [];
   for (const [key, raw] of Object.entries(style)) {
     const value = read(raw);
@@ -179,6 +189,7 @@ function snapshot() {
 }
 
 function flip() {
+  flush();
   pending = false;
   const skip = reducedMotion();
   if (!skip) {
@@ -190,13 +201,19 @@ function flip() {
       const dy = from.top - to.top;
       const transition = timing(entry.transition());
       if (Math.abs(dx) > 0.5 || Math.abs(dy) > 0.5) {
-        animate(el, { transform: [`translate(${dx}px, ${dy}px)`, "translate(0px, 0px)"] }, transition);
+        animate(
+          el,
+          { transform: [`translate(${dx}px, ${dy}px)`, "translate(0px, 0px)"] },
+          transition,
+        );
       }
       if (entry.mode === true && Math.abs(from.height - to.height) > 0.5) {
         const declared = el.style.height;
-        animate(el, { height: [`${from.height}px`, `${to.height}px`] }, transition).then(() => {
-          el.style.height = declared;
-        });
+        void animate(el, { height: [`${from.height}px`, `${to.height}px`] }, transition).then(
+          () => {
+            el.style.height = declared;
+          },
+        );
       }
     }
     for (const [id, { el, transition }] of layoutIds) {
@@ -206,7 +223,8 @@ function flip() {
       if (!to.width || !to.height) continue;
       const dx = from.left - to.left;
       const dy = from.top - to.top;
-      if (Math.abs(dx) < 0.5 && Math.abs(dy) < 0.5 && Math.abs(from.width - to.width) < 0.5) continue;
+      if (Math.abs(dx) < 0.5 && Math.abs(dy) < 0.5 && Math.abs(from.width - to.width) < 0.5)
+        continue;
       el.style.transformOrigin = "0 0";
       animate(
         el,
@@ -248,27 +266,63 @@ export function useInstantLayoutTransition() {
 
 // ── presence ─────────────────────────────────────────────────────────────────
 
-const PresenceContext = createContext<{ skipInitial: Accessor<boolean> }>();
+const PresenceContext = createContext<{ skipInitial: Accessor<boolean> }>({
+  skipInitial: () => false,
+});
 
 type ExitInfo = { target: Target; transition: Transition | undefined };
 const exits = new WeakMap<Element, ExitInfo>();
 
 export function AnimatePresence(props: { initial?: boolean; children: JSX.Element }) {
-  const [skipInitial, setSkipInitial] = createSignal(props.initial === false);
-  onMount(() => setSkipInitial(false));
+  const [skipInitial, setSkipInitial] = createSignal(untrack(() => props.initial === false));
+  onSettled(() => {
+    setSkipInitial(false);
+  });
   return (
-    <PresenceContext.Provider value={{ skipInitial }}>
-      <SolidTransition
-        onExit={(el, done) => {
-          const info = exits.get(el);
-          if (!info) return done();
-          animate(el, info.target, timing(info.transition)).then(done, done);
-        }}
-      >
-        {props.children}
-      </SolidTransition>
-    </PresenceContext.Provider>
+    <PresenceContext value={{ skipInitial }}>
+      <Presence>{props.children}</Presence>
+    </PresenceContext>
   );
+}
+
+function Presence(props: { children: JSX.Element }) {
+  const resolved = children(() => props.children);
+  const exited = new WeakSet<Element>();
+  const exiting = new WeakSet<Element>();
+  const [exitDone, setExitDone] = createSignal(0);
+
+  const shown = createMemo<unknown[]>((previous = []) => {
+    exitDone();
+    const next: unknown[] = resolved.toArray();
+    if (isServer) return next;
+    previous.forEach((node, index) => {
+      if (next.includes(node) || !(node instanceof Element)) return;
+      if (!exits.has(node) || exited.has(node)) return;
+      next.splice(Math.min(index, next.length), 0, node);
+    });
+    return next;
+  });
+
+  createEffect(
+    () =>
+      shown().filter(
+        (node): node is Element => node instanceof Element && !resolved.toArray().includes(node),
+      ),
+    (leaving) => {
+      for (const el of leaving) {
+        if (exiting.has(el)) continue;
+        exiting.add(el);
+        const info = exits.get(el)!;
+        const finish = () => {
+          exited.add(el);
+          setExitDone((n) => n + 1);
+        };
+        animate(el, info.target, timing(info.transition)).then(finish, finish);
+      }
+    },
+  );
+
+  return shown as unknown as JSX.Element;
 }
 
 // ── m.* components ───────────────────────────────────────────────────────────
@@ -282,7 +336,7 @@ type MotionOwnProps = {
   viewport?: { once?: boolean; amount?: number | "some" | "all"; margin?: string };
   layout?: boolean | "position";
   layoutId?: string;
-  style?: MotionStyle;
+  style?: MotionStyle | string;
   ref?: (el: HTMLElement) => void;
 };
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -303,87 +357,108 @@ const OWN = [
 ] as const;
 
 function createMotionComponent(tag: string) {
+  const Tag = dynamic(() => tag) as Component<JSX.HTMLAttributes<HTMLElement>>;
   return (props: MotionProps) => {
-    const [local, rest] = splitProps(props, OWN);
+    const rest = omit(props, ...OWN);
     const presence = useContext(PresenceContext);
-    const skipInitial = local.initial === false || (presence?.skipInitial() ?? false);
+    const transition = () => untrack(() => props.transition);
+    const skipInitial = untrack(() => props.initial === false || presence.skipInitial());
     // First paint (server and hydration): `initial`, or the `animate` target when
     // initial is skipped — what framer-motion renders inline on the server too.
-    const first: Target | undefined = skipInitial
-      ? local.animate
-      : local.initial || local.animate;
-    const firstStyle = toCss(first as MotionStyle);
-    let el!: HTMLElement;
+    const firstStyle = untrack(() => {
+      const first: Target | undefined = skipInitial
+        ? props.animate
+        : props.initial || props.animate;
+      return toCss(first as MotionStyle);
+    });
+    const [element, setElement] = createSignal<HTMLElement>();
+    let el: HTMLElement | undefined;
 
-    if (!isServer) {
-      onMount(() => {
-        if (local.exit) exits.set(el, { target: local.exit, transition: local.transition });
-        if (local.animate && !skipInitial && local.initial) {
-          animate(el, local.animate, timing(local.transition));
-        }
-        if (local.whileInView) {
-          const once = local.viewport?.once;
-          const stop = inView(
-            el,
-            () => {
-              animate(el, local.whileInView!, timing(local.transition));
-              if (once) {
-                stop();
-                return;
-              }
-              return () => {
-                if (local.initial) animate(el, local.initial, timing(local.transition));
-              };
-            },
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            { amount: local.viewport?.amount, margin: local.viewport?.margin as any },
-          );
-          onCleanup(stop);
-        }
-        if (local.layoutId) {
-          const id = local.layoutId;
-          layoutIds.set(id, { el, transition: () => local.transition });
-          onCleanup(() => {
-            if (layoutIds.get(id)?.el === el) layoutIds.delete(id);
-          });
-        }
-      });
-      createEffect(
-        on(
-          () => (local.layout ? (local.layout === "position" ? "position" : true) : false),
-          (mode) => {
-            if (mode) layoutEls.set(el, { mode, transition: () => local.transition });
-            else layoutEls.delete(el);
-          },
-        ),
-      );
-      onCleanup(() => layoutEls.delete(el));
-      createEffect(
-        on(
-          () => (local.animate ? JSON.stringify(local.animate) : ""),
+    createEffect(element, (node) => {
+      if (!node) return;
+      const { exit, initial, whileInView, viewport, layoutId } = untrack(() => ({
+        exit: props.exit,
+        initial: props.initial,
+        whileInView: props.whileInView,
+        viewport: props.viewport,
+        layoutId: props.layoutId,
+      }));
+      const stops: Array<() => void> = [() => layoutEls.delete(node)];
+      if (exit) exits.set(node, { target: exit, transition: transition() });
+      const target = untrack(() => props.animate);
+      if (target && !skipInitial && initial) animate(node, target, timing(transition()));
+      if (whileInView) {
+        const stop = inView(
+          node,
           () => {
-            if (local.animate) animate(el, local.animate, timing(local.transition));
+            animate(node, whileInView, timing(transition()));
+            if (viewport?.once) {
+              stop();
+              return;
+            }
+            return () => {
+              if (initial) animate(node, initial, timing(transition()));
+            };
           },
-          { defer: true },
-        ),
-      );
-    }
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          { amount: viewport?.amount, margin: viewport?.margin as any },
+        );
+        stops.push(stop);
+      }
+      if (layoutId) {
+        layoutIds.set(layoutId, { el: node, transition });
+        stops.push(() => {
+          if (layoutIds.get(layoutId)?.el === node) layoutIds.delete(layoutId);
+        });
+      }
+      return () => stops.forEach((stop) => stop());
+    });
+    createEffect(
+      () => (element() && props.layout ? (props.layout === "position" ? "position" : true) : false),
+      (mode) => {
+        if (!el) return;
+        if (mode) layoutEls.set(el, { mode, transition });
+        else layoutEls.delete(el);
+      },
+    );
+    let lastTarget = untrack(() => (props.animate ? JSON.stringify(props.animate) : ""));
+    createEffect(
+      () => props.animate,
+      (target) => {
+        const key = target ? JSON.stringify(target) : "";
+        if (key === lastTarget) return;
+        lastTarget = key;
+        if (el && target) animate(el, target, timing(transition()));
+      },
+    );
 
     return (
-      <Dynamic
-        component={tag}
+      <Tag
         {...rest}
         ref={(node: HTMLElement) => {
           el = node;
-          local.ref?.(node);
+          setElement(node);
+          props.ref?.(node);
         }}
-        style={{ ...firstStyle, ...toCss(local.style) }}
+        style={{ ...firstStyle, ...toCss(props.style) }}
       />
     );
   };
 }
 
-const TAGS = ["div", "span", "p", "nav", "li", "ul", "article", "img", "section", "button", "a"] as const;
+const TAGS = [
+  "div",
+  "span",
+  "p",
+  "nav",
+  "li",
+  "ul",
+  "article",
+  "img",
+  "section",
+  "button",
+  "a",
+] as const;
 export const m = Object.fromEntries(TAGS.map((tag) => [tag, createMotionComponent(tag)])) as Record<
   (typeof TAGS)[number],
   (props: MotionProps) => JSX.Element
@@ -391,8 +466,12 @@ export const m = Object.fromEntries(TAGS.map((tag) => [tag, createMotionComponen
 export const motion = m;
 
 // LazyMotion / LayoutGroup / MotionConfig have no work to do here.
-export const LazyMotion = (props: { children: JSX.Element; features?: unknown; strict?: boolean }) =>
-  props.children;
+export const LazyMotion = (props: {
+  children: JSX.Element;
+  features?: unknown;
+  strict?: boolean;
+}) => props.children;
 export const LayoutGroup = (props: { children: JSX.Element }) => props.children;
-export const MotionConfig = (props: { children: JSX.Element; reducedMotion?: string }) => props.children;
+export const MotionConfig = (props: { children: JSX.Element; reducedMotion?: string }) =>
+  props.children;
 export const domMax = {};

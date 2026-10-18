@@ -4,15 +4,14 @@ import {
   createSignal,
   createUniqueId,
   For,
-  onCleanup,
-  onMount,
+  onSettled,
   Show,
+  untrack,
   type Component,
-  type ComponentProps,
-  type JSX,
 } from "solid-js";
+import type { ComponentProps, JSX } from "@solidjs/web";
 import { AnimatePresence, m, type MotionStyle, type MotionValue } from "../../../../compat/motion";
-import { ArrowUpRight, Menu, Search, X } from "lucide-solid";
+import { ArrowUpRight, Menu, Search, X } from "../../../../compat/lucide";
 import { EASE, STAGGER } from "../motion-constants";
 import { useReducedMotion } from "../use-reduced-motion";
 import { LiquidImage } from "./liquid-image";
@@ -20,17 +19,17 @@ import { FooterNavigation, FooterLegal } from "./footer-content";
 type RevealComponent = Component<{ children: JSX.Element; delay?: number; sx?: StyleXStyles }>;
 function useScrolledPastTop() {
   const [scrolled, setScrolled] = createSignal(false);
-  onMount(() => {
+  onSettled(() => {
     const update = () => setScrolled(window.scrollY > 8);
     update();
     window.addEventListener("scroll", update, { passive: true });
-    onCleanup(() => window.removeEventListener("scroll", update));
+    return () => window.removeEventListener("scroll", update);
   });
   return scrolled;
 }
 function useActiveSection(ids: readonly string[]) {
   const [active, setActive] = createSignal(ids[0]);
-  onMount(() => {
+  onSettled(() => {
     const ratios = new Map<string, number>();
     const observer = new IntersectionObserver(
       (entries) => {
@@ -46,7 +45,7 @@ function useActiveSection(ids: readonly string[]) {
       const section = document.getElementById(id);
       if (section) observer.observe(section);
     }
-    onCleanup(() => observer.disconnect());
+    return () => observer.disconnect();
   });
   return active;
 }
@@ -79,7 +78,7 @@ export function CorporateHeader(props: {
   const menuId = createUniqueId();
   const reduce = useReducedMotion();
   const scrolled = useScrolledPastTop();
-  const activeId = useActiveSection(props.sectionIds);
+  const activeId = useActiveSection(untrack(() => props.sectionIds));
   const closeOnEscape = (event: KeyboardEvent) => {
     if (event.key === "Escape" && menuOpen()) setMenuOpen(false);
   };
@@ -87,43 +86,48 @@ export function CorporateHeader(props: {
   return (
     <header
       onKeyDown={closeOnEscape}
-      {...stylex.props(props.styles.header, (scrolled() || menuOpen()) && props.styles.headerSolid)}
+      {...stylex.attrs(props.styles.header, (scrolled() || menuOpen()) && props.styles.headerSolid)}
     >
-      <div {...stylex.props(props.styles.shell, props.styles.headerInner, props.styles.headerEnter)}>
-        <a href="#top" aria-label="FENCHEM home" {...stylex.props(props.styles.logoLink)}>
+      <div
+        {...stylex.attrs(props.styles.shell, props.styles.headerInner, props.styles.headerEnter)}
+      >
+        <a href="#top" aria-label="FENCHEM home" {...stylex.attrs(props.styles.logoLink)}>
           {props.logo}
         </a>
-        <nav aria-label="Main" {...stylex.props(props.styles.nav)}>
+        <nav aria-label="Main" {...stylex.attrs(props.styles.nav)}>
           <For each={props.navItems}>
             {(item) => (
               <a
                 href={item.href}
                 aria-current={isActive(item.href) ? "location" : undefined}
-                {...stylex.props(props.styles.navLink, isActive(item.href) && props.styles.navLinkActive)}
+                {...stylex.attrs(
+                  props.styles.navLink,
+                  isActive(item.href) && props.styles.navLinkActive,
+                )}
               >
                 {item.label}
               </a>
             )}
           </For>
         </nav>
-        <div {...stylex.props(props.styles.headerActions)}>
-          <button type="button" aria-label="AI search" {...stylex.props(props.styles.searchPill)}>
+        <div {...stylex.attrs(props.styles.headerActions)}>
+          <button type="button" aria-label="AI search" {...stylex.attrs(props.styles.searchPill)}>
             <Search size={16} strokeWidth={2} absoluteStrokeWidth aria-hidden="true" />
           </button>
           <button
             type="button"
             aria-label="CN, switch language"
-            {...stylex.props(props.styles.langButton)}
+            {...stylex.attrs(props.styles.langButton)}
           >
             CN
           </button>
           <button
             type="button"
             aria-label={menuOpen() ? "Close menu" : "Open menu"}
-            aria-expanded={menuOpen()}
+            aria-expanded={menuOpen() ? "true" : "false"}
             aria-controls={menuId}
             onClick={() => setMenuOpen((open) => !open)}
-            {...stylex.props(props.styles.menuButton)}
+            {...stylex.attrs(props.styles.menuButton)}
           >
             {menuOpen() ? (
               <X size={24} strokeWidth={2} absoluteStrokeWidth aria-hidden="true" />
@@ -138,13 +142,13 @@ export function CorporateHeader(props: {
           <m.nav
             id={menuId}
             aria-label="Main"
-            {...stylex.props(props.styles.menuPanel)}
+            class={stylex.attrs(props.styles.menuPanel).class}
             initial={{ opacity: 0, transform: "translateY(-8px)" }}
             animate={{ opacity: 1, transform: "translateY(0px)" }}
             exit={{ opacity: 0, transform: "translateY(-8px)" }}
             transition={{ duration: reduce() ? 0.15 : 0.2, ease: EASE }}
           >
-            <ul {...stylex.props(props.styles.menuList)}>
+            <ul {...stylex.attrs(props.styles.menuList)}>
               <For each={props.navItems}>
                 {(item) => (
                   <li>
@@ -152,7 +156,7 @@ export function CorporateHeader(props: {
                       href={item.href}
                       aria-current={isActive(item.href) ? "location" : undefined}
                       onClick={() => setMenuOpen(false)}
-                      {...stylex.props(
+                      {...stylex.attrs(
                         props.styles.menuLink,
                         isActive(item.href) && props.styles.menuLinkActive,
                       )}
@@ -185,13 +189,17 @@ export function HeroBackdrop(props: {
   liquidProgress?: MotionValue<number>;
 }) {
   return (
-    <m.div aria-hidden="true" {...stylex.props(props.styles.heroParallax)} style={props.motionStyle}>
-      <div {...stylex.props(props.styles.heroBackdrop)}>
+    <m.div
+      aria-hidden="true"
+      {...stylex.attrs(props.styles.heroParallax)}
+      style={props.motionStyle}
+    >
+      <div {...stylex.attrs(props.styles.heroBackdrop)}>
         <img
           src={props.source}
           alt=""
           decoding="async"
-          {...stylex.props(props.styles.heroLayer, props.styles.heroImage)}
+          {...stylex.attrs(props.styles.heroLayer, props.styles.heroImage)}
         />
         <LiquidImage
           src={props.source}
@@ -199,8 +207,8 @@ export function HeroBackdrop(props: {
           fragment={props.liquidFragment}
           progress={props.liquidProgress}
         />
-        <div {...stylex.props(props.styles.heroLayer, props.styles.heroTintColor)} />
-        <div {...stylex.props(props.styles.heroLayer, props.styles.heroTintScreen)} />
+        <div {...stylex.attrs(props.styles.heroLayer, props.styles.heroTintColor)} />
+        <div {...stylex.attrs(props.styles.heroLayer, props.styles.heroTintScreen)} />
       </div>
     </m.div>
   );
@@ -219,19 +227,19 @@ export function StrengthDetails(props: {
 }) {
   return (
     <div
-      {...stylex.props(
+      {...stylex.attrs(
         props.styles.strengthText,
         props.strength.tone === "blue" && props.styles.strengthTextInverse,
       )}
     >
-      <div {...stylex.props(props.styles.strengthCopy)}>
-        <h3 {...stylex.props(props.styles.strengthTitle)}>{props.strength.title}</h3>
+      <div {...stylex.attrs(props.styles.strengthCopy)}>
+        <h3 {...stylex.attrs(props.styles.strengthTitle)}>{props.strength.title}</h3>
         {props.strength.description ? (
-          <p {...stylex.props(props.styles.strengthSmall)}>{props.strength.description}</p>
+          <p {...stylex.attrs(props.styles.strengthSmall)}>{props.strength.description}</p>
         ) : null}
       </div>
       {props.strength.link ? (
-        <a href="#offices" {...stylex.props(props.styles.strengthLink)}>
+        <a href="#offices" {...stylex.attrs(props.styles.strengthLink)}>
           {props.strength.link}
           <ArrowUpRight size={12} strokeWidth={1.5} absoluteStrokeWidth aria-hidden="true" />
         </a>
@@ -257,18 +265,18 @@ export function OfficeDirectory(props: {
   Reveal: RevealComponent;
 }) {
   return (
-    <div {...stylex.props(props.styles.officesBand)}>
-      <div {...stylex.props(props.styles.shell, props.styles.inset120, props.styles.regions)}>
+    <div {...stylex.attrs(props.styles.officesBand)}>
+      <div {...stylex.attrs(props.styles.shell, props.styles.inset120, props.styles.regions)}>
         <For each={props.columns}>
           {(column, index) => (
             <props.Reveal delay={index() * STAGGER} sx={props.styles.officeColumn}>
               <For each={column}>
                 {(group) => (
-                  <div {...stylex.props(props.styles.officeGroup)}>
-                    <h3 {...stylex.props(props.styles.regionHeader)}>{group.region}</h3>
-                    <ul {...stylex.props(props.styles.list, props.styles.regionBody)}>
+                  <div {...stylex.attrs(props.styles.officeGroup)}>
+                    <h3 {...stylex.attrs(props.styles.regionHeader)}>{group.region}</h3>
+                    <ul {...stylex.attrs(props.styles.list, props.styles.regionBody)}>
                       <For each={group.offices}>
-                        {(office) => <li {...stylex.props(props.styles.mutedText)}>{office}</li>}
+                        {(office) => <li {...stylex.attrs(props.styles.mutedText)}>{office}</li>}
                       </For>
                     </ul>
                   </div>
@@ -307,15 +315,15 @@ export function CorporateNews(props: {
     <section
       id="news"
       aria-labelledby="oo-news-title"
-      {...stylex.props(props.styles.news, props.styles.anchor)}
+      {...stylex.attrs(props.styles.news, props.styles.anchor)}
     >
-      <div {...stylex.props(props.styles.shell, props.styles.inset120, props.styles.newsInner)}>
+      <div {...stylex.attrs(props.styles.shell, props.styles.inset120, props.styles.newsInner)}>
         <props.Reveal>
-          <h2 id="oo-news-title" {...stylex.props(props.styles.sectionTitle)}>
+          <h2 id="oo-news-title" {...stylex.attrs(props.styles.sectionTitle)}>
             {props.title}
           </h2>
         </props.Reveal>
-        <ul {...stylex.props(props.styles.accordion)}>
+        <ul {...stylex.attrs(props.styles.accordion)}>
           <For each={props.items}>
             {(item, index) => (
               <m.li layout="position" transition={{ duration: 0.25, ease: EASE }}>
@@ -344,10 +352,10 @@ export function CorporateFooter(props: {
   children: JSX.Element;
 }) {
   return (
-    <footer {...stylex.props(props.styles.footer)}>
-      <div {...stylex.props(props.styles.shell, props.styles.inset120, props.styles.footerInner)}>
+    <footer {...stylex.attrs(props.styles.footer)}>
+      <div {...stylex.attrs(props.styles.shell, props.styles.inset120, props.styles.footerInner)}>
         <FooterNavigation logo={props.logo} columns={props.columns} styles={props.styles} />
-        <hr {...stylex.props(props.styles.footerRule)} />
+        <hr {...stylex.attrs(props.styles.footerRule)} />
         <FooterLegal copyright={props.copyright} styles={props.styles}>
           {props.children}
         </FooterLegal>

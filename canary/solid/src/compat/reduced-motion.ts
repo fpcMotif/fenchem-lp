@@ -1,16 +1,16 @@
-import { createSignal, onCleanup, onMount, type Accessor } from "solid-js";
+import { createSignal, onSettled, type Accessor } from "solid-js";
 
 const QUERY = "(prefers-reduced-motion: reduce)";
 
 /** Hydration-safe media query: false on the server and during hydration, then live. */
 export function createMediaQuery(query: string): Accessor<boolean> {
   const [matches, setMatches] = createSignal(false);
-  onMount(() => {
+  onSettled(() => {
     const media = window.matchMedia(query);
     const update = () => setMatches(media.matches);
     update();
     media.addEventListener("change", update);
-    onCleanup(() => media.removeEventListener("change", update));
+    return () => media.removeEventListener("change", update);
   });
   return matches;
 }

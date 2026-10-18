@@ -1,19 +1,19 @@
 import { Collapse } from "../shared/collapse";
 import { m, useInstantLayoutTransition } from "../../../../compat/motion";
-import { Plus } from "lucide-solid";
-import { breakpoints, colors } from "../../../ui/tokens.stylex";
+import { Plus } from "../../../../compat/lucide";
+import { colors } from "../../../ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 import {
-  batch,
   createEffect,
   createMemo,
   createSignal,
   createUniqueId,
+  flush,
   For,
-  on,
   Show,
-  type JSX,
+  untrack,
 } from "solid-js";
+import type { JSX } from "@solidjs/web";
 import { EASE } from "../motion-constants";
 import { useReducedMotion } from "../use-reduced-motion";
 import {
@@ -168,7 +168,10 @@ const styles = stylex.create({
     borderBottomStyle: "solid",
     borderBottomColor: TINT_RULE_SOFT,
     transitionProperty: "background-color",
-    transitionDuration: { default: "0ms", ["@media (prefers-reduced-motion: no-preference)"]: "200ms" },
+    transitionDuration: {
+      default: "0ms",
+      ["@media (prefers-reduced-motion: no-preference)"]: "200ms",
+    },
     transitionTimingFunction: ease.out,
   },
   ledgerRowOpen: {
@@ -191,7 +194,10 @@ const styles = stylex.create({
     color: TINT_INK,
     cursor: "pointer",
     transitionProperty: "background-color",
-    transitionDuration: { default: "0ms", ["@media (prefers-reduced-motion: no-preference)"]: "200ms" },
+    transitionDuration: {
+      default: "0ms",
+      ["@media (prefers-reduced-motion: no-preference)"]: "200ms",
+    },
     transitionTimingFunction: ease.out,
     outlineStyle: { default: "none", ":focus-visible": "solid" },
     outlineWidth: 2,
@@ -246,7 +252,10 @@ const styles = stylex.create({
     maskImage: "linear-gradient(to right, #000 calc(100% - 56px), transparent)",
     opacity: 1,
     transitionProperty: "opacity",
-    transitionDuration: { default: "0ms", ["@media (prefers-reduced-motion: no-preference)"]: "200ms" },
+    transitionDuration: {
+      default: "0ms",
+      ["@media (prefers-reduced-motion: no-preference)"]: "200ms",
+    },
     transitionTimingFunction: ease.out,
   },
   ledgerPreviewOpen: {
@@ -274,7 +283,10 @@ const styles = stylex.create({
     },
     whiteSpace: "nowrap",
     transitionProperty: "border-color, color",
-    transitionDuration: { default: "0ms", ["@media (prefers-reduced-motion: no-preference)"]: "200ms" },
+    transitionDuration: {
+      default: "0ms",
+      ["@media (prefers-reduced-motion: no-preference)"]: "200ms",
+    },
     transitionTimingFunction: ease.out,
   },
   keepTogether: {
@@ -300,7 +312,10 @@ const styles = stylex.create({
       [stylex.when.ancestor(":hover")]: { default: TINT_BODY, [HOVER]: ACCENT },
     },
     transitionProperty: "background-color, color",
-    transitionDuration: { default: "0ms", ["@media (prefers-reduced-motion: no-preference)"]: "160ms" },
+    transitionDuration: {
+      default: "0ms",
+      ["@media (prefers-reduced-motion: no-preference)"]: "160ms",
+    },
     transitionTimingFunction: ease.out,
   },
   toggleOpen: {
@@ -437,7 +452,10 @@ const styles = stylex.create({
     cursor: "pointer",
     transform: { default: null, ":active": "scale(0.96)" },
     transitionProperty: "background-color, color, transform",
-    transitionDuration: { default: "0ms", ["@media (prefers-reduced-motion: no-preference)"]: "160ms" },
+    transitionDuration: {
+      default: "0ms",
+      ["@media (prefers-reduced-motion: no-preference)"]: "160ms",
+    },
     transitionTimingFunction: ease.out,
     outlineStyle: { default: "none", ":focus-visible": "solid" },
     outlineWidth: 2,
@@ -627,7 +645,10 @@ const styles = stylex.create({
     textOverflow: "ellipsis",
     textWrap: "pretty",
     transitionProperty: "color",
-    transitionDuration: { default: "0ms", ["@media (prefers-reduced-motion: no-preference)"]: "150ms" },
+    transitionDuration: {
+      default: "0ms",
+      ["@media (prefers-reduced-motion: no-preference)"]: "150ms",
+    },
     transitionTimingFunction: ease.out,
   },
   tabTitleSelected: {
@@ -762,12 +783,12 @@ const styles = stylex.create({
 });
 
 function Inci(props: { text: string }) {
-  const text = props.text;
+  const text = untrack(() => props.text);
   const parts: JSX.Element[] = [];
   let last = 0;
   for (const match of text.matchAll(INCI_LATIN)) {
     parts.push(text.slice(last, match.index));
-    parts.push(<span {...stylex.props(styles.keepTogether)}>{match[0]}</span>);
+    parts.push(<span {...stylex.attrs(styles.keepTogether)}>{match[0]}</span>);
     last = match.index + match[0].length;
   }
   parts.push(text.slice(last));
@@ -779,10 +800,10 @@ function ToggleIcon(props: { open: boolean }) {
   return (
     <span
       aria-hidden="true"
-      {...stylex.props(styles.toggle, props.open && styles.toggleOpen, styles.colToggle)}
+      {...stylex.attrs(styles.toggle, props.open && styles.toggleOpen, styles.colToggle)}
     >
       <m.span
-        {...stylex.props(styles.toggleGlyph)}
+        {...stylex.attrs(styles.toggleGlyph)}
         initial={false}
         animate={{ rotate: props.open ? 45 : 0 }}
         transition={reduce() ? { duration: 0 } : { type: "spring", duration: 0.3, bounce: 0 }}
@@ -806,32 +827,32 @@ function LedgerRow(props: {
     <m.li
       layout="position"
       transition={{ duration: 0.26, ease: EASE }}
-      {...stylex.props(styles.ledgerRow, props.open && styles.ledgerRowOpen)}
+      {...stylex.attrs(styles.ledgerRow, props.open && styles.ledgerRowOpen)}
     >
-      <h3 {...stylex.props(styles.ledgerHeading, stylex.defaultMarker())}>
+      <h3 {...stylex.attrs(styles.ledgerHeading, stylex.defaultMarker())}>
         <button
           type="button"
-          aria-expanded={props.open}
+          aria-expanded={props.open ? "true" : "false"}
           aria-controls={props.open ? panelId : undefined}
           onClick={(event) => props.onToggle(event.currentTarget)}
-          {...stylex.props(
+          {...stylex.attrs(
             styles.ledgerGrid,
             styles.ledgerTrigger,
             props.open && styles.ledgerTriggerOpen,
           )}
         >
-          <span {...stylex.props(styles.ledgerName, styles.colName)}>
-            <span {...stylex.props(styles.ledgerIndex, props.open && styles.ledgerIndexOpen)}>
+          <span {...stylex.attrs(styles.ledgerName, styles.colName)}>
+            <span {...stylex.attrs(styles.ledgerIndex, props.open && styles.ledgerIndexOpen)}>
               {padIndex(props.index)}
             </span>
-            <span {...stylex.props(styles.ledgerNames)}>
-              <span {...stylex.props(styles.ledgerPrimary)}>{props.group.label}</span>
-              <span {...stylex.props(styles.ledgerLatin)}>{props.group.items.length} 款原料</span>
+            <span {...stylex.attrs(styles.ledgerNames)}>
+              <span {...stylex.attrs(styles.ledgerPrimary)}>{props.group.label}</span>
+              <span {...stylex.attrs(styles.ledgerLatin)}>{props.group.items.length} 款原料</span>
             </span>
           </span>
           <span
             aria-hidden="true"
-            {...stylex.props(
+            {...stylex.attrs(
               styles.ledgerPreview,
               props.open && styles.ledgerPreviewOpen,
               styles.colPreview,
@@ -839,7 +860,7 @@ function LedgerRow(props: {
           >
             <For each={props.group.items}>
               {(item) => (
-                <span {...stylex.props(styles.chip)}>{splitParen(item.title).primary}</span>
+                <span {...stylex.attrs(styles.chip)}>{splitParen(item.title).primary}</span>
               )}
             </For>
           </span>
@@ -848,33 +869,35 @@ function LedgerRow(props: {
       </h3>
       <Collapse
         id={panelId}
-        {...stylex.props(styles.ledgerPanelClip)}
+        {...stylex.attrs(styles.ledgerPanelClip)}
         open={props.open}
 
         transition={{ duration: reduce() ? 0 : 0.28, ease: EASE }}
       >
-        <div {...stylex.props(styles.ledgerGrid, styles.ledgerPanel)}>
-          {props.group.intro && <p {...stylex.props(styles.ledgerIntro)}>{props.group.intro}</p>}
-          <div {...stylex.props(styles.materialTable)}>
-            <div aria-hidden="true" {...stylex.props(styles.materialHead)}>
-              <span {...stylex.props(styles.colMaterialName)}>产品名称</span>
-              <span {...stylex.props(styles.colMaterialInci)}>INCI 名称</span>
-              <span {...stylex.props(styles.colMaterialFeatures)}>特性&应用</span>
+        <div {...stylex.attrs(styles.ledgerGrid, styles.ledgerPanel)}>
+          {props.group.intro && <p {...stylex.attrs(styles.ledgerIntro)}>{props.group.intro}</p>}
+          <div {...stylex.attrs(styles.materialTable)}>
+            <div aria-hidden="true" {...stylex.attrs(styles.materialHead)}>
+              <span {...stylex.attrs(styles.colMaterialName)}>产品名称</span>
+              <span {...stylex.attrs(styles.colMaterialInci)}>INCI 名称</span>
+              <span {...stylex.attrs(styles.colMaterialFeatures)}>特性&应用</span>
             </div>
-            <ul {...stylex.props(styles.materialList)}>
+            <ul {...stylex.attrs(styles.materialList)}>
               <For each={props.group.items}>
                 {(item) => {
                   const { primary, secondary } = splitParen(item.title);
                   return (
-                    <li {...stylex.props(styles.material)}>
-                      <span {...stylex.props(styles.materialName, styles.colMaterialName)}>
+                    <li {...stylex.attrs(styles.material)}>
+                      <span {...stylex.attrs(styles.materialName, styles.colMaterialName)}>
                         {primary}
-                        {secondary && <span {...stylex.props(styles.ledgerLatin)}>{secondary}</span>}
+                        {secondary && (
+                          <span {...stylex.attrs(styles.ledgerLatin)}>{secondary}</span>
+                        )}
                       </span>
-                      <p {...stylex.props(styles.materialInci, styles.colMaterialInci)}>
+                      <p {...stylex.attrs(styles.materialInci, styles.colMaterialInci)}>
                         <Inci text={item.inci} />
                       </p>
-                      <p {...stylex.props(styles.materialFeatures, styles.colMaterialFeatures)}>
+                      <p {...stylex.attrs(styles.materialFeatures, styles.colMaterialFeatures)}>
                         {item.features}
                       </p>
                     </li>
@@ -891,20 +914,17 @@ function LedgerRow(props: {
 
 function Field(props: { label: string; children: JSX.Element }) {
   return (
-    <div {...stylex.props(styles.field)}>
-      <dt {...stylex.props(styles.fieldLabel)}>{props.label}</dt>
-      <dd {...stylex.props(styles.fieldValue)}>{props.children}</dd>
+    <div {...stylex.attrs(styles.field)}>
+      <dt {...stylex.attrs(styles.fieldLabel)}>{props.label}</dt>
+      <dd {...stylex.attrs(styles.fieldValue)}>{props.children}</dd>
     </div>
   );
 }
 
 function Descriptions(props: { lines: string[] }) {
   return (
-    <Show
-      when={props.lines.length > 0}
-      fallback={<span {...stylex.props(styles.absent)}>无</span>}
-    >
-      <ul {...stylex.props(styles.lines, styles.description)}>
+    <Show when={props.lines.length > 0} fallback={<span {...stylex.attrs(styles.absent)}>无</span>}>
+      <ul {...stylex.attrs(styles.lines, styles.description)}>
         <For each={props.lines}>{(line) => <li>{line}</li>}</For>
       </ul>
     </Show>
@@ -914,34 +934,34 @@ function Descriptions(props: { lines: string[] }) {
 function FormulaSheet(props: { item: SolutionItem }) {
   return (
     <>
-      <header {...stylex.props(styles.sheetHead)}>
-        <p {...stylex.props(styles.sheetArea)}>
+      <header {...stylex.attrs(styles.sheetHead)}>
+        <p {...stylex.attrs(styles.sheetArea)}>
           {SOLUTION_AREAS.find((area) => area.id === props.item.area)?.label}
         </p>
-        <h3 {...stylex.props(styles.sheetTitle)}>{props.item.title}</h3>
-        <p {...stylex.props(styles.sheetSubtitle)}>{props.item.subtitle}</p>
+        <h3 {...stylex.attrs(styles.sheetTitle)}>{props.item.title}</h3>
+        <p {...stylex.attrs(styles.sheetSubtitle)}>{props.item.subtitle}</p>
       </header>
-      <dl {...stylex.props(styles.fields)}>
+      <dl {...stylex.attrs(styles.fields)}>
         <Field label="概述">
           <Descriptions lines={props.item.overview} />
         </Field>
         <Field label="功能">
-          <span {...stylex.props(styles.strong)}>{props.item.functions.join(" · ")}</span>
+          <span {...stylex.attrs(styles.strong)}>{props.item.functions.join(" · ")}</span>
         </Field>
         <Field label="配方挑战">
           <Descriptions lines={props.item.challenges} />
         </Field>
         <Field label="功能性成分">
-          <ul {...stylex.props(styles.lines)}>
+          <ul {...stylex.attrs(styles.lines)}>
             <For each={props.item.keyIngredients}>
               {(ingredient) => {
                 const { primary, note } = splitNote(ingredient);
                 return (
-                  <li {...stylex.props(styles.keepWords)}>
-                    <span {...stylex.props(styles.strong)}>
+                  <li {...stylex.attrs(styles.keepWords)}>
+                    <span {...stylex.attrs(styles.strong)}>
                       {primary.replaceAll(" / ", `${NO_BREAK_SPACE}/ `)}
                     </span>
-                    {note && <span {...stylex.props(styles.note)}>{note}</span>}
+                    {note && <span {...stylex.attrs(styles.note)}>{note}</span>}
                   </li>
                 );
               }}
@@ -965,40 +985,44 @@ export function ProductCatalog(props: { categoryId: string }) {
     const current = openIndex();
     if (current !== null && current < index) {
       const triggerTop = trigger.getBoundingClientRect().top;
-      startInstantLayout(() => setOpenIndex(null));
+      startInstantLayout(() => {
+        setOpenIndex(null);
+        flush();
+      });
       window.scrollBy({
         top: trigger.getBoundingClientRect().top - triggerTop,
         behavior: "instant",
       });
     }
     setOpenIndex(current === index ? null : index);
+    flush();
   };
 
   return (
     <section
       id="products-catalog"
       aria-labelledby="catalog-title"
-      {...stylex.props(styles.section, styles.bandSurface)}
+      {...stylex.attrs(styles.section, styles.bandSurface)}
     >
-      <div {...stylex.props(kitStyles.shell, kitStyles.inset120)}>
-        <header {...stylex.props(styles.sectionHead)}>
-          <p lang="en" {...stylex.props(styles.sectionEyebrow)}>
+      <div {...stylex.attrs(kitStyles.shell, kitStyles.inset120)}>
+        <header {...stylex.attrs(styles.sectionHead)}>
+          <p lang="en" {...stylex.attrs(styles.sectionEyebrow)}>
             Catalog
           </p>
-          <h2 id="catalog-title" {...stylex.props(styles.sectionTitle)}>
+          <h2 id="catalog-title" {...stylex.attrs(styles.sectionTitle)}>
             产品目录
           </h2>
-          <p {...stylex.props(styles.sectionLead)}>
+          <p {...stylex.attrs(styles.sectionLead)}>
             {props.categoryId === "personal-care"
               ? "精选个人护理全形态天然油脂与经典功效配方方案"
               : `${categoryLabel()}核心原料与应用定制方案`}
           </p>
         </header>
-        <div {...stylex.props(styles.ledgerCard)}>
-          <div aria-hidden="true" {...stylex.props(styles.ledgerGrid, styles.ledgerHeader)}>
-            <span {...stylex.props(styles.colName)}>原料分类</span>
+        <div {...stylex.attrs(styles.ledgerCard)}>
+          <div aria-hidden="true" {...stylex.attrs(styles.ledgerGrid, styles.ledgerHeader)}>
+            <span {...stylex.attrs(styles.colName)}>原料分类</span>
           </div>
-          <ul {...stylex.props(styles.ledger)}>
+          <ul {...stylex.attrs(styles.ledger)}>
             <For each={SHEET_CATALOG_GROUPS}>
               {(group, index) => (
                 <LedgerRow
@@ -1026,39 +1050,35 @@ export function ProductSolutions() {
   const [selectedId, setSelectedId] = createSignal<string | undefined>(solutions[0]?.id);
 
   createEffect(
-    on(
-      () => [area(), reduce()] as const,
-      ([, reduceNow]) => {
-        const list = areaListRef;
-        const chip = list?.querySelector<HTMLElement>('[aria-pressed="true"]');
-        if (!list || !chip || list.scrollWidth <= list.clientWidth) return;
-        const left = chip.offsetLeft - (list.clientWidth - chip.offsetWidth) / 2;
-        list.scrollTo({ left: Math.max(0, left), behavior: reduceNow ? "auto" : "smooth" });
-      },
-    ),
+    () => [area(), reduce()] as const,
+    ([, reduceNow]) => {
+      const list = areaListRef;
+      const chip = list?.querySelector<HTMLElement>('[aria-pressed="true"]');
+      if (!list || !chip || list.scrollWidth <= list.clientWidth) return;
+      const left = chip.offsetLeft - (list.clientWidth - chip.offsetWidth) / 2;
+      list.scrollTo({ left: Math.max(0, left), behavior: reduceNow ? "auto" : "smooth" });
+    },
   );
 
   createEffect(
-    on(
-      () => [area(), selectedId(), reduce()] as const,
-      ([, , reduceNow]) => {
-        const rail = railRef;
-        const tab = rail?.querySelector<HTMLElement>('[aria-selected="true"]');
-        if (!rail || !tab) return;
-        const behavior = reduceNow ? "auto" : "smooth";
-        if (rail.scrollWidth > rail.clientWidth) {
-          const left = tab.offsetLeft - (rail.clientWidth - tab.offsetWidth) / 2;
-          rail.scrollTo({ left: Math.max(0, left), behavior });
-          return;
-        }
-        const visibleTop =
-          rail.scrollTop + (Number.parseFloat(getComputedStyle(rail).scrollPaddingTop) || 0);
-        const visibleBottom = rail.scrollTop + rail.clientHeight;
-        if (tab.offsetTop >= visibleTop && tab.offsetTop + tab.offsetHeight <= visibleBottom) return;
-        const top = tab.offsetTop - (rail.clientHeight - tab.offsetHeight) / 2;
-        rail.scrollTo({ top: Math.max(0, top), behavior });
-      },
-    ),
+    () => [area(), selectedId(), reduce()] as const,
+    ([, , reduceNow]) => {
+      const rail = railRef;
+      const tab = rail?.querySelector<HTMLElement>('[aria-selected="true"]');
+      if (!rail || !tab) return;
+      const behavior = reduceNow ? "auto" : "smooth";
+      if (rail.scrollWidth > rail.clientWidth) {
+        const left = tab.offsetLeft - (rail.clientWidth - tab.offsetWidth) / 2;
+        rail.scrollTo({ left: Math.max(0, left), behavior });
+        return;
+      }
+      const visibleTop =
+        rail.scrollTop + (Number.parseFloat(getComputedStyle(rail).scrollPaddingTop) || 0);
+      const visibleBottom = rail.scrollTop + rail.clientHeight;
+      if (tab.offsetTop >= visibleTop && tab.offsetTop + tab.offsetHeight <= visibleBottom) return;
+      const top = tab.offsetTop - (rail.clientHeight - tab.offsetHeight) / 2;
+      rail.scrollTo({ top: Math.max(0, top), behavior });
+    },
   );
 
   const scope = createMemo(() => {
@@ -1076,12 +1096,11 @@ export function ProductSolutions() {
   const chooseArea = (next: AreaFilter) => {
     // React reads `selected` from the render closure and batches both updates.
     const current = selected();
-    batch(() => {
-      setArea(next);
-      if (next !== "all" && current && current.area !== next) {
-        setSelectedId(solutions.find((item) => item.area === next)?.id);
-      }
-    });
+    setArea(next);
+    if (next !== "all" && current && current.area !== next) {
+      setSelectedId(solutions.find((item) => item.area === next)?.id);
+    }
+    flush();
   };
 
   const handleRailKeyDown = (event: KeyboardEvent & { currentTarget: HTMLDivElement }) => {
@@ -1111,14 +1130,14 @@ export function ProductSolutions() {
       <section
         id="products-solutions"
         aria-labelledby="solutions-title"
-        {...stylex.props(styles.section)}
+        {...stylex.attrs(styles.section)}
       >
-        <div {...stylex.props(kitStyles.shell, kitStyles.inset120)}>
-          <header {...stylex.props(styles.sectionHead)}>
-            <p lang="en" {...stylex.props(styles.sectionEyebrow)}>
+        <div {...stylex.attrs(kitStyles.shell, kitStyles.inset120)}>
+          <header {...stylex.attrs(styles.sectionHead)}>
+            <p lang="en" {...stylex.attrs(styles.sectionEyebrow)}>
               Solutions
             </p>
-            <h2 id="solutions-title" {...stylex.props(styles.sectionTitle)}>
+            <h2 id="solutions-title" {...stylex.attrs(styles.sectionTitle)}>
               应用方案
             </h2>
           </header>
@@ -1127,7 +1146,7 @@ export function ProductSolutions() {
               ref={areaListRef}
               role="group"
               aria-label="按应用领域筛选"
-              {...stylex.props(styles.areaList)}
+              {...stylex.attrs(styles.areaList)}
             >
               <For each={areaChips}>
                 {(entry) => {
@@ -1135,13 +1154,13 @@ export function ProductSolutions() {
                   return (
                     <button
                       type="button"
-                      aria-pressed={isActive()}
+                      aria-pressed={isActive() ? "true" : "false"}
                       onClick={() => chooseArea(entry.id)}
-                      {...stylex.props(styles.area, isActive() && styles.areaActive)}
+                      {...stylex.attrs(styles.area, isActive() && styles.areaActive)}
                     >
-                      <span {...stylex.props(styles.areaLabel)}>{entry.label}</span>
+                      <span {...stylex.attrs(styles.areaLabel)}>{entry.label}</span>
                       <span
-                        {...stylex.props(styles.areaCount, isActive() && styles.areaCountActive)}
+                        {...stylex.attrs(styles.areaCount, isActive() && styles.areaCountActive)}
                       >
                         {entry.count}
                       </span>
@@ -1151,15 +1170,15 @@ export function ProductSolutions() {
               </For>
             </div>
           )}
-          <div {...stylex.props(styles.browser)}>
-            <div {...stylex.props(styles.railFrame)}>
+          <div {...stylex.attrs(styles.browser)}>
+            <div {...stylex.attrs(styles.railFrame)}>
               <m.div
                 ref={(el: HTMLElement) => (railRef = el as HTMLDivElement)}
                 role="tablist"
                 aria-label="应用方案"
                 aria-orientation="vertical"
                 onKeyDown={handleRailKeyDown}
-                {...stylex.props(styles.rail)}
+                {...stylex.attrs(styles.rail)}
               >
                 <For each={SOLUTION_AREAS}>
                   {(group) => {
@@ -1168,10 +1187,10 @@ export function ProductSolutions() {
                     );
                     return (
                       <Show when={items().length > 0}>
-                        <div {...stylex.props(styles.railGroup)}>
-                          <p aria-hidden="true" {...stylex.props(styles.railHeading)}>
+                        <div {...stylex.attrs(styles.railGroup)}>
+                          <p aria-hidden="true" {...stylex.attrs(styles.railHeading)}>
                             {group.label}
-                            <span {...stylex.props(styles.railHeadingCount)}>
+                            <span {...stylex.attrs(styles.railHeadingCount)}>
                               {items().length} 款
                             </span>
                           </p>
@@ -1183,11 +1202,11 @@ export function ProductSolutions() {
                                   type="button"
                                   role="tab"
                                   id={`${uid}-tab-${item.id}`}
-                                  aria-selected={isSelected()}
+                                  aria-selected={isSelected() ? "true" : "false"}
                                   aria-controls={`${uid}-panel`}
                                   tabindex={isSelected() ? 0 : -1}
                                   onClick={() => setSelectedId(item.id)}
-                                  {...stylex.props(
+                                  {...stylex.attrs(
                                     styles.solutionTab,
                                     isSelected() && styles.solutionTabSelected,
                                     stylex.defaultMarker(),
@@ -1201,27 +1220,27 @@ export function ProductSolutions() {
                                           ? { duration: 0 }
                                           : { type: "spring", duration: 0.32, bounce: 0 }
                                       }
-                                      {...stylex.props(styles.tabIndicator)}
+                                      {...stylex.attrs(styles.tabIndicator)}
                                     />
                                   </Show>
                                   <span
-                                    {...stylex.props(
+                                    {...stylex.attrs(
                                       styles.tabIndex,
                                       isSelected() && styles.tabIndexSelected,
                                     )}
                                   >
                                     {padIndex(scope().indexOf(item))}
                                   </span>
-                                  <span {...stylex.props(styles.tabText)}>
+                                  <span {...stylex.attrs(styles.tabText)}>
                                     <span
-                                      {...stylex.props(
+                                      {...stylex.attrs(
                                         styles.tabTitle,
                                         isSelected() && styles.tabTitleSelected,
                                       )}
                                     >
                                       {item.title}
                                     </span>
-                                    <span {...stylex.props(styles.tabMeta)}>
+                                    <span {...stylex.attrs(styles.tabMeta)}>
                                       {item.functions.join(" · ")}
                                     </span>
                                   </span>
@@ -1241,11 +1260,11 @@ export function ProductSolutions() {
               id={`${uid}-panel`}
               aria-labelledby={`${uid}-tab-${selected()?.id}`}
               tabindex={0}
-              {...stylex.props(styles.sheet)}
+              {...stylex.attrs(styles.sheet)}
             >
               <Show when={selected()} keyed>
                 {(item) => (
-                  <div {...stylex.props(styles.panel)}>
+                  <div {...stylex.attrs(styles.panel)}>
                     <FormulaSheet item={item} />
                   </div>
                 )}

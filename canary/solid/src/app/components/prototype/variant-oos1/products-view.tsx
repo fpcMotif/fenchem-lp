@@ -1,11 +1,10 @@
 import { Flow } from "../shared/flow";
-import { breakpoints, colors } from "../../../ui/tokens.stylex";
+import { colors } from "../../../ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { ChevronRight } from "lucide-solid";
-import { createMemo, createSignal, For, Show, type Component, type JSX } from "solid-js";
-import { Dynamic } from "solid-js/web";
-
-import { useSearch } from "../../../../compat/router";
+import { ChevronRight } from "../../../../compat/lucide";
+import { createMemo, createSignal, For, Show, type Component } from "solid-js";
+import { dynamic, type JSX } from "@solidjs/web";
+import { useSearch } from "@tanstack/solid-router";
 
 import { ContactCta } from "./contact-cta";
 import { CTA, PRODUCTS_CTA_SUBTITLE } from "./content";
@@ -163,7 +162,10 @@ const styles = stylex.create({
     whiteSpace: "nowrap",
     transform: {
       default: null,
-      ":active": { default: null, ["@media (prefers-reduced-motion: no-preference)"]: "scale(0.96)" },
+      ":active": {
+        default: null,
+        ["@media (prefers-reduced-motion: no-preference)"]: "scale(0.96)",
+      },
     },
     "::before": {
       content: '""',
@@ -241,7 +243,10 @@ const styles = stylex.create({
     cursor: "pointer",
     transform: {
       default: null,
-      ":active": { default: null, ["@media (prefers-reduced-motion: no-preference)"]: "scale(0.98)" },
+      ":active": {
+        default: null,
+        ["@media (prefers-reduced-motion: no-preference)"]: "scale(0.98)",
+      },
     },
     outlineStyle: "solid",
     outlineWidth: { default: 1, ":focus-visible": 3 },
@@ -321,7 +326,7 @@ function CardImage(props: { src: string; alt: string; eager: boolean }) {
   return (
     <>
       {failed() ? (
-        <span aria-hidden="true" {...stylex.props(styles.cardImg, styles.cardImgMissing)} />
+        <span aria-hidden="true" {...stylex.attrs(styles.cardImg, styles.cardImgMissing)} />
       ) : (
         <img
           src={props.src}
@@ -329,7 +334,7 @@ function CardImage(props: { src: string; alt: string; eager: boolean }) {
           loading={props.eager ? "eager" : "lazy"}
           decoding="async"
           onError={() => setFailed(true)}
-          {...stylex.props(styles.cardImg)}
+          {...stylex.attrs(styles.cardImg)}
         />
       )}
     </>
@@ -345,8 +350,10 @@ export function ProductsView(props: {
 }) {
   const [activeTab, setActiveTab] = createSignal<string>("personal-care");
   const [activeProductIndex, setActiveProductIndex] = createSignal<number>(0);
-  const search = useSearch();
+  const search = useSearch({ strict: false });
   const compare = () => search().compare;
+  const CatalogSection = dynamic(() => props.CatalogSection);
+  const SolutionsSection = dynamic(() => props.SolutionsSection);
   const activeCategory = createMemo(
     () => CATEGORIES.find((cat) => cat.id === activeTab()) ?? CATEGORIES[0],
   );
@@ -354,26 +361,26 @@ export function ProductsView(props: {
   const spotlight = createMemo(() => props.renderSpotlight?.(activeCategory()));
 
   return (
-    <div id="products-top" lang="zh-CN" {...stylex.props(styles.root)}>
+    <div id="products-top" lang="zh-CN" {...stylex.attrs(styles.root)}>
       <Show
         when={hero() != null}
         fallback={
           <section
             aria-label="Products and applications panorama banner"
-            {...stylex.props(styles.bannerWrap)}
+            {...stylex.attrs(styles.bannerWrap)}
           >
-            <figure {...stylex.props(styles.bannerFigure)}>
+            <figure {...stylex.attrs(styles.bannerFigure)}>
               <img
                 src={FEATURED_PRODUCT.bannerImage}
                 alt="Panorama of Fenchem products and applications in their natural form"
                 fetchpriority="high"
                 decoding="async"
-                {...stylex.props(styles.bannerImg)}
+                {...stylex.attrs(styles.bannerImg)}
               />
             </figure>
-            <div {...stylex.props(kitStyles.shell, kitStyles.inset120, styles.bannerContent)}>
-              <h1 {...stylex.props(styles.bannerTitle)}>{activeCategory().label}</h1>
-              <p {...stylex.props(styles.bannerLead)}>{PRODUCTS_HERO_LEAD}</p>
+            <div {...stylex.attrs(kitStyles.shell, kitStyles.inset120, styles.bannerContent)}>
+              <h1 {...stylex.attrs(styles.bannerTitle)}>{activeCategory().label}</h1>
+              <p {...stylex.attrs(styles.bannerLead)}>{PRODUCTS_HERO_LEAD}</p>
             </div>
           </section>
         }
@@ -381,31 +388,31 @@ export function ProductsView(props: {
         {hero()}
       </Show>
 
-      <div {...stylex.props(styles.subBar)}>
-        <div {...stylex.props(kitStyles.shell, kitStyles.inset120, styles.subBarInner)}>
-          <nav aria-label="Breadcrumb" {...stylex.props(styles.breadcrumb)}>
+      <div {...stylex.attrs(styles.subBar)}>
+        <div {...stylex.attrs(kitStyles.shell, kitStyles.inset120, styles.subBarInner)}>
+          <nav aria-label="Breadcrumb" {...stylex.attrs(styles.breadcrumb)}>
             <button
               type="button"
               onClick={() => props.onNavigateHome("top")}
-              {...stylex.props(styles.breadcrumbLink)}
+              {...stylex.attrs(styles.breadcrumbLink)}
             >
               首页
             </button>
             <ChevronRight size={13} strokeWidth={1.5} absoluteStrokeWidth aria-hidden="true" />
-            <span aria-current="page" {...stylex.props(styles.breadcrumbCurrent)}>
+            <span aria-current="page" {...stylex.attrs(styles.breadcrumbCurrent)}>
               产品与应用
             </span>
           </nav>
-          <div role="group" aria-label="Categories" {...stylex.props(styles.chipList)}>
+          <div role="group" aria-label="Categories" {...stylex.attrs(styles.chipList)}>
             <For each={CATEGORIES}>
               {(cat) => {
                 const isActive = () => activeTab() === cat.id;
                 return (
                   <button
                     type="button"
-                    aria-pressed={isActive()}
+                    aria-pressed={isActive() ? "true" : "false"}
                     onClick={() => setActiveTab(cat.id)}
-                    {...stylex.props(styles.chip, isActive() && styles.chipActive)}
+                    {...stylex.attrs(styles.chip, isActive() && styles.chipActive)}
                   >
                     {cat.label}
                   </button>
@@ -421,30 +428,30 @@ export function ProductsView(props: {
         fallback={
           <section
             aria-labelledby="spotlight-title"
-            {...stylex.props(kitStyles.shell, kitStyles.inset120, styles.spotlightSection)}
+            {...stylex.attrs(kitStyles.shell, kitStyles.inset120, styles.spotlightSection)}
           >
-            <div {...stylex.props(styles.spotlightGrid)}>
-              <div {...stylex.props(styles.spotlightText)}>
-                <h2 id="spotlight-title" {...stylex.props(styles.spotlightBrand)}>
+            <div {...stylex.attrs(styles.spotlightGrid)}>
+              <div {...stylex.attrs(styles.spotlightText)}>
+                <h2 id="spotlight-title" {...stylex.attrs(styles.spotlightBrand)}>
                   {FEATURED_PRODUCT.brand}
                 </h2>
-                <p {...stylex.props(styles.spotlightTagline)}>{FEATURED_PRODUCT.tagline}</p>
-                <div {...stylex.props(styles.productList)}>
+                <p {...stylex.attrs(styles.spotlightTagline)}>{FEATURED_PRODUCT.tagline}</p>
+                <div {...stylex.attrs(styles.productList)}>
                   <For each={FEATURED_PRODUCT.items.slice(0, 2)}>
                     {(item, idx) => (
                       <button
                         type="button"
-                        aria-pressed={activeProductIndex() === idx()}
+                        aria-pressed={activeProductIndex() === idx() ? "true" : "false"}
                         onClick={() => setActiveProductIndex(idx())}
                         onMouseEnter={() => setActiveProductIndex(idx())}
-                        {...stylex.props(
+                        {...stylex.attrs(
                           styles.productText,
                           activeProductIndex() === idx() && styles.productTextActive,
                         )}
                       >
-                        <span {...stylex.props(styles.cardBody)}>
-                          <span {...stylex.props(styles.cardName)}>{item.englishName}</span>
-                          <span {...stylex.props(styles.cardDesc)}>{item.desc}</span>
+                        <span {...stylex.attrs(styles.cardBody)}>
+                          <span {...stylex.attrs(styles.cardName)}>{item.englishName}</span>
+                          <span {...stylex.attrs(styles.cardDesc)}>{item.desc}</span>
                         </span>
                       </button>
                     )}
@@ -454,17 +461,17 @@ export function ProductsView(props: {
               <div
                 role="group"
                 aria-label={`${FEATURED_PRODUCT.items.length} core oil ingredient cards`}
-                {...stylex.props(styles.spotlightCardsWrap)}
+                {...stylex.attrs(styles.spotlightCardsWrap)}
               >
                 <For each={FEATURED_PRODUCT.items}>
                   {(item, idx) => (
                     <button
                       type="button"
-                      aria-pressed={activeProductIndex() === idx()}
+                      aria-pressed={activeProductIndex() === idx() ? "true" : "false"}
                       aria-label={item.englishName}
                       onClick={() => setActiveProductIndex(idx())}
                       onMouseEnter={() => setActiveProductIndex(idx())}
-                      {...stylex.props(
+                      {...stylex.attrs(
                         styles.productCard,
                         activeProductIndex() === idx() && styles.productCardActive,
                       )}
@@ -482,13 +489,13 @@ export function ProductsView(props: {
       </Show>
 
       {props.CatalogSection && compare() !== "baseline" && compare() !== "solutions" ? (
-        <Dynamic component={props.CatalogSection} />
+        <CatalogSection />
       ) : (
         <ProductCatalog categoryId={activeTab()} />
       )}
       {props.SolutionsSection && compare() !== "baseline" && compare() !== "catalog" ? (
         <Flow>
-          <Dynamic component={props.SolutionsSection} />
+          <SolutionsSection />
         </Flow>
       ) : (
         <Flow>

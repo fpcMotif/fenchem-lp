@@ -1,29 +1,30 @@
 import { fileURLToPath } from "node:url";
 
+import { cloudflare } from "@cloudflare/vite-plugin";
+import solid from "@solidjs/vite-plugin";
 import stylex from "@stylexjs/unplugin";
+import { tanstackStart } from "@tanstack/solid-start/plugin/vite";
 import { defineConfig } from "vite";
-import solid from "vite-plugin-solid";
 
 const src = (path: string) => fileURLToPath(new URL(`./src/${path}`, import.meta.url));
 
-export default defineConfig(({ isSsrBuild }) => ({
+export default defineConfig({
   // Same images/fonts the React app serves.
-  publicDir: isSsrBuild ? false : fileURLToPath(new URL("../../apps/web/public", import.meta.url)),
+  publicDir: fileURLToPath(new URL("../../apps/web/public", import.meta.url)),
+  server: {
+    allowedHosts: [".localhost", "localhost", "127.0.0.1"],
+  },
+  build: {
+    target: "es2022",
+    sourcemap: process.env.SOURCEMAP === "1",
+  },
   plugins: [
     stylex.vite({
       useCSSLayers: true,
       unstable_moduleResolution: { type: "commonJS", rootDir: src("") },
     }),
+    cloudflare({ viteEnvironment: { name: "ssr" } }),
+    tanstackStart(),
     solid({ ssr: true }),
   ],
-  build: {
-    target: "es2022",
-    outDir: isSsrBuild ? "dist/server" : "dist/client",
-    emptyOutDir: true,
-    sourcemap: process.env.SOURCEMAP === "1",
-    rollupOptions: isSsrBuild ? { output: { entryFileNames: "worker.js" } } : undefined,
-  },
-  ssr: isSsrBuild
-    ? { noExternal: true, target: "webworker", resolve: { conditions: ["workerd", "worker", "solid", "module", "import"] } }
-    : undefined,
-}));
+});

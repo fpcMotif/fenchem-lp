@@ -41,7 +41,7 @@ const ROOT = fileURLToPath(new URL("..", import.meta.url));
 
 const TARGETS = {
   react: { dir: join(ROOT, "apps/web"), config: "dist/server/wrangler.json" },
-  solid: { dir: join(ROOT, "canary/solid"), config: "wrangler.jsonc" },
+  solid: { dir: join(ROOT, "canary/solid"), config: "dist/server/wrangler.json" },
 };
 
 const ROUTES = {
@@ -50,7 +50,12 @@ const ROUTES = {
 };
 
 // Fast 4G as the plan defines it: 150 ms RTT, 1.6 Mbps down, 750 kbps up.
-const NETWORK = { offline: false, latency: 150, downloadThroughput: 200_000, uploadThroughput: 93_750 };
+const NETWORK = {
+  offline: false,
+  latency: 150,
+  downloadThroughput: 200_000,
+  uploadThroughput: 93_750,
+};
 const CPU_SLOWDOWN = 4;
 
 // ── servers ──────────────────────────────────────────────────────────────────
@@ -59,8 +64,25 @@ function startWorker(name, port) {
   const t = TARGETS[name];
   const child = spawn(
     join(ROOT, "canary/solid/node_modules/.bin/wrangler"),
-    ["dev", "-c", t.config, "--port", String(port), "--ip", "127.0.0.1", "--inspector-port", String(port + 1000), "--log-level", "error"],
-    { cwd: t.dir, stdio: ["ignore", "pipe", "pipe"], detached: true, env: { ...process.env, WRANGLER_SEND_METRICS: "false" } },
+    [
+      "dev",
+      "-c",
+      t.config,
+      "--port",
+      String(port),
+      "--ip",
+      "127.0.0.1",
+      "--inspector-port",
+      String(port + 1000),
+      "--log-level",
+      "error",
+    ],
+    {
+      cwd: t.dir,
+      stdio: ["ignore", "pipe", "pipe"],
+      detached: true,
+      env: { ...process.env, WRANGLER_SEND_METRICS: "false" },
+    },
   );
   let log = "";
   child.stdout.on("data", (d) => (log += d));
@@ -96,7 +118,13 @@ async function waitFor(url, timeoutMs = 90_000) {
 function startBrotliProxy(upstreamPort, port) {
   const server = http.createServer((req, res) => {
     const up = http.request(
-      { host: "127.0.0.1", port: upstreamPort, path: req.url, method: req.method, headers: { ...req.headers, "accept-encoding": "identity" } },
+      {
+        host: "127.0.0.1",
+        port: upstreamPort,
+        path: req.url,
+        method: req.method,
+        headers: { ...req.headers, "accept-encoding": "identity" },
+      },
       (upRes) => {
         const type = String(upRes.headers["content-type"] ?? "");
         const compressible = /text\/|javascript|json|css|svg|xml/.test(type);
@@ -111,7 +139,9 @@ function startBrotliProxy(upstreamPort, port) {
         headers["content-encoding"] = "br";
         headers.vary = "accept-encoding";
         res.writeHead(upRes.statusCode ?? 502, headers);
-        const br = zlib.createBrotliCompress({ params: { [zlib.constants.BROTLI_PARAM_QUALITY]: type.includes("html") ? 5 : 11 } });
+        const br = zlib.createBrotliCompress({
+          params: { [zlib.constants.BROTLI_PARAM_QUALITY]: type.includes("html") ? 5 : 11 },
+        });
         br.pipe(res);
         upRes.on("data", (chunk) => {
           br.write(chunk);
@@ -134,7 +164,8 @@ function startBrotliProxy(upstreamPort, port) {
 function pageObservers() {
   window.__perf = { lcp: 0, longTasks: [], errors: [] };
   new PerformanceObserver((list) => {
-    for (const e of list.getEntries()) window.__perf.lcp = e.renderTime || e.loadTime || e.startTime;
+    for (const e of list.getEntries())
+      window.__perf.lcp = e.renderTime || e.loadTime || e.startTime;
   }).observe({ type: "largest-contentful-paint", buffered: true });
   new PerformanceObserver((list) => {
     for (const e of list.getEntries()) window.__perf.longTasks.push([e.startTime, e.duration]);
@@ -157,7 +188,8 @@ async function newPage(browser, { throttle }) {
   const errors = [];
   page.on("pageerror", (e) => errors.push(`pageerror: ${e.message}`));
   page.on("console", (m) => {
-    if (m.type() === "error" && !/Failed to load resource|ERR_FAILED|net::/.test(m.text())) errors.push(`console: ${m.text().slice(0, 200)}`);
+    if (m.type() === "error" && !/Failed to load resource|ERR_FAILED|net::/.test(m.text()))
+      errors.push(`console: ${m.text().slice(0, 200)}`);
   });
   await page.addInitScript(pageObservers);
   return { context, page, cdp, errors };
@@ -167,7 +199,9 @@ async function newPage(browser, { throttle }) {
 async function sampleLoad(browser, baseUrl, route) {
   const { context, page, cdp, errors } = await newPage(browser, { throttle: true });
   const requests = new Map();
-  cdp.on("Network.requestWillBeSent", (e) => requests.set(e.requestId, { url: e.request.url, start: e.timestamp, type: e.type }));
+  cdp.on("Network.requestWillBeSent", (e) =>
+    requests.set(e.requestId, { url: e.request.url, start: e.timestamp, type: e.type }),
+  );
   cdp.on("Network.responseReceived", (e) => {
     const r = requests.get(e.requestId);
     if (r) r.type = e.type;
@@ -187,7 +221,10 @@ async function sampleLoad(browser, baseUrl, route) {
   let stableSince = Date.now();
   const start = Date.now();
   while (Date.now() - start < 20_000) {
-    const now = await page.evaluate(() => ({ lcp: window.__perf.lcp, tasks: window.__perf.longTasks.length }));
+    const now = await page.evaluate(() => ({
+      lcp: window.__perf.lcp,
+      tasks: window.__perf.longTasks.length,
+    }));
     if (now.lcp !== last.lcp || now.tasks !== last.tasks) {
       last = now;
       stableSince = Date.now();
@@ -195,8 +232,14 @@ async function sampleLoad(browser, baseUrl, route) {
     await sleep(250);
   }
   const m = await page.evaluate(() => {
-    const paint = performance.getEntriesByType("paint").find((e) => e.name === "first-contentful-paint");
-    return { fcp: paint?.startTime ?? null, lcp: window.__perf.lcp, longTasks: window.__perf.longTasks };
+    const paint = performance
+      .getEntriesByType("paint")
+      .find((e) => e.name === "first-contentful-paint");
+    return {
+      fcp: paint?.startTime ?? null,
+      lcp: window.__perf.lcp,
+      longTasks: window.__perf.longTasks,
+    };
   });
   const tbt = m.longTasks
     .filter(([s]) => m.fcp != null && s >= m.fcp)
@@ -218,7 +261,17 @@ async function sampleLoad(browser, baseUrl, route) {
     byType[r.type === "Document" ? "document" : r.type === "Stylesheet" ? "css" : "js"] += r.bytes;
   }
   await context.close();
-  return { fcp: m.fcp, lcp: m.lcp, tbt, wire, reqs, wireAll, reqsAll, ...prefix("wire_", byType), errors };
+  return {
+    fcp: m.fcp,
+    lcp: m.lcp,
+    tbt,
+    wire,
+    reqs,
+    wireAll,
+    reqsAll,
+    ...prefix("wire_", byType),
+    errors,
+  };
 }
 
 function prefix(p, obj) {
@@ -227,14 +280,34 @@ function prefix(p, obj) {
 
 // Interaction script: [route, label, locator factory]. Each step clicks once.
 const INTERACTIONS = [
-  ["home", "nav → products view", (p) => p.locator("header").getByText("产品与应用", { exact: true }).first()],
+  [
+    "home",
+    "nav → products view",
+    (p) => p.locator("header").getByText("产品与应用", { exact: true }).first(),
+  ],
   ["products", "category chip: 2nd", (p) => p.locator('[aria-label="Categories"] button').nth(1)],
   ["products", "category chip: 3rd", (p) => p.locator('[aria-label="Categories"] button').nth(2)],
   ["products", "category chip: 1st", (p) => p.locator('[aria-label="Categories"] button').nth(0)],
-  ["products", "catalog row expand", (p) => p.locator("#products-catalog button[aria-expanded]").first()],
-  ["products", "solutions filter: 2nd", (p) => p.locator('[aria-label="按应用领域筛选"] button').nth(1)],
-  ["products", "solutions filter: all", (p) => p.locator('[aria-label="按应用领域筛选"] button').nth(0)],
-  ["products", "solutions tab: 3rd", (p) => p.locator('[role="tablist"][aria-label="应用方案"] [role="tab"]').nth(2)],
+  [
+    "products",
+    "catalog row expand",
+    (p) => p.locator("#products-catalog button[aria-expanded]").first(),
+  ],
+  [
+    "products",
+    "solutions filter: 2nd",
+    (p) => p.locator('[aria-label="按应用领域筛选"] button').nth(1),
+  ],
+  [
+    "products",
+    "solutions filter: all",
+    (p) => p.locator('[aria-label="按应用领域筛选"] button').nth(0),
+  ],
+  [
+    "products",
+    "solutions tab: 3rd",
+    (p) => p.locator('[role="tablist"][aria-label="应用方案"] [role="tab"]').nth(2),
+  ],
 ];
 
 function installFrameTimer() {
@@ -291,7 +364,11 @@ async function sampleInteractions(browser, baseUrl) {
 async function mainDigest(page) {
   const text = await page.evaluate(() => {
     const main = document.querySelector("main") ?? document.body;
-    const pressed = [...main.querySelectorAll('[aria-pressed="true"],[aria-selected="true"],[aria-expanded="true"]')].map((e) => e.textContent?.trim().slice(0, 40));
+    const pressed = [
+      ...main.querySelectorAll(
+        '[aria-pressed="true"],[aria-selected="true"],[aria-expanded="true"]',
+      ),
+    ].map((e) => e.textContent?.trim().slice(0, 40));
     return JSON.stringify([main.innerText.replace(/\s+/g, " "), pressed]);
   });
   return createHash("sha1").update(text).digest("hex").slice(0, 12);
@@ -308,7 +385,9 @@ function workerUploadSize(name) {
     { cwd: t.dir, encoding: "utf8", env: { ...process.env, WRANGLER_SEND_METRICS: "false" } },
   );
   const m = log.match(/Total Upload:\s*([\d.]+)\s*KiB\s*\/\s*gzip:\s*([\d.]+)\s*KiB/);
-  return m ? { upload_kib: Number(m[1]), upload_gzip_kib: Number(m[2]) } : { upload_kib: null, upload_gzip_kib: null };
+  return m
+    ? { upload_kib: Number(m[1]), upload_gzip_kib: Number(m[2]) }
+    : { upload_kib: null, upload_gzip_kib: null };
 }
 
 async function ttfb(url) {
@@ -341,7 +420,13 @@ async function sampleCold(name, port) {
 function stats(values) {
   const v = values.filter((x) => typeof x === "number" && !Number.isNaN(x));
   if (!v.length) return null;
-  return { p50: median(v), p75: percentile(v, 75), min: Math.min(...v), max: Math.max(...v), n: v.length };
+  return {
+    p50: median(v),
+    p75: percentile(v, 75),
+    min: Math.min(...v),
+    max: Math.max(...v),
+    n: v.length,
+  };
 }
 
 function interleave(names, i) {
@@ -359,14 +444,19 @@ export async function measureCanary(opts) {
       TARGETS[n] = { dir: join(ROOT, dir), config };
     }
     if (!TARGETS[n]) throw new Error(`unknown target ${n}`);
-    if (!existsSync(join(TARGETS[n].dir, TARGETS[n].config))) throw new Error(`${n}: build first (${TARGETS[n].config} missing)`);
+    if (!existsSync(join(TARGETS[n].dir, TARGETS[n].config)))
+      throw new Error(`${n}: build first (${TARGETS[n].config} missing)`);
   }
-  const results = Object.fromEntries(names.map((n) => [n, { load: {}, inp: {}, edge: {}, errors: [], digests: [] }]));
+  const results = Object.fromEntries(
+    names.map((n) => [n, { load: {}, inp: {}, edge: {}, errors: [], digests: [] }]),
+  );
 
   console.log("→ metric 4a: worker upload size (wrangler deploy --dry-run)");
   for (const n of names) Object.assign(results[n].edge, workerUploadSize(n));
 
-  console.log(`→ metric 4b: cold first SSR request (${opts.coldRuns} fresh workerd starts each, interleaved)`);
+  console.log(
+    `→ metric 4b: cold first SSR request (${opts.coldRuns} fresh workerd starts each, interleaved)`,
+  );
   const cold = Object.fromEntries(names.map((n) => [n, []]));
   for (let i = 0; i < opts.coldRuns; i++) {
     for (const [k, n] of interleave(names, i).entries()) {
@@ -381,11 +471,18 @@ export async function measureCanary(opts) {
   const proxies = [];
   try {
     for (const s of servers) await waitFor(`http://127.0.0.1:${s.port}/robots.txt`);
-    for (const [k, s] of servers.entries()) proxies.push(await startBrotliProxy(s.port, 8900 + k * 10));
-    const proxyUrl = Object.fromEntries(names.map((n, k) => [n, `http://127.0.0.1:${8900 + k * 10}`]));
-    const directUrl = Object.fromEntries(names.map((n, k) => [n, `http://127.0.0.1:${8700 + k * 10}`]));
+    for (const [k, s] of servers.entries())
+      proxies.push(await startBrotliProxy(s.port, 8900 + k * 10));
+    const proxyUrl = Object.fromEntries(
+      names.map((n, k) => [n, `http://127.0.0.1:${8900 + k * 10}`]),
+    );
+    const directUrl = Object.fromEntries(
+      names.map((n, k) => [n, `http://127.0.0.1:${8700 + k * 10}`]),
+    );
 
-    console.log(`→ metric 4c: warm SSR TTFB (${opts.warm} requests each, interleaved, after 10 warm-ups)`);
+    console.log(
+      `→ metric 4c: warm SSR TTFB (${opts.warm} requests each, interleaved, after 10 warm-ups)`,
+    );
     for (const n of names) for (let i = 0; i < 10; i++) await ttfb(directUrl[n] + ROUTES.home);
     const warm = Object.fromEntries(names.map((n) => [n, { ttfb: [], total: [] }]));
     for (let i = 0; i < opts.warm; i++) {
@@ -408,7 +505,9 @@ export async function measureCanary(opts) {
       args: ["--disable-3d-apis"],
     });
     try {
-      console.log(`→ metrics 1+2: throttled cold loads (${opts.runs} runs × ${Object.keys(ROUTES).length} routes, interleaved)`);
+      console.log(
+        `→ metrics 1+2: throttled cold loads (${opts.runs} runs × ${Object.keys(ROUTES).length} routes, interleaved)`,
+      );
       for (const route of Object.keys(ROUTES)) {
         const samples = Object.fromEntries(names.map((n) => [n, []]));
         for (let i = 0; i < opts.runs; i++) {
@@ -423,11 +522,15 @@ export async function measureCanary(opts) {
         }
         for (const n of names) {
           const keys = Object.keys(samples[n][0]).filter((k) => k !== "errors");
-          results[n].load[route] = Object.fromEntries(keys.map((k) => [k, stats(samples[n].map((s) => s[k]))]));
+          results[n].load[route] = Object.fromEntries(
+            keys.map((k) => [k, stats(samples[n].map((s) => s[k]))]),
+          );
         }
       }
 
-      console.log(`→ metric 3: click → next frame at ${CPU_SLOWDOWN}x CPU (${opts.runs} runs, interleaved)`);
+      console.log(
+        `→ metric 3: click → next frame at ${CPU_SLOWDOWN}x CPU (${opts.runs} runs, interleaved)`,
+      );
       const frames = Object.fromEntries(names.map((n) => [n, {}]));
       for (let i = 0; i < opts.runs; i++) {
         for (const n of interleave(names, i)) {
@@ -435,11 +538,17 @@ export async function measureCanary(opts) {
           for (const [label, ms] of Object.entries(s.frames)) (frames[n][label] ??= []).push(ms);
           results[n].errors.push(...s.errors.map((e) => `interactions: ${e}`));
           if (i === 0) results[n].digests = s.digests;
-          console.log(`  ${n} #${i + 1}: ${Object.values(s.frames).map((x) => x.toFixed(0)).join(" ")} ms`);
+          console.log(
+            `  ${n} #${i + 1}: ${Object.values(s.frames)
+              .map((x) => x.toFixed(0))
+              .join(" ")} ms`,
+          );
         }
       }
       for (const n of names) {
-        results[n].inp = Object.fromEntries(Object.entries(frames[n]).map(([k, v]) => [k, stats(v)]));
+        results[n].inp = Object.fromEntries(
+          Object.entries(frames[n]).map(([k, v]) => [k, stats(v)]),
+        );
         const all = Object.values(frames[n]).flat();
         results[n].inp.all = stats(all);
       }
@@ -459,7 +568,14 @@ export async function measureCanary(opts) {
       .filter(Boolean);
     results[n].error_count = results[n].errors.length;
   }
-  return { date: new Date().toISOString(), runs: opts.runs, network: NETWORK, cpu_slowdown: CPU_SLOWDOWN, routes: ROUTES, results };
+  return {
+    date: new Date().toISOString(),
+    runs: opts.runs,
+    network: NETWORK,
+    cpu_slowdown: CPU_SLOWDOWN,
+    routes: ROUTES,
+    results,
+  };
 }
 
 // ── report ───────────────────────────────────────────────────────────────────
@@ -474,12 +590,18 @@ export function toMarkdown(report) {
   const R = report.results;
   const lines = [];
   lines.push(`# OOS1 canary: ${names.join(" vs ")}`, "");
-  lines.push(`${report.date} · ${report.runs} interleaved runs · Fast 4G (150 ms RTT, 1.6 Mbps) + ${report.cpu_slowdown}x CPU · brotli proxy · cells are p50 / p75 (min–max)`, "");
+  lines.push(
+    `${report.date} · ${report.runs} interleaved runs · Fast 4G (150 ms RTT, 1.6 Mbps) + ${report.cpu_slowdown}x CPU · brotli proxy · cells are p50 / p75 (min–max)`,
+    "",
+  );
   const head = `| Metric | ${names.join(" | ")} |`;
   const sep = `| --- | ${names.map(() => "---").join(" | ")} |`;
   for (const route of Object.keys(report.routes)) {
     lines.push(`## ${route} (\`${report.routes[route]}\`)`, "", head, sep);
-    const row = (label, key, fmt) => lines.push(`| ${label} | ${names.map((n) => cell(R[n].load[route][key], fmt)).join(" | ")} |`);
+    const row = (label, key, fmt) =>
+      lines.push(
+        `| ${label} | ${names.map((n) => cell(R[n].load[route][key], fmt)).join(" | ")} |`,
+      );
     row("Wire before LCP, kB br", "wire", kb);
     row("  document kB", "wire_document", kb);
     row("  CSS kB", "wire_css", kb);
@@ -492,17 +614,32 @@ export function toMarkdown(report) {
     lines.push("");
   }
   lines.push("## Interaction: click → next frame, ms (4x CPU)", "", head, sep);
-  for (const label of Object.keys(R[names[0]].inp)) lines.push(`| ${label} | ${names.map((n) => cell(R[n].inp[label], f1)).join(" | ")} |`);
+  for (const label of Object.keys(R[names[0]].inp))
+    lines.push(`| ${label} | ${names.map((n) => cell(R[n].inp[label], f1)).join(" | ")} |`);
   lines.push("", "## Edge (workerd via wrangler dev)", "", head, sep);
-  lines.push(`| Worker upload gzip KiB | ${names.map((n) => f1(R[n].edge.upload_gzip_kib)).join(" | ")} |`);
-  lines.push(`| Worker upload raw KiB | ${names.map((n) => f1(R[n].edge.upload_kib)).join(" | ")} |`);
-  lines.push(`| Cold first SSR TTFB ms | ${names.map((n) => cell(R[n].edge.cold_ttfb_ms, f1)).join(" | ")} |`);
-  lines.push(`| Warm SSR TTFB ms | ${names.map((n) => cell(R[n].edge.warm_ttfb_ms, f1)).join(" | ")} |`);
-  lines.push(`| Warm full HTML ms | ${names.map((n) => cell(R[n].edge.warm_html_total_ms, f1)).join(" | ")} |`);
+  lines.push(
+    `| Worker upload gzip KiB | ${names.map((n) => f1(R[n].edge.upload_gzip_kib)).join(" | ")} |`,
+  );
+  lines.push(
+    `| Worker upload raw KiB | ${names.map((n) => f1(R[n].edge.upload_kib)).join(" | ")} |`,
+  );
+  lines.push(
+    `| Cold first SSR TTFB ms | ${names.map((n) => cell(R[n].edge.cold_ttfb_ms, f1)).join(" | ")} |`,
+  );
+  lines.push(
+    `| Warm SSR TTFB ms | ${names.map((n) => cell(R[n].edge.warm_ttfb_ms, f1)).join(" | ")} |`,
+  );
+  lines.push(
+    `| Warm full HTML ms | ${names.map((n) => cell(R[n].edge.warm_html_total_ms, f1)).join(" | ")} |`,
+  );
   lines.push("", "## Correctness", "", head, sep);
   lines.push(`| Page/console errors | ${names.map((n) => R[n].error_count).join(" | ")} |`);
-  lines.push(`| Interaction DOM mismatches vs ${names[0]} | ${names.map((n) => R[n].parity_mismatches.length ? R[n].parity_mismatches.join(", ") : "0").join(" | ")} |`);
-  const errs = names.flatMap((n) => [...new Set(R[n].errors)].slice(0, 5).map((e) => `- ${n}: ${e}`));
+  lines.push(
+    `| Interaction DOM mismatches vs ${names[0]} | ${names.map((n) => (R[n].parity_mismatches.length ? R[n].parity_mismatches.join(", ") : "0")).join(" | ")} |`,
+  );
+  const errs = names.flatMap((n) =>
+    [...new Set(R[n].errors)].slice(0, 5).map((e) => `- ${n}: ${e}`),
+  );
   if (errs.length) lines.push("", "Errors (first 5 unique per target):", "", ...errs);
   return lines.join("\n") + "\n";
 }

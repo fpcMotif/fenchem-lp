@@ -3,23 +3,34 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build && vite build --ssr src/worker.tsx --outDir dist/server",
-    "serve": "wrangler dev --port 4175",
+    "dev": "vite dev --port 4176",
+    "build": "vite build",
+    "serve": "wrangler dev --config dist/server/wrangler.json --port 4175",
     "typecheck": "tsc --noEmit -p ."
   },
   "dependencies": {
+    "@solidjs/web": "2.0.0-rc.8",
     "@stylexjs/stylex": "0.19.1",
-    "lucide-solid": "^1.59.0",
+    "@tanstack/solid-router": "2.0.0-rc.8",
+    "@tanstack/solid-start": "2.0.0-rc.8",
+    "lucide": "1.59.0",
     "motion": "^14",
-    "solid-js": "1.9.17",
-    "solid-transition-group": "^0.3.0"
+    "solid-js": "2.0.0-rc.8"
   },
   "devDependencies": {
+    "@cloudflare/vite-plugin": "1.64.0",
+    "@solidjs/vite-plugin": "3.0.0-next.43",
     "@stylexjs/unplugin": "0.19.1",
+    "@types/node": "22",
     "typescript": "5",
     "vite": "^8",
-    "vite-plugin-solid": "^2.11.14",
     "wrangler": "^4.151.1"
+  },
+  "overrides": {
+    "@solidjs/babel-plugin": "2.0.0-rc.8",
+    "@solidjs/compiler": "2.0.0-rc.8",
+    "@solidjs/signals": "2.0.0-rc.8",
+    "@solidjs/web": "2.0.0-rc.8",
+    "solid-js": "2.0.0-rc.8"
   }
 }

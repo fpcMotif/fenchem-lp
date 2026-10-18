@@ -1,7 +1,6 @@
 import { useReducedMotion } from "../use-reduced-motion";
-import { breakpoints } from "../../../ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { createSignal, onCleanup, onMount, type Accessor } from "solid-js";
+import { createSignal, onSettled, type Accessor } from "solid-js";
 
 export const INTRO_REVEAL_MS = 500;
 
@@ -29,7 +28,7 @@ export type IntroState = "play" | "skip";
 export function useIntro(): Accessor<IntroState> {
   const reduce = useReducedMotion();
   const [state, setState] = createSignal<IntroState>("play");
-  onMount(() => {
+  onSettled(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       return;
     }
@@ -39,10 +38,10 @@ export function useIntro(): Accessor<IntroState> {
       for (const name of events) window.removeEventListener(name, skip);
     }, INTRO_REVEAL_MS + 1100);
     for (const name of events) window.addEventListener(name, skip, { once: true, passive: true });
-    onCleanup(() => {
+    return () => {
       window.clearTimeout(finished);
       for (const name of events) window.removeEventListener(name, skip);
-    });
+    };
   });
   return () => (reduce() ? "skip" : state());
 }

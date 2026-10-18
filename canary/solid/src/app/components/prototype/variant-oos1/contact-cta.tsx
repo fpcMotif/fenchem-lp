@@ -1,6 +1,6 @@
-import { breakpoints, colors } from "../../../ui/tokens.stylex";
+import { colors } from "../../../ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { createUniqueId, For, mergeProps, Show } from "solid-js";
+import { createUniqueId, For, merge, Show } from "solid-js";
 
 import { CTA } from "./content";
 import { RiseReveal } from "./rise-reveal";
@@ -107,7 +107,10 @@ const styles = stylex.create({
     cursor: "pointer",
     transform: {
       default: null,
-      ":active": { default: null, ["@media (prefers-reduced-motion: no-preference)"]: "scale(0.96)" },
+      ":active": {
+        default: null,
+        ["@media (prefers-reduced-motion: no-preference)"]: "scale(0.96)",
+      },
     },
     transitionProperty: "background-color, color, transform",
     transitionDuration: "160ms",
@@ -133,27 +136,27 @@ export function ContactCta(rawProps: {
   subtitle?: string;
   actions?: ContactCtaActions;
 }) {
-  const props = mergeProps({ title: CTA.title, actions: [CTA.action] as ContactCtaActions }, rawProps);
+  const props = merge({ title: CTA.title, actions: [CTA.action] as ContactCtaActions }, rawProps);
   const titleId = createUniqueId();
   return (
-    <section id={props.id} aria-labelledby={titleId} {...stylex.props(styles.section)}>
-      <span aria-hidden="true" lang="en" {...stylex.props(styles.word)}>
+    <section id={props.id} aria-labelledby={titleId} {...stylex.attrs(styles.section)}>
+      <span aria-hidden="true" lang="en" {...stylex.attrs(styles.word)}>
         Fenchem
       </span>
       <RiseReveal sx={styles.inner}>
-        <div {...stylex.props(styles.heading)}>
-          <h2 id={titleId} {...stylex.props(styles.title)}>
+        <div {...stylex.attrs(styles.heading)}>
+          <h2 id={titleId} {...stylex.attrs(styles.title)}>
             {props.title}
           </h2>
           <Show when={props.subtitle}>
-            <p {...stylex.props(styles.subtitle)}>{props.subtitle}</p>
+            <p {...stylex.attrs(styles.subtitle)}>{props.subtitle}</p>
           </Show>
         </div>
         <Show when={props.actions.length > 0}>
-          <div {...stylex.props(styles.actions)}>
+          <div {...stylex.attrs(styles.actions)}>
             <For each={props.actions}>
               {(action) => {
-                const sx = stylex.props(
+                const sx = stylex.attrs(
                   styles.button,
                   action.tone === "secondary" ? styles.secondary : styles.primary,
                 );

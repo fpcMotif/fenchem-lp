@@ -2,3 +2,5 @@ node_modules
 dist
 .wrangler
 .dry-run
+.tanstack
+src/routeTree.gen.ts

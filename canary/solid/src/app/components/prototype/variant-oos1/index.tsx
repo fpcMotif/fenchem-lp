@@ -13,11 +13,11 @@ import { FooterLegal } from "../shared/footer-content";
 import { NewsAccordion } from "../shared/news-accordion";
 import { ProductSummary } from "../shared/product-summary";
 import { SplitDialog } from "../contact-dialog-lab/variants/split";
-import { breakpoints, colors } from "../../../ui/tokens.stylex";
+import { colors } from "../../../ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 import type { StyleXStyles } from "@stylexjs/stylex";
-import { useSearch } from "../../../../compat/router";
-import { Globe, Lightbulb, Plus, Shield, Users } from "lucide-solid";
+import { useSearch } from "@tanstack/solid-router";
+import { Globe, Lightbulb, Plus, Shield, Users } from "../../../../compat/lucide";
 import type { LucideIcon } from "../../../../compat/lucide";
 import {
   AnimatePresence,
@@ -37,17 +37,15 @@ import {
   createUniqueId,
   For,
   Match,
-  mergeProps,
-  on,
-  onCleanup,
-  onMount,
+  merge,
+  onSettled,
   Show,
+  untrack,
   Switch,
   type Accessor,
   type Component,
-  type JSX,
 } from "solid-js";
-import { Dynamic } from "solid-js/web";
+import { dynamic, type JSX } from "@solidjs/web";
 
 import { EASE } from "../motion-constants";
 
@@ -251,7 +249,8 @@ const PATTERN_TILE = {
 // stylex.props with reactive (accessor) arguments: the StyleX compiler tries to
 // evaluate local arrow functions at build time and throws, so these call sites
 // resolve at runtime instead.
-const sxProps = (...args: Parameters<typeof stylex.props>) => stylex.props(...args);
+const sxProps = (...args: ReadonlyArray<StyleXStyles | false | null | undefined>) =>
+  stylex.attrs(...args);
 
 const styles = stylex.create({
   root: {
@@ -346,7 +345,10 @@ const styles = stylex.create({
     textDecoration: "none",
     transform: {
       default: null,
-      ":active": { default: null, ["@media (prefers-reduced-motion: no-preference)"]: "scale(0.96)" },
+      ":active": {
+        default: null,
+        ["@media (prefers-reduced-motion: no-preference)"]: "scale(0.96)",
+      },
     },
     transitionProperty: "background-color, color, transform",
     transitionDuration: "160ms",
@@ -1157,10 +1159,18 @@ const styles = stylex.create({
     height: "auto",
   },
   mapWrapEnter: {
-    translate: { default: "0px 0px", [DESKTOP]: "-120px 0px", ["@media (prefers-reduced-motion: reduce)"]: null },
+    translate: {
+      default: "0px 0px",
+      [DESKTOP]: "-120px 0px",
+      ["@media (prefers-reduced-motion: reduce)"]: null,
+    },
   },
   mapWrapEnterRun: {
-    animationName: { default: fadeIn, [DESKTOP]: mapSlideIn, ["@media (prefers-reduced-motion: reduce)"]: "none" },
+    animationName: {
+      default: fadeIn,
+      [DESKTOP]: mapSlideIn,
+      ["@media (prefers-reduced-motion: reduce)"]: "none",
+    },
     animationDuration: `${MAP_SWEEP_MS}ms`,
     animationTimingFunction: MAP_SWEEP_EASE,
     animationFillMode: "both",
@@ -1177,13 +1187,20 @@ const styles = stylex.create({
   },
   mapSweepRun: {
     animationName: { default: mapSweep, ["@media (prefers-reduced-motion: reduce)"]: fadeIn },
-    animationDuration: { default: `${MAP_SWEEP_MS}ms`, ["@media (prefers-reduced-motion: reduce)"]: "300ms" },
+    animationDuration: {
+      default: `${MAP_SWEEP_MS}ms`,
+      ["@media (prefers-reduced-motion: reduce)"]: "300ms",
+    },
     animationTimingFunction: MAP_SWEEP_EASE,
     animationFillMode: "both",
   },
   globalCopyEnter: {
     opacity: 0,
-    translate: { default: "0px 0px", [DESKTOP]: "-80px 0px", ["@media (prefers-reduced-motion: reduce)"]: null },
+    translate: {
+      default: "0px 0px",
+      [DESKTOP]: "-80px 0px",
+      ["@media (prefers-reduced-motion: reduce)"]: null,
+    },
   },
   globalCopyEnterRun: {
     animationName: {
@@ -1192,7 +1209,10 @@ const styles = stylex.create({
       ["@media (prefers-reduced-motion: reduce)"]: fadeIn,
     },
     animationDuration: { default: "700ms", ["@media (prefers-reduced-motion: reduce)"]: "300ms" },
-    animationDelay: { default: `${MAP_SWEEP_MS / 2}ms`, ["@media (prefers-reduced-motion: reduce)"]: "0ms" },
+    animationDelay: {
+      default: `${MAP_SWEEP_MS / 2}ms`,
+      ["@media (prefers-reduced-motion: reduce)"]: "0ms",
+    },
     animationTimingFunction: ease.out,
     animationFillMode: "both",
   },
@@ -1452,11 +1472,11 @@ type ZoomProps = {
 };
 
 function ZoomReveal(props: ZoomProps) {
-  const p = mergeProps({ delay: 0, y: 24, scale: ZOOM_FROM_SCALE }, props);
+  const p = merge({ delay: 0, y: 24, scale: ZOOM_FROM_SCALE }, props);
   const reduce = useReducedMotion();
   return (
     <m.div
-      {...stylex.props(p.sx, p.style)}
+      {...stylex.attrs(p.sx, p.style)}
       initial={{ opacity: 0, transform: zoomFrom(p.y, p.scale) }}
       whileInView={{ opacity: 1, transform: SETTLED }}
       viewport={{ once: true, margin: "-80px" }}
@@ -1469,7 +1489,7 @@ function ZoomReveal(props: ZoomProps) {
 
 function VectorArt(props: { paths: readonly VectorPath[]; viewBox: string; sx: StyleXStyles }) {
   return (
-    <svg viewBox={props.viewBox} aria-hidden="true" {...UNFOCUSABLE} {...stylex.props(props.sx)}>
+    <svg viewBox={props.viewBox} aria-hidden="true" {...UNFOCUSABLE} {...stylex.attrs(props.sx)}>
       <For each={props.paths}>{(path) => <path d={path.d} fill={path.fill} />}</For>
     </svg>
   );
@@ -1477,11 +1497,11 @@ function VectorArt(props: { paths: readonly VectorPath[]; viewBox: string; sx: S
 
 function useScrolledPastTop() {
   const [scrolled, setScrolled] = createSignal(false);
-  onMount(() => {
+  onSettled(() => {
     const update = () => setScrolled(window.scrollY > 8);
     update();
     window.addEventListener("scroll", update, { passive: true });
-    onCleanup(() => window.removeEventListener("scroll", update));
+    return () => window.removeEventListener("scroll", update);
   });
   return scrolled;
 }
@@ -1496,7 +1516,7 @@ function useNavFits(
   navRef: Accessor<HTMLElement | undefined>,
 ) {
   const [fits, setFits] = createSignal(true);
-  onMount(() => {
+  onSettled(() => {
     const inner = innerRef();
     const nav = navRef();
     if (!inner || !nav) return;
@@ -1518,7 +1538,7 @@ function useNavFits(
     observer.observe(inner);
     observer.observe(nav);
     void document.fonts?.ready.then(measure);
-    onCleanup(() => observer.disconnect());
+    return () => observer.disconnect();
   });
   return fits;
 }
@@ -1635,7 +1655,7 @@ function SiteHeader(props: {
       onKeyDown={closeOnEscape}
       {...sxProps(styles.header, (scrolled() || menuOpen()) && styles.headerSolid)}
     >
-      <div ref={innerEl} {...stylex.props(styles.shell, styles.headerInner)}>
+      <div ref={innerEl} {...stylex.attrs(styles.shell, styles.headerInner)}>
         <a
           href="#top"
           aria-label="FENCHEM home"
@@ -1645,7 +1665,7 @@ function SiteHeader(props: {
               props.onNavigate("home", "top");
             }
           }}
-          {...stylex.props(styles.logoLink)}
+          {...stylex.attrs(styles.logoLink)}
         >
           <LogoMark />
         </a>
@@ -1659,7 +1679,7 @@ function SiteHeader(props: {
               href={item.href}
               aria-current={isActive(item.href) ? "location" : undefined}
               onClick={(event) => handleItemClick(event, item.href)}
-              {...stylex.props(styles.navLink, isActive(item.href) && styles.navLinkActive)}
+              {...stylex.attrs(styles.navLink, isActive(item.href) && styles.navLinkActive)}
             >
               {item.label}
             </a>
@@ -1683,20 +1703,20 @@ function SiteHeader(props: {
           <m.nav
             id={menuId}
             aria-label="Main"
-            {...stylex.props(styles.menuPanel)}
+            {...stylex.attrs(styles.menuPanel)}
             initial={{ opacity: 0, transform: "translateY(-8px)" }}
             animate={{ opacity: 1, transform: "translateY(0px)" }}
             exit={{ opacity: 0, transform: "translateY(-8px)" }}
             transition={{ duration: reduce() ? 0.15 : 0.2, ease: EASE }}
           >
-            <ul {...stylex.props(styles.menuList)}>
+            <ul {...stylex.attrs(styles.menuList)}>
               {NAV_ITEMS.map((item) => (
                 <li>
                   <a
                     href={item.href}
                     aria-current={isActive(item.href) ? "location" : undefined}
                     onClick={(event) => handleItemClick(event, item.href)}
-                    {...stylex.props(styles.menuLink, isActive(item.href) && styles.menuLinkActive)}
+                    {...stylex.attrs(styles.menuLink, isActive(item.href) && styles.menuLinkActive)}
                   >
                     {item.label}
                   </a>
@@ -1712,12 +1732,12 @@ function SiteHeader(props: {
 
 function LogoMark() {
   return (
-    <svg viewBox="0 0 161 52" aria-hidden="true" {...UNFOCUSABLE} {...stylex.props(styles.logo)}>
+    <svg viewBox="0 0 161 52" aria-hidden="true" {...UNFOCUSABLE} {...stylex.attrs(styles.logo)}>
       {LOGO_PATHS.map((path) => (
         <path
           d={path.d}
           fill={path.fill}
-          {...stylex.props(styles.logoPart, styles.enterDelay(logoPartDelay(path.d)))}
+          {...stylex.attrs(styles.logoPart, styles.enterDelay(logoPartDelay(path.d)))}
         />
       ))}
     </svg>
@@ -1803,7 +1823,7 @@ function InkPhrase(props: {
   const reduce = useReducedMotion();
   const opacity = useTransform(props.progress, props.range, [0.48, 1]);
   return (
-    <m.span {...stylex.props(styles.inkPhrase)} style={reduce() ? undefined : { opacity }}>
+    <m.span {...stylex.attrs(styles.inkPhrase)} style={reduce() ? undefined : { opacity }}>
       {props.children}
     </m.span>
   );
@@ -1819,13 +1839,13 @@ function About(props: { onOpenAboutPage?: () => void }) {
     <section
       id="about"
       aria-labelledby="oo-about-title"
-      {...stylex.props(styles.about, styles.inset124, styles.anchor)}
+      {...stylex.attrs(styles.about, styles.inset124, styles.anchor)}
     >
       <RiseReveal sx={styles.aboutInner}>
-        <h2 id="oo-about-title" {...stylex.props(styles.sectionTitle)}>
+        <h2 id="oo-about-title" {...stylex.attrs(styles.sectionTitle)}>
           {ABOUT.title}
         </h2>
-        <p ref={textEl} {...stylex.props(styles.aboutBody)}>
+        <p ref={textEl} {...stylex.attrs(styles.aboutBody)}>
           {ABOUT_INK_LINES.map((segments, lineIndex) => (
             <>
               {lineIndex > 0 ? <br /> : null}
@@ -1842,14 +1862,14 @@ function About(props: { onOpenAboutPage?: () => void }) {
             <button
               type="button"
               onClick={() => props.onOpenAboutPage?.()}
-              {...stylex.props(styles.button, styles.buttonPrimary, styles.buttonCompact)}
+              {...stylex.attrs(styles.button, styles.buttonPrimary, styles.buttonCompact)}
             >
               更多
             </button>
           ) : (
             <a
               href={ABOUT.cta.href}
-              {...stylex.props(styles.button, styles.buttonPrimary, styles.buttonCompact)}
+              {...stylex.attrs(styles.button, styles.buttonPrimary, styles.buttonCompact)}
             >
               {ABOUT.cta.label}
             </a>
@@ -1911,16 +1931,16 @@ function Campus() {
 function DigitWheel(props: { digit: number; delay: number }) {
   const reduce = useReducedMotion();
   return (
-    <span {...stylex.props(styles.wheel)}>
+    <span {...stylex.attrs(styles.wheel)}>
       <m.span
-        {...stylex.props(styles.wheelColumn)}
+        {...stylex.attrs(styles.wheelColumn)}
         initial={{ transform: "translateY(0%)" }}
         whileInView={{ transform: `translateY(${-(10 + props.digit) * 5}%)` }}
         viewport={{ once: true, margin: "-60px" }}
         transition={{ duration: reduce() ? 0 : 1.6, delay: reduce() ? 0 : props.delay, ease: EASE }}
       >
         {DIGIT_CELLS.map((cell) => (
-          <span {...stylex.props(styles.wheelCell)}>{cell}</span>
+          <span {...stylex.attrs(styles.wheelCell)}>{cell}</span>
         ))}
       </m.span>
     </span>
@@ -1929,7 +1949,7 @@ function DigitWheel(props: { digit: number; delay: number }) {
 
 function Odometer(props: { value: string; offset: number }) {
   return (
-    <span aria-hidden="true" {...stylex.props(styles.statValue)}>
+    <span aria-hidden="true" {...stylex.attrs(styles.statValue)}>
       <For each={props.value.split("")}>
         {(character, index) =>
           /\d/.test(character) ? (
@@ -1965,10 +1985,10 @@ function StatItem(props: { stat: (typeof STATS)[number]; index: number }) {
 }
 
 function IconPattern(props: { icon: StrengthIcon }) {
-  const Icon = () => STRENGTH_ICONS[props.icon];
+  const Icon = dynamic(() => STRENGTH_ICONS[props.icon]);
   const tileId = createUniqueId();
   return (
-    <svg aria-hidden="true" {...stylex.props(styles.pattern)}>
+    <svg aria-hidden="true" {...stylex.attrs(styles.pattern)}>
       <defs>
         <pattern
           id={tileId}
@@ -1978,14 +1998,7 @@ function IconPattern(props: { icon: StrengthIcon }) {
           patternUnits="userSpaceOnUse"
         >
           {PATTERN_TILE.cells.map(([x, y]) => (
-            <Dynamic
-              component={Icon()}
-              x={x}
-              y={y}
-              size={32}
-              strokeWidth={2}
-              absoluteStrokeWidth
-            />
+            <Icon x={x} y={y} size={32} strokeWidth={2} absoluteStrokeWidth />
           ))}
         </pattern>
       </defs>
@@ -2086,7 +2099,7 @@ function ProductCard(props: { product: (typeof PRODUCTS)[number]; index: number 
   const [imageFailed, setImageFailed] = createSignal(false);
   return (
     <RiseReveal delay={riseDelay(props.index)} sx={styles.productCard}>
-      <div {...stylex.props(styles.productImageFrame)}>
+      <div {...stylex.attrs(styles.productImageFrame)}>
         {imageFailed() ? null : (
           <img
             src={props.product.image}
@@ -2094,7 +2107,7 @@ function ProductCard(props: { product: (typeof PRODUCTS)[number]; index: number 
             loading="lazy"
             decoding="async"
             onError={() => setImageFailed(true)}
-            {...stylex.props(styles.productImage)}
+            {...stylex.attrs(styles.productImage)}
           />
         )}
       </div>
@@ -2118,13 +2131,13 @@ function Products(props: { onOpenProductsPage?: () => void }) {
     <section
       id="products"
       aria-labelledby="oo-products-title"
-      {...stylex.props(styles.products, styles.inset120, styles.anchor)}
+      {...stylex.attrs(styles.products, styles.inset120, styles.anchor)}
     >
       <RiseReveal sx={styles.introBlock}>
-        <h2 id="oo-products-title" {...stylex.props(styles.sectionTitle)}>
+        <h2 id="oo-products-title" {...stylex.attrs(styles.sectionTitle)}>
           {PRODUCTS_INTRO.title}
         </h2>
-        <p {...stylex.props(styles.sectionLead)}>{PRODUCTS_INTRO.lead}</p>
+        <p {...stylex.attrs(styles.sectionLead)}>{PRODUCTS_INTRO.lead}</p>
       </RiseReveal>
       <RiseReveal delay={riseDelay(1)} sx={styles.productsCta}>
         <a
@@ -2135,12 +2148,12 @@ function Products(props: { onOpenProductsPage?: () => void }) {
               props.onOpenProductsPage();
             }
           }}
-          {...stylex.props(styles.button, styles.buttonPrimary, styles.buttonCompact)}
+          {...stylex.attrs(styles.button, styles.buttonPrimary, styles.buttonCompact)}
         >
           {PRODUCTS_INTRO.cta.label}
         </a>
       </RiseReveal>
-      <div id="product-list" {...stylex.props(styles.productGrid)}>
+      <div id="product-list" {...stylex.attrs(styles.productGrid)}>
         <For each={PRODUCTS}>
           {(product, index) => <ProductCard product={product} index={index()} />}
         </For>
@@ -2200,9 +2213,9 @@ function Offices() {
 function AccordionIcon(props: { open: boolean }) {
   const reduce = useReducedMotion();
   return (
-    <span aria-hidden="true" {...stylex.props(styles.newsIconSlot)}>
+    <span aria-hidden="true" {...stylex.attrs(styles.newsIconSlot)}>
       <m.span
-        {...stylex.props(styles.newsIconLayer)}
+        {...stylex.attrs(styles.newsIconLayer)}
         animate={{ rotate: props.open ? 45 : 0 }}
         transition={reduce() ? { duration: 0 } : { type: "spring", duration: 0.3, bounce: 0 }}
       >
@@ -2253,9 +2266,9 @@ function News() {
 
 function SiteFooter(props: { onNavigate?: (view: View, targetId?: string) => void }) {
   return (
-    <footer {...stylex.props(styles.footer)}>
-      <div {...stylex.props(styles.shell, styles.inset120, styles.footerInner)}>
-        <div {...stylex.props(styles.footerTop)}>
+    <footer {...stylex.attrs(styles.footer)}>
+      <div {...stylex.attrs(styles.shell, styles.inset120, styles.footerInner)}>
+        <div {...stylex.attrs(styles.footerTop)}>
           <img
             src={IMAGES.footerLogo.src}
             alt={IMAGES.footerLogo.alt}
@@ -2263,13 +2276,13 @@ function SiteFooter(props: { onNavigate?: (view: View, targetId?: string) => voi
             height={73}
             loading="lazy"
             decoding="async"
-            {...stylex.props(styles.footerLogo)}
+            {...stylex.attrs(styles.footerLogo)}
           />
-          <nav aria-label="Footer" {...stylex.props(styles.footerColumns)}>
+          <nav aria-label="Footer" {...stylex.attrs(styles.footerColumns)}>
             {FOOTER_COLUMNS.map((column) => (
-              <div {...stylex.props(styles.footerColumn)}>
-                <h3 {...stylex.props(styles.footerHeading)}>{column.heading}</h3>
-                <ul {...stylex.props(styles.footerLinks)}>
+              <div {...stylex.attrs(styles.footerColumn)}>
+                <h3 {...stylex.attrs(styles.footerHeading)}>{column.heading}</h3>
+                <ul {...stylex.attrs(styles.footerLinks)}>
                   {column.links.map((link) => (
                     <li>
                       <a
@@ -2280,7 +2293,7 @@ function SiteFooter(props: { onNavigate?: (view: View, targetId?: string) => voi
                             props.onNavigate(link.page, `${link.page}-top`);
                           }
                         }}
-                        {...stylex.props(styles.footerLink)}
+                        {...stylex.attrs(styles.footerLink)}
                       >
                         {link.label}
                       </a>
@@ -2291,7 +2304,7 @@ function SiteFooter(props: { onNavigate?: (view: View, targetId?: string) => voi
             ))}
           </nav>
         </div>
-        <hr {...stylex.props(styles.footerRule)} />
+        <hr {...stylex.attrs(styles.footerRule)} />
         <FooterLegal
           copyright={COPYRIGHT}
           styles={{
@@ -2300,10 +2313,10 @@ function SiteFooter(props: { onNavigate?: (view: View, targetId?: string) => voi
             social: styles.social,
           }}
         >
-          <a href="#top" aria-label="LinkedIn" {...stylex.props(styles.socialLink)}>
+          <a href="#top" aria-label="LinkedIn" {...stylex.attrs(styles.socialLink)}>
             <VectorArt paths={LINKEDIN_PATHS} viewBox="0 0 20 20" sx={styles.socialIcon} />
           </a>
-          <a href="#top" aria-label="WeChat" {...stylex.props(styles.socialLink)}>
+          <a href="#top" aria-label="WeChat" {...stylex.attrs(styles.socialLink)}>
             <VectorArt paths={WECHAT_PATHS} viewBox="0 0 20 20" sx={styles.socialIcon} />
           </a>
         </FooterLegal>
@@ -2331,7 +2344,7 @@ export function VariantOOS1(props: {
   ContactPage?: Component<SubPageProps>;
   startView?: View;
 }) {
-  const p = mergeProps(
+  const p = merge(
     {
       AboutPage: AboutView as Component<SubPageProps>,
       ProductsPage: ProductsView as Component<SubPageProps>,
@@ -2343,26 +2356,32 @@ export function VariantOOS1(props: {
     },
     props,
   );
+  const AboutPage = dynamic(() => p.AboutPage);
+  const ProductsPage = dynamic(() => p.ProductsPage);
+  const RdPage = dynamic(() => p.RdPage);
+  const InsightsPage = dynamic(() => p.InsightsPage);
+  const NewsPage = dynamic(() => p.NewsPage);
+  const ContactPage = dynamic(() => p.ContactPage);
   const reduce = useReducedMotion();
   const intro = useIntro();
   const introVars = () =>
     ({
       "--oo-intro": intro() === "play" ? `${INTRO_REVEAL_MS}ms` : "0ms",
     }) as JSX.CSSProperties;
-  createEffect(
-    on(reduce, (reduced) => {
-      if (reduced) return;
-      const root = document.documentElement;
-      const previous = root.style.scrollBehavior;
-      root.style.scrollBehavior = "smooth";
-      onCleanup(() => {
-        root.style.scrollBehavior = previous;
-      });
-    }),
-  );
+  createEffect(reduce, (reduced) => {
+    if (reduced) return;
+    const root = document.documentElement;
+    const previous = root.style.scrollBehavior;
+    root.style.scrollBehavior = "smooth";
+    return () => {
+      root.style.scrollBehavior = previous;
+    };
+  });
 
-  const search = useSearch();
-  const [view, setView] = createSignal<View>(viewFromPage(search().page, p.startView));
+  const search = useSearch({ strict: false });
+  const [view, setView] = createSignal<View>(
+    untrack(() => viewFromPage(search().page, p.startView)),
+  );
   const [contactModalOpen, setContactModalOpen] = createSignal(false);
 
   const handleNavigate = (targetView: View, targetId?: string) => {
@@ -2388,21 +2407,21 @@ export function VariantOOS1(props: {
     }
   };
 
-  onMount(() => {
+  onSettled(() => {
     const onPopState = () => {
       const params = new URLSearchParams(window.location.search);
       setView(viewFromPage(params.get("page"), p.startView));
     };
     window.addEventListener("popstate", onPopState);
-    onCleanup(() => window.removeEventListener("popstate", onPopState));
+    return () => window.removeEventListener("popstate", onPopState);
   });
 
   return (
     <LazyMotion features={domMax} strict>
       <LayoutGroup>
         <MotionConfig reducedMotion="user">
-          <div lang="zh-CN" {...stylex.props(styles.root)} style={introVars()}>
-            <a href="#main-content" {...stylex.props(styles.skipLink)}>
+          <div lang="zh-CN" {...stylex.attrs(styles.root)} style={introVars()}>
+            <a href="#main-content" {...stylex.attrs(styles.skipLink)}>
               跳到主要内容
             </a>
             <SiteHeader
@@ -2411,7 +2430,7 @@ export function VariantOOS1(props: {
               onOpenContactDialog={() => setContactModalOpen(true)}
             />
             <div {...sxProps(styles.page, intro() === "play" && introStyles.pageReveal)}>
-              <main id="main-content" tabindex={-1} {...stylex.props(styles.mainTarget)}>
+              <main id="main-content" tabindex={-1} {...stylex.attrs(styles.mainTarget)}>
                 <Switch
                   fallback={
                     <>
@@ -2440,30 +2459,26 @@ export function VariantOOS1(props: {
                   }
                 >
                   <Match when={view() === "about"}>
-                    <Dynamic
-                      component={p.AboutPage}
+                    <AboutPage
                       onNavigateHome={(target?: string) =>
                         handleNavigate(target === "products" ? "products" : "home", target)
                       }
                     />
                   </Match>
                   <Match when={view() === "products"}>
-                    <Dynamic
-                      component={p.ProductsPage}
+                    <ProductsPage
                       onNavigateHome={(target?: string) => handleNavigate("home", target)}
                     />
                   </Match>
                   <Match when={view() === "rd"}>
-                    <Dynamic
-                      component={p.RdPage}
+                    <RdPage
                       onNavigateHome={(target?: string) =>
                         handleNavigate(target === "contact" ? "contact" : "home", target)
                       }
                     />
                   </Match>
                   <Match when={view() === "insights"}>
-                    <Dynamic
-                      component={p.InsightsPage}
+                    <InsightsPage
                       onNavigateHome={(target?: string) =>
                         handleNavigate(
                           target === "contact"
@@ -2477,16 +2492,14 @@ export function VariantOOS1(props: {
                     />
                   </Match>
                   <Match when={view() === "news"}>
-                    <Dynamic
-                      component={p.NewsPage}
+                    <NewsPage
                       onNavigateHome={(target?: string) =>
                         handleNavigate(target === "contact" ? "contact" : "home", target)
                       }
                     />
                   </Match>
                   <Match when={view() === "contact"}>
-                    <Dynamic
-                      component={p.ContactPage}
+                    <ContactPage
                       onNavigateHome={(target?: string) => handleNavigate("home", target)}
                     />
                   </Match>

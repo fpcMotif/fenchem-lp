@@ -1,7 +1,8 @@
 import * as stylex from "@stylexjs/stylex";
 import type { StyleXStyles } from "@stylexjs/stylex";
-import { For, type Component, type JSX, type Setter } from "solid-js";
-import { Menu, Search, X, ArrowRight } from "lucide-solid";
+import { For, type Component, type Setter } from "solid-js";
+import type { JSX } from "@solidjs/web";
+import { Menu, Search, X, ArrowRight } from "../../../../compat/lucide";
 import { Collapse } from "./collapse";
 import { EASE } from "../motion-constants";
 import { createInquiryHref } from "../../landing/landing-content";
@@ -29,32 +30,49 @@ export function BloomHeadline(props: {
   introAfter: (delay: number) => string;
 }) {
   return (
-    <span lang="en" {...stylex.props(props.styles.heroHeadline)}>
+    <span lang="en" {...stylex.attrs(props.styles.heroHeadline)}>
       <span
-        {...stylex.props(props.styles.heroLead, props.styles.heroBloom, props.styles.enterDelay(props.introAfter(300)))}
+        {...stylex.attrs(
+          props.styles.heroLead,
+          props.styles.heroBloom,
+          props.styles.enterDelay(props.introAfter(300)),
+        )}
       >
         {props.OPENING_BEFORE}
-        <span {...stylex.props(props.styles.heroAccent)}>{props.HERO.accent}</span>
+        <span {...stylex.attrs(props.styles.heroAccent)}>{props.HERO.accent}</span>
         {props.OPENING_AFTER}
       </span>{" "}
       <span
-        {...stylex.props(props.styles.heroLead, props.styles.heroBloom, props.styles.enterDelay(props.introAfter(400)))}
+        {...stylex.attrs(
+          props.styles.heroLead,
+          props.styles.heroBloom,
+          props.styles.enterDelay(props.introAfter(400)),
+        )}
       >
         {props.CLOSING_LEAD}
       </span>{" "}
-      <span {...stylex.props(props.styles.heroBreakLine)}>
+      <span {...stylex.attrs(props.styles.heroBreakLine)}>
         <span
-          {...stylex.props(props.styles.heroBreak, props.styles.heroBloom, props.styles.enterDelay(props.introAfter(500)))}
+          {...stylex.attrs(
+            props.styles.heroBreak,
+            props.styles.heroBloom,
+            props.styles.enterDelay(props.introAfter(500)),
+          )}
         >
-          <span {...stylex.props(props.styles.heroBreakInk, props.styles.heroBreakHead)}>{props.CLOSING_WORD}</span>
-          <span aria-hidden="true" {...stylex.props(props.styles.heroBreakInk, props.styles.heroBreakTail)}>
+          <span {...stylex.attrs(props.styles.heroBreakInk, props.styles.heroBreakHead)}>
+            {props.CLOSING_WORD}
+          </span>
+          <span
+            aria-hidden="true"
+            {...stylex.attrs(props.styles.heroBreakInk, props.styles.heroBreakTail)}
+          >
             {props.CLOSING_WORD}
           </span>
         </span>
-        <span aria-hidden="true" {...stylex.props(props.styles.heroPeriodSeat)}>
-          <span {...stylex.props(props.styles.heroPeriod)} />
+        <span aria-hidden="true" {...stylex.attrs(props.styles.heroPeriodSeat)}>
+          <span {...stylex.attrs(props.styles.heroPeriod)} />
         </span>
-        <span {...stylex.props(props.styles.visuallyHidden)}>.</span>
+        <span {...stylex.attrs(props.styles.visuallyHidden)}>.</span>
       </span>
     </span>
   );
@@ -72,21 +90,25 @@ export function CorporateHeaderActions(props: {
   setMenuOpen: Setter<boolean>;
 }) {
   return (
-    <div {...stylex.props(props.styles.headerActions)}>
-      <button type="button" {...stylex.props(props.styles.searchPill)}>
+    <div {...stylex.attrs(props.styles.headerActions)}>
+      <button type="button" {...stylex.attrs(props.styles.searchPill)}>
         <Search size={16} strokeWidth={2} absoluteStrokeWidth aria-hidden="true" />
-        <span {...stylex.props(props.styles.searchPlaceholder)}>AI 搜索</span>
+        <span {...stylex.attrs(props.styles.searchPlaceholder)}>AI 搜索</span>
       </button>
-      <button type="button" aria-label="CN, switch language" {...stylex.props(props.styles.langButton)}>
+      <button
+        type="button"
+        aria-label="CN, switch language"
+        {...stylex.attrs(props.styles.langButton)}
+      >
         CN
       </button>
       <button
         type="button"
         aria-label={props.menuOpen ? "Close menu" : "Open menu"}
-        aria-expanded={props.menuOpen}
+        aria-expanded={props.menuOpen ? "true" : "false"}
         aria-controls={props.menuId}
         onClick={() => props.setMenuOpen((open) => !open)}
-        {...stylex.props(props.styles.menuButton)}
+        {...stylex.attrs(props.styles.menuButton)}
       >
         {props.menuOpen ? (
           <X size={24} strokeWidth={2} absoluteStrokeWidth aria-hidden="true" />
@@ -115,22 +137,24 @@ export function CampusStatistic(props: {
 }) {
   return (
     <>
-      {props.index > 0 ? <span aria-hidden="true" {...stylex.props(props.styles.statDivider)} /> : null}
+      {props.index > 0 ? (
+        <span aria-hidden="true" {...stylex.attrs(props.styles.statDivider)} />
+      ) : null}
       <props.RiseReveal delay={props.riseDelay(props.index)} sx={props.styles.stat}>
-        <p {...stylex.props(props.styles.statText)}>{props.stat.label}</p>
-        <p {...stylex.props(props.styles.statFigure)}>
+        <p {...stylex.attrs(props.styles.statText)}>{props.stat.label}</p>
+        <p {...stylex.attrs(props.styles.statFigure)}>
           <props.Odometer value={props.stat.value} offset={props.index * props.STAT_STAGGER} />
           {props.stat.unit ? (
-            <span aria-hidden="true" {...stylex.props(props.styles.statUnit)}>
+            <span aria-hidden="true" {...stylex.attrs(props.styles.statUnit)}>
               {props.stat.unit}
             </span>
           ) : null}
-          <span {...stylex.props(props.styles.visuallyHidden)}>
+          <span {...stylex.attrs(props.styles.visuallyHidden)}>
             {props.stat.value}
             {props.stat.unit ?? ""}
           </span>
         </p>
-        <p {...stylex.props(props.styles.statText)}>{props.stat.caption}</p>
+        <p {...stylex.attrs(props.styles.statText)}>{props.stat.caption}</p>
       </props.RiseReveal>
     </>
   );
@@ -155,17 +179,17 @@ export function SpecificationMobileMenu(props: {
       open={props.open}
 
       transition={{ duration: props.reduce ? 0 : 0.36, ease: EASE }}
-      {...stylex.props(props.styles.mobilePanel)}
+      class={stylex.attrs(props.styles.mobilePanel).class}
     >
-      <div {...stylex.props(props.styles.container)}>
-        <ul {...stylex.props(props.styles.mobileList)}>
+      <div {...stylex.attrs(props.styles.container)}>
+        <ul {...stylex.attrs(props.styles.mobileList)}>
           <For each={props.links}>
             {(link) => (
               <li>
                 <a
                   href={link.href}
                   onClick={() => props.setOpen(false)}
-                  {...stylex.props(props.styles.mobileLink)}
+                  {...stylex.attrs(props.styles.mobileLink)}
                 >
                   {link.label}
                 </a>
@@ -176,10 +200,10 @@ export function SpecificationMobileMenu(props: {
             <a
               href={createInquiryHref("contact")}
               onClick={() => props.setOpen(false)}
-              {...stylex.props(props.styles.ctaPrimary)}
+              {...stylex.attrs(props.styles.ctaPrimary)}
             >
               Request a specification
-              <ArrowRight aria-hidden size={14} />
+              <ArrowRight aria-hidden="true" size={14} />
             </a>
           </li>
         </ul>

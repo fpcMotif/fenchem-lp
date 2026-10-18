@@ -1,6 +1,7 @@
 import * as stylex from "@stylexjs/stylex";
 import type { StyleXStyles } from "@stylexjs/stylex";
-import { createUniqueId, For, Show, type JSX } from "solid-js";
+import { createUniqueId, For, Show } from "solid-js";
+import type { JSX } from "@solidjs/web";
 
 import { EASE } from "../motion-constants";
 import { useReducedMotion } from "../use-reduced-motion";
@@ -34,7 +35,7 @@ function DetailText(props: { text: string }) {
     <For each={splitWithUrls(props.text)}>
       {(segment) =>
         segment.isLink ? (
-          <a href={segment.part} {...stylex.props(local.link)}>
+          <a href={segment.part} {...stylex.attrs(local.link)}>
             {segment.part}
           </a>
         ) : (
@@ -61,20 +62,20 @@ export function NewsAccordion(props: {
     <Show
       when={props.item.details.length !== 0}
       fallback={
-        <h3 {...stylex.props(props.styles.newsHeading)}>
-          <span {...stylex.props(props.styles.newsTrigger, local.staticTrigger)}>
+        <h3 {...stylex.attrs(props.styles.newsHeading)}>
+          <span {...stylex.attrs(props.styles.newsTrigger, local.staticTrigger)}>
             {props.item.title}
           </span>
         </h3>
       }
     >
-      <h3 {...stylex.props(props.styles.newsHeading)}>
+      <h3 {...stylex.attrs(props.styles.newsHeading)}>
         <button
           type="button"
-          aria-expanded={props.open}
+          aria-expanded={props.open ? "true" : "false"}
           aria-controls={panelId}
           onClick={() => props.onToggle()}
-          {...stylex.props(props.styles.newsTrigger)}
+          {...stylex.attrs(props.styles.newsTrigger)}
         >
           <span>{props.item.title}</span>
           {props.icon}
@@ -84,12 +85,12 @@ export function NewsAccordion(props: {
         id={panelId}
         open={props.open}
         transition={{ duration: reduce() ? 0 : 0.25, ease: EASE }}
-        {...stylex.props(props.styles.newsPanel)}
+        class={stylex.attrs(props.styles.newsPanel).class}
       >
-        <div {...stylex.props(props.styles.newsPanelInner)}>
+        <div {...stylex.attrs(props.styles.newsPanelInner)}>
           <For each={props.item.details}>
             {(detail) => (
-              <p {...stylex.props(props.styles.mutedText)}>
+              <p {...stylex.attrs(props.styles.mutedText)}>
                 <DetailText text={detail} />
               </p>
             )}

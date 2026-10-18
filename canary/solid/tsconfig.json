@@ -9,7 +9,7 @@
     "isolatedModules": true,
     "skipLibCheck": true,
     "jsx": "preserve",
-    "jsxImportSource": "solid-js",
+    "jsxImportSource": "@solidjs/web",
     "types": ["vite/client"]
   },
   "include": ["src/**/*", "vite.config.ts"]

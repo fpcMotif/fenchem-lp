@@ -1,5 +1,5 @@
 import { m } from "../../../../compat/motion";
-import type { JSX } from "solid-js";
+import type { JSX } from "@solidjs/web";
 import { EASE } from "../motion-constants";
 import { useReducedMotion } from "../use-reduced-motion";
 

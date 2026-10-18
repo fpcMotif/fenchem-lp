@@ -1,9 +1,9 @@
-import { breakpoints, colors } from "../../../ui/tokens.stylex";
+import { colors } from "../../../ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { ChevronRight } from "lucide-solid";
+import { ChevronRight } from "../../../../compat/lucide";
 import { useInView } from "../../../../compat/motion";
-import { createEffect, For, mergeProps, on, type JSX } from "solid-js";
-import { Dynamic } from "solid-js/web";
+import { createEffect, For, merge, untrack } from "solid-js";
+import { dynamic as dynamicTag, type JSX } from "@solidjs/web";
 
 import { useReducedMotion } from "../use-reduced-motion";
 
@@ -77,7 +77,10 @@ export const kitStyles = stylex.create({
 const styles = stylex.create({
   reveal: {
     opacity: 0,
-    transform: { default: null, ["@media (prefers-reduced-motion: no-preference)"]: "translateY(18px)" },
+    transform: {
+      default: null,
+      ["@media (prefers-reduced-motion: no-preference)"]: "translateY(18px)",
+    },
     transitionProperty: "opacity, transform",
     transitionDuration: "900ms",
     transitionTimingFunction: ease.out,
@@ -120,7 +123,10 @@ const styles = stylex.create({
     color: colors.paper,
   },
   bannerImage: {
-    animationName: { default: null, ["@media (prefers-reduced-motion: no-preference)"]: bannerSettle },
+    animationName: {
+      default: null,
+      ["@media (prefers-reduced-motion: no-preference)"]: bannerSettle,
+    },
     animationDuration: "1800ms",
     animationDelay: "200ms",
     animationTimingFunction: ease.out,
@@ -304,7 +310,10 @@ const styles = stylex.create({
     cursor: "pointer",
     transform: {
       default: null,
-      ":active": { default: null, ["@media (prefers-reduced-motion: no-preference)"]: "scale(0.96)" },
+      ":active": {
+        default: null,
+        ["@media (prefers-reduced-motion: no-preference)"]: "scale(0.96)",
+      },
     },
     transitionProperty: "background-color, color, transform, box-shadow",
     transitionDuration: "160ms",
@@ -372,14 +381,14 @@ export function Reveal(props: {
   sx?: stylex.StyleXStyles;
   as?: "div" | "li" | "figure" | "article";
 }) {
-  const p = mergeProps({ step: 0, as: "div" as const }, props);
+  const p = merge({ step: 0, as: "div" as const }, props);
+  const Tag = dynamicTag(() => p.as);
   let ref: HTMLElement | undefined;
   const shown = useInView(() => ref, { once: true, margin: "0px 0px -12% 0px" });
   return (
-    <Dynamic
-      component={p.as}
+    <Tag
       ref={(el: HTMLElement) => (ref = el)}
-      {...stylex.props(
+      {...stylex.attrs(
         styles.reveal,
         shown() && styles.revealShown,
         dynamic.delay(revealDelay(p.step)),
@@ -387,7 +396,7 @@ export function Reveal(props: {
       )}
     >
       {p.children}
-    </Dynamic>
+    </Tag>
   );
 }
 
@@ -403,23 +412,23 @@ export function SubPageBanner(props: {
   titleId: string;
   size?: "compact" | "tall";
 }) {
-  const p = mergeProps({ imagePosition: "center 58%" }, props);
+  const p = merge({ imagePosition: "center 58%" }, props);
   const compact = () => p.size === "compact";
   const tall = () => p.size === "tall";
   return (
-    <section aria-labelledby={p.titleId} {...stylex.props(styles.banner)}>
+    <section aria-labelledby={p.titleId} {...stylex.attrs(styles.banner)}>
       <img
         src={p.image}
         alt={p.imageAlt}
         fetchpriority="high"
         decoding="async"
-        {...stylex.props(styles.fill, styles.bannerImage)}
+        {...stylex.attrs(styles.fill, styles.bannerImage)}
         style={{ "object-position": p.imagePosition }}
       />
-      <div aria-hidden="true" {...stylex.props(styles.fill, styles.bannerScrim)} />
-      <div aria-hidden="true" {...stylex.props(styles.grain)} />
+      <div aria-hidden="true" {...stylex.attrs(styles.fill, styles.bannerScrim)} />
+      <div aria-hidden="true" {...stylex.attrs(styles.grain)} />
       <div
-        {...stylex.props(
+        {...stylex.attrs(
           kitStyles.shell,
           kitStyles.inset120,
           styles.bannerContent,
@@ -427,36 +436,36 @@ export function SubPageBanner(props: {
           tall() && styles.bannerContentTall,
         )}
       >
-        <div {...stylex.props(styles.bannerText, compact() && styles.bannerTextCompact)}>
+        <div {...stylex.attrs(styles.bannerText, compact() && styles.bannerTextCompact)}>
           {p.eyebrow ? (
-            <p lang="en" {...stylex.props(styles.bannerEyebrow)}>
+            <p lang="en" {...stylex.attrs(styles.bannerEyebrow)}>
               {p.eyebrow}
             </p>
           ) : null}
           <h1
             id={p.titleId}
-            {...stylex.props(styles.bannerTitle, compact() && styles.bannerTitleCompact)}
+            {...stylex.attrs(styles.bannerTitle, compact() && styles.bannerTitleCompact)}
           >
             {p.title}
           </h1>
-          <p lang="en" {...stylex.props(styles.bannerTagline, tall() && styles.bannerTaglineTall)}>
+          <p lang="en" {...stylex.attrs(styles.bannerTagline, tall() && styles.bannerTaglineTall)}>
             {p.tagline}
           </p>
-          <p {...stylex.props(styles.bannerLead, tall() && styles.bannerLeadTall)}>{p.lead}</p>
+          <p {...stylex.attrs(styles.bannerLead, tall() && styles.bannerLeadTall)}>{p.lead}</p>
         </div>
-        <div lang="en" {...stylex.props(styles.bannerMeta)}>
+        <div lang="en" {...stylex.attrs(styles.bannerMeta)}>
           <For each={p.meta}>
             {(item, index) => (
               <>
                 {index() > 0 ? (
-                  <span aria-hidden="true" {...stylex.props(styles.bannerMetaRule)} />
+                  <span aria-hidden="true" {...stylex.attrs(styles.bannerMetaRule)} />
                 ) : null}
                 <span>{item}</span>
               </>
             )}
           </For>
-          <span aria-hidden="true" {...stylex.props(styles.scrollTrack)}>
-            <span {...stylex.props(styles.scrollThumb)} />
+          <span aria-hidden="true" {...stylex.attrs(styles.scrollTrack)}>
+            <span {...stylex.attrs(styles.scrollThumb)} />
           </span>
         </div>
       </div>
@@ -473,55 +482,53 @@ export function SubPageNav(props: {
   onSelectChip?: (id: string) => void;
   chipsLabel?: string;
 }) {
-  const p = mergeProps({ chipsLabel: "On this page" }, props);
-  const controlled = p.onSelectChip !== undefined;
-  const spyIds = controlled ? [] : p.chips.map((chip) => chip.id);
+  const p = merge({ chipsLabel: "On this page" }, props);
+  const controlled = untrack(() => p.onSelectChip !== undefined);
+  const spyIds = controlled ? [] : untrack(() => p.chips.map((chip) => chip.id));
   const spy = useActiveSection(spyIds);
   const active = () => (controlled ? p.activeChip : spy());
   let chipListRef: HTMLElement | undefined;
   const reduce = useReducedMotion();
 
   createEffect(
-    on(
-      () => [active(), reduce()] as const,
-      ([current, reduceNow]) => {
-        const list = chipListRef;
-        const chip = current ? list?.querySelector<HTMLElement>(`[data-chip="${current}"]`) : null;
-        if (!list || !chip) return;
-        const listBox = list.getBoundingClientRect();
-        const chipBox = chip.getBoundingClientRect();
-        if (chipBox.left < listBox.left || chipBox.right > listBox.right) {
-          list.scrollBy({
-            left: chipBox.left - listBox.left - 16,
-            behavior: reduceNow ? "auto" : "smooth",
-          });
-        }
-      },
-    ),
+    () => [active(), reduce()] as const,
+    ([current, reduceNow]) => {
+      const list = chipListRef;
+      const chip = current ? list?.querySelector<HTMLElement>(`[data-chip="${current}"]`) : null;
+      if (!list || !chip) return;
+      const listBox = list.getBoundingClientRect();
+      const chipBox = chip.getBoundingClientRect();
+      if (chipBox.left < listBox.left || chipBox.right > listBox.right) {
+        list.scrollBy({
+          left: chipBox.left - listBox.left - 16,
+          behavior: reduceNow ? "auto" : "smooth",
+        });
+      }
+    },
   );
 
   return (
-    <div {...stylex.props(styles.subBar)}>
-      <div {...stylex.props(kitStyles.shell, kitStyles.inset120, styles.subBarInner)}>
-        <nav aria-label="Breadcrumb" {...stylex.props(styles.breadcrumb)}>
+    <div {...stylex.attrs(styles.subBar)}>
+      <div {...stylex.attrs(kitStyles.shell, kitStyles.inset120, styles.subBarInner)}>
+        <nav aria-label="Breadcrumb" {...stylex.attrs(styles.breadcrumb)}>
           <button
             type="button"
             onClick={() => p.onNavigateHome("top")}
-            {...stylex.props(styles.breadcrumbLink, kitStyles.focusRing)}
+            {...stylex.attrs(styles.breadcrumbLink, kitStyles.focusRing)}
           >
             首页
           </button>
           <ChevronRight size={14} aria-hidden="true" />
-          <span aria-current="page" {...stylex.props(styles.breadcrumbCurrent)}>
+          <span aria-current="page" {...stylex.attrs(styles.breadcrumbCurrent)}>
             {p.current}
           </span>
         </nav>
-        <nav aria-label={p.chipsLabel} ref={chipListRef} {...stylex.props(styles.chipList)}>
+        <nav aria-label={p.chipsLabel} ref={chipListRef} {...stylex.attrs(styles.chipList)}>
           <For each={p.chips}>
             {(chip, index) => {
               const isActive = () => active() === chip.id;
               const sx = () =>
-                stylex.props(
+                stylex.attrs(
                   styles.chip,
                   index() === 0 && styles.chipLead,
                   isActive() && styles.chipActive,
@@ -531,7 +538,7 @@ export function SubPageNav(props: {
                 <button
                   type="button"
                   data-chip={chip.id}
-                  aria-pressed={isActive()}
+                  aria-pressed={isActive() ? "true" : "false"}
                   onClick={() => p.onSelectChip!(chip.id)}
                   {...sx()}
                 >
@@ -565,14 +572,22 @@ export function SectionHead(props: {
   const invert = () => props.invert ?? false;
   return (
     <Reveal sx={styles.sectionHead}>
-      <p lang="en" {...stylex.props(styles.sectionEyebrow, invert() && styles.sectionEyebrowInvert)}>
+      <p
+        lang="en"
+        {...stylex.attrs(styles.sectionEyebrow, invert() && styles.sectionEyebrowInvert)}
+      >
         {props.eyebrow}
       </p>
-      <h2 id={props.titleId} {...stylex.props(styles.sectionTitle, invert() && styles.sectionTitleInvert)}>
+      <h2
+        id={props.titleId}
+        {...stylex.attrs(styles.sectionTitle, invert() && styles.sectionTitleInvert)}
+      >
         {props.title}
       </h2>
       {props.lead ? (
-        <p {...stylex.props(styles.sectionLead, invert() && styles.sectionLeadInvert)}>{props.lead}</p>
+        <p {...stylex.attrs(styles.sectionLead, invert() && styles.sectionLeadInvert)}>
+          {props.lead}
+        </p>
       ) : null}
     </Reveal>
   );

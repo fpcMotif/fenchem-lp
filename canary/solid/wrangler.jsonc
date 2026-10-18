@@ -1,7 +1,12 @@
 {
   "name": "fenchem-solid-canary",
-  "main": "./dist/server/worker.js",
+  "main": "@tanstack/solid-start/server-entry",
   "compatibility_date": "2026-07-14",
   "compatibility_flags": ["nodejs_compat"],
-  "assets": { "directory": "./dist/client", "binding": "ASSETS", "run_worker_first": true }
+  "assets": {
+    "directory": "dist/client",
+    "binding": "ASSETS",
+    "not_found_handling": "none",
+    "run_worker_first": false,
+  },
 }

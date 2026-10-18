@@ -1,6 +1,7 @@
 import * as stylex from "@stylexjs/stylex";
 import type { StyleXStyles } from "@stylexjs/stylex";
-import { For, type JSX } from "solid-js";
+import { For } from "solid-js";
+import type { JSX } from "@solidjs/web";
 
 export function FooterNavigation(props: {
   logo: { src: string; alt: string };
@@ -17,7 +18,7 @@ export function FooterNavigation(props: {
   >;
 }) {
   return (
-    <div {...stylex.props(props.styles.footerTop)}>
+    <div {...stylex.attrs(props.styles.footerTop)}>
       <img
         src={props.logo.src}
         alt={props.logo.alt}
@@ -25,18 +26,18 @@ export function FooterNavigation(props: {
         height={73}
         loading="lazy"
         decoding="async"
-        {...stylex.props(props.styles.footerLogo)}
+        {...stylex.attrs(props.styles.footerLogo)}
       />
-      <nav aria-label="Footer" {...stylex.props(props.styles.footerColumns)}>
+      <nav aria-label="Footer" {...stylex.attrs(props.styles.footerColumns)}>
         <For each={props.columns}>
           {(column) => (
-            <div {...stylex.props(props.styles.footerColumn)}>
-              <h3 {...stylex.props(props.styles.footerHeading)}>{column.heading}</h3>
-              <ul {...stylex.props(props.styles.footerLinks)}>
+            <div {...stylex.attrs(props.styles.footerColumn)}>
+              <h3 {...stylex.attrs(props.styles.footerHeading)}>{column.heading}</h3>
+              <ul {...stylex.attrs(props.styles.footerLinks)}>
                 <For each={column.links}>
                   {(link) => (
                     <li>
-                      <a href="#top" {...stylex.props(props.styles.footerLink)}>
+                      <a href="#top" {...stylex.attrs(props.styles.footerLink)}>
                         {link}
                       </a>
                     </li>
@@ -57,9 +58,9 @@ export function FooterLegal(props: {
   styles: Record<"footerBottom" | "copyright" | "social", StyleXStyles>;
 }) {
   return (
-    <div {...stylex.props(props.styles.footerBottom)}>
-      <p {...stylex.props(props.styles.copyright)}>{props.copyright}</p>
-      <div {...stylex.props(props.styles.social)}>{props.children}</div>
+    <div {...stylex.attrs(props.styles.footerBottom)}>
+      <p {...stylex.attrs(props.styles.copyright)}>{props.copyright}</p>
+      <div {...stylex.attrs(props.styles.social)}>{props.children}</div>
     </div>
   );
 }

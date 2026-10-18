@@ -2,17 +2,10 @@ import type { STATS as CampusStats } from "../variant-oos/content";
 type CampusStat = (typeof CampusStats)[number];
 import * as stylex from "@stylexjs/stylex";
 import type { StyleXStyles } from "@stylexjs/stylex";
-import {
-  For,
-  Show,
-  type Component,
-  type ComponentProps,
-  type JSX,
-  type Ref,
-  type Setter,
-} from "solid-js";
+import { For, Show, type Component, type Ref, type Setter } from "solid-js";
+import type { ComponentProps, JSX } from "@solidjs/web";
 import { m, AnimatePresence, type MotionValue } from "../../../../compat/motion";
-import { ArrowUpRight } from "lucide-solid";
+import { ArrowUpRight } from "../../../../compat/lucide";
 import { EASE, STAGGER } from "../motion-constants";
 import { HeroGradeFilter } from "../hero-grade";
 import { HeroBackdrop } from "./corporate-sections";
@@ -38,22 +31,30 @@ export function LakeStatistic(props: {
   drawn: boolean;
 }) {
   return (
-    <div {...stylex.props(props.styles.lakeStat)}>
-      <m.p {...stylex.props(props.styles.lakeLabel)} style={{ opacity: props.surfacing, y: props.lift }}>
+    <div {...stylex.attrs(props.styles.lakeStat)}>
+      <m.p
+        {...stylex.attrs(props.styles.lakeLabel)}
+        style={{ opacity: props.surfacing, y: props.lift }}
+      >
         {props.stat.label}
       </m.p>
       <m.p
         data-lake-glyph={props.display}
         data-lake-final={props.stat.value}
         data-lake-unit={props.stat.unit ?? ""}
-        {...stylex.props(props.styles.lakeFigure, props.drawn && props.styles.lakeFigureDrawn)}
+        {...stylex.attrs(props.styles.lakeFigure, props.drawn && props.styles.lakeFigureDrawn)}
         style={{ opacity: props.surfacing }}
       >
         <span aria-hidden="true">{props.display}</span>
-        <span {...stylex.props(props.styles.visuallyHidden)}>{props.stat.value}</span>
-        {props.stat.unit ? <span {...stylex.props(props.styles.lakeUnit)}>{props.stat.unit}</span> : null}
+        <span {...stylex.attrs(props.styles.visuallyHidden)}>{props.stat.value}</span>
+        {props.stat.unit ? (
+          <span {...stylex.attrs(props.styles.lakeUnit)}>{props.stat.unit}</span>
+        ) : null}
       </m.p>
-      <m.p {...stylex.props(props.styles.lakeCaption)} style={{ opacity: props.surfacing, y: props.lift }}>
+      <m.p
+        {...stylex.attrs(props.styles.lakeCaption)}
+        style={{ opacity: props.surfacing, y: props.lift }}
+      >
         {props.stat.caption}
       </m.p>
     </div>
@@ -74,14 +75,18 @@ export function CountedStatistic(props: {
 }) {
   return (
     <>
-      {props.index > 0 ? <span aria-hidden="true" {...stylex.props(props.styles.statDivider)} /> : null}
+      {props.index > 0 ? (
+        <span aria-hidden="true" {...stylex.attrs(props.styles.statDivider)} />
+      ) : null}
       <props.ZoomReveal delay={props.index * STAGGER} sx={props.styles.stat}>
-        <p {...stylex.props(props.styles.statText)}>{props.stat.label}</p>
-        <p {...stylex.props(props.styles.statFigure)}>
+        <p {...stylex.attrs(props.styles.statText)}>{props.stat.label}</p>
+        <p {...stylex.attrs(props.styles.statFigure)}>
           <props.CountUp value={props.stat.value} />
-          {props.stat.unit ? <span {...stylex.props(props.styles.statUnit)}>{props.stat.unit}</span> : null}
+          {props.stat.unit ? (
+            <span {...stylex.attrs(props.styles.statUnit)}>{props.stat.unit}</span>
+          ) : null}
         </p>
-        <p {...stylex.props(props.styles.statText)}>{props.stat.caption}</p>
+        <p {...stylex.attrs(props.styles.statText)}>{props.stat.caption}</p>
       </props.ZoomReveal>
     </>
   );
@@ -103,15 +108,18 @@ export function TiltedProductCard(props: {
   summaryStyles: ComponentProps<typeof ProductSummary>["styles"];
 }) {
   return (
-    <props.ZoomReveal delay={props.index * STAGGER} sx={[props.styles.productCard, stylex.defaultMarker()]}>
-      <div ref={props.tiltRef} {...stylex.props(props.styles.productTilt)}>
-        <div {...stylex.props(props.styles.productImageFrame)}>
+    <props.ZoomReveal
+      delay={props.index * STAGGER}
+      sx={[props.styles.productCard, stylex.defaultMarker()]}
+    >
+      <div ref={props.tiltRef} {...stylex.attrs(props.styles.productTilt)}>
+        <div {...stylex.attrs(props.styles.productImageFrame)}>
           <img
             src={props.product.image}
             alt={props.product.english}
             loading="lazy"
             decoding="async"
-            {...stylex.props(props.styles.productImage)}
+            {...stylex.attrs(props.styles.productImage)}
           />
         </div>
         <ProductSummary
@@ -119,7 +127,7 @@ export function TiltedProductCard(props: {
           sx={[props.styles.productPanel, props.index % 2 === 1 && props.styles.productPanelAlt]}
           styles={props.summaryStyles}
         />
-        <span aria-hidden="true" {...stylex.props(props.styles.productGlare)} />
+        <span aria-hidden="true" {...stylex.attrs(props.styles.productGlare)} />
       </div>
     </props.ZoomReveal>
   );
@@ -153,19 +161,22 @@ export function CorporateMenu(props: {
   return (
     <header
       onKeyDown={props.closeOnEscape}
-      {...stylex.props(props.styles.header, (props.scrolled || props.menuOpen) && props.styles.headerSolid)}
+      {...stylex.attrs(
+        props.styles.header,
+        (props.scrolled || props.menuOpen) && props.styles.headerSolid,
+      )}
     >
-      <div {...stylex.props(props.styles.shell, props.styles.headerInner)}>
-        <a href="#top" aria-label="FENCHEM home" {...stylex.props(props.styles.logoLink)}>
+      <div {...stylex.attrs(props.styles.shell, props.styles.headerInner)}>
+        <a href="#top" aria-label="FENCHEM home" {...stylex.attrs(props.styles.logoLink)}>
           <props.LogoMark />
         </a>
-        <nav aria-label="Main" {...stylex.props(props.styles.nav)}>
+        <nav aria-label="Main" {...stylex.attrs(props.styles.nav)}>
           <For each={props.NAV_ITEMS}>
             {(item) => (
               <a
                 href={item.href}
                 aria-current={props.isActive(item.href) ? "location" : undefined}
-                {...stylex.props(
+                {...stylex.attrs(
                   props.styles.navLink,
                   props.isActive(item.href) && props.styles.navLinkActive,
                 )}
@@ -187,13 +198,13 @@ export function CorporateMenu(props: {
           <m.nav
             id={props.menuId}
             aria-label="Main"
-            {...stylex.props(props.styles.menuPanel)}
+            class={stylex.attrs(props.styles.menuPanel).class}
             initial={{ opacity: 0, transform: "translateY(-8px)" }}
             animate={{ opacity: 1, transform: "translateY(0px)" }}
             exit={{ opacity: 0, transform: "translateY(-8px)" }}
             transition={{ duration: props.reduce ? 0.15 : 0.2, ease: EASE }}
           >
-            <ul {...stylex.props(props.styles.menuList)}>
+            <ul {...stylex.attrs(props.styles.menuList)}>
               <For each={props.NAV_ITEMS}>
                 {(item) => (
                   <li>
@@ -201,7 +212,7 @@ export function CorporateMenu(props: {
                       href={item.href}
                       aria-current={props.isActive(item.href) ? "location" : undefined}
                       onClick={() => props.setMenuOpen(false)}
-                      {...stylex.props(
+                      {...stylex.attrs(
                         props.styles.menuLink,
                         props.isActive(item.href) && props.styles.menuLinkActive,
                       )}
@@ -267,10 +278,17 @@ export function RisingHero(props: {
   backdropStyles: ComponentProps<typeof HeroBackdrop>["styles"];
   backdropFragment?: string;
   backdropProgress?: MotionValue<number>;
-  onSecondaryClick?: (event: MouseEvent & { currentTarget: HTMLAnchorElement; target: Element }) => void;
+  onSecondaryClick?: (
+    event: MouseEvent & { currentTarget: HTMLAnchorElement; target: Element },
+  ) => void;
 }) {
   return (
-    <section ref={props.heroRef} id="top" aria-labelledby="oo-hero-title" {...stylex.props(props.styles.hero)}>
+    <section
+      ref={props.heroRef}
+      id="top"
+      aria-labelledby="oo-hero-title"
+      {...stylex.attrs(props.styles.hero)}
+    >
       <HeroGradeFilter />
       <HeroBackdrop
         styles={props.backdropStyles}
@@ -280,34 +298,38 @@ export function RisingHero(props: {
         liquidProgress={props.backdropProgress}
       />
       <m.div
-        {...stylex.props(props.styles.shell, props.styles.inset120, props.styles.heroContent)}
+        {...stylex.attrs(props.styles.shell, props.styles.inset120, props.styles.heroContent)}
         style={props.reduce ? undefined : { y: props.contentY, opacity: props.contentOpacity }}
       >
-        <div {...stylex.props(props.styles.heroCopy)}>
-          <h1 id="oo-hero-title" {...stylex.props(props.styles.heroTitle)}>
+        <div {...stylex.attrs(props.styles.heroCopy)}>
+          <h1 id="oo-hero-title" {...stylex.attrs(props.styles.heroTitle)}>
             <span
               lang={
                 HAN_SCRIPT.test(
-                  props.OPENING_BEFORE + props.HERO.accent + props.OPENING_AFTER + props.CLOSING_LEAD + props.CLOSING_WORD,
+                  props.OPENING_BEFORE +
+                    props.HERO.accent +
+                    props.OPENING_AFTER +
+                    props.CLOSING_LEAD +
+                    props.CLOSING_WORD,
                 )
                   ? undefined
                   : "en"
               }
-              {...stylex.props(props.styles.heroHeadline)}
+              {...stylex.attrs(props.styles.heroHeadline)}
             >
               <span
-                {...stylex.props(
+                {...stylex.attrs(
                   props.styles.heroLead,
                   props.styles.heroRise,
                   props.styles.enterDelay(props.introAfter(0)),
                 )}
               >
                 {props.OPENING_BEFORE}
-                <span {...stylex.props(props.styles.heroAccent)}>{props.HERO.accent}</span>
+                <span {...stylex.attrs(props.styles.heroAccent)}>{props.HERO.accent}</span>
                 {props.OPENING_AFTER}
               </span>{" "}
               <span
-                {...stylex.props(
+                {...stylex.attrs(
                   props.styles.heroLead,
                   props.styles.heroRise,
                   props.styles.enterDelay(props.introAfter(80)),
@@ -315,32 +337,32 @@ export function RisingHero(props: {
               >
                 {props.CLOSING_LEAD}
               </span>{" "}
-              <span {...stylex.props(props.styles.heroBreakLine)}>
+              <span {...stylex.attrs(props.styles.heroBreakLine)}>
                 <span
-                  {...stylex.props(
+                  {...stylex.attrs(
                     props.styles.heroBreak,
                     props.styles.heroRise,
                     props.styles.enterDelay(props.introAfter(160)),
                   )}
                 >
-                  <span {...stylex.props(props.styles.heroBreakInk, props.styles.heroBreakHead)}>
+                  <span {...stylex.attrs(props.styles.heroBreakInk, props.styles.heroBreakHead)}>
                     {props.CLOSING_WORD}
                   </span>
                   <span
                     aria-hidden="true"
-                    {...stylex.props(props.styles.heroBreakInk, props.styles.heroBreakTail)}
+                    {...stylex.attrs(props.styles.heroBreakInk, props.styles.heroBreakTail)}
                   >
                     {props.CLOSING_WORD}
                   </span>
                 </span>
-                <span aria-hidden="true" {...stylex.props(props.styles.heroPeriodSeat)}>
-                  <span {...stylex.props(props.styles.heroPeriod)} />
+                <span aria-hidden="true" {...stylex.attrs(props.styles.heroPeriodSeat)}>
+                  <span {...stylex.attrs(props.styles.heroPeriod)} />
                 </span>
-                <span {...stylex.props(props.styles.visuallyHidden)}>.</span>
+                <span {...stylex.attrs(props.styles.visuallyHidden)}>.</span>
               </span>
             </span>{" "}
             <span
-              {...stylex.props(
+              {...stylex.attrs(
                 props.styles.heroSubtitle,
                 props.styles.heroRise,
                 props.styles.enterDelay(props.introAfter(240)),
@@ -350,10 +372,20 @@ export function RisingHero(props: {
             </span>
           </h1>
         </div>
-        <div {...stylex.props(props.styles.ctaRow, props.styles.heroFade, props.styles.enterDelay(props.introAfter(600)))}>
+        <div
+          {...stylex.attrs(
+            props.styles.ctaRow,
+            props.styles.heroFade,
+            props.styles.enterDelay(props.introAfter(600)),
+          )}
+        >
           <a
             href={props.HERO.primary.href}
-            {...stylex.props(props.styles.button, props.styles.buttonPrimary, props.styles.buttonHero)}
+            {...stylex.attrs(
+              props.styles.button,
+              props.styles.buttonPrimary,
+              props.styles.buttonHero,
+            )}
           >
             {props.HERO.primary.label}
           </a>
@@ -365,7 +397,11 @@ export function RisingHero(props: {
                 props.onSecondaryClick(event);
               }
             }}
-            {...stylex.props(props.styles.button, props.styles.buttonSecondary, props.styles.buttonHero)}
+            {...stylex.attrs(
+              props.styles.button,
+              props.styles.buttonSecondary,
+              props.styles.buttonHero,
+            )}
           >
             {props.HERO.secondary.label}
           </a>
@@ -401,13 +437,13 @@ export function InkedAbout(props: {
     <section
       id="about"
       aria-labelledby="oo-about-title"
-      {...stylex.props(props.styles.about, props.styles.inset124, props.styles.anchor)}
+      {...stylex.attrs(props.styles.about, props.styles.inset124, props.styles.anchor)}
     >
       <props.RiseReveal sx={props.styles.aboutInner}>
-        <h2 id="oo-about-title" {...stylex.props(props.styles.sectionTitle)}>
+        <h2 id="oo-about-title" {...stylex.attrs(props.styles.sectionTitle)}>
           {props.ABOUT.title}
         </h2>
-        <p ref={props.textRef} {...stylex.props(props.styles.aboutBody)}>
+        <p ref={props.textRef} {...stylex.attrs(props.styles.aboutBody)}>
           <For each={props.ABOUT_INK_LINES}>
             {(segments, lineIndex) => (
               <>
@@ -425,7 +461,11 @@ export function InkedAbout(props: {
         </p>
         <a
           href={props.ABOUT.cta.href}
-          {...stylex.props(props.styles.button, props.styles.buttonPrimary, props.styles.buttonCompact)}
+          {...stylex.attrs(
+            props.styles.button,
+            props.styles.buttonPrimary,
+            props.styles.buttonCompact,
+          )}
         >
           {props.ABOUT.cta.label}
         </a>
@@ -452,10 +492,10 @@ export function FramedCampus(props: {
   StatItem: Component<{ stat: CampusStat; index: number }>;
 }) {
   return (
-    <section id="campus" aria-label="R&D and production" {...stylex.props(props.styles.anchor)}>
-      <div ref={props.stageRef} {...stylex.props(props.styles.campusStage)}>
+    <section id="campus" aria-label="R&D and production" {...stylex.attrs(props.styles.anchor)}>
+      <div ref={props.stageRef} {...stylex.attrs(props.styles.campusStage)}>
         <m.div
-          {...stylex.props(props.styles.campusFrame)}
+          {...stylex.attrs(props.styles.campusFrame)}
           style={props.reduce ? undefined : { clipPath: props.windowClip }}
         >
           <m.img
@@ -463,12 +503,12 @@ export function FramedCampus(props: {
             alt={props.IMAGES.campus.alt}
             loading="lazy"
             decoding="async"
-            {...stylex.props(props.styles.campusImage)}
+            {...stylex.attrs(props.styles.campusImage)}
             style={props.reduce ? undefined : { scale: props.photoScale }}
           />
         </m.div>
       </div>
-      <div {...stylex.props(props.styles.shell, props.styles.inset132, props.styles.statsBand)}>
+      <div {...stylex.attrs(props.styles.shell, props.styles.inset132, props.styles.statsBand)}>
         <For each={props.STATS}>
           {(stat, index) => <props.StatItem stat={stat} index={index()} />}
         </For>
@@ -518,11 +558,11 @@ export function SweepingOffices(props: {
   riseDelay: (index: number) => number;
 }) {
   return (
-    <section id="offices" aria-labelledby="oo-offices-title" {...stylex.props(props.styles.anchor)}>
-      <div {...stylex.props(props.styles.globalBand)}>
-        <div ref={props.rowRef} {...stylex.props(props.styles.globalRow)}>
+    <section id="offices" aria-labelledby="oo-offices-title" {...stylex.attrs(props.styles.anchor)}>
+      <div {...stylex.attrs(props.styles.globalBand)}>
+        <div ref={props.rowRef} {...stylex.attrs(props.styles.globalRow)}>
           <div
-            {...stylex.props(
+            {...stylex.attrs(
               props.styles.mapWrap,
               props.styles.mapWrapEnter,
               props.rowInView && props.styles.mapWrapEnterRun,
@@ -535,13 +575,17 @@ export function SweepingOffices(props: {
               height={321}
               loading="lazy"
               decoding="async"
-              {...stylex.props(props.styles.mapImage, props.styles.mapSweep, props.rowInView && props.styles.mapSweepRun)}
+              {...stylex.attrs(
+                props.styles.mapImage,
+                props.styles.mapSweep,
+                props.rowInView && props.styles.mapSweepRun,
+              )}
             />
             <For each={props.OFFICE_MAP_PINS}>
               {(pin, index) => (
                 <span
                   aria-hidden="true"
-                  {...stylex.props(
+                  {...stylex.attrs(
                     props.styles.mapRing,
                     props.rowInView && props.styles.mapRingPulse,
                     props.styles.mapRingAt(
@@ -555,33 +599,31 @@ export function SweepingOffices(props: {
             </For>
           </div>
           <div
-            {...stylex.props(
+            {...stylex.attrs(
               props.styles.globalCopy,
               props.styles.globalCopyEnter,
               props.rowInView && props.styles.globalCopyEnterRun,
             )}
           >
-            <h2 id="oo-offices-title" {...stylex.props(props.styles.sectionTitle)}>
+            <h2 id="oo-offices-title" {...stylex.attrs(props.styles.sectionTitle)}>
               {props.GLOBAL_INTRO.title}
             </h2>
-            <p {...stylex.props(props.styles.sectionLead)}>{props.GLOBAL_INTRO.lead}</p>
+            <p {...stylex.attrs(props.styles.sectionLead)}>{props.GLOBAL_INTRO.lead}</p>
           </div>
         </div>
       </div>
-      <div {...stylex.props(props.styles.officesBand)}>
-        <div {...stylex.props(props.styles.shell, props.styles.inset120, props.styles.regions)}>
+      <div {...stylex.attrs(props.styles.officesBand)}>
+        <div {...stylex.attrs(props.styles.shell, props.styles.inset120, props.styles.regions)}>
           <For each={props.OFFICE_COLUMNS}>
             {(column, index) => (
               <props.RiseReveal delay={props.riseDelay(index())} sx={props.styles.officeColumn}>
                 <For each={column}>
                   {(group) => (
-                    <div {...stylex.props(props.styles.officeGroup)}>
-                      <h3 {...stylex.props(props.styles.regionHeader)}>{group.region}</h3>
-                      <ul {...stylex.props(props.styles.list, props.styles.regionBody)}>
+                    <div {...stylex.attrs(props.styles.officeGroup)}>
+                      <h3 {...stylex.attrs(props.styles.regionHeader)}>{group.region}</h3>
+                      <ul {...stylex.attrs(props.styles.list, props.styles.regionBody)}>
                         <For each={group.offices}>
-                          {(office) => (
-                            <li {...stylex.props(props.styles.mutedText)}>{office}</li>
-                          )}
+                          {(office) => <li {...stylex.attrs(props.styles.mutedText)}>{office}</li>}
                         </For>
                       </ul>
                     </div>
@@ -610,17 +652,22 @@ export function StrengthQuadrantCopy(props: {
   idPrefix: string;
 }) {
   return (
-    <div {...stylex.props(props.styles.quadrantText, props.inverse && props.styles.quadrantInverse)}>
-      <div {...stylex.props(props.styles.quadrantCopy)}>
-        <h3 id={`${props.idPrefix}-strength-${props.index}`} {...stylex.props(props.styles.quadrantTitle)}>
+    <div
+      {...stylex.attrs(props.styles.quadrantText, props.inverse && props.styles.quadrantInverse)}
+    >
+      <div {...stylex.attrs(props.styles.quadrantCopy)}>
+        <h3
+          id={`${props.idPrefix}-strength-${props.index}`}
+          {...stylex.attrs(props.styles.quadrantTitle)}
+        >
           {props.strength.title}
         </h3>
         {props.strength.description ? (
-          <p {...stylex.props(props.styles.quadrantSmall)}>{props.strength.description}</p>
+          <p {...stylex.attrs(props.styles.quadrantSmall)}>{props.strength.description}</p>
         ) : null}
       </div>
       {props.strength.link ? (
-        <a href="#offices" {...stylex.props(props.styles.quadrantLink)}>
+        <a href="#offices" {...stylex.attrs(props.styles.quadrantLink)}>
           {props.strength.link}
           <ArrowUpRight size={12} strokeWidth={1.5} absoluteStrokeWidth aria-hidden="true" />
         </a>
@@ -656,29 +703,33 @@ export function QuadrantStrengths(props: {
     <section
       id="strengths"
       aria-labelledby="oos1-strengths-title"
-      {...stylex.props(props.styles.strengths, props.styles.inset120, props.styles.anchor)}
+      {...stylex.attrs(props.styles.strengths, props.styles.inset120, props.styles.anchor)}
     >
       <props.RiseReveal sx={props.styles.introBlock}>
-        <h2 id="oos1-strengths-title" {...stylex.props(props.styles.sectionTitle)}>
+        <h2 id="oos1-strengths-title" {...stylex.attrs(props.styles.sectionTitle)}>
           {props.STRENGTHS_INTRO.title}
         </h2>
-        <p {...stylex.props(props.styles.sectionLead)}>{props.STRENGTHS_INTRO.lead}</p>
+        <p {...stylex.attrs(props.styles.sectionLead)}>{props.STRENGTHS_INTRO.lead}</p>
       </props.RiseReveal>
-      <div ref={props.gridRef} {...stylex.props(props.styles.quadrants)}>
+      <div ref={props.gridRef} {...stylex.attrs(props.styles.quadrants)}>
         <For each={props.STRENGTHS}>
           {(strength, index) => (
             <props.Quadrant strength={strength} index={index()} apart={props.apart} />
           )}
         </For>
-        <m.div aria-hidden="true" {...stylex.props(props.styles.badge)} style={{ rotate: props.rotate }}>
-          <svg viewBox="0 0 160 160" {...stylex.props(props.styles.badgeSvg)}>
+        <m.div
+          aria-hidden="true"
+          {...stylex.attrs(props.styles.badge)}
+          style={{ rotate: props.rotate }}
+        >
+          <svg viewBox="0 0 160 160" {...stylex.attrs(props.styles.badgeSvg)}>
             <defs>
               <path
                 id="oos1-badge-ring"
                 d={`M80,80 m-${props.RING_RADIUS},0 a${props.RING_RADIUS},${props.RING_RADIUS} 0 1,1 ${props.RING_RADIUS * 2},0 a${props.RING_RADIUS},${props.RING_RADIUS} 0 1,1 -${props.RING_RADIUS * 2},0`}
               />
             </defs>
-            <text {...stylex.props(props.styles.badgeText)}>
+            <text {...stylex.attrs(props.styles.badgeText)}>
               <textPath
                 href="#oos1-badge-ring"
                 // Solid's TextPath typings omit these valid SVGTextContentElement attributes.
@@ -687,7 +738,7 @@ export function QuadrantStrengths(props: {
                 WHY FENCHEM · 为什么选择泛成 · WHY FENCHEM · 为什么选择泛成 ·
               </textPath>
             </text>
-            <g {...stylex.props(props.styles.badgeCross)} stroke="currentColor" stroke-width="1">
+            <g {...stylex.attrs(props.styles.badgeCross)} stroke="currentColor" stroke-width="1">
               <line x1="80" y1="56" x2="80" y2="104" />
               <line x1="56" y1="80" x2="104" y2="80" />
             </g>

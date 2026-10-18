@@ -1,5 +1,6 @@
 import { m, type HTMLMotionProps, type Transition } from "../../../../compat/motion";
-import { splitProps, type JSX } from "solid-js";
+import { omit } from "solid-js";
+import type { JSX } from "@solidjs/web";
 import { useReducedMotion } from "../use-reduced-motion";
 
 export function Collapse(
@@ -9,26 +10,26 @@ export function Collapse(
     transition: Transition;
   },
 ) {
-  const [local, rest] = splitProps(props, ["open", "children", "transition", "style"]);
+  const rest = omit(props, "open", "children", "transition", "style");
   const reduce = useReducedMotion();
-  const timing = () => (reduce() ? { duration: 0 } : local.transition);
+  const timing = () => (reduce() ? { duration: 0 } : props.transition);
 
   return (
     <m.div
       {...rest}
       layout={!reduce()}
-      inert={!local.open || undefined}
-      aria-hidden={!local.open}
-      style={{ ...local.style, height: local.open ? "auto" : 0, overflow: "hidden" }}
+      inert={!props.open || undefined}
+      aria-hidden={props.open ? "false" : "true"}
+      style={{ ...props.style, height: props.open ? "auto" : 0, overflow: "hidden" }}
       transition={timing()}
     >
       <m.div
         layout="position"
         initial={false}
-        animate={{ opacity: local.open ? 1 : 0 }}
+        animate={{ opacity: props.open ? 1 : 0 }}
         transition={timing()}
       >
-        {local.children}
+        {props.children}
       </m.div>
     </m.div>
   );
