@@ -1,10 +1,10 @@
 amends "package://github.com/jdx/hk/releases/download/v2.3.1/hk@2.3.1#/Config.pkl"
 
 steps {
-  ["oxlint"] {
+  ["lint"] {
     glob = "*.{js,jsx,ts,tsx,mjs,cjs,mts,cts}"
-    check = "bun oxlint {{files}}"
-    fix = "bun oxlint --fix {{files}}"
+    check = "bun lint {{files}}"
+    fix = "bun lint --fix {{files}}"
   }
   ["fmt"] {
     glob = "*.{js,jsx,ts,tsx,mjs,cjs,mts,cts,json,jsonc,yaml,yml,md}"
