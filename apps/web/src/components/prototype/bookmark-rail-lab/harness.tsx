@@ -222,7 +222,7 @@ export function BookmarkRailLab(props: {
               {(entry, index) => (
                 <button
                   ref={(node) => {
-                    itemEls[index()] = node;
+                    itemEls[untrack(index)] = node;
                   }}
                   type="button"
                   class="proto-picker-item"

@@ -9,7 +9,7 @@ import { ui } from "./layout";
 import { TICK, echoIndexes, trailOpacity } from "./strobe-values";
 import { frameLabel } from "./time-grid-values";
 import { bp, face, tone } from "./tokens.stylex";
-import { createEffect, createSignal, type Accessor } from "solid-js";
+import { createEffect, createSignal, untrack, type Accessor } from "solid-js";
 
 const EXPOSURES = 7;
 const ECHOES = EXPOSURES - 1;
@@ -268,7 +268,7 @@ function useHeroScrub(reduce: Accessor<boolean>) {
       };
       if (reduce) {
         title.style.setProperty("--m", "0");
-        const count = countRef();
+        const count = untrack(countRef);
         if (count) count.textContent = frameLabel(2);
         return;
       }
@@ -281,7 +281,7 @@ function useHeroScrub(reduce: Accessor<boolean>) {
         );
         mergeExposures(window.scrollY, scrubRefs);
       };
-      measure();
+      untrack(measure);
       const observer = new ResizeObserver(measure);
       observer.observe(section);
       return () => observer.disconnect();

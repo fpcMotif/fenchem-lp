@@ -1,6 +1,6 @@
 import * as stylex from "@stylexjs/stylex";
 import type { JSX } from "@solidjs/web";
-import { createEffect } from "solid-js";
+import { createEffect, untrack } from "solid-js";
 import { m, useMotionValue, useMotionValueEvent, useScroll } from "@/compat/motion";
 
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
@@ -162,7 +162,7 @@ export function StillPoint() {
   createEffect(
     () => [reduce(), twoColumn()],
     () => {
-      update();
+      untrack(update);
       window.addEventListener("resize", update);
       return () => window.removeEventListener("resize", update);
     },

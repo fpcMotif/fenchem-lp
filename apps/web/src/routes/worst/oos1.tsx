@@ -90,9 +90,8 @@ function WorstOOS1() {
   return (
     <>
       <div style={{ "min-width": 0 }}>
-        <Show when={loaded()}>
-          {(current) => {
-            const state = current();
+        <Show when={loaded()} keyed>
+          {(state) => {
             if ("error" in state) return <CrashNotice error={state.error} />;
             const Variant = state.Variant;
             return (

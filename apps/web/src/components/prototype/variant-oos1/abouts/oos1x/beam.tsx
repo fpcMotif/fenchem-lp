@@ -1,5 +1,5 @@
 import * as stylex from "@stylexjs/stylex";
-import { createEffect } from "solid-js";
+import { createEffect, untrack } from "solid-js";
 import { m, useMotionValue, useMotionValueEvent, useScroll, useTransform } from "@/compat/motion";
 
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
@@ -103,7 +103,7 @@ export function BalanceBeam() {
   createEffect(
     () => [reduce(), twoColumn()],
     () => {
-      update();
+      untrack(update);
       window.addEventListener("resize", update);
       return () => window.removeEventListener("resize", update);
     },

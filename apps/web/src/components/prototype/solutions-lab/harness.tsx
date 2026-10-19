@@ -158,7 +158,7 @@ export function SolutionsLab(props: { initial: number }) {
   const items: (HTMLButtonElement | undefined)[] = [];
 
   const moveHighlight = () => {
-    const item = items[current()];
+    const item = items[untrack(current)];
     if (!item || !highlight) return;
     highlight.style.width = `${item.offsetWidth}px`;
     highlight.style.transform = `translateX(${item.offsetLeft}px)`;
