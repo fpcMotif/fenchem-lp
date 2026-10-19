@@ -3,7 +3,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "check-types": "bun check",
+    "check-types": "bun run routes:generate && bun check",
+    "routes:generate": "bun scripts/generate-route-tree.ts",
     "build": "vp build",
     "serve": "vp preview",
     "preview": "vp preview",
@@ -36,6 +37,7 @@
     "@fenchem-lp/config": "workspace:*",
     "@stylexswc/unplugin": "0.18.5",
     "@tanstack/react-router-devtools": "^1.167.2",
+    "@tanstack/router-generator": "1.167.40",
     "@testing-library/dom": "^10.4.2",
     "@testing-library/react": "^16.3.3",
     "@types/react": "catalog:",

@@ -8,7 +8,7 @@ This project was created with [Better-T-Stack](https://github.com/AmanVarshney01
 - **TanStack Start** - SSR framework with TanStack Router
 - **StyleX** - Atomic CSS-in-JS, compiled by `@stylexswc/unplugin` (see [ADR-0003](docs/adr/0003-stylex-swc-compiler.md))
 - **Base UI** - Accessible, unstyled primitives behind the shared components in `packages/ui`
-- **Oxlint** - Oxlint + Oxfmt (linting & formatting)
+- **Bun lint and fmt** - `bun lint` and `bun fmt` run the oxc rules in `.oxlintrc.json` and `.oxfmtrc.json` natively
 - **Vite+** - Unified Vite toolchain, workspace task runner, linting, and formatting
 
 ## Getting Started
@@ -57,8 +57,8 @@ For more details, see the guide on [Deploying to Cloudflare with Alchemy](https:
 
 ## Git Hooks and Formatting
 
-- **Pre-commit hooks** run Oxlint and `bun fmt` on staged files through `hk` (`hk.pkl`).
-- Run checks: `bun run check:lint` and `bun run check-types`
+- **Pre-commit hooks** run `bun lint` and `bun fmt` on staged files through `hk` (`hk.pkl`).
+- Run checks: `bun run check`
 
 ## Project Structure
 
@@ -77,10 +77,11 @@ fenchem-lp/
 - `bun run dev`: Start all applications in development mode
 - `bun run build`: Build all applications
 - `bun run dev:web`: Start only the web application
-- `bun run check-types`: Check TypeScript types across all workspace projects with `bun check`
-- `bun run check:lint`: Run Oxlint, format with `bun fmt`, and run the StyleX check
+- `bun run check`: Typecheck, run `bun lint`, and check formatting without writing files
+- `bun run typecheck` (alias `check-types`): Generate `apps/web/src/routeTree.gen.ts`, then check TypeScript types across all workspace projects with `bun check`
+- `bun run check:lint`: Run `bun lint`, format with `bun fmt`, and run the StyleX check
 - `bun run check:stylex`: Check StyleX usage and that no legacy styling packages are installed
 - `bun run test`: Run the web unit tests
-- `bun run lint`: Run Vite+ lint checks
+- `bun run lint`: Run `bun lint`
 - `bun run format`: Format the repository natively with `bun fmt`
 - `bun run staged`: Run Vite+ checks against staged files
