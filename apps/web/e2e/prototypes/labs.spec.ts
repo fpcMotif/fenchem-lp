@@ -20,10 +20,7 @@ for (const lab of labs) {
     await page.goto(`/prototypes/${lab}`);
     const variants = page.locator(".proto-picker-item:not(.proto-picker-replay)");
     await variants.first().waitFor();
-    await page.waitForFunction(() => {
-      const item = document.querySelector(".proto-picker-item");
-      return item && Object.keys(item).some((key) => key.includes("$$"));
-    });
+    await expect(page.locator("html")).toHaveAttribute("data-hydrated");
 
     const count = await variants.count();
     expect(count).toBeGreaterThan(1);

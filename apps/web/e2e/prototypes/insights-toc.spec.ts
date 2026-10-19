@@ -4,10 +4,7 @@ const VARIANT = { margin: 1, contents: 2, locator: 3, spine: 4, stepper: 5 } as 
 
 async function openLab(page: Page, variant: number) {
   await page.goto(`/prototypes/insights-toc?v=${variant}&n=4`);
-  await page.waitForFunction(() => {
-    const item = document.querySelector(".proto-picker-item");
-    return item && Object.keys(item).some((key) => key.includes("$$"));
-  });
+  await expect(page.locator("html")).toHaveAttribute("data-hydrated");
 }
 
 const contentsNav = (page: Page) => page.getByRole("navigation", { name: "本页目录" });

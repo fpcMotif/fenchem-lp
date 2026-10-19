@@ -1,5 +1,5 @@
 import * as stylex from "@stylexjs/stylex";
-import { children, createSignal, onSettled, type Accessor } from "solid-js";
+import { children, createSignal, onSettled, Show, type Accessor } from "solid-js";
 import type { JSX } from "@solidjs/web";
 
 import { createExternalStore } from "@/compat/external-store";
@@ -47,7 +47,9 @@ export function Tag(props: { numeral: string; label?: JSX.Element; pinned?: bool
   return (
     <span {...stylex.attrs(tagStyles.tag, (props.pinned ?? true) && tagStyles.pinned)}>
       <span>{props.numeral}</span>
-      {props.label ? <span {...stylex.attrs(tagStyles.muted)}>{props.label}</span> : null}
+      <Show when={props.label}>
+        {(label) => <span {...stylex.attrs(tagStyles.muted)}>{label()}</span>}
+      </Show>
     </span>
   );
 }

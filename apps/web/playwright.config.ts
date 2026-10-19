@@ -7,9 +7,9 @@ const baseURL = `http://${host}:${port}`;
 export default defineConfig({
   testDir: "./e2e",
   testIgnore: "prototypes/**",
-  timeout: 30_000,
+  timeout: 15_000,
   expect: {
-    timeout: 8_000,
+    timeout: 5_000,
   },
   fullyParallel: false,
   workers: 1,
@@ -33,7 +33,7 @@ export default defineConfig({
       name: "chromium",
       use: {
         ...devices["Desktop Chrome"],
-        channel: "chromium",
+        channel: "chrome",
         viewport: { width: 1440, height: 1000 },
       },
     },

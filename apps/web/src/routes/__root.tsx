@@ -7,9 +7,10 @@ import {
   createRootRoute,
   useRouterState,
 } from "@tanstack/solid-router";
-import { Show } from "solid-js";
+import { Loading, Show } from "solid-js";
 import type { JSX } from "@solidjs/web";
 
+import { HydrationMark } from "@/components/hydration-mark";
 import { PERF_DEBUG_SCRIPT } from "@/lib/perf-debug";
 
 import Header from "../components/header";
@@ -80,11 +81,17 @@ function RootDocument(props: { children: JSX.Element }) {
 function RootLayout() {
   // The public landing page on "/" brings its own navigation; hide the app chrome there.
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const page = () => (
+    <Loading fallback={null}>
+      <Outlet />
+      <HydrationMark />
+    </Loading>
+  );
   return (
-    <Show when={pathname() !== "/"} fallback={<Outlet />}>
+    <Show when={pathname() !== "/"} fallback={page()}>
       <div {...stylex.attrs(rootStyles.shell)}>
         <Header />
-        <Outlet />
+        {page()}
       </div>
     </Show>
   );

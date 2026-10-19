@@ -8,9 +8,9 @@ const baseURL = server.origin;
 
 export default defineConfig({
   testDir: "./e2e/prototypes",
-  timeout: 30_000,
+  timeout: 15_000,
   expect: {
-    timeout: 8_000,
+    timeout: 5_000,
   },
   fullyParallel: false,
   workers: 1,
@@ -29,7 +29,18 @@ export default defineConfig({
   },
   projects: [
     {
+      name: "hydration",
+      testMatch: "hydration.spec.ts",
+      fullyParallel: true,
+      use: {
+        ...devices["Desktop Chrome"],
+        channel: "chrome",
+        viewport: { width: 1440, height: 900 },
+      },
+    },
+    {
       name: "desktop",
+      testIgnore: "hydration.spec.ts",
       use: {
         ...devices["Desktop Chrome"],
         channel: "chrome",
@@ -38,6 +49,7 @@ export default defineConfig({
     },
     {
       name: "mobile",
+      testIgnore: "hydration.spec.ts",
       use: {
         ...devices["Pixel 7"],
         channel: "chrome",

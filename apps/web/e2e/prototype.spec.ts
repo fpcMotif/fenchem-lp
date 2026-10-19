@@ -4,10 +4,7 @@ test("production keyboard navigation stays inside product tabs", async ({ page }
   await page.goto("/?variant=oos1pb");
   const tabs = page.locator("#products-solutions [role=tab]");
   await tabs.first().waitFor();
-  await page.waitForFunction(() => {
-    const tab = document.querySelector("#products-solutions [role=tab]");
-    return tab && Object.keys(tab).some((key) => key.includes("$$"));
-  });
+  await expect(page.locator("html")).toHaveAttribute("data-hydrated");
   await expect(page.getByLabel("Next variant")).toHaveCount(0);
   await tabs.first().focus();
   await page.keyboard.press("ArrowRight");

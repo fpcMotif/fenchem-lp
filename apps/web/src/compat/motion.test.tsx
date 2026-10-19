@@ -1,4 +1,4 @@
-import { createSignal } from "solid-js";
+import { createSignal, flush } from "solid-js";
 import { describe, expect, it } from "vitest";
 
 import { m, useMotionValue } from "@/compat/motion";
@@ -21,5 +21,38 @@ describe("solid test harness", () => {
     expect(button.style.transform).toBe("translateX(4px)");
     fireEvent.click(button);
     expect(button.textContent).toBe("1");
+  });
+
+  it("builds children once", () => {
+    let builds = 0;
+    function Child() {
+      builds++;
+      return <span>child</span>;
+    }
+    render(() => (
+      <m.div>
+        <Child />
+      </m.div>
+    ));
+    expect(screen.getByText("child")).toBeTruthy();
+    expect(builds).toBe(1);
+  });
+
+  it("renders motion-value attributes as their current value", () => {
+    const d = { value: undefined as ReturnType<typeof useMotionValue<string>> | undefined };
+    function Line() {
+      d.value = useMotionValue("M0 0L1 1");
+      return (
+        <svg>
+          <m.path data-testid="line" d={d.value} />
+        </svg>
+      );
+    }
+    render(() => <Line />);
+    const path = screen.getByTestId("line");
+    expect(path.getAttribute("d")).toBe("M0 0L1 1");
+    d.value!.set("M0 0L2 2");
+    flush();
+    expect(path.getAttribute("d")).toBe("M0 0L2 2");
   });
 });

@@ -6,6 +6,10 @@ steps {
     check = "bun lint {{files}}"
     fix = "bun lint --fix {{files}}"
   }
+  ["jsx-reads"] {
+    glob = "*.tsx"
+    check = "bun scripts/check-jsx-double-read.ts {{files}}"
+  }
   ["fmt"] {
     glob = "*.{js,jsx,ts,tsx,mjs,cjs,mts,cts,json,jsonc,yaml,yml,md}"
     check = "bun fmt --check {{files}}"

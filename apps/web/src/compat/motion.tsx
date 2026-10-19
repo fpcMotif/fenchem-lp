@@ -29,6 +29,7 @@ import {
   createSignal,
   flush,
   getOwner,
+  merge,
   omit,
   onCleanup,
   onSettled,
@@ -855,11 +856,28 @@ function whenConnected(node: Element, run: () => void) {
   return () => cancelAnimationFrame(frame);
 }
 
+type PassedAttributes = { readonly [attribute: string]: unknown };
+
 function createMotionComponent(tag: string) {
   const svg = SVG_TAGS.has(tag);
   return (props: MotionProps) => {
     const Tag = dynamic(() => tag) as Component<JSX.HTMLAttributes<HTMLElement>>;
-    const rest = omit(props, ...OWN);
+    const passed = omit(props, ...OWN) as PassedAttributes;
+    const motionKeys = untrack(() =>
+      Object.keys(passed).filter((key) => key !== "children" && isMotionValue(passed[key])),
+    );
+    const rest = merge(
+      passed,
+      Object.defineProperties(
+        {},
+        Object.fromEntries(
+          motionKeys.map((key) => [
+            key,
+            { enumerable: true, get: () => (passed[key] as MotionValue<unknown>)() },
+          ]),
+        ),
+      ),
+    );
     const presence = useContext(PresenceContext);
     const provided = useContext(VariantContext);
     const parent = provided === NO_VARIANTS ? undefined : provided;

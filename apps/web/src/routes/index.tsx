@@ -1,5 +1,4 @@
 import { createFileRoute } from "@tanstack/solid-router";
-import { Loading } from "solid-js";
 import { dynamic } from "@solidjs/web";
 
 import { PrototypeSwitcher } from "@/components/prototype/prototype-switcher";
@@ -43,9 +42,7 @@ function HomeComponent() {
   const Active = dynamic(() => VARIANTS.find((v) => v.key === search().variant)?.Component);
   return (
     <>
-      <Loading fallback={null}>
-        <Active />
-      </Loading>
+      <Active />
       <PrototypeSwitcher current={search().variant} compare={search().compare} />
     </>
   );
