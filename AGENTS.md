@@ -1,7 +1,7 @@
 # AGENTS.md
 
 - **Scope**: stay inside this checkout. Confine searches and reads to this repository.
-- **Check**: run `bun run check` after each batch of edits. It generates the TanStack route tree, typechecks with `bun check -b`, lints with `bun lint`, and checks formatting with `bun fmt --check`. Both read the oxc configs (`.oxlintrc.json`, `.oxfmtrc.json`). Use `bun check` for types, never `tsc` or `bunx tsc`.
+- **Check**: run `bun run check` after each batch of edits. It generates the TanStack route tree, typechecks with `bun check --no-script -b`, lints with `bun lint`, and checks formatting with `bun fmt --check`. Both read the oxc configs (`.oxlintrc.json`, `.oxfmtrc.json`). Use `bun check --no-script` for types, never `tsc` or `bunx tsc`.
 - **Dev URLs**: connect to `https://fenchem.localhost` with `ignoreHTTPSErrors: true`. Do not resolve to raw localhost ports. Ad-hoc browser scripts require system Chrome (`channel: "chrome"`).
 - **OOS1 subpages**: view components live in `apps/web/src/components/prototype/variant-oos1/`: `about-view.tsx`, `insights-view.tsx`, `news-view.tsx`, `rd-view.tsx`, and `contact-view.tsx`.
 - **Prototype labs**: verify `/prototypes/*` with `bun run test:prototypes`. It runs the typed specs in `apps/web/e2e/prototypes/` in system Chrome against this checkout's portless dev server. Add a lab's interaction checks there as web-first assertions. `test:e2e` serves a production build, where prototype routes return not-found. Verify motion and scroll headlessly; the Browser pane throttles animation frames while hidden.

@@ -952,7 +952,7 @@ export function AboutOOS1Figma({ onNavigateHome }: SubPageProps) {
       <SubPageNav current="关于我们" chips={NAV_CHIPS} onNavigateHome={onNavigateHome} />
       <Profile />
       <HistoryTimeline stickyTop={STICKY_TOP} plain sx={[kitStyles.anchor, styles.historyGray]} />
-      <CampusGallery showEyebrow={false} headerSx={styles.campusHead} />
+      <CampusGallery headerSx={styles.campusHead} />
       <Culture />
       <Structure />
       <Csr />

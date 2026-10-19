@@ -28,11 +28,11 @@ jobs:
     steps:
       - uses: actions/checkout@v5
 
-      # Pinned via the packageManager field in package.json so CI always runs
-      # the same bun that generated bun.lock.
+      # package.json records bun@1.4.4. That release is canary-only, so CI
+      # installs the canary channel instead of a stable GitHub asset.
       - uses: oven-sh/setup-bun@v2
         with:
-          bun-version-file: package.json
+          bun-version: canary
 
       - run: bun install --frozen-lockfile
 

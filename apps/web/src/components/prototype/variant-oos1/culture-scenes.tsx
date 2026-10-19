@@ -1,29 +1,34 @@
-import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
+import { breakpoints } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 import { m, useScroll, useTransform } from "motion/react";
 import { useRef } from "react";
 
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
-import { ABOUT_CAMPUS, ABOUT_CULTURE, ABOUT_MOMENT } from "./about-data";
-import { RiseReveal } from "./rise-reveal";
-import { color, font, layout, media } from "./tokens.stylex";
+import { ABOUT_CULTURE } from "./about-data";
+import { Reveal } from "./subpage-kit";
+import { color, layout, media } from "./tokens.stylex";
 
-const FRAME_TINT = "#e6ecf7";
-const WASH_SAND = "#f8f4ec";
-const WASH_BLUE = "#f1f4fa";
-const WASH_GREEN = "#f1f6ee";
-const MD_TO_LG = "@media (min-width: 768px) and (max-width: 1023.98px)";
 const DESKTOP = breakpoints.xl;
 const LG = breakpoints.lg;
+const FRAME_TINT = "#e6ecf7";
+const SECTION_GRAY = "#f6f6f6";
 const SCENE_OFFSET: ["start end", "end 0.35"] = ["start end", "end 0.35"];
 const HUMAN_ZOOM = 2.3;
 
+const CULTURE_TITLES: Record<string, string> = { 专业和专注: "专业与专注" };
+
+const cultureValue = (title: string) => {
+  const value = ABOUT_CULTURE.values.find((entry) => entry.title === title);
+  if (!value) throw new Error(`ABOUT_CULTURE has no value titled ${title}`);
+  return { title: CULTURE_TITLES[value.title] ?? value.title, desc: value.desc };
+};
+
 const styles = stylex.create({
   section: {
-    position: "relative",
-    overflow: "hidden",
-    paddingBlock: { default: 72, [DESKTOP]: 128 },
+    paddingTop: { default: 72, [DESKTOP]: 152 },
+    paddingBottom: { default: 72, [DESKTOP]: 200 },
+    backgroundColor: SECTION_GRAY,
   },
   shell: {
     width: "100%",
@@ -33,98 +38,85 @@ const styles = stylex.create({
     paddingInline: { default: 16, [media.tablet]: 40, [DESKTOP]: layout.inset120 },
   },
   header: {
-    marginBottom: { default: 40, [DESKTOP]: 64 },
-  },
-  eyebrow: {
-    margin: 0,
-    marginBottom: 12,
-    fontFamily: font.display,
-    fontSize: 12,
-    fontWeight: 600,
-    letterSpacing: "0.22em",
-    textTransform: "uppercase",
-    color: colors.brandBlue700,
+    marginBottom: { default: 40, [DESKTOP]: 98 },
   },
   title: {
     margin: 0,
     fontSize: { default: 26, [media.tablet]: 32, [DESKTOP]: 40 },
     fontWeight: 700,
     lineHeight: 1.2,
+    textWrap: "balance",
     color: color.ink,
   },
   story: {
     display: "flex",
     flexDirection: "column",
-    gap: { default: 72, [media.tablet]: 96, [DESKTOP]: 128 },
+    gap: { default: 72, [media.tablet]: 96, [DESKTOP]: 159 },
   },
-  sceneGrid: {
+  scene: {
     display: { default: "block", [LG]: "grid" },
     gridTemplateColumns: { default: "none", [LG]: "repeat(12, minmax(0, 1fr))" },
     columnGap: 24,
     alignItems: "end",
   },
-
-  figure: {
+  sceneFigure: {
+    gridColumn: { default: "auto", [LG]: "1 / 7" },
+    gridRow: { default: "auto", [LG]: "1" },
     margin: 0,
   },
-  frame: {
+  sceneFigureEnd: {
+    gridColumn: { default: "auto", [LG]: "7 / 13" },
+  },
+  sceneFrame: {
     position: "relative",
     overflow: "hidden",
+    aspectRatio: "3 / 2",
     backgroundColor: FRAME_TINT,
   },
-  fill: {
+  artMotion: {
     position: "absolute",
     top: 0,
     left: 0,
-    display: "block",
     width: "100%",
     height: "100%",
+  },
+  sceneArt: {
+    position: "absolute",
+    display: "block",
+    maxWidth: "none",
     objectFit: "cover",
   },
-  caption: {
-    marginTop: 12,
-    fontSize: 12,
-    lineHeight: 1.6,
-    letterSpacing: "0.06em",
-    color: color.bodyText,
+  helixArt: {
+    top: "-63.16%",
+    left: "-2.21%",
+    width: "156.12%",
+    height: "175.77%",
   },
-
-  vastFigure: {
-    marginInline: { default: -16, [breakpoints.md]: 0 },
+  lensArt: {
+    top: "-64.48%",
+    left: "-17.35%",
+    width: "166.5%",
+    height: "187.24%",
   },
-  vastCaption: {
-    paddingLeft: { default: 16, [breakpoints.md]: 0 },
-  },
-  vastFrame: {
-    aspectRatio: { default: "4 / 3", [media.tablet]: "2 / 1", [DESKTOP]: "2.3 / 1" },
-  },
-  vastImage: {
-    objectPosition: "50% 72%",
-  },
-  vastText: {
-    display: "grid",
-    gridTemplateColumns: { default: "minmax(0, 1fr)", [LG]: "repeat(12, minmax(0, 1fr))" },
-    columnGap: 24,
-    marginTop: { default: 28, [DESKTOP]: 40 },
-  },
-  vastBody: {
-    gridColumn: { default: "auto", [LG]: "7 / 13" },
-  },
-  sceneFigure: {
-    gridColumn: { default: "auto", [LG]: "1 / 7" },
-    width: { default: "82%", [MD_TO_LG]: "72%", [LG]: "auto" },
-  },
-  sceneFrame: {
-    aspectRatio: "3 / 2",
+  networkArt: {
+    top: "-30.97%",
+    left: "-24.25%",
+    width: "139.96%",
+    height: "157.45%",
+    transform: "rotate(26.34deg)",
   },
   sceneText: {
     gridColumn: { default: "auto", [LG]: "7 / 13" },
+    gridRow: { default: "auto", [LG]: "1" },
     marginTop: { default: 24, [LG]: 0 },
   },
-  humanImage: {
-    transformOrigin: "73% 78%",
+  sceneTextStart: {
+    gridColumn: { default: "auto", [LG]: "1 / 7" },
+    display: "flex",
+    flexDirection: "column",
+    alignItems: { default: "flex-start", [LG]: "flex-end" },
+    textAlign: { default: "start", [LG]: "end" },
   },
-
   valueTitle: {
     margin: 0,
     fontSize: { default: 24, [DESKTOP]: 32 },
@@ -133,180 +125,105 @@ const styles = stylex.create({
     letterSpacing: "0.06em",
     color: color.ink,
   },
-  desc: {
+  valueDesc: {
     maxWidth: "28em",
     margin: 0,
     marginTop: 14,
     fontSize: 16,
     lineHeight: 2,
     letterSpacing: "0.04em",
-    color: color.bodyText,
     textWrap: "pretty",
+    color: color.bodyText,
   },
 });
 
-type CultureValue = (typeof ABOUT_CULTURE.values)[number];
-type CampusShot = (typeof ABOUT_CAMPUS.photos)[number];
+const SCENES = [
+  {
+    value: cultureValue("安静与坚持"),
+    art: "/prototype/about/figma/culture-helix.jpg",
+    alt: "A glowing DNA double helix",
+    artStyle: styles.helixArt,
+    imageEnd: false,
+  },
+  {
+    value: cultureValue("专业和专注"),
+    art: "/prototype/about/figma/culture-lens.jpg",
+    alt: "A magnifying glass over a DNA strand",
+    artStyle: styles.lensArt,
+    imageEnd: true,
+  },
+  {
+    value: cultureValue("合作与创新"),
+    art: "/prototype/about/figma/culture-network.jpg",
+    alt: "Molecules linked together in a network",
+    artStyle: styles.networkArt,
+    imageEnd: false,
+  },
+] as const;
 
-const VALUES: readonly CultureValue[] = ABOUT_CULTURE.values;
-const [PROFESSIONAL, QUIET, TOGETHER, ...MORE_VALUES] = VALUES;
-const LAB = ABOUT_CAMPUS.photos.find((photo) => photo.id === "lab");
-const LOUNGE = ABOUT_CAMPUS.photos.find((photo) => photo.id === "lounge");
-const SPARE_PHOTOS = ABOUT_CAMPUS.photos.filter(
-  (photo) => photo.id !== "lab" && photo.id !== "lounge",
-);
+const SCROLLS = [
+  { input: [0, 0.7], output: [1.18, 1], reduced: 1, origin: "50% 72%" },
+  { input: [0, 1], output: [1, 1.16], reduced: 1, origin: "center" },
+  { input: [0, 0.8], output: [1.5, HUMAN_ZOOM], reduced: HUMAN_ZOOM, origin: "73% 78%" },
+] as const;
 
-function useSceneProgress() {
+function CultureScene({
+  scene,
+  scroll,
+}: {
+  scene: (typeof SCENES)[number];
+  scroll: (typeof SCROLLS)[number];
+}) {
   const ref = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: SCENE_OFFSET });
-  return [ref, scrollYProgress] as const;
-}
-
-function VastScene({ value }: { value: CultureValue }) {
-  const [ref, progress] = useSceneProgress();
   const reduce = useReducedMotion();
-  const scale = useTransform(progress, [0, 0.7], [1.18, 1]);
+  const { scrollYProgress } = useScroll({ target: ref, offset: SCENE_OFFSET });
+  const scale = useTransform(scrollYProgress, [...scroll.input], [...scroll.output]);
 
   return (
-    <article ref={ref}>
-      <RiseReveal sx={[styles.figure, styles.vastFigure]}>
-        <figure {...stylex.props(styles.figure)}>
-          <div {...stylex.props(styles.frame, styles.vastFrame)}>
-            <m.img
-              src={ABOUT_MOMENT.image}
-              alt={ABOUT_MOMENT.alt}
+    <article ref={ref} {...stylex.props(styles.scene)}>
+      <Reveal as="figure" sx={[styles.sceneFigure, scene.imageEnd && styles.sceneFigureEnd]}>
+        <div {...stylex.props(styles.sceneFrame)}>
+          <m.div
+            {...stylex.props(styles.artMotion)}
+            style={{ scale: reduce ? scroll.reduced : scale, transformOrigin: scroll.origin }}
+          >
+            <img
+              src={scene.art}
+              alt={scene.alt}
               loading="lazy"
               decoding="async"
-              {...stylex.props(styles.fill, styles.vastImage)}
-              style={{ scale: reduce ? 1 : scale }}
+              {...stylex.props(styles.sceneArt, scene.artStyle)}
             />
-          </div>
-          <figcaption {...stylex.props(styles.caption, styles.vastCaption)}>
-            {ABOUT_MOMENT.caption}
-          </figcaption>
-        </figure>
-      </RiseReveal>
-      <div {...stylex.props(styles.vastText)}>
-        <RiseReveal delay={0.15} sx={styles.vastBody}>
-          <h3 {...stylex.props(styles.valueTitle)}>{value.title}</h3>
-          <p {...stylex.props(styles.desc)}>{value.desc}</p>
-        </RiseReveal>
-      </div>
-    </article>
-  );
-}
-
-function RoomScene({ value, photo }: { value: CultureValue; photo?: CampusShot }) {
-  const [ref, progress] = useSceneProgress();
-  const reduce = useReducedMotion();
-  const scale = useTransform(progress, [0, 1], [1, 1.16]);
-
-  return (
-    <article ref={ref} {...stylex.props(styles.sceneGrid)}>
-      {photo ? (
-        <RiseReveal sx={styles.sceneFigure}>
-          <figure {...stylex.props(styles.figure)}>
-            <div {...stylex.props(styles.frame, styles.sceneFrame)}>
-              <m.img
-                src={photo.src}
-                alt={photo.alt}
-                loading="lazy"
-                decoding="async"
-                {...stylex.props(styles.fill)}
-                style={{ scale: reduce ? 1 : scale }}
-              />
-            </div>
-            <figcaption {...stylex.props(styles.caption)}>{photo.caption}</figcaption>
-          </figure>
-        </RiseReveal>
-      ) : null}
-      <RiseReveal delay={0.15} sx={styles.sceneText}>
-        <h3 {...stylex.props(styles.valueTitle)}>{value.title}</h3>
-        <p {...stylex.props(styles.desc)}>{value.desc}</p>
-      </RiseReveal>
-    </article>
-  );
-}
-
-function HumanScene({ value, photo }: { value: CultureValue; photo?: CampusShot }) {
-  const [ref, progress] = useSceneProgress();
-  const reduce = useReducedMotion();
-  const scale = useTransform(progress, [0, 0.8], [1.5, HUMAN_ZOOM]);
-
-  return (
-    <article ref={ref} {...stylex.props(styles.sceneGrid)}>
-      {photo ? (
-        <RiseReveal sx={styles.sceneFigure}>
-          <figure {...stylex.props(styles.figure)}>
-            <div {...stylex.props(styles.frame, styles.sceneFrame)}>
-              <m.img
-                src={photo.large}
-                alt={photo.alt}
-                loading="lazy"
-                decoding="async"
-                {...stylex.props(styles.fill, styles.humanImage)}
-                style={{ scale: reduce ? HUMAN_ZOOM : scale }}
-              />
-            </div>
-            <figcaption {...stylex.props(styles.caption)}>{photo.caption}</figcaption>
-          </figure>
-        </RiseReveal>
-      ) : null}
-      <RiseReveal delay={0.15} sx={styles.sceneText}>
-        <h3 {...stylex.props(styles.valueTitle)}>{value.title}</h3>
-        <p {...stylex.props(styles.desc)}>{value.desc}</p>
-      </RiseReveal>
+          </m.div>
+        </div>
+      </Reveal>
+      <Reveal step={1} sx={[styles.sceneText, scene.imageEnd && styles.sceneTextStart]}>
+        <h3 {...stylex.props(styles.valueTitle)}>{scene.value.title}</h3>
+        <p {...stylex.props(styles.valueDesc)}>{scene.value.desc}</p>
+      </Reveal>
     </article>
   );
 }
 
 export function CultureScenes({ sx }: { sx?: stylex.StyleXStyles }) {
-  const sectionRef = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({ target: sectionRef, offset: ["start end", "end start"] });
-  const wash = useTransform(
-    scrollYProgress,
-    [0.12, 0.45, 0.78],
-    [WASH_SAND, WASH_BLUE, WASH_GREEN],
-  );
-
   return (
-    <m.section
-      ref={sectionRef}
+    <section
       id="about-culture"
       aria-labelledby="about-culture-title"
       {...stylex.props(styles.section, sx)}
-      style={{ backgroundColor: wash }}
     >
       <div {...stylex.props(styles.shell)}>
-        <RiseReveal sx={styles.header}>
-          <p lang="en" {...stylex.props(styles.eyebrow)}>
-            {ABOUT_CULTURE.eyebrow}
-          </p>
+        <Reveal sx={styles.header}>
           <h2 id="about-culture-title" {...stylex.props(styles.title)}>
             {ABOUT_CULTURE.title}
           </h2>
-        </RiseReveal>
+        </Reveal>
         <div {...stylex.props(styles.story)}>
-          {QUIET ? <VastScene value={QUIET} /> : null}
-          {PROFESSIONAL ? <RoomScene value={PROFESSIONAL} photo={LAB} /> : null}
-          {TOGETHER ? <HumanScene value={TOGETHER} photo={LOUNGE} /> : null}
-          {MORE_VALUES.map((value, index) =>
-            index % 2 === 0 ? (
-              <RoomScene
-                key={value.title}
-                value={value}
-                photo={SPARE_PHOTOS[index % SPARE_PHOTOS.length]}
-              />
-            ) : (
-              <HumanScene
-                key={value.title}
-                value={value}
-                photo={SPARE_PHOTOS[index % SPARE_PHOTOS.length]}
-              />
-            ),
-          )}
+          {SCENES.map((scene, index) => (
+            <CultureScene key={scene.value.title} scene={scene} scroll={SCROLLS[index]} />
+          ))}
         </div>
       </div>
-    </m.section>
+    </section>
   );
 }

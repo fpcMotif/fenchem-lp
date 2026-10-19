@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "check-types": "bun run routes:generate && bun check",
+    "check-types": "bun run routes:generate && bun check --no-script",
     "routes:generate": "bun scripts/generate-route-tree.ts",
     "build": "vp build",
     "serve": "vp preview",

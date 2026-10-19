@@ -20,9 +20,9 @@ const COUNT = CAMPUS_GALLERY.length;
 const BRAND_MARK = "/prototype/official-site/fenchem-logo.png";
 const DESKTOP = breakpoints.xl;
 const SLIDE_EASE = "cubic-bezier(0.32, 0.72, 0, 1)";
-const SLIDE_MS = 700;
+const SLIDE_MS = 520;
 
-const AUTOPLAY_MS = 2500;
+const AUTOPLAY_MS = 1600;
 const DRAG_START_PX = 6;
 const SWIPE_COMMIT = 0.18;
 const WHEEL_STEP_PX = 40;
@@ -90,7 +90,7 @@ const styles = stylex.create({
     overflow: "hidden",
     padding: 0,
     borderWidth: 0,
-    borderRadius: { default: 16, [DESKTOP]: 22 },
+    borderRadius: { default: 4, [DESKTOP]: 6 },
     backgroundColor: "#dfe5ee",
     boxShadow: "0 28px 56px -28px rgba(6, 28, 66, 0.45)",
     cursor: "pointer",

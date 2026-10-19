@@ -1,7 +1,7 @@
 import { LightboxStage } from "../shared/lightbox-stage";
 import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { ChevronLeft, ChevronRight, Factory, Leaf, Recycle, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { m, useScroll, useTransform } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 
@@ -14,24 +14,22 @@ import { ContactCta } from "./contact-cta";
 import { CTA } from "./content";
 import { CultureScenes } from "./culture-scenes";
 import { HistoryTimeline } from "./history-timeline";
-import { Reveal, SubPageBanner, SubPageNav, kitStyles } from "./subpage-kit";
+import { Reveal, SubPageNav, kitStyles } from "./subpage-kit";
 import { color, ease, font, layout, media, texture } from "./tokens.stylex";
-import { Profile as ProfileOOS1G } from "./abouts/oos1g/profile";
 import { NavyBand } from "./abouts/oos1c/navy-band";
 
 const CSR_ACCENT = "#8cd6a3";
+const HISTORY_GRAY = "#f6f6f6";
 const DESKTOP = breakpoints.xl;
+const MD = breakpoints.md;
+const LG = breakpoints.lg;
+const FRAME_TINT = "#e6ecf7";
+const HERO_TITLE = "源于自然，精于科学";
 
 const STICKY_TOP = Number.parseFloat(layout.headerHeight) + Number.parseFloat(layout.subBarHeight);
 
 const [PROFILE_CHIP, ...LATER_CHIPS] = ABOUT_HERO.navChips;
 const NAV_CHIPS = [PROFILE_CHIP, ABOUT_HISTORY.navChip, ...LATER_CHIPS];
-
-const CSR_ICONS = {
-  factory: Factory,
-  recycle: Recycle,
-  leaf: Leaf,
-} as const;
 
 const fadeIn = stylex.keyframes({
   "0%": { opacity: 0 },
@@ -76,15 +74,115 @@ const styles = stylex.create({
   sectionHeader: {
     marginBottom: { default: 40, [DESKTOP]: 64 },
   },
-  sectionEyebrow: {
+  historyBand: {
+    backgroundColor: HISTORY_GRAY,
+  },
+  hero: {
+    position: "relative",
+    display: "flex",
+    alignItems: "flex-end",
+    height: { default: 240, [MD]: "clamp(300px, 31vw, 480px)" },
+    overflow: "hidden",
+    backgroundColor: color.navyDeep,
+  },
+  heroImage: {
+    position: "absolute",
+    top: "-19.73%",
+    left: "-2.17%",
+    width: "104.35%",
+    height: "161.43%",
+    objectFit: "cover",
+  },
+  heroScrim: {
+    position: "absolute",
+    inset: 0,
+    backgroundImage:
+      "linear-gradient(180deg, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0) 22.222%), linear-gradient(0deg, rgba(6, 28, 66, 0.78) 0%, rgba(6, 28, 66, 0.34) 42%, rgba(6, 28, 66, 0) 66%)",
+  },
+  heroContent: {
+    position: "relative",
+    paddingBottom: { default: 24, [MD]: 40 },
+  },
+  heroTitle: {
     margin: 0,
-    marginBottom: 12,
-    fontFamily: font.display,
-    fontSize: 12,
-    fontWeight: 600,
-    letterSpacing: "0.22em",
-    textTransform: "uppercase",
-    color: colors.brandBlue700,
+    fontSize: { default: 34, [MD]: 48, [DESKTOP]: 60 },
+    fontWeight: 700,
+    lineHeight: 1.2,
+    letterSpacing: "0.072em",
+    textWrap: "balance",
+    color: colors.paper,
+  },
+  heroLead: {
+    margin: 0,
+    marginTop: { default: 8, [MD]: 20 },
+    fontSize: { default: 14, [MD]: 17 },
+    lineHeight: 1.8,
+    letterSpacing: "0.08em",
+    textWrap: "pretty",
+    color: "rgba(255, 255, 255, 0.84)",
+  },
+  profile: {
+    paddingTop: { default: 72, [DESKTOP]: 128 },
+    paddingBottom: { default: 56, [DESKTOP]: 80 },
+    backgroundColor: colors.paper,
+  },
+  profileGrid: {
+    display: "grid",
+    gridTemplateColumns: { default: "minmax(0, 1fr)", [LG]: "repeat(2, minmax(0, 1fr))" },
+    alignItems: "center",
+    rowGap: 32,
+    paddingInline: { default: 16, [media.tablet]: 40, [LG]: 0 },
+  },
+  profilePhotoCell: {
+    paddingInlineStart: { default: 0, [LG]: layout.inset120 },
+    paddingInlineEnd: { default: 0, [LG]: 48 },
+  },
+  profilePhoto: {
+    position: "relative",
+    overflow: "hidden",
+    margin: 0,
+    aspectRatio: { default: "4 / 3", [LG]: "5 / 6" },
+    backgroundColor: FRAME_TINT,
+  },
+  profileLobby: {
+    objectPosition: "28% 50%",
+  },
+  profileTextCell: {
+    display: "flex",
+    flexDirection: "column",
+    gap: { default: 24, [DESKTOP]: 48 },
+    paddingInlineStart: { default: 0, [LG]: 48 },
+    paddingInlineEnd: { default: 0, [LG]: layout.inset120 },
+    paddingBottom: { default: 0, [LG]: 28 },
+  },
+  profileName: {
+    margin: 0,
+    maxWidth: "9em",
+    fontSize: { default: 32, [media.tablet]: 40, [LG]: "clamp(36px, 3.4vw, 48px)" },
+    fontWeight: 500,
+    lineHeight: 1.25,
+    letterSpacing: "0.02em",
+    textWrap: "balance",
+    color: color.ink,
+  },
+  profileEnglish: {
+    margin: 0,
+    marginTop: { default: 10, [DESKTOP]: 6 },
+    fontSize: { default: 18, [DESKTOP]: 24 },
+    fontWeight: 500,
+    lineHeight: "29px",
+    letterSpacing: "0.012em",
+    color: color.bodyText,
+  },
+  profileLead: {
+    margin: 0,
+    maxWidth: 510,
+    fontSize: 16,
+    fontWeight: 500,
+    lineHeight: 1.6,
+    letterSpacing: "0.053em",
+    textWrap: "pretty",
+    color: color.ink,
   },
   sectionTitle: {
     margin: 0,
@@ -266,50 +364,19 @@ const styles = stylex.create({
     letterSpacing: "0.04em",
     color: "rgba(255, 255, 255, 0.78)",
   },
-  csrOutcomes: {
-    display: "grid",
-    gridTemplateColumns: { default: "1fr", [breakpoints.md]: "repeat(3, minmax(0, 1fr))" },
-    columnGap: 40,
-    margin: 0,
-    padding: 0,
-    listStyle: "none",
-  },
-  csrOutcome: {
-    display: "flex",
-    alignItems: "center",
-    gap: 14,
-    paddingBlock: { default: 18, [breakpoints.md]: 24 },
-    borderTopWidth: 1,
-    borderTopStyle: "solid",
-    borderTopColor: "rgba(255, 255, 255, 0.22)",
-    fontSize: { default: 17, [DESKTOP]: 20 },
-    fontWeight: 600,
-    letterSpacing: "0.08em",
-  },
-  csrOutcomeIcon: {
-    flexShrink: 0,
-    color: CSR_ACCENT,
-  },
 });
 
 function SectionHeader({
-  eyebrow,
   title,
   titleId,
   sx,
 }: {
-  eyebrow?: string;
   title: string;
   titleId: string;
   sx?: stylex.StyleXStyles;
 }) {
   return (
     <Reveal sx={[styles.sectionHeader, sx]}>
-      {eyebrow ? (
-        <p lang="en" {...stylex.props(styles.sectionEyebrow)}>
-          {eyebrow}
-        </p>
-      ) : null}
       <h2 id={titleId} {...stylex.props(styles.sectionTitle)}>
         {title}
       </h2>
@@ -404,13 +471,7 @@ function Lightbox({
   );
 }
 
-export function CampusGallery({
-  showEyebrow = true,
-  headerSx,
-}: {
-  showEyebrow?: boolean;
-  headerSx?: stylex.StyleXStyles;
-}) {
+export function CampusGallery({ headerSx }: { headerSx?: stylex.StyleXStyles }) {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const [stepped, setStepped] = useState(false);
   const count = CAMPUS_GALLERY.length;
@@ -426,12 +487,7 @@ export function CampusGallery({
       {...stylex.props(styles.campusSection, kitStyles.anchor)}
     >
       <div {...stylex.props(kitStyles.shell, kitStyles.inset120)}>
-        <SectionHeader
-          eyebrow={showEyebrow ? ABOUT_CAMPUS.eyebrow : undefined}
-          title={ABOUT_CAMPUS.title}
-          titleId="about-campus-title"
-          sx={headerSx}
-        />
+        <SectionHeader title={ABOUT_CAMPUS.title} titleId="about-campus-title" sx={headerSx} />
       </div>
       <CampusCarousel paused={openIndex !== null} onOpen={open} />
       <Lightbox
@@ -490,22 +546,41 @@ function CsrSection() {
           </div>
           <p {...stylex.props(styles.csrDesc)}>{ABOUT_CSR.desc}</p>
         </Reveal>
-        <ul {...stylex.props(styles.csrOutcomes)}>
-          {ABOUT_CSR.outcomes.map((outcome, idx) => {
-            const Icon = CSR_ICONS[outcome.icon];
-            return (
-              <Reveal key={outcome.title} as="li" step={idx} sx={styles.csrOutcome}>
-                <Icon
-                  size={22}
-                  strokeWidth={1.75}
-                  aria-hidden="true"
-                  {...stylex.props(styles.csrOutcomeIcon)}
-                />
-                {outcome.title}
-              </Reveal>
-            );
-          })}
-        </ul>
+      </div>
+    </section>
+  );
+}
+
+function Profile() {
+  return (
+    <section
+      id="about-profile"
+      aria-label="Company overview"
+      {...stylex.props(styles.profile, kitStyles.anchor)}
+    >
+      <div {...stylex.props(kitStyles.shell, styles.profileGrid)}>
+        <div {...stylex.props(styles.profilePhotoCell)}>
+          <Reveal as="figure" sx={styles.profilePhoto}>
+            <img
+              src={ABOUT_HERO.lobbyImage}
+              alt="Fenchem headquarters lobby with a curved ceiling and marble floor"
+              loading="lazy"
+              decoding="async"
+              {...stylex.props(styles.fill, styles.profileLobby)}
+            />
+          </Reveal>
+        </div>
+        <div {...stylex.props(styles.profileTextCell)}>
+          <Reveal>
+            <h2 {...stylex.props(styles.profileName)}>{ABOUT_HERO.title}</h2>
+            <p lang="en" {...stylex.props(styles.profileEnglish)}>
+              {ABOUT_HERO.englishTitle}
+            </p>
+          </Reveal>
+          <Reveal step={1}>
+            <p {...stylex.props(styles.profileLead)}>{ABOUT_HERO.lead}</p>
+          </Reveal>
+        </div>
       </div>
     </section>
   );
@@ -514,22 +589,33 @@ function CsrSection() {
 export function AboutView({ onNavigateHome }: { onNavigateHome: (hash?: string) => void }) {
   return (
     <div id="about-top" {...stylex.props(styles.root)}>
-      <SubPageBanner
-        size="tall"
-        title={ABOUT_BANNER.title}
-        titleId="about-banner-title"
-        tagline={ABOUT_BANNER.tagline}
-        lead={ABOUT_BANNER.lead}
-        meta={[ABOUT_BANNER.established, ABOUT_BANNER.place]}
-        image={ABOUT_BANNER.image}
-        imageAlt={ABOUT_BANNER.alt}
-      />
+      <section aria-labelledby="about-banner-title" {...stylex.props(styles.hero)}>
+        <img
+          src={ABOUT_BANNER.image}
+          alt={ABOUT_BANNER.alt}
+          fetchPriority="high"
+          decoding="async"
+          {...stylex.props(styles.heroImage)}
+        />
+        <div aria-hidden="true" {...stylex.props(styles.heroScrim)} />
+        <div {...stylex.props(kitStyles.shell, kitStyles.inset120, styles.heroContent)}>
+          <h1 id="about-banner-title" {...stylex.props(styles.heroTitle)}>
+            {HERO_TITLE}
+          </h1>
+          <p {...stylex.props(styles.heroLead)}>{ABOUT_BANNER.lead}</p>
+        </div>
+      </section>
 
       <SubPageNav current="关于我们" chips={NAV_CHIPS} onNavigateHome={onNavigateHome} />
 
-      <ProfileOOS1G />
+      <Profile />
 
-      <HistoryTimeline stickyTop={STICKY_TOP} sx={kitStyles.anchor} />
+      <HistoryTimeline
+        stickyTop={STICKY_TOP}
+        plain
+        showYear
+        sx={[kitStyles.anchor, styles.historyBand]}
+      />
 
       <CampusGallery />
 

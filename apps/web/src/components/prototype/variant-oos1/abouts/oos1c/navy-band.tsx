@@ -25,17 +25,6 @@ const styles = stylex.create({
   head: {
     marginBottom: { default: 16, [mq.xl]: 20 },
   },
-  eyebrow: {
-    margin: 0,
-    marginBottom: 12,
-    fontFamily:
-      '"Inter Tight", "Helvetica Neue", Arial, "Source Han Sans SC", "Noto Sans SC", sans-serif',
-    fontSize: 12,
-    fontWeight: 600,
-    letterSpacing: "0.22em",
-    textTransform: "uppercase",
-    color: tone.onNavyMuted,
-  },
   title: {
     margin: 0,
     fontSize: { default: 26, [mq.tablet]: 32, [mq.xl]: 40 },
@@ -167,9 +156,6 @@ export function NavyBand() {
         {...stylex.props(ui.shell, ui.inset, ui.anchor)}
       >
         <Reveal sx={styles.head}>
-          <p lang="en" {...stylex.props(styles.eyebrow)}>
-            {ABOUT_HONORS.eyebrow}
-          </p>
           <h2 id="about-honor-title" {...stylex.props(styles.title)}>
             {ABOUT_HONORS.title}
           </h2>
@@ -201,9 +187,6 @@ export function NavyBand() {
         {...stylex.props(ui.shell, ui.inset, ui.anchor)}
       >
         <Reveal sx={styles.head}>
-          <p lang="en" {...stylex.props(styles.eyebrow)}>
-            {ABOUT_STRUCTURE.eyebrow}
-          </p>
           <h2 id="about-structure-title" {...stylex.props(styles.title)}>
             {ABOUT_STRUCTURE.title}
           </h2>

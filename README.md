@@ -78,7 +78,7 @@ fenchem-lp/
 - `bun run build`: Build all applications
 - `bun run dev:web`: Start only the web application
 - `bun run check`: Typecheck, run `bun lint`, and check formatting without writing files
-- `bun run typecheck` (alias `check-types`): Generate `apps/web/src/routeTree.gen.ts`, then check TypeScript types across all workspace projects with `bun check`
+- `bun run typecheck` (alias `check-types`): Generate `apps/web/src/routeTree.gen.ts`, then check TypeScript types across all workspace projects with `bun check --no-script`
 - `bun run check:lint`: Run `bun lint`, format with `bun fmt`, and run the StyleX check
 - `bun run check:stylex`: Check StyleX usage and that no legacy styling packages are installed
 - `bun run test`: Run the web unit tests

@@ -103,34 +103,18 @@ const styles = stylex.create({
 
   header: {
     display: "flex",
-    alignItems: "flex-end",
+    alignItems: "flex-start",
     justifyContent: "space-between",
     gap: 24,
     marginBottom: { default: 28, [DESKTOP]: 40 },
-  },
-  eyebrow: {
-    margin: 0,
-    marginBottom: 12,
-    fontFamily: font.display,
-    fontSize: 12,
-    fontWeight: 600,
-    letterSpacing: "0.22em",
-    textTransform: "uppercase",
-    color: colors.brandBlue700,
   },
   title: {
     margin: 0,
     fontSize: { default: 26, [media.tablet]: 32, [DESKTOP]: 40 },
     fontWeight: 700,
     lineHeight: 1.2,
+    textWrap: "balance",
     color: color.ink,
-  },
-  caption: {
-    margin: 0,
-    marginTop: 12,
-    fontSize: { default: 13, [breakpoints.md]: 14 },
-    letterSpacing: "0.06em",
-    color: color.bodyText,
   },
 
   odometer: {
@@ -667,10 +651,12 @@ export function HistoryTimeline({
   stickyTop,
   sx,
   plain = false,
+  showYear = false,
 }: {
   stickyTop: number;
   sx?: stylex.StyleXStyles;
   plain?: boolean;
+  showYear?: boolean;
 }) {
   const sectionRef = useRef<HTMLElement>(null);
   const viewportRef = useRef<HTMLDivElement>(null);
@@ -753,23 +739,17 @@ export function HistoryTimeline({
       >
         <div ref={headerRef} {...stylex.props(styles.shell, styles.header)}>
           <RiseReveal>
-            {plain ? null : (
-              <p lang="en" {...stylex.props(styles.eyebrow)}>
-                {ABOUT_HISTORY.eyebrow}
-              </p>
-            )}
             <h2 id="about-history-title" {...stylex.props(styles.title)}>
               {ABOUT_HISTORY.title}
             </h2>
-            <p {...stylex.props(styles.caption)}>{ABOUT_HISTORY.caption}</p>
           </RiseReveal>
-          {plain ? null : <Odometer year={year} />}
+          {showYear || !plain ? <Odometer year={year} /> : null}
         </div>
 
         <div
           ref={viewportRef}
           role={pinned ? undefined : "region"}
-          aria-label={pinned ? undefined : `${ABOUT_HISTORY.eyebrow}, scrolls horizontally`}
+          aria-label={pinned ? undefined : `${ABOUT_HISTORY.title}，横向滚动查看`}
           tabIndex={pinned ? undefined : 0}
           {...stylex.props(styles.viewport, pinned ? styles.viewportPinned : styles.viewportFree)}
         >
