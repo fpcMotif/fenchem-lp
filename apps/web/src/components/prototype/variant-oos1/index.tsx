@@ -12,7 +12,6 @@ import { LayoutGroup } from "motion/react";
 import { FooterLegal } from "../shared/footer-content";
 import { NewsAccordion } from "../shared/news-accordion";
 import { ProductSummary } from "../shared/product-summary";
-import { SplitDialog } from "../contact-dialog-lab/variants/split";
 import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 import type { StyleXStyles } from "@stylexjs/stylex";
@@ -31,6 +30,8 @@ import {
 } from "motion/react";
 import {
   Fragment,
+  Suspense,
+  lazy,
   useEffect,
   useId,
   useRef,
@@ -42,7 +43,7 @@ import {
   type ReactNode,
   type RefObject,
 } from "react";
-import { preinit } from "react-dom";
+import { preconnect, preinit } from "react-dom";
 
 import { EASE } from "@/components/prototype/motion-constants";
 
@@ -51,12 +52,8 @@ import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 import { LINKEDIN_PATHS, LOGO_PATHS, WECHAT_PATHS, type VectorPath } from "../variant-o/vectors";
 import { INTRO_REVEAL_MS, introStyles, useIntro } from "@/components/prototype/shared/intro";
 
-import { AboutView } from "./about-view";
 import { ContactCta } from "./contact-cta";
-import { ContactView } from "./contact-view";
 import { HERO_BLOB_TWIST } from "./hero-blob-twist";
-import { InsightsView } from "./insights-view";
-import { ProductsView } from "./products-view";
 import { RiseReveal } from "./rise-reveal";
 import { color, ease, font, layout, media, zIndex } from "./tokens.stylex";
 import { useActiveSection } from "./use-active-section";
@@ -82,10 +79,30 @@ import {
 } from "./content";
 
 const GOOGLE_FONTS =
-  "https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter+Tight:ital,wght@0,500;0,800;1,500&family=Noto+Sans+SC:wght@400;500;700;900&display=swap";
+  "https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter+Tight:ital,wght@0,500;0,800;1,500&display=swap";
+
+const loadAboutView = () => import("./about-view");
+const loadProductsView = () => import("./products-view");
+const loadInsightsView = () => import("./insights-view");
+const loadContactView = () => import("./contact-view");
+const loadSplitDialog = () => import("../contact-dialog-lab/variants/split");
+
+const AboutView = lazy(() => loadAboutView().then((m) => ({ default: m.AboutView })));
+const ProductsView = lazy(() => loadProductsView().then((m) => ({ default: m.ProductsView })));
+const InsightsView = lazy(() => loadInsightsView().then((m) => ({ default: m.InsightsView })));
+const ContactView = lazy(() => loadContactView().then((m) => ({ default: m.ContactView })));
+const SplitDialog = lazy(() => loadSplitDialog().then((m) => ({ default: m.SplitDialog })));
+
+function prefetchOffscreenViews() {
+  void loadAboutView();
+  void loadProductsView();
+  void loadInsightsView();
+  void loadContactView();
+  void loadSplitDialog();
+}
 
 const DISPLAY_FONT =
-  '"Inter Tight", "Helvetica Neue", Arial, "Source Han Sans SC", "Noto Sans SC", sans-serif';
+  '"Inter Tight", "Helvetica Neue", Arial, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif';
 const PANEL_ALT = "#e8e8e8";
 const FOOTER_BLUE = "#294f92";
 const HERO_OVERLAY = "#0743a9";
@@ -292,6 +309,9 @@ const styles = stylex.create({
   },
   mainTarget: {
     outlineStyle: "none",
+  },
+  viewFallback: {
+    minHeight: "100svh",
   },
   shell: {
     width: "100%",
@@ -682,7 +702,7 @@ const styles = stylex.create({
   },
   heroAccent: {
     fontFamily:
-      '"Instrument Serif", "Times New Roman", "Source Han Sans SC", "Noto Sans SC", serif',
+      '"Instrument Serif", "Times New Roman", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", serif',
     fontStyle: "italic",
     fontSynthesis: "none",
     fontWeight: 400,
@@ -2334,8 +2354,30 @@ export function VariantOOS1({
   ContactPage?: ComponentType<SubPageProps>;
   startView?: View;
 }) {
+  preconnect("https://fonts.gstatic.com", { crossOrigin: "anonymous" });
   preinit(GOOGLE_FONTS, { as: "style" });
   const reduce = useReducedMotion();
+  useEffect(() => {
+    let cancel = () => {};
+    const scheduleAfterLoad = () => {
+      if (typeof requestIdleCallback === "undefined") {
+        const timer = setTimeout(prefetchOffscreenViews, 1000);
+        cancel = () => clearTimeout(timer);
+        return;
+      }
+      const handle = requestIdleCallback(prefetchOffscreenViews, { timeout: 4000 });
+      cancel = () => cancelIdleCallback(handle);
+    };
+    if (document.readyState === "complete") {
+      scheduleAfterLoad();
+    } else {
+      window.addEventListener("load", scheduleAfterLoad, { once: true });
+    }
+    return () => {
+      window.removeEventListener("load", scheduleAfterLoad);
+      cancel();
+    };
+  }, []);
   const intro = useIntro();
   const introVars = {
     "--oo-intro": intro === "play" ? `${INTRO_REVEAL_MS}ms` : "0ms",
@@ -2401,66 +2443,70 @@ export function VariantOOS1({
             />
             <div {...stylex.props(styles.page, intro === "play" && introStyles.pageReveal)}>
               <main id="main-content" tabIndex={-1} {...stylex.props(styles.mainTarget)}>
-                {view === "about" ? (
-                  <AboutPage
-                    onNavigateHome={(target) =>
-                      handleNavigate(target === "products" ? "products" : "home", target)
-                    }
-                  />
-                ) : view === "products" ? (
-                  <ProductsPage onNavigateHome={(target) => handleNavigate("home", target)} />
-                ) : view === "insights" ? (
-                  <InsightsPage
-                    onNavigateHome={(target) =>
-                      handleNavigate(
-                        target === "contact"
-                          ? "contact"
-                          : target === "products"
-                            ? "products"
-                            : "home",
-                        target,
-                      )
-                    }
-                  />
-                ) : view === "contact" ? (
-                  <ContactPage onNavigateHome={(target) => handleNavigate("home", target)} />
-                ) : HomePage ? (
-                  <HomePage
-                    onNavigate={handleNavigate}
-                    onOpenContactDialog={() => setContactModalOpen(true)}
-                  />
-                ) : (
-                  <>
-                    <Hero onOpenContactDialog={() => setContactModalOpen(true)} />
-                    <About onOpenAboutPage={() => handleNavigate("about", "about-top")} />
-                    <Campus />
-                    <Strengths />
-                    <Products
-                      onOpenProductsPage={() => handleNavigate("products", "products-top")}
+                <Suspense fallback={<div {...stylex.props(styles.viewFallback)} />}>
+                  {view === "about" ? (
+                    <AboutPage
+                      onNavigateHome={(target) =>
+                        handleNavigate(target === "products" ? "products" : "home", target)
+                      }
                     />
-                    <Offices />
-                    <News />
-                    <Flow>
-                      <ContactCta
-                        id="contact"
-                        actions={[
-                          {
-                            label: "联系我们",
-                            tone: "primary",
-                            onClick: () => setContactModalOpen(true),
-                          },
-                        ]}
+                  ) : view === "products" ? (
+                    <ProductsPage onNavigateHome={(target) => handleNavigate("home", target)} />
+                  ) : view === "insights" ? (
+                    <InsightsPage
+                      onNavigateHome={(target) =>
+                        handleNavigate(
+                          target === "contact"
+                            ? "contact"
+                            : target === "products"
+                              ? "products"
+                              : "home",
+                          target,
+                        )
+                      }
+                    />
+                  ) : view === "contact" ? (
+                    <ContactPage onNavigateHome={(target) => handleNavigate("home", target)} />
+                  ) : HomePage ? (
+                    <HomePage
+                      onNavigate={handleNavigate}
+                      onOpenContactDialog={() => setContactModalOpen(true)}
+                    />
+                  ) : (
+                    <>
+                      <Hero onOpenContactDialog={() => setContactModalOpen(true)} />
+                      <About onOpenAboutPage={() => handleNavigate("about", "about-top")} />
+                      <Campus />
+                      <Strengths />
+                      <Products
+                        onOpenProductsPage={() => handleNavigate("products", "products-top")}
                       />
-                    </Flow>
-                  </>
-                )}
+                      <Offices />
+                      <News />
+                      <Flow>
+                        <ContactCta
+                          id="contact"
+                          actions={[
+                            {
+                              label: "联系我们",
+                              tone: "primary",
+                              onClick: () => setContactModalOpen(true),
+                            },
+                          ]}
+                        />
+                      </Flow>
+                    </>
+                  )}
+                </Suspense>
               </main>
               <Flow>
                 <SiteFooter onNavigate={handleNavigate} />
               </Flow>
             </div>
             {contactModalOpen ? (
-              <SplitDialog subject={null} onClose={() => setContactModalOpen(false)} />
+              <Suspense fallback={null}>
+                <SplitDialog subject={null} onClose={() => setContactModalOpen(false)} />
+              </Suspense>
             ) : null}
           </div>
         </MotionConfig>
