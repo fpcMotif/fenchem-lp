@@ -349,15 +349,6 @@ const styles = stylex.create({
     textAlign: "center",
     color: TINT_MUTED,
   },
-  ledgerEmpty: {
-    margin: 0,
-    paddingBlock: 40,
-    paddingInline: 24,
-    fontSize: 15,
-    lineHeight: "26px",
-    textAlign: "center",
-    color: TINT_MUTED,
-  },
   ledgerIntro: {
     gridColumn: { default: "1 / -1", [LG]: "1 / 9" },
     margin: 0,
@@ -1016,6 +1007,8 @@ export function ProductCatalog({ categoryId }: { categoryId: string }) {
     setOpenIndex(openIndex === index ? null : index);
   };
 
+  if (groups.length === 0) return null;
+
   return (
     <section
       id="products-catalog"
@@ -1027,31 +1020,23 @@ export function ProductCatalog({ categoryId }: { categoryId: string }) {
           <h2 id="catalog-title" {...stylex.props(styles.sectionTitle)}>
             产品目录
           </h2>
-          <p {...stylex.props(styles.sectionLead)}>
-            {categoryId === "personal-care"
-              ? "精选个人护理全形态天然油脂与经典功效配方方案"
-              : `${categoryLabel}核心原料与应用定制方案`}
-          </p>
+          <p {...stylex.props(styles.sectionLead)}>{`${categoryLabel}核心原料与应用定制方案`}</p>
         </header>
         <div {...stylex.props(styles.ledgerCard)}>
           <div aria-hidden="true" {...stylex.props(styles.ledgerGrid, styles.ledgerHeader)}>
             <span {...stylex.props(styles.colName)}>原料分类</span>
           </div>
-          {groups.length === 0 ? (
-            <p {...stylex.props(styles.ledgerEmpty)}>暂无原料分类</p>
-          ) : (
-            <ul {...stylex.props(styles.ledger)}>
-              {groups.map((group, index) => (
-                <LedgerRow
-                  key={group.id}
-                  group={group}
-                  index={index}
-                  open={openIndex === index}
-                  onToggle={(trigger) => toggle(index, trigger)}
-                />
-              ))}
-            </ul>
-          )}
+          <ul {...stylex.props(styles.ledger)}>
+            {groups.map((group, index) => (
+              <LedgerRow
+                key={group.id}
+                group={group}
+                index={index}
+                open={openIndex === index}
+                onToggle={(trigger) => toggle(index, trigger)}
+              />
+            ))}
+          </ul>
         </div>
       </div>
     </section>
