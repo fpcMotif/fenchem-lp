@@ -267,6 +267,7 @@ const styles = stylex.create({
     color: color.bodyText,
   },
   breadcrumbLink: {
+    position: "relative",
     padding: 0,
     borderWidth: 0,
     backgroundColor: "transparent",
@@ -275,6 +276,12 @@ const styles = stylex.create({
     fontFamily: "inherit",
     color: { default: color.bodyText, ":hover": { default: null, [HOVER]: colors.brandBlue700 } },
     cursor: "pointer",
+    "::before": {
+      content: '""',
+      position: "absolute",
+      insetBlock: -12,
+      insetInline: -8,
+    },
   },
   breadcrumbCurrent: {
     color: color.ink,
