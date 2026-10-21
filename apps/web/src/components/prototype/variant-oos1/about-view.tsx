@@ -651,6 +651,8 @@ function RdSection() {
         <Reveal as="figure" step={1} sx={styles.rdFigure}>
           <img
             src={ABOUT_RD.image}
+            srcSet="/prototype/about/campus-lab.webp 1400w, /prototype/about/campus-lab-lg.webp 2400w"
+            sizes="(min-width: 1280px) 1200px, 100vw"
             alt={ABOUT_RD.imageAlt}
             loading="lazy"
             decoding="async"
@@ -778,6 +780,8 @@ export function AboutView({ onNavigateHome }: { onNavigateHome: (hash?: string) 
       <section aria-labelledby="about-banner-title" {...stylex.props(styles.hero)}>
         <img
           src={ABOUT_BANNER.image}
+          srcSet={`/prototype/about/about-hero-campus-1200.webp 1200w, ${ABOUT_BANNER.image} 2400w`}
+          sizes="100vw"
           alt={ABOUT_BANNER.alt}
           fetchPriority="high"
           decoding="async"
