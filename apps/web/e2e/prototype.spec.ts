@@ -43,6 +43,10 @@ test("product comparisons change only the selected section", async ({ page }) =>
   await page.emulateMedia({ reducedMotion: "reduce" });
   const sections = async (query: string) => {
     await page.goto(`/?variant=oos1pb${query}`, { waitUntil: "networkidle" });
+    await page
+      .getByRole("group", { name: "Categories" })
+      .getByRole("button", { name: "功能性食品" })
+      .click();
     return {
       catalog: await page.locator("#products-catalog").innerText(),
       solutions: await page.locator("#products-solutions").innerText(),
