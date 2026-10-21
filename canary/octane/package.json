@@ -1,0 +1,25 @@
+{
+  "name": "fenchem-octane-canary",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "serve": "wrangler dev --port 4174"
+  },
+  "dependencies": {
+    "@octanejs/adapter-cloudflare": "^0.0.60",
+    "@octanejs/lucide": "^0.1.59",
+    "@octanejs/motion": "^0.1.64",
+    "@octanejs/stylex": "^0.1.64",
+    "@octanejs/vite-plugin": "^0.4.1",
+    "@stylexjs/stylex": "0.19.1",
+    "octane": "0.13.7"
+  },
+  "devDependencies": {
+    "@tsrx/oxc": "0.20.0",
+    "typescript": "^7.0.2",
+    "vite": "^8",
+    "wrangler": "^4.151.0"
+  }
+}
