@@ -7,7 +7,7 @@ import { useState, type ComponentType, type ReactNode } from "react";
 
 import { ContactCta } from "./contact-cta";
 import { CTA, PRODUCTS_CTA_SUBTITLE } from "./content";
-import { CATEGORIES, FEATURED_PRODUCT, PRODUCTS_HERO_LEAD, type Category } from "./products-data";
+import { CATEGORIES, FEATURED_PRODUCT, type Category } from "./products-data";
 import { ProductCatalog, ProductSolutions } from "./products-sections";
 import { kitStyles } from "./subpage-kit";
 import { color, ease, font, layout, media, zIndex } from "./tokens.stylex";
@@ -62,13 +62,6 @@ const styles = stylex.create({
     lineHeight: 1.2,
     letterSpacing: "0.072em",
     color: color.ink,
-  },
-  bannerLead: {
-    margin: 0,
-    marginTop: { default: 8, [breakpoints.md]: 20 },
-    fontSize: { default: 15, [breakpoints.md]: 20 },
-    lineHeight: 1.53,
-    color: color.bodyText,
   },
 
   subBar: {
@@ -366,8 +359,7 @@ export function ProductsView({
             />
           </figure>
           <div {...stylex.props(kitStyles.shell, kitStyles.inset120, styles.bannerContent)}>
-            <h1 {...stylex.props(styles.bannerTitle)}>{activeCategory.label}</h1>
-            <p {...stylex.props(styles.bannerLead)}>{PRODUCTS_HERO_LEAD}</p>
+            <h1 {...stylex.props(styles.bannerTitle)}>{activeCategory.label}</h1>{" "}
           </div>
         </section>
       )}
