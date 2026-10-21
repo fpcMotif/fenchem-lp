@@ -16,7 +16,6 @@ export const CONTACT_NAV_CHIPS = [
 ] as const;
 
 export const INQUIRY_INTRO = {
-  eyebrow: "Get in touch",
   title: "告诉我们您的需求",
   lead: "填写表单后，专属客户经理与应用工程师会在工作日 24 小时内与您联系。",
   brochureLabel: "下载企业画册与产品目录 (PDF)",
@@ -29,7 +28,6 @@ export const CONTACT_DETAILS = [
 ] as const;
 
 export const VISIT_INTRO = {
-  eyebrow: "Visit us",
   title: "交通位置",
   lead: "到访前请通过表单预约，我们会提前安排专人接待与参观路线。",
 } as const;
@@ -78,7 +76,6 @@ export const NEXT_STEPS = [
 ] as const;
 
 export const CONTACT_FAQ_INTRO = {
-  eyebrow: "FAQ",
   title: "常见问题",
 } as const;
 

@@ -101,16 +101,6 @@ const styles = stylex.create({
   sectionHeadTight: {
     marginBottom: { default: 32, [DESKTOP]: 40 },
   },
-  sectionEyebrow: {
-    margin: 0,
-    marginBottom: 12,
-    fontFamily: font.display,
-    fontSize: 12,
-    fontWeight: 600,
-    letterSpacing: "0.22em",
-    textTransform: "uppercase",
-    color: colors.brandBlue700,
-  },
   sectionTitle: {
     margin: 0,
     fontSize: { default: 26, [media.tablet]: 32, [DESKTOP]: 40 },
@@ -770,13 +760,11 @@ const styles = stylex.create({
 });
 
 function SectionHead({
-  eyebrow,
   title,
   titleId,
   lead,
   tight = false,
 }: {
-  eyebrow: string;
   title: string;
   titleId: string;
   lead?: ReactNode;
@@ -784,9 +772,6 @@ function SectionHead({
 }) {
   return (
     <RiseReveal sx={[styles.sectionHead, tight && styles.sectionHeadTight]}>
-      <p lang="en" {...stylex.props(styles.sectionEyebrow)}>
-        {eyebrow}
-      </p>
       <h2 id={titleId} {...stylex.props(styles.sectionTitle)}>
         {title}
       </h2>
@@ -1062,7 +1047,6 @@ function Inquiry() {
       <div {...stylex.props(kitStyles.shell, kitStyles.inset120, styles.inquiryLayout)}>
         <div {...stylex.props(styles.inquiryAside)}>
           <SectionHead
-            eyebrow={INQUIRY_INTRO.eyebrow}
             title={INQUIRY_INTRO.title}
             titleId="contact-inquiry-title"
             lead={INQUIRY_INTRO.lead}
@@ -1203,7 +1187,6 @@ function Visit() {
     >
       <div {...stylex.props(kitStyles.shell, kitStyles.inset120)}>
         <SectionHead
-          eyebrow={VISIT_INTRO.eyebrow}
           title={VISIT_INTRO.title}
           titleId="contact-visit-title"
           lead={VISIT_INTRO.lead}
@@ -1286,7 +1269,6 @@ function Faq() {
     >
       <div {...stylex.props(kitStyles.shell, kitStyles.inset120, styles.faqLayout)}>
         <SectionHead
-          eyebrow={CONTACT_FAQ_INTRO.eyebrow}
           title={CONTACT_FAQ_INTRO.title}
           titleId="contact-faq-title"
           lead={
