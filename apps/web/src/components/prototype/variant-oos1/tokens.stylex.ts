@@ -3,7 +3,7 @@ import * as stylex from "@stylexjs/stylex";
 export const color = stylex.defineConsts({
   ink: "#1a1a1a",
   bodyText: "#4d4d4d",
-  muted: "#6b7280",
+  muted: "#5d6470",
   navyDeep: "#0b2a5c",
 });
 

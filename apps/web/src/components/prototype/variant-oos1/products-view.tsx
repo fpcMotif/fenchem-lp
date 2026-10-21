@@ -15,7 +15,6 @@ import { color, ease, font, layout, media, zIndex } from "./tokens.stylex";
 const MUTED_LABEL = "#52525b";
 const PHOTO_OUTLINE = "rgba(0, 0, 0, 0.1)";
 const ACCENT = "#78598d";
-const HERO_LEAD = "#595959";
 
 const DESKTOP = breakpoints.xl;
 const LG = breakpoints.lg;
@@ -69,7 +68,7 @@ const styles = stylex.create({
     marginTop: { default: 8, [breakpoints.md]: 20 },
     fontSize: { default: 15, [breakpoints.md]: 20 },
     lineHeight: 1.53,
-    color: HERO_LEAD,
+    color: color.bodyText,
   },
 
   subBar: {
