@@ -1,0 +1,65 @@
+# Typecheck, lint, format, repo checks, production build, and e2e tests.
+
+name: CI
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      # package.json records bun@1.4.4. That release is canary-only, so CI
+      # installs the canary channel instead of a stable GitHub asset.
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: canary
+
+      - run: bun install --frozen-lockfile
+
+      # routeTree.gen.ts is untracked, so generate it before type checking.
+      - run: bun apps/web/scripts/generate-route-tree.ts
+
+      # --no-script runs Bun's type checker instead of the root "check" script.
+      - run: bun check --no-script -b
+
+      - run: bun lint
+
+      - run: bun fmt --check
+
+      - run: bun scripts/check-delayed-dom-lookup.ts
+
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: canary
+
+      - run: bun install --frozen-lockfile
+
+      - run: bunx playwright install --with-deps chromium
+
+      # test:e2e typechecks and builds before it serves the production build.
+      - run: bun run test:e2e
+
+      - if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-traces
+          path: apps/web/test-results/
+          retention-days: 7

@@ -1,9 +1,17 @@
 import { expect, type Page, test } from "@playwright/test";
 
+const HERO_HEADING = /Standardized\s*actives, specified\s*to the decimal\./;
+const QUALITY_HEADING = "Trust is argued with specifications, not adjectives.";
+const INDEX_HEADING = "Periodic index: eight actives, one specification each.";
+const CONTACT_HEADING = /Send us the target\.\s*We send the specification\./;
+
 const gotoLanding = async (page: Page, path = "/") => {
   await page.goto(path, { waitUntil: "domcontentloaded" });
-  await expect(page.getByRole("heading", { level: 1, name: "Fenchem" })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1, name: HERO_HEADING })).toBeVisible();
 };
+
+const primaryCta = (page: Page) =>
+  page.getByRole("link", { name: "Request a specification" }).first();
 
 test.describe("Fenchem landing page", () => {
   test("loads the production landing page without prototype friction", async ({ page }) => {
@@ -14,35 +22,25 @@ test.describe("Fenchem landing page", () => {
       }
     });
 
-    await gotoLanding(page, "/?variant=c");
+    await gotoLanding(page);
 
     await expect(page).toHaveTitle(/Fenchem/);
-    await expect(page.getByText("Botanical intelligence since 1995")).toBeVisible();
     await expect(page.getByLabel("Previous variant")).toHaveCount(0);
-    await expect(page.getByText("Deep Forest")).toHaveCount(0);
     await expect(page.getByText("TanStack Router")).toHaveCount(0);
     expect(messages).toEqual([]);
   });
 
   test("lets buyers move from nav to quality proof and contact", async ({ page }) => {
     await gotoLanding(page);
+    const nav = page.getByRole("navigation", { name: "Primary navigation" });
 
-    await page.getByRole("link", { name: "Quality" }).click();
+    await nav.getByRole("link", { name: "Certificate" }).click();
     await expect(page).toHaveURL(/#quality$/);
-    await expect(
-      page.getByRole("heading", {
-        name: "Every lot has a paper trail before it has a sales story.",
-      }),
-    ).toBeVisible();
+    await expect(page.getByRole("heading", { name: QUALITY_HEADING })).toBeInViewport();
 
-    await page
-      .getByRole("navigation", { name: "Primary navigation" })
-      .getByRole("link", { name: "Contact" })
-      .click();
+    await nav.getByRole("link", { name: "Contact" }).click();
     await expect(page).toHaveURL(/#contact$/);
-    await expect(
-      page.getByRole("heading", { name: "Tell Fenchem what you are formulating." }),
-    ).toBeVisible();
+    await expect(page.getByRole("heading", { name: CONTACT_HEADING })).toBeInViewport();
   });
 
   test("keeps the desktop layout free of horizontal overflow", async ({ page }) => {
@@ -58,10 +56,8 @@ test.describe("Fenchem landing page", () => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await gotoLanding(page);
 
-    await expect(page.getByRole("link", { name: "Explore portfolio" })).toBeVisible();
-    await expect(
-      page.getByRole("heading", { name: "Built for real formulation work." }),
-    ).toBeVisible();
+    await expect(page.getByRole("link", { name: "Read a certificate of analysis" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: INDEX_HEADING })).toBeVisible();
   });
 
   test("keeps every shipped link safe and every hash target valid", async ({ page }) => {
@@ -75,7 +71,10 @@ test.describe("Fenchem landing page", () => {
         return {
           href,
           text: link.textContent?.replace(/\s+/g, " ").trim() ?? "",
-          isSafe: href.startsWith("#") || href.startsWith("mailto:sales@fenchem.com?"),
+          isSafe:
+            href.startsWith("#") ||
+            href === "mailto:sales@fenchem.com" ||
+            href.startsWith("mailto:sales@fenchem.com?"),
           targetExists: !hash || ids.has(hash),
         };
       });
@@ -89,14 +88,13 @@ test.describe("Fenchem landing page", () => {
     await gotoLanding(page);
 
     await page.keyboard.press("Tab");
-    const skipLink = page.getByRole("link", { name: "Skip to ingredients" });
-    await expect(skipLink).toBeVisible();
+    const skipLink = page.getByRole("link", { name: "Skip to content" });
+    await expect(skipLink).toBeFocused();
+    await expect(skipLink).toBeInViewport();
 
     await page.keyboard.press("Enter");
-    await expect(page).toHaveURL(/#industries$/);
-    await expect(
-      page.getByRole("heading", { name: "Built for real formulation work." }),
-    ).toBeVisible();
+    await expect(page).toHaveURL(/#main-content$/);
+    await expect(page.locator("main")).toBeFocused();
   });
 
   test("keeps keyboard focus visible in the header", async ({ page }) => {
@@ -129,13 +127,10 @@ test.describe("Fenchem landing page mobile", () => {
     await page.setViewportSize({ width: 390, height: 844 });
     await gotoLanding(page);
 
-    await expect(page.getByRole("link", { name: "Request specs" })).toBeVisible();
-    await expect(page.getByRole("link", { name: "Explore portfolio" })).toBeVisible();
-    await expect(
-      page.getByRole("navigation", { name: "Primary navigation" }).getByRole("link", {
-        name: "Quality",
-      }),
-    ).toBeVisible();
+    await expect(primaryCta(page)).toBeVisible();
+    await expect(page.getByRole("link", { name: "Read a certificate of analysis" })).toBeVisible();
+    await page.getByRole("button", { name: "Open menu" }).click();
+    await expect(page.getByRole("link", { name: "Certificate" }).last()).toBeVisible();
 
     const overflow = await page.evaluate(
       () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
@@ -148,12 +143,8 @@ test.describe("Fenchem landing page mobile", () => {
     await gotoLanding(page);
     await page.addStyleTag({ content: "html { font-size: 150% !important; }" });
 
-    await expect(page.getByRole("link", { name: "Request specs" })).toBeVisible();
-    await expect(
-      page.getByRole("navigation", { name: "Primary navigation" }).getByRole("link", {
-        name: "Contact",
-      }),
-    ).toBeVisible();
+    await expect(primaryCta(page)).toBeVisible();
+    await expect(page.getByRole("button", { name: "Open menu" })).toBeVisible();
 
     const layout = await page.evaluate(() => {
       const viewportWidth = document.documentElement.clientWidth;
@@ -207,13 +198,11 @@ test.describe("Fenchem landing page viewport extremes", () => {
       await page.setViewportSize({ width: viewport.width, height: viewport.height });
       await gotoLanding(page);
 
-      await expect(page.getByRole("link", { name: "Request specs" })).toBeVisible();
+      await expect(primaryCta(page)).toBeVisible();
 
       const layout = await page.evaluate(() => {
         const hero = document.querySelector("section");
-        const stats = [...document.querySelectorAll("dd")].map((element) =>
-          element.textContent?.trim(),
-        );
+        const heading = document.querySelector("h1")?.getBoundingClientRect();
         const smallTargets = [...document.querySelectorAll<HTMLElement>("main a, main button")]
           .filter((element) => {
             const rect = element.getBoundingClientRect();
@@ -240,14 +229,14 @@ test.describe("Fenchem landing page viewport extremes", () => {
           .map((element) => element.textContent?.replace(/\s+/g, " ").trim() ?? element.tagName);
         return {
           overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
-          firstViewportHasStats: stats.includes("25+") && stats.includes("40+"),
+          firstViewportHasHeading: !!heading && heading.bottom <= window.innerHeight,
           heroHeight: hero?.getBoundingClientRect().height ?? 0,
           smallTargets,
         };
       });
 
       expect(layout.overflow).toBeLessThanOrEqual(1);
-      expect(layout.firstViewportHasStats).toBe(true);
+      expect(layout.firstViewportHasHeading).toBe(true);
       expect(layout.heroHeight).toBeGreaterThan(420);
       expect(layout.smallTargets).toEqual([]);
     });

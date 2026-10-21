@@ -26,7 +26,7 @@
     "qa:doctor": "bun --no-env-file tools/qa/run.mjs doctor",
     "dev": "vp run -r dev",
     "build": "vp run -r build",
-    "check": "bun run typecheck && bun lint && bun fmt --check",
+    "check": "bun run typecheck && bun lint && bun fmt --check && bun scripts/check-delayed-dom-lookup.ts",
     "check-types": "bun run typecheck",
     "typecheck": "bun apps/web/scripts/generate-route-tree.ts && bun check --no-script -b",
     "check:lint": "bun lint && bun fmt && bun scripts/check-stylex-types.ts",

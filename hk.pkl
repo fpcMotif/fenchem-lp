@@ -6,6 +6,14 @@ steps {
     check = "bun lint {{files}}"
     fix = "bun lint --fix {{files}}"
   }
+  ["delayed-dom-lookup"] {
+    glob = List("apps/web/src/**/*.{ts,tsx}", "packages/ui/src/**/*.{ts,tsx}")
+    check = "bun scripts/check-delayed-dom-lookup.ts {{files}}"
+  }
+  ["typecheck"] {
+    glob = "*.{ts,tsx,mts,cts}"
+    check = "bun apps/web/scripts/generate-route-tree.ts && bun check --no-script -b"
+  }
   ["fmt"] {
     glob = "*.{js,jsx,ts,tsx,mjs,cjs,mts,cts,json,jsonc,yaml,yml,md}"
     check = "bun fmt --check {{files}}"

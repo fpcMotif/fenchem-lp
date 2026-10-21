@@ -14,7 +14,7 @@
     "dev:portless": "portless",
     "test": "node ../../node_modules/vitest/dist/cli.js run --config vitest.config.ts",
     "test:coverage": "node ../../node_modules/vitest/dist/cli.js run --config vitest.config.ts --coverage",
-    "test:e2e": "NO_PROXY=localhost,127.0.0.1,::1 no_proxy=localhost,127.0.0.1,::1 playwright test --config playwright.config.ts",
+    "test:e2e": "bun run check-types && vp build && NO_PROXY=localhost,127.0.0.1,::1 no_proxy=localhost,127.0.0.1,::1 playwright test --config playwright.config.ts",
     "test:prototypes": "NO_PROXY=localhost,127.0.0.1,::1,.localhost no_proxy=localhost,127.0.0.1,::1,.localhost playwright test --config playwright.prototypes.config.ts",
     "vite": "vp"
   },

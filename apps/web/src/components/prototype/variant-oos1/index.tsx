@@ -2331,6 +2331,16 @@ function SiteFooter({ onNavigate }: { onNavigate?: (view: View, targetId?: strin
   );
 }
 
+type ScrollTarget = { id: string; behavior: ScrollBehavior };
+
+function ScrollToTargetAfterViewMounts({ target }: { target: ScrollTarget | null }) {
+  useEffect(() => {
+    if (!target) return;
+    document.getElementById(target.id)?.scrollIntoView({ behavior: target.behavior });
+  }, [target]);
+  return null;
+}
+
 const viewFromPage = (page: unknown, startView: View): View => {
   if (page === "about" || page === "home") return page;
   if (page === "products" || page === "produces") return "products";
@@ -2395,6 +2405,7 @@ export function VariantOOS1({
   const { page } = useSearch({ strict: false });
   const [view, setView] = useState<View>(() => viewFromPage(page, startView));
   const [contactModalOpen, setContactModalOpen] = useState(false);
+  const [scrollTarget, setScrollTarget] = useState<ScrollTarget | null>(null);
 
   const handleNavigate = (targetView: View, targetId?: string) => {
     setView(targetView);
@@ -2409,10 +2420,7 @@ export function VariantOOS1({
       window.history.pushState({}, "", url.toString());
       const behavior: ScrollBehavior = reduce ? "auto" : "smooth";
       if (targetId) {
-        setTimeout(() => {
-          const el = document.getElementById(targetId);
-          if (el) el.scrollIntoView({ behavior });
-        }, 60);
+        setScrollTarget({ id: targetId, behavior });
       } else {
         window.scrollTo({ top: 0, behavior });
       }
@@ -2497,6 +2505,7 @@ export function VariantOOS1({
                       </Flow>
                     </>
                   )}
+                  <ScrollToTargetAfterViewMounts target={scrollTarget} />
                 </Suspense>
               </main>
               <Flow>

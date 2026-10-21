@@ -21,7 +21,7 @@ export default defineConfig({
   webServer: {
     command: `bun run serve -- --host ${host} --port ${port}`,
     url: baseURL,
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: false,
     timeout: 120_000,
     env: {
       NO_PROXY: "localhost,127.0.0.1,::1",

@@ -51,9 +51,9 @@ export function IntroOverlay({
   useEffect(() => {
     let stop = () => {};
     let impactTimer = 0;
+    const period = document.querySelector("[data-hero-period]");
     const timer = window.setTimeout(() => {
       const dot = dotRef.current;
-      const period = document.querySelector("[data-hero-period]");
       if (!dot || !period) {
         impactRef.current();
         landedRef.current();
