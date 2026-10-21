@@ -12,6 +12,9 @@ const OOX_WORD_ON_TINT = "#d7e1f1";
 const WORD_ON_TINT = `color-mix(in srgb, ${OOX_WORD_ON_TINT} 80%, ${TINT})`;
 const WORD_TRACKING = "0.06em";
 const DESKTOP = breakpoints.xl;
+const WORD_SIZE = "30vw";
+const WORD_SIZE_DESKTOP = "min(360px, 25vw)";
+const WORD_CAP_ABOVE_EDGE = 0.581;
 
 export type ContactCtaAction = {
   label: string;
@@ -30,7 +33,10 @@ const styles = stylex.create({
     justifyContent: "center",
     overflow: "clip",
     paddingTop: { default: 80, [DESKTOP]: 128 },
-    paddingBottom: { default: 120, [DESKTOP]: 220 },
+    paddingBottom: {
+      default: `calc(${WORD_SIZE} * ${WORD_CAP_ABOVE_EDGE})`,
+      [DESKTOP]: `calc(${WORD_SIZE_DESKTOP} * ${WORD_CAP_ABOVE_EDGE})`,
+    },
     paddingInline: { default: 16, [media.tablet]: 40, [DESKTOP]: layout.inset124 },
     scrollMarginTop: layout.headerHeight,
     backgroundColor: TINT,
@@ -40,7 +46,7 @@ const styles = stylex.create({
     left: "50%",
     bottom: 0,
     fontFamily: font.display,
-    fontSize: { default: "30vw", [DESKTOP]: "min(360px, 25vw)" },
+    fontSize: { default: WORD_SIZE, [DESKTOP]: WORD_SIZE_DESKTOP },
     fontWeight: 800,
     lineHeight: 0.74,
     letterSpacing: `-${WORD_TRACKING}`,

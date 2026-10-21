@@ -56,9 +56,7 @@ import { ContactCta } from "./contact-cta";
 import { ContactView } from "./contact-view";
 import { HERO_BLOB_TWIST } from "./hero-blob-twist";
 import { InsightsView } from "./insights-view";
-import { NewsView } from "./news-view";
 import { ProductsView } from "./products-view";
-import { RdView } from "./rd-view";
 import { RiseReveal } from "./rise-reveal";
 import { color, ease, font, layout, media, zIndex } from "./tokens.stylex";
 import { useActiveSection } from "./use-active-section";
@@ -1539,9 +1537,13 @@ function useNavFits(
   return fits;
 }
 
-export type View = "home" | "about" | "products" | "rd" | "insights" | "news" | "contact";
+export type View = "home" | "about" | "products" | "insights" | "contact";
 export type AboutPageProps = { onNavigateHome: (hash?: string) => void };
 export type SubPageProps = AboutPageProps;
+export type HomePageProps = {
+  onNavigate: (view: View, targetId?: string) => void;
+  onOpenContactDialog: () => void;
+};
 
 function SiteHeader({
   currentView,
@@ -1570,14 +1572,8 @@ function SiteHeader({
     if (href === "#products") {
       return currentView === "products";
     }
-    if (href === "#campus" || href === "#rd") {
-      return currentView === "rd";
-    }
     if (href === "#insights") {
       return currentView === "insights";
-    }
-    if (href === "#news") {
-      return currentView === "news";
     }
     if (href === "#contact") {
       return currentView === "contact";
@@ -1602,21 +1598,9 @@ function SiteHeader({
       setMenuOpen(false);
       return;
     }
-    if (href === "#campus" || href === "#rd") {
-      event.preventDefault();
-      onNavigate("rd", "rd-top");
-      setMenuOpen(false);
-      return;
-    }
     if (href === "#insights") {
       event.preventDefault();
       onNavigate("insights", "insights-top");
-      setMenuOpen(false);
-      return;
-    }
-    if (href === "#news") {
-      event.preventDefault();
-      onNavigate("news", "news-top");
       setMenuOpen(false);
       return;
     }
@@ -2332,9 +2316,7 @@ function SiteFooter({ onNavigate }: { onNavigate?: (view: View, targetId?: strin
 const viewFromPage = (page: unknown, startView: View): View => {
   if (page === "about" || page === "home") return page;
   if (page === "products" || page === "produces") return "products";
-  if (page === "rd" || page === "manufacturing" || page === "campus") return "rd";
   if (page === "insights" || page === "insight") return "insights";
-  if (page === "news") return "news";
   if (page === "contact") return "contact";
   return startView;
 };
@@ -2342,17 +2324,15 @@ const viewFromPage = (page: unknown, startView: View): View => {
 export function VariantOOS1({
   AboutPage = AboutView,
   ProductsPage = ProductsView,
-  RdPage = RdView,
   InsightsPage = InsightsView,
-  NewsPage = NewsView,
   ContactPage = ContactView,
+  HomePage,
   startView = "home",
 }: {
+  HomePage?: ComponentType<HomePageProps>;
   AboutPage?: ComponentType<SubPageProps>;
   ProductsPage?: ComponentType<SubPageProps>;
-  RdPage?: ComponentType<SubPageProps>;
   InsightsPage?: ComponentType<SubPageProps>;
-  NewsPage?: ComponentType<SubPageProps>;
   ContactPage?: ComponentType<SubPageProps>;
   startView?: View;
 }) {
@@ -2431,12 +2411,6 @@ export function VariantOOS1({
                   />
                 ) : view === "products" ? (
                   <ProductsPage onNavigateHome={(target) => handleNavigate("home", target)} />
-                ) : view === "rd" ? (
-                  <RdPage
-                    onNavigateHome={(target) =>
-                      handleNavigate(target === "contact" ? "contact" : "home", target)
-                    }
-                  />
                 ) : view === "insights" ? (
                   <InsightsPage
                     onNavigateHome={(target) =>
@@ -2450,14 +2424,13 @@ export function VariantOOS1({
                       )
                     }
                   />
-                ) : view === "news" ? (
-                  <NewsPage
-                    onNavigateHome={(target) =>
-                      handleNavigate(target === "contact" ? "contact" : "home", target)
-                    }
-                  />
                 ) : view === "contact" ? (
                   <ContactPage onNavigateHome={(target) => handleNavigate("home", target)} />
+                ) : HomePage ? (
+                  <HomePage
+                    onNavigate={handleNavigate}
+                    onOpenContactDialog={() => setContactModalOpen(true)}
+                  />
                 ) : (
                   <>
                     <Hero onOpenContactDialog={() => setContactModalOpen(true)} />

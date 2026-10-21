@@ -18,7 +18,7 @@ describe("product variant source coverage", () => {
   });
 
   it("retains every formula and its metadata", () => {
-    expect(FLAT_FORMULAS).toHaveLength(10);
+    expect(FLAT_FORMULAS).toHaveLength(20);
     expect(FLAT_FORMULAS.map((item) => item.id)).toEqual(SOLUTION_ITEMS.map((item) => item.id));
     for (const formula of FLAT_FORMULAS) {
       expect(FORMULA_TRAITS[formula.id]).toBeDefined();

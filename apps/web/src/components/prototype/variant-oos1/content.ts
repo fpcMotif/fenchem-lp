@@ -23,9 +23,7 @@ export const NAV_ITEMS = [
   { label: "首页", href: "#top" },
   { label: "关于我们", href: "#about" },
   { label: "产品与应用", href: "#products" },
-  { label: "研发与生产", href: "#campus" },
   { label: "行业洞察", href: "#insights" },
-  { label: "新闻资讯", href: "#news" },
   { label: "联系我们", href: "#contact" },
 ] as const;
 
@@ -90,7 +88,7 @@ export const NEWS: readonly { title: string; details: readonly string[] }[] = [
 
 export type FooterLink = {
   label: string;
-  page?: "about" | "products" | "rd" | "insights" | "news" | "contact";
+  page?: "about" | "products" | "insights" | "contact";
 };
 
 export const FOOTER_COLUMNS: readonly { heading: string; links: readonly FooterLink[] }[] = [
@@ -99,7 +97,6 @@ export const FOOTER_COLUMNS: readonly { heading: string; links: readonly FooterL
     links: [
       { label: "关于我们", page: "about" },
       { label: "产品与应用", page: "products" },
-      { label: "研发与生产", page: "rd" },
       { label: "联系我们", page: "contact" },
     ],
   },
@@ -107,13 +104,11 @@ export const FOOTER_COLUMNS: readonly { heading: string; links: readonly FooterL
     heading: "资讯与资源",
     links: [
       { label: "行业洞察", page: "insights" },
-      { label: "新闻资讯", page: "news" },
       { label: "技术白皮书", page: "insights" },
-      { label: "全球展会日程", page: "news" },
       { label: "常见解答", page: "contact" },
     ],
   },
-  { heading: "法律与合规", links: [{ label: "隐私声明" }, { label: "合规准则", page: "rd" }] },
+  { heading: "法律与合规", links: [{ label: "隐私声明" }, { label: "合规准则" }] },
 ];
 
 export const OFFICE_MAP_PINS: readonly { left: number; top: number }[] = [

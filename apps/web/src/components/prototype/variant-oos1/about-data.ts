@@ -217,6 +217,34 @@ export const ABOUT_CULTURE = {
   ],
 } as const;
 
+export const ABOUT_RD = {
+  navChip: { label: "研发智造", english: "R&D", id: "about-rd" },
+  title: "研发与智造",
+  lead: "从原料开发、配方应用到功效验证，再到规模化生产，全链路自主可控。",
+  image: "/prototype/about/campus-lab-lg.webp",
+  imageAlt: "Fenchem R&D laboratory with glass-walled labs",
+  stats: [
+    { value: "35+", unit: "人", label: "资深研发团队" },
+    { value: "160+", unit: "项", label: "累计申请专利" },
+    { value: "85+", unit: "项", label: "授权专利" },
+    { value: "30+", unit: "项", label: "发明专利" },
+  ],
+  pillars: [
+    {
+      title: "团队与硬件",
+      desc: "35+ 人资深研发团队，配备国内外先进设备，覆盖原料开发、配方应用、功效验证全链路。",
+    },
+    {
+      title: "核心技术",
+      desc: "聚焦天然动植物成分的提取、分离、改性与深加工；自研与外部合作协同，掌握多项动植物源活性成分核心技术。",
+    },
+    {
+      title: "智造基地",
+      desc: "位于南京溧水经济开发区，邻近禄口机场，占地 35,000 m²；按国际标准建设精益化、自动化、信息化工厂，全链路闭环品控。",
+    },
+  ],
+} as const;
+
 export const ABOUT_CSR = {
   title: "社会责任",
   statement: ["平衡生态环境和客户需求，", "确保可持续发展。"],

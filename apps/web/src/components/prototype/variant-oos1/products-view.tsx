@@ -466,7 +466,7 @@ export function ProductsView({
       {CatalogSection && compare !== "baseline" && compare !== "solutions" ? (
         <CatalogSection />
       ) : (
-        <ProductCatalog categoryId={activeTab} />
+        <ProductCatalog key={activeTab} categoryId={activeTab} />
       )}
       {SolutionsSection && compare !== "baseline" && compare !== "catalog" ? (
         <Flow>
@@ -474,7 +474,7 @@ export function ProductsView({
         </Flow>
       ) : (
         <Flow>
-          <ProductSolutions />
+          <ProductSolutions key={activeTab} categoryId={activeTab} />
         </Flow>
       )}
 

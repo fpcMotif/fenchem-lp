@@ -7,7 +7,14 @@ import { useEffect, useRef, useState } from "react";
 
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
-import { ABOUT_BANNER, ABOUT_CAMPUS, ABOUT_CSR, ABOUT_HERO, ABOUT_HISTORY } from "./about-data";
+import {
+  ABOUT_BANNER,
+  ABOUT_CAMPUS,
+  ABOUT_CSR,
+  ABOUT_HERO,
+  ABOUT_HISTORY,
+  ABOUT_RD,
+} from "./about-data";
 import { CampusCarousel } from "./campus-carousel";
 import { CAMPUS_GALLERY } from "./campus-gallery";
 import { ContactCta } from "./contact-cta";
@@ -24,12 +31,20 @@ const DESKTOP = breakpoints.xl;
 const MD = breakpoints.md;
 const LG = breakpoints.lg;
 const FRAME_TINT = "#e6ecf7";
+const RD_HAIRLINE = "rgba(26, 26, 26, 0.12)";
 const HERO_TITLE = "源于自然，精于科学";
 
 const STICKY_TOP = Number.parseFloat(layout.headerHeight) + Number.parseFloat(layout.subBarHeight);
 
 const [PROFILE_CHIP, ...LATER_CHIPS] = ABOUT_HERO.navChips;
-const NAV_CHIPS = [PROFILE_CHIP, ABOUT_HISTORY.navChip, ...LATER_CHIPS];
+const AFTER_CULTURE = LATER_CHIPS.findIndex((chip) => chip.id === "about-culture") + 1;
+const NAV_CHIPS = [
+  PROFILE_CHIP,
+  ABOUT_HISTORY.navChip,
+  ...LATER_CHIPS.slice(0, AFTER_CULTURE),
+  ABOUT_RD.navChip,
+  ...LATER_CHIPS.slice(AFTER_CULTURE),
+];
 
 const fadeIn = stylex.keyframes({
   "0%": { opacity: 0 },
@@ -297,6 +312,122 @@ const styles = stylex.create({
     insetInlineEnd: { default: 12, [breakpoints.md]: 32 },
   },
 
+  rdSection: {
+    paddingBlock: { default: 72, [DESKTOP]: 128 },
+    backgroundColor: colors.paper,
+  },
+  rdHead: {
+    display: "grid",
+    gridTemplateColumns: { default: "minmax(0, 1fr)", [LG]: "minmax(0, 1fr) minmax(0, 1fr)" },
+    alignItems: "end",
+    gap: { default: 16, [LG]: 48 },
+    marginBottom: { default: 32, [DESKTOP]: 56 },
+  },
+  rdLead: {
+    margin: 0,
+    maxWidth: "30em",
+    fontSize: 16,
+    lineHeight: 1.8,
+    letterSpacing: "0.04em",
+    textWrap: "pretty",
+    color: color.bodyText,
+  },
+  rdFigure: {
+    position: "relative",
+    overflow: "hidden",
+    margin: 0,
+    aspectRatio: { default: "4 / 3", [MD]: "16 / 7", [DESKTOP]: "12 / 5" },
+    backgroundColor: FRAME_TINT,
+  },
+  rdImage: {
+    objectPosition: "50% 55%",
+  },
+  rdStats: {
+    display: "grid",
+    gridTemplateColumns: {
+      default: "repeat(2, minmax(0, 1fr))",
+      [MD]: "repeat(4, minmax(0, 1fr))",
+    },
+    rowGap: 32,
+    margin: 0,
+    paddingBlock: { default: 32, [DESKTOP]: 48 },
+    borderBottomWidth: 1,
+    borderBottomStyle: "solid",
+    borderBottomColor: RD_HAIRLINE,
+  },
+  rdStat: {
+    display: "flex",
+    flexDirection: "column-reverse",
+    justifyContent: "flex-end",
+    gap: 10,
+    paddingInline: { default: 16, [DESKTOP]: 32 },
+    borderInlineStartWidth: 1,
+    borderInlineStartStyle: "solid",
+    borderInlineStartColor: RD_HAIRLINE,
+  },
+  rdStatWrapStart: {
+    paddingInlineStart: { default: 0, [MD]: 16, [DESKTOP]: 32 },
+    borderInlineStartColor: { default: "transparent", [MD]: RD_HAIRLINE },
+  },
+  rdStatFirst: {
+    paddingInlineStart: { default: 0, [MD]: 0, [DESKTOP]: 0 },
+    borderInlineStartColor: { default: "transparent", [MD]: "transparent" },
+  },
+  rdStatRow: {
+    display: "flex",
+    alignItems: "baseline",
+    gap: 4,
+    margin: 0,
+  },
+  rdStatValue: {
+    fontFamily: font.display,
+    fontSize: { default: 36, [DESKTOP]: 52 },
+    fontWeight: 500,
+    lineHeight: 1,
+    letterSpacing: "-0.03em",
+    fontVariantNumeric: "tabular-nums",
+    color: color.ink,
+  },
+  rdStatUnit: {
+    fontSize: 14,
+    color: color.muted,
+  },
+  rdStatLabel: {
+    fontSize: 14,
+    letterSpacing: "0.06em",
+    color: color.bodyText,
+  },
+  rdPillars: {
+    display: "flex",
+    flexDirection: "column",
+  },
+  rdPillar: {
+    display: "grid",
+    gridTemplateColumns: { default: "minmax(0, 1fr)", [LG]: "minmax(0, 1fr) minmax(0, 2fr)" },
+    gap: { default: 8, [LG]: 48 },
+    paddingBlock: { default: 24, [DESKTOP]: 32 },
+    borderBottomWidth: 1,
+    borderBottomStyle: "solid",
+    borderBottomColor: RD_HAIRLINE,
+  },
+  rdPillarTitle: {
+    margin: 0,
+    fontSize: 17,
+    fontWeight: 600,
+    lineHeight: 1.7,
+    letterSpacing: "0.04em",
+    color: color.ink,
+  },
+  rdPillarDesc: {
+    margin: 0,
+    maxWidth: "40em",
+    fontSize: 15,
+    lineHeight: 1.9,
+    letterSpacing: "0.02em",
+    textWrap: "pretty",
+    color: color.bodyText,
+  },
+
   csrSection: {
     position: "relative",
     overflow: "hidden",
@@ -503,6 +634,61 @@ export function CampusGallery({ headerSx }: { headerSx?: stylex.StyleXStyles }) 
   );
 }
 
+function RdSection() {
+  return (
+    <section
+      id={ABOUT_RD.navChip.id}
+      aria-labelledby="about-rd-title"
+      {...stylex.props(styles.rdSection, kitStyles.anchor)}
+    >
+      <div {...stylex.props(kitStyles.shell, kitStyles.inset120)}>
+        <Reveal sx={styles.rdHead}>
+          <h2 id="about-rd-title" {...stylex.props(styles.sectionTitle)}>
+            {ABOUT_RD.title}
+          </h2>
+          <p {...stylex.props(styles.rdLead)}>{ABOUT_RD.lead}</p>
+        </Reveal>
+        <Reveal as="figure" step={1} sx={styles.rdFigure}>
+          <img
+            src={ABOUT_RD.image}
+            alt={ABOUT_RD.imageAlt}
+            loading="lazy"
+            decoding="async"
+            {...stylex.props(styles.fill, styles.rdImage)}
+          />
+        </Reveal>
+        <dl {...stylex.props(styles.rdStats)}>
+          {ABOUT_RD.stats.map((stat, index) => (
+            <Reveal
+              key={stat.label}
+              step={index}
+              sx={[
+                styles.rdStat,
+                index % 2 === 0 && styles.rdStatWrapStart,
+                index === 0 && styles.rdStatFirst,
+              ]}
+            >
+              <dt {...stylex.props(styles.rdStatLabel)}>{stat.label}</dt>
+              <dd {...stylex.props(styles.rdStatRow)}>
+                <span {...stylex.props(styles.rdStatValue)}>{stat.value}</span>
+                <span {...stylex.props(styles.rdStatUnit)}>{stat.unit}</span>
+              </dd>
+            </Reveal>
+          ))}
+        </dl>
+        <div {...stylex.props(styles.rdPillars)}>
+          {ABOUT_RD.pillars.map((pillar, index) => (
+            <Reveal key={pillar.title} step={index} sx={styles.rdPillar}>
+              <h3 {...stylex.props(styles.rdPillarTitle)}>{pillar.title}</h3>
+              <p {...stylex.props(styles.rdPillarDesc)}>{pillar.desc}</p>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function CsrSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const reduce = useReducedMotion();
@@ -620,6 +806,8 @@ export function AboutView({ onNavigateHome }: { onNavigateHome: (hash?: string) 
       <CampusGallery />
 
       <CultureScenes sx={kitStyles.anchor} />
+
+      <RdSection />
 
       <CsrSection />
 
