@@ -18,6 +18,7 @@ export interface FeaturedProduct {
   tagline: string;
   items: FeaturedItem[];
   bannerImage: string;
+  bannerSrcSet: string;
 }
 
 export interface CatalogItem {
@@ -142,7 +143,10 @@ export const FEATURED_PRODUCT: FeaturedProduct = {
   brand: "OLVE'Care™ Shea",
   tagline: "天然全形态乳木果油脂，适配任何配方剂型",
   items: FEATURED_ITEMS,
-  bannerImage: "/products/banner.png",
+  bannerImage: "/products/banner-1920.webp",
+  bannerSrcSet: [1280, 1920, 2880, 4096]
+    .map((width) => `/products/banner-${width}.webp ${width}w`)
+    .join(", "),
 };
 
 export const CATALOG_GROUPS: CatalogGroup[] = [

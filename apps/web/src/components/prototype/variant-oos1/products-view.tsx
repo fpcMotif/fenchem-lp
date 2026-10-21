@@ -358,6 +358,8 @@ export function ProductsView({
           <figure {...stylex.props(styles.bannerFigure)}>
             <img
               src={FEATURED_PRODUCT.bannerImage}
+              srcSet={FEATURED_PRODUCT.bannerSrcSet}
+              sizes="(min-width: 768px) clamp(1200px, 124vw, 1920px), 960px"
               alt="Panorama of Fenchem products and applications in their natural form"
               fetchPriority="high"
               decoding="async"
