@@ -18,6 +18,27 @@ test("production keyboard navigation stays inside product tabs", async ({ page }
   await expect(page).toHaveURL(/variant=oos1pb$/);
 });
 
+test("opening the about page from a scrolled home lands at its top", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/?variant=oos1", { waitUntil: "networkidle" });
+  const aboutLink = page.locator('header a[href="#about"]');
+  await page.waitForFunction(() => {
+    const link = document.querySelector('header a[href="#about"]');
+    return link && Object.keys(link).some((key) => key.startsWith("__reactProps"));
+  });
+  await page.evaluate(() => window.scrollTo({ top: 3000, behavior: "instant" }));
+  await aboutLink.click();
+  await expect(page).toHaveURL(/page=about#about-top$/);
+  await expect
+    .poll(() =>
+      page.evaluate(() => {
+        const top = document.getElementById("about-top")?.getBoundingClientRect().top;
+        return top === undefined ? Number.POSITIVE_INFINITY : Math.abs(top);
+      }),
+    )
+    .toBeLessThan(2);
+});
+
 test("product comparisons change only the selected section", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   const sections = async (query: string) => {
