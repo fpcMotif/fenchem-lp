@@ -114,7 +114,10 @@ const styles = stylex.create({
     alignItems: "flex-end",
     boxSizing: "border-box",
     minHeight: { default: 240, [breakpoints.md]: "clamp(300px, 31vw, 480px)" },
-    paddingTop: layout.headerHeight,
+    paddingTop: {
+      default: `calc(${layout.headerHeight} + 40px)`,
+      [breakpoints.md]: layout.headerHeight,
+    },
     backgroundColor: color.navyDeep,
     color: colors.paper,
   },
@@ -126,7 +129,10 @@ const styles = stylex.create({
     animationFillMode: "both",
   },
   bannerScrim: {
-    backgroundImage: `linear-gradient(to bottom, rgba(255, 255, 255, 0.6) 0px, rgba(255, 255, 255, 0) 160px), linear-gradient(to top, ${NAVY_SCRIM} 0%, rgba(6, 28, 66, 0.34) 42%, rgba(6, 28, 66, 0) 66%)`,
+    backgroundImage: {
+      default: `linear-gradient(to bottom, rgba(255, 255, 255, 0.6) 0px, rgba(255, 255, 255, 0) 112px), linear-gradient(to top, ${NAVY_SCRIM} 0%, rgba(6, 28, 66, 0.6) 55%, rgba(6, 28, 66, 0.2) 100%)`,
+      [breakpoints.md]: `linear-gradient(to bottom, rgba(255, 255, 255, 0.6) 0px, rgba(255, 255, 255, 0) 160px), linear-gradient(to top, ${NAVY_SCRIM} 0%, rgba(6, 28, 66, 0.5) 50%, rgba(6, 28, 66, 0.12) 100%)`,
+    },
     pointerEvents: "none",
   },
   bannerContent: {
@@ -158,7 +164,7 @@ const styles = stylex.create({
     fontWeight: 600,
     letterSpacing: "0.22em",
     textTransform: "uppercase",
-    color: "rgba(255, 255, 255, 0.72)",
+    color: "rgba(255, 255, 255, 0.9)",
   },
   bannerTitle: {
     margin: 0,
@@ -206,7 +212,8 @@ const styles = stylex.create({
     fontWeight: 500,
     letterSpacing: "0.22em",
     textTransform: "uppercase",
-    color: "rgba(255, 255, 255, 0.92)",
+    color: colors.paper,
+    textShadow: "0 1px 12px rgba(6, 28, 66, 0.55)",
   },
   bannerMetaRule: {
     width: 40,
