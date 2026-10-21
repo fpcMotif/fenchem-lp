@@ -27,7 +27,6 @@ const DATASET_LABELS: Record<Dataset, string> = {
 };
 
 const ANCHOR_KEY = "worst-oos1-anchor";
-const RESTORE_DELAY_MS = 500;
 
 export const Route = createFileRoute("/worst/oos1")({
   validateSearch: (search: {
@@ -70,7 +69,7 @@ function WorstOOS1() {
   }, [data, fixed, articles]);
 
   useEffect(() => {
-    if (loaded && "Variant" in loaded) restoreAnchor();
+    if (loaded && "Variant" in loaded) return restoreAnchor();
   }, [loaded]);
 
   return (
@@ -233,14 +232,24 @@ function restoreAnchor() {
   }
   if (!anchor) return;
   const { id, top } = anchor;
-  window.setTimeout(() => {
-    const element = document.getElementById(id);
-    if (!element) return;
+  const scrollToAnchor = (element: HTMLElement) =>
     window.scrollTo({
       top: element.getBoundingClientRect().top + window.scrollY - top,
       behavior: "instant",
     });
-  }, RESTORE_DELAY_MS);
+  const existing = document.getElementById(id);
+  if (existing) {
+    scrollToAnchor(existing);
+    return;
+  }
+  const observer = new MutationObserver(() => {
+    const element = document.getElementById(id);
+    if (!element) return;
+    observer.disconnect();
+    scrollToAnchor(element);
+  });
+  observer.observe(document.body, { childList: true, subtree: true });
+  return () => observer.disconnect();
 }
 
 function go(
