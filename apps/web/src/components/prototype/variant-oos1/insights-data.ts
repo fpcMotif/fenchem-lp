@@ -214,15 +214,4 @@ const GLP1_ARTICLE: InsightArticle = {
   ],
 };
 
-export const INSIGHTS_ARTICLES: InsightArticle[] = [
-  GLP1_ARTICLE,
-  {
-    ...GLP1_ARTICLE,
-    id: "insights-glp1-copy",
-    cover: {
-      src: "/products/figma/hero-functional-food.jpg",
-      alt: "女士在餐桌前享用家常菜肴",
-      position: "72% 50%",
-    },
-  },
-];
+export const INSIGHTS_ARTICLES: InsightArticle[] = [GLP1_ARTICLE];
