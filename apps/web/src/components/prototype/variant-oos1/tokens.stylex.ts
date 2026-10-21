@@ -5,6 +5,11 @@ export const color = stylex.defineConsts({
   bodyText: "#4d4d4d",
   muted: "#5d6470",
   navyDeep: "#0b2a5c",
+  pageTint: "#f3f5fa",
+  blueTint: "#e6ecf7",
+  neutralTint: "#f6f6f6",
+  chip: "#f3f4f6",
+  chipHover: "#e5e7eb",
 });
 
 export const font = stylex.defineConsts({

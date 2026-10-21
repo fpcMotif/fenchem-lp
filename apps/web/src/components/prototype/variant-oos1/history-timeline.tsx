@@ -33,7 +33,6 @@ import {
 import { RiseReveal } from "./rise-reveal";
 import { color, ease, font, layout, media } from "./tokens.stylex";
 
-const PAGE = "#f3f5fa";
 const MUTED_INK = "rgba(26, 26, 26, 0.22)";
 const UNLIT_YEAR_INK = "rgba(26, 26, 26, 0.52)";
 const HAIRLINE = "rgba(26, 26, 26, 0.12)";
@@ -348,7 +347,7 @@ const styles = stylex.create({
     stroke: colors.brandGreen500,
   },
   nodeRing: {
-    fill: PAGE,
+    fill: color.pageTint,
     stroke: BLUE_RING,
     strokeWidth: 1.25,
     transitionProperty: "stroke",

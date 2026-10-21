@@ -198,7 +198,7 @@ const styles = stylex.create({
     borderStyle: "solid",
     borderColor: "rgba(26, 26, 26, 0.14)",
     borderRadius: "50%",
-    backgroundColor: { default: colors.paper, ":hover": "#f3f4f6" },
+    backgroundColor: { default: colors.paper, ":hover": color.chip },
     color: color.ink,
     cursor: "pointer",
     transform: {

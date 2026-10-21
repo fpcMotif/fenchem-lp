@@ -26,11 +26,9 @@ import { color, ease, font, layout, media, texture } from "./tokens.stylex";
 import { NavyBand } from "./abouts/oos1c/navy-band";
 
 const CSR_ACCENT = "#8cd6a3";
-const HISTORY_GRAY = "#f6f6f6";
 const DESKTOP = breakpoints.xl;
 const MD = breakpoints.md;
 const LG = breakpoints.lg;
-const FRAME_TINT = "#e6ecf7";
 const RD_HAIRLINE = "rgba(26, 26, 26, 0.12)";
 const HERO_TITLE = "源于自然，精于科学";
 
@@ -58,7 +56,7 @@ const zoomIn = stylex.keyframes({
 
 const styles = stylex.create({
   root: {
-    backgroundColor: "#f3f5fa",
+    backgroundColor: color.pageTint,
     color: color.ink,
     fontFamily: font.body,
   },
@@ -90,7 +88,7 @@ const styles = stylex.create({
     marginBottom: { default: 40, [DESKTOP]: 64 },
   },
   historyBand: {
-    backgroundColor: HISTORY_GRAY,
+    backgroundColor: color.neutralTint,
   },
   hero: {
     position: "relative",
@@ -157,7 +155,7 @@ const styles = stylex.create({
     overflow: "hidden",
     margin: 0,
     aspectRatio: { default: "4 / 3", [LG]: "5 / 6" },
-    backgroundColor: FRAME_TINT,
+    backgroundColor: color.blueTint,
   },
   profileLobby: {
     objectPosition: "28% 50%",
@@ -337,7 +335,7 @@ const styles = stylex.create({
     overflow: "hidden",
     margin: 0,
     aspectRatio: { default: "4 / 3", [MD]: "16 / 7", [DESKTOP]: "12 / 5" },
-    backgroundColor: FRAME_TINT,
+    backgroundColor: color.blueTint,
   },
   rdImage: {
     objectPosition: "50% 55%",

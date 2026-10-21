@@ -63,7 +63,7 @@ export const kitStyles = stylex.create({
     paddingBlock: { default: 72, [DESKTOP]: 112 },
   },
   sectionAlt: {
-    backgroundColor: "#f3f5fa",
+    backgroundColor: color.pageTint,
   },
   focusRing: {
     outlineStyle: { default: "none", ":focus-visible": "solid" },
@@ -306,7 +306,7 @@ const styles = stylex.create({
     height: 36,
     paddingInline: 18,
     borderRadius: 999,
-    backgroundColor: { default: "#f3f4f6", ":hover": { default: null, [HOVER]: "#e5e7eb" } },
+    backgroundColor: { default: color.chip, ":hover": { default: null, [HOVER]: color.chipHover } },
     fontFamily: "inherit",
     fontSize: 13,
     fontWeight: 500,

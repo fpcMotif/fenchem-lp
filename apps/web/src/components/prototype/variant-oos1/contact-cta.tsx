@@ -6,10 +6,8 @@ import { CTA } from "./content";
 import { RiseReveal } from "./rise-reveal";
 import { color, ease, font, layout, media } from "./tokens.stylex";
 
-const TINT = "#e6ecf7";
-const PAPER_HOVER = "#f6f6f6";
 const OOX_WORD_ON_TINT = "#d7e1f1";
-const WORD_ON_TINT = `color-mix(in srgb, ${OOX_WORD_ON_TINT} 80%, ${TINT})`;
+const WORD_ON_TINT = `color-mix(in srgb, ${OOX_WORD_ON_TINT} 80%, ${color.blueTint})`;
 const WORD_TRACKING = "0.06em";
 const DESKTOP = breakpoints.xl;
 const WORD_SIZE = "30vw";
@@ -39,7 +37,7 @@ const styles = stylex.create({
     },
     paddingInline: { default: 16, [media.tablet]: 40, [DESKTOP]: layout.inset124 },
     scrollMarginTop: layout.headerHeight,
-    backgroundColor: TINT,
+    backgroundColor: color.blueTint,
   },
   word: {
     position: "absolute",
@@ -128,7 +126,7 @@ const styles = stylex.create({
     color: colors.paper,
   },
   secondary: {
-    backgroundColor: { default: colors.paper, ":hover": PAPER_HOVER },
+    backgroundColor: { default: colors.paper, ":hover": color.neutralTint },
     color: colors.brandBlue700,
   },
 });

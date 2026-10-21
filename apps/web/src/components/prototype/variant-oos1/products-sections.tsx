@@ -31,7 +31,6 @@ import { color, ease, layout, media } from "./tokens.stylex";
 
 type AreaFilter = SolutionAreaId | "all";
 
-const SURFACE = "#f3f5fa";
 const TINT_INK = "oklch(0.26 0.035 261.5)";
 const TINT_BODY = "oklch(0.44 0.025 261.5)";
 const TINT_MUTED = "oklch(0.52 0.02 261.5)";
@@ -127,7 +126,7 @@ const styles = stylex.create({
     scrollMarginTop: layout.headerHeight,
   },
   bandSurface: {
-    backgroundColor: SURFACE,
+    backgroundColor: color.pageTint,
   },
   sectionHead: {
     marginBottom: HEAD_SPACE,
@@ -344,7 +343,7 @@ const styles = stylex.create({
     paddingBlock: 64,
     paddingInline: 24,
     borderRadius: CARD_RADIUS,
-    backgroundColor: SURFACE,
+    backgroundColor: color.pageTint,
     fontSize: 15,
     lineHeight: "26px",
     textAlign: "center",

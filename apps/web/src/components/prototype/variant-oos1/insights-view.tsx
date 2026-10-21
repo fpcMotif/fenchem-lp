@@ -20,7 +20,6 @@ import { SubPageBanner, SubPageNav, kitStyles } from "./subpage-kit";
 import { color, ease, media } from "./tokens.stylex";
 
 const HAIRLINE = "rgba(26, 26, 26, 0.12)";
-const SURFACE_ALT = "#f3f5fa";
 const DESKTOP = breakpoints.xl;
 
 const styles = stylex.create({
@@ -67,7 +66,7 @@ const styles = stylex.create({
     margin: 0,
     aspectRatio: "4 / 3",
     overflow: "hidden",
-    backgroundColor: SURFACE_ALT,
+    backgroundColor: color.pageTint,
   },
   articleFigureEnd: {
     order: { default: 0, [breakpoints.md]: 2 },
@@ -130,7 +129,7 @@ const styles = stylex.create({
     marginBlock: 6,
     paddingBlock: { default: 18, [DESKTOP]: 22 },
     paddingInline: { default: 20, [DESKTOP]: 26 },
-    backgroundColor: SURFACE_ALT,
+    backgroundColor: color.pageTint,
   },
   coreViewParagraph: {
     margin: 0,
@@ -195,7 +194,7 @@ const styles = stylex.create({
     outlineOffset: 2,
   },
   expandButtonOutline: {
-    backgroundColor: { default: "transparent", ":hover": SURFACE_ALT },
+    backgroundColor: { default: "transparent", ":hover": color.pageTint },
     color: colors.brandBlue700,
   },
   expandIcon: {
@@ -282,7 +281,7 @@ const styles = stylex.create({
     marginTop: 6,
     paddingBlock: { default: 16, [DESKTOP]: 20 },
     paddingInline: { default: 20, [DESKTOP]: 24 },
-    backgroundColor: SURFACE_ALT,
+    backgroundColor: color.pageTint,
   },
   devPromptParagraph: {
     margin: 0,

@@ -150,7 +150,7 @@ const styles = stylex.create({
     height: 36,
     paddingInline: 18,
     borderRadius: 999,
-    backgroundColor: { default: "#f3f4f6", ":hover": "#e5e7eb" },
+    backgroundColor: { default: color.chip, ":hover": color.chipHover },
     fontSize: 13,
     fontWeight: 500,
     letterSpacing: "0.04em",
@@ -265,7 +265,7 @@ const styles = stylex.create({
     outlineOffset: -1,
   },
   cardImgMissing: {
-    backgroundColor: "#f3f4f6",
+    backgroundColor: color.chip,
   },
   cardBody: {
     display: "flex",

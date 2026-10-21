@@ -84,10 +84,8 @@ import {
 const GOOGLE_FONTS =
   "https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter+Tight:ital,wght@0,500;0,800;1,500&family=Noto+Sans+SC:wght@400;500;700;900&display=swap";
 
-const TINT = "#e6ecf7";
 const DISPLAY_FONT =
   '"Inter Tight", "Helvetica Neue", Arial, "Source Han Sans SC", "Noto Sans SC", sans-serif';
-const SURFACE = "#f6f6f6";
 const PANEL_ALT = "#e8e8e8";
 const FOOTER_BLUE = "#294f92";
 const HERO_OVERLAY = "#0743a9";
@@ -257,7 +255,7 @@ const PATTERN_TILE = {
 const styles = stylex.create({
   root: {
     position: "relative",
-    backgroundColor: "#f3f5fa",
+    backgroundColor: color.pageTint,
     color: color.ink,
     fontFamily: font.body,
     WebkitFontSmoothing: "antialiased",
@@ -362,7 +360,7 @@ const styles = stylex.create({
     color: colors.paper,
   },
   buttonSecondary: {
-    backgroundColor: { default: colors.paper, ":hover": TINT },
+    backgroundColor: { default: colors.paper, ":hover": color.blueTint },
     color: colors.brandBlue700,
   },
   buttonHero: { minWidth: 144, height: 48, paddingInline: 24 },
@@ -1023,7 +1021,7 @@ const styles = stylex.create({
     flexDirection: "column",
     alignItems: "center",
     paddingBlock: { default: 72, [DESKTOP]: 96 },
-    backgroundColor: SURFACE,
+    backgroundColor: color.neutralTint,
   },
   productsCta: {
     paddingTop: 24,
@@ -1048,7 +1046,7 @@ const styles = stylex.create({
   productImageFrame: {
     overflow: "hidden",
     aspectRatio: "300 / 327",
-    backgroundColor: TINT,
+    backgroundColor: color.blueTint,
   },
   productImage: {
     display: "block",
@@ -1211,7 +1209,7 @@ const styles = stylex.create({
   officesBand: {
     paddingTop: 48,
     paddingBottom: { default: 72, [DESKTOP]: 96 },
-    backgroundColor: SURFACE,
+    backgroundColor: color.neutralTint,
   },
   regions: {
     display: "grid",
@@ -1237,7 +1235,7 @@ const styles = stylex.create({
     height: 40,
     margin: 0,
     paddingInline: 16,
-    backgroundColor: TINT,
+    backgroundColor: color.blueTint,
     fontSize: 16,
     fontWeight: 700,
     lineHeight: 1.2,
@@ -1269,7 +1267,7 @@ const styles = stylex.create({
   },
   newsItem: {
     paddingBottom: 12,
-    backgroundColor: SURFACE,
+    backgroundColor: color.neutralTint,
   },
   newsHeading: {
     margin: 0,

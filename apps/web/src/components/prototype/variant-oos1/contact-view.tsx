@@ -29,10 +29,7 @@ import { color, ease, font, layout, media } from "./tokens.stylex";
 
 const HAIRLINE = "rgba(26, 26, 26, 0.14)";
 const FIELD_BORDER = "#8a93a3";
-const TINT = "#f3f5fa";
-const BLUE_TINT = "#e6ecf7";
 const BLUE_WASH = "#f2f6fd";
-const CHIP_BG = "#f3f4f6";
 const REQUIRED_MARK = "#b91c1c";
 const MAP_LAND = "#eef1f5";
 const MAP_BLOCK = "#e3e8ef";
@@ -226,7 +223,7 @@ const styles = stylex.create({
   },
 
   formPanel: {
-    backgroundColor: TINT,
+    backgroundColor: color.pageTint,
     padding: { default: "32px 20px", [breakpoints.md]: 40, [DESKTOP]: 48 },
   },
   form: {
@@ -506,7 +503,7 @@ const styles = stylex.create({
     borderRadius: 0,
     backgroundColor: {
       default: colors.paper,
-      ":hover": { default: null, [HOVER]: BLUE_TINT },
+      ":hover": { default: null, [HOVER]: color.blueTint },
     },
     fontFamily: "inherit",
     fontSize: 14,
@@ -524,7 +521,7 @@ const styles = stylex.create({
   },
 
   visitSection: {
-    backgroundColor: TINT,
+    backgroundColor: color.pageTint,
   },
   visitStage: {
     position: "relative",
@@ -740,7 +737,7 @@ const styles = stylex.create({
     width: 32,
     height: 32,
     borderRadius: 999,
-    backgroundColor: CHIP_BG,
+    backgroundColor: color.chip,
     color: color.ink,
     transitionProperty: "transform, background-color, color",
     transitionDuration: { default: "0s", [breakpoints.motionOk]: "200ms" },
