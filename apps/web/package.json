@@ -6,6 +6,7 @@
     "check-types": "bun run routes:generate && bun check --no-script",
     "routes:generate": "bun scripts/generate-route-tree.ts",
     "build": "vp build",
+    "deploy": "vp build && wrangler deploy",
     "serve": "vp preview",
     "preview": "vp preview",
     "dev": "vp dev",
