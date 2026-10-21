@@ -1183,7 +1183,7 @@ export const EXTRA_SOLUTIONS: products.SolutionItem[] = [
   },
   {
     id: "cleansing-balm",
-    area: "cleansing",
+    area: "face",
     title: "白池花籽油卸妆膏",
     englishName: "Meadowfoam Cleansing Balm",
     subtitle: "一款以白池花籽油为核心的固态卸妆膏",
@@ -1200,7 +1200,7 @@ export const EXTRA_SOLUTIONS: products.SolutionItem[] = [
   },
   {
     id: "amino-cleanser",
-    area: "cleansing",
+    area: "face",
     title: "氨基酸温和洁面乳",
     englishName: "Amino Acid Gentle Cleanser",
     subtitle: "一款氨基酸表活体系的温和保湿洁面乳",
@@ -1217,7 +1217,7 @@ export const EXTRA_SOLUTIONS: products.SolutionItem[] = [
   },
   {
     id: "cleansing-oil",
-    area: "cleansing",
+    area: "face",
     title: "植物卸妆油",
     englishName: "Botanical Cleansing Oil",
     subtitle: "一款植物油脂复配的易乳化卸妆油",
@@ -1234,7 +1234,7 @@ export const EXTRA_SOLUTIONS: products.SolutionItem[] = [
   },
   {
     id: "shea-body-wash",
-    area: "cleansing",
+    area: "body",
     title: "乳木果滋润沐浴露",
     englishName: "Shea Moisturizing Body Wash",
     subtitle: "一款添加液态乳木果油的滋润型沐浴露",

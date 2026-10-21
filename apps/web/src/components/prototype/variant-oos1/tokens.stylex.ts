@@ -3,15 +3,21 @@ import * as stylex from "@stylexjs/stylex";
 export const color = stylex.defineConsts({
   ink: "#1a1a1a",
   bodyText: "#4d4d4d",
-  muted: "#6b7280",
+  muted: "#5d6470",
   navyDeep: "#0b2a5c",
+  pageTint: "#f3f5fa",
+  blueTint: "#e6ecf7",
+  neutralTint: "#f6f6f6",
+  chip: "#f3f4f6",
+  chipHover: "#e5e7eb",
 });
 
 export const font = stylex.defineConsts({
   display:
-    '"Inter Tight", "Helvetica Neue", Arial, "Source Han Sans SC", "Noto Sans SC", sans-serif',
-  serifAccent: '"Instrument Serif", Georgia, "Source Han Sans SC", "Noto Sans SC", serif',
-  body: '"Source Han Sans SC", "Noto Sans SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif',
+    '"Inter Tight", "Helvetica Neue", Arial, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif',
+  serifAccent:
+    '"Instrument Serif", Georgia, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", serif',
+  body: '"PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif',
 });
 
 export const texture = stylex.defineConsts({

@@ -7,7 +7,7 @@ import { useState, type ComponentType, type ReactNode } from "react";
 
 import { ContactCta } from "./contact-cta";
 import { CTA, PRODUCTS_CTA_SUBTITLE } from "./content";
-import { CATEGORIES, FEATURED_PRODUCT, PRODUCTS_HERO_LEAD, type Category } from "./products-data";
+import { CATEGORIES, FEATURED_PRODUCT, type Category } from "./products-data";
 import { ProductCatalog, ProductSolutions } from "./products-sections";
 import { kitStyles } from "./subpage-kit";
 import { color, ease, font, layout, media, zIndex } from "./tokens.stylex";
@@ -15,7 +15,6 @@ import { color, ease, font, layout, media, zIndex } from "./tokens.stylex";
 const MUTED_LABEL = "#52525b";
 const PHOTO_OUTLINE = "rgba(0, 0, 0, 0.1)";
 const ACCENT = "#78598d";
-const HERO_LEAD = "#595959";
 
 const DESKTOP = breakpoints.xl;
 const LG = breakpoints.lg;
@@ -63,13 +62,6 @@ const styles = stylex.create({
     lineHeight: 1.2,
     letterSpacing: "0.072em",
     color: color.ink,
-  },
-  bannerLead: {
-    margin: 0,
-    marginTop: { default: 8, [breakpoints.md]: 20 },
-    fontSize: { default: 15, [breakpoints.md]: 20 },
-    lineHeight: 1.53,
-    color: HERO_LEAD,
   },
 
   subBar: {
@@ -151,7 +143,7 @@ const styles = stylex.create({
     height: 36,
     paddingInline: 18,
     borderRadius: 999,
-    backgroundColor: { default: "#f3f4f6", ":hover": "#e5e7eb" },
+    backgroundColor: { default: color.chip, ":hover": color.chipHover },
     fontSize: 13,
     fontWeight: 500,
     letterSpacing: "0.04em",
@@ -266,7 +258,7 @@ const styles = stylex.create({
     outlineOffset: -1,
   },
   cardImgMissing: {
-    backgroundColor: "#f3f4f6",
+    backgroundColor: color.chip,
   },
   cardBody: {
     display: "flex",
@@ -358,6 +350,8 @@ export function ProductsView({
           <figure {...stylex.props(styles.bannerFigure)}>
             <img
               src={FEATURED_PRODUCT.bannerImage}
+              srcSet={FEATURED_PRODUCT.bannerSrcSet}
+              sizes="(min-width: 768px) clamp(1200px, 124vw, 1920px), 960px"
               alt="Panorama of Fenchem products and applications in their natural form"
               fetchPriority="high"
               decoding="async"
@@ -365,8 +359,7 @@ export function ProductsView({
             />
           </figure>
           <div {...stylex.props(kitStyles.shell, kitStyles.inset120, styles.bannerContent)}>
-            <h1 {...stylex.props(styles.bannerTitle)}>{activeCategory.label}</h1>
-            <p {...stylex.props(styles.bannerLead)}>{PRODUCTS_HERO_LEAD}</p>
+            <h1 {...stylex.props(styles.bannerTitle)}>{activeCategory.label}</h1>{" "}
           </div>
         </section>
       )}
@@ -466,7 +459,7 @@ export function ProductsView({
       {CatalogSection && compare !== "baseline" && compare !== "solutions" ? (
         <CatalogSection />
       ) : (
-        <ProductCatalog categoryId={activeTab} />
+        <ProductCatalog key={activeTab} categoryId={activeTab} />
       )}
       {SolutionsSection && compare !== "baseline" && compare !== "catalog" ? (
         <Flow>
@@ -474,7 +467,7 @@ export function ProductsView({
         </Flow>
       ) : (
         <Flow>
-          <ProductSolutions />
+          <ProductSolutions key={activeTab} categoryId={activeTab} />
         </Flow>
       )}
 

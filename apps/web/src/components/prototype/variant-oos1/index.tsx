@@ -12,7 +12,6 @@ import { LayoutGroup } from "motion/react";
 import { FooterLegal } from "../shared/footer-content";
 import { NewsAccordion } from "../shared/news-accordion";
 import { ProductSummary } from "../shared/product-summary";
-import { SplitDialog } from "../contact-dialog-lab/variants/split";
 import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 import type { StyleXStyles } from "@stylexjs/stylex";
@@ -31,6 +30,8 @@ import {
 } from "motion/react";
 import {
   Fragment,
+  Suspense,
+  lazy,
   useEffect,
   useId,
   useRef,
@@ -42,7 +43,7 @@ import {
   type ReactNode,
   type RefObject,
 } from "react";
-import { preinit } from "react-dom";
+import { preconnect, preinit } from "react-dom";
 
 import { EASE } from "@/components/prototype/motion-constants";
 
@@ -51,14 +52,8 @@ import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 import { LINKEDIN_PATHS, LOGO_PATHS, WECHAT_PATHS, type VectorPath } from "../variant-o/vectors";
 import { INTRO_REVEAL_MS, introStyles, useIntro } from "@/components/prototype/shared/intro";
 
-import { AboutView } from "./about-view";
 import { ContactCta } from "./contact-cta";
-import { ContactView } from "./contact-view";
 import { HERO_BLOB_TWIST } from "./hero-blob-twist";
-import { InsightsView } from "./insights-view";
-import { NewsView } from "./news-view";
-import { ProductsView } from "./products-view";
-import { RdView } from "./rd-view";
 import { RiseReveal } from "./rise-reveal";
 import { color, ease, font, layout, media, zIndex } from "./tokens.stylex";
 import { useActiveSection } from "./use-active-section";
@@ -84,12 +79,30 @@ import {
 } from "./content";
 
 const GOOGLE_FONTS =
-  "https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter+Tight:ital,wght@0,500;0,800;1,500&family=Noto+Sans+SC:wght@400;500;700;900&display=swap";
+  "https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter+Tight:ital,wght@0,500;0,800;1,500&display=swap";
 
-const TINT = "#e6ecf7";
+const loadAboutView = () => import("./about-view");
+const loadProductsView = () => import("./products-view");
+const loadInsightsView = () => import("./insights-view");
+const loadContactView = () => import("./contact-view");
+const loadSplitDialog = () => import("../contact-dialog-lab/variants/split");
+
+const AboutView = lazy(() => loadAboutView().then((m) => ({ default: m.AboutView })));
+const ProductsView = lazy(() => loadProductsView().then((m) => ({ default: m.ProductsView })));
+const InsightsView = lazy(() => loadInsightsView().then((m) => ({ default: m.InsightsView })));
+const ContactView = lazy(() => loadContactView().then((m) => ({ default: m.ContactView })));
+const SplitDialog = lazy(() => loadSplitDialog().then((m) => ({ default: m.SplitDialog })));
+
+function prefetchOffscreenViews() {
+  void loadAboutView();
+  void loadProductsView();
+  void loadInsightsView();
+  void loadContactView();
+  void loadSplitDialog();
+}
+
 const DISPLAY_FONT =
-  '"Inter Tight", "Helvetica Neue", Arial, "Source Han Sans SC", "Noto Sans SC", sans-serif';
-const SURFACE = "#f6f6f6";
+  '"Inter Tight", "Helvetica Neue", Arial, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif';
 const PANEL_ALT = "#e8e8e8";
 const FOOTER_BLUE = "#294f92";
 const HERO_OVERLAY = "#0743a9";
@@ -259,7 +272,7 @@ const PATTERN_TILE = {
 const styles = stylex.create({
   root: {
     position: "relative",
-    backgroundColor: "#f3f5fa",
+    backgroundColor: color.pageTint,
     color: color.ink,
     fontFamily: font.body,
     WebkitFontSmoothing: "antialiased",
@@ -296,6 +309,9 @@ const styles = stylex.create({
   },
   mainTarget: {
     outlineStyle: "none",
+  },
+  viewFallback: {
+    minHeight: "100svh",
   },
   shell: {
     width: "100%",
@@ -364,7 +380,7 @@ const styles = stylex.create({
     color: colors.paper,
   },
   buttonSecondary: {
-    backgroundColor: { default: colors.paper, ":hover": TINT },
+    backgroundColor: { default: colors.paper, ":hover": color.blueTint },
     color: colors.brandBlue700,
   },
   buttonHero: { minWidth: 144, height: 48, paddingInline: 24 },
@@ -686,7 +702,7 @@ const styles = stylex.create({
   },
   heroAccent: {
     fontFamily:
-      '"Instrument Serif", "Times New Roman", "Source Han Sans SC", "Noto Sans SC", serif',
+      '"Instrument Serif", "Times New Roman", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", serif',
     fontStyle: "italic",
     fontSynthesis: "none",
     fontWeight: 400,
@@ -1025,7 +1041,7 @@ const styles = stylex.create({
     flexDirection: "column",
     alignItems: "center",
     paddingBlock: { default: 72, [DESKTOP]: 96 },
-    backgroundColor: SURFACE,
+    backgroundColor: color.neutralTint,
   },
   productsCta: {
     paddingTop: 24,
@@ -1050,7 +1066,7 @@ const styles = stylex.create({
   productImageFrame: {
     overflow: "hidden",
     aspectRatio: "300 / 327",
-    backgroundColor: TINT,
+    backgroundColor: color.blueTint,
   },
   productImage: {
     display: "block",
@@ -1213,7 +1229,7 @@ const styles = stylex.create({
   officesBand: {
     paddingTop: 48,
     paddingBottom: { default: 72, [DESKTOP]: 96 },
-    backgroundColor: SURFACE,
+    backgroundColor: color.neutralTint,
   },
   regions: {
     display: "grid",
@@ -1239,7 +1255,7 @@ const styles = stylex.create({
     height: 40,
     margin: 0,
     paddingInline: 16,
-    backgroundColor: TINT,
+    backgroundColor: color.blueTint,
     fontSize: 16,
     fontWeight: 700,
     lineHeight: 1.2,
@@ -1271,7 +1287,7 @@ const styles = stylex.create({
   },
   newsItem: {
     paddingBottom: 12,
-    backgroundColor: SURFACE,
+    backgroundColor: color.neutralTint,
   },
   newsHeading: {
     margin: 0,
@@ -1539,9 +1555,13 @@ function useNavFits(
   return fits;
 }
 
-export type View = "home" | "about" | "products" | "rd" | "insights" | "news" | "contact";
+export type View = "home" | "about" | "products" | "insights" | "contact";
 export type AboutPageProps = { onNavigateHome: (hash?: string) => void };
 export type SubPageProps = AboutPageProps;
+export type HomePageProps = {
+  onNavigate: (view: View, targetId?: string) => void;
+  onOpenContactDialog: () => void;
+};
 
 function SiteHeader({
   currentView,
@@ -1570,14 +1590,8 @@ function SiteHeader({
     if (href === "#products") {
       return currentView === "products";
     }
-    if (href === "#campus" || href === "#rd") {
-      return currentView === "rd";
-    }
     if (href === "#insights") {
       return currentView === "insights";
-    }
-    if (href === "#news") {
-      return currentView === "news";
     }
     if (href === "#contact") {
       return currentView === "contact";
@@ -1602,21 +1616,9 @@ function SiteHeader({
       setMenuOpen(false);
       return;
     }
-    if (href === "#campus" || href === "#rd") {
-      event.preventDefault();
-      onNavigate("rd", "rd-top");
-      setMenuOpen(false);
-      return;
-    }
     if (href === "#insights") {
       event.preventDefault();
       onNavigate("insights", "insights-top");
-      setMenuOpen(false);
-      return;
-    }
-    if (href === "#news") {
-      event.preventDefault();
-      onNavigate("news", "news-top");
       setMenuOpen(false);
       return;
     }
@@ -2332,9 +2334,7 @@ function SiteFooter({ onNavigate }: { onNavigate?: (view: View, targetId?: strin
 const viewFromPage = (page: unknown, startView: View): View => {
   if (page === "about" || page === "home") return page;
   if (page === "products" || page === "produces") return "products";
-  if (page === "rd" || page === "manufacturing" || page === "campus") return "rd";
   if (page === "insights" || page === "insight") return "insights";
-  if (page === "news") return "news";
   if (page === "contact") return "contact";
   return startView;
 };
@@ -2342,22 +2342,42 @@ const viewFromPage = (page: unknown, startView: View): View => {
 export function VariantOOS1({
   AboutPage = AboutView,
   ProductsPage = ProductsView,
-  RdPage = RdView,
   InsightsPage = InsightsView,
-  NewsPage = NewsView,
   ContactPage = ContactView,
+  HomePage,
   startView = "home",
 }: {
+  HomePage?: ComponentType<HomePageProps>;
   AboutPage?: ComponentType<SubPageProps>;
   ProductsPage?: ComponentType<SubPageProps>;
-  RdPage?: ComponentType<SubPageProps>;
   InsightsPage?: ComponentType<SubPageProps>;
-  NewsPage?: ComponentType<SubPageProps>;
   ContactPage?: ComponentType<SubPageProps>;
   startView?: View;
 }) {
+  preconnect("https://fonts.gstatic.com", { crossOrigin: "anonymous" });
   preinit(GOOGLE_FONTS, { as: "style" });
   const reduce = useReducedMotion();
+  useEffect(() => {
+    let cancel = () => {};
+    const scheduleAfterLoad = () => {
+      if (typeof requestIdleCallback === "undefined") {
+        const timer = setTimeout(prefetchOffscreenViews, 1000);
+        cancel = () => clearTimeout(timer);
+        return;
+      }
+      const handle = requestIdleCallback(prefetchOffscreenViews, { timeout: 4000 });
+      cancel = () => cancelIdleCallback(handle);
+    };
+    if (document.readyState === "complete") {
+      scheduleAfterLoad();
+    } else {
+      window.addEventListener("load", scheduleAfterLoad, { once: true });
+    }
+    return () => {
+      window.removeEventListener("load", scheduleAfterLoad);
+      cancel();
+    };
+  }, []);
   const intro = useIntro();
   const introVars = {
     "--oo-intro": intro === "play" ? `${INTRO_REVEAL_MS}ms` : "0ms",
@@ -2423,73 +2443,70 @@ export function VariantOOS1({
             />
             <div {...stylex.props(styles.page, intro === "play" && introStyles.pageReveal)}>
               <main id="main-content" tabIndex={-1} {...stylex.props(styles.mainTarget)}>
-                {view === "about" ? (
-                  <AboutPage
-                    onNavigateHome={(target) =>
-                      handleNavigate(target === "products" ? "products" : "home", target)
-                    }
-                  />
-                ) : view === "products" ? (
-                  <ProductsPage onNavigateHome={(target) => handleNavigate("home", target)} />
-                ) : view === "rd" ? (
-                  <RdPage
-                    onNavigateHome={(target) =>
-                      handleNavigate(target === "contact" ? "contact" : "home", target)
-                    }
-                  />
-                ) : view === "insights" ? (
-                  <InsightsPage
-                    onNavigateHome={(target) =>
-                      handleNavigate(
-                        target === "contact"
-                          ? "contact"
-                          : target === "products"
-                            ? "products"
-                            : "home",
-                        target,
-                      )
-                    }
-                  />
-                ) : view === "news" ? (
-                  <NewsPage
-                    onNavigateHome={(target) =>
-                      handleNavigate(target === "contact" ? "contact" : "home", target)
-                    }
-                  />
-                ) : view === "contact" ? (
-                  <ContactPage onNavigateHome={(target) => handleNavigate("home", target)} />
-                ) : (
-                  <>
-                    <Hero onOpenContactDialog={() => setContactModalOpen(true)} />
-                    <About onOpenAboutPage={() => handleNavigate("about", "about-top")} />
-                    <Campus />
-                    <Strengths />
-                    <Products
-                      onOpenProductsPage={() => handleNavigate("products", "products-top")}
+                <Suspense fallback={<div {...stylex.props(styles.viewFallback)} />}>
+                  {view === "about" ? (
+                    <AboutPage
+                      onNavigateHome={(target) =>
+                        handleNavigate(target === "products" ? "products" : "home", target)
+                      }
                     />
-                    <Offices />
-                    <News />
-                    <Flow>
-                      <ContactCta
-                        id="contact"
-                        actions={[
-                          {
-                            label: "联系我们",
-                            tone: "primary",
-                            onClick: () => setContactModalOpen(true),
-                          },
-                        ]}
+                  ) : view === "products" ? (
+                    <ProductsPage onNavigateHome={(target) => handleNavigate("home", target)} />
+                  ) : view === "insights" ? (
+                    <InsightsPage
+                      onNavigateHome={(target) =>
+                        handleNavigate(
+                          target === "contact"
+                            ? "contact"
+                            : target === "products"
+                              ? "products"
+                              : "home",
+                          target,
+                        )
+                      }
+                    />
+                  ) : view === "contact" ? (
+                    <ContactPage onNavigateHome={(target) => handleNavigate("home", target)} />
+                  ) : HomePage ? (
+                    <HomePage
+                      onNavigate={handleNavigate}
+                      onOpenContactDialog={() => setContactModalOpen(true)}
+                    />
+                  ) : (
+                    <>
+                      <Hero onOpenContactDialog={() => setContactModalOpen(true)} />
+                      <About onOpenAboutPage={() => handleNavigate("about", "about-top")} />
+                      <Campus />
+                      <Strengths />
+                      <Products
+                        onOpenProductsPage={() => handleNavigate("products", "products-top")}
                       />
-                    </Flow>
-                  </>
-                )}
+                      <Offices />
+                      <News />
+                      <Flow>
+                        <ContactCta
+                          id="contact"
+                          actions={[
+                            {
+                              label: "联系我们",
+                              tone: "primary",
+                              onClick: () => setContactModalOpen(true),
+                            },
+                          ]}
+                        />
+                      </Flow>
+                    </>
+                  )}
+                </Suspense>
               </main>
               <Flow>
                 <SiteFooter onNavigate={handleNavigate} />
               </Flow>
             </div>
             {contactModalOpen ? (
-              <SplitDialog subject={null} onClose={() => setContactModalOpen(false)} />
+              <Suspense fallback={null}>
+                <SplitDialog subject={null} onClose={() => setContactModalOpen(false)} />
+              </Suspense>
             ) : null}
           </div>
         </MotionConfig>

@@ -18,6 +18,7 @@ export interface FeaturedProduct {
   tagline: string;
   items: FeaturedItem[];
   bannerImage: string;
+  bannerSrcSet: string;
 }
 
 export interface CatalogItem {
@@ -38,7 +39,17 @@ export interface CatalogGroup {
   items: CatalogItem[];
 }
 
-export type SolutionAreaId = "face" | "body" | "cleansing" | "hair" | "sun";
+export type SolutionAreaId =
+  | "face"
+  | "body"
+  | "hair"
+  | "sun"
+  | "makeup"
+  | "baby"
+  | "special"
+  | "trend"
+  | "dairy"
+  | "bakery";
 
 export interface SolutionArea {
   id: SolutionAreaId;
@@ -59,6 +70,14 @@ export interface SolutionItem {
   texture: string[];
   applications: string[];
 }
+
+export interface SolutionSet {
+  lead?: string;
+  areas: SolutionArea[];
+  items: SolutionItem[];
+}
+
+export const CATALOG_CATEGORY_ID = "functional-food";
 
 export const CATEGORIES: Category[] = [
   { id: "personal-care", label: "个人护理", englishLabel: "Personal care" },
@@ -124,7 +143,10 @@ export const FEATURED_PRODUCT: FeaturedProduct = {
   brand: "OLVE'Care™ Shea",
   tagline: "天然全形态乳木果油脂，适配任何配方剂型",
   items: FEATURED_ITEMS,
-  bannerImage: "/products/banner.png",
+  bannerImage: "/products/banner-1920.webp",
+  bannerSrcSet: [1280, 1920, 2880, 4096]
+    .map((width) => `/products/banner-${width}.webp ${width}w`)
+    .join(", "),
 };
 
 export const CATALOG_GROUPS: CatalogGroup[] = [
@@ -842,15 +864,18 @@ export const SHEET_CATALOG_GROUPS: CatalogGroup[] = [
 export const SOLUTION_AREAS: SolutionArea[] = [
   { id: "face", label: "面部护理", englishLabel: "Face care" },
   { id: "body", label: "身体护理", englishLabel: "Body care" },
-  { id: "cleansing", label: "清洁", englishLabel: "Cleansing" },
-  { id: "hair", label: "头发护理", englishLabel: "Hair care" },
-  { id: "sun", label: "防晒", englishLabel: "Sun care" },
+  { id: "hair", label: "头皮 & 头发护理", englishLabel: "Scalp and hair care" },
+  { id: "sun", label: "防晒护理", englishLabel: "Sun care" },
+  { id: "makeup", label: "彩妆 & 底妆", englishLabel: "Color cosmetics and base makeup" },
+  { id: "baby", label: "母婴温和护理", englishLabel: "Gentle mother and baby care" },
+  { id: "special", label: "特殊护理", englishLabel: "Special care" },
+  { id: "trend", label: "趋势概念配方", englishLabel: "Trend concept formulas" },
 ];
 
 export const SOLUTION_ITEMS: SolutionItem[] = [
   {
     id: "clay-mask",
-    area: "cleansing",
+    area: "face",
     title: "滋润清洁泥膜",
     englishName: "Nourishing Cleansing Clay Mask",
     subtitle: "一款含天然黏土的清洁舒缓涂抹泥膜",
@@ -1014,7 +1039,7 @@ export const SOLUTION_ITEMS: SolutionItem[] = [
   },
   {
     id: "shower-oil",
-    area: "cleansing",
+    area: "body",
     title: "柔润温和沐浴油",
     englishName: "Gentle Shower Oil",
     subtitle: "50% 高含量鳄梨油的无皂基沐浴油",
@@ -1083,4 +1108,225 @@ export const SOLUTION_ITEMS: SolutionItem[] = [
     texture: ["细腻乳霜", "成膜快，轻微泛白"],
     applications: ["面部防晒", "高倍户外防护"],
   },
+  {
+    id: "scalp-serum",
+    area: "hair",
+    title: "控油舒缓头皮精华",
+    englishName: "Balancing Scalp Serum",
+    subtitle: "一款以安德罗巴油与 AT Calm-ist™ 为核心的头皮护理精华",
+    overview: [
+      "水基头皮精华，滴管式精准涂抹",
+      "安德罗巴油平衡头皮油脂、辅助去屑",
+      "AT Calm-ist™ 六重植提舒缓头皮泛红瘙痒",
+    ],
+    functions: ["平衡控油", "舒缓头皮", "辅助去屑"],
+    keyIngredients: ["安德罗巴油", "AT Calm-ist™ 植物抗敏剂", "巴巴苏籽油"],
+    challenges: ["油脂在水基体系中的增溶", "清爽不油腻的头皮使用感"],
+    texture: ["轻盈水状", "速干不黏腻"],
+    applications: ["头皮护理", "油性敏感头皮"],
+  },
+  {
+    id: "sun-stick",
+    area: "sun",
+    title: "清透防晒棒",
+    englishName: "Sheer Sun Stick",
+    subtitle: "一款以巴西棕榈蜡成型的便携固态防晒棒",
+    overview: [
+      "无水固态防晒棒，SPF50+、PA++++",
+      "巴西棕榈蜡提供硬度与成型性",
+      "橄榄角鲨烷与霍霍巴油带来顺滑涂抹感",
+    ],
+    functions: ["便携补涂", "高倍防护", "顺滑不搓泥"],
+    keyIngredients: ["巴西棕榈蜡", "橄榄角鲨烷", "霍霍巴油", "FM-DBA 己二酸二丁酯"],
+    challenges: ["蜡基体系的硬度与涂抹性平衡", "防晒剂在无水体系中的溶解"],
+    texture: ["固态棒状", "推开即化"],
+    applications: ["面部与身体补涂", "户外便携防晒"],
+  },
+  {
+    id: "lip-balm",
+    area: "makeup",
+    title: "植萃润色唇膏",
+    englishName: "Botanical Tinted Lip Balm",
+    subtitle: "一款以红木籽油天然着色的滋润唇膏",
+    overview: [
+      "无水唇膏体系，巴西棕榈蜡与蓖麻籽油成型",
+      "红木籽提取物天然显色，无需合成色素",
+      "芒果籽脂与乳木果油长效滋润",
+    ],
+    functions: ["天然润色", "长效滋润", "提升光泽"],
+    keyIngredients: ["红木籽油", "巴西棕榈蜡", "蓖麻籽油", "芒果籽脂"],
+    challenges: ["天然色素的稳定与均匀显色", "膏体硬度与上唇顺滑度的平衡"],
+    texture: ["固态膏棒", "上唇丝滑"],
+    applications: ["唇部护理", "润色唇膏"],
+  },
+  {
+    id: "skin-tint",
+    area: "makeup",
+    title: "养肤轻透粉底液",
+    englishName: "Skincare Skin Tint",
+    subtitle: "一款以白池花籽油分散色粉的养肤底妆",
+    overview: [
+      "油包水底妆体系，轻薄贴肤",
+      "白池花籽油提升色粉分散性，妆面均匀",
+      "橄榄角鲨烷与 4D 玻尿酸带妆养肤",
+    ],
+    functions: ["自然遮瑕", "轻薄贴肤", "带妆养肤"],
+    keyIngredients: ["白池花籽油", "橄榄角鲨烷", "4D HA 多重透明质酸钠", "FM-DBA 己二酸二丁酯"],
+    challenges: ["色粉分散与防沉降", "持妆力与轻薄肤感的平衡"],
+    texture: ["流动乳液", "轻薄易推开"],
+    applications: ["面部底妆", "养肤粉底液"],
+  },
+  {
+    id: "baby-cream",
+    area: "baby",
+    title: "婴幼儿舒缓润肤霜",
+    englishName: "Gentle Baby Cream",
+    subtitle: "一款极简配方的婴幼儿保湿修护霜",
+    overview: [
+      "乳化型润肤霜，无香精、无色素",
+      "精制乳木果油与燕麦来源成分修护屏障",
+      "AT Calm-ist™ 舒缓干痒泛红",
+    ],
+    functions: ["温和保湿", "屏障修护", "舒缓干痒"],
+    keyIngredients: ["精制乳木果油", "AT Calm-ist™ 植物抗敏剂", "FM 1618 天然乳化剂"],
+    challenges: ["极简配方的防腐保障", "高安全性与滋润度的平衡"],
+    texture: ["柔润乳霜", "好推开不黏腻"],
+    applications: ["婴幼儿面部与身体护理", "敏感肌润肤"],
+  },
+  {
+    id: "stretch-oil",
+    area: "baby",
+    title: "孕期舒纹护理油",
+    englishName: "Pregnancy Stretch Mark Oil",
+    subtitle: "一款孕期可用的全植物油身体护理油",
+    overview: [
+      "全植物油配方，无精油添加",
+      "巴卡斯籽油与玫瑰果油提升肌肤弹性",
+      "甜杏仁油为基底，温和亲肤",
+    ],
+    functions: ["提升弹性", "预防干痒", "柔润肌肤"],
+    keyIngredients: ["巴卡斯籽油", "玫瑰果油", "甜杏仁油", "生育酚"],
+    challenges: ["全植物油体系的氧化稳定", "无香体系的气味控制"],
+    texture: ["澄清油状液体", "吸收快不油腻"],
+    applications: ["孕期身体护理", "妊娠纹预防"],
+  },
+  {
+    id: "barrier-balm",
+    area: "special",
+    title: "屏障修护多用膏",
+    englishName: "Multi-Use Barrier Balm",
+    subtitle: "一款针对干裂与局部粗糙的高浓度修护膏",
+    overview: [
+      "无水修护膏，高含量乳木果油与可可籽脂",
+      "科拜巴脂辅助抗炎与修护",
+      "可用于手肘、脚跟、唇周等局部干裂部位",
+    ],
+    functions: ["干裂修护", "强效封闭", "抗炎舒缓"],
+    keyIngredients: ["精制乳木果油", "可可籽脂", "科拜巴脂", "海檀木籽油"],
+    challenges: ["高固脂含量的质地细腻度", "低温下的结晶控制"],
+    texture: ["厚实膏体", "遇体温融化"],
+    applications: ["局部干裂护理", "多用途修护膏"],
+  },
+  {
+    id: "spot-gel",
+    area: "special",
+    title: "淡斑精华凝胶",
+    englishName: "Targeted Spot Gel",
+    subtitle: "一款以 377 为核心的局部淡斑凝胶",
+    overview: [
+      "水凝胶体系，局部点涂",
+      "苯乙基间苯二酚（377）多通路抑黑",
+      "4-己基间苯二酚协同抗氧化",
+    ],
+    functions: ["局部淡斑", "均匀肤色", "抗氧化"],
+    keyIngredients: ["苯乙基间苯二酚", "4-己基间苯二酚", "4D HA 多重透明质酸钠"],
+    challenges: ["美白活性物的增溶与变色控制", "高效与刺激性的平衡"],
+    texture: ["透明凝胶", "清爽速干"],
+    applications: ["面部局部护理", "淡斑精华"],
+  },
+  {
+    id: "amazon-serum",
+    area: "trend",
+    title: "亚马逊超级果油精华",
+    englishName: "Amazon Superfruit Serum",
+    subtitle: "一款以巴西莓油与星果棕果油为主题的抗氧化油精华",
+    overview: [
+      "可持续采集的亚马逊植物油复配",
+      "巴西莓油高多酚抗氧化、抗糖化",
+      "星果棕果油富含胡萝卜素，提亮肤色",
+    ],
+    functions: ["抗氧化", "抗糖化", "提亮弹润"],
+    keyIngredients: ["巴西莓油", "星果棕果油", "木鲁星果棕籽脂", "橄榄角鲨烷"],
+    challenges: ["深色植物油的色泽与稳定", "多种油脂的肤感调和"],
+    texture: ["琥珀色油状液体", "轻盈易吸收"],
+    applications: ["面部精华油", "天然可持续概念产品"],
+  },
+  {
+    id: "botox-like-eye",
+    area: "trend",
+    title: "即时紧致眼霜",
+    englishName: "Instant Firming Eye Cream",
+    subtitle: "一款以千日菊提取物为核心的“植物肉毒素”眼霜",
+    overview: [
+      "乳化型眼霜，千日菊提取物即时抚纹",
+      "鳄梨油与白池花籽油滋养眼周",
+      "4D 玻尿酸多层保湿",
+    ],
+    functions: ["即时抚纹", "紧致眼周", "保湿滋养"],
+    keyIngredients: ["千日菊提取物", "鳄梨油", "白池花籽油", "4D HA 多重透明质酸钠"],
+    challenges: ["即时功效与温和性的平衡", "眼周质地的轻薄与滋润"],
+    texture: ["细腻乳霜", "易推开不搓泥"],
+    applications: ["眼周护理", "抗皱紧致眼霜"],
+  },
 ];
+
+export const FOOD_SOLUTION_AREAS: SolutionArea[] = [
+  { id: "dairy", label: "乳品", englishLabel: "Dairy" },
+  { id: "bakery", label: "烘焙", englishLabel: "Bakery" },
+];
+
+export const FOOD_SOLUTION_ITEMS: SolutionItem[] = [
+  {
+    id: "phgg-yogurt",
+    area: "dairy",
+    title: "高纤酸奶",
+    englishName: "High-Fiber Yogurt",
+    subtitle: "添加 2.5% InFiber™ PHGG，提升质地与结构稳定性",
+    overview: [
+      "全脂牛乳体系，经热处理、接种发酵、低温冷藏制备酸奶",
+      "2.5% 添加量赋予酸奶细腻顺滑、厚实口感，无黏腻感",
+      "相比空白对照组，酸奶凝胶结构更稳定，成型效果更好",
+    ],
+    functions: ["膳食纤维强化", "提升质地", "稳定凝胶结构"],
+    keyIngredients: ["InFiber™ PHGG（添加量 2.5%）"],
+    challenges: ["膳食纤维易带来黏腻、颗粒感", "酸奶凝胶结构与成型稳定性"],
+    texture: ["细腻顺滑", "厚实无黏腻"],
+    applications: ["高纤型酸奶", "发酵乳甜品"],
+  },
+  {
+    id: "phgg-cookie",
+    area: "bakery",
+    title: "低糖曲奇饼干",
+    englishName: "Low-Sugar Cookies",
+    subtitle: "添加 5% InFiber™ PHGG，烘焙高纤添加，保持原有口感",
+    overview: [
+      "粉体过筛，黄油搅打混合制成面团，冷藏定型后 170℃ 烘烤 18–20 min",
+      "5% 添加不会对饼干口感造成负面影响，无砂砾、异味问题",
+      "辅助烘烤上色，亦可通过微调烘烤参数优化外观",
+    ],
+    functions: ["膳食纤维强化", "保持原有口感", "辅助烘烤上色"],
+    keyIngredients: ["InFiber™ PHGG（添加量 5%）"],
+    challenges: ["高纤添加易带来砂砾感与异味", "烘烤上色与外观控制"],
+    texture: ["保持原有口感", "无砂砾感"],
+    applications: ["高纤低糖饼干", "酥饼等烘焙产品"],
+  },
+];
+
+export const SOLUTIONS_BY_CATEGORY: Partial<Record<string, SolutionSet>> = {
+  "personal-care": { areas: SOLUTION_AREAS, items: SOLUTION_ITEMS },
+  "functional-food": {
+    lead: "InFiber™ PHGG（部分水解瓜尔胶）｜可溶性益生元膳食纤维，赋能乳品与烘焙产品升级。肠道健康消费热潮下，高纤食品成为市场热点，但不少膳食纤维配料容易带来黏腻、颗粒感，影响产品口感与外观。InFiber™ PHGG 是低粘度水溶性益生元膳食纤维，适配多种加工工艺，助力产品实现膳食纤维强化，同时保障良好感官体验。",
+    areas: FOOD_SOLUTION_AREAS,
+    items: FOOD_SOLUTION_ITEMS,
+  },
+};

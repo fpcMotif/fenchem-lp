@@ -1,0 +1,341 @@
+import { colors } from "@fenchem-lp/ui/tokens.stylex";
+import * as stylex from "@stylexjs/stylex";
+import { AnimatePresence, m } from "motion/react";
+import { useCallback, useEffect, useRef, useState, type MouseEvent } from "react";
+
+import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
+import { color, ease } from "../../tokens.stylex";
+
+export type CodexBookmarkItem = {
+  id: string;
+  title: string;
+  summary: string;
+};
+
+const TICK_HEIGHT = 20;
+const TICK_GAP = 4;
+const RAIL_PAD = 6;
+const CLOSE_DELAY_MS = 120;
+const EASE_OUT = [0.22, 1, 0.36, 1] as const;
+const CARD_SPRING = { type: "spring", duration: 0.3, bounce: 0 } as const;
+
+function tickCenter(index: number) {
+  return RAIL_PAD + index * (TICK_HEIGHT + TICK_GAP) + TICK_HEIGHT / 2;
+}
+
+type BarState = "open" | "near" | "active" | "rest";
+
+const styles = stylex.create({
+  rail: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    gap: 4,
+    paddingBlock: 6,
+    position: "relative",
+    pointerEvents: "auto",
+  },
+  tickItem: {
+    position: "relative",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  tickButton: {
+    appearance: "none",
+    borderWidth: 0,
+    backgroundColor: "transparent",
+    padding: 0,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    width: 28,
+    height: 20,
+    cursor: "pointer",
+    position: "relative",
+    outlineStyle: { default: "none", ":focus-visible": "solid" },
+    outlineWidth: 2,
+    outlineColor: colors.brandBlue700,
+    outlineOffset: 2,
+    borderRadius: 4,
+  },
+  bar: {
+    display: "block",
+    width: 22,
+    height: 2,
+    borderRadius: 1,
+    transformOrigin: "center",
+    transitionProperty: "transform, background-color",
+    transitionDuration: {
+      default: "180ms",
+      "@media (prefers-reduced-motion: reduce)": "0ms",
+    },
+    transitionTimingFunction: ease.out,
+  },
+  barOpen: {
+    transform: "scaleX(1)",
+    backgroundColor: color.ink,
+  },
+  barNear: {
+    transform: "scaleX(0.727)",
+    backgroundColor: "rgba(26, 26, 26, 0.4)",
+  },
+  barActive: {
+    transform: "scaleX(0.818)",
+    backgroundColor: color.ink,
+  },
+  barRest: {
+    transform: "scaleX(0.545)",
+    backgroundColor: "rgba(26, 26, 26, 0.22)",
+  },
+  cardAnchor: {
+    position: "absolute",
+    top: 0,
+    left: "calc(100% + 8px)",
+    height: 0,
+    transformOrigin: "left top",
+    zIndex: 50,
+  },
+  card: {
+    position: "relative",
+    transform: "translateY(-50%)",
+    width: 240,
+    maxWidth: "min(260px, calc(100vw - 80px))",
+    backgroundColor: "#ffffff",
+    borderRadius: 10,
+    borderWidth: 1,
+    borderStyle: "solid",
+    borderColor: "rgba(0, 0, 0, 0.08)",
+    boxShadow: "0 4px 20px -2px rgba(0, 0, 0, 0.08), 0 2px 6px -1px rgba(0, 0, 0, 0.04)",
+    padding: "10px 12px",
+    textAlign: "start",
+    userSelect: "none",
+    cursor: "pointer",
+    overflow: "hidden",
+  },
+  cardTitle: {
+    display: "block",
+    margin: 0,
+    marginBottom: 4,
+    fontSize: 13,
+    fontWeight: 600,
+    lineHeight: 1.35,
+    color: color.ink,
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+    whiteSpace: "nowrap",
+    minWidth: 0,
+  },
+  cardSummary: {
+    margin: 0,
+    fontSize: 12,
+    lineHeight: 1.55,
+    color: color.bodyText,
+    display: "-webkit-box",
+    WebkitBoxOrient: "vertical",
+    WebkitLineClamp: 2,
+    overflow: "hidden",
+    textWrap: "pretty",
+  },
+});
+
+export function scrollToBookmark(id: string, headerOffset = 144) {
+  const element = document.getElementById(id);
+  if (!element) return;
+  const elementPosition = element.getBoundingClientRect().top;
+  const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+  window.scrollTo({
+    top: offsetPosition,
+    behavior: "smooth",
+  });
+}
+
+export function useBookmarkActive(ids: readonly string[], headerOffset = 160): string {
+  const [activeId, setActiveId] = useState<string>(ids[0] ?? "");
+
+  useEffect(() => {
+    if (ids.length === 0) return;
+
+    let frame = 0;
+    const updateActive = () => {
+      frame = 0;
+      let current = ids[0];
+      for (const id of ids) {
+        const element = document.getElementById(id);
+        if (element) {
+          const rect = element.getBoundingClientRect();
+          if (rect.top <= headerOffset + 48) {
+            current = id;
+          }
+        }
+      }
+      setActiveId(current);
+    };
+
+    const schedule = () => {
+      if (!frame) frame = requestAnimationFrame(updateActive);
+    };
+
+    updateActive();
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule);
+    return () => {
+      window.removeEventListener("scroll", schedule);
+      window.removeEventListener("resize", schedule);
+      if (frame) cancelAnimationFrame(frame);
+    };
+  }, [ids, headerOffset]);
+
+  return activeId;
+}
+
+function barStateFor(index: number, openIndex: number, isActive: boolean): BarState {
+  if (index === openIndex) return "open";
+  if (isActive) return "active";
+  if (openIndex !== -1 && Math.abs(index - openIndex) === 1) return "near";
+  return "rest";
+}
+
+export function CodexBookmarkRail({
+  items,
+  activeId,
+  onSelect,
+}: {
+  items: readonly CodexBookmarkItem[];
+  activeId: string;
+  onSelect: (id: string) => void;
+}) {
+  const reduce = useReducedMotion();
+  const [hoveredId, setHoveredId] = useState<string | null>(null);
+  const [pinnedId, setPinnedId] = useState<string | null>(null);
+  const pinTimerRef = useRef<number | undefined>(undefined);
+  const closeTimerRef = useRef<number | undefined>(undefined);
+
+  const cancelClose = useCallback(() => {
+    clearTimeout(closeTimerRef.current);
+  }, []);
+
+  const scheduleClose = useCallback(() => {
+    clearTimeout(closeTimerRef.current);
+    closeTimerRef.current = window.setTimeout(() => {
+      setHoveredId(null);
+    }, CLOSE_DELAY_MS);
+  }, []);
+
+  const openTick = useCallback((id: string) => {
+    clearTimeout(closeTimerRef.current);
+    setHoveredId(id);
+  }, []);
+
+  const handleSelect = useCallback(
+    (id: string, event?: MouseEvent) => {
+      event?.stopPropagation();
+      onSelect(id);
+      setPinnedId(id);
+      clearTimeout(pinTimerRef.current);
+      pinTimerRef.current = window.setTimeout(() => {
+        setPinnedId(null);
+      }, 1400);
+    },
+    [onSelect],
+  );
+
+  useEffect(() => {
+    return () => {
+      clearTimeout(pinTimerRef.current);
+      clearTimeout(closeTimerRef.current);
+    };
+  }, []);
+
+  const openId = hoveredId ?? pinnedId;
+  const openIndex = openId === null ? -1 : items.findIndex((item) => item.id === openId);
+  const openItem = openIndex === -1 ? null : items[openIndex];
+  const cardY = openIndex === -1 ? 0 : tickCenter(openIndex);
+
+  return (
+    <nav
+      aria-label="文章书签导航"
+      {...stylex.props(styles.rail)}
+      onMouseEnter={cancelClose}
+      onMouseLeave={scheduleClose}
+    >
+      {items.map((item, index) => {
+        const isActive = item.id === activeId;
+        const barState = barStateFor(index, openIndex, isActive);
+
+        return (
+          <div key={item.id} {...stylex.props(styles.tickItem)}>
+            <button
+              type="button"
+              aria-label={`${item.title} — 书签`}
+              aria-current={isActive ? "location" : undefined}
+              onClick={(e) => handleSelect(item.id, e)}
+              onMouseEnter={() => openTick(item.id)}
+              onFocus={() => openTick(item.id)}
+              onBlur={scheduleClose}
+              {...stylex.props(styles.tickButton)}
+            >
+              <span
+                aria-hidden="true"
+                {...stylex.props(
+                  styles.bar,
+                  barState === "open" && styles.barOpen,
+                  barState === "near" && styles.barNear,
+                  barState === "active" && styles.barActive,
+                  barState === "rest" && styles.barRest,
+                )}
+              />
+            </button>
+          </div>
+        );
+      })}
+
+      <AnimatePresence>
+        {openItem ? (
+          <m.div
+            key="card-anchor"
+            initial={
+              reduce ? { opacity: 0, y: cardY } : { opacity: 0, x: -4, scale: 0.97, y: cardY }
+            }
+            animate={{ opacity: 1, x: 0, scale: 1, y: cardY }}
+            exit={
+              reduce
+                ? { opacity: 0, transition: { duration: 0.12 } }
+                : {
+                    opacity: 0,
+                    x: -4,
+                    scale: 0.97,
+                    transition: { duration: 0.12, ease: EASE_OUT },
+                  }
+            }
+            transition={
+              reduce
+                ? { duration: 0.12, y: { duration: 0 } }
+                : { duration: 0.18, ease: EASE_OUT, y: CARD_SPRING }
+            }
+            {...stylex.props(styles.cardAnchor)}
+            onMouseEnter={cancelClose}
+            onClick={(e) => handleSelect(openItem.id, e)}
+          >
+            <div {...stylex.props(styles.card)}>
+              <AnimatePresence mode="popLayout" initial={false}>
+                <m.div
+                  key={openItem.id}
+                  initial={reduce ? { opacity: 0 } : { opacity: 0, filter: "blur(2px)" }}
+                  animate={{ opacity: 1, filter: "blur(0px)" }}
+                  exit={reduce ? { opacity: 0 } : { opacity: 0, filter: "blur(2px)" }}
+                  transition={{ duration: reduce ? 0 : 0.14, ease: EASE_OUT }}
+                >
+                  <span {...stylex.props(styles.cardTitle)} title={openItem.title}>
+                    {openItem.title}
+                  </span>
+                  <p {...stylex.props(styles.cardSummary)}>{openItem.summary}</p>
+                </m.div>
+              </AnimatePresence>
+            </div>
+          </m.div>
+        ) : null}
+      </AnimatePresence>
+    </nav>
+  );
+}

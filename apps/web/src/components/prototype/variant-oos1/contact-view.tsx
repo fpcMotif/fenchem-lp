@@ -29,10 +29,7 @@ import { color, ease, font, layout, media } from "./tokens.stylex";
 
 const HAIRLINE = "rgba(26, 26, 26, 0.14)";
 const FIELD_BORDER = "#8a93a3";
-const TINT = "#f3f5fa";
-const BLUE_TINT = "#e6ecf7";
 const BLUE_WASH = "#f2f6fd";
-const CHIP_BG = "#f3f4f6";
 const REQUIRED_MARK = "#b91c1c";
 const MAP_LAND = "#eef1f5";
 const MAP_BLOCK = "#e3e8ef";
@@ -103,16 +100,6 @@ const styles = stylex.create({
   },
   sectionHeadTight: {
     marginBottom: { default: 32, [DESKTOP]: 40 },
-  },
-  sectionEyebrow: {
-    margin: 0,
-    marginBottom: 12,
-    fontFamily: font.display,
-    fontSize: 12,
-    fontWeight: 600,
-    letterSpacing: "0.22em",
-    textTransform: "uppercase",
-    color: colors.brandBlue700,
   },
   sectionTitle: {
     margin: 0,
@@ -226,7 +213,7 @@ const styles = stylex.create({
   },
 
   formPanel: {
-    backgroundColor: TINT,
+    backgroundColor: color.pageTint,
     padding: { default: "32px 20px", [breakpoints.md]: 40, [DESKTOP]: 48 },
   },
   form: {
@@ -506,7 +493,7 @@ const styles = stylex.create({
     borderRadius: 0,
     backgroundColor: {
       default: colors.paper,
-      ":hover": { default: null, [HOVER]: BLUE_TINT },
+      ":hover": { default: null, [HOVER]: color.blueTint },
     },
     fontFamily: "inherit",
     fontSize: 14,
@@ -524,7 +511,7 @@ const styles = stylex.create({
   },
 
   visitSection: {
-    backgroundColor: TINT,
+    backgroundColor: color.pageTint,
   },
   visitStage: {
     position: "relative",
@@ -740,7 +727,7 @@ const styles = stylex.create({
     width: 32,
     height: 32,
     borderRadius: 999,
-    backgroundColor: CHIP_BG,
+    backgroundColor: color.chip,
     color: color.ink,
     transitionProperty: "transform, background-color, color",
     transitionDuration: { default: "0s", [breakpoints.motionOk]: "200ms" },
@@ -773,13 +760,11 @@ const styles = stylex.create({
 });
 
 function SectionHead({
-  eyebrow,
   title,
   titleId,
   lead,
   tight = false,
 }: {
-  eyebrow: string;
   title: string;
   titleId: string;
   lead?: ReactNode;
@@ -787,9 +772,6 @@ function SectionHead({
 }) {
   return (
     <RiseReveal sx={[styles.sectionHead, tight && styles.sectionHeadTight]}>
-      <p lang="en" {...stylex.props(styles.sectionEyebrow)}>
-        {eyebrow}
-      </p>
       <h2 id={titleId} {...stylex.props(styles.sectionTitle)}>
         {title}
       </h2>
@@ -1065,7 +1047,6 @@ function Inquiry() {
       <div {...stylex.props(kitStyles.shell, kitStyles.inset120, styles.inquiryLayout)}>
         <div {...stylex.props(styles.inquiryAside)}>
           <SectionHead
-            eyebrow={INQUIRY_INTRO.eyebrow}
             title={INQUIRY_INTRO.title}
             titleId="contact-inquiry-title"
             lead={INQUIRY_INTRO.lead}
@@ -1206,7 +1187,6 @@ function Visit() {
     >
       <div {...stylex.props(kitStyles.shell, kitStyles.inset120)}>
         <SectionHead
-          eyebrow={VISIT_INTRO.eyebrow}
           title={VISIT_INTRO.title}
           titleId="contact-visit-title"
           lead={VISIT_INTRO.lead}
@@ -1289,7 +1269,6 @@ function Faq() {
     >
       <div {...stylex.props(kitStyles.shell, kitStyles.inset120, styles.faqLayout)}>
         <SectionHead
-          eyebrow={CONTACT_FAQ_INTRO.eyebrow}
           title={CONTACT_FAQ_INTRO.title}
           titleId="contact-faq-title"
           lead={

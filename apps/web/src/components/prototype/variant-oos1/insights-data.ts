@@ -18,6 +18,7 @@ export type InsightArticle = {
   title: string;
   navLabel: string | null;
   lead: string | null;
+  cover?: { src: string; alt: string; position: string };
   thesis: { label: string; statement: string } | null;
   intro: readonly string[];
   sections: readonly InsightSection[];
@@ -37,6 +38,11 @@ const GLP1_ARTICLE: InsightArticle = {
   title: "GLP-1时代的膳食纤维机会",
   navLabel: "GLP-1与膳食纤维",
   lead: "从饱腹管理到肠道健康支持，重新理解膳食纤维在营养中的价值",
+  cover: {
+    src: "/products/figma/fiber-plate.jpg",
+    alt: "盛有蔬果、豆类、全谷物与坚果的均衡膳食餐盘",
+    position: "50% 50%",
+  },
   thesis: {
     label: "核心观点",
     statement:

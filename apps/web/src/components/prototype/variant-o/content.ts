@@ -2,7 +2,11 @@ const ASSET_BASE = "/prototype/official-site";
 
 export const IMAGES = {
   hero: `${ASSET_BASE}/hero-background.webp`,
-  campus: { src: `${ASSET_BASE}/campus.webp`, alt: "Exterior of the Fenchem campus buildings" },
+  campus: {
+    src: `${ASSET_BASE}/campus.webp`,
+    srcSet: `${ASSET_BASE}/campus-1200.webp 1200w, ${ASSET_BASE}/campus-1800.webp 1800w, ${ASSET_BASE}/campus.webp 2674w`,
+    alt: "Exterior of the Fenchem campus buildings",
+  },
   officeMap: { src: `${ASSET_BASE}/office-map.webp`, alt: "Map of Fenchem's global offices" },
   footerLogo: { src: `${ASSET_BASE}/fenchem-logo.png`, alt: "FENCHEM" },
 } as const;

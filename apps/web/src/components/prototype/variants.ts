@@ -207,6 +207,12 @@ export const VARIANTS: readonly VariantEntry[] = [
     () => import("./variant-oos1/index").then((m) => m.VariantOOS1),
     "oos",
   ),
+  page(
+    "oos1taste",
+    "O campus home · taste pass",
+    () => import("./variant-oos1/home/oos1taste/index").then((m) => m.VariantOOS1Taste),
+    "oos1",
+  ),
   ...ABOUT_VARIANTS,
   page(
     "oos1doubao",
@@ -221,6 +227,15 @@ export const VARIANTS: readonly VariantEntry[] = [
     "oos1",
   ),
   ...PRODUCT_VARIANTS,
+  page(
+    "oos1insightsabandon",
+    "O campus insights · Bookmark rail sidebar / before the sidebar redo",
+    () =>
+      import("./variant-oos1/insights/oos1insightsabandon/index").then(
+        (m) => m.VariantOOS1InsightsAbandon,
+      ),
+    "oos1",
+  ),
   page(
     "oos2",
     "Official site · O campus keep-open",

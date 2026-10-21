@@ -559,8 +559,8 @@ export function ProductsOOS1Doubao({
         </div>
       </section>
 
-      <ProductCatalog categoryId={activeTab} />
-      <ProductSolutions />
+      <ProductCatalog key={activeTab} categoryId={activeTab} />
+      <ProductSolutions key={activeTab} categoryId={activeTab} />
 
       <ContactCta
         subtitle={PRODUCTS_CTA_SUBTITLE}

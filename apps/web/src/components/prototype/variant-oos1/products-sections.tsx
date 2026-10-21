@@ -7,6 +7,7 @@ import {
   useEffect,
   useId,
   useMemo,
+  useReducer,
   useRef,
   useState,
   type KeyboardEvent,
@@ -16,20 +17,20 @@ import { flushSync } from "react-dom";
 import { EASE } from "@/components/prototype/motion-constants";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 import {
+  CATALOG_CATEGORY_ID,
   CATEGORIES,
   SHEET_CATALOG_GROUPS,
-  SOLUTION_AREAS,
-  SOLUTION_ITEMS,
+  SOLUTIONS_BY_CATEGORY,
   type CatalogGroup,
+  type SolutionArea,
   type SolutionAreaId,
   type SolutionItem,
 } from "./products-data";
 import { kitStyles } from "./subpage-kit";
-import { color, ease, font, layout, media } from "./tokens.stylex";
+import { color, ease, layout, media } from "./tokens.stylex";
 
 type AreaFilter = SolutionAreaId | "all";
 
-const SURFACE = "#f3f5fa";
 const TINT_INK = "oklch(0.26 0.035 261.5)";
 const TINT_BODY = "oklch(0.44 0.025 261.5)";
 const TINT_MUTED = "oklch(0.52 0.02 261.5)";
@@ -56,8 +57,38 @@ const CARD_RADIUS = { default: 12, [DESKTOP]: 16 } as const;
 
 const padIndex = (index: number) => String(index + 1).padStart(2, "0");
 
-const orderByArea = (items: SolutionItem[]) =>
-  SOLUTION_AREAS.flatMap((area) => items.filter((item) => item.area === area.id));
+const orderByArea = (areas: SolutionArea[], items: SolutionItem[]) =>
+  areas.flatMap((area) => items.filter((item) => item.area === area.id));
+
+type BrowseState =
+  | { status: "showing"; area: AreaFilter; selectedId: string }
+  | { status: "empty"; area: AreaFilter };
+
+type BrowseEvent = { type: "pickArea"; area: AreaFilter } | { type: "pickSolution"; id: string };
+
+const initialBrowse = (solutions: SolutionItem[]): BrowseState => {
+  const first = solutions[0];
+  return first
+    ? { status: "showing", area: "all", selectedId: first.id }
+    : { status: "empty", area: "all" };
+};
+
+const transition = (
+  solutions: SolutionItem[],
+  state: BrowseState,
+  event: BrowseEvent,
+): BrowseState => {
+  if (event.type === "pickSolution") {
+    return state.status === "showing" ? { ...state, selectedId: event.id } : state;
+  }
+  const inArea = (item: SolutionItem) => event.area === "all" || item.area === event.area;
+  const current =
+    state.status === "showing" ? solutions.find((item) => item.id === state.selectedId) : undefined;
+  const next = current && inArea(current) ? current : solutions.find(inArea);
+  return next
+    ? { status: "showing", area: event.area, selectedId: next.id }
+    : { status: "empty", area: event.area };
+};
 
 const splitParen = (text: string) => {
   const open = text.indexOf(" (");
@@ -95,20 +126,10 @@ const styles = stylex.create({
     scrollMarginTop: layout.headerHeight,
   },
   bandSurface: {
-    backgroundColor: SURFACE,
+    backgroundColor: color.pageTint,
   },
   sectionHead: {
     marginBottom: HEAD_SPACE,
-  },
-  sectionEyebrow: {
-    margin: 0,
-    marginBottom: 12,
-    fontFamily: font.display,
-    fontSize: 12,
-    fontWeight: 600,
-    letterSpacing: "0.22em",
-    textTransform: "uppercase",
-    color: ACCENT,
   },
   sectionTitle: {
     margin: 0,
@@ -316,6 +337,17 @@ const styles = stylex.create({
     rowGap: 20,
     paddingTop: 4,
     paddingBottom: 28,
+  },
+  solutionsEmpty: {
+    margin: 0,
+    paddingBlock: 64,
+    paddingInline: 24,
+    borderRadius: CARD_RADIUS,
+    backgroundColor: color.pageTint,
+    fontSize: 15,
+    lineHeight: "26px",
+    textAlign: "center",
+    color: TINT_MUTED,
   },
   ledgerIntro: {
     gridColumn: { default: "1 / -1", [LG]: "1 / 9" },
@@ -915,12 +947,12 @@ function Descriptions({ lines }: { lines: string[] }) {
   );
 }
 
-function FormulaSheet({ item }: { item: SolutionItem }) {
+function FormulaSheet({ item, areas }: { item: SolutionItem; areas: SolutionArea[] }) {
   return (
     <>
       <header {...stylex.props(styles.sheetHead)}>
         <p {...stylex.props(styles.sheetArea)}>
-          {SOLUTION_AREAS.find((area) => area.id === item.area)?.label}
+          {areas.find((area) => area.id === item.area)?.label}
         </p>
         <h3 {...stylex.props(styles.sheetTitle)}>{item.title}</h3>
         <p {...stylex.props(styles.sheetSubtitle)}>{item.subtitle}</p>
@@ -961,6 +993,7 @@ export function ProductCatalog({ categoryId }: { categoryId: string }) {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const startInstantLayout = useInstantLayoutTransition();
   const categoryLabel = CATEGORIES.find((c) => c.id === categoryId)?.label;
+  const groups = categoryId === CATALOG_CATEGORY_ID ? SHEET_CATALOG_GROUPS : [];
 
   const toggle = (index: number, trigger: HTMLElement) => {
     if (openIndex !== null && openIndex < index) {
@@ -974,6 +1007,8 @@ export function ProductCatalog({ categoryId }: { categoryId: string }) {
     setOpenIndex(openIndex === index ? null : index);
   };
 
+  if (groups.length === 0) return null;
+
   return (
     <section
       id="products-catalog"
@@ -982,24 +1017,17 @@ export function ProductCatalog({ categoryId }: { categoryId: string }) {
     >
       <div {...stylex.props(kitStyles.shell, kitStyles.inset120)}>
         <header {...stylex.props(styles.sectionHead)}>
-          <p lang="en" {...stylex.props(styles.sectionEyebrow)}>
-            Catalog
-          </p>
           <h2 id="catalog-title" {...stylex.props(styles.sectionTitle)}>
             产品目录
           </h2>
-          <p {...stylex.props(styles.sectionLead)}>
-            {categoryId === "personal-care"
-              ? "精选个人护理全形态天然油脂与经典功效配方方案"
-              : `${categoryLabel}核心原料与应用定制方案`}
-          </p>
+          <p {...stylex.props(styles.sectionLead)}>{`${categoryLabel}核心原料与应用定制方案`}</p>
         </header>
         <div {...stylex.props(styles.ledgerCard)}>
           <div aria-hidden="true" {...stylex.props(styles.ledgerGrid, styles.ledgerHeader)}>
             <span {...stylex.props(styles.colName)}>原料分类</span>
           </div>
           <ul {...stylex.props(styles.ledger)}>
-            {SHEET_CATALOG_GROUPS.map((group, index) => (
+            {groups.map((group, index) => (
               <LedgerRow
                 key={group.id}
                 group={group}
@@ -1015,14 +1043,24 @@ export function ProductCatalog({ categoryId }: { categoryId: string }) {
   );
 }
 
-export function ProductSolutions() {
+export function ProductSolutions({ categoryId }: { categoryId: string }) {
   const reduce = useReducedMotion();
   const uid = useId();
   const areaListRef = useRef<HTMLDivElement>(null);
   const railRef = useRef<HTMLDivElement>(null);
-  const solutions = useMemo(() => orderByArea(SOLUTION_ITEMS), []);
-  const [area, setArea] = useState<AreaFilter>("all");
-  const [selectedId, setSelectedId] = useState<string | undefined>(solutions[0]?.id);
+  const solutionSet = SOLUTIONS_BY_CATEGORY[categoryId];
+  const areas = solutionSet?.areas ?? [];
+  const solutions = useMemo(
+    () => (solutionSet ? orderByArea(solutionSet.areas, solutionSet.items) : []),
+    [solutionSet],
+  );
+  const [browse, send] = useReducer(
+    (state: BrowseState, event: BrowseEvent) => transition(solutions, state, event),
+    solutions,
+    initialBrowse,
+  );
+  const area = browse.area;
+  const selectedId = browse.status === "showing" ? browse.selectedId : undefined;
 
   useEffect(() => {
     const list = areaListRef.current;
@@ -1050,25 +1088,21 @@ export function ProductSolutions() {
     rail.scrollTo({ top: Math.max(0, top), behavior });
   }, [area, selectedId, reduce]);
 
+  if (solutions.length === 0) return null;
+
   const scope = area === "all" ? solutions : solutions.filter((item) => item.area === area);
   const position = Math.max(
     0,
     scope.findIndex((item) => item.id === selectedId),
   );
-  const selected = scope[position];
-  if (!selected) return null;
+  const selected = browse.status === "showing" ? scope[position] : undefined;
 
-  const groups = SOLUTION_AREAS.map((entry) => ({
-    ...entry,
-    items: scope.filter((item) => item.area === entry.id),
-  })).filter((group) => group.items.length > 0);
-
-  const chooseArea = (next: AreaFilter) => {
-    setArea(next);
-    if (next !== "all" && selected.area !== next) {
-      setSelectedId(solutions.find((item) => item.area === next)?.id);
-    }
-  };
+  const groups = areas
+    .map((entry) => ({
+      ...entry,
+      items: scope.filter((item) => item.area === entry.id),
+    }))
+    .filter((group) => group.items.length > 0);
 
   const handleRailKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
     const step = TAB_STEPS[event.key];
@@ -1077,19 +1111,17 @@ export function ProductSolutions() {
     const next = step(position, scope.length);
     const nextItem = scope[next];
     if (!nextItem) return;
-    setSelectedId(nextItem.id);
+    send({ type: "pickSolution", id: nextItem.id });
     event.currentTarget.querySelectorAll<HTMLElement>('[role="tab"]')[next]?.focus();
   };
 
-  const areaChips = [{ id: "all" as const, label: "全部" }, ...SOLUTION_AREAS]
-    .map((entry) => ({
-      ...entry,
-      count:
-        entry.id === "all"
-          ? solutions.length
-          : solutions.filter((item) => item.area === entry.id).length,
-    }))
-    .filter((entry) => entry.count > 0);
+  const areaChips = [{ id: "all" as const, label: "全部" }, ...areas].map((entry) => ({
+    ...entry,
+    count:
+      entry.id === "all"
+        ? solutions.length
+        : solutions.filter((item) => item.area === entry.id).length,
+  }));
 
   return (
     <section
@@ -1099,12 +1131,10 @@ export function ProductSolutions() {
     >
       <div {...stylex.props(kitStyles.shell, kitStyles.inset120)}>
         <header {...stylex.props(styles.sectionHead)}>
-          <p lang="en" {...stylex.props(styles.sectionEyebrow)}>
-            Solutions
-          </p>
           <h2 id="solutions-title" {...stylex.props(styles.sectionTitle)}>
             应用方案
           </h2>
+          {solutionSet?.lead && <p {...stylex.props(styles.sectionLead)}>{solutionSet.lead}</p>}
         </header>
         {solutions.length > 1 && (
           <div
@@ -1120,7 +1150,7 @@ export function ProductSolutions() {
                   key={entry.id}
                   type="button"
                   aria-pressed={isActive}
-                  onClick={() => chooseArea(entry.id)}
+                  onClick={() => send({ type: "pickArea", area: entry.id })}
                   {...stylex.props(styles.area, isActive && styles.areaActive)}
                 >
                   <span {...stylex.props(styles.areaLabel)}>{entry.label}</span>
@@ -1132,89 +1162,98 @@ export function ProductSolutions() {
             })}
           </div>
         )}
-        <div {...stylex.props(styles.browser)}>
-          <div {...stylex.props(styles.railFrame)}>
-            <m.div
-              ref={railRef}
-              layoutScroll
-              role="tablist"
-              aria-label="应用方案"
-              aria-orientation="vertical"
-              onKeyDown={handleRailKeyDown}
-              {...stylex.props(styles.rail)}
-            >
-              {groups.map((group) => (
-                <div key={group.id} {...stylex.props(styles.railGroup)}>
-                  <p aria-hidden="true" {...stylex.props(styles.railHeading)}>
-                    {group.label}
-                    <span {...stylex.props(styles.railHeadingCount)}>{group.items.length} 款</span>
-                  </p>
-                  {group.items.map((item) => {
-                    const isSelected = item.id === selected.id;
-                    return (
-                      <button
-                        key={item.id}
-                        type="button"
-                        role="tab"
-                        id={`${uid}-tab-${item.id}`}
-                        aria-selected={isSelected}
-                        aria-controls={`${uid}-panel`}
-                        tabIndex={isSelected ? 0 : -1}
-                        onClick={() => setSelectedId(item.id)}
-                        {...stylex.props(
-                          styles.solutionTab,
-                          isSelected && styles.solutionTabSelected,
-                          stylex.defaultMarker(),
-                        )}
-                      >
-                        {isSelected && (
-                          <m.span
-                            layoutId={`${uid}-solution-tab`}
-                            transition={
-                              reduce
-                                ? { duration: 0 }
-                                : { type: "spring", duration: 0.32, bounce: 0 }
-                            }
-                            {...stylex.props(styles.tabIndicator)}
-                          />
-                        )}
-                        <span
-                          {...stylex.props(styles.tabIndex, isSelected && styles.tabIndexSelected)}
+        {selected ? (
+          <div {...stylex.props(styles.browser)}>
+            <div {...stylex.props(styles.railFrame)}>
+              <m.div
+                ref={railRef}
+                layoutScroll
+                role="tablist"
+                aria-label="应用方案"
+                aria-orientation="vertical"
+                onKeyDown={handleRailKeyDown}
+                {...stylex.props(styles.rail)}
+              >
+                {groups.map((group) => (
+                  <div key={group.id} {...stylex.props(styles.railGroup)}>
+                    <p aria-hidden="true" {...stylex.props(styles.railHeading)}>
+                      {group.label}
+                      <span {...stylex.props(styles.railHeadingCount)}>
+                        {group.items.length} 款
+                      </span>
+                    </p>
+                    {group.items.map((item) => {
+                      const isSelected = item.id === selected.id;
+                      return (
+                        <button
+                          key={item.id}
+                          type="button"
+                          role="tab"
+                          id={`${uid}-tab-${item.id}`}
+                          aria-selected={isSelected}
+                          aria-controls={`${uid}-panel`}
+                          tabIndex={isSelected ? 0 : -1}
+                          onClick={() => send({ type: "pickSolution", id: item.id })}
+                          {...stylex.props(
+                            styles.solutionTab,
+                            isSelected && styles.solutionTabSelected,
+                            stylex.defaultMarker(),
+                          )}
                         >
-                          {padIndex(scope.indexOf(item))}
-                        </span>
-                        <span {...stylex.props(styles.tabText)}>
+                          {isSelected && (
+                            <m.span
+                              layoutId={`${uid}-solution-tab`}
+                              transition={
+                                reduce
+                                  ? { duration: 0 }
+                                  : { type: "spring", duration: 0.32, bounce: 0 }
+                              }
+                              {...stylex.props(styles.tabIndicator)}
+                            />
+                          )}
                           <span
                             {...stylex.props(
-                              styles.tabTitle,
-                              isSelected && styles.tabTitleSelected,
+                              styles.tabIndex,
+                              isSelected && styles.tabIndexSelected,
                             )}
                           >
-                            {item.title}
+                            {padIndex(scope.indexOf(item))}
                           </span>
-                          <span {...stylex.props(styles.tabMeta)}>
-                            {item.functions.join(" · ")}
+                          <span {...stylex.props(styles.tabText)}>
+                            <span
+                              {...stylex.props(
+                                styles.tabTitle,
+                                isSelected && styles.tabTitleSelected,
+                              )}
+                            >
+                              {item.title}
+                            </span>
+                            <span {...stylex.props(styles.tabMeta)}>
+                              {item.functions.join(" · ")}
+                            </span>
                           </span>
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
-              ))}
-            </m.div>
-          </div>
-          <div
-            role="tabpanel"
-            id={`${uid}-panel`}
-            aria-labelledby={`${uid}-tab-${selected.id}`}
-            tabIndex={0}
-            {...stylex.props(styles.sheet)}
-          >
-            <div key={selected.id} {...stylex.props(styles.panel)}>
-              <FormulaSheet item={selected} />
+                        </button>
+                      );
+                    })}
+                  </div>
+                ))}
+              </m.div>
+            </div>
+            <div
+              role="tabpanel"
+              id={`${uid}-panel`}
+              aria-labelledby={`${uid}-tab-${selected.id}`}
+              tabIndex={0}
+              {...stylex.props(styles.sheet)}
+            >
+              <div key={selected.id} {...stylex.props(styles.panel)}>
+                <FormulaSheet item={selected} areas={areas} />
+              </div>
             </div>
           </div>
-        </div>
+        ) : (
+          <p {...stylex.props(styles.solutionsEmpty)}>暂无方案</p>
+        )}
       </div>
     </section>
   );

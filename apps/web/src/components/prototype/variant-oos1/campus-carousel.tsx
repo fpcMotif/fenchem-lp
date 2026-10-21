@@ -198,7 +198,7 @@ const styles = stylex.create({
     borderStyle: "solid",
     borderColor: "rgba(26, 26, 26, 0.14)",
     borderRadius: "50%",
-    backgroundColor: { default: colors.paper, ":hover": "#f3f4f6" },
+    backgroundColor: { default: colors.paper, ":hover": color.chip },
     color: color.ink,
     cursor: "pointer",
     transform: {
@@ -400,6 +400,8 @@ export function CampusCarousel({
               >
                 <img
                   src={photo.image}
+                  srcSet={photo.srcSet || undefined}
+                  sizes="(min-width: 1280px) 600px, (min-width: 768px) min(520px, 62vw), calc(100vw - 112px)"
                   alt={photo.alt}
                   loading={approached && Math.abs(offset) <= EAGER_RANGE ? "eager" : "lazy"}
                   decoding="async"

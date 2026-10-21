@@ -503,7 +503,7 @@ export function FramedCampus({
   reduce: boolean;
   windowClip: MotionValue<string>;
   photoScale: MotionValue<number>;
-  IMAGES: { campus: { src: string; alt: string } };
+  IMAGES: { campus: { src: string; srcSet?: string; alt: string } };
   STATS: readonly CampusStat[];
   StatItem: ComponentType<{ stat: CampusStat; index: number }>;
 }) {
@@ -516,6 +516,8 @@ export function FramedCampus({
         >
           <m.img
             src={IMAGES.campus.src}
+            srcSet={IMAGES.campus.srcSet}
+            sizes="100vw"
             alt={IMAGES.campus.alt}
             loading="lazy"
             decoding="async"
