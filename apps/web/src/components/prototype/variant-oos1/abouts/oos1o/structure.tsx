@@ -75,10 +75,6 @@ const styles = stylex.create({
     letterSpacing: "0.12em",
     color: tone.blue,
   },
-  ringNote: {
-    fontSize: 19,
-    letterSpacing: 0,
-  },
   ringRow: {
     position: "relative",
     marginTop: { default: 20, [bp.desktop]: 28 },
@@ -134,14 +130,9 @@ const styles = stylex.create({
     height: 28,
     backgroundColor: "rgba(11, 42, 92, 0.3)",
   },
-  index: {
-    marginTop: { default: 0, [bp.desktop]: 16 },
-    fontSize: 14,
-    color: tone.blue,
-  },
   subName: {
     margin: 0,
-    marginTop: 8,
+    marginTop: { default: 0, [bp.desktop]: 16 },
     fontFamily: face.sans,
     fontSize: { default: 17, [bp.laptop]: 16, [bp.wide]: 17 },
     lineHeight: 1.55,
@@ -167,7 +158,7 @@ export function Structure() {
       {...stylex.props(styles.section)}
     >
       <div {...stylex.props(ui.shell)}>
-        <SectionHead id="oos1o-structure" label="Structure" title={ABOUT_STRUCTURE.title} quiet />
+        <SectionHead id="oos1o-structure" title={ABOUT_STRUCTURE.title} quiet />
         <div {...stylex.props(styles.holding)}>
           <p {...stylex.props(styles.badge)}>{holding.badge}</p>
           <p {...stylex.props(styles.name)}>
@@ -177,12 +168,7 @@ export function Structure() {
             {holding.english}
           </p>
         </div>
-        <p {...stylex.props(styles.ringLabel)}>
-          {subsidiaryBadge}
-          <span lang="en" {...stylex.props(ui.serif, styles.ringNote)}>
-            Wholly-owned
-          </span>
-        </p>
+        <p {...stylex.props(styles.ringLabel)}>{subsidiaryBadge}</p>
         <div {...stylex.props(styles.ringRow)}>
           <svg
             viewBox={`0 0 2000 ${VERTEX + 4}`}
@@ -208,9 +194,6 @@ export function Structure() {
               >
                 <span aria-hidden="true" {...stylex.props(styles.node)} />
                 <span aria-hidden="true" {...stylex.props(styles.tick)} />
-                <span aria-hidden="true" {...stylex.props(ui.latin, styles.index)}>
-                  {String(index + 1).padStart(2, "0")}
-                </span>
                 <p {...stylex.props(styles.subName)}>
                   <CompanyName name={subsidiary.name} />
                 </p>

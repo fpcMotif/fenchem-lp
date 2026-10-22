@@ -49,7 +49,6 @@ export function EngineeringStatus({
 }
 export function IngredientCardDetails({
   styles,
-  i,
   item,
 }: {
   styles: {
@@ -70,7 +69,6 @@ export function IngredientCardDetails({
   return (
     <div {...stylex.props(styles.matrixCardBody)}>
       <div {...stylex.props(styles.matrixCardMeta)}>
-        <span {...stylex.props(styles.matrixCardIndex)}>{String(i + 1).padStart(2, "0")} —</span>
         <span {...stylex.props(styles.matrixCardCode)}>{item.code}</span>
       </div>
       <h3 {...stylex.props(styles.matrixCardTitle)}>{item.name}</h3>

@@ -72,14 +72,6 @@ const S = stylex.create({
     fontSize: "0.4em",
     color: tone.mint,
   },
-  text: {
-    margin: 0,
-    fontFamily: font.sans,
-    fontSize: 15,
-    fontWeight: 400,
-    letterSpacing: "0.08em",
-    color: tone.white80,
-  },
 });
 
 export function Band() {
@@ -100,7 +92,6 @@ export function Band() {
                 <span>{stat.value}</span>
                 {stat.unit ? <span {...stylex.props(S.unit)}>{stat.unit}</span> : null}
               </div>
-              <p {...stylex.props(S.text)}>{stat.caption}</p>
             </Reveal>
           ))}
         </ul>

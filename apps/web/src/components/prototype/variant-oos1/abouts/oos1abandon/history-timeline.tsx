@@ -108,16 +108,6 @@ const styles = stylex.create({
     gap: 24,
     marginBottom: { default: 28, [DESKTOP]: 40 },
   },
-  eyebrow: {
-    margin: 0,
-    marginBottom: 12,
-    fontFamily: font.display,
-    fontSize: 12,
-    fontWeight: 600,
-    letterSpacing: "0.22em",
-    textTransform: "uppercase",
-    color: colors.brandBlue700,
-  },
   title: {
     margin: 0,
     fontSize: { default: 26, [media.tablet]: 32, [DESKTOP]: 40 },
@@ -294,14 +284,6 @@ const styles = stylex.create({
   },
   yearActive: {
     color: colors.brandBlue700,
-  },
-  kicker: {
-    fontFamily: font.serifAccent,
-    fontSize: { default: 18, [DESKTOP]: 22 },
-    fontStyle: "italic",
-    fontWeight: 400,
-    letterSpacing: 0,
-    color: color.bodyText,
   },
   events: {
     display: "flex",
@@ -753,11 +735,6 @@ export function HistoryTimeline({
       >
         <div ref={headerRef} {...stylex.props(styles.shell, styles.header)}>
           <RiseReveal>
-            {plain ? null : (
-              <p lang="en" {...stylex.props(styles.eyebrow)}>
-                {ABOUT_HISTORY.eyebrow}
-              </p>
-            )}
             <h2 id="about-history-title" {...stylex.props(styles.title)}>
               {ABOUT_HISTORY.title}
             </h2>
@@ -823,11 +800,6 @@ export function HistoryTimeline({
                       )}
                     >
                       {milestone.year}
-                      {"kicker" in milestone && !plain ? (
-                        <span lang="en" {...stylex.props(styles.kicker)}>
-                          {milestone.kicker}
-                        </span>
-                      ) : null}
                     </h3>
                     <ul {...stylex.props(styles.events)}>
                       {milestone.events.map((event, eventIndex) => (

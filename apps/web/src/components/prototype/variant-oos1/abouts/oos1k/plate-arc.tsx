@@ -161,13 +161,6 @@ const styles = stylex.create({
     letterSpacing: "0.06em",
     color: sky.star,
   },
-  english: {
-    margin: 0,
-    fontFamily: face.serif,
-    fontStyle: "italic",
-    fontSize: 22,
-    color: sky.muted,
-  },
   note: {
     marginTop: 6,
   },
@@ -350,9 +343,6 @@ export function PlateArc({ onOpen }: { onOpen: (index: number) => void }) {
                 <span {...stylex.props(ui.designation, styles.numeral)}>{plate.numeral}</span>
               </p>
               <p {...stylex.props(styles.caption)}>{plate.caption}</p>
-              <p lang="en" {...stylex.props(styles.english)}>
-                {plate.english}
-              </p>
               <p {...stylex.props(ui.body, styles.note)}>{plate.description}</p>
             </div>
             <ol aria-label="Film strip index" {...stylex.props(styles.register)}>

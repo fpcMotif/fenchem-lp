@@ -197,7 +197,7 @@ const styles = stylex.create({
   tab: {
     position: "relative",
     display: "grid",
-    gridTemplateColumns: "36px minmax(0, 1fr)",
+    gridTemplateColumns: "minmax(0, 1fr)",
     alignItems: "baseline",
     width: "100%",
     minHeight: 64,
@@ -241,18 +241,6 @@ const styles = stylex.create({
       transform: "scaleY(1)",
     },
   },
-  tabNumber: {
-    fontFamily: NUMERAL_FONT,
-    fontSize: 13,
-    fontWeight: 500,
-    lineHeight: "24px",
-    letterSpacing: "0.02em",
-    fontVariantNumeric: "tabular-nums",
-    color: MUTED,
-  },
-  tabNumberSelected: {
-    color: ACCENT,
-  },
   tabTitle: {
     fontSize: 15,
     fontWeight: 400,
@@ -264,7 +252,6 @@ const styles = stylex.create({
     fontWeight: 500,
   },
   tabSubtitle: {
-    gridColumn: "2",
     marginTop: 2,
     fontSize: 13,
     lineHeight: "20px",
@@ -289,25 +276,8 @@ const styles = stylex.create({
   sheetHead: {
     paddingBottom: { default: 24, [MD]: 28 },
   },
-  sheetNumber: {
-    display: "flex",
-    alignItems: "baseline",
-    gap: 6,
-    margin: 0,
-    fontFamily: NUMERAL_FONT,
-    fontSize: 13,
-    fontWeight: 500,
-    lineHeight: "20px",
-    letterSpacing: "0.04em",
-    fontVariantNumeric: "tabular-nums",
-    color: MUTED,
-  },
-  sheetNumberCurrent: {
-    color: ACCENT,
-  },
   sheetTitle: {
     margin: 0,
-    marginTop: 12,
     fontSize: { default: 20, [MD]: 24 },
     fontWeight: 500,
     lineHeight: { default: "28px", [MD]: "32px" },
@@ -607,11 +577,6 @@ export function Solutions() {
                         )}
                       >
                         <span
-                          {...stylex.props(styles.tabNumber, selected && styles.tabNumberSelected)}
-                        >
-                          {padIndex(index)}
-                        </span>
-                        <span
                           {...stylex.props(styles.tabTitle, selected && styles.tabTitleSelected)}
                         >
                           {item.title}
@@ -642,10 +607,6 @@ export function Solutions() {
                   transition={{ duration: reduce ? 0 : 0.2, ease: EASE }}
                 >
                   <header {...stylex.props(styles.sheetHead)}>
-                    <p {...stylex.props(styles.sheetNumber)}>
-                      <span>No.</span>
-                      <span {...stylex.props(styles.sheetNumberCurrent)}>{padIndex(active)}</span>
-                    </p>
                     <h3 {...stylex.props(styles.sheetTitle)}>{formula.title}</h3>
                     <p {...stylex.props(styles.sheetSubtitle)}>{formula.subtitle}</p>
                   </header>
@@ -672,7 +633,7 @@ export function Solutions() {
                   上一个
                 </span>
                 <span {...stylex.props(styles.pagerTitle, !previous && styles.pagerTitleDisabled)}>
-                  {previous ? `${padIndex(active - 1)} ${previous.title}` : " "}
+                  {previous ? previous.title : " "}
                 </span>
               </button>
               <button
@@ -690,7 +651,7 @@ export function Solutions() {
                   <ArrowRight size={16} strokeWidth={1.5} absoluteStrokeWidth aria-hidden="true" />
                 </span>
                 <span {...stylex.props(styles.pagerTitle, !next && styles.pagerTitleDisabled)}>
-                  {next ? `${padIndex(active + 1)} ${next.title}` : " "}
+                  {next ? next.title : " "}
                 </span>
               </button>
             </div>

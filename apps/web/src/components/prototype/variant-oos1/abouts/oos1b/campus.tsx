@@ -26,13 +26,7 @@ export function Campus() {
       {...stylex.props(ui.anchor, ui.section)}
     >
       <div {...stylex.props(ui.shell)}>
-        <SectionHead
-          id="oos1b-campus"
-          index={2}
-          eyebrow="Campus"
-          title={ABOUT_CAMPUS.title}
-          note="Each photograph is a doorway into the next."
-        />
+        <SectionHead id="oos1b-campus" title={ABOUT_CAMPUS.title} />
         <p {...srOnly}>
           Walk through in order: {WALK}, then look back at the headquarters from above.
         </p>

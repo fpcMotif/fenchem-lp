@@ -25,15 +25,6 @@ const styles = stylex.create({
     lineHeight: 1.1,
     color: tone.navy,
   },
-  hint: {
-    margin: 0,
-    fontFamily: face.latin,
-    fontSize: 12,
-    fontWeight: 500,
-    letterSpacing: "0.08em",
-    textTransform: "uppercase",
-    color: tone.body,
-  },
   list: {
     display: "grid",
     gridTemplateColumns: {
@@ -150,9 +141,6 @@ export function PlateIndex({
           Index of plates
           <span {...srOnly}> Campus photo index</span>
         </h3>
-        <p lang="en" {...stylex.props(ui.serif, styles.hint)}>
-          Open any frame
-        </p>
       </div>
       <ul {...stylex.props(styles.list)}>
         {plates.map((plate, index) => (

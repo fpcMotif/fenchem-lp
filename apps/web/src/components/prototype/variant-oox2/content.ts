@@ -1,5 +1,3 @@
-import { HERO } from "../variant-oox/content";
-
 export {
   ABOUT,
   CAMPUS,
@@ -27,9 +25,4 @@ export {
 
 export const SOURCE_LABEL = "源头";
 
-export const FORK_ACCENT = "Four markets, one source.";
-
-export const PASSAGE = {
-  line: "Innovation starts at the source.",
-  motto: HERO.motto,
-} as const;
+export const PASSAGE_LINE = "Innovation starts at the source.";

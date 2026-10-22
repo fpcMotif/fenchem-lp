@@ -279,14 +279,6 @@ const styles = stylex.create({
   yearActive: {
     color: colors.brandBlue700,
   },
-  kicker: {
-    fontFamily: font.serifAccent,
-    fontSize: { default: 18, [DESKTOP]: 22 },
-    fontStyle: "italic",
-    fontWeight: 400,
-    letterSpacing: 0,
-    color: color.bodyText,
-  },
   events: {
     display: "flex",
     flexDirection: "column",
@@ -803,11 +795,6 @@ export function HistoryTimeline({
                       )}
                     >
                       {milestone.year}
-                      {"kicker" in milestone && !plain ? (
-                        <span lang="en" {...stylex.props(styles.kicker)}>
-                          {milestone.kicker}
-                        </span>
-                      ) : null}
                     </h3>
                     <ul {...stylex.props(styles.events)}>
                       {milestone.events.map((event, eventIndex) => (

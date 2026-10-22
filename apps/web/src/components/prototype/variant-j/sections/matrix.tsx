@@ -51,7 +51,6 @@ const styles = stylex.create({
     },
   },
   heading: {
-    marginTop: "1.25rem",
     maxWidth: "42rem",
     textWrap: "balance",
     fontFamily: typography.display,
@@ -287,7 +286,6 @@ function LedgerRow({ label, value }: { label: string; value: string }) {
 export function MatrixSection() {
   const ref = useSectionAnimation<HTMLElement>((root) => {
     revealWords(root, "[data-matrix-heading]");
-    riseIn(root, "[data-matrix-eyebrow]", { delay: 0.1 });
     riseIn(root, "[data-matrix-aside]", { delay: 0.25 });
     riseIn(root, "[data-matrix-card]", { stagger: 0.08 });
     for (const card of root.querySelectorAll<HTMLElement>("[data-matrix-card]")) {
@@ -305,9 +303,6 @@ export function MatrixSection() {
       <div {...stylex.props(styles.container)}>
         <div {...stylex.props(styles.header)}>
           <div>
-            <p data-matrix-eyebrow {...stylex.props(sharedStyles.techLabel)}>
-              02 — Active Compounds
-            </p>
             <h2 id="ingredients-heading" data-matrix-heading {...stylex.props(styles.heading)}>
               <SplitWords
                 segments={[

@@ -446,11 +446,8 @@ export function InsightsView({ onNavigateHome }: { onNavigateHome: (target?: str
   return (
     <div id="insights-top" lang="zh-CN" {...stylex.props(kitStyles.root)}>
       <SubPageBanner
-        eyebrow={INSIGHTS_PAGE.eyebrow}
         title="行业洞察"
-        tagline={INSIGHTS_PAGE.tagline}
         lead={INSIGHTS_PAGE.lead}
-        meta={INSIGHTS_PAGE.meta}
         image="/prototype/official-site/product-human-nutrition.webp"
         imageAlt={INSIGHTS_PAGE.imageAlt}
         titleId="insights-banner-title"

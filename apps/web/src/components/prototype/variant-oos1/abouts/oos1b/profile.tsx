@@ -94,9 +94,6 @@ const styles = stylex.create({
     letterSpacing: "0.06em",
     color: tone.ink,
   },
-  captionEnglish: {
-    fontSize: 19,
-  },
   network: {
     display: "flex",
     flexWrap: "wrap",
@@ -134,13 +131,7 @@ export function Profile() {
       aria-labelledby="oos1b-profile"
       {...stylex.props(ui.anchor, ui.section, ui.shell)}
     >
-      <SectionHead
-        id="oos1b-profile"
-        index={1}
-        eyebrow="Profile"
-        title="企业概况"
-        note="Thirty years of ingredients, from Nanjing."
-      />
+      <SectionHead id="oos1b-profile" title="企业概况" />
       <div ref={ref} {...stylex.props(...stepIn(arrived, 0))}>
         <Mat
           raised
@@ -191,9 +182,6 @@ export function Profile() {
                 </Bevel>
                 <figcaption {...stylex.props(styles.caption)}>
                   <span {...stylex.props(styles.captionText)}>{ABOUT_HERO.lobbyCaption}</span>
-                  <span lang="en" {...stylex.props(ui.serif, styles.captionEnglish)}>
-                    {LOBBY.english}
-                  </span>
                 </figcaption>
               </figure>
             </Mat>

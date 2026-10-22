@@ -63,16 +63,6 @@ const styles = stylex.create({
     flex: "1 1 auto",
     minWidth: 0,
   },
-  barLabel: {
-    display: { default: "none", [MD]: "block" },
-    flexShrink: 0,
-    fontSize: 12,
-    fontWeight: 500,
-    lineHeight: "16px",
-    letterSpacing: "0.08em",
-    color: ink.muted,
-    whiteSpace: "nowrap",
-  },
   barTitle: {
     margin: 0,
     display: "flex",
@@ -298,11 +288,6 @@ const styles = stylex.create({
     lineHeight: "20px",
     color: ink.muted,
   },
-  emptySlot: {
-    fontSize: 13,
-    lineHeight: "24px",
-    color: ink.muted,
-  },
   remove: {
     position: "absolute",
     top: 8,
@@ -485,9 +470,7 @@ function CompareTable({
                 <RemoveButton item={item} onRemove={onRemove} />
               </th>
             ) : (
-              <td key={`slot-${slot}`} {...stylex.props(styles.cell, styles.nameCell)}>
-                <span {...stylex.props(styles.emptySlot)}>从目录勾选加入</span>
-              </td>
+              <td key={`slot-${slot}`} {...stylex.props(styles.cell, styles.nameCell)} />
             ),
           )}
         </tr>
@@ -607,28 +590,23 @@ export function CompareStrip({
                 </span>
               </p>
             ) : (
-              <>
-                <span aria-hidden="true" {...stylex.props(styles.barLabel)}>
-                  对比清单
-                </span>
-                <ul aria-label="Selected ingredients" {...stylex.props(styles.chips)}>
-                  {items.map((item) => (
-                    <li key={item.id} {...stylex.props(styles.chipItem)}>
-                      <button
-                        type="button"
-                        aria-label={`Remove ${item.englishName}`}
-                        onClick={() => remove(item)}
-                        {...stylex.props(styles.chip)}
-                      >
-                        {item.primary}
-                        <span aria-hidden="true" {...stylex.props(styles.chipIcon)}>
-                          <X size={14} strokeWidth={1.5} absoluteStrokeWidth />
-                        </span>
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              </>
+              <ul aria-label="Selected ingredients" {...stylex.props(styles.chips)}>
+                {items.map((item) => (
+                  <li key={item.id} {...stylex.props(styles.chipItem)}>
+                    <button
+                      type="button"
+                      aria-label={`Remove ${item.englishName}`}
+                      onClick={() => remove(item)}
+                      {...stylex.props(styles.chip)}
+                    >
+                      {item.primary}
+                      <span aria-hidden="true" {...stylex.props(styles.chipIcon)}>
+                        <X size={14} strokeWidth={1.5} absoluteStrokeWidth />
+                      </span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
             )}
             {count >= max && (
               <span id={hintId} {...stylex.props(styles.hint)}>

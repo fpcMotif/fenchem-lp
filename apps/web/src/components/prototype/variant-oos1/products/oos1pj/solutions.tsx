@@ -63,10 +63,6 @@ const RESERVED_HEIGHT = Object.fromEntries(
   FIELDS.map(({ key }) => [key, reservedHeight(key)]),
 ) as Record<FieldKey, string>;
 
-const INDEX_BY_ID: Record<string, number> = Object.fromEntries(
-  SOLUTION_ITEMS.map((item, index) => [item.id, index]),
-);
-
 const DEFAULT_PAIR: [string, string] = [SOLUTION_ITEMS[0]?.id ?? "", SOLUTION_ITEMS[1]?.id ?? ""];
 
 const findSolution = (id: string): SolutionItem =>
@@ -359,19 +355,8 @@ const styles = stylex.create({
     paddingBottom: 24,
     paddingInline: { default: 20, [MD]: 24, [DESKTOP]: 32 },
   },
-  index: {
-    display: "block",
-    fontFamily: NUMERAL_FONT,
-    fontSize: 13,
-    fontWeight: 500,
-    lineHeight: "20px",
-    letterSpacing: "0.04em",
-    fontVariantNumeric: "tabular-nums",
-    color: ACCENT,
-  },
   sheetTitle: {
     margin: 0,
-    marginTop: 8,
     fontSize: { default: 20, [DESKTOP]: 22 },
     fontWeight: 500,
     lineHeight: { default: "28px", [DESKTOP]: "30px" },
@@ -552,7 +537,6 @@ function Sheet({
           transition={timing}
           {...stylex.props(styles.paperHead)}
         >
-          <span {...stylex.props(styles.index)}>{padIndex(INDEX_BY_ID[item.id] ?? 0)}</span>
           <h3 id={titleId} {...stylex.props(styles.sheetTitle)}>
             {item.title}
           </h3>
@@ -622,8 +606,7 @@ export function Solutions() {
             应用方案
           </h2>
           <p {...stylex.props(styles.meta)}>
-            <span {...stylex.props(styles.numeral)}>{SOLUTION_ITEMS.length}</span>{" "}
-            款方案，任选两款逐项对照
+            <span {...stylex.props(styles.numeral)}>{SOLUTION_ITEMS.length}</span> 款方案
           </p>
         </header>
 

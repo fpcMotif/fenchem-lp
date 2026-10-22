@@ -48,7 +48,6 @@ export const ABOUT_HISTORY = {
   milestones: [
     {
       year: 1995,
-      kicker: "Beginning",
       events: [{ text: "在中国-南京成立总部" }],
     },
     {

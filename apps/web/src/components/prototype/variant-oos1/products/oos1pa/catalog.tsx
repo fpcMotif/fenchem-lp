@@ -5,7 +5,7 @@ import { useEffect, useId, useRef, useState, type MouseEvent, type ReactNode } f
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
 import { CATALOG_GROUPS } from "../../products-data";
-import { FLAT_ITEMS, REGION_META, padIndex, type FlatItem } from "../shared/derived";
+import { FLAT_ITEMS, REGION_META, type FlatItem } from "../shared/derived";
 import { font, media, motionCss, tone } from "./tokens.stylex";
 
 const HEADER_HEIGHT = 80;
@@ -255,15 +255,6 @@ const styles = stylex.create({
     gap: 4,
     paddingInlineEnd: { default: 0, [media.lg]: 24 },
   },
-  groupIndex: {
-    fontFamily: font.numeral,
-    fontSize: 13,
-    fontWeight: 500,
-    lineHeight: "16px",
-    letterSpacing: "0.04em",
-    fontVariantNumeric: "tabular-nums",
-    color: colors.brandGreen300,
-  },
   groupLabelRow: {
     display: "flex",
     alignItems: "baseline",
@@ -494,7 +485,6 @@ export function Catalog() {
                   >
                     <div {...stylex.props(styles.groupInner)}>
                       <span {...stylex.props(styles.groupName)}>
-                        <span {...stylex.props(styles.groupIndex)}>{padIndex(region.index)}</span>
                         <span {...stylex.props(styles.groupLabelRow)}>
                           <span {...stylex.props(styles.groupLabel)}>{region.group.label}</span>
                           <span {...stylex.props(styles.groupCount)}>

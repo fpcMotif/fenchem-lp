@@ -184,14 +184,7 @@ export function Honors() {
       sectionRef={sectionRef}
       head={
         <>
-          <SectionHead
-            num="05"
-            word="Recognition"
-            title={ABOUT_HONORS.title}
-            titleId="oos1w-honor"
-            fig="Fig. 5"
-            legend="Eight honours, spotted on three lanes by level. Developed, they sort themselves."
-          />
+          <SectionHead title={ABOUT_HONORS.title} titleId="oos1w-honor" />
           <LevelKey />
         </>
       }

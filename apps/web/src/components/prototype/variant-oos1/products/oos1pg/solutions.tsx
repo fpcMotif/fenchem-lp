@@ -8,7 +8,6 @@ import { EASE } from "@/components/prototype/motion-constants";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
 import { SOLUTION_ITEMS, type SolutionItem } from "../../products-data";
-import { padIndex } from "../shared/derived";
 import { font, mq, ui } from "./theme.stylex";
 
 const TABLET = mq.tablet;
@@ -135,20 +134,6 @@ const styles = stylex.create({
       transform: "scaleX(1)",
     },
   },
-  tabNumber: {
-    fontFamily: font.numeral,
-    fontSize: 12,
-    fontWeight: 500,
-    lineHeight: "16px",
-    letterSpacing: "0.04em",
-    fontVariantNumeric: "tabular-nums",
-    color: ui.muted,
-    transitionProperty: "color",
-    transitionDuration: "150ms",
-  },
-  tabNumberOn: {
-    color: ACCENT,
-  },
   tabTitle: {
     fontSize: 14,
     fontWeight: 400,
@@ -198,14 +183,8 @@ const styles = stylex.create({
     borderBottomStyle: "solid",
     borderBottomColor: ui.ink,
   },
-  number: {
-    fontFamily: font.numeral,
-    fontSize: { default: 24, [MD]: 32 },
-    fontWeight: 500,
-    lineHeight: { default: "28px", [MD]: "34px" },
-    letterSpacing: "-0.01em",
-    fontVariantNumeric: "tabular-nums",
-    color: ACCENT,
+  headText: {
+    gridColumnStart: { default: null, [MD]: 2 },
   },
   headTitle: {
     margin: 0,
@@ -587,9 +566,6 @@ export function Solutions() {
                   onClick={() => selectSolution(solutionIndex)}
                   {...stylex.props(styles.tab, on && styles.tabOn)}
                 >
-                  <span {...stylex.props(styles.tabNumber, on && styles.tabNumberOn)}>
-                    {padIndex(solutionIndex)}
-                  </span>
                   <span {...stylex.props(styles.tabTitle, on && styles.tabTitleOn)}>
                     {solution.title}
                   </span>
@@ -616,10 +592,7 @@ export function Solutions() {
                 {...stylex.props(styles.sheetLayer)}
               >
                 <header {...stylex.props(styles.sheetHead)}>
-                  <span aria-hidden="true" {...stylex.props(styles.number)}>
-                    {padIndex(index)}
-                  </span>
-                  <div>
+                  <div {...stylex.props(styles.headText)}>
                     <h3 {...stylex.props(styles.headTitle)}>{item.title}</h3>
                     <p {...stylex.props(styles.headSubtitle)}>{item.subtitle}</p>
                   </div>

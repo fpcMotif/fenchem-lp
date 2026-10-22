@@ -55,31 +55,6 @@ const styles = stylex.create({
     rowGap: 20,
     paddingBlock: { default: 0, [bp.desktop]: "48px 40px" },
   },
-  meta: {
-    order: 1,
-    gridColumn: { default: "1 / -1", [bp.desktop]: "1 / span 3" },
-    gridRow: "1",
-    display: "flex",
-    flexDirection: { default: "row", [bp.desktop]: "column" },
-    alignItems: { default: "baseline", [bp.desktop]: "flex-start" },
-    gap: { default: 12, [bp.desktop]: 4 },
-    paddingInline: { default: 20, [bp.tablet]: 40, [bp.desktop]: 0 },
-  },
-  established: {
-    margin: 0,
-    fontFamily: face.serif,
-    fontSize: { default: 24, [bp.desktop]: 32 },
-    lineHeight: 1.1,
-    color: tone.navy,
-  },
-  place: {
-    margin: 0,
-    fontFamily: face.latin,
-    fontSize: 14,
-    fontWeight: 500,
-    letterSpacing: "0.04em",
-    color: tone.quiet,
-  },
   lead: {
     order: 2,
     gridColumn: { default: "1 / -1", [bp.desktop]: "9 / span 4" },
@@ -100,21 +75,13 @@ const styles = stylex.create({
     gridRow: { default: "auto", [bp.desktop]: "2" },
     alignSelf: "end",
     justifySelf: { default: "start", [bp.desktop]: "end" },
-    display: { default: "flex", [bp.motionReduce]: "none" },
-    alignItems: "baseline",
-    gap: 10,
+    display: { default: "block", [bp.motionReduce]: "none" },
     margin: 0,
     paddingInline: { default: 20, [bp.tablet]: 40, [bp.desktop]: 0 },
     fontFamily: face.sans,
     fontSize: 14,
     lineHeight: 1.5,
     color: tone.quiet,
-  },
-  hintSerif: {
-    fontFamily: face.serif,
-    fontStyle: "italic",
-    fontSize: 17,
-    color: tone.navy,
   },
   comp: {
     order: 3,
@@ -179,21 +146,8 @@ export function Hero() {
     <section aria-labelledby="oos1t-title" {...stylex.props(styles.hero)}>
       <div {...stylex.props(styles.stage)}>
         <div {...stylex.props(ui.shell, ui.grid, styles.overlay)}>
-          <div {...stylex.props(styles.meta)}>
-            <p lang="en" {...stylex.props(styles.established)}>
-              {ABOUT_BANNER.established}
-            </p>
-            <p lang="en" {...stylex.props(styles.place)}>
-              {ABOUT_BANNER.place} · 32° N
-            </p>
-          </div>
           <p {...stylex.props(styles.lead)}>{ABOUT_BANNER.lead}</p>
-          <p {...stylex.props(styles.hint)}>
-            <span lang="en" aria-hidden="true" {...stylex.props(styles.hintSerif)}>
-              IX — I
-            </span>
-            <span>向下滚动，日影随时辰移动</span>
-          </p>
+          <p {...stylex.props(styles.hint)}>向下滚动，日影随时辰移动</p>
         </div>
         <div {...stylex.props(styles.comp)}>
           <div {...stylex.props(styles.anchor)}>

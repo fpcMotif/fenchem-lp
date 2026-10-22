@@ -84,17 +84,6 @@ const styles = stylex.create({
     letterSpacing: "0.08em",
     color: tone.tintInk,
   },
-  groupEnglish: {
-    display: { default: "none", [bp.md]: "inline" },
-    flexShrink: 0,
-    fontFamily: face.display,
-    fontSize: 11,
-    fontWeight: 500,
-    lineHeight: "20px",
-    letterSpacing: "0.16em",
-    textTransform: "uppercase",
-    color: tone.tintMuted,
-  },
   groupRule: {
     flexGrow: 1,
     height: 1,
@@ -499,9 +488,6 @@ export function GridVariant() {
             <div key={group.id} {...stylex.props(styles.group)}>
               <p aria-hidden="true" {...stylex.props(styles.groupHead)}>
                 <span {...stylex.props(styles.groupLabel)}>{group.label}</span>
-                <span lang="en" {...stylex.props(styles.groupEnglish)}>
-                  {group.englishLabel}
-                </span>
                 <span {...stylex.props(styles.groupRule)} />
                 <span {...stylex.props(styles.groupCount)}>{group.items.length}</span>
               </p>

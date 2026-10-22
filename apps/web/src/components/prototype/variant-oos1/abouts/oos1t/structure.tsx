@@ -59,20 +59,12 @@ const styles = stylex.create({
     color: tone.quiet,
   },
   rowLabel: {
-    display: "flex",
-    alignItems: "baseline",
-    gap: 10,
     marginInline: 0,
     marginBottom: 0,
     marginTop: { default: 72, [bp.desktop]: 104 },
     fontFamily: face.sans,
     fontSize: 15,
     color: tone.quiet,
-  },
-  rowEnglish: {
-    fontFamily: face.serif,
-    fontStyle: "italic",
-    fontSize: 16,
   },
   row: {
     display: "grid",
@@ -95,16 +87,9 @@ const styles = stylex.create({
   subFace: {
     display: "flex",
     flexDirection: "column",
-    justifyContent: "space-between",
-    gap: 20,
+    justifyContent: "flex-end",
     minHeight: { default: 112, [bp.desktop]: 184 },
     padding: { default: "18px 18px 20px", [bp.desktop]: "22px 20px 24px" },
-  },
-  index: {
-    fontFamily: face.serif,
-    fontSize: 22,
-    lineHeight: 1,
-    color: tone.navy,
   },
   subName: {
     margin: 0,
@@ -138,7 +123,6 @@ export function Structure() {
         titleId="oos1t-structure"
         hour={SECTION_HOURS.structure}
         title={ABOUT_STRUCTURE.title}
-        english="Structure"
       />
       <div {...stylex.props(styles.body)}>
         <div {...stylex.props(styles.holding)}>
@@ -153,20 +137,12 @@ export function Structure() {
             </h3>
           </div>
         </div>
-        <p {...stylex.props(styles.rowLabel)}>
-          <span>{subsidiaryBadge}</span>
-          <span lang="en" {...stylex.props(styles.rowEnglish)}>
-            Wholly owned
-          </span>
-        </p>
+        <p {...stylex.props(styles.rowLabel)}>{subsidiaryBadge}</p>
         <ul {...stylex.props(styles.row)}>
-          {subsidiaries.map((company, index) => (
+          {subsidiaries.map((company) => (
             <li key={company.id} {...stylex.props(styles.subsidiary)}>
               <Cast lift={LIFT.block} />
               <div {...stylex.props(styles.block, styles.subFace)}>
-                <span aria-hidden="true" {...stylex.props(styles.index)}>
-                  {String(index + 1).padStart(2, "0")}
-                </span>
                 <h4 {...stylex.props(styles.subName)}>
                   <Phrase text={company.name} />
                   <span lang="en" {...stylex.props(styles.subEnglish)}>

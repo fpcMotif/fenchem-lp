@@ -1,0 +1,14 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "overused-font",
+        "value": "plus jakarta sans",
+        "createdAt": "2026-10-22T07:21:21.713Z",
+        "reason": "ADR 0002 (docs/adr/0002-english-site-typography.md) records Plus Jakarta Sans as the chosen body/UI face"
+      }
+    ]
+  }
+}

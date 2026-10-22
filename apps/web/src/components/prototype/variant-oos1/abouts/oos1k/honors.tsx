@@ -8,10 +8,10 @@ import { bp, face, sky } from "./tokens.stylex";
 
 type Level = (typeof ABOUT_HONORS.items)[number]["level"];
 
-const CLASSES: Record<Level, { magnitude: Magnitude; zh: string; en: string }> = {
-  national: { magnitude: 1, zh: "国家级", en: "National" },
-  provincial: { magnitude: 2, zh: "省级", en: "Provincial" },
-  municipal: { magnitude: 3, zh: "市级", en: "Municipal" },
+const CLASSES: Record<Level, { magnitude: Magnitude; zh: string }> = {
+  national: { magnitude: 1, zh: "国家级" },
+  provincial: { magnitude: 2, zh: "省级" },
+  municipal: { magnitude: 3, zh: "市级" },
 };
 
 const LEVELS: readonly Level[] = ["national", "provincial", "municipal"];
@@ -180,17 +180,9 @@ export function Honors() {
     <section id="about-honor" aria-labelledby="oos1k-honor" {...stylex.props(ui.section, ui.shell)}>
       <div {...stylex.props(styles.grid)}>
         <div {...stylex.props(styles.aside)}>
-          <ChartHeading
-            id="oos1k-honor"
-            numeral="V"
-            label="Honors"
-            title={ABOUT_HONORS.title}
-            note="A catalogue by magnitude"
-          />
+          <ChartHeading id="oos1k-honor" title={ABOUT_HONORS.title} />
           <div {...stylex.props(styles.keyBox)}>
-            <p {...stylex.props(ui.label)}>
-              <span lang="en">Magnitude</span> · 星等
-            </p>
+            <p {...stylex.props(ui.label)}>星等</p>
             <ul {...stylex.props(styles.key)}>
               {LEVELS.map((level) => (
                 <li key={level} {...stylex.props(styles.keyRow)}>
@@ -200,12 +192,7 @@ export function Honors() {
                   <span {...stylex.props(styles.dotCell, ui.designation, styles.keyNumeral)}>
                     {CLASSES[level].magnitude}
                   </span>
-                  <span {...stylex.props(styles.keyName)}>
-                    {CLASSES[level].zh}
-                    <span lang="en" {...stylex.props(ui.label)}>
-                      {CLASSES[level].en}
-                    </span>
-                  </span>
+                  <span {...stylex.props(styles.keyName)}>{CLASSES[level].zh}</span>
                 </li>
               ))}
             </ul>
@@ -223,10 +210,10 @@ export function Honors() {
                 Cat. No.
               </th>
               <th scope="col" {...stylex.props(ui.label, styles.th)}>
-                名称 <span lang="en">· Designation</span>
+                名称
               </th>
               <th scope="col" {...stylex.props(ui.label, styles.th, styles.classColumn)}>
-                级别 <span lang="en">· Class</span>
+                级别
               </th>
               <th scope="col" lang="en" {...stylex.props(ui.label, styles.th, styles.magColumn)}>
                 Mag.
@@ -249,14 +236,11 @@ export function Honors() {
                   <td {...stylex.props(styles.td)}>
                     <span {...stylex.props(styles.name, type[level.magnitude])}>{item.title}</span>
                     <span aria-hidden="true" {...stylex.props(ui.label, styles.sub)}>
-                      {level.zh} · <span lang="en">{level.en}</span>
+                      {level.zh}
                     </span>
                   </td>
                   <td {...stylex.props(styles.td, styles.classColumn)}>
                     <span {...stylex.props(styles.classZh)}>{level.zh}</span>
-                    <span lang="en" {...stylex.props(ui.label)}>
-                      {level.en}
-                    </span>
                   </td>
                   <td {...stylex.props(styles.td, styles.magColumn, ui.designation, styles.mag)}>
                     {level.magnitude}

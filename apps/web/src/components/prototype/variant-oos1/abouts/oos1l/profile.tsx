@@ -81,9 +81,6 @@ export function Profile() {
           </div>
           <figcaption {...stylex.props(styles.caption)}>
             <span>{ABOUT_HERO.lobbyCaption}</span>
-            <span lang="en" {...stylex.props(ui.note)}>
-              Lobby
-            </span>
           </figcaption>
         </figure>
         <div {...stylex.props(styles.stanza)}>

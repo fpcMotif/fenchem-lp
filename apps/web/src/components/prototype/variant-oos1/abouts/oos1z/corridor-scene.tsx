@@ -2,7 +2,7 @@ import * as stylex from "@stylexjs/stylex";
 import { Fragment, type CSSProperties } from "react";
 
 import type { CorridorGeometry } from "./corridor-geometry";
-import { LAKE, PLACE, WORKS, ui } from "./shared";
+import { LAKE, WORKS, ui } from "./shared";
 import { face, tone } from "./tokens.stylex";
 
 const styles = stylex.create({
@@ -67,10 +67,6 @@ const styles = stylex.create({
   },
   labelTitle: {
     fontSize: "1em",
-  },
-  labelMeta: {
-    fontSize: "0.86em",
-    color: tone.body,
   },
   lakeFrame: {
     backgroundColor: tone.paper,
@@ -224,9 +220,6 @@ export function CorridorScene({
                 Nº {work.number}
               </span>
               <span {...stylex.props(styles.labelTitle)}>{work.caption}</span>
-              <span lang="en" {...stylex.props(ui.italic, styles.labelMeta)}>
-                {work.english}, {PLACE}
-              </span>
             </span>
           </Fragment>
         );
@@ -256,9 +249,6 @@ export function CorridorScene({
           Nº {LAKE.number}
         </span>
         <span>{LAKE.title}</span>
-        <span lang="en" {...stylex.props(ui.italic)}>
-          {LAKE.facing}
-        </span>
       </span>
     </>
   );

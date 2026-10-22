@@ -1,5 +1,4 @@
 import * as stylex from "@stylexjs/stylex";
-import { ArrowDown } from "lucide-react";
 import { useRef, useState } from "react";
 
 import { ABOUT_BANNER, ABOUT_HERO } from "../../about-data";
@@ -125,12 +124,6 @@ const styles = stylex.create({
     fontVariantNumeric: "tabular-nums",
     color: tone.ink,
   },
-  cue: {
-    display: { default: "none", [bp.pin]: "flex" },
-    alignItems: "center",
-    gap: 10,
-    marginTop: 40,
-  },
   profileText: {
     display: "flex",
     flexDirection: "column",
@@ -235,10 +228,6 @@ export function HeroAssembly() {
               </dd>
             </div>
           </dl>
-          <p aria-hidden="true" {...stylex.props(ui.caps, styles.cue)}>
-            <ArrowDown size={14} strokeWidth={1.25} />
-            <span lang="en">Scroll to assemble</span>
-          </p>
         </div>
         <AssemblySteps progress={progress} />
       </section>
@@ -258,7 +247,7 @@ export function HeroAssembly() {
       >
         <div {...stylex.props(styles.profileText)}>
           <p aria-hidden="true" lang="en" {...stylex.props(ui.caps, styles.sheetLine)}>
-            Sheet 01 / {pad2(SHEET_COUNT)} · Profile
+            Sheet 01 / {pad2(SHEET_COUNT)}
           </p>
           <h2 id="oos1m-profile" {...stylex.props(styles.profileTitle)}>
             企业概况

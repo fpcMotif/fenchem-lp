@@ -7,10 +7,10 @@ import { bp, face, tone } from "./tokens.stylex";
 
 type Level = (typeof ABOUT_HONORS.items)[number]["level"];
 
-const LEVELS: Record<Level, { plates: number; label: string; english: string }> = {
-  national: { plates: 3, label: "国家级", english: "National" },
-  provincial: { plates: 2, label: "江苏省级", english: "Provincial" },
-  municipal: { plates: 1, label: "南京市级", english: "Municipal" },
+const LEVELS: Record<Level, { plates: number; label: string }> = {
+  national: { plates: 3, label: "国家级" },
+  provincial: { plates: 2, label: "江苏省级" },
+  municipal: { plates: 1, label: "南京市级" },
 };
 
 const STACK = { halfWidth: 15, halfHeight: 7.5, thickness: 5, width: 34, height: 33 } as const;
@@ -137,12 +137,7 @@ export function Honors() {
       aria-labelledby="oos1m-honor"
       {...stylex.props(ui.shell, ui.section, ui.anchor)}
     >
-      <SheetHeader
-        sheet={5}
-        title={ABOUT_HONORS.title}
-        english="Specification"
-        titleId="oos1m-honor"
-      />
+      <SheetHeader sheet={5} title={ABOUT_HONORS.title} titleId="oos1m-honor" />
       <div {...stylex.props(styles.table)}>
         <div aria-hidden="true" {...stylex.props(ui.caps, styles.row, styles.head)}>
           <span lang="en">Item</span>
@@ -167,9 +162,6 @@ export function Honors() {
                   <span {...stylex.props(styles.levelText)}>
                     <span {...srOnly}>Level:</span>
                     {level.label}
-                    <span lang="en" {...stylex.props(ui.label)}>
-                      {level.english}
-                    </span>
                   </span>
                 </span>
               </li>

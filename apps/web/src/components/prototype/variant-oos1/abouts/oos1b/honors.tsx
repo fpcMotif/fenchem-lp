@@ -143,7 +143,7 @@ function Tier({
     >
       <h3 {...srOnly}>{tier.english} honors</h3>
       <span aria-hidden="true">
-        <Tag numeral={ROMAN[depth]} label={`${tier.english} · ${tier.label}`} />
+        <Tag numeral={ROMAN[depth]} label={tier.label} />
       </span>
       <ul {...stylex.props(styles.list)}>
         {items.map((item, index) => (
@@ -165,13 +165,7 @@ export function Honors() {
       aria-labelledby="oos1b-honor"
       {...stylex.props(ui.anchor, ui.section, ui.shell)}
     >
-      <SectionHead
-        id="oos1b-honor"
-        index={5}
-        eyebrow="Honours"
-        title={ABOUT_HONORS.title}
-        note="From the nation inward to the city."
-      />
+      <SectionHead id="oos1b-honor" title={ABOUT_HONORS.title} />
       <div ref={ref}>
         <Tier depth={0} arrived={arrived}>
           <Tier depth={1} arrived={arrived}>

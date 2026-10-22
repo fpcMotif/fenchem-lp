@@ -10,10 +10,10 @@ import { bp, face, tone } from "./tokens.stylex";
 
 type Glyph = (typeof ABOUT_CULTURE.values)[number]["glyph"];
 
-const EXPOSURE_PLAN: Record<Glyph, { echoes: number; unit: number; note: string }> = {
-  专: { echoes: 1, unit: 0.2, note: "Double exposure" },
-  静: { echoes: 0, unit: 0, note: "Single exposure" },
-  新: { echoes: 4, unit: 0.26, note: "Five exposures" },
+const EXPOSURE_PLAN: Record<Glyph, { echoes: number; unit: number }> = {
+  专: { echoes: 1, unit: 0.2 },
+  静: { echoes: 0, unit: 0 },
+  新: { echoes: 4, unit: 0.26 },
 };
 
 const DOUBLE_EXPOSURE_OPACITY = 0.3;
@@ -41,11 +41,6 @@ const styles = stylex.create({
     aspectRatio: { default: "16 / 9", [bp.abovePhone]: "4 / 3" },
     backgroundColor: tone.white,
     boxShadow: "inset 0 0 0 1px rgba(11, 42, 92, 0.16)",
-  },
-  plateNote: {
-    position: "absolute",
-    right: 12,
-    bottom: 12,
   },
   glyph: {
     position: "relative",
@@ -139,9 +134,6 @@ function GlyphPlate({ glyph, phase }: { glyph: Glyph; phase: Phase }) {
           {glyph}
         </span>
       </span>
-      <span lang="en" {...stylex.props(ui.frameNumber, styles.plateNote)}>
-        {plan.note}
-      </span>
     </div>
   );
 }
@@ -164,7 +156,7 @@ function ValueRow({ value }: { value: (typeof ABOUT_CULTURE.values)[number] }) {
 export function Culture() {
   return (
     <section id="about-culture" aria-labelledby="oos1p-culture" {...stylex.props(ui.plate)}>
-      <PlateHead plate={3} english="Culture" title={ABOUT_CULTURE.title} titleId="oos1p-culture" />
+      <PlateHead title={ABOUT_CULTURE.title} titleId="oos1p-culture" />
       <div {...stylex.props(ui.shell)}>
         <ol {...stylex.props(styles.list)}>
           {ABOUT_CULTURE.values.map((value) => (

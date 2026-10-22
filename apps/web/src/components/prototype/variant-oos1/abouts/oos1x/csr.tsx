@@ -26,15 +26,10 @@ const styles = stylex.create({
     listStyleType: "none",
   },
   outcome: {
-    display: "grid",
-    gridTemplateColumns: { default: "40px minmax(0, 1fr)", [bp.wide]: "56px minmax(0, 1fr)" },
-    alignItems: "baseline",
     paddingBlock: { default: 14, [bp.wide]: 20 },
     borderTopWidth: 1,
     borderTopStyle: "solid",
     borderTopColor: tone.hairline,
-  },
-  outcomeTitle: {
     fontSize: scale.heading,
     lineHeight: 1.3,
     letterSpacing: "0.04em",
@@ -71,12 +66,9 @@ export function Csr() {
         >
           <p {...stylex.props(type.body, styles.desc)}>{ABOUT_CSR.desc}</p>
           <ul {...stylex.props(styles.outcomes)}>
-            {ABOUT_CSR.outcomes.map((outcome, index) => (
-              <li key={outcome.title} {...stylex.props(styles.outcome)}>
-                <span aria-hidden="true" {...stylex.props(type.counterweight, type.counterHeading)}>
-                  {String(index + 1).padStart(2, "0")}
-                </span>
-                <span {...stylex.props(type.light, styles.outcomeTitle)}>{outcome.title}</span>
+            {ABOUT_CSR.outcomes.map((outcome) => (
+              <li key={outcome.title} {...stylex.props(type.light, styles.outcome)}>
+                {outcome.title}
               </li>
             ))}
           </ul>

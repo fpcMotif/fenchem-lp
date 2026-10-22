@@ -84,12 +84,7 @@ export function Profile() {
       {...stylex.props(ui.anchor, ui.room)}
     >
       <div {...stylex.props(ui.shell)}>
-        <RoomSign
-          numeral="I"
-          id="oos1z-profile"
-          title={sectionTitle("about-profile")}
-          english="Introduction"
-        />
+        <RoomSign id="oos1z-profile" title={sectionTitle("about-profile")} />
         <div {...stylex.props(styles.text)}>
           <p {...stylex.props(styles.company)}>{ABOUT_HERO.title}</p>
           <p lang="en" {...stylex.props(ui.italic, styles.english)}>

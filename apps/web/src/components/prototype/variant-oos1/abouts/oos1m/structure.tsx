@@ -108,12 +108,7 @@ export function Structure() {
       aria-labelledby="oos1m-structure"
       {...stylex.props(ui.shell, ui.section, ui.anchor)}
     >
-      <SheetHeader
-        sheet={6}
-        title={ABOUT_STRUCTURE.title}
-        english="General assembly"
-        titleId="oos1m-structure"
-      />
+      <SheetHeader sheet={6} title={ABOUT_STRUCTURE.title} titleId="oos1m-structure" />
       <div {...stylex.props(ui.grid, styles.body)}>
         <div ref={drawingRef} {...stylex.props(styles.drawing)}>
           <StructureDrawing progress={progress} />

@@ -5,11 +5,11 @@ import { useRef } from "react";
 import { useLightbox } from "@/components/prototype/shared/lightbox";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
-import { ABOUT_BANNER, ABOUT_CAMPUS } from "../../about-data";
+import { ABOUT_CAMPUS } from "../../about-data";
 import { Lightbox } from "./lightbox";
 import { Reveal } from "./shared";
 import { ui } from "./shared-values";
-import { curve, media, tone, type } from "./tokens.stylex";
+import { curve, media, tone } from "./tokens.stylex";
 
 const WARP = 16;
 const WEFT = 9;
@@ -140,21 +140,7 @@ const styles = stylex.create({
     backgroundPosition: `${shift} 0%, 0% 0%`,
   }),
   under: {
-    display: "flex",
-    flexDirection: { default: "column", [media.aboveTablet]: "row" },
-    alignItems: { default: "flex-start", [media.aboveTablet]: "baseline" },
-    justifyContent: "space-between",
-    gap: { default: 6, [media.aboveTablet]: 24 },
     paddingTop: { default: 18, [media.wide]: 22 },
-  },
-  tagline: {
-    margin: 0,
-    fontFamily: type.serif,
-    fontStyle: "italic",
-    fontWeight: 400,
-    fontSize: { default: 22, [media.wide]: 28 },
-    lineHeight: 1.2,
-    color: tone.ink,
   },
   fringe: {
     display: "flex",
@@ -285,14 +271,9 @@ function LoomStage() {
             <WeftRow key={`weft-${index}`} index={index} weave={weave} still={reduce} />
           ))}
         </div>
-        <div {...stylex.props(styles.under)}>
-          <p lang="en" {...stylex.props(styles.tagline)}>
-            {ABOUT_BANNER.tagline}
-          </p>
-          <p {...stylex.props(ui.caption)}>
-            {LAB.caption} × {GROUNDS.caption}
-          </p>
-        </div>
+        <p {...stylex.props(ui.caption, styles.under)}>
+          {LAB.caption} × {GROUNDS.caption}
+        </p>
       </div>
       <div aria-hidden="true" {...stylex.props(styles.runway)} />
     </div>
@@ -309,7 +290,7 @@ export function CampusLoom() {
       {...stylex.props(ui.section, ui.anchor, styles.section)}
     >
       <h2 id="about-campus-title" {...stylex.props(ui.srOnly)}>
-        {ABOUT_CAMPUS.eyebrow}
+        {ABOUT_CAMPUS.title}
       </h2>
       <div {...stylex.props(ui.shell)}>
         <LoomStage />

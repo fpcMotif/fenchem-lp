@@ -352,13 +352,6 @@ const styles = stylex.create({
     letterSpacing: "0.02em",
     color: "inherit",
   },
-  footIndex: {
-    fontFamily: NUMERAL_FONT,
-    fontSize: 12,
-    fontWeight: 500,
-    fontVariantNumeric: "tabular-nums",
-    marginInlineEnd: 8,
-  },
   srOnly: {
     position: "absolute",
     width: 1,
@@ -457,12 +450,7 @@ function FootButton({
         <span {...stylex.props(styles.footLabel, disabled && styles.footLabelDisabled)}>
           {direction === "prev" ? "上一个" : "下一个"}
         </span>
-        {neighbour && target !== null && (
-          <span {...stylex.props(styles.footTitle)}>
-            <span {...stylex.props(styles.footIndex)}>{padIndex(target)}</span>
-            {neighbour.title}
-          </span>
-        )}
+        {neighbour && <span {...stylex.props(styles.footTitle)}>{neighbour.title}</span>}
       </span>
       {direction === "next" && arrow}
     </button>

@@ -81,10 +81,6 @@ const styles = stylex.create({
     rowGap: 10,
     paddingBottom: { default: 24, [bp.wide]: 34 },
   },
-  label: {
-    gridColumn: { default: "auto", [bp.wide]: "1 / 3" },
-    color: tone.onNavyQuiet,
-  },
   heading: {
     gridColumn: { default: "auto", [bp.wide]: "3 / 8" },
     color: tone.onNavyQuiet,
@@ -174,13 +170,6 @@ export function StillPoint() {
         <div {...stylex.props(ui.shell)}>
           <div {...stylex.props(styles.measure)}>
             <div {...stylex.props(ui.columns, styles.standing)}>
-              <p
-                lang="en"
-                aria-hidden="true"
-                {...stylex.props(type.counterweight, type.counterHeading, styles.label)}
-              >
-                Responsibility
-              </p>
               <h2 id="oos1x-csr" {...stylex.props(type.light, type.heading, styles.heading)}>
                 {ABOUT_CSR.title}
               </h2>

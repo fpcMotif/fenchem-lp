@@ -217,20 +217,8 @@ const styles = stylex.create({
     paddingInline: "1.5rem",
     textAlign: "center",
   },
-  heroMicroTag: {
-    fontFamily: typography.tech,
-    fontSize: {
-      default: "11px",
-      [breakpoints.md]: "12px",
-    },
-    textTransform: "uppercase",
-    letterSpacing: "0.45em",
-    color: colors.brandGreen400,
-    margin: 0,
-  },
   heroH1: {
     marginInline: "auto",
-    marginTop: "2rem",
     maxWidth: "80rem",
     fontFamily: typography.display,
     fontSize: "clamp(3rem, 9vw, 7.5rem)",
@@ -481,16 +469,7 @@ const styles = stylex.create({
       [breakpoints.lg]: 2,
     },
   },
-  chapterEyebrow: {
-    fontFamily: typography.tech,
-    fontSize: "11px",
-    textTransform: "uppercase",
-    letterSpacing: "0.4em",
-    color: colors.brandGreen400,
-    margin: 0,
-  },
   chapterH2: {
-    marginTop: "1.5rem",
     fontFamily: typography.display,
     fontSize: {
       default: "2.25rem",
@@ -563,15 +542,7 @@ const styles = stylex.create({
     maxWidth: "72rem",
     paddingInline: "1.5rem",
   },
-  railHeaderFlex: {
-    display: "flex",
-    flexWrap: "wrap",
-    alignItems: "flex-end",
-    justifyContent: "space-between",
-    gap: "1.5rem",
-  },
   railH2: {
-    marginTop: "1.5rem",
     fontFamily: typography.display,
     fontSize: {
       default: "2.25rem",
@@ -581,14 +552,6 @@ const styles = stylex.create({
     lineHeight: 1.1,
     letterSpacing: "-0.025em",
     color: "#ffffff",
-  },
-  railScrollHint: {
-    fontFamily: typography.tech,
-    fontSize: "11px",
-    textTransform: "uppercase",
-    letterSpacing: "0.25em",
-    color: "rgba(255, 255, 255, 0.6)",
-    margin: 0,
   },
   railScrollContainer: {
     marginTop: "3.5rem",
@@ -709,7 +672,6 @@ const styles = stylex.create({
   },
   standardsH2: {
     marginInline: "auto",
-    marginTop: "1.5rem",
     maxWidth: "42rem",
     fontFamily: typography.display,
     fontSize: {
@@ -852,7 +814,6 @@ const styles = stylex.create({
   },
   ctaH2: {
     marginInline: "auto",
-    marginTop: "2rem",
     maxWidth: "48rem",
     fontFamily: typography.display,
     fontSize: "clamp(2.5rem, 6vw, 5rem)",
@@ -959,15 +920,6 @@ const styles = stylex.create({
     fontSize: "1.875rem",
     fontWeight: 300,
     color: "rgba(255, 255, 255, 0.8)",
-    margin: 0,
-  },
-  footerSub: {
-    marginTop: "0.25rem",
-    fontFamily: typography.tech,
-    fontSize: "11px",
-    textTransform: "uppercase",
-    letterSpacing: "0.3em",
-    color: colors.brandGreen500,
     margin: 0,
   },
   footerNav: {
@@ -1104,30 +1056,6 @@ function HeroHeader({ reduce }: { reduce: boolean | null }) {
         }}
         {...stylex.props(styles.heroContent)}
       >
-        <m.p
-          initial={
-            reduce
-              ? {
-                  opacity: 0,
-                }
-              : {
-                  opacity: 0,
-                  y: 20,
-                }
-          }
-          animate={{
-            opacity: 1,
-            y: 0,
-          }}
-          transition={{
-            duration: 1,
-            delay: 0.4,
-            ease: EASE,
-          }}
-          {...stylex.props(styles.heroMicroTag)}
-        >
-          Botanical Intelligence Since 1995
-        </m.p>
         <m.h1
           initial={
             reduce
@@ -1278,7 +1206,6 @@ function OriginChapter() {
         </Reveal>
         <div {...stylex.props(styles.chapterTextCol)}>
           <Reveal>
-            <p {...stylex.props(styles.chapterEyebrow)}>01 — Origin</p>
             <h2 id="origin-heading" {...stylex.props(styles.chapterH2)}>
               Grown with <span {...stylex.props(styles.italicGreen300)}>patience.</span>
             </h2>
@@ -1306,7 +1233,6 @@ function ScienceChapter() {
       <div {...stylex.props(styles.chapterGrid)}>
         <div {...stylex.props(styles.chapterTextColReversed)}>
           <Reveal>
-            <p {...stylex.props(styles.chapterEyebrow)}>02 — Science</p>
             <h2 id="science-heading" {...stylex.props(styles.chapterH2)}>
               Refined to the <span {...stylex.props(styles.italicGreen300)}>molecule.</span>
             </h2>
@@ -1348,15 +1274,9 @@ function IngredientRail() {
     >
       <div {...stylex.props(styles.railHeaderContainer)}>
         <Reveal>
-          <div {...stylex.props(styles.railHeaderFlex)}>
-            <div>
-              <p {...stylex.props(styles.chapterEyebrow)}>03 — Portfolio</p>
-              <h2 id="portfolio-heading" {...stylex.props(styles.railH2)}>
-                The <span {...stylex.props(styles.italicGreen300)}>living</span> library
-              </h2>
-            </div>
-            <p {...stylex.props(styles.railScrollHint)}>Scroll →</p>
-          </div>
+          <h2 id="portfolio-heading" {...stylex.props(styles.railH2)}>
+            The <span {...stylex.props(styles.italicGreen300)}>living</span> library
+          </h2>
         </Reveal>
       </div>
       <div {...stylex.props(styles.railScrollContainer)}>
@@ -1407,7 +1327,6 @@ function StandardsPillars() {
       <div {...stylex.props(styles.standardsContainer)}>
         <Reveal>
           <div {...stylex.props(styles.standardsHeader)}>
-            <p {...stylex.props(styles.chapterEyebrow)}>04 — Standards</p>
             <h2 id="standards-heading" {...stylex.props(styles.standardsH2)}>
               Our promise, <span {...stylex.props(styles.italicGreen300)}>codified.</span>
             </h2>
@@ -1462,7 +1381,6 @@ function CtaSection() {
 
       <Reveal>
         <div {...stylex.props(styles.ctaContent)}>
-          <p {...stylex.props(styles.chapterEyebrow)}>Partner with Fenchem</p>
           <h2 id="cta-heading" {...stylex.props(styles.ctaH2)}>
             Bring the forest to{" "}
             <span {...stylex.props(styles.italicGreen300)}>your formulation.</span>
@@ -1495,10 +1413,7 @@ function SiteFooter() {
   return (
     <footer {...stylex.props(styles.footer)}>
       <div {...stylex.props(styles.footerContainer)}>
-        <div>
-          <p {...stylex.props(styles.footerBrand)}>Fenchem</p>
-          <p {...stylex.props(styles.footerSub)}>Rooted in Nature, Refined by Science</p>
-        </div>
+        <p {...stylex.props(styles.footerBrand)}>Fenchem</p>
         <nav aria-label="Footer navigation" {...stylex.props(styles.footerNav)}>
           {["Privacy Policy", "Terms of Service", "Ingredient Transparency", "Global Offices"].map(
             (label) => (

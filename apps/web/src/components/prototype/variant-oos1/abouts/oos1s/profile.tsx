@@ -124,7 +124,7 @@ const s = stylex.create({
     flexDirection: "column",
     gap: 6,
   },
-  statCaption: {
+  statLabel: {
     margin: 0,
     fontSize: step.body,
     letterSpacing: "0.08em",
@@ -181,8 +181,7 @@ export function Profile() {
               {stat.unit ? <span {...stylex.props(s.statUnit)}>{stat.unit}</span> : null}
             </div>
             <div {...stylex.props(s.statText)}>
-              <p {...stylex.props(ui.label)}>{stat.label}</p>
-              <p {...stylex.props(s.statCaption)}>{stat.caption}</p>
+              <p {...stylex.props(s.statLabel)}>{stat.label}</p>
             </div>
           </Reveal>
         ))}

@@ -63,19 +63,6 @@ const styles = stylex.create({
     letterSpacing: "0.04em",
     color: tone.ink,
   },
-  kickerEnglish: {
-    fontSize: { default: 19, [bp.desktop]: 22 },
-  },
-  place: {
-    margin: 0,
-    justifySelf: "end",
-    fontFamily: face.latin,
-    fontSize: 13,
-    fontWeight: 500,
-    letterSpacing: "0.04em",
-    color: tone.navy,
-    display: { default: "none", [bp.abovePhone]: "block" },
-  },
   middle: {
     flexGrow: 1,
     display: "flex",
@@ -166,32 +153,6 @@ const styles = stylex.create({
   bottomRow: {
     alignItems: "end",
     rowGap: 20,
-  },
-  year: {
-    display: "flex",
-    alignItems: "baseline",
-    gap: 10,
-    margin: 0,
-  },
-  yearLabel: {
-    fontFamily: face.serif,
-    fontStyle: "italic",
-    fontSize: 22,
-    color: tone.navy,
-  },
-  yearDigits: {
-    fontFamily: face.latin,
-    fontWeight: 500,
-    fontSize: { default: 48, [bp.desktop]: 60 },
-    lineHeight: 0.9,
-    letterSpacing: "-0.01em",
-    fontVariantNumeric: "tabular-nums",
-    color: tone.ink,
-  },
-  yearEcho: {
-    marginInlineEnd: "-0.1em",
-    color: tone.navy,
-    opacity: 0.3,
   },
   lead: {
     margin: 0,
@@ -309,12 +270,6 @@ export function Hero() {
           <div {...stylex.props(ui.grid, styles.topRow)}>
             <p {...stylex.props(ui.q1to2, styles.kicker)}>
               <span {...stylex.props(styles.kickerTitle)}>{ABOUT_BANNER.title}</span>
-              <span lang="en" {...stylex.props(ui.eyebrow, styles.kickerEnglish)}>
-                About Fenchem
-              </span>
-            </p>
-            <p lang="en" {...stylex.props(ui.q3to4, styles.place)}>
-              {ABOUT_BANNER.place}
             </p>
           </div>
         </div>
@@ -369,14 +324,6 @@ export function Hero() {
 
         <div {...stylex.props(ui.shell)}>
           <div {...stylex.props(ui.grid, styles.bottomRow)}>
-            <p {...stylex.props(ui.q1, styles.year)}>
-              <span lang="en" {...stylex.props(styles.yearLabel)}>
-                Est.
-              </span>
-              <span {...stylex.props(styles.yearDigits)}>
-                1<span {...stylex.props(styles.yearEcho)}>9</span>95
-              </span>
-            </p>
             <p {...stylex.props(ui.q2to3, styles.lead)}>{ABOUT_BANNER.lead}</p>
             <p aria-hidden="true" {...stylex.props(ui.q4, styles.readout)}>
               <span {...stylex.props(ui.frameNumber, styles.readoutLine)}>

@@ -9,7 +9,6 @@ import { ui } from "./shared";
 import { SECTION_HOURS } from "./sun";
 import { bp, face, tone } from "./tokens.stylex";
 
-const ENGLISH = ["Focus", "Stillness", "Renewal"] as const;
 const STILL_GLYPH = "静";
 const LIFT = LIFTS.stele;
 
@@ -73,12 +72,6 @@ const styles = stylex.create({
     writingMode: "vertical-rl",
     color: tone.ink,
   },
-  english: {
-    fontFamily: face.serif,
-    fontStyle: "italic",
-    fontSize: { default: 14, [bp.desktop]: 17 },
-    color: tone.quiet,
-  },
   desc: {
     gridColumn: "1 / -1",
     display: "flex",
@@ -129,7 +122,6 @@ export function Culture() {
         titleId="oos1t-culture"
         hour={SECTION_HOURS.culture}
         title={ABOUT_CULTURE.title}
-        english="Culture"
       />
       <ul {...stylex.props(ui.grid, styles.field)}>
         {ABOUT_CULTURE.values.map((value, index) => {
@@ -152,9 +144,6 @@ export function Culture() {
                     {value.glyph}
                   </span>
                   <h3 {...stylex.props(styles.title)}>{value.title}</h3>
-                  <span lang="en" aria-hidden="true" {...stylex.props(styles.english)}>
-                    {ENGLISH[index]}
-                  </span>
                 </div>
               </div>
               <p {...stylex.props(ui.body, styles.desc)}>

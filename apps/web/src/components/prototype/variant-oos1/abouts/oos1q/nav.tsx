@@ -152,7 +152,7 @@ export function Nav({ onNavigateHome }: { onNavigateHome: (hash?: string) => voi
                 aria-current={isActive ? "location" : undefined}
                 {...stylex.props(s.tab, isActive && s.tabActive, ui.focusRing, s.tabFocus)}
               >
-                <span lang="en">{item.english}</span>
+                <span>{item.label}</span>
                 <span
                   aria-hidden="true"
                   {...stylex.props(s.tabMark, isActive && s.tabMarkActive)}

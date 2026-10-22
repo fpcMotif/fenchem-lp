@@ -96,9 +96,6 @@ const styles = stylex.create({
     letterSpacing: "0.06em",
     color: tone.ink,
   },
-  english: {
-    fontSize: 19,
-  },
   count: {
     fontFamily: face.latin,
     fontSize: 11,
@@ -162,9 +159,6 @@ export function Lightbox({
               </div>
               <figcaption {...stylex.props(styles.caption)}>
                 <span {...stylex.props(styles.chinese)}>{plate.caption}</span>
-                <span lang="en" {...stylex.props(ui.serif, styles.english)}>
-                  {plate.english}
-                </span>
                 <span {...stylex.props(styles.count)}>
                   {index + 1} / {plates.length}
                 </span>

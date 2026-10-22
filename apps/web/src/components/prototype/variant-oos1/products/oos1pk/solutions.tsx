@@ -13,7 +13,7 @@ import {
 import { EASE } from "@/components/prototype/motion-constants";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
-import { FLAT_FORMULAS, padIndex, type FlatFormula } from "../shared/derived";
+import { FLAT_FORMULAS, type FlatFormula } from "../shared/derived";
 
 const INK = "#1a1a1a";
 const BODY_TEXT = "#4d4d4d";
@@ -28,7 +28,6 @@ const SHEET_RULE = "#ece7d5";
 const BAND_HOVER = "rgba(7, 67, 174, 0.04)";
 const SHEET_SHADOW = "0 1px 2px rgba(64, 52, 16, 0.06), 0 6px 16px -12px rgba(64, 52, 16, 0.22)";
 const ACCENT = colors.brandGreen700;
-const ACCENT_TEXT = colors.brandGreen800;
 const FOCUS = colors.brandBlue700;
 const EASE_OUT_CSS = "cubic-bezier(0.22, 1, 0.36, 1)";
 const BODY_FONT =
@@ -196,20 +195,6 @@ const styles = stylex.create({
       transform: "none",
     },
   },
-  tabNumber: {
-    flexShrink: 0,
-    width: { default: "auto", [LG]: 24 },
-    fontFamily: NUMERAL_FONT,
-    fontSize: 12,
-    fontWeight: 500,
-    lineHeight: "24px",
-    letterSpacing: "0.02em",
-    fontVariantNumeric: "tabular-nums",
-    color: MUTED,
-  },
-  tabNumberSelected: {
-    color: ACCENT_TEXT,
-  },
   tabTitle: {
     fontSize: { default: 15, [LG]: 16 },
     fontWeight: 400,
@@ -341,18 +326,9 @@ const styles = stylex.create({
   headMeta: {
     display: "flex",
     alignItems: "baseline",
-    justifyContent: "space-between",
+    justifyContent: "flex-end",
     gap: 16,
     margin: 0,
-  },
-  number: {
-    fontFamily: NUMERAL_FONT,
-    fontSize: 13,
-    fontWeight: 500,
-    lineHeight: "20px",
-    letterSpacing: "0.04em",
-    fontVariantNumeric: "tabular-nums",
-    color: ACCENT_TEXT,
   },
   page: {
     display: { default: "none", [LG]: "inline" },
@@ -517,7 +493,6 @@ function SheetHead({
   return (
     <header>
       <p {...stylex.props(styles.headMeta)}>
-        <span {...stylex.props(styles.number)}>{padIndex(formula.index)}</span>
         <span aria-hidden="true" {...stylex.props(styles.page)}>
           {page}
         </span>
@@ -673,9 +648,6 @@ export function Solutions() {
                   onKeyDown={(event) => onTabKeyDown(event, formula.index)}
                   {...stylex.props(styles.tab, active && styles.tabSelected)}
                 >
-                  <span {...stylex.props(styles.tabNumber, active && styles.tabNumberSelected)}>
-                    {padIndex(formula.index)}
-                  </span>
                   <span {...stylex.props(styles.tabTitle, active && styles.tabTitleSelected)}>
                     {formula.title}
                   </span>

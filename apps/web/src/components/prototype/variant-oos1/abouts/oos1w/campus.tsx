@@ -9,10 +9,8 @@ import { SectionHead } from "./shared";
 import { ui } from "./shared-values";
 import { bp, chrome, face, tone } from "./tokens.stylex";
 
-const PANELS = "abcdefg";
-
 const PHOTOS: readonly (LightboxPhoto & { src: string; english: string; description: string })[] =
-  ABOUT_CAMPUS.photos.map((photo, index) => ({
+  ABOUT_CAMPUS.photos.map((photo) => ({
     id: photo.id,
     src: photo.src,
     large: photo.large,
@@ -20,7 +18,6 @@ const PHOTOS: readonly (LightboxPhoto & { src: string; english: string; descript
     description: photo.description,
     caption: photo.caption,
     english: photo.english,
-    panel: PANELS[index] ?? String(index + 1),
   }));
 
 const styles = stylex.create({
@@ -78,17 +75,10 @@ const styles = stylex.create({
     },
   },
   legend: {
-    display: "grid",
-    gridTemplateColumns: "auto minmax(0, 1fr)",
-    columnGap: { default: 10, [bp.desktop]: 14 },
+    display: "flex",
+    flexDirection: "column",
     rowGap: 4,
-    alignItems: "baseline",
     margin: 0,
-  },
-  figNum: {
-    gridRow: "1 / span 2",
-    color: tone.ink,
-    whiteSpace: "nowrap",
   },
   caption: {
     fontFamily: face.sans,
@@ -164,9 +154,6 @@ function Panel({
         />
       </button>
       <figcaption {...stylex.props(styles.legend)}>
-        <span lang="en" {...stylex.props(ui.micro, styles.figNum)}>
-          Fig. 2{photo.panel}
-        </span>
         <span {...stylex.props(styles.caption, lead && styles.captionLead)}>{photo.caption}</span>
         <span aria-hidden="true" {...stylex.props(styles.detail, lead && styles.detailLead)}>
           {photo.description}
@@ -195,14 +182,7 @@ export function Campus() {
       <div {...stylex.props(ui.shell)}>
         <div {...stylex.props(ui.grid, ui.ruled)}>
           <div {...stylex.props(ui.headCol)}>
-            <SectionHead
-              num="02"
-              word="Site"
-              title={ABOUT_CAMPUS.title}
-              titleId="oos1w-campus"
-              fig="Fig. 2"
-              legend="Seven views of the Nanjing campus, one lead plate and six in series, all at one ratio."
-            />
+            <SectionHead title={ABOUT_CAMPUS.title} titleId="oos1w-campus" />
           </div>
 
           <div {...stylex.props(styles.lead)}>

@@ -10,10 +10,10 @@ import { bp, chrome, face, tone } from "./tokens.stylex";
 
 type Level = (typeof ABOUT_HONORS.items)[number]["level"];
 
-const LEVELS: readonly { level: Level; zh: string; en: string }[] = [
-  { level: "national", zh: "国家级", en: "National" },
-  { level: "provincial", zh: "省级", en: "Provincial" },
-  { level: "municipal", zh: "市级", en: "Municipal" },
+const LEVELS: readonly { level: Level; zh: string }[] = [
+  { level: "national", zh: "国家级" },
+  { level: "provincial", zh: "省级" },
+  { level: "municipal", zh: "市级" },
 ];
 
 const NAVY = "#0b2a5c";
@@ -63,12 +63,12 @@ const BANDS = ABOUT_HONORS.items.map((item, index) => {
 
 const CORE_RING = halfRing(CORE, 0);
 
-const LEVEL_SPANS = LEVELS.map(({ level, zh, en }) => {
+const LEVEL_SPANS = LEVELS.map(({ level, zh }) => {
   const indexes = ABOUT_HONORS.items.flatMap((item, index) =>
     item.level === level ? [index] : [],
   );
   const middle = CORE + STEP * ((indexes[0] + indexes[indexes.length - 1]) / 2 + 0.5);
-  return { level, zh, en, offset: (middle / WIDTH) * 100 };
+  return { level, zh, offset: (middle / WIDTH) * 100 };
 });
 
 const styles = stylex.create({
@@ -125,11 +125,6 @@ const styles = stylex.create({
     letterSpacing: "0.06em",
     color: tone.navy,
     whiteSpace: "nowrap",
-  },
-  footSerif: {
-    fontSize: 16,
-    letterSpacing: 0,
-    color: tone.body,
   },
   pith: {
     position: "absolute",
@@ -240,12 +235,7 @@ export function Honors() {
             ))}
           </svg>
 
-          <SectionHead
-            id="oos1o-honor"
-            label="Honours"
-            title={ABOUT_HONORS.title}
-            sx={styles.head}
-          />
+          <SectionHead id="oos1o-honor" title={ABOUT_HONORS.title} sx={styles.head} />
         </div>
 
         <div aria-hidden="true" {...stylex.props(styles.feet)}>
@@ -257,22 +247,14 @@ export function Honors() {
               style={{ left: `${50 + span.offset}%` }}
             >
               {span.zh}
-              <span lang="en" {...stylex.props(ui.serif, styles.footSerif)}>
-                {span.en}
-              </span>
             </span>
           ))}
         </div>
 
         <div {...stylex.props(styles.groups)}>
-          {LEVELS.map(({ level, zh, en }) => (
+          {LEVELS.map(({ level, zh }) => (
             <div key={level} {...stylex.props(styles.group)}>
-              <p {...stylex.props(styles.groupLabel)}>
-                <span aria-hidden="true">{zh}</span>
-                <span lang="en" {...stylex.props(ui.serif)}>
-                  {en}
-                </span>
-              </p>
+              <p {...stylex.props(styles.groupLabel)}>{zh}</p>
               <ul {...stylex.props(styles.items)}>
                 {ABOUT_HONORS.items
                   .filter((item) => item.level === level)

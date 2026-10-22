@@ -1,6 +1,6 @@
 import * as stylex from "@stylexjs/stylex";
 
-import { PLACE, WORKS, srOnly, ui } from "./shared";
+import { WORKS, srOnly, ui } from "./shared";
 import { bp, face, tone } from "./tokens.stylex";
 
 const styles = stylex.create({
@@ -90,10 +90,6 @@ const styles = stylex.create({
     lineHeight: 1.5,
     color: tone.ink,
   },
-  meta: {
-    fontSize: 16,
-    color: tone.body,
-  },
 });
 
 const photoWidth = stylex.create({
@@ -137,9 +133,6 @@ export function GalleryWall({ onOpen }: { onOpen: (index: number) => void }) {
                 Nº {work.number}
               </span>
               <span {...stylex.props(styles.title)}>{work.caption}</span>
-              <span lang="en" {...stylex.props(ui.italic, styles.meta)}>
-                {work.english}, {PLACE}
-              </span>
             </p>
           </li>
         );

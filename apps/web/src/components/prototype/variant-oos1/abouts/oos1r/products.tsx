@@ -102,15 +102,6 @@ const s = stylex.create({
     flexShrink: 0,
     opacity: 0.5,
   },
-  desc: {
-    margin: 0,
-    marginTop: 8,
-    fontSize: step.small,
-    fontWeight: 400,
-    lineHeight: 1.8,
-    letterSpacing: "0.04em",
-    color: tone.body,
-  },
   tags: {
     display: "flex",
     flexWrap: "wrap",
@@ -171,7 +162,6 @@ export function Products({ onNavigateHome }: { onNavigateHome: (hash?: string) =
                   <ArrowUpRight size={16} aria-hidden="true" {...stylex.props(s.arrow)} />
                 </button>
               </h3>
-              <p {...stylex.props(s.desc)}>{product.description}</p>
               <ul {...stylex.props(s.tags)}>
                 {product.tags.map((tag) => (
                   <li key={tag}>{tag}</li>

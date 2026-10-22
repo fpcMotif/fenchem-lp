@@ -978,7 +978,6 @@ function StatItem({ stat, index }: { stat: (typeof STATS)[number]; index: number
           <span {...stylex.props(styles.statValue)}>{stat.value}</span>
           {stat.unit ? <span {...stylex.props(styles.statUnit)}>{stat.unit}</span> : null}
         </p>
-        <p {...stylex.props(styles.statText)}>{stat.caption}</p>
       </Reveal>
     </>
   );

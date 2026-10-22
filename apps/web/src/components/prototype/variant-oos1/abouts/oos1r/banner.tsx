@@ -1,9 +1,9 @@
-import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
+import { breakpoints } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 
 import { ABOUT_BANNER } from "../../about-data";
 import { ui } from "./shared-values";
-import { band, font, layout, motionCss, step, tone } from "./tokens.stylex";
+import { band, layout, motionCss, step, tone } from "./tokens.stylex";
 
 const rise = stylex.keyframes({
   "0%": { opacity: 0, transform: "translateY(20px)" },
@@ -40,15 +40,6 @@ const s = stylex.create({
     letterSpacing: "0.08em",
     color: tone.ink,
   },
-  tagline: {
-    margin: 0,
-    fontFamily: font.serif,
-    fontStyle: "italic",
-    fontSize: { default: 22, [band.mdToXl]: 28, [breakpoints.xl]: 32 },
-    fontWeight: 400,
-    lineHeight: 1.2,
-    color: colors.brandBlue700,
-  },
   figure: {
     margin: 0,
     marginTop: { default: 24, [breakpoints.xl]: 36 },
@@ -82,15 +73,6 @@ const s = stylex.create({
     lineHeight: 1.7,
     color: tone.body,
   },
-  place: {
-    margin: 0,
-    marginTop: 12,
-    fontSize: step.label,
-    fontWeight: 400,
-    letterSpacing: "0.1em",
-    lineHeight: 1.6,
-    color: tone.body,
-  },
 });
 
 export function Banner() {
@@ -101,9 +83,6 @@ export function Banner() {
           <h1 id="about-banner-title" {...stylex.props(s.title, s.enter, dynamic.delay(120))}>
             {ABOUT_BANNER.title}
           </h1>
-          <p lang="en" {...stylex.props(s.tagline, s.enter, dynamic.delay(260))}>
-            {ABOUT_BANNER.tagline}
-          </p>
         </div>
       </div>
       <figure {...stylex.props(s.figure, s.enter, dynamic.delay(400))}>
@@ -117,9 +96,6 @@ export function Banner() {
           />
         </div>
         <figcaption {...stylex.props(s.captionRow)}>
-          <p lang="en" {...stylex.props(s.place)}>
-            {ABOUT_BANNER.established} · {ABOUT_BANNER.place}
-          </p>
           <p {...stylex.props(s.lead)}>{ABOUT_BANNER.lead}</p>
         </figcaption>
       </figure>

@@ -30,19 +30,16 @@ const REQUEST_TYPES = [
   {
     id: "general",
     label: "一般咨询",
-    english: "General Information",
     placeholder: "请简要描述您想了解的内容，如公司概况、产品目录、到访预约或合作方式",
   },
   {
     id: "technical",
     label: "技术咨询",
-    english: "Technical Information",
     placeholder: "请描述目标功效、剂型与配方问题，或所需样品与技术文件（COA、TDS、MSDS）",
   },
   {
     id: "commercial",
     label: "商务咨询",
-    english: "Commercial Information",
     placeholder: "请填写品名、规格、预计年用量、包装要求与交付地点",
   },
 ] as const;
@@ -50,14 +47,12 @@ const QR_CODES = [
   {
     id: "wechat",
     label: "官方微信",
-    caption: "微信扫码关注官方公众号",
     image: "/prototype/contact/wechat-qr.png",
     alt: "泛成官方微信公众号二维码",
   },
   {
     id: "xiaohongshu",
     label: "泛成小红书",
-    caption: "扫码关注泛成官方小红书",
     image: "/prototype/contact/xiaohongshu-qr.png",
     alt: "泛成小红书主页二维码",
   },
@@ -395,13 +390,6 @@ const styles = stylex.create({
     minWidth: 0,
     whiteSpace: "nowrap",
   },
-  english: {
-    overflow: "hidden",
-    fontSize: 13,
-    whiteSpace: "nowrap",
-    textOverflow: "ellipsis",
-    color: color.muted,
-  },
   chevron: {
     color: color.ink,
     transitionProperty: "transform",
@@ -433,7 +421,7 @@ const styles = stylex.create({
   },
   option: {
     display: "grid",
-    gridTemplateColumns: "auto minmax(0, 1fr) 16px",
+    gridTemplateColumns: "minmax(0, 1fr) 16px",
     alignItems: "baseline",
     columnGap: 10,
     paddingBlock: 11,
@@ -630,12 +618,7 @@ function RequestTypeSelect({
         onKeyDown={handleKeyDown}
         {...stylex.props(labStyles.input, styles.trigger, open && styles.triggerOpen)}
       >
-        <span {...stylex.props(styles.triggerValue)}>
-          {selected.label}
-          <span lang="en" {...stylex.props(styles.english)}>
-            {selected.english}
-          </span>
-        </span>
+        <span {...stylex.props(styles.triggerValue)}>{selected.label}</span>
         <ChevronDown
           size={20}
           strokeWidth={1.75}
@@ -668,9 +651,6 @@ function RequestTypeSelect({
               )}
             >
               {type.label}
-              <span lang="en" {...stylex.props(styles.english)}>
-                {type.english}
-              </span>
               {isSelected ? (
                 <Check
                   size={16}

@@ -10,7 +10,6 @@ import {
 } from "@/components/landing/landing-content";
 import { SplitWords, useSectionAnimation } from "../motion";
 import { drawRule, revealWords, riseIn } from "../motion-values";
-import { sharedStyles } from "../styles";
 
 /*
  * Variant J — formulation presenter: the one interactive moment on the page.
@@ -93,7 +92,6 @@ const styles = stylex.create({
     },
   },
   heading: {
-    marginTop: "1.25rem",
     maxWidth: "42rem",
     fontFamily: typography.display,
     fontWeight: 300,
@@ -369,9 +367,6 @@ export function PresenterSection() {
       {...stylex.props(styles.section)}
     >
       <div {...stylex.props(styles.container)}>
-        <p data-vj-intro {...stylex.props(sharedStyles.techLabel)}>
-          04 — Formulation
-        </p>
         <h2 data-vj-heading id="formulation-heading" {...stylex.props(styles.heading)}>
           <SplitWords
             segments={[

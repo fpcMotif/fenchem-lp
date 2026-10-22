@@ -16,21 +16,12 @@ import {
 import { CTA, STATS } from "../../content";
 import type { AboutPageProps } from "../../index";
 import { useActiveSection } from "../../use-active-section";
-import { CAMPUS_CAPTION_EN, CAMPUS_HANG, type CampusPhoto } from "./campus-hang";
+import { CAMPUS_HANG, type CampusPhoto } from "./campus-hang";
 import { CultureStory } from "./culture";
 import { BrushCoat, CyanotypeDefs, useDeveloped } from "./cyanotype";
 import { shared } from "./cyanotype-values";
 import { Lightbox } from "./lightbox";
 import { curve, font, media, tone } from "./tokens.stylex";
-
-const NAV_EN: Record<(typeof ABOUT_HERO.navChips)[number]["id"], string> = {
-  "about-profile": "Profile",
-  "about-campus": "Campus",
-  "about-culture": "Culture",
-  "about-csr": "Responsibility",
-  "about-honor": "Honors",
-  "about-structure": "Structure",
-};
 
 const SECTION_IDS = ABOUT_HERO.navChips.map((chip) => chip.id);
 
@@ -86,9 +77,6 @@ function Banner({ onNavigateHome }: AboutPageProps) {
           <h1 id="about-title" {...stylex.props(styles.title)}>
             {ABOUT_BANNER.title}
           </h1>
-          <p lang="en" {...stylex.props(styles.tagline)}>
-            {ABOUT_BANNER.tagline}
-          </p>
         </div>
         <figure {...stylex.props(styles.heroFigure)}>
           <div
@@ -108,10 +96,6 @@ function Banner({ onNavigateHome }: AboutPageProps) {
           </div>
           <figcaption {...stylex.props(styles.heroCaption)}>
             <span {...stylex.props(styles.heroLead)}>{ABOUT_BANNER.lead}</span>
-            <span lang="en" {...stylex.props(styles.inscription)}>
-              <span>{ABOUT_BANNER.place}</span>
-              <span>{ABOUT_BANNER.established}</span>
-            </span>
           </figcaption>
         </figure>
       </div>
@@ -153,7 +137,7 @@ function PageNav() {
                   aria-hidden="true"
                   {...stylex.props(styles.navMark, current && styles.navMarkCurrent)}
                 />
-                <span lang="en">{NAV_EN[chip.id]}</span>
+                {chip.label}
               </a>
             </li>
           );
@@ -174,7 +158,7 @@ function Profile() {
       {...stylex.props(styles.section)}
     >
       <h2 id="about-profile-heading" {...stylex.props(shared.srOnly)}>
-        Profile
+        {ABOUT_HERO.navChips[0].label}
       </h2>
       <div {...stylex.props(styles.column, styles.grid)}>
         <div {...stylex.props(styles.profileText)}>
@@ -244,7 +228,7 @@ function Campus() {
       {...stylex.props(styles.section)}
     >
       <h2 id="about-campus-heading" {...stylex.props(shared.srOnly)}>
-        {ABOUT_CAMPUS.eyebrow}
+        {ABOUT_CAMPUS.title}
       </h2>
       <ul {...stylex.props(styles.column, styles.grid, styles.campusList)}>
         {CAMPUS_HANG.map((photo, index) => (
@@ -289,9 +273,7 @@ function CampusPrint({ photo, onOpen }: { photo: CampusPhoto; onOpen: () => void
           />
         </span>
       </button>
-      <figcaption {...stylex.props(shared.caption)}>
-        <span lang="en">{CAMPUS_CAPTION_EN[photo.id]}</span>
-      </figcaption>
+      <figcaption {...stylex.props(shared.caption)}>{photo.caption}</figcaption>
     </figure>
   );
 }
@@ -303,7 +285,7 @@ function Responsibility() {
   return (
     <section id="about-csr" aria-labelledby="about-csr-heading" {...stylex.props(styles.section)}>
       <h2 id="about-csr-heading" {...stylex.props(shared.srOnly)}>
-        Responsibility
+        {ABOUT_CSR.title}
       </h2>
       <div {...stylex.props(styles.column, styles.grid)}>
         <h3 {...stylex.props(styles.statement)}>
@@ -364,7 +346,7 @@ function Honors() {
       {...stylex.props(styles.section)}
     >
       <h2 id="about-honor-heading" {...stylex.props(shared.srOnly)}>
-        {ABOUT_HONORS.eyebrow}
+        {ABOUT_HONORS.title}
       </h2>
       <div {...stylex.props(styles.column, styles.grid)}>
         <ul {...stylex.props(styles.honorList)}>
@@ -401,7 +383,7 @@ function Structure() {
       {...stylex.props(styles.section)}
     >
       <h2 id="about-structure-heading" {...stylex.props(shared.srOnly)}>
-        {ABOUT_STRUCTURE.eyebrow}
+        {ABOUT_STRUCTURE.title}
       </h2>
       <div {...stylex.props(styles.column, styles.grid)}>
         <div {...stylex.props(styles.holding)}>
@@ -539,14 +521,6 @@ const styles = stylex.create({
     letterSpacing: "0.04em",
     color: tone.prussian,
   },
-  tagline: {
-    margin: 0,
-    fontFamily: font.serif,
-    fontStyle: "italic",
-    fontSize: { default: 20, [media.desktop]: 26 },
-    lineHeight: 1.3,
-    color: tone.body,
-  },
   heroFigure: {
     marginInline: 0,
     marginTop: { default: 32, [media.desktop]: 44 },
@@ -577,14 +551,6 @@ const styles = stylex.create({
     fontSize: 15,
     lineHeight: 1.8,
     color: tone.body,
-  },
-  inscription: {
-    display: "flex",
-    gap: 28,
-    fontSize: 13,
-    letterSpacing: "0.02em",
-    color: tone.pencil,
-    whiteSpace: "nowrap",
   },
 
   pageNav: {

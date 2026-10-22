@@ -24,10 +24,6 @@ const styles = stylex.create({
   heading: {
     gridColumn: { default: "auto", [bp.desktop]: "1 / span 7" },
   },
-  hint: {
-    gridColumn: { default: "auto", [bp.desktop]: "9 / span 4" },
-    justifySelf: { default: "start", [bp.desktop]: "end" },
-  },
 });
 
 export function Campus() {
@@ -42,15 +38,8 @@ export function Campus() {
     >
       <div {...stylex.props(styles.head)}>
         <div {...stylex.props(styles.heading)}>
-          <ChartHeading
-            id="oos1k-campus"
-            numeral="II"
-            label="Campus"
-            title={ABOUT_CAMPUS.title}
-            note="An archive of seven plates"
-          />
+          <ChartHeading id="oos1k-campus" title={ABOUT_CAMPUS.title} />
         </div>
-        <p {...stylex.props(ui.label, styles.hint)}>点击底片查看大图</p>
       </div>
 
       {reduce ? null : <PlateArc onOpen={lightbox.open} />}

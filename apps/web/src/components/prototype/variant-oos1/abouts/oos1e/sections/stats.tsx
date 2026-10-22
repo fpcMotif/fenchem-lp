@@ -62,13 +62,6 @@ const styles = stylex.create({
     fontSize: { default: 28, [media.lgUp]: "clamp(22px, 2.4vw, 34px)" },
     fontWeight: 500,
   },
-  caption: {
-    margin: 0,
-    fontSize: 15,
-    lineHeight: 1.7,
-    letterSpacing: "0.08em",
-    color: color.onNavyMuted,
-  },
   photoCaption: {
     position: "relative",
     margin: 0,
@@ -96,7 +89,6 @@ export function StatsSheet() {
               <span {...stylex.props(styles.value)}>{stat.value}</span>
               {stat.unit ? <span {...stylex.props(styles.unit)}>{stat.unit}</span> : null}
             </div>
-            <p {...stylex.props(styles.caption)}>{stat.caption}</p>
           </Reveal>
         ))}
       </ul>

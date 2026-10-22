@@ -8,10 +8,10 @@ import { bp, face, scale, tone } from "./tokens.stylex";
 
 type Level = (typeof ABOUT_HONORS.items)[number]["level"];
 
-const LEVELS: readonly { level: Level; label: string; english: string }[] = [
-  { level: "national", label: "国家级", english: "National" },
-  { level: "provincial", label: "省级", english: "Provincial" },
-  { level: "municipal", label: "市级", english: "Municipal" },
+const LEVELS: readonly { level: Level; label: string }[] = [
+  { level: "national", label: "国家级" },
+  { level: "provincial", label: "省级" },
+  { level: "municipal", label: "市级" },
 ];
 
 const styles = stylex.create({
@@ -30,21 +30,14 @@ const styles = stylex.create({
     lineHeight: 1.45,
     letterSpacing: "0.04em",
   },
-  level: {
-    display: "grid",
-    rowGap: 12,
-    margin: 0,
-  },
   levelLabel: {
+    margin: 0,
     fontFamily: face.sans,
     fontSize: scale.heading,
     fontWeight: 900,
     lineHeight: 1,
     letterSpacing: "0.06em",
     color: tone.navy,
-  },
-  levelEnglish: {
-    fontSize: 20,
   },
 });
 
@@ -63,19 +56,10 @@ export function Honors() {
           loadFirstOnPhone
           standing={
             index === 0 ? (
-              <StandingTitle id="oos1x-honor" en="Honors">
-                {ABOUT_HONORS.title}
-              </StandingTitle>
+              <StandingTitle id="oos1x-honor">{ABOUT_HONORS.title}</StandingTitle>
             ) : undefined
           }
-          load={
-            <p {...stylex.props(styles.level)}>
-              <span {...stylex.props(styles.levelLabel)}>{group.label}</span>
-              <span lang="en" {...stylex.props(type.serif, styles.levelEnglish)}>
-                {group.english}
-              </span>
-            </p>
-          }
+          load={<p {...stylex.props(styles.levelLabel)}>{group.label}</p>}
         >
           <ul {...stylex.props(styles.titles)}>
             {ABOUT_HONORS.items

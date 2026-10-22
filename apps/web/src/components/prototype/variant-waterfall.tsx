@@ -1601,7 +1601,6 @@ function MatrixSection() {
             <input
               type="search"
               aria-label="Search actives by name, source, or code"
-              placeholder="Search by name, source or code"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               {...stylex.props(styles.input, styles.searchInput)}
@@ -1695,8 +1694,7 @@ function MatrixSection() {
         </div>
         <p {...stylex.props(styles.tableFoot)}>
           {filterActive && `Showing ${filtered.length} of ${ingredients.length} actives. `}
-          Assay values are release specifications, confirmed by HPLC on every lot. Each row requests
-          a specification.
+          Assay values are release specifications, confirmed by HPLC on every lot.
         </p>
       </div>
     </section>
@@ -1784,9 +1782,8 @@ function FormulationSection() {
         <div {...stylex.props(styles.sectionHead)}>
           <h2 {...stylex.props(styles.h2)}>Build the target, we return the specification</h2>
           <p {...stylex.props(styles.lead)}>
-            Choose the application, the delivery format and the certification set, then add your
-            details. The brief lists the matching actives with their assay thresholds; the
-            laboratory returns a validated proposal within one business day.
+            The brief lists the matching actives with their assay thresholds; the laboratory returns
+            a validated proposal within one business day.
           </p>
         </div>
 
@@ -1935,9 +1932,6 @@ function ContactSection() {
           <a href={`mailto:${company.email}`} {...stylex.props(styles.footerLink)}>
             {company.email}
           </a>
-          <span>
-            {company.hq.city}, {company.hq.country}
-          </span>
           <span>A specification within one business day.</span>
         </p>
         <a href="#top" {...stylex.props(styles.textLink)}>

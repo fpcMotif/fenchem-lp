@@ -101,13 +101,6 @@ const styles = stylex.create({
     letterSpacing: 0,
     color: hue.mint,
   },
-  statCaption: {
-    margin: 0,
-    fontSize: 15,
-    fontWeight: 400,
-    letterSpacing: "0.08em",
-    color: hue.onDark,
-  },
 });
 
 export function Moment() {
@@ -147,7 +140,6 @@ export function Moment() {
                   </span>
                 ) : null}
               </div>
-              <p {...stylex.props(styles.statCaption)}>{stat.caption}</p>
             </Reveal>
           ))}
         </ul>

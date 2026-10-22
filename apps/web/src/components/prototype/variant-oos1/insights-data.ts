@@ -25,10 +25,7 @@ export type InsightArticle = {
 };
 
 export const INSIGHTS_PAGE = {
-  eyebrow: "Insights",
-  tagline: "Ingredient Science & Market Signals",
   lead: "泛成技术团队对营养原料、配方趋势与市场变化的观察与解读。",
-  meta: ["Technical Insights", "Nutrition Trends"],
   imageAlt: "身穿米白色毛衣的女士在明黄背景前闭眼微笑",
 };
 

@@ -49,7 +49,7 @@ const SCENES: readonly Scene[] = [
 ];
 
 const TEXT_GAP = 47;
-const TEXT_LIFT = 52;
+const TEXT_LIFT = 18;
 
 const THREAD_A =
   "M200,0 C200,110 560,170 575,300C594,520 700,520 700,640 C700,880 590,1050 575,1180 C560,1290 440,1300 440,1520";
@@ -76,8 +76,6 @@ const WEFT_ROWS = Array.from({ length: 11 }, (_, index) => index);
 const TIED_COLUMNS = new Set([3, 6, 10]);
 const columnX = (index: number) => SWATCH_LEFT + 10 + index * 20;
 const rowY = (index: number) => SWATCH_TOP + 12 + index * 16;
-
-const narration = (place: string) => `在${place}`;
 
 const styles = stylex.create({
   section: {
@@ -141,14 +139,6 @@ const styles = stylex.create({
   },
   placeStart: (left: string, top: number) => ({ left, top }),
   placeEnd: (right: string, top: number) => ({ right, top }),
-  narration: {
-    margin: 0,
-    marginBottom: 14,
-    fontSize: 13,
-    lineHeight: "20px",
-    letterSpacing: "0.12em",
-    color: tone.label,
-  },
   title: {
     position: "relative",
     margin: 0,
@@ -339,7 +329,7 @@ export function CultureStory() {
       {...stylex.props(ui.section, ui.anchor, styles.section)}
     >
       <h2 id="about-culture-title" {...stylex.props(ui.srOnly)}>
-        {ABOUT_CULTURE.eyebrow}
+        {ABOUT_CULTURE.title}
       </h2>
       <div {...stylex.props(ui.shell)}>
         <div ref={canvasRef} {...stylex.props(styles.canvas)}>
@@ -366,7 +356,6 @@ export function CultureStory() {
                           ],
                     ]}
                   >
-                    <p {...stylex.props(styles.narration)}>{narration(scene.photo.caption)}</p>
                     <h3 {...stylex.props(styles.title)}>
                       <span aria-hidden="true" {...stylex.props(styles.knotMark)} />
                       {scene.value.title}

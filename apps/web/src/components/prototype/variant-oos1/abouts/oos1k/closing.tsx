@@ -57,9 +57,6 @@ const styles = stylex.create({
     transitionProperty: "border-color",
     transitionDuration: "300ms",
   },
-  ringEn: {
-    color: sky.text,
-  },
   ringZh: {
     fontFamily: face.sans,
     fontSize: { default: 18, [bp.desktop]: 20 },
@@ -100,9 +97,6 @@ export function Closing({ onNavigateHome }: AboutPageProps) {
       <div {...stylex.props(ui.shell)}>
         <div {...stylex.props(styles.stage)}>
           <div {...stylex.props(styles.upper)}>
-            <p lang="en" {...stylex.props(ui.label)}>
-              The atlas closes at its pole
-            </p>
             <h2 id="oos1k-closing" {...stylex.props(styles.title)}>
               回到南京
             </h2>
@@ -114,15 +108,12 @@ export function Closing({ onNavigateHome }: AboutPageProps) {
               onClick={() => onNavigateHome("contact")}
               {...stylex.props(styles.ring, ui.focusable)}
             >
-              <span lang="en" aria-hidden="true" {...stylex.props(ui.label, styles.ringEn)}>
-                Contact
-              </span>
               <span {...stylex.props(styles.ringZh)}>联系我们</span>
             </button>
           </div>
           <div {...stylex.props(styles.lower)}>
             <p lang="en" {...stylex.props(ui.label)}>
-              Pole · 32°03′ N 118°47′ E
+              32°03′ N 118°47′ E
             </p>
             <button
               type="button"

@@ -213,19 +213,6 @@ const styles = stylex.create({
     flexDirection: "column",
     gap: { default: 14, [DESKTOP]: 18 },
   },
-  kicker: {
-    display: "flex",
-    flexWrap: "wrap",
-    alignItems: "center",
-    columnGap: 14,
-    rowGap: 4,
-  },
-  count: {
-    fontSize: 13,
-    fontWeight: 600,
-    letterSpacing: "0.06em",
-    color: color.ink,
-  },
   sections: {
     marginTop: { default: 20, [DESKTOP]: 28 },
   },
@@ -237,15 +224,11 @@ export function TocPage({
   under,
   children,
 }: SubPageProps & { bar?: ReactNode; under?: ReactNode; children: ReactNode }) {
-  const articles = useLabArticles();
   return (
     <div id="insights-top" lang="zh-CN" {...stylex.props(kitStyles.root)}>
       <SubPageBanner
-        eyebrow="Insights"
         title="行业洞察"
-        tagline="Notes from the formulation bench"
         lead="来自泛成应用研发团队的原料趋势、配方方法与法规观察"
-        meta={[`${articles.length} 篇洞察 · 持续更新`]}
         image="/prototype/official-site/product-human-nutrition.webp"
         imageAlt="行业洞察"
         titleId="insights-banner-title"
@@ -293,7 +276,7 @@ export function ArticleFlow({
 }) {
   return (
     <div {...stylex.props(styles.flow, sx)}>
-      {articles.map((article, index) => {
+      {articles.map((article) => {
         const titleId = `${article.id}-flow-title`;
         return (
           <article
@@ -303,12 +286,7 @@ export function ArticleFlow({
             {...stylex.props(styles.article, kitStyles.anchor)}
           >
             <header {...stylex.props(styles.head)}>
-              <div {...stylex.props(styles.kicker)}>
-                <span {...stylex.props(styles.count, labStyles.displayNumber)}>
-                  {`${padIndex(index)} / ${padIndex(articles.length - 1)}`}
-                </span>
-                <ArticleMeta article={article} />
-              </div>
+              <ArticleMeta article={article} />
               <h2 id={titleId} {...stylex.props(labStyles.docTitle)}>
                 {article.title}
               </h2>

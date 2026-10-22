@@ -2,7 +2,7 @@ import * as stylex from "@stylexjs/stylex";
 
 import { ABOUT_CSR } from "../../about-data";
 import { Bevel, Mat, SectionHead, Tag, useArrived } from "./shared";
-import { ROMAN, bevel, stepIn, ui } from "./shared-values";
+import { bevel, stepIn, ui } from "./shared-values";
 import { bp, face, space, tone } from "./tokens.stylex";
 
 const styles = stylex.create({
@@ -78,14 +78,6 @@ const styles = stylex.create({
     paddingInlineStart: 0,
     borderInlineStartWidth: 0,
   },
-  numeral: {
-    minWidth: 22,
-    fontFamily: face.latin,
-    fontSize: 12,
-    fontWeight: 500,
-    letterSpacing: "0.06em",
-    color: tone.navy,
-  },
   outcomeTitle: {
     fontFamily: face.sans,
     fontSize: { default: 16, [bp.desktop]: 19 },
@@ -103,13 +95,7 @@ export function Csr() {
       aria-labelledby="oos1b-csr"
       {...stylex.props(ui.anchor, ui.section, ui.shell)}
     >
-      <SectionHead
-        id="oos1b-csr"
-        index={4}
-        eyebrow="Responsibility"
-        title={ABOUT_CSR.title}
-        note="Ecology and demand, kept in balance."
-      />
+      <SectionHead id="oos1b-csr" title={ABOUT_CSR.title} />
       <div ref={ref} {...stylex.props(...stepIn(arrived, 0))}>
         <Mat
           raised
@@ -120,9 +106,6 @@ export function Csr() {
                   key={outcome.title}
                   {...stylex.props(styles.outcome, index === 0 && styles.outcomeFirst)}
                 >
-                  <span lang="en" {...stylex.props(styles.numeral)}>
-                    {ROMAN[index].toLowerCase()}
-                  </span>
                   <span {...stylex.props(styles.outcomeTitle)}>{outcome.title}</span>
                 </li>
               ))}

@@ -11,10 +11,10 @@ import { bp, face, tone } from "./tokens.stylex";
 
 type Level = (typeof ABOUT_HONORS.items)[number]["level"];
 
-const TIERS: readonly { level: Level; label: string; english: string }[] = [
-  { level: "national", label: "国家级", english: "National" },
-  { level: "provincial", label: "省级", english: "Provincial" },
-  { level: "municipal", label: "市级", english: "Municipal" },
+const TIERS: readonly { level: Level; label: string }[] = [
+  { level: "national", label: "国家级" },
+  { level: "provincial", label: "省级" },
+  { level: "municipal", label: "市级" },
 ];
 
 const styles = stylex.create({
@@ -65,22 +65,11 @@ const styles = stylex.create({
     boxShadow: `inset 0 0 0 1px ${tone.edge}, inset 0 0 0 9px ${tone.face}, inset 0 0 0 10px ${tone.line}`,
   },
   level: {
-    display: "flex",
-    alignItems: "baseline",
-    gap: 8,
     margin: 0,
-  },
-  levelChinese: {
     fontFamily: face.sans,
     fontSize: 14,
     letterSpacing: "0.08em",
     color: tone.quiet,
-  },
-  levelSerif: {
-    fontFamily: face.serif,
-    fontStyle: "italic",
-    fontSize: { default: 16, [bp.desktop]: 18 },
-    color: tone.navy,
   },
   rule: {
     display: "block",
@@ -147,12 +136,7 @@ export function Honors() {
       data-hour={SECTION_HOURS.honor}
       {...stylex.props(ui.section, ui.shell)}
     >
-      <SectionHead
-        titleId="oos1t-honor"
-        hour={SECTION_HOURS.honor}
-        title={ABOUT_HONORS.title}
-        english="Honors"
-      />
+      <SectionHead titleId="oos1t-honor" hour={SECTION_HOURS.honor} title={ABOUT_HONORS.title} />
       <div {...stylex.props(styles.wall)}>
         {TIERS.map((tier) => {
           const items = ABOUT_HONORS.items.filter((item) => item.level === tier.level);
@@ -168,12 +152,7 @@ export function Honors() {
             >
               <Cast lift={LIFT.block} still />
               <div {...stylex.props(styles.face, faces[tier.level])}>
-                <p {...stylex.props(styles.level)}>
-                  <span {...stylex.props(styles.levelChinese)}>{tier.label}</span>
-                  <span lang="en" {...stylex.props(styles.levelSerif)}>
-                    {tier.english}
-                  </span>
-                </p>
+                <p {...stylex.props(styles.level)}>{tier.label}</p>
                 <span aria-hidden="true" {...stylex.props(styles.rule)} />
                 <p {...stylex.props(styles.title)}>
                   <Phrase text={item.title} />
@@ -183,14 +162,14 @@ export function Honors() {
           ));
           if (tier.level !== "national") {
             return (
-              <ul key={tier.level} aria-label={tier.english} {...stylex.props(ui.grid, styles.row)}>
+              <ul key={tier.level} aria-label={tier.label} {...stylex.props(ui.grid, styles.row)}>
                 {plaques}
               </ul>
             );
           }
           return (
             <div key={tier.level} {...stylex.props(ui.grid, styles.row)}>
-              <ul aria-label={tier.english} {...stylex.props(styles.single)}>
+              <ul aria-label={tier.label} {...stylex.props(styles.single)}>
                 {plaques}
               </ul>
               <p lang="en" {...stylex.props(styles.noon)}>

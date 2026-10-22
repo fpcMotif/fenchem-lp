@@ -46,13 +46,6 @@ const styles = stylex.create({
     color: tone.navy,
     fontFeatureSettings: '"palt"',
   },
-  subtitle: {
-    margin: 0,
-    marginTop: { default: 10, [bp.desktop]: 14 },
-    fontSize: { default: 19, [bp.desktop]: 24 },
-    lineHeight: 1.35,
-    color: tone.body,
-  },
   vestibule: {
     position: "relative",
     marginTop: { default: 40, [bp.desktop]: 56 },
@@ -117,10 +110,6 @@ const styles = stylex.create({
     transitionDuration: "320ms",
     transitionTimingFunction: chrome.ease,
   },
-  doorNote: {
-    fontSize: { default: 17, [bp.desktop]: 20 },
-    color: "rgba(255, 255, 255, 0.82)",
-  },
   back: {
     display: "inline-flex",
     alignItems: "center",
@@ -160,16 +149,10 @@ export function Closing({ onNavigateHome }: { onNavigateHome: (hash?: string) =>
       <div {...stylex.props(ui.shell, styles.head)}>
         <p {...stylex.props(styles.sign)}>
           <span {...stylex.props(styles.signChinese)}>出口</span>
-          <span lang="en" {...stylex.props(ui.caps)}>
-            Exit
-          </span>
         </p>
         <h2 id="oos1z-closing" {...stylex.props(styles.title)}>
           感谢参观
         </h2>
-        <p lang="en" {...stylex.props(ui.italic, styles.subtitle)}>
-          Thank you for visiting. This way out leads to contact.
-        </p>
       </div>
       <div {...stylex.props(styles.vestibule)}>
         <Lines drawing={PHONE} sx={styles.phone} />
@@ -188,18 +171,12 @@ export function Closing({ onNavigateHome }: { onNavigateHome: (hash?: string) =>
               {...stylex.props(styles.arrow)}
             />
           </span>
-          <span lang="en" {...stylex.props(ui.italic, styles.doorNote)}>
-            Contact us
-          </span>
         </button>
       </div>
       <div {...stylex.props(styles.backRow)}>
         <a href="#about-top" {...stylex.props(ui.focus, styles.back)}>
           <ArrowUp size={14} strokeWidth={1.5} aria-hidden="true" />
           回到入口
-          <span lang="en" {...stylex.props(ui.italic)}>
-            Back to the entrance
-          </span>
         </a>
       </div>
     </section>

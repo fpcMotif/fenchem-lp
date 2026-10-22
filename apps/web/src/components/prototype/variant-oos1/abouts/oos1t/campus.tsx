@@ -11,24 +11,11 @@ import { srOnly, ui } from "./shared";
 import { SECTION_HOURS } from "./sun";
 import { bp, face, tone } from "./tokens.stylex";
 
-type PhotoId = (typeof ABOUT_CAMPUS.photos)[number]["id"];
-
-const ENGLISH: Record<PhotoId, string> = {
-  aerial: "Headquarters",
-  lab: "Laboratory",
-  showroom: "Showroom",
-  reception: "Reception",
-  lounge: "Lounge",
-  office: "Open office",
-  grounds: "Grounds",
-};
-
 const PHOTOS: readonly LightboxPhoto[] = ABOUT_CAMPUS.photos.map((photo) => ({
   id: photo.id,
   large: photo.large,
   alt: photo.alt,
   caption: photo.caption,
-  english: ENGLISH[photo.id],
 }));
 
 const styles = stylex.create({
@@ -67,12 +54,6 @@ const styles = stylex.create({
     fontFamily: face.sans,
     fontSize: 15,
     color: tone.ink,
-  },
-  english: {
-    fontFamily: face.serif,
-    fontStyle: "italic",
-    fontSize: 17,
-    color: tone.quiet,
   },
 });
 
@@ -117,12 +98,7 @@ export function Campus() {
       data-hour={SECTION_HOURS.campus}
       {...stylex.props(ui.section, ui.shell)}
     >
-      <SectionHead
-        titleId="oos1t-campus"
-        hour={SECTION_HOURS.campus}
-        title={ABOUT_CAMPUS.title}
-        english="Campus"
-      />
+      <SectionHead titleId="oos1t-campus" hour={SECTION_HOURS.campus} title={ABOUT_CAMPUS.title} />
       <ul {...stylex.props(ui.grid, styles.field)}>
         {ABOUT_CAMPUS.photos.map((photo, index) => (
           <li key={photo.id} {...stylex.props(place[photo.id])}>
@@ -145,9 +121,6 @@ export function Campus() {
               </span>
               <span {...stylex.props(styles.caption)}>
                 <span>{photo.caption}</span>
-                <span lang="en" {...stylex.props(styles.english)}>
-                  {ENGLISH[photo.id]}
-                </span>
                 <span {...srOnly}>View larger</span>
               </span>
             </button>

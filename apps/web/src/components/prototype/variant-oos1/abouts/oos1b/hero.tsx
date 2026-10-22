@@ -122,16 +122,6 @@ const styles = stylex.create({
     color: tone.ink,
     textWrap: "pretty",
   },
-  meta: {
-    margin: 0,
-    flexShrink: 0,
-    fontFamily: face.latin,
-    fontSize: 12,
-    fontWeight: 500,
-    letterSpacing: "0.08em",
-    textTransform: "uppercase",
-    color: tone.navy,
-  },
 });
 
 export function Hero() {
@@ -152,9 +142,6 @@ export function Hero() {
           foot={
             <div {...stylex.props(styles.foot)}>
               <p {...stylex.props(styles.lead)}>{ABOUT_BANNER.lead}</p>
-              <p lang="en" {...stylex.props(styles.meta)}>
-                {ABOUT_BANNER.established} · {ABOUT_BANNER.place}
-              </p>
             </div>
           }
         >

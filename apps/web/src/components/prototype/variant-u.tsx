@@ -313,12 +313,6 @@ const styles = stylex.create({
       [breakpoints.md]: "flex",
     },
   },
-  stripHideMobile: {
-    display: {
-      default: "none",
-      [breakpoints.md]: "inline",
-    },
-  },
   header: {
     position: "sticky",
     top: 0,
@@ -479,16 +473,6 @@ const styles = stylex.create({
     display: "grid",
     gap: 24,
   },
-  heroKicker: {
-    display: "flex",
-    alignItems: "center",
-    gap: 12,
-  },
-  heroRule: {
-    width: 32,
-    height: 2,
-    backgroundColor: colors.brandGreen400,
-  },
   heroActions: {
     display: "flex",
     flexWrap: "wrap",
@@ -568,7 +552,7 @@ const styles = stylex.create({
   },
   specCardFoot: {
     display: "flex",
-    justifyContent: "space-between",
+    justifyContent: "flex-end",
     alignItems: "center",
     paddingBlock: 12,
     paddingInline: 16,
@@ -622,11 +606,6 @@ const styles = stylex.create({
   },
   sectionHeadMain: {
     display: "grid",
-    gap: 10,
-  },
-  sectionIndex: {
-    display: "flex",
-    alignItems: "center",
     gap: 10,
   },
 
@@ -807,12 +786,6 @@ const styles = stylex.create({
     alignContent: "start",
     gap: 10,
   },
-  cardIndex: {
-    fontFamily: typography.tech,
-    fontSize: 11,
-    letterSpacing: "0.08em",
-    color: colors.mute600,
-  },
 
   /* Quality */
   pillarGrid: {
@@ -941,20 +914,6 @@ const styles = stylex.create({
     gap: 12,
     justifyItems: "start",
   },
-  contactMeta: {
-    display: "grid",
-    gap: 8,
-    listStyle: "none",
-    margin: 0,
-    padding: 0,
-  },
-  contactMetaItem: {
-    display: "flex",
-    alignItems: "center",
-    gap: 8,
-    fontSize: 13,
-    color: colors.mute700,
-  },
 
   /* Footer */
   footer: {
@@ -1021,9 +980,6 @@ function UtilityStrip() {
         <div {...stylex.props(styles.stripRow)}>
           <div {...stylex.props(styles.stripGroup)}>
             <span {...stylex.props(styles.mono)}>Q1 index · 08 specimens</span>
-            <span {...stylex.props(styles.mono, styles.stripHideMobile)}>
-              ISO 9001 · GMP · FSSC 22000
-            </span>
           </div>
           <div {...stylex.props(styles.stripGroup, styles.stripRight)}>
             <span {...stylex.props(styles.mono)}>
@@ -1137,14 +1093,6 @@ function HeroSection() {
         <div {...stylex.props(styles.heroGrid)}>
           <div {...stylex.props(styles.heroLeft)}>
             <Reveal margin="0px">
-              <div {...stylex.props(styles.heroKicker)}>
-                <span aria-hidden {...stylex.props(styles.heroRule)} />
-                <p {...stylex.props(styles.labelSm)}>
-                  {company.legalName} · {company.since}
-                </p>
-              </div>
-            </Reveal>
-            <Reveal delay={STAGGER} margin="0px">
               <h1 {...stylex.props(styles.displayLg)}>
                 Specified ingredients for formulators in 40+ countries
               </h1>
@@ -1182,7 +1130,6 @@ function HeroSection() {
             <Reveal delay={STAGGER * 2} margin="0px" sx={styles.heroRight}>
               <article aria-label="Specification card" {...stylex.props(styles.specCard)}>
                 <div {...stylex.props(styles.specCardHead)}>
-                  <span {...stylex.props(styles.labelSm)}>Specification</span>
                   <span {...stylex.props(styles.mono)}>{COVER.code}</span>
                 </div>
                 <div {...stylex.props(styles.specCardTitle)}>
@@ -1202,10 +1149,6 @@ function HeroSection() {
                   </tbody>
                 </table>
                 <div {...stylex.props(styles.specCardFoot)}>
-                  <span {...stylex.props(styles.appCell, styles.bodySm)}>
-                    <span aria-hidden {...stylex.props(styles.dot)} />
-                    Documentation available
-                  </span>
                   <a href={createInquiryHref("industries")} {...stylex.props(styles.link)}>
                     Request dossier
                     <ArrowUpRight aria-hidden size={14} />
@@ -1243,26 +1186,13 @@ function KpiBand() {
 
 /* ─────────────────────────────── Section head ─────────────────────────────── */
 
-function SectionHead({
-  index,
-  label,
-  title,
-  aside,
-}: {
-  index: string;
-  label: string;
-  title: string;
-  aside?: React.ReactNode;
-}) {
+function SectionHead({ id, title, aside }: { id: string; title: string; aside?: React.ReactNode }) {
   return (
     <Reveal sx={styles.sectionHead}>
       <div {...stylex.props(styles.sectionHeadMain)}>
-        <div {...stylex.props(styles.sectionIndex)}>
-          <span {...stylex.props(styles.mono)}>{index}</span>
-          <span aria-hidden {...stylex.props(styles.heroRule)} />
-          <p {...stylex.props(styles.labelSm)}>{label}</p>
-        </div>
-        <h2 {...stylex.props(styles.headlineLg)}>{title}</h2>
+        <h2 id={id} {...stylex.props(styles.headlineLg)}>
+          {title}
+        </h2>
       </div>
       {aside}
     </Reveal>
@@ -1276,8 +1206,7 @@ function LedgerSection() {
     <section id="ledger" aria-labelledby="ledger-title" {...stylex.props(styles.band)}>
       <div {...stylex.props(styles.container)}>
         <SectionHead
-          index="01"
-          label="Ingredient ledger"
+          id="ledger-title"
           title="Eight actives, one specification each"
           aside={
             <a href={createInquiryHref("industries")} {...stylex.props(styles.link)}>
@@ -1374,9 +1303,6 @@ function LedgerSection() {
               ))}
             </ul>
             <div {...stylex.props(styles.tableFoot)}>
-              <span {...stylex.props(styles.mono)}>
-                {pad(ingredients.length)} rows · assay and form per lot
-              </span>
               <span {...stylex.props(styles.mono)}>Documentation before sampling</span>
             </div>
           </div>
@@ -1396,7 +1322,7 @@ function IndustriesSection() {
       {...stylex.props(styles.band, styles.bandSurface)}
     >
       <div {...stylex.props(styles.container)}>
-        <SectionHead index="02" label="Industries" title="Three markets, one chain of custody" />
+        <SectionHead id="industries-title" title="Three markets, one chain of custody" />
         <div {...stylex.props(styles.threeGrid)}>
           {industries.map((industry, i) => (
             <Reveal key={industry.title} delay={STAGGER * i} sx={styles.tintCard}>
@@ -1408,9 +1334,6 @@ function IndustriesSection() {
                 {...stylex.props(styles.tintCardImg)}
               />
               <div {...stylex.props(styles.tintCardBody)}>
-                <span {...stylex.props(styles.cardIndex)}>
-                  {pad(i + 1)} / {pad(industries.length)}
-                </span>
                 <h3 {...stylex.props(styles.headlineMd)}>{industry.title}</h3>
                 <p {...stylex.props(styles.bodyMd)}>{industry.copy}</p>
                 <a href={createInquiryHref("industries")} {...stylex.props(styles.link)}>
@@ -1433,15 +1356,13 @@ function QualitySection() {
     <section id="quality" aria-labelledby="quality-title" {...stylex.props(styles.band)}>
       <div {...stylex.props(styles.container)}>
         <SectionHead
-          index="03"
-          label="Quality"
+          id="quality-title"
           title="Identity, potency and stability validated on every lot"
         />
         <Reveal>
           <div {...stylex.props(styles.pillarGrid)}>
-            {pillars.map((pillar, i) => (
+            {pillars.map((pillar) => (
               <div key={pillar.title} {...stylex.props(styles.pillarCard)}>
-                <span {...stylex.props(styles.cardIndex)}>{pad(i + 1)}</span>
                 <h3 {...stylex.props(styles.headlineMd)}>{pillar.title}</h3>
                 <p {...stylex.props(styles.bodyMd)}>{pillar.copy}</p>
               </div>
@@ -1490,16 +1411,7 @@ function GlobalSection() {
       {...stylex.props(styles.band, styles.bandSurface)}
     >
       <div {...stylex.props(styles.container)}>
-        <SectionHead
-          index="04"
-          label="Global supply"
-          title="Six bases on three continents"
-          aside={
-            <span {...stylex.props(styles.mono)}>
-              HQ {company.hq.city} · {company.hq.coords}
-            </span>
-          }
-        />
+        <SectionHead id="global-title" title="Six bases on three continents" />
         <Reveal>
           <div {...stylex.props(styles.card)}>
             <div style={{ overflowX: "auto" }}>
@@ -1557,11 +1469,6 @@ function ContactSection() {
       <div {...stylex.props(styles.container)}>
         <div {...stylex.props(styles.contactGrid)}>
           <Reveal sx={styles.contactMain}>
-            <div {...stylex.props(styles.sectionIndex)}>
-              <span {...stylex.props(styles.mono)}>05</span>
-              <span aria-hidden {...stylex.props(styles.heroRule)} />
-              <p {...stylex.props(styles.labelSm)}>Contact</p>
-            </div>
             <h2 id="contact-title" {...stylex.props(styles.headlineLg)}>
               Send the target specification. We return assay, form and dossier within 24 hours.
             </h2>
@@ -1577,16 +1484,6 @@ function ContactSection() {
             <a href={`mailto:${company.email}`} {...stylex.props(styles.link)}>
               {company.email}
             </a>
-            <ul {...stylex.props(styles.contactMeta)}>
-              <li {...stylex.props(styles.contactMetaItem)}>
-                <span aria-hidden {...stylex.props(styles.dot)} />
-                Response &lt; 24h
-              </li>
-              <li {...stylex.props(styles.contactMetaItem)}>
-                <span aria-hidden {...stylex.props(styles.dot)} />
-                Documentation before sampling
-              </li>
-            </ul>
           </Reveal>
         </div>
       </div>
@@ -1607,9 +1504,7 @@ function FooterSection() {
               <span {...stylex.props(styles.brandWord)}>FENCHEM</span>
             </a>
             <p {...stylex.props(styles.bodySm)}>{company.tagline}</p>
-            <span {...stylex.props(styles.mono)}>
-              {company.legalName} · {company.since}
-            </span>
+            <span {...stylex.props(styles.mono)}>{company.since}</span>
           </div>
           <div {...stylex.props(styles.footerCol)}>
             <h3 {...stylex.props(styles.labelSm)}>Sections</h3>

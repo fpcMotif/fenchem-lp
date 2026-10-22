@@ -182,19 +182,8 @@ const styles = stylex.create({
     display: "flex",
     flexDirection: "column",
   },
-  number: {
-    margin: 0,
-    fontFamily: face.numeral,
-    fontSize: 13,
-    fontWeight: 500,
-    lineHeight: "20px",
-    letterSpacing: "0.08em",
-    fontVariantNumeric: "tabular-nums",
-    color: colors.brandGreen700,
-  },
   title: {
     margin: 0,
-    marginTop: 8,
     fontSize: { default: 22, [media.table]: 24 },
     fontWeight: 500,
     lineHeight: { default: "30px", [media.table]: "32px" },
@@ -227,8 +216,7 @@ const styles = stylex.create({
     gridArea: "1 / 1",
     boxSizing: "border-box",
     minWidth: 0,
-    paddingTop: { default: 20, [media.table]: 28, [media.desktop]: 32 },
-    paddingBottom: { default: 4, [media.table]: 12 },
+    paddingBlock: { default: 4, [media.table]: 12 },
     paddingInline: { default: 20, [media.table]: 32, [media.desktop]: 40 },
     backgroundColor: tone.paper,
     borderWidth: 1,
@@ -246,18 +234,6 @@ const styles = stylex.create({
   },
   sideHidden: {
     opacity: 0,
-  },
-  caption: {
-    margin: 0,
-    paddingBottom: 14,
-    borderBottomWidth: 1,
-    borderBottomStyle: "solid",
-    borderBottomColor: tone.ink,
-    fontSize: 12,
-    fontWeight: 500,
-    lineHeight: "18px",
-    letterSpacing: "0.08em",
-    color: tone.muted,
   },
   fields: {
     margin: 0,
@@ -325,7 +301,6 @@ function SheetFace({
         reduce && !shown && styles.sideHidden,
       )}
     >
-      <p {...stylex.props(styles.caption)}>{side.label}</p>
       <dl {...stylex.props(styles.fields)}>
         {side.fields(item).map((field) => (
           <div key={field.label} {...stylex.props(styles.field)}>
@@ -452,7 +427,6 @@ export function Solutions() {
               transition={{ duration: reduce ? 0 : 0.22, ease: EASE }}
             >
               <div {...stylex.props(styles.intro)}>
-                <p {...stylex.props(styles.number)}>{padIndex(index)}</p>
                 <h3 {...stylex.props(styles.title)}>{item.title}</h3>
                 <p {...stylex.props(styles.subtitle)}>{item.subtitle}</p>
               </div>

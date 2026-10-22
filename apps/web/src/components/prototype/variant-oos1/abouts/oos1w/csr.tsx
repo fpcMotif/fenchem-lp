@@ -5,7 +5,6 @@ import { SectionHead } from "./shared";
 import { ui } from "./shared-values";
 import { bp, face, tone } from "./tokens.stylex";
 
-const NUMERALS = ["i", "ii", "iii"] as const;
 const WATERLINE = "60%";
 
 const styles = stylex.create({
@@ -49,9 +48,6 @@ const styles = stylex.create({
     listStyleType: "none",
   },
   outcome: {
-    display: "flex",
-    alignItems: "baseline",
-    gap: 12,
     paddingBlock: { default: 14, [bp.tablet]: 16, [bp.desktop]: 16 },
     borderTopWidth: 1,
     borderTopStyle: "solid",
@@ -60,14 +56,6 @@ const styles = stylex.create({
     fontSize: { default: 17, [bp.desktop]: 18 },
     lineHeight: 1.5,
     color: tone.ink,
-  },
-  numeral: {
-    minWidth: "1.4em",
-    fontFamily: face.serif,
-    fontStyle: "italic",
-    fontSize: 20,
-    lineHeight: 1,
-    color: tone.blue,
   },
   figure: {
     gridColumn: { default: "1 / -1", [bp.tablet]: "2 / -2", [bp.desktop]: "10 / -1" },
@@ -118,21 +106,6 @@ const styles = stylex.create({
     color: tone.body,
     whiteSpace: "nowrap",
   },
-  caption: {
-    display: "flex",
-    alignItems: "baseline",
-    gap: 10,
-    marginTop: 12,
-  },
-  captionNum: {
-    color: tone.ink,
-  },
-  captionItalic: {
-    fontFamily: face.serif,
-    fontStyle: "italic",
-    fontSize: 17,
-    lineHeight: 1.3,
-  },
 });
 
 export function Csr() {
@@ -141,12 +114,7 @@ export function Csr() {
       <div {...stylex.props(ui.shell)}>
         <div {...stylex.props(ui.grid, ui.ruled)}>
           <div {...stylex.props(ui.headCol)}>
-            <SectionHead
-              num="04"
-              word="Responsibility"
-              title={ABOUT_CSR.title}
-              titleId="oos1w-csr"
-            />
+            <SectionHead title={ABOUT_CSR.title} titleId="oos1w-csr" />
           </div>
 
           <div {...stylex.props(styles.text)}>
@@ -159,11 +127,8 @@ export function Csr() {
             </p>
             <p {...stylex.props(styles.desc)}>{ABOUT_CSR.desc}</p>
             <ul {...stylex.props(styles.outcomes)}>
-              {ABOUT_CSR.outcomes.map((outcome, index) => (
+              {ABOUT_CSR.outcomes.map((outcome) => (
                 <li key={outcome.title} {...stylex.props(styles.outcome)}>
-                  <span lang="en" aria-hidden="true" {...stylex.props(styles.numeral)}>
-                    {NUMERALS[index]}
-                  </span>
                   {outcome.title}
                 </li>
               ))}
@@ -187,14 +152,6 @@ export function Csr() {
                 front
               </span>
             </div>
-            <figcaption {...stylex.props(ui.micro, styles.caption)}>
-              <span lang="en" {...stylex.props(styles.captionNum)}>
-                Fig. 4
-              </span>
-              <span lang="en" {...stylex.props(styles.captionItalic)}>
-                The waterline, read as a solvent front.
-              </span>
-            </figcaption>
           </figure>
         </div>
       </div>

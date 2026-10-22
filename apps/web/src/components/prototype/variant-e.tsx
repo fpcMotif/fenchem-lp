@@ -54,39 +54,27 @@ const HERO_META = [
     v: "FN-LP / 2026-E",
   },
   {
-    k: "ORIGIN",
-    v: "N 32.06 / E 118.79",
-  },
-  {
     k: "ESTABLISHED",
     v: "1995 — NANJING",
-  },
-  {
-    k: "CERT",
-    v: "ISO 9001 / GMP",
   },
 ] as const;
 const STATS = [
   {
-    label: "[SYS.UPTIME]",
     value: "30+",
     unit: "years",
     desc: "Continuous ingredient engineering and refinement since 1995.",
   },
   {
-    label: "[NODES]",
     value: "06",
     unit: "global bases",
     desc: "R&D and manufacturing distributed across three continents.",
   },
   {
-    label: "[CERT.INDEX]",
     value: "ISO",
     unit: "/ GMP",
     desc: "Audited quality compliance across every production vector.",
   },
   {
-    label: "[REACH]",
     value: "40+",
     unit: "countries",
     desc: "Formulation partners supplied across regulated markets.",
@@ -112,20 +100,14 @@ const PROTOCOL_DETAIL = [
 ] as const;
 const DOMAIN_DETAIL = [
   {
-    code: "A-01",
-    cat: "CAT: NUTRI",
     desc: "Bioavailable actives engineered for capsules, tablets, softgels and powder delivery systems.",
     division: "nutrition" as DivisionKey,
   },
   {
-    code: "B-02",
-    cat: "CAT: F&B",
     desc: "Heat- and pH-stable functional ingredients for fortification, natural color and clean-label claims.",
     division: "food" as DivisionKey,
   },
   {
-    code: "C-03",
-    cat: "CAT: CARE",
     desc: "Dermatologically active agents formulated for cellular compatibility and sensory performance.",
     division: "cosmetics" as DivisionKey,
   },
@@ -372,10 +354,6 @@ const styles = stylex.create({
       outlineOffset: "4px",
     },
   },
-  navLinkNum: {
-    marginRight: "0.375rem",
-    color: colors.brandGreen700,
-  },
   navCta: {
     display: "inline-flex",
     minHeight: "2.75rem",
@@ -467,55 +445,7 @@ const styles = stylex.create({
       [breakpoints.lg]: "7rem",
     },
   },
-  heroSysBadge: {
-    display: "inline-flex",
-    width: "fit-content",
-    alignItems: "center",
-    gap: "0.625rem",
-    borderWidth: "1px",
-    borderStyle: "solid",
-    borderColor: colors.line,
-    backgroundColor: colors.paper,
-    paddingInline: "0.875rem",
-    paddingBlock: "0.5rem",
-  },
-  heroSysPingWrap: {
-    position: "relative",
-    display: "flex",
-    height: "0.5rem",
-    width: "0.5rem",
-  },
-  heroSysPingOuter: {
-    position: "absolute",
-    display: "inline-flex",
-    height: "100%",
-    width: "100%",
-    borderRadius: radii.full,
-    backgroundColor: "color-mix(in oklch, var(--color-brand-green-500) 50%, transparent)",
-    animationName: {
-      default: ping,
-      [breakpoints.motionReduce]: "none",
-    },
-    animationDuration: "1.5s",
-    animationIterationCount: "infinite",
-  },
-  heroSysPingInner: {
-    position: "relative",
-    display: "inline-flex",
-    height: "0.5rem",
-    width: "0.5rem",
-    borderRadius: radii.full,
-    backgroundColor: colors.brandGreen500,
-  },
-  heroSysText: {
-    fontFamily: typography.tech,
-    fontSize: "10px",
-    textTransform: "uppercase",
-    letterSpacing: "0.3em",
-    color: colors.mute600,
-  },
   heroH1: {
-    marginTop: "2.5rem",
     fontFamily: typography.body,
     fontSize: "clamp(2.7rem, 6.4vw, 6rem)",
     fontWeight: 900,
@@ -652,23 +582,6 @@ const styles = stylex.create({
     letterSpacing: "0.18em",
     color: colors.ink,
     margin: 0,
-  },
-  statusDd: {
-    display: "flex",
-    alignItems: "center",
-    gap: "0.5rem",
-    fontFamily: typography.tech,
-    fontSize: "11px",
-    textTransform: "uppercase",
-    letterSpacing: "0.18em",
-    color: colors.brandGreen700,
-    margin: 0,
-  },
-  statusDot: {
-    height: "0.375rem",
-    width: "0.375rem",
-    borderRadius: radii.full,
-    backgroundColor: colors.brandGreen500,
   },
   heroImgFrame: {
     position: "relative",
@@ -813,16 +726,7 @@ const styles = stylex.create({
     transitionProperty: "background-color",
     transitionDuration: "500ms",
   },
-  statLabel: {
-    fontFamily: typography.tech,
-    fontSize: "10px",
-    textTransform: "uppercase",
-    letterSpacing: "0.28em",
-    color: colors.mute600,
-    margin: 0,
-  },
   statValueRow: {
-    marginTop: "1.25rem",
     display: "flex",
     flexWrap: "wrap",
     alignItems: "baseline",
@@ -880,16 +784,7 @@ const styles = stylex.create({
     },
     justifyContent: "space-between",
   },
-  sectionCode: {
-    fontFamily: typography.tech,
-    fontSize: "11px",
-    textTransform: "uppercase",
-    letterSpacing: "0.28em",
-    color: colors.mute600,
-    margin: 0,
-  },
   sectionH2: {
-    marginTop: "1.25rem",
     fontFamily: typography.body,
     fontSize: {
       default: "2.25rem",
@@ -1009,17 +904,6 @@ const styles = stylex.create({
       [breakpoints.md]: "2rem",
     },
   },
-  matrixHeaderRow: {
-    display: "flex",
-    alignItems: "baseline",
-    justifyContent: "space-between",
-  },
-  matrixIndex: {
-    fontFamily: typography.tech,
-    fontSize: "11px",
-    letterSpacing: "0.22em",
-    color: colors.brandGreen700,
-  },
   matrixCode: {
     fontFamily: typography.tech,
     fontSize: "10px",
@@ -1102,16 +986,6 @@ const styles = stylex.create({
     borderBottomWidth: "1px",
     borderBottomStyle: "solid",
     borderBottomColor: colors.line,
-  },
-  protocolAside: {
-    maxWidth: "20rem",
-    fontFamily: typography.tech,
-    fontSize: "12px",
-    textTransform: "uppercase",
-    lineHeight: 1.625,
-    letterSpacing: "0.2em",
-    color: colors.mute600,
-    margin: 0,
   },
   protocolGrid: {
     display: "grid",
@@ -1302,33 +1176,6 @@ const styles = stylex.create({
       [breakpoints.md]: "1.5rem",
     },
   },
-  domainColCode: {
-    gridColumn: {
-      default: "auto",
-      [breakpoints.md]: "span 2",
-    },
-  },
-  domainCodeRow: {
-    display: "flex",
-    alignItems: "center",
-    gap: "0.5rem",
-  },
-  domainCode: {
-    fontFamily: typography.tech,
-    fontSize: "11px",
-    letterSpacing: "0.22em",
-    color: colors.brandGreen700,
-    margin: 0,
-  },
-  domainCat: {
-    marginTop: "0.25rem",
-    fontFamily: typography.tech,
-    fontSize: "10px",
-    textTransform: "uppercase",
-    letterSpacing: "0.22em",
-    color: colors.mute600,
-    margin: 0,
-  },
   domainH3: {
     fontFamily: typography.body,
     fontSize: {
@@ -1343,7 +1190,7 @@ const styles = stylex.create({
     },
     gridColumn: {
       default: "auto",
-      [breakpoints.md]: "span 5",
+      [breakpoints.md]: "span 7",
     },
     transitionProperty: "color",
     transitionDuration: "300ms",
@@ -1400,16 +1247,7 @@ const styles = stylex.create({
       [breakpoints.md]: "7rem",
     },
   },
-  ctaChannelTag: {
-    fontFamily: typography.tech,
-    fontSize: "11px",
-    textTransform: "uppercase",
-    letterSpacing: "0.28em",
-    color: colors.brandGreen300,
-    margin: 0,
-  },
   ctaH2: {
-    marginTop: "1.5rem",
     maxWidth: "56rem",
     fontFamily: typography.body,
     fontSize: {
@@ -1503,15 +1341,6 @@ const styles = stylex.create({
       outlineOffset: "4px",
     },
   },
-  ctaResponseText: {
-    marginTop: "2.5rem",
-    fontFamily: typography.tech,
-    fontSize: "10px",
-    textTransform: "uppercase",
-    letterSpacing: "0.28em",
-    color: "color-mix(in oklch, var(--color-paper) 65%, transparent)",
-    margin: 0,
-  },
   networkHeader: {
     display: "flex",
     alignItems: "center",
@@ -1531,17 +1360,6 @@ const styles = stylex.create({
     textTransform: "uppercase",
     letterSpacing: "0.26em",
     color: colors.brandGreen300,
-  },
-  networkVerifiedText: {
-    display: {
-      default: "none",
-      [breakpoints.md]: "block",
-    },
-    fontFamily: typography.tech,
-    fontSize: "10px",
-    textTransform: "uppercase",
-    letterSpacing: "0.26em",
-    color: "color-mix(in oklch, var(--color-paper) 65%, transparent)",
   },
   networkGrid: {
     display: "grid",
@@ -1571,14 +1389,11 @@ const styles = stylex.create({
     transitionDuration: "500ms",
   },
   networkCardMeta: {
-    display: "flex",
-    alignItems: "baseline",
-    justifyContent: "space-between",
     fontFamily: typography.tech,
     fontSize: "10px",
     textTransform: "uppercase",
     letterSpacing: "0.2em",
-    color: colors.brandGreen300,
+    color: "color-mix(in oklch, var(--color-paper) 65%, transparent)",
   },
   networkCity: {
     marginTop: "1rem",
@@ -1642,14 +1457,6 @@ const styles = stylex.create({
       outline: `2px solid ${colors.brandGreen500}`,
       outlineOffset: "4px",
     },
-  },
-  footerSubtitle: {
-    marginTop: "1rem",
-    maxWidth: "20rem",
-    fontFamily: typography.body,
-    fontSize: "1.125rem",
-    fontWeight: 500,
-    color: colors.mute600,
   },
   footerCerts: {
     marginTop: "1.5rem",
@@ -1751,9 +1558,6 @@ const styles = stylex.create({
       default: "flex-start",
       [breakpoints.md]: "space-between",
     },
-  },
-  footerEof: {
-    color: colors.brandGreen700,
   },
   /* ─── Division Badges & Accents ───────────────────────── */
   divisionDot: {
@@ -1866,21 +1670,10 @@ function DivisionTag({ division }: { division: DivisionKey }) {
 }
 
 /* Section header with mono code and brand-green heading */
-function SectionHead({
-  code,
-  title,
-  sub,
-  right,
-}: {
-  code: string;
-  title: string;
-  sub: string;
-  right?: ReactNode;
-}) {
+function SectionHead({ title, sub, right }: { title: string; sub: string; right?: ReactNode }) {
   return (
     <div {...stylex.props(styles.sectionHead)}>
       <Reveal>
-        <p {...stylex.props(styles.sectionCode)}>{code}</p>
         <h2 {...stylex.props(styles.sectionH2)}>
           {title} <span {...stylex.props(styles.greenAccentText)}>{sub}</span>
         </h2>
@@ -1930,17 +1723,6 @@ function HeroSection() {
       <div {...stylex.props(styles.heroGrid)}>
         {/* Left: headline block */}
         <div {...stylex.props(styles.heroLeft)}>
-          <Reveal>
-            <span {...stylex.props(styles.heroSysBadge)}>
-              <span {...stylex.props(styles.heroSysPingWrap)}>
-                <span {...stylex.props(styles.heroSysPingOuter)} />
-                <span {...stylex.props(styles.heroSysPingInner)} />
-              </span>
-              <span {...stylex.props(styles.heroSysText)}>
-                SYS.ACTIVE — Botanical Intelligence Since 1995
-              </span>
-            </span>
-          </Reveal>
           <Reveal delay={0.1}>
             <h1 {...stylex.props(styles.heroH1)}>
               Nurturing Vitality through{" "}
@@ -1989,13 +1771,6 @@ function HeroSection() {
                     <dd {...stylex.props(styles.metaDd)}>{row.v}</dd>
                   </div>
                 ))}
-                <div {...stylex.props(styles.metaRow)}>
-                  <dt {...stylex.props(styles.metaDt)}>STATUS</dt>
-                  <dd {...stylex.props(styles.statusDd)}>
-                    <span aria-hidden {...stylex.props(styles.statusDot)} />
-                    OPERATIONAL
-                  </dd>
-                </div>
               </dl>
               <div {...stylex.props(styles.heroImgFrame)}>
                 <img
@@ -2048,9 +1823,8 @@ function StatBand() {
   return (
     <section aria-label="Company metrics" {...stylex.props(styles.statBand)}>
       {STATS.map((s, i) => (
-        <Reveal key={s.label} delay={i * 0.08}>
+        <Reveal key={s.unit} delay={i * 0.08}>
           <div {...stylex.props(styles.statCard)}>
-            <p {...stylex.props(styles.statLabel)}>{s.label}</p>
             <div {...stylex.props(styles.statValueRow)}>
               <span {...stylex.props(styles.statValue)}>{s.value}</span>
               <span {...stylex.props(styles.statUnit)}>{s.unit}</span>
@@ -2068,7 +1842,6 @@ function MatrixSection() {
   return (
     <section id="matrix" {...stylex.props(styles.matrixSection)}>
       <SectionHead
-        code="SYS.CAT_01 // ACTIVE COMPOUNDS"
         title="Ingredient"
         sub="matrix."
         right={
@@ -2106,12 +1879,7 @@ function MatrixSection() {
                     </span>
                   </div>
                   <div {...stylex.props(styles.matrixContent)}>
-                    <div {...stylex.props(styles.matrixHeaderRow)}>
-                      <span {...stylex.props(styles.matrixIndex)}>
-                        {String(i + 1).padStart(2, "0")} —
-                      </span>
-                      <span {...stylex.props(styles.matrixCode)}>{item.code}</span>
-                    </div>
+                    <span {...stylex.props(styles.matrixCode)}>{item.code}</span>
                     <h3 {...stylex.props(styles.matrixName)}>{item.name}</h3>
                     {/* Division badge */}
                     <div {...stylex.props(styles.matrixBadgeRow)}>
@@ -2156,16 +1924,7 @@ function MatrixSection() {
 function ProtocolSection() {
   return (
     <section id="protocol" {...stylex.props(styles.protocolSection)}>
-      <SectionHead
-        code="SYS.METHOD // 02"
-        title="Operating"
-        sub="protocol."
-        right={
-          <p {...stylex.props(styles.protocolAside)}>
-            Rooted in nature, refined by science — every lot, every market, every release.
-          </p>
-        }
-      />
+      <SectionHead title="Operating" sub="protocol." />
       <div {...stylex.props(styles.protocolGrid)}>
         <div {...stylex.props(styles.protocolFigureCol)}>
           <Reveal>
@@ -2206,11 +1965,7 @@ function ProtocolSection() {
 function DomainsSection() {
   return (
     <section id="domains" {...stylex.props(styles.domainsSection)}>
-      <SectionHead
-        code="SYS.CAT_02 // APPLICATION DOMAINS"
-        title="Built for three"
-        sub="industries."
-      />
+      <SectionHead title="Built for three" sub="industries." />
       <div>
         {industries.map((industry, i) => {
           const detail = DOMAIN_DETAIL[i];
@@ -2219,13 +1974,6 @@ function DomainsSection() {
             <a key={industry.title} href="#contact" {...stylex.props(styles.domainLink)}>
               <Reveal delay={i * 0.06}>
                 <div {...stylex.props(styles.domainRowGrid)}>
-                  <div {...stylex.props(styles.domainColCode)}>
-                    <div {...stylex.props(styles.domainCodeRow)}>
-                      <DivisionDot division={detail.division} />
-                      <p {...stylex.props(styles.domainCode)}>{detail.code}</p>
-                    </div>
-                    <p {...stylex.props(styles.domainCat)}>{detail.cat}</p>
-                  </div>
                   <h3 {...stylex.props(styles.domainH3)}>{industry.title}</h3>
                   <p {...stylex.props(styles.domainDesc)}>{detail.desc}</p>
                   <div {...stylex.props(styles.domainArrowCol)}>
@@ -2249,7 +1997,6 @@ function CtaNetworkSection() {
     <section id="contact" {...stylex.props(styles.ctaNetworkSection)}>
       <div {...stylex.props(styles.ctaTopBanner)}>
         <Reveal>
-          <p {...stylex.props(styles.ctaChannelTag)}>SYS.CONTACT // OPEN CHANNEL</p>
           <h2 {...stylex.props(styles.ctaH2)}>
             Your next formulation,{" "}
             <span {...stylex.props(styles.ctaH2Green)}>engineered to specification.</span>
@@ -2276,31 +2023,16 @@ function CtaNetworkSection() {
             </a>
           </div>
         </Reveal>
-        <Reveal delay={0.25}>
-          <p {...stylex.props(styles.ctaResponseText)}>
-            RESPONSE.TIME &lt; 24H — TECHNICAL DOSSIERS ON REQUEST
-          </p>
-        </Reveal>
       </div>
       <div id="network">
         <div {...stylex.props(styles.networkHeader)}>
           <span {...stylex.props(styles.networkNodesTitle)}>SYS.NET // 6 ACTIVE NODES</span>
-          <span {...stylex.props(styles.networkVerifiedText)}>LAT/LONG VERIFIED — 2026.06</span>
         </div>
         <div {...stylex.props(styles.networkGrid)}>
           {regions.map((region, i) => (
             <Reveal key={region.city} delay={(i % 3) * 0.08}>
               <div {...stylex.props(styles.networkCard)}>
-                <div {...stylex.props(styles.networkCardMeta)}>
-                  <span>{`NODE ${String(i + 1).padStart(2, "0")}`}</span>
-                  <span
-                    style={{
-                      color: "color-mix(in oklch, var(--color-paper) 65%, transparent)",
-                    }}
-                  >
-                    {region.coords}
-                  </span>
-                </div>
+                <p {...stylex.props(styles.networkCardMeta)}>{region.coords}</p>
                 <p {...stylex.props(styles.networkCity)}>{region.city}</p>
                 <p {...stylex.props(styles.networkRole)}>{region.role}</p>
               </div>
@@ -2321,7 +2053,6 @@ function FooterSection() {
           <a href="/" {...stylex.props(styles.footerLogo)}>
             FENCHEM
           </a>
-          <p {...stylex.props(styles.footerSubtitle)}>Rooted in nature, refined by science.</p>
           <p {...stylex.props(styles.footerCerts)}>
             ISO 9001 : 2015 / GMP / HACCP
             <br />
@@ -2353,8 +2084,7 @@ function FooterSection() {
       </p>
       <div {...stylex.props(styles.footerLegalRow)}>
         <span>© 2026 Fenchem — All Rights Reserved</span>
-        <span>N 32.06 / E 118.79 — Nanjing</span>
-        <span {...stylex.props(styles.footerEof)}>SYS.EOF // END OF SPEC</span>
+        <span>N 32.06 / E 118.79 — Nanjing</span>{" "}
       </div>
     </footer>
   );
@@ -2388,11 +2118,8 @@ export function VariantE() {
                 <span {...stylex.props(styles.logoSub)}>Innovation Lab</span>
               </a>
               <div {...stylex.props(styles.navLinksDesktop)}>
-                {NAV_LINKS.map((link, i) => (
+                {NAV_LINKS.map((link) => (
                   <a key={link.href} href={link.href} {...stylex.props(styles.navLink)}>
-                    <span {...stylex.props(styles.navLinkNum)}>
-                      {String(i + 1).padStart(2, "0")}
-                    </span>
                     {link.label}
                   </a>
                 ))}

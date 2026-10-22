@@ -10,10 +10,10 @@ import { bp, face, tone } from "./tokens.stylex";
 
 type Level = (typeof ABOUT_HONORS.items)[number]["level"];
 
-const LEVELS: Record<Level, { label: string; english: string; exposures: number }> = {
-  national: { label: "国家级", english: "National", exposures: 3 },
-  provincial: { label: "省级", english: "Provincial", exposures: 2 },
-  municipal: { label: "市级", english: "Municipal", exposures: 1 },
+const LEVELS: Record<Level, { label: string; exposures: number }> = {
+  national: { label: "国家级", exposures: 3 },
+  provincial: { label: "省级", exposures: 2 },
+  municipal: { label: "市级", exposures: 1 },
 };
 
 const FRAME_STAGGER = 2 * TICK;
@@ -80,9 +80,6 @@ const styles = stylex.create({
     fontWeight: 500,
     letterSpacing: "0.06em",
     color: tone.navy,
-  },
-  levelEnglish: {
-    fontSize: { default: 17, [bp.desktop]: 18 },
   },
   title: {
     margin: 0,
@@ -153,7 +150,7 @@ export function Honors() {
   const [sequenceRef, phase] = useEntry<HTMLOListElement>();
   return (
     <section id="about-honor" aria-labelledby="oos1p-honor" {...stylex.props(ui.plate)}>
-      <PlateHead plate={5} english="Honors" title={ABOUT_HONORS.title} titleId="oos1p-honor" />
+      <PlateHead title={ABOUT_HONORS.title} titleId="oos1p-honor" />
       <div {...stylex.props(ui.shell)}>
         <ol ref={sequenceRef} {...stylex.props(styles.sequence)}>
           {ABOUT_HONORS.items.map((item, index) => {
@@ -168,9 +165,6 @@ export function Honors() {
                   />
                   <p {...stylex.props(styles.level)}>
                     <span {...stylex.props(styles.levelLabel)}>{level.label}</span>
-                    <span lang="en" {...stylex.props(ui.eyebrow, styles.levelEnglish)}>
-                      {level.english}
-                    </span>
                   </p>
                 </div>
                 <p {...stylex.props(styles.title)}>{item.title}</p>

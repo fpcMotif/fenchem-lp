@@ -126,13 +126,6 @@ const s = stylex.create({
   },
   statLabel: {
     margin: 0,
-    fontSize: step.label,
-    letterSpacing: "0.08em",
-    color: tone.onNavyQuiet,
-  },
-  statCaption: {
-    margin: 0,
-    marginTop: 6,
     fontSize: { default: step.body, [breakpoints.md]: step.lead },
     letterSpacing: "0.1em",
     color: tone.onNavy,
@@ -189,7 +182,6 @@ export function Profile() {
                 </p>
                 <div {...stylex.props(s.note)}>
                   <p {...stylex.props(s.statLabel)}>{stat.label}</p>
-                  <p {...stylex.props(s.statCaption)}>{stat.caption}</p>
                 </div>
               </Reveal>
             ))}

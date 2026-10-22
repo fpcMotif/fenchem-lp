@@ -56,7 +56,6 @@ import {
   OFFICE_COLUMNS,
   OFFICE_MAP_PINS,
   PRODUCTS_INTRO,
-  SECTION_LABELS,
   STATS,
   STRENGTHS,
   STRENGTHS_INTRO,
@@ -293,10 +292,6 @@ const styles = stylex.create({
     letterSpacing: "0.12em",
     color: INK,
   },
-  hangEnd: {
-    paddingInlineStart: { default: 18, [DESKTOP]: 0 },
-    paddingInlineEnd: { default: 0, [DESKTOP]: 18 },
-  },
   hangOnDark: {
     borderTopColor: colors.paper,
     color: colors.paper,
@@ -315,15 +310,6 @@ const styles = stylex.create({
     borderColor: colors.brandBlue700,
     borderBottomLeftRadius: 7,
     pointerEvents: "none",
-  },
-  hookEnd: {
-    insetInlineStart: { default: 0, [DESKTOP]: "auto" },
-    insetInlineEnd: { default: "auto", [DESKTOP]: 0 },
-    borderInlineStartWidth: { default: 1, [DESKTOP]: 0 },
-    borderInlineEndWidth: { default: 0, [DESKTOP]: 1 },
-    borderInlineEndStyle: "solid",
-    borderBottomLeftRadius: { default: 7, [DESKTOP]: 0 },
-    borderBottomRightRadius: { default: 0, [DESKTOP]: 7 },
   },
   hookOnDark: {
     borderColor: colors.paper,
@@ -973,14 +959,6 @@ const styles = stylex.create({
     letterSpacing: "0.01em",
     color: INK,
   },
-  stagePitch: {
-    margin: 0,
-    fontFamily: SERIF_FONT,
-    fontStyle: "italic",
-    fontSize: { default: 24, [DESKTOP]: 30 },
-    lineHeight: 1,
-    color: colors.brandGreen800,
-  },
   stageKicker: {
     margin: 0,
     fontSize: 16,
@@ -1191,13 +1169,6 @@ const styles = stylex.create({
     alignItems: "center",
     justifyContent: "space-between",
     color: INK,
-  },
-  strengthNumber: {
-    fontFamily: DISPLAY_FONT,
-    fontSize: 13,
-    fontWeight: 500,
-    letterSpacing: "0.08em",
-    fontVariantNumeric: "tabular-nums",
   },
   strengthText: {
     position: "relative",
@@ -1742,34 +1713,14 @@ function DropIn({
   );
 }
 
-function Hook({ mirror = false, onDark = false }: { mirror?: boolean; onDark?: boolean }) {
-  return (
-    <span
-      aria-hidden="true"
-      {...stylex.props(styles.hook, mirror && styles.hookEnd, onDark && styles.hookOnDark)}
-    />
-  );
+function Hook({ onDark = false }: { onDark?: boolean }) {
+  return <span aria-hidden="true" {...stylex.props(styles.hook, onDark && styles.hookOnDark)} />;
 }
 
-function Hang({
-  children,
-  number,
-  mirror = false,
-  onDark = false,
-}: {
-  children: ReactNode;
-  number?: number;
-  mirror?: boolean;
-  onDark?: boolean;
-}) {
+function Hang({ children }: { children: ReactNode }) {
   return (
-    <p {...stylex.props(styles.hang, mirror && styles.hangEnd, onDark && styles.hangOnDark)}>
-      <Hook mirror={mirror} onDark={onDark} />
-      {number === undefined ? null : (
-        <span {...stylex.props(styles.hangNumber, onDark && styles.hangNumberOnDark)}>
-          {twoDigits(number)}
-        </span>
-      )}
+    <p {...stylex.props(styles.hang)}>
+      <Hook />
       {children}
     </p>
   );
@@ -2011,9 +1962,6 @@ function About() {
     >
       <div {...stylex.props(styles.shell, styles.inset120, styles.mirrorGrid)}>
         <DropIn sx={styles.mirrorStart}>
-          <Hang number={1} mirror>
-            {SECTION_LABELS.about}
-          </Hang>
           <h2 id="oox3-about-title" {...stylex.props(styles.sectionTitle, styles.aboutTitle)}>
             {ABOUT.title}
           </h2>
@@ -2046,7 +1994,6 @@ function ProductsIntro() {
   return (
     <div {...stylex.props(styles.shell, styles.inset120, styles.productsIntro)}>
       <DropIn sx={[styles.head, styles.headCenter]}>
-        <Hang number={2}>{SECTION_LABELS.products}</Hang>
         <h2 id="oox3-products-title" {...stylex.props(styles.sectionTitle)}>
           {PRODUCTS_INTRO.title}
         </h2>
@@ -2085,7 +2032,6 @@ function MarketStage({
   const copyOpacity = useTransform(local, [0.62, 0.9, 1.04, 1.26], [0, 1, 1, 0]);
   const copyEvents = useTransform(copyOpacity, (value) => (value > 0.5 ? "auto" : "none"));
   const titleY = useTransform(local, [0.62, 0.82, 0.94], [-44, 7, 0]);
-  const startY = useTransform(local, [0.62, 0.92], [-18, 0]);
   const endY = useTransform(local, [0.7, 0.98], [22, 0]);
   const alt = index % 2 === 1;
   return (
@@ -2099,19 +2045,9 @@ function MarketStage({
         {...stylex.props(styles.stageStart)}
         style={{ opacity: copyOpacity, pointerEvents: copyEvents }}
       >
-        <m.div style={{ y: startY }}>
-          <Hang number={index + 1} mirror>
-            <span lang="en">
-              / {twoDigits(MARKETS.length)} · {market.english}
-            </span>
-          </Hang>
-        </m.div>
         <m.h3 id={titleId} {...stylex.props(styles.stageTitle)} style={{ y: titleY }}>
           {market.title}
         </m.h3>
-        <m.p lang="en" {...stylex.props(styles.stagePitch)} style={{ y: startY }}>
-          {market.pitch}
-        </m.p>
       </m.div>
       <figure {...stylex.props(styles.frame)}>
         {index === 0 ? <span aria-hidden="true" {...stylex.props(styles.frameSlot)} /> : null}
@@ -2243,7 +2179,6 @@ function Strengths() {
     >
       <div {...stylex.props(styles.shell, styles.inset120)}>
         <DropIn sx={styles.head}>
-          <Hang number={3}>{SECTION_LABELS.strengths}</Hang>
           <h2 id="oox3-strengths-title" {...stylex.props(styles.sectionTitle)}>
             {STRENGTHS_INTRO.title}
           </h2>
@@ -2269,9 +2204,6 @@ function Strengths() {
                     <IconPattern icon={strength.icon} />
                     <div {...stylex.props(styles.strengthTop, inverse && styles.strengthInverse)}>
                       <Icon size={32} strokeWidth={1.5} absoluteStrokeWidth aria-hidden="true" />
-                      <span aria-hidden="true" {...stylex.props(styles.strengthNumber)}>
-                        {twoDigits(index + 1)}
-                      </span>
                     </div>
                     <div {...stylex.props(styles.strengthText, inverse && styles.strengthInverse)}>
                       <h3 id={`oox3-strength-${index}`} {...stylex.props(styles.strengthTitle)}>
@@ -2326,9 +2258,6 @@ function Campus() {
           />
           <div aria-hidden="true" {...stylex.props(styles.campusShade)} />
           <div {...stylex.props(styles.campusCaption)}>
-            <Hang number={4} onDark>
-              <span lang="en">{CAMPUS.echo}</span>
-            </Hang>
             <h2 id="oox3-campus-title" {...stylex.props(styles.sectionTitle, styles.campusTitle)}>
               {CAMPUS.label}
             </h2>
@@ -2343,7 +2272,6 @@ function Campus() {
               <span {...stylex.props(styles.statValue)}>{stat.value}</span>
               {stat.unit ? <span {...stylex.props(styles.statUnit)}>{stat.unit}</span> : null}
             </p>
-            <p {...stylex.props(styles.mutedText)}>{stat.caption}</p>
           </DropIn>
         ))}
       </div>
@@ -2378,7 +2306,6 @@ function Offices() {
             ))}
           </div>
           <div {...stylex.props(styles.globalCopy)}>
-            <Hang number={5}>{SECTION_LABELS.offices}</Hang>
             <h2 id="oox3-offices-title" {...stylex.props(styles.sectionTitle)}>
               {GLOBAL_INTRO.title}
             </h2>
@@ -2459,7 +2386,6 @@ function News() {
     >
       <div {...stylex.props(styles.shell, styles.inset120, styles.newsInner)}>
         <DropIn sx={styles.head}>
-          <Hang number={6}>{SECTION_LABELS.news}</Hang>
           <h2 id="oox3-news-title" {...stylex.props(styles.sectionTitle)}>
             {NEWS_TITLE}
           </h2>
@@ -2498,9 +2424,6 @@ function ContactMirror() {
       <div {...stylex.props(styles.shell, styles.inset120, styles.contactContent)}>
         <MarketTags label="Choose an application area" sx={styles.contactTags} />
         <DropIn sx={styles.contactCopy}>
-          <Hang number={7} mirror>
-            {SECTION_LABELS.contact}
-          </Hang>
           <p lang="en" {...stylex.props(styles.contactDisplay)}>
             <span {...stylex.props(styles.contactLine, styles.contactLineSoft)}>
               {CONTACT_FIRST}

@@ -3,7 +3,7 @@ import { Factory, Leaf, Recycle, type LucideIcon } from "lucide-react";
 
 import { ABOUT_CSR } from "../../about-data";
 import { RoomSign } from "./room-sign";
-import { LAKE, PLACE, sectionTitle, ui } from "./shared";
+import { LAKE, sectionTitle, ui } from "./shared";
 import { bp, chrome, face, tone } from "./tokens.stylex";
 
 const ICONS: Record<(typeof ABOUT_CSR.outcomes)[number]["icon"], LucideIcon> = {
@@ -68,10 +68,6 @@ const styles = stylex.create({
     fontFamily: face.sans,
     fontSize: 15,
     color: tone.ink,
-  },
-  meta: {
-    fontSize: 16,
-    color: tone.body,
   },
   wall: {
     display: "flex",
@@ -152,21 +148,13 @@ export function Csr() {
                 Nº {LAKE.number}
               </span>
               <span {...stylex.props(styles.title)}>{LAKE.title}</span>
-              <span lang="en" {...stylex.props(ui.italic, styles.meta)}>
-                {LAKE.english}, {PLACE}
-              </span>
             </span>
           </figcaption>
         </figure>
       </div>
       <div {...stylex.props(ui.shell, ui.room)}>
         <div {...stylex.props(styles.wall)}>
-          <RoomSign
-            numeral="III"
-            id="oos1z-csr"
-            title={sectionTitle("about-csr")}
-            english="Responsibility"
-          />
+          <RoomSign id="oos1z-csr" title={sectionTitle("about-csr")} />
           <p {...stylex.props(styles.statement)}>
             {ABOUT_CSR.statement.map((line) => (
               <span key={line} {...stylex.props(styles.line)}>

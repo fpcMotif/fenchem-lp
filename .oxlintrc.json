@@ -3,12 +3,23 @@
   "options": {
     "typeAware": true
   },
-  "plugins": ["typescript", "unicorn", "oxc", "react"],
+  "plugins": ["typescript", "unicorn", "oxc", "react", "jsx-a11y"],
   "categories": {
     "correctness": "error"
   },
   "rules": {
     "react/rules-of-hooks": "error",
+    "jsx-a11y/alt-text": "error",
+    "jsx-a11y/control-has-associated-label": "error",
+    "jsx-a11y/label-has-associated-control": "error",
+    "jsx-a11y/click-events-have-key-events": "off",
+    "jsx-a11y/interactive-supports-focus": "off",
+    "jsx-a11y/no-noninteractive-element-interactions": "off",
+    "jsx-a11y/no-noninteractive-element-to-interactive-role": "off",
+    "jsx-a11y/no-noninteractive-tabindex": "off",
+    "jsx-a11y/no-redundant-roles": "off",
+    "jsx-a11y/no-static-element-interactions": "off",
+    "jsx-a11y/prefer-tag-over-role": "off",
     "typescript/no-explicit-any": "warn",
     "typescript/no-restricted-imports": [
       "error",

@@ -2,10 +2,9 @@ import * as stylex from "@stylexjs/stylex";
 
 import { ABOUT_BANNER, ABOUT_HERO } from "../../about-data";
 import { PoleMark } from "./shared";
-import { srOnly, ui } from "./shared-values";
+import { ui } from "./shared-values";
 import { bp, chrome, face, sky } from "./tokens.stylex";
 
-const NUMERALS = ["I", "II", "III", "IV", "V", "VI"] as const;
 const [LEAD_SINCE, LEAD_FOCUS] = ABOUT_BANNER.lead.split(" · ");
 
 const styles = stylex.create({
@@ -18,14 +17,6 @@ const styles = stylex.create({
     gridTemplateRows: "1fr 0 1fr",
     height: chrome.sky,
     minHeight: 560,
-  },
-  margin: {
-    position: "absolute",
-    top: { default: 20, [bp.desktop]: 28 },
-    insetInline: 0,
-    display: "flex",
-    justifyContent: "space-between",
-    gap: 16,
   },
   upper: {
     alignSelf: "end",
@@ -129,11 +120,6 @@ const styles = stylex.create({
     transitionProperty: "color",
     transitionDuration: "200ms",
   },
-  linkNumeral: {
-    minWidth: "1.4em",
-    fontSize: 19,
-    color: sky.muted,
-  },
 });
 
 export function Hero() {
@@ -141,17 +127,7 @@ export function Hero() {
     <section aria-labelledby="oos1k-title" {...stylex.props(styles.hero)}>
       <div {...stylex.props(ui.shell)}>
         <div {...stylex.props(styles.stage)}>
-          <div {...stylex.props(styles.margin)}>
-            <p lang="en" {...stylex.props(ui.label)}>
-              Atlas of Fenchem
-            </p>
-            <p lang="en" {...stylex.props(ui.label)}>
-              {ABOUT_BANNER.established} · {ABOUT_BANNER.place}
-            </p>
-          </div>
-
           <div {...stylex.props(styles.upper)}>
-            <p {...stylex.props(ui.label)}>泛成星图</p>
             <h1 id="oos1k-title" {...stylex.props(styles.title)}>
               {ABOUT_BANNER.title}
             </h1>
@@ -162,7 +138,7 @@ export function Hero() {
             <p {...stylex.props(styles.poleLabel)}>
               <span {...stylex.props(styles.poleName)}>天极 · 南京</span>
               <span lang="en" {...stylex.props(ui.label)}>
-                Pole · 32°03′ N 118°47′ E
+                32°03′ N 118°47′ E
               </span>
             </p>
           </div>
@@ -180,13 +156,9 @@ export function Hero() {
 
           <nav aria-label="Star chart index" {...stylex.props(styles.index)}>
             <ol {...stylex.props(styles.list)}>
-              {ABOUT_HERO.navChips.map((chip, index) => (
+              {ABOUT_HERO.navChips.map((chip) => (
                 <li key={chip.id}>
                   <a href={`#${chip.id}`} {...stylex.props(styles.link, ui.focusable)}>
-                    <span aria-hidden="true" {...stylex.props(ui.designation, styles.linkNumeral)}>
-                      {NUMERALS[index]}
-                    </span>
-                    <span {...srOnly}>Figure {index + 1} </span>
                     {chip.label}
                   </a>
                 </li>

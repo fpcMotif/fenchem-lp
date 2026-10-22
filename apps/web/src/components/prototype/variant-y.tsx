@@ -176,18 +176,6 @@ const styles = stylex.create({
   },
 
   /* Type roles */
-  eyebrow: {
-    margin: 0,
-    fontFamily: typography.tech,
-    fontSize: 11,
-    lineHeight: 1.4,
-    letterSpacing: "0.32em",
-    textTransform: "uppercase",
-    color: colors.brandGreen700,
-  },
-  eyebrowOnDark: {
-    color: colors.brandGreen400,
-  },
   techLabel: {
     fontFamily: typography.tech,
     fontSize: 11,
@@ -757,10 +745,6 @@ const styles = stylex.create({
     textTransform: "uppercase",
     color: colors.mute700,
   },
-  divisionIndex: {
-    marginLeft: "auto",
-    color: colors.mute500,
-  },
   dot: {
     display: "inline-block",
     width: 8,
@@ -828,12 +812,6 @@ const styles = stylex.create({
       default: "left",
       [breakpoints.lg]: "right",
     },
-  },
-  ordinal: {
-    fontFamily: typography.display,
-    fontStyle: "italic",
-    fontSize: 14,
-    color: colors.brandGreen700,
   },
 
   /* A–Z index */
@@ -1584,11 +1562,6 @@ function HeroSection() {
       <div {...stylex.props(styles.container, styles.containerFull)}>
         <div {...stylex.props(styles.heroInner)}>
           <Reveal margin="0px">
-            <p {...stylex.props(styles.eyebrow, styles.eyebrowOnDark)}>
-              Botanical intelligence since 1995 · six bases · three continents
-            </p>
-          </Reveal>
-          <Reveal delay={STAGGER} margin="0px">
             <h1 {...stylex.props(styles.display, styles.heroTitle)}>
               Rooted in nature,
               <span {...stylex.props(styles.heroTitleItalic)}>refined by science.</span>
@@ -1615,7 +1588,6 @@ function HeroSection() {
             <div {...stylex.props(styles.heroMeta)}>
               <span {...stylex.props(styles.heroMetaItem)}>ISO 9001 · GMP · FSSC 22000</span>
               <span {...stylex.props(styles.heroMetaItem)}>Response &lt; 24h</span>
-              <span {...stylex.props(styles.heroMetaItem)}>{company.hq.coords}</span>
             </div>
           </Reveal>
         </div>
@@ -1654,26 +1626,11 @@ function StatBand() {
 
 /* ─────────────────────────────── Section header ─────────────────────────────── */
 
-function SectionHead({
-  ordinal,
-  eyebrow,
-  title,
-  aside,
-}: {
-  ordinal: string;
-  eyebrow: string;
-  title: React.ReactNode;
-  aside?: React.ReactNode;
-}) {
+function SectionHead({ title, aside }: { title: React.ReactNode; aside?: React.ReactNode }) {
   return (
     <div {...stylex.props(styles.sectionHead)}>
       <div {...stylex.props(styles.sectionHeadMain)}>
         <Reveal>
-          <p {...stylex.props(styles.eyebrow)}>
-            <span {...stylex.props(styles.ordinal)}>{ordinal}</span> — {eyebrow}
-          </p>
-        </Reveal>
-        <Reveal delay={STAGGER}>
           <h2 {...stylex.props(styles.display, styles.h2)}>{title}</h2>
         </Reveal>
       </div>
@@ -1758,8 +1715,6 @@ function IndexSection() {
     >
       <div {...stylex.props(styles.container)}>
         <SectionHead
-          ordinal="01"
-          eyebrow="A–Z index · 08 specimens"
           title={
             <span id="index-title">
               The portfolio, <span {...stylex.props(styles.displayItalic)}>alphabetically</span>{" "}
@@ -1859,8 +1814,6 @@ function IndustriesSection() {
     >
       <div {...stylex.props(styles.container)}>
         <SectionHead
-          ordinal="02"
-          eyebrow="Industries · 03 markets · 06 divisions"
           title={
             <span id="industries-title">
               Three markets, <span {...stylex.props(styles.displayItalic)}>one</span> chain of
@@ -1900,13 +1853,10 @@ function IndustriesSection() {
         </div>
         <Reveal delay={STAGGER * 3}>
           <ul aria-label="Divisions" {...stylex.props(styles.sixGrid)} style={{ marginTop: 48 }}>
-            {DIVISION_ORDER.map((division, i) => (
+            {DIVISION_ORDER.map((division) => (
               <li key={division} {...stylex.props(styles.divisionCell)}>
                 <DivisionDot division={division} />
                 {DIVISION_LABEL[division]}
-                <span {...stylex.props(styles.divisionIndex)}>
-                  {String(i + 1).padStart(2, "0")}
-                </span>
               </li>
             ))}
           </ul>
@@ -1927,8 +1877,6 @@ function QualitySection() {
     >
       <div {...stylex.props(styles.container)}>
         <SectionHead
-          ordinal="03"
-          eyebrow="Quality · 03 pillars · 06 certifications"
           title={
             <span id="quality-title">
               Trust is argued with{" "}
@@ -1944,11 +1892,8 @@ function QualitySection() {
         />
         <Reveal>
           <div {...stylex.props(styles.pillarGrid)}>
-            {pillars.map((pillar, i) => (
+            {pillars.map((pillar) => (
               <div key={pillar.title} {...stylex.props(styles.pillarCell)}>
-                <span {...stylex.props(styles.ordinal)} style={{ fontSize: 22 }}>
-                  {String(i + 1).padStart(2, "0")}
-                </span>
                 <h3 {...stylex.props(styles.pillarTitle)}>{pillar.title}</h3>
                 <p {...stylex.props(styles.prose)}>{pillar.copy}</p>
               </div>
@@ -1991,8 +1936,6 @@ function GlobalSection() {
     >
       <div {...stylex.props(styles.container)}>
         <SectionHead
-          ordinal="04"
-          eyebrow="Global supply · 06 bases"
           title={
             <span id="global-title">
               Sourced at origin, <span {...stylex.props(styles.displayItalic)}>traced</span> from
@@ -2007,11 +1950,9 @@ function GlobalSection() {
         />
         <Reveal>
           <ul aria-label="Regions" {...stylex.props(styles.sixGrid)}>
-            {regions.map((region, i) => (
+            {regions.map((region) => (
               <li key={region.city} {...stylex.props(styles.cell)}>
-                <span {...stylex.props(styles.cellIndex)}>
-                  {String(i + 1).padStart(2, "0")} · {region.short}
-                </span>
+                <span {...stylex.props(styles.cellIndex)}>{region.short}</span>
                 <h3 {...stylex.props(styles.cellTitle)}>{region.city}</h3>
                 <p {...stylex.props(styles.cellSub)}>
                   {region.country} · {region.role}
@@ -2039,11 +1980,6 @@ function FinaleSection() {
         <div {...stylex.props(styles.finaleGrid)}>
           <div {...stylex.props(styles.finaleMain)}>
             <Reveal>
-              <p {...stylex.props(styles.eyebrow)}>
-                <span {...stylex.props(styles.ordinal)}>05</span> — Contact
-              </p>
-            </Reveal>
-            <Reveal delay={STAGGER}>
               <h2 id="contact-title" {...stylex.props(styles.finaleTitle)}>
                 Send us the target.{" "}
                 <span {...stylex.props(styles.finaleTitleUpright)}>We send the specification.</span>
@@ -2065,8 +2001,6 @@ function FinaleSection() {
             <span>Response &lt; 24h</span>
             <span {...stylex.props(styles.finaleRule)} />
             <span>Documentation before sampling</span>
-            <span {...stylex.props(styles.finaleRule)} />
-            <span>{company.legalName}</span>
           </Reveal>
         </div>
       </div>

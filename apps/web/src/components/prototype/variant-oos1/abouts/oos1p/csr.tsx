@@ -34,10 +34,6 @@ const styles = stylex.create({
     rowGap: 28,
     alignItems: "start",
   },
-  caption: {
-    margin: 0,
-    fontSize: { default: 19, [bp.desktop]: 21 },
-  },
   desc: {
     maxWidth: "28em",
   },
@@ -69,7 +65,7 @@ export function Csr() {
   const [figureRef, figurePhase] = useEntry<HTMLElement>();
   return (
     <section id="about-csr" aria-labelledby="oos1p-csr" {...stylex.props(ui.plate)}>
-      <PlateHead plate={4} english="Responsibility" title={ABOUT_CSR.title} titleId="oos1p-csr" />
+      <PlateHead title={ABOUT_CSR.title} titleId="oos1p-csr" />
       <div {...stylex.props(ui.shell)}>
         <div {...stylex.props(ui.grid)}>
           <p ref={statementRef} {...stylex.props(ui.q2to4, styles.statement)}>
@@ -94,9 +90,6 @@ export function Csr() {
         </figure>
 
         <div {...stylex.props(ui.grid, styles.details)}>
-          <p lang="en" aria-hidden="true" {...stylex.props(ui.q1, ui.eyebrow, styles.caption)}>
-            Reflection
-          </p>
           <p {...stylex.props(ui.q2to3, ui.body, styles.desc)}>{ABOUT_CSR.desc}</p>
           <ul {...stylex.props(ui.q4, styles.outcomes)}>
             {ABOUT_CSR.outcomes.map((outcome, index) => (

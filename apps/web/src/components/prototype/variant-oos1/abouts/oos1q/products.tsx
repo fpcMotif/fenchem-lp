@@ -100,14 +100,6 @@ const s = stylex.create({
       height: "100%",
     },
   },
-  desc: {
-    margin: 0,
-    marginTop: 8,
-    fontSize: step.small,
-    lineHeight: 1.9,
-    letterSpacing: "0.05em",
-    color: tone.body,
-  },
   tags: {
     display: "flex",
     flexWrap: "wrap",
@@ -160,7 +152,6 @@ export function Products({ onNavigateHome }: { onNavigateHome: (hash?: string) =
                 {product.title}
               </button>
             </h3>
-            <p {...stylex.props(s.desc)}>{product.description}</p>
             <ul {...stylex.props(s.tags)}>
               {product.tags.map((tag) => (
                 <li key={tag}>{tag}</li>

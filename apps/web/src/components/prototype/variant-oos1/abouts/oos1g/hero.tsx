@@ -192,12 +192,6 @@ const styles = stylex.create({
     letterSpacing: 0,
     color: colors.brandBlue700,
   },
-  caption: {
-    margin: 0,
-    fontSize: 14,
-    letterSpacing: "0.1em",
-    color: palette.body,
-  },
 });
 
 export function Hero() {
@@ -239,9 +233,6 @@ export function Hero() {
         </div>
         <div {...stylex.props(layout.padRight, styles.introRight)}>
           <p {...stylex.props(styles.lead)}>{ABOUT_BANNER.lead}</p>
-          <p lang="en" {...stylex.props(layout.label)}>
-            {ABOUT_BANNER.established} · {ABOUT_BANNER.place}
-          </p>
         </div>
       </div>
     </section>
@@ -265,7 +256,6 @@ export function Stats() {
                 <CountUp value={stat.value} />
                 {stat.unit ? <span {...stylex.props(styles.unit)}>{stat.unit}</span> : null}
               </div>
-              <p {...stylex.props(styles.caption)}>{stat.caption}</p>
             </Reveal>
           );
         })}

@@ -80,12 +80,7 @@ export function Csr() {
       data-hour={SECTION_HOURS.csr}
       {...stylex.props(ui.section, ui.shell)}
     >
-      <SectionHead
-        titleId="oos1t-csr"
-        hour={SECTION_HOURS.csr}
-        title={ABOUT_CSR.title}
-        english="Responsibility"
-      />
+      <SectionHead titleId="oos1t-csr" hour={SECTION_HOURS.csr} title={ABOUT_CSR.title} />
       <div {...stylex.props(ui.grid, styles.body)}>
         <p {...stylex.props(styles.statement)}>
           {ABOUT_CSR.statement.map((line) => (

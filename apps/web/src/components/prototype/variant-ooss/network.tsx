@@ -36,7 +36,6 @@ const HOVER_MS = "200ms";
 const DIMMED_OPACITY = 0.3;
 
 const CITY_INK = "#c7d2e8";
-const META = "全球资源整合 · 本地化服务";
 const HQ_OFFICE = "南京，中国";
 const HQ_TAG = "总部";
 
@@ -355,12 +354,6 @@ const styles = stylex.create({
     fontSize: 17,
     lineHeight: 1.7,
     color: color.white80,
-  },
-  meta: {
-    margin: 0,
-    fontSize: 14,
-    lineHeight: 1.5,
-    color: color.white60,
   },
   mapBox: {
     position: "relative",
@@ -734,9 +727,6 @@ export function Network() {
           </SectionTitle>
           <Reveal as="p" index={1} sx={styles.lead}>
             {GLOBAL_INTRO.lead}
-          </Reveal>
-          <Reveal as="p" index={2} sx={styles.meta}>
-            {META}
           </Reveal>
         </div>
         <WorldMap active={active} />

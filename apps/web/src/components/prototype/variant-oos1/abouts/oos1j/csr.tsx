@@ -4,7 +4,7 @@ import * as stylex from "@stylexjs/stylex";
 import { ABOUT_CSR } from "../../about-data";
 import { CropMarks, DriftImage, Reveal, RiseLines, SectionName, useInViewOnce } from "./parts";
 import { base, ty } from "./shared";
-import { font, hue, size } from "./theme.stylex";
+import { hue, size } from "./theme.stylex";
 
 const styles = stylex.create({
   csr: {
@@ -67,13 +67,6 @@ const styles = stylex.create({
     transform: "none",
   },
   outcomeDelay: (index: number) => ({ transitionDelay: `${300 + index * 140}ms` }),
-  numeral: {
-    fontFamily: font.display,
-    fontSize: 11,
-    fontVariantNumeric: "tabular-nums",
-    letterSpacing: "0.14em",
-    color: hue.quiet,
-  },
   photoWrap: {
     position: "relative",
   },
@@ -111,9 +104,6 @@ export function Csr() {
                   )}
                 />
                 <span>{outcome.title}</span>
-                <span aria-hidden="true" lang="en" {...stylex.props(styles.numeral)}>
-                  {String(index + 1).padStart(2, "0")}
-                </span>
               </li>
             ))}
           </ul>

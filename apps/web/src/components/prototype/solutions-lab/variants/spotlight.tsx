@@ -69,14 +69,6 @@ const styles = stylex.create({
     letterSpacing: "0.08em",
     color: tone.tintInk,
   },
-  english: {
-    fontFamily: face.display,
-    fontSize: 11,
-    fontWeight: 500,
-    letterSpacing: "0.16em",
-    textTransform: "uppercase",
-    color: tone.tintMuted,
-  },
   heroPosition: {
     flexShrink: 0,
     fontFamily: face.display,
@@ -480,12 +472,7 @@ function Hero({ item, position, total }: { item: SolutionItem; position: number;
     <>
       <header>
         <p {...stylex.props(styles.heroMeta)}>
-          <span {...stylex.props(styles.heroArea)}>
-            {area?.label}
-            <span lang="en" {...stylex.props(styles.english)}>
-              {area?.englishLabel}
-            </span>
-          </span>
+          <span {...stylex.props(styles.heroArea)}>{area?.label}</span>
           <span {...stylex.props(styles.heroPosition)}>
             <span {...stylex.props(styles.heroPositionCurrent)}>{padIndex(position)}</span>
             {` / ${padIndex(total - 1)}`}
@@ -642,9 +629,6 @@ export function SpotlightVariant() {
           <h3 id={`${uid}-contents`} {...stylex.props(styles.contentsTitle)}>
             目录
           </h3>
-          <span lang="en" {...stylex.props(styles.english)}>
-            Contents
-          </span>
         </div>
         <div
           role="tablist"
@@ -658,9 +642,6 @@ export function SpotlightVariant() {
                 <Fragment key={group.id}>
                   <p aria-hidden="true" {...stylex.props(styles.tocGroup)}>
                     {group.label}
-                    <span lang="en" {...stylex.props(styles.english)}>
-                      {group.englishLabel}
-                    </span>
                   </p>
                   {group.items.map(renderEntry)}
                 </Fragment>

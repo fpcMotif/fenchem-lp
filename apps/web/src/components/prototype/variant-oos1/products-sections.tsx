@@ -18,7 +18,6 @@ import { EASE } from "@/components/prototype/motion-constants";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 import {
   CATALOG_CATEGORY_ID,
-  CATEGORIES,
   SHEET_CATALOG_GROUPS,
   SOLUTIONS_BY_CATEGORY,
   type CatalogGroup,
@@ -54,8 +53,6 @@ const GUTTER = 24;
 const TWELVE = "repeat(12, minmax(0, 1fr))";
 const HEAD_SPACE = { default: 32, [DESKTOP]: 56 } as const;
 const CARD_RADIUS = { default: 12, [DESKTOP]: 16 } as const;
-
-const padIndex = (index: number) => String(index + 1).padStart(2, "0");
 
 const orderByArea = (areas: SolutionArea[], items: SolutionItem[]) =>
   areas.flatMap((area) => items.filter((item) => item.area === area.id));
@@ -164,16 +161,6 @@ const styles = stylex.create({
     columnGap: { default: 12, [LG]: GUTTER },
     paddingInline: { default: 20, [LG]: 32 },
   },
-  ledgerHeader: {
-    display: { default: "none", [LG]: "grid" },
-    paddingBlock: 16,
-    backgroundColor: TINT_HEAD,
-    fontSize: 12,
-    fontWeight: 500,
-    lineHeight: "16px",
-    letterSpacing: "0.08em",
-    color: TINT_MUTED,
-  },
   colName: { gridColumn: { default: null, [LG]: "1 / 5" } },
   colPreview: { gridColumn: { default: null, [LG]: "5 / 12" } },
   colToggle: { gridColumn: { default: null, [LG]: "12 / 13" } },
@@ -226,19 +213,6 @@ const styles = stylex.create({
     alignItems: "baseline",
     gap: 14,
     minWidth: 0,
-  },
-  ledgerIndex: {
-    flexShrink: 0,
-    width: 24,
-    fontSize: 12,
-    fontWeight: 400,
-    lineHeight: "24px",
-    fontVariantNumeric: "tabular-nums",
-    letterSpacing: "0.04em",
-    color: TINT_MUTED,
-  },
-  ledgerIndexOpen: {
-    color: ACCENT,
   },
   ledgerNames: {
     display: "flex",
@@ -352,7 +326,6 @@ const styles = stylex.create({
   ledgerIntro: {
     gridColumn: { default: "1 / -1", [LG]: "1 / 9" },
     margin: 0,
-    paddingInlineStart: { default: 0, [LG]: 38 },
     fontSize: 15,
     lineHeight: "26px",
     color: TINT_BODY,
@@ -362,7 +335,6 @@ const styles = stylex.create({
     gridColumn: "1 / -1",
     display: "grid",
     gridTemplateColumns: { default: "minmax(0, 1fr)", [LG]: "subgrid" },
-    marginInlineStart: { default: 0, [LG]: 38 },
     overflow: "hidden",
     borderRadius: 10,
     backgroundColor: colors.paper,
@@ -572,9 +544,8 @@ const styles = stylex.create({
   solutionTab: {
     position: "relative",
     display: "grid",
-    gridTemplateColumns: { default: "auto auto", [LG]: "22px minmax(0, 1fr)" },
+    gridTemplateColumns: { default: "auto", [LG]: "minmax(0, 1fr)" },
     alignItems: "baseline",
-    columnGap: { default: 6, [LG]: 14 },
     flexShrink: 0,
     width: { default: null, [LG]: "100%" },
     paddingBlock: { default: 8, [LG]: 12 },
@@ -624,17 +595,6 @@ const styles = stylex.create({
       height: TAB_FLARE,
       backgroundImage: FLARE_BOTTOM,
     },
-  },
-  tabIndex: {
-    position: "relative",
-    fontSize: 12,
-    lineHeight: "22px",
-    letterSpacing: "0.04em",
-    fontVariantNumeric: "tabular-nums",
-    color: TINT_MUTED,
-  },
-  tabIndexSelected: {
-    color: TINT_INK,
   },
   tabText: {
     position: "relative",
@@ -697,15 +657,6 @@ const styles = stylex.create({
   },
   sheetHead: {
     paddingBottom: { default: 20, [MD]: 28 },
-  },
-  sheetArea: {
-    margin: 0,
-    marginBottom: 10,
-    fontSize: 13,
-    fontWeight: 500,
-    lineHeight: "20px",
-    letterSpacing: "0.08em",
-    color: ACCENT,
   },
   sheetTitle: {
     margin: 0,
@@ -829,12 +780,10 @@ function ToggleIcon({ open }: { open: boolean }) {
 
 function LedgerRow({
   group,
-  index,
   open,
   onToggle,
 }: {
   group: CatalogGroup;
-  index: number;
   open: boolean;
   onToggle: (trigger: HTMLElement) => void;
 }) {
@@ -860,9 +809,6 @@ function LedgerRow({
           )}
         >
           <span {...stylex.props(styles.ledgerName, styles.colName)}>
-            <span {...stylex.props(styles.ledgerIndex, open && styles.ledgerIndexOpen)}>
-              {padIndex(index)}
-            </span>
             <span {...stylex.props(styles.ledgerNames)}>
               <span {...stylex.props(styles.ledgerPrimary)}>{group.label}</span>
               <span {...stylex.props(styles.ledgerLatin)}>{group.items.length} 款原料</span>
@@ -947,13 +893,10 @@ function Descriptions({ lines }: { lines: string[] }) {
   );
 }
 
-function FormulaSheet({ item, areas }: { item: SolutionItem; areas: SolutionArea[] }) {
+function FormulaSheet({ item }: { item: SolutionItem }) {
   return (
     <>
       <header {...stylex.props(styles.sheetHead)}>
-        <p {...stylex.props(styles.sheetArea)}>
-          {areas.find((area) => area.id === item.area)?.label}
-        </p>
         <h3 {...stylex.props(styles.sheetTitle)}>{item.title}</h3>
         <p {...stylex.props(styles.sheetSubtitle)}>{item.subtitle}</p>
       </header>
@@ -992,7 +935,6 @@ function FormulaSheet({ item, areas }: { item: SolutionItem; areas: SolutionArea
 export function ProductCatalog({ categoryId }: { categoryId: string }) {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const startInstantLayout = useInstantLayoutTransition();
-  const categoryLabel = CATEGORIES.find((c) => c.id === categoryId)?.label;
   const groups = categoryId === CATALOG_CATEGORY_ID ? SHEET_CATALOG_GROUPS : [];
 
   const toggle = (index: number, trigger: HTMLElement) => {
@@ -1020,18 +962,13 @@ export function ProductCatalog({ categoryId }: { categoryId: string }) {
           <h2 id="catalog-title" {...stylex.props(styles.sectionTitle)}>
             产品目录
           </h2>
-          <p {...stylex.props(styles.sectionLead)}>{`${categoryLabel}核心原料与应用定制方案`}</p>
         </header>
         <div {...stylex.props(styles.ledgerCard)}>
-          <div aria-hidden="true" {...stylex.props(styles.ledgerGrid, styles.ledgerHeader)}>
-            <span {...stylex.props(styles.colName)}>原料分类</span>
-          </div>
           <ul {...stylex.props(styles.ledger)}>
             {groups.map((group, index) => (
               <LedgerRow
                 key={group.id}
                 group={group}
-                index={index}
                 open={openIndex === index}
                 onToggle={(trigger) => toggle(index, trigger)}
               />
@@ -1211,14 +1148,6 @@ export function ProductSolutions({ categoryId }: { categoryId: string }) {
                               {...stylex.props(styles.tabIndicator)}
                             />
                           )}
-                          <span
-                            {...stylex.props(
-                              styles.tabIndex,
-                              isSelected && styles.tabIndexSelected,
-                            )}
-                          >
-                            {padIndex(scope.indexOf(item))}
-                          </span>
                           <span {...stylex.props(styles.tabText)}>
                             <span
                               {...stylex.props(
@@ -1247,7 +1176,7 @@ export function ProductSolutions({ categoryId }: { categoryId: string }) {
               {...stylex.props(styles.sheet)}
             >
               <div key={selected.id} {...stylex.props(styles.panel)}>
-                <FormulaSheet item={selected} areas={areas} />
+                <FormulaSheet item={selected} />
               </div>
             </div>
           </div>

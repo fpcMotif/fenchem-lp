@@ -820,7 +820,6 @@ function InquiryFields({
   focusOnMount: boolean;
 }) {
   const nameRef = useRef<HTMLInputElement>(null);
-  const subject = INQUIRY_SUBJECTS.find((item) => item.id === subjectId) ?? INQUIRY_SUBJECTS[0];
 
   useEffect(() => {
     if (focusOnMount) nameRef.current?.focus();
@@ -885,7 +884,6 @@ function InquiryFields({
             required
             autoComplete="tel"
             inputMode="tel"
-            placeholder="用于物流通知与技术对接"
             {...stylex.props(styles.input)}
           />
         </Field>
@@ -907,7 +905,6 @@ function InquiryFields({
             name="company"
             required
             autoComplete="organization"
-            placeholder="品牌方、代工厂或研发机构全称"
             {...stylex.props(styles.input)}
           />
         </Field>
@@ -916,7 +913,6 @@ function InquiryFields({
             id="contact-message"
             name="message"
             required
-            placeholder={subject.placeholder}
             {...stylex.props(styles.input, styles.textarea)}
           />
         </Field>
@@ -1300,9 +1296,7 @@ export function ContactView({ onNavigateHome }: { onNavigateHome: (target?: stri
         size="compact"
         title={CONTACT_BANNER.title}
         titleId="contact-banner-title"
-        tagline={CONTACT_BANNER.tagline}
         lead={CONTACT_BANNER.lead}
-        meta={CONTACT_BANNER.meta}
         image={CONTACT_BANNER.image}
         imageAlt={CONTACT_BANNER.imageAlt}
       />

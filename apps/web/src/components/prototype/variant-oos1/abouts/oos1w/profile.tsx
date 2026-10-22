@@ -58,29 +58,16 @@ const styles = stylex.create({
     objectPosition: "42% 50%",
   },
   figCaption: {
-    display: "flex",
-    alignItems: "baseline",
-    gap: 12,
     marginTop: 14,
-  },
-  figNum: {
-    flexShrink: 0,
-    color: tone.ink,
-  },
-  figText: {
     fontFamily: face.sans,
     fontSize: { default: 15, [bp.desktop]: 16 },
+    lineHeight: 1.4,
     color: tone.ink,
   },
   network: {
     marginTop: { default: 44, [bp.desktop]: 64 },
   },
   networkCaption: {
-    display: "flex",
-    flexWrap: "wrap",
-    alignItems: "baseline",
-    columnGap: 12,
-    rowGap: 4,
     margin: 0,
     fontFamily: face.sans,
     fontSize: { default: 16, [bp.desktop]: 18 },
@@ -101,9 +88,6 @@ const styles = stylex.create({
     listStyleType: "none",
   },
   country: {
-    display: "flex",
-    alignItems: "baseline",
-    gap: 10,
     paddingBlock: { default: 12, [bp.desktop]: 14 },
     borderTopWidth: 1,
     borderTopStyle: "solid",
@@ -111,9 +95,6 @@ const styles = stylex.create({
     fontFamily: face.sans,
     fontSize: { default: 16, [bp.desktop]: 17 },
     color: tone.ink,
-  },
-  index: {
-    minWidth: "1.8em",
   },
 });
 
@@ -123,7 +104,7 @@ export function Profile() {
       <div {...stylex.props(ui.shell)}>
         <div {...stylex.props(ui.grid, ui.ruled)}>
           <div {...stylex.props(ui.headCol)}>
-            <SectionHead num="01" word="Abstract" title={PROFILE_LABEL} titleId="oos1w-profile" />
+            <SectionHead title={PROFILE_LABEL} titleId="oos1w-profile" />
           </div>
 
           <div {...stylex.props(styles.abstract)}>
@@ -134,18 +115,10 @@ export function Profile() {
             <p {...stylex.props(styles.lead)}>{ABOUT_HERO.lead}</p>
 
             <div {...stylex.props(styles.network)}>
-              <p {...stylex.props(styles.networkCaption)}>
-                <span lang="en" {...stylex.props(ui.micro)}>
-                  Table 1
-                </span>
-                <span>{ABOUT_HERO.networkLabel}</span>
-              </p>
+              <p {...stylex.props(styles.networkCaption)}>{ABOUT_HERO.networkLabel}</p>
               <ol {...stylex.props(styles.countries)}>
-                {ABOUT_HERO.countries.map((country, index) => (
+                {ABOUT_HERO.countries.map((country) => (
                   <li key={country} {...stylex.props(styles.country)}>
-                    <span aria-hidden="true" {...stylex.props(ui.micro, styles.index)}>
-                      {String(index + 1).padStart(2, "0")}
-                    </span>
                     {country}
                   </li>
                 ))}
@@ -163,12 +136,7 @@ export function Profile() {
                 {...stylex.props(styles.lobbyImage)}
               />
             </div>
-            <figcaption {...stylex.props(ui.micro, styles.figCaption)}>
-              <span lang="en" {...stylex.props(styles.figNum)}>
-                Fig. 1
-              </span>
-              <span {...stylex.props(styles.figText)}>{ABOUT_HERO.lobbyCaption}</span>
-            </figcaption>
+            <figcaption {...stylex.props(styles.figCaption)}>{ABOUT_HERO.lobbyCaption}</figcaption>
           </figure>
         </div>
       </div>

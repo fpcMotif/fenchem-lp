@@ -4,7 +4,7 @@ import * as stylex from "@stylexjs/stylex";
 import { ABOUT_CSR, ABOUT_CULTURE } from "../../about-data";
 import { Reveal, SectionName } from "./parts";
 import { base, ty } from "./shared";
-import { font, hue, size } from "./theme.stylex";
+import { hue, size } from "./theme.stylex";
 
 const WATER = `linear-gradient(rgba(11, 42, 92, 0.3), rgba(11, 42, 92, 0.3)), url(${ABOUT_CSR.image})`;
 
@@ -93,16 +93,6 @@ const styles = stylex.create({
       [stylex.when.ancestor(":hover")]: "0 0, 94% 88%",
     },
   },
-  numeral: {
-    position: "absolute",
-    top: { default: 28, [breakpoints.lg]: 36 },
-    right: 0,
-    fontFamily: font.display,
-    fontSize: 11,
-    fontVariantNumeric: "tabular-nums",
-    letterSpacing: "0.14em",
-    color: hue.quiet,
-  },
   title: {
     margin: 0,
     fontSize: "clamp(24px, 2.2vw, 30px)",
@@ -138,9 +128,6 @@ export function Culture() {
             >
               <span aria-hidden="true" {...stylex.props(styles.rule)} />
               <span aria-hidden="true" {...stylex.props(styles.ruleInk)} />
-              <span aria-hidden="true" lang="en" {...stylex.props(styles.numeral)}>
-                {String(idx + 1).padStart(2, "0")}
-              </span>
               <span
                 aria-hidden="true"
                 {...stylex.props(styles.glyph, styles.glyphImage(WATER), GLYPH_WATER[idx])}

@@ -126,10 +126,6 @@ const styles = stylex.create({
     letterSpacing: "0.06em",
     color: tone.ink,
   },
-  english: {
-    fontSize: 19,
-    lineHeight: 1,
-  },
 });
 
 const strokeProps = {
@@ -346,9 +342,6 @@ function Scene({ layout, progress }: { layout: StageLayout; progress: MotionValu
             >
               <span {...stylex.props(styles.numeral)}>{plate.numeral}</span>
               <span {...stylex.props(styles.chinese)}>{plate.caption}</span>
-              <span lang="en" {...stylex.props(ui.serif, styles.english)}>
-                {plate.english}
-              </span>
             </p>
           ))}
         </div>

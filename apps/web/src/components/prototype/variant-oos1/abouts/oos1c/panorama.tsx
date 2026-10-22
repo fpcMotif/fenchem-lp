@@ -9,7 +9,6 @@ import {
   GROUPS,
   LOBBY_ALT,
   NAV_ENGLISH,
-  PHOTO_ENGLISH,
   PHOTO_SHAPE,
   STAT_ENGLISH,
   STRIP_LOOPS,
@@ -323,9 +322,6 @@ const styles = stylex.create({
     letterSpacing: "0.08em",
     color: tone.body,
   },
-  noteEnglish: {
-    color: tone.muted,
-  },
   stats: {
     display: "flex",
     flexDirection: "column",
@@ -508,13 +504,10 @@ const SHAPE_MEDIA = {
   portrait: styles.shapePortrait,
 } as const;
 
-function PhotoNote({ en, cn }: { en: string; cn: string }) {
+function PhotoNote({ cn }: { cn: string }) {
   return (
     <figcaption {...stylex.props(styles.note)}>
       <span>{cn}</span>
-      <span lang="en" {...stylex.props(styles.noteEnglish)}>
-        {en}
-      </span>
     </figcaption>
   );
 }
@@ -715,7 +708,7 @@ export function Panorama({
                           {...stylex.props(styles.tileButton)}
                         />
                       </div>
-                      <PhotoNote en={PHOTO_ENGLISH[photo.id]} cn={photo.caption} />
+                      <PhotoNote cn={photo.caption} />
                     </figure>
                   </Fragment>
                 );
@@ -807,7 +800,7 @@ function ProfileFrames({ pinned }: { pinned: boolean }) {
             {...stylex.props(styles.fill)}
           />
         </div>
-        <PhotoNote en="Headquarters Lobby" cn={ABOUT_HERO.lobbyCaption} />
+        <PhotoNote cn={ABOUT_HERO.lobbyCaption} />
       </figure>
 
       <Seam />

@@ -268,21 +268,6 @@ const styles = stylex.create({
       inset: 0,
     },
   },
-  index: {
-    flexShrink: 0,
-    width: 20,
-    fontFamily: font.numeral,
-    fontSize: 12,
-    fontWeight: 500,
-    lineHeight: "24px",
-    fontVariantNumeric: "tabular-nums",
-    color: ui.muted,
-    transitionProperty: "color",
-    transitionDuration: "150ms",
-  },
-  indexActive: {
-    color: ACCENT,
-  },
   names: {
     display: "flex",
     flexDirection: "column",
@@ -704,7 +689,7 @@ export function Catalog() {
                 animate={{ opacity: 1 }}
                 transition={{ duration: reduce ? 0 : 0.2, ease: EASE }}
               >
-                {items.map((item, index) => {
+                {items.map((item) => {
                   const active = wide ? item.id === selected.id : item.id === openId;
                   const expanded = !wide && item.id === openId;
                   const detailId = `${detailBaseId}-${item.id}`;
@@ -745,9 +730,6 @@ export function Catalog() {
                             {...relation}
                             {...stylex.props(styles.rowButton, stylex.defaultMarker())}
                           >
-                            <span {...stylex.props(styles.index, active && styles.indexActive)}>
-                              {padIndex(index)}
-                            </span>
                             <span {...stylex.props(styles.names)}>
                               <span {...stylex.props(styles.primaryLine)}>
                                 <span

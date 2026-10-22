@@ -305,14 +305,7 @@ export function Structure() {
       <div {...stylex.props(ui.shell)}>
         <div {...stylex.props(ui.grid, ui.ruled)}>
           <div {...stylex.props(ui.headCol)}>
-            <SectionHead
-              num="06"
-              word="Structure"
-              title={ABOUT_STRUCTURE.title}
-              titleId="oos1w-structure"
-              fig="Fig. 6"
-              legend="The holding is the origin. Five lanes leave it and travel to the same height."
-            />
+            <SectionHead title={ABOUT_STRUCTURE.title} titleId="oos1w-structure" />
           </div>
 
           <div ref={figureRef} {...stylex.props(styles.figure)}>

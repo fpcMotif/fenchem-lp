@@ -31,13 +31,6 @@ const styles = stylex.create({
     display: "block",
     textWrap: "balance",
   },
-  noteEnglish: {
-    margin: 0,
-    marginTop: 6,
-    fontSize: { default: 18, [bp.desktop]: 21 },
-    lineHeight: 1.4,
-    color: tone.body,
-  },
 });
 
 export function Campus() {
@@ -50,19 +43,11 @@ export function Campus() {
       {...stylex.props(ui.anchor, styles.section)}
     >
       <div {...stylex.props(ui.shell, styles.head)}>
-        <RoomSign
-          numeral="II"
-          id="oos1z-campus"
-          title={sectionTitle("about-campus")}
-          english="Campus"
-        >
+        <RoomSign id="oos1z-campus" title={sectionTitle("about-campus")}>
           <p {...stylex.props(styles.note)}>
             <span {...stylex.props(styles.balanced)}>
               七幅园区影像分列走廊两侧；尽头的一幅，正对着你。
             </span>
-          </p>
-          <p lang="en" {...stylex.props(ui.italic, styles.noteEnglish)}>
-            Seven works line the corridor. One, at the end, faces you.
           </p>
         </RoomSign>
         <CorridorPlan onOpen={lightbox.open} />

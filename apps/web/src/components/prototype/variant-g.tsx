@@ -10,15 +10,7 @@ import { EngineeringStatus } from "./shared/corporate-content-sections";
  */
 import { useRef } from "react";
 import { LazyMotion, domAnimation, m, useScroll, useTransform } from "motion/react";
-import {
-  ArrowRight,
-  ArrowUpRight,
-  CheckCircle2,
-  FlaskConical,
-  Globe,
-  Leaf,
-  Sprout,
-} from "lucide-react";
+import { ArrowRight, ArrowUpRight, FlaskConical, Globe, Leaf, Sprout } from "lucide-react";
 import * as stylex from "@stylexjs/stylex";
 import { breakpoints, colors, radii, typography } from "@fenchem-lp/ui/tokens.stylex";
 import { Reveal } from "@/components/prototype/motion";
@@ -388,26 +380,7 @@ const styles = stylex.create({
       [breakpoints.lg]: "8rem",
     },
   },
-  heroPill: {
-    display: "inline-flex",
-    alignItems: "center",
-    gap: "0.5rem",
-    borderRadius: radii.full,
-    borderWidth: "1px",
-    borderStyle: "solid",
-    borderColor: colors.brandGreen200,
-    backgroundColor: colors.brandGreen50,
-    paddingInline: "1rem",
-    paddingBlock: "0.375rem",
-    fontFamily: typography.tech,
-    fontSize: "11px",
-    textTransform: "uppercase",
-    letterSpacing: "0.32em",
-    color: colors.brandBlue700,
-    margin: 0,
-  },
   heroH1: {
-    marginTop: "2rem",
     fontFamily: typography.display,
     fontSize: "clamp(2.6rem, 6vw, 5.5rem)",
     fontWeight: 700,
@@ -560,26 +533,6 @@ const styles = stylex.create({
     background:
       "linear-gradient(to top, color-mix(in oklch, var(--color-brand-green-950) 30%, transparent), transparent 60%)",
   },
-  heroImgBadgeWrap: {
-    position: "absolute",
-    bottom: "1rem",
-    left: "1rem",
-    right: "1rem",
-  },
-  heroImgBadge: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    borderRadius: radii.sm,
-    borderWidth: "1px",
-    borderStyle: "solid",
-    borderColor: "color-mix(in oklch, var(--color-paper) 20%, transparent)",
-    backgroundColor: "color-mix(in oklch, var(--color-paper) 90%, transparent)",
-    paddingInline: "1rem",
-    paddingBlock: "0.625rem",
-    backdropFilter: "blur(4px)",
-    WebkitBackdropFilter: "blur(4px)",
-  },
   heroBadgeMono: {
     fontFamily: typography.tech,
     fontSize: "10px",
@@ -676,16 +629,7 @@ const styles = stylex.create({
     },
     justifyContent: "space-between",
   },
-  sectionTagBlue: {
-    fontFamily: typography.tech,
-    fontSize: "11px",
-    textTransform: "uppercase",
-    letterSpacing: "0.32em",
-    color: colors.brandBlue700,
-    margin: 0,
-  },
   sectionH2: {
-    marginTop: "1rem",
     fontFamily: typography.display,
     fontSize: {
       default: "2.25rem",
@@ -695,14 +639,6 @@ const styles = stylex.create({
     lineHeight: 1.02,
     letterSpacing: "-0.03em",
     color: colors.ink,
-    margin: 0,
-  },
-  sectionHeaderP: {
-    maxWidth: "20rem",
-    fontFamily: typography.body,
-    fontSize: "0.875rem",
-    lineHeight: 1.625,
-    color: colors.mute600,
     margin: 0,
   },
   industryRowLink: {
@@ -939,12 +875,6 @@ const styles = stylex.create({
     display: "flex",
     alignItems: "baseline",
     justifyContent: "space-between",
-  },
-  matrixIndex: {
-    fontFamily: typography.tech,
-    fontSize: "11px",
-    letterSpacing: "0.22em",
-    color: colors.brandGreen700,
   },
   matrixCode: {
     fontFamily: typography.tech,
@@ -1183,17 +1113,6 @@ const styles = stylex.create({
     color: colors.mute600,
     margin: 0,
   },
-  pillarIsoBadge: {
-    marginTop: "1rem",
-    display: "flex",
-    alignItems: "center",
-    gap: "0.5rem",
-    fontFamily: typography.tech,
-    fontSize: "10px",
-    textTransform: "uppercase",
-    letterSpacing: "0.22em",
-    color: colors.brandGreen700,
-  },
   /* ─── Deep Green Finale ───────────────────────────────── */
   finaleSection: {
     position: "relative",
@@ -1229,16 +1148,7 @@ const styles = stylex.create({
       [breakpoints.md]: "9rem",
     },
   },
-  finaleTag: {
-    fontFamily: typography.tech,
-    fontSize: "11px",
-    textTransform: "uppercase",
-    letterSpacing: "0.32em",
-    color: colors.brandGreen400,
-    margin: 0,
-  },
   finaleH2: {
-    marginTop: "1.5rem",
     maxWidth: "56rem",
     fontFamily: typography.display,
     fontSize: {
@@ -1330,15 +1240,6 @@ const styles = stylex.create({
       outline: `2px solid ${colors.brandGreen400}`,
       outlineOffset: "2px",
     },
-  },
-  finaleResponseText: {
-    marginTop: "2.5rem",
-    fontFamily: typography.tech,
-    fontSize: "10px",
-    textTransform: "uppercase",
-    letterSpacing: "0.28em",
-    color: colors.brandGreen400,
-    margin: 0,
   },
   nodesWrap: {
     marginTop: "5rem",
@@ -1573,9 +1474,6 @@ const styles = stylex.create({
       [breakpoints.md]: "space-between",
     },
   },
-  footerLegalGreen: {
-    color: colors.brandGreen700,
-  },
 });
 const MATRIX_DETAIL = [
   {
@@ -1677,9 +1575,6 @@ function HeroSection() {
         <div {...stylex.props(styles.heroGrid)}>
           {/* Left: Headline block */}
           <div {...stylex.props(styles.heroLeft)}>
-            <Reveal>
-              <p {...stylex.props(styles.heroPill)}>Botanical Intelligence Since 1995</p>
-            </Reveal>
             <Reveal delay={0.1}>
               <h1 {...stylex.props(styles.heroH1)}>
                 Nurturing Vitality
@@ -1750,15 +1645,6 @@ function HeroSection() {
               />
               <div aria-hidden {...stylex.props(styles.heroImgOverlay)} />
             </div>
-            {/* Caption badge */}
-            <div {...stylex.props(styles.heroImgBadgeWrap)}>
-              <div {...stylex.props(styles.heroImgBadge)}>
-                <span {...stylex.props(styles.heroBadgeMono)}>
-                  Rooted in Nature, Refined by Science
-                </span>
-                <span {...stylex.props(styles.heroBadgeGreen)}>Since 1995</span>
-              </div>
-            </div>
           </div>
         </div>
       </div>
@@ -1806,16 +1692,9 @@ function IndustriesSection() {
         {/* Section header */}
         <div {...stylex.props(styles.sectionHeader)}>
           <Reveal>
-            <p {...stylex.props(styles.sectionTagBlue)}>01 — Application Domains</p>
             <h2 id="industries-heading" {...stylex.props(styles.sectionH2)}>
               Built for three <span {...stylex.props(styles.greenSpan)}>industries</span>
             </h2>
-          </Reveal>
-          <Reveal delay={0.1}>
-            <p {...stylex.props(styles.sectionHeaderP)}>
-              Clinically supported actives engineered for the precise demands of each formulation
-              discipline.
-            </p>
           </Reveal>
         </div>
 
@@ -1867,7 +1746,6 @@ function MatrixSection() {
         {/* Header */}
         <div {...stylex.props(styles.sectionHeader)}>
           <Reveal>
-            <p {...stylex.props(styles.sectionTagBlue)}>02 — Active Compounds</p>
             <h2 id="matrix-heading" {...stylex.props(styles.sectionH2)}>
               Ingredient <span {...stylex.props(styles.greenSpan)}>matrix</span>
             </h2>
@@ -1909,9 +1787,6 @@ function MatrixSection() {
                 {/* Content */}
                 <div {...stylex.props(styles.matrixBody)}>
                   <div {...stylex.props(styles.matrixTopRow)}>
-                    <span {...stylex.props(styles.matrixIndex)}>
-                      {String(i + 1).padStart(2, "0")} —
-                    </span>
                     <span {...stylex.props(styles.matrixCode)}>{item.code}</span>
                   </div>
                   <h3 {...stylex.props(styles.matrixName)}>{item.name}</h3>
@@ -1966,15 +1841,9 @@ function StandardsSection() {
         {/* Header */}
         <div {...stylex.props(styles.sectionHeader)}>
           <Reveal>
-            <p {...stylex.props(styles.sectionTagBlue)}>03 — Quality Infrastructure</p>
             <h2 id="standards-heading" {...stylex.props(styles.sectionH2)}>
               Science-backed <span {...stylex.props(styles.greenSpan)}>standards</span>
             </h2>
-          </Reveal>
-          <Reveal delay={0.1}>
-            <p {...stylex.props(styles.sectionHeaderP)}>
-              Every lot. Every market. Every release — documented to your regulatory map.
-            </p>
           </Reveal>
         </div>
 
@@ -2022,16 +1891,6 @@ function StandardsSection() {
                     <div>
                       <h3 {...stylex.props(styles.pillarH3)}>{pillar.title}</h3>
                       <p {...stylex.props(styles.pillarP)}>{PILLAR_DETAIL[i].copy}</p>
-                      <div {...stylex.props(styles.pillarIsoBadge)}>
-                        <CheckCircle2
-                          aria-hidden
-                          style={{
-                            height: "0.875rem",
-                            width: "0.875rem",
-                          }}
-                        />
-                        ISO 9001 · GMP Certified
-                      </div>
                     </div>
                   </div>
                 </Reveal>
@@ -2082,7 +1941,6 @@ function FinaleSection() {
       <div {...stylex.props(styles.container1480)}>
         <div {...stylex.props(styles.finaleContent)}>
           <Reveal>
-            <p {...stylex.props(styles.finaleTag)}>04 — Partner with Fenchem</p>
             <h2 id="contact-heading" {...stylex.props(styles.finaleH2)}>
               Your next formulation,
               <br />
@@ -2110,12 +1968,6 @@ function FinaleSection() {
                 Explore Portfolio
               </a>
             </div>
-          </Reveal>
-
-          <Reveal delay={0.25}>
-            <p {...stylex.props(styles.finaleResponseText)}>
-              Response Time &lt; 24h — Technical Dossiers on Request
-            </p>
           </Reveal>
 
           {/* Office nodes */}
@@ -2155,11 +2007,7 @@ function FooterSection() {
               <Leaf aria-hidden strokeWidth={1.5} {...stylex.props(styles.footerLeafIcon)} />
             </div>
             <p {...stylex.props(styles.footerTagline)}>Rooted in Nature, Refined by Science.</p>
-            <p {...stylex.props(styles.footerCertsText)}>
-              ISO 9001 : 2015 · GMP · HACCP
-              <br />
-              Est. 1995 — Nanjing, China
-            </p>
+            <p {...stylex.props(styles.footerCertsText)}>Est. 1995 — Nanjing, China</p>
             <div {...stylex.props(styles.footerCertBadges)}>
               {certifications.map((cert) => (
                 <span key={cert} {...stylex.props(styles.footerCertBadge)}>
@@ -2194,8 +2042,6 @@ function FooterSection() {
         {/* Legal strip */}
         <div {...stylex.props(styles.footerLegalRow)}>
           <span>© 2026 Fenchem Biochemical Group — All Rights Reserved</span>
-          <span>N 32.06 / E 118.79 — Nanjing, China</span>
-          <span {...stylex.props(styles.footerLegalGreen)}>Botanical Intelligence Since 1995</span>
         </div>
       </div>
     </footer>

@@ -161,9 +161,6 @@ export function Hero() {
                 {...stylex.props(ui.fill, s.image)}
               />
             </div>
-            <figcaption lang="en" {...stylex.props(ui.caption)}>
-              {ABOUT_BANNER.place}
-            </figcaption>
           </figure>
         </div>
       </div>

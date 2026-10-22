@@ -213,19 +213,8 @@ const styles = stylex.create({
     borderBottomStyle: "solid",
     borderBottomColor: INK,
   },
-  sheetNumber: {
-    display: "block",
-    fontFamily: NUMERAL_FONT,
-    fontSize: 13,
-    fontWeight: 500,
-    lineHeight: "20px",
-    letterSpacing: "0.04em",
-    fontVariantNumeric: "tabular-nums",
-    color: ACCENT,
-  },
   sheetTitle: {
     margin: 0,
-    marginTop: 8,
     fontSize: { default: 20, [DESKTOP]: 24 },
     fontWeight: 500,
     lineHeight: { default: "28px", [DESKTOP]: "32px" },
@@ -377,7 +366,7 @@ function Field({ label, children }: { label: string; children: ReactNode }) {
   );
 }
 
-function Sheet({ item, index }: { item: SolutionItem; index: number }) {
+function Sheet({ item }: { item: SolutionItem }) {
   const titleId = useId();
   return (
     <article
@@ -386,7 +375,6 @@ function Sheet({ item, index }: { item: SolutionItem; index: number }) {
       {...stylex.props(styles.sheet)}
     >
       <header {...stylex.props(styles.sheetHead)}>
-        <span {...stylex.props(styles.sheetNumber)}>{padIndex(index)}</span>
         <h3 id={titleId} {...stylex.props(styles.sheetTitle)}>
           {item.title}
         </h3>
@@ -561,8 +549,8 @@ export function Solutions() {
           onKeyDown={handleKeyDown}
           {...stylex.props(styles.track)}
         >
-          {SOLUTION_ITEMS.map((item, index) => (
-            <Sheet key={item.id} item={item} index={index} />
+          {SOLUTION_ITEMS.map((item) => (
+            <Sheet key={item.id} item={item} />
           ))}
         </div>
         <div role="group" aria-label="Jump to solution" {...stylex.props(styles.dots)}>

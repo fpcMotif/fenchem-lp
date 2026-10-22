@@ -277,14 +277,7 @@ export function Culture() {
       sectionRef={sectionRef}
       head={
         <>
-          <SectionHead
-            num="03"
-            word="Values"
-            title={ABOUT_CULTURE.title}
-            titleId="oos1w-culture"
-            fig="Fig. 3"
-            legend="One sample, developed. As the front climbs, it resolves into the three values it was made of."
-          />
+          <SectionHead title={ABOUT_CULTURE.title} titleId="oos1w-culture" />
           <Formula />
         </>
       }

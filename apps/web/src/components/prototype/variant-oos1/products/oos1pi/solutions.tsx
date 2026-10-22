@@ -93,19 +93,6 @@ const styles = stylex.create({
       transform: "scaleY(1)",
     },
   },
-  tabIndex: {
-    flexShrink: 0,
-    width: 22,
-    fontFamily: font.numeral,
-    fontSize: 12,
-    fontWeight: 500,
-    lineHeight: "24px",
-    fontVariantNumeric: "tabular-nums",
-    color: tone.muted,
-  },
-  tabIndexSelected: {
-    color: ACCENT,
-  },
   tabName: {
     fontSize: 15,
     fontWeight: 400,
@@ -571,9 +558,6 @@ export function Solutions() {
                   onClick={() => setSelected(index)}
                   {...stylex.props(styles.tab, isSelected && styles.tabSelected)}
                 >
-                  <span {...stylex.props(styles.tabIndex, isSelected && styles.tabIndexSelected)}>
-                    {padIndex(index)}
-                  </span>
                   <span {...stylex.props(styles.tabName, isSelected && styles.tabNameSelected)}>
                     {item.title}
                   </span>

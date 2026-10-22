@@ -108,15 +108,6 @@ const styles = stylex.create({
     lineHeight: 1.04,
     letterSpacing: "0.04em",
   },
-  tagline: {
-    margin: 0,
-    marginTop: { default: 12, [bp.desktop]: 16 },
-    fontFamily: face.serif,
-    fontStyle: "italic",
-    fontSize: { default: 21, [bp.desktop]: 26 },
-    lineHeight: 1.25,
-    color: tone.ink,
-  },
   lead: {
     margin: 0,
     marginTop: { default: 14, [bp.desktop]: 18 },
@@ -127,11 +118,6 @@ const styles = stylex.create({
     maxWidth: "30em",
     textWrap: "pretty",
   },
-  meta: {
-    margin: 0,
-    marginTop: { default: 14, [bp.desktop]: 20 },
-  },
-
   profile: {
     paddingBottom: { default: "16svh", [bp.desktop]: "18svh" },
   },
@@ -199,13 +185,6 @@ const styles = stylex.create({
     borderRadius: 2,
     boxShadow: "0 0 0 1px rgba(255, 255, 255, 0.8), 0 44px 80px -48px rgba(11, 42, 92, 0.6)",
   },
-  lobbyTag: {
-    position: "absolute",
-    left: 12,
-    bottom: 12,
-    paddingBlock: 6,
-    paddingInline: 10,
-  },
   statsPane: {
     gridArea: "2 / 8 / 3 / 12",
     position: "relative",
@@ -245,11 +224,6 @@ const styles = stylex.create({
     fontSize: 14,
     lineHeight: 1.5,
     color: tone.onGlass,
-  },
-  statCaption: {
-    marginInlineStart: 10,
-    color: tone.body,
-    fontSize: 13,
   },
 });
 
@@ -309,15 +283,7 @@ export function Stage({ onNavigateHome }: { onNavigateHome: (hash?: string) => v
                 <h1 id="oos1y-title" {...stylex.props(ui.etched, styles.title)}>
                   {ABOUT_BANNER.title}
                 </h1>
-                <p lang="en" {...stylex.props(styles.tagline)}>
-                  {ABOUT_BANNER.tagline}
-                </p>
                 <p {...stylex.props(styles.lead)}>{ABOUT_BANNER.lead}</p>
-                <p {...stylex.props(ui.label, styles.meta)}>
-                  <span lang="en">{ABOUT_BANNER.established}</span>
-                  <span aria-hidden="true"> · </span>
-                  <span lang="en">{ABOUT_BANNER.place}</span>
-                </p>
               </div>
             </div>
           </div>
@@ -329,7 +295,7 @@ export function Stage({ onNavigateHome }: { onNavigateHome: (hash?: string) => v
           {...stylex.props(ui.anchor, styles.profile)}
         >
           <h2 id="oos1y-profile" {...srOnly}>
-            Profile
+            {ABOUT_HERO.navChips[0].label}
           </h2>
           <div {...stylex.props(ui.shell)}>
             <div {...stylex.props(styles.composition)}>
@@ -352,9 +318,6 @@ export function Stage({ onNavigateHome }: { onNavigateHome: (hash?: string) => v
                   decoding="async"
                   {...stylex.props(ui.fill)}
                 />
-                <figcaption {...stylex.props(ui.glass, ui.label, styles.lobbyTag)}>
-                  <span lang="en">Lobby</span>
-                </figcaption>
               </figure>
 
               <div {...stylex.props(ui.glass, styles.statsPane)}>
@@ -362,10 +325,7 @@ export function Stage({ onNavigateHome }: { onNavigateHome: (hash?: string) => v
                   <dl {...stylex.props(styles.stats)}>
                     {STATS.map((stat) => (
                       <div key={stat.label} {...stylex.props(styles.stat)}>
-                        <dt {...stylex.props(styles.statLabel)}>
-                          {stat.label}
-                          <span {...stylex.props(styles.statCaption)}>{stat.caption}</span>
-                        </dt>
+                        <dt {...stylex.props(styles.statLabel)}>{stat.label}</dt>
                         <dd {...stylex.props(ui.etched, styles.statValue)}>
                           {stat.value}
                           {stat.unit ? (

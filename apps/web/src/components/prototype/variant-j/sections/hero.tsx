@@ -60,7 +60,6 @@ const styles = stylex.create({
   },
   heading: {
     marginInline: "auto",
-    marginTop: "2rem",
     fontFamily: typography.display,
     fontWeight: 300,
     fontSize: "clamp(3rem, 8.5vw, 7rem)",
@@ -116,15 +115,10 @@ export function HeroSection() {
   const ref = useSectionAnimation<HTMLElement>((root) => {
     const tl = gsap.timeline({ defaults: { ease: EASE_OUT } });
     tl.from(
-      root.querySelectorAll("[data-hero-eyebrow]"),
-      { y: 22, autoAlpha: 0, duration: 0.7 },
-      0.15,
+      root.querySelectorAll("[data-word-inner], .vi-word-inner"),
+      { yPercent: 112, duration: 1, stagger: 0.055 },
+      0.3,
     )
-      .from(
-        root.querySelectorAll("[data-word-inner], .vi-word-inner"),
-        { yPercent: 112, duration: 1, stagger: 0.055 },
-        0.3,
-      )
       .from(
         root.querySelectorAll("[data-hero-lede], [data-hero-ctas]"),
         { y: 24, autoAlpha: 0, duration: 0.8, stagger: 0.12 },
@@ -159,9 +153,6 @@ export function HeroSection() {
       <div aria-hidden="true" data-hero-deepen {...stylex.props(styles.deepen)} />
 
       <div {...stylex.props(styles.content)}>
-        <p data-hero-eyebrow {...stylex.props(sharedStyles.techLabelDark)}>
-          {HERO.eyebrow}
-        </p>
         <h1 {...stylex.props(styles.heading)}>
           <SplitWords
             segments={[

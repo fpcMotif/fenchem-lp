@@ -50,14 +50,6 @@ export const ui = stylex.create({
     height: "100%",
     objectFit: "cover",
   },
-  eyebrow: {
-    margin: 0,
-    fontFamily: face.serif,
-    fontStyle: "italic",
-    fontSize: { default: 18, [bp.desktop]: 20 },
-    lineHeight: 1.3,
-    color: tone.quiet,
-  },
   body: {
     margin: 0,
     fontFamily: face.sans,

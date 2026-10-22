@@ -35,11 +35,6 @@ const surface = stylex.keyframes({
   "100%": { clipPath: "inset(0 0 0 0)" },
 });
 
-const draw = stylex.keyframes({
-  "0%": { transform: "scaleX(0)" },
-  "100%": { transform: "none" },
-});
-
 const styles = stylex.create({
   hero: {
     position: "relative",
@@ -57,24 +52,6 @@ const styles = stylex.create({
     flexDirection: "column",
     flexGrow: 1,
     gap: { default: 24, [breakpoints.lg]: 32 },
-  },
-  meta: {
-    display: "flex",
-    alignItems: "center",
-    gap: { default: 16, [breakpoints.lg]: 28 },
-    margin: 0,
-    color: hue.quiet,
-  },
-  metaRule: {
-    flexGrow: 1,
-    height: 1,
-    backgroundColor: hue.hairline,
-    transformOrigin: "left center",
-    animationName: { default: null, [breakpoints.motionOk]: draw },
-    animationDuration: "1400ms",
-    animationDelay: "260ms",
-    animationTimingFunction: size.ease,
-    animationFillMode: "backwards",
   },
   head: {
     display: "grid",
@@ -181,11 +158,6 @@ export function Hero() {
         sx={styles.monument}
       />
       <div {...stylex.props(base.shell, styles.inner)}>
-        <p lang="en" {...stylex.props(ty.quiet, styles.meta)}>
-          <span>{ABOUT_BANNER.established}</span>
-          <span aria-hidden="true" {...stylex.props(styles.metaRule)} />
-          <span>{ABOUT_BANNER.place}</span>
-        </p>
         <div {...stylex.props(styles.head)}>
           <h1 id="about-banner-title" {...stylex.props(styles.title)}>
             <RiseText

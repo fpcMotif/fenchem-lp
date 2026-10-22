@@ -7,18 +7,18 @@ import { LEVER } from "./counterweight";
 import { Lightbox, type LightboxPhoto } from "./lightbox";
 import { Pair, StandingTitle } from "./pair";
 import { srOnly, type, ui } from "./shared";
-import { bp, face, grid, tone } from "./tokens.stylex";
+import { bp, grid, tone } from "./tokens.stylex";
 
 type PhotoId = (typeof ABOUT_CAMPUS.photos)[number]["id"];
 
-const CAMPUS_FRAME: Record<PhotoId, { english: string; ratio: number }> = {
-  aerial: { english: "Headquarters", ratio: 4 / 3 },
-  lab: { english: "Laboratory", ratio: 16 / 9 },
-  showroom: { english: "Showroom", ratio: 3 / 2 },
-  reception: { english: "Reception", ratio: 1 },
-  lounge: { english: "Lounge", ratio: 4 / 3 },
-  office: { english: "Open office", ratio: 3 / 2 },
-  grounds: { english: "Grounds", ratio: 4 / 5 },
+const CAMPUS_RATIO: Record<PhotoId, number> = {
+  aerial: 4 / 3,
+  lab: 16 / 9,
+  showroom: 3 / 2,
+  reception: 1,
+  lounge: 4 / 3,
+  office: 3 / 2,
+  grounds: 4 / 5,
 };
 
 const CAMPUS_PHOTOS: readonly LightboxPhoto[] = ABOUT_CAMPUS.photos.map((photo) => ({
@@ -26,40 +26,15 @@ const CAMPUS_PHOTOS: readonly LightboxPhoto[] = ABOUT_CAMPUS.photos.map((photo) 
   large: photo.large,
   alt: photo.alt,
   caption: photo.caption,
-  english: CAMPUS_FRAME[photo.id].english,
 }));
 
 const styles = stylex.create({
   caption: {
     textWrap: "balance",
   },
-  english: {
-    marginTop: { default: 8, [bp.wide]: 14 },
-    fontSize: "clamp(24px, 2.5vw, 36px)",
-    color: tone.ink,
-  },
   description: {
     marginTop: { default: 12, [bp.wide]: 24 },
     maxWidth: "20em",
-  },
-  plate: {
-    display: { default: "flex", [bp.desktop]: "grid" },
-    alignItems: { default: "baseline", [bp.desktop]: "normal" },
-    columnGap: 10,
-    rowGap: 10,
-    margin: 0,
-    paddingTop: { default: 0, [bp.wide]: 10 },
-  },
-  plateLabel: {
-    fontSize: 18,
-  },
-  plateCount: {
-    fontFamily: face.display,
-    fontSize: 13,
-    fontWeight: 800,
-    letterSpacing: "0.02em",
-    fontVariantNumeric: "tabular-nums",
-    color: "rgba(11, 42, 92, 0.42)",
   },
   button: {
     position: "relative",
@@ -111,27 +86,12 @@ export function Campus() {
         <Pair
           key={photo.id}
           lever={LEVER}
-          loadRatio={CAMPUS_FRAME[photo.id].ratio}
+          loadRatio={CAMPUS_RATIO[photo.id]}
           offset={index % 2 === 0 ? "end" : "start"}
           standing={
             index === 0 ? (
-              <StandingTitle id="oos1x-campus" en="Campus">
-                {ABOUT_CAMPUS.title}
-              </StandingTitle>
+              <StandingTitle id="oos1x-campus">{ABOUT_CAMPUS.title}</StandingTitle>
             ) : undefined
-          }
-          tag={
-            <p aria-hidden="true" {...stylex.props(styles.plate)}>
-              <span lang="en" {...stylex.props(type.serif, styles.plateLabel)}>
-                Plate
-              </span>
-              <span {...stylex.props(type.counterweight, type.counterTitle)}>
-                {String(index + 1).padStart(2, "0")}
-              </span>
-              <span {...stylex.props(styles.plateCount)}>
-                / {String(CAMPUS_PHOTOS.length).padStart(2, "0")}
-              </span>
-            </p>
           }
           load={
             <button
@@ -156,9 +116,6 @@ export function Campus() {
           }
         >
           <p {...stylex.props(type.light, type.display, styles.caption)}>{photo.caption}</p>
-          <p lang="en" {...stylex.props(type.serif, styles.english)}>
-            {CAMPUS_FRAME[photo.id].english}
-          </p>
           <p aria-hidden="true" {...stylex.props(type.body, styles.description)}>
             {photo.description}
           </p>

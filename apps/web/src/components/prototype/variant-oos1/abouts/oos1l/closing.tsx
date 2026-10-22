@@ -93,11 +93,6 @@ const styles = stylex.create({
     textDecorationLine: { default: "none", ":hover": "underline" },
     textUnderlineOffset: 5,
   },
-  homeEn: {
-    fontFamily: face.serif,
-    fontSize: 17,
-    fontStyle: "italic",
-  },
   stopBox: {
     flexShrink: 0,
     alignSelf: "flex-end",
@@ -177,9 +172,6 @@ export function Closing({ onNavigateHome }: AboutPageProps) {
               </button>
               <button type="button" onClick={() => onNavigateHome()} {...stylex.props(styles.home)}>
                 <span>回到首页</span>
-                <span lang="en" {...stylex.props(styles.homeEn)}>
-                  Home
-                </span>
               </button>
             </div>
             <Clause line={CLOSING} sx={styles.line} />

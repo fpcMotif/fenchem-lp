@@ -71,13 +71,6 @@ const styles = stylex.create({
     fontWeight: 500,
     color: color.mint,
   },
-  caption: {
-    margin: 0,
-    fontSize: 14,
-    fontWeight: 400,
-    letterSpacing: "0.08em",
-    color: color.onNavy,
-  },
   srOnly: {
     position: "absolute",
     width: 1,
@@ -142,7 +135,6 @@ export function Stats() {
                 <CountUp value={stat.value} />
                 {stat.unit ? <span {...stylex.props(styles.unit)}>{stat.unit}</span> : null}
               </div>
-              <p {...stylex.props(styles.caption)}>{stat.caption}</p>
             </li>
           ))}
         </ul>

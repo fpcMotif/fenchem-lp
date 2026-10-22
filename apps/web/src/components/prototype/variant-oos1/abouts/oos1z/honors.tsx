@@ -8,19 +8,9 @@ import { bp, face, tone } from "./tokens.stylex";
 const FIRST_NUMBER = 12;
 
 const LEVELS = [
-  { level: "national", label: "国家级", english: "National", line: "National honour" },
-  {
-    level: "provincial",
-    label: "江苏省级",
-    english: "Provincial",
-    line: "Provincial honour, Jiangsu",
-  },
-  {
-    level: "municipal",
-    label: "南京市级",
-    english: "Municipal",
-    line: "Municipal honour, Nanjing",
-  },
+  { level: "national", label: "国家级" },
+  { level: "provincial", label: "江苏省级" },
+  { level: "municipal", label: "南京市级" },
 ] as const;
 
 const GROUPS = LEVELS.map((entry) => ({
@@ -64,10 +54,6 @@ const styles = stylex.create({
     fontSize: { default: 14, [bp.desktop]: 15 },
     letterSpacing: "0.04em",
     color: tone.ink,
-  },
-  railCount: {
-    fontSize: { default: 15, [bp.desktop]: 16 },
-    color: tone.body,
   },
   plaques: {
     display: "flex",
@@ -135,31 +121,18 @@ const styles = stylex.create({
     color: tone.ink,
     textWrap: "balance",
   },
-  level: {
-    fontSize: { default: 15, [bp.desktop]: 16 },
-    lineHeight: 1.3,
-    color: tone.body,
-  },
 });
 
 export function Honors() {
   return (
     <section id="about-honor" aria-labelledby="oos1z-honor" {...stylex.props(ui.anchor, ui.room)}>
       <div {...stylex.props(ui.shell)}>
-        <RoomSign
-          numeral="V"
-          id="oos1z-honor"
-          title={sectionTitle("about-honor")}
-          english="Honours, hung on the line"
-        />
+        <RoomSign id="oos1z-honor" title={sectionTitle("about-honor")} />
         <div {...stylex.props(styles.wall)}>
           {GROUPS.map((group) => (
             <div key={group.level} {...stylex.props(styles.row)}>
               <div {...stylex.props(styles.rail)}>
                 <span {...stylex.props(styles.railLabel)}>{group.label}</span>
-                <span lang="en" {...stylex.props(ui.italic, styles.railCount)}>
-                  {group.english}
-                </span>
               </div>
               <ol {...stylex.props(styles.plaques)}>
                 {group.items.map((item) => (
@@ -171,9 +144,6 @@ export function Honors() {
                           Nº {item.number}
                         </span>
                         <span {...stylex.props(styles.title)}>{item.title}</span>
-                        <span lang="en" {...stylex.props(ui.italic, styles.level)}>
-                          {group.line}
-                        </span>
                       </div>
                     </div>
                   </li>

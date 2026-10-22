@@ -224,16 +224,6 @@ const styles = stylex.create({
     letterSpacing: "0.35em",
     color: colors.brandBlue700,
   },
-  eyebrowGreen400: {
-    fontFamily: typography.tech,
-    fontSize: {
-      default: 11,
-      [breakpoints.md]: 12,
-    },
-    textTransform: "uppercase",
-    letterSpacing: "0.35em",
-    color: colors.brandGreen400,
-  },
   ctaPrimary: {
     display: "inline-flex",
     minHeight: 44,
@@ -608,26 +598,6 @@ const styles = stylex.create({
     },
     textAlign: "center",
   },
-  heroTagPill: {
-    display: "inline-flex",
-    alignItems: "center",
-    gap: 10,
-    borderRadius: radii.full,
-    borderWidth: 1,
-    borderStyle: "solid",
-    borderColor: "color-mix(in oklch, var(--color-paper) 25%, transparent)",
-    paddingLeft: 16,
-    paddingRight: 16,
-    paddingTop: 6,
-    paddingBottom: 6,
-  },
-  heroTagText: {
-    fontFamily: typography.tech,
-    fontSize: 11,
-    textTransform: "uppercase",
-    letterSpacing: "0.32em",
-    color: colors.brandGreen300,
-  },
   heroHeading: {
     marginTop: 32,
     maxWidth: 896,
@@ -674,12 +644,8 @@ const styles = stylex.create({
   searchForm: {
     margin: 0,
   },
-  searchLabel: {
-    display: "block",
-  },
   searchRel: {
     position: "relative",
-    marginTop: 10,
   },
   searchIcon: {
     pointerEvents: "none",
@@ -874,13 +840,6 @@ const styles = stylex.create({
     color: colors.ink,
     margin: 0,
   },
-  marketsLead: {
-    maxWidth: 320,
-    fontFamily: typography.body,
-    fontSize: 14,
-    lineHeight: 1.625,
-    color: colors.mute600,
-  },
   marketsGrid: {
     marginTop: 40,
     display: "grid",
@@ -945,17 +904,6 @@ const styles = stylex.create({
   marketCardBody: {
     position: "relative",
     padding: 24,
-  },
-  marketCardApp: {
-    display: "flex",
-    alignItems: "center",
-    gap: 8,
-    fontFamily: typography.tech,
-    fontSize: 11,
-    textTransform: "uppercase",
-    letterSpacing: "0.24em",
-    color: colors.paper,
-    margin: 0,
   },
   marketCardTitle: {
     marginTop: 12,
@@ -1531,14 +1479,6 @@ const styles = stylex.create({
       ":focus-visible": "2px solid currentColor",
     },
   },
-  finaleResponseTime: {
-    marginTop: 32,
-    fontFamily: typography.tech,
-    fontSize: 11,
-    textTransform: "uppercase",
-    letterSpacing: "0.28em",
-    color: colors.brandGreen400,
-  },
   /* Footer */
   footer: {
     backgroundColor: colors.brandBlue950,
@@ -1819,10 +1759,7 @@ function IngredientSearch() {
   return (
     <div {...stylex.props(styles.searchCard)}>
       <search {...stylex.props(styles.searchForm)}>
-        <label
-          htmlFor="ingredient-search"
-          {...stylex.props(styles.techLabelLight, styles.searchLabel)}
-        >
+        <label htmlFor="ingredient-search" {...stylex.props(styles.srOnly)}>
           Search the ingredient portfolio
         </label>
         <div {...stylex.props(styles.searchRel)}>
@@ -1933,14 +1870,6 @@ function HeroSection() {
       <div aria-hidden {...stylex.props(styles.heroScrim)} />
       <div {...stylex.props(styles.container, styles.heroInner)}>
         <Intro>
-          <p {...stylex.props(styles.heroTagPill)}>
-            <LiveDot />
-            <span {...stylex.props(styles.heroTagText)}>
-              Ingredient supply portal — 40+ countries
-            </span>
-          </p>
-        </Intro>
-        <Intro delay={STAGGER}>
           <h1 {...stylex.props(styles.heroHeading)}>Botanical intelligence, supplied worldwide.</h1>
         </Intro>
         <Intro delay={STAGGER * 2}>
@@ -1971,16 +1900,9 @@ function MarketsSection() {
       <div {...stylex.props(styles.container, styles.marketsInner)}>
         <div {...stylex.props(styles.marketsHeaderRow)}>
           <Reveal>
-            <p {...stylex.props(styles.eyebrowBlue)}>01 — Markets</p>
             <h2 id="markets-heading" {...stylex.props(styles.marketsHeading)}>
               Start from <span {...stylex.props(styles.eyebrowBlue)}>your market</span>
             </h2>
-          </Reveal>
-          <Reveal delay={STAGGER}>
-            <p {...stylex.props(styles.marketsLead)}>
-              Three application domains, one documentation standard. Pick a lane and land on the
-              compounds built for it.
-            </p>
           </Reveal>
         </div>
 
@@ -2006,17 +1928,9 @@ function MarketsSection() {
                     {...stylex.props(styles.marketCardTopBar, styles[DIVISION_BAR_KEYS[division]])}
                   />
                   <div {...stylex.props(styles.marketCardBody)}>
-                    <p {...stylex.props(styles.marketCardApp)}>
-                      <span
-                        aria-hidden
-                        {...stylex.props(styles.dotBase, styles[DIVISION_DOT_KEYS[division]])}
-                      />
-                      {MARKET_APPLICATIONS[i]}
-                    </p>
                     <h3 {...stylex.props(styles.marketCardTitle)}>{industry.title}</h3>
                     <p {...stylex.props(styles.marketCardCopy)}>{industry.copy}</p>
                     <span {...stylex.props(styles.marketCardExplore)}>
-                      Explore ingredients
                       <ArrowUpRight aria-hidden size={14} />
                     </span>
                   </div>
@@ -2065,7 +1979,6 @@ function HeritageSection() {
     <section aria-labelledby="heritage-heading" {...stylex.props(styles.heritageSection)}>
       <div {...stylex.props(styles.container, styles.heritageGrid)}>
         <Reveal>
-          <p {...stylex.props(styles.eyebrowBlue)}>02 — Since {company.founded}</p>
           <h2 id="heritage-heading" {...stylex.props(styles.heritageHeading)}>
             Thirty years from Nanjing{" "}
             <span {...stylex.props(styles.eyebrowBlue)}>to six global bases</span>
@@ -2128,7 +2041,6 @@ function MatrixSection() {
       <div {...stylex.props(styles.container, styles.marketsInner)}>
         <div {...stylex.props(styles.marketsHeaderRow)}>
           <Reveal>
-            <p {...stylex.props(styles.eyebrowBlue)}>03 — Portfolio</p>
             <h2 id="matrix-heading" {...stylex.props(styles.matrixHeading)}>
               The featured <span {...stylex.props(styles.eyebrowBlue)}>compound index</span>
             </h2>
@@ -2219,16 +2131,9 @@ function NetworkSection() {
       <div {...stylex.props(styles.container, styles.marketsInner)}>
         <div {...stylex.props(styles.marketsHeaderRow)}>
           <Reveal>
-            <p {...stylex.props(styles.eyebrowBlue)}>04 — Network</p>
             <h2 id="network-heading" {...stylex.props(styles.matrixHeading)}>
               Six bases, <span {...stylex.props(styles.eyebrowBlue)}>one supply standard</span>
             </h2>
-          </Reveal>
-          <Reveal delay={STAGGER}>
-            <p {...stylex.props(styles.marketsLead)}>
-              Documentation, compliance and logistics handled from the base nearest your regulatory
-              map.
-            </p>
           </Reveal>
         </div>
 
@@ -2271,7 +2176,6 @@ function FinaleSection() {
       <div aria-hidden {...stylex.props(styles.finaleRadial)} />
       <div {...stylex.props(styles.container, styles.finaleInner)}>
         <Reveal>
-          <p {...stylex.props(styles.eyebrowGreen400)}>05 — Contact</p>
           <h2 id="contact-heading" {...stylex.props(styles.finaleHeading)}>
             Found your ingredient?{" "}
             <span
@@ -2297,9 +2201,6 @@ function FinaleSection() {
               {company.email}
             </a>
           </div>
-          <p {...stylex.props(styles.finaleResponseTime)}>
-            Response &lt; 24h — Technical Dossiers on Request
-          </p>
         </Reveal>
       </div>
     </section>
@@ -2351,14 +2252,6 @@ function FooterSection() {
 
         <div {...stylex.props(styles.footerLegal)}>
           <span>© 2026 {company.legalName} — All Rights Reserved</span>
-          <span
-            style={{
-              fontVariantNumeric: "tabular-nums",
-            }}
-          >
-            {company.hq.coords} — Nanjing, China
-          </span>
-          <span>Botanical Intelligence Since {company.founded}</span>
         </div>
       </div>
     </footer>

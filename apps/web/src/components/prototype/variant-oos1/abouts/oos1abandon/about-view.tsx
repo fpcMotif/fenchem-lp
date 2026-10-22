@@ -76,16 +76,6 @@ const styles = stylex.create({
   sectionHeader: {
     marginBottom: { default: 40, [DESKTOP]: 64 },
   },
-  sectionEyebrow: {
-    margin: 0,
-    marginBottom: 12,
-    fontFamily: font.display,
-    fontSize: 12,
-    fontWeight: 600,
-    letterSpacing: "0.22em",
-    textTransform: "uppercase",
-    color: colors.brandBlue700,
-  },
   sectionTitle: {
     margin: 0,
     fontSize: { default: 26, [media.tablet]: 32, [DESKTOP]: 40 },
@@ -293,23 +283,16 @@ const styles = stylex.create({
 });
 
 function SectionHeader({
-  eyebrow,
   title,
   titleId,
   sx,
 }: {
-  eyebrow?: string;
   title: string;
   titleId: string;
   sx?: stylex.StyleXStyles;
 }) {
   return (
     <Reveal sx={[styles.sectionHeader, sx]}>
-      {eyebrow ? (
-        <p lang="en" {...stylex.props(styles.sectionEyebrow)}>
-          {eyebrow}
-        </p>
-      ) : null}
       <h2 id={titleId} {...stylex.props(styles.sectionTitle)}>
         {title}
       </h2>
@@ -404,13 +387,7 @@ function Lightbox({
   );
 }
 
-export function CampusGallery({
-  showEyebrow = true,
-  headerSx,
-}: {
-  showEyebrow?: boolean;
-  headerSx?: stylex.StyleXStyles;
-}) {
+export function CampusGallery({ headerSx }: { headerSx?: stylex.StyleXStyles }) {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const [stepped, setStepped] = useState(false);
   const count = CAMPUS_GALLERY.length;
@@ -426,12 +403,7 @@ export function CampusGallery({
       {...stylex.props(styles.campusSection, kitStyles.anchor)}
     >
       <div {...stylex.props(kitStyles.shell, kitStyles.inset120)}>
-        <SectionHeader
-          eyebrow={showEyebrow ? ABOUT_CAMPUS.eyebrow : undefined}
-          title={ABOUT_CAMPUS.title}
-          titleId="about-campus-title"
-          sx={headerSx}
-        />
+        <SectionHeader title={ABOUT_CAMPUS.title} titleId="about-campus-title" sx={headerSx} />
       </div>
       <CampusCarousel paused={openIndex !== null} onOpen={open} />
       <Lightbox
@@ -520,7 +492,6 @@ export function AboutOOS1ABANDON({ onNavigateHome }: { onNavigateHome: (hash?: s
         titleId="about-banner-title"
         tagline={ABOUT_BANNER.tagline}
         lead={ABOUT_BANNER.lead}
-        meta={[ABOUT_BANNER.established, ABOUT_BANNER.place]}
         image={ABOUT_BANNER.image}
         imageAlt={ABOUT_BANNER.alt}
       />

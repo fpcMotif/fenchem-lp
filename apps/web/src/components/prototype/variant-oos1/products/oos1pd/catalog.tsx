@@ -6,7 +6,7 @@ import { useId, useState, type ChangeEvent } from "react";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
 import { CATALOG_GROUPS } from "../../products-data";
-import { FLAT_ITEMS, REGION_META, inciWithoutLatin, padIndex } from "../shared/derived";
+import { FLAT_ITEMS, inciWithoutLatin, padIndex } from "../shared/derived";
 
 const GROUND = "#311a1d";
 const GROUND_RAISED = "#3d2427";
@@ -18,7 +18,6 @@ const CHAPTER_RULE = "rgba(243, 233, 230, 0.38)";
 const STRONG_RULE = "rgba(243, 233, 230, 0.72)";
 const CONTROL_BORDER = "rgba(243, 233, 230, 0.3)";
 const CONTROL_BORDER_HOVER = "rgba(243, 233, 230, 0.6)";
-const ACCENT = colors.brandGreen300;
 const FOCUS = colors.brandBlue300;
 const BODY_FONT =
   '"Source Han Sans SC", "Noto Sans SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif';
@@ -44,14 +43,7 @@ const CHAPTERS = CATALOG_GROUPS.map((group, groupIndex) => {
   const rows = FLAT_ITEMS.map((item, index) => ({ item, number: padIndex(index) })).filter(
     (row) => row.item.groupIndex === groupIndex,
   );
-  const first = rows[0]?.number ?? "";
-  const last = rows[rows.length - 1]?.number ?? "";
-  return {
-    group,
-    english: REGION_META[group.id]?.english ?? "",
-    rows,
-    range: first === last ? first : `${first}–${last}`,
-  };
+  return { group, rows };
 });
 
 const styles = stylex.create({
@@ -231,17 +223,6 @@ const styles = stylex.create({
     alignItems: "baseline",
     rowGap: 12,
   },
-  chapterRange: {
-    display: { default: "none", [WIDE]: "block" },
-    gridColumn: "1",
-    fontFamily: NUMERAL_FONT,
-    fontSize: 13,
-    fontWeight: 500,
-    lineHeight: "30px",
-    letterSpacing: "0.02em",
-    fontVariantNumeric: "tabular-nums",
-    color: MUTED,
-  },
   chapterHeading: {
     gridColumn: { default: "1", [WIDE]: "2 / 5" },
     paddingInlineEnd: { default: 0, [WIDE]: 24 },
@@ -263,15 +244,6 @@ const styles = stylex.create({
     rowGap: 4,
     margin: 0,
     marginTop: 8,
-  },
-  chapterEnglish: {
-    fontFamily: NUMERAL_FONT,
-    fontSize: 11,
-    fontWeight: 500,
-    lineHeight: "16px",
-    letterSpacing: "0.14em",
-    textTransform: "uppercase",
-    color: ACCENT,
   },
   chapterCount: {
     fontSize: 12,
@@ -515,15 +487,9 @@ export function Catalog() {
                     )}
                   >
                     <div {...stylex.props(styles.chapterGrid)}>
-                      <span aria-hidden="true" {...stylex.props(styles.chapterRange)}>
-                        {chapter.range}
-                      </span>
                       <div {...stylex.props(styles.chapterHeading)}>
                         <h3 {...stylex.props(styles.chapterLabel)}>{chapter.group.label}</h3>
                         <p {...stylex.props(styles.chapterMeta)}>
-                          <span lang="en" {...stylex.props(styles.chapterEnglish)}>
-                            {chapter.english}
-                          </span>
                           <span {...stylex.props(styles.chapterCount)}>
                             {chapter.rows.length} 款原料
                           </span>

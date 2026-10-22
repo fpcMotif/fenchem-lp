@@ -33,27 +33,15 @@ const styles = stylex.create({
     letterSpacing: "0.03em",
     color: tone.navy,
   },
-  english: {
-    gridColumn: { default: "2", [bp.tabletUp]: "10 / 13" },
-    gridRow: "1",
-    margin: 0,
-    justifySelf: "end",
-    fontSize: { default: 18, [bp.desktop]: 26 },
-    lineHeight: 1.2,
-    color: tone.body,
-    textAlign: "right",
-  },
 });
 
 export function SheetHeader({
   sheet,
   title,
-  english,
   titleId,
 }: {
   sheet: number;
   title: string;
-  english: string;
   titleId: string;
 }) {
   return (
@@ -64,9 +52,6 @@ export function SheetHeader({
       <h2 id={titleId} {...stylex.props(styles.title)}>
         {title}
       </h2>
-      <p lang="en" {...stylex.props(ui.serif, styles.english)}>
-        {english}
-      </p>
     </header>
   );
 }

@@ -1,7 +1,6 @@
 import * as stylex from "@stylexjs/stylex";
 import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import { bp, face, space, tone } from "./tokens.stylex";
-import { ui } from "./shared-values";
 
 const tagStyles = stylex.create({
   tag: {
@@ -57,34 +56,9 @@ const headStyles = stylex.create({
     marginBottom: { default: 40, [bp.tablet]: 56, [bp.desktop]: 72 },
   },
   rule: {
-    display: "flex",
-    alignItems: "center",
-    gap: { default: 14, [bp.upTablet]: 20 },
-    marginBottom: { default: 22, [bp.tablet]: 30, [bp.desktop]: 36 },
-    fontFamily: face.latin,
-    fontSize: 11,
-    fontWeight: 500,
-    lineHeight: 1,
-    letterSpacing: "0.24em",
-    textTransform: "uppercase",
-    color: tone.quiet,
-  },
-  index: {
-    fontVariantNumeric: "tabular-nums",
-    letterSpacing: "0.12em",
-  },
-  line: {
-    flexGrow: 1,
     height: 1,
+    marginBottom: { default: 22, [bp.tablet]: 30, [bp.desktop]: 36 },
     backgroundColor: tone.ruleFaint,
-  },
-  row: {
-    display: "flex",
-    flexWrap: "wrap",
-    alignItems: "last baseline",
-    justifyContent: "space-between",
-    columnGap: 48,
-    rowGap: { default: 12, [bp.upTablet]: 16 },
   },
   title: {
     margin: 0,
@@ -95,47 +69,15 @@ const headStyles = stylex.create({
     letterSpacing: "0.08em",
     color: tone.ink,
   },
-  note: {
-    margin: 0,
-    maxWidth: "20em",
-    fontSize: { default: 18, [bp.tablet]: 20, [bp.laptop]: 21, [bp.wide]: 23 },
-    lineHeight: 1.3,
-    textAlign: { default: "start", [bp.desktop]: "end" },
-    textWrap: "balance",
-    color: tone.note,
-  },
 });
 
-export function SectionHead({
-  id,
-  index,
-  eyebrow,
-  title,
-  note,
-}: {
-  id: string;
-  index: number;
-  eyebrow: string;
-  title: string;
-  note?: string;
-}) {
+export function SectionHead({ id, title }: { id: string; title: string }) {
   return (
     <div {...stylex.props(headStyles.head)}>
-      <div aria-hidden="true" lang="en" {...stylex.props(headStyles.rule)}>
-        <span {...stylex.props(headStyles.index)}>{String(index).padStart(2, "0")}</span>
-        <span {...stylex.props(headStyles.line)} />
-        <span>{eyebrow}</span>
-      </div>
-      <div {...stylex.props(headStyles.row)}>
-        <h2 id={id} {...stylex.props(headStyles.title)}>
-          {title}
-        </h2>
-        {note ? (
-          <p lang="en" {...stylex.props(ui.serif, headStyles.note)}>
-            {note}
-          </p>
-        ) : null}
-      </div>
+      <div aria-hidden="true" {...stylex.props(headStyles.rule)} />
+      <h2 id={id} {...stylex.props(headStyles.title)}>
+        {title}
+      </h2>
     </div>
   );
 }

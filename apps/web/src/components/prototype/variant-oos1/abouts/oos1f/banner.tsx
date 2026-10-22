@@ -111,21 +111,6 @@ const styles = stylex.create({
     objectPosition: "46% 50%",
     borderRadius: 2,
   },
-  caption: {
-    display: "flex",
-    columnGap: 20,
-    fontFamily: font.cjk,
-    fontSize: 12,
-    fontWeight: 400,
-    letterSpacing: "0.14em",
-    color: color.body,
-    writingMode: { default: "horizontal-tb", [breakpoints.lg]: "vertical-rl" },
-    position: { default: "static", [breakpoints.lg]: "absolute" },
-    top: { default: null, [breakpoints.lg]: 0 },
-    left: { default: null, [breakpoints.lg]: "calc(100% + 18px)" },
-    marginBlock: { default: 14, [breakpoints.lg]: 0 },
-    whiteSpace: "nowrap",
-  },
 });
 
 export function Banner() {
@@ -158,10 +143,6 @@ export function Banner() {
                 decoding="async"
                 {...stylex.props(styles.image)}
               />
-              <figcaption lang="en" {...stylex.props(styles.caption)}>
-                <span>{ABOUT_BANNER.established}</span>
-                <span>{ABOUT_BANNER.place}</span>
-              </figcaption>
             </figure>
           </div>
         </div>

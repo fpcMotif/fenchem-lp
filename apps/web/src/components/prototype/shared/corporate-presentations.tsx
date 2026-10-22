@@ -61,9 +61,6 @@ export function LakeStatistic({
         <span {...stylex.props(styles.visuallyHidden)}>{stat.value}</span>
         {stat.unit ? <span {...stylex.props(styles.lakeUnit)}>{stat.unit}</span> : null}
       </m.p>
-      <m.p {...stylex.props(styles.lakeCaption)} style={{ opacity: surfacing, y: lift }}>
-        {stat.caption}
-      </m.p>
     </div>
   );
 }
@@ -95,7 +92,6 @@ export function CountedStatistic({
           <CountUp value={stat.value} />
           {stat.unit ? <span {...stylex.props(styles.statUnit)}>{stat.unit}</span> : null}
         </p>
-        <p {...stylex.props(styles.statText)}>{stat.caption}</p>
       </ZoomReveal>
     </>
   );

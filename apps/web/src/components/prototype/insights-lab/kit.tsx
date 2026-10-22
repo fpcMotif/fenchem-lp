@@ -378,15 +378,11 @@ export function LabPage({
   onSelectChip?: (id: string) => void;
   children: ReactNode;
 }) {
-  const articles = useLabArticles();
   return (
     <div id="insights-top" lang="zh-CN" {...stylex.props(kitStyles.root)}>
       <SubPageBanner
-        eyebrow="Insights"
         title="行业洞察"
-        tagline="Notes from the formulation bench"
         lead="来自泛成应用研发团队的原料趋势、配方方法与法规观察"
-        meta={[`${articles.length} 篇洞察 · 持续更新`]}
         image="/prototype/official-site/product-human-nutrition.webp"
         imageAlt="行业洞察"
         titleId="insights-banner-title"

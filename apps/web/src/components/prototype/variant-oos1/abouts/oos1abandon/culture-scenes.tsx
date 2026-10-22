@@ -1,4 +1,4 @@
-import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
+import { breakpoints } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 import { m, useScroll, useTransform } from "motion/react";
 import { useRef } from "react";
@@ -7,7 +7,7 @@ import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
 import { ABOUT_CAMPUS, ABOUT_CULTURE, ABOUT_MOMENT } from "../../about-data";
 import { RiseReveal } from "../../rise-reveal";
-import { color, font, layout, media } from "../../tokens.stylex";
+import { color, layout, media } from "../../tokens.stylex";
 
 const FRAME_TINT = "#e6ecf7";
 const WASH_SAND = "#f8f4ec";
@@ -34,16 +34,6 @@ const styles = stylex.create({
   },
   header: {
     marginBottom: { default: 40, [DESKTOP]: 64 },
-  },
-  eyebrow: {
-    margin: 0,
-    marginBottom: 12,
-    fontFamily: font.display,
-    fontSize: 12,
-    fontWeight: 600,
-    letterSpacing: "0.22em",
-    textTransform: "uppercase",
-    color: colors.brandBlue700,
   },
   title: {
     margin: 0,
@@ -279,9 +269,6 @@ export function CultureScenes({ sx }: { sx?: stylex.StyleXStyles }) {
     >
       <div {...stylex.props(styles.shell)}>
         <RiseReveal sx={styles.header}>
-          <p lang="en" {...stylex.props(styles.eyebrow)}>
-            {ABOUT_CULTURE.eyebrow}
-          </p>
           <h2 id="about-culture-title" {...stylex.props(styles.title)}>
             {ABOUT_CULTURE.title}
           </h2>

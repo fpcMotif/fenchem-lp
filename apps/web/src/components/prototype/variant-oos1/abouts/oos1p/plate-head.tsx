@@ -2,8 +2,6 @@ import * as stylex from "@stylexjs/stylex";
 
 import { ui } from "./layout";
 import { StrobeText, useEntry } from "./strobe";
-import { ForwardArrow } from "./time-grid";
-import { frameLabel } from "./time-grid-values";
 import { bp, face, tone } from "./tokens.stylex";
 
 const styles = stylex.create({
@@ -11,19 +9,6 @@ const styles = stylex.create({
     alignItems: "baseline",
     rowGap: 14,
     marginBottom: { default: 40, [bp.tablet]: 56, [bp.desktop]: 72 },
-  },
-  label: {
-    display: "flex",
-    alignItems: "baseline",
-    gap: 12,
-    margin: 0,
-  },
-  plateNumber: {
-    display: "inline-flex",
-    alignItems: "center",
-    gap: 6,
-    fontSize: 13,
-    color: tone.navy,
   },
   title: {
     margin: 0,
@@ -46,14 +31,10 @@ const styles = stylex.create({
 });
 
 export function PlateHead({
-  plate,
-  english,
   title,
   titleId,
   latin = false,
 }: {
-  plate: number;
-  english: string;
   title: string;
   titleId: string;
   latin?: boolean;
@@ -62,15 +43,6 @@ export function PlateHead({
   return (
     <div ref={ref} {...stylex.props(ui.shell)}>
       <div {...stylex.props(ui.grid, styles.head)}>
-        <p {...stylex.props(ui.q1, styles.label)}>
-          <span {...stylex.props(ui.frameNumber, styles.plateNumber)}>
-            <ForwardArrow />
-            {frameLabel(plate)}
-          </span>
-          <span lang="en" {...stylex.props(ui.eyebrow)}>
-            {english}
-          </span>
-        </p>
         <h2
           id={titleId}
           lang={latin ? "en" : undefined}

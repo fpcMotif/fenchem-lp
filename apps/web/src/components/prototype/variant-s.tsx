@@ -1838,9 +1838,6 @@ function FooterSection() {
                 {company.email}
               </a>
             </p>
-            <p {...stylex.props(styles.footerItem)}>
-              {company.hq.city}, {company.hq.country}
-            </p>
           </div>
         </div>
         <div {...stylex.props(styles.footerBottom)}>

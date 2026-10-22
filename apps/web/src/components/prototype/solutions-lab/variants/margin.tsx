@@ -265,15 +265,6 @@ const styles = stylex.create({
     letterSpacing: "0.12em",
     color: tone.tintMuted,
   },
-  areaEnglish: {
-    fontFamily: face.display,
-    fontSize: 11,
-    fontWeight: 500,
-    lineHeight: "20px",
-    letterSpacing: "0.18em",
-    textTransform: "uppercase",
-    color: tone.tintMuted,
-  },
   counter: {
     marginInlineStart: "auto",
     fontFamily: face.display,
@@ -401,11 +392,6 @@ function Sheet({ item, position, total }: { item: SolutionItem; position: number
       <header>
         <p {...stylex.props(styles.eyebrow)}>
           <span {...stylex.props(styles.areaLabel)}>{area?.label}</span>
-          {area && (
-            <span lang="en" {...stylex.props(styles.areaEnglish)}>
-              {area.englishLabel}
-            </span>
-          )}
           <span aria-hidden="true" {...stylex.props(styles.counter)}>
             {padIndex(position)} / {String(total).padStart(2, "0")}
           </span>

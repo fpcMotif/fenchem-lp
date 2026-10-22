@@ -4,7 +4,7 @@ import { ABOUT_HERO, ABOUT_MOMENT } from "../../about-data";
 import { LEVER } from "./counterweight";
 import { Pair, StandingTitle } from "./pair";
 import { type, ui } from "./shared";
-import { bp, face, scale, tone } from "./tokens.stylex";
+import { bp, face, tone } from "./tokens.stylex";
 
 const styles = stylex.create({
   name: {
@@ -51,9 +51,6 @@ const styles = stylex.create({
   panorama: { aspectRatio: "4 / 3" },
   lobbyPosition: { objectPosition: "50% 60%" },
   panoramaPosition: { objectPosition: "40% 50%" },
-  sixteen: {
-    fontSize: scale.titleCounterweight,
-  },
 });
 
 export function Profile() {
@@ -63,11 +60,7 @@ export function Profile() {
         lever={LEVER}
         loadRatio={3 / 2}
         offset="end"
-        standing={
-          <StandingTitle id="oos1x-profile" en="Profile">
-            企业概况
-          </StandingTitle>
-        }
+        standing={<StandingTitle id="oos1x-profile">企业概况</StandingTitle>}
         load={
           <figure {...stylex.props(styles.figure)}>
             <div {...stylex.props(styles.frame, styles.classic)}>
@@ -95,11 +88,6 @@ export function Profile() {
         lever={LEVER}
         loadRatio={4 / 3}
         offset="start"
-        tag={
-          <p aria-hidden="true" {...stylex.props(type.counterweight, styles.sixteen)}>
-            16
-          </p>
-        }
         load={
           <figure {...stylex.props(styles.figure)}>
             <div {...stylex.props(styles.frame, styles.panorama)}>

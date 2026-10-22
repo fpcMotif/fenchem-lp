@@ -14,12 +14,6 @@ const LEVEL_LABEL = {
   municipal: "南京市级",
 } as const;
 
-const STAT_ENGLISH: Record<(typeof STATS)[number]["label"], string> = {
-  公司历史: "Company history",
-  全球分公司: "Global offices",
-  生产基地: "Production bases",
-};
-
 const CSR_ICONS = {
   factory: Factory,
   recycle: Recycle,
@@ -447,7 +441,7 @@ export function Profile() {
       {...stylex.props(ui.section, ui.anchor, styles.profile)}
     >
       <h2 id="about-profile-title" {...stylex.props(ui.srOnly)}>
-        {ABOUT_HERO.navChips[0].english}
+        {ABOUT_HERO.navChips[0].label}
       </h2>
       <div {...stylex.props(ui.shell)}>
         <div {...stylex.props(styles.profileGrid)}>
@@ -494,7 +488,7 @@ export function Profile() {
                 index === STATS.length - 1 && styles.statLast,
               ]}
             >
-              <dt {...stylex.props(ui.srOnly)}>{STAT_ENGLISH[stat.label]}</dt>
+              <dt {...stylex.props(ui.srOnly)}>{stat.label}</dt>
               <dd {...stylex.props(styles.statValue)}>
                 {stat.value}
                 {stat.unit ? <span {...stylex.props(styles.statUnit)}>{stat.unit}</span> : null}
@@ -517,7 +511,7 @@ export function Responsibility() {
       {...stylex.props(ui.section, ui.anchor, styles.csr)}
     >
       <h2 id="about-csr-title" {...stylex.props(ui.srOnly)}>
-        {ABOUT_HERO.navChips[3].english}
+        {ABOUT_CSR.title}
       </h2>
       <div {...stylex.props(ui.shell, styles.csrGrid)}>
         <Reveal as="figure" sx={styles.csrPhoto}>
@@ -571,7 +565,7 @@ export function Honors() {
       {...stylex.props(ui.section, ui.anchor, styles.honors)}
     >
       <h2 id="about-honor-title" {...stylex.props(ui.srOnly)}>
-        {ABOUT_HONORS.eyebrow}
+        {ABOUT_HONORS.title}
       </h2>
       <div {...stylex.props(ui.shell)}>
         <ul {...stylex.props(styles.honorList)}>
@@ -595,6 +589,7 @@ export function Honors() {
 export function Structure() {
   const [showChart, setShowChart] = useState(false);
   const chartId = useId();
+  const badgeId = useId();
   return (
     <section
       id="about-structure"
@@ -602,7 +597,7 @@ export function Structure() {
       {...stylex.props(ui.section, ui.anchor, styles.structure)}
     >
       <h2 id="about-structure-title" {...stylex.props(ui.srOnly)}>
-        {ABOUT_STRUCTURE.eyebrow}
+        {ABOUT_STRUCTURE.title}
       </h2>
       <div {...stylex.props(ui.shell)}>
         <Reveal sx={styles.holding}>
@@ -613,13 +608,10 @@ export function Structure() {
           </span>
         </Reveal>
         <div aria-hidden="true" {...stylex.props(styles.loomBeam)} />
-        <p {...stylex.props(ui.caption, styles.subsidiaryBadge)}>
+        <p id={badgeId} {...stylex.props(ui.caption, styles.subsidiaryBadge)}>
           {ABOUT_STRUCTURE.subsidiaryBadge}
         </p>
-        <ul
-          aria-label={ABOUT_STRUCTURE.subsidiaryBadgeEnglish}
-          {...stylex.props(styles.subsidiaries)}
-        >
+        <ul aria-labelledby={badgeId} {...stylex.props(styles.subsidiaries)}>
           {ABOUT_STRUCTURE.subsidiaries.map((sub, index) => (
             <Reveal key={sub.id} as="li" delay={index * 70} sx={styles.subsidiary}>
               <span aria-hidden="true" {...stylex.props(styles.warpEnd)} />

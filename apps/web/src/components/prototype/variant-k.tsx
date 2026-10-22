@@ -128,26 +128,6 @@ const styles = stylex.create({
     letterSpacing: "0.24em",
     color: colors.mute600,
   },
-  eyebrowGreen: {
-    fontFamily: typography.tech,
-    fontSize: {
-      default: 11,
-      [breakpoints.md]: 12,
-    },
-    textTransform: "uppercase",
-    letterSpacing: "0.35em",
-    color: colors.brandGreen700,
-  },
-  eyebrowGreen400: {
-    fontFamily: typography.tech,
-    fontSize: {
-      default: 11,
-      [breakpoints.md]: 12,
-    },
-    textTransform: "uppercase",
-    letterSpacing: "0.35em",
-    color: colors.brandGreen400,
-  },
   ctaPrimary: {
     display: "inline-flex",
     minHeight: 44,
@@ -449,28 +429,7 @@ const styles = stylex.create({
       [breakpoints.lg]: "span 7 / span 7",
     },
   },
-  heroBadge: {
-    display: "inline-flex",
-    width: "fit-content",
-    alignItems: "center",
-    gap: 8,
-    borderRadius: radii.full,
-    borderWidth: 1,
-    borderStyle: "solid",
-    borderColor: colors.brandGreen200,
-    backgroundColor: colors.brandGreen50,
-    paddingLeft: 16,
-    paddingRight: 16,
-    paddingTop: 6,
-    paddingBottom: 6,
-    fontFamily: typography.tech,
-    fontSize: 11,
-    textTransform: "uppercase",
-    letterSpacing: "0.32em",
-    color: colors.brandGreen700,
-  },
   heroTitle: {
-    marginTop: 32,
     fontFamily: typography.display,
     fontSize: "clamp(3rem, 7.5vw, 6.5rem)",
     fontWeight: 700,
@@ -560,13 +519,6 @@ const styles = stylex.create({
     justifyContent: "space-between",
     gap: 16,
   },
-  captionFieldAccent: {
-    fontFamily: typography.tech,
-    fontSize: 11,
-    textTransform: "uppercase",
-    letterSpacing: "0.24em",
-    color: colors.brandGreen700,
-  },
   /* Division bands signature module */
   divisionsHeaderOuter: {
     borderBottomWidth: 1,
@@ -593,7 +545,6 @@ const styles = stylex.create({
     },
   },
   divisionsHeading: {
-    marginTop: 16,
     maxWidth: 768,
     fontFamily: typography.display,
     fontSize: {
@@ -605,17 +556,6 @@ const styles = stylex.create({
     letterSpacing: "-0.03em",
     color: colors.ink,
     margin: 0,
-  },
-  divisionsLead: {
-    marginTop: 24,
-    maxWidth: 576,
-    fontFamily: typography.body,
-    fontSize: {
-      default: 16,
-      [breakpoints.md]: 18,
-    },
-    lineHeight: 1.625,
-    color: colors.mute600,
   },
   bandSection: {
     borderBottomWidth: 1,
@@ -844,7 +784,6 @@ const styles = stylex.create({
     },
   },
   storyTitle: {
-    marginTop: 32,
     maxWidth: 1024,
     fontFamily: typography.display,
     fontSize: "clamp(2.8rem, 8vw, 7rem)",
@@ -864,14 +803,6 @@ const styles = stylex.create({
     },
     lineHeight: 1.625,
     color: colors.mute600,
-  },
-  storyTagline: {
-    marginTop: 32,
-    fontFamily: typography.tech,
-    fontSize: 11,
-    textTransform: "uppercase",
-    letterSpacing: "0.28em",
-    color: colors.brandGreen700,
   },
   /* Matrix Section */
   matrixSection: {
@@ -915,7 +846,6 @@ const styles = stylex.create({
     },
   },
   matrixHeading: {
-    marginTop: 16,
     fontFamily: typography.display,
     fontSize: {
       default: 36,
@@ -980,12 +910,6 @@ const styles = stylex.create({
     alignItems: "baseline",
     justifyContent: "space-between",
     gap: 16,
-  },
-  matrixIndex: {
-    fontFamily: typography.tech,
-    fontSize: 11,
-    letterSpacing: "0.22em",
-    color: colors.brandGreen700,
   },
   matrixCode: {
     fontFamily: typography.tech,
@@ -1081,7 +1005,6 @@ const styles = stylex.create({
     },
   },
   certsHeading: {
-    marginTop: 12,
     fontFamily: typography.display,
     fontSize: {
       default: 30,
@@ -1161,7 +1084,6 @@ const styles = stylex.create({
     textAlign: "center",
   },
   finaleHeading: {
-    marginTop: 32,
     marginLeft: "auto",
     marginRight: "auto",
     maxWidth: 896,
@@ -1195,14 +1117,6 @@ const styles = stylex.create({
     flexWrap: "wrap",
     justifyContent: "center",
     gap: 16,
-  },
-  finaleResponseTime: {
-    marginTop: 40,
-    fontFamily: typography.tech,
-    fontSize: 11,
-    textTransform: "uppercase",
-    letterSpacing: "0.28em",
-    color: colors.brandGreen400,
   },
   /* Footer */
   footer: {
@@ -1453,9 +1367,6 @@ function HeroSection() {
           {/* Headline block */}
           <div {...stylex.props(styles.heroLeft)}>
             <Intro>
-              <p {...stylex.props(styles.heroBadge)}>Botanical ingredients — since 1995</p>
-            </Intro>
-            <Intro delay={STAGGER}>
               <h1 {...stylex.props(styles.heroTitle)}>
                 Every division,
                 <br />
@@ -1510,7 +1421,6 @@ function HeroSection() {
                 </div>
                 <figcaption {...stylex.props(styles.figCaption)}>
                   <span {...stylex.props(styles.techLabel)}>Nutrition division</span>
-                  <span {...stylex.props(styles.captionFieldAccent)}>Field — 01</span>
                 </figcaption>
               </figure>
             </Intro>
@@ -1526,7 +1436,6 @@ function HeroSection() {
                 </div>
                 <figcaption {...stylex.props(styles.figCaption)}>
                   <span {...stylex.props(styles.techLabel)}>Personal care division</span>
-                  <span {...stylex.props(styles.captionFieldAccent)}>Field — 03</span>
                 </figcaption>
               </figure>
             </Intro>
@@ -1563,9 +1472,6 @@ function DivisionBand({ band, index }: { band: BandConfig; index: number }) {
               >
                 {band.numeral}
               </span>
-              <p {...stylex.props(styles.eyebrowGreen)}>
-                Division {band.numeral} — {band.application}
-              </p>
               <h3 id={headingId} {...stylex.props(styles.bandTitle)}>
                 {industry.title}
               </h3>
@@ -1614,17 +1520,10 @@ function DivisionsSection() {
       <div {...stylex.props(styles.divisionsHeaderOuter)}>
         <div {...stylex.props(styles.container, styles.divisionsHeaderInner)}>
           <Reveal>
-            <p {...stylex.props(styles.eyebrowGreen)}>01 — The divisions</p>
             <h2 {...stylex.props(styles.divisionsHeading)}>
               Three fields of color,{" "}
               <span {...stylex.props(styles.italicGreen)}>one signature.</span>
             </h2>
-          </Reveal>
-          <Reveal delay={STAGGER}>
-            <p {...stylex.props(styles.divisionsLead)}>
-              Each division carries its own hue from the Fenchem brand book — worn here as a wash,
-              never a wall — and every one releases against the same audited standard.
-            </p>
           </Reveal>
         </div>
       </div>
@@ -1642,7 +1541,6 @@ function StorySection() {
     <section id="story" aria-labelledby="story-heading" {...stylex.props(styles.storySection)}>
       <div {...stylex.props(styles.container, styles.storyInner)}>
         <Reveal>
-          <p {...stylex.props(styles.eyebrowGreen)}>02 — The record</p>
           <h2 id="story-heading" {...stylex.props(styles.storyTitle)}>
             <span {...stylex.props(styles.italicGreen)}>30+ years.</span> 6 bases. 40+ countries.
           </h2>
@@ -1656,11 +1554,6 @@ function StorySection() {
             releases against the same audited standard.
           </p>
         </Reveal>
-        <Reveal delay={STAGGER * 3}>
-          <p {...stylex.props(styles.storyTagline)}>
-            {company.tagline} — {company.since}
-          </p>
-        </Reveal>
       </div>
     </section>
   );
@@ -1668,13 +1561,12 @@ function StorySection() {
 
 /* ─────────────────────────────── Compact matrix strip ─────────────────────────────── */
 
-function MatrixCard({ item, index }: { item: Ingredient; index: number }) {
+function MatrixCard({ item }: { item: Ingredient }) {
   const division = divisionForApplication(item.application);
   const topStyleKey = MATRIX_TOP_KEYS[division];
   return (
     <article {...stylex.props(styles.matrixCard, styles[topStyleKey])}>
       <div {...stylex.props(styles.matrixCardMeta)}>
-        <span {...stylex.props(styles.matrixIndex)}>{String(index + 1).padStart(2, "0")} —</span>
         <span {...stylex.props(styles.matrixCode)}>{item.code}</span>
       </div>
       <h3 {...stylex.props(styles.matrixCardTitle)}>{item.name}</h3>
@@ -1694,7 +1586,6 @@ function MatrixSection() {
       <div {...stylex.props(styles.container, styles.matrixInner)}>
         <div {...stylex.props(styles.matrixHeaderRow)}>
           <Reveal>
-            <p {...stylex.props(styles.eyebrowGreen)}>03 — Featured portfolio</p>
             <h2 id="matrix-heading" {...stylex.props(styles.matrixHeading)}>
               The compact <span {...stylex.props(styles.italicGreen)}>matrix</span>
             </h2>
@@ -1713,8 +1604,8 @@ function MatrixSection() {
             aria-label="Featured ingredients — scrolls horizontally"
             {...stylex.props(styles.matrixStrip)}
           >
-            {getFeaturedIngredients().map((item, i) => (
-              <MatrixCard key={item.code} item={item} index={i} />
+            {getFeaturedIngredients().map((item) => (
+              <MatrixCard key={item.code} item={item} />
             ))}
           </address>
         </Reveal>
@@ -1731,12 +1622,9 @@ function CertificationsSection() {
       <div {...stylex.props(styles.container, styles.certsInner)}>
         <Reveal>
           <div {...stylex.props(styles.certsFlex)}>
-            <div>
-              <p {...stylex.props(styles.eyebrowGreen)}>04 — Certified</p>
-              <h2 id="certs-heading" {...stylex.props(styles.certsHeading)}>
-                Audited on every lot
-              </h2>
-            </div>
+            <h2 id="certs-heading" {...stylex.props(styles.certsHeading)}>
+              Audited on every lot
+            </h2>
             <ul {...stylex.props(styles.certsList)}>
               {certificationDetails.map((cert) => (
                 <li key={cert.name} {...stylex.props(styles.certBadge)}>
@@ -1768,7 +1656,6 @@ function FinaleSection() {
       />
       <div {...stylex.props(styles.container, styles.finaleInner)}>
         <Reveal>
-          <p {...stylex.props(styles.eyebrowGreen400)}>05 — Partner with Fenchem</p>
           <h2 id="contact-heading" {...stylex.props(styles.finaleHeading)}>
             One standard, <span {...stylex.props(styles.italicGreen)}>signed on every lot.</span>
           </h2>
@@ -1784,11 +1671,6 @@ function FinaleSection() {
               <ArrowRight aria-hidden size={16} />
             </a>
           </div>
-        </Reveal>
-        <Reveal delay={STAGGER * 3}>
-          <p {...stylex.props(styles.finaleResponseTime)}>
-            Response &lt; 24h — Technical dossiers on request
-          </p>
         </Reveal>
       </div>
     </section>

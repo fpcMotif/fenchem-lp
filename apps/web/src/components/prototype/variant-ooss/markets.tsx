@@ -14,7 +14,6 @@ type Product = (typeof PRODUCTS)[number];
 const COUNT = PRODUCTS.length;
 const SEGMENT_ENTRY = 0.06;
 const SCROLL_SETTLE_MS = 1200;
-const META = "解决方案创新 · 稳定供应保障";
 
 const PIN_HEIGHT = "360svh";
 const STAGE_TOP = 112;
@@ -122,12 +121,6 @@ const styles = stylex.create({
   headerAction: {
     flexShrink: 0,
     marginBottom: -12,
-  },
-  meta: {
-    margin: 0,
-    fontSize: 16,
-    lineHeight: 1.5,
-    color: color.inkMuted,
   },
   body: {
     marginTop: HEADER_GAP,
@@ -435,9 +428,6 @@ function MarketsHeader() {
           <TextLink href={PRODUCTS_INTRO.cta.href}>{PRODUCTS_INTRO.cta.label}</TextLink>
         </Reveal>
       </div>
-      <Reveal as="p" index={1} sx={styles.meta}>
-        {META}
-      </Reveal>
     </div>
   );
 }

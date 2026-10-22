@@ -42,14 +42,6 @@ export const ui = stylex.create({
     letterSpacing: "0.02em",
     color: tone.ink,
   },
-  labelEn: {
-    fontFamily: face.serif,
-    fontSize: 18,
-    fontStyle: "italic",
-    fontWeight: 400,
-    letterSpacing: 0,
-    color: tone.body,
-  },
   body: {
     margin: 0,
     fontFamily: face.sans,

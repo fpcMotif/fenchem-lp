@@ -4,7 +4,7 @@ import * as stylex from "@stylexjs/stylex";
 import { ABOUT_CAMPUS, ABOUT_CULTURE, ABOUT_HERO, ABOUT_MOMENT } from "../../about-data";
 import { Reveal, Section } from "./shared";
 import { ui } from "./shared-values";
-import { band, font, layout, step, tone } from "./tokens.stylex";
+import { band, layout, step, tone } from "./tokens.stylex";
 
 const s = stylex.create({
   story: {
@@ -69,10 +69,6 @@ const s = stylex.create({
     rowGap: 12,
     marginTop: { default: 24, [breakpoints.xl]: 36 },
   },
-  vastSlug: {
-    gridColumn: { default: "auto", [breakpoints.lg]: "1 / 5" },
-    fontSize: { default: 28, [breakpoints.lg]: 40 },
-  },
   vastBody: {
     gridColumn: { default: "auto", [breakpoints.lg]: "6 / 12" },
   },
@@ -85,20 +81,6 @@ const s = stylex.create({
     marginTop: { default: 24, [breakpoints.lg]: 0 },
     alignSelf: "start",
   },
-  slug: {
-    margin: 0,
-    fontFamily: font.serif,
-    fontStyle: "italic",
-    fontWeight: 400,
-    lineHeight: 1.1,
-    color: tone.body,
-  },
-  roomSlug: {
-    fontSize: { default: 24, [breakpoints.lg]: 28 },
-  },
-  humanSlug: {
-    fontSize: 20,
-  },
   titleVast: {
     margin: 0,
     fontSize: { default: 28, [band.mdToXl]: 40, [breakpoints.xl]: 52 },
@@ -109,7 +91,6 @@ const s = stylex.create({
   },
   titleRoom: {
     margin: 0,
-    marginTop: 12,
     fontSize: { default: 24, [breakpoints.xl]: 32 },
     fontWeight: 500,
     lineHeight: 1.3,
@@ -118,7 +99,6 @@ const s = stylex.create({
   },
   titleHuman: {
     margin: 0,
-    marginTop: 10,
     fontSize: 22,
     fontWeight: 500,
     lineHeight: 1.3,
@@ -164,9 +144,6 @@ export function Culture() {
             </figcaption>
           </Reveal>
           <Reveal delay={150} sx={s.vastText}>
-            <p lang="en" {...stylex.props(s.slug, s.vastSlug)}>
-              From above
-            </p>
             <div {...stylex.props(s.vastBody)}>
               <h3 {...stylex.props(s.titleVast)}>{quiet.title}</h3>
               <p {...stylex.props(s.desc)}>{quiet.desc}</p>
@@ -187,9 +164,6 @@ export function Culture() {
             <figcaption {...stylex.props(ui.caption)}>{lab.caption}</figcaption>
           </Reveal>
           <Reveal delay={150} sx={s.roomText}>
-            <p lang="en" {...stylex.props(s.slug, s.roomSlug)}>
-              Down the corridor
-            </p>
             <h3 {...stylex.props(s.titleRoom)}>{professional.title}</h3>
             <p {...stylex.props(s.desc)}>{professional.desc}</p>
           </Reveal>
@@ -208,9 +182,6 @@ export function Culture() {
             <figcaption {...stylex.props(ui.caption)}>{lounge.caption}</figcaption>
           </Reveal>
           <Reveal delay={150} sx={s.humanText}>
-            <p lang="en" {...stylex.props(s.slug, s.humanSlug)}>
-              Where people meet
-            </p>
             <h3 {...stylex.props(s.titleHuman)}>{together.title}</h3>
             <p {...stylex.props(s.desc)}>{together.desc}</p>
           </Reveal>

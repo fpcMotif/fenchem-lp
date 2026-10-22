@@ -50,7 +50,6 @@ const styles = stylex.create({
     },
   },
   heading: {
-    marginTop: "1.5rem",
     fontFamily: typography.display,
     fontSize: {
       default: "3rem",
@@ -64,20 +63,6 @@ const styles = stylex.create({
   headingItalic: {
     fontStyle: "italic",
     color: colors.brandGreen700,
-  },
-  intro: {
-    gridColumn: {
-      [breakpoints.md]: "span 5",
-    },
-    maxWidth: "24rem",
-    lineHeight: 1.625,
-    color: colors.mute600,
-    justifySelf: {
-      [breakpoints.md]: "end",
-    },
-    textAlign: {
-      [breakpoints.md]: "right",
-    },
   },
   list: {
     marginTop: "5rem",
@@ -198,7 +183,6 @@ const styles = stylex.create({
 
 export function IndustriesSection() {
   const ref = useSectionAnimation<HTMLElement>((root) => {
-    riseIn(root, "[data-ind-eyebrow], [data-ind-intro]", { stagger: 0.12 });
     revealWords(root, "[data-ind-heading]", { delay: 0.08 });
     drawRule(root, "[data-ind-rule]", { stagger: 0.12 });
     riseIn(root, "[data-ind-row]", { stagger: 0.12, delay: 0.14 });
@@ -215,9 +199,6 @@ export function IndustriesSection() {
       <div {...stylex.props(styles.container)}>
         <div {...stylex.props(styles.headerGrid)}>
           <div {...stylex.props(styles.headerCol)}>
-            <p data-ind-eyebrow {...stylex.props(sharedStyles.techLabel)}>
-              01 — Application Domains
-            </p>
             <h2 id="industries-heading" data-ind-heading {...stylex.props(styles.heading)}>
               <SplitWords
                 segments={[
@@ -230,10 +211,6 @@ export function IndustriesSection() {
               />
             </h2>
           </div>
-          <p data-ind-intro {...stylex.props(styles.intro)}>
-            Clinically supported actives engineered for the precise demands of each formulation
-            discipline.
-          </p>
         </div>
 
         <ul {...stylex.props(styles.list)}>

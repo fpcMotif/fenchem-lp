@@ -96,12 +96,10 @@ export function SectionHead({
   titleId,
   hour,
   title,
-  english,
 }: {
   titleId: string;
   hour: number;
   title: string;
-  english: string;
 }) {
   const reading = clock(hour);
   return (
@@ -126,9 +124,6 @@ export function SectionHead({
         <h2 id={titleId} {...stylex.props(styles.title)}>
           {title}
         </h2>
-        <p lang="en" {...stylex.props(ui.eyebrow)}>
-          {english}
-        </p>
       </div>
     </header>
   );

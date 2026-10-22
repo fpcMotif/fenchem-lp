@@ -22,10 +22,6 @@ const styles = stylex.create({
   line: {
     display: "block",
   },
-  english: {
-    marginTop: { default: 12, [bp.wide]: 18 },
-    fontSize: "clamp(20px, 1.67vw, 24px)",
-  },
   action: {
     display: "inline-flex",
     alignItems: "center",
@@ -82,9 +78,6 @@ export function Closing({ onNavigateHome }: AboutPageProps) {
             </span>
           ))}
         </h2>
-        <p lang="en" {...stylex.props(type.serif, styles.english)}>
-          Balance begins with a conversation.
-        </p>
       </Pair>
     </section>
   );

@@ -33,7 +33,6 @@ const PAPER_RULE = "#e4dbca";
 const INK = "#1a1a1a";
 const BODY_TEXT = "#4d4d4d";
 const MUTED = "#6b6b70";
-const ACCENT = colors.brandGreen700;
 const ACCENT_ON_DARK = colors.brandGreen300;
 const FOCUS_ON_DARK = colors.brandBlue300;
 const EASE_OUT_CSS = "cubic-bezier(0.22, 1, 0.36, 1)";
@@ -326,17 +325,8 @@ const styles = stylex.create({
     borderBottomColor: INK,
     backgroundColor: PAPER,
   },
-  sheetNumber: {
-    fontFamily: NUMERAL_FONT,
-    fontSize: 14,
-    fontWeight: 500,
-    lineHeight: "20px",
-    letterSpacing: "0.04em",
-    fontVariantNumeric: "tabular-nums",
-    color: MUTED,
-  },
-  sheetNumberCurrent: {
-    color: ACCENT,
+  sheetHeading: {
+    gridColumn: { default: "auto", [SM]: "2", [LG]: "2" },
   },
   sheetTitle: {
     margin: 0,
@@ -452,12 +442,10 @@ function Inline({ items }: { items: string[] }) {
 function Sheet({
   item,
   index,
-  current,
   sheetRef,
 }: {
   item: SolutionItem;
   index: number;
-  current: boolean;
   sheetRef: (node: HTMLElement | null) => void;
 }) {
   const titleId = useId();
@@ -470,11 +458,7 @@ function Sheet({
       {...stylex.props(styles.sheet)}
     >
       <header {...stylex.props(styles.sheetHead)}>
-        <span {...stylex.props(styles.sheetNumber)}>
-          <span {...stylex.props(current && styles.sheetNumberCurrent)}>{padIndex(index)}</span>
-          {` / ${TOTAL_LABEL}`}
-        </span>
-        <div>
+        <div {...stylex.props(styles.sheetHeading)}>
           <h3 id={titleId} {...stylex.props(styles.sheetTitle)}>
             {item.title}
           </h3>
@@ -738,7 +722,6 @@ export function Solutions() {
                 key={item.id}
                 item={item}
                 index={index}
-                current={index === active}
                 sheetRef={(node) => {
                   sheetRefs.current[index] = node;
                 }}

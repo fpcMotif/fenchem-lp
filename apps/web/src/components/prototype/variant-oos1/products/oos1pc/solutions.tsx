@@ -119,19 +119,6 @@ const styles = stylex.create({
       transform: "scaleX(1)",
     },
   },
-  tabIndex: {
-    flexShrink: 0,
-    fontFamily: face.numeral,
-    fontSize: 12,
-    fontWeight: 500,
-    lineHeight: "24px",
-    letterSpacing: "0.04em",
-    fontVariantNumeric: "tabular-nums",
-    color: tone.muted,
-  },
-  tabIndexSelected: {
-    color: colors.brandGreen700,
-  },
   tabTitle: {
     minWidth: 0,
     overflow: "hidden",
@@ -415,11 +402,6 @@ const styles = stylex.create({
     letterSpacing: "0.02em",
     color: tone.muted,
   },
-  stepNeighbourIndex: {
-    marginInlineEnd: 6,
-    fontFamily: face.numeral,
-    fontVariantNumeric: "tabular-nums",
-  },
 });
 
 function Trademarked({ text }: { text: string }) {
@@ -615,18 +597,12 @@ function StepButton({
       )}
     >
       {!isNext && <Icon size={16} strokeWidth={1.5} absoluteStrokeWidth aria-hidden="true" />}
-      {isNext && neighbour && target !== null && (
-        <span {...stylex.props(styles.stepNeighbour)}>
-          <span {...stylex.props(styles.stepNeighbourIndex)}>{padIndex(target)}</span>
-          {neighbour.title}
-        </span>
+      {isNext && neighbour && (
+        <span {...stylex.props(styles.stepNeighbour)}>{neighbour.title}</span>
       )}
       <span>{isNext ? "下一个" : "上一个"}</span>
-      {!isNext && neighbour && target !== null && (
-        <span {...stylex.props(styles.stepNeighbour)}>
-          <span {...stylex.props(styles.stepNeighbourIndex)}>{padIndex(target)}</span>
-          {neighbour.title}
-        </span>
+      {!isNext && neighbour && (
+        <span {...stylex.props(styles.stepNeighbour)}>{neighbour.title}</span>
       )}
       {isNext && <Icon size={16} strokeWidth={1.5} absoluteStrokeWidth aria-hidden="true" />}
     </button>
@@ -711,9 +687,6 @@ export function Solutions() {
                 onKeyDown={(event) => onTabKeyDown(event, index)}
                 {...stylex.props(styles.tab, isActive && styles.tabSelected)}
               >
-                <span {...stylex.props(styles.tabIndex, isActive && styles.tabIndexSelected)}>
-                  {padIndex(index)}
-                </span>
                 <span {...stylex.props(styles.tabTitle, isActive && styles.tabTitleSelected)}>
                   {item.title}
                 </span>

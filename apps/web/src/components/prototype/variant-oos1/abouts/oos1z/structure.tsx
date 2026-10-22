@@ -223,12 +223,7 @@ export function Structure() {
       {...stylex.props(ui.anchor, ui.room)}
     >
       <div {...stylex.props(ui.shell)}>
-        <RoomSign
-          numeral="VI"
-          id="oos1z-structure"
-          title={sectionTitle("about-structure")}
-          english="The floor plan"
-        />
+        <RoomSign id="oos1z-structure" title={sectionTitle("about-structure")} />
         <div {...stylex.props(styles.plan)}>
           <div {...stylex.props(styles.hall)}>
             <span lang="en" {...stylex.props(ui.caps, styles.hallNumber)}>
@@ -245,7 +240,7 @@ export function Structure() {
             </span>
             <span aria-hidden="true" {...stylex.props(styles.exitGap)} />
             <a href="#oos1z-exit" {...stylex.props(ui.caps, ui.focus, styles.exit)}>
-              出口 Exit
+              出口
               <ArrowDown size={13} strokeWidth={1.5} aria-hidden="true" />
             </a>
           </div>

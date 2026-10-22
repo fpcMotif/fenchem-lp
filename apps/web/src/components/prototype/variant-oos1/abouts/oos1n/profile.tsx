@@ -123,12 +123,6 @@ const s = stylex.create({
     letterSpacing: 0,
     color: tone.body,
   },
-  statCaption: {
-    margin: 0,
-    fontSize: step.body,
-    letterSpacing: "0.06em",
-    color: tone.body,
-  },
 });
 
 export function Profile() {
@@ -173,7 +167,6 @@ export function Profile() {
               <span>{stat.value}</span>
               {stat.unit ? <span {...stylex.props(s.statUnit)}>{stat.unit}</span> : null}
             </p>
-            <p {...stylex.props(s.statCaption)}>{stat.caption}</p>
           </Reveal>
         ))}
       </ul>

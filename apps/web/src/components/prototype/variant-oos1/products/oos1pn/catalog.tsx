@@ -123,19 +123,8 @@ const styles = stylex.create({
     borderTopStyle: "solid",
     borderTopColor: INK,
   },
-  english: {
-    margin: 0,
-    fontFamily: LATIN_FONT,
-    fontSize: 12,
-    fontWeight: 500,
-    lineHeight: "16px",
-    letterSpacing: "0.08em",
-    textTransform: "uppercase",
-    color: MUTED,
-  },
   heading: {
     margin: 0,
-    marginTop: 8,
     fontSize: 20,
     fontWeight: 500,
     lineHeight: "28px",
@@ -299,16 +288,10 @@ function Inci({ text }: { text: string }) {
 
 function RegionBlock({ group }: { group: CatalogGroup }) {
   const headingId = useId();
-  const meta = REGION_META[group.id];
 
   return (
     <div id={blockId(group.id)} {...stylex.props(styles.block)}>
       <div {...stylex.props(styles.head)}>
-        {meta && (
-          <p lang="en" {...stylex.props(styles.english)}>
-            {meta.english}
-          </p>
-        )}
         <h3 id={headingId} tabIndex={-1} {...stylex.props(styles.heading)}>
           {group.label}
         </h3>

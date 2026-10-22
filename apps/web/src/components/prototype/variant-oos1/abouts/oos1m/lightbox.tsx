@@ -136,9 +136,6 @@ export function Lightbox({
                   {view.letter}
                 </span>
                 <span {...stylex.props(styles.captionTitle)}>{view.caption}</span>
-                <span lang="en" {...stylex.props(ui.label)}>
-                  View {view.letter} · {view.english}
-                </span>
               </figcaption>
             </figure>
           </LightboxStage>

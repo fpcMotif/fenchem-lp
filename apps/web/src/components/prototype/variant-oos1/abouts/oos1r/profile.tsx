@@ -162,15 +162,6 @@ const s = stylex.create({
     fontSize: { default: 18, [breakpoints.xl]: 24 },
     letterSpacing: "0.02em",
   },
-  statCaption: {
-    margin: 0,
-    marginTop: 6,
-    fontSize: step.small,
-    fontWeight: 400,
-    letterSpacing: "0.06em",
-    lineHeight: 1.7,
-    color: tone.body,
-  },
 });
 
 export function Profile() {
@@ -227,10 +218,7 @@ export function Profile() {
                   <span {...stylex.props(s.statUnit)}>{stat.unit}</span>
                 ) : null}
               </p>
-              <div>
-                <p {...stylex.props(s.statLabel)}>{stat.label}</p>
-                <p {...stylex.props(s.statCaption)}>{stat.caption}</p>
-              </div>
+              <p {...stylex.props(s.statLabel)}>{stat.label}</p>
             </Reveal>
           ))}
         </ul>

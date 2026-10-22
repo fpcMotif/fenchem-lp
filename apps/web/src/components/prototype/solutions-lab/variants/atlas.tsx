@@ -119,17 +119,6 @@ const styles = stylex.create({
     fontVariantNumeric: "tabular-nums",
     color: tone.tintMuted,
   },
-  colEnglish: {
-    gridColumn: "1 / -1",
-    margin: 0,
-    fontFamily: face.display,
-    fontSize: 11,
-    fontWeight: 500,
-    lineHeight: "16px",
-    letterSpacing: "0.14em",
-    textTransform: "uppercase",
-    color: tone.tintMuted,
-  },
   names: {
     display: "flex",
     flexDirection: "column",
@@ -242,15 +231,6 @@ const styles = stylex.create({
     letterSpacing: "0.06em",
     color: tone.accent,
     whiteSpace: "nowrap",
-  },
-  english: {
-    overflow: "hidden",
-    textOverflow: "ellipsis",
-    fontFamily: face.display,
-    fontSize: 11,
-    letterSpacing: "0.14em",
-    textTransform: "uppercase",
-    color: tone.tintMuted,
   },
   stepper: {
     flexShrink: 0,
@@ -441,9 +421,6 @@ function SheetMeta({
     <div {...stylex.props(styles.sheetMeta)}>
       <p {...stylex.props(styles.sheetArea)}>
         <span>{area?.label}</span>
-        <span lang="en" {...stylex.props(styles.english)}>
-          {area?.englishLabel}
-        </span>
       </p>
       <div {...stylex.props(styles.stepper)}>
         <p {...stylex.props(styles.sheetCount)}>
@@ -645,9 +622,6 @@ export function AtlasVariant() {
                   {currentArea.label}
                 </h3>
                 <span {...stylex.props(styles.colCount)}>{currentArea.items.length} 款</span>
-                <p lang="en" {...stylex.props(styles.colEnglish)}>
-                  {currentArea.englishLabel}
-                </p>
               </header>
               <div {...stylex.props(styles.flowGrid)}>
                 {columns.map((items) => (
@@ -673,9 +647,6 @@ export function AtlasVariant() {
                         {group.label}
                       </h3>
                       <span {...stylex.props(styles.colCount)}>{group.items.length} 款</span>
-                      <p lang="en" {...stylex.props(styles.colEnglish)}>
-                        {group.englishLabel}
-                      </p>
                     </header>
                     <NameList items={group.items} {...listProps} />
                   </section>

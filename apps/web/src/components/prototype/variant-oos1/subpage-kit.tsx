@@ -335,48 +335,6 @@ const styles = stylex.create({
     color: { default: colors.paper, ":hover": { default: null, [HOVER]: colors.paper } },
     boxShadow: "0 4px 12px -2px rgba(29, 78, 216, 0.32)",
   },
-
-  sectionHead: {
-    maxWidth: 720,
-    marginBottom: { default: 40, [DESKTOP]: 56 },
-  },
-  sectionEyebrow: {
-    margin: 0,
-    marginBottom: 12,
-    fontFamily: font.display,
-    fontSize: 12,
-    fontWeight: 600,
-    letterSpacing: "0.22em",
-    textTransform: "uppercase",
-    color: colors.brandBlue700,
-  },
-  sectionEyebrowInvert: {
-    color: "#9db9e8",
-  },
-  sectionTitle: {
-    margin: 0,
-    fontSize: { default: 26, [media.tablet]: 32, [DESKTOP]: 40 },
-    fontWeight: 700,
-    lineHeight: 1.2,
-    color: color.ink,
-    textWrap: "balance",
-  },
-  sectionTitleInvert: {
-    color: colors.paper,
-  },
-  sectionLead: {
-    margin: 0,
-    marginTop: 14,
-    maxWidth: "36em",
-    fontSize: { default: 15, [DESKTOP]: 16 },
-    lineHeight: 1.8,
-    letterSpacing: "0.03em",
-    color: color.bodyText,
-    textWrap: "pretty",
-  },
-  sectionLeadInvert: {
-    color: "rgba(255, 255, 255, 0.72)",
-  },
 });
 
 export function Reveal({
@@ -412,7 +370,7 @@ export function SubPageBanner({
   title,
   tagline,
   lead,
-  meta,
+  meta = [],
   image,
   imageAlt,
   imagePosition = "center 58%",
@@ -421,9 +379,9 @@ export function SubPageBanner({
 }: {
   eyebrow?: string;
   title: string;
-  tagline: string;
+  tagline?: string;
   lead: string;
-  meta: readonly string[];
+  meta?: readonly string[];
   image: string;
   imageAlt: string;
   imagePosition?: string;
@@ -465,9 +423,11 @@ export function SubPageBanner({
           >
             {title}
           </h1>
-          <p lang="en" {...stylex.props(styles.bannerTagline, tall && styles.bannerTaglineTall)}>
-            {tagline}
-          </p>
+          {tagline ? (
+            <p lang="en" {...stylex.props(styles.bannerTagline, tall && styles.bannerTaglineTall)}>
+              {tagline}
+            </p>
+          ) : null}
           <p {...stylex.props(styles.bannerLead, tall && styles.bannerLeadTall)}>{lead}</p>
         </div>
         <div lang="en" {...stylex.props(styles.bannerMeta)}>
@@ -579,33 +539,5 @@ export function SubPageNav({
         </nav>
       </div>
     </div>
-  );
-}
-
-export function SectionHead({
-  eyebrow,
-  title,
-  titleId,
-  lead,
-  invert = false,
-}: {
-  eyebrow: string;
-  title: string;
-  titleId: string;
-  lead?: string;
-  invert?: boolean;
-}) {
-  return (
-    <Reveal sx={styles.sectionHead}>
-      <p lang="en" {...stylex.props(styles.sectionEyebrow, invert && styles.sectionEyebrowInvert)}>
-        {eyebrow}
-      </p>
-      <h2 id={titleId} {...stylex.props(styles.sectionTitle, invert && styles.sectionTitleInvert)}>
-        {title}
-      </h2>
-      {lead ? (
-        <p {...stylex.props(styles.sectionLead, invert && styles.sectionLeadInvert)}>{lead}</p>
-      ) : null}
-    </Reveal>
   );
 }

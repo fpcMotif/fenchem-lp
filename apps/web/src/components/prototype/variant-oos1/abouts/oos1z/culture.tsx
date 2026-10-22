@@ -7,7 +7,6 @@ import { sectionTitle, ui } from "./shared";
 import { bp, face, tone } from "./tokens.stylex";
 
 const ROOM = roomDrawing();
-const ENGLISH = ["Expertise & focus", "Quiet persistence", "Collaboration & innovation"] as const;
 const FIRST_NUMBER = 9;
 
 const styles = stylex.create({
@@ -105,13 +104,6 @@ const styles = stylex.create({
     letterSpacing: "0.04em",
     color: tone.ink,
   },
-  english: {
-    margin: 0,
-    marginTop: 2,
-    fontSize: { default: 17, [bp.desktop]: 19 },
-    lineHeight: 1.35,
-    color: tone.body,
-  },
   desc: {
     margin: 0,
     marginTop: 14,
@@ -134,12 +126,7 @@ export function Culture() {
       {...stylex.props(ui.anchor, ui.room)}
     >
       <div {...stylex.props(ui.shell)}>
-        <RoomSign
-          numeral="IV"
-          id="oos1z-culture"
-          title={sectionTitle("about-culture")}
-          english="Culture, in three rooms"
-        />
+        <RoomSign id="oos1z-culture" title={sectionTitle("about-culture")} />
         <ol {...stylex.props(styles.rooms)}>
           {ABOUT_CULTURE.values.map((value, index) => (
             <li key={value.glyph} {...stylex.props(styles.room)}>
@@ -188,9 +175,6 @@ export function Culture() {
                   Nº {String(FIRST_NUMBER + index).padStart(2, "0")}
                 </span>
                 <h3 {...stylex.props(styles.title)}>{value.title}</h3>
-                <p lang="en" {...stylex.props(ui.italic, styles.english)}>
-                  {ENGLISH[index]}
-                </p>
                 <p {...stylex.props(styles.desc)}>
                   <span {...stylex.props(styles.balanced)}>{value.desc}</span>
                 </p>

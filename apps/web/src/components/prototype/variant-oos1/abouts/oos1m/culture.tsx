@@ -191,9 +191,6 @@ function Component({ progress, index }: { progress: MotionValue<number>; index: 
       <div {...stylex.props(styles.spec)}>
         <p {...stylex.props(ui.caps, styles.specHead)}>
           <span lang="en">Component C-{pad2(index + 1)}</span>
-          <span lang="en" {...stylex.props(ui.label)}>
-            {ENGLISH[index]}
-          </span>
         </p>
         <h3 {...stylex.props(styles.name)}>{value.title}</h3>
         <p {...stylex.props(styles.row)}>
@@ -217,12 +214,7 @@ export function Culture() {
       aria-labelledby="oos1m-culture"
       {...stylex.props(ui.shell, ui.section, ui.anchor)}
     >
-      <SheetHeader
-        sheet={3}
-        title={ABOUT_CULTURE.title}
-        english="Components, exploded"
-        titleId="oos1m-culture"
-      />
+      <SheetHeader sheet={3} title={ABOUT_CULTURE.title} titleId="oos1m-culture" />
       <ol ref={listRef} {...stylex.props(styles.list)}>
         {ABOUT_CULTURE.values.map((value, index) => (
           <Component key={value.glyph} progress={progress} index={index} />

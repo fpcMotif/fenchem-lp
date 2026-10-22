@@ -45,15 +45,8 @@ export function Culture() {
           offset={index % 2 === 0 ? "start" : "end"}
           standing={
             index === 0 ? (
-              <StandingTitle id="oos1x-culture" en="Culture">
-                {ABOUT_CULTURE.title}
-              </StandingTitle>
+              <StandingTitle id="oos1x-culture">{ABOUT_CULTURE.title}</StandingTitle>
             ) : undefined
-          }
-          tag={
-            <p aria-hidden="true" {...stylex.props(type.counterweight, type.counterDisplay)}>
-              {String(index + 1).padStart(2, "0")}
-            </p>
           }
           load={
             <div aria-hidden="true" {...stylex.props(styles.weight)}>

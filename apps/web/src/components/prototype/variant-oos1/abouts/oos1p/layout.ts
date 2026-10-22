@@ -47,15 +47,6 @@ export const ui = stylex.create({
     fontVariantNumeric: "tabular-nums",
     color: tone.frameNumber,
   },
-  eyebrow: {
-    margin: 0,
-    fontFamily: face.serif,
-    fontStyle: "italic",
-    fontWeight: 400,
-    fontSize: { default: 20, [bp.desktop]: 24 },
-    lineHeight: 1.1,
-    color: tone.navy,
-  },
   body: {
     margin: 0,
     fontFamily: face.sans,

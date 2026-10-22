@@ -5,7 +5,6 @@ import { SheetHeader } from "./sheet-header";
 import { ui } from "./shared";
 import { bp, face, tone } from "./tokens.stylex";
 
-const ENGLISH = ["Energy", "Material", "Carbon"] as const;
 const TARGET = { x: 59, y: 41 } as const;
 const ROW_CENTERS = [100 / 6, 50, 500 / 6] as const;
 
@@ -131,12 +130,7 @@ export function Csr() {
       aria-labelledby="oos1m-csr"
       {...stylex.props(ui.shell, ui.section, ui.anchor)}
     >
-      <SheetHeader
-        sheet={4}
-        title={ABOUT_CSR.title}
-        english="One site, three outcomes"
-        titleId="oos1m-csr"
-      />
+      <SheetHeader sheet={4} title={ABOUT_CSR.title} titleId="oos1m-csr" />
       <div {...stylex.props(ui.grid, styles.intro)}>
         <p {...stylex.props(styles.statement)}>
           {ABOUT_CSR.statement.map((line) => (
@@ -193,9 +187,6 @@ export function Csr() {
                 {index + 1}
               </span>
               <span {...stylex.props(styles.partText)}>
-                <span lang="en" {...stylex.props(ui.label)}>
-                  {ENGLISH[index]}
-                </span>
                 <span {...stylex.props(styles.partTitle)}>{outcome.title}</span>
               </span>
             </li>

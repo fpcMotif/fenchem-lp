@@ -161,19 +161,6 @@ const styles = stylex.create({
       backgroundColor: ACCENT,
     },
   },
-  tabNumber: {
-    flexShrink: 0,
-    fontFamily: NUMERAL_FONT,
-    fontSize: 12,
-    fontWeight: 500,
-    lineHeight: "16px",
-    letterSpacing: "0.04em",
-    fontVariantNumeric: "tabular-nums",
-    color: MUTED,
-  },
-  tabNumberActive: {
-    color: ACCENT,
-  },
   tabTitle: {
     fontSize: 14,
     fontWeight: 400,
@@ -502,9 +489,6 @@ export function Solutions() {
                   onKeyDown={onTabKeyDown}
                   {...stylex.props(styles.tab, isActive && styles.tabActive)}
                 >
-                  <span {...stylex.props(styles.tabNumber, isActive && styles.tabNumberActive)}>
-                    {padIndex(index)}
-                  </span>
                   <span {...stylex.props(styles.tabTitle, isActive && styles.tabTitleActive)}>
                     <TabTitle title={item.title} />
                   </span>

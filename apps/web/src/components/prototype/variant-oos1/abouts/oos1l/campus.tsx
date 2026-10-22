@@ -11,23 +11,10 @@ import { SENTENCE } from "./sentence";
 import { srOnly, ui } from "./shared";
 import { bp, chrome, tone } from "./tokens.stylex";
 
-type PhotoId = (typeof ABOUT_CAMPUS.photos)[number]["id"];
-
-const ENGLISH: Record<PhotoId, string> = {
-  aerial: "Headquarters",
-  lab: "Laboratory",
-  showroom: "Showroom",
-  reception: "Reception",
-  lounge: "Lounge",
-  office: "Open office",
-  grounds: "Grounds",
-};
-
 const PHOTOS: readonly LightboxPhoto[] = ABOUT_CAMPUS.photos.map((photo, index) => ({
   id: photo.id,
   large: photo.large,
   alt: photo.alt,
-  english: ENGLISH[photo.id],
   line: SENTENCE.campus[index],
 }));
 
@@ -91,13 +78,6 @@ const styles = stylex.create({
     transitionDuration: "900ms",
     transitionTimingFunction: chrome.ease,
   },
-  note: {
-    display: "flex",
-    gap: 12,
-  },
-  number: {
-    color: tone.ink,
-  },
 });
 
 const crops = stylex.create({
@@ -142,12 +122,6 @@ export function Campus() {
                     />
                     <span {...srOnly}>, View larger</span>
                   </button>
-                  <figcaption lang="en" {...stylex.props(ui.note, styles.note)}>
-                    <span {...stylex.props(styles.number)}>
-                      {String(index + 1).padStart(2, "0")}
-                    </span>
-                    <span>{ENGLISH[photo.id]}</span>
-                  </figcaption>
                 </figure>
               </li>
             );

@@ -13,7 +13,6 @@ export type LightboxPhoto = {
   large: string;
   alt: string;
   caption: string;
-  english: string;
 };
 
 const backdropIn = stylex.keyframes({
@@ -88,12 +87,6 @@ const styles = stylex.create({
     fontVariantNumeric: "tabular-nums",
     color: "rgba(255, 255, 255, 0.6)",
   },
-  english: {
-    fontFamily: face.serif,
-    fontStyle: "italic",
-    fontSize: 18,
-    color: "rgba(255, 255, 255, 0.78)",
-  },
   button: {
     position: "absolute",
     display: "flex",
@@ -154,9 +147,6 @@ export function Lightbox({
                   {frameLabel(index + 1)} / {frameLabel(photos.length)}
                 </span>
                 <span>{photo.caption}</span>
-                <span lang="en" {...stylex.props(styles.english)}>
-                  {photo.english}
-                </span>
               </figcaption>
             </figure>
           </LightboxStage>
@@ -177,7 +167,7 @@ export function Lightbox({
             }}
           />
           <span {...stylex.props(ui.srOnly)} aria-live="polite">
-            {photo.english}
+            {photo.caption}
           </span>
         </>
       )}

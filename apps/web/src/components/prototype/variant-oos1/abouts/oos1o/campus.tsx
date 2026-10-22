@@ -12,16 +12,6 @@ import { bp, chrome, face, tone } from "./tokens.stylex";
 
 type PhotoId = (typeof ABOUT_CAMPUS.photos)[number]["id"];
 
-const ENGLISH: Record<PhotoId, string> = {
-  lab: "Laboratory",
-  showroom: "Showroom",
-  reception: "Reception",
-  office: "Open office",
-  lounge: "Lounge",
-  aerial: "Headquarters",
-  grounds: "Grounds",
-};
-
 const CORE = 500;
 const GAP = 22;
 const ORIGIN = 2600;
@@ -61,7 +51,6 @@ const SAMPLES = CORE_SAMPLE.map((sample, index) => {
   const anchorY = ringY(depth, anchorX) - 12;
   const placed = {
     ...photo,
-    english: ENGLISH[sample.id],
     side,
     depth,
     ratio: sample.ratio,
@@ -98,12 +87,11 @@ const TEXTURE = (() => {
 
 const SAMPLE_RINGS = SAMPLES.map((sample) => arc(sample.depth)).join("");
 
-const LIGHTBOX: readonly LightboxPhoto[] = SAMPLES.map(({ id, large, alt, caption, english }) => ({
+const LIGHTBOX: readonly LightboxPhoto[] = SAMPLES.map(({ id, large, alt, caption }) => ({
   id,
   large,
   alt,
   caption,
-  english,
 }));
 
 const styles = stylex.create({
@@ -121,13 +109,6 @@ const styles = stylex.create({
     justifyContent: "space-between",
     gap: 20,
     marginBottom: { default: 40, [bp.tablet]: 48, [bp.desktop]: 24 },
-  },
-  note: {
-    margin: 0,
-    maxWidth: "24em",
-    fontSize: { default: 19, [bp.desktop]: 22 },
-    lineHeight: 1.35,
-    color: tone.body,
   },
   gallery: {
     position: "relative",
@@ -220,15 +201,6 @@ const styles = stylex.create({
       [bp.tabletUp]: "translate(-100%, -100%) rotate(var(--oos1o-angle))",
     },
   },
-  index: {
-    fontSize: 13,
-    color: tone.blue,
-  },
-  english: {
-    fontSize: 18,
-    letterSpacing: 0,
-    color: tone.body,
-  },
   button: {
     position: "relative",
     display: "block",
@@ -271,10 +243,7 @@ export function Campus() {
     <section id="about-campus" aria-labelledby="oos1o-campus" {...stylex.props(styles.section)}>
       <div {...stylex.props(ui.shell)}>
         <div {...stylex.props(styles.head)}>
-          <SectionHead id="oos1o-campus" label="Campus" title={ABOUT_CAMPUS.title} />
-          <p lang="en" {...stylex.props(ui.serif, styles.note)}>
-            Seven samples taken along one radius, from the heart of the building out to the grounds.
-          </p>
+          <SectionHead id="oos1o-campus" title={ABOUT_CAMPUS.title} />
         </div>
 
         <div {...stylex.props(styles.gallery)} style={GALLERY_VARS}>
@@ -327,13 +296,7 @@ export function Campus() {
                     sample.side > 0 ? styles.captionOut : styles.captionIn,
                   )}
                 >
-                  <span {...stylex.props(ui.latin, styles.index)}>
-                    {String(index + 1).padStart(2, "0")}
-                  </span>
-                  <span>{sample.caption}</span>
-                  <span lang="en" {...stylex.props(ui.serif, styles.english)}>
-                    {sample.english}
-                  </span>
+                  {sample.caption}
                 </p>
                 <button
                   type="button"

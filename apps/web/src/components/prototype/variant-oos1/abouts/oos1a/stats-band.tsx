@@ -63,14 +63,6 @@ const styles = stylex.create({
     letterSpacing: "0",
     color: palette.mint,
   },
-  caption: {
-    margin: 0,
-    fontFamily: fonts.cjk,
-    fontSize: 14,
-    fontWeight: 400,
-    letterSpacing: "0.1em",
-    color: palette.paleText,
-  },
 });
 
 const COLUMN_STYLES = [styles.one, styles.two, styles.three] as const;
@@ -92,7 +84,6 @@ export function StatsBand() {
                   </span>
                 ) : null}
               </p>
-              <p {...stylex.props(styles.caption)}>{stat.caption}</p>
             </Reveal>
           ))}
         </ul>

@@ -76,11 +76,7 @@ export function Structure() {
         lever={AT_REST}
         loadLine
         loadFirstOnPhone
-        standing={
-          <StandingTitle id="oos1x-structure" en="Structure">
-            {ABOUT_STRUCTURE.title}
-          </StandingTitle>
-        }
+        standing={<StandingTitle id="oos1x-structure">{ABOUT_STRUCTURE.title}</StandingTitle>}
         load={
           <div {...stylex.props(styles.holding)}>
             <p {...stylex.props(type.note)}>{holding.badge}</p>

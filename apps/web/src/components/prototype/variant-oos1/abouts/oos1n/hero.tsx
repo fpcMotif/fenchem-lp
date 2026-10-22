@@ -4,7 +4,7 @@ import * as stylex from "@stylexjs/stylex";
 import { ABOUT_BANNER } from "../../about-data";
 import { ArchPhoto } from "./shared";
 import { ui } from "./shared-values";
-import { font, motionCss, step, tone } from "./tokens.stylex";
+import { motionCss, step, tone } from "./tokens.stylex";
 
 const rise = stylex.keyframes({
   "0%": { opacity: 0, transform: "translateY(20px)" },
@@ -52,18 +52,6 @@ const s = stylex.create({
     flexDirection: "column",
     gap: 24,
   },
-  tagline: {
-    margin: 0,
-    fontFamily: font.serif,
-    fontStyle: "italic",
-    fontSize: { default: step.headline, [breakpoints.md]: step.display },
-    fontWeight: 400,
-    lineHeight: 1.1,
-    color: tone.ink,
-  },
-  taglineLine: {
-    display: "block",
-  },
   lead: {
     margin: 0,
     maxWidth: "26em",
@@ -108,21 +96,9 @@ const s = stylex.create({
     animationTimingFunction: motionCss.out,
     animationFillMode: "backwards",
   },
-  meta: {
-    display: "flex",
-    flexWrap: "wrap",
-    columnGap: 12,
-    marginTop: 12,
-    fontSize: step.label,
-    fontWeight: 400,
-    letterSpacing: "0.04em",
-    color: tone.quiet,
-  },
 });
 
 export function Hero() {
-  const [taglineLead, taglineClose] = ABOUT_BANNER.tagline.split(", ");
-
   return (
     <section aria-labelledby="about-banner-title" {...stylex.props(s.hero, ui.onPage)}>
       <div {...stylex.props(ui.shell, ui.inset, ui.grid)}>
@@ -131,10 +107,6 @@ export function Hero() {
             {ABOUT_BANNER.title}
           </h1>
           <div {...stylex.props(s.lower, s.enter, dynamic.delay(350))}>
-            <p lang="en" {...stylex.props(s.tagline)}>
-              <span {...stylex.props(s.taglineLine)}>{taglineLead},</span>
-              <span {...stylex.props(s.taglineLine)}>{taglineClose}</span>
-            </p>
             <p {...stylex.props(s.lead)}>
               {ABOUT_BANNER.lead.split(" · ").map((part) => (
                 <span key={part} {...stylex.props(s.leadLine)}>
@@ -156,11 +128,6 @@ export function Hero() {
             />
             <span aria-hidden="true" {...stylex.props(s.drop)} />
           </div>
-          <figcaption lang="en" {...stylex.props(s.meta)}>
-            <span>{ABOUT_BANNER.established}</span>
-            <span aria-hidden="true">/</span>
-            <span>{ABOUT_BANNER.place}</span>
-          </figcaption>
         </figure>
       </div>
     </section>

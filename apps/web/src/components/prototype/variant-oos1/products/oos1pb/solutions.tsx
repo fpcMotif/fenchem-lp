@@ -136,26 +136,6 @@ const styles = stylex.create({
       transform: "none",
     },
   },
-  listRow: {
-    display: "flex",
-    flexDirection: { default: "column", [LG]: "row" },
-    alignItems: { default: "flex-start", [LG]: "baseline" },
-    gap: { default: 2, [LG]: 16 },
-  },
-  listNumber: {
-    flexShrink: 0,
-    width: { default: "auto", [LG]: 24 },
-    fontFamily: font.numeral,
-    fontSize: 12,
-    fontWeight: 500,
-    lineHeight: "20px",
-    letterSpacing: "0.04em",
-    fontVariantNumeric: "tabular-nums",
-    color: ink.muted,
-  },
-  listNumberOn: {
-    color: colors.brandGreen700,
-  },
   listTitle: {
     fontSize: { default: 14, [LG]: 15 },
     fontWeight: 400,
@@ -432,14 +412,6 @@ const styles = stylex.create({
     textOverflow: "ellipsis",
     whiteSpace: "nowrap",
   },
-  pagerNumber: {
-    flexShrink: 0,
-    fontFamily: font.numeral,
-    fontSize: 12,
-    fontWeight: 500,
-    fontVariantNumeric: "tabular-nums",
-    color: ink.muted,
-  },
 });
 
 function Field({ label, children }: { label: string; children: ReactNode }) {
@@ -621,13 +593,8 @@ export function Solutions() {
                   onClick={() => selectSolution(index)}
                   {...stylex.props(frame.focusRing, styles.listTab, selected && styles.listTabOn)}
                 >
-                  <span {...stylex.props(styles.listRow)}>
-                    <span {...stylex.props(styles.listNumber, selected && styles.listNumberOn)}>
-                      {padIndex(index)}
-                    </span>
-                    <span {...stylex.props(styles.listTitle, selected && styles.listTitleOn)}>
-                      {solution.title}
-                    </span>
+                  <span {...stylex.props(styles.listTitle, selected && styles.listTitleOn)}>
+                    {solution.title}
                   </span>
                 </button>
               );
@@ -730,9 +697,6 @@ export function Solutions() {
                   上一个
                 </span>
                 <span {...stylex.props(styles.pagerTitle)}>
-                  <span {...stylex.props(styles.pagerNumber)}>
-                    {padIndex(wrapIndex(activeIndex - 1))}
-                  </span>
                   <span {...stylex.props(styles.pagerName)}>{prev.title}</span>
                 </span>
               </button>
@@ -746,9 +710,6 @@ export function Solutions() {
                   <ArrowRight size={14} strokeWidth={1.5} absoluteStrokeWidth aria-hidden="true" />
                 </span>
                 <span {...stylex.props(styles.pagerTitle)}>
-                  <span {...stylex.props(styles.pagerNumber)}>
-                    {padIndex(wrapIndex(activeIndex + 1))}
-                  </span>
                   <span {...stylex.props(styles.pagerName)}>{next.title}</span>
                 </span>
               </button>

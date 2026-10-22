@@ -5,7 +5,7 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
 import { CATALOG_GROUPS, type CatalogGroup, type CatalogItem } from "../../products-data";
-import { REGION_META, padIndex, splitTitle } from "../shared/derived";
+import { REGION_META, splitTitle } from "../shared/derived";
 import { catalogRowId, useFlashedCatalogItem } from "./catalog-flash";
 import { bp, face, tone } from "./tokens.stylex";
 
@@ -95,7 +95,7 @@ const styles = stylex.create({
   railButton: {
     position: "relative",
     display: { default: "inline-flex", [bp.desktop]: "grid" },
-    gridTemplateColumns: "24px minmax(0, 1fr) auto",
+    gridTemplateColumns: "minmax(0, 1fr) auto",
     alignItems: { default: "center", [bp.desktop]: "baseline" },
     columnGap: { default: 6, [bp.desktop]: 12 },
     width: { default: "auto", [bp.desktop]: "100%" },
@@ -139,19 +139,6 @@ const styles = stylex.create({
     "::after": {
       transform: "none",
     },
-  },
-  railIndex: {
-    display: { default: "none", [bp.desktop]: "inline" },
-    fontFamily: face.numeral,
-    fontSize: 12,
-    fontWeight: 500,
-    lineHeight: "24px",
-    letterSpacing: "0.04em",
-    fontVariantNumeric: "tabular-nums",
-    color: tone.muted,
-  },
-  railIndexActive: {
-    color: colors.brandGreen700,
   },
   railLabelFull: {
     display: { default: "none", [bp.desktop]: "inline" },
@@ -210,16 +197,6 @@ const styles = stylex.create({
     display: "flex",
     alignItems: "baseline",
     gap: 12,
-  },
-  captionIndex: {
-    flexShrink: 0,
-    fontFamily: face.numeral,
-    fontSize: 13,
-    fontWeight: 500,
-    lineHeight: "28px",
-    letterSpacing: "0.04em",
-    fontVariantNumeric: "tabular-nums",
-    color: colors.brandGreen700,
   },
   captionTitle: {
     margin: 0,
@@ -475,7 +452,7 @@ function RegionRail({
   return (
     <nav aria-label="Catalog categories" {...stylex.props(styles.rail)}>
       <ul ref={listRef} {...stylex.props(styles.railList)}>
-        {CATALOG_GROUPS.map((group, index) => {
+        {CATALOG_GROUPS.map((group) => {
           const id = regionId(group.id);
           const isActive = activeId === id;
           return (
@@ -487,12 +464,6 @@ function RegionRail({
                 onClick={() => onJump(group)}
                 {...stylex.props(styles.railButton, isActive && styles.railButtonActive)}
               >
-                <span
-                  aria-hidden="true"
-                  {...stylex.props(styles.railIndex, isActive && styles.railIndexActive)}
-                >
-                  {padIndex(index)}
-                </span>
                 <span {...stylex.props(styles.railLabelFull, isActive && styles.railLabelActive)}>
                   {group.label}
                 </span>
@@ -542,12 +513,10 @@ function ItemRow({ item, flashed }: { item: CatalogItem; flashed: boolean }) {
 
 function RegionTable({
   group,
-  index,
   isLast,
   flashedId,
 }: {
   group: CatalogGroup;
-  index: number;
   isLast: boolean;
   flashedId: string | null;
 }) {
@@ -560,9 +529,6 @@ function RegionTable({
       >
         <caption {...stylex.props(styles.caption)}>
           <div {...stylex.props(styles.captionRow)}>
-            <span aria-hidden="true" {...stylex.props(styles.captionIndex)}>
-              {padIndex(index)}
-            </span>
             <h3 id={regionTitleId(group.id)} tabIndex={-1} {...stylex.props(styles.captionTitle)}>
               {group.label}
             </h3>
@@ -637,7 +603,6 @@ export function Catalog() {
               <RegionTable
                 key={group.id}
                 group={group}
-                index={index}
                 isLast={index === CATALOG_GROUPS.length - 1}
                 flashedId={flashedId}
               />

@@ -4,7 +4,7 @@ import { Check, ChevronDown } from "lucide-react";
 import { useId, useState } from "react";
 
 import { CATALOG_GROUPS } from "../../products-data";
-import { FLAT_ITEMS, FORM_LABEL, REGION_META, padIndex, type FlatItem } from "../shared/derived";
+import { FLAT_ITEMS, FORM_LABEL, REGION_META, type FlatItem } from "../shared/derived";
 
 const INK = "#1a1a1a";
 const BODY_TEXT = "#4d4d4d";
@@ -27,7 +27,6 @@ const DESKTOP = breakpoints.xl;
 const MD = breakpoints.md;
 const INSET = "min(120px, 8.333vw)";
 const HEADER_HEIGHT = 80;
-const NAME_INDENT = 36;
 const REFERENCE_WIDTH = 1200;
 
 type ColumnId = "name" | "latin" | "inci" | "features" | "origin" | "form" | "tags";
@@ -330,9 +329,6 @@ const styles = stylex.create({
     animationDuration: { default: "200ms", [breakpoints.motionReduce]: "0ms" },
     animationTimingFunction: "ease-out",
   },
-  headCellName: {
-    paddingInlineStart: NAME_INDENT,
-  },
   tbody: {
     display: { default: "block", [MD]: "table-row-group" },
   },
@@ -356,17 +352,6 @@ const styles = stylex.create({
     alignItems: "baseline",
     gap: 12,
   },
-  groupIndex: {
-    flexShrink: 0,
-    width: 24,
-    fontFamily: NUMERAL_FONT,
-    fontSize: 12,
-    fontWeight: 500,
-    lineHeight: "24px",
-    letterSpacing: "0.04em",
-    fontVariantNumeric: "tabular-nums",
-    color: ACCENT,
-  },
   groupLabel: {
     fontSize: 16,
     fontWeight: 500,
@@ -384,7 +369,6 @@ const styles = stylex.create({
     margin: 0,
     marginTop: 8,
     maxWidth: 600,
-    paddingInlineStart: NAME_INDENT,
     fontSize: 14,
     lineHeight: "24px",
     color: BODY_TEXT,
@@ -421,7 +405,6 @@ const styles = stylex.create({
   nameCell: {
     display: { default: "block", [MD]: "table-cell" },
     paddingBottom: { default: 8, [MD]: 18 },
-    paddingInlineStart: { default: 0, [MD]: NAME_INDENT },
   },
   cellLabel: {
     display: { default: "block", [MD]: "none" },
@@ -669,14 +652,7 @@ export function Catalog() {
             <thead {...stylex.props(styles.thead)}>
               <tr>
                 {shown.map((column) => (
-                  <th
-                    key={column.id}
-                    scope="col"
-                    {...stylex.props(
-                      styles.headCell,
-                      column.id === LOCKED_COLUMN && styles.headCellName,
-                    )}
-                  >
+                  <th key={column.id} scope="col" {...stylex.props(styles.headCell)}>
                     {column.label}
                   </th>
                 ))}
@@ -691,9 +667,6 @@ export function Catalog() {
                     {...stylex.props(styles.groupCell, index === 0 && styles.groupCellFirst)}
                   >
                     <span {...stylex.props(styles.groupHead)}>
-                      <span aria-hidden="true" {...stylex.props(styles.groupIndex)}>
-                        {padIndex(index)}
-                      </span>
                       <span {...stylex.props(styles.groupLabel)}>{group.label}</span>
                       <span {...stylex.props(styles.groupCount)}>{items.length} 款原料</span>
                     </span>

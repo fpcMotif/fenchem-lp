@@ -98,16 +98,8 @@ const styles = stylex.create({
     width: { default: "auto", [bp.pinned]: FOUR_COLUMNS },
     zIndex: 1,
   },
-  tagline: {
-    margin: 0,
-    fontSize: { default: 30, [bp.tablet]: 36, [bp.laptop]: 32, [bp.wide]: 40 },
-    lineHeight: 1.1,
-    color: tone.ink,
-    textWrap: "balance",
-  },
   caption: {
     margin: 0,
-    marginTop: 16,
     fontSize: 14,
     letterSpacing: "0.03em",
     color: tone.body,
@@ -302,9 +294,6 @@ export function Growth() {
           </m.header>
 
           <m.div style={heroMotion} {...stylex.props(styles.motto)}>
-            <p lang="en" {...stylex.props(ui.serif, styles.tagline)}>
-              {ABOUT_BANNER.tagline}
-            </p>
             <p lang="en" {...stylex.props(ui.latin, styles.caption)}>
               One ring for every year since 1995.
             </p>
@@ -326,7 +315,7 @@ export function Growth() {
 
       <section id="about-profile" aria-labelledby="oos1o-profile" {...stylex.props(styles.profile)}>
         <div {...stylex.props(styles.profileCopy)}>
-          <SectionHead id="oos1o-profile" label="Profile" title="企业概况" quiet />
+          <SectionHead id="oos1o-profile" title="企业概况" quiet />
           <p {...stylex.props(styles.company)}>
             <CompanyName name={ABOUT_HERO.title} />
           </p>

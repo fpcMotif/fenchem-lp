@@ -240,14 +240,6 @@ const styles = stylex.create({
     fontWeight: 700,
     color: color.ink,
   },
-  routeEnglish: {
-    marginInlineStart: 8,
-    fontFamily: font.serifAccent,
-    fontSize: 15,
-    fontStyle: "italic",
-    fontWeight: 400,
-    color: color.muted,
-  },
   routeMeta: {
     margin: 0,
     marginTop: 4,
@@ -429,7 +421,7 @@ export function RouteDialog({ subject, onClose }: DialogVariantProps) {
         <header {...stylex.props(styles.head)}>
           <div>
             <p {...stylex.props(styles.progress)}>
-              <span lang="en">{step === "done" ? "Sent" : `Step ${stepIndex + 1} / 2`}</span>
+              {step === "done" ? null : <span lang="en">{`Step ${stepIndex + 1} / 2`}</span>}
               <span aria-hidden="true" {...stylex.props(styles.progressTrack)}>
                 {[0, 1].map((index) => (
                   <span
@@ -527,12 +519,7 @@ export function RouteDialog({ subject, onClose }: DialogVariantProps) {
                     <>
                       <div {...stylex.props(styles.routeCard)}>
                         <div>
-                          <p {...stylex.props(styles.routeTeam)}>
-                            {route.team}
-                            <span lang="en" {...stylex.props(styles.routeEnglish)}>
-                              {route.english}
-                            </span>
-                          </p>
+                          <p {...stylex.props(styles.routeTeam)}>{route.team}</p>
                           <p {...stylex.props(styles.routeMeta)}>
                             {active.label} · {route.reply} ·{" "}
                             <a

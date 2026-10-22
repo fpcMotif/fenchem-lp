@@ -23,7 +23,6 @@ export const tone = stylex.defineConsts({
   ruleStrong: "rgba(11, 42, 92, 0.62)",
   ruleFaint: "rgba(11, 42, 92, 0.12)",
   quiet: "rgba(11, 42, 92, 0.5)",
-  note: "rgba(11, 42, 92, 0.72)",
   bevelOuter: "rgba(11, 42, 92, 0.34)",
   bevelInner: "rgba(11, 42, 92, 0.18)",
   whisper: "#f3f5fa",

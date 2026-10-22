@@ -48,29 +48,25 @@ export const COMPANY = {
 
 export const SUBJECT_ROUTES: Record<
   InquirySubjectId,
-  { team: string; english: string; reply: string; channel: (typeof CONTACT_DETAILS)[number] }
+  { team: string; reply: string; channel: (typeof CONTACT_DETAILS)[number] }
 > = {
   sample: {
     team: "样品服务中心",
-    english: "Sample desk",
     reply: "48 小时内顺丰寄样",
     channel: primaryEmail,
   },
   formulation: {
     team: "应用研发中心",
-    english: "Application lab",
     reply: "1 对 1 配方工程师答疑",
     channel: primaryEmail,
   },
   visit: {
     team: "总部行政接待",
-    english: "Visitor desk",
     reply: "提前 3 个工作日确认到访",
     channel: primaryPhone,
   },
   other: {
     team: "综合事务部",
-    english: "General office",
     reply: "工作日 24 小时内回复",
     channel: primaryEmail,
   },

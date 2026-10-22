@@ -48,7 +48,6 @@ import {
   COPYRIGHT,
   CTA,
   FOOTER_COLUMNS,
-  FORK_ACCENT,
   GLOBAL_INTRO,
   HERO,
   IMAGES,
@@ -59,7 +58,7 @@ import {
   NEWS_TITLE,
   OFFICE_COLUMNS,
   OFFICE_MAP_PINS,
-  PASSAGE,
+  PASSAGE_LINE,
   PRODUCTS_INTRO,
   SOURCE_LABEL,
   STATS,
@@ -821,14 +820,6 @@ const styles = stylex.create({
     gap: 18,
     textAlign: "center",
   },
-  forkAccent: {
-    margin: 0,
-    fontFamily: SERIF_FONT,
-    fontStyle: "italic",
-    fontSize: { default: 26, [DESKTOP]: 36 },
-    lineHeight: 1.1,
-    color: colors.brandGreen800,
-  },
   introLead: {
     maxWidth: 620,
   },
@@ -927,26 +918,8 @@ const styles = stylex.create({
     alignSelf: { default: "auto", [DESKTOP]: "flex-start" },
     paddingTop: { default: 0, [DESKTOP]: 40 },
   },
-  rowLabel: {
-    display: "inline-flex",
-    alignItems: "center",
-    gap: 10,
-    margin: 0,
-    fontFamily: DISPLAY_FONT,
-    fontSize: 13,
-    fontWeight: 500,
-    lineHeight: 1,
-    letterSpacing: "0.06em",
-    textTransform: "lowercase",
-    color: BODY_TEXT,
-    transitionProperty: "color",
-    transitionDuration: "600ms",
-    transitionTimingFunction: "ease",
-  },
-  rowLabelLit: {
-    color: colors.brandBlue700,
-  },
-  rowLabelDot: {
+  rowDot: {
+    display: "block",
     width: 9,
     height: 9,
     boxSizing: "border-box",
@@ -954,12 +927,14 @@ const styles = stylex.create({
     borderWidth: 1.5,
     borderStyle: "solid",
     borderColor: "currentColor",
+    color: BODY_TEXT,
     backgroundColor: "transparent",
-    transitionProperty: "background-color",
+    transitionProperty: "color, background-color",
     transitionDuration: "600ms",
     transitionTimingFunction: "ease",
   },
-  rowLabelDotLit: {
+  rowDotLit: {
+    color: colors.brandBlue700,
     backgroundColor: "currentColor",
   },
   rowTitle: {
@@ -968,15 +943,6 @@ const styles = stylex.create({
     fontWeight: 700,
     lineHeight: 1.12,
     color: INK,
-  },
-  rowPitch: {
-    margin: 0,
-    marginTop: -4,
-    fontFamily: SERIF_FONT,
-    fontStyle: "italic",
-    fontSize: { default: 24, [DESKTOP]: 30 },
-    lineHeight: 1.05,
-    color: colors.brandGreen800,
   },
   rowKicker: {
     margin: 0,
@@ -1226,14 +1192,6 @@ const styles = stylex.create({
     color: INK,
     textWrap: "balance",
   },
-  passageMotto: {
-    margin: 0,
-    fontSize: { default: 14, [DESKTOP]: 16 },
-    fontWeight: 500,
-    lineHeight: 1.4,
-    letterSpacing: "0.5em",
-    color: BODY_TEXT,
-  },
 
   campusFrame: {
     overflow: "hidden",
@@ -1271,13 +1229,6 @@ const styles = stylex.create({
     lineHeight: 1.2,
     letterSpacing: "0.2em",
     color: BODY_TEXT,
-  },
-  statCaption: {
-    margin: 0,
-    fontSize: { default: 20, [DESKTOP]: 24 },
-    fontWeight: 700,
-    lineHeight: 1.3,
-    color: INK,
   },
   statFigure: {
     margin: 0,
@@ -2135,19 +2086,10 @@ function ProductRow({ market, index, lit }: { market: Market; index: number; lit
         />
       </figure>
       <ZoomReveal sx={[styles.copy, flip ? styles.copyHigh : styles.copyLow]}>
-        <p lang="en" {...stylex.props(styles.rowLabel, lit && styles.rowLabelLit)}>
-          <span
-            aria-hidden="true"
-            {...stylex.props(styles.rowLabelDot, lit && styles.rowLabelDotLit)}
-          />
-          {market.english}
-        </p>
+        <span aria-hidden="true" {...stylex.props(styles.rowDot, lit && styles.rowDotLit)} />
         <h3 id={titleId} {...stylex.props(styles.rowTitle)}>
           {market.title}
         </h3>
-        <p lang="en" {...stylex.props(styles.rowPitch)}>
-          {market.pitch}
-        </p>
         <p {...stylex.props(styles.rowKicker)}>{market.kicker}</p>
         <ul aria-label={`${market.english} segments`} {...stylex.props(styles.rowTags)}>
           {market.tags.map((tag, tagIndex) => (
@@ -2190,9 +2132,6 @@ function Products({ lit }: { lit: number }) {
             <h2 id="oox2-products-title" {...stylex.props(styles.sectionTitle)}>
               {PRODUCTS_INTRO.title}
             </h2>
-            <p lang="en" {...stylex.props(styles.forkAccent)}>
-              {FORK_ACCENT}
-            </p>
             <p {...stylex.props(styles.sectionLead, styles.introLead)}>{PRODUCTS_INTRO.lead}</p>
           </FadeReveal>
           <span aria-hidden="true" data-route="outlet" {...stylex.props(styles.anchorDot)} />
@@ -2334,14 +2273,13 @@ function Strengths() {
 
 function Passage() {
   return (
-    <section aria-label={PASSAGE.line} {...stylex.props(styles.passage, styles.inset120)}>
+    <section aria-label={PASSAGE_LINE} {...stylex.props(styles.passage, styles.inset120)}>
       <span aria-hidden="true" {...stylex.props(styles.passageStem)} />
       <FadeReveal>
         <p lang="en" {...stylex.props(styles.passageLine)}>
-          {PASSAGE.line}
+          {PASSAGE_LINE}
         </p>
       </FadeReveal>
-      <p {...stylex.props(styles.passageMotto)}>{PASSAGE.motto}</p>
     </section>
   );
 }
@@ -2370,7 +2308,6 @@ function Campus() {
         {STATS.map((stat, index) => (
           <ZoomReveal key={stat.label} delay={index * STAGGER} sx={styles.stat}>
             <p {...stylex.props(styles.statLabel)}>{stat.label}</p>
-            <p {...stylex.props(styles.statCaption)}>{stat.caption}</p>
             <p {...stylex.props(styles.statFigure)}>
               {stat.value}
               {stat.unit ?? ""}

@@ -50,10 +50,6 @@ const styles = stylex.create({
     lineHeight: 1.2,
     color: tone.ink,
   },
-  labelEnglish: {
-    display: { default: "none", [bp.wide]: "inline" },
-    marginInlineStart: 8,
-  },
   delta: {
     position: "absolute",
     top: 0,
@@ -122,12 +118,7 @@ function PlateLabel({
       {...stylex.props(styles.label)}
     >
       <span {...stylex.props(ui.balloon, active === id && ui.balloonActive)}>{part.item}</span>
-      <span {...stylex.props(styles.labelName)}>
-        {part.name}
-        <span lang="en" {...stylex.props(ui.label, styles.labelEnglish)}>
-          {part.english}
-        </span>
-      </span>
+      <span {...stylex.props(styles.labelName)}>{part.name}</span>
     </m.div>
   );
 }

@@ -36,32 +36,26 @@ const NAV_LINKS = [
 
 const HERO_META = [
   { k: "SPEC.REF", v: "FN-LP / 2026-B" },
-  { k: "ORIGIN", v: "N 32.06 / E 118.79" },
   { k: "ESTABLISHED", v: "1995 — NANJING" },
-  { k: "CERT", v: "ISO 9001 / GMP" },
 ] as const;
 
 const STATS = [
   {
-    label: "[SYS.UPTIME]",
     value: "30+",
     unit: "years",
     desc: "Continuous ingredient engineering and refinement since 1995.",
   },
   {
-    label: "[NODES]",
     value: "06",
     unit: "global bases",
     desc: "R&D and manufacturing distributed across three continents.",
   },
   {
-    label: "[CERT.INDEX]",
     value: "ISO",
     unit: "/ GMP",
     desc: "Audited quality compliance across every production vector.",
   },
   {
-    label: "[REACH]",
     value: "40+",
     unit: "countries",
     desc: "Formulation partners supplied across regulated markets.",
@@ -88,18 +82,12 @@ const PROTOCOL_DETAIL = [
 
 const DOMAIN_DETAIL = [
   {
-    code: "A-01",
-    cat: "CAT: NUTRI",
     desc: "Bioavailable actives engineered for capsules, tablets, softgels and powder delivery systems.",
   },
   {
-    code: "B-02",
-    cat: "CAT: F&B",
     desc: "Heat- and pH-stable functional ingredients for fortification, natural color and clean-label claims.",
   },
   {
-    code: "C-03",
-    cat: "CAT: CARE",
     desc: "Dermatologically active agents formulated for cellular compatibility and sensory performance.",
   },
 ] as const;
@@ -282,10 +270,6 @@ const styles = stylex.create({
     transitionDuration: "300ms",
     textDecoration: "none",
   },
-  navLinkNum: {
-    marginRight: "0.375rem",
-    color: colors.moss,
-  },
   navCta: {
     display: "inline-flex",
     alignItems: "center",
@@ -355,55 +339,7 @@ const styles = stylex.create({
     paddingBlock: { default: "4rem", [breakpoints.md]: "6rem", [breakpoints.lg]: "7rem" },
     gridColumn: { default: "auto", [breakpoints.lg]: "span 8" },
   },
-  heroStatusBadge: {
-    display: "inline-flex",
-    width: "fit-content",
-    alignItems: "center",
-    gap: "0.625rem",
-    borderWidth: "1px",
-    borderStyle: "solid",
-    borderColor: colors.pebble,
-    backgroundColor: "#ffffff",
-    paddingInline: "0.875rem",
-    paddingBlock: "0.5rem",
-  },
-  heroStatusPingWrap: {
-    position: "relative",
-    display: "flex",
-    width: "0.5rem",
-    height: "0.5rem",
-  },
-  heroStatusPingRing: {
-    position: "absolute",
-    display: "inline-flex",
-    height: "100%",
-    width: "100%",
-    borderRadius: radii.full,
-    backgroundColor: "color-mix(in oklab, var(--color-moss) 50%, transparent)",
-    animationName: {
-      default: pingAnim,
-      [breakpoints.motionReduce]: "none",
-    },
-    animationDuration: "1s",
-    animationIterationCount: "infinite",
-  },
-  heroStatusPingDot: {
-    position: "relative",
-    display: "inline-flex",
-    width: "0.5rem",
-    height: "0.5rem",
-    borderRadius: radii.full,
-    backgroundColor: colors.moss,
-  },
-  heroStatusText: {
-    fontFamily: typography.tech,
-    fontSize: "10px",
-    textTransform: "uppercase",
-    letterSpacing: "0.3em",
-    color: "color-mix(in oklab, var(--color-bark) 60%, transparent)",
-  },
   heroHeadline: {
-    marginTop: "2.5rem",
     fontFamily: typography.body,
     fontSize: "clamp(2.7rem, 6.4vw, 6rem)",
     fontWeight: 600,
@@ -529,22 +465,6 @@ const styles = stylex.create({
     textTransform: "uppercase",
     letterSpacing: "0.18em",
     color: "color-mix(in oklab, var(--color-bark) 80%, transparent)",
-  },
-  heroMetaDdActive: {
-    display: "flex",
-    alignItems: "center",
-    gap: "0.5rem",
-    fontFamily: typography.tech,
-    fontSize: "11px",
-    textTransform: "uppercase",
-    letterSpacing: "0.18em",
-    color: colors.moss,
-  },
-  heroMetaStatusDot: {
-    width: "0.375rem",
-    height: "0.375rem",
-    borderRadius: radii.full,
-    backgroundColor: colors.moss,
   },
   heroLabImgWrapper: {
     position: "relative",
@@ -676,15 +596,7 @@ const styles = stylex.create({
     transitionProperty: "background-color",
     transitionDuration: "500ms",
   },
-  statBandLabel: {
-    fontFamily: typography.tech,
-    fontSize: "10px",
-    textTransform: "uppercase",
-    letterSpacing: "0.28em",
-    color: "color-mix(in oklab, var(--color-bark) 70%, transparent)",
-  },
   statBandValWrap: {
-    marginTop: "1.25rem",
     display: "flex",
     flexWrap: "wrap",
     alignItems: "baseline",
@@ -723,15 +635,7 @@ const styles = stylex.create({
     alignItems: { default: "stretch", [breakpoints.md]: "flex-end" },
     justifyContent: { default: "flex-start", [breakpoints.md]: "space-between" },
   },
-  sectionHeadCode: {
-    fontFamily: typography.tech,
-    fontSize: "11px",
-    textTransform: "uppercase",
-    letterSpacing: "0.28em",
-    color: colors.moss,
-  },
   sectionHeadTitle: {
-    marginTop: "1.25rem",
     fontFamily: typography.body,
     fontSize: { default: "2.25rem", [breakpoints.md]: "3rem" },
     fontWeight: 600,
@@ -835,17 +739,6 @@ const styles = stylex.create({
     paddingInline: { default: "1.25rem", [breakpoints.md]: "1.75rem" },
     paddingBlock: { default: "1.75rem", [breakpoints.md]: "2rem" },
   },
-  matrixCardHeader: {
-    display: "flex",
-    alignItems: "baseline",
-    justifyContent: "space-between",
-  },
-  matrixCardNum: {
-    fontFamily: typography.tech,
-    fontSize: "11px",
-    letterSpacing: "0.22em",
-    color: colors.moss,
-  },
   matrixCardCode: {
     fontFamily: typography.tech,
     fontSize: "10px",
@@ -921,15 +814,6 @@ const styles = stylex.create({
     borderBottomWidth: "1px",
     borderBottomStyle: "solid",
     borderBottomColor: colors.pebble,
-  },
-  protocolSubtitle: {
-    maxWidth: "20rem",
-    fontFamily: typography.tech,
-    fontSize: "10px",
-    textTransform: "uppercase",
-    lineHeight: 1.625,
-    letterSpacing: "0.2em",
-    color: "color-mix(in oklab, var(--color-bark) 60%, transparent)",
   },
   protocolGrid: {
     display: "grid",
@@ -1055,25 +939,8 @@ const styles = stylex.create({
     paddingBlock: { default: "2.25rem", [breakpoints.md]: "3rem" },
     gridTemplateColumns: { default: "1fr", [breakpoints.md]: "repeat(12, 1fr)" },
   },
-  domainMetaCol: {
-    gridColumn: { default: "auto", [breakpoints.md]: "span 2" },
-  },
-  domainCode: {
-    fontFamily: typography.tech,
-    fontSize: "11px",
-    letterSpacing: "0.22em",
-    color: colors.moss,
-  },
-  domainCat: {
-    marginTop: "0.25rem",
-    fontFamily: typography.tech,
-    fontSize: "10px",
-    textTransform: "uppercase",
-    letterSpacing: "0.22em",
-    color: "color-mix(in oklab, var(--color-bark) 70%, transparent)",
-  },
   domainTitleCol: {
-    gridColumn: { default: "auto", [breakpoints.md]: "span 5" },
+    gridColumn: { default: "auto", [breakpoints.md]: "span 7" },
     fontFamily: typography.body,
     fontSize: { default: "1.5rem", [breakpoints.md]: "2.25rem" },
     fontWeight: 600,
@@ -1115,15 +982,7 @@ const styles = stylex.create({
     paddingInline: { default: "1.25rem", [breakpoints.md]: "2.5rem" },
     paddingBlock: { default: "5rem", [breakpoints.md]: "7rem" },
   },
-  ctaTopEyebrow: {
-    fontFamily: typography.tech,
-    fontSize: "11px",
-    textTransform: "uppercase",
-    letterSpacing: "0.28em",
-    color: "color-mix(in oklab, var(--color-mint) 80%, transparent)",
-  },
   ctaTopHeading: {
-    marginTop: "1.5rem",
     maxWidth: "56rem",
     fontFamily: typography.body,
     fontSize: { default: "2.25rem", [breakpoints.md]: "3.75rem" },
@@ -1196,14 +1055,6 @@ const styles = stylex.create({
     transitionDuration: "300ms",
     textDecoration: "none",
   },
-  ctaResponseTime: {
-    marginTop: "2.5rem",
-    fontFamily: typography.tech,
-    fontSize: "10px",
-    textTransform: "uppercase",
-    letterSpacing: "0.28em",
-    color: "color-mix(in oklab, var(--color-cream) 60%, transparent)",
-  },
   networkHeaderRow: {
     display: "flex",
     alignItems: "center",
@@ -1220,14 +1071,6 @@ const styles = stylex.create({
     textTransform: "uppercase",
     letterSpacing: "0.26em",
     color: "color-mix(in oklab, var(--color-mint) 70%, transparent)",
-  },
-  networkHeaderLatLong: {
-    display: { default: "none", [breakpoints.md]: "block" },
-    fontFamily: typography.tech,
-    fontSize: "10px",
-    textTransform: "uppercase",
-    letterSpacing: "0.26em",
-    color: "color-mix(in oklab, var(--color-cream) 60%, transparent)",
   },
   networkGrid: {
     display: "grid",
@@ -1254,16 +1097,10 @@ const styles = stylex.create({
     transitionDuration: "500ms",
   },
   networkCellMeta: {
-    display: "flex",
-    alignItems: "baseline",
-    justifyContent: "space-between",
     fontFamily: typography.tech,
     fontSize: "10px",
     textTransform: "uppercase",
     letterSpacing: "0.2em",
-    color: "color-mix(in oklab, var(--color-mint) 70%, transparent)",
-  },
-  networkCellCoords: {
     color: "color-mix(in oklab, var(--color-cream) 60%, transparent)",
   },
   networkCity: {
@@ -1311,15 +1148,6 @@ const styles = stylex.create({
     ":hover": {
       opacity: 0.7,
     },
-  },
-  footerTagline: {
-    marginTop: "1rem",
-    maxWidth: "20rem",
-    fontFamily: typography.display,
-    fontSize: "1.125rem",
-    fontWeight: 300,
-    fontStyle: "italic",
-    color: colors.moss,
   },
   footerCertText: {
     marginTop: "1.5rem",
@@ -1396,19 +1224,14 @@ const styles = stylex.create({
     alignItems: { default: "stretch", [breakpoints.md]: "center" },
     justifyContent: { default: "flex-start", [breakpoints.md]: "space-between" },
   },
-  textMoss: {
-    color: colors.moss,
-  },
 });
 
 /* Section header: mono code / big sans title with one serif italic word */
 function SectionHead({
-  code,
   title,
   italic,
   right,
 }: {
-  code: string;
   title: string;
   italic: string;
   right?: ReactNode;
@@ -1416,7 +1239,6 @@ function SectionHead({
   return (
     <div {...stylex.props(styles.sectionHeadWrap)}>
       <Reveal>
-        <p {...stylex.props(styles.sectionHeadCode)}>{code}</p>
         <h2 {...stylex.props(styles.sectionHeadTitle)}>
           {title} <span {...stylex.props(styles.sectionHeadItalic)}>{italic}</span>
         </h2>
@@ -1462,17 +1284,6 @@ function HeroSection() {
       <div {...stylex.props(styles.heroGrid)}>
         {/* Left: headline block */}
         <div {...stylex.props(styles.heroLeft)}>
-          <Reveal>
-            <span {...stylex.props(styles.heroStatusBadge)}>
-              <span {...stylex.props(styles.heroStatusPingWrap)}>
-                <span {...stylex.props(styles.heroStatusPingRing)} />
-                <span {...stylex.props(styles.heroStatusPingDot)} />
-              </span>
-              <span {...stylex.props(styles.heroStatusText)}>
-                System Active — Botanical Intelligence Since 1995
-              </span>
-            </span>
-          </Reveal>
           <Reveal delay={0.1}>
             <h1 {...stylex.props(styles.heroHeadline)}>
               Engineering high-performance botanical ingredients
@@ -1506,13 +1317,6 @@ function HeroSection() {
                   <dd {...stylex.props(styles.heroMetaDd)}>{row.v}</dd>
                 </div>
               ))}
-              <div {...stylex.props(styles.heroMetaRow)}>
-                <dt {...stylex.props(styles.heroMetaDt)}>STATUS</dt>
-                <dd {...stylex.props(styles.heroMetaDdActive)}>
-                  <span {...stylex.props(styles.heroMetaStatusDot)} />
-                  OPERATIONAL
-                </dd>
-              </div>
             </dl>
             <div {...stylex.props(styles.heroLabImgWrapper)}>
               <img
@@ -1564,9 +1368,8 @@ function StatBand() {
   return (
     <section aria-label="Company metrics" {...stylex.props(styles.statBandGrid)}>
       {STATS.map((s, i) => (
-        <Reveal key={s.label} delay={i * 0.08} sx={styles.statBandCardBg}>
+        <Reveal key={s.unit} delay={i * 0.08} sx={styles.statBandCardBg}>
           <div {...stylex.props(styles.statBandCell)}>
-            <p {...stylex.props(styles.statBandLabel)}>{s.label}</p>
             <div {...stylex.props(styles.statBandValWrap)}>
               <span {...stylex.props(styles.statBandValue)}>{s.value}</span>
               <span {...stylex.props(styles.statBandUnit)}>{s.unit}</span>
@@ -1584,7 +1387,6 @@ function MatrixSection() {
   return (
     <section id="matrix" {...stylex.props(styles.matrixSection)}>
       <SectionHead
-        code="SYS.CAT_01 // ACTIVE COMPOUNDS"
         title="Ingredient"
         italic="matrix."
         right={
@@ -1607,12 +1409,7 @@ function MatrixSection() {
               <span {...stylex.props(styles.matrixCategoryBadge)}>{item.category}</span>
             </div>
             <div {...stylex.props(styles.matrixCardContent)}>
-              <div {...stylex.props(styles.matrixCardHeader)}>
-                <span {...stylex.props(styles.matrixCardNum)}>
-                  {String(i + 1).padStart(2, "0")} —
-                </span>
-                <span {...stylex.props(styles.matrixCardCode)}>{item.code}</span>
-              </div>
+              <span {...stylex.props(styles.matrixCardCode)}>{item.code}</span>
               <h3 {...stylex.props(styles.matrixCardTitle)}>{item.name}</h3>
               <dl {...stylex.props(styles.matrixCardDl)}>
                 <div {...stylex.props(styles.matrixCardDlRow)}>
@@ -1644,16 +1441,7 @@ function MatrixSection() {
 function ProtocolSection() {
   return (
     <section id="protocol" {...stylex.props(styles.protocolSection)}>
-      <SectionHead
-        code="SYS.METHOD // 02"
-        title="Operating"
-        italic="protocol."
-        right={
-          <p {...stylex.props(styles.protocolSubtitle)}>
-            Rooted in nature, refined by science — every lot, every market, every release.
-          </p>
-        }
-      />
+      <SectionHead title="Operating" italic="protocol." />
       <div {...stylex.props(styles.protocolGrid)}>
         <div {...stylex.props(styles.protocolFigCol)}>
           <Reveal>
@@ -1689,11 +1477,7 @@ function ProtocolSection() {
 function DomainsSection() {
   return (
     <section id="domains" {...stylex.props(styles.domainsSection)}>
-      <SectionHead
-        code="SYS.CAT_02 // APPLICATION DOMAINS"
-        title="Built for three"
-        italic="industries."
-      />
+      <SectionHead title="Built for three" italic="industries." />
       <div>
         {industries.map((industry, i) => {
           const isLast = i === industries.length - 1;
@@ -1704,10 +1488,6 @@ function DomainsSection() {
               {...stylex.props(styles.domainRowLink, isLast && styles.domainRowLinkLast)}
             >
               <Reveal delay={i * 0.06} sx={styles.domainRowInner}>
-                <div {...stylex.props(styles.domainMetaCol)}>
-                  <p {...stylex.props(styles.domainCode)}>{DOMAIN_DETAIL[i].code}</p>
-                  <p {...stylex.props(styles.domainCat)}>{DOMAIN_DETAIL[i].cat}</p>
-                </div>
                 <h3 {...stylex.props(styles.domainTitleCol)}>{industry.title}</h3>
                 <p {...stylex.props(styles.domainDescCol)}>{DOMAIN_DETAIL[i].desc}</p>
                 <div {...stylex.props(styles.domainArrowCol)}>
@@ -1728,7 +1508,6 @@ function CtaNetworkSection() {
     <section id="contact" {...stylex.props(styles.ctaNetworkSection)}>
       <div {...stylex.props(styles.ctaTopBlock)}>
         <Reveal>
-          <p {...stylex.props(styles.ctaTopEyebrow)}>SYS.CONTACT // OPEN CHANNEL</p>
           <h2 {...stylex.props(styles.ctaTopHeading)}>
             Your next formulation,{" "}
             <span {...stylex.props(styles.ctaTopItalic)}>engineered to specification.</span>
@@ -1747,25 +1526,16 @@ function CtaNetworkSection() {
             Explore Portfolio
           </a>
         </Reveal>
-        <Reveal delay={0.25}>
-          <p {...stylex.props(styles.ctaResponseTime)}>
-            RESPONSE.TIME &lt; 24H — TECHNICAL DOSSIERS ON REQUEST
-          </p>
-        </Reveal>
       </div>
       <div id="network">
         <div {...stylex.props(styles.networkHeaderRow)}>
           <span {...stylex.props(styles.networkHeaderTag)}>SYS.NET // 6 ACTIVE NODES</span>
-          <span {...stylex.props(styles.networkHeaderLatLong)}>LAT/LONG VERIFIED — 2026.06</span>
         </div>
         <div {...stylex.props(styles.networkGrid)}>
           {regions.map((region, i) => (
             <Reveal key={region.city} delay={(i % 3) * 0.08} sx={styles.networkCellBg}>
               <div {...stylex.props(styles.networkCell)}>
-                <div {...stylex.props(styles.networkCellMeta)}>
-                  <span>{`NODE ${String(i + 1).padStart(2, "0")}`}</span>
-                  <span {...stylex.props(styles.networkCellCoords)}>{region.coords}</span>
-                </div>
+                <p {...stylex.props(styles.networkCellMeta)}>{region.coords}</p>
                 <p {...stylex.props(styles.networkCity)}>{region.city}</p>
                 <p {...stylex.props(styles.networkRole)}>{region.role}</p>
               </div>
@@ -1786,7 +1556,6 @@ function FooterSection() {
           <button type="button" {...stylex.props(styles.footerBrandBtn)}>
             FENCHEM
           </button>
-          <p {...stylex.props(styles.footerTagline)}>Rooted in nature, refined by science.</p>
           <p {...stylex.props(styles.footerCertText)}>
             ISO 9001 : 2015 / GMP / HACCP
             <br />
@@ -1814,7 +1583,6 @@ function FooterSection() {
       <div {...stylex.props(styles.footerBottomBar)}>
         <span>© 2026 Fenchem — All Rights Reserved</span>
         <span>N 32.06 / E 118.79 — Nanjing</span>
-        <span {...stylex.props(styles.textMoss)}>SYS.EOF // END OF SPEC</span>
       </div>
     </footer>
   );
@@ -1848,11 +1616,8 @@ export function VariantB() {
                 <span {...stylex.props(styles.brandSubtitle)}>Innovation Lab</span>
               </button>
               <div {...stylex.props(styles.navLinksWrapper)}>
-                {NAV_LINKS.map((link, i) => (
+                {NAV_LINKS.map((link) => (
                   <a key={link.href} href={link.href} {...stylex.props(styles.navLink)}>
-                    <span {...stylex.props(styles.navLinkNum)}>
-                      {String(i + 1).padStart(2, "0")}
-                    </span>
                     {link.label}
                   </a>
                 ))}

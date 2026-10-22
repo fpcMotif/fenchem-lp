@@ -8,7 +8,6 @@ import {
   FLAT_ITEMS,
   FUNCTION_TAGS,
   REGION_META,
-  padIndex,
   type FlatItem,
   type FunctionTag,
 } from "../shared/derived";
@@ -57,7 +56,6 @@ interface InciSegment {
 
 interface CatalogRow {
   item: FlatItem;
-  number: string;
   region: string;
   inci: InciSegment[];
   inciText: string;
@@ -90,12 +88,11 @@ const splitInci = (inci: string): InciSegment[] => {
     });
 };
 
-const ROWS: CatalogRow[] = FLAT_ITEMS.map((item, index) => {
+const ROWS: CatalogRow[] = FLAT_ITEMS.map((item) => {
   const inci = splitInci(item.inci);
   const inciText = inci.map((segment) => segment.text).join("");
   return {
     item,
-    number: padIndex(index),
     region: REGION_META[item.group.id]?.short ?? item.group.label,
     inci,
     inciText,
@@ -226,10 +223,6 @@ const styles = stylex.create({
   searchInput: {
     paddingInlineStart: 42,
     paddingInlineEnd: 44,
-    "::placeholder": {
-      color: MUTED,
-      opacity: 1,
-    },
     "::-webkit-search-cancel-button": {
       appearance: "none",
     },
@@ -462,9 +455,6 @@ const styles = stylex.create({
     textAlign: "start",
     color: MUTED,
   },
-  thName: {
-    paddingInlineStart: 28,
-  },
   lastCell: {
     paddingInlineEnd: 0,
   },
@@ -507,22 +497,6 @@ const styles = stylex.create({
   nameCell: {
     gridColumn: "1",
   },
-  nameLine: {
-    display: "flex",
-    alignItems: "baseline",
-    minWidth: 0,
-  },
-  number: {
-    flexShrink: 0,
-    width: 28,
-    fontFamily: NUMERAL_FONT,
-    fontSize: 12,
-    fontWeight: 500,
-    lineHeight: "24px",
-    letterSpacing: "0.02em",
-    fontVariantNumeric: "tabular-nums",
-    color: MUTED,
-  },
   names: {
     display: "flex",
     flexDirection: "column",
@@ -554,7 +528,6 @@ const styles = stylex.create({
   inciCell: {
     gridColumn: "1 / -1",
     paddingTop: { default: 0, [LG]: 18 },
-    paddingInlineStart: { default: 28, [LG]: 0 },
     fontSize: 13,
     lineHeight: "22px",
     color: BODY_TEXT,
@@ -569,7 +542,6 @@ const styles = stylex.create({
   },
   featuresCell: {
     gridColumn: "1 / -1",
-    paddingInlineStart: { default: 28, [LG]: 0 },
   },
   features: {
     margin: 0,
@@ -580,7 +552,6 @@ const styles = stylex.create({
   },
   emptyCell: {
     paddingBlock: { default: 40, [LG]: 56 },
-    paddingInlineStart: { default: 0, [LG]: 28 },
   },
   emptyText: {
     margin: 0,
@@ -598,18 +569,15 @@ function TableRow({ row, terms }: { row: CatalogRow; terms: string[] }) {
   return (
     <tr {...stylex.props(styles.row)}>
       <th scope="row" {...stylex.props(styles.cell, styles.nameCell)}>
-        <span {...stylex.props(styles.nameLine)}>
-          <span {...stylex.props(styles.number)}>{row.number}</span>
-          <span {...stylex.props(styles.names)}>
-            <span {...stylex.props(styles.primary)}>
-              <Marked text={item.primary} ranges={findRanges(item.primary, terms)} />
-            </span>
-            {item.secondary && (
-              <span {...stylex.props(styles.secondary)}>
-                <Marked text={item.secondary} ranges={findRanges(item.secondary, terms)} />
-              </span>
-            )}
+        <span {...stylex.props(styles.names)}>
+          <span {...stylex.props(styles.primary)}>
+            <Marked text={item.primary} ranges={findRanges(item.primary, terms)} />
           </span>
+          {item.secondary && (
+            <span {...stylex.props(styles.secondary)}>
+              <Marked text={item.secondary} ranges={findRanges(item.secondary, terms)} />
+            </span>
+          )}
         </span>
       </th>
       <td {...stylex.props(styles.cell, styles.regionCell)}>{row.region}</td>
@@ -708,7 +676,6 @@ export function Catalog() {
               id={searchId}
               type="search"
               value={query}
-              placeholder="搜索名称、INCI 或特性"
               autoComplete="off"
               spellCheck={false}
               enterKeyHint="search"
@@ -832,7 +799,7 @@ export function Catalog() {
           </colgroup>
           <thead {...stylex.props(styles.thead)}>
             <tr>
-              <th scope="col" {...stylex.props(styles.th, styles.thName)}>
+              <th scope="col" {...stylex.props(styles.th)}>
                 <span aria-hidden="true">名称</span>
                 <span {...stylex.props(styles.srOnly)}>Name</span>
               </th>

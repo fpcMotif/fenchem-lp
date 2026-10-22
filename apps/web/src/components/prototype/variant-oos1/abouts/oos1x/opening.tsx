@@ -4,7 +4,7 @@ import { ABOUT_BANNER } from "../../about-data";
 import { LEVER } from "./counterweight";
 import { Pair } from "./pair";
 import { type, ui } from "./shared";
-import { bp, face, scale, tone } from "./tokens.stylex";
+import { bp, tone } from "./tokens.stylex";
 
 const styles = stylex.create({
   stand: {
@@ -14,23 +14,9 @@ const styles = stylex.create({
     rowGap: { default: 14, [bp.wide]: 22 },
     alignItems: "end",
   },
-  tagline: {
-    gridColumn: { default: "auto", [bp.wide]: "1 / 8" },
-    fontSize: "clamp(20px, 1.67vw, 24px)",
-    color: tone.body,
-  },
   title: {
     gridColumn: { default: "auto", [bp.wide]: "1 / 8" },
     marginInlineStart: "-0.04em",
-  },
-  established: {
-    display: "grid",
-    rowGap: 10,
-    margin: 0,
-    paddingTop: { default: 0, [bp.wide]: 10 },
-  },
-  est: {
-    fontSize: 18,
   },
   lead: {
     fontSize: { default: 17, [bp.wide]: "clamp(19px, 1.67vw, 24px)" },
@@ -39,14 +25,6 @@ const styles = stylex.create({
   },
   leadLine: {
     display: "block",
-  },
-  place: {
-    marginTop: { default: 16, [bp.wide]: 24 },
-    fontFamily: face.display,
-    fontSize: scale.headingCounterweight,
-    fontWeight: 800,
-    letterSpacing: "0.01em",
-    color: tone.navy,
   },
   frame: {
     margin: 0,
@@ -68,25 +46,9 @@ export function Opening() {
         offset="start"
         standingSx={styles.stand}
         standing={
-          <>
-            <p lang="en" {...stylex.props(type.serif, styles.tagline, ui.knockout)}>
-              {ABOUT_BANNER.tagline}
-            </p>
-            <h1
-              id="oos1x-title"
-              {...stylex.props(type.light, type.title, styles.title, ui.knockout)}
-            >
-              {ABOUT_BANNER.title}
-            </h1>
-          </>
-        }
-        tag={
-          <p {...stylex.props(styles.established)}>
-            <span lang="en" {...stylex.props(type.serif, styles.est)}>
-              Est.
-            </span>
-            <span {...stylex.props(type.counterweight, type.counterTitle)}>1995</span>
-          </p>
+          <h1 id="oos1x-title" {...stylex.props(type.light, type.title, styles.title, ui.knockout)}>
+            {ABOUT_BANNER.title}
+          </h1>
         }
         load={
           <figure {...stylex.props(styles.frame)}>
@@ -106,9 +68,6 @@ export function Opening() {
               {half}
             </span>
           ))}
-        </p>
-        <p lang="en" {...stylex.props(styles.place)}>
-          {ABOUT_BANNER.place}
         </p>
       </Pair>
     </header>

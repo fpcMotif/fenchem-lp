@@ -3,7 +3,7 @@ import * as stylex from "@stylexjs/stylex";
 
 import { ABOUT_BANNER } from "../../about-data";
 import { ui } from "./shared-values";
-import { font, motionCss, step, tone } from "./tokens.stylex";
+import { motionCss, step, tone } from "./tokens.stylex";
 
 const rise = stylex.keyframes({
   "0%": { opacity: 0, transform: "translateY(24px)" },
@@ -40,19 +40,6 @@ const s = stylex.create({
     letterSpacing: "0.16em",
     color: tone.ink,
   },
-  tagline: {
-    margin: 0,
-    marginTop: { default: 28, [breakpoints.xl]: 40 },
-    fontFamily: font.serif,
-    fontStyle: "italic",
-    fontSize: { default: 28, [breakpoints.md]: 34, [breakpoints.xl]: 40 },
-    fontWeight: 400,
-    lineHeight: 1.2,
-    color: tone.ink,
-  },
-  taglineLine: {
-    display: "block",
-  },
   lead: {
     gridColumn: { default: "auto", [breakpoints.lg]: "9 / 13" },
     margin: 0,
@@ -73,16 +60,9 @@ const s = stylex.create({
   image: {
     objectPosition: "48% 50%",
   },
-  captionRow: {
-    display: "flex",
-    justifyContent: "space-between",
-    gap: 24,
-  },
 });
 
 export function Hero() {
-  const [taglineLead, taglineClose] = ABOUT_BANNER.tagline.split(", ");
-
   return (
     <section aria-labelledby="about-banner-title" {...stylex.props(s.hero)}>
       <div {...stylex.props(ui.shell, ui.inset)}>
@@ -91,10 +71,6 @@ export function Hero() {
             <h1 id="about-banner-title" {...stylex.props(s.title, s.enter, dynamic.delay(200))}>
               {ABOUT_BANNER.title}
             </h1>
-            <p lang="en" {...stylex.props(s.tagline, s.enter, dynamic.delay(420))}>
-              <span {...stylex.props(s.taglineLine)}>{taglineLead},</span>
-              <span {...stylex.props(s.taglineLine)}>{taglineClose}</span>
-            </p>
           </div>
           <p {...stylex.props(s.lead, s.enter, dynamic.delay(600))}>{ABOUT_BANNER.lead}</p>
         </div>
@@ -108,10 +84,6 @@ export function Hero() {
               {...stylex.props(ui.fill, s.image)}
             />
           </div>
-          <figcaption lang="en" {...stylex.props(ui.caption, s.captionRow)}>
-            <span>{ABOUT_BANNER.place}</span>
-            <span>{ABOUT_BANNER.established}</span>
-          </figcaption>
         </figure>
       </div>
     </section>

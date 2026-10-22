@@ -1,8 +1,6 @@
 import * as stylex from "@stylexjs/stylex";
 import { m, useTransform } from "motion/react";
-import { useId } from "react";
 
-import { ABOUT_BANNER } from "../../about-data";
 import { hourAngle, useSunHour } from "./sun";
 import { face, tone } from "./tokens.stylex";
 
@@ -61,13 +59,6 @@ const styles = stylex.create({
     fontSize: 10,
     fill: tone.ink,
   },
-  motto: {
-    fontFamily: face.serif,
-    fontStyle: "italic",
-    fontSize: 5,
-    letterSpacing: "0.02em",
-    fill: tone.body,
-  },
 });
 
 function Numeral({ hour, label }: { hour: number; label: string }) {
@@ -96,18 +87,14 @@ const FULL_RING = "M -152.08 -26.82 A 170 60 0 1 0 152.08 -26.82";
 const DAY_RING = "M -42.2 58.1 A 170 60 0 0 0 155 24.6";
 
 export function Dial({ dayOnly = false }: { dayOnly?: boolean }) {
-  const arcId = useId();
   const ticks = dayOnly ? TICKS.filter((hour) => hour >= 8.6 && hour <= 13.5) : TICKS;
   return (
     <svg
       viewBox="-185 -32 370 120"
       role="img"
-      aria-label={`Sundial with hour lines from 9 a.m. to 1 p.m. Inscription: ${ABOUT_BANNER.tagline}`}
+      aria-label="Sundial with hour lines from 9 a.m. to 1 p.m."
       {...stylex.props(styles.svg)}
     >
-      <defs>
-        <path id={arcId} d="M -35.72 42.57 A 125.8 44.4 0 0 0 112.54 19.84" />
-      </defs>
       <g fill="none" stroke={tone.navy}>
         <path
           d={dayOnly ? DAY_RING : FULL_RING}
@@ -176,11 +163,6 @@ export function Dial({ dayOnly = false }: { dayOnly?: boolean }) {
           vectorEffect="non-scaling-stroke"
         />
       </g>
-      <text {...stylex.props(styles.motto)}>
-        <textPath href={`#${arcId}`} startOffset="50%" textAnchor="middle">
-          {ABOUT_BANNER.tagline}
-        </textPath>
-      </text>
       {NUMERALS.map((numeral) => (
         <Numeral key={numeral.hour} {...numeral} />
       ))}

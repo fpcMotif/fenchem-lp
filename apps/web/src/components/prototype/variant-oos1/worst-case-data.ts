@@ -280,7 +280,7 @@ const WORST_ABOUT = () => {
   setFields(about.ABOUT_HISTORY, {
     caption: "双螺旋每交汇一次，即走过一年；向右滑动查看 1995 年至今的重要里程碑",
     milestones: [
-      { year: 1995, kicker: "Where it all began", events: [{ text: "在中国-南京成立总部" }] },
+      { year: 1995, events: [{ text: "在中国-南京成立总部" }] },
       ...demoMilestones.slice(1, -1),
       {
         year: 2024,
@@ -980,9 +980,7 @@ const TYPICAL_INSIGHTS = (count: ArticleCount) => {
     [...insights.INSIGHTS_ARTICLES, ...TYPICAL_INSIGHT_ARTICLES].slice(0, count),
   );
   setFields(insights.INSIGHTS_PAGE, {
-    tagline: "以科学视角解读营养配方趋势",
     lead: "围绕体重管理、肠道健康与健康老龄化，分享原料选择与配方开发的技术观点",
-    meta: [`技术洞察 · ${count}篇文章`],
   });
 };
 

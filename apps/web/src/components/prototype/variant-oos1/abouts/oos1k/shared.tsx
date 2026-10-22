@@ -2,18 +2,12 @@ import * as stylex from "@stylexjs/stylex";
 import { useEffect, useRef, useState } from "react";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 import { bp, face, sky } from "./tokens.stylex";
-import { ui } from "./shared-values";
 
 const heading = stylex.create({
   root: {
     display: "flex",
     flexDirection: "column",
     gap: { default: 14, [bp.desktop]: 18 },
-  },
-  numeral: {
-    fontSize: 21,
-    marginInline: 2,
-    color: sky.tint,
   },
   title: {
     margin: 0,
@@ -23,14 +17,6 @@ const heading = stylex.create({
     lineHeight: 1.1,
     letterSpacing: "0.04em",
     color: sky.star,
-  },
-  note: {
-    margin: 0,
-    fontFamily: face.serif,
-    fontStyle: "italic",
-    fontSize: { default: 21, [bp.desktop]: 26 },
-    lineHeight: 1.3,
-    color: sky.muted,
   },
 });
 
@@ -66,30 +52,12 @@ export function PoleMark() {
   );
 }
 
-export function ChartHeading({
-  id,
-  numeral,
-  label,
-  title,
-  note,
-}: {
-  id: string;
-  numeral: string;
-  label: string;
-  title: string;
-  note: string;
-}) {
+export function ChartHeading({ id, title }: { id: string; title: string }) {
   return (
     <header {...stylex.props(heading.root)}>
-      <p lang="en" {...stylex.props(ui.label)}>
-        Chart <span {...stylex.props(ui.designation, heading.numeral)}>{numeral}</span> · {label}
-      </p>
       <h2 id={id} {...stylex.props(heading.title)}>
         {title}
       </h2>
-      <p lang="en" {...stylex.props(heading.note)}>
-        {note}
-      </p>
     </header>
   );
 }

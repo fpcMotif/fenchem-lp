@@ -12,24 +12,11 @@ import { ForwardArrow } from "./time-grid";
 import { frameLabel } from "./time-grid-values";
 import { bp, face, tone } from "./tokens.stylex";
 
-type PhotoId = (typeof ABOUT_CAMPUS.photos)[number]["id"];
-
-const ENGLISH: Record<PhotoId, string> = {
-  aerial: "Headquarters",
-  lab: "Laboratory",
-  showroom: "Showroom",
-  reception: "Reception",
-  lounge: "Lounge",
-  office: "Open office",
-  grounds: "Grounds",
-};
-
 const PHOTOS: readonly LightboxPhoto[] = ABOUT_CAMPUS.photos.map((photo) => ({
   id: photo.id,
   large: photo.large,
   alt: photo.alt,
   caption: photo.caption,
-  english: ENGLISH[photo.id],
 }));
 
 const EXPOSURES_PER_SECOND = 12;
@@ -135,13 +122,6 @@ const styles = stylex.create({
     letterSpacing: "0.04em",
     color: tone.white,
   },
-  captionEnglish: {
-    display: { default: "none", [bp.abovePhone]: "inline" },
-    fontFamily: face.serif,
-    fontStyle: "italic",
-    fontSize: { default: 17, [bp.desktop]: 19 },
-    color: "rgba(255, 255, 255, 0.66)",
-  },
   legend: {
     display: "flex",
     flexDirection: "column",
@@ -158,13 +138,6 @@ const styles = stylex.create({
     lineHeight: 1.45,
     letterSpacing: "0.04em",
     color: tone.white,
-  },
-  legendNote: {
-    margin: 0,
-    fontFamily: face.sans,
-    fontSize: { default: 15, [bp.desktop]: 16 },
-    lineHeight: 1.7,
-    color: "rgba(255, 255, 255, 0.72)",
   },
 });
 
@@ -185,14 +158,10 @@ export function Campus() {
 
   return (
     <section id="about-campus" aria-labelledby="oos1p-campus" {...stylex.props(ui.plate)}>
-      <PlateHead plate={2} english="Campus" title={ABOUT_CAMPUS.title} titleId="oos1p-campus" />
+      <PlateHead title={ABOUT_CAMPUS.title} titleId="oos1p-campus" />
       <div {...stylex.props(styles.band)}>
         <div {...stylex.props(ui.shell)}>
           <div aria-hidden="true" {...stylex.props(ui.grid, styles.rebate)}>
-            <p {...stylex.props(ui.q1to2, ui.frameNumber, styles.rebateText)}>
-              <ForwardArrow />
-              Plate 02 · Chronophotographic study
-            </p>
             <p {...stylex.props(ui.q3to4, ui.frameNumber, styles.rebateText, styles.rebateEnd)}>
               {frameLabel(count)} exposures · 1/12 s
             </p>
@@ -224,9 +193,6 @@ export function Campus() {
                   />
                   <span {...stylex.props(styles.caption)}>
                     <span {...stylex.props(styles.captionText)}>{photo.caption}</span>
-                    <span lang="en" {...stylex.props(styles.captionEnglish)}>
-                      {ENGLISH[photo.id]}
-                    </span>
                     <span {...srOnly}>View larger</span>
                   </span>
                 </button>
@@ -234,11 +200,6 @@ export function Campus() {
             ))}
             <li {...stylex.props(styles.legend)}>
               <p {...stylex.props(styles.legendTitle)}>{ABOUT_MOMENT.caption}</p>
-              <p {...stylex.props(styles.legendNote)}>
-                七帧，一处园区。
-                <br />
-                点击任一帧，查看大图。
-              </p>
             </li>
           </ul>
         </div>

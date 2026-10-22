@@ -45,10 +45,7 @@ const VIEWS: readonly (LightboxView & { id: PhotoId; src: string })[] = ORDER.ma
   };
 });
 
-const NOTES = [
-  "All views are frontal photographs. No projection is applied.",
-  "Select a view to enlarge it. Arrow keys step through the set.",
-] as const;
+const NOTES = ["All views are frontal photographs. No projection is applied."] as const;
 
 const styles = stylex.create({
   grid: {
@@ -233,12 +230,7 @@ export function Campus() {
       aria-labelledby="oos1m-campus"
       {...stylex.props(ui.shell, ui.section, ui.anchor)}
     >
-      <SheetHeader
-        sheet={2}
-        title={ABOUT_CAMPUS.title}
-        english="Site views A–G"
-        titleId="oos1m-campus"
-      />
+      <SheetHeader sheet={2} title={ABOUT_CAMPUS.title} titleId="oos1m-campus" />
       <ul {...stylex.props(styles.grid)}>
         {VIEWS.map((view, index) => (
           <li key={view.id} {...stylex.props(styles.view, stylex.defaultMarker())}>
@@ -263,9 +255,6 @@ export function Campus() {
               <ViewMarker letter={view.letter} />
               <span {...stylex.props(styles.text)}>
                 <span {...stylex.props(styles.name)}>{view.caption}</span>
-                <span lang="en" {...stylex.props(ui.label)}>
-                  View {view.letter} · {view.english}
-                </span>
               </span>
             </div>
           </li>

@@ -147,7 +147,7 @@ export function SubNav({ onNavigateHome }: { onNavigateHome: (hash?: string) => 
                 aria-current={isActive ? "location" : undefined}
                 {...stylex.props(s.tab, isActive && s.tabActive, ui.focusRing)}
               >
-                <span lang="en">{item.english}</span>
+                <span>{item.label}</span>
                 <span
                   aria-hidden="true"
                   {...stylex.props(s.tabMark, isActive && s.tabMarkActive)}

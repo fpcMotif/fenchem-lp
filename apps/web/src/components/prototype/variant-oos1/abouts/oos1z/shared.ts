@@ -12,16 +12,6 @@ export const DWELL_RATIO = 0.7;
 export type Wall = "left" | "right";
 type PhotoId = (typeof ABOUT_CAMPUS.photos)[number]["id"];
 
-const ENGLISH: Record<PhotoId, string> = {
-  aerial: "Headquarters",
-  lab: "Laboratory",
-  showroom: "Showroom",
-  reception: "Reception",
-  lounge: "Lounge",
-  office: "Open office",
-  grounds: "Grounds",
-};
-
 const ASPECT: Record<PhotoId, number> = {
   aerial: 1400 / 1048,
   lab: 1400 / 577,
@@ -40,7 +30,6 @@ export type Work = {
   alt: string;
   caption: string;
   englishCaption: string;
-  english: string;
   wall: Wall;
   aspect: number;
 };
@@ -53,7 +42,6 @@ export const WORKS: readonly Work[] = ABOUT_CAMPUS.photos.map((photo, index) => 
   alt: photo.alt,
   caption: photo.caption,
   englishCaption: photo.english,
-  english: ENGLISH[photo.id],
   wall: index % 2 === 0 ? "left" : "right",
   aspect: ASPECT[photo.id],
 }));
@@ -61,14 +49,10 @@ export const WORKS: readonly Work[] = ABOUT_CAMPUS.photos.map((photo, index) => 
 export const LAKE = {
   number: "08",
   title: "园区水景",
-  english: "The lake",
-  facing: "The lake, facing you",
   src: ABOUT_CSR.image,
   alt: ABOUT_CSR.imageAlt,
   aspect: 3 / 2,
 } as const;
-
-export const PLACE = "Nanjing";
 
 export function sectionTitle(id: string): string {
   return ABOUT_HERO.navChips.find((chip) => chip.id === id)?.label ?? "";

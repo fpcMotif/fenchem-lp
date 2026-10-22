@@ -52,35 +52,12 @@ const styles = stylex.create({
     width: "100%",
     objectFit: "cover",
   },
-  captionBox: {
-    marginTop: "1rem",
-    display: "flex",
-    flexWrap: "wrap",
-    alignItems: "baseline",
-    justifyContent: "space-between",
-    columnGap: "1.5rem",
-    rowGap: "0.5rem",
-    borderRadius: "14px",
-    borderWidth: 1,
-    borderStyle: "solid",
-    borderColor: colors.line,
-    paddingInline: "1rem",
-    paddingBlock: "0.75rem",
-  },
-  captionCategory: {
-    fontFamily: typography.tech,
-    fontSize: "11px",
-    color: colors.ink,
-    textTransform: "uppercase",
-    letterSpacing: "0.26em",
-  },
   rightCol: {
     gridColumn: {
       [breakpoints.lg]: "span 7",
     },
   },
   heading: {
-    marginTop: "1.5rem",
     fontFamily: typography.display,
     fontWeight: 300,
     fontSize: "clamp(2.25rem, 4.6vw, 3.75rem)",
@@ -237,8 +214,6 @@ const FORMATS = ["Capsule", "Tablet", "Softgel", "Powder blend"];
 export function DossierSection() {
   const ref = useSectionAnimation<HTMLElement>((root) => {
     settleImage(root, "[data-dossier-img]");
-    riseIn(root, "[data-dossier-caption]", { delay: 0.15 });
-    riseIn(root, "[data-dossier-eyebrow]");
     revealWords(root, "[data-dossier-heading]", { delay: 0.1 });
     riseIn(root, "[data-dossier-intro]", { delay: 0.35 });
     drawRule(root, "[data-dossier-rule]", { stagger: 0.06 });
@@ -265,19 +240,9 @@ export function DossierSection() {
               {...stylex.props(styles.plateImg)}
             />
           </div>
-          <div data-dossier-caption {...stylex.props(styles.captionBox)}>
-            <span {...stylex.props(sharedStyles.techLabel)}>
-              {DOSSIER.code} — dossier reference
-            </span>
-            <span {...stylex.props(styles.captionCategory)}>{DOSSIER.category}</span>
-          </div>
         </div>
 
         <div {...stylex.props(styles.rightCol)}>
-          <p data-dossier-eyebrow {...stylex.props(sharedStyles.techLabel)}>
-            03 — Product Dossier
-          </p>
-
           <h2 id="dossier-heading" data-dossier-heading {...stylex.props(styles.heading)}>
             <SplitWords
               segments={[

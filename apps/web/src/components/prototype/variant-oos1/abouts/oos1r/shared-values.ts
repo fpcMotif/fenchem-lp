@@ -3,12 +3,7 @@ import * as stylex from "@stylexjs/stylex";
 import { ABOUT_HERO } from "../../about-data";
 import { band, font, layout, motionCss, step, tone } from "./tokens.stylex";
 
-const NAV_ENGLISH = ["Profile", "Campus", "Culture", "Responsibility", "Honors", "Structure"];
-
-export const NAV_ITEMS = [
-  ...ABOUT_HERO.navChips.map((chip, idx) => ({ ...chip, english: NAV_ENGLISH[idx] })),
-  { label: "产品与应用", id: "about-products", english: "Products" },
-];
+export const NAV_ITEMS = [...ABOUT_HERO.navChips, { label: "产品与应用", id: "about-products" }];
 
 export const SECTION_IDS: readonly string[] = NAV_ITEMS.map((item) => item.id);
 

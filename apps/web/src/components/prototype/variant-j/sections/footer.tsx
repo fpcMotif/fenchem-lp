@@ -178,10 +178,6 @@ const styles = stylex.create({
       ":focus-visible": 4,
     },
   },
-  directText: {
-    color: "color-mix(in oklch, var(--color-paper) 75%, transparent)",
-    fontSize: "0.875rem",
-  },
   coordsText: {
     fontFamily: typography.tech,
     fontSize: "11px",
@@ -329,7 +325,6 @@ export function FooterSection() {
                   {company.email}
                 </a>
               </li>
-              <li {...stylex.props(styles.directText)}>{company.since}</li>
               <li {...stylex.props(styles.coordsText)}>HQ {company.hq.coords}</li>
             </ul>
           </div>

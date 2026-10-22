@@ -45,7 +45,6 @@ const styles = stylex.create({
   },
   heading: {
     marginInline: "auto",
-    marginTop: "2rem",
     maxWidth: "48rem",
     fontFamily: typography.display,
     fontWeight: 300,
@@ -132,9 +131,6 @@ const styles = stylex.create({
     height: "1rem",
     transition: "transform 300ms ease",
   },
-  responseTime: {
-    marginTop: "2.5rem",
-  },
   basesWrap: {
     position: "relative",
     marginInline: "auto",
@@ -199,10 +195,6 @@ export function FinaleSection() {
       <div aria-hidden="true" {...stylex.props(styles.glow)} />
 
       <div {...stylex.props(styles.content)}>
-        <p data-finale-rise {...stylex.props(sharedStyles.techLabelDark)}>
-          Partner with Fenchem
-        </p>
-
         <h2 id="finale-heading" data-finale-heading {...stylex.props(styles.heading)}>
           <SplitWords
             segments={[
@@ -226,10 +218,6 @@ export function FinaleSection() {
             Explore the Portfolio
           </a>
         </div>
-
-        <p data-finale-rise {...stylex.props(sharedStyles.techLabelDark, styles.responseTime)}>
-          Response time under 24h — technical dossiers on request
-        </p>
       </div>
 
       <div {...stylex.props(styles.basesWrap)}>

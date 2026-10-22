@@ -81,14 +81,12 @@ export const INDUSTRY_COPY: Record<string, string> = {
 };
 
 export const HERO = {
-  eyebrow: "Botanical Intelligence Since 1995",
   lede: "Premium botanical and functional ingredients for the world's most demanding formulations — grown with patience, perfected in the laboratory, documented to specification.",
   primaryCta: "Explore the Portfolio",
   secondaryCta: "Request a Specification",
 } as const;
 
 export const ORIGIN_QUOTE = {
-  eyebrow: "05 — Origin",
   lines: [
     "Nature holds the keys",
     "to human vitality.",

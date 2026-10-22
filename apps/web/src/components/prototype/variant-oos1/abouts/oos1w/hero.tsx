@@ -27,6 +27,7 @@ const styles = stylex.create({
     boxSizing: "border-box",
     minHeight: { default: "calc(100svh - 80px)", [bp.desktop]: "max(640px, calc(100svh - 80px))" },
     paddingTop: { default: 20, [bp.desktop]: 28 },
+    paddingBottom: 106,
   },
   main: {
     position: "relative",
@@ -48,18 +49,9 @@ const styles = stylex.create({
     letterSpacing: "0.04em",
     color: tone.ink,
   },
-  tagline: {
-    margin: 0,
-    marginTop: { default: 18, [bp.desktop]: 28 },
-    fontFamily: face.serif,
-    fontStyle: "italic",
-    fontSize: { default: 22, [bp.tablet]: 30, [bp.desktop]: 34 },
-    lineHeight: 1.15,
-    color: tone.ink,
-  },
   lead: {
     margin: 0,
-    marginTop: { default: 16, [bp.desktop]: 22 },
+    marginTop: { default: 24, [bp.desktop]: 32 },
     maxWidth: "34em",
     fontFamily: face.sans,
     fontSize: { default: 17, [bp.tablet]: 19, [bp.desktop]: 20 },
@@ -168,44 +160,17 @@ const styles = stylex.create({
     backgroundColor: tone.pencil,
     pointerEvents: "none",
   },
-  caption: {
-    display: "flex",
-    alignItems: "baseline",
-    gap: 10,
-    margin: 0,
-    paddingTop: { default: 14, [bp.desktop]: 18 },
-    paddingBottom: { default: 72, [bp.desktop]: 64 },
-    maxWidth: { default: "62%", [bp.tablet]: "70%", [bp.desktop]: "60%" },
-  },
-  figNum: {
-    flexShrink: 0,
-    whiteSpace: "nowrap",
-  },
-  captionItalic: {
-    fontFamily: face.serif,
-    fontStyle: "italic",
-    fontSize: { default: 16, [bp.desktop]: 18 },
-    lineHeight: 1.3,
-    color: tone.body,
-  },
 });
 
 export function Hero() {
   return (
     <section aria-labelledby="oos1w-title" {...stylex.props(styles.hero)}>
       <div {...stylex.props(ui.shell, styles.frame)}>
-        <p lang="en" {...stylex.props(ui.english)}>
-          {ABOUT_BANNER.established} · {ABOUT_BANNER.place}
-        </p>
-
         <div {...stylex.props(ui.grid, styles.main)}>
           <div {...stylex.props(styles.text)}>
             <h1 id="oos1w-title" {...stylex.props(styles.title)}>
               {ABOUT_BANNER.title}
             </h1>
-            <p lang="en" {...stylex.props(styles.tagline)}>
-              {ABOUT_BANNER.tagline}
-            </p>
             <p {...stylex.props(styles.lead)}>{ABOUT_BANNER.lead}</p>
           </div>
 
@@ -226,13 +191,6 @@ export function Hero() {
           </div>
           <span aria-hidden="true" {...stylex.props(styles.origin)} />
         </div>
-
-        <p aria-hidden="true" {...stylex.props(ui.micro, styles.caption)}>
-          <span {...stylex.props(styles.figNum)}>Fig. 0</span>
-          <span lang="en" {...stylex.props(styles.captionItalic)}>
-            One sample on the origin line, before development.
-          </span>
-        </p>
       </div>
     </section>
   );

@@ -132,9 +132,6 @@ export function Closing({ onNavigateHome }: { onNavigateHome: (hash?: string) =>
             Drawn by
           </p>
           <p {...stylex.props(styles.value)}>{ABOUT_HERO.title}</p>
-          <p lang="en" {...stylex.props(ui.caps)}>
-            {ABOUT_BANNER.established} · {ABOUT_BANNER.place}
-          </p>
         </div>
         <div {...stylex.props(styles.cell, styles.sheetCell)}>
           <p lang="en" {...stylex.props(ui.caps)}>

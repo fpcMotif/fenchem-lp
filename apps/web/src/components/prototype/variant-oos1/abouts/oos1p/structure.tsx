@@ -67,9 +67,6 @@ const styles = stylex.create({
     letterSpacing: "0.06em",
     color: tone.navy,
   },
-  badgeEnglish: {
-    fontSize: 19,
-  },
   holdingName: {
     margin: 0,
     fontFamily: face.sans,
@@ -128,12 +125,7 @@ export function Structure() {
   const { holding, subsidiaries, subsidiaryBadge, subsidiaryBadgeEnglish } = ABOUT_STRUCTURE;
   return (
     <section id="about-structure" aria-labelledby="oos1p-structure" {...stylex.props(ui.plate)}>
-      <PlateHead
-        plate={6}
-        english="Structure"
-        title={ABOUT_STRUCTURE.title}
-        titleId="oos1p-structure"
-      />
+      <PlateHead title={ABOUT_STRUCTURE.title} titleId="oos1p-structure" />
       <div {...stylex.props(ui.shell)}>
         <div ref={rowsRef} {...stylex.props(styles.rows)}>
           <div {...stylex.props(ui.grid, styles.row)}>
@@ -146,9 +138,6 @@ export function Structure() {
             </div>
             <p {...stylex.props(styles.badge)}>
               <span {...stylex.props(styles.badgeLabel)}>{holding.badge}</span>
-              <span lang="en" {...stylex.props(ui.eyebrow, styles.badgeEnglish)}>
-                Holding
-              </span>
             </p>
           </div>
 
@@ -166,9 +155,6 @@ export function Structure() {
                 {index === 0 ? (
                   <p aria-hidden="true" {...stylex.props(styles.badge)}>
                     <span {...stylex.props(styles.badgeLabel)}>{subsidiaryBadge}</span>
-                    <span lang="en" {...stylex.props(ui.eyebrow, styles.badgeEnglish)}>
-                      Subsidiaries
-                    </span>
                   </p>
                 ) : null}
               </li>

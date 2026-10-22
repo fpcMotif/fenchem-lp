@@ -3,7 +3,7 @@ import * as stylex from "@stylexjs/stylex";
 import { ArrowUpRight } from "lucide-react";
 import { useId, useRef, useState } from "react";
 
-import { FLAT_FORMULAS, padIndex } from "../shared/derived";
+import { FLAT_FORMULAS } from "../shared/derived";
 import { SheetDialog } from "./sheet-dialog";
 import { font, media, motionCss, tone } from "./tokens.stylex";
 
@@ -101,27 +101,12 @@ const styles = stylex.create({
   cardHead: {
     display: "flex",
     alignItems: "center",
-    justifyContent: "space-between",
+    justifyContent: "flex-end",
     height: 44,
     paddingInline: { default: 14, [media.md]: 20 },
     borderBottomWidth: 1,
     borderBottomStyle: "solid",
     borderBottomColor: tone.mintHairline,
-  },
-  cardIndex: {
-    fontFamily: font.numeral,
-    fontSize: 13,
-    fontWeight: 500,
-    lineHeight: "16px",
-    letterSpacing: "0.04em",
-    fontVariantNumeric: "tabular-nums",
-    color: {
-      default: tone.muted,
-      [stylex.when.ancestor(":hover")]: colors.brandGreen700,
-    },
-    transitionProperty: "color",
-    transitionDuration: "150ms",
-    transitionTimingFunction: "ease",
   },
   cardArrow: {
     display: "flex",
@@ -242,7 +227,6 @@ export function Solutions() {
                 {...stylex.props(styles.card, stylex.defaultMarker())}
               >
                 <span {...stylex.props(styles.cardHead)}>
-                  <span {...stylex.props(styles.cardIndex)}>{padIndex(formula.index)}</span>
                   <span aria-hidden="true" {...stylex.props(styles.cardArrow)}>
                     <ArrowUpRight size={16} strokeWidth={1.5} absoluteStrokeWidth />
                   </span>
