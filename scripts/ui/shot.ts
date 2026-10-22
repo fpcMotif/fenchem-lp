@@ -9,6 +9,7 @@ import {
   OUT_ROOT,
   describeCapture,
   fileKey,
+  measureEach,
   parseCapture,
   toTarget,
   type Command,
@@ -47,22 +48,19 @@ ${CAPTURE_USAGE}
       ),
       async run(browser) {
         mkdirSync(values.out, { recursive: true });
-        const results = await Promise.all(
-          jobs.map(async (job) => ({
-            job,
-            result: await render(browser, job.target.url, job.width, capture, false),
-          })),
+        return measureEach(
+          jobs,
+          (job) => `${job.width}px  ${job.target.label}`,
+          (job) => render(browser, job.target.url, job.width, capture, false),
+          (job, result) => {
+            writeFileSync(job.file, result.png);
+            const found = problems(result);
+            console.log(`${job.width}px  ${job.target.label}  ${found.length ? "RED" : "ok"}`);
+            for (const line of found) console.log(`  ${line}`);
+            console.log(`  file      ${job.file}`);
+            return found.length > 0;
+          },
         );
-        let red = false;
-        for (const { job, result } of results) {
-          writeFileSync(job.file, result.png);
-          const found = problems(result);
-          red ||= found.length > 0;
-          console.log(`${job.width}px  ${job.target.label}  ${found.length ? "RED" : "ok"}`);
-          for (const line of found) console.log(`  ${line}`);
-          console.log(`  file      ${job.file}`);
-        }
-        return red;
       },
     };
   },

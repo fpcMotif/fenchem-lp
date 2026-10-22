@@ -15,6 +15,7 @@ import {
   OUT_ROOT,
   describeCapture,
   fileKey,
+  measureEach,
   parseCapture,
   toTarget,
   type Capture,
@@ -38,6 +39,35 @@ type Band = { top: number; bottom: number; left: number; right: number };
 type Source = { kind: "live"; url: string } | { kind: "baseline"; file: string; chrome: string };
 type Side = { label: string; source: Source };
 type Pair = { before: Side; after: Side; width: number; capture: Capture; dir: string };
+
+export const DIFF_ROOT = join(OUT_ROOT, "diff");
+export const RESULT_FILE = "result.json";
+
+export type PairResult = {
+  before: string;
+  after: string;
+  width: number;
+  state: "ok" | "red" | "cannot measure";
+  ranAt: string;
+  changedPixels?: number;
+  percent?: number;
+  found: string[];
+  error?: string;
+  compare?: string;
+  changes?: string;
+};
+
+function saveResult(pair: Pair, result: Omit<PairResult, "before" | "after" | "width" | "ranAt">) {
+  mkdirSync(pair.dir, { recursive: true });
+  const full: PairResult = {
+    before: pair.before.label,
+    after: pair.after.label,
+    width: pair.width,
+    ranAt: new Date().toISOString(),
+    ...result,
+  };
+  writeFileSync(join(pair.dir, RESULT_FILE), JSON.stringify(full, null, 2));
+}
 
 function filled(width: number, height: number, color: Rgb) {
   const image = new PNG({ width, height });
@@ -328,7 +358,16 @@ async function compare(browser: Browser, pair: Pair, maxDiff: number) {
         ]
       : []),
   ];
-  return { red: overBudget || found.length > 0, lines };
+  const red = overBudget || found.length > 0;
+  saveResult(pair, {
+    state: red ? "red" : "ok",
+    changedPixels: changed,
+    percent,
+    found,
+    compare: join(pair.dir, "compare.png"),
+    ...(bands.length > 0 ? { changes } : {}),
+  });
+  return { red, lines };
 }
 
 export const diff: Command = {
@@ -349,7 +388,9 @@ compare.png (before | after | diff). In diff.png, red marks pixels that got
 lighter, green marks pixels that got darker, and yellow marks anti-aliasing,
 which is not counted. When pixels changed, also writes changes.png: before |
 after crops of the first ${LISTED_BANDS} regions, at most ${REVIEW_WIDTH}px wide, small enough
-for a model to read.
+for a model to read. Each width's folder also gets ${RESULT_FILE}: the state (ok,
+red, or cannot measure), changed pixels, problems found, and file paths, which
+\`bun run ui review\` reads.
 
 Red when a width changes more than --max-diff, or a live render never holds
 still, has page errors or an error status, or scrolls sideways. A baseline
@@ -368,7 +409,7 @@ ${CAPTURE_USAGE}
       options: {
         ...CAPTURE_OPTIONS,
         "max-diff": { type: "string", default: "0" },
-        out: { type: "string", default: join(OUT_ROOT, "diff") },
+        out: { type: "string", default: DIFF_ROOT },
       },
     });
     const maxDiff = Number(values["max-diff"]);
@@ -428,9 +469,16 @@ ${CAPTURE_USAGE}
           `compare at ${pair.width}px (${describeCapture(pair.capture)}): ${describe(pair.before)} → ${describe(pair.after)}; write ${pair.dir}`,
       ),
       async run(browser) {
-        const results = await Promise.all(pairs.map((pair) => compare(browser, pair, maxDiff)));
-        for (const { lines } of results) console.log(lines.join("\n") + "\n");
-        return results.some(({ red }) => red);
+        return measureEach(
+          pairs,
+          (pair) => `${pair.width}px   ${pair.before.label}  →  ${pair.after.label}`,
+          (pair) => compare(browser, pair, maxDiff),
+          (_pair, { red, lines }) => {
+            console.log(lines.join("\n"));
+            return red;
+          },
+          (pair, error) => saveResult(pair, { state: "cannot measure", found: [], error }),
+        );
       },
     };
   },

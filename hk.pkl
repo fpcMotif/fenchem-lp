@@ -14,6 +14,10 @@ steps {
     glob = "*.{ts,tsx,mts,cts}"
     check = "bun apps/web/scripts/generate-route-tree.ts && bun check --no-script -b"
   }
+  ["test-ui"] {
+    glob = "scripts/ui/**/*.ts"
+    check = "bun run test:ui"
+  }
   ["fmt"] {
     glob = "*.{js,jsx,ts,tsx,mjs,cjs,mts,cts,json,jsonc,yaml,yml,md}"
     check = "bun fmt --check {{files}}"

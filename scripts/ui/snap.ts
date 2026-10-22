@@ -16,6 +16,7 @@ import {
   CAPTURE_USAGE,
   describeCapture,
   fileKey,
+  measureEach,
   OUT_ROOT,
   parseCapture,
   toTarget,
@@ -90,8 +91,10 @@ ${CAPTURE_USAGE}`,
         ),
       ),
       async run(browser) {
-        const saved = await Promise.all(
-          targets.map(async (target) => {
+        return measureEach(
+          targets,
+          (target) => target.label,
+          async (target) => {
             const renders = await Promise.all(
               widths.map(async (width) => ({
                 width,
@@ -114,22 +117,21 @@ ${CAPTURE_USAGE}`,
             rmSync(dir, { recursive: true, force: true });
             renameSync(staging, dir);
             return {
-              target,
               dir,
               found: renders.flatMap(({ width, result }) =>
                 problems(result, result.still).map((line) => `${width}px ${line}`),
               ),
             };
-          }),
+          },
+          (target, { dir, found }) => {
+            console.log(
+              `saved  ${target.label}  ${widths.join(",")}px  ${found.length ? "RED" : "ok"}`,
+            );
+            for (const line of found) console.log(`  ${line}`);
+            console.log(`  dir       ${dir}`);
+            return found.length > 0;
+          },
         );
-        for (const { target, dir, found } of saved) {
-          console.log(
-            `saved  ${target.label}  ${widths.join(",")}px  ${found.length ? "RED" : "ok"}`,
-          );
-          for (const line of found) console.log(`  ${line}`);
-          console.log(`  dir       ${dir}`);
-        }
-        return saved.some(({ found }) => found.length > 0);
       },
     };
   },

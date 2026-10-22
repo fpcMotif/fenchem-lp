@@ -9,6 +9,7 @@ import type { Capture } from "./command";
 export const NOISE_THRESHOLD = 0.01;
 const DEV_OVERLAY_CSS = "[data-mesurer-root]{display:none!important}";
 const PAGES_AT_ONCE = 4;
+const LOAD_TIMEOUT_MS = 60_000;
 const STILL_ATTEMPTS = 6;
 export const PAGE_EPOCH = Date.UTC(2026, 0, 15, 9);
 export const ADVANCE_MS = 2_000;
@@ -166,7 +167,7 @@ export function withPage<T>(
           : page.screenshot({ ...settings, fullPage: full });
       };
 
-      const response = await page.goto(url, { waitUntil: "networkidle" });
+      const response = await page.goto(url, { waitUntil: "load", timeout: LOAD_TIMEOUT_MS });
       const status = response?.status() ?? 0;
       if (status === 404) throw new Error(`${url} answered 404; check the target`);
       await page.addStyleTag({ content: DEV_OVERLAY_CSS + css });

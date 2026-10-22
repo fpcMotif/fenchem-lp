@@ -41,6 +41,8 @@ jobs:
 
       - run: bun scripts/check-delayed-dom-lookup.ts
 
+      - run: bun run test:ui
+
   e2e:
     runs-on: ubuntu-latest
     steps:

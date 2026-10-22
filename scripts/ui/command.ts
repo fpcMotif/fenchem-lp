@@ -12,7 +12,45 @@ export type Command = {
   summary: string;
   usage: string;
   plan: (argv: string[], origin: string) => Plan;
+  offline?: true;
 };
+
+const JOBS_AT_ONCE = 4;
+
+export const message = (error: unknown) => (error instanceof Error ? error.message : String(error));
+
+export async function measureEach<J, R>(
+  jobs: J[],
+  name: (job: J) => string,
+  measure: (job: J) => Promise<R>,
+  report: (job: J, result: R) => boolean,
+  onFailed?: (job: J, reason: string) => void,
+) {
+  let red = false;
+  let finished = 0;
+  let next = 0;
+  const failed: string[] = [];
+  const worker = async () => {
+    while (next < jobs.length) {
+      const job = jobs[next++] as J;
+      try {
+        red = report(job, await measure(job)) || red;
+      } catch (error) {
+        failed.push(name(job));
+        const reason = message(error).split("\n")[0] ?? "";
+        console.log(`${name(job)}  CANNOT MEASURE\n  error     ${reason}`);
+        onFailed?.(job, reason);
+      }
+      console.log(`  progress  ${++finished} of ${jobs.length} done\n`);
+    }
+  };
+  await Promise.all(Array.from({ length: JOBS_AT_ONCE }, worker));
+  if (failed.length > 0)
+    throw new Error(
+      `${failed.length} of ${jobs.length} could not be measured (${failed.join(", ")}); the rest are reported above`,
+    );
+  return red;
+}
 
 export type Target = { label: string; url: string };
 
