@@ -114,13 +114,6 @@ const styles = stylex.create({
     textWrap: "balance",
     color: color.ink,
   },
-  caption: {
-    margin: 0,
-    paddingTop: 12,
-    fontSize: 14,
-    letterSpacing: "0.06em",
-    color: color.bodyText,
-  },
 
   odometer: {
     display: "flex",
@@ -643,11 +636,9 @@ function useGeometry(
 export function HistoryTimeline({
   stickyTop,
   sx,
-  plain = false,
 }: {
   stickyTop: number;
   sx?: stylex.StyleXStyles;
-  plain?: boolean;
 }) {
   const sectionRef = useRef<HTMLElement>(null);
   const viewportRef = useRef<HTMLDivElement>(null);
@@ -733,9 +724,8 @@ export function HistoryTimeline({
             <h2 id="about-history-title" {...stylex.props(styles.title)}>
               {ABOUT_HISTORY.title}
             </h2>
-            {plain ? <p {...stylex.props(styles.caption)}>{ABOUT_HISTORY.caption}</p> : null}
           </RiseReveal>
-          {plain ? null : <Odometer year={year} />}
+          <Odometer year={year} />
         </div>
 
         <div

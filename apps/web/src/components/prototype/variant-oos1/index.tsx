@@ -84,12 +84,14 @@ const GOOGLE_FONTS =
 const loadAboutView = () => import("./about-view");
 const loadProductsView = () => import("./products-view");
 const loadInsightsView = () => import("./insights-view");
+const loadNewsView = () => import("./news-view");
 const loadContactView = () => import("./contact-view");
 const loadSplitDialog = () => import("../contact-dialog-lab/variants/split");
 
 const AboutView = lazy(() => loadAboutView().then((m) => ({ default: m.AboutView })));
 const ProductsView = lazy(() => loadProductsView().then((m) => ({ default: m.ProductsView })));
 const InsightsView = lazy(() => loadInsightsView().then((m) => ({ default: m.InsightsView })));
+const NewsView = lazy(() => loadNewsView().then((m) => ({ default: m.NewsView })));
 const ContactView = lazy(() => loadContactView().then((m) => ({ default: m.ContactView })));
 const SplitDialog = lazy(() => loadSplitDialog().then((m) => ({ default: m.SplitDialog })));
 
@@ -97,6 +99,7 @@ function prefetchOffscreenViews() {
   void loadAboutView();
   void loadProductsView();
   void loadInsightsView();
+  void loadNewsView();
   void loadContactView();
   void loadSplitDialog();
 }
@@ -1551,7 +1554,7 @@ function useNavFits(
   return fits;
 }
 
-export type View = "home" | "about" | "products" | "insights" | "contact";
+export type View = "home" | "about" | "products" | "insights" | "news" | "contact";
 export type AboutPageProps = { onNavigateHome: (hash?: string) => void };
 export type SubPageProps = AboutPageProps;
 export type HomePageProps = {
@@ -1589,6 +1592,9 @@ function SiteHeader({
     if (href === "#insights") {
       return currentView === "insights";
     }
+    if (href === "#news") {
+      return currentView === "news";
+    }
     if (href === "#contact") {
       return currentView === "contact";
     }
@@ -1615,6 +1621,12 @@ function SiteHeader({
     if (href === "#insights") {
       event.preventDefault();
       onNavigate("insights", "insights-top");
+      setMenuOpen(false);
+      return;
+    }
+    if (href === "#news") {
+      event.preventDefault();
+      onNavigate("news", "news-top");
       setMenuOpen(false);
       return;
     }
@@ -2341,6 +2353,7 @@ const viewFromPage = (page: unknown, startView: View): View => {
   if (page === "about" || page === "home") return page;
   if (page === "products" || page === "produces") return "products";
   if (page === "insights" || page === "insight") return "insights";
+  if (page === "news") return "news";
   if (page === "contact") return "contact";
   return startView;
 };
@@ -2349,6 +2362,7 @@ export function VariantOOS1({
   AboutPage = AboutView,
   ProductsPage = ProductsView,
   InsightsPage = InsightsView,
+  NewsPage = NewsView,
   ContactPage = ContactView,
   HomePage,
   startView = "home",
@@ -2357,6 +2371,7 @@ export function VariantOOS1({
   AboutPage?: ComponentType<SubPageProps>;
   ProductsPage?: ComponentType<SubPageProps>;
   InsightsPage?: ComponentType<SubPageProps>;
+  NewsPage?: ComponentType<SubPageProps>;
   ContactPage?: ComponentType<SubPageProps>;
   startView?: View;
 }) {
@@ -2458,6 +2473,19 @@ export function VariantOOS1({
                     <ProductsPage onNavigateHome={(target) => handleNavigate("home", target)} />
                   ) : view === "insights" ? (
                     <InsightsPage
+                      onNavigateHome={(target) =>
+                        handleNavigate(
+                          target === "contact"
+                            ? "contact"
+                            : target === "products"
+                              ? "products"
+                              : "home",
+                          target,
+                        )
+                      }
+                    />
+                  ) : view === "news" ? (
+                    <NewsPage
                       onNavigateHome={(target) =>
                         handleNavigate(
                           target === "contact"

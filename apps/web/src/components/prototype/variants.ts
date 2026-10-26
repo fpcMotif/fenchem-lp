@@ -30,6 +30,7 @@ const ABOUT_NAMES: Record<string, string> = {
   oos1abandon: "Early about / before the figma pass",
   oos1b: "Portal / pull back",
   oos1c: "Panorama / seam",
+  oos1cover: "Coverflow campus / side peeks",
   oos1d: "Phi / off-by-one",
   oos1e: "Dossier / overprint",
   oos1f: "Strand / twist",

@@ -3,7 +3,7 @@ import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { m, useScroll, useTransform } from "motion/react";
-import { useEffect, useRef, useState } from "react";
+import { type ComponentType, useEffect, useRef, useState } from "react";
 
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
@@ -532,7 +532,13 @@ function Lightbox({
   );
 }
 
-export function CampusGallery({ headerSx }: { headerSx?: stylex.StyleXStyles }) {
+export function CampusGallery({
+  headerSx,
+  Carousel = CampusCarousel,
+}: {
+  headerSx?: stylex.StyleXStyles;
+  Carousel?: ComponentType<{ paused: boolean; onOpen: (index: number) => void }>;
+}) {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const [stepped, setStepped] = useState(false);
   const count = CAMPUS_GALLERY.length;
@@ -554,7 +560,7 @@ export function CampusGallery({ headerSx }: { headerSx?: stylex.StyleXStyles }) 
           sx={headerSx}
         />
       </div>
-      <CampusCarousel paused={openIndex !== null} onOpen={open} />
+      <Carousel paused={openIndex !== null} onOpen={open} />
       <Lightbox
         index={openIndex}
         stepped={stepped}
@@ -717,7 +723,13 @@ function Profile() {
   );
 }
 
-export function AboutView({ onNavigateHome }: { onNavigateHome: (hash?: string) => void }) {
+export function AboutView({
+  onNavigateHome,
+  Carousel,
+}: {
+  onNavigateHome: (hash?: string) => void;
+  Carousel?: ComponentType<{ paused: boolean; onOpen: (index: number) => void }>;
+}) {
   return (
     <div id="about-top" {...stylex.props(styles.root)}>
       <section aria-labelledby="about-banner-title" {...stylex.props(styles.hero)}>
@@ -740,9 +752,9 @@ export function AboutView({ onNavigateHome }: { onNavigateHome: (hash?: string) 
 
       <Profile />
 
-      <HistoryTimeline stickyTop={STICKY_TOP} plain sx={[kitStyles.anchor, styles.historyBand]} />
+      <HistoryTimeline stickyTop={STICKY_TOP} sx={[kitStyles.anchor, styles.historyBand]} />
 
-      <CampusGallery />
+      <CampusGallery Carousel={Carousel} />
 
       <CultureScenes sx={kitStyles.anchor} />
 

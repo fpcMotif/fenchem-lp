@@ -58,6 +58,72 @@ const CARD_RADIUS = { default: 12, [DESKTOP]: 16 } as const;
 const orderByArea = (areas: SolutionArea[], items: SolutionItem[]) =>
   areas.flatMap((area) => items.filter((item) => item.area === area.id));
 
+const EDGE_PX = 52;
+const EDGE_SPEED = 5.5;
+
+const bindEdgeScroll = (node: HTMLElement, reduce: boolean) => {
+  if (reduce) return () => {};
+  let speedX = 0;
+  let speedY = 0;
+  let frame = 0;
+
+  const stop = () => {
+    speedX = 0;
+    speedY = 0;
+    if (frame) cancelAnimationFrame(frame);
+    frame = 0;
+  };
+
+  const tick = () => {
+    if (speedX) node.scrollLeft += speedX;
+    if (speedY) node.scrollTop += speedY;
+    const canX =
+      speedX < 0
+        ? node.scrollLeft > 0
+        : node.scrollLeft + node.clientWidth < node.scrollWidth - 1;
+    const canY =
+      speedY < 0
+        ? node.scrollTop > 0
+        : node.scrollTop + node.clientHeight < node.scrollHeight - 1;
+    if ((speedX !== 0 && canX) || (speedY !== 0 && canY)) frame = requestAnimationFrame(tick);
+    else frame = 0;
+  };
+
+  const onMove = (event: PointerEvent) => {
+    const box = node.getBoundingClientRect();
+    const x = event.clientX - box.left;
+    const y = event.clientY - box.top;
+    const flow = getComputedStyle(node);
+    const overflowY =
+      node.scrollHeight > node.clientHeight + 1 && flow.overflowY !== "hidden" && flow.overflowY !== "visible";
+    const overflowX =
+      node.scrollWidth > node.clientWidth + 1 && flow.overflowX !== "hidden" && flow.overflowX !== "visible";
+    speedX = 0;
+    speedY = 0;
+    if (overflowY) {
+      if (y < EDGE_PX) speedY = -EDGE_SPEED * (1 - Math.max(0, y) / EDGE_PX);
+      else if (box.height - y < EDGE_PX) {
+        speedY = EDGE_SPEED * (1 - Math.max(0, box.height - y) / EDGE_PX);
+      }
+    }
+    if (overflowX) {
+      if (x < EDGE_PX) speedX = -EDGE_SPEED * (1 - Math.max(0, x) / EDGE_PX);
+      else if (box.width - x < EDGE_PX) {
+        speedX = EDGE_SPEED * (1 - Math.max(0, box.width - x) / EDGE_PX);
+      }
+    }
+    if ((speedX !== 0 || speedY !== 0) && frame === 0) frame = requestAnimationFrame(tick);
+  };
+
+  node.addEventListener("pointermove", onMove);
+  node.addEventListener("pointerleave", stop);
+  return () => {
+    node.removeEventListener("pointermove", onMove);
+    node.removeEventListener("pointerleave", stop);
+    stop();
+  };
+};
+
 type BrowseState =
   | { status: "showing"; area: AreaFilter; selectedId: string }
   | { status: "empty"; area: AreaFilter };
@@ -222,19 +288,7 @@ const styles = stylex.create({
   ledgerName: {
     display: "flex",
     alignItems: "flex-start",
-    gap: 24,
     minWidth: 0,
-  },
-  ledgerIndex: {
-    flexShrink: 0,
-    fontSize: 12,
-    lineHeight: "24px",
-    letterSpacing: "0.04em",
-    fontVariantNumeric: "tabular-nums",
-    color: TINT_MUTED,
-  },
-  ledgerIndexOpen: {
-    color: ACCENT,
   },
   ledgerNames: {
     display: "flex",
@@ -511,12 +565,12 @@ const styles = stylex.create({
     inset: { default: null, [LG]: 0 },
     display: { default: "flex", [LG]: "block" },
     gap: 2,
-    paddingTop: { default: 4, [LG]: 0 },
-    paddingBottom: { default: 4, [LG]: 20 },
-    paddingInlineStart: { default: 4, [LG]: 12 },
+    paddingTop: { default: 4, [LG]: 8 },
+    paddingBottom: { default: 4, [LG]: 12 },
+    paddingInlineStart: { default: 4, [LG]: 18 },
     paddingInlineEnd: { default: 4, [LG]: 0 },
     scrollPaddingInline: 4,
-    scrollPaddingTop: { default: null, [LG]: 44 },
+    scrollPaddingTop: { default: null, [LG]: 8 },
     overflowX: { default: "auto", [LG]: "hidden" },
     overflowY: { default: "hidden", [LG]: "auto" },
     scrollbarWidth: "none",
@@ -524,27 +578,44 @@ const styles = stylex.create({
     borderRadius: { default: 12, [LG]: 0 },
     backgroundColor: { default: TINT_FILL, [LG]: "transparent" },
   },
-  railGroup: {
-    display: { default: "contents", [LG]: "block" },
+  railBar: {
+    position: "absolute",
+    top: 18,
+    bottom: 18,
+    left: 7,
+    zIndex: 3,
+    display: { default: "none", [LG]: "block" },
+    width: 1,
+    backgroundImage:
+      "linear-gradient(to bottom, transparent, oklch(0.55 0.1 255 / 0.18) 18%, oklch(0.55 0.1 255 / 0.18) 82%, transparent)",
+    opacity: 0,
+    pointerEvents: "none",
+    transitionProperty: "opacity",
+    transitionDuration: { default: "0ms", [breakpoints.motionOk]: "220ms" },
+    transitionTimingFunction: ease.out,
   },
-  railHeading: {
-    position: "sticky",
+  railThumb: {
+    position: "absolute",
     top: 0,
-    zIndex: 2,
-    display: { default: "none", [LG]: "flex" },
-    justifyContent: "space-between",
-    gap: 12,
-    margin: 0,
-    paddingTop: 16,
-    paddingBottom: 8,
-    paddingInlineStart: 16,
-    paddingInlineEnd: 24,
-    backgroundColor: TINT_FILL,
-    fontSize: 12,
-    fontWeight: 500,
-    lineHeight: "20px",
-    letterSpacing: "0.08em",
-    color: TINT_MUTED,
+    left: -8,
+    width: 17,
+    height: 17,
+    pointerEvents: "auto",
+    cursor: "grab",
+    touchAction: "none",
+    "::before": {
+      content: '""',
+      position: "absolute",
+      top: 5,
+      left: 5,
+      width: 7,
+      height: 7,
+      borderRadius: "50%",
+      backgroundColor: "oklch(0.74 0.1 248 / 0.34)",
+      backgroundImage:
+        "radial-gradient(circle at 32% 28%, oklch(1 0 0 / 0.95), oklch(0.8 0.08 245 / 0.55) 36%, oklch(0.58 0.14 255 / 0.2) 70%, transparent)",
+      boxShadow: "inset 0 0.5px 0.5px oklch(1 0 0 / 0.95), 0 0 6px oklch(0.64 0.12 255 / 0.35)",
+    },
   },
   solutionTab: {
     position: "relative",
@@ -782,12 +853,10 @@ function ToggleIcon({ open }: { open: boolean }) {
 
 function LedgerRow({
   group,
-  index,
   open,
   onToggle,
 }: {
   group: CatalogGroup;
-  index: number;
   open: boolean;
   onToggle: (trigger: HTMLElement) => void;
 }) {
@@ -813,12 +882,6 @@ function LedgerRow({
           )}
         >
           <span {...stylex.props(styles.ledgerName, styles.colName)}>
-            <span
-              aria-hidden="true"
-              {...stylex.props(styles.ledgerIndex, open && styles.ledgerIndexOpen)}
-            >
-              {String(index + 1).padStart(2, "0")}
-            </span>
             <span {...stylex.props(styles.ledgerNames)}>
               <span {...stylex.props(styles.ledgerPrimary)}>{group.label}</span>
               <span {...stylex.props(styles.ledgerLatin)}>{group.items.length} 款原料</span>
@@ -982,7 +1045,6 @@ export function ProductCatalog({ categoryId }: { categoryId: string }) {
               <LedgerRow
                 key={group.id}
                 group={group}
-                index={index}
                 open={openIndex === index}
                 onToggle={(trigger) => toggle(index, trigger)}
               />
@@ -998,7 +1060,10 @@ export function ProductSolutions({ categoryId }: { categoryId: string }) {
   const reduce = useReducedMotion();
   const uid = useId();
   const areaListRef = useRef<HTMLDivElement>(null);
+  const railFrameRef = useRef<HTMLDivElement>(null);
   const railRef = useRef<HTMLDivElement>(null);
+  const railBarRef = useRef<HTMLDivElement>(null);
+  const railThumbRef = useRef<HTMLDivElement>(null);
   const solutionSet =
     SOLUTIONS_BY_CATEGORY[categoryId] ?? SOLUTIONS_BY_CATEGORY[DEFAULT_SOLUTIONS_CATEGORY_ID];
   const areas = solutionSet?.areas ?? [];
@@ -1016,11 +1081,15 @@ export function ProductSolutions({ categoryId }: { categoryId: string }) {
 
   useEffect(() => {
     const list = areaListRef.current;
-    const chip = list?.querySelector<HTMLElement>('[aria-pressed="true"]');
-    if (!list || !chip || list.scrollWidth <= list.clientWidth) return;
-    const left = chip.offsetLeft - (list.clientWidth - chip.offsetWidth) / 2;
-    list.scrollTo({ left: Math.max(0, left), behavior: reduce ? "auto" : "smooth" });
-  }, [area, reduce]);
+    if (!list) return;
+    const release = bindEdgeScroll(list, reduce);
+    const chip = list.querySelector<HTMLElement>('[aria-pressed="true"]');
+    if (chip && list.scrollWidth > list.clientWidth) {
+      const left = chip.offsetLeft - (list.clientWidth - chip.offsetWidth) / 2;
+      list.scrollTo({ left: Math.max(0, left), behavior: reduce ? "auto" : "smooth" });
+    }
+    return release;
+  }, [area, reduce, solutions]);
 
   useEffect(() => {
     const rail = railRef.current;
@@ -1040,6 +1109,78 @@ export function ProductSolutions({ categoryId }: { categoryId: string }) {
     rail.scrollTo({ top: Math.max(0, top), behavior });
   }, [area, selectedId, reduce]);
 
+  useEffect(() => {
+    const frame = railFrameRef.current;
+    const rail = railRef.current;
+    const bar = railBarRef.current;
+    const thumb = railThumbRef.current;
+    if (!frame || !rail || !bar || !thumb) return;
+
+    let near = false;
+    let drag: { pointer: number; startY: number; startScroll: number } | null = null;
+
+    const paint = () => {
+      const overflow = rail.scrollHeight - rail.clientHeight;
+      const vertical = overflow > 1;
+      bar.hidden = !vertical;
+      if (!vertical) return;
+      const track = bar.clientHeight;
+      const thumbHeight = thumb.offsetHeight || 30;
+      const travel = Math.max(0, track - thumbHeight);
+      const y = (rail.scrollTop / overflow) * travel;
+      thumb.style.transform = `translate3d(0, ${y}px, 0)`;
+      bar.style.opacity = near ? "1" : "0";
+      thumb.style.pointerEvents = near ? "auto" : "none";
+    };
+
+    const onEnter = () => {
+      near = true;
+      paint();
+    };
+    const onLeave = () => {
+      near = false;
+      paint();
+    };
+    const onThumbDown = (event: PointerEvent) => {
+      event.preventDefault();
+      event.stopPropagation();
+      thumb.setPointerCapture(event.pointerId);
+      drag = { pointer: event.pointerId, startY: event.clientY, startScroll: rail.scrollTop };
+    };
+    const onThumbMove = (event: PointerEvent) => {
+      if (!drag || drag.pointer !== event.pointerId) return;
+      const overflow = rail.scrollHeight - rail.clientHeight;
+      const travel = Math.max(1, bar.clientHeight - thumb.offsetHeight);
+      rail.scrollTop = drag.startScroll + ((event.clientY - drag.startY) / travel) * overflow;
+    };
+    const onThumbUp = (event: PointerEvent) => {
+      if (drag?.pointer === event.pointerId) drag = null;
+    };
+
+    paint();
+    const releaseEdge = bindEdgeScroll(rail, reduce);
+    const observer = new ResizeObserver(paint);
+    observer.observe(rail);
+    rail.addEventListener("scroll", paint, { passive: true });
+    frame.addEventListener("pointerenter", onEnter);
+    frame.addEventListener("pointerleave", onLeave);
+    thumb.addEventListener("pointerdown", onThumbDown);
+    thumb.addEventListener("pointermove", onThumbMove);
+    thumb.addEventListener("pointerup", onThumbUp);
+    thumb.addEventListener("pointercancel", onThumbUp);
+    return () => {
+      releaseEdge();
+      observer.disconnect();
+      rail.removeEventListener("scroll", paint);
+      frame.removeEventListener("pointerenter", onEnter);
+      frame.removeEventListener("pointerleave", onLeave);
+      thumb.removeEventListener("pointerdown", onThumbDown);
+      thumb.removeEventListener("pointermove", onThumbMove);
+      thumb.removeEventListener("pointerup", onThumbUp);
+      thumb.removeEventListener("pointercancel", onThumbUp);
+    };
+  }, [area, reduce, selectedId, solutions]);
+
   if (solutions.length === 0) return null;
 
   const scope = area === "all" ? solutions : solutions.filter((item) => item.area === area);
@@ -1048,13 +1189,6 @@ export function ProductSolutions({ categoryId }: { categoryId: string }) {
     scope.findIndex((item) => item.id === selectedId),
   );
   const selected = browse.status === "showing" ? scope[position] : undefined;
-
-  const groups = areas
-    .map((entry) => ({
-      ...entry,
-      items: scope.filter((item) => item.area === entry.id),
-    }))
-    .filter((group) => group.items.length > 0);
 
   const handleRailKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
     const step = TAB_STEPS[event.key];
@@ -1107,7 +1241,7 @@ export function ProductSolutions({ categoryId }: { categoryId: string }) {
         )}
         {selected ? (
           <div {...stylex.props(styles.browser)}>
-            <div {...stylex.props(styles.railFrame)}>
+            <div ref={railFrameRef} {...stylex.props(styles.railFrame)}>
               <m.div
                 ref={railRef}
                 layoutScroll
@@ -1117,59 +1251,48 @@ export function ProductSolutions({ categoryId }: { categoryId: string }) {
                 onKeyDown={handleRailKeyDown}
                 {...stylex.props(styles.rail)}
               >
-                {groups.map((group) => (
-                  <div key={group.id} {...stylex.props(styles.railGroup)}>
-                    <p aria-hidden="true" {...stylex.props(styles.railHeading)}>
-                      {group.label}
-                    </p>
-                    {group.items.map((item) => {
-                      const isSelected = item.id === selected.id;
-                      return (
-                        <button
-                          key={item.id}
-                          type="button"
-                          role="tab"
-                          id={`${uid}-tab-${item.id}`}
-                          aria-selected={isSelected}
-                          aria-controls={`${uid}-panel`}
-                          tabIndex={isSelected ? 0 : -1}
-                          onClick={() => send({ type: "pickSolution", id: item.id })}
-                          {...stylex.props(
-                            styles.solutionTab,
-                            isSelected && styles.solutionTabSelected,
-                            stylex.defaultMarker(),
-                          )}
+                {scope.map((item) => {
+                  const isSelected = item.id === selected.id;
+                  return (
+                    <button
+                      key={item.id}
+                      type="button"
+                      role="tab"
+                      id={`${uid}-tab-${item.id}`}
+                      aria-selected={isSelected}
+                      aria-controls={`${uid}-panel`}
+                      tabIndex={isSelected ? 0 : -1}
+                      onClick={() => send({ type: "pickSolution", id: item.id })}
+                      {...stylex.props(
+                        styles.solutionTab,
+                        isSelected && styles.solutionTabSelected,
+                        stylex.defaultMarker(),
+                      )}
+                    >
+                      {isSelected && (
+                        <m.span
+                          layoutId={`${uid}-solution-tab`}
+                          transition={
+                            reduce ? { duration: 0 } : { type: "spring", duration: 0.32, bounce: 0 }
+                          }
+                          {...stylex.props(styles.tabIndicator)}
+                        />
+                      )}
+                      <span {...stylex.props(styles.tabText)}>
+                        <span
+                          {...stylex.props(styles.tabTitle, isSelected && styles.tabTitleSelected)}
                         >
-                          {isSelected && (
-                            <m.span
-                              layoutId={`${uid}-solution-tab`}
-                              transition={
-                                reduce
-                                  ? { duration: 0 }
-                                  : { type: "spring", duration: 0.32, bounce: 0 }
-                              }
-                              {...stylex.props(styles.tabIndicator)}
-                            />
-                          )}
-                          <span {...stylex.props(styles.tabText)}>
-                            <span
-                              {...stylex.props(
-                                styles.tabTitle,
-                                isSelected && styles.tabTitleSelected,
-                              )}
-                            >
-                              {item.title}
-                            </span>
-                            <span {...stylex.props(styles.tabMeta)}>
-                              {item.functions.join(" · ")}
-                            </span>
-                          </span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                ))}
+                          {item.title}
+                        </span>
+                        <span {...stylex.props(styles.tabMeta)}>{item.functions.join(" · ")}</span>
+                      </span>
+                    </button>
+                  );
+                })}
               </m.div>
+              <div ref={railBarRef} aria-hidden="true" {...stylex.props(styles.railBar)}>
+                <div ref={railThumbRef} {...stylex.props(styles.railThumb)} />
+              </div>
             </div>
             <div
               role="tabpanel"

@@ -24,6 +24,7 @@ export const NAV_ITEMS = [
   { label: "关于我们", href: "#about" },
   { label: "产品与应用", href: "#products" },
   { label: "行业洞察", href: "#insights" },
+  { label: "新闻资讯", href: "#news" },
   { label: "联系我们", href: "#contact" },
 ] as const;
 
@@ -38,9 +39,9 @@ export const HERO = {
 export const ABOUT = {
   ...FIGMA_ABOUT,
   lines: [
-    "南京泛成国际控股有限公司是行业内领先的原料供应商，凭借现代化生产基地和专业研发能力、遍布全球的分",
-    "公司网络，为客户提供一站式定制化解决方案。我们经过三十多年的发展和经验积累，已成为全球范围内同行",
-    "业中最具影响力的公司之一。",
+    "南京泛成生物科技有限公司是南京泛成国际控股有限公司的控股子公司，是行业内领先的原料供应商，",
+    "凭借现代化生产基地和专业研发能力、遍布全球的业务和销售网络，为客户提供一站式定制化解决方案。",
+    "我们经过三十余年的发展和经验积累，已成为全球范围内同行业中具有影响力的公司之一。",
   ],
   cta: { label: "更多", href: "#campus" },
 } as const;
@@ -91,7 +92,7 @@ export const NEWS: readonly { title: string; details: readonly string[] }[] = [
 
 export type FooterLink = {
   label: string;
-  page?: "about" | "products" | "insights" | "contact";
+  page?: "about" | "products" | "insights" | "news" | "contact";
 };
 
 export const FOOTER_COLUMNS: readonly { heading: string; links: readonly FooterLink[] }[] = [
@@ -107,6 +108,7 @@ export const FOOTER_COLUMNS: readonly { heading: string; links: readonly FooterL
     heading: "资讯与资源",
     links: [
       { label: "行业洞察", page: "insights" },
+      { label: "新闻资讯", page: "news" },
       { label: "技术白皮书", page: "insights" },
       { label: "常见解答", page: "contact" },
     ],
