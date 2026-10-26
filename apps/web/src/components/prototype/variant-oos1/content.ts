@@ -70,20 +70,23 @@ export const STRENGTHS = FIGMA_STRENGTHS.map((strength) => ({
   link: strength.link ? `了解${strength.title}` : null,
 }));
 
-const PENDING_DETAILS = ["[日期 · 地点待补充]", "[活动介绍待补充]"] as const;
-
 export const NEWS: readonly { title: string; details: readonly string[] }[] = [
   {
-    title: "1. In-cosmetics® 拉丁美洲展",
-    details: [
-      "2026 年 9 月 23 – 24 日 · 巴西 圣保罗",
-      "欢迎参加 2026 年 In-cosmetics® 拉丁美洲展！",
-    ],
+    title: "1. PCHi 2027 中国国际化妆品个人及家庭护理用品原料展览会",
+    details: ["2027 年 2 月 24 – 26 日 · 展位号 3D39"],
   },
-  { title: "2. IFSCC 大会 2026", details: PENDING_DETAILS },
-  { title: "3. Naturally Kiawah 研讨会 2026", details: PENDING_DETAILS },
-  { title: "4. In-cosmetics® Global 2026", details: PENDING_DETAILS },
-  { title: "5. PCHi 2026 个人护理品行业峰会", details: PENDING_DETAILS },
+  {
+    title: "2. FIC 2027 中国国际食品添加剂和配料展览会",
+    details: ["2027 年 3 月 17 – 19 日 · 展位号 3Y01"],
+  },
+  {
+    title: "3. FIA 2027 亚洲食品配料中国展",
+    details: ["2027 年 6 月 22 – 24 日 · 展位号 41H30"],
+  },
+  {
+    title: "4. PCT 2027 个人护理品技术高峰论坛",
+    details: ["2027 年 7 月"],
+  },
 ];
 
 export type FooterLink = {

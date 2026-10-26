@@ -497,6 +497,11 @@ const WORST_INSIGHT_ARTICLES: insights.InsightArticle[] = [
       "后生元、益生元与膳食纤维协同：面向GLP-1伴随营养与健康老龄化人群的日常型肠道健康饮品配方开发要点",
     navLabel: null,
     lead: "从原料筛选、发酵特征与胃肠耐受评估，到即饮饮料、冲调粉与条袋装等不同剂型的稳定性测试，系统梳理肠道健康饮品从概念到上市的关键环节",
+    cover: {
+      src: MISSING_IMAGE,
+      alt: "肠道健康饮品稳定性加速测试与流变学表征实验样品",
+      position: "50% 50%",
+    },
     thesis: {
       label: "核心观点",
       statement:
@@ -733,11 +738,11 @@ const WORST_INSIGHT_ARTICLES: insights.InsightArticle[] = [
             kind: "terms",
             items: [
               {
-                term: "Lacticaseibacillus rhamnosus GG",
+                term: "Lacticaseibacillus_rhamnosus_GG_ATCC_53103",
                 desc: "研究资料较多、应用历史较长的菌株之一，常用于儿童与成人肠道健康产品。",
               },
               {
-                term: "Bifidobacterium animalis subsp. lactis",
+                term: "Bifidobacterium animalis subsp. lactis BB-12 / HN019",
                 desc: "耐酸、耐氧能力相对较好，适合与乳制品和固体饮料体系复配。",
               },
               {
@@ -756,7 +761,8 @@ const WORST_INSIGHT_ARTICLES: insights.InsightArticle[] = [
           {
             kind: "paragraphs",
             items: [
-              "完整的加速与长期稳定性测试方案可参考：https://example.com/technical-library/probiotics/stability-testing-protocol-for-solid-beverages-and-stick-packs-2026-edition.pdf",
+              "完整的加速与长期稳定性测试方案可参考：https://example.com/technical-library/probiotics/stability_testing_protocol_for_solid_beverages_and_stick_packs_2026_edition_rev04_final.pdf",
+              "技术支持与COA索取邮箱：formulation.stability.support@northwind-nutraceutical-ingredients-holdings.example.com",
             ],
           },
           {

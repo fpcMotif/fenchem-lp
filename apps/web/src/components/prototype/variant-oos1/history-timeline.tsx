@@ -41,7 +41,6 @@ const BLUE_TRACK = "rgba(7, 67, 174, 0.16)";
 const GREEN_TRACK = "rgba(100, 167, 51, 0.3)";
 const BLUE_RING = "rgba(7, 67, 174, 0.38)";
 const DESKTOP = breakpoints.xl;
-const SHELL_EDGE = "max(0px, (100% - 1440px) / 2)";
 const PIN_QUERY = "(min-width: 1024px) and (min-height: 760px)";
 const PIN_SPRING = { stiffness: 260, damping: 40, restDelta: 0.0005 };
 const END_SNAP = 0.995;
@@ -95,10 +94,9 @@ const styles = stylex.create({
   },
   shell: {
     width: "100%",
-    maxWidth: 1440,
     marginInline: "auto",
     boxSizing: "border-box",
-    paddingInline: { default: 16, [media.tablet]: 40, [DESKTOP]: layout.inset120 },
+    paddingInline: { default: 16, [media.tablet]: 40, [DESKTOP]: layout.insetFluid },
   },
 
   header: {
@@ -115,6 +113,13 @@ const styles = stylex.create({
     lineHeight: 1.2,
     textWrap: "balance",
     color: color.ink,
+  },
+  caption: {
+    margin: 0,
+    paddingTop: 12,
+    fontSize: 14,
+    letterSpacing: "0.06em",
+    color: color.bodyText,
   },
 
   odometer: {
@@ -159,7 +164,7 @@ const styles = stylex.create({
     overflowY: "hidden",
     overscrollBehaviorX: "contain",
     scrollSnapType: "x proximity",
-    scrollPaddingInline: { default: 16, [media.tablet]: 40, [DESKTOP]: layout.inset120 },
+    scrollPaddingInline: { default: 16, [media.tablet]: 40, [DESKTOP]: layout.insetFluid },
     scrollbarWidth: "none",
     outlineStyle: { default: "none", ":focus-visible": "solid" },
     outlineWidth: 2,
@@ -172,11 +177,7 @@ const styles = stylex.create({
     gridAutoColumns: { default: 200, [breakpoints.md]: 232, [breakpoints.lg]: 248, [DESKTOP]: 280 },
     gridTemplateRows: { default: "auto 48px auto", [breakpoints.lg]: "auto 56px auto" },
     width: "max-content",
-    paddingInline: {
-      default: `calc(${SHELL_EDGE} + 16px)`,
-      [media.tablet]: `calc(${SHELL_EDGE} + 40px)`,
-      [DESKTOP]: `calc(${SHELL_EDGE} + ${layout.inset120})`,
-    },
+    paddingInline: { default: 16, [media.tablet]: 40, [DESKTOP]: layout.insetFluid },
     willChange: "transform",
   },
   list: {
@@ -643,12 +644,10 @@ export function HistoryTimeline({
   stickyTop,
   sx,
   plain = false,
-  showYear = false,
 }: {
   stickyTop: number;
   sx?: stylex.StyleXStyles;
   plain?: boolean;
-  showYear?: boolean;
 }) {
   const sectionRef = useRef<HTMLElement>(null);
   const viewportRef = useRef<HTMLDivElement>(null);
@@ -734,8 +733,9 @@ export function HistoryTimeline({
             <h2 id="about-history-title" {...stylex.props(styles.title)}>
               {ABOUT_HISTORY.title}
             </h2>
+            {plain ? <p {...stylex.props(styles.caption)}>{ABOUT_HISTORY.caption}</p> : null}
           </RiseReveal>
-          {showYear || !plain ? <Odometer year={year} /> : null}
+          {plain ? null : <Odometer year={year} />}
         </div>
 
         <div

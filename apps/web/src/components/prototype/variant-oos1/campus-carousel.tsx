@@ -20,6 +20,7 @@ const COUNT = CAMPUS_GALLERY.length;
 const BRAND_MARK = "/prototype/official-site/fenchem-logo.png";
 const DESKTOP = breakpoints.xl;
 const SLIDE_EASE = "cubic-bezier(0.32, 0.72, 0, 1)";
+const COUNTER_GRAY = "#6b7280";
 const SLIDE_MS = 520;
 
 const AUTOPLAY_MS = 1600;
@@ -138,6 +139,9 @@ const styles = stylex.create({
     textShadow: "0 1px 8px rgba(0, 0, 0, 0.3)",
     pointerEvents: "none",
   },
+  headFront: {
+    height: "20%",
+  },
   avatar: {
     flexShrink: 0,
     width: 26,
@@ -215,21 +219,11 @@ const styles = stylex.create({
   },
   status: {
     display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    gap: 4,
+    alignItems: "baseline",
+    justifyContent: "center",
+    gap: 11,
     minWidth: { default: 150, [DESKTOP]: 190 },
     margin: 0,
-  },
-  area: {
-    fontSize: 12,
-    letterSpacing: "0.16em",
-    color: colors.brandBlue700,
-  },
-  captionRow: {
-    display: "flex",
-    alignItems: "baseline",
-    gap: 10,
   },
   caption: {
     fontSize: 15,
@@ -242,7 +236,7 @@ const styles = stylex.create({
     fontSize: 13,
     fontVariantNumeric: "tabular-nums",
     letterSpacing: "0.08em",
-    color: color.muted,
+    color: COUNTER_GRAY,
   },
 });
 
@@ -408,9 +402,13 @@ export function CampusCarousel({
                   draggable={false}
                   {...stylex.props(styles.photo, dynamic.focus(photo.focus))}
                 />
-                <span aria-hidden="true" {...stylex.props(styles.head)}>
-                  <img src={BRAND_MARK} alt="" {...stylex.props(styles.avatar)} />
-                  {photo.caption}
+                <span aria-hidden="true" {...stylex.props(styles.head, front && styles.headFront)}>
+                  {front ? null : (
+                    <>
+                      <img src={BRAND_MARK} alt="" {...stylex.props(styles.avatar)} />
+                      {photo.caption}
+                    </>
+                  )}
                 </span>
               </button>
             );
@@ -427,12 +425,9 @@ export function CampusCarousel({
           <ChevronLeft size={20} aria-hidden="true" />
         </button>
         <p {...stylex.props(styles.status)}>
-          <span {...stylex.props(styles.area)}>{current.area}</span>
-          <span {...stylex.props(styles.captionRow)}>
-            <span {...stylex.props(styles.caption)}>{current.caption}</span>
-            <span lang="en" {...stylex.props(styles.counter)}>
-              {pad(active + 1)} / {pad(COUNT)}
-            </span>
+          <span {...stylex.props(styles.caption)}>{current.caption}</span>
+          <span lang="en" {...stylex.props(styles.counter)}>
+            {pad(active + 1)} / {pad(COUNT)}
           </span>
         </p>
         <button

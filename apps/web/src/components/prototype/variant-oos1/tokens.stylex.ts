@@ -29,6 +29,9 @@ export const layout = stylex.defineConsts({
   subBarHeight: "64px",
   inset120: "min(120px, 8.333vw)",
   inset124: "min(124px, 8.611vw)",
+  insetFluid: "8.333vw",
+  insetFluid124: "8.611vw",
+  insetFluid118: "8.194vw",
 });
 
 export const media = stylex.defineConsts({

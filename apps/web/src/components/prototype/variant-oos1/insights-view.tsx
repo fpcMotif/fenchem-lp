@@ -24,14 +24,12 @@ const DESKTOP = breakpoints.xl;
 
 const styles = stylex.create({
   pageSection: {
-    paddingTop: { default: 48, [DESKTOP]: 80 },
-    paddingBottom: { default: 64, [DESKTOP]: 104 },
+    paddingTop: { default: 32, [DESKTOP]: 48 },
+    paddingBottom: { default: 48, [DESKTOP]: 72 },
     containerType: "inline-size",
   },
   articleWrapper: {
     position: "relative",
-    maxWidth: 800,
-    marginInline: "auto",
   },
   articleMain: {
     width: "100%",
@@ -41,7 +39,7 @@ const styles = stylex.create({
     borderTopColor: HAIRLINE,
   },
   compactArticle: {
-    paddingBlock: { default: 28, [DESKTOP]: 36 },
+    paddingBlock: { default: 28, [DESKTOP]: 40 },
     borderBottomWidth: 1,
     borderBottomStyle: "solid",
     borderBottomColor: HAIRLINE,
@@ -53,7 +51,7 @@ const styles = stylex.create({
       [breakpoints.md]: "minmax(0, 5fr) minmax(0, 7fr)",
     },
     alignItems: "center",
-    columnGap: { default: 0, [breakpoints.md]: 40 },
+    columnGap: { default: 0, [breakpoints.md]: 40, [DESKTOP]: 72 },
     rowGap: 20,
   },
   articleHeadReverse: {
@@ -64,7 +62,7 @@ const styles = stylex.create({
   },
   articleFigure: {
     margin: 0,
-    aspectRatio: "4 / 3",
+    aspectRatio: "16 / 10",
     overflow: "hidden",
     backgroundColor: color.pageTint,
   },
@@ -82,6 +80,10 @@ const styles = stylex.create({
     flexDirection: "column",
     gap: 10,
     minWidth: 0,
+    maxWidth: 640,
+  },
+  readingColumn: {
+    maxWidth: 860,
   },
   compactTitle: {
     margin: 0,
@@ -377,7 +379,7 @@ function readMinutes(article: InsightArticle) {
   return Math.max(1, Math.round(text.length / CHARS_PER_MINUTE));
 }
 
-function InsightArticleView({
+export function InsightArticleView({
   article,
   coverEnd,
   open,
@@ -485,8 +487,8 @@ function InsightArticleView({
             transition={{ duration: reduce ? 0.15 : 0.4, ease: EASE }}
             {...stylex.props(styles.expandedWrap)}
           >
-            <div {...stylex.props(styles.compactPreview)}>{preview}</div>
-            <div {...stylex.props(styles.expandedInner)}>
+            <div {...stylex.props(styles.compactPreview, styles.readingColumn)}>{preview}</div>
+            <div {...stylex.props(styles.expandedInner, styles.readingColumn)}>
               {article.sections.map((section) => (
                 <InsightSectionView
                   key={section.slug}

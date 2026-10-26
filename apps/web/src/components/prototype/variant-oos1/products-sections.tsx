@@ -17,7 +17,8 @@ import { flushSync } from "react-dom";
 import { EASE } from "@/components/prototype/motion-constants";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 import {
-  CATALOG_CATEGORY_ID,
+  CATALOG_BY_CATEGORY,
+  DEFAULT_SOLUTIONS_CATEGORY_ID,
   SHEET_CATALOG_GROUPS,
   SOLUTIONS_BY_CATEGORY,
   type CatalogGroup,
@@ -208,11 +209,32 @@ const styles = stylex.create({
   ledgerTriggerOpen: {
     backgroundColor: "transparent",
   },
+  ledgerHead: {
+    margin: 0,
+    paddingBlock: 16,
+    backgroundColor: TINT_HEAD,
+    fontSize: 12,
+    fontWeight: 500,
+    lineHeight: "16px",
+    letterSpacing: "0.08em",
+    color: TINT_MUTED,
+  },
   ledgerName: {
     display: "flex",
-    alignItems: "baseline",
-    gap: 14,
+    alignItems: "flex-start",
+    gap: 24,
     minWidth: 0,
+  },
+  ledgerIndex: {
+    flexShrink: 0,
+    fontSize: 12,
+    lineHeight: "24px",
+    letterSpacing: "0.04em",
+    fontVariantNumeric: "tabular-nums",
+    color: TINT_MUTED,
+  },
+  ledgerIndexOpen: {
+    color: ACCENT,
   },
   ledgerNames: {
     display: "flex",
@@ -453,18 +475,6 @@ const styles = stylex.create({
     cursor: "default",
     transform: "none",
   },
-  areaCount: {
-    flexShrink: 0,
-    fontSize: 12,
-    fontWeight: 500,
-    lineHeight: "16px",
-    letterSpacing: "0.04em",
-    fontVariantNumeric: "tabular-nums",
-    color: TINT_MUTED,
-  },
-  areaCountActive: {
-    color: "rgba(255, 255, 255, 0.72)",
-  },
   areaLabel: {
     fontSize: 14,
     fontWeight: 500,
@@ -535,11 +545,6 @@ const styles = stylex.create({
     lineHeight: "20px",
     letterSpacing: "0.08em",
     color: TINT_MUTED,
-  },
-  railHeadingCount: {
-    fontWeight: 400,
-    letterSpacing: "0.04em",
-    fontVariantNumeric: "tabular-nums",
   },
   solutionTab: {
     position: "relative",
@@ -681,20 +686,16 @@ const styles = stylex.create({
     gridTemplateColumns: { default: "minmax(0, 1fr)", [DESKTOP]: "repeat(2, minmax(0, 1fr))" },
     gridTemplateRows: { default: "none", [DESKTOP]: "repeat(3, auto)" },
     gridAutoFlow: { default: "row", [DESKTOP]: "column" },
-    columnGap: { default: 0, [DESKTOP]: 40 },
+    columnGap: { default: 0, [DESKTOP]: 48 },
     margin: 0,
   },
   field: {
     display: "grid",
-    gridTemplateColumns: {
-      default: "minmax(0, 1fr)",
-      [MD]: "88px minmax(0, 1fr)",
-      [DESKTOP]: "minmax(0, 1fr)",
-    },
+    gridTemplateColumns: { default: "minmax(0, 1fr)", [MD]: "88px minmax(0, 1fr)" },
     alignContent: "start",
     columnGap: 16,
-    rowGap: { default: 6, [DESKTOP]: 4 },
-    paddingBlock: { default: 16, [MD]: 20, [DESKTOP]: 16 },
+    rowGap: 6,
+    paddingBlock: { default: 16, [MD]: 20 },
     borderTopWidth: 1,
     borderTopStyle: "solid",
     borderTopColor: TINT_RULE_SOFT,
@@ -705,6 +706,7 @@ const styles = stylex.create({
     fontWeight: 500,
     lineHeight: "24px",
     letterSpacing: "0.04em",
+    whiteSpace: "nowrap",
     color: TINT_MUTED,
   },
   fieldValue: {
@@ -780,10 +782,12 @@ function ToggleIcon({ open }: { open: boolean }) {
 
 function LedgerRow({
   group,
+  index,
   open,
   onToggle,
 }: {
   group: CatalogGroup;
+  index: number;
   open: boolean;
   onToggle: (trigger: HTMLElement) => void;
 }) {
@@ -809,6 +813,12 @@ function LedgerRow({
           )}
         >
           <span {...stylex.props(styles.ledgerName, styles.colName)}>
+            <span
+              aria-hidden="true"
+              {...stylex.props(styles.ledgerIndex, open && styles.ledgerIndexOpen)}
+            >
+              {String(index + 1).padStart(2, "0")}
+            </span>
             <span {...stylex.props(styles.ledgerNames)}>
               <span {...stylex.props(styles.ledgerPrimary)}>{group.label}</span>
               <span {...stylex.props(styles.ledgerLatin)}>{group.items.length} 款原料</span>
@@ -933,9 +943,10 @@ function FormulaSheet({ item }: { item: SolutionItem }) {
 }
 
 export function ProductCatalog({ categoryId }: { categoryId: string }) {
+  const catalog = CATALOG_BY_CATEGORY[categoryId];
+  const groups = catalog?.groups ?? SHEET_CATALOG_GROUPS;
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const startInstantLayout = useInstantLayoutTransition();
-  const groups = categoryId === CATALOG_CATEGORY_ID ? SHEET_CATALOG_GROUPS : [];
 
   const toggle = (index: number, trigger: HTMLElement) => {
     if (openIndex !== null && openIndex < index) {
@@ -949,8 +960,6 @@ export function ProductCatalog({ categoryId }: { categoryId: string }) {
     setOpenIndex(openIndex === index ? null : index);
   };
 
-  if (groups.length === 0) return null;
-
   return (
     <section
       id="products-catalog"
@@ -962,13 +971,18 @@ export function ProductCatalog({ categoryId }: { categoryId: string }) {
           <h2 id="catalog-title" {...stylex.props(styles.sectionTitle)}>
             产品目录
           </h2>
+          {catalog && <p {...stylex.props(styles.sectionLead)}>{catalog.lead}</p>}
         </header>
         <div {...stylex.props(styles.ledgerCard)}>
+          <p {...stylex.props(styles.ledgerGrid, styles.ledgerHead)}>
+            <span {...stylex.props(styles.colName)}>原料分类</span>
+          </p>
           <ul {...stylex.props(styles.ledger)}>
             {groups.map((group, index) => (
               <LedgerRow
                 key={group.id}
                 group={group}
+                index={index}
                 open={openIndex === index}
                 onToggle={(trigger) => toggle(index, trigger)}
               />
@@ -985,7 +999,8 @@ export function ProductSolutions({ categoryId }: { categoryId: string }) {
   const uid = useId();
   const areaListRef = useRef<HTMLDivElement>(null);
   const railRef = useRef<HTMLDivElement>(null);
-  const solutionSet = SOLUTIONS_BY_CATEGORY[categoryId];
+  const solutionSet =
+    SOLUTIONS_BY_CATEGORY[categoryId] ?? SOLUTIONS_BY_CATEGORY[DEFAULT_SOLUTIONS_CATEGORY_ID];
   const areas = solutionSet?.areas ?? [];
   const solutions = useMemo(
     () => (solutionSet ? orderByArea(solutionSet.areas, solutionSet.items) : []),
@@ -1052,13 +1067,7 @@ export function ProductSolutions({ categoryId }: { categoryId: string }) {
     event.currentTarget.querySelectorAll<HTMLElement>('[role="tab"]')[next]?.focus();
   };
 
-  const areaChips = [{ id: "all" as const, label: "全部" }, ...areas].map((entry) => ({
-    ...entry,
-    count:
-      entry.id === "all"
-        ? solutions.length
-        : solutions.filter((item) => item.area === entry.id).length,
-  }));
+  const areaChips = [{ id: "all" as const, label: "全部" }, ...areas];
 
   return (
     <section
@@ -1091,9 +1100,6 @@ export function ProductSolutions({ categoryId }: { categoryId: string }) {
                   {...stylex.props(styles.area, isActive && styles.areaActive)}
                 >
                   <span {...stylex.props(styles.areaLabel)}>{entry.label}</span>
-                  <span {...stylex.props(styles.areaCount, isActive && styles.areaCountActive)}>
-                    {entry.count}
-                  </span>
                 </button>
               );
             })}
@@ -1115,9 +1121,6 @@ export function ProductSolutions({ categoryId }: { categoryId: string }) {
                   <div key={group.id} {...stylex.props(styles.railGroup)}>
                     <p aria-hidden="true" {...stylex.props(styles.railHeading)}>
                       {group.label}
-                      <span {...stylex.props(styles.railHeadingCount)}>
-                        {group.items.length} 款
-                      </span>
                     </p>
                     {group.items.map((item) => {
                       const isSelected = item.id === selected.id;

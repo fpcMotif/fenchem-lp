@@ -117,6 +117,7 @@ export const ABOUT_MOMENT = {
 export const ABOUT_CAMPUS = {
   eyebrow: "Campus",
   title: "园区环境",
+  galleryTitle: "工作环境",
   photos: [
     {
       id: "aerial",
@@ -222,12 +223,6 @@ export const ABOUT_RD = {
   lead: "从原料开发、配方应用到功效验证，再到规模化生产，全链路自主可控。",
   image: "/prototype/about/campus-lab-lg.webp",
   imageAlt: "Fenchem R&D laboratory with glass-walled labs",
-  stats: [
-    { value: "35+", unit: "人", label: "资深研发团队" },
-    { value: "160+", unit: "项", label: "累计申请专利" },
-    { value: "85+", unit: "项", label: "授权专利" },
-    { value: "30+", unit: "项", label: "发明专利" },
-  ],
   pillars: [
     {
       title: "团队与硬件",
@@ -244,12 +239,75 @@ export const ABOUT_RD = {
   ],
 } as const;
 
+export const ABOUT_CERTIFICATIONS = {
+  id: "about-certifications",
+  title: "质量与认证",
+  items: [
+    { id: "iso-9001", name: "ISO 9001", image: "/prototype/about/certifications/iso-9001.png" },
+    { id: "iso-14001", name: "ISO 14001", image: "/prototype/about/certifications/iso-14001.png" },
+    { id: "iso-45001", name: "ISO 45001", image: "/prototype/about/certifications/iso-45001.png" },
+    { id: "ecovadis", name: "EcoVadis", image: "/prototype/about/certifications/ecovadis.png" },
+    { id: "smeta", name: "SMETA", image: "/prototype/about/certifications/smeta.png" },
+    {
+      id: "fssc-22000",
+      name: "FSSC 22000",
+      image: "/prototype/about/certifications/fssc-22000.png",
+    },
+    {
+      id: "brcgs",
+      name: "BRCGS Food Safety",
+      image: "/prototype/about/certifications/brcgs.png",
+    },
+    {
+      id: "usda-organic",
+      name: "USDA Organic",
+      image: "/prototype/about/certifications/usda-organic.png",
+    },
+    {
+      id: "gmp-plus",
+      name: "GMP+ Feed Safety Assurance",
+      image: "/prototype/about/certifications/gmp-plus.png",
+    },
+    {
+      id: "eurofins-ip-trust",
+      name: "Eurofins IP TRUST Site",
+      image: "/prototype/about/certifications/eurofins-ip-trust.png",
+    },
+    { id: "fami-qs", name: "FAMI-QS", image: "/prototype/about/certifications/fami-qs.png" },
+    {
+      id: "reach",
+      name: "REACH Compliant",
+      image: "/prototype/about/certifications/reach.png",
+    },
+    {
+      id: "rspo",
+      name: "RSPO Certified Sustainable Palm Oil",
+      image: "/prototype/about/certifications/rspo.png",
+    },
+    { id: "ok-kosher", name: "OK Kosher", image: "/prototype/about/certifications/ok-kosher.png" },
+    {
+      id: "star-k-kosher",
+      name: "Star-K Kosher",
+      image: "/prototype/about/certifications/star-k-kosher.png",
+    },
+    { id: "halal", name: "Halal", image: "/prototype/about/certifications/halal.png" },
+    {
+      id: "ecocert",
+      name: "ECOCERT Raw Material Cosmetics",
+      image: "/prototype/about/certifications/ecocert.png",
+    },
+    { id: "natrue", name: "NATRUE", image: "/prototype/about/certifications/natrue.png" },
+  ],
+} as const;
+
 export const ABOUT_CSR = {
   title: "社会责任",
   statement: ["平衡生态环境和客户需求，", "确保可持续发展。"],
   desc: "在碳达峰碳中和的大背景下，我们将可持续发展理念与企业发展战略相融合，在产品中积极运用可持续科技。",
   image: "/prototype/about/csr-campus-lake.webp",
   imageAlt: "Campus pond reflecting the Fenchem R&D building and trees",
+  forestImage: "/prototype/about/csr-forest.jpg",
+  forestImageAlt: "Sunlight falling through a mossy old-growth forest with a small stream",
   outcomes: [
     { icon: "factory", title: "降低工业能耗" },
     { icon: "recycle", title: "减少原料损耗" },

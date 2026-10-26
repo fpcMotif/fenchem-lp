@@ -7,7 +7,19 @@ import { useState, type ComponentType, type ReactNode } from "react";
 
 import { ContactCta } from "./contact-cta";
 import { CTA, PRODUCTS_CTA_SUBTITLE } from "./content";
-import { CATEGORIES, FEATURED_PRODUCT, type Category } from "./products-data";
+import {
+  CATEGORIES,
+  CATEGORY_HEROES,
+  FEATURED_PRODUCT,
+  FIBER_BRAND,
+  FIBER_SPOTLIGHTS,
+  HERO_FRAME,
+  SPOTLIGHT_FRAME,
+  SPOTLIGHT_HIDDEN_CATEGORIES,
+  type Category,
+  type CategoryHero,
+  type FiberSpotlight,
+} from "./products-data";
 import { ProductCatalog, ProductSolutions } from "./products-sections";
 import { kitStyles } from "./subpage-kit";
 import { color, ease, font, layout, media, zIndex } from "./tokens.stylex";
@@ -15,9 +27,13 @@ import { color, ease, font, layout, media, zIndex } from "./tokens.stylex";
 const MUTED_LABEL = "#52525b";
 const PHOTO_OUTLINE = "rgba(0, 0, 0, 0.1)";
 const ACCENT = "#78598d";
+const SPOTLIGHT_FONT = `"Noto Sans SC", ${font.body}`;
 
 const DESKTOP = breakpoints.xl;
 const LG = breakpoints.lg;
+const MD = breakpoints.md;
+
+const percentOf = (value: number, whole: number) => `${((value / whole) * 100).toFixed(3)}%`;
 
 const styles = stylex.create({
   root: {
@@ -31,7 +47,7 @@ const styles = stylex.create({
     position: "relative",
     width: "100%",
     display: "flex",
-    alignItems: "flex-end",
+    alignItems: "center",
     height: { default: 240, [breakpoints.md]: "clamp(300px, 31vw, 480px)" },
     overflow: "hidden",
     backgroundColor: color.navyDeep,
@@ -51,9 +67,38 @@ const styles = stylex.create({
     objectFit: "cover",
     objectPosition: "center 48%",
   },
+  heroLayer: (left: string, top: string, width: string, height: string) => ({
+    position: "absolute",
+    overflow: "hidden",
+    left: { default: 0, [MD]: left },
+    top: { default: 0, [MD]: top },
+    width: { default: "100%", [MD]: width },
+    height: { default: "100%", [MD]: height },
+  }),
+  heroLayerSecondary: {
+    display: { default: "none", [MD]: "block" },
+  },
+  heroLayerImg: {
+    display: "block",
+    width: "100%",
+    height: "100%",
+  },
+  heroLayerCover: {
+    objectFit: "cover",
+    objectPosition: { default: "right center", [MD]: "center" },
+  },
+  heroLayerFill: {
+    objectFit: "fill",
+  },
+  heroLayerCrop: (left: string, width: string) => ({
+    position: "absolute",
+    top: 0,
+    left,
+    width,
+    maxWidth: "none",
+  }),
   bannerContent: {
     position: "relative",
-    paddingBottom: { default: 24, [breakpoints.md]: 40 },
   },
   bannerTitle: {
     margin: 0,
@@ -193,6 +238,7 @@ const styles = stylex.create({
   },
   spotlightBrand: {
     margin: 0,
+    fontFamily: SPOTLIGHT_FONT,
     fontSize: { default: 36, [media.tablet]: 44, [DESKTOP]: 52 },
     fontWeight: 700,
     lineHeight: 1.1,
@@ -266,6 +312,7 @@ const styles = stylex.create({
     gap: 4,
   },
   cardName: {
+    fontFamily: SPOTLIGHT_FONT,
     fontSize: { default: 15, [DESKTOP]: 16 },
     fontWeight: 700,
     lineHeight: 1.5,
@@ -304,7 +351,144 @@ const styles = stylex.create({
   productTextActive: {
     color: ACCENT,
   },
+  fiberLogoHeading: {
+    margin: 0,
+  },
+  fiberLogo: {
+    display: "block",
+    width: { default: 240, [DESKTOP]: 341 },
+    height: "auto",
+  },
+  fiberSlogan: {
+    margin: 0,
+    paddingTop: { default: 20, [DESKTOP]: 32 },
+    fontSize: { default: 32, [media.tablet]: 44, [DESKTOP]: 52 },
+    fontWeight: 500,
+    lineHeight: 1.523,
+    letterSpacing: "0.083em",
+    color: color.ink,
+  },
+  fiberSloganLine: {
+    display: "block",
+  },
+  fiberStage: (backdrop: string) => ({
+    position: "relative",
+    overflow: "hidden",
+    width: "100%",
+    aspectRatio: `${SPOTLIGHT_FRAME.width} / ${SPOTLIGHT_FRAME.height}`,
+    backgroundColor: backdrop,
+  }),
+  fiberStageMirrored: {
+    transform: "scaleX(-1)",
+  },
+  fiberPhotoBox: (left: string, top: string, width: string, height: string) => ({
+    position: "absolute",
+    overflow: "hidden",
+    left,
+    top,
+    width,
+    height,
+  }),
+  fiberPhoto: (left: string, top: string, width: string, height: string) => ({
+    position: "absolute",
+    left,
+    top,
+    width,
+    height,
+    maxWidth: "none",
+  }),
 });
+
+function CategoryHeroArt({ hero }: { hero: CategoryHero }) {
+  return hero.layers.map(({ src, box, fit, crop }, index) => {
+    const primary = index === 0;
+    return (
+      <div
+        key={`${src}-${box.x}`}
+        {...stylex.props(
+          styles.heroLayer(
+            percentOf(box.x, HERO_FRAME.width),
+            percentOf(box.y, HERO_FRAME.height),
+            percentOf(box.width, HERO_FRAME.width),
+            percentOf(box.height, HERO_FRAME.height),
+          ),
+          !primary && styles.heroLayerSecondary,
+        )}
+      >
+        <img
+          src={src}
+          alt={primary ? hero.alt : ""}
+          fetchPriority={primary ? "high" : "auto"}
+          decoding="async"
+          {...stylex.props(
+            styles.heroLayerImg,
+            fit === "cover" ? styles.heroLayerCover : styles.heroLayerFill,
+            crop && styles.heroLayerCrop(`${crop.x}%`, `${crop.width}%`),
+          )}
+        />
+      </div>
+    );
+  });
+}
+
+function FiberSpotlightPanel({ spotlight }: { spotlight: FiberSpotlight }) {
+  const { photoBox, crop } = spotlight;
+  return (
+    <section
+      aria-labelledby="fiber-spotlight-title"
+      {...stylex.props(kitStyles.shell, kitStyles.inset120, styles.spotlightSection)}
+    >
+      <div {...stylex.props(styles.spotlightGrid)}>
+        <div {...stylex.props(styles.spotlightText)}>
+          <h2 id="fiber-spotlight-title" {...stylex.props(styles.fiberLogoHeading)}>
+            <img
+              src={FIBER_BRAND.logo}
+              alt={FIBER_BRAND.name}
+              width={341}
+              height={69}
+              decoding="async"
+              {...stylex.props(styles.fiberLogo)}
+            />
+          </h2>
+          <p {...stylex.props(styles.fiberSlogan)}>
+            {FIBER_BRAND.slogan.map((line) => (
+              <span key={line} {...stylex.props(styles.fiberSloganLine)}>
+                {line}
+              </span>
+            ))}
+          </p>
+        </div>
+        <div
+          {...stylex.props(
+            styles.fiberStage(spotlight.backdrop),
+            spotlight.mirrored && styles.fiberStageMirrored,
+          )}
+        >
+          <div
+            {...stylex.props(
+              styles.fiberPhotoBox(
+                percentOf(photoBox.x, SPOTLIGHT_FRAME.width),
+                percentOf(photoBox.y, SPOTLIGHT_FRAME.height),
+                percentOf(photoBox.width, SPOTLIGHT_FRAME.width),
+                percentOf(photoBox.height, SPOTLIGHT_FRAME.height),
+              ),
+            )}
+          >
+            <img
+              src={spotlight.photo}
+              alt={spotlight.photoAlt}
+              loading="lazy"
+              decoding="async"
+              {...stylex.props(
+                styles.fiberPhoto(`${crop.x}%`, `${crop.y}%`, `${crop.width}%`, `${crop.height}%`),
+              )}
+            />
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
 
 function CardImage({ src, alt, eager }: { src: string; alt: string; eager: boolean }) {
   const [failed, setFailed] = useState(false);
@@ -336,9 +520,12 @@ export function ProductsView({
   renderSpotlight?: (category: Category) => ReactNode;
 }) {
   const [activeTab, setActiveTab] = useState<string>("personal-care");
-  const [activeProductIndex, setActiveProductIndex] = useState<number>(0);
+  const [activeProductIndex, setActiveProductIndex] = useState<number | null>(null);
   const { compare } = useSearch({ strict: false });
   const activeCategory = CATEGORIES.find((cat) => cat.id === activeTab) ?? CATEGORIES[0];
+  const categoryHero = CATEGORY_HEROES[activeCategory.id];
+  const fiberSpotlight = FIBER_SPOTLIGHTS[activeCategory.id];
+  const showSpotlight = !SPOTLIGHT_HIDDEN_CATEGORIES.has(activeCategory.id);
 
   return (
     <div id="products-top" lang="zh-CN" {...stylex.props(styles.root)}>
@@ -348,15 +535,19 @@ export function ProductsView({
           {...stylex.props(styles.bannerWrap)}
         >
           <figure {...stylex.props(styles.bannerFigure)}>
-            <img
-              src={FEATURED_PRODUCT.bannerImage}
-              srcSet={FEATURED_PRODUCT.bannerSrcSet}
-              sizes="(min-width: 768px) clamp(1200px, 124vw, 1920px), 960px"
-              alt="Panorama of Fenchem products and applications in their natural form"
-              fetchPriority="high"
-              decoding="async"
-              {...stylex.props(styles.bannerImg)}
-            />
+            {categoryHero ? (
+              <CategoryHeroArt key={activeCategory.id} hero={categoryHero} />
+            ) : (
+              <img
+                src={FEATURED_PRODUCT.bannerImage}
+                srcSet={FEATURED_PRODUCT.bannerSrcSet}
+                sizes="(min-width: 768px) clamp(1200px, 124vw, 1920px), 960px"
+                alt="Panorama of Fenchem products and applications in their natural form"
+                fetchPriority="high"
+                decoding="async"
+                {...stylex.props(styles.bannerImg)}
+              />
+            )}
           </figure>
           <div {...stylex.props(kitStyles.shell, kitStyles.inset120, styles.bannerContent)}>
             <h1 {...stylex.props(styles.bannerTitle)}>{activeCategory.label}</h1>{" "}
@@ -398,68 +589,71 @@ export function ProductsView({
         </div>
       </div>
 
-      {renderSpotlight?.(activeCategory) ?? (
-        <section
-          aria-labelledby="spotlight-title"
-          {...stylex.props(kitStyles.shell, kitStyles.inset120, styles.spotlightSection)}
-        >
-          <div {...stylex.props(styles.spotlightGrid)}>
-            <div {...stylex.props(styles.spotlightText)}>
-              <h2 id="spotlight-title" {...stylex.props(styles.spotlightBrand)}>
-                {FEATURED_PRODUCT.brand}
-              </h2>
-              <p {...stylex.props(styles.spotlightTagline)}>{FEATURED_PRODUCT.tagline}</p>
-              <div {...stylex.props(styles.productList)}>
-                {FEATURED_PRODUCT.items.slice(0, 2).map((item, idx) => (
+      {renderSpotlight?.(activeCategory) ??
+        (!showSpotlight ? null : fiberSpotlight ? (
+          <FiberSpotlightPanel spotlight={fiberSpotlight} />
+        ) : (
+          <section
+            aria-labelledby="spotlight-title"
+            {...stylex.props(kitStyles.shell, kitStyles.inset120, styles.spotlightSection)}
+          >
+            <div {...stylex.props(styles.spotlightGrid)}>
+              <div {...stylex.props(styles.spotlightText)}>
+                <h2 id="spotlight-title" {...stylex.props(styles.spotlightBrand)}>
+                  {FEATURED_PRODUCT.brand}
+                </h2>
+                <p {...stylex.props(styles.spotlightTagline)}>{FEATURED_PRODUCT.tagline}</p>
+                <div {...stylex.props(styles.productList)}>
+                  {FEATURED_PRODUCT.items.slice(0, 2).map((item, idx) => (
+                    <button
+                      key={item.id}
+                      type="button"
+                      aria-pressed={activeProductIndex === idx}
+                      onClick={() => setActiveProductIndex(idx)}
+                      onMouseEnter={() => setActiveProductIndex(idx)}
+                      {...stylex.props(
+                        styles.productText,
+                        activeProductIndex === idx && styles.productTextActive,
+                      )}
+                    >
+                      <span {...stylex.props(styles.cardBody)}>
+                        <span {...stylex.props(styles.cardName)}>{item.englishName}</span>
+                        <span {...stylex.props(styles.cardDesc)}>{item.desc}</span>
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div
+                role="group"
+                aria-label={`${FEATURED_PRODUCT.items.length} core oil ingredient cards`}
+                {...stylex.props(styles.spotlightCardsWrap)}
+              >
+                {FEATURED_PRODUCT.items.map((item, idx) => (
                   <button
                     key={item.id}
                     type="button"
                     aria-pressed={activeProductIndex === idx}
+                    aria-label={item.englishName}
                     onClick={() => setActiveProductIndex(idx)}
                     onMouseEnter={() => setActiveProductIndex(idx)}
                     {...stylex.props(
-                      styles.productText,
-                      activeProductIndex === idx && styles.productTextActive,
+                      styles.productCard,
+                      activeProductIndex === idx && styles.productCardActive,
                     )}
                   >
-                    <span {...stylex.props(styles.cardBody)}>
-                      <span {...stylex.props(styles.cardName)}>{item.englishName}</span>
-                      <span {...stylex.props(styles.cardDesc)}>{item.desc}</span>
-                    </span>
+                    <CardImage src={item.cardImage} alt={item.cardAlt} eager={idx < 3} />
                   </button>
                 ))}
               </div>
             </div>
-            <div
-              role="group"
-              aria-label={`${FEATURED_PRODUCT.items.length} core oil ingredient cards`}
-              {...stylex.props(styles.spotlightCardsWrap)}
-            >
-              {FEATURED_PRODUCT.items.map((item, idx) => (
-                <button
-                  key={item.id}
-                  type="button"
-                  aria-pressed={activeProductIndex === idx}
-                  aria-label={item.englishName}
-                  onClick={() => setActiveProductIndex(idx)}
-                  onMouseEnter={() => setActiveProductIndex(idx)}
-                  {...stylex.props(
-                    styles.productCard,
-                    activeProductIndex === idx && styles.productCardActive,
-                  )}
-                >
-                  <CardImage src={item.cardImage} alt={item.cardAlt} eager={idx < 3} />
-                </button>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
+          </section>
+        ))}
 
       {CatalogSection && compare !== "baseline" && compare !== "solutions" ? (
         <CatalogSection />
       ) : (
-        <ProductCatalog key={activeTab} categoryId={activeTab} />
+        <ProductCatalog key={activeTab} categoryId={activeCategory.id} />
       )}
       {SolutionsSection && compare !== "baseline" && compare !== "catalog" ? (
         <Flow>

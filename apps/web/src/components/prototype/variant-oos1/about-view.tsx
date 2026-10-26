@@ -10,9 +10,9 @@ import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 import {
   ABOUT_BANNER,
   ABOUT_CAMPUS,
+  ABOUT_CERTIFICATIONS,
   ABOUT_CSR,
   ABOUT_HERO,
-  ABOUT_HISTORY,
   ABOUT_RD,
 } from "./about-data";
 import { CampusCarousel } from "./campus-carousel";
@@ -22,10 +22,10 @@ import { CTA } from "./content";
 import { CultureScenes } from "./culture-scenes";
 import { HistoryTimeline } from "./history-timeline";
 import { Reveal, SubPageNav, kitStyles } from "./subpage-kit";
-import { color, ease, font, layout, media, texture } from "./tokens.stylex";
-import { NavyBand } from "./abouts/oos1c/navy-band";
+import { color, ease, font, layout, media } from "./tokens.stylex";
+import { AboutNavyBand } from "./about-navy-band";
 
-const CSR_ACCENT = "#8cd6a3";
+const CSR_DESC_BREAK = ABOUT_CSR.desc.indexOf("，") + 1;
 const DESKTOP = breakpoints.xl;
 const MD = breakpoints.md;
 const LG = breakpoints.lg;
@@ -33,16 +33,6 @@ const RD_HAIRLINE = "rgba(26, 26, 26, 0.12)";
 const HERO_TITLE = "源于自然，精于科学";
 
 const STICKY_TOP = Number.parseFloat(layout.headerHeight) + Number.parseFloat(layout.subBarHeight);
-
-const [PROFILE_CHIP, ...LATER_CHIPS] = ABOUT_HERO.navChips;
-const AFTER_CULTURE = LATER_CHIPS.findIndex((chip) => chip.id === "about-culture") + 1;
-const NAV_CHIPS = [
-  PROFILE_CHIP,
-  ABOUT_HISTORY.navChip,
-  ...LATER_CHIPS.slice(0, AFTER_CULTURE),
-  ABOUT_RD.navChip,
-  ...LATER_CHIPS.slice(AFTER_CULTURE),
-];
 
 const fadeIn = stylex.keyframes({
   "0%": { opacity: 0 },
@@ -59,20 +49,6 @@ const styles = stylex.create({
     backgroundColor: color.pageTint,
     color: color.ink,
     fontFamily: font.body,
-  },
-  grain: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    width: "100%",
-    height: "100%",
-    backgroundImage: texture.grain,
-    opacity: 0.14,
-    mixBlendMode: "overlay",
-    pointerEvents: "none",
-  },
-  behind: {
-    zIndex: -1,
   },
   fill: {
     position: "absolute",
@@ -110,72 +86,64 @@ const styles = stylex.create({
     position: "absolute",
     inset: 0,
     backgroundImage:
-      "linear-gradient(180deg, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0) 22.222%), linear-gradient(0deg, rgba(6, 28, 66, 0.78) 0%, rgba(6, 28, 66, 0.34) 42%, rgba(6, 28, 66, 0) 66%)",
+      "linear-gradient(180deg, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0) 22.222%)",
   },
-  heroContent: {
-    position: "relative",
-    paddingBottom: { default: 24, [MD]: 40 },
-  },
-  heroTitle: {
-    margin: 0,
-    fontSize: { default: 34, [MD]: 48, [DESKTOP]: 60 },
-    fontWeight: 700,
-    lineHeight: 1.2,
-    letterSpacing: "0.072em",
-    textWrap: "balance",
-    color: colors.paper,
-  },
-  heroLead: {
-    margin: 0,
-    marginTop: { default: 8, [MD]: 20 },
-    fontSize: { default: 14, [MD]: 17 },
-    lineHeight: 1.8,
-    letterSpacing: "0.08em",
-    textWrap: "pretty",
-    color: "rgba(255, 255, 255, 0.84)",
+  visuallyHidden: {
+    position: "absolute",
+    width: 1,
+    height: 1,
+    padding: 0,
+    margin: -1,
+    overflow: "hidden",
+    clip: "rect(0, 0, 0, 0)",
+    whiteSpace: "nowrap",
+    borderWidth: 0,
   },
   profile: {
-    paddingTop: { default: 72, [DESKTOP]: 128 },
-    paddingBottom: { default: 56, [DESKTOP]: 80 },
+    paddingBlock: { default: 72, [DESKTOP]: 128 },
     backgroundColor: colors.paper,
   },
   profileGrid: {
     display: "grid",
-    gridTemplateColumns: { default: "minmax(0, 1fr)", [LG]: "repeat(2, minmax(0, 1fr))" },
+    gridTemplateColumns: {
+      default: "minmax(0, 1fr)",
+      [LG]: "repeat(2, minmax(0, 1fr))",
+      [DESKTOP]: "minmax(0, 552px) minmax(0, 1fr)",
+    },
     alignItems: "center",
-    rowGap: 32,
-    paddingInline: { default: 16, [media.tablet]: 40, [LG]: 0 },
-  },
-  profilePhotoCell: {
-    paddingInlineStart: { default: 0, [LG]: layout.inset120 },
-    paddingInlineEnd: { default: 0, [LG]: 48 },
+    gap: { default: 32, [LG]: 64 },
   },
   profilePhoto: {
     position: "relative",
+    justifySelf: { default: "stretch", [LG]: "end" },
+    width: { default: "100%", [DESKTOP]: 432 },
     overflow: "hidden",
     margin: 0,
-    aspectRatio: { default: "4 / 3", [LG]: "5 / 6" },
+    aspectRatio: { default: "4 / 3", [LG]: "432 / 485" },
     backgroundColor: color.blueTint,
   },
   profileLobby: {
-    objectPosition: "28% 50%",
+    position: "absolute",
+    top: { default: 0, [LG]: "-12.99%" },
+    left: { default: 0, [LG]: "-3.47%" },
+    width: { default: "100%", [LG]: "105.79%" },
+    height: { default: "100%", [LG]: "112.99%" },
+    maxWidth: "none",
+    objectFit: "cover",
   },
   profileTextCell: {
     display: "flex",
     flexDirection: "column",
     gap: { default: 24, [DESKTOP]: 48 },
-    paddingInlineStart: { default: 0, [LG]: 48 },
-    paddingInlineEnd: { default: 0, [LG]: layout.inset120 },
-    paddingBottom: { default: 0, [LG]: 28 },
   },
   profileName: {
     margin: 0,
-    maxWidth: "9em",
-    fontSize: { default: 32, [media.tablet]: 40, [LG]: "clamp(36px, 3.4vw, 48px)" },
+    fontSize: { default: 32, [media.tablet]: 40, [DESKTOP]: 48 },
     fontWeight: 500,
     lineHeight: 1.25,
     letterSpacing: "0.02em",
     textWrap: "balance",
+    whiteSpace: { default: "normal", [DESKTOP]: "nowrap" },
     color: color.ink,
   },
   profileEnglish: {
@@ -189,7 +157,7 @@ const styles = stylex.create({
   },
   profileLead: {
     margin: 0,
-    maxWidth: 510,
+    maxWidth: 528,
     fontSize: 16,
     fontWeight: 500,
     lineHeight: 1.6,
@@ -340,61 +308,6 @@ const styles = stylex.create({
   rdImage: {
     objectPosition: "50% 55%",
   },
-  rdStats: {
-    display: "grid",
-    gridTemplateColumns: {
-      default: "repeat(2, minmax(0, 1fr))",
-      [MD]: "repeat(4, minmax(0, 1fr))",
-    },
-    rowGap: 32,
-    margin: 0,
-    paddingBlock: { default: 32, [DESKTOP]: 48 },
-    borderBottomWidth: 1,
-    borderBottomStyle: "solid",
-    borderBottomColor: RD_HAIRLINE,
-  },
-  rdStat: {
-    display: "flex",
-    flexDirection: "column-reverse",
-    justifyContent: "flex-end",
-    gap: 10,
-    paddingInline: { default: 16, [DESKTOP]: 32 },
-    borderInlineStartWidth: 1,
-    borderInlineStartStyle: "solid",
-    borderInlineStartColor: RD_HAIRLINE,
-  },
-  rdStatWrapStart: {
-    paddingInlineStart: { default: 0, [MD]: 16, [DESKTOP]: 32 },
-    borderInlineStartColor: { default: "transparent", [MD]: RD_HAIRLINE },
-  },
-  rdStatFirst: {
-    paddingInlineStart: { default: 0, [MD]: 0, [DESKTOP]: 0 },
-    borderInlineStartColor: { default: "transparent", [MD]: "transparent" },
-  },
-  rdStatRow: {
-    display: "flex",
-    alignItems: "baseline",
-    gap: 4,
-    margin: 0,
-  },
-  rdStatValue: {
-    fontFamily: font.display,
-    fontSize: { default: 36, [DESKTOP]: 52 },
-    fontWeight: 500,
-    lineHeight: 1,
-    letterSpacing: "-0.03em",
-    fontVariantNumeric: "tabular-nums",
-    color: color.ink,
-  },
-  rdStatUnit: {
-    fontSize: 14,
-    color: color.muted,
-  },
-  rdStatLabel: {
-    fontSize: 14,
-    letterSpacing: "0.06em",
-    color: color.bodyText,
-  },
   rdPillars: {
     display: "flex",
     flexDirection: "column",
@@ -426,12 +339,42 @@ const styles = stylex.create({
     color: color.bodyText,
   },
 
+  certSection: {
+    paddingBottom: { default: 72, [DESKTOP]: 128 },
+    backgroundColor: colors.paper,
+  },
+  certGrid: {
+    display: "grid",
+    gridTemplateColumns: {
+      default: "repeat(2, minmax(0, 1fr))",
+      [MD]: "repeat(3, minmax(0, 1fr))",
+      [LG]: "repeat(5, minmax(0, 1fr))",
+    },
+    gap: 15,
+    margin: 0,
+    padding: 0,
+    listStyle: "none",
+  },
+  certItem: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  certLogo: {
+    display: "block",
+    width: "100%",
+    maxWidth: 228,
+    height: "auto",
+    aspectRatio: "2 / 1",
+    objectFit: "contain",
+  },
+
   csrSection: {
     position: "relative",
     overflow: "hidden",
     isolation: "isolate",
     paddingTop: { default: 260, [media.tablet]: 340, [DESKTOP]: 420 },
-    paddingBottom: { default: 64, [DESKTOP]: 104 },
+    paddingBottom: { default: 64, [DESKTOP]: 194 },
     backgroundColor: "#0a2a26",
     color: "#ffffff",
   },
@@ -439,9 +382,9 @@ const styles = stylex.create({
     position: "absolute",
     zIndex: -2,
     top: "-8%",
-    left: 0,
-    width: "100%",
-    height: "116%",
+    left: "-9.1%",
+    width: "125.6%",
+    height: "123%",
   },
   csrImage: {
     display: "block",
@@ -450,48 +393,37 @@ const styles = stylex.create({
     objectFit: "cover",
     objectPosition: "center 40%",
   },
-  csrScrim: {
-    zIndex: -1,
-    backgroundImage:
-      "linear-gradient(to top, rgba(6, 30, 27, 0.97) 0%, rgba(6, 30, 27, 0.86) 36%, rgba(6, 30, 27, 0.32) 64%, rgba(6, 30, 27, 0.05) 100%), linear-gradient(to right, rgba(6, 30, 27, 0.5), rgba(6, 30, 27, 0) 64%)",
-    pointerEvents: "none",
-  },
   csrInner: {
     display: "flex",
     flexDirection: "column",
-    gap: { default: 48, [DESKTOP]: 88 },
-  },
-  csrHead: {
-    display: "grid",
-    gridTemplateColumns: { default: "1fr", [DESKTOP]: "minmax(0, 1.2fr) minmax(0, 0.8fr)" },
-    gap: { default: 24, [DESKTOP]: 80 },
-    alignItems: "end",
+    gap: { default: 32, [DESKTOP]: 52 },
   },
   csrTitle: {
     margin: 0,
-    marginBottom: 20,
-    fontSize: 18,
-    fontWeight: 600,
-    letterSpacing: "0.12em",
-    color: CSR_ACCENT,
+    fontSize: { default: 28, [media.tablet]: 34, [DESKTOP]: 40 },
+    fontWeight: 700,
+    lineHeight: 1.2,
+    textWrap: "balance",
   },
   csrStatement: {
     margin: 0,
-    fontSize: { default: 28, [media.tablet]: 40, [DESKTOP]: 52 },
-    fontWeight: 700,
-    lineHeight: 1.4,
-    letterSpacing: "0.04em",
-  },
-  csrStatementLine: {
-    display: "block",
+    marginTop: 20,
+    fontSize: { default: 22, [media.tablet]: 28, [DESKTOP]: 32 },
+    fontWeight: 500,
+    lineHeight: { default: 1.6, [DESKTOP]: 2.275 },
+    letterSpacing: "0.065em",
+    textWrap: "pretty",
   },
   csrDesc: {
     margin: 0,
-    maxWidth: "28em",
     fontSize: 15,
     lineHeight: 2,
     letterSpacing: "0.04em",
+    textWrap: "pretty",
     color: "rgba(255, 255, 255, 0.78)",
+  },
+  csrDescLine: {
+    display: "block",
   },
 });
 
@@ -616,7 +548,11 @@ export function CampusGallery({ headerSx }: { headerSx?: stylex.StyleXStyles }) 
       {...stylex.props(styles.campusSection, kitStyles.anchor)}
     >
       <div {...stylex.props(kitStyles.shell, kitStyles.inset120)}>
-        <SectionHeader title={ABOUT_CAMPUS.title} titleId="about-campus-title" sx={headerSx} />
+        <SectionHeader
+          title={ABOUT_CAMPUS.galleryTitle}
+          titleId="about-campus-title"
+          sx={headerSx}
+        />
       </div>
       <CampusCarousel paused={openIndex !== null} onOpen={open} />
       <Lightbox
@@ -657,25 +593,6 @@ function RdSection() {
             {...stylex.props(styles.fill, styles.rdImage)}
           />
         </Reveal>
-        <dl {...stylex.props(styles.rdStats)}>
-          {ABOUT_RD.stats.map((stat, index) => (
-            <Reveal
-              key={stat.label}
-              step={index}
-              sx={[
-                styles.rdStat,
-                index % 2 === 0 && styles.rdStatWrapStart,
-                index === 0 && styles.rdStatFirst,
-              ]}
-            >
-              <dt {...stylex.props(styles.rdStatLabel)}>{stat.label}</dt>
-              <dd {...stylex.props(styles.rdStatRow)}>
-                <span {...stylex.props(styles.rdStatValue)}>{stat.value}</span>
-                <span {...stylex.props(styles.rdStatUnit)}>{stat.unit}</span>
-              </dd>
-            </Reveal>
-          ))}
-        </dl>
         <div {...stylex.props(styles.rdPillars)}>
           {ABOUT_RD.pillars.map((pillar, index) => (
             <Reveal key={pillar.title} step={index} sx={styles.rdPillar}>
@@ -684,6 +601,37 @@ function RdSection() {
             </Reveal>
           ))}
         </div>
+      </div>
+    </section>
+  );
+}
+
+function CertificationsSection() {
+  return (
+    <section
+      id={ABOUT_CERTIFICATIONS.id}
+      aria-labelledby="about-certifications-title"
+      {...stylex.props(styles.certSection, kitStyles.anchor)}
+    >
+      <div {...stylex.props(kitStyles.shell, kitStyles.inset120)}>
+        <SectionHeader title={ABOUT_CERTIFICATIONS.title} titleId="about-certifications-title" />
+        <Reveal step={1}>
+          <ul {...stylex.props(styles.certGrid)}>
+            {ABOUT_CERTIFICATIONS.items.map((item) => (
+              <li key={item.id} {...stylex.props(styles.certItem)}>
+                <img
+                  src={item.image}
+                  alt={item.name}
+                  width={260}
+                  height={130}
+                  loading="lazy"
+                  decoding="async"
+                  {...stylex.props(styles.certLogo)}
+                />
+              </li>
+            ))}
+          </ul>
+        </Reveal>
       </div>
     </section>
   );
@@ -707,30 +655,29 @@ function CsrSection() {
     >
       <m.div {...stylex.props(styles.csrMedia)} style={reduce ? undefined : { y: drift }}>
         <img
-          src={ABOUT_CSR.image}
-          alt={ABOUT_CSR.imageAlt}
+          src={ABOUT_CSR.forestImage}
+          alt={ABOUT_CSR.forestImageAlt}
           loading="lazy"
           decoding="async"
           {...stylex.props(styles.csrImage)}
         />
       </m.div>
-      <div aria-hidden="true" {...stylex.props(styles.fill, styles.csrScrim)} />
-      <div aria-hidden="true" {...stylex.props(styles.grain, styles.behind)} />
-      <div {...stylex.props(kitStyles.shell, kitStyles.inset120, styles.csrInner)}>
-        <Reveal sx={styles.csrHead}>
+      <div {...stylex.props(kitStyles.shell, kitStyles.inset120)}>
+        <Reveal sx={styles.csrInner}>
           <div>
             <h2 id="about-csr-title" {...stylex.props(styles.csrTitle)}>
               {ABOUT_CSR.title}
             </h2>
-            <p {...stylex.props(styles.csrStatement)}>
-              {ABOUT_CSR.statement.map((line) => (
-                <span key={line} {...stylex.props(styles.csrStatementLine)}>
-                  {line}
-                </span>
-              ))}
-            </p>
+            <p {...stylex.props(styles.csrStatement)}>{ABOUT_CSR.statement.join("")}</p>
           </div>
-          <p {...stylex.props(styles.csrDesc)}>{ABOUT_CSR.desc}</p>
+          <p {...stylex.props(styles.csrDesc)}>
+            <span {...stylex.props(styles.csrDescLine)}>
+              {ABOUT_CSR.desc.slice(0, CSR_DESC_BREAK)}
+            </span>
+            <span {...stylex.props(styles.csrDescLine)}>
+              {ABOUT_CSR.desc.slice(CSR_DESC_BREAK)}
+            </span>
+          </p>
         </Reveal>
       </div>
     </section>
@@ -744,18 +691,7 @@ function Profile() {
       aria-label="Company overview"
       {...stylex.props(styles.profile, kitStyles.anchor)}
     >
-      <div {...stylex.props(kitStyles.shell, styles.profileGrid)}>
-        <div {...stylex.props(styles.profilePhotoCell)}>
-          <Reveal as="figure" sx={styles.profilePhoto}>
-            <img
-              src={ABOUT_HERO.lobbyImage}
-              alt="Fenchem headquarters lobby with a curved ceiling and marble floor"
-              loading="lazy"
-              decoding="async"
-              {...stylex.props(styles.fill, styles.profileLobby)}
-            />
-          </Reveal>
-        </div>
+      <div {...stylex.props(kitStyles.shell, kitStyles.inset120, styles.profileGrid)}>
         <div {...stylex.props(styles.profileTextCell)}>
           <Reveal>
             <h2 {...stylex.props(styles.profileName)}>{ABOUT_HERO.title}</h2>
@@ -767,6 +703,15 @@ function Profile() {
             <p {...stylex.props(styles.profileLead)}>{ABOUT_HERO.lead}</p>
           </Reveal>
         </div>
+        <Reveal as="figure" step={1} sx={styles.profilePhoto}>
+          <img
+            src={ABOUT_HERO.lobbyImage}
+            alt="Fenchem headquarters lobby with a curved ceiling and marble floor"
+            loading="lazy"
+            decoding="async"
+            {...stylex.props(styles.profileLobby)}
+          />
+        </Reveal>
       </div>
     </section>
   );
@@ -786,24 +731,16 @@ export function AboutView({ onNavigateHome }: { onNavigateHome: (hash?: string) 
           {...stylex.props(styles.heroImage)}
         />
         <div aria-hidden="true" {...stylex.props(styles.heroScrim)} />
-        <div {...stylex.props(kitStyles.shell, kitStyles.inset120, styles.heroContent)}>
-          <h1 id="about-banner-title" {...stylex.props(styles.heroTitle)}>
-            {HERO_TITLE}
-          </h1>
-          <p {...stylex.props(styles.heroLead)}>{ABOUT_BANNER.lead}</p>
-        </div>
+        <h1 id="about-banner-title" {...stylex.props(styles.visuallyHidden)}>
+          {HERO_TITLE}
+        </h1>
       </section>
 
-      <SubPageNav current="关于我们" chips={NAV_CHIPS} onNavigateHome={onNavigateHome} />
+      <SubPageNav current="关于我们" onNavigateHome={onNavigateHome} />
 
       <Profile />
 
-      <HistoryTimeline
-        stickyTop={STICKY_TOP}
-        plain
-        showYear
-        sx={[kitStyles.anchor, styles.historyBand]}
-      />
+      <HistoryTimeline stickyTop={STICKY_TOP} plain sx={[kitStyles.anchor, styles.historyBand]} />
 
       <CampusGallery />
 
@@ -811,9 +748,11 @@ export function AboutView({ onNavigateHome }: { onNavigateHome: (hash?: string) 
 
       <RdSection />
 
+      <CertificationsSection />
+
       <CsrSection />
 
-      <NavyBand />
+      <AboutNavyBand />
 
       <ContactCta
         actions={[

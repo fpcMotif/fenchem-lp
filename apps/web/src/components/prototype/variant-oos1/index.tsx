@@ -111,7 +111,6 @@ const HOVER_MOTION =
   "@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)";
 
 const INSET_132 = "min(132px, 9.167vw)";
-const INSET_118 = "min(118px, 8.194vw)";
 
 const NAV_SECTION_IDS = NAV_ITEMS.map((item) => item.href.slice(1));
 
@@ -315,15 +314,14 @@ const styles = stylex.create({
   },
   shell: {
     width: "100%",
-    maxWidth: 1440,
     marginInline: "auto",
     boxSizing: "border-box",
   },
   inset120: {
-    paddingInline: { default: 16, [media.tablet]: 40, [DESKTOP]: layout.inset120 },
+    paddingInline: { default: 16, [media.tablet]: 40, [DESKTOP]: layout.insetFluid },
   },
   inset124: {
-    paddingInline: { default: 16, [media.tablet]: 40, [DESKTOP]: layout.inset124 },
+    paddingInline: { default: 16, [media.tablet]: 40, [DESKTOP]: layout.insetFluid124 },
   },
   inset132: {
     paddingInline: { default: 16, [media.tablet]: 40, [DESKTOP]: INSET_132 },
@@ -406,8 +404,8 @@ const styles = stylex.create({
     gridTemplateColumns: "1fr auto 1fr",
     alignItems: "start",
     height: layout.headerHeight,
-    paddingInlineStart: { default: 16, [media.tablet]: 40, [DESKTOP]: layout.inset120 },
-    paddingInlineEnd: { default: 16, [media.tablet]: 40, [DESKTOP]: INSET_118 },
+    paddingInlineStart: { default: 16, [media.tablet]: 40, [DESKTOP]: layout.insetFluid },
+    paddingInlineEnd: { default: 16, [media.tablet]: 40, [DESKTOP]: layout.insetFluid118 },
   },
   logoLink: {
     display: "block",
@@ -917,7 +915,6 @@ const styles = stylex.create({
     },
     gap: 2,
     width: "100%",
-    maxWidth: 1200,
   },
   quadrant: {
     position: "relative",
@@ -1054,7 +1051,6 @@ const styles = stylex.create({
       [DESKTOP]: "repeat(4, minmax(0, 1fr))",
     },
     width: "100%",
-    maxWidth: 1200,
     marginTop: { default: 48, [DESKTOP]: 96 },
     scrollMarginTop: `calc(${layout.headerHeight} + 24px)`,
   },
@@ -1135,9 +1131,9 @@ const styles = stylex.create({
     marginInlineStart: {
       default: 16,
       [media.tablet]: 40,
-      [DESKTOP]: `max(${layout.inset120}, calc(50% - 522px))`,
+      [DESKTOP]: `max(${layout.insetFluid}, calc(50% - 522px))`,
     },
-    marginInlineEnd: { default: 16, [media.tablet]: 40, [DESKTOP]: layout.inset120 },
+    marginInlineEnd: { default: 16, [media.tablet]: 40, [DESKTOP]: layout.insetFluid },
   },
   mapWrap: {
     position: "relative",

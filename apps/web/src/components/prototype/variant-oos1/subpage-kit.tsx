@@ -49,12 +49,11 @@ export const kitStyles = stylex.create({
   },
   shell: {
     width: "100%",
-    maxWidth: 1440,
     marginInline: "auto",
     boxSizing: "border-box",
   },
   inset120: {
-    paddingInline: { default: 16, [media.tablet]: 40, [DESKTOP]: layout.inset120 },
+    paddingInline: { default: 16, [media.tablet]: 40, [DESKTOP]: layout.insetFluid },
   },
   anchor: {
     scrollMarginTop: `calc(${layout.headerHeight} + ${layout.subBarHeight} + 24px)`,
@@ -448,16 +447,18 @@ export function SubPageBanner({
   );
 }
 
+const NO_CHIPS: readonly { id: string; label: string }[] = [];
+
 export function SubPageNav({
   current,
-  chips,
+  chips = NO_CHIPS,
   onNavigateHome,
   activeChip,
   onSelectChip,
   chipsLabel = "On this page",
 }: {
   current: string;
-  chips: readonly { id: string; label: string }[];
+  chips?: readonly { id: string; label: string }[];
   onNavigateHome: (hash?: string) => void;
   /** Controlled mode (filters): render buttons instead of scroll-spy anchors. */
   activeChip?: string;
@@ -504,39 +505,41 @@ export function SubPageNav({
             {current}
           </span>
         </nav>
-        <nav aria-label={chipsLabel} ref={chipListRef} {...stylex.props(styles.chipList)}>
-          {chips.map((chip, index) => {
-            const isActive = active === chip.id;
-            const sx = stylex.props(
-              styles.chip,
-              index === 0 && styles.chipLead,
-              isActive && styles.chipActive,
-              kitStyles.focusRing,
-            );
-            return controlled ? (
-              <button
-                key={chip.id}
-                type="button"
-                data-chip={chip.id}
-                aria-pressed={isActive}
-                onClick={() => onSelectChip(chip.id)}
-                {...sx}
-              >
-                {chip.label}
-              </button>
-            ) : (
-              <a
-                key={chip.id}
-                href={`#${chip.id}`}
-                data-chip={chip.id}
-                aria-current={isActive ? "location" : undefined}
-                {...sx}
-              >
-                {chip.label}
-              </a>
-            );
-          })}
-        </nav>
+        {chips.length > 0 && (
+          <nav aria-label={chipsLabel} ref={chipListRef} {...stylex.props(styles.chipList)}>
+            {chips.map((chip, index) => {
+              const isActive = active === chip.id;
+              const sx = stylex.props(
+                styles.chip,
+                index === 0 && styles.chipLead,
+                isActive && styles.chipActive,
+                kitStyles.focusRing,
+              );
+              return controlled ? (
+                <button
+                  key={chip.id}
+                  type="button"
+                  data-chip={chip.id}
+                  aria-pressed={isActive}
+                  onClick={() => onSelectChip(chip.id)}
+                  {...sx}
+                >
+                  {chip.label}
+                </button>
+              ) : (
+                <a
+                  key={chip.id}
+                  href={`#${chip.id}`}
+                  data-chip={chip.id}
+                  aria-current={isActive ? "location" : undefined}
+                  {...sx}
+                >
+                  {chip.label}
+                </a>
+              );
+            })}
+          </nav>
+        )}
       </div>
     </div>
   );

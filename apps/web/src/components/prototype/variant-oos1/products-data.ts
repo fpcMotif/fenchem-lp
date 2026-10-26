@@ -21,6 +21,34 @@ export interface FeaturedProduct {
   bannerSrcSet: string;
 }
 
+export interface FrameBox {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+export interface HeroLayer {
+  src: string;
+  box: FrameBox;
+  fit: "cover" | "fill";
+  crop?: { x: number; width: number };
+}
+
+export interface CategoryHero {
+  alt: string;
+  layers: HeroLayer[];
+}
+
+export interface FiberSpotlight {
+  photo: string;
+  photoAlt: string;
+  backdrop: string;
+  photoBox: FrameBox;
+  crop: FrameBox;
+  mirrored: boolean;
+}
+
 export interface CatalogItem {
   id: string;
   title: string;
@@ -77,7 +105,7 @@ export interface SolutionSet {
   items: SolutionItem[];
 }
 
-export const CATALOG_CATEGORY_ID = "functional-food";
+export const DEFAULT_SOLUTIONS_CATEGORY_ID = "personal-care";
 
 export const CATEGORIES: Category[] = [
   { id: "personal-care", label: "个人护理", englishLabel: "Personal care" },
@@ -94,23 +122,23 @@ export const FEATURED_ITEMS: FeaturedItem[] = [
     name: "液态乳木果油",
     englishName: "OLVE'Care™ Shea Oil",
     desc: "更加全能，突破形态界限。高流动性和铺展性，无需担心高添加量下的结晶问题。",
-    cardImage: "/products/card-1.png",
-    cardAlt: "OLVE'Care™ Shea Oil, a fluid liquid shea texture",
+    cardImage: "/products/figma/oos1-shea-tile-1.jpg",
+    cardAlt: "OLVE'Care™ Shea Oil, soft pastel brushstrokes of a fluid texture",
   },
   {
     id: "shea-butter",
     name: "精制乳木果油",
     englishName: "OLVE'Care™ Shea butter",
     desc: "经典固态版，肤感丝滑丰厚",
-    cardImage: "/products/card-6.png",
-    cardAlt: "OLVE'Care™ Shea Butter, a smooth spreadable texture",
+    cardImage: "/products/figma/oos1-shea-tile-2.jpg",
+    cardAlt: "OLVE'Care™ Shea Butter, a white shea blossom on pale blue",
   },
   {
     id: "acai-oil",
     name: "巴西莓油",
     englishName: "Amazon Açai Berry Oil",
     desc: "冷榨深绿色纯净油体，花青素与多酚含量极高，抗氧化抗糖化，弹润活肤。",
-    cardImage: "/products/card-3.png",
+    cardImage: "/products/figma/oos1-shea-tile-3.jpg",
     cardAlt: "Deep purple Amazonian açaí superfruit oil rich in polyphenols",
   },
   {
@@ -118,7 +146,7 @@ export const FEATURED_ITEMS: FeaturedItem[] = [
     name: "优质鳄梨油",
     englishName: "Virgin Avocado Oil",
     desc: "鲜切牛油果冷榨，富含 ω-9 与高含量不皂化物，抗炎修护，强韧屏障。",
-    cardImage: "/products/card-4.png",
+    cardImage: "/products/figma/oos1-shea-tile-4.jpg",
     cardAlt: "Freshly cut green avocado, rich in natural monounsaturated fatty acids",
   },
   {
@@ -126,16 +154,16 @@ export const FEATURED_ITEMS: FeaturedItem[] = [
     name: "巴西坚果油",
     englishName: "Wild Brazil Nut Oil",
     desc: "富含天然微量元素硒、维生素 E 与不饱和脂肪酸，赋予毛鳞片镜面光泽。",
-    cardImage: "/products/card-7.png",
-    cardAlt: "Amazonian Brazil nuts and their nourishing oil",
+    cardImage: "/products/figma/oos1-shea-tile-5.jpg",
+    cardAlt: "A split green nut with its pale kernel among leaves",
   },
   {
     id: "plant-squalane",
     name: "高纯植物角鲨烷",
     englishName: "Pure Plant Squalane",
     desc: "100% 植物橄榄来源，极致亲肤丝滑透气无黏腻，与皮肤脂质膜完美相融。",
-    cardImage: "/products/card-2.png",
-    cardAlt: "Glossy gel droplets of plant-derived squalane",
+    cardImage: "/products/figma/oos1-shea-tile-6.jpg",
+    cardAlt: "Soft peach brushstrokes of a silky plant squalane texture",
   },
 ];
 
@@ -148,6 +176,81 @@ export const FEATURED_PRODUCT: FeaturedProduct = {
     .map((width) => `/products/banner-${width}.webp ${width}w`)
     .join(", "),
 };
+
+export const HERO_FRAME = { width: 1440, height: 446 };
+
+export const CATEGORY_HEROES: Partial<Record<string, CategoryHero>> = {
+  "human-nutrition": {
+    alt: "A young athlete stretching forward on a track, wearing earbuds",
+    layers: [
+      {
+        src: "/products/figma/oos1-hero-nutrition.jpg",
+        box: { x: 341, y: 0, width: 1099, height: 473 },
+        fit: "cover",
+      },
+      {
+        src: "/products/figma/oos1-hero-nutrition-edge.jpg",
+        box: { x: 0, y: 0, width: 653, height: 473 },
+        fit: "fill",
+      },
+    ],
+  },
+  "functional-food": {
+    alt: "A woman smiling as she eats a home-cooked meal at a wooden table",
+    layers: [
+      {
+        src: "/products/figma/oos1-hero-functional-food.jpg",
+        box: { x: 349, y: -17, width: 1091, height: 463 },
+        fit: "cover",
+      },
+      {
+        src: "/products/figma/oos1-hero-functional-food.jpg",
+        box: { x: -188, y: -17, width: 821, height: 463 },
+        fit: "fill",
+        crop: { x: -0.25, width: 384.66 },
+      },
+    ],
+  },
+  "pet-health": {
+    alt: "A woman on an orange sofa smiling down at a corgi lying on the carpet",
+    layers: [
+      {
+        src: "/products/figma/oos1-hero-pet.jpg",
+        box: { x: -46, y: -129, width: 1531, height: 656 },
+        fit: "cover",
+      },
+    ],
+  },
+};
+
+export const FIBER_BRAND = {
+  logo: "/products/figma/in-fiber-logo.png",
+  name: "In-Fiber",
+  slogan: ["源自纤维", "不止纤维"],
+};
+
+export const SPOTLIGHT_FRAME = { width: 653.22, height: 484.91 };
+
+export const FIBER_SPOTLIGHTS: Partial<Record<string, FiberSpotlight>> = {
+  "human-nutrition": {
+    photo: "/products/figma/oos1-spotlight-nutrition.png",
+    photoAlt: "A laughing woman holding a supplement bottle against her cheek",
+    backdrop: "#c3e0ff",
+    photoBox: { x: 0, y: 22.27, width: 653, height: 462.1 },
+    crop: { x: -23.8, y: 0, width: 147.61, height: 100 },
+    mirrored: false,
+  },
+  "functional-food": {
+    photo: "/products/figma/oos1-spotlight-food.png",
+    photoAlt: "A smiling young man drinking from a fibre drink bottle",
+    backdrop: "#ffa362",
+    photoBox: { x: 27.22, y: 0, width: 626, height: 484.37 },
+    crop: { x: -10.86, y: -3, width: 126.2, height: 103.01 },
+    mirrored: true,
+  },
+};
+
+export const SPOTLIGHT_HIDDEN_CATEGORIES = new Set(["pet-health"]);
 
 export const CATALOG_GROUPS: CatalogGroup[] = [
   {
@@ -860,6 +963,15 @@ export const SHEET_CATALOG_GROUPS: CatalogGroup[] = [
     ],
   },
 ];
+
+export const CATALOG_BY_CATEGORY: Partial<
+  Record<string, { lead: string; groups: CatalogGroup[] }>
+> = {
+  "personal-care": {
+    lead: "精选个人护理全形态天然油脂与经典功效配方方案",
+    groups: CATALOG_GROUPS,
+  },
+};
 
 export const SOLUTION_AREAS: SolutionArea[] = [
   { id: "face", label: "面部护理", englishLabel: "Face care" },
