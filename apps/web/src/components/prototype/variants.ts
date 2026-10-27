@@ -28,6 +28,7 @@ type VariantEntry = {
 const ABOUT_NAMES: Record<string, string> = {
   oos1a: "Lattice / misregistered",
   oos1abandon: "Early about / before the figma pass",
+  oos1album: "Album flow / mirrored campus",
   oos1b: "Portal / pull back",
   oos1c: "Panorama / seam",
   oos1cover: "Coverflow campus / side peeks",

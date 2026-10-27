@@ -17,6 +17,8 @@ export interface FeaturedProduct {
   brand: string;
   tagline: string;
   items: FeaturedItem[];
+  mosaicImage: string;
+  mosaicAlt: string;
   bannerImage: string;
   bannerSrcSet: string;
 }
@@ -65,6 +67,13 @@ export interface CatalogGroup {
   sheetName?: string;
   intro?: string;
   items: CatalogItem[];
+}
+
+export interface CategoryCatalog {
+  lead?: string;
+  specLabel: string;
+  featuresLabel: string;
+  groups: CatalogGroup[];
 }
 
 export type SolutionAreaId =
@@ -171,6 +180,9 @@ export const FEATURED_PRODUCT: FeaturedProduct = {
   brand: "OLVE'Care™ Shea",
   tagline: "天然全形态乳木果油脂，适配任何配方剂型",
   items: FEATURED_ITEMS,
+  mosaicImage: "/products/figma/oos1-shea-mosaic.jpg",
+  mosaicAlt:
+    "Six painted oil ingredients: shea textures, shea blossom, açaí, avocado and Brazil nut",
   bannerImage: "/products/banner-1920.webp",
   bannerSrcSet: [1280, 1920, 2880, 4096]
     .map((width) => `/products/banner-${width}.webp ${width}w`)
@@ -964,12 +976,30 @@ export const SHEET_CATALOG_GROUPS: CatalogGroup[] = [
   },
 ];
 
-export const CATALOG_BY_CATEGORY: Partial<
-  Record<string, { lead: string; groups: CatalogGroup[] }>
-> = {
+const groupsForSheet = (sheetName: string) =>
+  SHEET_CATALOG_GROUPS.filter((group) => group.sheetName === sheetName);
+
+export const CATALOG_BY_CATEGORY: Partial<Record<string, CategoryCatalog>> = {
   "personal-care": {
     lead: "精选个人护理全形态天然油脂与经典功效配方方案",
+    specLabel: "INCI 名称",
+    featuresLabel: "特性&应用",
     groups: CATALOG_GROUPS,
+  },
+  "human-nutrition": {
+    specLabel: "核心规格/成分",
+    featuresLabel: "产品介绍",
+    groups: groupsForSheet("营养功能原料"),
+  },
+  "functional-food": {
+    specLabel: "产品规格",
+    featuresLabel: "产品介绍",
+    groups: groupsForSheet("普通食品原料"),
+  },
+  "pet-health": {
+    specLabel: "核心规格/成分",
+    featuresLabel: "产品介绍",
+    groups: groupsForSheet("宠物食品方向"),
   },
 };
 

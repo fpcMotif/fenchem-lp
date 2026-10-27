@@ -153,6 +153,17 @@ const styles = stylex.create({
     flexDirection: "column",
     gap: 18,
   },
+  bannerTextHidden: {
+    position: "absolute",
+    width: 1,
+    height: 1,
+    padding: 0,
+    margin: -1,
+    overflow: "hidden",
+    clip: "rect(0, 0, 0, 0)",
+    whiteSpace: "nowrap",
+    borderWidth: 0,
+  },
   bannerTextCompact: {
     gap: 12,
   },
@@ -375,6 +386,7 @@ export function SubPageBanner({
   imagePosition = "center 58%",
   titleId,
   size,
+  textHidden = false,
 }: {
   eyebrow?: string;
   title: string;
@@ -386,6 +398,7 @@ export function SubPageBanner({
   imagePosition?: string;
   titleId: string;
   size?: "compact" | "tall";
+  textHidden?: boolean;
 }) {
   const compact = size === "compact";
   const tall = size === "tall";
@@ -410,7 +423,13 @@ export function SubPageBanner({
           tall && styles.bannerContentTall,
         )}
       >
-        <div {...stylex.props(styles.bannerText, compact && styles.bannerTextCompact)}>
+        <div
+          {...stylex.props(
+            styles.bannerText,
+            compact && styles.bannerTextCompact,
+            textHidden && styles.bannerTextHidden,
+          )}
+        >
           {eyebrow ? (
             <p lang="en" {...stylex.props(styles.bannerEyebrow)}>
               {eyebrow}

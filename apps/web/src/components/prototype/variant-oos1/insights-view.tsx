@@ -323,6 +323,7 @@ export function InsightsView({ onNavigateHome }: { onNavigateHome: (target?: str
         image="/prototype/official-site/product-human-nutrition.webp"
         imageAlt={INSIGHTS_PAGE.imageAlt}
         titleId="insights-banner-title"
+        textHidden
       />
 
       <SubPageNav current="行业洞察" chips={[]} onNavigateHome={onNavigateHome} />

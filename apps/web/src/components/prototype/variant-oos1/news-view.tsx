@@ -218,6 +218,7 @@ export function NewsView({ onNavigateHome }: { onNavigateHome: (hash?: string) =
         imageAlt=""
         imagePosition="center 42%"
         size="compact"
+        textHidden
       />
       <SubPageNav current={NEWS_PAGE.title} onNavigateHome={onNavigateHome} />
       <section {...stylex.props(styles.section)}>

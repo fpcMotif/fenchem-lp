@@ -254,48 +254,10 @@ const styles = stylex.create({
     color: MUTED_LABEL,
     letterSpacing: "0.03em",
   },
-  spotlightCardsWrap: {
-    display: "grid",
-    gridTemplateColumns: {
-      default: "repeat(2, minmax(0, 1fr))",
-      [breakpoints.sm]: "repeat(3, minmax(0, 1fr))",
-    },
-    gap: { default: 8, [LG]: 10 },
-  },
-  productCard: {
-    appearance: "none",
-    display: "flex",
-    flexDirection: "column",
-    minWidth: 0,
-    padding: 0,
-    overflow: "hidden",
-    borderWidth: 0,
-    borderRadius: 0,
-    backgroundColor: "transparent",
-    textAlign: "start",
-    fontFamily: "inherit",
-    cursor: "pointer",
-    transform: {
-      default: null,
-      ":active": { default: null, [breakpoints.motionOk]: "scale(0.98)" },
-    },
-    outlineStyle: "solid",
-    outlineWidth: { default: 1, ":focus-visible": 3 },
-    outlineColor: { default: "transparent", ":focus-visible": colors.brandBlue700 },
-    outlineOffset: { default: 2, ":focus-visible": 4 },
-    transitionProperty: "outline-color, transform",
-    transitionDuration: "160ms",
-    transitionTimingFunction: ease.out,
-  },
-  productCardActive: {
-    outlineWidth: { default: 2, ":focus-visible": 3 },
-    outlineColor: { default: ACCENT, ":focus-visible": colors.brandBlue700 },
-    outlineOffset: 4,
-  },
   cardImg: {
     display: "block",
     width: "100%",
-    aspectRatio: "8 / 9",
+    aspectRatio: "1266 / 952",
     borderRadius: 0,
     objectFit: "cover",
     outlineWidth: 1,
@@ -624,28 +586,11 @@ export function ProductsView({
                   ))}
                 </div>
               </div>
-              <div
-                role="group"
-                aria-label={`${FEATURED_PRODUCT.items.length} core oil ingredient cards`}
-                {...stylex.props(styles.spotlightCardsWrap)}
-              >
-                {FEATURED_PRODUCT.items.map((item, idx) => (
-                  <button
-                    key={item.id}
-                    type="button"
-                    aria-pressed={activeProductIndex === idx}
-                    aria-label={item.englishName}
-                    onClick={() => setActiveProductIndex(idx)}
-                    onMouseEnter={() => setActiveProductIndex(idx)}
-                    {...stylex.props(
-                      styles.productCard,
-                      activeProductIndex === idx && styles.productCardActive,
-                    )}
-                  >
-                    <CardImage src={item.cardImage} alt={item.cardAlt} eager={idx < 3} />
-                  </button>
-                ))}
-              </div>
+              <CardImage
+                src={FEATURED_PRODUCT.mosaicImage}
+                alt={FEATURED_PRODUCT.mosaicAlt}
+                eager
+              />
             </div>
           </section>
         ))}

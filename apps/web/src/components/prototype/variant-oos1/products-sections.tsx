@@ -78,13 +78,9 @@ const bindEdgeScroll = (node: HTMLElement, reduce: boolean) => {
     if (speedX) node.scrollLeft += speedX;
     if (speedY) node.scrollTop += speedY;
     const canX =
-      speedX < 0
-        ? node.scrollLeft > 0
-        : node.scrollLeft + node.clientWidth < node.scrollWidth - 1;
+      speedX < 0 ? node.scrollLeft > 0 : node.scrollLeft + node.clientWidth < node.scrollWidth - 1;
     const canY =
-      speedY < 0
-        ? node.scrollTop > 0
-        : node.scrollTop + node.clientHeight < node.scrollHeight - 1;
+      speedY < 0 ? node.scrollTop > 0 : node.scrollTop + node.clientHeight < node.scrollHeight - 1;
     if ((speedX !== 0 && canX) || (speedY !== 0 && canY)) frame = requestAnimationFrame(tick);
     else frame = 0;
   };
@@ -95,9 +91,13 @@ const bindEdgeScroll = (node: HTMLElement, reduce: boolean) => {
     const y = event.clientY - box.top;
     const flow = getComputedStyle(node);
     const overflowY =
-      node.scrollHeight > node.clientHeight + 1 && flow.overflowY !== "hidden" && flow.overflowY !== "visible";
+      node.scrollHeight > node.clientHeight + 1 &&
+      flow.overflowY !== "hidden" &&
+      flow.overflowY !== "visible";
     const overflowX =
-      node.scrollWidth > node.clientWidth + 1 && flow.overflowX !== "hidden" && flow.overflowX !== "visible";
+      node.scrollWidth > node.clientWidth + 1 &&
+      flow.overflowX !== "hidden" &&
+      flow.overflowX !== "visible";
     speedX = 0;
     speedY = 0;
     if (overflowY) {
@@ -465,11 +465,30 @@ const styles = stylex.create({
     letterSpacing: "0.02em",
     color: TINT_INK,
   },
+  materialPrimaryRow: {
+    display: "flex",
+    flexWrap: "wrap",
+    alignItems: "center",
+    gap: 8,
+  },
+  materialTag: {
+    display: "inline-flex",
+    alignItems: "center",
+    height: 20,
+    paddingInline: 8,
+    borderRadius: 999,
+    backgroundColor: colors.brandBlue100,
+    fontSize: 11,
+    fontWeight: 500,
+    lineHeight: "20px",
+    color: ACCENT,
+  },
   materialInci: {
     margin: 0,
     fontSize: 13,
     lineHeight: "22px",
     color: TINT_MUTED,
+    whiteSpace: "pre-line",
   },
   materialFeatures: {
     margin: 0,
@@ -582,39 +601,32 @@ const styles = stylex.create({
     position: "absolute",
     top: 18,
     bottom: 18,
-    left: 7,
+    left: 11,
     zIndex: 3,
     display: { default: "none", [LG]: "block" },
     width: 1,
     backgroundImage:
       "linear-gradient(to bottom, transparent, oklch(0.55 0.1 255 / 0.18) 18%, oklch(0.55 0.1 255 / 0.18) 82%, transparent)",
-    opacity: 0,
     pointerEvents: "none",
-    transitionProperty: "opacity",
-    transitionDuration: { default: "0ms", [breakpoints.motionOk]: "220ms" },
-    transitionTimingFunction: ease.out,
   },
   railThumb: {
     position: "absolute",
     top: 0,
     left: -8,
     width: 17,
-    height: 17,
+    height: 22,
     pointerEvents: "auto",
     cursor: "grab",
     touchAction: "none",
     "::before": {
       content: '""',
       position: "absolute",
-      top: 5,
-      left: 5,
-      width: 7,
-      height: 7,
-      borderRadius: "50%",
-      backgroundColor: "oklch(0.74 0.1 248 / 0.34)",
-      backgroundImage:
-        "radial-gradient(circle at 32% 28%, oklch(1 0 0 / 0.95), oklch(0.8 0.08 245 / 0.55) 36%, oklch(0.58 0.14 255 / 0.2) 70%, transparent)",
-      boxShadow: "inset 0 0.5px 0.5px oklch(1 0 0 / 0.95), 0 0 6px oklch(0.64 0.12 255 / 0.35)",
+      top: 0,
+      left: 5.5,
+      width: 6,
+      height: 22,
+      borderRadius: 999,
+      backgroundColor: "oklch(0.5 0.05 255 / 0.85)",
     },
   },
   solutionTab: {
@@ -851,12 +863,58 @@ function ToggleIcon({ open }: { open: boolean }) {
   );
 }
 
+function MaterialTable({
+  items,
+  specLabel,
+  featuresLabel,
+}: {
+  items: CatalogGroup["items"];
+  specLabel: string;
+  featuresLabel: string;
+}) {
+  return (
+    <div {...stylex.props(styles.materialTable)}>
+      <div aria-hidden="true" {...stylex.props(styles.materialHead)}>
+        <span {...stylex.props(styles.colMaterialName)}>产品名称</span>
+        <span {...stylex.props(styles.colMaterialInci)}>{specLabel}</span>
+        <span {...stylex.props(styles.colMaterialFeatures)}>{featuresLabel}</span>
+      </div>
+      <ul {...stylex.props(styles.materialList)}>
+        {items.map((item) => {
+          const { primary, secondary } = splitParen(item.title);
+          return (
+            <li key={item.id} {...stylex.props(styles.material)}>
+              <span {...stylex.props(styles.materialName, styles.colMaterialName)}>
+                <span {...stylex.props(styles.materialPrimaryRow)}>
+                  <span>{primary}</span>
+                  {item.tag && <span {...stylex.props(styles.materialTag)}>{item.tag}</span>}
+                </span>
+                {secondary && <span {...stylex.props(styles.ledgerLatin)}>{secondary}</span>}
+              </span>
+              <p {...stylex.props(styles.materialInci, styles.colMaterialInci)}>
+                <Inci text={item.inci.trimEnd()} />
+              </p>
+              <p {...stylex.props(styles.materialFeatures, styles.colMaterialFeatures)}>
+                {item.features}
+              </p>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  );
+}
+
 function LedgerRow({
   group,
+  specLabel,
+  featuresLabel,
   open,
   onToggle,
 }: {
   group: CatalogGroup;
+  specLabel: string;
+  featuresLabel: string;
   open: boolean;
   onToggle: (trigger: HTMLElement) => void;
 }) {
@@ -914,32 +972,7 @@ function LedgerRow({
       >
         <div {...stylex.props(styles.ledgerGrid, styles.ledgerPanel)}>
           {group.intro && <p {...stylex.props(styles.ledgerIntro)}>{group.intro}</p>}
-          <div {...stylex.props(styles.materialTable)}>
-            <div aria-hidden="true" {...stylex.props(styles.materialHead)}>
-              <span {...stylex.props(styles.colMaterialName)}>产品名称</span>
-              <span {...stylex.props(styles.colMaterialInci)}>INCI 名称</span>
-              <span {...stylex.props(styles.colMaterialFeatures)}>特性&应用</span>
-            </div>
-            <ul {...stylex.props(styles.materialList)}>
-              {group.items.map((item) => {
-                const { primary, secondary } = splitParen(item.title);
-                return (
-                  <li key={item.id} {...stylex.props(styles.material)}>
-                    <span {...stylex.props(styles.materialName, styles.colMaterialName)}>
-                      {primary}
-                      {secondary && <span {...stylex.props(styles.ledgerLatin)}>{secondary}</span>}
-                    </span>
-                    <p {...stylex.props(styles.materialInci, styles.colMaterialInci)}>
-                      <Inci text={item.inci} />
-                    </p>
-                    <p {...stylex.props(styles.materialFeatures, styles.colMaterialFeatures)}>
-                      {item.features}
-                    </p>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
+          <MaterialTable items={group.items} specLabel={specLabel} featuresLabel={featuresLabel} />
         </div>
       </Collapse>
     </m.li>
@@ -1008,7 +1041,9 @@ function FormulaSheet({ item }: { item: SolutionItem }) {
 export function ProductCatalog({ categoryId }: { categoryId: string }) {
   const catalog = CATALOG_BY_CATEGORY[categoryId];
   const groups = catalog?.groups ?? SHEET_CATALOG_GROUPS;
-  const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const specLabel = catalog?.specLabel ?? "核心规格/成分";
+  const featuresLabel = catalog?.featuresLabel ?? "产品介绍";
+  const [openIndex, setOpenIndex] = useState<number | null>(() => (groups.length === 1 ? 0 : null));
   const startInstantLayout = useInstantLayoutTransition();
 
   const toggle = (index: number, trigger: HTMLElement) => {
@@ -1034,7 +1069,7 @@ export function ProductCatalog({ categoryId }: { categoryId: string }) {
           <h2 id="catalog-title" {...stylex.props(styles.sectionTitle)}>
             产品目录
           </h2>
-          {catalog && <p {...stylex.props(styles.sectionLead)}>{catalog.lead}</p>}
+          {catalog?.lead && <p {...stylex.props(styles.sectionLead)}>{catalog.lead}</p>}
         </header>
         <div {...stylex.props(styles.ledgerCard)}>
           <p {...stylex.props(styles.ledgerGrid, styles.ledgerHead)}>
@@ -1045,6 +1080,8 @@ export function ProductCatalog({ categoryId }: { categoryId: string }) {
               <LedgerRow
                 key={group.id}
                 group={group}
+                specLabel={group.sheetName === "普通食品原料" ? "产品规格" : specLabel}
+                featuresLabel={featuresLabel}
                 open={openIndex === index}
                 onToggle={(trigger) => toggle(index, trigger)}
               />
@@ -1060,7 +1097,6 @@ export function ProductSolutions({ categoryId }: { categoryId: string }) {
   const reduce = useReducedMotion();
   const uid = useId();
   const areaListRef = useRef<HTMLDivElement>(null);
-  const railFrameRef = useRef<HTMLDivElement>(null);
   const railRef = useRef<HTMLDivElement>(null);
   const railBarRef = useRef<HTMLDivElement>(null);
   const railThumbRef = useRef<HTMLDivElement>(null);
@@ -1110,13 +1146,11 @@ export function ProductSolutions({ categoryId }: { categoryId: string }) {
   }, [area, selectedId, reduce]);
 
   useEffect(() => {
-    const frame = railFrameRef.current;
     const rail = railRef.current;
     const bar = railBarRef.current;
     const thumb = railThumbRef.current;
-    if (!frame || !rail || !bar || !thumb) return;
+    if (!rail || !bar || !thumb) return;
 
-    let near = false;
     let drag: { pointer: number; startY: number; startScroll: number } | null = null;
 
     const paint = () => {
@@ -1129,18 +1163,8 @@ export function ProductSolutions({ categoryId }: { categoryId: string }) {
       const travel = Math.max(0, track - thumbHeight);
       const y = (rail.scrollTop / overflow) * travel;
       thumb.style.transform = `translate3d(0, ${y}px, 0)`;
-      bar.style.opacity = near ? "1" : "0";
-      thumb.style.pointerEvents = near ? "auto" : "none";
     };
 
-    const onEnter = () => {
-      near = true;
-      paint();
-    };
-    const onLeave = () => {
-      near = false;
-      paint();
-    };
     const onThumbDown = (event: PointerEvent) => {
       event.preventDefault();
       event.stopPropagation();
@@ -1162,8 +1186,6 @@ export function ProductSolutions({ categoryId }: { categoryId: string }) {
     const observer = new ResizeObserver(paint);
     observer.observe(rail);
     rail.addEventListener("scroll", paint, { passive: true });
-    frame.addEventListener("pointerenter", onEnter);
-    frame.addEventListener("pointerleave", onLeave);
     thumb.addEventListener("pointerdown", onThumbDown);
     thumb.addEventListener("pointermove", onThumbMove);
     thumb.addEventListener("pointerup", onThumbUp);
@@ -1172,8 +1194,6 @@ export function ProductSolutions({ categoryId }: { categoryId: string }) {
       releaseEdge();
       observer.disconnect();
       rail.removeEventListener("scroll", paint);
-      frame.removeEventListener("pointerenter", onEnter);
-      frame.removeEventListener("pointerleave", onLeave);
       thumb.removeEventListener("pointerdown", onThumbDown);
       thumb.removeEventListener("pointermove", onThumbMove);
       thumb.removeEventListener("pointerup", onThumbUp);
@@ -1241,7 +1261,7 @@ export function ProductSolutions({ categoryId }: { categoryId: string }) {
         )}
         {selected ? (
           <div {...stylex.props(styles.browser)}>
-            <div ref={railFrameRef} {...stylex.props(styles.railFrame)}>
+            <div {...stylex.props(styles.railFrame)}>
               <m.div
                 ref={railRef}
                 layoutScroll
