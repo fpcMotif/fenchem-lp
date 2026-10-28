@@ -16,7 +16,8 @@ import {
   type InsightBlock,
   type InsightSection,
 } from "./insights-data";
-import { SubPageBanner, SubPageNav, kitStyles } from "./subpage-kit";
+import { ProductsBanner, ProductsBannerImage, ProductsSubBar } from "./products-view";
+import { kitStyles } from "./subpage-kit";
 import { color, ease, media } from "./tokens.stylex";
 
 const HAIRLINE = "rgba(26, 26, 26, 0.12)";
@@ -34,13 +35,10 @@ const styles = stylex.create({
   articleMain: {
     width: "100%",
     minWidth: 0,
-    borderTopWidth: 1,
-    borderTopStyle: "solid",
-    borderTopColor: HAIRLINE,
   },
   compactArticle: {
     paddingBlock: { default: 28, [DESKTOP]: 40 },
-    borderBottomWidth: 1,
+    borderBottomWidth: { default: 1, ":last-child": 0 },
     borderBottomStyle: "solid",
     borderBottomColor: HAIRLINE,
   },
@@ -317,16 +315,14 @@ export function InsightsView({ onNavigateHome }: { onNavigateHome: (target?: str
 
   return (
     <div id="insights-top" lang="zh-CN" {...stylex.props(kitStyles.root)}>
-      <SubPageBanner
-        title="行业洞察"
-        lead={INSIGHTS_PAGE.lead}
-        image="/prototype/official-site/product-human-nutrition.webp"
-        imageAlt={INSIGHTS_PAGE.imageAlt}
-        titleId="insights-banner-title"
-        textHidden
-      />
+      <ProductsBanner title="行业洞察" label="Industry insights banner">
+        <ProductsBannerImage
+          src="/products/figma/oos1-insights-banner.jpg"
+          alt={INSIGHTS_PAGE.imageAlt}
+        />
+      </ProductsBanner>
 
-      <SubPageNav current="行业洞察" chips={[]} onNavigateHome={onNavigateHome} />
+      <ProductsSubBar current="行业洞察" onNavigateHome={onNavigateHome} />
 
       <div {...stylex.props(styles.pageSection)}>
         <div {...stylex.props(kitStyles.shell, kitStyles.inset120)}>

@@ -1,9 +1,10 @@
 import { LightboxStage } from "../shared/lightbox-stage";
 import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
+
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { m, useScroll, useTransform } from "motion/react";
-import { type ComponentType, useEffect, useRef, useState } from "react";
+import { type ComponentType, Fragment, useEffect, useRef, useState } from "react";
 
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
@@ -25,6 +26,9 @@ import { Reveal, SubPageNav, kitStyles } from "./subpage-kit";
 import { color, ease, font, layout, media } from "./tokens.stylex";
 import { AboutNavyBand } from "./about-navy-band";
 
+const wordSegmenter = new Intl.Segmenter("zh-CN", { granularity: "word" });
+const phrasesOf = (text: string) => Array.from(wordSegmenter.segment(text), (part) => part.segment);
+const RD_TAIL = 6;
 const CSR_DESC_BREAK = ABOUT_CSR.desc.indexOf("，") + 1;
 const DESKTOP = breakpoints.xl;
 const MD = breakpoints.md;
@@ -289,15 +293,7 @@ const styles = stylex.create({
     gap: { default: 16, [LG]: 48 },
     marginBottom: { default: 32, [DESKTOP]: 56 },
   },
-  rdLead: {
-    margin: 0,
-    maxWidth: "30em",
-    fontSize: 16,
-    lineHeight: 1.8,
-    letterSpacing: "0.04em",
-    textWrap: "pretty",
-    color: color.bodyText,
-  },
+
   rdFigure: {
     position: "relative",
     overflow: "hidden",
@@ -329,13 +325,23 @@ const styles = stylex.create({
     letterSpacing: "0.04em",
     color: color.ink,
   },
+  rdTail: {
+    whiteSpace: "nowrap",
+  },
   rdPillarDesc: {
     margin: 0,
     maxWidth: "40em",
     fontSize: 15,
     lineHeight: 1.9,
     letterSpacing: "0.02em",
+    textAlign: "justify",
+    textJustify: "inter-character",
     textWrap: "pretty",
+    lineBreak: "strict",
+    wordBreak: "keep-all",
+    overflowWrap: "anywhere",
+    textAutospace: "normal",
+    whiteSpace: "pre-line",
     color: color.bodyText,
   },
 
@@ -586,7 +592,6 @@ function RdSection() {
           <h2 id="about-rd-title" {...stylex.props(styles.sectionTitle)}>
             {ABOUT_RD.title}
           </h2>
-          <p {...stylex.props(styles.rdLead)}>{ABOUT_RD.lead}</p>
         </Reveal>
         <Reveal as="figure" step={1} sx={styles.rdFigure}>
           <img
@@ -603,7 +608,16 @@ function RdSection() {
           {ABOUT_RD.pillars.map((pillar, index) => (
             <Reveal key={pillar.title} step={index} sx={styles.rdPillar}>
               <h3 {...stylex.props(styles.rdPillarTitle)}>{pillar.title}</h3>
-              <p {...stylex.props(styles.rdPillarDesc)}>{pillar.desc}</p>
+              <p {...stylex.props(styles.rdPillarDesc)}>
+                {phrasesOf(pillar.desc.slice(0, -RD_TAIL)).map((phrase, i) => (
+                  <Fragment key={i}>
+                    {i > 0 ? <wbr /> : null}
+                    {phrase}
+                  </Fragment>
+                ))}
+                <wbr />
+                <span {...stylex.props(styles.rdTail)}>{pillar.desc.slice(-RD_TAIL)}</span>
+              </p>
             </Reveal>
           ))}
         </div>

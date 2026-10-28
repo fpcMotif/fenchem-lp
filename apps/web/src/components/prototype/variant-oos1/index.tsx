@@ -71,6 +71,7 @@ import {
   OFFICE_MAP_PINS,
   PRODUCTS,
   PRODUCTS_INTRO,
+  PRODUCT_MENU,
   STATS,
   STRENGTHS,
   STRENGTHS_INTRO,
@@ -346,6 +347,7 @@ const styles = stylex.create({
     textAlign: "center",
     textWrap: "pretty",
   },
+
   mutedText: {
     margin: 0,
     fontSize: 16,
@@ -422,8 +424,9 @@ const styles = stylex.create({
   },
   logo: {
     display: "block",
-    width: 161,
-    height: 52,
+    width: { default: 136, [breakpoints.md]: "clamp(124px, 11.18vw, 161px)" },
+    height: "auto",
+    aspectRatio: "161 / 52",
   },
   logoPart: {
     transformBox: "fill-box",
@@ -434,7 +437,7 @@ const styles = stylex.create({
     animationFillMode: "both",
   },
   nav: {
-    display: { default: "none", [DESKTOP]: "flex" },
+    display: { default: "none", [breakpoints.md]: "flex" },
     gridColumn: "2",
     marginTop: 23,
   },
@@ -448,9 +451,9 @@ const styles = stylex.create({
     display: "flex",
     alignItems: "center",
     height: 40,
-    paddingInline: 20,
+    paddingInline: { default: "clamp(8px, 1.38vw, 20px)", [DESKTOP]: 20 },
     whiteSpace: "nowrap",
-    fontSize: 16,
+    fontSize: { default: "clamp(14px, 1.11vw, 16px)", [DESKTOP]: 16 },
     fontWeight: 500,
     lineHeight: 1.2,
     color: { default: color.ink, ":hover": colors.brandBlue700 },
@@ -466,8 +469,8 @@ const styles = stylex.create({
     "::after": {
       content: '""',
       position: "absolute",
-      insetInlineStart: 21,
-      insetInlineEnd: 20,
+      insetInlineStart: { default: "clamp(9px, 1.38vw, 21px)", [DESKTOP]: 21 },
+      insetInlineEnd: { default: "clamp(8px, 1.38vw, 20px)", [DESKTOP]: 20 },
       bottom: 3,
       height: 1,
       backgroundColor: "#0743a2",
@@ -485,9 +488,9 @@ const styles = stylex.create({
     display: { default: "none", [breakpoints.md]: "flex" },
     alignItems: "center",
     gap: 8,
-    width: 170,
+    width: { default: "clamp(112px, 11.8vw, 170px)", [DESKTOP]: 170 },
     height: 38,
-    paddingInline: 16,
+    paddingInline: { default: 12, [DESKTOP]: 16 },
     boxSizing: "border-box",
     borderWidth: 1,
     borderStyle: "solid",
@@ -505,7 +508,7 @@ const styles = stylex.create({
     outlineOffset: 2,
   },
   searchPlaceholder: {
-    fontFamily: "inherit",
+    fontFamily: `Arial, ${font.body}`,
     fontSize: 14,
     lineHeight: 1.2,
     color: color.bodyText,
@@ -514,6 +517,7 @@ const styles = stylex.create({
     paddingBlock: 10,
     paddingInline: 6,
     marginBlock: -10,
+    marginInline: -6,
     borderWidth: 0,
     backgroundColor: "transparent",
     fontFamily: "inherit",
@@ -527,7 +531,7 @@ const styles = stylex.create({
     outlineOffset: -2,
   },
   menuButton: {
-    display: { default: "inline-flex", [DESKTOP]: "none" },
+    display: { default: "inline-flex", [breakpoints.md]: "none" },
     alignItems: "center",
     justifyContent: "center",
     width: 44,
@@ -587,6 +591,80 @@ const styles = stylex.create({
   },
   menuLinkActive: {
     color: colors.brandBlue700,
+  },
+  menuSubList: {
+    display: "flex",
+    flexDirection: "column",
+    margin: 0,
+    paddingBlock: 0,
+    paddingInlineStart: 16,
+    paddingInlineEnd: 0,
+    listStyleType: "none",
+  },
+  menuSubLink: {
+    minHeight: 40,
+    fontSize: 15,
+    fontWeight: 400,
+    color: { default: color.bodyText, ":hover": colors.brandBlue700 },
+  },
+  navItem: {
+    position: "relative",
+    display: "flex",
+  },
+  navDropdownWrap: {
+    position: "absolute",
+    top: "100%",
+    left: "50%",
+    transform: "translateX(-50%)",
+    zIndex: 10,
+    paddingTop: 10,
+  },
+  navDropdown: {
+    minWidth: 164,
+    margin: 0,
+    padding: 5,
+    listStyleType: "none",
+    boxSizing: "border-box",
+    backgroundImage:
+      "linear-gradient(165deg, rgba(255, 255, 255, 0.36) 0%, rgba(255, 255, 255, 0.16) 52%, rgba(235, 243, 255, 0.24) 100%)",
+    backdropFilter: "blur(24px) saturate(190%)",
+    WebkitBackdropFilter: "blur(24px) saturate(190%)",
+    borderWidth: 1,
+    borderStyle: "solid",
+    borderColor: "rgba(255, 255, 255, 0.48)",
+    borderRadius: 16,
+    boxShadow:
+      "inset 0 1px 0 0 rgba(255, 255, 255, 0.82), inset 0 -0.5px 0 0 rgba(255, 255, 255, 0.28), 0 18px 40px -14px rgba(11, 42, 92, 0.16), 0 1px 3px rgba(11, 42, 92, 0.05)",
+    transformOrigin: "top center",
+  },
+  navDropdownLink: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    minHeight: 36,
+    paddingInline: 18,
+    borderRadius: 11,
+    whiteSpace: "nowrap",
+    fontSize: 14,
+    fontWeight: 450,
+    letterSpacing: "0.03em",
+    color: { default: "rgba(18, 24, 38, 0.88)", ":hover": colors.brandBlue700 },
+    backgroundColor: {
+      default: "transparent",
+      ":hover": "rgba(255, 255, 255, 0.44)",
+    },
+    boxShadow: {
+      default: "none",
+      ":hover": "inset 0 1px 0 rgba(255, 255, 255, 0.72), 0 2px 8px -2px rgba(11, 42, 92, 0.06)",
+    },
+    textDecoration: "none",
+    transitionProperty: "color, background-color, box-shadow",
+    transitionDuration: "180ms",
+    transitionTimingFunction: ease.out,
+    outlineStyle: { default: "none", ":focus-visible": "solid" },
+    outlineWidth: 2,
+    outlineColor: colors.brandBlue700,
+    outlineOffset: -2,
   },
 
   hero: {
@@ -793,7 +871,7 @@ const styles = stylex.create({
     fontWeight: 500,
     lineHeight: 1.8,
     color: color.ink,
-    textAlign: "center",
+    textAlign: "left",
   },
   inkPhrase: {
     transitionProperty: "opacity",
@@ -1557,6 +1635,7 @@ function useNavFits(
 export type View = "home" | "about" | "products" | "insights" | "news" | "contact";
 export type AboutPageProps = { onNavigateHome: (hash?: string) => void };
 export type SubPageProps = AboutPageProps;
+export type ProductsPageProps = SubPageProps & { category?: { id: string } };
 export type HomePageProps = {
   onNavigate: (view: View, targetId?: string) => void;
   onOpenContactDialog: () => void;
@@ -1568,10 +1647,18 @@ function SiteHeader({
   onOpenContactDialog,
 }: {
   currentView?: View;
-  onNavigate?: (view: View, targetId?: string) => void;
+  onNavigate?: (view: View, targetId?: string, category?: string) => void;
   onOpenContactDialog?: () => void;
 }) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [productsOpen, setProductsOpen] = useState(false);
+  const openCategory = (event: React.MouseEvent<HTMLAnchorElement>, id: string) => {
+    if (!onNavigate) return;
+    event.preventDefault();
+    onNavigate("products", "products-top", id);
+    setProductsOpen(false);
+    setMenuOpen(false);
+  };
   const menuId = useId();
   const reduce = useReducedMotion();
   const scrolled = useScrolledPastTop();
@@ -1580,7 +1667,9 @@ function SiteHeader({
   const navRef = useRef<HTMLElement>(null);
   const navFits = useNavFits(innerRef, navRef);
   const closeOnEscape = (event: KeyboardEvent<HTMLElement>) => {
-    if (event.key === "Escape" && menuOpen) setMenuOpen(false);
+    if (event.key !== "Escape") return;
+    if (menuOpen) setMenuOpen(false);
+    setProductsOpen(false);
   };
   const isActive = (href: string) => {
     if (href === "#about") {
@@ -1678,17 +1767,60 @@ function SiteHeader({
           aria-label="Main"
           {...stylex.props(styles.nav, !navFits && styles.navCollapsed)}
         >
-          {NAV_ITEMS.map((item) => (
-            <a
-              key={item.href}
-              href={item.href}
-              aria-current={isActive(item.href) ? "location" : undefined}
-              onClick={(event) => handleItemClick(event, item.href)}
-              {...stylex.props(styles.navLink, isActive(item.href) && styles.navLinkActive)}
-            >
-              {item.label}
-            </a>
-          ))}
+          {NAV_ITEMS.map((item) => {
+            const link = (
+              <a
+                href={item.href}
+                aria-current={isActive(item.href) ? "location" : undefined}
+                onClick={(event) => handleItemClick(event, item.href)}
+                {...stylex.props(styles.navLink, isActive(item.href) && styles.navLinkActive)}
+              >
+                {item.label}
+              </a>
+            );
+            if (item.href !== "#products") return <Fragment key={item.href}>{link}</Fragment>;
+            return (
+              <div
+                key={item.href}
+                onMouseEnter={() => setProductsOpen(true)}
+                onMouseLeave={() => setProductsOpen(false)}
+                onFocus={() => setProductsOpen(true)}
+                onBlur={(event) => {
+                  if (!event.currentTarget.contains(event.relatedTarget)) setProductsOpen(false);
+                }}
+                {...stylex.props(styles.navItem)}
+              >
+                {link}
+                <AnimatePresence initial={false}>
+                  {productsOpen ? (
+                    <div {...stylex.props(styles.navDropdownWrap)}>
+                      <m.ul
+                        key="products-dropdown"
+                        aria-label="产品与应用"
+                        {...stylex.props(styles.navDropdown)}
+                        initial={{ opacity: 0, scale: 0.96, y: -4 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.97, y: -3 }}
+                        transition={{ duration: reduce ? 0.1 : 0.18, ease: EASE }}
+                      >
+                        {PRODUCT_MENU.map((entry) => (
+                          <li key={entry.id}>
+                            <a
+                              href="#products"
+                              onClick={(event) => openCategory(event, entry.id)}
+                              {...stylex.props(styles.navDropdownLink)}
+                            >
+                              {entry.label}
+                            </a>
+                          </li>
+                        ))}
+                      </m.ul>
+                    </div>
+                  ) : null}
+                </AnimatePresence>
+              </div>
+            );
+          })}
         </nav>
         <CorporateHeaderActions
           styles={{
@@ -1726,6 +1858,21 @@ function SiteHeader({
                   >
                     {item.label}
                   </a>
+                  {item.href === "#products" ? (
+                    <ul {...stylex.props(styles.menuSubList)}>
+                      {PRODUCT_MENU.map((entry) => (
+                        <li key={entry.id}>
+                          <a
+                            href="#products"
+                            onClick={(event) => openCategory(event, entry.id)}
+                            {...stylex.props(styles.menuLink, styles.menuSubLink)}
+                          >
+                            {entry.label}
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : null}
                 </li>
               ))}
             </ul>
@@ -2143,7 +2290,14 @@ function Products({ onOpenProductsPage }: { onOpenProductsPage?: () => void }) {
         <h2 id="oo-products-title" {...stylex.props(styles.sectionTitle)}>
           {PRODUCTS_INTRO.title}
         </h2>
-        <p {...stylex.props(styles.sectionLead)}>{PRODUCTS_INTRO.lead}</p>
+        <p {...stylex.props(styles.sectionLead)}>
+          {PRODUCTS_INTRO.lead.split(/(?<=原料，)/).map((line, index) => (
+            <Fragment key={line}>
+              {index > 0 ? <br /> : null}
+              {line}
+            </Fragment>
+          ))}
+        </p>
       </RiseReveal>
       <RiseReveal delay={riseDelay(1)} sx={styles.productsCta}>
         <a
@@ -2369,7 +2523,7 @@ export function VariantOOS1({
 }: {
   HomePage?: ComponentType<HomePageProps>;
   AboutPage?: ComponentType<SubPageProps>;
-  ProductsPage?: ComponentType<SubPageProps>;
+  ProductsPage?: ComponentType<ProductsPageProps>;
   InsightsPage?: ComponentType<SubPageProps>;
   NewsPage?: ComponentType<SubPageProps>;
   ContactPage?: ComponentType<SubPageProps>;
@@ -2418,7 +2572,10 @@ export function VariantOOS1({
   const [contactModalOpen, setContactModalOpen] = useState(false);
   const [scrollTarget, setScrollTarget] = useState<ScrollTarget | null>(null);
 
-  const handleNavigate = (targetView: View, targetId?: string) => {
+  const [productsCategory, setProductsCategory] = useState<{ id: string }>();
+
+  const handleNavigate = (targetView: View, targetId?: string, category?: string) => {
+    if (category) setProductsCategory({ id: category });
     setView(targetView);
     if (typeof window !== "undefined") {
       const url = new URL(window.location.href);
@@ -2470,7 +2627,10 @@ export function VariantOOS1({
                       }
                     />
                   ) : view === "products" ? (
-                    <ProductsPage onNavigateHome={(target) => handleNavigate("home", target)} />
+                    <ProductsPage
+                      category={productsCategory}
+                      onNavigateHome={(target) => handleNavigate("home", target)}
+                    />
                   ) : view === "insights" ? (
                     <InsightsPage
                       onNavigateHome={(target) =>

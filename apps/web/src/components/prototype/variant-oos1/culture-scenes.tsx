@@ -1,15 +1,15 @@
 import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
+import type { ReactNode } from "react";
 
 import { ABOUT_CULTURE } from "./about-data";
-import { Reveal } from "./subpage-kit";
-import { color, layout, media } from "./tokens.stylex";
+import { Reveal, kitStyles } from "./subpage-kit";
+import { color, media } from "./tokens.stylex";
 
 const DESKTOP = breakpoints.xl;
 const LG = breakpoints.lg;
-const PETAL = "/prototype/about/figma/culture-card-petal.jpg";
-const WAVE = "/prototype/about/figma/culture-card-wave.jpg";
-const DESC_GRAY = "#595959";
+const TILE_SIZE = 384;
+const STROKE_WIDTH = 5;
 
 const CULTURE_TITLES: Record<string, string> = { 专业和专注: "专业与专注" };
 
@@ -21,17 +21,11 @@ const cultureValue = (title: string) => {
 
 const styles = stylex.create({
   section: {
-    paddingTop: { default: 72, [DESKTOP]: 143 },
-    paddingBottom: { default: 72, [DESKTOP]: 128 },
+    paddingTop: { default: 72, [DESKTOP]: 63 },
+    paddingBottom: { default: 72, [DESKTOP]: 265 },
     backgroundColor: colors.paper,
   },
-  shell: {
-    width: "100%",
-    maxWidth: 1440,
-    marginInline: "auto",
-    boxSizing: "border-box",
-    paddingInline: { default: 16, [media.tablet]: 40, [DESKTOP]: layout.inset120 },
-  },
+
   header: {
     marginBottom: { default: 40, [DESKTOP]: 64 },
   },
@@ -41,6 +35,7 @@ const styles = stylex.create({
     fontSize: { default: 26, [media.tablet]: 32, [DESKTOP]: 40 },
     fontWeight: 700,
     lineHeight: 1.2,
+
     textWrap: "balance",
     color: color.ink,
   },
@@ -48,84 +43,83 @@ const styles = stylex.create({
     display: "grid",
     gridTemplateColumns: { default: "minmax(0, 1fr)", [LG]: "repeat(3, minmax(0, 1fr))" },
     gap: { default: 16, [LG]: 24 },
+    maxWidth: { default: TILE_SIZE, [LG]: "none" },
+    marginInline: "auto",
   },
   card: {
-    position: "relative",
     display: "flex",
     flexDirection: "column",
-    alignItems: "center",
-    gap: 16,
+    alignItems: "stretch",
+  },
+  tile: {
     aspectRatio: "1 / 1",
     overflow: "hidden",
-    boxSizing: "border-box",
-    paddingTop: "37.92%",
-    paddingInline: "8.33%",
-    backgroundColor: colors.paper,
-    isolation: "isolate",
   },
-  layer: {
-    position: "absolute",
-    zIndex: -1,
+  art: {
     display: "block",
-    maxWidth: "none",
-    pointerEvents: "none",
+    width: "100%",
+    height: "100%",
   },
-  layerBox: (left: string, top: string, width: string, height: string, blur: number) => ({
-    left,
-    top,
-    width,
-    height,
-    filter: `blur(${blur}px)`,
-  }),
   cardTitle: {
     margin: 0,
-    fontSize: { default: 28, [DESKTOP]: 32 },
-    fontWeight: 400,
-    lineHeight: 1.2,
+    marginTop: 20,
+    fontSize: { default: 22, [DESKTOP]: 24 },
+    fontWeight: 700,
+    lineHeight: 1.3,
+    letterSpacing: "0.06em",
     textAlign: "center",
     color: color.ink,
   },
   cardDesc: {
-    alignSelf: "stretch",
-    maxWidth: 320,
     margin: 0,
-    fontSize: 16,
-    lineHeight: 1.2,
-    color: DESC_GRAY,
+    marginTop: 10,
+    fontSize: 14,
+    lineHeight: 1.8,
+    letterSpacing: "0.02em",
+    textAlign: "center",
+    color: color.bodyText,
+    textWrap: "balance",
   },
 });
-
-type Layer = { src: string; box: [string, string, string, string]; blur: number };
-
-const PETAL_LAYER: Layer = { src: PETAL, box: ["-86.98%", "0%", "614.1%", "263%"], blur: 40 };
-const WAVE_WIDE: Layer = {
-  src: WAVE,
-  box: ["-1208.3%", "-20.01%", "2079.4%", "891.2%"],
-  blur: 10,
-};
 
 const CARDS = [
   {
     value: cultureValue("安静与坚持"),
-    layers: [PETAL_LAYER, { src: WAVE, box: ["-525.4%", "-13.36%", "942.4%", "404.3%"], blur: 10 }],
+    fill: "#6a8ece",
+
+    art: (
+      <g stroke="#394f77">
+        <ellipse cx={191.505} cy={95.609} rx={93.5} ry={34} />
+        <ellipse cx={191.005} cy={170.609} rx={113} ry={41} />
+        <ellipse cx={191.505} cy={266.609} rx={151.5} ry={55} />
+      </g>
+    ),
   },
   {
     value: cultureValue("专业和专注"),
-    layers: [
-      PETAL_LAYER,
-      WAVE_WIDE,
-      { src: WAVE, box: ["-46.41%", "-28.46%", "843%", "410.3%"], blur: 64.2 },
-    ],
+    fill: "#e3e3e3",
+
+    art: (
+      <g stroke="#8e8e93">
+        <circle cx={189.005} cy={191.609} r={66.0714} />
+        <circle cx={189.005} cy={191.609} r={111.786} />
+        <circle cx={189.005} cy={191.609} r={157.5} />
+      </g>
+    ),
   },
   {
     value: cultureValue("合作与创新"),
-    layers: [
-      PETAL_LAYER,
-      WAVE_WIDE,
-      { src: WAVE, box: ["-389.6%", "-8.63%", "843%", "410.3%"], blur: 64.2 },
-    ],
+    fill: "#93c170",
+
+    art: (
+      <path
+        d="M309.71 40.609H159.576L61.005 246.102H167.159L83.752 349.609L337 200.437H208.1L309.71 40.609Z"
+        stroke="#558b2b"
+        strokeLinejoin="round"
+      />
+    ),
   },
-] satisfies { value: ReturnType<typeof cultureValue>; layers: Layer[] }[];
+] satisfies { value: ReturnType<typeof cultureValue>; fill: string; art: ReactNode }[];
 
 export function CultureScenes({ sx }: { sx?: stylex.StyleXStyles }) {
   return (
@@ -134,7 +128,7 @@ export function CultureScenes({ sx }: { sx?: stylex.StyleXStyles }) {
       aria-labelledby="about-culture-title"
       {...stylex.props(styles.section, sx)}
     >
-      <div {...stylex.props(styles.shell)}>
+      <div {...stylex.props(kitStyles.shell, kitStyles.inset120)}>
         <Reveal sx={styles.header}>
           <h2 id="about-culture-title" {...stylex.props(styles.title)}>
             {ABOUT_CULTURE.title}
@@ -143,16 +137,19 @@ export function CultureScenes({ sx }: { sx?: stylex.StyleXStyles }) {
         <div {...stylex.props(styles.cards)}>
           {CARDS.map((card, index) => (
             <Reveal key={card.value.title} as="article" step={index} sx={styles.card}>
-              {card.layers.map((layer) => (
-                <img
-                  key={layer.box.join()}
-                  src={layer.src}
-                  alt=""
-                  loading="lazy"
-                  decoding="async"
-                  {...stylex.props(styles.layer, styles.layerBox(...layer.box, layer.blur))}
-                />
-              ))}
+              <div {...stylex.props(styles.tile)}>
+                <svg
+                  viewBox={`0 0 ${TILE_SIZE} ${TILE_SIZE}`}
+                  fill="none"
+                  strokeWidth={STROKE_WIDTH}
+                  aria-hidden="true"
+                  focusable="false"
+                  {...stylex.props(styles.art)}
+                >
+                  <rect width={TILE_SIZE} height={TILE_SIZE} fill={card.fill} />
+                  {card.art}
+                </svg>
+              </div>
               <h3 {...stylex.props(styles.cardTitle)}>{card.value.title}</h3>
               <p {...stylex.props(styles.cardDesc)}>{card.value.desc}</p>
             </Reveal>

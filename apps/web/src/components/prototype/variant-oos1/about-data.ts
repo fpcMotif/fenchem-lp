@@ -11,7 +11,7 @@ export const ABOUT_BANNER = {
 export const ABOUT_HERO = {
   title: "南京泛成国际控股有限公司",
   englishTitle: "Fenchem Holdings Corporation Ltd.",
-  lead: "自1995年创立于南京，专注于为食品营养品、宠物健康和个人护理行业提供原料和解决方案，建立起集研产销于一体的完整产业链。",
+  lead: "FENCHEM自1995年创立于南京，专注于为食品营养品、宠物健康和个人护理行业提供原料和解决方案，建立起集研产销于一体的完整产业链。",
   networkLabel: "全球 16 家分支机构，遍布",
   countries: [
     "美国",
@@ -219,25 +219,29 @@ export const ABOUT_CULTURE = {
 
 export const ABOUT_RD = {
   navChip: { label: "研发智造", english: "R&D", id: "about-rd" },
-  title: "研发与智造",
-  lead: "从原料开发、配方应用到功效验证，再到规模化生产，全链路自主可控。",
+  title: "研发智造",
+
   image: "/prototype/about/campus-lab-lg.webp",
   imageAlt: "Fenchem R&D laboratory with glass-walled labs",
   pillars: [
     {
-      title: "团队与硬件",
-      desc: "泛成研发中心配备国内外先进的试验仪器，小试中试设备，为客户提供专业的产品解决方案。我们的研发技术人员在原料开发、配方应用和功效验证等方面拥有丰富的经验。",
+      title: "生产基地",
+      desc: "我们的生产基地坐落于南京市溧水区经济开发区，紧邻禄口国际机场，占地面积约 35000㎡。工厂严格依照国际标准规划建设，融合精益化、自动化、信息化生产体系。",
     },
     {
-      title: "核心技术",
-      desc: "研发中心专注于从提取、分离、精制、物理改性等工艺，以产品应用和解决方案为导向。近年来，通过自主研发及和外部科研力量合作，经过多年的投入和积累，截止今日，已申请专利超过160项，共有授权专利超过85项，其中发明专利超过30项。",
+      title: "研发创新",
+      desc: "泛成研发中心配置国内外先进的分析检测仪器及小试、中试成套设备。团队聚焦提取、分离、精制、物理改性等核心工艺，深耕原料开发、配方应用与功效验证。依托自主研发与产学研协同合作，累计申请专利超160项，授权专利85余项（含发明专利30余项）。",
+    },
+    {
+      title: "质控服务",
+      desc: "坚持以终端应用与客户需求为导向，依托原料甄选、全链路质控、柔性生产及定制化解决方案能力，搭建起成熟专业的闭环管理体系，精准把控产业链每一环节，稳定输出高品质产品。",
     },
   ],
 } as const;
 
 export const ABOUT_CERTIFICATIONS = {
   id: "about-certifications",
-  title: "质量与认证",
+  title: "质量认证",
   items: [
     { id: "iso-9001", name: "ISO 9001", image: "/prototype/about/certifications/iso-9001.png" },
     { id: "iso-14001", name: "ISO 14001", image: "/prototype/about/certifications/iso-14001.png" },
@@ -376,7 +380,7 @@ export const ABOUT_STRUCTURE = {
     name: "南京泛成国际控股有限公司",
     english: "Fenchem Holdings Corporation Ltd.",
   },
-  subsidiaryBadge: "全资子公司",
+  subsidiaryBadge: "控股子公司",
   subsidiaryBadgeEnglish: "Wholly owned subsidiary",
   subsidiaries: [
     { id: "sub-1", name: "南京豪亚生物化工有限公司", english: "Fenchem Supply Chain Ltd." },

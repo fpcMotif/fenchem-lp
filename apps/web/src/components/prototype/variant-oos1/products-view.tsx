@@ -11,10 +11,10 @@ import {
   CATEGORIES,
   CATEGORY_HEROES,
   FEATURED_PRODUCT,
-  FIBER_BRAND,
   FIBER_SPOTLIGHTS,
   HERO_FRAME,
   SPOTLIGHT_FRAME,
+  SPOTLIGHT_HEADLINE,
   SPOTLIGHT_HIDDEN_CATEGORIES,
   type Category,
   type CategoryHero,
@@ -28,6 +28,7 @@ const MUTED_LABEL = "#52525b";
 const PHOTO_OUTLINE = "rgba(0, 0, 0, 0.1)";
 const ACCENT = "#78598d";
 const SPOTLIGHT_FONT = `"Noto Sans SC", ${font.body}`;
+const SUB_BAR_FONT = `Arial, ${font.body}`;
 
 const DESKTOP = breakpoints.xl;
 const LG = breakpoints.lg;
@@ -48,7 +49,9 @@ const styles = stylex.create({
     width: "100%",
     display: "flex",
     alignItems: "center",
-    height: { default: 240, [breakpoints.md]: "clamp(300px, 31vw, 480px)" },
+    boxSizing: "border-box",
+    height: { default: 240, [breakpoints.md]: "clamp(280px, 31vw, 480px)" },
+    paddingTop: { default: 36, [media.tablet]: 32, [DESKTOP]: 0 },
     overflow: "hidden",
     backgroundColor: color.navyDeep,
     color: colors.paper,
@@ -102,7 +105,7 @@ const styles = stylex.create({
   },
   bannerTitle: {
     margin: 0,
-    fontSize: { default: 34, [breakpoints.md]: 48, [DESKTOP]: 60 },
+    fontSize: { default: 34, [breakpoints.md]: "clamp(38px, 4.167vw, 60px)" },
     fontWeight: 700,
     lineHeight: 1.2,
     letterSpacing: "0.072em",
@@ -131,6 +134,7 @@ const styles = stylex.create({
     alignItems: "center",
     gap: 8,
     flexShrink: 0,
+    fontFamily: SUB_BAR_FONT,
     fontSize: 13,
     letterSpacing: "0.04em",
     color: color.bodyText,
@@ -158,12 +162,12 @@ const styles = stylex.create({
   },
   breadcrumbCurrent: {
     color: color.ink,
-    fontWeight: 600,
+    fontWeight: 700,
   },
   chipList: {
     display: "flex",
     alignItems: "center",
-    justifyContent: { default: "flex-start", [breakpoints.lg]: "flex-end" },
+    justifyContent: { default: "flex-start", [breakpoints.md]: "flex-end" },
     gap: { default: 10, [breakpoints.md]: 12 },
     flexGrow: 1,
     minWidth: 0,
@@ -171,6 +175,7 @@ const styles = stylex.create({
     paddingInlineStart: { default: 16, [breakpoints.md]: 0 },
     paddingInlineEnd: { default: 24, [breakpoints.md]: 0 },
     paddingBlock: 4,
+    fontFamily: SUB_BAR_FONT,
     overflowX: "auto",
     scrollbarWidth: "none",
     maskImage: {
@@ -217,7 +222,6 @@ const styles = stylex.create({
   chipActive: {
     backgroundColor: { default: colors.brandBlue700, ":hover": colors.brandBlue800 },
     color: { default: colors.paper, ":hover": colors.paper },
-    boxShadow: "0 4px 12px -2px rgba(29, 78, 216, 0.32)",
   },
   spotlightSection: {
     paddingTop: { default: 48, [DESKTOP]: 128 },
@@ -313,36 +317,28 @@ const styles = stylex.create({
   productTextActive: {
     color: ACCENT,
   },
-  fiberLogoHeading: {
-    margin: 0,
-  },
-  fiberLogo: {
-    display: "block",
-    width: { default: 240, [DESKTOP]: 341 },
-    height: "auto",
-  },
-  fiberSlogan: {
-    margin: 0,
-    paddingTop: { default: 20, [DESKTOP]: 32 },
-    fontSize: { default: 32, [media.tablet]: 44, [DESKTOP]: 52 },
-    fontWeight: 500,
-    lineHeight: 1.523,
-    letterSpacing: "0.083em",
-    color: color.ink,
-  },
-  fiberSloganLine: {
-    display: "block",
-  },
   fiberStage: (backdrop: string) => ({
     position: "relative",
     overflow: "hidden",
     width: "100%",
     aspectRatio: `${SPOTLIGHT_FRAME.width} / ${SPOTLIGHT_FRAME.height}`,
     backgroundColor: backdrop,
+    containerType: "inline-size",
   }),
-  fiberStageMirrored: {
-    transform: "scaleX(-1)",
-  },
+  fiberHeadline: (left: string) => ({
+    position: "absolute",
+    zIndex: 1,
+    left,
+    top: `${((SPOTLIGHT_HEADLINE.top / SPOTLIGHT_FRAME.height) * 100).toFixed(3)}%`,
+    margin: 0,
+    fontFamily: SPOTLIGHT_FONT,
+    fontSize: `${((SPOTLIGHT_HEADLINE.fontSize / SPOTLIGHT_FRAME.width) * 100).toFixed(3)}cqw`,
+    fontWeight: 500,
+    lineHeight: SPOTLIGHT_HEADLINE.lineHeight / SPOTLIGHT_HEADLINE.fontSize,
+    letterSpacing: `${(SPOTLIGHT_HEADLINE.letterSpacing / SPOTLIGHT_HEADLINE.fontSize).toFixed(4)}em`,
+    whiteSpace: "nowrap",
+    color: color.ink,
+  }),
   fiberPhotoBox: (left: string, top: string, width: string, height: string) => ({
     position: "absolute",
     overflow: "hidden",
@@ -400,52 +396,34 @@ function FiberSpotlightPanel({ spotlight }: { spotlight: FiberSpotlight }) {
       aria-labelledby="fiber-spotlight-title"
       {...stylex.props(kitStyles.shell, kitStyles.inset120, styles.spotlightSection)}
     >
-      <div {...stylex.props(styles.spotlightGrid)}>
-        <div {...stylex.props(styles.spotlightText)}>
-          <h2 id="fiber-spotlight-title" {...stylex.props(styles.fiberLogoHeading)}>
-            <img
-              src={FIBER_BRAND.logo}
-              alt={FIBER_BRAND.name}
-              width={341}
-              height={69}
-              decoding="async"
-              {...stylex.props(styles.fiberLogo)}
-            />
-          </h2>
-          <p {...stylex.props(styles.fiberSlogan)}>
-            {FIBER_BRAND.slogan.map((line) => (
-              <span key={line} {...stylex.props(styles.fiberSloganLine)}>
-                {line}
-              </span>
-            ))}
-          </p>
-        </div>
-        <div
+      <div {...stylex.props(styles.fiberStage(spotlight.backdrop))}>
+        <h2
+          id="fiber-spotlight-title"
           {...stylex.props(
-            styles.fiberStage(spotlight.backdrop),
-            spotlight.mirrored && styles.fiberStageMirrored,
+            styles.fiberHeadline(percentOf(spotlight.headlineX, SPOTLIGHT_FRAME.width)),
           )}
         >
-          <div
+          {SPOTLIGHT_HEADLINE.text}
+        </h2>
+        <div
+          {...stylex.props(
+            styles.fiberPhotoBox(
+              percentOf(photoBox.x, SPOTLIGHT_FRAME.width),
+              percentOf(photoBox.y, SPOTLIGHT_FRAME.height),
+              percentOf(photoBox.width, SPOTLIGHT_FRAME.width),
+              percentOf(photoBox.height, SPOTLIGHT_FRAME.height),
+            ),
+          )}
+        >
+          <img
+            src={spotlight.photo}
+            alt={spotlight.photoAlt}
+            loading="lazy"
+            decoding="async"
             {...stylex.props(
-              styles.fiberPhotoBox(
-                percentOf(photoBox.x, SPOTLIGHT_FRAME.width),
-                percentOf(photoBox.y, SPOTLIGHT_FRAME.height),
-                percentOf(photoBox.width, SPOTLIGHT_FRAME.width),
-                percentOf(photoBox.height, SPOTLIGHT_FRAME.height),
-              ),
+              styles.fiberPhoto(`${crop.x}%`, `${crop.y}%`, `${crop.width}%`, `${crop.height}%`),
             )}
-          >
-            <img
-              src={spotlight.photo}
-              alt={spotlight.photoAlt}
-              loading="lazy"
-              decoding="async"
-              {...stylex.props(
-                styles.fiberPhoto(`${crop.x}%`, `${crop.y}%`, `${crop.width}%`, `${crop.height}%`),
-              )}
-            />
-          </div>
+          />
         </div>
       </div>
     </section>
@@ -468,20 +446,108 @@ function CardImage({ src, alt, eager }: { src: string; alt: string; eager: boole
   );
 }
 
+export function ProductsBanner({
+  title,
+  label,
+  children,
+}: {
+  title: string;
+  label: string;
+  children: ReactNode;
+}) {
+  return (
+    <section aria-label={label} {...stylex.props(styles.bannerWrap)}>
+      <figure {...stylex.props(styles.bannerFigure)}>{children}</figure>
+      <div {...stylex.props(kitStyles.shell, kitStyles.inset120, styles.bannerContent)}>
+        <h1 {...stylex.props(styles.bannerTitle)}>{title}</h1>{" "}
+      </div>
+    </section>
+  );
+}
+
+export function ProductsBannerImage({ src, alt }: { src: string; alt: string }) {
+  return (
+    <img
+      src={src}
+      alt={alt}
+      fetchPriority="high"
+      decoding="async"
+      {...stylex.props(styles.bannerImg)}
+    />
+  );
+}
+
+export function ProductsSubBar({
+  activeId,
+  onSelect,
+  onNavigateHome,
+  current = "产品与应用",
+}: {
+  activeId?: string;
+  onSelect?: (id: string) => void;
+  onNavigateHome: (hash?: string) => void;
+  current?: string;
+}) {
+  return (
+    <div {...stylex.props(styles.subBar)}>
+      <div {...stylex.props(kitStyles.shell, kitStyles.inset120, styles.subBarInner)}>
+        <nav aria-label="Breadcrumb" {...stylex.props(styles.breadcrumb)}>
+          <button
+            type="button"
+            onClick={() => onNavigateHome("top")}
+            {...stylex.props(styles.breadcrumbLink)}
+          >
+            首页
+          </button>
+          <ChevronRight size={13} strokeWidth={1.5} absoluteStrokeWidth aria-hidden="true" />
+          <span aria-current="page" {...stylex.props(styles.breadcrumbCurrent)}>
+            {current}
+          </span>
+        </nav>
+        {onSelect && (
+          <div role="group" aria-label="Categories" {...stylex.props(styles.chipList)}>
+            {CATEGORIES.map((cat) => {
+              const isActive = activeId === cat.id;
+              return (
+                <button
+                  key={cat.id}
+                  type="button"
+                  aria-pressed={isActive}
+                  onClick={() => onSelect(cat.id)}
+                  {...stylex.props(styles.chip, isActive && styles.chipActive)}
+                >
+                  {cat.label}
+                </button>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export function ProductsView({
   onNavigateHome,
   CatalogSection,
   SolutionsSection,
   renderHero,
   renderSpotlight,
+  category,
 }: {
   onNavigateHome: (hash?: string) => void;
+  category?: { id: string };
   CatalogSection?: ComponentType;
   SolutionsSection?: ComponentType;
   renderHero?: (category: Category) => ReactNode;
   renderSpotlight?: (category: Category) => ReactNode;
 }) {
-  const [activeTab, setActiveTab] = useState<string>("personal-care");
+  const [activeTab, setActiveTab] = useState<string>(category?.id ?? "personal-care");
+  const [seenCategory, setSeenCategory] = useState(category);
+  if (category !== seenCategory) {
+    setSeenCategory(category);
+    if (category) setActiveTab(category.id);
+  }
   const [activeProductIndex, setActiveProductIndex] = useState<number | null>(null);
   const { compare } = useSearch({ strict: false });
   const activeCategory = CATEGORIES.find((cat) => cat.id === activeTab) ?? CATEGORIES[0];
@@ -492,64 +558,31 @@ export function ProductsView({
   return (
     <div id="products-top" lang="zh-CN" {...stylex.props(styles.root)}>
       {renderHero?.(activeCategory) ?? (
-        <section
-          aria-label="Products and applications panorama banner"
-          {...stylex.props(styles.bannerWrap)}
+        <ProductsBanner
+          title={activeCategory.label}
+          label="Products and applications panorama banner"
         >
-          <figure {...stylex.props(styles.bannerFigure)}>
-            {categoryHero ? (
-              <CategoryHeroArt key={activeCategory.id} hero={categoryHero} />
-            ) : (
-              <img
-                src={FEATURED_PRODUCT.bannerImage}
-                srcSet={FEATURED_PRODUCT.bannerSrcSet}
-                sizes="(min-width: 768px) clamp(1200px, 124vw, 1920px), 960px"
-                alt="Panorama of Fenchem products and applications in their natural form"
-                fetchPriority="high"
-                decoding="async"
-                {...stylex.props(styles.bannerImg)}
-              />
-            )}
-          </figure>
-          <div {...stylex.props(kitStyles.shell, kitStyles.inset120, styles.bannerContent)}>
-            <h1 {...stylex.props(styles.bannerTitle)}>{activeCategory.label}</h1>{" "}
-          </div>
-        </section>
+          {categoryHero ? (
+            <CategoryHeroArt key={activeCategory.id} hero={categoryHero} />
+          ) : (
+            <img
+              src={FEATURED_PRODUCT.bannerImage}
+              srcSet={FEATURED_PRODUCT.bannerSrcSet}
+              sizes="(min-width: 768px) clamp(1200px, 124vw, 1920px), 960px"
+              alt="Panorama of Fenchem products and applications in their natural form"
+              fetchPriority="high"
+              decoding="async"
+              {...stylex.props(styles.bannerImg)}
+            />
+          )}
+        </ProductsBanner>
       )}
 
-      <div {...stylex.props(styles.subBar)}>
-        <div {...stylex.props(kitStyles.shell, kitStyles.inset120, styles.subBarInner)}>
-          <nav aria-label="Breadcrumb" {...stylex.props(styles.breadcrumb)}>
-            <button
-              type="button"
-              onClick={() => onNavigateHome("top")}
-              {...stylex.props(styles.breadcrumbLink)}
-            >
-              首页
-            </button>
-            <ChevronRight size={13} strokeWidth={1.5} absoluteStrokeWidth aria-hidden="true" />
-            <span aria-current="page" {...stylex.props(styles.breadcrumbCurrent)}>
-              产品与应用
-            </span>
-          </nav>
-          <div role="group" aria-label="Categories" {...stylex.props(styles.chipList)}>
-            {CATEGORIES.map((cat) => {
-              const isActive = activeTab === cat.id;
-              return (
-                <button
-                  key={cat.id}
-                  type="button"
-                  aria-pressed={isActive}
-                  onClick={() => setActiveTab(cat.id)}
-                  {...stylex.props(styles.chip, isActive && styles.chipActive)}
-                >
-                  {cat.label}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      </div>
+      <ProductsSubBar
+        activeId={activeTab}
+        onSelect={setActiveTab}
+        onNavigateHome={onNavigateHome}
+      />
 
       {renderSpotlight?.(activeCategory) ??
         (!showSpotlight ? null : fiberSpotlight ? (

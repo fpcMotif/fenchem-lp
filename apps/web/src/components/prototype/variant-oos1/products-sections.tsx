@@ -19,7 +19,6 @@ import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 import {
   CATALOG_BY_CATEGORY,
   DEFAULT_SOLUTIONS_CATEGORY_ID,
-  SHEET_CATALOG_GROUPS,
   SOLUTIONS_BY_CATEGORY,
   type CatalogGroup,
   type SolutionArea,
@@ -55,8 +54,13 @@ const TWELVE = "repeat(12, minmax(0, 1fr))";
 const HEAD_SPACE = { default: 32, [DESKTOP]: 56 } as const;
 const CARD_RADIUS = { default: 12, [DESKTOP]: 16 } as const;
 
+const NO_AREAS: SolutionArea[] = [];
+const NO_GROUPS: CatalogGroup[] = [];
+
 const orderByArea = (areas: SolutionArea[], items: SolutionItem[]) =>
-  areas.flatMap((area) => items.filter((item) => item.area === area.id));
+  areas.length === 0
+    ? items
+    : areas.flatMap((area) => items.filter((item) => item.area === area.id));
 
 const EDGE_PX = 52;
 const EDGE_SPEED = 5.5;
@@ -1040,7 +1044,7 @@ function FormulaSheet({ item }: { item: SolutionItem }) {
 
 export function ProductCatalog({ categoryId }: { categoryId: string }) {
   const catalog = CATALOG_BY_CATEGORY[categoryId];
-  const groups = catalog?.groups ?? SHEET_CATALOG_GROUPS;
+  const groups = catalog?.groups ?? NO_GROUPS;
   const specLabel = catalog?.specLabel ?? "核心规格/成分";
   const featuresLabel = catalog?.featuresLabel ?? "产品介绍";
   const [openIndex, setOpenIndex] = useState<number | null>(() => (groups.length === 1 ? 0 : null));
@@ -1080,7 +1084,7 @@ export function ProductCatalog({ categoryId }: { categoryId: string }) {
               <LedgerRow
                 key={group.id}
                 group={group}
-                specLabel={group.sheetName === "普通食品原料" ? "产品规格" : specLabel}
+                specLabel={specLabel}
                 featuresLabel={featuresLabel}
                 open={openIndex === index}
                 onToggle={(trigger) => toggle(index, trigger)}
@@ -1102,10 +1106,10 @@ export function ProductSolutions({ categoryId }: { categoryId: string }) {
   const railThumbRef = useRef<HTMLDivElement>(null);
   const solutionSet =
     SOLUTIONS_BY_CATEGORY[categoryId] ?? SOLUTIONS_BY_CATEGORY[DEFAULT_SOLUTIONS_CATEGORY_ID];
-  const areas = solutionSet?.areas ?? [];
+  const areas = SOLUTIONS_BY_CATEGORY[categoryId]?.areas ?? NO_AREAS;
   const solutions = useMemo(
-    () => (solutionSet ? orderByArea(solutionSet.areas, solutionSet.items) : []),
-    [solutionSet],
+    () => (solutionSet ? orderByArea(areas, solutionSet.items) : []),
+    [areas, solutionSet],
   );
   const [browse, send] = useReducer(
     (state: BrowseState, event: BrowseEvent) => transition(solutions, state, event),
@@ -1234,9 +1238,8 @@ export function ProductSolutions({ categoryId }: { categoryId: string }) {
           <h2 id="solutions-title" {...stylex.props(styles.sectionTitle)}>
             应用方案
           </h2>
-          {solutionSet?.lead && <p {...stylex.props(styles.sectionLead)}>{solutionSet.lead}</p>}
         </header>
-        {solutions.length > 1 && (
+        {areas.length > 0 && solutions.length > 1 && (
           <div
             ref={areaListRef}
             role="group"

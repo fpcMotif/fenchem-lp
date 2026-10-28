@@ -12,7 +12,7 @@ import {
 } from "react";
 import { flushSync } from "react-dom";
 
-import { color, ease, font } from "../../variant-oos1/tokens.stylex";
+import { color, ease } from "../../variant-oos1/tokens.stylex";
 import {
   COMPANY,
   CONTACT_DETAILS,
@@ -197,15 +197,7 @@ const styles = stylex.create({
     lineHeight: 1.4,
     color: colors.paper,
   },
-  companyEnglish: {
-    margin: 0,
-    marginTop: 4,
-    fontFamily: font.serifAccent,
-    fontSize: { default: 16, [DESKTOP]: 18 },
-    fontStyle: "italic",
-    lineHeight: 1.3,
-    color: ON_NAVY_MUTED,
-  },
+
   details: {
     display: { default: "none", [DESKTOP]: "flex" },
     flexDirection: "column",
@@ -729,9 +721,6 @@ export function SplitDialog({ subject, onClose, state = "pristine" }: DialogVari
         <aside aria-label="公司信息" {...stylex.props(styles.aside)}>
           <div>
             <p {...stylex.props(styles.companyName)}>{COMPANY.name}</p>
-            <p lang="en" {...stylex.props(styles.companyEnglish)}>
-              {COMPANY.english}
-            </p>
           </div>
           <div {...stylex.props(styles.quickLinks)}>
             {CONTACT_DETAILS.filter((d) => d.href).map((detail) => (

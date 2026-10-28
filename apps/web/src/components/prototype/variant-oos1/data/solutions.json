@@ -1,0 +1,289 @@
+[
+  {
+    "categoryId": "personal-care",
+    "id": "clay-mask",
+    "area": "face",
+    "title": "滋润清洁泥膜",
+    "englishName": "Nourishing Cleansing Clay Mask",
+    "subtitle": "一款含天然黏土的清洁舒缓涂抹泥膜",
+    "overview": [
+      "乳化型清洁泥膜",
+      "325目巴西黏土为核心粉体",
+      "复配多种植物油脂",
+      "清洁同时舒缓，减少拔干紧绷"
+    ],
+    "functions": ["清洁吸附", "保湿滋养", "舒缓修护"],
+    "keyIngredients": [
+      "巴西黏土",
+      "AT Calm-ist™ 植物抗敏剂",
+      "乳木果油",
+      "白池花籽油",
+      "霍霍巴籽油"
+    ],
+    "challenges": ["粉体均匀分散与体系悬浮稳定", "清洁力与保湿舒缓的平衡"],
+    "texture": ["膏状泥质", "柔滑易涂抹"],
+    "applications": ["涂抹式清洁面膜"]
+  },
+  {
+    "categoryId": "personal-care",
+    "id": "rose-mist",
+    "area": "face",
+    "title": "舒缓保湿补水喷雾",
+    "englishName": "Soothing Hydrating Mist",
+    "subtitle": "一款含抗敏活性成分的玫瑰纯露保湿喷雾",
+    "overview": ["大马士革玫瑰纯露，气味香甜纯正", "六重植提抗敏因子协同增效，保湿舒缓，镇定舒缓"],
+    "functions": ["补水保湿", "舒缓镇定"],
+    "keyIngredients": ["大马士革玫瑰纯露", "AT Calm-ist™ 植物抗敏剂"],
+    "challenges": [],
+    "texture": ["水状"],
+    "applications": ["保湿抗敏喷雾/水"]
+  },
+  {
+    "categoryId": "personal-care",
+    "id": "botanical-lotion",
+    "area": "body",
+    "title": "植物精粹身体乳",
+    "englishName": "Botanical Body Lotion",
+    "subtitle": "一款以多重植物油脂与 4D 玻尿酸为核心的滋润型身体乳",
+    "overview": [
+      "乳化型滋润身体乳",
+      "复配四种植物油脂（大花可可脂、鳄梨油、橄榄果渣油、澳洲坚果油）",
+      "4D 多重透明质酸钠体系，多层级保湿",
+      "VC-IP 衍生物提亮，尿囊素舒缓修护"
+    ],
+    "functions": ["深层滋润", "多重保湿", "舒缓提亮"],
+    "keyIngredients": [
+      "4D HA 多重透明质酸钠复合物",
+      "VC-IP 抗坏血酸四异棕榈酸酯",
+      "FM-AT 尿囊素",
+      "大花可可树籽脂 / 鳄梨油 / 橄榄果渣油 / 澳洲坚果油"
+    ],
+    "challenges": [
+      "高含量植物油脂的乳化稳定性",
+      "4D 玻尿酸不同分子量层级的均匀分散",
+      "滋润感与质地清爽的平衡",
+      "多元油脂复配体系的肤感协调"
+    ],
+    "texture": ["轻盈乳状", "易推开吸收快"],
+    "applications": ["身体护理", "日常保湿润肤"]
+  },
+  {
+    "categoryId": "personal-care",
+    "id": "hand-cream",
+    "area": "body",
+    "title": "滋养保湿护手霜",
+    "englishName": "Nourishing Hand Cream",
+    "subtitle": "一款以乳木果油与芒果籽脂为核心的深度滋润型护手霜",
+    "overview": [
+      "乳化型高滋润护手霜",
+      "高含量乳木果油（6%）+ 芒果籽脂（3%），强化滋润修护",
+      "4D 多重透明质酸钠体系，多层级保湿锁水",
+      "黄原胶复配增稠，膏体细腻稳定"
+    ],
+    "functions": ["深度滋养", "持久保湿", "修护干燥"],
+    "keyIngredients": [
+      "4D HA 多重透明质酸钠复合物",
+      "乳木果油（6% 高添加）",
+      "芒果籽脂",
+      "白池花籽油"
+    ],
+    "challenges": [
+      "高含量固态油脂的乳化与膏体稳定性",
+      "厚重膏体与涂抹延展性的平衡",
+      "4D 玻尿酸在高油相体系中的均匀分散",
+      "滋润感与黏腻感的平衡控制"
+    ],
+    "texture": ["厚实膏状", "丰润易推开"],
+    "applications": ["手部护理", "干燥肌深度滋养"]
+  },
+  {
+    "categoryId": "personal-care",
+    "id": "shea-body-cream",
+    "area": "body",
+    "title": "乳木果油身体霜",
+    "englishName": "Shea Butter Body Cream",
+    "subtitle": "一款20% 高含量乳木果油的包裹感舒缓身体霜",
+    "overview": [
+      "高滋润身体霜，添加 20% 液态乳木果油",
+      "包裹感强肤感滋润不腻，为敏感肌提供舒缓防护",
+      "富集三萜类活性分子，具备抗炎舒缓属性",
+      "极简配方，仅 8 种 INCI 成分"
+    ],
+    "functions": ["20% 高含量乳木果油", "包裹舒缓敏感肌", "深度滋养柔肤"],
+    "keyIngredients": ["液态乳木果油", "三萜类活性物"],
+    "challenges": [
+      "20% 高含量油脂的乳化稳定性",
+      "包裹感与黏腻感的平衡",
+      "高活性物的体系兼容性",
+      "极简配方的防腐保障"
+    ],
+    "texture": ["丰润乳霜", "肤感细腻滋润"],
+    "applications": ["身体护理", "敏感肌滋养舒缓"]
+  },
+  {
+    "categoryId": "personal-care",
+    "id": "body-oil",
+    "area": "body",
+    "title": "身体护理精华油",
+    "englishName": "Body Serum Oil",
+    "subtitle": "一款轻质滋养的全油基身体护理精华油",
+    "overview": [
+      "全油基身体护理油，以甜杏仁油为基底",
+      "复配角鲨烷、霍霍巴油等润肤油脂",
+      "添加红没药醇舒缓修护",
+      "轻质油感，滋养不黏腻"
+    ],
+    "functions": ["柔润滋养", "舒缓修护", "轻薄润肤"],
+    "keyIngredients": ["甜杏仁油", "角鲨烷", "霍霍巴油", "红没药醇"],
+    "challenges": [
+      "多种油脂的肤感调和",
+      "全油体系的氧化稳定",
+      "滋润度与清爽感的平衡",
+      "香精与油相的兼容稳定"
+    ],
+    "texture": ["澄清油状液体", "顺滑易延展"],
+    "applications": ["身体护理", "身体精华油、按摩油"]
+  },
+  {
+    "categoryId": "personal-care",
+    "id": "whitening-cream",
+    "area": "face",
+    "title": "多效滋润美白霜",
+    "englishName": "Multi-Action Brightening Cream",
+    "subtitle": "一款4 - 丁基间苯二酚为核心的多效美白面霜",
+    "overview": [
+      "乳化型多效美白面霜",
+      "4 - 丁基间苯二酚为核心美白成分，复配烟酰胺",
+      "4D 玻尿酸多层保湿，乙酰氨基葡萄糖修护",
+      "多种植物油脂润肤，红没药醇舒缓"
+    ],
+    "functions": ["多效美白提亮", "深层保湿修护", "舒缓润肤"],
+    "keyIngredients": [
+      "4 - 丁基间苯二酚",
+      "烟酰胺",
+      "4D HA 多重透明质酸钠",
+      "乙酰氨基葡萄糖",
+      "泛醇、Ⅲ 型胶原蛋白",
+      "白池花籽油、橄榄角鲨烷",
+      "红没药醇"
+    ],
+    "challenges": [
+      "美白活性物的体系兼容与稳定",
+      "4D 玻尿酸在乳化体系中的均匀分散",
+      "多种油脂的乳化稳定",
+      "美白功效与温和性的平衡"
+    ],
+    "texture": ["细腻乳霜", "顺滑易推开"],
+    "applications": ["面部护理", "美白保湿面霜"]
+  },
+  {
+    "categoryId": "personal-care",
+    "id": "shower-oil",
+    "area": "face",
+    "title": "柔润温和沐浴油",
+    "englishName": "Gentle Shower Oil",
+    "subtitle": "一款50% 高含量鳄梨油的无皂基沐浴油",
+    "overview": [
+      "50% 高含量鳄梨油沐浴油，遇水转化为乳状",
+      "无皂基配方，温和清洁同时滋养肌肤",
+      "冷工艺制作，保留植物油脂活性"
+    ],
+    "functions": ["温和滋养清洁", "无皂基配方", "浴后柔润不紧绷"],
+    "keyIngredients": ["鳄梨油", "胡萝卜提取物", "生育酚", "甘油保湿体系"],
+    "challenges": ["遇水转乳的质地表现", "冷配工艺的体系均一", "清洁力与滋养力的平衡"],
+    "texture": ["油状液体", "遇水乳化呈奶白色"],
+    "applications": ["身体清洁", "敏感肌沐浴油"]
+  },
+  {
+    "categoryId": "personal-care",
+    "id": "argan-hair-oil",
+    "area": "hair",
+    "title": "阿甘油护发精华油",
+    "englishName": "Argan Oil Hair Serum",
+    "subtitle": "一款阿甘油复配硅油的修护护发精华油",
+    "overview": [
+      "硅油基护发精华油，添加阿甘油与亚麻籽油",
+      "修护受损发丝，柔顺毛躁",
+      "角鲨烷滋养发丝，提升光泽",
+      "玫瑰精油调香，使用感愉悦"
+    ],
+    "functions": ["修护受损发丝", "柔顺毛躁", "提升发丝光泽"],
+    "keyIngredients": ["阿甘油", "亚麻籽油", "橄榄角鲨烷"],
+    "challenges": [
+      "植物油与硅油的兼容稳定",
+      "修护力与清爽感的平衡",
+      "精油调香的体系稳定",
+      "全油体系的氧化稳定"
+    ],
+    "texture": ["透明油状液体", "轻盈顺滑不黏腻"],
+    "applications": ["头发护理", "护发精华油"]
+  },
+  {
+    "categoryId": "personal-care",
+    "id": "sunscreen",
+    "area": "sun",
+    "title": "SPF50 高倍防晒霜",
+    "englishName": "SPF50 High-Protection Sunscreen",
+    "subtitle": "一款物化结合的高倍户外防晒面霜",
+    "overview": [
+      "高倍防晒面霜，SPF50+、PA++++ 防护等级",
+      "化学 + 物理防晒剂复配，全波段广谱防护",
+      "4D 玻尿酸保湿，尿囊素舒缓防晒刺激",
+      "防水成膜体系，提升持妆力"
+    ],
+    "functions": ["高倍广谱防晒", "防水持妆", "保湿舒缓"],
+    "keyIngredients": [
+      "二氧化钛",
+      "亚甲基双 - 苯并三唑基四甲基丁基苯酚",
+      "对苯二亚甲基二樟脑磺酸",
+      "二乙氨基羟苯甲酰基苯甲酸己酯",
+      "双 - 乙基己氧苯酚甲氧苯基三嗪",
+      "乙基己基三嗪酮",
+      "4D HA 多重透明质酸钠"
+    ],
+    "challenges": [
+      "物理防晒剂的分散与防泛白",
+      "高含量防晒剂的溶解与稳定",
+      "高倍防晒力与清爽肤感的平衡",
+      "防水成膜与配方稳定性"
+    ],
+    "texture": ["细腻乳霜", "成膜快，轻微泛白"],
+    "applications": ["面部防晒", "高倍户外防护"]
+  },
+  {
+    "categoryId": "functional-food",
+    "id": "phgg-yogurt",
+    "area": "dairy",
+    "title": "高纤酸奶",
+    "englishName": "High-Fiber Yogurt",
+    "subtitle": "添加 2.5% InFiber™ PHGG，提升质地与结构稳定性",
+    "overview": [
+      "全脂牛乳体系，经热处理、接种发酵、低温冷藏制备酸奶",
+      "2.5% 添加量赋予酸奶细腻顺滑、厚实口感，无黏腻感",
+      "相比空白对照组，酸奶凝胶结构更稳定，成型效果更好"
+    ],
+    "functions": ["膳食纤维强化", "提升质地", "稳定凝胶结构"],
+    "keyIngredients": ["InFiber™ PHGG（添加量 2.5%）"],
+    "challenges": ["膳食纤维易带来黏腻、颗粒感", "酸奶凝胶结构与成型稳定性"],
+    "texture": ["细腻顺滑", "厚实无黏腻"],
+    "applications": ["高纤型酸奶", "发酵乳甜品"]
+  },
+  {
+    "categoryId": "functional-food",
+    "id": "phgg-cookie",
+    "area": "bakery",
+    "title": "低糖曲奇饼干",
+    "englishName": "Low-Sugar Cookies",
+    "subtitle": "添加 5% InFiber™ PHGG，烘焙高纤添加，保持原有口感",
+    "overview": [
+      "粉体过筛，黄油搅打混合制成面团，冷藏定型后 170℃ 烘烤 18–20 min",
+      "5% 添加不会对饼干口感造成负面影响，无砂砾、异味问题",
+      "辅助烘烤上色，亦可通过微调烘烤参数优化外观"
+    ],
+    "functions": ["膳食纤维强化", "保持原有口感", "辅助烘烤上色"],
+    "keyIngredients": ["InFiber™ PHGG（添加量 5%）"],
+    "challenges": ["高纤添加易带来砂砾感与异味", "烘烤上色与外观控制"],
+    "texture": ["保持原有口感", "无砂砾感"],
+    "applications": ["高纤低糖饼干", "酥饼等烘焙产品"]
+  }
+]

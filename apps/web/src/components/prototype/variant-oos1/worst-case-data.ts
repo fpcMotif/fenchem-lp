@@ -236,7 +236,7 @@ const WORST_ABOUT = () => {
   });
   setFields(about.ABOUT_HERO, {
     englishTitle: "Nanjing Fenchem International Holdings Corporation Limited",
-    lead: "自1995年创立于南京，专注于为食品营养品、宠物健康和个人护理行业提供原料和解决方案，建立起集研发、生产、质量控制、法规注册与全球销售于一体的完整产业链，产品远销 60 多个国家和地区。",
+    lead: "FENCHEM自1995年创立于南京，专注于为食品营养品、宠物健康和个人护理行业提供原料和解决方案，建立起集研发、生产、质量控制、法规注册与全球销售于一体的完整产业链，产品远销 60 多个国家和地区。",
     networkLabel: "全球 16 家分支机构，遍布",
     countries: [
       "美国",

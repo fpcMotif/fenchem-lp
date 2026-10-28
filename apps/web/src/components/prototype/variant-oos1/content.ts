@@ -19,6 +19,13 @@ export {
   type StrengthTone,
 } from "../variant-o/content";
 
+export const PRODUCT_MENU = [
+  { id: "personal-care", label: "个人护理" },
+  { id: "functional-food", label: "功能性食品" },
+  { id: "human-nutrition", label: "人类营养健康" },
+  { id: "pet-health", label: "宠物健康" },
+] as const;
+
 export const NAV_ITEMS = [
   { label: "首页", href: "#top" },
   { label: "关于我们", href: "#about" },

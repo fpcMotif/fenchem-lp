@@ -1,0 +1,26 @@
+[
+  {
+    "categoryId": "personal-care",
+    "id": "face",
+    "label": "面部护理",
+    "englishLabel": "Face care"
+  },
+  {
+    "categoryId": "personal-care",
+    "id": "body",
+    "label": "身体护理",
+    "englishLabel": "Body care"
+  },
+  {
+    "categoryId": "personal-care",
+    "id": "hair",
+    "label": "头皮 & 头发护理",
+    "englishLabel": "Scalp and hair care"
+  },
+  {
+    "categoryId": "personal-care",
+    "id": "sun",
+    "label": "防晒护理",
+    "englishLabel": "Sun care"
+  }
+]

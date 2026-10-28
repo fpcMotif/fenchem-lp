@@ -2,7 +2,7 @@ import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 import { ChevronRight } from "lucide-react";
 import { useInView } from "motion/react";
-import { Fragment, useEffect, useMemo, useRef, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, type ReactNode } from "react";
 
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
@@ -29,11 +29,6 @@ const revealDelay = (index: number) => Math.min(index, REVEAL_MAX_STEPS) * REVEA
 const bannerSettle = stylex.keyframes({
   "0%": { scale: "1.08" },
   "100%": { scale: "1" },
-});
-
-const scrollCue = stylex.keyframes({
-  "0%": { transform: "translateY(-100%)" },
-  "100%": { transform: "translateY(200%)" },
 });
 
 const dynamic = stylex.create({
@@ -211,46 +206,6 @@ const styles = stylex.create({
   bannerLeadTall: {
     maxWidth: 640,
   },
-  bannerMeta: {
-    display: { default: "none", [breakpoints.md]: "flex" },
-    flexDirection: "column",
-    alignItems: "flex-end",
-    gap: 14,
-    flexShrink: 0,
-    fontFamily: font.display,
-    fontSize: 12,
-    fontWeight: 500,
-    letterSpacing: "0.22em",
-    textTransform: "uppercase",
-    color: colors.paper,
-    textShadow: "0 1px 12px rgba(6, 28, 66, 0.55)",
-  },
-  bannerMetaRule: {
-    width: 40,
-    height: 1,
-    backgroundColor: "rgba(255, 255, 255, 0.72)",
-  },
-  scrollTrack: {
-    position: "relative",
-    overflow: "hidden",
-    width: 1,
-    height: 56,
-    marginTop: 10,
-    marginInlineEnd: 4,
-    backgroundColor: "rgba(255, 255, 255, 0.25)",
-  },
-  scrollThumb: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    width: "100%",
-    height: "40%",
-    backgroundColor: colors.paper,
-    animationName: { default: null, [breakpoints.motionOk]: scrollCue },
-    animationDuration: "2400ms",
-    animationTimingFunction: "cubic-bezier(0.65, 0, 0.35, 1)",
-    animationIterationCount: "infinite",
-  },
 
   subBar: {
     position: "sticky",
@@ -380,7 +335,6 @@ export function SubPageBanner({
   title,
   tagline,
   lead,
-  meta = [],
   image,
   imageAlt,
   imagePosition = "center 58%",
@@ -392,7 +346,6 @@ export function SubPageBanner({
   title: string;
   tagline?: string;
   lead: string;
-  meta?: readonly string[];
   image: string;
   imageAlt: string;
   imagePosition?: string;
@@ -447,19 +400,6 @@ export function SubPageBanner({
             </p>
           ) : null}
           <p {...stylex.props(styles.bannerLead, tall && styles.bannerLeadTall)}>{lead}</p>
-        </div>
-        <div lang="en" {...stylex.props(styles.bannerMeta)}>
-          {meta.map((item, index) => (
-            <Fragment key={item}>
-              {index > 0 ? (
-                <span aria-hidden="true" {...stylex.props(styles.bannerMetaRule)} />
-              ) : null}
-              <span>{item}</span>
-            </Fragment>
-          ))}
-          <span aria-hidden="true" {...stylex.props(styles.scrollTrack)}>
-            <span {...stylex.props(styles.scrollThumb)} />
-          </span>
         </div>
       </div>
     </section>

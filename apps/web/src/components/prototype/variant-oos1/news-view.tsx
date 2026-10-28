@@ -12,12 +12,13 @@ import {
   type CompanyNewsItem,
   type DomesticShow,
 } from "./news-data";
-import { SubPageBanner, SubPageNav, kitStyles } from "./subpage-kit";
+import { ProductsBanner, ProductsBannerImage } from "./products-view";
+import { SubPageNav, kitStyles } from "./subpage-kit";
 import { color } from "./tokens.stylex";
 
 const HAIRLINE = "rgba(26, 26, 26, 0.12)";
 const DESKTOP = breakpoints.xl;
-const BANNER = "/prototype/official-site/product-human-nutrition.webp";
+const BANNER = "/products/figma/oos1-news-banner.jpg";
 
 const styles = stylex.create({
   section: {
@@ -209,17 +210,9 @@ export function NewsView({ onNavigateHome }: { onNavigateHome: (hash?: string) =
 
   return (
     <div id="news-top" lang="zh-CN" {...stylex.props(kitStyles.root)}>
-      <SubPageBanner
-        titleId="news-title"
-        eyebrow="资讯"
-        title={NEWS_PAGE.title}
-        lead={NEWS_PAGE.lead}
-        image={BANNER}
-        imageAlt=""
-        imagePosition="center 42%"
-        size="compact"
-        textHidden
-      />
+      <ProductsBanner title={NEWS_PAGE.title} label="News and exhibitions banner">
+        <ProductsBannerImage src={BANNER} alt="" />
+      </ProductsBanner>
       <SubPageNav current={NEWS_PAGE.title} onNavigateHome={onNavigateHome} />
       <section {...stylex.props(styles.section)}>
         <div {...stylex.props(kitStyles.shell, kitStyles.inset120, styles.columns)}>
