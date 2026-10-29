@@ -65,7 +65,9 @@ ds-bundle/
 /.agent/
 /.agents/*
 !/.agents/traits/
-/.claude/
+/.claude/*
+!/.claude/settings.json
+!/.claude/hooks/
 /.crush/
 /.factory/
 /.windsurf/
