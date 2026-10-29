@@ -10,8 +10,9 @@ const OOX_WORD_ON_TINT = "#d7e1f1";
 const WORD_ON_TINT = `color-mix(in srgb, ${OOX_WORD_ON_TINT} 80%, ${color.blueTint})`;
 const WORD_TRACKING = "0.06em";
 const DESKTOP = breakpoints.xl;
-const WORD_SIZE = "30vw";
-const WORD_SIZE_DESKTOP = "min(360px, 25vw)";
+// "FENCHEM" advances 4.36em at its tracking, so this size keeps the desktop inset each side.
+const WORD_EM_WIDTH = 4.36;
+const WORD_SIZE = `min(360px, (100vw - 2 * ${layout.inset124}) / ${WORD_EM_WIDTH})`;
 const WORD_CAP_ABOVE_EDGE = 0.581;
 
 export type ContactCtaAction = {
@@ -31,10 +32,7 @@ const styles = stylex.create({
     justifyContent: "center",
     overflow: "clip",
     paddingTop: { default: 80, [DESKTOP]: 128 },
-    paddingBottom: {
-      default: `calc(${WORD_SIZE} * ${WORD_CAP_ABOVE_EDGE})`,
-      [DESKTOP]: `calc(${WORD_SIZE_DESKTOP} * ${WORD_CAP_ABOVE_EDGE})`,
-    },
+    paddingBottom: `calc(${WORD_SIZE} * ${WORD_CAP_ABOVE_EDGE})`,
     paddingInline: { default: 16, [media.tablet]: 40, [DESKTOP]: layout.inset124 },
     scrollMarginTop: layout.headerHeight,
     backgroundColor: color.blueTint,
@@ -44,7 +42,7 @@ const styles = stylex.create({
     left: "50%",
     bottom: 0,
     fontFamily: font.display,
-    fontSize: { default: WORD_SIZE, [DESKTOP]: WORD_SIZE_DESKTOP },
+    fontSize: WORD_SIZE,
     fontWeight: 800,
     lineHeight: 0.74,
     letterSpacing: `-${WORD_TRACKING}`,
