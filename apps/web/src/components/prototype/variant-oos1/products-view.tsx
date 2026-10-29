@@ -6,7 +6,7 @@ import { ChevronRight } from "lucide-react";
 import { useState, type ComponentType, type ReactNode } from "react";
 
 import { ContactCta } from "./contact-cta";
-import { CTA, PRODUCTS_CTA_SUBTITLE } from "./content";
+import { CTA } from "./content";
 import {
   CATEGORIES,
   CATEGORY_HEROES,
@@ -645,7 +645,6 @@ export function ProductsView({
 
       <Flow>
         <ContactCta
-          subtitle={PRODUCTS_CTA_SUBTITLE}
           actions={[{ label: CTA.action.label, onClick: () => onNavigateHome("contact") }]}
         />
       </Flow>

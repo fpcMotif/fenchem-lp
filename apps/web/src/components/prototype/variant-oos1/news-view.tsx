@@ -250,8 +250,6 @@ export function NewsView({ onNavigateHome }: { onNavigateHome: (hash?: string) =
       </section>
       <ContactCta
         id="news-contact"
-        title="需要索取样品或技术资料？"
-        subtitle="我们的应用团队随时为您提供添加量指导与配方参考。"
         actions={[{ label: "联系我们", onClick: () => onNavigateHome("contact") }]}
       />
     </div>

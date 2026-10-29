@@ -112,6 +112,8 @@ const PANEL_ALT = "#e8e8e8";
 const FOOTER_BLUE = "#294f92";
 const HERO_OVERLAY = "#0743a9";
 const DESKTOP = breakpoints.xl;
+const FOOTER_ROW = "@media (min-width: 560px)";
+const MOBILE_MOTION = "@media (max-width: 559.98px) and (prefers-reduced-motion: no-preference)";
 const HOVER_MOTION =
   "@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)";
 
@@ -1442,7 +1444,8 @@ const styles = stylex.create({
     display: "flex",
     flexDirection: { default: "column", [DESKTOP]: "row" },
     justifyContent: "space-between",
-    gap: 40,
+    alignItems: "flex-start",
+    gap: { default: 28, [DESKTOP]: 40 },
   },
   footerLogo: {
     display: "block",
@@ -1452,16 +1455,24 @@ const styles = stylex.create({
     filter: "brightness(0) invert(1)",
   },
   footerColumns: {
-    display: "flex",
-    flexWrap: "wrap",
-    gap: 32,
+    display: "grid",
+    gridTemplateColumns: {
+      default: "minmax(0, 1fr)",
+      [FOOTER_ROW]: "repeat(3, max-content)",
+      [DESKTOP]: "repeat(3, 210px)",
+    },
+    justifyContent: { default: "start", [FOOTER_ROW]: "space-between", [DESKTOP]: "start" },
+    alignItems: "start",
+    columnGap: { default: 0, [FOOTER_ROW]: 24, [DESKTOP]: 32 },
+    rowGap: 24,
+    paddingInline: { default: 0, [FOOTER_ROW]: "clamp(40px, 8vw, 88px)", [DESKTOP]: 0 },
+    width: { default: "100%", [DESKTOP]: "auto" },
   },
   footerColumn: {
     display: "flex",
     flexDirection: "column",
-    gap: 35,
-    width: { default: "auto", [DESKTOP]: 210 },
-    minWidth: 140,
+    gap: { default: 12, [DESKTOP]: 35 },
+    minWidth: 0,
   },
   footerHeading: {
     margin: 0,
@@ -1472,7 +1483,7 @@ const styles = stylex.create({
   footerLinks: {
     display: "flex",
     flexDirection: "column",
-    gap: 15,
+    gap: { default: 10, [DESKTOP]: 15 },
     margin: 0,
     padding: 0,
     fontSize: 16,
@@ -1484,10 +1495,21 @@ const styles = stylex.create({
     lineHeight: 1.2,
     color: colors.paper,
     textDecoration: { default: "none", ":hover": "underline" },
+    opacity: {
+      default: 1,
+      ":active": { default: 0.65, [FOOTER_ROW]: 1 },
+    },
+    transitionProperty: "opacity",
+    transitionDuration: "150ms",
+    transitionTimingFunction: "cubic-bezier(0.2, 0, 0, 1)",
     outlineStyle: { default: "none", ":focus-visible": "solid" },
     outlineWidth: 2,
     outlineColor: colors.paper,
     outlineOffset: 2,
+  },
+  footerLinkStatic: {
+    cursor: "default",
+    textDecoration: "none",
   },
   footerRule: {
     width: "100%",
@@ -1504,11 +1526,13 @@ const styles = stylex.create({
   },
   copyright: {
     margin: 0,
+    minWidth: 0,
     fontSize: 12,
-    lineHeight: 1.2,
+    lineHeight: 1.5,
   },
   social: {
     display: "flex",
+    flexShrink: 0,
     alignItems: "center",
     gap: 12,
   },
@@ -1518,10 +1542,17 @@ const styles = stylex.create({
     height: 32,
     padding: 6,
     margin: -6,
-    opacity: { default: 0.65, ":hover": 1 },
-    transitionProperty: "opacity",
+    opacity: { default: 0.65, ":hover": 1, ":active": 1 },
+    transform: {
+      default: "scale(1)",
+      ":active": { default: "scale(1)", [MOBILE_MOTION]: "scale(0.96)" },
+    },
+    transitionProperty: { default: "opacity, transform", [FOOTER_ROW]: "opacity" },
     transitionDuration: "150ms",
-    transitionTimingFunction: "ease",
+    transitionTimingFunction: {
+      default: "cubic-bezier(0.2, 0, 0, 1)",
+      [FOOTER_ROW]: "ease",
+    },
     outlineStyle: { default: "none", ":focus-visible": "solid" },
     outlineWidth: 2,
     outlineColor: colors.paper,
@@ -2437,7 +2468,13 @@ function News() {
   );
 }
 
-function SiteFooter({ onNavigate }: { onNavigate?: (view: View, targetId?: string) => void }) {
+function SiteFooter({
+  onNavigate,
+  onOpenContactDialog,
+}: {
+  onNavigate?: (view: View, targetId?: string) => void;
+  onOpenContactDialog?: () => void;
+}) {
   return (
     <footer {...stylex.props(styles.footer)}>
       <div {...stylex.props(styles.shell, styles.inset120, styles.footerInner)}>
@@ -2456,22 +2493,33 @@ function SiteFooter({ onNavigate }: { onNavigate?: (view: View, targetId?: strin
               <div key={column.heading} {...stylex.props(styles.footerColumn)}>
                 <h3 {...stylex.props(styles.footerHeading)}>{column.heading}</h3>
                 <ul {...stylex.props(styles.footerLinks)}>
-                  {column.links.map((link) => (
-                    <li key={link.label}>
-                      <a
-                        href={link.page ? `#${link.page}-top` : "#top"}
-                        onClick={(event) => {
-                          if (link.page && onNavigate) {
-                            event.preventDefault();
-                            onNavigate(link.page, `${link.page}-top`);
-                          }
-                        }}
-                        {...stylex.props(styles.footerLink)}
-                      >
-                        {link.label}
-                      </a>
-                    </li>
-                  ))}
+                  {column.links.map((link) => {
+                    const page = link.page;
+                    return (
+                      <li key={link.label}>
+                        {page ? (
+                          <a
+                            href={page === "contact" ? "#contact" : `#${page}-top`}
+                            onClick={(event) => {
+                              event.preventDefault();
+                              if (page === "contact") {
+                                onOpenContactDialog?.();
+                                return;
+                              }
+                              onNavigate?.(page, `${page}-top`);
+                            }}
+                            {...stylex.props(styles.footerLink)}
+                          >
+                            {link.label}
+                          </a>
+                        ) : (
+                          <span {...stylex.props(styles.footerLink, styles.footerLinkStatic)}>
+                            {link.label}
+                          </span>
+                        )}
+                      </li>
+                    );
+                  })}
                 </ul>
               </div>
             ))}
@@ -2600,6 +2648,18 @@ export function VariantOOS1({
     }
   };
 
+  const openContactDialog = () => setContactModalOpen(true);
+  const handleSubpageNavigate = (target?: string) => {
+    if (target === "contact") {
+      openContactDialog();
+      return;
+    }
+    handleNavigate(
+      target === "products" ? "products" : "home",
+      target === "products" ? "products-top" : target,
+    );
+  };
+
   useEffect(() => {
     const onPopState = () => {
       const params = new URLSearchParams(window.location.search);
@@ -2620,58 +2680,29 @@ export function VariantOOS1({
             <SiteHeader
               currentView={view}
               onNavigate={handleNavigate}
-              onOpenContactDialog={() => setContactModalOpen(true)}
+              onOpenContactDialog={openContactDialog}
             />
             <div {...stylex.props(styles.page, intro === "play" && introStyles.pageReveal)}>
               <main id="main-content" tabIndex={-1} {...stylex.props(styles.mainTarget)}>
                 <Suspense fallback={<div {...stylex.props(styles.viewFallback)} />}>
                   {view === "about" ? (
-                    <AboutPage
-                      onNavigateHome={(target) =>
-                        handleNavigate(target === "products" ? "products" : "home", target)
-                      }
-                    />
+                    <AboutPage onNavigateHome={handleSubpageNavigate} />
                   ) : view === "products" ? (
                     <ProductsPage
                       category={productsCategory}
-                      onNavigateHome={(target) => handleNavigate("home", target)}
+                      onNavigateHome={handleSubpageNavigate}
                     />
                   ) : view === "insights" ? (
-                    <InsightsPage
-                      onNavigateHome={(target) =>
-                        handleNavigate(
-                          target === "contact"
-                            ? "contact"
-                            : target === "products"
-                              ? "products"
-                              : "home",
-                          target,
-                        )
-                      }
-                    />
+                    <InsightsPage onNavigateHome={handleSubpageNavigate} />
                   ) : view === "news" ? (
-                    <NewsPage
-                      onNavigateHome={(target) =>
-                        handleNavigate(
-                          target === "contact"
-                            ? "contact"
-                            : target === "products"
-                              ? "products"
-                              : "home",
-                          target,
-                        )
-                      }
-                    />
+                    <NewsPage onNavigateHome={handleSubpageNavigate} />
                   ) : view === "contact" ? (
                     <ContactPage onNavigateHome={(target) => handleNavigate("home", target)} />
                   ) : HomePage ? (
-                    <HomePage
-                      onNavigate={handleNavigate}
-                      onOpenContactDialog={() => setContactModalOpen(true)}
-                    />
+                    <HomePage onNavigate={handleNavigate} onOpenContactDialog={openContactDialog} />
                   ) : (
                     <>
-                      <Hero onOpenContactDialog={() => setContactModalOpen(true)} />
+                      <Hero onOpenContactDialog={openContactDialog} />
                       <About onOpenAboutPage={() => handleNavigate("about", "about-top")} />
                       <Campus />
                       <Strengths />
@@ -2687,7 +2718,7 @@ export function VariantOOS1({
                             {
                               label: "联系我们",
                               tone: "primary",
-                              onClick: () => setContactModalOpen(true),
+                              onClick: openContactDialog,
                             },
                           ]}
                         />
@@ -2698,7 +2729,7 @@ export function VariantOOS1({
                 </Suspense>
               </main>
               <Flow>
-                <SiteFooter onNavigate={handleNavigate} />
+                <SiteFooter onNavigate={handleNavigate} onOpenContactDialog={openContactDialog} />
               </Flow>
             </div>
             {contactModalOpen ? (

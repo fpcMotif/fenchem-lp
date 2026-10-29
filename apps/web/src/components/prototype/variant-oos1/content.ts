@@ -116,8 +116,6 @@ export const FOOTER_COLUMNS: readonly { heading: string; links: readonly FooterL
     links: [
       { label: "行业洞察", page: "insights" },
       { label: "新闻资讯", page: "news" },
-      { label: "技术白皮书", page: "insights" },
-      { label: "常见解答", page: "contact" },
     ],
   },
   { heading: "法律与合规", links: [{ label: "隐私声明" }, { label: "合规准则" }] },

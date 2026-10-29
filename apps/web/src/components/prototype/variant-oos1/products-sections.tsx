@@ -1,6 +1,6 @@
 import { Collapse } from "../shared/collapse";
 import { m, useInstantLayoutTransition } from "motion/react";
-import { Plus } from "lucide-react";
+import { ChevronDown, Plus } from "lucide-react";
 import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 import {
@@ -560,28 +560,130 @@ const styles = stylex.create({
     whiteSpace: "nowrap",
   },
 
+  solutionFilter: {
+    position: "relative",
+    display: { default: "block", [DESKTOP]: "none" },
+    marginTop: 16,
+    zIndex: 2,
+  },
+  solutionFilterButton: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 12,
+    width: "100%",
+    minHeight: 48,
+    paddingInline: 16,
+    boxSizing: "border-box",
+    borderWidth: 1,
+    borderStyle: "solid",
+    borderColor: TINT_RULE,
+    borderRadius: 12,
+    backgroundColor: colors.paper,
+    fontFamily: "inherit",
+    fontSize: 15,
+    fontWeight: 500,
+    lineHeight: "22px",
+    letterSpacing: "0.02em",
+    color: TINT_INK,
+    textAlign: "start",
+    cursor: "pointer",
+    outlineStyle: { default: "none", ":focus-visible": "solid" },
+    outlineWidth: 2,
+    outlineColor: ACCENT,
+    outlineOffset: 2,
+  },
+  solutionFilterLabel: {
+    minWidth: 0,
+    overflow: "hidden",
+    whiteSpace: "nowrap",
+    textOverflow: "ellipsis",
+  },
+  solutionFilterIcon: {
+    flexShrink: 0,
+    color: TINT_MUTED,
+    transitionProperty: "transform",
+    transitionDuration: { default: "0ms", [breakpoints.motionOk]: "160ms" },
+    transitionTimingFunction: ease.out,
+  },
+  solutionFilterIconOpen: {
+    transform: "rotate(180deg)",
+  },
+  solutionFilterMenu: {
+    position: "absolute",
+    top: "calc(100% + 6px)",
+    insetInline: 0,
+    zIndex: 3,
+    margin: 0,
+    padding: 6,
+    listStyleType: "none",
+    maxHeight: 320,
+    overflowY: "auto",
+    boxSizing: "border-box",
+    backgroundColor: colors.paper,
+    borderWidth: 1,
+    borderStyle: "solid",
+    borderColor: TINT_RULE,
+    borderRadius: 12,
+    boxShadow: CARD_SHADOW,
+  },
+  solutionFilterOption: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "flex-start",
+    gap: 2,
+    width: "100%",
+    paddingBlock: 10,
+    paddingInline: 12,
+    borderWidth: 0,
+    borderRadius: 8,
+    backgroundColor: { default: "transparent", ":hover": TINT_FILL },
+    fontFamily: "inherit",
+    textAlign: "start",
+    cursor: "pointer",
+    color: TINT_INK,
+    outlineStyle: { default: "none", ":focus-visible": "solid" },
+    outlineWidth: 2,
+    outlineColor: ACCENT,
+    outlineOffset: -2,
+  },
+  solutionFilterOptionSelected: {
+    backgroundColor: TINT_FILL,
+    color: ACCENT,
+  },
+  solutionFilterOptionTitle: {
+    fontSize: 14,
+    fontWeight: 500,
+    lineHeight: "22px",
+  },
+  solutionFilterOptionMeta: {
+    fontSize: 12,
+    lineHeight: "18px",
+    color: TINT_MUTED,
+  },
+
   browser: {
     display: "grid",
     gridTemplateColumns: {
       default: "minmax(0, 1fr)",
-      [LG]: "300px minmax(0, 1fr)",
       [DESKTOP]: "320px minmax(0, 1fr)",
     },
     rowGap: 12,
     marginTop: { default: 16, [DESKTOP]: 24 },
-    minHeight: { default: null, [LG]: 600 },
-    overflow: { default: null, [LG]: "hidden" },
-    borderWidth: { default: 0, [LG]: 1 },
+    minHeight: { default: null, [DESKTOP]: 600 },
+    overflow: { default: null, [DESKTOP]: "hidden" },
+    borderWidth: { default: 0, [DESKTOP]: 1 },
     borderStyle: "solid",
     borderColor: TINT_RULE,
-    borderRadius: { default: 0, [LG]: 12, [DESKTOP]: 16 },
-    backgroundColor: { default: null, [LG]: colors.paper },
-    boxShadow: { default: null, [LG]: CARD_SHADOW },
+    borderRadius: { default: 0, [DESKTOP]: 16 },
+    backgroundColor: { default: null, [DESKTOP]: colors.paper },
+    boxShadow: { default: null, [DESKTOP]: CARD_SHADOW },
   },
   railFrame: {
-    position: { default: null, [LG]: "relative" },
+    display: { default: "none", [DESKTOP]: "block" },
+    position: { default: null, [DESKTOP]: "relative" },
     minWidth: 0,
-    backgroundColor: { default: null, [LG]: TINT_FILL },
+    backgroundColor: { default: null, [DESKTOP]: TINT_FILL },
   },
   rail: {
     position: { default: "relative", [LG]: "absolute" },
@@ -730,12 +832,12 @@ const styles = stylex.create({
     paddingInline: { default: 20, [MD]: 40, [DESKTOP]: 48 },
     paddingTop: { default: 28, [MD]: 40, [DESKTOP]: 44 },
     paddingBottom: { default: 12, [MD]: 20 },
-    borderWidth: { default: 1, [LG]: 0 },
+    borderWidth: { default: 1, [DESKTOP]: 0 },
     borderStyle: "solid",
     borderColor: TINT_RULE,
-    borderRadius: { default: 12, [LG]: 0 },
+    borderRadius: { default: 12, [DESKTOP]: 0 },
     backgroundColor: colors.paper,
-    boxShadow: { default: CARD_SHADOW, [LG]: "none" },
+    boxShadow: { default: CARD_SHADOW, [DESKTOP]: "none" },
     outlineStyle: { default: "none", ":focus-visible": "solid" },
     outlineWidth: 2,
     outlineColor: ACCENT,
@@ -1118,6 +1220,30 @@ export function ProductSolutions({ categoryId }: { categoryId: string }) {
   );
   const area = browse.area;
   const selectedId = browse.status === "showing" ? browse.selectedId : undefined;
+  const [filterOpen, setFilterOpen] = useState(false);
+  const filterRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setFilterOpen(false);
+  }, [area, categoryId]);
+
+  useEffect(() => {
+    if (!filterOpen) return;
+    const onPointerDown = (event: PointerEvent) => {
+      const target = event.target;
+      if (target instanceof Node && filterRef.current?.contains(target)) return;
+      setFilterOpen(false);
+    };
+    const onKeyDown = (event: globalThis.KeyboardEvent) => {
+      if (event.key === "Escape") setFilterOpen(false);
+    };
+    document.addEventListener("pointerdown", onPointerDown);
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.removeEventListener("pointerdown", onPointerDown);
+      document.removeEventListener("keydown", onKeyDown);
+    };
+  }, [filterOpen]);
 
   useEffect(() => {
     const list = areaListRef.current;
@@ -1262,6 +1388,63 @@ export function ProductSolutions({ categoryId }: { categoryId: string }) {
             })}
           </div>
         )}
+        {selected && scope.length > 1 ? (
+          <div ref={filterRef} {...stylex.props(styles.solutionFilter)}>
+            <button
+              type="button"
+              aria-haspopup="listbox"
+              aria-expanded={filterOpen}
+              aria-controls={`${uid}-solutions`}
+              onClick={() => setFilterOpen((open) => !open)}
+              {...stylex.props(styles.solutionFilterButton)}
+            >
+              <span {...stylex.props(styles.solutionFilterLabel)}>{selected.title}</span>
+              <ChevronDown
+                size={18}
+                strokeWidth={2}
+                absoluteStrokeWidth
+                aria-hidden="true"
+                {...stylex.props(
+                  styles.solutionFilterIcon,
+                  filterOpen && styles.solutionFilterIconOpen,
+                )}
+              />
+            </button>
+            <ul
+              id={`${uid}-solutions`}
+              role="listbox"
+              aria-label="应用方案"
+              hidden={!filterOpen}
+              {...stylex.props(styles.solutionFilterMenu)}
+            >
+              {scope.map((item) => {
+                const isSelected = item.id === selected.id;
+                return (
+                  <li key={item.id}>
+                    <button
+                      type="button"
+                      role="option"
+                      aria-selected={isSelected}
+                      onClick={() => {
+                        send({ type: "pickSolution", id: item.id });
+                        setFilterOpen(false);
+                      }}
+                      {...stylex.props(
+                        styles.solutionFilterOption,
+                        isSelected && styles.solutionFilterOptionSelected,
+                      )}
+                    >
+                      <span {...stylex.props(styles.solutionFilterOptionTitle)}>{item.title}</span>
+                      <span {...stylex.props(styles.solutionFilterOptionMeta)}>
+                        {item.functions.join(" · ")}
+                      </span>
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        ) : null}
         {selected ? (
           <div {...stylex.props(styles.browser)}>
             <div {...stylex.props(styles.railFrame)}>
