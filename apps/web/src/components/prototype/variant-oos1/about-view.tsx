@@ -3,10 +3,7 @@ import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
-import { m, useScroll, useTransform } from "motion/react";
 import { type ComponentType, useEffect, useRef, useState } from "react";
-
-import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
 import {
   ABOUT_BANNER,
@@ -376,30 +373,24 @@ const styles = stylex.create({
     position: "relative",
     overflow: "hidden",
     isolation: "isolate",
-    paddingTop: { default: 260, [media.tablet]: 340, [DESKTOP]: 420 },
-    paddingBottom: { default: 64, [DESKTOP]: 194 },
+    paddingTop: { default: 260, [media.tablet]: 340, [DESKTOP]: 356 },
+    paddingBottom: { default: 64, [DESKTOP]: 127 },
     backgroundColor: "#0a2a26",
     color: "#ffffff",
   },
-  csrMedia: {
+  csrImage: {
     position: "absolute",
     zIndex: -2,
-    top: "-8%",
-    left: "-9.1%",
-    width: "125.6%",
-    height: "123%",
-  },
-  csrImage: {
+    inset: 0,
     display: "block",
     width: "100%",
     height: "100%",
     objectFit: "cover",
-    objectPosition: "center 40%",
   },
   csrInner: {
     display: "flex",
     flexDirection: "column",
-    gap: { default: 32, [DESKTOP]: 52 },
+    gap: { default: 32, [DESKTOP]: 14 },
   },
   csrTitle: {
     margin: 0,
@@ -653,30 +644,19 @@ function CertificationsSection() {
 }
 
 function CsrSection() {
-  const sectionRef = useRef<HTMLElement>(null);
-  const reduce = useReducedMotion();
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ["start end", "end start"],
-  });
-  const drift = useTransform(scrollYProgress, [0, 1], ["-6%", "6%"]);
-
   return (
     <section
-      ref={sectionRef}
       id="about-csr"
       aria-labelledby="about-csr-title"
       {...stylex.props(styles.csrSection, kitStyles.anchor)}
     >
-      <m.div {...stylex.props(styles.csrMedia)} style={reduce ? undefined : { y: drift }}>
-        <img
-          src={ABOUT_CSR.forestImage}
-          alt={ABOUT_CSR.forestImageAlt}
-          loading="lazy"
-          decoding="async"
-          {...stylex.props(styles.csrImage)}
-        />
-      </m.div>
+      <img
+        src={ABOUT_CSR.forestImage}
+        alt={ABOUT_CSR.forestImageAlt}
+        loading="lazy"
+        decoding="async"
+        {...stylex.props(styles.csrImage)}
+      />
       <div {...stylex.props(kitStyles.shell, kitStyles.inset120)}>
         <Reveal sx={styles.csrInner}>
           <div>

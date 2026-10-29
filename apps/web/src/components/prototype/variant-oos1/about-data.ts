@@ -307,7 +307,7 @@ export const ABOUT_CSR = {
   image: "/prototype/about/csr-campus-lake.webp",
   imageAlt: "Campus pond reflecting the Fenchem R&D building and trees",
   forestImage: "/prototype/about/csr-forest.jpg",
-  forestImageAlt: "Sunlight falling through a mossy old-growth forest with a small stream",
+  forestImageAlt: "Sunlight falling through a misty old-growth forest with mossy ground",
   outcomes: [
     { icon: "factory", title: "降低工业能耗" },
     { icon: "recycle", title: "减少原料损耗" },

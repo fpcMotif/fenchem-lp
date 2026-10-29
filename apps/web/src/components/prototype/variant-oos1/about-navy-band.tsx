@@ -21,7 +21,8 @@ const styles = stylex.create({
     display: "flex",
     flexDirection: "column",
     gap: { default: 64, [mq.xl]: 96 },
-    paddingBlock: { default: 72, [mq.xl]: 128 },
+    paddingTop: { default: 72, [mq.xl]: 128 },
+    paddingBottom: { default: 72, [mq.xl]: 123 },
     backgroundColor: BAND_BLUE,
     color: colors.paper,
   },
@@ -34,7 +35,7 @@ const styles = stylex.create({
     color: colors.paper,
   },
   honorsHead: {
-    marginBottom: 20,
+    marginBottom: { default: 20, [mq.xl]: 28 },
   },
   level: {
     paddingBlock: 20,
@@ -43,6 +44,7 @@ const styles = stylex.create({
     borderTopColor: tone.onNavyLine,
   },
   levelFirst: {
+    paddingBottom: { default: 20, [mq.xl]: 21 },
     borderTopWidth: 0,
   },
   honorList: {
@@ -66,7 +68,7 @@ const styles = stylex.create({
     textWrap: "balance",
   },
   structureHead: {
-    marginBottom: { default: 32, [mq.xl]: 60 },
+    marginBottom: { default: 32, [mq.xl]: 48 },
   },
   structure: {
     display: "grid",
@@ -87,6 +89,7 @@ const styles = stylex.create({
     margin: 0,
     fontSize: 14,
     fontWeight: 500,
+    lineHeight: "17px",
     letterSpacing: "0.12em",
     color: tone.onNavyMuted,
   },
@@ -101,6 +104,7 @@ const styles = stylex.create({
   holdingEnglish: {
     fontSize: 14,
     fontWeight: 400,
+    lineHeight: "17px",
     letterSpacing: "0.03em",
     color: tone.onNavyMuted,
   },
