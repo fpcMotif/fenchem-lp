@@ -4,7 +4,7 @@ import * as stylex from "@stylexjs/stylex";
 
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { m, useScroll, useTransform } from "motion/react";
-import { type ComponentType, Fragment, useEffect, useRef, useState } from "react";
+import { type ComponentType, useEffect, useRef, useState } from "react";
 
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
@@ -16,6 +16,7 @@ import {
   ABOUT_HERO,
   ABOUT_RD,
 } from "./about-data";
+import { useBalancedColumns } from "./balanced-columns";
 import { CampusCarousel } from "./campus-carousel";
 import { CAMPUS_GALLERY } from "./campus-gallery";
 import { ContactCta } from "./contact-cta";
@@ -26,9 +27,8 @@ import { Reveal, SubPageNav, kitStyles } from "./subpage-kit";
 import { color, ease, font, layout, media } from "./tokens.stylex";
 import { AboutNavyBand } from "./about-navy-band";
 
-const wordSegmenter = new Intl.Segmenter("zh-CN", { granularity: "word" });
-const phrasesOf = (text: string) => Array.from(wordSegmenter.segment(text), (part) => part.segment);
-const RD_TAIL = 6;
+const RD_MAX_COLUMNS = 44;
+const PROFILE_MAX_COLUMNS = 33;
 const CSR_DESC_BREAK = ABOUT_CSR.desc.indexOf("，") + 1;
 const DESKTOP = breakpoints.xl;
 const MD = breakpoints.md;
@@ -161,12 +161,14 @@ const styles = stylex.create({
   },
   profileLead: {
     margin: 0,
-    maxWidth: 528,
+    inlineSize: `min(${PROFILE_MAX_COLUMNS}em, round(down, 100%, 1em))`,
     fontSize: 16,
     fontWeight: 500,
     lineHeight: 1.6,
-    letterSpacing: "0.053em",
+    textAlign: "justify",
+    textJustify: "inter-character",
     textWrap: "pretty",
+    lineBreak: "strict",
     color: color.ink,
   },
   sectionTitle: {
@@ -325,20 +327,15 @@ const styles = stylex.create({
     letterSpacing: "0.04em",
     color: color.ink,
   },
-  rdTail: {
-    whiteSpace: "nowrap",
-  },
   rdPillarDesc: {
     margin: 0,
-    maxWidth: "40em",
+    inlineSize: `min(${RD_MAX_COLUMNS}em, round(down, 100%, 1em))`,
     fontSize: 15,
     lineHeight: 1.9,
-    letterSpacing: "0.02em",
     textAlign: "justify",
     textJustify: "inter-character",
     textWrap: "pretty",
     lineBreak: "strict",
-    wordBreak: "keep-all",
     overflowWrap: "anywhere",
     textAutospace: "normal",
     whiteSpace: "pre-line",
@@ -581,8 +578,11 @@ export function CampusGallery({
 }
 
 function RdSection() {
+  const sectionRef = useRef<HTMLElement>(null);
+  useBalancedColumns(sectionRef, RD_MAX_COLUMNS);
   return (
     <section
+      ref={sectionRef}
       id={ABOUT_RD.navChip.id}
       aria-labelledby="about-rd-title"
       {...stylex.props(styles.rdSection, kitStyles.anchor)}
@@ -608,16 +608,11 @@ function RdSection() {
           {ABOUT_RD.pillars.map((pillar, index) => (
             <Reveal key={pillar.title} step={index} sx={styles.rdPillar}>
               <h3 {...stylex.props(styles.rdPillarTitle)}>{pillar.title}</h3>
-              <p {...stylex.props(styles.rdPillarDesc)}>
-                {phrasesOf(pillar.desc.slice(0, -RD_TAIL)).map((phrase, i) => (
-                  <Fragment key={i}>
-                    {i > 0 ? <wbr /> : null}
-                    {phrase}
-                  </Fragment>
-                ))}
-                <wbr />
-                <span {...stylex.props(styles.rdTail)}>{pillar.desc.slice(-RD_TAIL)}</span>
-              </p>
+              <div>
+                <p data-balanced {...stylex.props(styles.rdPillarDesc)}>
+                  {pillar.desc}
+                </p>
+              </div>
             </Reveal>
           ))}
         </div>
@@ -705,8 +700,11 @@ function CsrSection() {
 }
 
 function Profile() {
+  const sectionRef = useRef<HTMLElement>(null);
+  useBalancedColumns(sectionRef, PROFILE_MAX_COLUMNS);
   return (
     <section
+      ref={sectionRef}
       id="about-profile"
       aria-label="Company overview"
       {...stylex.props(styles.profile, kitStyles.anchor)}
@@ -720,7 +718,9 @@ function Profile() {
             </p>
           </Reveal>
           <Reveal step={1}>
-            <p {...stylex.props(styles.profileLead)}>{ABOUT_HERO.lead}</p>
+            <p data-balanced {...stylex.props(styles.profileLead)}>
+              {ABOUT_HERO.lead}
+            </p>
           </Reveal>
         </div>
         <Reveal as="figure" step={1} sx={styles.profilePhoto}>

@@ -9,6 +9,7 @@ import { color, media } from "./tokens.stylex";
 const DESKTOP = breakpoints.xl;
 const LG = breakpoints.lg;
 const TILE_SIZE = 384;
+const COMPACT_TILE = 112;
 const STROKE_WIDTH = 5;
 
 const CULTURE_TITLES: Record<string, string> = { 专业和专注: "专业与专注" };
@@ -21,8 +22,6 @@ const cultureValue = (title: string) => {
 
 const styles = stylex.create({
   section: {
-    paddingTop: { default: 72, [DESKTOP]: 63 },
-    paddingBottom: { default: 72, [DESKTOP]: 265 },
     backgroundColor: colors.paper,
   },
 
@@ -42,18 +41,23 @@ const styles = stylex.create({
   cards: {
     display: "grid",
     gridTemplateColumns: { default: "minmax(0, 1fr)", [LG]: "repeat(3, minmax(0, 1fr))" },
-    gap: { default: 16, [LG]: 24 },
-    maxWidth: { default: TILE_SIZE, [LG]: "none" },
-    marginInline: "auto",
+    gap: { default: 20, [LG]: 24 },
   },
   card: {
     display: "flex",
-    flexDirection: "column",
-    alignItems: "stretch",
+    flexDirection: { default: "row", [LG]: "column" },
+    alignItems: { default: "center", [LG]: "stretch" },
+    gap: { default: 16, [LG]: 0 },
   },
   tile: {
+    flexShrink: 0,
+    width: { default: COMPACT_TILE, [LG]: "auto" },
     aspectRatio: "1 / 1",
     overflow: "hidden",
+  },
+  copy: {
+    minWidth: 0,
+    textAlign: { default: "start", [LG]: "center" },
   },
   art: {
     display: "block",
@@ -62,21 +66,19 @@ const styles = stylex.create({
   },
   cardTitle: {
     margin: 0,
-    marginTop: 20,
-    fontSize: { default: 22, [DESKTOP]: 24 },
+    marginTop: { default: 0, [LG]: 20 },
+    fontSize: { default: 18, [LG]: 22, [DESKTOP]: 24 },
     fontWeight: 700,
     lineHeight: 1.3,
     letterSpacing: "0.06em",
-    textAlign: "center",
     color: color.ink,
   },
   cardDesc: {
     margin: 0,
-    marginTop: 10,
+    marginTop: { default: 6, [LG]: 10 },
     fontSize: 14,
     lineHeight: 1.8,
     letterSpacing: "0.02em",
-    textAlign: "center",
     color: color.bodyText,
     textWrap: "balance",
   },
@@ -150,8 +152,10 @@ export function CultureScenes({ sx }: { sx?: stylex.StyleXStyles }) {
                   {card.art}
                 </svg>
               </div>
-              <h3 {...stylex.props(styles.cardTitle)}>{card.value.title}</h3>
-              <p {...stylex.props(styles.cardDesc)}>{card.value.desc}</p>
+              <div {...stylex.props(styles.copy)}>
+                <h3 {...stylex.props(styles.cardTitle)}>{card.value.title}</h3>
+                <p {...stylex.props(styles.cardDesc)}>{card.value.desc}</p>
+              </div>
             </Reveal>
           ))}
         </div>

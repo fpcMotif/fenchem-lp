@@ -52,6 +52,7 @@ import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 import { LINKEDIN_PATHS, LOGO_PATHS, WECHAT_PATHS, type VectorPath } from "../variant-o/vectors";
 import { INTRO_REVEAL_MS, introStyles, useIntro } from "@/components/prototype/shared/intro";
 
+import { useBalancedColumns } from "./balanced-columns";
 import { ContactCta } from "./contact-cta";
 import { HERO_BLOB_TWIST } from "./hero-blob-twist";
 import { RiseReveal } from "./rise-reveal";
@@ -119,9 +120,10 @@ const INSET_132 = "min(132px, 9.167vw)";
 const NAV_SECTION_IDS = NAV_ITEMS.map((item) => item.href.slice(1));
 
 const ABOUT_CHARS = ABOUT.lines.join("").length;
-const ABOUT_INK_LINES = (() => {
+const ABOUT_MAX_COLUMNS = 46;
+const ABOUT_INK_SEGMENTS = (() => {
   let inked = 0;
-  return ABOUT.lines.map((line) =>
+  return ABOUT.lines.flatMap((line) =>
     line.split(/(?<=[，。、])/).map((text) => {
       const start = inked / ABOUT_CHARS;
       inked += text.length;
@@ -863,15 +865,20 @@ const styles = stylex.create({
     flexDirection: "column",
     alignItems: "center",
     gap: 30,
+    width: "100%",
     maxWidth: { default: 768, [DESKTOP]: 920 },
   },
   aboutBody: {
     margin: 0,
+    inlineSize: `min(${ABOUT_MAX_COLUMNS}em, round(down, 100%, 1em))`,
     fontSize: { default: 16, [DESKTOP]: 18 },
     fontWeight: 500,
     lineHeight: 1.8,
     color: color.ink,
-    textAlign: "left",
+    textAlign: "justify",
+    textJustify: "inter-character",
+    lineBreak: "strict",
+    textWrap: "pretty",
   },
   inkPhrase: {
     transitionProperty: "opacity",
@@ -1987,8 +1994,11 @@ function InkPhrase({
 function About({ onOpenAboutPage }: { onOpenAboutPage?: () => void }) {
   const textRef = useRef<HTMLParagraphElement>(null);
   const { scrollYProgress } = useScroll({ target: textRef, offset: ["start 0.85", "end 0.45"] });
+  const sectionRef = useRef<HTMLElement>(null);
+  useBalancedColumns(sectionRef, ABOUT_MAX_COLUMNS);
   return (
     <section
+      ref={sectionRef}
       id="about"
       aria-labelledby="oo-about-title"
       {...stylex.props(styles.about, styles.inset124, styles.anchor)}
@@ -1997,16 +2007,11 @@ function About({ onOpenAboutPage }: { onOpenAboutPage?: () => void }) {
         <h2 id="oo-about-title" {...stylex.props(styles.sectionTitle)}>
           {ABOUT.title}
         </h2>
-        <p ref={textRef} {...stylex.props(styles.aboutBody)}>
-          {ABOUT_INK_LINES.map((segments, lineIndex) => (
-            <Fragment key={segments[0].text}>
-              {lineIndex > 0 ? <br /> : null}
-              {segments.map((segment) => (
-                <InkPhrase key={segment.text} progress={scrollYProgress} range={segment.range}>
-                  {segment.text}
-                </InkPhrase>
-              ))}
-            </Fragment>
+        <p ref={textRef} data-balanced {...stylex.props(styles.aboutBody)}>
+          {ABOUT_INK_SEGMENTS.map((segment) => (
+            <InkPhrase key={segment.text} progress={scrollYProgress} range={segment.range}>
+              {segment.text}
+            </InkPhrase>
           ))}
         </p>
         <div style={{ display: "flex", justifyContent: "center" }}>
