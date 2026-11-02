@@ -1,0 +1,135 @@
+import * as stylex from "@stylexjs/stylex";
+
+export const colors = stylex.defineVars({
+  background: "var(--background)",
+  foreground: "var(--foreground)",
+  card: "var(--card)",
+  cardForeground: "var(--card-foreground)",
+  popover: "var(--popover)",
+  popoverForeground: "var(--popover-foreground)",
+  primary: "var(--primary)",
+  primaryForeground: "var(--primary-foreground)",
+  secondary: "var(--secondary)",
+  secondaryForeground: "var(--secondary-foreground)",
+  muted: "var(--muted)",
+  mutedForeground: "var(--muted-foreground)",
+  accent: "var(--accent)",
+  accentForeground: "var(--accent-foreground)",
+  destructive: "var(--destructive)",
+  border: "var(--border)",
+  input: "var(--input)",
+  ring: "var(--ring)",
+  chart1: "var(--chart-1)",
+  chart2: "var(--chart-2)",
+  chart3: "var(--chart-3)",
+  chart4: "var(--chart-4)",
+  chart5: "var(--chart-5)",
+  sidebar: "var(--sidebar)",
+  sidebarForeground: "var(--sidebar-foreground)",
+  sidebarPrimary: "var(--sidebar-primary)",
+  sidebarPrimaryForeground: "var(--sidebar-primary-foreground)",
+  sidebarAccent: "var(--sidebar-accent)",
+  sidebarAccentForeground: "var(--sidebar-accent-foreground)",
+  sidebarBorder: "var(--sidebar-border)",
+  sidebarRing: "var(--sidebar-ring)",
+
+  // Editorial Tokens
+  forest: "var(--color-forest)",
+  fern: "var(--color-fern)",
+  moss: "var(--color-moss)",
+  sage: "var(--color-sage)",
+  mint: "var(--color-mint)",
+  mist: "var(--color-mist)",
+  cream: "var(--color-cream)",
+  parchment: "var(--color-parchment)",
+  stone: "var(--color-stone)",
+  pebble: "var(--color-pebble)",
+  bark: "var(--color-bark)",
+  clay: "var(--color-clay)",
+  blush: "var(--color-blush)",
+
+  // Brand Blue
+  brandBlue50: "var(--color-brand-blue-50)",
+  brandBlue100: "var(--color-brand-blue-100)",
+  brandBlue200: "var(--color-brand-blue-200)",
+  brandBlue300: "var(--color-brand-blue-300)",
+  brandBlue400: "var(--color-brand-blue-400)",
+  brandBlue500: "var(--color-brand-blue-500)",
+  brandBlue600: "var(--color-brand-blue-600)",
+  brandBlue700: "var(--color-brand-blue-700)",
+  brandBlue800: "var(--color-brand-blue-800)",
+  brandBlue900: "var(--color-brand-blue-900)",
+  brandBlue950: "var(--color-brand-blue-950)",
+
+  // Brand Green
+  brandGreen50: "var(--color-brand-green-50)",
+  brandGreen100: "var(--color-brand-green-100)",
+  brandGreen200: "var(--color-brand-green-200)",
+  brandGreen300: "var(--color-brand-green-300)",
+  brandGreen400: "var(--color-brand-green-400)",
+  brandGreen500: "var(--color-brand-green-500)",
+  brandGreen600: "var(--color-brand-green-600)",
+  brandGreen700: "var(--color-brand-green-700)",
+  brandGreen800: "var(--color-brand-green-800)",
+  brandGreen900: "var(--color-brand-green-900)",
+  brandGreen950: "var(--color-brand-green-950)",
+
+  // Neutrals
+  paper: "var(--color-paper)",
+  ink: "var(--color-ink)",
+  line: "var(--color-line)",
+  mute50: "var(--color-mute-50)",
+  mute100: "var(--color-mute-100)",
+  mute200: "var(--color-mute-200)",
+  mute300: "var(--color-mute-300)",
+  mute400: "var(--color-mute-400)",
+  mute500: "var(--color-mute-500)",
+  mute600: "var(--color-mute-600)",
+  mute700: "var(--color-mute-700)",
+  mute800: "var(--color-mute-800)",
+  mute900: "var(--color-mute-900)",
+
+  // Division (auxiliary) accents
+  feed: "var(--color-feed)",
+  cosmetics: "var(--color-cosmetics)",
+  cosmetics200: "var(--color-cosmetics-200)",
+  agro: "var(--color-agro)",
+  food: "var(--color-food)",
+  chem: "var(--color-chem)",
+  nutrition: "var(--color-nutrition)",
+});
+
+export const radii = stylex.defineVars({
+  none: "0px",
+  sm: "calc(var(--radius) - 4px)",
+  md: "calc(var(--radius) - 2px)",
+  lg: "var(--radius)",
+  xl: "calc(var(--radius) + 4px)",
+  "2xl": "calc(var(--radius) + 8px)",
+  "3xl": "calc(var(--radius) + 12px)",
+  "4xl": "calc(var(--radius) + 16px)",
+  full: "9999px",
+});
+
+export const typography = stylex.defineVars({
+  sans: '"Inter Variable", sans-serif',
+  display: '"Newsreader", "Georgia", "Times New Roman", serif',
+  body: '"Plus Jakarta Sans", "Noto Sans SC", "Inter Variable", system-ui, sans-serif',
+  tech: '"JetBrains Mono", ui-monospace, "SFMono-Regular", monospace',
+});
+
+export const shadows = stylex.defineVars({
+  ambient: "0 24px 48px -12px oklch(0.288 0.04 160.598 / 0.08)",
+  lift: "0 12px 32px -8px oklch(0.288 0.04 160.598 / 0.06)",
+});
+
+export const breakpoints = stylex.defineConsts({
+  sm: "@media (min-width: 640px)",
+  md: "@media (min-width: 768px)",
+  lg: "@media (min-width: 1024px)",
+  xl: "@media (min-width: 1280px)",
+  "2xl": "@media (min-width: 1536px)",
+  motionReduce: "@media (prefers-reduced-motion: reduce)",
+  motionOk: "@media (prefers-reduced-motion: no-preference)",
+  dark: "@media (prefers-color-scheme: dark)",
+});
