@@ -72,3 +72,4 @@ ds-bundle/
 /.pi/
 /.vite-hooks/
 /fenchem-asset/
+canary/.dry-run/

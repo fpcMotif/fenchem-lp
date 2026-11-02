@@ -30,6 +30,17 @@ node perf/measure-coldstart.mjs                # local preview, --runs / --port
 node perf/measure-deployed.mjs --url=https://your-worker.workers.dev [--runs=5]
 ```
 
+Framework comparison (React vs the Octane canary in `canary/`, see `canary/README.md`):
+
+```bash
+node perf/measure-canary.mjs [--runs=7] [--chromium=/opt/pw-browsers/chromium]
+```
+
+It reports five metrics as p50 / p75 / range over interleaved runs: wire bytes
+before LCP behind a brotli proxy; FCP, LCP and TBT at Fast 4G + 4x CPU; click to
+next frame; workerd worker size, cold TTFB and warm TTFB; and errors plus DOM parity.
+Output goes to `perf/canary/<timestamp>.{json,md}`.
+
 ## Known confounds — read this before trusting a number off your own machine
 
 Two real ones surfaced while building this, both worth understanding before citing a
