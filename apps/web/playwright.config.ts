@@ -1,5 +1,7 @@
 import { defineConfig, devices } from "@playwright/test";
 
+import { chromeChannel } from "../../scripts/ui/chrome-channel";
+
 const host = "127.0.0.1";
 const port = 3001;
 const baseURL = `http://${host}:${port}`;
@@ -33,7 +35,7 @@ export default defineConfig({
       name: "chromium",
       use: {
         ...devices["Desktop Chrome"],
-        channel: "chrome",
+        channel: chromeChannel,
         viewport: { width: 1440, height: 1000 },
       },
     },

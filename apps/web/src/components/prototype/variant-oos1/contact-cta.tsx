@@ -6,12 +6,25 @@ import { CTA } from "./content";
 import { RiseReveal } from "./rise-reveal";
 import { color, ease, font, layout, media } from "./tokens.stylex";
 
-const TINT = "#e6ecf7";
-const PAPER_HOVER = "#f6f6f6";
 const OOX_WORD_ON_TINT = "#d7e1f1";
-const WORD_ON_TINT = `color-mix(in srgb, ${OOX_WORD_ON_TINT} 80%, ${TINT})`;
+const WORD_ON_TINT = `color-mix(in srgb, ${OOX_WORD_ON_TINT} 80%, ${color.blueTint})`;
 const WORD_TRACKING = "0.06em";
 const DESKTOP = "@media (min-width: 1280px)";
+const WORD_EM_WIDTH = 4.36;
+const WORD_INK_EM_WIDTH = 4.34;
+const wordSize = (inset: string) => `calc((100vw - 2 * ${inset}) / ${WORD_INK_EM_WIDTH})`;
+const WORD_SIZE = {
+  default: wordSize("24px"),
+  [media.tablet]: wordSize("40px"),
+  [DESKTOP]: `min(360px, (100vw - 2 * ${layout.inset124}) / ${WORD_EM_WIDTH})`,
+};
+const WORD_CAP_ABOVE_EDGE = 0.581;
+const WORD_FULL_CAP_ABOVE_EDGE = 0.744;
+const WORD_CAP_PADDING = {
+  default: `calc(${WORD_SIZE.default} * ${WORD_FULL_CAP_ABOVE_EDGE})`,
+  [media.tablet]: `calc(${WORD_SIZE[media.tablet]} * ${WORD_FULL_CAP_ABOVE_EDGE})`,
+  [DESKTOP]: `calc(${WORD_SIZE[DESKTOP]} * ${WORD_CAP_ABOVE_EDGE})`,
+};
 
 export type ContactCtaAction = {
   label: string;
@@ -30,17 +43,17 @@ const styles = stylex.create({
     justifyContent: "center",
     overflow: "clip",
     paddingTop: { default: 80, [DESKTOP]: 128 },
-    paddingBottom: { default: 120, [DESKTOP]: 220 },
-    paddingInline: { default: 16, [media.tablet]: 40, [DESKTOP]: layout.inset124 },
+    paddingBottom: WORD_CAP_PADDING,
+    paddingInline: { default: 24, [media.tablet]: 40, [DESKTOP]: layout.inset124 },
     scrollMarginTop: layout.headerHeight,
-    backgroundColor: TINT,
+    backgroundColor: color.blueTint,
   },
   word: {
     position: "absolute",
     left: "50%",
     bottom: 0,
     fontFamily: font.display,
-    fontSize: { default: "30vw", [DESKTOP]: "min(360px, 25vw)" },
+    fontSize: WORD_SIZE,
     fontWeight: 800,
     lineHeight: 0.74,
     letterSpacing: `-${WORD_TRACKING}`,
@@ -48,7 +61,7 @@ const styles = stylex.create({
     textTransform: "uppercase",
     whiteSpace: "nowrap",
     color: WORD_ON_TINT,
-    translate: "-50% 22%",
+    translate: { default: "-50% 0", [DESKTOP]: "-50% 22%" },
     pointerEvents: "none",
     userSelect: "none",
   },
@@ -125,7 +138,7 @@ const styles = stylex.create({
     color: colors.paper,
   },
   secondary: {
-    backgroundColor: { default: colors.paper, ":hover": PAPER_HOVER },
+    backgroundColor: { default: colors.paper, ":hover": color.neutralTint },
     color: colors.brandBlue700,
   },
 });

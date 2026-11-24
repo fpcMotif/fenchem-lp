@@ -124,19 +124,8 @@ const styles = stylex.create({
     borderTopStyle: "solid",
     borderTopColor: INK,
   },
-  english: {
-    margin: 0,
-    fontFamily: LATIN_FONT,
-    fontSize: 12,
-    fontWeight: 500,
-    lineHeight: "16px",
-    letterSpacing: "0.08em",
-    textTransform: "uppercase",
-    color: MUTED,
-  },
   heading: {
     margin: 0,
-    marginTop: 8,
     fontSize: 20,
     fontWeight: 500,
     lineHeight: "28px",
@@ -301,16 +290,10 @@ function inciParts(text: string) {
 function RegionBlock(props: { group: CatalogGroup }) {
   const group = props.group;
   const headingId = createUniqueId();
-  const meta = REGION_META[group.id];
 
   return (
     <div id={blockId(group.id)} {...stylex.attrs(styles.block)}>
       <div {...stylex.attrs(styles.head)}>
-        {meta && (
-          <p lang="en" {...stylex.attrs(styles.english)}>
-            {meta.english}
-          </p>
-        )}
         <h3 id={headingId} tabindex={-1} {...stylex.attrs(styles.heading)}>
           {group.label}
         </h3>

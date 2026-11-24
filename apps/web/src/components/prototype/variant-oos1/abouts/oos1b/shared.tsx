@@ -5,7 +5,6 @@ import type { JSX } from "@solidjs/web";
 import { createExternalStore } from "@/compat/external-store";
 
 import { bp, face, space, tone } from "./tokens.stylex";
-import { ui } from "./shared-values";
 
 // stylex.attrs with reactive (accessor) arguments resolves at runtime here, because
 // the StyleX compiler tries to evaluate them at build time and throws.
@@ -59,34 +58,9 @@ const headStyles = stylex.create({
     marginBottom: { default: 40, [bp.tablet]: 56, [bp.desktop]: 72 },
   },
   rule: {
-    display: "flex",
-    alignItems: "center",
-    gap: { default: 14, [bp.upTablet]: 20 },
-    marginBottom: { default: 22, [bp.tablet]: 30, [bp.desktop]: 36 },
-    fontFamily: face.latin,
-    fontSize: 11,
-    fontWeight: 500,
-    lineHeight: 1,
-    letterSpacing: "0.24em",
-    textTransform: "uppercase",
-    color: tone.quiet,
-  },
-  index: {
-    fontVariantNumeric: "tabular-nums",
-    letterSpacing: "0.12em",
-  },
-  line: {
-    flexGrow: 1,
     height: 1,
+    marginBottom: { default: 22, [bp.tablet]: 30, [bp.desktop]: 36 },
     backgroundColor: tone.ruleFaint,
-  },
-  row: {
-    display: "flex",
-    flexWrap: "wrap",
-    alignItems: "last baseline",
-    justifyContent: "space-between",
-    columnGap: 48,
-    rowGap: { default: 12, [bp.upTablet]: 16 },
   },
   title: {
     margin: 0,
@@ -97,41 +71,15 @@ const headStyles = stylex.create({
     letterSpacing: "0.08em",
     color: tone.ink,
   },
-  note: {
-    margin: 0,
-    maxWidth: "20em",
-    fontSize: { default: 18, [bp.tablet]: 20, [bp.laptop]: 21, [bp.wide]: 23 },
-    lineHeight: 1.3,
-    textAlign: { default: "start", [bp.desktop]: "end" },
-    textWrap: "balance",
-    color: tone.note,
-  },
 });
 
-export function SectionHead(props: {
-  id: string;
-  index: number;
-  eyebrow: string;
-  title: string;
-  note?: string;
-}) {
+export function SectionHead(props: { id: string; title: string }) {
   return (
     <div {...stylex.attrs(headStyles.head)}>
-      <div aria-hidden="true" lang="en" {...stylex.attrs(headStyles.rule)}>
-        <span {...stylex.attrs(headStyles.index)}>{String(props.index).padStart(2, "0")}</span>
-        <span {...stylex.attrs(headStyles.line)} />
-        <span>{props.eyebrow}</span>
-      </div>
-      <div {...stylex.attrs(headStyles.row)}>
-        <h2 id={props.id} {...stylex.attrs(headStyles.title)}>
-          {props.title}
-        </h2>
-        {props.note ? (
-          <p lang="en" {...stylex.attrs(ui.serif, headStyles.note)}>
-            {props.note}
-          </p>
-        ) : null}
-      </div>
+      <div aria-hidden="true" {...stylex.attrs(headStyles.rule)} />
+      <h2 id={props.id} {...stylex.attrs(headStyles.title)}>
+        {props.title}
+      </h2>
     </div>
   );
 }

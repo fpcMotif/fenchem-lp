@@ -174,6 +174,28 @@ const styles = stylex.create({
   nativeTable: { display: "block", width: "100%", borderCollapse: "collapse", borderSpacing: 0 },
   nativeList: { listStyleType: "none", padding: 0, margin: 0 },
   nativeCell: { fontWeight: "inherit", textAlign: "inherit", padding: 0 },
+  skipLink: {
+    position: "fixed",
+    top: 16,
+    insetInlineStart: 16,
+    zIndex: 70,
+    paddingBlock: 12,
+    paddingInline: 16,
+    backgroundColor: colors.paper,
+    color: colors.brandGreen900,
+    fontFamily: SANS,
+    fontSize: 16,
+    lineHeight: 1.2,
+    textDecoration: "none",
+    transform: { default: "translateY(-200%)", ":focus-visible": "none" },
+    outlineStyle: { default: "none", ":focus-visible": "solid" },
+    outlineWidth: 2,
+    outlineColor: colors.brandGreen900,
+    outlineOffset: 2,
+  },
+  mainTarget: {
+    outlineStyle: "none",
+  },
   root: {
     backgroundColor: colors.paper,
     color: colors.ink,
@@ -357,6 +379,7 @@ const styles = stylex.create({
     display: "inline-flex",
     alignItems: "center",
     gap: 6,
+    minHeight: 40,
     fontFamily: SANS,
     fontSize: 17,
     fontWeight: 500,
@@ -1035,6 +1058,9 @@ const styles = stylex.create({
     gap: 28,
   },
   finaleMail: {
+    display: "inline-flex",
+    alignItems: "center",
+    minHeight: 40,
     fontFamily: SANS,
     fontSize: 15,
     fontWeight: 500,
@@ -1818,9 +1844,6 @@ function FooterSection() {
                 {company.email}
               </a>
             </p>
-            <p {...stylex.attrs(styles.footerItem)}>
-              {company.hq.city}, {company.hq.country}
-            </p>
           </div>
         </div>
         <div {...stylex.attrs(styles.footerBottom)}>
@@ -1859,8 +1882,11 @@ export function VariantS() {
       <LayoutGroup>
         <div {...stylex.attrs(styles.root)}>
           <SmoothScroll />
+          <a href="#main-content" {...stylex.attrs(styles.skipLink)}>
+            Skip to content
+          </a>
           <NavBar />
-          <main>
+          <main id="main-content" tabindex={-1} {...stylex.attrs(styles.mainTarget)}>
             <HeroSection />
             <IndexSection />
             <CertificateSection />

@@ -42,7 +42,7 @@ export const Route = createRootRoute({
         ? [
             {
               rel: "stylesheet",
-              href: "/virtual:stylex.css",
+              href: "/stylex.css",
             },
           ]
         : []),
@@ -65,7 +65,7 @@ function RootDocument(props: { children: JSX.Element }) {
   return (
     <html lang="en" class="dark">
       <head>
-        <style>{"@layer base;"}</style>
+        <style>{"@layer ui-sdk, base;"}</style>
         <HeadContent />
         <script>{PERF_DEBUG_SCRIPT}</script>
       </head>

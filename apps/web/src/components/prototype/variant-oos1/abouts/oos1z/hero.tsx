@@ -1,4 +1,5 @@
 import * as stylex from "@stylexjs/stylex";
+import type { JSX } from "@solidjs/web";
 import { createEffect } from "solid-js";
 import { m, useScroll, useSpring, useTransform, type MotionValue } from "@/compat/motion";
 
@@ -6,8 +7,10 @@ import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
 import { ABOUT_BANNER } from "../../about-data";
 import { corridorDrawing, type Drawing } from "./perspective";
-import { NON_SCALING, UNFOCUSABLE, ui } from "./shared";
 import { bp, chrome, face, tone } from "./tokens.stylex";
+
+const UNFOCUSABLE = { focusable: "false" } as JSX.SvgSVGAttributes<SVGSVGElement>;
+const NON_SCALING = { "vector-effect": "non-scaling-stroke" } as const;
 
 const PHONE = corridorDrawing(15, false);
 const TABLET = corridorDrawing(21, true);
@@ -98,13 +101,8 @@ const styles = stylex.create({
     animationTimingFunction: chrome.ease,
     animationFillMode: "both",
   },
-  eyebrow: {
-    margin: 0,
-    color: tone.navy,
-  },
   title: {
     margin: 0,
-    marginTop: { default: 18, [bp.desktop]: 14, [bp.wide]: 20 },
     fontFamily: face.sans,
     fontWeight: 300,
     fontSize: {
@@ -118,13 +116,6 @@ const styles = stylex.create({
     marginInlineEnd: "-0.06em",
     color: tone.navy,
     fontFeatureSettings: '"palt"',
-  },
-  tagline: {
-    margin: 0,
-    marginTop: { default: 12, [bp.desktop]: 10, [bp.wide]: 14 },
-    fontSize: { default: 20, [bp.tablet]: 24, [bp.laptop]: 20, [bp.wide]: 26 },
-    lineHeight: 1.25,
-    color: tone.ink,
   },
   lead: {
     margin: 0,
@@ -228,15 +219,9 @@ export function Hero() {
         <Lines drawing={TABLET} sx={styles.tablet} />
         <LookingLines eyeX={eyeX} eyeY={eyeY} />
         <m.div style={{ x: wallX, y: wallY }} {...stylex.attrs(styles.farWall)}>
-          <p lang="en" {...stylex.attrs(ui.caps, styles.eyebrow)}>
-            {ABOUT_BANNER.established} — {ABOUT_BANNER.place}
-          </p>
           <h1 id="oos1z-title" {...stylex.attrs(styles.title)}>
             {ABOUT_BANNER.title}
           </h1>
-          <p lang="en" {...stylex.attrs(ui.italic, styles.tagline)}>
-            {ABOUT_BANNER.tagline}
-          </p>
           <p {...stylex.attrs(styles.lead)}>
             <span {...stylex.attrs(styles.balanced)}>{ABOUT_BANNER.lead}</span>
           </p>

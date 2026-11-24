@@ -12,7 +12,6 @@ import { LayoutGroup } from "@/compat/motion";
 import { FooterLegal } from "../shared/footer-content";
 import { NewsAccordion } from "../shared/news-accordion";
 import { ProductSummary } from "../shared/product-summary";
-import { SplitDialog } from "../contact-dialog-lab/variants/split";
 import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 import type { StyleXStyles } from "@stylexjs/stylex";
@@ -37,6 +36,8 @@ import {
   createSignal,
   createUniqueId,
   For,
+  lazy,
+  Loading,
   Match,
   merge,
   onSettled,
@@ -46,7 +47,7 @@ import {
   type Accessor,
   type Component,
 } from "solid-js";
-import { dynamic, type JSX } from "@solidjs/web";
+import { dynamic, useHead, type JSX } from "@solidjs/web";
 
 import { EASE } from "../motion-constants";
 
@@ -55,14 +56,9 @@ import { useReducedMotion } from "../use-reduced-motion";
 import { LINKEDIN_PATHS, LOGO_PATHS, WECHAT_PATHS, type VectorPath } from "../variant-o/vectors";
 import { INTRO_REVEAL_MS, introStyles, useIntro } from "../shared/intro";
 
-import { AboutView } from "./about-view";
+import { useBalancedColumns } from "./balanced-columns";
 import { ContactCta } from "./contact-cta";
-import { ContactView } from "./contact-view";
 import { HERO_BLOB_TWIST } from "./hero-blob-twist";
-import { InsightsView } from "./insights-view";
-import { NewsView } from "./news-view";
-import { ProductsView } from "./products-view";
-import { RdView } from "./rd-view";
 import { RiseReveal } from "./rise-reveal";
 import { color, ease, font, layout, media, zIndex } from "./tokens.stylex";
 import { useActiveSection } from "./use-active-section";
@@ -80,6 +76,7 @@ import {
   OFFICE_MAP_PINS,
   PRODUCTS,
   PRODUCTS_INTRO,
+  PRODUCT_MENU,
   STATS,
   STRENGTHS,
   STRENGTHS_INTRO,
@@ -88,28 +85,53 @@ import {
 } from "./content";
 
 const GOOGLE_FONTS =
-  "https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter+Tight:ital,wght@0,500;0,800;1,500&family=Noto+Sans+SC:wght@400;500;700;900&display=swap";
+  "https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter+Tight:ital,wght@0,500;0,800;1,500&display=swap";
 
-const TINT = "#e6ecf7";
+const loadAboutView = () => import("./about-view");
+const loadProductsView = () => import("./products-view");
+const loadInsightsView = () => import("./insights-view");
+const loadNewsView = () => import("./news-view");
+const loadContactView = () => import("./contact-view");
+const loadSplitDialog = () => import("../contact-dialog-lab/variants/split");
+
+const AboutView = lazy(loadAboutView, { export: "AboutView" });
+const ProductsView = lazy(loadProductsView, { export: "ProductsView" });
+const InsightsView = lazy(loadInsightsView, { export: "InsightsView" });
+const NewsView = lazy(loadNewsView, { export: "NewsView" });
+const ContactView = lazy(loadContactView, { export: "ContactView" });
+const SplitDialog = lazy(loadSplitDialog, { export: "SplitDialog" });
+
+function prefetchOffscreenViews() {
+  void loadAboutView();
+  void loadProductsView();
+  void loadInsightsView();
+  void loadNewsView();
+  void loadContactView();
+  void loadSplitDialog();
+}
+
 const DISPLAY_FONT =
-  '"Inter Tight", "Helvetica Neue", Arial, "Source Han Sans SC", "Noto Sans SC", sans-serif';
-const SURFACE = "#f6f6f6";
+  '"Inter Tight", "Helvetica Neue", Arial, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif';
 const PANEL_ALT = "#e8e8e8";
 const FOOTER_BLUE = "#294f92";
 const HERO_OVERLAY = "#0743a9";
 const DESKTOP = "@media (min-width: 1280px)";
+const FOOTER_ROW = "@media (min-width: 560px)";
+const FOOTER_THREE_COLUMNS = "@media (min-width: 360px)";
+const FOOTER_INLINE = "@media (min-width: 640px)";
+const MOBILE_MOTION = "@media (max-width: 559.98px) and (prefers-reduced-motion: no-preference)";
 const HOVER_MOTION =
   "@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)";
 
 const INSET_132 = "min(132px, 9.167vw)";
-const INSET_118 = "min(118px, 8.194vw)";
 
 const NAV_SECTION_IDS = NAV_ITEMS.map((item) => item.href.slice(1));
 
 const ABOUT_CHARS = ABOUT.lines.join("").length;
-const ABOUT_INK_LINES = (() => {
+const ABOUT_MAX_COLUMNS = 46;
+const ABOUT_INK_SEGMENTS = (() => {
   let inked = 0;
-  return ABOUT.lines.map((line) =>
+  return ABOUT.lines.flatMap((line) =>
     line.split(/(?<=[，。、])/).map((text) => {
       const start = inked / ABOUT_CHARS;
       inked += text.length;
@@ -259,7 +281,7 @@ const sxProps = (...args: ReadonlyArray<StyleXStyles | false | null | undefined>
 const styles = stylex.create({
   root: {
     position: "relative",
-    backgroundColor: "#f3f5fa",
+    backgroundColor: color.pageTint,
     color: color.ink,
     fontFamily: font.body,
     WebkitFontSmoothing: "antialiased",
@@ -297,17 +319,19 @@ const styles = stylex.create({
   mainTarget: {
     outlineStyle: "none",
   },
+  viewFallback: {
+    minHeight: "100svh",
+  },
   shell: {
     width: "100%",
-    maxWidth: 1440,
     marginInline: "auto",
     boxSizing: "border-box",
   },
   inset120: {
-    paddingInline: { default: 16, [media.tablet]: 40, [DESKTOP]: layout.inset120 },
+    paddingInline: { default: 16, [media.tablet]: 40, [DESKTOP]: layout.insetFluid },
   },
   inset124: {
-    paddingInline: { default: 16, [media.tablet]: 40, [DESKTOP]: layout.inset124 },
+    paddingInline: { default: 16, [media.tablet]: 40, [DESKTOP]: layout.insetFluid124 },
   },
   inset132: {
     paddingInline: { default: 16, [media.tablet]: 40, [DESKTOP]: INSET_132 },
@@ -367,7 +391,7 @@ const styles = stylex.create({
     color: colors.paper,
   },
   buttonSecondary: {
-    backgroundColor: { default: colors.paper, ":hover": TINT },
+    backgroundColor: { default: colors.paper, ":hover": color.blueTint },
     color: colors.brandBlue700,
   },
   buttonHero: { minWidth: 144, height: 48, paddingInline: 24 },
@@ -393,8 +417,8 @@ const styles = stylex.create({
     gridTemplateColumns: "1fr auto 1fr",
     alignItems: "start",
     height: layout.headerHeight,
-    paddingInlineStart: { default: 16, [media.tablet]: 40, [DESKTOP]: layout.inset120 },
-    paddingInlineEnd: { default: 16, [media.tablet]: 40, [DESKTOP]: INSET_118 },
+    paddingInlineStart: { default: 16, [media.tablet]: 40, [DESKTOP]: layout.insetFluid },
+    paddingInlineEnd: { default: 16, [media.tablet]: 40, [DESKTOP]: layout.insetFluid118 },
   },
   logoLink: {
     display: "block",
@@ -408,8 +432,9 @@ const styles = stylex.create({
   },
   logo: {
     display: "block",
-    width: 161,
-    height: 52,
+    width: { default: 136, ["@media (min-width: 768px)"]: "clamp(124px, 11.18vw, 161px)" },
+    height: "auto",
+    aspectRatio: "161 / 52",
   },
   logoPart: {
     transformBox: "fill-box",
@@ -420,7 +445,7 @@ const styles = stylex.create({
     animationFillMode: "both",
   },
   nav: {
-    display: { default: "none", [DESKTOP]: "flex" },
+    display: { default: "none", ["@media (min-width: 768px)"]: "flex" },
     gridColumn: "2",
     marginTop: 23,
   },
@@ -434,9 +459,9 @@ const styles = stylex.create({
     display: "flex",
     alignItems: "center",
     height: 40,
-    paddingInline: 20,
+    paddingInline: { default: "clamp(8px, 1.38vw, 20px)", [DESKTOP]: 20 },
     whiteSpace: "nowrap",
-    fontSize: 16,
+    fontSize: { default: "clamp(14px, 1.11vw, 16px)", [DESKTOP]: 16 },
     fontWeight: 500,
     lineHeight: 1.2,
     color: { default: color.ink, ":hover": colors.brandBlue700 },
@@ -452,8 +477,8 @@ const styles = stylex.create({
     "::after": {
       content: '""',
       position: "absolute",
-      insetInlineStart: 21,
-      insetInlineEnd: 20,
+      insetInlineStart: { default: "clamp(9px, 1.38vw, 21px)", [DESKTOP]: 21 },
+      insetInlineEnd: { default: "clamp(8px, 1.38vw, 20px)", [DESKTOP]: 20 },
       bottom: 3,
       height: 1,
       backgroundColor: "#0743a2",
@@ -471,9 +496,9 @@ const styles = stylex.create({
     display: { default: "none", ["@media (min-width: 768px)"]: "flex" },
     alignItems: "center",
     gap: 8,
-    width: 170,
+    width: { default: "clamp(112px, 11.8vw, 170px)", [DESKTOP]: 170 },
     height: 38,
-    paddingInline: 16,
+    paddingInline: { default: 12, [DESKTOP]: 16 },
     boxSizing: "border-box",
     borderWidth: 1,
     borderStyle: "solid",
@@ -491,7 +516,7 @@ const styles = stylex.create({
     outlineOffset: 2,
   },
   searchPlaceholder: {
-    fontFamily: "inherit",
+    fontFamily: `Arial, ${font.body}`,
     fontSize: 14,
     lineHeight: 1.2,
     color: color.bodyText,
@@ -500,6 +525,7 @@ const styles = stylex.create({
     paddingBlock: 10,
     paddingInline: 6,
     marginBlock: -10,
+    marginInline: -6,
     borderWidth: 0,
     backgroundColor: "transparent",
     fontFamily: "inherit",
@@ -513,7 +539,7 @@ const styles = stylex.create({
     outlineOffset: -2,
   },
   menuButton: {
-    display: { default: "inline-flex", [DESKTOP]: "none" },
+    display: { default: "inline-flex", ["@media (min-width: 768px)"]: "none" },
     alignItems: "center",
     justifyContent: "center",
     width: 44,
@@ -573,6 +599,80 @@ const styles = stylex.create({
   },
   menuLinkActive: {
     color: colors.brandBlue700,
+  },
+  menuSubList: {
+    display: "flex",
+    flexDirection: "column",
+    margin: 0,
+    paddingBlock: 0,
+    paddingInlineStart: 16,
+    paddingInlineEnd: 0,
+    listStyleType: "none",
+  },
+  menuSubLink: {
+    minHeight: 40,
+    fontSize: 15,
+    fontWeight: 400,
+    color: { default: color.bodyText, ":hover": colors.brandBlue700 },
+  },
+  navItem: {
+    position: "relative",
+    display: "flex",
+  },
+  navDropdownWrap: {
+    position: "absolute",
+    top: "100%",
+    left: "50%",
+    transform: "translateX(-50%)",
+    zIndex: 10,
+    paddingTop: 10,
+  },
+  navDropdown: {
+    minWidth: 164,
+    margin: 0,
+    padding: 5,
+    listStyleType: "none",
+    boxSizing: "border-box",
+    backgroundImage:
+      "linear-gradient(165deg, rgba(255, 255, 255, 0.36) 0%, rgba(255, 255, 255, 0.16) 52%, rgba(235, 243, 255, 0.24) 100%)",
+    backdropFilter: "blur(24px) saturate(190%)",
+    WebkitBackdropFilter: "blur(24px) saturate(190%)",
+    borderWidth: 1,
+    borderStyle: "solid",
+    borderColor: "rgba(255, 255, 255, 0.48)",
+    borderRadius: 16,
+    boxShadow:
+      "inset 0 1px 0 0 rgba(255, 255, 255, 0.82), inset 0 -0.5px 0 0 rgba(255, 255, 255, 0.28), 0 18px 40px -14px rgba(11, 42, 92, 0.16), 0 1px 3px rgba(11, 42, 92, 0.05)",
+    transformOrigin: "top center",
+  },
+  navDropdownLink: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    minHeight: 36,
+    paddingInline: 18,
+    borderRadius: 11,
+    whiteSpace: "nowrap",
+    fontSize: 14,
+    fontWeight: 450,
+    letterSpacing: "0.03em",
+    color: { default: "rgba(18, 24, 38, 0.88)", ":hover": colors.brandBlue700 },
+    backgroundColor: {
+      default: "transparent",
+      ":hover": "rgba(255, 255, 255, 0.44)",
+    },
+    boxShadow: {
+      default: "none",
+      ":hover": "inset 0 1px 0 rgba(255, 255, 255, 0.72), 0 2px 8px -2px rgba(11, 42, 92, 0.06)",
+    },
+    textDecoration: "none",
+    transitionProperty: "color, background-color, box-shadow",
+    transitionDuration: "180ms",
+    transitionTimingFunction: ease.out,
+    outlineStyle: { default: "none", ":focus-visible": "solid" },
+    outlineWidth: 2,
+    outlineColor: colors.brandBlue700,
+    outlineOffset: -2,
   },
 
   hero: {
@@ -683,13 +783,13 @@ const styles = stylex.create({
     display: "block",
     fontSize: { default: 20, [media.tablet]: 26, [DESKTOP]: "min(34px, 2.5vw)" },
     fontWeight: 500,
-    lineHeight: 1.06,
+    lineHeight: 1.12,
     letterSpacing: "-0.025em",
     wordSpacing: "0.05em",
   },
   heroAccent: {
     fontFamily:
-      '"Instrument Serif", "Times New Roman", "Source Han Sans SC", "Noto Sans SC", serif',
+      '"Instrument Serif", "Times New Roman", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", serif',
     fontStyle: "italic",
     fontSynthesis: "none",
     fontWeight: 400,
@@ -771,15 +871,20 @@ const styles = stylex.create({
     flexDirection: "column",
     alignItems: "center",
     gap: 30,
+    width: "100%",
     maxWidth: { default: 768, [DESKTOP]: 920 },
   },
   aboutBody: {
     margin: 0,
+    inlineSize: `min(${ABOUT_MAX_COLUMNS}em, round(down, 100%, 1em))`,
     fontSize: { default: 16, [DESKTOP]: 18 },
     fontWeight: 500,
     lineHeight: 1.8,
     color: color.ink,
-    textAlign: "center",
+    textAlign: "justify",
+    textJustify: "inter-character",
+    lineBreak: "strict",
+    textWrap: "pretty",
   },
   inkPhrase: {
     transitionProperty: "opacity",
@@ -827,9 +932,9 @@ const styles = stylex.create({
     color: color.ink,
   },
   statFigure: {
+    position: "relative",
     display: "flex",
     alignItems: "baseline",
-    gap: 2,
     margin: 0,
     fontFamily: DISPLAY_FONT,
   },
@@ -866,6 +971,10 @@ const styles = stylex.create({
     borderWidth: 0,
   },
   statUnit: {
+    position: "absolute",
+    insetInlineStart: "calc(100% + 2px)",
+    bottom: "0.1125em",
+    whiteSpace: "nowrap",
     fontSize: 32,
     fontWeight: 500,
     lineHeight: 1.2,
@@ -904,7 +1013,6 @@ const styles = stylex.create({
     },
     gap: 2,
     width: "100%",
-    maxWidth: 1200,
   },
   quadrant: {
     position: "relative",
@@ -940,6 +1048,7 @@ const styles = stylex.create({
     pointerEvents: "none",
     opacity: {
       default: 0,
+      "@media (hover: none)": 1,
       [stylex.when.ancestor(":hover")]: 1,
       [stylex.when.ancestor(":focus-within")]: 1,
     },
@@ -1028,7 +1137,7 @@ const styles = stylex.create({
     flexDirection: "column",
     alignItems: "center",
     paddingBlock: { default: 72, [DESKTOP]: 96 },
-    backgroundColor: SURFACE,
+    backgroundColor: color.neutralTint,
   },
   productsCta: {
     paddingTop: 24,
@@ -1041,7 +1150,6 @@ const styles = stylex.create({
       [DESKTOP]: "repeat(4, minmax(0, 1fr))",
     },
     width: "100%",
-    maxWidth: 1200,
     marginTop: { default: 48, [DESKTOP]: 96 },
     scrollMarginTop: `calc(${layout.headerHeight} + 24px)`,
   },
@@ -1053,7 +1161,7 @@ const styles = stylex.create({
   productImageFrame: {
     overflow: "hidden",
     aspectRatio: "300 / 327",
-    backgroundColor: TINT,
+    backgroundColor: color.blueTint,
   },
   productImage: {
     display: "block",
@@ -1122,9 +1230,9 @@ const styles = stylex.create({
     marginInlineStart: {
       default: 16,
       [media.tablet]: 40,
-      [DESKTOP]: `max(${layout.inset120}, calc(50% - 522px))`,
+      [DESKTOP]: `max(${layout.insetFluid}, calc(50% - 522px))`,
     },
-    marginInlineEnd: { default: 16, [media.tablet]: 40, [DESKTOP]: layout.inset120 },
+    marginInlineEnd: { default: 16, [media.tablet]: 40, [DESKTOP]: layout.insetFluid },
   },
   mapWrap: {
     position: "relative",
@@ -1234,7 +1342,7 @@ const styles = stylex.create({
   officesBand: {
     paddingTop: 48,
     paddingBottom: { default: 72, [DESKTOP]: 96 },
-    backgroundColor: SURFACE,
+    backgroundColor: color.neutralTint,
   },
   regions: {
     display: "grid",
@@ -1260,7 +1368,7 @@ const styles = stylex.create({
     height: 40,
     margin: 0,
     paddingInline: 16,
-    backgroundColor: TINT,
+    backgroundColor: color.blueTint,
     fontSize: 16,
     fontWeight: 700,
     lineHeight: 1.2,
@@ -1292,7 +1400,7 @@ const styles = stylex.create({
   },
   newsItem: {
     paddingBottom: 12,
-    backgroundColor: SURFACE,
+    backgroundColor: color.neutralTint,
   },
   newsHeading: {
     margin: 0,
@@ -1349,40 +1457,50 @@ const styles = stylex.create({
   },
 
   footer: {
-    paddingTop: 64,
-    paddingBottom: 48,
+    paddingTop: { default: 72, [DESKTOP]: 64 },
+    paddingBottom: { default: 72, [DESKTOP]: 48 },
     backgroundColor: FOOTER_BLUE,
     color: colors.paper,
   },
   footerInner: {
     display: "flex",
     flexDirection: "column",
-    gap: 30,
+    gap: { default: 36, [DESKTOP]: 30 },
+    paddingInline: { default: 24, [media.tablet]: 40, [DESKTOP]: layout.insetFluid },
   },
   footerTop: {
     display: "flex",
-    flexDirection: { default: "column", [DESKTOP]: "row" },
+    flexDirection: { default: "column", [FOOTER_INLINE]: "row" },
     justifyContent: "space-between",
+    alignItems: "flex-start",
     gap: 40,
   },
   footerLogo: {
     display: "block",
+    flexShrink: 0,
     width: 225,
     height: 73,
     objectFit: "cover",
     filter: "brightness(0) invert(1)",
   },
   footerColumns: {
-    display: "flex",
-    flexWrap: "wrap",
-    gap: 32,
+    display: "grid",
+    gridTemplateColumns: {
+      default: "repeat(2, minmax(0, 1fr))",
+      [FOOTER_THREE_COLUMNS]: "repeat(3, max-content)",
+      [DESKTOP]: "repeat(3, 210px)",
+    },
+    justifyContent: { default: "space-between", [DESKTOP]: "start" },
+    alignItems: "start",
+    columnGap: { default: 24, [FOOTER_INLINE]: 40, [media.tablet]: 56, [DESKTOP]: 32 },
+    rowGap: { default: 36, [FOOTER_THREE_COLUMNS]: 28, [DESKTOP]: 24 },
+    width: { default: "100%", [FOOTER_INLINE]: "auto" },
   },
   footerColumn: {
     display: "flex",
     flexDirection: "column",
-    gap: 35,
-    width: { default: "auto", [DESKTOP]: 210 },
-    minWidth: 140,
+    gap: { default: 12, [DESKTOP]: 35 },
+    minWidth: 0,
   },
   footerHeading: {
     margin: 0,
@@ -1393,7 +1511,7 @@ const styles = stylex.create({
   footerLinks: {
     display: "flex",
     flexDirection: "column",
-    gap: 15,
+    gap: { default: 10, [DESKTOP]: 15 },
     margin: 0,
     padding: 0,
     fontSize: 16,
@@ -1405,10 +1523,21 @@ const styles = stylex.create({
     lineHeight: 1.2,
     color: colors.paper,
     textDecoration: { default: "none", ":hover": "underline" },
+    opacity: {
+      default: 1,
+      ":active": { default: 0.65, [FOOTER_ROW]: 1 },
+    },
+    transitionProperty: "opacity",
+    transitionDuration: "150ms",
+    transitionTimingFunction: "cubic-bezier(0.2, 0, 0, 1)",
     outlineStyle: { default: "none", ":focus-visible": "solid" },
     outlineWidth: 2,
     outlineColor: colors.paper,
     outlineOffset: 2,
+  },
+  footerLinkStatic: {
+    cursor: "default",
+    textDecoration: "none",
   },
   footerRule: {
     width: "100%",
@@ -1425,11 +1554,13 @@ const styles = stylex.create({
   },
   copyright: {
     margin: 0,
+    minWidth: 0,
     fontSize: 12,
-    lineHeight: 1.2,
+    lineHeight: 1.5,
   },
   social: {
     display: "flex",
+    flexShrink: 0,
     alignItems: "center",
     gap: 12,
   },
@@ -1439,10 +1570,17 @@ const styles = stylex.create({
     height: 32,
     padding: 6,
     margin: -6,
-    opacity: { default: 0.65, ":hover": 1 },
-    transitionProperty: "opacity",
+    opacity: { default: 0.65, ":hover": 1, ":active": 1 },
+    transform: {
+      default: "scale(1)",
+      ":active": { default: "scale(1)", [MOBILE_MOTION]: "scale(0.96)" },
+    },
+    transitionProperty: { default: "opacity, transform", [FOOTER_ROW]: "opacity" },
     transitionDuration: "150ms",
-    transitionTimingFunction: "ease",
+    transitionTimingFunction: {
+      default: "cubic-bezier(0.2, 0, 0, 1)",
+      [FOOTER_ROW]: "ease",
+    },
     outlineStyle: { default: "none", ":focus-visible": "solid" },
     outlineWidth: 2,
     outlineColor: colors.paper,
@@ -1547,16 +1685,29 @@ function useNavFits(
   return fits;
 }
 
-export type View = "home" | "about" | "products" | "rd" | "insights" | "news" | "contact";
+export type View = "home" | "about" | "products" | "insights" | "news" | "contact";
 export type AboutPageProps = { onNavigateHome: (hash?: string) => void };
 export type SubPageProps = AboutPageProps;
+export type ProductsPageProps = SubPageProps & { category?: { id: string } };
+export type HomePageProps = {
+  onNavigate: (view: View, targetId?: string) => void;
+  onOpenContactDialog: () => void;
+};
 
 function SiteHeader(props: {
   currentView?: View;
-  onNavigate?: (view: View, targetId?: string) => void;
+  onNavigate?: (view: View, targetId?: string, category?: string) => void;
   onOpenContactDialog?: () => void;
 }) {
   const [menuOpen, setMenuOpen] = createSignal(false);
+  const [productsOpen, setProductsOpen] = createSignal(false);
+  const openCategory = (event: MouseEvent, id: string) => {
+    if (!props.onNavigate) return;
+    event.preventDefault();
+    props.onNavigate("products", "products-top", id);
+    setProductsOpen(false);
+    setMenuOpen(false);
+  };
   const menuId = createUniqueId();
   const reduce = useReducedMotion();
   const scrolled = useScrolledPastTop();
@@ -1568,7 +1719,9 @@ function SiteHeader(props: {
     () => navEl,
   );
   const closeOnEscape = (event: KeyboardEvent) => {
-    if (event.key === "Escape" && menuOpen()) setMenuOpen(false);
+    if (event.key !== "Escape") return;
+    if (menuOpen()) setMenuOpen(false);
+    setProductsOpen(false);
   };
   const isActive = (href: string) => {
     const currentView = props.currentView;
@@ -1577,9 +1730,6 @@ function SiteHeader(props: {
     }
     if (href === "#products") {
       return currentView === "products";
-    }
-    if (href === "#campus" || href === "#rd") {
-      return currentView === "rd";
     }
     if (href === "#insights") {
       return currentView === "insights";
@@ -1609,12 +1759,6 @@ function SiteHeader(props: {
     if (href === "#products") {
       event.preventDefault();
       onNavigate("products", "products-top");
-      setMenuOpen(false);
-      return;
-    }
-    if (href === "#campus" || href === "#rd") {
-      event.preventDefault();
-      onNavigate("rd", "rd-top");
       setMenuOpen(false);
       return;
     }
@@ -1678,16 +1822,61 @@ function SiteHeader(props: {
           aria-label="Main"
           {...sxProps(styles.nav, !navFits() && styles.navCollapsed)}
         >
-          {NAV_ITEMS.map((item) => (
-            <a
-              href={item.href}
-              aria-current={isActive(item.href) ? "location" : undefined}
-              onClick={(event) => handleItemClick(event, item.href)}
-              {...stylex.attrs(styles.navLink, isActive(item.href) && styles.navLinkActive)}
-            >
-              {item.label}
-            </a>
-          ))}
+          {NAV_ITEMS.map((item) => {
+            const link = (
+              <a
+                href={item.href}
+                aria-current={isActive(item.href) ? "location" : undefined}
+                onClick={(event) => handleItemClick(event, item.href)}
+                {...stylex.attrs(styles.navLink, isActive(item.href) && styles.navLinkActive)}
+              >
+                {item.label}
+              </a>
+            );
+            if (item.href !== "#products") return link;
+            return (
+              <div
+                onMouseEnter={() => setProductsOpen(true)}
+                onMouseLeave={() => setProductsOpen(false)}
+                onFocusIn={() => setProductsOpen(true)}
+                onFocusOut={(event) => {
+                  const next = event.relatedTarget;
+                  if (!(next instanceof Node && event.currentTarget.contains(next))) {
+                    setProductsOpen(false);
+                  }
+                }}
+                {...stylex.attrs(styles.navItem)}
+              >
+                {link}
+                <AnimatePresence initial={false}>
+                  <Show when={productsOpen()}>
+                    <div {...stylex.attrs(styles.navDropdownWrap)}>
+                      <m.ul
+                        aria-label="产品与应用"
+                        {...stylex.attrs(styles.navDropdown)}
+                        initial={{ opacity: 0, scale: 0.96, y: -4 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.97, y: -3 }}
+                        transition={{ duration: reduce() ? 0.1 : 0.18, ease: EASE }}
+                      >
+                        {PRODUCT_MENU.map((entry) => (
+                          <li>
+                            <a
+                              href="#products"
+                              onClick={(event) => openCategory(event, entry.id)}
+                              {...stylex.attrs(styles.navDropdownLink)}
+                            >
+                              {entry.label}
+                            </a>
+                          </li>
+                        ))}
+                      </m.ul>
+                    </div>
+                  </Show>
+                </AnimatePresence>
+              </div>
+            );
+          })}
         </nav>
         <CorporateHeaderActions
           styles={{
@@ -1724,6 +1913,21 @@ function SiteHeader(props: {
                   >
                     {item.label}
                   </a>
+                  {item.href === "#products" ? (
+                    <ul {...stylex.attrs(styles.menuSubList)}>
+                      {PRODUCT_MENU.map((entry) => (
+                        <li>
+                          <a
+                            href="#products"
+                            onClick={(event) => openCategory(event, entry.id)}
+                            {...stylex.attrs(styles.menuLink, styles.menuSubLink)}
+                          >
+                            {entry.label}
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : null}
                 </li>
               ))}
             </ul>
@@ -1839,8 +2043,11 @@ function About(props: { onOpenAboutPage?: () => void }) {
     target: () => textEl,
     offset: ["start 0.85", "end 0.45"],
   });
+  let sectionEl: HTMLElement | undefined;
+  useBalancedColumns(() => sectionEl, ABOUT_MAX_COLUMNS);
   return (
     <section
+      ref={sectionEl}
       id="about"
       aria-labelledby="oo-about-title"
       {...stylex.attrs(styles.about, styles.inset124, styles.anchor)}
@@ -1849,16 +2056,11 @@ function About(props: { onOpenAboutPage?: () => void }) {
         <h2 id="oo-about-title" {...stylex.attrs(styles.sectionTitle)}>
           {ABOUT.title}
         </h2>
-        <p ref={textEl} {...stylex.attrs(styles.aboutBody)}>
-          {ABOUT_INK_LINES.map((segments, lineIndex) => (
-            <>
-              {lineIndex > 0 ? <br /> : null}
-              {segments.map((segment) => (
-                <InkPhrase progress={scrollYProgress} range={segment.range}>
-                  {segment.text}
-                </InkPhrase>
-              ))}
-            </>
+        <p ref={textEl} data-balanced {...stylex.attrs(styles.aboutBody)}>
+          {ABOUT_INK_SEGMENTS.map((segment) => (
+            <InkPhrase progress={scrollYProgress} range={segment.range}>
+              {segment.text}
+            </InkPhrase>
           ))}
         </p>
         <div style={{ display: "flex", "justify-content": "center" }}>
@@ -2141,7 +2343,14 @@ function Products(props: { onOpenProductsPage?: () => void }) {
         <h2 id="oo-products-title" {...stylex.attrs(styles.sectionTitle)}>
           {PRODUCTS_INTRO.title}
         </h2>
-        <p {...stylex.attrs(styles.sectionLead)}>{PRODUCTS_INTRO.lead}</p>
+        <p {...stylex.attrs(styles.sectionLead)}>
+          {PRODUCTS_INTRO.lead.split(/(?<=原料，)/).map((line, index) => (
+            <>
+              {index > 0 ? <br /> : null}
+              {line}
+            </>
+          ))}
+        </p>
       </RiseReveal>
       <RiseReveal delay={riseDelay(1)} sx={styles.productsCta}>
         <a
@@ -2268,7 +2477,10 @@ function News() {
   );
 }
 
-function SiteFooter(props: { onNavigate?: (view: View, targetId?: string) => void }) {
+function SiteFooter(props: {
+  onNavigate?: (view: View, targetId?: string) => void;
+  onOpenContactDialog?: () => void;
+}) {
   return (
     <footer {...stylex.attrs(styles.footer)}>
       <div {...stylex.attrs(styles.shell, styles.inset120, styles.footerInner)}>
@@ -2287,22 +2499,33 @@ function SiteFooter(props: { onNavigate?: (view: View, targetId?: string) => voi
               <div {...stylex.attrs(styles.footerColumn)}>
                 <h3 {...stylex.attrs(styles.footerHeading)}>{column.heading}</h3>
                 <ul {...stylex.attrs(styles.footerLinks)}>
-                  {column.links.map((link) => (
-                    <li>
-                      <a
-                        href={link.page ? `#${link.page}-top` : "#top"}
-                        onClick={(event) => {
-                          if (link.page && props.onNavigate) {
-                            event.preventDefault();
-                            props.onNavigate(link.page, `${link.page}-top`);
-                          }
-                        }}
-                        {...stylex.attrs(styles.footerLink)}
-                      >
-                        {link.label}
-                      </a>
-                    </li>
-                  ))}
+                  {column.links.map((link) => {
+                    const page = link.page;
+                    return (
+                      <li>
+                        {page ? (
+                          <a
+                            href={page === "contact" ? "#contact" : `#${page}-top`}
+                            onClick={(event) => {
+                              event.preventDefault();
+                              if (page === "contact") {
+                                props.onOpenContactDialog?.();
+                                return;
+                              }
+                              props.onNavigate?.(page, `${page}-top`);
+                            }}
+                            {...stylex.attrs(styles.footerLink)}
+                          >
+                            {link.label}
+                          </a>
+                        ) : (
+                          <span {...stylex.attrs(styles.footerLink, styles.footerLinkStatic)}>
+                            {link.label}
+                          </span>
+                        )}
+                      </li>
+                    );
+                  })}
                 </ul>
               </div>
             ))}
@@ -2329,10 +2552,22 @@ function SiteFooter(props: { onNavigate?: (view: View, targetId?: string) => voi
   );
 }
 
+type ScrollTarget = { id: string; behavior: ScrollBehavior };
+
+function ScrollToTargetAfterViewMounts(props: { target: ScrollTarget | null }) {
+  createEffect(
+    () => props.target,
+    (target) => {
+      if (!target) return;
+      document.getElementById(target.id)?.scrollIntoView({ behavior: target.behavior });
+    },
+  );
+  return null;
+}
+
 const viewFromPage = (page: unknown, startView: View): View => {
   if (page === "about" || page === "home") return page;
   if (page === "products" || page === "produces") return "products";
-  if (page === "rd" || page === "manufacturing" || page === "campus") return "rd";
   if (page === "insights" || page === "insight") return "insights";
   if (page === "news") return "news";
   if (page === "contact") return "contact";
@@ -2340,9 +2575,9 @@ const viewFromPage = (page: unknown, startView: View): View => {
 };
 
 export function VariantOOS1(props: {
+  HomePage?: Component<HomePageProps>;
   AboutPage?: Component<SubPageProps>;
-  ProductsPage?: Component<SubPageProps>;
-  RdPage?: Component<SubPageProps>;
+  ProductsPage?: Component<ProductsPageProps>;
   InsightsPage?: Component<SubPageProps>;
   NewsPage?: Component<SubPageProps>;
   ContactPage?: Component<SubPageProps>;
@@ -2351,8 +2586,7 @@ export function VariantOOS1(props: {
   const p = merge(
     {
       AboutPage: AboutView as Component<SubPageProps>,
-      ProductsPage: ProductsView as Component<SubPageProps>,
-      RdPage: RdView as Component<SubPageProps>,
+      ProductsPage: ProductsView as Component<ProductsPageProps>,
       InsightsPage: InsightsView as Component<SubPageProps>,
       NewsPage: NewsView as Component<SubPageProps>,
       ContactPage: ContactView as Component<SubPageProps>,
@@ -2360,14 +2594,40 @@ export function VariantOOS1(props: {
     },
     props,
   );
+  useHead({
+    tag: "link",
+    props: { rel: "preconnect", href: "https://fonts.gstatic.com", crossorigin: "anonymous" },
+    key: "preconnect:https://fonts.gstatic.com",
+  });
   preinit(GOOGLE_FONTS, { as: "style" });
+  const HomePage = dynamic(() => p.HomePage);
   const AboutPage = dynamic(() => p.AboutPage);
   const ProductsPage = dynamic(() => p.ProductsPage);
-  const RdPage = dynamic(() => p.RdPage);
   const InsightsPage = dynamic(() => p.InsightsPage);
   const NewsPage = dynamic(() => p.NewsPage);
   const ContactPage = dynamic(() => p.ContactPage);
   const reduce = useReducedMotion();
+  onSettled(() => {
+    let cancel = () => {};
+    const scheduleAfterLoad = () => {
+      if (typeof requestIdleCallback === "undefined") {
+        const timer = setTimeout(prefetchOffscreenViews, 1000);
+        cancel = () => clearTimeout(timer);
+        return;
+      }
+      const handle = requestIdleCallback(prefetchOffscreenViews, { timeout: 4000 });
+      cancel = () => cancelIdleCallback(handle);
+    };
+    if (document.readyState === "complete") {
+      scheduleAfterLoad();
+    } else {
+      window.addEventListener("load", scheduleAfterLoad, { once: true });
+    }
+    return () => {
+      window.removeEventListener("load", scheduleAfterLoad);
+      cancel();
+    };
+  });
   const intro = useIntro();
   const introVars = () =>
     ({
@@ -2388,8 +2648,12 @@ export function VariantOOS1(props: {
     untrack(() => viewFromPage(search().page, p.startView)),
   );
   const [contactModalOpen, setContactModalOpen] = createSignal(false);
+  const [scrollTarget, setScrollTarget] = createSignal<ScrollTarget | null>(null);
 
-  const handleNavigate = (targetView: View, targetId?: string) => {
+  const [productsCategory, setProductsCategory] = createSignal<{ id: string }>();
+
+  const handleNavigate = (targetView: View, targetId?: string, category?: string) => {
+    if (category) setProductsCategory({ id: category });
     setView(targetView);
     if (typeof window !== "undefined") {
       const url = new URL(window.location.href);
@@ -2402,14 +2666,23 @@ export function VariantOOS1(props: {
       window.history.pushState({}, "", url.toString());
       const behavior: ScrollBehavior = reduce() ? "auto" : "smooth";
       if (targetId) {
-        setTimeout(() => {
-          const el = document.getElementById(targetId);
-          if (el) el.scrollIntoView({ behavior });
-        }, 60);
+        setScrollTarget({ id: targetId, behavior });
       } else {
         window.scrollTo({ top: 0, behavior });
       }
     }
+  };
+
+  const openContactDialog = () => setContactModalOpen(true);
+  const handleSubpageNavigate = (target?: string) => {
+    if (target === "contact") {
+      openContactDialog();
+      return;
+    }
+    handleNavigate(
+      target === "products" ? "products" : "home",
+      target === "products" ? "products-top" : target,
+    );
   };
 
   onSettled(() => {
@@ -2432,90 +2705,76 @@ export function VariantOOS1(props: {
             <SiteHeader
               currentView={view()}
               onNavigate={handleNavigate}
-              onOpenContactDialog={() => setContactModalOpen(true)}
+              onOpenContactDialog={openContactDialog}
             />
             <div {...sxProps(styles.page, intro() === "play" && introStyles.pageReveal)}>
               <main id="main-content" tabindex={-1} {...stylex.attrs(styles.mainTarget)}>
-                <Switch
-                  fallback={
-                    <>
-                      <Hero onOpenContactDialog={() => setContactModalOpen(true)} />
-                      <About onOpenAboutPage={() => handleNavigate("about", "about-top")} />
-                      <Campus />
-                      <Strengths />
-                      <Products
-                        onOpenProductsPage={() => handleNavigate("products", "products-top")}
-                      />
-                      <Offices />
-                      <News />
-                      <Flow>
-                        <ContactCta
-                          id="contact"
-                          actions={[
-                            {
-                              label: "联系我们",
-                              tone: "primary",
-                              onClick: () => setContactModalOpen(true),
-                            },
-                          ]}
+                <Loading fallback={<div {...stylex.attrs(styles.viewFallback)} />}>
+                  <Switch
+                    fallback={
+                      <>
+                        <Hero onOpenContactDialog={openContactDialog} />
+                        <About onOpenAboutPage={() => handleNavigate("about", "about-top")} />
+                        <Campus />
+                        <Strengths />
+                        <Products
+                          onOpenProductsPage={() => handleNavigate("products", "products-top")}
                         />
-                      </Flow>
-                    </>
-                  }
-                >
-                  <Match when={view() === "about"}>
-                    <AboutPage
-                      onNavigateHome={(target?: string) =>
-                        handleNavigate(target === "products" ? "products" : "home", target)
-                      }
-                    />
-                  </Match>
-                  <Match when={view() === "products"}>
-                    <ProductsPage
-                      onNavigateHome={(target?: string) => handleNavigate("home", target)}
-                    />
-                  </Match>
-                  <Match when={view() === "rd"}>
-                    <RdPage
-                      onNavigateHome={(target?: string) =>
-                        handleNavigate(target === "contact" ? "contact" : "home", target)
-                      }
-                    />
-                  </Match>
-                  <Match when={view() === "insights"}>
-                    <InsightsPage
-                      onNavigateHome={(target?: string) =>
-                        handleNavigate(
-                          target === "contact"
-                            ? "contact"
-                            : target === "products"
-                              ? "products"
-                              : "home",
-                          target,
-                        )
-                      }
-                    />
-                  </Match>
-                  <Match when={view() === "news"}>
-                    <NewsPage
-                      onNavigateHome={(target?: string) =>
-                        handleNavigate(target === "contact" ? "contact" : "home", target)
-                      }
-                    />
-                  </Match>
-                  <Match when={view() === "contact"}>
-                    <ContactPage
-                      onNavigateHome={(target?: string) => handleNavigate("home", target)}
-                    />
-                  </Match>
-                </Switch>
+                        <Offices />
+                        <News />
+                        <Flow>
+                          <ContactCta
+                            id="contact"
+                            actions={[
+                              {
+                                label: "联系我们",
+                                tone: "primary",
+                                onClick: openContactDialog,
+                              },
+                            ]}
+                          />
+                        </Flow>
+                      </>
+                    }
+                  >
+                    <Match when={view() === "about"}>
+                      <AboutPage onNavigateHome={handleSubpageNavigate} />
+                    </Match>
+                    <Match when={view() === "products"}>
+                      <ProductsPage
+                        category={productsCategory()}
+                        onNavigateHome={handleSubpageNavigate}
+                      />
+                    </Match>
+                    <Match when={view() === "insights"}>
+                      <InsightsPage onNavigateHome={handleSubpageNavigate} />
+                    </Match>
+                    <Match when={view() === "news"}>
+                      <NewsPage onNavigateHome={handleSubpageNavigate} />
+                    </Match>
+                    <Match when={view() === "contact"}>
+                      <ContactPage
+                        onNavigateHome={(target?: string) => handleNavigate("home", target)}
+                      />
+                    </Match>
+                    <Match when={p.HomePage}>
+                      <HomePage
+                        onNavigate={handleNavigate}
+                        onOpenContactDialog={openContactDialog}
+                      />
+                    </Match>
+                  </Switch>
+                  <ScrollToTargetAfterViewMounts target={scrollTarget()} />
+                </Loading>
               </main>
               <Flow>
-                <SiteFooter onNavigate={handleNavigate} />
+                <SiteFooter onNavigate={handleNavigate} onOpenContactDialog={openContactDialog} />
               </Flow>
             </div>
             <Show when={contactModalOpen()}>
-              <SplitDialog subject={null} onClose={() => setContactModalOpen(false)} />
+              <Loading fallback={null}>
+                <SplitDialog subject={null} onClose={() => setContactModalOpen(false)} />
+              </Loading>
             </Show>
           </div>
         </MotionConfig>

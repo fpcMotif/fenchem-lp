@@ -101,10 +101,6 @@ const S = stylex.create({
       [media.desktop]: `calc(${layout.inset} * -1)`,
     },
   },
-  caption: {
-    marginTop: 16,
-    paddingInlineStart: { default: 16, [media.tablet]: 40, [breakpoints.lg]: 0 },
-  },
 });
 
 export function Hero() {
@@ -149,9 +145,6 @@ export function Hero() {
               priority
             />
           </MountWipe>
-          <p lang="en" {...stylex.attrs(base.quiet, S.caption)}>
-            {ABOUT_BANNER.established} · {ABOUT_BANNER.place}
-          </p>
         </div>
       </div>
     </section>

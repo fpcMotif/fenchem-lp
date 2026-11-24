@@ -1,8 +1,6 @@
 export const CONTACT_BANNER = {
   title: "联系我们",
-  tagline: "Talk to the people behind the ingredients.",
   lead: "申请试样、咨询配方或探讨定制研发，泛成技术团队随时恭候您的联络。",
-  meta: ["24H Response", "16 Global Sites"],
   image: "/prototype/about/campus-reception-lg.webp",
   imageAlt: "泛成总部接待大厅与全球客户服务中心",
 } as const;
@@ -16,7 +14,6 @@ export const CONTACT_NAV_CHIPS = [
 ] as const;
 
 export const INQUIRY_INTRO = {
-  eyebrow: "Get in touch",
   title: "告诉我们您的需求",
   lead: "填写表单后，专属客户经理与应用工程师会在工作日 24 小时内与您联系。",
   brochureLabel: "下载企业画册与产品目录 (PDF)",
@@ -29,7 +26,6 @@ export const CONTACT_DETAILS = [
 ] as const;
 
 export const VISIT_INTRO = {
-  eyebrow: "Visit us",
   title: "交通位置",
   lead: "到访前请通过表单预约，我们会提前安排专人接待与参观路线。",
 } as const;
@@ -78,7 +74,6 @@ export const NEXT_STEPS = [
 ] as const;
 
 export const CONTACT_FAQ_INTRO = {
-  eyebrow: "FAQ",
   title: "常见问题",
 } as const;
 

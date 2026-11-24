@@ -7,7 +7,6 @@ import { bp, face, sky } from "./tokens.stylex";
 
 const BELT_RISE = [0, 7, 14] as const;
 const BELT_CENTER = 3.5;
-const NUMERALS = ["i", "ii", "iii"] as const;
 
 const styles = stylex.create({
   grid: {
@@ -119,10 +118,6 @@ const styles = stylex.create({
     alignItems: "center",
     gap: 4,
   },
-  outcomeNumeral: {
-    fontSize: 17,
-    color: sky.faint,
-  },
   outcomeTitle: {
     whiteSpace: "nowrap",
     fontFamily: face.sans,
@@ -160,13 +155,7 @@ export function Csr() {
         </figure>
 
         <div {...stylex.attrs(styles.text)}>
-          <ChartHeading
-            id="oos1k-csr"
-            numeral="IV"
-            label="Responsibility"
-            title={ABOUT_CSR.title}
-            note="A belt of three stars"
-          />
+          <ChartHeading id="oos1k-csr" title={ABOUT_CSR.title} />
           <p {...stylex.attrs(styles.statement)}>
             {ABOUT_CSR.statement.map((line) => (
               <span {...stylex.attrs(styles.line)}>{line}</span>
@@ -202,12 +191,6 @@ export function Csr() {
                 >
                   <span aria-hidden="true" {...stylex.attrs(styles.point)} />
                   <span {...stylex.attrs(styles.outcome)}>
-                    <span
-                      aria-hidden="true"
-                      {...stylex.attrs(ui.designation, styles.outcomeNumeral)}
-                    >
-                      {NUMERALS[index]}
-                    </span>
                     <span {...stylex.attrs(styles.outcomeTitle)}>{outcome.title}</span>
                   </span>
                 </li>

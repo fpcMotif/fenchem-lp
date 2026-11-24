@@ -2,13 +2,12 @@ import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 import { ChevronLeft, ChevronRight } from "@fenchem-lp/ui/components/lucide";
 import { AnimatePresence, m } from "@/compat/motion";
-import { createEffect, createSignal, createUniqueId, flush, For, Show, untrack } from "solid-js";
+import { createEffect, createSignal, createUniqueId, flush, For, Show } from "solid-js";
 
 import { EASE } from "@/components/prototype/motion-constants";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
 import { SOLUTION_ITEMS, type SolutionItem } from "../../products-data";
-import { padIndex } from "../shared/derived";
 import { font, mq, ui } from "./theme.stylex";
 
 const TABLET = mq.tablet;
@@ -139,20 +138,6 @@ const styles = stylex.create({
       transform: "scaleX(1)",
     },
   },
-  tabNumber: {
-    fontFamily: font.numeral,
-    fontSize: 12,
-    fontWeight: 500,
-    lineHeight: "16px",
-    letterSpacing: "0.04em",
-    fontVariantNumeric: "tabular-nums",
-    color: ui.muted,
-    transitionProperty: "color",
-    transitionDuration: "150ms",
-  },
-  tabNumberOn: {
-    color: ACCENT,
-  },
   tabTitle: {
     fontSize: 14,
     fontWeight: 400,
@@ -202,14 +187,8 @@ const styles = stylex.create({
     borderBottomStyle: "solid",
     borderBottomColor: ui.ink,
   },
-  number: {
-    fontFamily: font.numeral,
-    fontSize: { default: 24, [MD]: 32 },
-    fontWeight: 500,
-    lineHeight: { default: "28px", [MD]: "34px" },
-    letterSpacing: "-0.01em",
-    fontVariantNumeric: "tabular-nums",
-    color: ACCENT,
+  headText: {
+    gridColumnStart: { default: null, [MD]: 2 },
   },
   headTitle: {
     margin: 0,
@@ -584,9 +563,6 @@ export function Solutions() {
                   onClick={() => selectSolution(solutionIndex)}
                   {...stylex.attrs(styles.tab, on() && styles.tabOn)}
                 >
-                  <span {...stylex.attrs(styles.tabNumber, on() && styles.tabNumberOn)}>
-                    {padIndex(solutionIndex)}
-                  </span>
                   <span {...stylex.attrs(styles.tabTitle, on() && styles.tabTitleOn)}>
                     {solution.title}
                   </span>
@@ -607,7 +583,6 @@ export function Solutions() {
             <AnimatePresence initial={false}>
               <Show when={item()} keyed>
                 {(current) => {
-                  const currentIndex = untrack(index);
                   return (
                     <m.div
                       initial={{ opacity: 0 }}
@@ -622,10 +597,7 @@ export function Solutions() {
                       {...stylex.attrs(styles.sheetLayer)}
                     >
                       <header {...stylex.attrs(styles.sheetHead)}>
-                        <span aria-hidden="true" {...stylex.attrs(styles.number)}>
-                          {padIndex(currentIndex)}
-                        </span>
-                        <div>
+                        <div {...stylex.attrs(styles.headText)}>
                           <h3 {...stylex.attrs(styles.headTitle)}>{current.title}</h3>
                           <p {...stylex.attrs(styles.headSubtitle)}>{current.subtitle}</p>
                         </div>

@@ -1,7 +1,6 @@
 import * as stylex from "@stylexjs/stylex";
 import type { StyleXStyles } from "@stylexjs/stylex";
 
-import { ui } from "./shared";
 import { bp, face, tone } from "./tokens.stylex";
 import { merge } from "solid-js";
 
@@ -10,12 +9,6 @@ const styles = stylex.create({
     display: "flex",
     flexDirection: "column",
     gap: { default: 10, [bp.desktop]: 14 },
-  },
-  label: {
-    margin: 0,
-    fontSize: { default: 22, [bp.desktop]: 26 },
-    lineHeight: 1,
-    color: tone.blue,
   },
   display: {
     margin: 0,
@@ -40,7 +33,6 @@ const styles = stylex.create({
 
 export function SectionHead(props: {
   id: string;
-  label: string;
   title: string;
   quiet?: boolean;
   sx?: StyleXStyles;
@@ -48,9 +40,6 @@ export function SectionHead(props: {
   const p = merge({ quiet: false }, props);
   return (
     <div {...stylex.attrs(styles.head, p.sx)}>
-      <p lang="en" {...stylex.attrs(ui.serif, styles.label)}>
-        {p.label}
-      </p>
       <h2 id={p.id} {...stylex.attrs(p.quiet ? styles.quiet : styles.display)}>
         {p.title}
       </h2>

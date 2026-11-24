@@ -35,7 +35,6 @@ const styles = stylex.create({
     textAlign: "center",
   },
   blockquote: {
-    marginTop: "2.5rem",
     marginInline: 0,
   },
   quoteText: {
@@ -104,12 +103,6 @@ const styles = stylex.create({
   },
   standardsTitleAccent: {
     color: colors.brandGreen400,
-  },
-  standardsIntro: {
-    maxWidth: "28rem",
-    color: "color-mix(in oklch, var(--color-cream) 60%, transparent)",
-    fontSize: "0.875rem",
-    lineHeight: 1.625,
   },
   pillarsGrid: {
     marginTop: "3.5rem",
@@ -201,7 +194,6 @@ export function OriginStandardsSection() {
       });
     }
 
-    riseIn(root, "[data-quote-eyebrow]");
     riseIn(root, "[data-quote-attribution]", { start: "top 88%" });
     settleImage(root, "[data-standards-img]");
     riseIn(root, "[data-standards-head] > *", { stagger: 0.1 });
@@ -220,9 +212,6 @@ export function OriginStandardsSection() {
       <div {...stylex.attrs(styles.container)}>
         {/* Origin — the pull-quote, inked in line by line on scroll */}
         <div {...stylex.attrs(styles.quoteWrap)}>
-          <p data-quote-eyebrow="" {...stylex.attrs(sharedStyles.techLabelDark)}>
-            {ORIGIN_QUOTE.eyebrow}
-          </p>
           <blockquote data-quote="" {...stylex.attrs(styles.blockquote)}>
             <p {...stylex.attrs(styles.quoteText)}>
               {ORIGIN_QUOTE.lines.map((line, index) => (
@@ -260,10 +249,6 @@ export function OriginStandardsSection() {
           <h2 id="quality-heading" {...stylex.attrs(styles.standardsTitle)}>
             Science-backed <span {...stylex.attrs(styles.standardsTitleAccent)}>standards.</span>
           </h2>
-          <p {...stylex.attrs(styles.standardsIntro)}>
-            Every lot. Every market. Every release — documented to your regulatory map before you
-            ask for it.
-          </p>
         </div>
 
         <div {...stylex.attrs(styles.pillarsGrid)}>

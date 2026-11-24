@@ -11,7 +11,6 @@ export type LightboxPhoto = {
   large: string;
   alt: string;
   caption: string;
-  english: string;
 };
 
 const fadeIn = stylex.keyframes({
@@ -100,9 +99,6 @@ const styles = stylex.create({
     fontSize: "clamp(26px, 2.78vw, 40px)",
     lineHeight: 1.1,
   },
-  english: {
-    fontSize: 20,
-  },
   controls: {
     gridColumn: { default: "auto", [bp.wide]: "8 / 13" },
     display: "flex",
@@ -175,9 +171,6 @@ export function Lightbox(props: { lightbox: LightboxState; photos: readonly Ligh
                   </span>
                 </span>
                 <span {...stylex.attrs(type.light, styles.caption)}>{photo.caption}</span>
-                <span lang="en" {...stylex.attrs(type.serif, styles.english)}>
-                  {photo.english}
-                </span>
                 <span {...srOnly}>
                   Photo {index + 1} of {props.photos.length}
                 </span>

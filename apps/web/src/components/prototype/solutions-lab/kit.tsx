@@ -118,16 +118,6 @@ const styles = stylex.create({
   head: {
     marginBottom: { default: 32, [bp.xl]: 56 },
   },
-  eyebrow: {
-    margin: 0,
-    marginBottom: 12,
-    fontFamily: face.display,
-    fontSize: 12,
-    fontWeight: 600,
-    letterSpacing: "0.22em",
-    textTransform: "uppercase",
-    color: tone.accent,
-  },
   title: {
     margin: 0,
     fontSize: { default: 26, [bp.tablet]: 32, [bp.xl]: 40 },
@@ -210,9 +200,6 @@ export function LabSection(props: { children: JSX.Element }) {
     <section aria-labelledby="lab-solutions-title" {...stylex.attrs(styles.section)}>
       <div {...stylex.attrs(kitStyles.shell, kitStyles.inset120)}>
         <header {...stylex.attrs(styles.head)}>
-          <p lang="en" {...stylex.attrs(styles.eyebrow)}>
-            Solutions
-          </p>
           <h2 id="lab-solutions-title" {...stylex.attrs(styles.title)}>
             应用方案
           </h2>

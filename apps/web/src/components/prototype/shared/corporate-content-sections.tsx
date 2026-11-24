@@ -50,16 +50,12 @@ export function IngredientCardDetails(props: {
     techLabel: StyleXStyles;
     matrixSpecLink: StyleXStyles;
   };
-  i: number;
   item: Ingredient;
 }) {
   const styles = props.styles;
   return (
     <div {...stylex.attrs(styles.matrixCardBody)}>
       <div {...stylex.attrs(styles.matrixCardMeta)}>
-        <span {...stylex.attrs(styles.matrixCardIndex)}>
-          {String(props.i + 1).padStart(2, "0")} —
-        </span>
         <span {...stylex.attrs(styles.matrixCardCode)}>{props.item.code}</span>
       </div>
       <h3 {...stylex.attrs(styles.matrixCardTitle)}>{props.item.name}</h3>

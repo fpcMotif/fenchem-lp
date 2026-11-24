@@ -12,7 +12,6 @@ export type LightboxPhoto = {
   id: string;
   large: string;
   alt: string;
-  english: string;
   line: Unit;
 };
 
@@ -136,8 +135,6 @@ export function Lightbox(props: { lightbox: LightboxState; photos: readonly Ligh
           <p {...stylex.attrs(styles.caption)}>
             <span lang="en" {...stylex.attrs(styles.count)}>
               {String(index + 1).padStart(2, "0")} / {String(props.photos.length).padStart(2, "0")}
-              {" · "}
-              {photo.english}
             </span>
             <span {...stylex.attrs(styles.line)}>
               <Words

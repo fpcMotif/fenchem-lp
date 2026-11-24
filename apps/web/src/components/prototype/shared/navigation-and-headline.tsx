@@ -129,7 +129,7 @@ export function CampusStatistic(props: {
     visuallyHidden: StyleXStyles;
   };
   index: number;
-  stat: { label: string; value: string; unit: string | null; caption: string };
+  stat: { label: string; value: string; unit: string | null };
   RiseReveal: Component<{ children: JSX.Element; delay?: number; sx?: StyleXStyles }>;
   Odometer: Component<{ value: string; offset: number }>;
   riseDelay: (index: number) => number;
@@ -154,7 +154,6 @@ export function CampusStatistic(props: {
             {props.stat.unit ?? ""}
           </span>
         </p>
-        <p {...stylex.attrs(props.styles.statText)}>{props.stat.caption}</p>
       </props.RiseReveal>
     </>
   );

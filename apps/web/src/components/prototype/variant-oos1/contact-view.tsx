@@ -38,10 +38,7 @@ import { color, ease, font, layout, media } from "./tokens.stylex";
 
 const HAIRLINE = "rgba(26, 26, 26, 0.14)";
 const FIELD_BORDER = "#8a93a3";
-const TINT = "#f3f5fa";
-const BLUE_TINT = "#e6ecf7";
 const BLUE_WASH = "#f2f6fd";
-const CHIP_BG = "#f3f4f6";
 const REQUIRED_MARK = "#b91c1c";
 const MAP_LAND = "#eef1f5";
 const MAP_BLOCK = "#e3e8ef";
@@ -112,16 +109,6 @@ const styles = stylex.create({
   },
   sectionHeadTight: {
     marginBottom: { default: 32, [DESKTOP]: 40 },
-  },
-  sectionEyebrow: {
-    margin: 0,
-    marginBottom: 12,
-    fontFamily: font.display,
-    fontSize: 12,
-    fontWeight: 600,
-    letterSpacing: "0.22em",
-    textTransform: "uppercase",
-    color: colors.brandBlue700,
   },
   sectionTitle: {
     margin: 0,
@@ -235,7 +222,7 @@ const styles = stylex.create({
   },
 
   formPanel: {
-    backgroundColor: TINT,
+    backgroundColor: color.pageTint,
     padding: { default: "32px 20px", ["@media (min-width: 768px)"]: 40, [DESKTOP]: 48 },
   },
   form: {
@@ -524,7 +511,7 @@ const styles = stylex.create({
     borderRadius: 0,
     backgroundColor: {
       default: colors.paper,
-      ":hover": { default: null, [HOVER]: BLUE_TINT },
+      ":hover": { default: null, [HOVER]: color.blueTint },
     },
     fontFamily: "inherit",
     fontSize: 14,
@@ -545,7 +532,7 @@ const styles = stylex.create({
   },
 
   visitSection: {
-    backgroundColor: TINT,
+    backgroundColor: color.pageTint,
   },
   visitStage: {
     position: "relative",
@@ -768,7 +755,7 @@ const styles = stylex.create({
     width: 32,
     height: 32,
     borderRadius: 999,
-    backgroundColor: CHIP_BG,
+    backgroundColor: color.chip,
     color: color.ink,
     transitionProperty: "transform, background-color, color",
     transitionDuration: {
@@ -804,7 +791,6 @@ const styles = stylex.create({
 });
 
 function SectionHead(props: {
-  eyebrow: string;
   title: string;
   titleId: string;
   lead?: JSX.Element;
@@ -812,9 +798,6 @@ function SectionHead(props: {
 }) {
   return (
     <RiseReveal sx={[styles.sectionHead, props.tight && styles.sectionHeadTight]}>
-      <p lang="en" {...stylex.attrs(styles.sectionEyebrow)}>
-        {props.eyebrow}
-      </p>
       <h2 id={props.titleId} {...stylex.attrs(styles.sectionTitle)}>
         {props.title}
       </h2>
@@ -861,8 +844,6 @@ function InquiryFields(props: {
   focusOnMount: boolean;
 }) {
   let nameInput: HTMLInputElement | undefined;
-  const subject = () =>
-    INQUIRY_SUBJECTS.find((item) => item.id === props.subjectId) ?? INQUIRY_SUBJECTS[0];
 
   onSettled(() => {
     if (props.focusOnMount) focusWhenConnected(nameInput);
@@ -927,7 +908,6 @@ function InquiryFields(props: {
             required
             autocomplete="tel"
             inputmode="tel"
-            placeholder="用于物流通知与技术对接"
             {...stylex.attrs(styles.input)}
           />
         </Field>
@@ -949,7 +929,6 @@ function InquiryFields(props: {
             name="company"
             required
             autocomplete="organization"
-            placeholder="品牌方、代工厂或研发机构全称"
             {...stylex.attrs(styles.input)}
           />
         </Field>
@@ -958,7 +937,6 @@ function InquiryFields(props: {
             id="contact-message"
             name="message"
             required
-            placeholder={subject().placeholder}
             {...stylex.attrs(styles.input, styles.textarea)}
           />
         </Field>
@@ -1096,7 +1074,6 @@ function Inquiry() {
       <div {...stylex.attrs(kitStyles.shell, kitStyles.inset120, styles.inquiryLayout)}>
         <div {...stylex.attrs(styles.inquiryAside)}>
           <SectionHead
-            eyebrow={INQUIRY_INTRO.eyebrow}
             title={INQUIRY_INTRO.title}
             titleId="contact-inquiry-title"
             lead={INQUIRY_INTRO.lead}
@@ -1241,7 +1218,6 @@ function Visit() {
     >
       <div {...stylex.attrs(kitStyles.shell, kitStyles.inset120)}>
         <SectionHead
-          eyebrow={VISIT_INTRO.eyebrow}
           title={VISIT_INTRO.title}
           titleId="contact-visit-title"
           lead={VISIT_INTRO.lead}
@@ -1324,7 +1300,6 @@ function Faq() {
     >
       <div {...stylex.attrs(kitStyles.shell, kitStyles.inset120, styles.faqLayout)}>
         <SectionHead
-          eyebrow={CONTACT_FAQ_INTRO.eyebrow}
           title={CONTACT_FAQ_INTRO.title}
           titleId="contact-faq-title"
           lead={
@@ -1356,9 +1331,7 @@ export function ContactView(props: { onNavigateHome: (target?: string) => void }
         size="compact"
         title={CONTACT_BANNER.title}
         titleId="contact-banner-title"
-        tagline={CONTACT_BANNER.tagline}
         lead={CONTACT_BANNER.lead}
-        meta={CONTACT_BANNER.meta}
         image={CONTACT_BANNER.image}
         imageAlt={CONTACT_BANNER.imageAlt}
       />

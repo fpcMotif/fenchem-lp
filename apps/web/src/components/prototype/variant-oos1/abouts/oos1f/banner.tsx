@@ -112,21 +112,6 @@ const styles = stylex.create({
     objectPosition: "46% 50%",
     borderRadius: 2,
   },
-  caption: {
-    display: "flex",
-    columnGap: 20,
-    fontFamily: font.cjk,
-    fontSize: 12,
-    fontWeight: 400,
-    letterSpacing: "0.14em",
-    color: color.body,
-    writingMode: { default: "horizontal-tb", ["@media (min-width: 1024px)"]: "vertical-rl" },
-    position: { default: "static", ["@media (min-width: 1024px)"]: "absolute" },
-    top: { default: null, ["@media (min-width: 1024px)"]: 0 },
-    left: { default: null, ["@media (min-width: 1024px)"]: "calc(100% + 18px)" },
-    marginBlock: { default: 14, ["@media (min-width: 1024px)"]: 0 },
-    whiteSpace: "nowrap",
-  },
 });
 
 export function Banner() {
@@ -157,10 +142,6 @@ export function Banner() {
                 decoding="async"
                 {...stylex.attrs(styles.image)}
               />
-              <figcaption lang="en" {...stylex.attrs(styles.caption)}>
-                <span>{ABOUT_BANNER.established}</span>
-                <span>{ABOUT_BANNER.place}</span>
-              </figcaption>
             </figure>
           </div>
         </div>

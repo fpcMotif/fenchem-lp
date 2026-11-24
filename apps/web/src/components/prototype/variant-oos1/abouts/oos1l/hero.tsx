@@ -23,9 +23,6 @@ const styles = stylex.create({
     justifyContent: "space-between",
     gap: 24,
   },
-  place: {
-    margin: 0,
-  },
   title: {
     margin: 0,
     fontWeight: "inherit",
@@ -65,12 +62,6 @@ export function Hero() {
         <div {...stylex.attrs(ui.shell, styles.metaRow)}>
           <p {...stylex.attrs(ui.label)}>
             <span>{ABOUT_BANNER.title}</span>
-            <span lang="en" {...stylex.attrs(ui.labelEn)}>
-              About Fenchem, in one sentence
-            </span>
-          </p>
-          <p lang="en" {...stylex.attrs(ui.note, styles.place)}>
-            {ABOUT_BANNER.established} · {ABOUT_BANNER.place}
           </p>
         </div>
       </div>

@@ -377,15 +377,11 @@ export function LabPage(
     children: JSX.Element;
   },
 ) {
-  const articles = useLabArticles();
   return (
     <div id="insights-top" lang="zh-CN" {...stylex.attrs(kitStyles.root)}>
       <SubPageBanner
-        eyebrow="Insights"
         title="行业洞察"
-        tagline="Notes from the formulation bench"
         lead="来自泛成应用研发团队的原料趋势、配方方法与法规观察"
-        meta={[`${articles().length} 篇洞察 · 持续更新`]}
         image="/prototype/official-site/product-human-nutrition.webp"
         imageAlt="行业洞察"
         titleId="insights-banner-title"
@@ -404,8 +400,6 @@ export function LabPage(
       <Flow>
         <ContactCta
           id="insights-bottom-cta"
-          title="需要索取样品或技术资料？"
-          subtitle="我们的应用团队随时为您提供添加量指导与配方参考。"
           actions={[{ label: "联系我们", onClick: () => props.onNavigateHome("contact") }]}
         />
       </Flow>

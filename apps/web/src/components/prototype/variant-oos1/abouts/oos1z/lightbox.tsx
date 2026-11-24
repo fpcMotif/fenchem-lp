@@ -3,7 +3,7 @@ import { LightboxDialog, type LightboxState } from "../../../shared/lightbox";
 import * as stylex from "@stylexjs/stylex";
 import { ArrowLeft, ArrowRight, X } from "@fenchem-lp/ui/components/lucide";
 
-import { PLACE, WORKS, ui } from "./shared";
+import { WORKS, ui } from "./shared";
 import { bp, chrome, face, tone } from "./tokens.stylex";
 
 const fadeIn = stylex.keyframes({
@@ -89,10 +89,6 @@ const styles = stylex.create({
     fontFamily: face.sans,
     fontSize: 15,
   },
-  meta: {
-    fontSize: 16,
-    color: tone.body,
-  },
   control: {
     position: "absolute",
     display: "flex",
@@ -149,9 +145,6 @@ export function Lightbox(props: { lightbox: LightboxState }) {
                   Nº {work.number}
                 </span>
                 <span {...stylex.attrs(styles.title)}>{work.caption}</span>
-                <span lang="en" {...stylex.attrs(ui.italic, styles.meta)}>
-                  {work.english}, {PLACE}
-                </span>
               </figcaption>
             </figure>
           </LightboxStage>

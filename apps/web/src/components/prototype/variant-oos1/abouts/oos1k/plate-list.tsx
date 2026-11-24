@@ -71,12 +71,6 @@ const styles = stylex.create({
     letterSpacing: "0.04em",
     color: sky.star,
   },
-  english: {
-    fontFamily: face.serif,
-    fontStyle: "italic",
-    fontSize: { default: 17, [bp.tablet]: 19 },
-    color: sky.muted,
-  },
 });
 
 const focus = stylex.create({
@@ -111,9 +105,6 @@ export function PlateList(props: { always: boolean; onOpen: (index: number) => v
                 {plate.numeral}
               </span>
               <span {...stylex.attrs(styles.caption)}>{plate.caption}</span>
-              <span lang="en" {...stylex.attrs(styles.english)}>
-                {plate.english}
-              </span>
               <span {...srOnly}>{plate.numeral}, View larger</span>
             </span>
           </button>

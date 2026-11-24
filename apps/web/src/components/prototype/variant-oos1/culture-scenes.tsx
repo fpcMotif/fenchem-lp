@@ -1,308 +1,271 @@
 import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { m, useScroll, useTransform } from "@/compat/motion";
-import { createSignal, Show } from "solid-js";
+import { m, type TargetAndTransition, type Variants } from "@/compat/motion";
+import { createSignal } from "solid-js";
+import type { JSX } from "@solidjs/web";
 
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
-import { ABOUT_CAMPUS, ABOUT_CULTURE, ABOUT_MOMENT } from "./about-data";
-import { RiseReveal } from "./rise-reveal";
-import { color, font, layout, media } from "./tokens.stylex";
+import { ABOUT_CULTURE } from "./about-data";
+import { Reveal, kitStyles } from "./subpage-kit";
+import { color, media } from "./tokens.stylex";
 
-const FRAME_TINT = "#e6ecf7";
-const WASH_SAND = "#f8f4ec";
-const WASH_BLUE = "#f1f4fa";
-const WASH_GREEN = "#f1f6ee";
-const MD_TO_LG = "@media (min-width: 768px) and (max-width: 1023.98px)";
 const DESKTOP = "@media (min-width: 1280px)";
 const LG = "@media (min-width: 1024px)";
-const SCENE_OFFSET: ["start end", "end 0.35"] = ["start end", "end 0.35"];
-const HUMAN_ZOOM = 2.3;
+const TILE_SIZE = 384;
+const COMPACT_TILE = 112;
+const STROKE_WIDTH = 5;
+const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1];
+const DRAW_SECONDS = 1.1;
+const SETTLE_SECONDS = 0.7;
+
+const CULTURE_TITLES: Record<string, string> = { 专业和专注: "专业与专注" };
+
+const cultureCopy = (title: string) => {
+  const value = ABOUT_CULTURE.values.find((entry) => entry.title === title);
+  if (!value) return null;
+  return { title: CULTURE_TITLES[value.title] ?? value.title, desc: value.desc };
+};
 
 const styles = stylex.create({
   section: {
-    position: "relative",
-    overflow: "hidden",
-    paddingBlock: { default: 72, [DESKTOP]: 128 },
+    backgroundColor: colors.paper,
   },
-  shell: {
-    width: "100%",
-    maxWidth: 1440,
-    marginInline: "auto",
-    boxSizing: "border-box",
-    paddingInline: { default: 16, [media.tablet]: 40, [DESKTOP]: layout.inset120 },
-  },
+
   header: {
     marginBottom: { default: 40, [DESKTOP]: 64 },
   },
-  eyebrow: {
-    margin: 0,
-    marginBottom: 12,
-    fontFamily: font.display,
-    fontSize: 12,
-    fontWeight: 600,
-    letterSpacing: "0.22em",
-    textTransform: "uppercase",
-    color: colors.brandBlue700,
-  },
   title: {
     margin: 0,
+    paddingTop: 12,
     fontSize: { default: 26, [media.tablet]: 32, [DESKTOP]: 40 },
     fontWeight: 700,
     lineHeight: 1.2,
+
+    textWrap: "balance",
     color: color.ink,
   },
-  story: {
+  cards: {
+    display: "grid",
+    gridTemplateColumns: { default: "minmax(0, 1fr)", [LG]: "repeat(3, minmax(0, 1fr))" },
+    gap: { default: 20, [LG]: 24 },
+  },
+  card: {
     display: "flex",
-    flexDirection: "column",
-    gap: { default: 72, [media.tablet]: 96, [DESKTOP]: 128 },
+    flexDirection: { default: "row", [LG]: "column" },
+    alignItems: { default: "center", [LG]: "stretch" },
+    gap: { default: 16, [LG]: 0 },
   },
-  sceneGrid: {
-    display: { default: "block", [LG]: "grid" },
-    gridTemplateColumns: { default: "none", [LG]: "repeat(12, minmax(0, 1fr))" },
-    columnGap: 24,
-    alignItems: "end",
-  },
-
-  figure: {
-    margin: 0,
-  },
-  frame: {
-    position: "relative",
+  tile: {
+    flexShrink: 0,
+    width: { default: COMPACT_TILE, [LG]: "auto" },
+    aspectRatio: "1 / 1",
     overflow: "hidden",
-    backgroundColor: FRAME_TINT,
   },
-  fill: {
-    position: "absolute",
-    top: 0,
-    left: 0,
+  copy: {
+    minWidth: 0,
+    textAlign: { default: "start", [LG]: "center" },
+  },
+  art: {
     display: "block",
     width: "100%",
     height: "100%",
-    objectFit: "cover",
   },
-  caption: {
-    marginTop: 12,
-    fontSize: 12,
-    lineHeight: 1.6,
-    letterSpacing: "0.06em",
-    color: color.bodyText,
-  },
-
-  vastFigure: {
-    marginInline: { default: -16, ["@media (min-width: 768px)"]: 0 },
-  },
-  vastCaption: {
-    paddingLeft: { default: 16, ["@media (min-width: 768px)"]: 0 },
-  },
-  vastFrame: {
-    aspectRatio: { default: "4 / 3", [media.tablet]: "2 / 1", [DESKTOP]: "2.3 / 1" },
-  },
-  vastImage: {
-    objectPosition: "50% 72%",
-  },
-  vastText: {
-    display: "grid",
-    gridTemplateColumns: { default: "minmax(0, 1fr)", [LG]: "repeat(12, minmax(0, 1fr))" },
-    columnGap: 24,
-    marginTop: { default: 28, [DESKTOP]: 40 },
-  },
-  vastBody: {
-    gridColumn: { default: "auto", [LG]: "7 / 13" },
-  },
-  sceneFigure: {
-    gridColumn: { default: "auto", [LG]: "1 / 7" },
-    width: { default: "82%", [MD_TO_LG]: "72%", [LG]: "auto" },
-  },
-  sceneFrame: {
-    aspectRatio: "3 / 2",
-  },
-  sceneText: {
-    gridColumn: { default: "auto", [LG]: "7 / 13" },
-    marginTop: { default: 24, [LG]: 0 },
-  },
-  humanImage: {
-    transformOrigin: "73% 78%",
-  },
-
-  valueTitle: {
+  cardTitle: {
     margin: 0,
-    fontSize: { default: 24, [DESKTOP]: 32 },
-    fontWeight: 500,
+    marginTop: { default: 0, [LG]: 20 },
+    fontSize: { default: 18, [LG]: 22, [DESKTOP]: 24 },
+    fontWeight: 700,
     lineHeight: 1.3,
     letterSpacing: "0.06em",
     color: color.ink,
   },
-  desc: {
-    maxWidth: "28em",
+  cardDesc: {
     margin: 0,
-    marginTop: 14,
-    fontSize: 16,
-    lineHeight: 2,
-    letterSpacing: "0.04em",
+    marginTop: { default: 6, [LG]: 10 },
+    fontSize: 14,
+    lineHeight: 1.8,
+    letterSpacing: "0.02em",
     color: color.bodyText,
-    textWrap: "pretty",
+    textWrap: "balance",
   },
 });
 
-type CultureValue = (typeof ABOUT_CULTURE.values)[number];
-type CampusShot = (typeof ABOUT_CAMPUS.photos)[number];
+const draw = (delay: number, rest: TargetAndTransition = {}, hover: TargetAndTransition = {}) =>
+  ({
+    hidden: { pathLength: 0, opacity: 0 },
+    shown: {
+      pathLength: 1,
+      opacity: 1,
+      x: 0,
+      y: 0,
+      scale: 1,
+      ...rest,
+      transition: {
+        pathLength: { duration: DRAW_SECONDS, delay, ease: EASE },
+        opacity: { duration: 0.01, delay },
+        default: { duration: SETTLE_SECONDS, delay: delay + DRAW_SECONDS * 0.6, ease: EASE },
+      },
+    },
+    hover: { pathLength: 1, opacity: 1, ...hover, transition: { duration: 0.6, ease: EASE } },
+  }) satisfies Variants;
 
-const VALUES: readonly CultureValue[] = ABOUT_CULTURE.values;
-const [PROFESSIONAL, QUIET, TOGETHER, ...MORE_VALUES] = VALUES;
-const LAB = ABOUT_CAMPUS.photos.find((photo) => photo.id === "lab");
-const LOUNGE = ABOUT_CAMPUS.photos.find((photo) => photo.id === "lounge");
-const SPARE_PHOTOS = ABOUT_CAMPUS.photos.filter(
-  (photo) => photo.id !== "lab" && photo.id !== "lounge",
-);
+const CAIRN_STONES = [
+  {
+    d: "M64 300C64 266 120 248 190 248C262 248 318 266 318 296C318 322 268 332 190 332C110 332 64 324 64 300Z",
+    lift: 0,
+  },
+  {
+    d: "M102 222C100 198 140 186 186 186C236 186 268 200 268 220C268 240 232 248 184 248C136 248 104 242 102 222Z",
+    lift: -6,
+  },
+  {
+    d: "M146 166C146 148 172 138 202 138C232 138 254 150 252 166C250 180 228 186 200 186C170 186 146 180 146 166Z",
+    lift: -12,
+  },
+  {
+    d: "M170 126C170 116 182 110 196 110C212 110 222 117 222 126C222 134 210 138 196 138C182 138 170 134 170 126Z",
+    lift: -18,
+  },
+] as const;
 
-function useSceneProgress() {
-  const [target, setTarget] = createSignal<HTMLElement>();
-  const { scrollYProgress } = useScroll({ target, offset: SCENE_OFFSET });
-  return [setTarget, scrollYProgress] as const;
-}
+const RINGS = [
+  { r: 150, width: 3, focus: 0.88 },
+  { r: 102, width: 5, focus: 0.9 },
+  { r: 62, width: 7, focus: 0.94 },
+] as const;
 
-function VastScene(props: { value: CultureValue }) {
-  const [ref, progress] = useSceneProgress();
-  const reduce = useReducedMotion();
-  const scale = useTransform(progress, [0, 0.7], [1.18, 1]);
+const BOLT_HALVES = [
+  { d: "M309.7 40.6H159.6L61 246.1H167.2L208.1 200.4Z", apart: -16 },
+  { d: "M167.2 246.1L83.8 349.6L337 200.4H208.1Z", apart: 16 },
+] as const;
 
-  return (
-    <article ref={ref}>
-      <RiseReveal sx={[styles.figure, styles.vastFigure]}>
-        <figure {...stylex.attrs(styles.figure)}>
-          <div {...stylex.attrs(styles.frame, styles.vastFrame)}>
-            <m.img
-              src={ABOUT_MOMENT.image}
-              alt={ABOUT_MOMENT.alt}
-              loading="lazy"
-              decoding="async"
-              {...stylex.attrs(styles.fill, styles.vastImage)}
-              style={{ scale: reduce() ? 1 : scale }}
-            />
-          </div>
-          <figcaption {...stylex.attrs(styles.caption, styles.vastCaption)}>
-            {ABOUT_MOMENT.caption}
-          </figcaption>
-        </figure>
-      </RiseReveal>
-      <div {...stylex.attrs(styles.vastText)}>
-        <RiseReveal delay={0.15} sx={styles.vastBody}>
-          <h3 {...stylex.attrs(styles.valueTitle)}>{props.value.title}</h3>
-          <p {...stylex.attrs(styles.desc)}>{props.value.desc}</p>
-        </RiseReveal>
-      </div>
-    </article>
-  );
-}
-
-function RoomScene(props: { value: CultureValue; photo?: CampusShot }) {
-  const [ref, progress] = useSceneProgress();
-  const reduce = useReducedMotion();
-  const scale = useTransform(progress, [0, 1], [1, 1.16]);
-
-  return (
-    <article ref={ref} {...stylex.attrs(styles.sceneGrid)}>
-      <Show when={props.photo}>
-        {(photo) => (
-          <RiseReveal sx={styles.sceneFigure}>
-            <figure {...stylex.attrs(styles.figure)}>
-              <div {...stylex.attrs(styles.frame, styles.sceneFrame)}>
-                <m.img
-                  src={photo().src}
-                  alt={photo().alt}
-                  loading="lazy"
-                  decoding="async"
-                  {...stylex.attrs(styles.fill)}
-                  style={{ scale: reduce() ? 1 : scale }}
-                />
-              </div>
-              <figcaption {...stylex.attrs(styles.caption)}>{photo().caption}</figcaption>
-            </figure>
-          </RiseReveal>
-        )}
-      </Show>
-      <RiseReveal delay={0.15} sx={styles.sceneText}>
-        <h3 {...stylex.attrs(styles.valueTitle)}>{props.value.title}</h3>
-        <p {...stylex.attrs(styles.desc)}>{props.value.desc}</p>
-      </RiseReveal>
-    </article>
-  );
-}
-
-function HumanScene(props: { value: CultureValue; photo?: CampusShot }) {
-  const [ref, progress] = useSceneProgress();
-  const reduce = useReducedMotion();
-  const scale = useTransform(progress, [0, 0.8], [1.5, HUMAN_ZOOM]);
-
-  return (
-    <article ref={ref} {...stylex.attrs(styles.sceneGrid)}>
-      <Show when={props.photo}>
-        {(photo) => (
-          <RiseReveal sx={styles.sceneFigure}>
-            <figure {...stylex.attrs(styles.figure)}>
-              <div {...stylex.attrs(styles.frame, styles.sceneFrame)}>
-                <m.img
-                  src={photo().large}
-                  alt={photo().alt}
-                  loading="lazy"
-                  decoding="async"
-                  {...stylex.attrs(styles.fill, styles.humanImage)}
-                  style={{ scale: reduce() ? HUMAN_ZOOM : scale }}
-                />
-              </div>
-              <figcaption {...stylex.attrs(styles.caption)}>{photo().caption}</figcaption>
-            </figure>
-          </RiseReveal>
-        )}
-      </Show>
-      <RiseReveal delay={0.15} sx={styles.sceneText}>
-        <h3 {...stylex.attrs(styles.valueTitle)}>{props.value.title}</h3>
-        <p {...stylex.attrs(styles.desc)}>{props.value.desc}</p>
-      </RiseReveal>
-    </article>
-  );
-}
+const CARDS = [
+  {
+    title: "安静与坚持",
+    fill: "#6a8ece",
+    art: () => (
+      <g stroke="#2f4670">
+        <m.path d="M44 332H340" variants={draw(0)} />
+        {CAIRN_STONES.map(({ d, lift }, index) => (
+          <m.path d={d} variants={draw(0.12 * (index + 1), {}, { y: lift })} />
+        ))}
+      </g>
+    ),
+  },
+  {
+    title: "专业和专注",
+    fill: "#e3e3e3",
+    art: () => (
+      <g stroke="#7c7c82">
+        {RINGS.map(({ r, width, focus }, index) => (
+          <m.circle
+            cx={192}
+            cy={192}
+            r={r}
+            stroke-width={width}
+            variants={draw(0.14 * index, {}, { scale: focus })}
+          />
+        ))}
+        <m.circle
+          cx={192}
+          cy={192}
+          r={14}
+          fill="#7c7c82"
+          stroke="none"
+          variants={{
+            hidden: { scale: 0, opacity: 0 },
+            shown: {
+              scale: 1,
+              opacity: 1,
+              transition: {
+                delay: 0.14 * RINGS.length + DRAW_SECONDS * 0.5,
+                duration: 0.5,
+                ease: EASE,
+              },
+            },
+            hover: { scale: 1.35, opacity: 1, transition: { duration: 0.6, ease: EASE } },
+          }}
+        />
+      </g>
+    ),
+  },
+  {
+    title: "合作与创新",
+    fill: "#93c170",
+    art: () => (
+      <g stroke="#4a7d24" stroke-linejoin="round">
+        {BOLT_HALVES.map(({ d, apart }, index) => (
+          <m.path
+            d={d}
+            variants={{
+              ...draw(0.18 * index, {}, { x: 6, y: -6 }),
+              hidden: { pathLength: 0, opacity: 0, x: apart, y: apart },
+            }}
+          />
+        ))}
+      </g>
+    ),
+  },
+] satisfies { title: string; fill: string; art: () => JSX.Element }[];
 
 export function CultureScenes(props: { sx?: stylex.StyleXStyles }) {
-  const [section, setSection] = createSignal<HTMLElement>();
-  const { scrollYProgress } = useScroll({ target: section, offset: ["start end", "end start"] });
-  const wash = useTransform(
-    scrollYProgress,
-    [0.12, 0.45, 0.78],
-    [WASH_SAND, WASH_BLUE, WASH_GREEN],
-  );
+  const reduce = useReducedMotion();
+  const cards = CARDS.flatMap((card) => {
+    const value = cultureCopy(card.title);
+    return value ? [{ ...card, value }] : [];
+  });
+  if (cards.length === 0) return null;
 
   return (
-    <m.section
-      ref={setSection}
+    <section
       id="about-culture"
       aria-labelledby="about-culture-title"
       {...stylex.attrs(styles.section, props.sx)}
-      style={{ backgroundColor: wash }}
     >
-      <div {...stylex.attrs(styles.shell)}>
-        <RiseReveal sx={styles.header}>
-          <p lang="en" {...stylex.attrs(styles.eyebrow)}>
-            {ABOUT_CULTURE.eyebrow}
-          </p>
+      <div {...stylex.attrs(kitStyles.shell, kitStyles.inset120)}>
+        <Reveal sx={styles.header}>
           <h2 id="about-culture-title" {...stylex.attrs(styles.title)}>
             {ABOUT_CULTURE.title}
           </h2>
-        </RiseReveal>
-        <div {...stylex.attrs(styles.story)}>
-          {QUIET ? <VastScene value={QUIET} /> : null}
-          {PROFESSIONAL ? <RoomScene value={PROFESSIONAL} photo={LAB} /> : null}
-          {TOGETHER ? <HumanScene value={TOGETHER} photo={LOUNGE} /> : null}
-          {MORE_VALUES.map((value, index) =>
-            index % 2 === 0 ? (
-              <RoomScene value={value} photo={SPARE_PHOTOS[index % SPARE_PHOTOS.length]} />
-            ) : (
-              <HumanScene value={value} photo={SPARE_PHOTOS[index % SPARE_PHOTOS.length]} />
-            ),
-          )}
+        </Reveal>
+        <div {...stylex.attrs(styles.cards)}>
+          {cards.map((card, index) => {
+            const [hovered, setHovered] = createSignal(false);
+            const hover = (event: PointerEvent, on: boolean) => {
+              if (event.pointerType !== "touch") setHovered(on);
+            };
+            return (
+              <Reveal as="article" step={index} sx={styles.card}>
+                <div {...stylex.attrs(styles.tile)}>
+                  <m.svg
+                    viewBox={`0 0 ${TILE_SIZE} ${TILE_SIZE}`}
+                    fill="none"
+                    stroke-width={STROKE_WIDTH}
+                    stroke-linecap="round"
+                    aria-hidden="true"
+                    focusable="false"
+                    variants={{}}
+                    initial={reduce() ? "shown" : "hidden"}
+                    whileInView={hovered() && !reduce() ? "hover" : "shown"}
+                    viewport={{ once: true, margin: "0px 0px -12% 0px" }}
+                    onPointerEnter={(event: PointerEvent) => hover(event, true)}
+                    onPointerLeave={(event: PointerEvent) => hover(event, false)}
+                    {...stylex.attrs(styles.art)}
+                  >
+                    <rect width={TILE_SIZE} height={TILE_SIZE} fill={card.fill} />
+                    {card.art()}
+                  </m.svg>
+                </div>
+                <div {...stylex.attrs(styles.copy)}>
+                  <h3 {...stylex.attrs(styles.cardTitle)}>{card.value.title}</h3>
+                  <p {...stylex.attrs(styles.cardDesc)}>{card.value.desc}</p>
+                </div>
+              </Reveal>
+            );
+          })}
         </div>
       </div>
-    </m.section>
+    </section>
   );
 }

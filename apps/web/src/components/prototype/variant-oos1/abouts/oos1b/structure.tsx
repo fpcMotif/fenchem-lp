@@ -2,7 +2,7 @@ import * as stylex from "@stylexjs/stylex";
 
 import { ABOUT_STRUCTURE } from "../../about-data";
 import { Bevel, Mat, SectionHead, Tag, useArrived } from "./shared";
-import { ROMAN, stepIn, ui } from "./shared-values";
+import { stepIn, ui } from "./shared-values";
 import { bp, face, space, tone } from "./tokens.stylex";
 
 const LEGAL_SUFFIX = /有限公司$/;
@@ -46,10 +46,6 @@ const styles = stylex.create({
     fontWeight: 500,
     color: tone.ink,
   },
-  rowLabelEn: {
-    fontSize: { default: 18, [bp.desktop]: 22 },
-    color: tone.navy,
-  },
   row: {
     display: "grid",
     gridTemplateColumns: {
@@ -92,18 +88,6 @@ const styles = stylex.create({
     color: tone.body,
     fontWeight: 400,
   },
-  plateFoot: {
-    display: "flex",
-    alignItems: "baseline",
-    gap: 8,
-  },
-  numeral: {
-    fontFamily: face.latin,
-    fontSize: 11,
-    fontWeight: 500,
-    letterSpacing: "0.06em",
-    color: tone.navy,
-  },
   english: {
     margin: 0,
     fontSize: { default: 15, [bp.upTablet]: 16, [bp.wide]: 17 },
@@ -120,13 +104,7 @@ export function Structure() {
       aria-labelledby="oos1b-structure"
       {...stylex.attrs(ui.anchor, ui.section, ui.shell)}
     >
-      <SectionHead
-        id="oos1b-structure"
-        index={6}
-        eyebrow="Structure"
-        title={ABOUT_STRUCTURE.title}
-        note="One holding, five companies within it."
-      />
+      <SectionHead id="oos1b-structure" title={ABOUT_STRUCTURE.title} />
       <div ref={ref} {...stylex.attrs(...stepIn(arrived(), 0))}>
         <Mat
           raised
@@ -141,25 +119,15 @@ export function Structure() {
           }
         >
           <Bevel field={styles.wall}>
-            <p {...stylex.attrs(styles.rowLabel)}>
-              {subsidiaryBadge}
-              <span lang="en" {...stylex.attrs(ui.serif, styles.rowLabelEn)}>
-                Wholly owned
-              </span>
-            </p>
+            <p {...stylex.attrs(styles.rowLabel)}>{subsidiaryBadge}</p>
             <ul {...stylex.attrs(styles.row)}>
               {subsidiaries.map((subsidiary, index) => (
                 <li {...stylex.attrs(styles.slot, ...stepIn(arrived(), 1 + index * 0.35))}>
                   <Mat
                     layout={styles.plate}
                     foot={
-                      <p {...stylex.attrs(styles.plateFoot, ui.reset)}>
-                        <span lang="en" {...stylex.attrs(styles.numeral)}>
-                          {ROMAN[index].toLowerCase()}
-                        </span>
-                        <span lang="en" {...stylex.attrs(ui.serif, styles.english)}>
-                          {subsidiary.english}
-                        </span>
+                      <p lang="en" {...stylex.attrs(ui.reset, ui.serif, styles.english)}>
+                        {subsidiary.english}
                       </p>
                     }
                   >

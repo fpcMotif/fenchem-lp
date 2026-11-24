@@ -14,7 +14,6 @@ import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 import type { StyleXStyles } from "@stylexjs/stylex";
 import {
-  ArrowDown,
   ArrowDownRight,
   Globe,
   Lightbulb,
@@ -51,7 +50,6 @@ import {
   CAMPUS,
   COPYRIGHT,
   CTA,
-  ECHO,
   FOOTER_COLUMNS,
   GLOBAL_INTRO,
   HERO,
@@ -67,6 +65,7 @@ import {
   STATS,
   STRENGTHS,
   STRENGTHS_INTRO,
+  STRENGTHS_RING,
   type Market,
   type StrengthIcon,
   type StrengthTone,
@@ -306,16 +305,6 @@ const styles = stylex.create({
   regBottomRight: { bottom: -6, right: -6 },
   regOnDark: { color: colors.paper },
 
-  headRow: {
-    display: "flex",
-    flexWrap: "wrap",
-    alignItems: "baseline",
-    columnGap: 16,
-    rowGap: 4,
-  },
-  headRowCenter: {
-    justifyContent: "center",
-  },
   sectionTitle: {
     margin: 0,
     fontSize: { default: 26, [TABLET]: 32, [DESKTOP]: 40 },
@@ -323,16 +312,6 @@ const styles = stylex.create({
     lineHeight: 1.2,
     color: INK,
     textWrap: "balance",
-  },
-  echo: {
-    fontFamily: SERIF_FONT,
-    fontStyle: "italic",
-    fontWeight: 400,
-    fontSize: { default: 24, [DESKTOP]: 32 },
-    lineHeight: 1,
-    letterSpacing: "-0.01em",
-    color: colors.brandGreen800,
-    textTransform: "lowercase",
   },
   sectionLead: {
     margin: 0,
@@ -358,21 +337,6 @@ const styles = stylex.create({
     alignItems: "center",
     marginInline: "auto",
     textAlign: "center",
-  },
-  verticalLabel: {
-    writingMode: "vertical-rl",
-    margin: 0,
-    fontSize: 13,
-    fontWeight: 500,
-    lineHeight: 1,
-    letterSpacing: "0.42em",
-    color: BODY_TEXT,
-  },
-  upright: {
-    textCombineUpright: "all",
-    fontFamily: DISPLAY_FONT,
-    letterSpacing: 0,
-    color: colors.brandBlue700,
   },
 
   button: {
@@ -780,25 +744,6 @@ const styles = stylex.create({
     display: "flex",
     paddingTop: 8,
   },
-  heroMotto: {
-    display: { default: "none", [DESKTOP]: "flex" },
-    position: "absolute",
-    top: 300,
-    right: `calc(${INSET_120} / 2 - 6px)`,
-    flexDirection: "column",
-    alignItems: "center",
-    gap: 16,
-    color: INK,
-  },
-  heroMottoRule: {
-    width: 1,
-    height: 56,
-    backgroundColor: INK,
-  },
-  heroMottoText: {
-    color: INK,
-    letterSpacing: "0.5em",
-  },
   heroIndex: {
     display: "grid",
     gridTemplateColumns: {
@@ -892,9 +837,6 @@ const styles = stylex.create({
     writingMode: { default: "horizontal-tb", [DESKTOP]: "vertical-rl" },
     letterSpacing: { default: 0, [DESKTOP]: "0.18em" },
   },
-  aboutEcho: {
-    writingMode: { default: "horizontal-tb", [DESKTOP]: "vertical-rl" },
-  },
   aboutBody: {
     display: "flex",
     flexDirection: "column",
@@ -918,45 +860,8 @@ const styles = stylex.create({
 
   productsIntro: {
     position: "relative",
-    display: "grid",
-    gridTemplateColumns: {
-      default: "minmax(0, 1fr)",
-      [DESKTOP]: "auto minmax(0, 1fr) auto",
-    },
-    alignItems: "end",
-    gap: { default: 24, [DESKTOP]: 40 },
     paddingTop: { default: 72, [DESKTOP]: 120 },
     paddingBottom: { default: 24, [DESKTOP]: 56 },
-  },
-  productsEyebrow: {
-    display: { default: "none", [DESKTOP]: "block" },
-    alignSelf: "stretch",
-    paddingInlineEnd: 20,
-    borderInlineEndWidth: 1,
-    borderInlineEndStyle: "solid",
-    borderInlineEndColor: HAIRLINE,
-  },
-  crossHint: {
-    display: { default: "none", [CROSSING]: "inline-flex" },
-    alignItems: "center",
-    gap: 12,
-    margin: 0,
-    fontSize: 14,
-    lineHeight: 1.3,
-    color: BODY_TEXT,
-    whiteSpace: "nowrap",
-  },
-  crossHintArrow: {
-    display: "inline-flex",
-    alignItems: "center",
-    justifyContent: "center",
-    width: 40,
-    height: 40,
-    borderRadius: "50%",
-    borderWidth: 1,
-    borderStyle: "solid",
-    borderColor: colors.brandBlue700,
-    color: colors.brandBlue700,
   },
 
   run: {
@@ -1034,13 +939,6 @@ const styles = stylex.create({
   marketWordAlt: {
     color: WORD_ON_SURFACE,
   },
-  panelTag: {
-    display: { default: "none", [DESKTOP]: "block" },
-    position: "absolute",
-    top: { default: 96, [CROSSING]: 168 },
-    left: `calc(${INSET_120} / 2 + 2px)`,
-    zIndex: 1,
-  },
   marketFigure: {
     position: "relative",
     zIndex: 1,
@@ -1079,30 +977,6 @@ const styles = stylex.create({
     minWidth: 0,
     maxWidth: 560,
   },
-  marketLabel: {
-    display: "flex",
-    alignItems: "center",
-    gap: 12,
-    margin: 0,
-    fontFamily: DISPLAY_FONT,
-    fontSize: 13,
-    fontWeight: 500,
-    lineHeight: 1,
-    letterSpacing: "0.06em",
-    color: colors.brandBlue700,
-  },
-  marketLabelNumber: {
-    fontVariantNumeric: "tabular-nums",
-  },
-  marketLabelRule: {
-    width: 40,
-    height: 1,
-    backgroundColor: colors.brandBlue700,
-  },
-  marketLabelWord: {
-    textTransform: "lowercase",
-    color: BODY_TEXT,
-  },
   marketTitle: {
     margin: 0,
     fontSize: { default: 32, [TABLET]: 44, [DESKTOP]: "min(60px, 4.2vw)" },
@@ -1110,15 +984,6 @@ const styles = stylex.create({
     lineHeight: 1.1,
     letterSpacing: "0.01em",
     color: INK,
-  },
-  marketPitch: {
-    margin: 0,
-    marginTop: -6,
-    fontFamily: SERIF_FONT,
-    fontStyle: "italic",
-    fontSize: { default: 24, [DESKTOP]: 32 },
-    lineHeight: 1,
-    color: colors.brandGreen800,
   },
   marketKicker: {
     margin: 0,
@@ -1332,13 +1197,6 @@ const styles = stylex.create({
   quadrantTopRight: {
     flexDirection: { default: "row", [breakpoints.md]: "row-reverse" },
   },
-  quadrantNumber: {
-    fontFamily: DISPLAY_FONT,
-    fontSize: 13,
-    fontWeight: 500,
-    letterSpacing: "0.08em",
-    fontVariantNumeric: "tabular-nums",
-  },
   quadrantText: {
     position: "relative",
     display: "flex",
@@ -1449,9 +1307,6 @@ const styles = stylex.create({
     color: colors.paper,
   },
   campusTitle: {
-    color: colors.paper,
-  },
-  campusEcho: {
     color: colors.paper,
   },
   campusCut: {
@@ -2034,29 +1889,12 @@ function RegMark(props: { sx?: StyleXStyles }) {
   return <span aria-hidden="true" {...stylex.attrs(styles.regMark, props.sx)} />;
 }
 
-function Echo(props: { children: JSX.Element; sx?: StyleXStyles }) {
-  return (
-    <span aria-hidden="true" lang="en" {...stylex.attrs(styles.echo, props.sx)}>
-      {props.children}
-    </span>
-  );
-}
-
-function SectionHead(props: {
-  id: string;
-  title: string;
-  echo: string;
-  lead?: string;
-  center?: boolean;
-}) {
+function SectionHead(props: { id: string; title: string; lead?: string; center?: boolean }) {
   return (
     <ZoomReveal sx={[styles.head, props.center && styles.headCenter]}>
-      <div {...stylex.attrs(styles.headRow, props.center && styles.headRowCenter)}>
-        <h2 id={props.id} {...stylex.attrs(styles.sectionTitle)}>
-          {props.title}
-        </h2>
-        <Echo>{props.echo}</Echo>
-      </div>
+      <h2 id={props.id} {...stylex.attrs(styles.sectionTitle)}>
+        {props.title}
+      </h2>
       <Show when={props.lead}>
         <p {...stylex.attrs(styles.sectionLead)}>{props.lead}</p>
       </Show>
@@ -2199,12 +2037,6 @@ function Hero() {
             {HERO.secondary.label}
           </a>
         </div>
-        <div
-          {...stylex.attrs(styles.heroMotto, styles.heroRise, styles.enterDelay(introAfter(900)))}
-        >
-          <span aria-hidden="true" {...stylex.attrs(styles.heroMottoRule)} />
-          <p {...stylex.attrs(styles.verticalLabel, styles.heroMottoText)}>{HERO.motto}</p>
-        </div>
         <nav aria-label="Four application areas">
           <ul {...stylex.attrs(styles.heroIndex)}>
             {MARKETS.map((market, index) => (
@@ -2274,7 +2106,6 @@ function About() {
           <h2 id="oox-about-title" {...stylex.attrs(styles.sectionTitle, styles.aboutTitle)}>
             {ABOUT.title}
           </h2>
-          <Echo sx={styles.aboutEcho}>{ABOUT.echo}</Echo>
         </ZoomReveal>
         <div {...stylex.attrs(styles.aboutBody)}>
           <p ref={textEl} {...stylex.attrs(styles.aboutText)}>
@@ -2297,35 +2128,13 @@ function About() {
 }
 
 function ProductsIntro() {
-  let introEl: HTMLDivElement | undefined;
-  const reduce = useReducedMotion();
-  const { scrollYProgress } = useScroll({
-    target: () => introEl,
-    offset: ["start 0.7", "end start"],
-  });
-  const turn = useTransform(scrollYProgress, [0, 1], [0, -90]);
   return (
-    <div ref={introEl} {...stylex.attrs(styles.shell, styles.inset120, styles.productsIntro)}>
-      <p aria-hidden="true" {...stylex.attrs(styles.verticalLabel, styles.productsEyebrow)}>
-        {PRODUCTS_INTRO.eyebrow}
-        <span {...stylex.attrs(styles.upright)}>{twoDigits(MARKETS.length)}</span>
-      </p>
+    <div {...stylex.attrs(styles.shell, styles.inset120, styles.productsIntro)}>
       <SectionHead
         id="oox-products-title"
         title={PRODUCTS_INTRO.title}
-        echo={PRODUCTS_INTRO.echo}
         lead={PRODUCTS_INTRO.lead}
       />
-      <p {...stylex.attrs(styles.crossHint)}>
-        {PRODUCTS_INTRO.hint}
-        <m.span
-          aria-hidden="true"
-          {...stylex.attrs(styles.crossHintArrow)}
-          style={reduce() ? undefined : { rotate: turn }}
-        >
-          <ArrowDown size={16} strokeWidth={1.5} absoluteStrokeWidth />
-        </m.span>
-      </p>
     </div>
   );
 }
@@ -2369,10 +2178,6 @@ function MarketPanel(props: {
       >
         {props.market.word}
       </m.span>
-      <p aria-hidden="true" {...stylex.attrs(styles.verticalLabel, styles.panelTag)}>
-        应用领域
-        <span {...stylex.attrs(styles.upright)}>{twoDigits(props.index + 1)}</span>
-      </p>
       <figure {...stylex.attrs(styles.marketFigure)}>
         <div {...stylex.attrs(styles.marketFrame)}>
           <m.img
@@ -2390,19 +2195,9 @@ function MarketPanel(props: {
         <RegMark sx={styles.regBottomRight} />
       </figure>
       <m.div {...stylex.attrs(styles.marketCopy)} style={{ x: copyX }}>
-        <p lang="en" {...stylex.attrs(styles.marketLabel)}>
-          <span {...stylex.attrs(styles.marketLabelNumber)}>
-            {twoDigits(props.index + 1)} / {twoDigits(MARKETS.length)}
-          </span>
-          <span aria-hidden="true" {...stylex.attrs(styles.marketLabelRule)} />
-          <span {...stylex.attrs(styles.marketLabelWord)}>{props.market.english}</span>
-        </p>
         <h3 id={titleId} {...stylex.attrs(styles.marketTitle)}>
           {props.market.title}
         </h3>
-        <p lang="en" {...stylex.attrs(styles.marketPitch)}>
-          {props.market.pitch}
-        </p>
         <p {...stylex.attrs(styles.marketKicker)}>{props.market.kicker}</p>
         <ul aria-label={`${props.market.english} segments`} {...stylex.attrs(styles.marketTags)}>
           <For each={props.market.tags}>
@@ -2594,9 +2389,6 @@ function Quadrant(props: {
         )}
       >
         <Icon size={36} strokeWidth={1.5} absoluteStrokeWidth aria-hidden="true" />
-        <span aria-hidden="true" {...stylex.attrs(styles.quadrantNumber)}>
-          {twoDigits(props.index + 1)}
-        </span>
       </div>
       <StrengthQuadrantCopy
         styles={{
@@ -2638,7 +2430,6 @@ function Strengths() {
       <SectionHead
         id="oox-strengths-title"
         title={STRENGTHS_INTRO.title}
-        echo={ECHO.strengths}
         lead={STRENGTHS_INTRO.lead}
         center
       />
@@ -2660,7 +2451,7 @@ function Strengths() {
                 // Solid's TextPath typings omit these valid SVGTextContentElement attributes.
                 {...{ textLength: RING_LENGTH, lengthAdjust: "spacing" }}
               >
-                {ECHO.strengthsRing}
+                {STRENGTHS_RING}
               </textPath>
             </text>
             <g {...stylex.attrs(styles.badgeCross)} stroke="currentColor" stroke-width="1">
@@ -2744,7 +2535,6 @@ function Campus() {
             <h2 id="oox-campus-title" {...stylex.attrs(styles.sectionTitle, styles.campusTitle)}>
               {CAMPUS.label}
             </h2>
-            <Echo sx={styles.campusEcho}>{CAMPUS.echo}</Echo>
           </div>
         </m.div>
         <m.span
@@ -2785,7 +2575,6 @@ function StatItem(props: { stat: (typeof STATS)[number]; index: number }) {
             {props.stat.unit ?? ""}
           </span>
         </p>
-        <p {...stylex.attrs(styles.statText)}>{props.stat.caption}</p>
       </ZoomReveal>
     </>
   );
@@ -2825,12 +2614,9 @@ function Offices() {
             ))}
           </div>
           <div {...stylex.attrs(styles.globalCopy)}>
-            <div {...stylex.attrs(styles.headRow, styles.headRowCenter)}>
-              <h2 id="oox-offices-title" {...stylex.attrs(styles.sectionTitle)}>
-                {GLOBAL_INTRO.title}
-              </h2>
-              <Echo>{ECHO.offices}</Echo>
-            </div>
+            <h2 id="oox-offices-title" {...stylex.attrs(styles.sectionTitle)}>
+              {GLOBAL_INTRO.title}
+            </h2>
             <p {...stylex.attrs(styles.sectionLead)}>{GLOBAL_INTRO.lead}</p>
           </div>
         </ZoomReveal>
@@ -2897,7 +2683,7 @@ function News() {
       {...stylex.attrs(styles.news, styles.anchor)}
     >
       <div {...stylex.attrs(styles.shell, styles.inset120, styles.newsInner)}>
-        <SectionHead id="oox-news-title" title={NEWS_TITLE} echo={ECHO.news} />
+        <SectionHead id="oox-news-title" title={NEWS_TITLE} />
         <ul {...stylex.attrs(styles.accordion)}>
           {NEWS.map((item, index) => (
             <m.li layout="position" transition={{ duration: 0.25, ease: EASE }}>
@@ -2927,12 +2713,9 @@ function ContactCta() {
         Fenchem
       </span>
       <ZoomReveal sx={[styles.shell, styles.inset120, styles.ctaInner]}>
-        <div {...stylex.attrs(styles.headRow, styles.headRowCenter)}>
-          <h2 id="oox-contact-title" {...stylex.attrs(styles.sectionTitle)}>
-            {CTA.title}
-          </h2>
-          <Echo>{CTA.echo}</Echo>
-        </div>
+        <h2 id="oox-contact-title" {...stylex.attrs(styles.sectionTitle)}>
+          {CTA.title}
+        </h2>
         <p {...stylex.attrs(styles.sectionLead, styles.ctaLead)}>{CTA.lead}</p>
         <ul aria-label="Choose an application area" {...stylex.attrs(styles.ctaMarkets)}>
           {MARKETS.map((market, index) => (

@@ -1,7 +1,7 @@
 import { fileURLToPath } from "node:url";
 
 import solid from "@solidjs/vite-plugin";
-import stylex from "@stylexjs/unplugin";
+import stylexRs from "@stylexswc/unplugin/vite";
 import { defineConfig } from "vitest/config";
 
 const appSrc = fileURLToPath(new URL("./src", import.meta.url));
@@ -10,13 +10,20 @@ const rootDir = fileURLToPath(new URL("../..", import.meta.url));
 
 export default defineConfig({
   plugins: [
-    stylex.vite({
-      useCSSLayers: true,
-      unstable_moduleResolution: {
-        type: "commonJS",
-        rootDir,
-      },
-    }),
+    [
+      stylexRs({
+        useCSSLayers: true,
+        rsOptions: {
+          dev: true,
+          unstable_moduleResolution: {
+            type: "commonJS",
+            rootDir,
+          },
+        },
+      }),
+    ]
+      .flat()
+      .map((plugin) => ({ ...plugin, enforce: "pre" as const })),
     solid(),
   ],
   resolve: {

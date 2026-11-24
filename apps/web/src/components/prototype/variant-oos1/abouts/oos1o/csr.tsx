@@ -5,8 +5,6 @@ import { SectionHead } from "./section-head";
 import { ui } from "./shared";
 import { bp, chrome, face, tone } from "./tokens.stylex";
 
-const NUMERALS = ["i", "ii", "iii"] as const;
-
 const styles = stylex.create({
   section: {
     paddingTop: { default: 96, [bp.tablet]: 128, [bp.desktop]: 176 },
@@ -77,25 +75,13 @@ const styles = stylex.create({
     letterSpacing: "0.04em",
     color: tone.ink,
   },
-  numeral: {
-    minWidth: 26,
-    fontSize: 24,
-    lineHeight: 1,
-    color: tone.blue,
-  },
 });
 
 export function Csr() {
   return (
     <section id="about-csr" aria-labelledby="oos1o-csr" {...stylex.attrs(styles.section)}>
       <div {...stylex.attrs(ui.shell, ui.grid)}>
-        <SectionHead
-          id="oos1o-csr"
-          label="Responsibility"
-          title={ABOUT_CSR.title}
-          quiet
-          sx={styles.head}
-        />
+        <SectionHead id="oos1o-csr" title={ABOUT_CSR.title} quiet sx={styles.head} />
         <p {...stylex.attrs(styles.statement)}>
           <span {...stylex.attrs(styles.line)}>{ABOUT_CSR.statement[0]}</span>
           <span {...stylex.attrs(styles.line, styles.lineIndent)}>{ABOUT_CSR.statement[1]}</span>
@@ -110,16 +96,11 @@ export function Csr() {
             {...stylex.attrs(ui.fill, styles.image)}
           />
         </figure>
-        <ol {...stylex.attrs(styles.outcomes)}>
-          {ABOUT_CSR.outcomes.map((outcome, index) => (
-            <li {...stylex.attrs(styles.outcome)}>
-              <span aria-hidden="true" {...stylex.attrs(ui.serif, styles.numeral)}>
-                {NUMERALS[index]}
-              </span>
-              {outcome.title}
-            </li>
+        <ul {...stylex.attrs(styles.outcomes)}>
+          {ABOUT_CSR.outcomes.map((outcome) => (
+            <li {...stylex.attrs(styles.outcome)}>{outcome.title}</li>
           ))}
-        </ol>
+        </ul>
       </div>
     </section>
   );

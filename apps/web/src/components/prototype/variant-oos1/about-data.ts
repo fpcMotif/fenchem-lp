@@ -11,7 +11,7 @@ export const ABOUT_BANNER = {
 export const ABOUT_HERO = {
   title: "南京泛成国际控股有限公司",
   englishTitle: "Fenchem Holdings Corporation Ltd.",
-  lead: "自1995年创立于南京，专注于为食品营养品、宠物健康和个人护理行业提供原料和解决方案，建立起集研产销于一体的完整产业链。",
+  lead: "FENCHEM自1995年创立于南京，专注于为食品营养品、宠物健康和个人护理行业提供原料和解决方案，建立起集研产销于一体的完整产业链。",
   networkLabel: "全球 16 家分支机构，遍布",
   countries: [
     "美国",
@@ -48,7 +48,6 @@ export const ABOUT_HISTORY = {
   milestones: [
     {
       year: 1995,
-      kicker: "Beginning",
       events: [{ text: "在中国-南京成立总部" }],
     },
     {
@@ -118,6 +117,7 @@ export const ABOUT_MOMENT = {
 export const ABOUT_CAMPUS = {
   eyebrow: "Campus",
   title: "园区环境",
+  galleryTitle: "工作环境",
   photos: [
     {
       id: "aerial",
@@ -217,12 +217,97 @@ export const ABOUT_CULTURE = {
   ],
 } as const;
 
+export const ABOUT_RD = {
+  navChip: { label: "研发智造", english: "R&D", id: "about-rd" },
+  title: "研发智造",
+
+  image: "/prototype/about/campus-lab-lg.webp",
+  imageAlt: "Fenchem R&D laboratory with glass-walled labs",
+  pillars: [
+    {
+      title: "生产基地",
+      desc: "公司生产基地位于南京溧水经济开发区，毗邻禄口国际机场，总占地面积约3.5万平方米。工厂严格依照国际标准规划建设，融合精益化、自动化、信息化生产体系。",
+    },
+    {
+      title: "研发创新",
+      desc: "泛成研发中心配置国内外先进的分析检测仪器及小试、中试成套设备。团队聚焦提取、分离、精制、物理改性等核心工艺，深耕原料开发、配方应用与功效验证。依托自主研发与产学研协同合作，累计申请专利超160项，授权专利85余项（含发明专利30余项）。",
+    },
+    {
+      title: "质控服务",
+      desc: "坚持以终端应用与客户需求为导向，依托原料甄选、全链路质控、柔性生产及定制化解决方案能力，搭建起成熟专业的闭环管理体系，精准把控产业链每一环节，稳定输出高品质产品。",
+    },
+  ],
+} as const;
+
+export const ABOUT_CERTIFICATIONS = {
+  id: "about-certifications",
+  title: "质量认证",
+  items: [
+    { id: "iso-9001", name: "ISO 9001", image: "/prototype/about/certifications/iso-9001.png" },
+    { id: "iso-14001", name: "ISO 14001", image: "/prototype/about/certifications/iso-14001.png" },
+    { id: "iso-45001", name: "ISO 45001", image: "/prototype/about/certifications/iso-45001.png" },
+    { id: "ecovadis", name: "EcoVadis", image: "/prototype/about/certifications/ecovadis.png" },
+    { id: "smeta", name: "SMETA", image: "/prototype/about/certifications/smeta.png" },
+    {
+      id: "fssc-22000",
+      name: "FSSC 22000",
+      image: "/prototype/about/certifications/fssc-22000.png",
+    },
+    {
+      id: "brcgs",
+      name: "BRCGS Food Safety",
+      image: "/prototype/about/certifications/brcgs.png",
+    },
+    {
+      id: "usda-organic",
+      name: "USDA Organic",
+      image: "/prototype/about/certifications/usda-organic.png",
+    },
+    {
+      id: "gmp-plus",
+      name: "GMP+ Feed Safety Assurance",
+      image: "/prototype/about/certifications/gmp-plus.png",
+    },
+    {
+      id: "eurofins-ip-trust",
+      name: "Eurofins IP TRUST Site",
+      image: "/prototype/about/certifications/eurofins-ip-trust.png",
+    },
+    { id: "fami-qs", name: "FAMI-QS", image: "/prototype/about/certifications/fami-qs.png" },
+    {
+      id: "reach",
+      name: "REACH Compliant",
+      image: "/prototype/about/certifications/reach.png",
+    },
+    {
+      id: "rspo",
+      name: "RSPO Certified Sustainable Palm Oil",
+      image: "/prototype/about/certifications/rspo.png",
+    },
+    { id: "ok-kosher", name: "OK Kosher", image: "/prototype/about/certifications/ok-kosher.png" },
+    {
+      id: "star-k-kosher",
+      name: "Star-K Kosher",
+      image: "/prototype/about/certifications/star-k-kosher.png",
+    },
+    { id: "halal", name: "Halal", image: "/prototype/about/certifications/halal.png" },
+    {
+      id: "ecocert",
+      name: "ECOCERT Raw Material Cosmetics",
+      image: "/prototype/about/certifications/ecocert.png",
+    },
+    { id: "natrue", name: "NATRUE", image: "/prototype/about/certifications/natrue.png" },
+  ],
+} as const;
+
 export const ABOUT_CSR = {
   title: "社会责任",
   statement: ["平衡生态环境和客户需求，", "确保可持续发展。"],
   desc: "在碳达峰碳中和的大背景下，我们将可持续发展理念与企业发展战略相融合，在产品中积极运用可持续科技。",
   image: "/prototype/about/csr-campus-lake.webp",
   imageAlt: "Campus pond reflecting the Fenchem R&D building and trees",
+  forestImage: "/prototype/about/csr-forest.jpg",
+  forestImageAlt: "Sunlight falling through a misty old-growth forest with mossy ground",
   outcomes: [
     { icon: "factory", title: "降低工业能耗" },
     { icon: "recycle", title: "减少原料损耗" },
@@ -295,7 +380,7 @@ export const ABOUT_STRUCTURE = {
     name: "南京泛成国际控股有限公司",
     english: "Fenchem Holdings Corporation Ltd.",
   },
-  subsidiaryBadge: "全资子公司",
+  subsidiaryBadge: "控股子公司",
   subsidiaryBadgeEnglish: "Wholly owned subsidiary",
   subsidiaries: [
     { id: "sub-1", name: "南京豪亚生物化工有限公司", english: "Fenchem Supply Chain Ltd." },

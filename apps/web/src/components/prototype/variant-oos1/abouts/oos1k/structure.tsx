@@ -235,13 +235,7 @@ export function Structure() {
       {...stylex.attrs(ui.section, ui.shell)}
     >
       <div {...stylex.attrs(styles.head)}>
-        <ChartHeading
-          id="oos1k-structure"
-          numeral="VI"
-          label="Structure"
-          title={ABOUT_STRUCTURE.title}
-          note="A primary and five companions"
-        />
+        <ChartHeading id="oos1k-structure" title={ABOUT_STRUCTURE.title} />
         <p {...stylex.attrs(styles.legend)}>
           <span {...stylex.attrs(styles.legendItem)}>
             <span aria-hidden="true" {...stylex.attrs(styles.legendDot, styles.legendPrimary)} />

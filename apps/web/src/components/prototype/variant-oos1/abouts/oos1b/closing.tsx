@@ -89,14 +89,6 @@ const styles = stylex.create({
     letterSpacing: "0.08em",
     whiteSpace: "nowrap",
   },
-  coreEnglish: {
-    fontFamily: face.serif,
-    fontStyle: "italic",
-    fontWeight: 400,
-    fontSize: { default: 20, [bp.desktop]: 24 },
-    letterSpacing: 0,
-    color: "rgba(255, 255, 255, 0.78)",
-  },
   arrow: {
     flexShrink: 0,
     transform: {
@@ -114,13 +106,7 @@ export function Closing(props: { onNavigateHome: (hash?: string) => void }) {
     <section aria-labelledby="oos1b-closing" {...stylex.attrs(ui.shell, styles.closing)}>
       <div {...stylex.attrs(styles.grid)}>
         <div {...stylex.attrs(styles.copy)}>
-          <SectionHead
-            id="oos1b-closing"
-            index={7}
-            eyebrow="Contact"
-            title="联系我们"
-            note="The next frame is yours."
-          />
+          <SectionHead id="oos1b-closing" title="联系我们" />
         </div>
         <a
           href="#contact"
@@ -137,12 +123,7 @@ export function Closing(props: { onNavigateHome: (hash?: string) => void }) {
                   <span {...stylex.attrs(styles.bevel, styles.bevelInner)}>
                     <span {...stylex.attrs(styles.coreLine)}>
                       <span {...stylex.attrs(styles.core)}>
-                        <span {...stylex.attrs(styles.coreLabel)}>
-                          联系泛成
-                          <span lang="en" {...stylex.attrs(styles.coreEnglish)}>
-                            Get in touch
-                          </span>
-                        </span>
+                        <span {...stylex.attrs(styles.coreLabel)}>联系泛成</span>
                         <ArrowRight
                           size={22}
                           strokeWidth={1.5}

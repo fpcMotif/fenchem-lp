@@ -598,7 +598,7 @@ export const FORMULA_TRAITS: Record<string, FormulaTraits> = {
     vessel: "bottle",
     family: "油",
     viscosity: 26,
-    zone: "身体",
+    zone: "面部",
     tags: ["清洁", "滋养"],
     uses: ["avocado"],
   },

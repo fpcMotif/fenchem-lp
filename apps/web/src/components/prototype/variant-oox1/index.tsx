@@ -41,11 +41,10 @@ import { INTRO_REVEAL_MS, introStyles, useIntro } from "@/components/prototype/s
 import {
   ABOUT,
   CAMPUS,
-  CONTACT,
   COPYRIGHT,
+  CTA,
   DECK_CLOSE,
   DECK_OPEN,
-  ECHO,
   FOOTER_COLUMNS,
   GLOBAL_INTRO,
   HERO,
@@ -325,20 +324,7 @@ const styles = stylex.create({
     outlineOffset: 2,
     fontSize: 10,
   },
-  ringOnDark: {
-    color: colors.paper,
-  },
 
-  headRow: {
-    display: "flex",
-    flexWrap: "wrap",
-    alignItems: "baseline",
-    columnGap: 16,
-    rowGap: 4,
-  },
-  headRowCenter: {
-    justifyContent: "center",
-  },
   sectionTitle: {
     margin: 0,
     fontSize: { default: 26, [TABLET]: 32, [DESKTOP]: 40 },
@@ -346,19 +332,6 @@ const styles = stylex.create({
     lineHeight: 1.2,
     color: INK,
     textWrap: "balance",
-  },
-  echo: {
-    fontFamily: SERIF_FONT,
-    fontStyle: "italic",
-    fontWeight: 400,
-    fontSize: { default: 24, [DESKTOP]: 32 },
-    lineHeight: 1,
-    letterSpacing: "-0.01em",
-    color: colors.brandGreen800,
-    textTransform: "lowercase",
-  },
-  echoOnDark: {
-    color: colors.brandGreen300,
   },
   sectionLead: {
     margin: 0,
@@ -987,22 +960,10 @@ const styles = stylex.create({
     outlineColor: colors.brandBlue700,
     outlineOffset: 4,
   },
-  frameIndexText: {
-    display: "flex",
-    flexDirection: "column",
-    gap: 4,
-  },
   frameIndexName: {
     fontSize: 16,
     fontWeight: 500,
     lineHeight: 1.2,
-  },
-  frameIndexWord: {
-    fontFamily: DISPLAY_FONT,
-    fontSize: 13,
-    lineHeight: 1.2,
-    color: BODY_TEXT,
-    textTransform: "lowercase",
   },
   frameIndexMuted: {
     color: BODY_TEXT,
@@ -1090,9 +1051,6 @@ const styles = stylex.create({
     color: colors.brandBlue700,
     fontVariantNumeric: "tabular-nums",
   },
-  cardStripWord: {
-    textTransform: "lowercase",
-  },
   cardBody: {
     display: "flex",
     flexDirection: { default: "column", [DESKTOP]: "row" },
@@ -1144,11 +1102,6 @@ const styles = stylex.create({
     flexBasis: 0,
     minWidth: 0,
   },
-  wordRow: {
-    display: "flex",
-    alignItems: "flex-start",
-    gap: 16,
-  },
   word: {
     fontFamily: DISPLAY_FONT,
     fontSize: { default: 64, [TABLET]: 88, [DESKTOP]: "min(108px, 11vh)" },
@@ -1159,24 +1112,12 @@ const styles = stylex.create({
     color: INK,
     paddingBottom: "0.08em",
   },
-  wordRing: {
-    marginTop: 4,
-  },
   cardTitle: {
     margin: 0,
     fontSize: { default: 28, [DESKTOP]: "min(40px, 4.4vh)" },
     fontWeight: 700,
     lineHeight: 1.15,
     color: INK,
-  },
-  pitch: {
-    margin: 0,
-    marginTop: -4,
-    fontFamily: SERIF_FONT,
-    fontStyle: "italic",
-    fontSize: { default: 24, [DESKTOP]: "min(30px, 3.3vh)" },
-    lineHeight: 1,
-    color: colors.brandGreen800,
   },
   kicker: {
     margin: 0,
@@ -1275,9 +1216,6 @@ const styles = stylex.create({
     display: "flex",
     alignItems: "center",
     justifyContent: "space-between",
-    color: INK,
-  },
-  strengthRing: {
     color: INK,
   },
   strengthText: {
@@ -1875,14 +1813,6 @@ function Ring(props: { value: number; sx?: StyleXStyles }) {
   );
 }
 
-function Echo(props: { children: JSX.Element; sx?: StyleXStyles }) {
-  return (
-    <span aria-hidden="true" lang="en" {...stylex.attrs(styles.echo, props.sx)}>
-      {props.children}
-    </span>
-  );
-}
-
 function GhostButton(props: {
   href: string;
   label: string;
@@ -1913,21 +1843,12 @@ function GhostButton(props: {
   );
 }
 
-function SectionHead(props: {
-  id: string;
-  title: string;
-  echo: string;
-  lead?: string;
-  center?: boolean;
-}) {
+function SectionHead(props: { id: string; title: string; lead?: string; center?: boolean }) {
   return (
     <ZoomReveal sx={[styles.head, props.center && styles.headCenter]}>
-      <div {...stylex.attrs(styles.headRow, props.center && styles.headRowCenter)}>
-        <h2 id={props.id} {...stylex.attrs(styles.sectionTitle)}>
-          {props.title}
-        </h2>
-        <Echo>{props.echo}</Echo>
-      </div>
+      <h2 id={props.id} {...stylex.attrs(styles.sectionTitle)}>
+        {props.title}
+      </h2>
       <Show when={props.lead}>
         <p {...stylex.attrs(styles.sectionLead)}>{props.lead}</p>
       </Show>
@@ -2127,7 +2048,6 @@ function Strengths() {
       <SectionHead
         id="oox1-strengths-title"
         title={STRENGTHS_INTRO.title}
-        echo={ECHO.strengths}
         lead={STRENGTHS_INTRO.lead}
         center
       />
@@ -2143,7 +2063,6 @@ function Strengths() {
             >
               <IconPattern icon={strength.icon} />
               <div {...stylex.attrs(styles.strengthTop, inverse && styles.strengthInverse)}>
-                <Ring value={index + 1} sx={[styles.strengthRing, inverse && styles.ringOnDark]} />
                 <Icon size={28} strokeWidth={1.5} absoluteStrokeWidth aria-hidden="true" />
               </div>
               <div {...stylex.attrs(styles.strengthText, inverse && styles.strengthInverse)}>
@@ -2179,16 +2098,15 @@ function About() {
       {...stylex.attrs(styles.about, styles.anchor)}
     >
       <span aria-hidden="true" lang="en" {...stylex.attrs(styles.aboutWord)}>
-        {ABOUT.echo}
+        {ABOUT.word}
       </span>
       <div {...stylex.attrs(styles.shell, styles.inset120, styles.aboutInner)}>
         <DoubleRule sx={styles.doubleRuleOnDark} />
         <div {...stylex.attrs(styles.aboutGrid)}>
-          <ZoomReveal sx={styles.headRow}>
+          <ZoomReveal>
             <h2 id="oox1-about-title" {...stylex.attrs(styles.sectionTitle, styles.aboutTitle)}>
               {ABOUT.title}
             </h2>
-            <Echo sx={styles.echoOnDark}>{ABOUT.echo}</Echo>
           </ZoomReveal>
           <ZoomReveal delay={0.08} sx={styles.aboutBody}>
             <p {...stylex.attrs(styles.aboutText)}>{ABOUT.body}</p>
@@ -2214,12 +2132,7 @@ function FrameIndex(props: { mirrored?: boolean }) {
         const body = (
           <>
             <Ring value={index + 1} />
-            <span {...stylex.attrs(styles.frameIndexText)}>
-              <span {...stylex.attrs(styles.frameIndexName)}>{market.title}</span>
-              <span lang="en" {...stylex.attrs(styles.frameIndexWord)}>
-                {market.english}
-              </span>
-            </span>
+            <span {...stylex.attrs(styles.frameIndexName)}>{market.title}</span>
           </>
         );
         return (
@@ -2247,7 +2160,7 @@ function DeckOpen() {
     <div {...stylex.attrs(styles.shell, styles.inset120, styles.frame)}>
       <DoubleRule />
       <div {...stylex.attrs(styles.frameRow)}>
-        <SectionHead id="oox1-products-title" title={DECK_OPEN.title} echo={DECK_OPEN.echo} />
+        <SectionHead id="oox1-products-title" title={DECK_OPEN.title} />
         <ZoomReveal delay={0.08} sx={styles.frameLead}>
           <p {...stylex.attrs(styles.sectionLead)}>{DECK_OPEN.lead}</p>
         </ZoomReveal>
@@ -2264,7 +2177,6 @@ function DeckClose() {
       <div {...stylex.attrs(styles.frameRow)}>
         <ZoomReveal sx={styles.frameClose}>
           <p {...stylex.attrs(styles.frameCloseLine)}>{DECK_CLOSE.line}</p>
-          <Echo>{DECK_CLOSE.echo}</Echo>
         </ZoomReveal>
         <GhostButton
           href={DECK_CLOSE.cta.href}
@@ -2295,9 +2207,6 @@ function DeckCard(props: { market: Market; index: number; depth: MotionValue<num
           <span {...stylex.attrs(styles.cardStripNumber)}>{twoDigits(props.index + 1)}</span>
           {props.market.title}
         </span>
-        <span lang="en" {...stylex.attrs(styles.cardStripWord)}>
-          {twoDigits(props.index + 1)} / {twoDigits(MARKETS.length)} · {props.market.english}
-        </span>
       </div>
       <DoubleRule sx={styles.doubleRuleSoft} />
       <div {...stylex.attrs(styles.cardBody)}>
@@ -2314,18 +2223,12 @@ function DeckCard(props: { market: Market; index: number; depth: MotionValue<num
           </div>
         </figure>
         <div {...stylex.attrs(styles.copy)}>
-          <div {...stylex.attrs(styles.wordRow)}>
-            <span aria-hidden="true" lang="en" {...stylex.attrs(styles.word)}>
-              {props.market.word}
-            </span>
-            <Ring value={props.index + 1} sx={styles.wordRing} />
-          </div>
+          <span aria-hidden="true" lang="en" {...stylex.attrs(styles.word)}>
+            {props.market.word}
+          </span>
           <h3 id={titleId} {...stylex.attrs(styles.cardTitle)}>
             {props.market.title}
           </h3>
-          <p lang="en" {...stylex.attrs(styles.pitch)}>
-            {props.market.pitch}
-          </p>
           <p {...stylex.attrs(styles.kicker)}>{props.market.kicker}</p>
           <ul aria-label={`${props.market.english} segments`} {...stylex.attrs(styles.tags)}>
             <For each={props.market.tags}>
@@ -2440,7 +2343,7 @@ function Campus() {
       {...stylex.attrs(styles.campus, styles.anchor)}
     >
       <div {...stylex.attrs(styles.shell, styles.inset120, styles.campusHead)}>
-        <SectionHead id="oox1-campus-title" title={CAMPUS.label} echo={CAMPUS.echo} />
+        <SectionHead id="oox1-campus-title" title={CAMPUS.label} />
       </div>
       <div {...stylex.attrs(styles.shell, styles.inset120, styles.figures)}>
         {STATS.map((stat, index) => (
@@ -2453,7 +2356,6 @@ function Campus() {
               {stat.value}
               {stat.unit ? <span {...stylex.attrs(styles.figureUnit)}>{stat.unit}</span> : null}
             </p>
-            <p {...stylex.attrs(styles.figureLabel)}>{stat.caption}</p>
           </ZoomReveal>
         ))}
       </div>
@@ -2526,12 +2428,9 @@ function Offices() {
             ))}
           </div>
           <div {...stylex.attrs(styles.globalCopy)}>
-            <div {...stylex.attrs(styles.headRow, styles.headRowCenter)}>
-              <h2 id="oox1-offices-title" {...stylex.attrs(styles.sectionTitle)}>
-                {GLOBAL_INTRO.title}
-              </h2>
-              <Echo>{ECHO.offices}</Echo>
-            </div>
+            <h2 id="oox1-offices-title" {...stylex.attrs(styles.sectionTitle)}>
+              {GLOBAL_INTRO.title}
+            </h2>
             <p {...stylex.attrs(styles.sectionLead)}>{GLOBAL_INTRO.lead}</p>
           </div>
         </ZoomReveal>
@@ -2598,7 +2497,7 @@ function News() {
       {...stylex.attrs(styles.news, styles.anchor)}
     >
       <div {...stylex.attrs(styles.shell, styles.inset120, styles.newsInner)}>
-        <SectionHead id="oox1-news-title" title={NEWS_TITLE} echo={ECHO.news} />
+        <SectionHead id="oox1-news-title" title={NEWS_TITLE} />
         <ul {...stylex.attrs(styles.accordion)}>
           {NEWS.map((item, index) => (
             <m.li layout="position" transition={{ duration: 0.25, ease: EASE }}>
@@ -2626,13 +2525,10 @@ function ContactCta() {
     >
       <ZoomReveal sx={[styles.shell, styles.inset120, styles.ctaInner]}>
         <DoubleRule sx={styles.ctaRule} />
-        <div {...stylex.attrs(styles.headRow, styles.headRowCenter)}>
-          <h2 id="oox1-contact-title" {...stylex.attrs(styles.sectionTitle)}>
-            {CONTACT.title}
-          </h2>
-          <Echo>{CONTACT.echo}</Echo>
-        </div>
-        <p {...stylex.attrs(styles.sectionLead, styles.ctaLead)}>{CONTACT.lead}</p>
+        <h2 id="oox1-contact-title" {...stylex.attrs(styles.sectionTitle)}>
+          {CTA.title}
+        </h2>
+        <p {...stylex.attrs(styles.sectionLead, styles.ctaLead)}>{CTA.lead}</p>
         <ul aria-label="Choose an application area" {...stylex.attrs(styles.ctaMarkets)}>
           {MARKETS.map((market, index) => (
             <li>
@@ -2648,8 +2544,8 @@ function ContactCta() {
           ))}
         </ul>
         <GhostButton
-          href={CONTACT.action.href}
-          label={CONTACT.action.label}
+          href={CTA.action.href}
+          label={CTA.action.label}
           size="wide"
           sx={styles.ghostWrapCenter}
         />

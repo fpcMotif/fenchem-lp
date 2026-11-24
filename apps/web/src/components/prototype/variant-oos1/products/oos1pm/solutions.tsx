@@ -212,7 +212,7 @@ const styles = stylex.create({
     minWidth: 0,
     paddingTop: { default: 28, [MD]: 40 },
     paddingInline: { default: 20, [MD]: 40, [DESKTOP]: 48 },
-    paddingBottom: { default: 60, [MD]: 72 },
+    paddingBottom: { default: 28, [MD]: 40 },
     backgroundColor: "#ffffff",
     borderWidth: 1,
     borderStyle: "solid",
@@ -290,23 +290,6 @@ const styles = stylex.create({
     whiteSpace: "nowrap",
     borderWidth: 0,
   },
-  folio: {
-    position: "absolute",
-    bottom: { default: 20, [MD]: 24 },
-    fontFamily: NUMERAL_FONT,
-    fontSize: 12,
-    fontWeight: 500,
-    lineHeight: "16px",
-    letterSpacing: "0.08em",
-    fontVariantNumeric: "tabular-nums",
-    color: MUTED,
-  },
-  folioLeft: {
-    insetInlineStart: { default: 20, [MD]: 40, [DESKTOP]: 48 },
-  },
-  folioRight: {
-    insetInlineEnd: { default: 20, [MD]: 40, [DESKTOP]: 48 },
-  },
 
   pager: {
     display: "grid",
@@ -369,14 +352,6 @@ const styles = stylex.create({
     overflow: "hidden",
     whiteSpace: "nowrap",
     textOverflow: "ellipsis",
-  },
-  pageIndex: {
-    flexShrink: 0,
-    fontFamily: NUMERAL_FONT,
-    fontSize: 13,
-    fontWeight: 500,
-    fontVariantNumeric: "tabular-nums",
-    color: MUTED,
   },
 });
 
@@ -492,7 +467,6 @@ function PageButton(props: {
       <Show when={props.target}>
         {(target) => (
           <span {...stylex.attrs(styles.pageTitle)}>
-            <span {...stylex.attrs(styles.pageIndex)}>{padIndex(target().index)}</span>
             <span {...stylex.attrs(styles.pageTitleText)}>{target().title}</span>
           </span>
         )}
@@ -549,8 +523,6 @@ export function Solutions() {
     setActive(next);
     tabs[next]?.focus();
   };
-
-  const folio = () => padIndex(active());
 
   return (
     <section id="products-solutions" aria-labelledby={titleId} {...stylex.attrs(styles.section)}>
@@ -621,15 +593,9 @@ export function Solutions() {
           <div {...stylex.attrs(styles.spread)}>
             <div {...stylex.attrs(styles.sheet, styles.sheetLeft)}>
               <Layers active={active()} render={(formula) => <LeftPage formula={formula} />} />
-              <span aria-hidden="true" {...stylex.attrs(styles.folio, styles.folioLeft)}>
-                {folio()} · 左
-              </span>
             </div>
             <div {...stylex.attrs(styles.sheet, styles.sheetRight)}>
               <Layers active={active()} render={(formula) => <RightPage formula={formula} />} />
-              <span aria-hidden="true" {...stylex.attrs(styles.folio, styles.folioRight)}>
-                {folio()} · 右
-              </span>
             </div>
           </div>
         </div>

@@ -51,9 +51,6 @@ const styles = stylex.create({
     letterSpacing: "0.06em",
     color: tone.ink,
   },
-  english: {
-    fontSize: { default: 16, [bp.upTablet]: 18 },
-  },
   break: {
     position: "relative",
     marginTop: { default: 56, [bp.tablet]: 80, [bp.desktop]: 104 },
@@ -144,9 +141,6 @@ function Level(props: { plate: Plate; children: JSX.Element }) {
         <PushedPhoto plate={props.plate} />
         <figcaption {...stylex.attrs(styles.caption)}>
           <span {...stylex.attrs(styles.chinese)}>{props.plate.caption}</span>
-          <span lang="en" {...stylex.attrs(ui.serif, styles.english)}>
-            {props.plate.english}
-          </span>
         </figcaption>
       </figure>
       {child() ? <div {...stylex.attrs(styles.child)}>{child()}</div> : null}
@@ -220,9 +214,6 @@ export function NestedSequence() {
       <p {...stylex.attrs(ui.reset, styles.breakCaption)}>
         <Tag numeral={AERIAL_PLATE.numeral} pinned={false} />
         <span {...stylex.attrs(styles.chinese)}>{AERIAL_PLATE.caption}</span>
-        <span lang="en" {...stylex.attrs(ui.serif, styles.english)}>
-          {AERIAL_PLATE.english}
-        </span>
       </p>
     </div>
   );

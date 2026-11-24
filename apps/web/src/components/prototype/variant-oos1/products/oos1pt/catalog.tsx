@@ -6,7 +6,7 @@ import type { JSX } from "@solidjs/web";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
 import { CATALOG_GROUPS, type CatalogGroup, type CatalogItem } from "../../products-data";
-import { REGION_META, padIndex, splitTitle } from "../shared/derived";
+import { REGION_META, splitTitle } from "../shared/derived";
 
 const INK = "#1a1a1a";
 const BODY_TEXT = "#4d4d4d";
@@ -14,7 +14,6 @@ const MUTED_LABEL = "#6b6b70";
 const GROUND = "#eef6f3";
 const HAIRLINE = "#d2e3dc";
 const REGION_RULE = "#86a99c";
-const ACCENT = colors.brandGreen700;
 const BODY_FONT =
   '"Source Han Sans SC", "Noto Sans SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif';
 const NUMERAL_FONT = '"Inter Tight", "Source Han Sans SC", "Noto Sans SC", sans-serif';
@@ -66,15 +65,6 @@ const styles = stylex.create({
     lineHeight: { default: "34px", [TABLET]: "36px", [DESKTOP]: "40px" },
     letterSpacing: "0.04em",
     color: INK,
-  },
-  lead: {
-    margin: 0,
-    marginTop: 12,
-    maxWidth: 520,
-    fontSize: 16,
-    lineHeight: "26px",
-    color: BODY_TEXT,
-    textWrap: "pretty",
   },
   index: {
     display: "flex",
@@ -212,15 +202,6 @@ const styles = stylex.create({
     gap: { default: 12, [LG]: 16 },
     paddingTop: { default: 28, [LG]: 20 },
     paddingBottom: { default: 4, [LG]: 24 },
-  },
-  regionIndex: {
-    fontFamily: NUMERAL_FONT,
-    fontSize: 13,
-    fontWeight: 500,
-    lineHeight: "20px",
-    letterSpacing: "0.04em",
-    fontVariantNumeric: "tabular-nums",
-    color: ACCENT,
   },
   regionLabel: {
     display: "block",
@@ -418,9 +399,6 @@ function RegionHeader(props: { group: CatalogGroup; index: number; id: string; r
       {...stylex.attrs(styles.regionCell, props.index === 0 && styles.regionCellFirst)}
     >
       <span {...stylex.attrs(styles.regionSticky)}>
-        <span aria-hidden="true" {...stylex.attrs(styles.regionIndex)}>
-          {padIndex(props.index)}
-        </span>
         <span {...stylex.attrs(styles.regionLabel)}>
           {lead}
           {rest && <span {...stylex.attrs(styles.regionRest)}>{rest}</span>}
@@ -482,12 +460,9 @@ export function Catalog() {
     <section id="products-catalog" aria-labelledby={titleId} {...stylex.attrs(styles.section)}>
       <div {...stylex.attrs(styles.shell)}>
         <header {...stylex.attrs(styles.head)}>
-          <div>
-            <h2 id={titleId} {...stylex.attrs(styles.title)}>
-              产品目录
-            </h2>
-            <p {...stylex.attrs(styles.lead)}>精选个人护理全形态天然油脂与经典功效配方方案</p>
-          </div>
+          <h2 id={titleId} {...stylex.attrs(styles.title)}>
+            产品目录
+          </h2>
           <nav aria-label="Origin index">
             <ul {...stylex.attrs(styles.index)}>
               {CATALOG_GROUPS.map((group) => (

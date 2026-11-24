@@ -1,9 +1,35 @@
 import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
+import type { StyleXStyles } from "@stylexjs/stylex";
 import { ArrowRight, Check, CheckCircle2, ChevronDown, X } from "@fenchem-lp/ui/components/lucide";
-import { createEffect, createSignal, createUniqueId, flush, Show, untrack } from "solid-js";
+import {
+  Dialog,
+  DialogBackdrop,
+  DialogClose,
+  DialogContent,
+  DialogTitle,
+} from "@ui-sdk/solid/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectItemIndicator,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@ui-sdk/solid/select";
+import {
+  createSignal,
+  createUniqueId,
+  flush,
+  For,
+  onSettled,
+  Show,
+  untrack,
+  useContext,
+} from "solid-js";
 
-import { color, ease, font } from "../../variant-oos1/tokens.stylex";
+import { color, ease } from "../../variant-oos1/tokens.stylex";
 import {
   COMPANY,
   CONTACT_DETAILS,
@@ -12,7 +38,7 @@ import {
   FieldError,
   fieldAria,
   labStyles,
-  useLabDialog,
+  PickerHostContext,
   type DialogVariantProps,
   type InquirySubjectId,
 } from "../kit";
@@ -21,19 +47,16 @@ const REQUEST_TYPES = [
   {
     id: "general",
     label: "一般咨询",
-    english: "General Information",
     placeholder: "请简要描述您想了解的内容，如公司概况、产品目录、到访预约或合作方式",
   },
   {
     id: "technical",
     label: "技术咨询",
-    english: "Technical Information",
     placeholder: "请描述目标功效、剂型与配方问题，或所需样品与技术文件（COA、TDS、MSDS）",
   },
   {
     id: "commercial",
     label: "商务咨询",
-    english: "Commercial Information",
     placeholder: "请填写品名、规格、预计年用量、包装要求与交付地点",
   },
 ] as const;
@@ -41,14 +64,12 @@ const QR_CODES = [
   {
     id: "wechat",
     label: "官方微信",
-    caption: "微信扫码关注官方公众号",
     image: "/prototype/contact/wechat-qr.png",
     alt: "泛成官方微信公众号二维码",
   },
   {
     id: "xiaohongshu",
     label: "泛成小红书",
-    caption: "扫码关注泛成官方小红书",
     image: "/prototype/contact/xiaohongshu-qr.png",
     alt: "泛成小红书主页二维码",
   },
@@ -129,21 +150,19 @@ const listIn = stylex.keyframes({
 });
 
 const styles = stylex.create({
-  dialog: {
-    "::backdrop": {
-      backgroundColor: BACKDROP,
-      animationName: fadeIn,
-      animationDuration: "200ms",
-      animationTimingFunction: ease.out,
-    },
+  backdrop: {
+    position: "fixed",
+    inset: 0,
+    backgroundColor: BACKDROP,
+    animationName: fadeIn,
+    animationDuration: "200ms",
+    animationTimingFunction: ease.out,
   },
-  dialogClosing: {
-    "::backdrop": {
-      animationName: fadeOut,
-      animationDuration: "150ms",
-      animationTimingFunction: ease.out,
-      animationFillMode: "forwards",
-    },
+  backdropClosing: {
+    animationName: fadeOut,
+    animationDuration: "150ms",
+    animationTimingFunction: ease.out,
+    animationFillMode: "forwards",
   },
   panel: {
     position: "absolute",
@@ -193,15 +212,7 @@ const styles = stylex.create({
     lineHeight: 1.4,
     color: colors.paper,
   },
-  companyEnglish: {
-    margin: 0,
-    marginTop: 4,
-    fontFamily: font.serifAccent,
-    fontSize: { default: 16, [DESKTOP]: 18 },
-    fontStyle: "italic",
-    lineHeight: 1.3,
-    color: ON_NAVY_MUTED,
-  },
+
   details: {
     display: { default: "none", [DESKTOP]: "flex" },
     flexDirection: "column",
@@ -386,13 +397,6 @@ const styles = stylex.create({
     minWidth: 0,
     whiteSpace: "nowrap",
   },
-  english: {
-    overflow: "hidden",
-    fontSize: 13,
-    whiteSpace: "nowrap",
-    textOverflow: "ellipsis",
-    color: color.muted,
-  },
   chevron: {
     color: color.ink,
     transitionProperty: "transform",
@@ -406,11 +410,7 @@ const styles = stylex.create({
     transform: "rotate(180deg)",
   },
   listbox: {
-    position: "absolute",
-    top: "calc(100% + 4px)",
-    left: 0,
-    right: 0,
-    zIndex: 2,
+    width: "var(--anchor-width)",
     margin: 0,
     padding: 4,
     listStyle: "none",
@@ -420,14 +420,14 @@ const styles = stylex.create({
     borderRadius: CONTROL_RADIUS,
     backgroundColor: colors.paper,
     boxShadow: "0 16px 32px -16px rgba(6, 20, 44, 0.28)",
-    transformOrigin: "top center",
+    transformOrigin: "var(--transform-origin)",
     animationName: { default: fadeIn, ["@media (prefers-reduced-motion: no-preference)"]: listIn },
     animationDuration: "150ms",
     animationTimingFunction: ease.out,
   },
   option: {
     display: "grid",
-    gridTemplateColumns: "auto minmax(0, 1fr) 16px",
+    gridTemplateColumns: "minmax(0, 1fr) 16px",
     alignItems: "baseline",
     columnGap: 10,
     paddingBlock: 11,
@@ -527,164 +527,111 @@ const stagger = (index: number) => [
   styles.staggerDelay(index),
 ];
 
+const sxProps = (...args: ReadonlyArray<StyleXStyles | false | null | undefined>) =>
+  stylex.attrs(...args);
+
 function RequestTypeSelect(props: {
   value: RequestTypeId;
   onChange: (value: RequestTypeId) => void;
 }) {
-  const baseId = createUniqueId();
-  const labelId = `${baseId}-label`;
-  const listId = `${baseId}-list`;
-  const optionId = (index: number) => `${baseId}-option-${index}`;
-  let rootRef: HTMLDivElement | undefined;
-  const selectedIndex = () => REQUEST_TYPES.findIndex((type) => type.id === props.value);
-  const [open, setOpen] = createSignal(false);
-  const [activeIndex, setActiveIndex] = createSignal(untrack(selectedIndex));
-  const selected = () => REQUEST_TYPES[selectedIndex()];
-
-  createEffect(open, (isOpen) => {
-    if (!isOpen) return;
-    const closeOnOutside = (event: PointerEvent) => {
-      if (!rootRef?.contains(event.target as Node)) setOpen(false);
-    };
-    document.addEventListener("pointerdown", closeOnOutside);
-    return () => document.removeEventListener("pointerdown", closeOnOutside);
-  });
-
-  const openAt = (index: number) => {
-    setActiveIndex(index);
-    setOpen(true);
-  };
-
-  const choose = (index: number) => {
-    props.onChange(REQUEST_TYPES[index].id);
-    setOpen(false);
-  };
-
-  const last = REQUEST_TYPES.length - 1;
-
-  const handleKeyDown = (event: KeyboardEvent) => {
-    if (!open()) {
-      if (["ArrowDown", "ArrowUp", "Enter", " "].includes(event.key)) {
-        event.preventDefault();
-        openAt(selectedIndex());
-      } else if (event.key === "Home" || event.key === "End") {
-        event.preventDefault();
-        openAt(event.key === "Home" ? 0 : last);
-      }
-      return;
-    }
-    switch (event.key) {
-      case "ArrowDown":
-        event.preventDefault();
-        setActiveIndex((index) => Math.min(index + 1, last));
-        break;
-      case "ArrowUp":
-        event.preventDefault();
-        setActiveIndex((index) => Math.max(index - 1, 0));
-        break;
-      case "Home":
-        event.preventDefault();
-        setActiveIndex(0);
-        break;
-      case "End":
-        event.preventDefault();
-        setActiveIndex(last);
-        break;
-      case "Enter":
-      case " ":
-        event.preventDefault();
-        choose(activeIndex());
-        break;
-      case "Escape":
-        event.preventDefault();
-        event.stopPropagation();
-        setOpen(false);
-        break;
-      case "Tab":
-        setOpen(false);
-        break;
-    }
-  };
+  const selected = () => REQUEST_TYPES.find((type) => type.id === props.value) ?? REQUEST_TYPES[0];
 
   return (
-    <div ref={rootRef} {...stylex.attrs(labStyles.field, styles.select)}>
-      <span id={labelId} {...stylex.attrs(labStyles.label)}>
-        咨询类型
-      </span>
-      <input type="hidden" name="requestType" value={props.value} />
-      <div
-        role="combobox"
-        tabindex={0}
-        aria-haspopup="listbox"
-        aria-expanded={open() ? "true" : "false"}
-        aria-controls={open() ? listId : undefined}
-        aria-labelledby={labelId}
-        aria-activedescendant={open() ? optionId(activeIndex()) : undefined}
-        onClick={() => (open() ? setOpen(false) : openAt(selectedIndex()))}
-        onKeyDown={handleKeyDown}
-        {...stylex.attrs(labStyles.input, styles.trigger, open() && styles.triggerOpen)}
-      >
-        <span {...stylex.attrs(styles.triggerValue)}>
-          {selected().label}
-          <span lang="en" {...stylex.attrs(styles.english)}>
-            {selected().english}
-          </span>
-        </span>
-        <ChevronDown
-          size={20}
-          strokeWidth={1.75}
-          aria-hidden="true"
-          {...stylex.attrs(styles.chevron, open() && styles.chevronOpen)}
-        />
+    <Select
+      name="requestType"
+      items={REQUEST_TYPES.map((type) => ({ value: type.id, label: type.label }))}
+      value={props.value}
+      onValueChange={(next) => {
+        if (next) props.onChange(next as RequestTypeId);
+      }}
+    >
+      <div {...stylex.attrs(labStyles.field, styles.select)}>
+        <SelectLabel {...stylex.attrs(labStyles.label)}>咨询类型</SelectLabel>
+        <SelectTrigger
+          class={(state) =>
+            sxProps(labStyles.input, styles.trigger, state.open && styles.triggerOpen).class
+          }
+        >
+          {(state) => (
+            <>
+              <SelectValue>
+                {() => <span {...stylex.attrs(styles.triggerValue)}>{selected().label}</span>}
+              </SelectValue>
+              <ChevronDown
+                size={20}
+                strokeWidth={1.75}
+                aria-hidden="true"
+                {...sxProps(styles.chevron, state.open && styles.chevronOpen)}
+              />
+            </>
+          )}
+        </SelectTrigger>
+        <SelectContent {...stylex.attrs(styles.listbox)}>
+          <For each={REQUEST_TYPES}>
+            {(type) => (
+              <SelectItem
+                value={type.id}
+                label={type.label}
+                class={(state) =>
+                  sxProps(
+                    styles.option,
+                    state.highlighted && styles.optionActive,
+                    state.selected && styles.optionSelected,
+                  ).class
+                }
+              >
+                {type.label}
+                <SelectItemIndicator>
+                  <Check
+                    size={16}
+                    strokeWidth={2}
+                    nonScalingStroke
+                    aria-hidden="true"
+                    {...stylex.attrs(styles.optionCheck)}
+                  />
+                </SelectItemIndicator>
+              </SelectItem>
+            )}
+          </For>
+        </SelectContent>
       </div>
-      <ul
-        id={listId}
-        role="listbox"
-        aria-labelledby={labelId}
-        hidden={!open()}
-        {...stylex.attrs(styles.listbox)}
-      >
-        {REQUEST_TYPES.map((type, index) => {
-          const isSelected = () => index === selectedIndex();
-          return (
-            <li
-              id={optionId(index)}
-              role="option"
-              aria-selected={isSelected() ? "true" : "false"}
-              onPointerDown={(event) => event.preventDefault()}
-              onPointerMove={() => setActiveIndex(index)}
-              onClick={() => choose(index)}
-              {...stylex.attrs(
-                styles.option,
-                index === activeIndex() && styles.optionActive,
-                isSelected() && styles.optionSelected,
-              )}
-            >
-              {type.label}
-              <span lang="en" {...stylex.attrs(styles.english)}>
-                {type.english}
-              </span>
-              {isSelected() ? (
-                <Check
-                  size={16}
-                  strokeWidth={2}
-                  nonScalingStroke
-                  aria-hidden="true"
-                  {...stylex.attrs(styles.optionCheck)}
-                />
-              ) : null}
-            </li>
-          );
-        })}
-      </ul>
-    </div>
+    </Select>
   );
 }
 
 export function SplitDialog(props: DialogVariantProps) {
   const state = untrack(() => props.state ?? "pristine");
-  const { closing, requestClose, dialogProps, panelProps } = useLabDialog(() => props.onClose());
+  const [open, setOpen] = createSignal(true);
+  const [closing, setClosing] = createSignal(false);
+  const setPickerHost = useContext(PickerHostContext);
   const titleId = createUniqueId();
+  let closed = false;
+
+  onSettled(() => {
+    const root = document.documentElement;
+    const previous = root.style.overflow;
+    root.style.overflow = "hidden";
+    return () => {
+      root.style.overflow = previous;
+      setPickerHost(null);
+    };
+  });
+
+  const finishClose = () => {
+    if (closed) return;
+    closed = true;
+    setOpen(false);
+    setPickerHost(null);
+    document.documentElement.style.overflow = "";
+    props.onClose();
+  };
+
+  const requestClose = () => {
+    if (closing()) return;
+    setClosing(true);
+    window.setTimeout(finishClose, 400);
+  };
+
   const [requestType, setRequestType] = createSignal<RequestTypeId>(
     untrack(() => {
       if (state === "technical") return "technical";
@@ -726,244 +673,249 @@ export function SplitDialog(props: DialogVariantProps) {
   };
 
   return (
-    <dialog
-      aria-labelledby={titleId}
-      {...dialogProps}
-      {...stylex.attrs(labStyles.dialog, styles.dialog, closing() && styles.dialogClosing)}
+    <Dialog
+      open={open()}
+      onOpenChange={(next) => {
+        if (!next) requestClose();
+      }}
     >
-      <button
-        type="button"
-        tabindex={-1}
-        aria-hidden="true"
-        onClick={requestClose}
-        {...stylex.attrs(labStyles.dismiss)}
-      />
-      <div {...panelProps} {...stylex.attrs(styles.panel, closing() && styles.panelClosing)}>
-        <aside aria-label="公司信息" {...stylex.attrs(styles.aside)}>
-          <div>
-            <p {...stylex.attrs(styles.companyName)}>{COMPANY.name}</p>
-            <p lang="en" {...stylex.attrs(styles.companyEnglish)}>
-              {COMPANY.english}
-            </p>
-          </div>
-          <div {...stylex.attrs(styles.quickLinks)}>
-            {CONTACT_DETAILS.filter((d) => d.href).map((detail) => (
-              <a href={detail.href!} {...stylex.attrs(styles.detailLink, styles.quickLinkItem)}>
-                <ContactIcon detail={detail} size={14} />
-                <span>{detail.value}</span>
-              </a>
-            ))}
-          </div>
-          <dl {...stylex.attrs(styles.details)}>
-            {CONTACT_DETAILS.map((detail) => (
-              <div {...stylex.attrs(styles.detailRow)}>
-                <dt
-                  title={detail.term}
-                  aria-label={detail.term}
-                  {...stylex.attrs(styles.detailTerm)}
-                >
-                  <ContactIcon detail={detail} size={15} />
-                </dt>
-                <dd {...stylex.attrs(styles.detailValue)}>
-                  {detail.href ? (
-                    <a href={detail.href} {...stylex.attrs(styles.detailLink)}>
-                      {detail.value}
-                    </a>
-                  ) : (
-                    detail.value
-                  )}
-                </dd>
-              </div>
-            ))}
-          </dl>
-          <div {...stylex.attrs(styles.qrSection)}>
-            <span {...stylex.attrs(styles.qrHeaderTitle)}>扫码关注官方社媒</span>
-            <div {...stylex.attrs(styles.dualQrRow)}>
-              {QR_CODES.map((qr) => (
-                <figure {...stylex.attrs(styles.dualQrCard)}>
-                  <img
-                    src={qr.image}
-                    alt={qr.alt}
-                    width={88}
-                    height={88}
-                    {...stylex.attrs(styles.dualQrImage)}
-                  />
-                  <figcaption {...stylex.attrs(styles.dualQrCaption)}>{qr.label}</figcaption>
-                </figure>
+      <DialogBackdrop {...stylex.attrs(styles.backdrop, closing() && styles.backdropClosing)} />
+      <DialogContent
+        ref={(el) => setPickerHost(el)}
+        lang="zh-CN"
+        aria-labelledby={titleId}
+        onClick={(event) => {
+          if (event.target === event.currentTarget) requestClose();
+        }}
+        {...stylex.attrs(labStyles.dialog)}
+      >
+        <div
+          onAnimationEnd={(event) => {
+            if (closing() && event.target === event.currentTarget) finishClose();
+          }}
+          {...stylex.attrs(styles.panel, closing() && styles.panelClosing)}
+        >
+          <aside aria-label="公司信息" {...stylex.attrs(styles.aside)}>
+            <div>
+              <p {...stylex.attrs(styles.companyName)}>{COMPANY.name}</p>
+            </div>
+            <div {...stylex.attrs(styles.quickLinks)}>
+              {CONTACT_DETAILS.filter((d) => d.href).map((detail) => (
+                <a href={detail.href!} {...stylex.attrs(styles.detailLink, styles.quickLinkItem)}>
+                  <ContactIcon detail={detail} size={14} />
+                  <span>{detail.value}</span>
+                </a>
               ))}
             </div>
-          </div>
-        </aside>
-
-        <div {...stylex.attrs(styles.main)}>
-          <header {...stylex.attrs(styles.mainHead)}>
-            <h2 id={titleId} {...stylex.attrs(styles.title)}>
-              给我们留言
-            </h2>
-            <button
-              type="button"
-              aria-label="关闭"
-              onClick={requestClose}
-              {...stylex.attrs(labStyles.closeButton, styles.closeOnNavy)}
-            >
-              <X size={20} strokeWidth={1.75} aria-hidden="true" />
-            </button>
-          </header>
-
-          <Show
-            when={!submitted()}
-            fallback={
-              <div {...stylex.attrs(styles.done)}>
-                <CheckCircle2
-                  size={36}
-                  strokeWidth={2.5}
-                  nonScalingStroke
-                  aria-hidden="true"
-                  {...stylex.attrs(styles.doneIcon, stagger(0))}
-                />
-                <h3
-                  ref={doneTitleRef}
-                  tabindex={-1}
-                  {...stylex.attrs(styles.doneTitle, stagger(1))}
-                >
-                  需求已提交
-                </h3>
-              </div>
-            }
-          >
-            <form
-              novalidate
-              onSubmit={handleSubmit}
-              onInput={updateError}
-              {...stylex.attrs(styles.form)}
-            >
-              <div {...stylex.attrs(styles.formBody)}>
-                <RequestTypeSelect value={requestType()} onChange={setRequestType} />
-                <div {...stylex.attrs(styles.grid)}>
-                  <Field id="split-name" label="联系人姓名" required error={errors().contactName}>
-                    <input
-                      id="split-name"
-                      name="contactName"
-                      required
-                      autocomplete="name"
-                      value={state === "long-text" ? LONG_TEXT_FIXTURE.contactName : undefined}
-                      {...stylex.attrs(
-                        labStyles.input,
-                        errors().contactName ? labStyles.inputInvalid : null,
-                      )}
-                    />
-                  </Field>
-                  <Field id="split-company" label="公司或机构" required error={errors().company}>
-                    <input
-                      id="split-company"
-                      name="company"
-                      required
-                      autocomplete="organization"
-                      value={state === "long-text" ? LONG_TEXT_FIXTURE.company : undefined}
-                      {...stylex.attrs(
-                        labStyles.input,
-                        errors().company ? labStyles.inputInvalid : null,
-                      )}
-                    />
-                  </Field>
-                  <Field id="split-phone" label="手机号" required error={errors().phone}>
-                    <input
-                      id="split-phone"
-                      name="phone"
-                      type="tel"
-                      required
-                      autocomplete="tel"
-                      inputmode="tel"
-                      value={state === "long-text" ? LONG_TEXT_FIXTURE.phone : undefined}
-                      {...fieldAria("split-phone", errors().phone)}
-                      {...stylex.attrs(
-                        labStyles.input,
-                        errors().phone ? labStyles.inputInvalid : null,
-                      )}
-                    />
-                  </Field>
-                  <Field id="split-email" label="工作邮箱" required error={errors().email}>
-                    <input
-                      id="split-email"
-                      name="email"
-                      type="email"
-                      required
-                      autocomplete="email"
-                      spellcheck={false}
-                      placeholder="name@company.com"
-                      value={state === "long-text" ? LONG_TEXT_FIXTURE.email : undefined}
-                      {...fieldAria("split-email", errors().email)}
-                      {...stylex.attrs(
-                        labStyles.input,
-                        errors().email ? labStyles.inputInvalid : null,
-                      )}
-                    />
-                  </Field>
-                  <Field
-                    id="split-message"
-                    label="需求描述"
-                    required
-                    error={errors().message}
-                    sx={styles.full}
+            <dl {...stylex.attrs(styles.details)}>
+              {CONTACT_DETAILS.map((detail) => (
+                <div {...stylex.attrs(styles.detailRow)}>
+                  <dt
+                    title={detail.term}
+                    aria-label={detail.term}
+                    {...stylex.attrs(styles.detailTerm)}
                   >
-                    <textarea
-                      id="split-message"
-                      name="message"
-                      required
-                      placeholder={active().placeholder}
-                      value={state === "long-text" ? LONG_TEXT_FIXTURE.message : undefined}
-                      {...stylex.attrs(
-                        labStyles.input,
-                        labStyles.textarea,
-                        errors().message ? labStyles.inputInvalid : null,
-                      )}
-                    />
-                  </Field>
+                    <ContactIcon detail={detail} size={15} />
+                  </dt>
+                  <dd {...stylex.attrs(styles.detailValue)}>
+                    {detail.href ? (
+                      <a href={detail.href} {...stylex.attrs(styles.detailLink)}>
+                        {detail.value}
+                      </a>
+                    ) : (
+                      detail.value
+                    )}
+                  </dd>
                 </div>
+              ))}
+            </dl>
+            <div {...stylex.attrs(styles.qrSection)}>
+              <span {...stylex.attrs(styles.qrHeaderTitle)}>扫码关注官方社媒</span>
+              <div {...stylex.attrs(styles.dualQrRow)}>
+                {QR_CODES.map((qr) => (
+                  <figure {...stylex.attrs(styles.dualQrCard)}>
+                    <img
+                      src={qr.image}
+                      alt={qr.alt}
+                      width={88}
+                      height={88}
+                      {...stylex.attrs(styles.dualQrImage)}
+                    />
+                    <figcaption {...stylex.attrs(styles.dualQrCaption)}>{qr.label}</figcaption>
+                  </figure>
+                ))}
               </div>
-              <div {...stylex.attrs(styles.footer)}>
-                <div {...stylex.attrs(styles.consent)}>
-                  <label {...stylex.attrs(labStyles.consent)}>
-                    <input
-                      id="split-consent"
-                      type="checkbox"
-                      name="consent"
-                      required
-                      checked={state === "long-text" ? true : undefined}
-                      {...fieldAria("split-consent", errors().consent)}
-                      {...stylex.attrs(labStyles.checkbox)}
-                    />
-                    <span>同意泛成就本次咨询联系我，配方信息严格保密</span>
-                  </label>
-                  <FieldError
-                    id="split-consent"
-                    error={errors().consent}
-                    sx={styles.consentError}
-                  />
-                </div>
-                <button
-                  type="submit"
-                  {...stylex.attrs(
-                    labStyles.primaryButton,
-                    labStyles.trailingIcon,
-                    labStyles.focusRing,
-                    stylex.defaultMarker(),
-                  )}
-                >
-                  提交
-                  <ArrowRight
-                    size={18}
-                    strokeWidth={2}
+            </div>
+          </aside>
+
+          <div {...stylex.attrs(styles.main)}>
+            <header {...stylex.attrs(styles.mainHead)}>
+              <DialogTitle id={titleId} {...stylex.attrs(styles.title)}>
+                给我们留言
+              </DialogTitle>
+              <DialogClose
+                aria-label="关闭"
+                {...stylex.attrs(labStyles.closeButton, styles.closeOnNavy)}
+              >
+                <X size={20} strokeWidth={1.75} aria-hidden="true" />
+              </DialogClose>
+            </header>
+
+            <Show
+              when={!submitted()}
+              fallback={
+                <div {...stylex.attrs(styles.done)}>
+                  <CheckCircle2
+                    size={36}
+                    strokeWidth={2.5}
                     nonScalingStroke
                     aria-hidden="true"
-                    {...stylex.attrs(labStyles.buttonArrow)}
+                    {...stylex.attrs(styles.doneIcon, stagger(0))}
                   />
-                </button>
-              </div>
-            </form>
-          </Show>
+                  <h3
+                    ref={doneTitleRef}
+                    tabindex={-1}
+                    {...stylex.attrs(styles.doneTitle, stagger(1))}
+                  >
+                    需求已提交
+                  </h3>
+                </div>
+              }
+            >
+              <form
+                novalidate
+                onSubmit={handleSubmit}
+                onInput={updateError}
+                {...stylex.attrs(styles.form)}
+              >
+                <div {...stylex.attrs(styles.formBody)}>
+                  <RequestTypeSelect value={requestType()} onChange={setRequestType} />
+                  <div {...stylex.attrs(styles.grid)}>
+                    <Field id="split-name" label="联系人姓名" required error={errors().contactName}>
+                      <input
+                        id="split-name"
+                        name="contactName"
+                        required
+                        autocomplete="name"
+                        value={state === "long-text" ? LONG_TEXT_FIXTURE.contactName : undefined}
+                        {...stylex.attrs(
+                          labStyles.input,
+                          errors().contactName ? labStyles.inputInvalid : null,
+                        )}
+                      />
+                    </Field>
+                    <Field id="split-company" label="公司或机构" required error={errors().company}>
+                      <input
+                        id="split-company"
+                        name="company"
+                        required
+                        autocomplete="organization"
+                        value={state === "long-text" ? LONG_TEXT_FIXTURE.company : undefined}
+                        {...stylex.attrs(
+                          labStyles.input,
+                          errors().company ? labStyles.inputInvalid : null,
+                        )}
+                      />
+                    </Field>
+                    <Field id="split-phone" label="手机号" required error={errors().phone}>
+                      <input
+                        id="split-phone"
+                        name="phone"
+                        type="tel"
+                        required
+                        autocomplete="tel"
+                        inputmode="tel"
+                        value={state === "long-text" ? LONG_TEXT_FIXTURE.phone : undefined}
+                        {...fieldAria("split-phone", errors().phone)}
+                        {...stylex.attrs(
+                          labStyles.input,
+                          errors().phone ? labStyles.inputInvalid : null,
+                        )}
+                      />
+                    </Field>
+                    <Field id="split-email" label="工作邮箱" required error={errors().email}>
+                      <input
+                        id="split-email"
+                        name="email"
+                        type="email"
+                        required
+                        autocomplete="email"
+                        spellcheck={false}
+                        placeholder="name@company.com"
+                        value={state === "long-text" ? LONG_TEXT_FIXTURE.email : undefined}
+                        {...fieldAria("split-email", errors().email)}
+                        {...stylex.attrs(
+                          labStyles.input,
+                          errors().email ? labStyles.inputInvalid : null,
+                        )}
+                      />
+                    </Field>
+                    <Field
+                      id="split-message"
+                      label="需求描述"
+                      required
+                      error={errors().message}
+                      sx={styles.full}
+                    >
+                      <textarea
+                        id="split-message"
+                        name="message"
+                        required
+                        placeholder={active().placeholder}
+                        value={state === "long-text" ? LONG_TEXT_FIXTURE.message : undefined}
+                        {...stylex.attrs(
+                          labStyles.input,
+                          labStyles.textarea,
+                          errors().message ? labStyles.inputInvalid : null,
+                        )}
+                      />
+                    </Field>
+                  </div>
+                </div>
+                <div {...stylex.attrs(styles.footer)}>
+                  <div {...stylex.attrs(styles.consent)}>
+                    <label {...stylex.attrs(labStyles.consent)}>
+                      <input
+                        id="split-consent"
+                        type="checkbox"
+                        name="consent"
+                        required
+                        checked={state === "long-text" ? true : undefined}
+                        {...fieldAria("split-consent", errors().consent)}
+                        {...stylex.attrs(labStyles.checkbox)}
+                      />
+                      <span>同意泛成就本次咨询联系我，配方信息严格保密</span>
+                    </label>
+                    <FieldError
+                      id="split-consent"
+                      error={errors().consent}
+                      sx={styles.consentError}
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    {...stylex.attrs(
+                      labStyles.primaryButton,
+                      labStyles.trailingIcon,
+                      labStyles.focusRing,
+                      stylex.defaultMarker(),
+                    )}
+                  >
+                    提交
+                    <ArrowRight
+                      size={18}
+                      strokeWidth={2}
+                      nonScalingStroke
+                      aria-hidden="true"
+                      {...stylex.attrs(labStyles.buttonArrow)}
+                    />
+                  </button>
+                </div>
+              </form>
+            </Show>
+          </div>
         </div>
-      </div>
-    </dialog>
+      </DialogContent>
+    </Dialog>
   );
 }

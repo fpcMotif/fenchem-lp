@@ -146,10 +146,6 @@ const styles = stylex.create({
     alignItems: "baseline",
     gap: 8,
   },
-  lakeNote: {
-    fontSize: 15,
-    color: tone.body,
-  },
 });
 
 export function CorridorPlan(props: { onOpen: (index: number) => void }) {
@@ -211,9 +207,6 @@ export function CorridorPlan(props: { onOpen: (index: number) => void }) {
               {LAKE.number}
             </span>
             <span {...stylex.attrs(styles.caption)}>{LAKE.title}</span>
-          </span>
-          <span lang="en" {...stylex.attrs(ui.italic, styles.lakeNote)}>
-            facing you
           </span>
         </p>
       </div>

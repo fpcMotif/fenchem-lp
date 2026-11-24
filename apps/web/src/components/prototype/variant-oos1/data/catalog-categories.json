@@ -1,0 +1,23 @@
+[
+  {
+    "categoryId": "personal-care",
+    "lead": "精选个人护理全形态天然油脂与经典功效配方方案",
+    "specLabel": "INCI 名称",
+    "featuresLabel": "特性&应用"
+  },
+  {
+    "categoryId": "human-nutrition",
+    "specLabel": "核心规格/成分",
+    "featuresLabel": "产品介绍"
+  },
+  {
+    "categoryId": "functional-food",
+    "specLabel": "产品规格",
+    "featuresLabel": "产品介绍"
+  },
+  {
+    "categoryId": "pet-health",
+    "specLabel": "核心规格/成分",
+    "featuresLabel": "产品介绍"
+  }
+]

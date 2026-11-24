@@ -12,25 +12,21 @@ type SceneLayout = "left" | "right" | "wide";
 const SCENES: readonly {
   value: CultureValue;
   photo: CampusPhoto;
-  narration: string;
   layout: SceneLayout;
 }[] = [
   {
     value: ABOUT_CULTURE.values[0],
     photo: campusPhoto("lab"),
-    narration: "在实验室里，",
     layout: "left",
   },
   {
     value: ABOUT_CULTURE.values[1],
     photo: campusPhoto("grounds"),
-    narration: "在园区的草地上，",
     layout: "right",
   },
   {
     value: ABOUT_CULTURE.values[2],
     photo: campusPhoto("lounge"),
-    narration: "在人们相遇的地方，",
     layout: "wide",
   },
 ];
@@ -43,7 +39,7 @@ export function CultureStory() {
       {...stylex.attrs(styles.section)}
     >
       <h2 id="about-culture-heading" {...stylex.attrs(shared.srOnly)}>
-        {ABOUT_CULTURE.eyebrow}
+        {ABOUT_CULTURE.title}
       </h2>
       <div {...stylex.attrs(styles.sheet)}>
         <BrushCoat />
@@ -55,12 +51,7 @@ export function CultureStory() {
   );
 }
 
-function Scene(props: {
-  value: CultureValue;
-  photo: CampusPhoto;
-  narration: string;
-  layout: SceneLayout;
-}) {
+function Scene(props: { value: CultureValue; photo: CampusPhoto; layout: SceneLayout }) {
   let ref: HTMLDivElement | undefined;
   const developed = useDeveloped(() => ref, 0.3);
 
@@ -82,7 +73,6 @@ function Scene(props: {
       <div
         {...stylex.attrs(styles.words, wordsLayout[props.layout], developed() && styles.wordsLit)}
       >
-        <p {...stylex.attrs(styles.narration)}>{props.narration}</p>
         <h3 {...stylex.attrs(styles.title)}>{props.value.title}</h3>
         <p {...stylex.attrs(styles.desc)}>{props.value.desc}</p>
       </div>
@@ -150,15 +140,8 @@ const styles = stylex.create({
   wordsLit: {
     opacity: 1,
   },
-  narration: {
-    margin: 0,
-    fontSize: 15,
-    lineHeight: 1.6,
-    letterSpacing: "0.08em",
-    color: tone.lightQuiet,
-  },
   title: {
-    marginBlock: "12px 0",
+    margin: 0,
     fontSize: { default: 30, [media.desktop]: 44 },
     fontWeight: 500,
     lineHeight: 1.25,

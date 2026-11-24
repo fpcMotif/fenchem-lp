@@ -78,12 +78,6 @@ const styles = stylex.create({
   statusUnit: {
     marginInlineStart: 4,
   },
-  hint: {
-    fontSize: 13,
-    lineHeight: "20px",
-    color: ink.muted,
-    textAlign: "end",
-  },
   clear: {
     display: "inline-flex",
     alignItems: "center",
@@ -593,10 +587,7 @@ export function Catalog() {
             <span {...stylex.attrs(styles.numeral)}>{matchCount()}</span>
             <span {...stylex.attrs(styles.statusUnit)}>款</span>
           </p>
-          <Show
-            when={activeTag()}
-            fallback={<span {...stylex.attrs(styles.hint)}>点按功效列标题筛选</span>}
-          >
+          <Show when={activeTag()}>
             <button
               type="button"
               onClick={() => setActiveTag(null)}

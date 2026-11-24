@@ -157,7 +157,7 @@ export function SubNav(props: { onNavigateHome: (hash?: string) => void }) {
                 {...stylex.attrs(s.tab, isActive() && s.tabActive, ui.focusRing)}
               >
                 <span aria-hidden="true" {...stylex.attrs(s.tick, isActive() && s.tickActive)} />
-                <span lang="en">{item.english}</span>
+                <span>{item.label}</span>
               </a>
             );
           })}

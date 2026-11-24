@@ -162,9 +162,6 @@ export function PartsList(props: {
               </span>
               <span {...stylex.attrs(styles.names)}>
                 <span {...stylex.attrs(styles.name)}>{part.name}</span>
-                <span lang="en" {...stylex.attrs(ui.label)}>
-                  {part.english}
-                </span>
               </span>
             </span>
             <span {...stylex.attrs(styles.qty)}>

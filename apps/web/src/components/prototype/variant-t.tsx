@@ -33,13 +33,7 @@ import { Collapse } from "./shared/collapse";
 import { createSignal, createEffect, createUniqueId, Show } from "solid-js";
 import type { JSX } from "@solidjs/web";
 import { LazyMotion, domMax, m, useScroll, useTransform } from "@/compat/motion";
-import {
-  ArrowRight,
-  ArrowUpRight,
-  ChevronRight,
-  ChevronsDown,
-  Leaf,
-} from "@fenchem-lp/ui/components/lucide";
+import { ArrowRight, ArrowUpRight, ChevronRight, Leaf } from "@fenchem-lp/ui/components/lucide";
 import * as stylex from "@stylexjs/stylex";
 import { breakpoints, colors, radii, typography } from "@fenchem-lp/ui/tokens.stylex";
 import { EASE, STAGGER } from "@/components/prototype/motion-constants";
@@ -187,13 +181,6 @@ const styles = stylex.create({
     fontSize: 15,
     lineHeight: 1.65,
     color: colors.mute700,
-  },
-  numeral: {
-    fontFamily: typography.display,
-    fontStyle: "italic",
-    fontSize: 22,
-    lineHeight: 1,
-    color: colors.brandGreen700,
   },
 
   /* Buttons */
@@ -510,15 +497,6 @@ const styles = stylex.create({
     alignItems: "center",
     gap: 20,
     marginTop: 8,
-  },
-  heroScrollCue: {
-    display: {
-      default: "none",
-      [breakpoints.lg]: "inline-flex",
-    },
-    alignItems: "center",
-    gap: 8,
-    color: colors.mute600,
   },
   heroRight: {
     position: "relative",
@@ -1531,14 +1509,6 @@ function HeroSection() {
     <section id="top" aria-label="Introduction" {...stylex.attrs(styles.hero)}>
       <div {...stylex.attrs(styles.heroGrid)}>
         <div {...stylex.attrs(styles.heroLeft)}>
-          <m.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: reduce() ? 0 : 0.6, ease: EASE }}
-            {...stylex.attrs(styles.eyebrow)}
-          >
-            Botanical intelligence since 1995
-          </m.p>
           <h1 {...stylex.attrs(styles.poster, styles.heroTitle)}>
             {HEADLINE.map((part, i) => (
               <m.span
@@ -1576,10 +1546,6 @@ function HeroSection() {
             <div {...stylex.attrs(styles.heroMeta)}>
               <span {...stylex.attrs(styles.techLabel)}>ISO 9001 · GMP · FSSC 22000</span>
               <span {...stylex.attrs(styles.techLabel)}>Response &lt; 24h</span>
-              <span {...stylex.attrs(styles.heroScrollCue)}>
-                <ChevronsDown aria-hidden="true" size={14} />
-                <span {...stylex.attrs(styles.techLabel)}>Scroll</span>
-              </span>
             </div>
           </Reveal>
         </div>
@@ -1637,22 +1603,11 @@ function DivisionMarquee() {
 
 /* ─────────────────────────────── Section head ─────────────────────────────── */
 
-function SectionHead(props: {
-  index: string;
-  eyebrow: string;
-  title: JSX.Element;
-  aside?: JSX.Element;
-  mirror?: boolean;
-}) {
+function SectionHead(props: { title: JSX.Element; aside?: JSX.Element; mirror?: boolean }) {
   return (
     <div {...stylex.attrs(styles.sectionHead)}>
       <div {...stylex.attrs(styles.sectionHeadMain)}>
         <Reveal>
-          <p {...stylex.attrs(styles.eyebrow)}>
-            <span {...stylex.attrs(styles.numeral)}>{props.index}</span> — {props.eyebrow}
-          </p>
-        </Reveal>
-        <Reveal delay={STAGGER}>
           <h2 {...stylex.attrs(styles.poster, styles.h2)}>{props.title}</h2>
         </Reveal>
       </div>
@@ -1678,8 +1633,6 @@ function IndustriesSection() {
     <section id="industries" aria-labelledby="industries-title" {...stylex.attrs(styles.section)}>
       <div {...stylex.attrs(styles.container)}>
         <SectionHead
-          index="01"
-          eyebrow="Industries · 03 markets"
           title={
             <span id="industries-title">
               Three markets, <span {...stylex.attrs(styles.posterItalic)}>one</span> chain of
@@ -1720,9 +1673,6 @@ function IndustriesSection() {
                   </figcaption>
                 </figure>
                 <div {...stylex.attrs(styles.chapterBody, mirror && styles.chapterBodyMirror)}>
-                  <span {...stylex.attrs(styles.techLabel)}>
-                    {String(i + 1).padStart(2, "0")} / 03
-                  </span>
                   <h3 {...stylex.attrs(styles.chapterTitle)}>{industry.title}</h3>
                   <p {...stylex.attrs(styles.lead)}>{industry.copy}</p>
                   <a href={createInquiryHref("industries")} {...stylex.attrs(styles.textLink)}>
@@ -1741,7 +1691,7 @@ function IndustriesSection() {
 
 /* ─────────────────────────────── Portfolio poster grid ─────────────────────────────── */
 
-function PosterCard(props: { ingredient: Ingredient; index: number }) {
+function PosterCard(props: { ingredient: Ingredient }) {
   const [active, setActive] = createSignal(false);
   const division = divisionForApplication(props.ingredient.application);
   const on = () => setActive(true);
@@ -1763,9 +1713,7 @@ function PosterCard(props: { ingredient: Ingredient; index: number }) {
           decoding="async"
           {...stylex.attrs(styles.cardImg, active() && styles.cardImgActive)}
         />
-        <figcaption {...stylex.attrs(styles.cardCode)}>
-          {props.ingredient.code} · {String(props.index + 1).padStart(2, "0")} / 06
-        </figcaption>
+        <figcaption {...stylex.attrs(styles.cardCode)}>{props.ingredient.code}</figcaption>
       </figure>
       <div {...stylex.attrs(styles.cardBody)}>
         <span {...stylex.attrs(styles.cardNameWrap)}>
@@ -1801,8 +1749,6 @@ function PortfolioSection() {
         <ChevronDivider />
         <div style={{ height: "48px" }} />
         <SectionHead
-          index="02"
-          eyebrow="Portfolio · 06 featured actives"
           mirror
           title={
             <span id="portfolio-title">
@@ -1823,8 +1769,8 @@ function PortfolioSection() {
         />
         <Reveal>
           <div {...stylex.attrs(styles.posterGrid)}>
-            {FEATURED.map((ingredient, i) => (
-              <PosterCard ingredient={ingredient} index={i} />
+            {FEATURED.map((ingredient) => (
+              <PosterCard ingredient={ingredient} />
             ))}
           </div>
         </Reveal>
@@ -1844,9 +1790,6 @@ function StatsBeat() {
             <p {...stylex.attrs(styles.eyebrow, styles.darkEyebrow)}>
               Figures a formulator can check
             </p>
-            <span {...stylex.attrs(styles.techLabel, styles.darkEyebrow)}>
-              {company.legalName} · {company.since}
-            </span>
           </div>
         </Reveal>
         <dl {...stylex.attrs(styles.statGrid)}>
@@ -1869,8 +1812,6 @@ function QualitySection() {
     <section id="quality" aria-labelledby="quality-title" {...stylex.attrs(styles.section)}>
       <div {...stylex.attrs(styles.container)}>
         <SectionHead
-          index="03"
-          eyebrow="Quality · 03 pillars · 06 certifications"
           title={
             <span id="quality-title">
               Trust is argued with{" "}
@@ -1886,9 +1827,8 @@ function QualitySection() {
         />
         <Reveal>
           <div {...stylex.attrs(styles.pillarGrid)}>
-            {pillars.map((pillar, i) => (
+            {pillars.map((pillar) => (
               <div {...stylex.attrs(styles.pillarCell)}>
-                <span {...stylex.attrs(styles.numeral)}>{String(i + 1).padStart(2, "0")}</span>
                 <h3 {...stylex.attrs(styles.pillarTitle)}>{pillar.title}</h3>
                 <p {...stylex.attrs(styles.prose)}>{pillar.copy}</p>
               </div>
@@ -1955,8 +1895,6 @@ function GlobalSection() {
         <ChevronDivider />
         <div style={{ height: "48px" }} />
         <SectionHead
-          index="04"
-          eyebrow="Global supply · 06 bases"
           mirror
           title={
             <span id="global-title">
@@ -2014,11 +1952,6 @@ function FinaleSection() {
         <div {...stylex.attrs(styles.finaleGrid)}>
           <div {...stylex.attrs(styles.finaleMain)}>
             <Reveal>
-              <p {...stylex.attrs(styles.eyebrow, styles.darkEyebrow)}>
-                <span {...stylex.attrs(styles.numeral, styles.finaleItalic)}>05</span> — Contact
-              </p>
-            </Reveal>
-            <Reveal delay={STAGGER}>
               <h2 id="contact-title" {...stylex.attrs(styles.poster, styles.finaleTitle)}>
                 Send the target.{" "}
                 <span {...stylex.attrs(styles.posterItalic, styles.finaleItalic)}>

@@ -1,0 +1,304 @@
+diff --git a/dist/src-DFB8LbjY.cjs b/dist/src-DFB8LbjY.cjs
+index c23a3b78bf8cc2c10b2542e81d3783b9cf9a7afe..37fba01cd5140a9dc9033ccd54280a4484da4d19 100644
+--- a/dist/src-DFB8LbjY.cjs
++++ b/dist/src-DFB8LbjY.cjs
+@@ -839,6 +839,53 @@ async function invalidateAndCollectCssModules(server, placeholder, carriesMarker
+ 	}));
+ 	return cssModules;
+ }
++const STYLEX_MODULE_IMPORT_RE = /from\s*["']([^"']*\.stylex(?:\.[cm]?[jt]sx?)?)["']/g;
++const SPLIT_CSS_PREFIX = "virtual:stylex-module/";
++const SPLIT_CSS_RESOLVED_PREFIX = "/__stylex_module/";
++const SPLIT_CSS_PRIORITY_LEVELS = 24;
++const STYLEX_DEFINITION_MODULE_RE = /\.stylex\.[cm]?[jt]sx?$/;
++function isStyleXDefinitionModule(id) {
++	return STYLEX_DEFINITION_MODULE_RE.test(id.split("?")[0]);
++}
++function padToAllPriorityLevels(rules) {
++	const padding = Array.from({ length: SPLIT_CSS_PRIORITY_LEVELS }, (_, level) => [`__stylex_pad_${level}`, {
++		ltr: "",
++		rtl: null
++	}, level * 1e3]);
++	return rules.concat(padding);
++}
++function collectConstRules(stylexRules) {
++	return Object.values(stylexRules).flat().filter((rule) => rule && rule[1] && rule[1].constKey);
++}
++function globalSplitRules(stylexRules) {
++	const definitions = Object.entries(stylexRules).filter(([id]) => isStyleXDefinitionModule(id)).flatMap(([, rules]) => rules).filter((rule) => rule && !(rule[1] && rule[1].constKey));
++	return { __stylex_global__: padToAllPriorityLevels([...definitions, ...collectConstRules(stylexRules)]) };
++}
++function moduleSplitCss(stylexRules, moduleId, transformedOptions) {
++	const own = (stylexRules[moduleId] ?? []).filter((rule) => rule && !(rule[1] && rule[1].constKey));
++	if (own.length === 0) return "";
++	const css = (0, _stylexswc_rs_compiler.processStylexRules)(padToAllPriorityLevels([...own, ...collectConstRules(stylexRules)]), transformedOptions);
++	return css.replace(/\n?@layer [^{};]+;\n?/, "\n").replace(/@layer [a-zA-Z0-9.-]+\{\s*\}/g, "");
++}
++const loadedStyleXModules = /* @__PURE__ */ new Map();
++let constModulesTransformed = false;
++async function transformStyleXConstModules(server, normalizedOptions) {
++	var _normalizedOptions$rsOptions$unstable;
++	if (constModulesTransformed) return;
++	constModulesTransformed = true;
++	const root = ((_normalizedOptions$rsOptions$unstable = normalizedOptions.rsOptions.unstable_moduleResolution) === null || _normalizedOptions$rsOptions$unstable === void 0 ? void 0 : _normalizedOptions$rsOptions$unstable.rootDir) ?? server.config.root;
++	const skip = new Set(["node_modules", "dist", "build", "coverage"]);
++	const files = [];
++	const walk = async (dir) => {
++		for (const entry of await node_fs.promises.readdir(dir, { withFileTypes: true })) {
++			if (entry.isDirectory()) {
++				if (!skip.has(entry.name) && !entry.name.startsWith(".")) await walk(node_path.join(dir, entry.name));
++			} else if (/\.stylex\.[cm]?[jt]sx?$/.test(entry.name)) files.push(node_path.join(dir, entry.name));
++		}
++	};
++	await walk(root);
++	await Promise.all(files.map((file) => server.transformRequest(`/@fs${file}`).catch(() => void 0)));
++}
+ async function transformStyleXDependencies(server, stylexRules, normalizedOptions) {
+ 	const visited = /* @__PURE__ */ new Set();
+ 	const transformDependencies = async (module) => {
+@@ -1031,11 +1078,13 @@ const unpluginFactory = (options = {}, meta) => {
+ 	let placeholderSeen = false;
+ 	let viteIsSsrBuild = false;
+ 	const finalizePlaceholderCss = async (css, targetName) => minifyInjectedCss(await transformStyleXCSS(css, targetName, normalizedOptions), viteCssMinify);
++	const splitCssByModule = options.splitCssByModule === true;
++	const splitCssModuleIds = /* @__PURE__ */ new Map();
+ 	const placeholderGenerateBundle = {
+ 		order: "post",
+ 		async handler(options, bundle) {
+ 			if (bundledDevCss.enabled) return;
+-			await injectPlaceholderIntoBundle(this, bundle, stylexRules, normalizedOptions, transformedOptions, placeholderSeen && !viteIsSsrBuild, finalizePlaceholderCss, viteCssCodeSplit ? null : {
++			await injectPlaceholderIntoBundle(this, bundle, splitCssByModule ? globalSplitRules(stylexRules) : stylexRules, normalizedOptions, transformedOptions, placeholderSeen && !viteIsSsrBuild, finalizePlaceholderCss, viteCssCodeSplit ? null : {
+ 				manifestFileNames: viteManifestFileNames,
+ 				outputOptions: options
+ 			});
+@@ -1055,6 +1104,12 @@ const unpluginFactory = (options = {}, meta) => {
+ 			const dir = node_path.dirname(id);
+ 			const basename = node_path.basename(id);
+ 			const file = node_path.join(dir, basename.split("?")[0] || basename);
++			if (!viteDevServer && typeof this.resolve === "function" && typeof this.load === "function") for (const [, specifier] of inputCode.matchAll(STYLEX_MODULE_IMPORT_RE)) {
++				const resolved = await this.resolve(specifier, id);
++				if (!resolved || resolved.external) continue;
++				if (!loadedStyleXModules.has(resolved.id)) loadedStyleXModules.set(resolved.id, this.load({ id: resolved.id }));
++				await loadedStyleXModules.get(resolved.id);
++			}
+ 			try {
+ 				var _normalizedOptions$rs;
+ 				let inputSourceMap;
+@@ -1062,7 +1117,12 @@ const unpluginFactory = (options = {}, meta) => {
+ 					const combinedMap = this.getCombinedSourcemap();
+ 					if (combinedMap === null || combinedMap === void 0 ? void 0 : combinedMap.mappings) inputSourceMap = JSON.stringify(combinedMap);
+ 				} catch (_unused) {}
+-				const { code, map } = transformStyleXCode(file, inputCode, normalizedOptions, stylexRules, id, inputSourceMap);
++				let { code, map } = transformStyleXCode(file, inputCode, normalizedOptions, stylexRules, id, inputSourceMap);
++				if (splitCssByModule && !viteDevServer && this.environment?.name === "client" && stylexRules[id] && !isStyleXDefinitionModule(id)) {
++					const key = crypto.default.createHash("sha1").update(id).digest("hex").slice(0, 16);
++					splitCssModuleIds.set(key, id);
++					code += `\nimport "${SPLIT_CSS_PREFIX}${key}.css";`;
++				}
+ 				if (normalizedOptions.useCssPlaceholder && viteDevServer && code !== inputCode) {
+ 					rulesRevision += 1;
+ 					cssRefreshFailures = 0;
+@@ -1121,11 +1181,17 @@ const unpluginFactory = (options = {}, meta) => {
+ 			resolveId: {
+ 				order: "pre",
+ 				handler(id, importer) {
++					if (splitCssByModule && id.startsWith(SPLIT_CSS_PREFIX)) return SPLIT_CSS_RESOLVED_PREFIX + id.slice(SPLIT_CSS_PREFIX.length);
+ 					if (!bundledDevCss.enabled) return null;
+ 					return bundledDevCss.resolveId.call(this, id, importer);
+ 				}
+ 			},
+ 			async load(id) {
++				if (splitCssByModule && id.startsWith(SPLIT_CSS_RESOLVED_PREFIX)) {
++					const key = node_path.basename(id.split("?")[0], ".css");
++					const moduleId = splitCssModuleIds.get(key);
++					return moduleId ? moduleSplitCss(stylexRules, moduleId, transformedOptions) : "";
++				}
+ 				const runtime = bundledDevCss.load(id);
+ 				if (runtime) return runtime;
+ 				if (!normalizedOptions.useCssPlaceholder) return null;
+@@ -1164,6 +1230,8 @@ const unpluginFactory = (options = {}, meta) => {
+ 				});
+ 			},
+ 			configureServer(server) {
++				wsSend || (wsSend = server.ws.send.bind(server.ws));
++				cssFileName || (cssFileName = ensureLeadingSlash(normalizedOptions.fileName));
+ 				if (cssRefreshTimer) {
+ 					clearTimeout(cssRefreshTimer);
+ 					cssRefreshTimer = null;
+@@ -1194,7 +1262,11 @@ const unpluginFactory = (options = {}, meta) => {
+ 						return;
+ 					}
+ 					(async () => {
+-						const collectedCSS = getStyleXRules(stylexRules, transformedOptions);
++						let collectedCSS = getStyleXRules(stylexRules, transformedOptions);
++						if (collectedCSS && hasUnresolvedDefineConstAtRule(collectedCSS)) {
++							await transformStyleXConstModules(server, normalizedOptions);
++							collectedCSS = getStyleXRules(stylexRules, transformedOptions);
++						}
+ 						const finalCSS = collectedCSS ? await transformStyleXCSS(collectedCSS, requestedCssFileName, normalizedOptions) : collectedCSS;
+ 						res.setHeader("Content-Type", "text/css");
+ 						res.end(finalCSS);
+diff --git a/dist/src-DZEdn1vU.js b/dist/src-DZEdn1vU.js
+index 97869cb05159173cd6beed97940cfae9096c63c5..6fab80658466d2aa099357453f0e90403ec96b03 100644
+--- a/dist/src-DZEdn1vU.js
++++ b/dist/src-DZEdn1vU.js
+@@ -815,6 +815,53 @@ async function invalidateAndCollectCssModules(server, placeholder, carriesMarker
+ 	}));
+ 	return cssModules;
+ }
++const STYLEX_MODULE_IMPORT_RE = /from\s*["']([^"']*\.stylex(?:\.[cm]?[jt]sx?)?)["']/g;
++const SPLIT_CSS_PREFIX = "virtual:stylex-module/";
++const SPLIT_CSS_RESOLVED_PREFIX = "/__stylex_module/";
++const SPLIT_CSS_PRIORITY_LEVELS = 24;
++const STYLEX_DEFINITION_MODULE_RE = /\.stylex\.[cm]?[jt]sx?$/;
++function isStyleXDefinitionModule(id) {
++	return STYLEX_DEFINITION_MODULE_RE.test(id.split("?")[0]);
++}
++function padToAllPriorityLevels(rules) {
++	const padding = Array.from({ length: SPLIT_CSS_PRIORITY_LEVELS }, (_, level) => [`__stylex_pad_${level}`, {
++		ltr: "",
++		rtl: null
++	}, level * 1e3]);
++	return rules.concat(padding);
++}
++function collectConstRules(stylexRules) {
++	return Object.values(stylexRules).flat().filter((rule) => rule && rule[1] && rule[1].constKey);
++}
++function globalSplitRules(stylexRules) {
++	const definitions = Object.entries(stylexRules).filter(([id]) => isStyleXDefinitionModule(id)).flatMap(([, rules]) => rules).filter((rule) => rule && !(rule[1] && rule[1].constKey));
++	return { __stylex_global__: padToAllPriorityLevels([...definitions, ...collectConstRules(stylexRules)]) };
++}
++function moduleSplitCss(stylexRules, moduleId, transformedOptions) {
++	const own = (stylexRules[moduleId] ?? []).filter((rule) => rule && !(rule[1] && rule[1].constKey));
++	if (own.length === 0) return "";
++	const css = processStylexRules(padToAllPriorityLevels([...own, ...collectConstRules(stylexRules)]), transformedOptions);
++	return css.replace(/\n?@layer [^{};]+;\n?/, "\n").replace(/@layer [a-zA-Z0-9.-]+\{\s*\}/g, "");
++}
++const loadedStyleXModules = /* @__PURE__ */ new Map();
++let constModulesTransformed = false;
++async function transformStyleXConstModules(server, normalizedOptions) {
++	var _normalizedOptions$rsOptions$unstable;
++	if (constModulesTransformed) return;
++	constModulesTransformed = true;
++	const root = ((_normalizedOptions$rsOptions$unstable = normalizedOptions.rsOptions.unstable_moduleResolution) === null || _normalizedOptions$rsOptions$unstable === void 0 ? void 0 : _normalizedOptions$rsOptions$unstable.rootDir) ?? server.config.root;
++	const skip = new Set(["node_modules", "dist", "build", "coverage"]);
++	const files = [];
++	const walk = async (dir) => {
++		for (const entry of await promises.readdir(dir, { withFileTypes: true })) {
++			if (entry.isDirectory()) {
++				if (!skip.has(entry.name) && !entry.name.startsWith(".")) await walk(path.join(dir, entry.name));
++			} else if (/\.stylex\.[cm]?[jt]sx?$/.test(entry.name)) files.push(path.join(dir, entry.name));
++		}
++	};
++	await walk(root);
++	await Promise.all(files.map((file) => server.transformRequest(`/@fs${file}`).catch(() => void 0)));
++}
+ async function transformStyleXDependencies(server, stylexRules, normalizedOptions) {
+ 	const visited = /* @__PURE__ */ new Set();
+ 	const transformDependencies = async (module) => {
+@@ -1007,11 +1054,13 @@ const unpluginFactory = (options = {}, meta) => {
+ 	let placeholderSeen = false;
+ 	let viteIsSsrBuild = false;
+ 	const finalizePlaceholderCss = async (css, targetName) => minifyInjectedCss(await transformStyleXCSS(css, targetName, normalizedOptions), viteCssMinify);
++	const splitCssByModule = options.splitCssByModule === true;
++	const splitCssModuleIds = /* @__PURE__ */ new Map();
+ 	const placeholderGenerateBundle = {
+ 		order: "post",
+ 		async handler(options, bundle) {
+ 			if (bundledDevCss.enabled) return;
+-			await injectPlaceholderIntoBundle(this, bundle, stylexRules, normalizedOptions, transformedOptions, placeholderSeen && !viteIsSsrBuild, finalizePlaceholderCss, viteCssCodeSplit ? null : {
++			await injectPlaceholderIntoBundle(this, bundle, splitCssByModule ? globalSplitRules(stylexRules) : stylexRules, normalizedOptions, transformedOptions, placeholderSeen && !viteIsSsrBuild, finalizePlaceholderCss, viteCssCodeSplit ? null : {
+ 				manifestFileNames: viteManifestFileNames,
+ 				outputOptions: options
+ 			});
+@@ -1031,6 +1080,12 @@ const unpluginFactory = (options = {}, meta) => {
+ 			const dir = path$1.dirname(id);
+ 			const basename = path$1.basename(id);
+ 			const file = path$1.join(dir, basename.split("?")[0] || basename);
++			if (!viteDevServer && typeof this.resolve === "function" && typeof this.load === "function") for (const [, specifier] of inputCode.matchAll(STYLEX_MODULE_IMPORT_RE)) {
++				const resolved = await this.resolve(specifier, id);
++				if (!resolved || resolved.external) continue;
++				if (!loadedStyleXModules.has(resolved.id)) loadedStyleXModules.set(resolved.id, this.load({ id: resolved.id }));
++				await loadedStyleXModules.get(resolved.id);
++			}
+ 			try {
+ 				var _normalizedOptions$rs;
+ 				let inputSourceMap;
+@@ -1038,7 +1093,12 @@ const unpluginFactory = (options = {}, meta) => {
+ 					const combinedMap = this.getCombinedSourcemap();
+ 					if (combinedMap === null || combinedMap === void 0 ? void 0 : combinedMap.mappings) inputSourceMap = JSON.stringify(combinedMap);
+ 				} catch (_unused) {}
+-				const { code, map } = transformStyleXCode(file, inputCode, normalizedOptions, stylexRules, id, inputSourceMap);
++				let { code, map } = transformStyleXCode(file, inputCode, normalizedOptions, stylexRules, id, inputSourceMap);
++				if (splitCssByModule && !viteDevServer && this.environment?.name === "client" && stylexRules[id] && !isStyleXDefinitionModule(id)) {
++					const key = crypto.createHash("sha1").update(id).digest("hex").slice(0, 16);
++					splitCssModuleIds.set(key, id);
++					code += `\nimport "${SPLIT_CSS_PREFIX}${key}.css";`;
++				}
+ 				if (normalizedOptions.useCssPlaceholder && viteDevServer && code !== inputCode) {
+ 					rulesRevision += 1;
+ 					cssRefreshFailures = 0;
+@@ -1097,11 +1157,17 @@ const unpluginFactory = (options = {}, meta) => {
+ 			resolveId: {
+ 				order: "pre",
+ 				handler(id, importer) {
++					if (splitCssByModule && id.startsWith(SPLIT_CSS_PREFIX)) return SPLIT_CSS_RESOLVED_PREFIX + id.slice(SPLIT_CSS_PREFIX.length);
+ 					if (!bundledDevCss.enabled) return null;
+ 					return bundledDevCss.resolveId.call(this, id, importer);
+ 				}
+ 			},
+ 			async load(id) {
++				if (splitCssByModule && id.startsWith(SPLIT_CSS_RESOLVED_PREFIX)) {
++					const key = path$1.basename(id.split("?")[0], ".css");
++					const moduleId = splitCssModuleIds.get(key);
++					return moduleId ? moduleSplitCss(stylexRules, moduleId, transformedOptions) : "";
++				}
+ 				const runtime = bundledDevCss.load(id);
+ 				if (runtime) return runtime;
+ 				if (!normalizedOptions.useCssPlaceholder) return null;
+@@ -1140,6 +1206,8 @@ const unpluginFactory = (options = {}, meta) => {
+ 				});
+ 			},
+ 			configureServer(server) {
++				wsSend || (wsSend = server.ws.send.bind(server.ws));
++				cssFileName || (cssFileName = ensureLeadingSlash(normalizedOptions.fileName));
+ 				if (cssRefreshTimer) {
+ 					clearTimeout(cssRefreshTimer);
+ 					cssRefreshTimer = null;
+@@ -1170,7 +1238,11 @@ const unpluginFactory = (options = {}, meta) => {
+ 						return;
+ 					}
+ 					(async () => {
+-						const collectedCSS = getStyleXRules(stylexRules, transformedOptions);
++						let collectedCSS = getStyleXRules(stylexRules, transformedOptions);
++						if (collectedCSS && hasUnresolvedDefineConstAtRule(collectedCSS)) {
++							await transformStyleXConstModules(server, normalizedOptions);
++							collectedCSS = getStyleXRules(stylexRules, transformedOptions);
++						}
+ 						const finalCSS = collectedCSS ? await transformStyleXCSS(collectedCSS, requestedCssFileName, normalizedOptions) : collectedCSS;
+ 						res.setHeader("Content-Type", "text/css");
+ 						res.end(finalCSS);
+diff --git a/dist/types-DqRANpr2.d.ts b/dist/types-DqRANpr2.d.ts
+index 2e6a1e8743b8dbfd59048ef5b87cf4ea47c46096..1d5395e6b0b9cdcfa88619398f94ef91aaee5d6c 100644
+--- a/dist/types-DqRANpr2.d.ts
++++ b/dist/types-DqRANpr2.d.ts
+@@ -76,6 +76,7 @@ interface UnpluginStylexRSOptions {
+    * marker.
+    */
+   useCssPlaceholder?: boolean | string;
++  splitCssByModule?: boolean;
+   /**
+    * How to report a build where `useCssPlaceholder` is on but no stylesheet in
+    * the output can carry the StyleX rules.
+diff --git a/dist/types.d.cts b/dist/types.d.cts
+index 380840fe1f68a93bb3a83262a1da404612f5f522..7e9ff7daa602f83bf2ff02697f8fdbafaae28b5f 100644
+--- a/dist/types.d.cts
++++ b/dist/types.d.cts
+@@ -76,6 +76,7 @@ export interface UnpluginStylexRSOptions {
+    * marker.
+    */
+   useCssPlaceholder?: boolean | string;
++  splitCssByModule?: boolean;
+   /**
+    * How to report a build where `useCssPlaceholder` is on but no stylesheet in
+    * the output can carry the StyleX rules.

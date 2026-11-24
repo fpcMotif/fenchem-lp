@@ -19,11 +19,17 @@ export {
   type StrengthTone,
 } from "../variant-o/content";
 
+export const PRODUCT_MENU = [
+  { id: "personal-care", label: "个人护理" },
+  { id: "functional-food", label: "功能性食品" },
+  { id: "human-nutrition", label: "人类营养健康" },
+  { id: "pet-health", label: "宠物健康" },
+] as const;
+
 export const NAV_ITEMS = [
   { label: "首页", href: "#top" },
   { label: "关于我们", href: "#about" },
   { label: "产品与应用", href: "#products" },
-  { label: "研发与生产", href: "#campus" },
   { label: "行业洞察", href: "#insights" },
   { label: "新闻资讯", href: "#news" },
   { label: "联系我们", href: "#contact" },
@@ -40,9 +46,9 @@ export const HERO = {
 export const ABOUT = {
   ...FIGMA_ABOUT,
   lines: [
-    "南京泛成国际控股有限公司是行业内领先的原料供应商，凭借现代化生产基地和专业研发能力、遍布全球的分",
-    "公司网络，为客户提供一站式定制化解决方案。我们经过三十多年的发展和经验积累，已成为全球范围内同行",
-    "业中最具影响力的公司之一。",
+    "南京泛成生物科技有限公司是南京泛成国际控股有限公司的控股子公司，是行业内领先的原料供应商，",
+    "凭借现代化生产基地和专业研发能力、遍布全球的业务和销售网络，为客户提供一站式定制化解决方案。",
+    "我们经过三十余年的发展和经验积累，已成为全球范围内同行业中具有影响力的公司之一。",
   ],
   cta: { label: "更多", href: "#campus" },
 } as const;
@@ -72,25 +78,28 @@ export const STRENGTHS = FIGMA_STRENGTHS.map((strength) => ({
   link: strength.link ? `了解${strength.title}` : null,
 }));
 
-const PENDING_DETAILS = ["[日期 · 地点待补充]", "[活动介绍待补充]"] as const;
-
 export const NEWS: readonly { title: string; details: readonly string[] }[] = [
   {
-    title: "1. In-cosmetics® 拉丁美洲展",
-    details: [
-      "2026 年 9 月 23 – 24 日 · 巴西 圣保罗",
-      "欢迎参加 2026 年 In-cosmetics® 拉丁美洲展！",
-    ],
+    title: "1. PCHi 2027 中国国际化妆品个人及家庭护理用品原料展览会",
+    details: ["2027 年 2 月 24 – 26 日 · 展位号 3D39"],
   },
-  { title: "2. IFSCC 大会 2026", details: PENDING_DETAILS },
-  { title: "3. Naturally Kiawah 研讨会 2026", details: PENDING_DETAILS },
-  { title: "4. In-cosmetics® Global 2026", details: PENDING_DETAILS },
-  { title: "5. PCHi 2026 个人护理品行业峰会", details: PENDING_DETAILS },
+  {
+    title: "2. FIC 2027 中国国际食品添加剂和配料展览会",
+    details: ["2027 年 3 月 17 – 19 日 · 展位号 3Y01"],
+  },
+  {
+    title: "3. FIA 2027 亚洲食品配料中国展",
+    details: ["2027 年 6 月 22 – 24 日 · 展位号 41H30"],
+  },
+  {
+    title: "4. PCT 2027 个人护理品技术高峰论坛",
+    details: ["2027 年 7 月"],
+  },
 ];
 
 export type FooterLink = {
   label: string;
-  page?: "about" | "products" | "rd" | "insights" | "news" | "contact";
+  page?: "about" | "products" | "insights" | "news" | "contact";
 };
 
 export const FOOTER_COLUMNS: readonly { heading: string; links: readonly FooterLink[] }[] = [
@@ -99,7 +108,6 @@ export const FOOTER_COLUMNS: readonly { heading: string; links: readonly FooterL
     links: [
       { label: "关于我们", page: "about" },
       { label: "产品与应用", page: "products" },
-      { label: "研发与生产", page: "rd" },
       { label: "联系我们", page: "contact" },
     ],
   },
@@ -108,12 +116,9 @@ export const FOOTER_COLUMNS: readonly { heading: string; links: readonly FooterL
     links: [
       { label: "行业洞察", page: "insights" },
       { label: "新闻资讯", page: "news" },
-      { label: "技术白皮书", page: "insights" },
-      { label: "全球展会日程", page: "news" },
-      { label: "常见解答", page: "contact" },
     ],
   },
-  { heading: "法律与合规", links: [{ label: "隐私声明" }, { label: "合规准则", page: "rd" }] },
+  { heading: "法律与合规", links: [{ label: "隐私声明" }, { label: "合规准则" }] },
 ];
 
 export const OFFICE_MAP_PINS: readonly { left: number; top: number }[] = [

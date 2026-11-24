@@ -92,12 +92,7 @@ const styles = stylex.create({
   },
 });
 
-export function SectionHead(props: {
-  titleId: string;
-  hour: number;
-  title: string;
-  english: string;
-}) {
+export function SectionHead(props: { titleId: string; hour: number; title: string }) {
   const reading = clock(props.hour);
   return (
     <header {...stylex.attrs(ui.grid, styles.head)}>
@@ -121,9 +116,6 @@ export function SectionHead(props: {
         <h2 id={props.titleId} {...stylex.attrs(styles.title)}>
           {props.title}
         </h2>
-        <p lang="en" {...stylex.attrs(ui.eyebrow)}>
-          {props.english}
-        </p>
       </div>
     </header>
   );

@@ -51,12 +51,6 @@ export function LakeStatistic(props: {
           <span {...stylex.attrs(props.styles.lakeUnit)}>{props.stat.unit}</span>
         ) : null}
       </m.p>
-      <m.p
-        {...stylex.attrs(props.styles.lakeCaption)}
-        style={{ opacity: props.surfacing, y: props.lift }}
-      >
-        {props.stat.caption}
-      </m.p>
     </div>
   );
 }
@@ -86,7 +80,6 @@ export function CountedStatistic(props: {
             <span {...stylex.attrs(props.styles.statUnit)}>{props.stat.unit}</span>
           ) : null}
         </p>
-        <p {...stylex.attrs(props.styles.statText)}>{props.stat.caption}</p>
       </props.ZoomReveal>
     </>
   );
@@ -487,7 +480,7 @@ export function FramedCampus(props: {
   reduce: boolean;
   windowClip: MotionValue<string>;
   photoScale: MotionValue<number>;
-  IMAGES: { campus: { src: string; alt: string } };
+  IMAGES: { campus: { src: string; srcSet?: string; alt: string } };
   STATS: readonly CampusStat[];
   StatItem: Component<{ stat: CampusStat; index: number }>;
 }) {
@@ -500,6 +493,8 @@ export function FramedCampus(props: {
         >
           <m.img
             src={props.IMAGES.campus.src}
+            srcset={props.IMAGES.campus.srcSet}
+            sizes="100vw"
             alt={props.IMAGES.campus.alt}
             loading="lazy"
             decoding="async"

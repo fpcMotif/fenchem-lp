@@ -7,7 +7,7 @@ import { EASE } from "@/components/prototype/motion-constants";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
 import { CATALOG_GROUPS, type CatalogGroup, type CatalogItem } from "../../products-data";
-import { REGION_META, inciWithoutLatin, latinNames, padIndex, splitTitle } from "../shared/derived";
+import { REGION_META, inciWithoutLatin, latinNames, splitTitle } from "../shared/derived";
 import { font, motionCss, tone } from "./tokens.stylex";
 import { ui } from "./ui";
 
@@ -158,12 +158,6 @@ const styles = stylex.create({
     letterSpacing: "0.04em",
     color: tone.ink,
   },
-  captionCount: {
-    fontSize: 13,
-    lineHeight: "20px",
-    fontVariantNumeric: "tabular-nums",
-    color: tone.muted,
-  },
   captionIntro: {
     margin: 0,
     marginTop: 12,
@@ -213,9 +207,6 @@ const styles = stylex.create({
     borderBottomStyle: "solid",
     borderBottomColor: tone.catalogRuleStrong,
   },
-  headCellName: {
-    paddingInlineStart: 36,
-  },
   lastCell: {
     paddingInlineEnd: 0,
   },
@@ -243,16 +234,6 @@ const styles = stylex.create({
     display: "flex",
     alignItems: "baseline",
     gap: 12,
-  },
-  groupIndex: {
-    flexShrink: 0,
-    width: 24,
-    fontFamily: font.numeral,
-    fontSize: 12,
-    fontWeight: 500,
-    lineHeight: "24px",
-    fontVariantNumeric: "tabular-nums",
-    color: ACCENT,
   },
   groupLabel: {
     fontSize: 15,
@@ -289,22 +270,6 @@ const styles = stylex.create({
   },
   dataCell: {
     marginTop: { default: 12, [MD]: 0 },
-    paddingInlineStart: { default: 36, [MD]: 0 },
-  },
-  nameLine: {
-    display: "flex",
-    alignItems: "baseline",
-    gap: 12,
-  },
-  rowIndex: {
-    flexShrink: 0,
-    width: 24,
-    fontFamily: font.numeral,
-    fontSize: 12,
-    fontWeight: 500,
-    lineHeight: "24px",
-    fontVariantNumeric: "tabular-nums",
-    color: tone.muted,
   },
   names: {
     display: "flex",
@@ -366,24 +331,16 @@ const styles = stylex.create({
   },
 });
 
-function ItemRow(props: {
-  item: CatalogItem;
-  index: number;
-  origin: string | null;
-  showOrigin: boolean;
-}) {
+function ItemRow(props: { item: CatalogItem; origin: string | null; showOrigin: boolean }) {
   const item = props.item;
   const { primary, secondary } = splitTitle(item.title);
   const latin = latinNames(item.inci);
   return (
     <tr {...stylex.attrs(styles.row)}>
       <th scope="row" {...stylex.attrs(styles.cell)}>
-        <span {...stylex.attrs(styles.nameLine)}>
-          <span {...stylex.attrs(styles.rowIndex)}>{padIndex(props.index)}</span>
-          <span {...stylex.attrs(styles.names)}>
-            <span {...stylex.attrs(styles.primary)}>{primary}</span>
-            {secondary && <span {...stylex.attrs(styles.secondary)}>{secondary}</span>}
-          </span>
+        <span {...stylex.attrs(styles.names)}>
+          <span {...stylex.attrs(styles.primary)}>{primary}</span>
+          {secondary && <span {...stylex.attrs(styles.secondary)}>{secondary}</span>}
         </span>
       </th>
       <td {...stylex.attrs(styles.cell, styles.dataCell)}>
@@ -435,9 +392,6 @@ function TableContent(props: { tabId: string; reduce: boolean }) {
         <div>
           <div {...stylex.attrs(styles.captionLine)}>
             <span {...stylex.attrs(styles.captionTitle)}>{single ? single.label : "全部原料"}</span>
-            <span {...stylex.attrs(styles.captionCount)}>
-              {single ? single.items.length : TOTAL_ITEMS} 款
-            </span>
           </div>
           {single?.intro && <p {...stylex.attrs(styles.captionIntro)}>{single.intro}</p>}
         </div>
@@ -450,7 +404,7 @@ function TableContent(props: { tabId: string; reduce: boolean }) {
       </colgroup>
       <thead {...stylex.attrs(styles.thead)}>
         <tr>
-          <th scope="col" {...stylex.attrs(styles.headCell, styles.headCellName)}>
+          <th scope="col" {...stylex.attrs(styles.headCell)}>
             <span aria-hidden="true">名称</span>
             <span {...stylex.attrs(ui.srOnly)}>Name</span>
           </th>
@@ -480,15 +434,14 @@ function TableContent(props: { tabId: string; reduce: boolean }) {
                 {...stylex.attrs(styles.groupCell, groupIndex === 0 && styles.groupCellFirst)}
               >
                 <span {...stylex.attrs(styles.groupLine)}>
-                  <span {...stylex.attrs(styles.groupIndex)}>{padIndex(groupIndex)}</span>
                   <span {...stylex.attrs(styles.groupLabel)}>{group.label}</span>
                   <span {...stylex.attrs(styles.groupCount)}>{group.items.length} 款</span>
                 </span>
               </th>
             </tr>
           )}
-          {group.items.map((item, index) => (
-            <ItemRow item={item} index={index} origin={originOf(group)} showOrigin={showAll} />
+          {group.items.map((item) => (
+            <ItemRow item={item} origin={originOf(group)} showOrigin={showAll} />
           ))}
         </m.tbody>
       ))}

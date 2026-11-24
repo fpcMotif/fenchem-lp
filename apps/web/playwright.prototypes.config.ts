@@ -1,5 +1,6 @@
 import { defineConfig, devices } from "@playwright/test";
 
+import { chromeChannel } from "../../scripts/ui/chrome-channel";
 import { resolveServer } from "../../scripts/ui/server";
 
 const server = await resolveServer();
@@ -34,7 +35,7 @@ export default defineConfig({
       fullyParallel: true,
       use: {
         ...devices["Desktop Chrome"],
-        channel: "chrome",
+        channel: chromeChannel,
         viewport: { width: 1440, height: 900 },
       },
     },
@@ -43,7 +44,7 @@ export default defineConfig({
       testIgnore: "hydration.spec.ts",
       use: {
         ...devices["Desktop Chrome"],
-        channel: "chrome",
+        channel: chromeChannel,
         viewport: { width: 1440, height: 900 },
       },
     },
@@ -52,7 +53,7 @@ export default defineConfig({
       testIgnore: "hydration.spec.ts",
       use: {
         ...devices["Pixel 7"],
-        channel: "chrome",
+        channel: chromeChannel,
       },
     },
   ],

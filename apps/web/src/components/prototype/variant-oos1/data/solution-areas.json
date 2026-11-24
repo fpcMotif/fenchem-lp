@@ -1,0 +1,50 @@
+[
+  {
+    "categoryId": "personal-care",
+    "id": "face",
+    "label": "面部护理",
+    "englishLabel": "Face care"
+  },
+  {
+    "categoryId": "personal-care",
+    "id": "body",
+    "label": "身体护理",
+    "englishLabel": "Body care"
+  },
+  {
+    "categoryId": "personal-care",
+    "id": "hair",
+    "label": "头皮 & 头发护理",
+    "englishLabel": "Scalp and hair care"
+  },
+  {
+    "categoryId": "personal-care",
+    "id": "sun",
+    "label": "防晒护理",
+    "englishLabel": "Sun care"
+  },
+  {
+    "categoryId": "personal-care",
+    "id": "makeup",
+    "label": "彩妆 & 底妆",
+    "englishLabel": "Makeup and base"
+  },
+  {
+    "categoryId": "personal-care",
+    "id": "baby",
+    "label": "母婴温和护理",
+    "englishLabel": "Gentle mother and baby care"
+  },
+  {
+    "categoryId": "personal-care",
+    "id": "special",
+    "label": "特殊护理",
+    "englishLabel": "Special care"
+  },
+  {
+    "categoryId": "personal-care",
+    "id": "trend",
+    "label": "趋势概念配方",
+    "englishLabel": "Trend concept formulas"
+  }
+]

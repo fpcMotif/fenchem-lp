@@ -9,7 +9,7 @@ import { Lightbox } from "./lightbox";
 import { CropMarks, Reveal, SectionName, useDrift } from "./parts";
 import { wipe } from "./parts-values";
 import { base, ty } from "./shared";
-import { font, hue, size } from "./theme.stylex";
+import { hue, size } from "./theme.stylex";
 import { createSignal } from "solid-js";
 
 const PHOTO_COUNT = ABOUT_CAMPUS.photos.length;
@@ -94,13 +94,6 @@ const styles = stylex.create({
     transitionProperty: "color",
     transitionDuration: "400ms",
   },
-  numeral: {
-    fontFamily: font.display,
-    fontSize: 11,
-    fontVariantNumeric: "tabular-nums",
-    letterSpacing: "0.14em",
-    color: hue.quiet,
-  },
 });
 
 function Tile(props: { photo: Photo; index: number; onOpen: () => void }) {
@@ -138,9 +131,6 @@ function Tile(props: { photo: Photo; index: number; onOpen: () => void }) {
           <CropMarks hover />
         </div>
         <figcaption {...stylex.attrs(ty.quiet, styles.caption)}>
-          <span aria-hidden="true" lang="en" {...stylex.attrs(styles.numeral)}>
-            {String(props.index + 1).padStart(2, "0")}
-          </span>
           <span>{props.photo.caption}</span>
         </figcaption>
       </figure>

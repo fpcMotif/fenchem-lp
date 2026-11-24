@@ -1,22 +1,22 @@
 import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { ChevronLeft, ChevronRight, Pause, Play } from "@fenchem-lp/ui/components/lucide";
 import { useInView } from "@/compat/motion";
-import { createEffect, createSignal } from "solid-js";
+import { createSignal, Show } from "solid-js";
 import type { JSX } from "@solidjs/web";
-
-import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
 import { CAMPUS_GALLERY } from "./campus-gallery";
 import { color, font } from "./tokens.stylex";
 
 const COUNT = CAMPUS_GALLERY.length;
+const LAST = COUNT - 1;
+const TRACK_PX = 300;
+const THUMB_PX = 22;
 const BRAND_MARK = "/prototype/official-site/fenchem-logo.png";
 const DESKTOP = "@media (min-width: 1280px)";
 const SLIDE_EASE = "cubic-bezier(0.32, 0.72, 0, 1)";
-const SLIDE_MS = 700;
+const COUNTER_GRAY = "#6b7280";
+const SLIDE_MS = 520;
 
-const AUTOPLAY_MS = 2500;
 const DRAG_START_PX = 6;
 const SWIPE_COMMIT = 0.18;
 const WHEEL_STEP_PX = 40;
@@ -55,6 +55,7 @@ const dynamic = stylex.create({
     zIndex,
   }),
   focus: (position: string) => ({ objectPosition: position }),
+  thumb: (shift: string) => ({ insetInlineStart: shift }),
 });
 
 const styles = stylex.create({
@@ -88,7 +89,7 @@ const styles = stylex.create({
     overflow: "hidden",
     padding: 0,
     borderWidth: 0,
-    borderRadius: { default: 16, [DESKTOP]: 22 },
+    borderRadius: { default: 4, [DESKTOP]: 6 },
     backgroundColor: "#dfe5ee",
     boxShadow: "0 28px 56px -28px rgba(6, 28, 66, 0.45)",
     cursor: "pointer",
@@ -139,6 +140,9 @@ const styles = stylex.create({
     textShadow: "0 1px 8px rgba(0, 0, 0, 0.3)",
     pointerEvents: "none",
   },
+  headFront: {
+    height: "20%",
+  },
   avatar: {
     flexShrink: 0,
     width: 26,
@@ -151,92 +155,13 @@ const styles = stylex.create({
     objectFit: "cover",
     objectPosition: "0% 50%",
   },
-  autoplayToggle: {
-    position: "absolute",
-    top: { default: 9, [DESKTOP]: 13 },
-    insetInlineEnd: { default: 9, [DESKTOP]: 13 },
-    zIndex: 101,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    width: 32,
-    height: 32,
-    padding: 0,
-    borderWidth: 0,
-    borderRadius: "50%",
-    backgroundColor: { default: "rgba(6, 28, 66, 0.42)", ":hover": "rgba(6, 28, 66, 0.6)" },
-    boxShadow: "0 0 0 1.5px rgba(255, 255, 255, 0.6)",
-    color: colors.paper,
-    cursor: "pointer",
-    transform: {
-      default: null,
-      ":active": {
-        default: null,
-        ["@media (prefers-reduced-motion: no-preference)"]: "scale(0.96)",
-      },
-    },
-    transitionProperty: "background-color, transform",
-    transitionDuration: "160ms",
-    transitionTimingFunction: SLIDE_EASE,
-    outlineStyle: { default: "none", ":focus-visible": "solid" },
-    outlineWidth: 2,
-    outlineColor: colors.paper,
-    outlineOffset: 2,
-  },
-  controls: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: { default: 16, [DESKTOP]: 24 },
-    marginTop: { default: 8, [DESKTOP]: 12 },
-  },
-  navButton: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    flexShrink: 0,
-    width: 44,
-    height: 44,
-    padding: 0,
-    borderWidth: 1,
-    borderStyle: "solid",
-    borderColor: "rgba(26, 26, 26, 0.14)",
-    borderRadius: "50%",
-    backgroundColor: { default: colors.paper, ":hover": "#f3f4f6" },
-    color: color.ink,
-    cursor: "pointer",
-    transform: {
-      default: null,
-      ":active": {
-        default: null,
-        ["@media (prefers-reduced-motion: no-preference)"]: "scale(0.96)",
-      },
-    },
-    transitionProperty: "background-color, transform",
-    transitionDuration: "160ms",
-    transitionTimingFunction: SLIDE_EASE,
-    outlineStyle: { default: "none", ":focus-visible": "solid" },
-    outlineWidth: 2,
-    outlineColor: colors.brandBlue700,
-    outlineOffset: 2,
-  },
   status: {
     display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    gap: 4,
-    minWidth: { default: 150, [DESKTOP]: 190 },
-    margin: 0,
-  },
-  area: {
-    fontSize: 12,
-    letterSpacing: "0.16em",
-    color: colors.brandBlue700,
-  },
-  captionRow: {
-    display: "flex",
     alignItems: "baseline",
-    gap: 10,
+    justifyContent: "center",
+    gap: 11,
+    margin: 0,
+    marginTop: { default: 8, [DESKTOP]: 12 },
   },
   caption: {
     fontSize: 15,
@@ -249,7 +174,48 @@ const styles = stylex.create({
     fontSize: 13,
     fontVariantNumeric: "tabular-nums",
     letterSpacing: "0.08em",
-    color: color.muted,
+    color: COUNTER_GRAY,
+  },
+  track: {
+    position: "relative",
+    width: TRACK_PX,
+    height: 3,
+    marginInline: "auto",
+    marginTop: { default: 14, [DESKTOP]: 18 },
+    borderRadius: 999,
+    backgroundColor: "rgba(120, 120, 128, 0.16)",
+    cursor: "pointer",
+    touchAction: "none",
+    outlineStyle: { default: "none", ":focus-visible": "solid" },
+    outlineWidth: 2,
+    outlineColor: colors.brandBlue700,
+    outlineOffset: 6,
+    "::before": {
+      content: '""',
+      position: "absolute",
+      left: 0,
+      right: 0,
+      top: -8,
+      bottom: -8,
+    },
+  },
+  thumb: {
+    position: "absolute",
+    top: -1.5,
+    width: THUMB_PX,
+    height: 6,
+    borderRadius: 999,
+    backgroundColor: "rgba(17, 17, 17, 0.92)",
+    pointerEvents: "none",
+    transitionProperty: "inset-inline-start",
+    transitionDuration: {
+      default: "0ms",
+      ["@media (prefers-reduced-motion: no-preference)"]: `${SLIDE_MS}ms`,
+    },
+    transitionTimingFunction: SLIDE_EASE,
+  },
+  thumbDirect: {
+    transitionDuration: "0ms",
   },
 });
 
@@ -258,30 +224,28 @@ type Gesture = { pointerId: number; startX: number; width: number; moved: boolea
 export function CampusCarousel(props: { paused: boolean; onOpen: (index: number) => void }) {
   const [position, setPosition] = createSignal(0);
   const [drag, setDrag] = createSignal<number | null>(null);
-  const [playChoice, setPlayChoice] = createSignal<boolean | null>(null);
   let region: HTMLDivElement | undefined;
   let slot: HTMLDivElement | undefined;
   let gesture: Gesture | null = null;
   let dragged = false;
   let wheel = { total: 0, lockedUntil: 0 };
   const approached = useInView(() => region, { once: true, margin: "600px 0px" });
-  const reduceMotion = useReducedMotion();
 
   const active = () => wrapIndex(position());
   const current = () => CAMPUS_GALLERY[active()];
-  const playing = () => playChoice() ?? !reduceMotion();
-  const paused = () => props.paused || drag() !== null || !playing();
   const step = (delta: number) => setPosition((value) => value + delta);
   const goTo = (index: number) => step(wrapOffset(index - active()));
+  const shown = () => {
+    const offset = drag();
+    return offset === null ? active() : wrapIndex(position() + offset);
+  };
 
-  createEffect(
-    () => [paused(), position()] as const,
-    ([isPaused]) => {
-      if (isPaused) return;
-      const timer = window.setTimeout(() => setPosition((value) => value + 1), AUTOPLAY_MS);
-      return () => window.clearTimeout(timer);
-    },
-  );
+  const scrub = (clientX: number, track: HTMLDivElement) => {
+    const rect = track.getBoundingClientRect();
+    const travel = Math.max(rect.width - THUMB_PX, 1);
+    const x = Math.min(travel, Math.max(0, clientX - rect.left - THUMB_PX / 2));
+    goTo(Math.round((x / travel) * LAST));
+  };
 
   const onPointerDown = (event: PointerEvent) => {
     if (event.button !== 0) return;
@@ -359,18 +323,6 @@ export function CampusCarousel(props: { paused: boolean; onOpen: (index: number)
         {...stylex.attrs(styles.stage)}
       >
         <div ref={slot} {...stylex.attrs(styles.slot)}>
-          <button
-            type="button"
-            aria-label={playing() ? "Pause slideshow" : "Play slideshow"}
-            onClick={() => setPlayChoice(!playing())}
-            {...stylex.attrs(styles.autoplayToggle)}
-          >
-            {playing() ? (
-              <Pause size={14} fill="currentColor" aria-hidden="true" />
-            ) : (
-              <Play size={14} fill="currentColor" aria-hidden="true" />
-            )}
-          </button>
           {CAMPUS_GALLERY.map((photo, index) => {
             const offset = () => wrapOffset(index - position() - (drag() ?? 0));
             const placed = () => poseAt(offset());
@@ -403,47 +355,60 @@ export function CampusCarousel(props: { paused: boolean; onOpen: (index: number)
               >
                 <img
                   src={photo.image}
+                  srcset={photo.srcSet || undefined}
+                  sizes="(min-width: 1280px) 600px, (min-width: 768px) min(520px, 62vw), calc(100vw - 112px)"
                   alt={photo.alt}
                   loading={approached() && Math.abs(offset()) <= EAGER_RANGE ? "eager" : "lazy"}
                   decoding="async"
                   draggable={false}
                   {...stylex.attrs(styles.photo, dynamic.focus(photo.focus))}
                 />
-                <span aria-hidden="true" {...stylex.attrs(styles.head)}>
-                  <img src={BRAND_MARK} alt="" {...stylex.attrs(styles.avatar)} />
-                  {photo.caption}
+                <span
+                  aria-hidden="true"
+                  {...stylex.attrs(styles.head, front() && styles.headFront)}
+                >
+                  <Show when={!front()}>
+                    <img src={BRAND_MARK} alt="" {...stylex.attrs(styles.avatar)} />
+                    {photo.caption}
+                  </Show>
                 </span>
               </button>
             );
           })}
         </div>
       </div>
-      <div {...stylex.attrs(styles.controls)}>
-        <button
-          type="button"
-          aria-label="Previous photo"
-          onClick={() => step(-1)}
-          {...stylex.attrs(styles.navButton)}
-        >
-          <ChevronLeft size={20} aria-hidden="true" />
-        </button>
-        <p {...stylex.attrs(styles.status)}>
-          <span {...stylex.attrs(styles.area)}>{current().area}</span>
-          <span {...stylex.attrs(styles.captionRow)}>
-            <span {...stylex.attrs(styles.caption)}>{current().caption}</span>
-            <span lang="en" {...stylex.attrs(styles.counter)}>
-              {pad(active() + 1)} / {pad(COUNT)}
-            </span>
-          </span>
-        </p>
-        <button
-          type="button"
-          aria-label="Next photo"
-          onClick={() => step(1)}
-          {...stylex.attrs(styles.navButton)}
-        >
-          <ChevronRight size={20} aria-hidden="true" />
-        </button>
+      <p aria-live="polite" {...stylex.attrs(styles.status)}>
+        <span {...stylex.attrs(styles.caption)}>{current().caption}</span>
+        <span lang="en" {...stylex.attrs(styles.counter)}>
+          {pad(active() + 1)} / {pad(COUNT)}
+        </span>
+      </p>
+      <div
+        role="slider"
+        aria-label="Album position"
+        aria-orientation="horizontal"
+        aria-valuemin={1}
+        aria-valuemax={COUNT}
+        aria-valuenow={active() + 1}
+        tabindex={0}
+        onPointerDown={(event) => {
+          if (event.button !== 0) return;
+          event.currentTarget.setPointerCapture(event.pointerId);
+          scrub(event.clientX, event.currentTarget);
+        }}
+        onPointerMove={(event) => {
+          if (!event.currentTarget.hasPointerCapture(event.pointerId)) return;
+          scrub(event.clientX, event.currentTarget);
+        }}
+        {...stylex.attrs(styles.track)}
+      >
+        <span
+          {...stylex.attrs(
+            styles.thumb,
+            drag() !== null && styles.thumbDirect,
+            dynamic.thumb(`${(shown() / LAST) * (TRACK_PX - THUMB_PX)}px`),
+          )}
+        />
       </div>
     </div>
   );

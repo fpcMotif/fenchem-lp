@@ -2,7 +2,11 @@ const ASSET_BASE = "/prototype/official-site";
 
 export const IMAGES = {
   hero: `${ASSET_BASE}/hero-background.webp`,
-  campus: { src: `${ASSET_BASE}/campus.webp`, alt: "Exterior of the Fenchem campus buildings" },
+  campus: {
+    src: `${ASSET_BASE}/campus.webp`,
+    srcSet: `${ASSET_BASE}/campus-1200.webp 1200w, ${ASSET_BASE}/campus-1800.webp 1800w, ${ASSET_BASE}/campus.webp 2674w`,
+    alt: "Exterior of the Fenchem campus buildings",
+  },
   officeMap: { src: `${ASSET_BASE}/office-map.webp`, alt: "Map of Fenchem's global offices" },
   footerLogo: { src: `${ASSET_BASE}/fenchem-logo.png`, alt: "FENCHEM" },
 } as const;
@@ -25,7 +29,7 @@ export const HERO = {
 
 export const ABOUT = {
   title: "关于泛成",
-  body: "南京泛成国际控股有限公司是行业内领先的原料供应商，凭借现代化生产基地和专业研发能力、遍布全球的分公司网络，为客户提供一站式定制化解决方案。我们经过三十多年的发展和经验积累，已成为全球范围内同行业中最具影响力的公司之一。",
+  body: "南京泛成生物科技有限公司是南京泛成国际控股有限公司的控股子公司，是行业内领先的原料供应商，凭借现代化生产基地和专业研发能力、遍布全球的业务和销售网络，为客户提供一站式定制化解决方案。我们经过三十余年的发展和经验积累，已成为全球范围内同行业中具有影响力的公司之一。",
   cta: { label: "更多", href: "#campus" },
 } as const;
 

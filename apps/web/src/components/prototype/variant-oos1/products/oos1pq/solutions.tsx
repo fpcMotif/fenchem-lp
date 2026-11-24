@@ -217,19 +217,8 @@ const styles = stylex.create({
     borderBottomStyle: "solid",
     borderBottomColor: INK,
   },
-  sheetNumber: {
-    display: "block",
-    fontFamily: NUMERAL_FONT,
-    fontSize: 13,
-    fontWeight: 500,
-    lineHeight: "20px",
-    letterSpacing: "0.04em",
-    fontVariantNumeric: "tabular-nums",
-    color: ACCENT,
-  },
   sheetTitle: {
     margin: 0,
-    marginTop: 8,
     fontSize: { default: 20, [DESKTOP]: 24 },
     fontWeight: 500,
     lineHeight: { default: "28px", [DESKTOP]: "32px" },
@@ -377,7 +366,7 @@ function Field(props: { label: string; children: JSX.Element }) {
   );
 }
 
-function Sheet(props: { item: SolutionItem; index: number }) {
+function Sheet(props: { item: SolutionItem }) {
   const item = props.item;
   const titleId = createUniqueId();
   return (
@@ -387,7 +376,6 @@ function Sheet(props: { item: SolutionItem; index: number }) {
       {...stylex.attrs(styles.sheet)}
     >
       <header {...stylex.attrs(styles.sheetHead)}>
-        <span {...stylex.attrs(styles.sheetNumber)}>{padIndex(props.index)}</span>
         <h3 id={titleId} {...stylex.attrs(styles.sheetTitle)}>
           {item.title}
         </h3>
@@ -561,8 +549,8 @@ export function Solutions() {
           onKeyDown={handleKeyDown}
           {...stylex.attrs(styles.track)}
         >
-          {SOLUTION_ITEMS.map((item, index) => (
-            <Sheet item={item} index={index} />
+          {SOLUTION_ITEMS.map((item) => (
+            <Sheet item={item} />
           ))}
         </div>
         <div role="group" aria-label="Jump to solution" {...stylex.attrs(styles.dots)}>

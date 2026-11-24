@@ -34,15 +34,14 @@ import {
 import { RiseReveal } from "./rise-reveal";
 import { color, ease, font, layout, media } from "./tokens.stylex";
 
-const PAGE = "#f3f5fa";
 const MUTED_INK = "rgba(26, 26, 26, 0.22)";
+const UNLIT_YEAR_INK = "rgba(26, 26, 26, 0.52)";
 const HAIRLINE = "rgba(26, 26, 26, 0.12)";
 const CONTROL_EDGE = "rgba(26, 26, 26, 0.28)";
 const BLUE_TRACK = "rgba(7, 67, 174, 0.16)";
 const GREEN_TRACK = "rgba(100, 167, 51, 0.3)";
 const BLUE_RING = "rgba(7, 67, 174, 0.38)";
 const DESKTOP = "@media (min-width: 1280px)";
-const SHELL_EDGE = "max(0px, (100% - 1440px) / 2)";
 const PIN_QUERY = "(min-width: 1024px) and (min-height: 760px)";
 const PIN_SPRING = { stiffness: 260, damping: 40, restDelta: 0.0005 };
 const END_SNAP = 0.995;
@@ -100,42 +99,25 @@ const styles = stylex.create({
   },
   shell: {
     width: "100%",
-    maxWidth: 1440,
     marginInline: "auto",
     boxSizing: "border-box",
-    paddingInline: { default: 16, [media.tablet]: 40, [DESKTOP]: layout.inset120 },
+    paddingInline: { default: 16, [media.tablet]: 40, [DESKTOP]: layout.insetFluid },
   },
 
   header: {
     display: "flex",
-    alignItems: "flex-end",
+    alignItems: "flex-start",
     justifyContent: "space-between",
     gap: 24,
     marginBottom: { default: 28, [DESKTOP]: 40 },
-  },
-  eyebrow: {
-    margin: 0,
-    marginBottom: 12,
-    fontFamily: font.display,
-    fontSize: 12,
-    fontWeight: 600,
-    letterSpacing: "0.22em",
-    textTransform: "uppercase",
-    color: colors.brandBlue700,
   },
   title: {
     margin: 0,
     fontSize: { default: 26, [media.tablet]: 32, [DESKTOP]: 40 },
     fontWeight: 700,
     lineHeight: 1.2,
+    textWrap: "balance",
     color: color.ink,
-  },
-  caption: {
-    margin: 0,
-    marginTop: 12,
-    fontSize: { default: 13, ["@media (min-width: 768px)"]: 14 },
-    letterSpacing: "0.06em",
-    color: color.bodyText,
   },
 
   odometer: {
@@ -209,11 +191,7 @@ const styles = stylex.create({
       ["@media (min-width: 1024px)"]: "auto 56px auto",
     },
     width: "max-content",
-    paddingInline: {
-      default: `calc(${SHELL_EDGE} + 16px)`,
-      [media.tablet]: `calc(${SHELL_EDGE} + 40px)`,
-      [DESKTOP]: `calc(${SHELL_EDGE} + ${layout.inset120})`,
-    },
+    paddingInline: { default: 16, [media.tablet]: 40, [DESKTOP]: layout.insetFluid },
     willChange: "transform",
   },
   list: {
@@ -305,7 +283,7 @@ const styles = stylex.create({
     lineHeight: 1,
     letterSpacing: "-0.02em",
     fontVariantNumeric: "tabular-nums",
-    color: MUTED_INK,
+    color: UNLIT_YEAR_INK,
     transitionProperty: "color",
     transitionDuration: "500ms",
     transitionTimingFunction: ease.out,
@@ -315,14 +293,6 @@ const styles = stylex.create({
   },
   yearActive: {
     color: colors.brandBlue700,
-  },
-  kicker: {
-    fontFamily: font.serifAccent,
-    fontSize: { default: 18, [DESKTOP]: 22 },
-    fontStyle: "italic",
-    fontWeight: 400,
-    letterSpacing: 0,
-    color: color.bodyText,
   },
   events: {
     display: "flex",
@@ -339,7 +309,7 @@ const styles = stylex.create({
     textWrap: "pretty",
   },
   event: {
-    opacity: 0.3,
+    opacity: 0.8,
     transitionProperty: "opacity, transform",
     transitionDuration: "700ms",
     transitionTimingFunction: ease.out,
@@ -390,7 +360,7 @@ const styles = stylex.create({
     stroke: colors.brandGreen500,
   },
   nodeRing: {
-    fill: PAGE,
+    fill: color.pageTint,
     stroke: BLUE_RING,
     strokeWidth: 1.25,
     transitionProperty: "stroke",
@@ -689,11 +659,7 @@ function useGeometry(
   return geometry;
 }
 
-export function HistoryTimeline(props: {
-  stickyTop: number;
-  sx?: stylex.StyleXStyles;
-  plain?: boolean;
-}) {
+export function HistoryTimeline(props: { stickyTop: number; sx?: stylex.StyleXStyles }) {
   let section: HTMLElement | undefined;
   let viewport: HTMLDivElement | undefined;
   let track: HTMLElement | undefined;
@@ -712,7 +678,6 @@ export function HistoryTimeline(props: {
     () => helixRow,
     () => viewport,
   );
-  const plain = () => props.plain ?? false;
 
   const x = useMotionValue(0);
   const draw = useMotionValue(0);
@@ -793,23 +758,17 @@ export function HistoryTimeline(props: {
       >
         <div ref={header} {...stylex.attrs(styles.shell, styles.header)}>
           <RiseReveal>
-            {plain() ? null : (
-              <p lang="en" {...stylex.attrs(styles.eyebrow)}>
-                {ABOUT_HISTORY.eyebrow}
-              </p>
-            )}
             <h2 id="about-history-title" {...stylex.attrs(styles.title)}>
               {ABOUT_HISTORY.title}
             </h2>
-            <p {...stylex.attrs(styles.caption)}>{ABOUT_HISTORY.caption}</p>
           </RiseReveal>
-          {plain() ? null : <Odometer year={year} />}
+          <Odometer year={year} />
         </div>
 
         <div
           ref={viewport}
           role={pinned() ? undefined : "region"}
-          aria-label={pinned() ? undefined : `${ABOUT_HISTORY.eyebrow}, scrolls horizontally`}
+          aria-label={pinned() ? undefined : `${ABOUT_HISTORY.title}，横向滚动查看`}
           tabindex={pinned() ? undefined : 0}
           {...stylex.attrs(styles.viewport, pinned() ? styles.viewportPinned : styles.viewportFree)}
         >
@@ -870,11 +829,6 @@ export function HistoryTimeline(props: {
                       )}
                     >
                       {milestone.year}
-                      {"kicker" in milestone && !plain() ? (
-                        <span lang="en" {...stylex.attrs(styles.kicker)}>
-                          {milestone.kicker}
-                        </span>
-                      ) : null}
                     </h3>
                     <ul {...stylex.attrs(styles.events)}>
                       {milestone.events.map((event, eventIndex) => (

@@ -221,13 +221,7 @@ export function Culture(props: { lit: boolean; onIgnite: () => void }) {
       aria-labelledby="oos1k-culture"
       {...stylex.attrs(ui.section, ui.shell)}
     >
-      <ChartHeading
-        id="oos1k-culture"
-        numeral="III"
-        label="Culture"
-        title={ABOUT_CULTURE.title}
-        note="Three stars, one of them new"
-      />
+      <ChartHeading id="oos1k-culture" title={ABOUT_CULTURE.title} />
 
       <div {...stylex.attrs(styles.layout)}>
         <div aria-hidden="true" {...stylex.attrs(styles.scope)}>

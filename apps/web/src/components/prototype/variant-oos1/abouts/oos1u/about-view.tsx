@@ -19,14 +19,6 @@ const HEADER_HEIGHT = 80;
 const BAR_HEIGHT = 48;
 const WARP = 16;
 const SECTION_IDS = ABOUT_HERO.navChips.map((chip) => chip.id);
-const NAV_WORDS: Record<string, string> = {
-  "about-profile": "Profile",
-  "about-campus": "Campus",
-  "about-culture": "Culture",
-  "about-csr": "Responsibility",
-  "about-honor": "Honors",
-  "about-structure": "Structure",
-};
 
 const warpRise = stylex.keyframes({
   "0%": { opacity: 0, transform: "translateY(22px)" },
@@ -304,9 +296,6 @@ function Banner() {
           </h1>
           <div {...stylex.attrs(styles.bannerAside)}>
             <p {...stylex.attrs(styles.bannerLead)}>{ABOUT_BANNER.lead}</p>
-            <p lang="en" {...stylex.attrs(ui.caption)}>
-              {ABOUT_BANNER.established} · {ABOUT_BANNER.place}
-            </p>
           </div>
         </div>
         <div role="img" aria-label={ABOUT_BANNER.alt} {...stylex.attrs(styles.warp)}>
@@ -385,7 +374,7 @@ function SectionBar(props: AboutPageProps) {
                 styles.navFocus,
               )}
             >
-              <span lang="en">{NAV_WORDS[chip.id]}</span>
+              {chip.label}
             </a>
           ))}
         </nav>

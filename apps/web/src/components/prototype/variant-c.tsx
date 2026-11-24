@@ -148,16 +148,8 @@ const styles = stylex.create({
     paddingInline: "1.5rem",
     textAlign: "center",
   },
-  heroEyebrow: {
-    fontFamily: typography.tech,
-    fontSize: { default: "11px", [breakpoints.md]: "12px" },
-    color: colors.mint,
-    textTransform: "uppercase",
-    letterSpacing: "0.45em",
-  },
   heroTitle: {
     marginInline: "auto",
-    marginTop: "2rem",
     maxWidth: "80rem",
     fontFamily: typography.display,
     fontWeight: 300,
@@ -323,15 +315,7 @@ const styles = stylex.create({
   originTextCol: {
     paddingLeft: { default: 0, [breakpoints.lg]: "2rem" },
   },
-  chapterEyebrow: {
-    fontFamily: typography.tech,
-    fontSize: "11px",
-    color: colors.mint,
-    textTransform: "uppercase",
-    letterSpacing: "0.4em",
-  },
   chapterTitle: {
-    marginTop: "1.5rem",
     fontFamily: typography.display,
     fontWeight: 300,
     fontSize: { default: "2.25rem", [breakpoints.md]: "3.75rem" },
@@ -399,20 +383,6 @@ const styles = stylex.create({
     marginInline: "auto",
     maxWidth: "72rem",
     paddingInline: "1.5rem",
-  },
-  portfolioHeaderFlex: {
-    display: "flex",
-    flexWrap: "wrap",
-    alignItems: "flex-end",
-    justifyContent: "space-between",
-    gap: "1.5rem",
-  },
-  portfolioScrollTag: {
-    fontFamily: typography.tech,
-    fontSize: "11px",
-    color: "color-mix(in oklab, var(--color-cream) 55%, transparent)",
-    textTransform: "uppercase",
-    letterSpacing: "0.25em",
   },
   portfolioRailScroll: {
     marginTop: "3.5rem",
@@ -591,16 +561,8 @@ const styles = stylex.create({
   ctaContentWrap: {
     position: "relative",
   },
-  ctaEyebrow: {
-    fontFamily: typography.tech,
-    fontSize: "11px",
-    color: colors.mint,
-    textTransform: "uppercase",
-    letterSpacing: "0.45em",
-  },
   ctaHeading: {
     marginInline: "auto",
-    marginTop: "2rem",
     maxWidth: "48rem",
     fontFamily: typography.display,
     fontWeight: 300,
@@ -756,14 +718,6 @@ function HeroHeader(props: { reduce: boolean | null }) {
         style={{ opacity: props.reduce ? 1 : heroFade }}
         {...stylex.attrs(styles.heroTextContainer)}
       >
-        <m.p
-          initial={props.reduce ? { opacity: 0 } : { opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, delay: 0.4, ease: EASE }}
-          {...stylex.attrs(styles.heroEyebrow)}
-        >
-          Botanical Intelligence Since 1995
-        </m.p>
         <m.h1
           initial={props.reduce ? { opacity: 0 } : { opacity: 0, y: 32 }}
           animate={{ opacity: 1, y: 0 }}
@@ -846,7 +800,6 @@ function OriginChapter() {
         </Reveal>
         <div {...stylex.attrs(styles.originTextCol)}>
           <Reveal>
-            <p {...stylex.attrs(styles.chapterEyebrow)}>01 — Origin</p>
             <h2 {...stylex.attrs(styles.chapterTitle)}>
               Grown with <em {...stylex.attrs(styles.heroMistItalic)}>patience.</em>
             </h2>
@@ -871,7 +824,6 @@ function ScienceChapter() {
       <div {...stylex.attrs(styles.chapterGrid)}>
         <div {...stylex.attrs(styles.scienceTextCol)}>
           <Reveal>
-            <p {...stylex.attrs(styles.chapterEyebrow)}>02 — Science</p>
             <h2 {...stylex.attrs(styles.chapterTitle)}>
               Refined to the <em {...stylex.attrs(styles.heroMistItalic)}>molecule.</em>
             </h2>
@@ -901,14 +853,10 @@ function IngredientRail() {
   return (
     <section id="portfolio" {...stylex.attrs(styles.portfolioSection)}>
       <div {...stylex.attrs(styles.portfolioHeaderWrap)}>
-        <Reveal sx={styles.portfolioHeaderFlex}>
-          <div>
-            <p {...stylex.attrs(styles.chapterEyebrow)}>03 — Portfolio</p>
-            <h2 {...stylex.attrs(styles.chapterTitle)}>
-              The <em {...stylex.attrs(styles.heroMistItalic)}>living</em> library
-            </h2>
-          </div>
-          <p {...stylex.attrs(styles.portfolioScrollTag)}>Scroll &rarr;</p>
+        <Reveal>
+          <h2 {...stylex.attrs(styles.chapterTitle)}>
+            The <em {...stylex.attrs(styles.heroMistItalic)}>living</em> library
+          </h2>
         </Reveal>
       </div>
       <div {...stylex.attrs(styles.portfolioRailScroll)}>
@@ -976,7 +924,6 @@ function CtaSection() {
     <section id="contact" {...stylex.attrs(styles.ctaSection)}>
       <div aria-hidden="true" {...stylex.attrs(styles.ctaGlow)} />
       <Reveal sx={styles.ctaContentWrap}>
-        <p {...stylex.attrs(styles.ctaEyebrow)}>Partner with Fenchem</p>
         <h2 {...stylex.attrs(styles.ctaHeading)}>
           Bring the forest to <em {...stylex.attrs(styles.heroMistItalic)}>your formulation.</em>
         </h2>
@@ -1003,9 +950,7 @@ function SiteFooter() {
             ),
           )}
         </nav>
-        <p {...stylex.attrs(styles.footerCopyright)}>
-          © 2026 Fenchem Biotek Ltd. — Rooted in Nature, Refined by Science
-        </p>
+        <p {...stylex.attrs(styles.footerCopyright)}>© 2026 Fenchem Biotek Ltd.</p>
       </div>
     </footer>
   );

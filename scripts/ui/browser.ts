@@ -4,6 +4,7 @@ import { chromium, type Browser, type Page, type Request } from "@playwright/tes
 import pixelmatch from "pixelmatch";
 import { PNG } from "pngjs";
 
+import { chromeChannel } from "./chrome-channel";
 import type { Capture } from "./command";
 
 export const NOISE_THRESHOLD = 0.01;
@@ -77,7 +78,7 @@ const slot = limiter(PAGES_AT_ONCE);
 
 export async function withBrowser<T>(run: (browser: Browser) => Promise<T>) {
   const browser = await chromium.launch({
-    channel: "chrome",
+    channel: chromeChannel,
     headless: true,
     args: ["--disable-gpu"],
   });

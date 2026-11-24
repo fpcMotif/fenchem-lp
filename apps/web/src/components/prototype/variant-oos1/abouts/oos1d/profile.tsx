@@ -110,13 +110,6 @@ const s = stylex.create({
     lineHeight: 1,
     color: colors.brandBlue700,
   },
-  statCaption: {
-    margin: 0,
-    fontSize: { default: "15px", ["@media (min-width: 1280px)"]: step.body },
-    lineHeight: 1.7,
-    letterSpacing: "0.06em",
-    color: tone.body,
-  },
 });
 
 export function Profile() {
@@ -162,7 +155,6 @@ export function Profile() {
               <span {...stylex.attrs(s.statValue)}>{stat.value}</span>
               {stat.unit ? <span {...stylex.attrs(s.statUnit)}>{stat.unit}</span> : null}
             </div>
-            <p {...stylex.attrs(s.statCaption)}>{stat.caption}</p>
           </Reveal>
         ))}
       </ul>

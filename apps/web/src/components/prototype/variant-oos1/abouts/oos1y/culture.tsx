@@ -200,7 +200,7 @@ export function CultureStory() {
       {...stylex.attrs(ui.anchor, styles.section)}
     >
       <h2 id="oos1y-culture" {...srOnly}>
-        {ABOUT_CULTURE.eyebrow}
+        {ABOUT_CULTURE.title}
       </h2>
       <div {...stylex.attrs(ui.shell)}>
         <ol ref={setListRef} {...stylex.attrs(styles.scenes)}>

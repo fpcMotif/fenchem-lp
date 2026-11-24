@@ -120,17 +120,6 @@ const styles = stylex.create({
     fontVariantNumeric: "tabular-nums",
     color: tone.tintMuted,
   },
-  colEnglish: {
-    gridColumn: "1 / -1",
-    margin: 0,
-    fontFamily: face.display,
-    fontSize: 11,
-    fontWeight: 500,
-    lineHeight: "16px",
-    letterSpacing: "0.14em",
-    textTransform: "uppercase",
-    color: tone.tintMuted,
-  },
   names: {
     display: "flex",
     flexDirection: "column",
@@ -243,15 +232,6 @@ const styles = stylex.create({
     letterSpacing: "0.06em",
     color: tone.accent,
     whiteSpace: "nowrap",
-  },
-  english: {
-    overflow: "hidden",
-    textOverflow: "ellipsis",
-    fontFamily: face.display,
-    fontSize: 11,
-    letterSpacing: "0.14em",
-    textTransform: "uppercase",
-    color: tone.tintMuted,
   },
   stepper: {
     flexShrink: 0,
@@ -437,9 +417,6 @@ function SheetMeta(props: {
     <div {...stylex.attrs(styles.sheetMeta)}>
       <p {...stylex.attrs(styles.sheetArea)}>
         <span>{area()?.label}</span>
-        <span lang="en" {...stylex.attrs(styles.english)}>
-          {area()?.englishLabel}
-        </span>
       </p>
       <div {...stylex.attrs(styles.stepper)}>
         <p {...stylex.attrs(styles.sheetCount)}>
@@ -662,9 +639,6 @@ export function AtlasVariant() {
                               <span {...stylex.attrs(styles.colCount)}>
                                 {group.items.length} 款
                               </span>
-                              <p lang="en" {...stylex.attrs(styles.colEnglish)}>
-                                {group.englishLabel}
-                              </p>
                             </header>
                             <NameList items={group.items} {...listProps} />
                           </section>
@@ -684,9 +658,6 @@ export function AtlasVariant() {
                         {area().label}
                       </h3>
                       <span {...stylex.attrs(styles.colCount)}>{area().items.length} 款</span>
-                      <p lang="en" {...stylex.attrs(styles.colEnglish)}>
-                        {area().englishLabel}
-                      </p>
                     </header>
                     <div {...stylex.attrs(styles.flowGrid)}>
                       <For each={columns()}>

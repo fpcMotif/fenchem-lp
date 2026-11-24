@@ -216,19 +216,6 @@ const styles = stylex.create({
     flexDirection: "column",
     gap: { default: 14, [DESKTOP]: 18 },
   },
-  kicker: {
-    display: "flex",
-    flexWrap: "wrap",
-    alignItems: "center",
-    columnGap: 14,
-    rowGap: 4,
-  },
-  count: {
-    fontSize: 13,
-    fontWeight: 600,
-    letterSpacing: "0.06em",
-    color: color.ink,
-  },
   sections: {
     marginTop: { default: 20, [DESKTOP]: 28 },
   },
@@ -237,15 +224,11 @@ const styles = stylex.create({
 export function TocPage(
   props: SubPageProps & { bar?: JSX.Element; under?: JSX.Element; children: JSX.Element },
 ) {
-  const articles = useLabArticles();
   return (
     <div id="insights-top" lang="zh-CN" {...stylex.attrs(kitStyles.root)}>
       <SubPageBanner
-        eyebrow="Insights"
         title="行业洞察"
-        tagline="Notes from the formulation bench"
         lead="来自泛成应用研发团队的原料趋势、配方方法与法规观察"
-        meta={[`${articles().length} 篇洞察 · 持续更新`]}
         image="/prototype/official-site/product-human-nutrition.webp"
         imageAlt="行业洞察"
         titleId="insights-banner-title"
@@ -275,8 +258,6 @@ export function TocPage(
       <Flow>
         <ContactCta
           id="insights-bottom-cta"
-          title="需要索取样品或技术资料？"
-          subtitle="我们的应用团队随时为您提供添加量指导与配方参考。"
           actions={[{ label: "联系我们", onClick: () => props.onNavigateHome("contact") }]}
         />
       </Flow>
@@ -288,7 +269,7 @@ export function ArticleFlow(props: { articles: readonly LabArticle[]; sx?: style
   return (
     <div {...stylex.attrs(styles.flow, props.sx)}>
       <For each={props.articles}>
-        {(article, index) => {
+        {(article) => {
           const titleId = `${article.id}-flow-title`;
           return (
             <article
@@ -297,12 +278,7 @@ export function ArticleFlow(props: { articles: readonly LabArticle[]; sx?: style
               {...stylex.attrs(styles.article, kitStyles.anchor)}
             >
               <header {...stylex.attrs(styles.head)}>
-                <div {...stylex.attrs(styles.kicker)}>
-                  <span {...stylex.attrs(styles.count, labStyles.displayNumber)}>
-                    {`${padIndex(index())} / ${padIndex(props.articles.length - 1)}`}
-                  </span>
-                  <ArticleMeta article={article} />
-                </div>
+                <ArticleMeta article={article} />
                 <h2 id={titleId} {...stylex.attrs(labStyles.docTitle)}>
                   {article.title}
                 </h2>

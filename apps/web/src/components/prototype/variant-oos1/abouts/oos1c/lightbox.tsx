@@ -6,7 +6,6 @@ import * as stylex from "@stylexjs/stylex";
 import { ChevronLeft, ChevronRight, X } from "@fenchem-lp/ui/components/lucide";
 
 import { ABOUT_CAMPUS } from "../../about-data";
-import { PHOTO_ENGLISH } from "./data";
 import { ease, face, mq } from "./tokens.stylex";
 
 const fadeIn = stylex.keyframes({
@@ -143,7 +142,6 @@ export function Lightbox(props: { lightbox: LightboxState }) {
               <img src={photo.large} alt={photo.alt} {...stylex.attrs(styles.image)} />
               <figcaption {...stylex.attrs(styles.caption)}>
                 <span>{photo.caption}</span>
-                <span lang="en">{PHOTO_ENGLISH[photo.id]}</span>
               </figcaption>
             </figure>
           </LightboxStage>

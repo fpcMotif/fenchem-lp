@@ -236,7 +236,7 @@ const WORST_ABOUT = () => {
   });
   setFields(about.ABOUT_HERO, {
     englishTitle: "Nanjing Fenchem International Holdings Corporation Limited",
-    lead: "自1995年创立于南京，专注于为食品营养品、宠物健康和个人护理行业提供原料和解决方案，建立起集研发、生产、质量控制、法规注册与全球销售于一体的完整产业链，产品远销 60 多个国家和地区。",
+    lead: "FENCHEM自1995年创立于南京，专注于为食品营养品、宠物健康和个人护理行业提供原料和解决方案，建立起集研发、生产、质量控制、法规注册与全球销售于一体的完整产业链，产品远销 60 多个国家和地区。",
     networkLabel: "全球 16 家分支机构，遍布",
     countries: [
       "美国",
@@ -280,7 +280,7 @@ const WORST_ABOUT = () => {
   setFields(about.ABOUT_HISTORY, {
     caption: "双螺旋每交汇一次，即走过一年；向右滑动查看 1995 年至今的重要里程碑",
     milestones: [
-      { year: 1995, kicker: "Where it all began", events: [{ text: "在中国-南京成立总部" }] },
+      { year: 1995, events: [{ text: "在中国-南京成立总部" }] },
       ...demoMilestones.slice(1, -1),
       {
         year: 2024,
@@ -497,6 +497,11 @@ const WORST_INSIGHT_ARTICLES: insights.InsightArticle[] = [
       "后生元、益生元与膳食纤维协同：面向GLP-1伴随营养与健康老龄化人群的日常型肠道健康饮品配方开发要点",
     navLabel: null,
     lead: "从原料筛选、发酵特征与胃肠耐受评估，到即饮饮料、冲调粉与条袋装等不同剂型的稳定性测试，系统梳理肠道健康饮品从概念到上市的关键环节",
+    cover: {
+      src: MISSING_IMAGE,
+      alt: "肠道健康饮品稳定性加速测试与流变学表征实验样品",
+      position: "50% 50%",
+    },
     thesis: {
       label: "核心观点",
       statement:
@@ -733,11 +738,11 @@ const WORST_INSIGHT_ARTICLES: insights.InsightArticle[] = [
             kind: "terms",
             items: [
               {
-                term: "Lacticaseibacillus rhamnosus GG",
+                term: "Lacticaseibacillus_rhamnosus_GG_ATCC_53103",
                 desc: "研究资料较多、应用历史较长的菌株之一，常用于儿童与成人肠道健康产品。",
               },
               {
-                term: "Bifidobacterium animalis subsp. lactis",
+                term: "Bifidobacterium animalis subsp. lactis BB-12 / HN019",
                 desc: "耐酸、耐氧能力相对较好，适合与乳制品和固体饮料体系复配。",
               },
               {
@@ -756,7 +761,8 @@ const WORST_INSIGHT_ARTICLES: insights.InsightArticle[] = [
           {
             kind: "paragraphs",
             items: [
-              "完整的加速与长期稳定性测试方案可参考：https://example.com/technical-library/probiotics/stability-testing-protocol-for-solid-beverages-and-stick-packs-2026-edition.pdf",
+              "完整的加速与长期稳定性测试方案可参考：https://example.com/technical-library/probiotics/stability_testing_protocol_for_solid_beverages_and_stick_packs_2026_edition_rev04_final.pdf",
+              "技术支持与COA索取邮箱：formulation.stability.support@northwind-nutraceutical-ingredients-holdings.example.com",
             ],
           },
           {
@@ -980,9 +986,7 @@ const TYPICAL_INSIGHTS = (count: ArticleCount) => {
     [...insights.INSIGHTS_ARTICLES, ...TYPICAL_INSIGHT_ARTICLES].slice(0, count),
   );
   setFields(insights.INSIGHTS_PAGE, {
-    tagline: "以科学视角解读营养配方趋势",
     lead: "围绕体重管理、肠道健康与健康老龄化，分享原料选择与配方开发的技术观点",
-    meta: [`技术洞察 · ${count}篇文章`],
   });
 };
 
@@ -1183,7 +1187,7 @@ export const EXTRA_SOLUTIONS: products.SolutionItem[] = [
   },
   {
     id: "cleansing-balm",
-    area: "cleansing",
+    area: "face",
     title: "白池花籽油卸妆膏",
     englishName: "Meadowfoam Cleansing Balm",
     subtitle: "一款以白池花籽油为核心的固态卸妆膏",
@@ -1200,7 +1204,7 @@ export const EXTRA_SOLUTIONS: products.SolutionItem[] = [
   },
   {
     id: "amino-cleanser",
-    area: "cleansing",
+    area: "face",
     title: "氨基酸温和洁面乳",
     englishName: "Amino Acid Gentle Cleanser",
     subtitle: "一款氨基酸表活体系的温和保湿洁面乳",
@@ -1217,7 +1221,7 @@ export const EXTRA_SOLUTIONS: products.SolutionItem[] = [
   },
   {
     id: "cleansing-oil",
-    area: "cleansing",
+    area: "face",
     title: "植物卸妆油",
     englishName: "Botanical Cleansing Oil",
     subtitle: "一款植物油脂复配的易乳化卸妆油",
@@ -1234,7 +1238,7 @@ export const EXTRA_SOLUTIONS: products.SolutionItem[] = [
   },
   {
     id: "shea-body-wash",
-    area: "cleansing",
+    area: "body",
     title: "乳木果滋润沐浴露",
     englishName: "Shea Moisturizing Body Wash",
     subtitle: "一款添加液态乳木果油的滋润型沐浴露",

@@ -15,10 +15,12 @@
     "check-types": "bun check"
   },
   "dependencies": {
-    "@solidjs/web": "2.0.0-rc.15",
+    "@solidjs/web": "^2.0.4",
     "@stylexjs/stylex": "^0.19.1",
+    "@ui-sdk/core": "^0.1.0-beta.17",
+    "@ui-sdk/solid": "^0.1.0-beta.17",
     "lucide": "1.59.0",
-    "solid-js": "2.0.0-rc.15"
+    "solid-js": "^2.0.4"
   },
   "devDependencies": {
     "@fenchem-lp/config": "workspace:*",

@@ -278,21 +278,6 @@ const styles = stylex.create({
       inset: 0,
     },
   },
-  index: {
-    flexShrink: 0,
-    width: 20,
-    fontFamily: font.numeral,
-    fontSize: 12,
-    fontWeight: 500,
-    lineHeight: "24px",
-    fontVariantNumeric: "tabular-nums",
-    color: ui.muted,
-    transitionProperty: "color",
-    transitionDuration: "150ms",
-  },
-  indexActive: {
-    color: ACCENT,
-  },
   names: {
     display: "flex",
     flexDirection: "column",
@@ -710,7 +695,7 @@ export function Catalog() {
                   transition={{ duration: reduce() ? 0 : 0.2, ease: EASE }}
                 >
                   <For each={items()}>
-                    {(item, index) => {
+                    {(item) => {
                       const active = () =>
                         wide() ? item.id === selected().id : item.id === openId();
                       const expanded = () => !wide() && item.id === openId();
@@ -748,11 +733,6 @@ export function Catalog() {
                                 aria-controls={wide() ? cardId : expanded() ? detailId : undefined}
                                 {...stylex.attrs(styles.rowButton, stylex.defaultMarker())}
                               >
-                                <span
-                                  {...stylex.attrs(styles.index, active() && styles.indexActive)}
-                                >
-                                  {padIndex(index())}
-                                </span>
                                 <span {...stylex.attrs(styles.names)}>
                                   <span {...stylex.attrs(styles.primaryLine)}>
                                     <span
