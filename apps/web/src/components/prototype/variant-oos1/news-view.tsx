@@ -1,355 +1,351 @@
+import { Collapse } from "../shared/collapse";
+import { breakpoints, colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
-import { MapPin } from "@fenchem-lp/ui/components/lucide";
-import { createMemo, createSignal, For } from "solid-js";
+import { ChevronDown, Plus } from "@fenchem-lp/ui/components/lucide";
+import { createSignal, createUniqueId, For, Show } from "solid-js";
 
-import { Flow } from "../shared/flow";
 import { ContactCta } from "./contact-cta";
-import { CTA } from "./content";
 import {
-  FEATURED_NEWS,
-  NEWS_CATEGORIES,
-  NEWS_HEADER,
-  NEWS_LIST,
-  UPCOMING_EVENTS,
-  type NewsItem,
+  COMPANY_NEWS,
+  DOMESTIC_SHOWS,
+  NEWS_PAGE,
+  type CompanyNewsItem,
+  type DomesticShow,
 } from "./news-data";
-import { SubPageBanner, SubPageNav, kitStyles } from "./subpage-kit";
-import { color } from "./tokens.stylex";
+import { SubPageNav, kitStyles } from "./subpage-kit";
+import { color, ease, layout } from "./tokens.stylex";
 
-const MUTED_LABEL = "#64748b";
-const NAVY_DEEP = "#071e42";
-const NAVY_ACCENT = "#0743a9";
+const HAIRLINE = "rgba(26, 26, 26, 0.12)";
+const DESKTOP = breakpoints.xl;
+const PREVIEW_COUNT = 5;
 
-const DESKTOP = "@media (min-width: 1280px)";
+const monthKey = (published: string) => {
+  const [, year = "0", month = "0"] = /(\d{4})年(\d{1,2})月/.exec(published) ?? [];
+  return Number(year) * 100 + Number(month);
+};
+
+const NEWEST_NEWS = [...COMPANY_NEWS].sort((a, b) => monthKey(b.published) - monthKey(a.published));
 
 const styles = stylex.create({
-  // Content Area
-  mainSection: {
-    paddingBlock: { default: 36, ["@media (min-width: 768px)"]: 64 },
+  page: {
+    paddingTop: layout.headerHeight,
   },
-
-  // Featured Story (Lucas Meyer editorial style)
-  featuredCard: {
-    display: "grid",
-    gridTemplateColumns: { default: "1fr", ["@media (min-width: 1024px)"]: "1.1fr 0.9fr" },
-    borderRadius: 16,
+  srOnly: {
+    position: "absolute",
+    width: 1,
+    height: 1,
+    margin: -1,
     overflow: "hidden",
-    borderWidth: 1,
-    borderStyle: "solid",
-    borderColor: "rgba(26, 26, 26, 0.08)",
-    backgroundColor: "#ffffff",
-    boxShadow: "0 4px 20px rgba(0, 0, 0, 0.04)",
-    marginBottom: { default: 40, ["@media (min-width: 768px)"]: 56 },
+    clipPath: "inset(50%)",
+    whiteSpace: "nowrap",
+    borderWidth: 0,
   },
-  featuredImgWrap: {
-    position: "relative",
-    minHeight: { default: 220, ["@media (min-width: 768px)"]: 320 },
-    backgroundColor: "#e2e8f0",
+  section: {
+    paddingTop: { default: 56, [DESKTOP]: 88 },
+    paddingBottom: { default: 72, [DESKTOP]: 112 },
   },
-  featuredImg: {
-    width: "100%",
-    height: "100%",
-    objectFit: "cover",
+  columns: {
+    display: "grid",
+    gridTemplateColumns: "1fr",
+    rowGap: { default: 64, [DESKTOP]: 88 },
   },
-  featuredBody: {
-    padding: { default: 24, ["@media (min-width: 768px)"]: 36 },
-    display: "flex",
-    flexDirection: "column",
-    justifyContent: "center",
-    gap: 12,
+  column: {
+    minWidth: 0,
   },
-  badge: {
-    fontSize: 11,
+  columnTitle: {
+    margin: 0,
+    fontSize: { default: 26, [DESKTOP]: 32 },
     fontWeight: 700,
-    color: NAVY_ACCENT,
-    textTransform: "uppercase",
-    letterSpacing: "0.06em",
+    lineHeight: 1.2,
+    letterSpacing: "-0.02em",
   },
-  metaText: {
-    fontSize: 12,
-    color: MUTED_LABEL,
-    display: "flex",
-    alignItems: "center",
-    gap: 12,
-  },
-  featuredTitle: {
-    fontSize: { default: 18, ["@media (min-width: 768px)"]: 22 },
-    fontWeight: 800,
-    color: color.ink,
-    lineHeight: 1.35,
+  columnLead: {
     margin: 0,
+    marginTop: 10,
+    fontSize: 15,
+    lineHeight: 1.6,
+    color: color.muted,
   },
-  featuredExcerpt: {
+  list: {
+    margin: 0,
+    marginTop: 28,
+    padding: 0,
+    listStyle: "none",
+    borderTopWidth: 1,
+    borderTopStyle: "solid",
+    borderTopColor: HAIRLINE,
+  },
+  row: {
+    borderBottomWidth: 1,
+    borderBottomStyle: "solid",
+    borderBottomColor: HAIRLINE,
+  },
+  show: {
+    display: "grid",
+    gap: 6,
+    paddingBlock: 22,
+  },
+  showTitle: {
+    margin: 0,
+    fontSize: 17,
+    fontWeight: 650,
+    lineHeight: 1.45,
+  },
+  showMeta: {
+    margin: 0,
     fontSize: 14,
-    lineHeight: 1.65,
-    color: color.bodyText,
+    lineHeight: 1.5,
+    color: color.muted,
+  },
+  trigger: {
+    display: "flex",
+    alignItems: "flex-start",
+    justifyContent: "space-between",
+    gap: 20,
+    width: "100%",
+    margin: 0,
+    paddingBlock: 22,
+    paddingInline: 0,
+    borderWidth: 0,
+    backgroundColor: "transparent",
+    color: "inherit",
+    fontFamily: "inherit",
+    textAlign: "start",
+    cursor: "pointer",
+  },
+  heading: {
     margin: 0,
   },
-  locationNote: {
+  copy: {
+    display: "grid",
+    gap: 8,
+    minWidth: 0,
+  },
+  storyTitle: {
+    fontSize: { default: 17, [DESKTOP]: 18 },
+    fontWeight: 650,
+    lineHeight: 1.45,
+  },
+  published: {
+    fontSize: 13,
+    lineHeight: 1.4,
+    color: color.muted,
+  },
+  icon: {
+    display: "grid",
+    placeItems: "center",
+    flexGrow: 0,
+    flexShrink: 0,
+    flexBasis: "auto",
+    width: 28,
+    height: 28,
+    marginTop: 2,
+    color: color.ink,
+    transitionProperty: "transform",
+    transitionDuration: { default: "200ms", "@media (prefers-reduced-motion: reduce)": "0ms" },
+    transitionTimingFunction: ease.out,
+  },
+  iconOpen: {
+    transform: "rotate(45deg)",
+  },
+  body: {
+    display: "grid",
+    gap: 14,
+    paddingBottom: 22,
+    maxWidth: 640,
+  },
+  paragraph: {
+    margin: 0,
+    fontSize: 15,
+    lineHeight: 1.75,
+    color: color.bodyText,
+  },
+  empty: {
+    margin: 0,
+    marginTop: 28,
+    paddingBlock: 28,
+    borderTopWidth: 1,
+    borderTopStyle: "solid",
+    borderTopColor: HAIRLINE,
+    borderBottomWidth: 1,
+    borderBottomStyle: "solid",
+    borderBottomColor: HAIRLINE,
+    fontSize: 15,
+    lineHeight: 1.6,
+    color: color.muted,
+  },
+  moreRow: {
+    display: "flex",
+    justifyContent: "center",
+    marginTop: 28,
+  },
+  moreButton: {
+    appearance: "none",
     display: "inline-flex",
     alignItems: "center",
     gap: 6,
-    fontSize: 13,
-    color: NAVY_DEEP,
-    fontWeight: 600,
-    backgroundColor: "#eff6ff",
-    padding: "6px 12px",
-    borderRadius: 6,
-    alignSelf: "flex-start",
-  },
-
-  // News Grid (3 columns)
-  newsGrid: {
-    display: "grid",
-    gridTemplateColumns: {
-      default: "1fr",
-      ["@media (min-width: 768px)"]: "repeat(2, 1fr)",
-      [DESKTOP]: "repeat(3, 1fr)",
-    },
-    gap: 24,
-  },
-  newsCard: {
-    borderRadius: 14,
+    height: 40,
+    paddingInlineStart: 20,
+    paddingInlineEnd: 16,
+    borderRadius: 999,
     borderWidth: 1,
     borderStyle: "solid",
-    borderColor: "rgba(26, 26, 26, 0.08)",
-    backgroundColor: "#ffffff",
-    overflow: "hidden",
-    display: "flex",
-    flexDirection: "column",
-    transition: "transform 0.2s ease, box-shadow 0.2s ease",
-    ":hover": {
-      transform: "translateY(-3px)",
-      boxShadow: "0 8px 24px rgba(0, 0, 0, 0.05)",
-      borderColor: "rgba(7, 67, 169, 0.3)",
-    },
-  },
-  newsImgWrap: {
-    position: "relative",
-    aspectRatio: "16 / 10",
-    backgroundColor: "#e2e8f0",
-  },
-  newsImg: {
-    width: "100%",
-    height: "100%",
-    objectFit: "cover",
-  },
-  newsBody: {
-    padding: 20,
-    display: "flex",
-    flexDirection: "column",
-    gap: 10,
-    flexGrow: 1,
-  },
-  newsTitle: {
+    borderColor: colors.brandBlue700,
+    backgroundColor: { default: "transparent", ":hover": color.pageTint },
+    color: colors.brandBlue700,
+    fontFamily: "inherit",
     fontSize: 15,
-    fontWeight: 700,
-    color: color.ink,
-    lineHeight: 1.4,
-    margin: 0,
-  },
-  newsExcerpt: {
-    fontSize: 13,
-    lineHeight: 1.6,
-    color: color.bodyText,
-    margin: 0,
-  },
-
-  // Upcoming Events Strip (Lucas Meyer style)
-  eventsSection: {
-    paddingBlock: { default: 40, ["@media (min-width: 768px)"]: 56 },
-    backgroundColor: "#f8fafc",
-    borderTopWidth: 1,
-    borderTopStyle: "solid",
-    borderTopColor: "rgba(26, 26, 26, 0.06)",
-  },
-  eventsHeader: {
-    marginBottom: 24,
-  },
-  eventsTitle: {
-    fontSize: { default: 22, ["@media (min-width: 768px)"]: 26 },
-    fontWeight: 800,
-    color: color.ink,
-    margin: "0 0 6px 0",
-  },
-  eventsLead: {
-    fontSize: 14,
-    color: color.bodyText,
-    margin: 0,
-  },
-  eventsGrid: {
-    display: "grid",
-    gridTemplateColumns: {
-      default: "1fr",
-      ["@media (min-width: 768px)"]: "repeat(2, 1fr)",
-      [DESKTOP]: "repeat(4, 1fr)",
-    },
-    gap: 16,
-  },
-  eventCard: {
-    backgroundColor: "#ffffff",
-    borderRadius: 12,
-    borderWidth: 1,
-    borderStyle: "solid",
-    borderColor: "rgba(26, 26, 26, 0.08)",
-    padding: 20,
-    display: "flex",
-    flexDirection: "column",
-    gap: 8,
-  },
-  eventDate: {
-    fontSize: 12,
-    fontWeight: 700,
-    color: NAVY_ACCENT,
-  },
-  eventName: {
-    fontSize: 15,
-    fontWeight: 800,
-    color: color.ink,
-    lineHeight: 1.3,
-  },
-  eventCity: {
-    fontSize: 13,
-    color: color.bodyText,
-    display: "flex",
-    alignItems: "center",
-    gap: 6,
-  },
-  eventBooth: {
-    fontSize: 12,
     fontWeight: 600,
-    color: NAVY_DEEP,
-    backgroundColor: "#eff6ff",
-    padding: "4px 8px",
-    borderRadius: 6,
-    alignSelf: "flex-start",
-    marginTop: "auto",
+    letterSpacing: "0.02em",
+    cursor: "pointer",
+    transitionProperty: "background-color",
+    transitionDuration: { default: "160ms", "@media (prefers-reduced-motion: reduce)": "0ms" },
+    transitionTimingFunction: ease.out,
+  },
+  moreIcon: {
+    transitionProperty: "transform",
+    transitionDuration: { default: "220ms", "@media (prefers-reduced-motion: reduce)": "0ms" },
+    transitionTimingFunction: ease.out,
+  },
+  moreIconRotated: {
+    transform: "rotate(180deg)",
   },
 });
 
-export function NewsView(props: { onNavigateHome: (target?: string) => void }) {
-  const [activeCat, setActiveCat] = createSignal<string>("all");
-
-  const filteredNews = createMemo<readonly NewsItem[]>(() =>
-    activeCat() === "all" ? NEWS_LIST : NEWS_LIST.filter((item) => item.category === activeCat()),
+function MoreButton(props: { hiddenCount: number; expanded: boolean; onToggle: () => void }) {
+  return (
+    <Show when={props.hiddenCount > 0}>
+      <div {...stylex.attrs(styles.moreRow)}>
+        <button
+          type="button"
+          aria-expanded={props.expanded ? "true" : "false"}
+          onClick={() => props.onToggle()}
+          {...stylex.attrs(styles.moreButton, kitStyles.focusRing)}
+        >
+          <span>{props.expanded ? "收起" : "查看更多"}</span>
+          <ChevronDown
+            size={16}
+            strokeWidth={2}
+            aria-hidden="true"
+            {...stylex.attrs(styles.moreIcon, props.expanded && styles.moreIconRotated)}
+          />
+        </button>
+      </div>
+    </Show>
   );
+}
+
+function ShowRow(props: { show: DomesticShow }) {
+  const meta = () =>
+    props.show.booth ? `${props.show.when} · ${props.show.booth}` : props.show.when;
+  return (
+    <li {...stylex.attrs(styles.row)}>
+      <article {...stylex.attrs(styles.show)}>
+        <h3 {...stylex.attrs(styles.showTitle)}>{props.show.title}</h3>
+        <p {...stylex.attrs(styles.showMeta)}>{meta()}</p>
+      </article>
+    </li>
+  );
+}
+
+function Story(props: { item: CompanyNewsItem; open: boolean; onToggle: () => void }) {
+  const panelId = createUniqueId();
+  return (
+    <li {...stylex.attrs(styles.row)}>
+      <h3 {...stylex.attrs(styles.heading)}>
+        <button
+          type="button"
+          aria-expanded={props.open ? "true" : "false"}
+          aria-controls={panelId}
+          onClick={() => props.onToggle()}
+          {...stylex.attrs(styles.trigger, kitStyles.focusRing)}
+        >
+          <span {...stylex.attrs(styles.copy)}>
+            <span {...stylex.attrs(styles.storyTitle)}>{props.item.title}</span>
+            <span {...stylex.attrs(styles.published)}>发布时间：{props.item.published}</span>
+          </span>
+          <span aria-hidden="true" {...stylex.attrs(styles.icon, props.open && styles.iconOpen)}>
+            <Plus size={16} strokeWidth={1.5} absoluteStrokeWidth />
+          </span>
+        </button>
+      </h3>
+      <Collapse
+        id={panelId}
+        open={props.open}
+        transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+      >
+        <div {...stylex.attrs(styles.body)}>
+          <For each={props.item.paragraphs}>
+            {(paragraph) => <p {...stylex.attrs(styles.paragraph)}>{paragraph}</p>}
+          </For>
+        </div>
+      </Collapse>
+    </li>
+  );
+}
+
+export function NewsView(props: { onNavigateHome: (hash?: string) => void }) {
+  const [openId, setOpenId] = createSignal<string | null>(null);
+  const [allShows, setAllShows] = createSignal(false);
+  const [allNews, setAllNews] = createSignal(false);
+  const shows = () => (allShows() ? DOMESTIC_SHOWS : DOMESTIC_SHOWS.slice(0, PREVIEW_COUNT));
+  const news = () => (allNews() ? NEWEST_NEWS : NEWEST_NEWS.slice(0, PREVIEW_COUNT));
 
   return (
-    <div id="news-top" lang="zh-CN" {...stylex.attrs(kitStyles.root)}>
-      <SubPageBanner
-        eyebrow={NEWS_HEADER.title}
-        title={NEWS_HEADER.chineseTitle}
-        titleId="news-title"
-        tagline={NEWS_HEADER.tagline}
-        lead={NEWS_HEADER.lead}
-        meta={NEWS_HEADER.meta}
-        image={NEWS_HEADER.image}
-        imageAlt={NEWS_HEADER.imageAlt}
-      />
-
-      <SubPageNav
-        current="新闻资讯"
-        chips={NEWS_CATEGORIES}
-        activeChip={activeCat()}
-        onSelectChip={setActiveCat}
-        chipsLabel="新闻分类"
-        onNavigateHome={props.onNavigateHome}
-      />
-
-      {/* Main News Content */}
-      <section {...stylex.attrs(styles.mainSection)}>
-        <div {...stylex.attrs(kitStyles.shell, kitStyles.inset120)}>
-          {/* Featured Headline Story */}
-          <article {...stylex.attrs(styles.featuredCard)}>
-            <div {...stylex.attrs(styles.featuredImgWrap)}>
-              <img
-                src={FEATURED_NEWS.image}
-                alt={FEATURED_NEWS.title}
-                loading="eager"
-                decoding="async"
-                {...stylex.attrs(styles.featuredImg)}
-              />
-            </div>
-            <div {...stylex.attrs(styles.featuredBody)}>
-              <span {...stylex.attrs(styles.badge)}>{FEATURED_NEWS.categoryLabel}</span>
-              <div {...stylex.attrs(styles.metaText)}>
-                <span>{FEATURED_NEWS.date}</span>
-                <span>·</span>
-                <span>{FEATURED_NEWS.readTime} 阅读</span>
-              </div>
-              <h2 {...stylex.attrs(styles.featuredTitle)}>{FEATURED_NEWS.title}</h2>
-              <p {...stylex.attrs(styles.featuredExcerpt)}>{FEATURED_NEWS.excerpt}</p>
-              {FEATURED_NEWS.location ? (
-                <div {...stylex.attrs(styles.locationNote)}>
-                  <MapPin size={14} color={NAVY_ACCENT} />
-                  <span>
-                    {FEATURED_NEWS.location} · {FEATURED_NEWS.booth}
-                  </span>
-                </div>
-              ) : null}
-            </div>
-          </article>
-
-          {/* News Cards Grid */}
-          <div {...stylex.attrs(styles.newsGrid)}>
-            <For each={filteredNews()}>
-              {(news) => (
-                <article {...stylex.attrs(styles.newsCard)}>
-                  <div {...stylex.attrs(styles.newsImgWrap)}>
-                    <img
-                      src={news.image}
-                      alt={news.title}
-                      loading="lazy"
-                      decoding="async"
-                      {...stylex.attrs(styles.newsImg)}
+    <div id="news-top" lang="zh-CN" {...stylex.attrs(kitStyles.root, styles.page)}>
+      <h1 {...stylex.attrs(styles.srOnly)}>{NEWS_PAGE.title}</h1>
+      <SubPageNav current={NEWS_PAGE.title} onNavigateHome={props.onNavigateHome} />
+      <section {...stylex.attrs(styles.section)}>
+        <div {...stylex.attrs(kitStyles.shell, kitStyles.inset120, styles.columns)}>
+          <div id="news-shows" {...stylex.attrs(kitStyles.anchor, styles.column)}>
+            <h2 {...stylex.attrs(styles.columnTitle)}>{NEWS_PAGE.showsTitle}</h2>
+            <p {...stylex.attrs(styles.columnLead)}>{NEWS_PAGE.showsLead}</p>
+            <Show
+              when={DOMESTIC_SHOWS.length > 0}
+              fallback={<p {...stylex.attrs(styles.empty)}>{NEWS_PAGE.companyEmpty}</p>}
+            >
+              <ul {...stylex.attrs(styles.list)}>
+                <For each={shows()}>{(show) => <ShowRow show={show} />}</For>
+              </ul>
+            </Show>
+            <MoreButton
+              hiddenCount={DOMESTIC_SHOWS.length - PREVIEW_COUNT}
+              expanded={allShows()}
+              onToggle={() => setAllShows((current) => !current)}
+            />
+          </div>
+          <div id="news-company" {...stylex.attrs(kitStyles.anchor, styles.column)}>
+            <h2 {...stylex.attrs(styles.columnTitle)}>{NEWS_PAGE.companyTitle}</h2>
+            <Show
+              when={COMPANY_NEWS.length > 0}
+              fallback={<p {...stylex.attrs(styles.empty)}>{NEWS_PAGE.companyEmpty}</p>}
+            >
+              <ul {...stylex.attrs(styles.list)}>
+                <For each={news()}>
+                  {(item) => (
+                    <Story
+                      item={item}
+                      open={openId() === item.id}
+                      onToggle={() =>
+                        setOpenId((current) => (current === item.id ? null : item.id))
+                      }
                     />
-                  </div>
-                  <div {...stylex.attrs(styles.newsBody)}>
-                    <span {...stylex.attrs(styles.badge)}>{news.categoryLabel}</span>
-                    <div {...stylex.attrs(styles.metaText)}>
-                      <span>{news.date}</span>
-                    </div>
-                    <h3 {...stylex.attrs(styles.newsTitle)}>{news.title}</h3>
-                    <p {...stylex.attrs(styles.newsExcerpt)}>{news.excerpt}</p>
-                  </div>
-                </article>
-              )}
-            </For>
+                  )}
+                </For>
+              </ul>
+            </Show>
+            <MoreButton
+              hiddenCount={NEWEST_NEWS.length - PREVIEW_COUNT}
+              expanded={allNews()}
+              onToggle={() => setAllNews((current) => !current)}
+            />
           </div>
         </div>
       </section>
-
-      {/* Upcoming Events / Expos Strip */}
-      <section {...stylex.attrs(styles.eventsSection)}>
-        <div {...stylex.attrs(kitStyles.shell, kitStyles.inset120)}>
-          <div {...stylex.attrs(styles.eventsHeader)}>
-            <h2 {...stylex.attrs(styles.eventsTitle)}>2026 全球重点展会日程</h2>
-            <p {...stylex.attrs(styles.eventsLead)}>
-              欢迎在展会现场与泛成技术团队会面，交流最新配方趋势与打样需求。
-            </p>
-          </div>
-
-          <div {...stylex.attrs(styles.eventsGrid)}>
-            {UPCOMING_EVENTS.map((event) => (
-              <div {...stylex.attrs(styles.eventCard)}>
-                <div {...stylex.attrs(styles.eventDate)}>{event.date}</div>
-                <div {...stylex.attrs(styles.eventName)}>{event.name}</div>
-                <div {...stylex.attrs(styles.eventCity)}>
-                  <MapPin size={13} color={NAVY_ACCENT} />
-                  <span>{event.city}</span>
-                </div>
-                <div {...stylex.attrs(styles.eventBooth)}>展位：{event.booth}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <Flow>
-        <ContactCta
-          actions={[{ label: CTA.action.label, onClick: () => props.onNavigateHome("contact") }]}
-        />
-      </Flow>
+      <ContactCta
+        id="news-contact"
+        actions={[{ label: "联系我们", onClick: () => props.onNavigateHome("contact") }]}
+      />
     </div>
   );
 }

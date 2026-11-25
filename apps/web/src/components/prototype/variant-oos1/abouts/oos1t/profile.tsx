@@ -98,12 +98,7 @@ export function Profile() {
       data-hour={SECTION_HOURS.profile}
       {...stylex.attrs(ui.section, ui.shell, styles.section)}
     >
-      <SectionHead
-        titleId="oos1t-profile"
-        hour={SECTION_HOURS.profile}
-        title="企业概况"
-        english="Profile"
-      />
+      <SectionHead titleId="oos1t-profile" hour={SECTION_HOURS.profile} title="企业概况" />
       <div {...stylex.attrs(ui.grid, styles.body)}>
         <div {...stylex.attrs(styles.text)}>
           <h3 {...stylex.attrs(styles.name)}>

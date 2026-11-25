@@ -29,7 +29,7 @@ export function Nova(props: {
   size: keyof typeof SIZES;
 }) {
   const shape = SIZES[props.size];
-  const hold = props.instant ? { duration: 0 } : null;
+  const hold = () => (props.instant ? { duration: 0 } : null);
   const bloom = `nova${createUniqueId().replace(/[^a-zA-Z0-9]/g, "")}`;
 
   return (
@@ -46,19 +46,19 @@ export function Nova(props: {
         fill={`url(#${bloom})`}
         initial={{ opacity: 0, scale: 0.2 }}
         animate={props.lit ? { opacity: [0, 1, 0.34], scale: [0.2, 2.1, 0.9] } : undefined}
-        transition={hold ?? { duration: 2.8, times: [0, 0.12, 1], ease: "easeOut" }}
+        transition={hold() ?? { duration: 2.8, times: [0, 0.12, 1], ease: "easeOut" }}
       />
       <m.circle
         r={shape.glow}
         fill={`url(#${bloom})`}
         initial={{ opacity: 0, scale: 0 }}
         animate={props.lit ? { opacity: [0, 1, 0.8], scale: [0, 1.8, 1] } : undefined}
-        transition={hold ?? { duration: 1.9, times: [0, 0.14, 1], ease: "easeOut" }}
+        transition={hold() ?? { duration: 1.9, times: [0, 0.14, 1], ease: "easeOut" }}
       />
       <m.g
         initial={{ opacity: 0, scale: 0 }}
         animate={props.lit ? { opacity: 1, scale: 1 } : undefined}
-        transition={hold ?? { delay: 0.22, duration: 1.8, ease: EASE }}
+        transition={hold() ?? { delay: 0.22, duration: 1.8, ease: EASE }}
       >
         <polygon
           points={diamond(shape.reach, shape.spikeWidth * 0.55)}
@@ -87,7 +87,7 @@ export function Nova(props: {
         r={shape.core}
         initial={{ scale: 0 }}
         animate={props.lit ? { scale: [0, 2.3, 1] } : undefined}
-        transition={hold ?? { duration: 1.3, times: [0, 0.2, 1], ease: "easeOut" }}
+        transition={hold() ?? { duration: 1.3, times: [0, 0.2, 1], ease: "easeOut" }}
         {...stylex.attrs(styles.light)}
       />
     </g>

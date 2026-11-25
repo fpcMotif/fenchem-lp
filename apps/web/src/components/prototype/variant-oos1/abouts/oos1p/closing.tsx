@@ -47,9 +47,6 @@ const styles = stylex.create({
     letterSpacing: "0.04em",
     color: tone.body,
   },
-  subEnglish: {
-    fontSize: 20,
-  },
   stack: {
     position: "relative",
     display: "block",
@@ -117,13 +114,7 @@ export function Closing(props: AboutPageProps) {
 
   return (
     <section aria-labelledby="oos1p-closing" {...stylex.attrs(ui.plate, styles.section)}>
-      <PlateHead
-        plate={7}
-        english="Return"
-        title={ABOUT_BANNER.tagline}
-        titleId="oos1p-closing"
-        latin
-      />
+      <PlateHead title={ABOUT_BANNER.tagline} titleId="oos1p-closing" latin />
       <div {...stylex.attrs(ui.shell)}>
         <div {...stylex.attrs(ui.grid)}>
           <div {...stylex.attrs(ui.q2to4)}>
@@ -136,12 +127,7 @@ export function Closing(props: AboutPageProps) {
               }}
               {...stylex.attrs(styles.link, stylex.defaultMarker())}
             >
-              <span {...stylex.attrs(styles.sub)}>
-                联系我们
-                <span lang="en" {...stylex.attrs(ui.eyebrow, styles.subEnglish)}>
-                  Contact
-                </span>
-              </span>
+              <span {...stylex.attrs(styles.sub)}>联系我们</span>
               <span {...stylex.attrs(styles.stack, reduce() && styles.stackReduced)}>
                 <span
                   {...stylex.attrs(

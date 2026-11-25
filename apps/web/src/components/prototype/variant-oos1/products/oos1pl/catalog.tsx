@@ -5,7 +5,7 @@ import { createSignal, createUniqueId } from "solid-js";
 import type { JSX } from "@solidjs/web";
 
 import { CATALOG_GROUPS, type CatalogGroup } from "../../products-data";
-import { padIndex, splitTitle } from "../shared/derived";
+import { splitTitle } from "../shared/derived";
 
 const INK = "#1a1a1a";
 const BODY_TEXT = "#4d4d4d";
@@ -13,7 +13,6 @@ const MUTED = "#6b6b70";
 const STONE = "#f3f0eb";
 const ROW_RULE = "#e2dcd2";
 const GROUP_RULE = "#d3cbbd";
-const ACCENT = colors.brandGreen700;
 const FOCUS = colors.brandBlue700;
 const EASE_OUT_CSS = "cubic-bezier(0.22, 1, 0.36, 1)";
 const BODY_FONT =
@@ -59,15 +58,6 @@ const styles = stylex.create({
     letterSpacing: "0.04em",
     textWrap: "balance",
     color: INK,
-  },
-  lead: {
-    margin: 0,
-    marginTop: 12,
-    maxWidth: 520,
-    fontSize: 16,
-    lineHeight: "26px",
-    color: BODY_TEXT,
-    textWrap: "pretty",
   },
 
   toolbar: {
@@ -223,22 +213,6 @@ const styles = stylex.create({
     outlineWidth: 2,
     outlineColor: FOCUS,
     outlineOffset: -2,
-  },
-  groupIndex: {
-    gridArea: "index",
-    fontFamily: NUMERAL_FONT,
-    fontSize: 12,
-    fontWeight: 500,
-    lineHeight: "24px",
-    letterSpacing: "0.04em",
-    fontVariantNumeric: "tabular-nums",
-    color: MUTED,
-    transitionProperty: "color",
-    transitionDuration: "200ms",
-    transitionTimingFunction: "ease",
-  },
-  groupIndexOpen: {
-    color: ACCENT,
   },
   groupName: {
     gridArea: "name",
@@ -486,12 +460,6 @@ function GroupBody(props: {
             onClick={() => props.onToggle()}
             {...stylex.attrs(styles.groupButton)}
           >
-            <span
-              aria-hidden="true"
-              {...stylex.attrs(styles.groupIndex, props.open && styles.groupIndexOpen)}
-            >
-              {padIndex(props.index)}
-            </span>
             <span {...stylex.attrs(styles.groupName)}>
               <span {...stylex.attrs(styles.groupLabel)}>{group.label}</span>
               <span {...stylex.attrs(styles.groupCount)}>{group.items.length} 款</span>
@@ -592,7 +560,6 @@ export function Catalog() {
           <h2 id={headingId} {...stylex.attrs(styles.title)}>
             产品目录
           </h2>
-          <p {...stylex.attrs(styles.lead)}>精选个人护理全形态天然油脂与经典功效配方方案</p>
         </header>
         <div {...stylex.attrs(styles.toolbar)}>
           <span {...stylex.attrs(styles.meta)}>

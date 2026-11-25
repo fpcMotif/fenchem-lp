@@ -4,7 +4,7 @@ import { LightboxDialog, type LightboxState } from "../../../shared/lightbox";
 import * as stylex from "@stylexjs/stylex";
 import { ChevronLeft, ChevronRight, X } from "@fenchem-lp/ui/components/lucide";
 
-import { CAMPUS_CAPTION_EN, CAMPUS_HANG } from "./campus-hang";
+import { CAMPUS_HANG } from "./campus-hang";
 import { shared } from "./cyanotype-values";
 import { curve, media, tone } from "./tokens.stylex";
 
@@ -39,9 +39,7 @@ export function Lightbox(props: { lightbox: LightboxState }) {
                 alt={photo.alt}
                 {...stylex.attrs(styles.image, shared.cyanotype)}
               />
-              <figcaption {...stylex.attrs(shared.caption)}>
-                <span lang="en">{CAMPUS_CAPTION_EN[photo.id]}</span>
-              </figcaption>
+              <figcaption {...stylex.attrs(shared.caption)}>{photo.caption}</figcaption>
             </figure>
           </LightboxStage>
           <LightboxControls

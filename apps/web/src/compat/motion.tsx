@@ -88,7 +88,10 @@ export function motionValue<T>(initial: T): MotionValue<T> {
     if (Object.is(next, current)) return;
     current = next;
     write(() => next);
-    for (const listener of Array.from(listeners)) listener(next);
+    // Listeners are imperative, like event handlers: what they read is the current value.
+    untrack(() => {
+      for (const listener of Array.from(listeners)) listener(next);
+    });
   };
   const value = Object.assign(() => read(), {
     get: () => current,
@@ -1019,7 +1022,7 @@ function createMotionComponent(tag: string) {
     const setRef = (node: HTMLElement) => {
       el = node;
       setElement(node);
-      const ref = props.ref;
+      const ref = untrack(() => props.ref);
       if (typeof ref === "function") ref(node);
     };
 
@@ -1031,7 +1034,8 @@ function createMotionComponent(tag: string) {
         style={{ ...firstStyle, ...toCss(props.style) }}
       />
     );
-    return props.variants !== undefined || inherits ? (
+    // Whether to provide variant context is fixed at creation, like `inherits`.
+    return untrack(() => props.variants !== undefined) || inherits ? (
       <VariantContext value={childState}>{content}</VariantContext>
     ) : (
       content

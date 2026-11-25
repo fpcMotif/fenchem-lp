@@ -215,13 +215,7 @@ export function Culture() {
       aria-labelledby="oos1b-culture"
       {...stylex.attrs(ui.anchor, ui.section, ui.shell)}
     >
-      <SectionHead
-        id="oos1b-culture"
-        index={3}
-        eyebrow="Culture"
-        title={ABOUT_CULTURE.title}
-        note="Three values, the newest at the centre."
-      />
+      <SectionHead id="oos1b-culture" title={ABOUT_CULTURE.title} />
       <div ref={ref} {...stylex.attrs(styles.stage)}>
         <div
           aria-hidden="true"

@@ -223,15 +223,6 @@ const styles = stylex.create({
   },
 
   /* Type roles */
-  eyebrow: {
-    margin: 0,
-    fontFamily: typography.tech,
-    fontSize: 11,
-    lineHeight: 1.4,
-    letterSpacing: "0.32em",
-    textTransform: "uppercase",
-    color: colors.brandGreen700,
-  },
   techLabel: {
     fontFamily: typography.tech,
     fontSize: 11,
@@ -986,9 +977,6 @@ const styles = stylex.create({
     justifyItems: "center",
     textAlign: "center",
   },
-  finaleEyebrow: {
-    color: colors.brandGreen400,
-  },
   finaleTitle: {
     fontSize: "clamp(2.3rem, 5vw, 4.6rem)",
     color: colors.paper,
@@ -1232,13 +1220,12 @@ function Folio(props: { label: string }) {
   );
 }
 
-function ChapterHead(props: { numeral: string; eyebrow: string; title: JSX.Element; id: string }) {
+function ChapterHead(props: { numeral: string; title: JSX.Element; id: string }) {
   return (
     <div {...stylex.attrs(styles.chapterHead)}>
       <Reveal>
         <div {...stylex.attrs(styles.chapterRow)}>
           <span {...stylex.attrs(styles.numeral)}>{props.numeral}</span>
-          <p {...stylex.attrs(styles.eyebrow)}>{props.eyebrow}</p>
         </div>
       </Reveal>
       <Reveal delay={STAGGER}>
@@ -1267,9 +1254,6 @@ function CoverSpread() {
           <div {...stylex.attrs(styles.diptych)}>
             <div {...stylex.attrs(styles.leaf, styles.coverLeft)}>
               <Reveal margin="0px">
-                <p {...stylex.attrs(styles.eyebrow)}>Botanical intelligence since 1995</p>
-              </Reveal>
-              <Reveal delay={STAGGER} margin="0px">
                 <h1 {...stylex.attrs(styles.display, styles.h1)}>
                   Nurturing vitality through{" "}
                   <span {...stylex.attrs(styles.italicGreen)}>botanical excellence</span>
@@ -1359,7 +1343,6 @@ function IndustriesChapter() {
           <div>
             <ChapterHead
               numeral={CHAPTERS[0]}
-              eyebrow="Industries · three markets"
               id="industries-title"
               title={
                 <>
@@ -1449,7 +1432,7 @@ function Portrait(props: { ingredient: Ingredient; index: number }) {
           />
         </div>
         <span {...stylex.attrs(styles.techLabel, styles.portraitCode)}>
-          {props.ingredient.code} · {String(props.index + 1).padStart(2, "0")} / 06
+          {props.ingredient.code}
         </span>
         <h3 {...stylex.attrs(styles.portraitName, active() && styles.portraitNameActive)}>
           {props.ingredient.name}
@@ -1478,7 +1461,6 @@ function PortfolioChapter() {
           <div>
             <ChapterHead
               numeral={CHAPTERS[1]}
-              eyebrow="Portfolio · six featured actives"
               id="portfolio-title"
               title={
                 <>
@@ -1514,7 +1496,6 @@ function QualityChapter() {
           <div>
             <ChapterHead
               numeral={CHAPTERS[2]}
-              eyebrow="Quality · three pillars · six certifications"
               id="quality-title"
               title={
                 <>
@@ -1526,11 +1507,8 @@ function QualityChapter() {
             <div {...stylex.attrs(styles.diptych)}>
               <Reveal sx={styles.leaf}>
                 <ol {...stylex.attrs(styles.pillarList, styles.proseColumns)}>
-                  {pillars.map((pillar, i) => (
+                  {pillars.map((pillar) => (
                     <li {...stylex.attrs(styles.pillarItem)}>
-                      <span {...stylex.attrs(styles.numeral)}>
-                        {String(i + 1).padStart(2, "0")}
-                      </span>
                       <h3 {...stylex.attrs(styles.pillarTitle)}>{pillar.title}</h3>
                       <p {...stylex.attrs(styles.prose)}>{pillar.copy}</p>
                     </li>
@@ -1538,9 +1516,6 @@ function QualityChapter() {
                 </ol>
               </Reveal>
               <Reveal delay={STAGGER} sx={styles.leafRight}>
-                <p {...stylex.attrs(styles.eyebrow)} style={{ "margin-bottom": "16px" }}>
-                  Certifications
-                </p>
                 <table {...stylex.attrs(styles.certTable)}>
                   <caption
                     style={{
@@ -1631,7 +1606,6 @@ function GlobalChapter() {
           <div>
             <ChapterHead
               numeral={CHAPTERS[3]}
-              eyebrow="Global supply · six bases"
               id="global-title"
               title={
                 <>
@@ -1692,9 +1666,6 @@ function FinaleSection() {
       <div {...stylex.attrs(styles.container)}>
         <div {...stylex.attrs(styles.finaleInner)}>
           <Reveal>
-            <p {...stylex.attrs(styles.eyebrow, styles.finaleEyebrow)}>Back page · Contact</p>
-          </Reveal>
-          <Reveal delay={STAGGER}>
             <h2 id="contact-title" {...stylex.attrs(styles.display, styles.finaleTitle)}>
               Send us the target.{" "}
               <span {...stylex.attrs(styles.finaleItalic)}>We send the specification.</span>
@@ -1715,7 +1686,6 @@ function FinaleSection() {
             <div {...stylex.attrs(styles.finaleMeta)}>
               <span>Response &lt; 24h</span>
               <span>Documentation before sampling</span>
-              <span>{company.legalName}</span>
             </div>
           </Reveal>
         </div>
@@ -1769,7 +1739,6 @@ function Colophon() {
                   {company.email}
                 </a>
               </li>
-              <li {...stylex.attrs(styles.colophonItem)}>{company.legalName}</li>
               <li {...stylex.attrs(styles.colophonItem)}>{company.hq.coords}</li>
             </ul>
           </div>

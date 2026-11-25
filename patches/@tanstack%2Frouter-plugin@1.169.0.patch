@@ -1,0 +1,72 @@
+diff --git a/dist/cjs/core/router-code-splitter-plugin.cjs b/dist/cjs/core/router-code-splitter-plugin.cjs
+index 5cb0353f2729073de79bf8a900669c8bc1477fbb..074b26ba734dad0197716adba385e99072d10f29 100644
+--- a/dist/cjs/core/router-code-splitter-plugin.cjs
++++ b/dist/cjs/core/router-code-splitter-plugin.cjs
+@@ -116,6 +116,13 @@ function createRouterCodeSplitterPlugin(options = {}, routerPluginContext, hmrSt
+ 		}
+ 		return compiledReferenceRoute;
+ 	};
++	const getSharedBindings = (code, baseId) => {
++		if (!sharedBindingsMap.has(baseId)) {
++			const generatorFileInfo = routerPluginContext.routesByFile.get(baseId);
++			if (generatorFileInfo) handleCompilingReferenceFile(code, baseId, generatorFileInfo);
++		}
++		return sharedBindingsMap.get(baseId);
++	};
+ 	const handleCompilingVirtualFile = (code, id) => {
+ 		if (require_utils.debug) console.info("Splitting Route: ", id);
+ 		const [_, ...pathnameParts] = id.split("?");
+@@ -124,7 +131,7 @@ function createRouterCodeSplitterPlugin(options = {}, routerPluginContext, hmrSt
+ 		const rawGrouping = (0, _tanstack_router_utils.decodeIdentifier)(splitValue);
+ 		const grouping = [...new Set(rawGrouping)].filter((p) => require_constants.splitRouteIdentNodes.includes(p));
+ 		const baseId = id.split("?")[0];
+-		const resolvedSharedBindings = sharedBindingsMap.get(baseId);
++		const resolvedSharedBindings = getSharedBindings(code, baseId);
+ 		const result = require_compilers.compileCodeSplitVirtualRoute({
+ 			code,
+ 			filename: id,
+@@ -212,7 +219,7 @@ function createRouterCodeSplitterPlugin(options = {}, routerPluginContext, hmrSt
+ 					const normalizedId = require_utils.normalizePath((0, node_url.fileURLToPath)(url));
+ 					const [baseId] = normalizedId.split("?");
+ 					if (!baseId) return null;
+-					const sharedBindings = sharedBindingsMap.get(baseId);
++					const sharedBindings = getSharedBindings(code, baseId);
+ 					if (!sharedBindings || sharedBindings.size === 0) return null;
+ 					if (require_utils.debug) console.info("Compiling Shared Module: ", id);
+ 					const result = require_compilers.compileCodeSplitSharedRoute({
+diff --git a/dist/esm/core/router-code-splitter-plugin.js b/dist/esm/core/router-code-splitter-plugin.js
+index e690ee5b5b0cda0c5bf925c1cf24829e8ae4a65d..671100a89b4c8b2222e44f8281cb92c5c46fdb3e 100644
+--- a/dist/esm/core/router-code-splitter-plugin.js
++++ b/dist/esm/core/router-code-splitter-plugin.js
+@@ -116,6 +116,13 @@ function createRouterCodeSplitterPlugin(options = {}, routerPluginContext, hmrSt
+ 		}
+ 		return compiledReferenceRoute;
+ 	};
++	const getSharedBindings = (code, baseId) => {
++		if (!sharedBindingsMap.has(baseId)) {
++			const generatorFileInfo = routerPluginContext.routesByFile.get(baseId);
++			if (generatorFileInfo) handleCompilingReferenceFile(code, baseId, generatorFileInfo);
++		}
++		return sharedBindingsMap.get(baseId);
++	};
+ 	const handleCompilingVirtualFile = (code, id) => {
+ 		if (debug) console.info("Splitting Route: ", id);
+ 		const [_, ...pathnameParts] = id.split("?");
+@@ -124,7 +131,7 @@ function createRouterCodeSplitterPlugin(options = {}, routerPluginContext, hmrSt
+ 		const rawGrouping = decodeIdentifier(splitValue);
+ 		const grouping = [...new Set(rawGrouping)].filter((p) => splitRouteIdentNodes.includes(p));
+ 		const baseId = id.split("?")[0];
+-		const resolvedSharedBindings = sharedBindingsMap.get(baseId);
++		const resolvedSharedBindings = getSharedBindings(code, baseId);
+ 		const result = compileCodeSplitVirtualRoute({
+ 			code,
+ 			filename: id,
+@@ -212,7 +219,7 @@ function createRouterCodeSplitterPlugin(options = {}, routerPluginContext, hmrSt
+ 					const normalizedId = normalizePath(fileURLToPath(url));
+ 					const [baseId] = normalizedId.split("?");
+ 					if (!baseId) return null;
+-					const sharedBindings = sharedBindingsMap.get(baseId);
++					const sharedBindings = getSharedBindings(code, baseId);
+ 					if (!sharedBindings || sharedBindings.size === 0) return null;
+ 					if (debug) console.info("Compiling Shared Module: ", id);
+ 					const result = compileCodeSplitSharedRoute({

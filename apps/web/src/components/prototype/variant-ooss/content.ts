@@ -52,7 +52,7 @@ export const ABOUT_STATEMENT = [
 ] as const;
 
 export const ABOUT_SUPPORT =
-  "南京泛成国际控股有限公司是行业内领先的原料供应商，已成为全球范围内同行业中最具影响力的公司之一。";
+  "南京泛成生物科技有限公司是南京泛成国际控股有限公司的控股子公司，是行业内领先的原料供应商，已成为全球范围内同行业中具有影响力的公司之一。";
 
 export const CAMPUS = {
   title: "现代化研发与生产基地",

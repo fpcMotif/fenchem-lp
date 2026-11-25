@@ -29,17 +29,12 @@ export const face = stylex.defineConsts({
   sans: '"Source Han Sans SC", "Noto Sans SC", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif',
   display:
     '"Inter Tight", "Helvetica Neue", Arial, "Source Han Sans SC", "Noto Sans SC", sans-serif',
-  serif:
-    '"Instrument Serif", Georgia, "Times New Roman", "Source Han Sans SC", "Noto Sans SC", serif',
 });
 
 export const scale = stylex.defineConsts({
   title: "clamp(52px, 8.9vw, 128px)",
-  titleCounterweight: "calc(clamp(52px, 8.9vw, 128px) * 3 / 8)",
   display: "clamp(34px, 4.45vw, 64px)",
-  displayCounterweight: "max(14px, calc(clamp(34px, 4.45vw, 64px) * 3 / 8))",
   heading: "clamp(28px, 2.78vw, 40px)",
-  headingCounterweight: "max(13px, calc(clamp(28px, 2.78vw, 40px) * 3 / 8))",
   body: "clamp(16px, 1.25vw, 18px)",
 });
 

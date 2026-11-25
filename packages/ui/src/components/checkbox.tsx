@@ -4,8 +4,14 @@ import { Check as CheckIcon } from "@fenchem-lp/ui/components/lucide";
 import { colors, radii } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 import type { StyleXStyles } from "@stylexjs/stylex";
+import {
+  Checkbox as UiCheckbox,
+  CheckboxIndicator as UiCheckboxIndicator,
+  type CheckboxCheckedChangeReason,
+} from "@ui-sdk/solid/checkbox";
+import type { ChangeDetails } from "@ui-sdk/core";
 import type { ComponentProps } from "@solidjs/web";
-import { createSignal, omit, Show } from "solid-js";
+import { omit } from "solid-js";
 
 const checkboxStyles = stylex.create({
   root: {
@@ -54,93 +60,47 @@ const checkboxStyles = stylex.create({
   },
 });
 
+const sxProps = (...args: ReadonlyArray<StyleXStyles | false | null | undefined>) =>
+  stylex.attrs(...args);
+
+type UiCheckboxProps = ComponentProps<typeof UiCheckbox>;
+
 export interface CheckboxProps extends Omit<
-  ComponentProps<"button">,
-  "class" | "value" | "onChange" | "type"
+  UiCheckboxProps,
+  "class" | "style" | "onCheckedChange"
 > {
-  checked?: boolean;
-  defaultChecked?: boolean;
-  onCheckedChange?: (checked: boolean, event: Event) => void;
-  name?: string;
-  value?: string;
-  required?: boolean;
-  readOnly?: boolean;
+  onCheckedChange?: (checked: boolean, details: ChangeDetails<CheckboxCheckedChangeReason>) => void;
   sx?: StyleXStyles;
 }
 
 function Checkbox(props: CheckboxProps) {
-  const rest = omit(
-    props,
-    "sx",
-    "checked",
-    "defaultChecked",
-    "onCheckedChange",
-    "name",
-    "value",
-    "required",
-    "readOnly",
-    "disabled",
-    "onClick",
-  );
-  const [uncontrolled, setUncontrolled] = createSignal(props.defaultChecked ?? false);
-  const checked = () => props.checked ?? uncontrolled();
+  const rest = omit(props, "sx", "onCheckedChange", "children");
   const isInvalid = () => {
     const ariaInvalid: unknown = props["aria-invalid"];
     return ariaInvalid === true || ariaInvalid === "true";
   };
 
-  const toggle = (event: MouseEvent & { currentTarget: HTMLButtonElement; target: Element }) => {
-    const onClick = props.onClick;
-    if (typeof onClick === "function") onClick(event);
-    if (event.defaultPrevented || props.disabled || props.readOnly) return;
-    const next = !checked();
-    if (props.checked === undefined) setUncontrolled(next);
-    props.onCheckedChange?.(next, event);
-  };
-
   return (
-    <>
-      <button
-        type="button"
-        role="checkbox"
-        data-slot="checkbox"
-        aria-checked={checked() ? "true" : "false"}
-        aria-required={props.required ? "true" : undefined}
-        aria-readonly={props.readOnly ? "true" : undefined}
-        data-checked={checked() ? "" : undefined}
-        data-unchecked={checked() ? undefined : ""}
-        data-disabled={props.disabled ? "" : undefined}
-        disabled={props.disabled}
-        {...rest}
-        {...stylex.attrs(
+    <UiCheckbox
+      {...rest}
+      onCheckedChange={(checked, details) => {
+        props.onCheckedChange?.(checked === true, details);
+      }}
+      class={(state) =>
+        sxProps(
           checkboxStyles.root,
-          checked() && checkboxStyles.checked,
-          !!props.disabled && checkboxStyles.disabled,
+          state.checked && checkboxStyles.checked,
+          state.disabled && checkboxStyles.disabled,
           isInvalid() && checkboxStyles.invalid,
           props.sx,
-        )}
-        onClick={toggle}
-      >
-        <Show when={checked()}>
-          <span data-slot="checkbox-indicator" {...stylex.attrs(checkboxStyles.indicator)}>
-            <CheckIcon size={14} />
-          </span>
-        </Show>
-      </button>
-      <Show when={props.name}>
-        <input
-          type="checkbox"
-          aria-hidden="true"
-          tabindex={-1}
-          hidden
-          name={props.name}
-          value={props.value ?? "on"}
-          checked={checked()}
-          required={props.required}
-          disabled={props.disabled}
-        />
-      </Show>
-    </>
+        ).class
+      }
+      style={() => sxProps(props.sx).style as Record<string, string | number> | undefined}
+    >
+      <UiCheckboxIndicator {...stylex.attrs(checkboxStyles.indicator)}>
+        <CheckIcon size={14} />
+      </UiCheckboxIndicator>
+    </UiCheckbox>
   );
 }
 

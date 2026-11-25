@@ -52,6 +52,19 @@ Object.defineProperty(window, "matchMedia", {
   })),
 });
 if (typeof document !== "undefined") {
+  HTMLElement.prototype.showPopover = function () {};
+  HTMLElement.prototype.hidePopover = function () {};
+  Element.prototype.getAnimations = () => [];
+  Element.prototype.scrollIntoView = function () {};
+  Element.prototype.checkVisibility = () => true;
+  Element.prototype.getClientRects = () => [] as unknown as DOMRectList;
+  document.elementFromPoint = () => null;
+  document.elementsFromPoint = () => [];
+  document.head.append(
+    Object.assign(document.createElement("style"), {
+      textContent: "[popover] { display: block !important }",
+    }),
+  );
   Object.defineProperty(document, "fonts", {
     writable: true,
     configurable: true,

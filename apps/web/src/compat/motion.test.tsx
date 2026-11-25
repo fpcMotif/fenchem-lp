@@ -1,7 +1,7 @@
 import { createSignal, flush } from "solid-js";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
-import { m, useMotionValue } from "@/compat/motion";
+import { m, useMotionValue, useMotionValueEvent, useTransform } from "@/compat/motion";
 import { fireEvent, render, screen } from "@/test/render";
 
 describe("solid test harness", () => {
@@ -36,6 +36,44 @@ describe("solid test harness", () => {
     ));
     expect(screen.getByText("child")).toBeTruthy();
     expect(builds).toBe(1);
+  });
+
+  it("reads props and motion values without strict untracked-read warnings", () => {
+    const warnings: string[] = [];
+    const spy = vi.spyOn(console, "warn").mockImplementation((message: unknown) => {
+      warnings.push(String(message));
+    });
+    let node: HTMLElement | undefined;
+    const [wide, setWide] = createSignal(false);
+    const attrs = (name: string) => ({ class: name });
+    function Scene() {
+      const source = useMotionValue(0);
+      const mapped = useTransform(() => source() * 2);
+      useMotionValueEvent(mapped, "change", () => wide());
+      return (
+        <m.div
+          ref={(el: HTMLElement) => (node = el)}
+          variants={{ shown: { opacity: wide() ? 1 : 0.5 } }}
+          initial="shown"
+          animate="shown"
+          onClick={() => source.set(source.get() + 1)}
+          {...attrs("scene")}
+        >
+          scene
+        </m.div>
+      );
+    }
+    try {
+      render(() => <Scene />);
+      fireEvent.click(screen.getByText("scene"));
+      flush();
+      setWide(true);
+      flush();
+    } finally {
+      spy.mockRestore();
+    }
+    expect(node).toBeInstanceOf(HTMLElement);
+    expect(warnings.filter((message) => message.includes("STRICT_READ_UNTRACKED"))).toEqual([]);
   });
 
   it("renders motion-value attributes as their current value", () => {

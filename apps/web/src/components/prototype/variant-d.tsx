@@ -21,7 +21,7 @@ import * as stylex from "@stylexjs/stylex";
 import type { StyleXStyles } from "@stylexjs/stylex";
 import { breakpoints, colors, radii, typography } from "@fenchem-lp/ui/tokens.stylex";
 import { EASE } from "@/components/prototype/motion-constants";
-import { Eyebrow, Intro, Reveal } from "@/components/prototype/motion";
+import { Intro, Reveal } from "@/components/prototype/motion";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 import {
   certificationDetails,
@@ -357,32 +357,7 @@ const styles = stylex.create({
       [breakpoints.lg]: "span 7",
     },
   },
-  heroBadge: {
-    display: "inline-flex",
-    alignItems: "center",
-    gap: "0.5rem",
-    borderRadius: radii.full,
-    borderWidth: "1px",
-    borderStyle: "solid",
-    borderColor: colors.brandGreen200,
-    backgroundColor: colors.brandGreen50,
-    paddingInline: "1rem",
-    paddingBlock: "0.375rem",
-    fontFamily: typography.tech,
-    fontSize: {
-      default: "10px",
-      [breakpoints.md]: "11px",
-    },
-    textTransform: "uppercase",
-    letterSpacing: "0.25em",
-    color: colors.brandGreen700,
-  },
-  badgeIcon: {
-    height: "0.875rem",
-    width: "0.875rem",
-  },
   heroH1: {
-    marginTop: "2rem",
     fontFamily: typography.display,
     fontSize: "clamp(3rem, 7.5vw, 6.25rem)",
     fontWeight: 400,
@@ -576,14 +551,6 @@ const styles = stylex.create({
     color: colors.brandGreen600,
     margin: 0,
   },
-  heroStatDesc: {
-    marginTop: "0.25rem",
-    fontFamily: typography.body,
-    fontSize: "0.75rem",
-    lineHeight: 1.5,
-    color: colors.mute600,
-    margin: 0,
-  },
   /* ─── Industries ──────────────────────────────────────── */
   section: {
     scrollMarginTop: "7rem",
@@ -702,19 +669,8 @@ const styles = stylex.create({
     transitionDuration: "700ms",
     transitionTimingFunction: "ease-out",
   },
-  industryTitleRow: {
-    marginTop: "1.75rem",
-    display: "flex",
-    alignItems: "baseline",
-    gap: "1rem",
-  },
-  industryNum: {
-    fontFamily: typography.tech,
-    fontSize: "0.75rem",
-    letterSpacing: "0.2em",
-    color: colors.brandGreen700,
-  },
   industryH3: {
+    marginTop: "1.75rem",
     fontFamily: typography.display,
     fontSize: {
       default: "1.5rem",
@@ -731,18 +687,6 @@ const styles = stylex.create({
     fontSize: "0.875rem",
     lineHeight: 1.625,
     color: colors.mute600,
-  },
-  industryLink: {
-    marginTop: "1.25rem",
-    display: "inline-flex",
-    alignItems: "center",
-    gap: "0.5rem",
-    fontFamily: typography.body,
-    fontSize: "0.875rem",
-    fontWeight: 600,
-    color: colors.brandGreen700,
-    transitionProperty: "color",
-    transitionDuration: "300ms",
   },
   /* ─── Science / Split Section ─────────────────────────── */
   scienceTintBand: {
@@ -920,7 +864,6 @@ const styles = stylex.create({
     },
   },
   pillarsGrid: {
-    marginTop: "3.5rem",
     display: "grid",
     gridTemplateColumns: {
       default: "1fr",
@@ -1454,18 +1397,7 @@ const styles = stylex.create({
     },
     paddingBottom: "2.5rem",
   },
-  footerEyebrow: {
-    fontFamily: typography.tech,
-    fontSize: {
-      default: "10px",
-      [breakpoints.md]: "11px",
-    },
-    textTransform: "uppercase",
-    letterSpacing: "0.3em",
-    color: "color-mix(in oklch, var(--color-brand-green-400) 80%, transparent)",
-  },
   footerWordmark: {
-    marginTop: "1.5rem",
     fontFamily: typography.display,
     fontSize: "clamp(4rem, 13vw, 10rem)",
     fontWeight: 300,
@@ -1700,13 +1632,6 @@ function HeroSection(props: HeroSectionProps) {
       <div {...stylex.attrs(styles.heroContainer)}>
         {/* Left: headline copy */}
         <div {...stylex.attrs(styles.heroLeft)}>
-          <Intro delay={0.05}>
-            <span {...stylex.attrs(styles.heroBadge)}>
-              <Leaf {...stylex.attrs(styles.badgeIcon)} aria-hidden="true" />
-              Botanical Intelligence Since 1995
-            </span>
-          </Intro>
-
           <Intro delay={0.18}>
             <h1 {...stylex.attrs(styles.heroH1)}>
               Nurturing <em {...stylex.attrs(styles.emGreen)}>Vitality</em>
@@ -1791,9 +1716,6 @@ function HeroSection(props: HeroSectionProps) {
                 >
                   <p {...stylex.attrs(styles.heroStatLabel)}>Extraction Yield</p>
                   <p {...stylex.attrs(styles.heroStatVal)}>98%</p>
-                  <p {...stylex.attrs(styles.heroStatDesc)}>
-                    Bio-active retention across our extraction process.
-                  </p>
                 </m.div>
               </m.div>
             </div>
@@ -1832,7 +1754,6 @@ function IndustriesSection() {
                 "max-width": "36rem",
               }}
             >
-              <Eyebrow>Where our ingredients work</Eyebrow>
               <h2 {...stylex.attrs(styles.sectionH2)}>
                 Purity across <em {...stylex.attrs(styles.emGreen600)}>industries</em>
               </h2>
@@ -1856,23 +1777,8 @@ function IndustriesSection() {
                       {...stylex.attrs(styles.industryImg)}
                     />
                   </div>
-                  <div {...stylex.attrs(styles.industryTitleRow)}>
-                    <span {...stylex.attrs(styles.industryNum)}>
-                      {String(i + 1).padStart(2, "0")}
-                    </span>
-                    <h3 {...stylex.attrs(styles.industryH3)}>{industry.title}</h3>
-                  </div>
+                  <h3 {...stylex.attrs(styles.industryH3)}>{industry.title}</h3>
                   <p {...stylex.attrs(styles.industryP)}>{industry.copy}</p>
-                  <span {...stylex.attrs(styles.industryLink)}>
-                    Explore applications
-                    <ArrowUpRight
-                      style={{
-                        height: "1rem",
-                        width: "1rem",
-                      }}
-                      aria-hidden="true"
-                    />
-                  </span>
                 </a>
               </div>
             </Reveal>
@@ -1930,7 +1836,6 @@ function ScienceSection() {
           {/* Copy */}
           <div>
             <Reveal>
-              <Eyebrow>The Fenchem legacy</Eyebrow>
               <h2 {...stylex.attrs(styles.scienceH2)}>
                 Rooted in Nature,
                 <br />
@@ -1958,15 +1863,6 @@ function ScienceSection() {
 
         {/* Pillars */}
         <div {...stylex.attrs(styles.pillarsDivider)}>
-          <Reveal>
-            <div
-              style={{
-                "text-align": "center",
-              }}
-            >
-              <Eyebrow>Three pillars of excellence</Eyebrow>
-            </div>
-          </Reveal>
           <div {...stylex.attrs(styles.pillarsGrid)}>
             {pillars.map((pillar, i) => {
               const Icon = PILLAR_ICONS[i];
@@ -2033,13 +1929,6 @@ function IngredientsSection() {
 
       <div {...stylex.attrs(styles.centerContainer)}>
         <Reveal>
-          <div
-            style={{
-              "text-align": "center",
-            }}
-          >
-            <Eyebrow>The portfolio</Eyebrow>
-          </div>
           <h2 {...stylex.attrs(styles.ingredientsH2)}>
             A <em {...stylex.attrs(styles.emGreen600)}>living library</em> of botanical actives
           </h2>
@@ -2126,7 +2015,6 @@ function GlobalSection() {
         <Reveal>
           <div {...stylex.attrs(styles.globalFlex)}>
             <div {...stylex.attrs(styles.globalLeft)}>
-              <Eyebrow>Global intelligent research</Eyebrow>
               <h2 {...stylex.attrs(styles.globalH2)}>
                 Six bases,
                 <br />
@@ -2168,13 +2056,6 @@ function CtaSection() {
             <div aria-hidden="true" {...stylex.attrs(styles.ctaBlobBlue)} />
 
             <div {...stylex.attrs(styles.ctaContent)}>
-              <div
-                style={{
-                  "text-align": "center",
-                }}
-              >
-                <Eyebrow>Start the conversation</Eyebrow>
-              </div>
               <h2 {...stylex.attrs(styles.ctaH2)}>
                 Let&rsquo;s formulate{" "}
                 <em {...stylex.attrs(styles.emGreen600)}>what&rsquo;s next.</em>
@@ -2214,7 +2095,6 @@ function FooterSection() {
     <footer {...stylex.attrs(styles.footer)}>
       <div {...stylex.attrs(styles.footerContainer)}>
         <Reveal>
-          <p {...stylex.attrs(styles.footerEyebrow)}>Rooted in Nature, Refined by Science</p>
           <p {...stylex.attrs(styles.footerWordmark)}>
             Fenchem<span {...stylex.attrs(styles.footerWordmarkDot)}>.</span>
           </p>

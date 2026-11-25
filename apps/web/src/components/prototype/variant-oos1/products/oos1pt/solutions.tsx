@@ -171,19 +171,6 @@ const styles = stylex.create({
       opacity: 1,
     },
   },
-  tabIndex: {
-    flexShrink: 0,
-    fontFamily: NUMERAL_FONT,
-    fontSize: 12,
-    fontWeight: 500,
-    lineHeight: "24px",
-    letterSpacing: "0.04em",
-    fontVariantNumeric: "tabular-nums",
-    color: MUTED_LABEL,
-  },
-  tabIndexSelected: {
-    color: ACCENT,
-  },
   tabTitle: {
     fontSize: 15,
     fontWeight: 400,
@@ -582,9 +569,6 @@ export function Solutions() {
                   onKeyDown={(event) => onTabKeyDown(event, index)}
                   {...stylex.attrs(styles.tab, selected() && styles.tabSelected)}
                 >
-                  <span {...stylex.attrs(styles.tabIndex, selected() && styles.tabIndexSelected)}>
-                    {padIndex(index)}
-                  </span>
                   <span {...stylex.attrs(styles.tabTitle, selected() && styles.tabTitleSelected)}>
                     {item.title}
                   </span>

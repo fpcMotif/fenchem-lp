@@ -1,16 +1,6 @@
 import { ABOUT_BANNER, ABOUT_CAMPUS, ABOUT_HERO } from "../../about-data";
 import { STATS } from "../../content";
 
-export const PHOTO_ENGLISH = {
-  aerial: "Headquarters",
-  lab: "R&D Laboratory",
-  showroom: "Showroom",
-  reception: "Reception Hall",
-  lounge: "Staff Lounge",
-  office: "Open Office",
-  grounds: "Campus Grounds",
-} as const satisfies Record<(typeof ABOUT_CAMPUS.photos)[number]["id"], string>;
-
 export const PHOTO_SHAPE = {
   aerial: "classic",
   lab: "wide",

@@ -117,19 +117,6 @@ const styles = stylex.create({
       transform: "scaleX(1)",
     },
   },
-  tabIndex: {
-    flexShrink: 0,
-    fontFamily: face.numeral,
-    fontSize: 12,
-    fontWeight: 500,
-    lineHeight: "24px",
-    letterSpacing: "0.04em",
-    fontVariantNumeric: "tabular-nums",
-    color: tone.muted,
-  },
-  tabIndexSelected: {
-    color: colors.brandGreen700,
-  },
   tabTitle: {
     minWidth: 0,
     overflow: "hidden",
@@ -413,11 +400,6 @@ const styles = stylex.create({
     letterSpacing: "0.02em",
     color: tone.muted,
   },
-  stepNeighbourIndex: {
-    marginInlineEnd: 6,
-    fontFamily: face.numeral,
-    fontVariantNumeric: "tabular-nums",
-  },
 });
 
 function Trademarked(props: { text: string }) {
@@ -588,12 +570,7 @@ function StepButton(props: {
   const Icon = isNext ? ChevronRight : ChevronLeft;
   const neighbourLabel = () => (
     <Show when={neighbour()}>
-      {(entry) => (
-        <span {...stylex.attrs(styles.stepNeighbour)}>
-          <span {...stylex.attrs(styles.stepNeighbourIndex)}>{padIndex(props.target!)}</span>
-          {entry().title}
-        </span>
-      )}
+      {(entry) => <span {...stylex.attrs(styles.stepNeighbour)}>{entry().title}</span>}
     </Show>
   );
   return (
@@ -699,9 +676,6 @@ export function Solutions() {
                 onKeyDown={(event) => onTabKeyDown(event, index)}
                 {...stylex.attrs(styles.tab, isActive() && styles.tabSelected)}
               >
-                <span {...stylex.attrs(styles.tabIndex, isActive() && styles.tabIndexSelected)}>
-                  {padIndex(index)}
-                </span>
                 <span {...stylex.attrs(styles.tabTitle, isActive() && styles.tabTitleSelected)}>
                   {item.title}
                 </span>

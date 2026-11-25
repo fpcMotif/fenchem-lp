@@ -1422,26 +1422,6 @@ const styles = stylex.create({
     backdropFilter: "blur(4px)",
     WebkitBackdropFilter: "blur(4px)",
   },
-  dossierBadgeBottom: {
-    position: "absolute",
-    bottom: 16,
-    left: 16,
-    right: 16,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    borderRadius: radii.sm,
-    borderWidth: 1,
-    borderStyle: "solid",
-    borderColor: colors.line,
-    backgroundColor: "color-mix(in oklch, var(--color-paper) 95%, transparent)",
-    paddingLeft: 16,
-    paddingRight: 16,
-    paddingTop: 10,
-    paddingBottom: 10,
-    backdropFilter: "blur(4px)",
-    WebkitBackdropFilter: "blur(4px)",
-  },
   dossierBodyCol: {
     paddingLeft: {
       default: 20,
@@ -2600,12 +2580,6 @@ function IndustriesSection() {
           label="Application Domains"
           title="Built for three"
           accent="industries"
-          aside={
-            <p {...stylex.attrs(styles.sectionAsideLead)}>
-              Clinically supported actives engineered for the precise demands of each formulation
-              discipline.
-            </p>
-          }
         />
 
         <div>
@@ -2864,7 +2838,6 @@ function MatrixSection() {
                     techLabel: styles.techLabel,
                     matrixSpecLink: styles.matrixSpecLink,
                   }}
-                  i={i}
                   item={item}
                 />
               </article>
@@ -3063,12 +3036,6 @@ function DossierSection() {
               />
               {DOSSIER.application}
             </span>
-            <div {...stylex.attrs(styles.dossierBadgeBottom)}>
-              <span {...stylex.attrs(styles.techLabel)}>
-                {DOSSIER.category} · {DOSSIER.specification}
-              </span>
-              <span {...stylex.attrs(styles.eyebrowGreen)}>{DOSSIER.code}</span>
-            </div>
           </div>
 
           {/* Dossier body */}

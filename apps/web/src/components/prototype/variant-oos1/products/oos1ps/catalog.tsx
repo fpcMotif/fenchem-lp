@@ -5,7 +5,7 @@ import { AnimatePresence } from "@/compat/motion";
 import { createMemo, createSignal, createUniqueId, Show } from "solid-js";
 
 import { CATALOG_GROUPS } from "../../products-data";
-import { FLAT_ITEMS, ITEM_BY_ID, padIndex, type FlatItem } from "../shared/derived";
+import { FLAT_ITEMS, ITEM_BY_ID, type FlatItem } from "../shared/derived";
 import { CompareStrip } from "./compare-strip";
 import { Inci } from "./inci";
 import { catalogTone, font, ink, layout, mq } from "./theme.stylex";
@@ -155,14 +155,6 @@ const styles = stylex.create({
   groupIndexCell: {
     gridColumn: "1",
     gridRow: "1",
-    paddingInlineStart: { default: 0, [MD]: 12 },
-    fontFamily: font.numeral,
-    fontSize: 13,
-    fontWeight: 500,
-    lineHeight: "24px",
-    letterSpacing: "0.04em",
-    fontVariantNumeric: "tabular-nums",
-    color: ink.muted,
   },
   groupLabelCell: {
     gridColumn: "2",
@@ -519,9 +511,7 @@ export function Catalog() {
                       first && styles.groupCellFirst,
                       styles.groupIndexCell,
                     )}
-                  >
-                    <span aria-hidden="true">{padIndex(index)}</span>
-                  </td>
+                  />
                   <th
                     scope="rowgroup"
                     colspan={group.intro ? 1 : 3}

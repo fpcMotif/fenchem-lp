@@ -1,0 +1,2648 @@
+{
+  "timestamp": "2026-11-24T11:29:23.766Z",
+  "runs": 5,
+  "env": {
+    "cpus": 12,
+    "loadAvgStart": [
+      5.27490234375,
+      6.14453125,
+      7.40283203125
+    ],
+    "uptimeBefore": "19:21  up 10:51, 13 users, load averages: 6.53 7.34 8.44",
+    "chromeVersion": "Google Chrome 160.0.8180.0 canary",
+    "sideAHead": "vmopxuspqsut 988164877109",
+    "sideBHead": "wwkzywlqytko f16e104e31f9"
+  },
+  "visualDiffs": [
+    {
+      "route": "home",
+      "viewport": "desktop",
+      "diffPct": 30.11,
+      "mismatched": 390175,
+      "totalPixels": 1296000
+    },
+    {
+      "route": "products",
+      "viewport": "desktop",
+      "diffPct": 8.84,
+      "mismatched": 114515,
+      "totalPixels": 1296000
+    },
+    {
+      "route": "about",
+      "viewport": "desktop",
+      "diffPct": 44.69,
+      "mismatched": 579217,
+      "totalPixels": 1296000
+    },
+    {
+      "route": "home",
+      "viewport": "mobile",
+      "diffPct": 9.53,
+      "mismatched": 31360,
+      "totalPixels": 329160
+    },
+    {
+      "route": "products",
+      "viewport": "mobile",
+      "diffPct": 15.9,
+      "mismatched": 52336,
+      "totalPixels": 329160
+    },
+    {
+      "route": "about",
+      "viewport": "mobile",
+      "diffPct": 59.72,
+      "mismatched": 196583,
+      "totalPixels": 329160
+    }
+  ],
+  "sides": {
+    "react": {
+      "dist": {
+        "client": {
+          "dir": "/Users/martinfan/devv/fenchem-lp/apps/web/dist/client",
+          "buckets": {
+            "css": {
+              "raw": 571613,
+              "gzip": 120235,
+              "count": 1
+            },
+            "js": {
+              "raw": 3952322,
+              "gzip": 1299717,
+              "count": 225
+            },
+            "other": {
+              "raw": 45580652,
+              "gzip": 42328721,
+              "count": 182
+            }
+          },
+          "total": {
+            "raw": 50104587,
+            "gzip": 43748673,
+            "count": 408
+          }
+        },
+        "worker": {
+          "entryRaw": 719584,
+          "entryGzip": 147922,
+          "uploadRaw": 7752016,
+          "uploadGzip": 1917586,
+          "fileCount": 257,
+          "topAssets": [
+            {
+              "file": "index.js",
+              "raw": 719584,
+              "gzip": 147922
+            },
+            {
+              "file": "assets/index-Cww7fOte.css",
+              "raw": 571613,
+              "gzip": 120235
+            },
+            {
+              "file": "assets/style-audit-utBD1AVx.js",
+              "raw": 436744,
+              "gzip": 95870
+            },
+            {
+              "file": "assets/variant-j-Dxdu7izo.js",
+              "raw": 348358,
+              "gzip": 88150
+            },
+            {
+              "file": "assets/world-map-path-BlJsf0fG.js",
+              "raw": 106740,
+              "gzip": 35617
+            },
+            {
+              "file": "assets/solutions-DjeYg9zJ.js",
+              "raw": 179333,
+              "gzip": 33694
+            }
+          ]
+        }
+      },
+      "ssr": {
+        "cold": {
+          "home": 13.469332999999097,
+          "products": 11.973458000000392,
+          "about": 10.12604199999987
+        },
+        "warm": {
+          "home": {
+            "n": 5,
+            "median": 6.303667000000132,
+            "p75": 5.302874999999403,
+            "min": 5.302874999999403,
+            "max": 8.523084000000381
+          },
+          "products": {
+            "n": 5,
+            "median": 6.799957999999606,
+            "p75": 5.744958999999653,
+            "min": 5.744958999999653,
+            "max": 7.170375000001513
+          },
+          "about": {
+            "n": 5,
+            "median": 6.266249999998763,
+            "p75": 5.685665999999401,
+            "min": 5.685665999999401,
+            "max": 6.979541999999128
+          }
+        }
+      },
+      "limiter": {
+        "loadMetrics": {
+          "jsHeapUsedBytes": 7154044,
+          "jsHeapTotalBytes": 10567680,
+          "nodes": 1057,
+          "listeners": 279,
+          "scriptDurationS": 0.244745,
+          "layoutDurationS": 0.077959,
+          "recalcStyleDurationS": 0.062227,
+          "taskDurationS": 0.686275
+        },
+        "settled": {
+          "jsHeapUsedBytes": 5802232,
+          "jsHeapTotalBytes": 6373376,
+          "nodes": 1039,
+          "listeners": 268,
+          "scriptDurationS": 0.245048,
+          "layoutDurationS": 0.077959,
+          "recalcStyleDurationS": 0.062774,
+          "taskDurationS": 0.746784
+        },
+        "topAssetsBr": [
+          {
+            "url": "/assets/index-BfErhFGv.js",
+            "type": "Script",
+            "brBytes": 179178
+          },
+          {
+            "url": "/assets/index-Cww7fOte.css",
+            "type": "Stylesheet",
+            "brBytes": 113312
+          },
+          {
+            "url": "/prototype/official-site/hero-background.webp",
+            "type": "Image",
+            "brBytes": 23991
+          },
+          {
+            "url": "/assets/variant-oos1-ChptU9l_.js",
+            "type": "Script",
+            "brBytes": 14841
+          },
+          {
+            "url": "/assets/react-BO6dM9-D.js",
+            "type": "Script",
+            "brBytes": 13934
+          },
+          {
+            "url": "/",
+            "type": "Document",
+            "brBytes": 13768
+          },
+          {
+            "url": "/assets/about-view-Bjj92S2u.js",
+            "type": "Script",
+            "brBytes": 10882
+          },
+          {
+            "url": "/assets/HTMLProjectionNode-EQiGWApU.js",
+            "type": "Script",
+            "brBytes": 9009
+          }
+        ]
+      },
+      "summary": {
+        "byRoute": {
+          "home": {
+            "ttfbMs": {
+              "n": 5,
+              "median": 150.09999999403954,
+              "p75": 150,
+              "min": 150,
+              "max": 150.19999999552965
+            },
+            "fcpMs": {
+              "n": 5,
+              "median": 1728,
+              "p75": 1712,
+              "min": 1712,
+              "max": 1732
+            },
+            "lcpMs": {
+              "n": 5,
+              "median": 1728,
+              "p75": 1712,
+              "min": 1712,
+              "max": 1732
+            },
+            "cls": {
+              "n": 5,
+              "median": 0,
+              "p75": 0,
+              "min": 0,
+              "max": 0
+            },
+            "tbtMs": {
+              "n": 5,
+              "median": 31,
+              "p75": 24,
+              "min": 24,
+              "max": 33
+            },
+            "reqBeforeLcp": {
+              "n": 5,
+              "median": 6,
+              "p75": 6,
+              "min": 6,
+              "max": 6
+            },
+            "reqTotal": {
+              "n": 5,
+              "median": 82,
+              "p75": 82,
+              "min": 82,
+              "max": 82
+            },
+            "htmlBr": {
+              "n": 5,
+              "median": 13768,
+              "p75": 13768,
+              "min": 13768,
+              "max": 13768
+            },
+            "cssBr": {
+              "n": 5,
+              "median": 113312,
+              "p75": 113312,
+              "min": 113312,
+              "max": 113312
+            },
+            "jsBr": {
+              "n": 5,
+              "median": 311764,
+              "p75": 311764,
+              "min": 311764,
+              "max": 313347
+            },
+            "totalBr": {
+              "n": 5,
+              "median": 462835,
+              "p75": 462835,
+              "min": 462835,
+              "max": 464418
+            },
+            "ssrWarmMs": {
+              "n": 5,
+              "median": 6.303667000000132,
+              "p75": 5.302874999999403,
+              "min": 5.302874999999403,
+              "max": 8.523084000000381
+            },
+            "ssrColdMs": 13.469332999999097
+          },
+          "products": {
+            "ttfbMs": {
+              "n": 5,
+              "median": 150.10000000149012,
+              "p75": 150,
+              "min": 150,
+              "max": 150.10000000149012
+            },
+            "fcpMs": {
+              "n": 5,
+              "median": 2476,
+              "p75": 2468,
+              "min": 2468,
+              "max": 2520
+            },
+            "lcpMs": {
+              "n": 5,
+              "median": 2476,
+              "p75": 2468,
+              "min": 2468,
+              "max": 2520
+            },
+            "cls": {
+              "n": 5,
+              "median": 0,
+              "p75": 0,
+              "min": 0,
+              "max": 0
+            },
+            "tbtMs": {
+              "n": 5,
+              "median": 25,
+              "p75": 24,
+              "min": 24,
+              "max": 36
+            },
+            "reqBeforeLcp": {
+              "n": 5,
+              "median": 6,
+              "p75": 6,
+              "min": 6,
+              "max": 6
+            },
+            "reqTotal": {
+              "n": 5,
+              "median": 82,
+              "p75": 82,
+              "min": 82,
+              "max": 82
+            },
+            "htmlBr": {
+              "n": 5,
+              "median": 18777,
+              "p75": 18777,
+              "min": 18777,
+              "max": 18777
+            },
+            "cssBr": {
+              "n": 5,
+              "median": 113312,
+              "p75": 113312,
+              "min": 113312,
+              "max": 113312
+            },
+            "jsBr": {
+              "n": 5,
+              "median": 325331,
+              "p75": 325331,
+              "min": 325331,
+              "max": 331423
+            },
+            "totalBr": {
+              "n": 5,
+              "median": 817530,
+              "p75": 817530,
+              "min": 817530,
+              "max": 823622
+            },
+            "ssrWarmMs": {
+              "n": 5,
+              "median": 6.799957999999606,
+              "p75": 5.744958999999653,
+              "min": 5.744958999999653,
+              "max": 7.170375000001513
+            },
+            "ssrColdMs": 11.973458000000392
+          },
+          "about": {
+            "ttfbMs": {
+              "n": 5,
+              "median": 150.10000000149012,
+              "p75": 150,
+              "min": 150,
+              "max": 150.69999999552965
+            },
+            "fcpMs": {
+              "n": 5,
+              "median": 2180,
+              "p75": 2176,
+              "min": 2176,
+              "max": 2208
+            },
+            "lcpMs": {
+              "n": 5,
+              "median": 3068,
+              "p75": 3024,
+              "min": 3024,
+              "max": 3100
+            },
+            "cls": {
+              "n": 5,
+              "median": 0,
+              "p75": 0,
+              "min": 0,
+              "max": 0
+            },
+            "tbtMs": {
+              "n": 5,
+              "median": 28,
+              "p75": 23,
+              "min": 23,
+              "max": 31
+            },
+            "reqBeforeLcp": {
+              "n": 5,
+              "median": 12,
+              "p75": 10,
+              "min": 10,
+              "max": 12
+            },
+            "reqTotal": {
+              "n": 5,
+              "median": 83,
+              "p75": 83,
+              "min": 83,
+              "max": 83
+            },
+            "htmlBr": {
+              "n": 5,
+              "median": 17063,
+              "p75": 17062,
+              "min": 17062,
+              "max": 17064
+            },
+            "cssBr": {
+              "n": 5,
+              "median": 113312,
+              "p75": 113312,
+              "min": 113312,
+              "max": 113312
+            },
+            "jsBr": {
+              "n": 5,
+              "median": 318336,
+              "p75": 318336,
+              "min": 318336,
+              "max": 318336
+            },
+            "totalBr": {
+              "n": 5,
+              "median": 699950,
+              "p75": 699949,
+              "min": 699949,
+              "max": 699951
+            },
+            "ssrWarmMs": {
+              "n": 5,
+              "median": 6.266249999998763,
+              "p75": 5.685665999999401,
+              "min": 5.685665999999401,
+              "max": 6.979541999999128
+            },
+            "ssrColdMs": 10.12604199999987
+          }
+        },
+        "interactions": {
+          "newsToggle": {
+            "commitMs": {
+              "n": 5,
+              "median": 67,
+              "p75": 60.600000001490116,
+              "min": 60.600000001490116,
+              "max": 68.30000000447035
+            },
+            "frameMs": {
+              "n": 5,
+              "median": 61.100000001490116,
+              "p75": 55.19999999552965,
+              "min": 55.19999999552965,
+              "max": 62.600000001490116
+            }
+          },
+          "dialogOpen": {
+            "commitMs": {
+              "n": 5,
+              "median": 25.399999998509884,
+              "p75": 18.100000001490116,
+              "min": 18.100000001490116,
+              "max": 25.700000002980232
+            },
+            "frameMs": {
+              "n": 5,
+              "median": 24.5,
+              "p75": 20.700000002980232,
+              "min": 20.700000002980232,
+              "max": 24.80000000447035
+            }
+          },
+          "categorySwitch": {
+            "commitMs": {
+              "n": 5,
+              "median": 45.29999999701977,
+              "p75": 42.899999998509884,
+              "min": 42.899999998509884,
+              "max": 56.30000000447035
+            },
+            "frameMs": {
+              "n": 5,
+              "median": 41,
+              "p75": 37.79999999701977,
+              "min": 37.79999999701977,
+              "max": 53.5
+            }
+          },
+          "catalogExpand": {
+            "commitMs": {
+              "n": 5,
+              "median": 28.299999997019768,
+              "p75": 22,
+              "min": 22,
+              "max": 28.899999998509884
+            },
+            "frameMs": {
+              "n": 5,
+              "median": 25.5,
+              "p75": 25,
+              "min": 25,
+              "max": 26.5
+            }
+          },
+          "lightboxOpen": {
+            "commitMs": {
+              "n": 5,
+              "median": 31.5,
+              "p75": 30.299999997019768,
+              "min": 30.299999997019768,
+              "max": 40.70000000298023
+            },
+            "frameMs": {
+              "n": 5,
+              "median": 27.19999999552965,
+              "p75": 25.399999998509884,
+              "min": 25.399999998509884,
+              "max": 34.899999998509884
+            }
+          }
+        },
+        "memory": {
+          "homeInitHeapBytes": {
+            "n": 5,
+            "median": 5765480,
+            "p75": 5755820,
+            "min": 5755820,
+            "max": 5771136
+          },
+          "productsInitHeapBytes": {
+            "n": 5,
+            "median": 5166828,
+            "p75": 5160588,
+            "min": 5160588,
+            "max": 5179116
+          },
+          "aboutInitHeapBytes": {
+            "n": 5,
+            "median": 5499024,
+            "p75": 5485324,
+            "min": 5485324,
+            "max": 5499992
+          },
+          "stressPeakHeapBytes": {
+            "n": 5,
+            "median": 12601444,
+            "p75": 12587184,
+            "min": 12587184,
+            "max": 12672584
+          },
+          "stressSettledHeapBytes": {
+            "n": 5,
+            "median": 9036068,
+            "p75": 9035424,
+            "min": 9035424,
+            "max": 9039508
+          },
+          "stressRetentionDeltaBytes": {
+            "n": 5,
+            "median": 3269944,
+            "p75": 3267060,
+            "min": 3267060,
+            "max": 3280248
+          },
+          "initNodes": {
+            "n": 5,
+            "median": 1038,
+            "p75": 1038,
+            "min": 1038,
+            "max": 1039
+          },
+          "afterNodes": {
+            "n": 5,
+            "median": 1044,
+            "p75": 1044,
+            "min": 1044,
+            "max": 1044
+          },
+          "nodesDelta": {
+            "n": 5,
+            "median": 6,
+            "p75": 5,
+            "min": 5,
+            "max": 6
+          },
+          "initListeners": {
+            "n": 5,
+            "median": 268,
+            "p75": 268,
+            "min": 268,
+            "max": 268
+          },
+          "afterListeners": {
+            "n": 5,
+            "median": 277,
+            "p75": 277,
+            "min": 277,
+            "max": 277
+          },
+          "listenersDelta": {
+            "n": 5,
+            "median": 9,
+            "p75": 9,
+            "min": 9,
+            "max": 9
+          }
+        },
+        "totalErrors": {
+          "pageErrors": 0,
+          "consoleErrors": 0,
+          "http5xx": 0
+        },
+        "allAssertionsPassed": true
+      },
+      "rounds": [
+        {
+          "round": 1,
+          "cold": {
+            "home": {
+              "route": "home",
+              "ttfbMs": 150.09999999403954,
+              "fcpMs": 1712,
+              "lcpMs": 1712,
+              "cls": 0,
+              "tbtMs": 26,
+              "reqBeforeLcp": 6,
+              "wire": {
+                "htmlBr": 13768,
+                "cssBr": 113312,
+                "jsBr": 311764,
+                "otherBr": 23991,
+                "totalBr": 462835,
+                "reqTotal": 82
+              },
+              "errors": {
+                "pageErrors": [],
+                "consoleErrors": [],
+                "http5xx": []
+              }
+            },
+            "products": {
+              "route": "products",
+              "ttfbMs": 150.10000000149012,
+              "fcpMs": 2476,
+              "lcpMs": 2476,
+              "cls": 0,
+              "tbtMs": 25,
+              "reqBeforeLcp": 6,
+              "wire": {
+                "htmlBr": 18777,
+                "cssBr": 113312,
+                "jsBr": 325331,
+                "otherBr": 360110,
+                "totalBr": 817530,
+                "reqTotal": 82
+              },
+              "errors": {
+                "pageErrors": [],
+                "consoleErrors": [],
+                "http5xx": []
+              }
+            },
+            "about": {
+              "route": "about",
+              "ttfbMs": 150,
+              "fcpMs": 2180,
+              "lcpMs": 3072,
+              "cls": 0,
+              "tbtMs": 25,
+              "reqBeforeLcp": 12,
+              "wire": {
+                "htmlBr": 17063,
+                "cssBr": 113312,
+                "jsBr": 318336,
+                "otherBr": 251239,
+                "totalBr": 699950,
+                "reqTotal": 83
+              },
+              "errors": {
+                "pageErrors": [],
+                "consoleErrors": [],
+                "http5xx": []
+              }
+            }
+          },
+          "interactive": {
+            "timings": {
+              "newsToggle": {
+                "commitMs": 68.30000000447035,
+                "frameMs": 62.600000001490116
+              },
+              "dialogOpen": {
+                "commitMs": 23.69999999552965,
+                "frameMs": 22.899999998509884
+              },
+              "categorySwitch": {
+                "commitMs": 42.899999998509884,
+                "frameMs": 39.899999998509884
+              },
+              "catalogExpand": {
+                "commitMs": 27.399999998509884,
+                "frameMs": 25
+              },
+              "lightboxOpen": {
+                "commitMs": 31.5,
+                "frameMs": 27.19999999552965
+              }
+            },
+            "assertions": {
+              "newsExpanded": true,
+              "selectSwitched": true,
+              "catPressed": true,
+              "catalogExpanded": true,
+              "areaPressed": true,
+              "tabArrowDown": true,
+              "lightboxClosed": true
+            },
+            "errors": {
+              "pageErrors": [],
+              "consoleErrors": [],
+              "http5xx": []
+            }
+          },
+          "memory": {
+            "home": {
+              "heapBytes": 5764032,
+              "nodes": 1038,
+              "listeners": 268
+            },
+            "stress": {
+              "initHeapBytes": 5764032,
+              "peakHeapBytes": 12587184,
+              "settledHeapBytes": 9039508,
+              "retentionDeltaBytes": 3275476,
+              "initNodes": 1038,
+              "afterNodes": 1044,
+              "nodesDelta": 6,
+              "initListeners": 268,
+              "afterListeners": 277,
+              "listenersDelta": 9
+            },
+            "products": {
+              "heapBytes": 5163616,
+              "nodes": 1496,
+              "listeners": 301
+            },
+            "about": {
+              "heapBytes": 5499024,
+              "nodes": 905,
+              "listeners": 369
+            }
+          }
+        },
+        {
+          "round": 2,
+          "cold": {
+            "home": {
+              "route": "home",
+              "ttfbMs": 150,
+              "fcpMs": 1712,
+              "lcpMs": 1712,
+              "cls": 0,
+              "tbtMs": 24,
+              "reqBeforeLcp": 6,
+              "wire": {
+                "htmlBr": 13768,
+                "cssBr": 113312,
+                "jsBr": 311764,
+                "otherBr": 23991,
+                "totalBr": 462835,
+                "reqTotal": 82
+              },
+              "errors": {
+                "pageErrors": [],
+                "consoleErrors": [],
+                "http5xx": []
+              }
+            },
+            "products": {
+              "route": "products",
+              "ttfbMs": 150.10000000149012,
+              "fcpMs": 2468,
+              "lcpMs": 2468,
+              "cls": 0,
+              "tbtMs": 24,
+              "reqBeforeLcp": 6,
+              "wire": {
+                "htmlBr": 18777,
+                "cssBr": 113312,
+                "jsBr": 325331,
+                "otherBr": 360110,
+                "totalBr": 817530,
+                "reqTotal": 82
+              },
+              "errors": {
+                "pageErrors": [],
+                "consoleErrors": [],
+                "http5xx": []
+              }
+            },
+            "about": {
+              "route": "about",
+              "ttfbMs": 150.10000000149012,
+              "fcpMs": 2180,
+              "lcpMs": 3068,
+              "cls": 0,
+              "tbtMs": 28,
+              "reqBeforeLcp": 12,
+              "wire": {
+                "htmlBr": 17064,
+                "cssBr": 113312,
+                "jsBr": 318336,
+                "otherBr": 251239,
+                "totalBr": 699951,
+                "reqTotal": 83
+              },
+              "errors": {
+                "pageErrors": [],
+                "consoleErrors": [],
+                "http5xx": []
+              }
+            }
+          },
+          "interactive": {
+            "timings": {
+              "newsToggle": {
+                "commitMs": 67,
+                "frameMs": 61
+              },
+              "dialogOpen": {
+                "commitMs": 25.399999998509884,
+                "frameMs": 24.799999997019768
+              },
+              "categorySwitch": {
+                "commitMs": 46.70000000298023,
+                "frameMs": 42.70000000298023
+              },
+              "catalogExpand": {
+                "commitMs": 28.5,
+                "frameMs": 25.5
+              },
+              "lightboxOpen": {
+                "commitMs": 39.399999998509884,
+                "frameMs": 34.899999998509884
+              }
+            },
+            "assertions": {
+              "newsExpanded": true,
+              "selectSwitched": true,
+              "catPressed": true,
+              "catalogExpanded": true,
+              "areaPressed": true,
+              "tabArrowDown": true,
+              "lightboxClosed": true
+            },
+            "errors": {
+              "pageErrors": [],
+              "consoleErrors": [],
+              "http5xx": []
+            }
+          },
+          "memory": {
+            "home": {
+              "heapBytes": 5771136,
+              "nodes": 1039,
+              "listeners": 268
+            },
+            "stress": {
+              "initHeapBytes": 5771136,
+              "peakHeapBytes": 12672584,
+              "settledHeapBytes": 9038196,
+              "retentionDeltaBytes": 3267060,
+              "initNodes": 1039,
+              "afterNodes": 1044,
+              "nodesDelta": 5,
+              "initListeners": 268,
+              "afterListeners": 277,
+              "listenersDelta": 9
+            },
+            "products": {
+              "heapBytes": 5178948,
+              "nodes": 1496,
+              "listeners": 301
+            },
+            "about": {
+              "heapBytes": 5485324,
+              "nodes": 905,
+              "listeners": 369
+            }
+          }
+        },
+        {
+          "round": 3,
+          "cold": {
+            "home": {
+              "route": "home",
+              "ttfbMs": 150.19999999552965,
+              "fcpMs": 1728,
+              "lcpMs": 1728,
+              "cls": 0,
+              "tbtMs": 31,
+              "reqBeforeLcp": 6,
+              "wire": {
+                "htmlBr": 13768,
+                "cssBr": 113312,
+                "jsBr": 311764,
+                "otherBr": 23991,
+                "totalBr": 462835,
+                "reqTotal": 82
+              },
+              "errors": {
+                "pageErrors": [],
+                "consoleErrors": [],
+                "http5xx": []
+              }
+            },
+            "products": {
+              "route": "products",
+              "ttfbMs": 150.10000000149012,
+              "fcpMs": 2520,
+              "lcpMs": 2520,
+              "cls": 0,
+              "tbtMs": 36,
+              "reqBeforeLcp": 6,
+              "wire": {
+                "htmlBr": 18777,
+                "cssBr": 113312,
+                "jsBr": 325331,
+                "otherBr": 360110,
+                "totalBr": 817530,
+                "reqTotal": 82
+              },
+              "errors": {
+                "pageErrors": [],
+                "consoleErrors": [],
+                "http5xx": []
+              }
+            },
+            "about": {
+              "route": "about",
+              "ttfbMs": 150.69999999552965,
+              "fcpMs": 2208,
+              "lcpMs": 3024,
+              "cls": 0,
+              "tbtMs": 28,
+              "reqBeforeLcp": 10,
+              "wire": {
+                "htmlBr": 17063,
+                "cssBr": 113312,
+                "jsBr": 318336,
+                "otherBr": 251239,
+                "totalBr": 699950,
+                "reqTotal": 83
+              },
+              "errors": {
+                "pageErrors": [],
+                "consoleErrors": [],
+                "http5xx": []
+              }
+            }
+          },
+          "interactive": {
+            "timings": {
+              "newsToggle": {
+                "commitMs": 67.69999999552965,
+                "frameMs": 61.79999999701977
+              },
+              "dialogOpen": {
+                "commitMs": 25.700000002980232,
+                "frameMs": 24.80000000447035
+              },
+              "categorySwitch": {
+                "commitMs": 56.30000000447035,
+                "frameMs": 53.5
+              },
+              "catalogExpand": {
+                "commitMs": 28.899999998509884,
+                "frameMs": 25.200000002980232
+              },
+              "lightboxOpen": {
+                "commitMs": 40.70000000298023,
+                "frameMs": 32.70000000298023
+              }
+            },
+            "assertions": {
+              "newsExpanded": true,
+              "selectSwitched": true,
+              "catPressed": true,
+              "catalogExpanded": true,
+              "areaPressed": true,
+              "tabArrowDown": true,
+              "lightboxClosed": true
+            },
+            "errors": {
+              "pageErrors": [],
+              "consoleErrors": [],
+              "http5xx": []
+            }
+          },
+          "memory": {
+            "home": {
+              "heapBytes": 5766052,
+              "nodes": 1038,
+              "listeners": 268
+            },
+            "stress": {
+              "initHeapBytes": 5766052,
+              "peakHeapBytes": 12622220,
+              "settledHeapBytes": 9035992,
+              "retentionDeltaBytes": 3269940,
+              "initNodes": 1038,
+              "afterNodes": 1044,
+              "nodesDelta": 6,
+              "initListeners": 268,
+              "afterListeners": 277,
+              "listenersDelta": 9
+            },
+            "products": {
+              "heapBytes": 5179116,
+              "nodes": 1496,
+              "listeners": 301
+            },
+            "about": {
+              "heapBytes": 5499124,
+              "nodes": 905,
+              "listeners": 369
+            }
+          }
+        },
+        {
+          "round": 4,
+          "cold": {
+            "home": {
+              "route": "home",
+              "ttfbMs": 150.10000000149012,
+              "fcpMs": 1728,
+              "lcpMs": 1728,
+              "cls": 0,
+              "tbtMs": 33,
+              "reqBeforeLcp": 6,
+              "wire": {
+                "htmlBr": 13768,
+                "cssBr": 113312,
+                "jsBr": 311764,
+                "otherBr": 23991,
+                "totalBr": 462835,
+                "reqTotal": 82
+              },
+              "errors": {
+                "pageErrors": [],
+                "consoleErrors": [],
+                "http5xx": []
+              }
+            },
+            "products": {
+              "route": "products",
+              "ttfbMs": 150.09999999403954,
+              "fcpMs": 2468,
+              "lcpMs": 2468,
+              "cls": 0,
+              "tbtMs": 24,
+              "reqBeforeLcp": 6,
+              "wire": {
+                "htmlBr": 18777,
+                "cssBr": 113312,
+                "jsBr": 325797,
+                "otherBr": 360110,
+                "totalBr": 817996,
+                "reqTotal": 82
+              },
+              "errors": {
+                "pageErrors": [],
+                "consoleErrors": [],
+                "http5xx": []
+              }
+            },
+            "about": {
+              "route": "about",
+              "ttfbMs": 150.19999999552965,
+              "fcpMs": 2176,
+              "lcpMs": 3100,
+              "cls": 0,
+              "tbtMs": 23,
+              "reqBeforeLcp": 12,
+              "wire": {
+                "htmlBr": 17062,
+                "cssBr": 113312,
+                "jsBr": 318336,
+                "otherBr": 251239,
+                "totalBr": 699949,
+                "reqTotal": 83
+              },
+              "errors": {
+                "pageErrors": [],
+                "consoleErrors": [],
+                "http5xx": []
+              }
+            }
+          },
+          "interactive": {
+            "timings": {
+              "newsToggle": {
+                "commitMs": 66.5,
+                "frameMs": 61.100000001490116
+              },
+              "dialogOpen": {
+                "commitMs": 25.700000002980232,
+                "frameMs": 24.5
+              },
+              "categorySwitch": {
+                "commitMs": 45.29999999701977,
+                "frameMs": 37.79999999701977
+              },
+              "catalogExpand": {
+                "commitMs": 22,
+                "frameMs": 26.5
+              },
+              "lightboxOpen": {
+                "commitMs": 31,
+                "frameMs": 26.899999998509884
+              }
+            },
+            "assertions": {
+              "newsExpanded": true,
+              "selectSwitched": true,
+              "catPressed": true,
+              "catalogExpanded": true,
+              "areaPressed": true,
+              "tabArrowDown": true,
+              "lightboxClosed": true
+            },
+            "errors": {
+              "pageErrors": [],
+              "consoleErrors": [],
+              "http5xx": []
+            }
+          },
+          "memory": {
+            "home": {
+              "heapBytes": 5755820,
+              "nodes": 1038,
+              "listeners": 268
+            },
+            "stress": {
+              "initHeapBytes": 5755820,
+              "peakHeapBytes": 12601444,
+              "settledHeapBytes": 9036068,
+              "retentionDeltaBytes": 3280248,
+              "initNodes": 1038,
+              "afterNodes": 1044,
+              "nodesDelta": 6,
+              "initListeners": 268,
+              "afterListeners": 277,
+              "listenersDelta": 9
+            },
+            "products": {
+              "heapBytes": 5160588,
+              "nodes": 1496,
+              "listeners": 301
+            },
+            "about": {
+              "heapBytes": 5495320,
+              "nodes": 905,
+              "listeners": 369
+            }
+          }
+        },
+        {
+          "round": 5,
+          "cold": {
+            "home": {
+              "route": "home",
+              "ttfbMs": 150.09999999403954,
+              "fcpMs": 1732,
+              "lcpMs": 1732,
+              "cls": 0,
+              "tbtMs": 33,
+              "reqBeforeLcp": 6,
+              "wire": {
+                "htmlBr": 13768,
+                "cssBr": 113312,
+                "jsBr": 313347,
+                "otherBr": 23991,
+                "totalBr": 464418,
+                "reqTotal": 82
+              },
+              "errors": {
+                "pageErrors": [],
+                "consoleErrors": [],
+                "http5xx": []
+              }
+            },
+            "products": {
+              "route": "products",
+              "ttfbMs": 150,
+              "fcpMs": 2476,
+              "lcpMs": 2476,
+              "cls": 0,
+              "tbtMs": 26,
+              "reqBeforeLcp": 6,
+              "wire": {
+                "htmlBr": 18777,
+                "cssBr": 113312,
+                "jsBr": 331423,
+                "otherBr": 360110,
+                "totalBr": 823622,
+                "reqTotal": 82
+              },
+              "errors": {
+                "pageErrors": [],
+                "consoleErrors": [],
+                "http5xx": []
+              }
+            },
+            "about": {
+              "route": "about",
+              "ttfbMs": 150.09999999403954,
+              "fcpMs": 2196,
+              "lcpMs": 3052,
+              "cls": 0,
+              "tbtMs": 31,
+              "reqBeforeLcp": 11,
+              "wire": {
+                "htmlBr": 17063,
+                "cssBr": 113312,
+                "jsBr": 318336,
+                "otherBr": 251239,
+                "totalBr": 699950,
+                "reqTotal": 83
+              },
+              "errors": {
+                "pageErrors": [],
+                "consoleErrors": [],
+                "http5xx": []
+              }
+            }
+          },
+          "interactive": {
+            "timings": {
+              "newsToggle": {
+                "commitMs": 60.600000001490116,
+                "frameMs": 55.19999999552965
+              },
+              "dialogOpen": {
+                "commitMs": 18.100000001490116,
+                "frameMs": 20.700000002980232
+              },
+              "categorySwitch": {
+                "commitMs": 45.100000001490116,
+                "frameMs": 41
+              },
+              "catalogExpand": {
+                "commitMs": 28.299999997019768,
+                "frameMs": 25.799999997019768
+              },
+              "lightboxOpen": {
+                "commitMs": 30.299999997019768,
+                "frameMs": 25.399999998509884
+              }
+            },
+            "assertions": {
+              "newsExpanded": true,
+              "selectSwitched": true,
+              "catPressed": true,
+              "catalogExpanded": true,
+              "areaPressed": true,
+              "tabArrowDown": true,
+              "lightboxClosed": true
+            },
+            "errors": {
+              "pageErrors": [],
+              "consoleErrors": [],
+              "http5xx": []
+            }
+          },
+          "memory": {
+            "home": {
+              "heapBytes": 5765480,
+              "nodes": 1038,
+              "listeners": 268
+            },
+            "stress": {
+              "initHeapBytes": 5765480,
+              "peakHeapBytes": 12598272,
+              "settledHeapBytes": 9035424,
+              "retentionDeltaBytes": 3269944,
+              "initNodes": 1038,
+              "afterNodes": 1044,
+              "nodesDelta": 6,
+              "initListeners": 268,
+              "afterListeners": 277,
+              "listenersDelta": 9
+            },
+            "products": {
+              "heapBytes": 5166828,
+              "nodes": 1496,
+              "listeners": 301
+            },
+            "about": {
+              "heapBytes": 5499992,
+              "nodes": 905,
+              "listeners": 369
+            }
+          }
+        }
+      ]
+    },
+    "solid-uisdk": {
+      "dist": {
+        "client": {
+          "dir": "/Users/martinfan/devv/fenchem-lp.solid-uisdk/apps/web/dist/client",
+          "buckets": {
+            "css": {
+              "raw": 639509,
+              "gzip": 128943,
+              "count": 1
+            },
+            "js": {
+              "raw": 4067918,
+              "gzip": 1378100,
+              "count": 182
+            },
+            "other": {
+              "raw": 13629695,
+              "gzip": 13416107,
+              "count": 67
+            }
+          },
+          "total": {
+            "raw": 18337122,
+            "gzip": 14923150,
+            "count": 250
+          }
+        },
+        "worker": {
+          "entryRaw": 443221,
+          "entryGzip": 93210,
+          "uploadRaw": 8575730,
+          "uploadGzip": 2124267,
+          "fileCount": 196,
+          "topAssets": [
+            {
+              "file": "assets/index-V4SIRysa.css",
+              "raw": 639509,
+              "gzip": 128943
+            },
+            {
+              "file": "assets/variant-oos1-BebB-DbG.js",
+              "raw": 396008,
+              "gzip": 98840
+            },
+            {
+              "file": "index.js",
+              "raw": 443221,
+              "gzip": 93210
+            },
+            {
+              "file": "assets/variant-j-buaOAL0j.js",
+              "raw": 346298,
+              "gzip": 89382
+            },
+            {
+              "file": "assets/server-Dv1GpcwV.js",
+              "raw": 299405,
+              "gzip": 82538
+            },
+            {
+              "file": "assets/motion-Casszm2O.js",
+              "raw": 215901,
+              "gzip": 57594
+            }
+          ]
+        }
+      },
+      "ssr": {
+        "cold": {
+          "home": 15.723958000000493,
+          "products": 15.022915999999896,
+          "about": 13.190042000000176
+        },
+        "warm": {
+          "home": {
+            "n": 5,
+            "median": 9.952166000000943,
+            "p75": 9.219083000001774,
+            "min": 9.219083000001774,
+            "max": 13.43791599999895
+          },
+          "products": {
+            "n": 5,
+            "median": 9.934417000000394,
+            "p75": 9.293416000000434,
+            "min": 9.293416000000434,
+            "max": 13.021334000000934
+          },
+          "about": {
+            "n": 5,
+            "median": 9.392750000000888,
+            "p75": 8.315542000000278,
+            "min": 8.315542000000278,
+            "max": 20.702667000001384
+          }
+        }
+      },
+      "limiter": {
+        "loadMetrics": {
+          "jsHeapUsedBytes": 7622824,
+          "jsHeapTotalBytes": 11616256,
+          "nodes": 1152,
+          "listeners": 126,
+          "scriptDurationS": 0.079708,
+          "layoutDurationS": 0.090857,
+          "recalcStyleDurationS": 0.047074,
+          "taskDurationS": 0.579709
+        },
+        "settled": {
+          "jsHeapUsedBytes": 6230992,
+          "jsHeapTotalBytes": 6635520,
+          "nodes": 1136,
+          "listeners": 118,
+          "scriptDurationS": 0.079708,
+          "layoutDurationS": 0.090857,
+          "recalcStyleDurationS": 0.047074,
+          "taskDurationS": 0.629804
+        },
+        "topAssetsBr": [
+          {
+            "url": "/assets/index-V4SIRysa.css",
+            "type": "Stylesheet",
+            "brBytes": 122789
+          },
+          {
+            "url": "/assets/variant-oos1-BruyBQks.js",
+            "type": "Script",
+            "brBytes": 63179
+          },
+          {
+            "url": "/assets/web-BY0zij-v.js",
+            "type": "Script",
+            "brBytes": 44151
+          },
+          {
+            "url": "/assets/index-D9s8wGjv.js",
+            "type": "Script",
+            "brBytes": 33195
+          },
+          {
+            "url": "/assets/motion-dT7ZpS8G.js",
+            "type": "Script",
+            "brBytes": 25325
+          },
+          {
+            "url": "/prototype/official-site/hero-background.webp",
+            "type": "Image",
+            "brBytes": 23973
+          },
+          {
+            "url": "/assets/worst-case-data-D3BpjItq.js",
+            "type": "Script",
+            "brBytes": 17275
+          },
+          {
+            "url": "/assets/products-view-BbPsnuBt.js",
+            "type": "Script",
+            "brBytes": 16605
+          }
+        ]
+      },
+      "summary": {
+        "byRoute": {
+          "home": {
+            "ttfbMs": {
+              "n": 5,
+              "median": 150.20000000298023,
+              "p75": 150,
+              "min": 150,
+              "max": 150.20000000298023
+            },
+            "fcpMs": {
+              "n": 5,
+              "median": 2416,
+              "p75": 2408,
+              "min": 2408,
+              "max": 2432
+            },
+            "lcpMs": {
+              "n": 5,
+              "median": 2416,
+              "p75": 2408,
+              "min": 2408,
+              "max": 2432
+            },
+            "cls": {
+              "n": 5,
+              "median": 0,
+              "p75": 0,
+              "min": 0,
+              "max": 0
+            },
+            "tbtMs": {
+              "n": 5,
+              "median": 63,
+              "p75": 56,
+              "min": 56,
+              "max": 83
+            },
+            "reqBeforeLcp": {
+              "n": 5,
+              "median": 40,
+              "p75": 40,
+              "min": 40,
+              "max": 40
+            },
+            "reqTotal": {
+              "n": 5,
+              "median": 60,
+              "p75": 60,
+              "min": 60,
+              "max": 60
+            },
+            "htmlBr": {
+              "n": 5,
+              "median": 16141,
+              "p75": 16141,
+              "min": 16141,
+              "max": 16141
+            },
+            "cssBr": {
+              "n": 5,
+              "median": 122789,
+              "p75": 122789,
+              "min": 122789,
+              "max": 122789
+            },
+            "jsBr": {
+              "n": 5,
+              "median": 351646,
+              "p75": 351646,
+              "min": 351646,
+              "max": 351646
+            },
+            "totalBr": {
+              "n": 5,
+              "median": 514549,
+              "p75": 514549,
+              "min": 514549,
+              "max": 514549
+            },
+            "ssrWarmMs": {
+              "n": 5,
+              "median": 9.952166000000943,
+              "p75": 9.219083000001774,
+              "min": 9.219083000001774,
+              "max": 13.43791599999895
+            },
+            "ssrColdMs": 15.723958000000493
+          },
+          "products": {
+            "ttfbMs": {
+              "n": 5,
+              "median": 150.10000000149012,
+              "p75": 150,
+              "min": 150,
+              "max": 150.20000000298023
+            },
+            "fcpMs": {
+              "n": 5,
+              "median": 3464,
+              "p75": 3456,
+              "min": 3456,
+              "max": 3480
+            },
+            "lcpMs": {
+              "n": 5,
+              "median": 28940,
+              "p75": 28936,
+              "min": 28936,
+              "max": 28940
+            },
+            "cls": {
+              "n": 5,
+              "median": 0,
+              "p75": 0,
+              "min": 0,
+              "max": 0
+            },
+            "tbtMs": {
+              "n": 5,
+              "median": 107,
+              "p75": 87,
+              "min": 87,
+              "max": 146
+            },
+            "reqBeforeLcp": {
+              "n": 5,
+              "median": 65,
+              "p75": 65,
+              "min": 65,
+              "max": 65
+            },
+            "reqTotal": {
+              "n": 5,
+              "median": 65,
+              "p75": 65,
+              "min": 65,
+              "max": 65
+            },
+            "htmlBr": {
+              "n": 5,
+              "median": 16133,
+              "p75": 16132,
+              "min": 16132,
+              "max": 16133
+            },
+            "cssBr": {
+              "n": 5,
+              "median": 122789,
+              "p75": 122789,
+              "min": 122789,
+              "max": 122789
+            },
+            "jsBr": {
+              "n": 5,
+              "median": 351646,
+              "p75": 351646,
+              "min": 351646,
+              "max": 351646
+            },
+            "totalBr": {
+              "n": 5,
+              "median": 5963530,
+              "p75": 5963529,
+              "min": 5963529,
+              "max": 5963530
+            },
+            "ssrWarmMs": {
+              "n": 5,
+              "median": 9.934417000000394,
+              "p75": 9.293416000000434,
+              "min": 9.293416000000434,
+              "max": 13.021334000000934
+            },
+            "ssrColdMs": 15.022915999999896
+          },
+          "about": {
+            "ttfbMs": {
+              "n": 5,
+              "median": 150.10000000149012,
+              "p75": 150.10000000149012,
+              "min": 150.10000000149012,
+              "max": 150.19999999552965
+            },
+            "fcpMs": {
+              "n": 5,
+              "median": 2796,
+              "p75": 2768,
+              "min": 2768,
+              "max": 2820
+            },
+            "lcpMs": {
+              "n": 5,
+              "median": 4208,
+              "p75": 4152,
+              "min": 4152,
+              "max": 4220
+            },
+            "cls": {
+              "n": 5,
+              "median": 0,
+              "p75": 0,
+              "min": 0,
+              "max": 0
+            },
+            "tbtMs": {
+              "n": 5,
+              "median": 57,
+              "p75": 47,
+              "min": 47,
+              "max": 61
+            },
+            "reqBeforeLcp": {
+              "n": 5,
+              "median": 60,
+              "p75": 60,
+              "min": 60,
+              "max": 60
+            },
+            "reqTotal": {
+              "n": 5,
+              "median": 61,
+              "p75": 61,
+              "min": 61,
+              "max": 61
+            },
+            "htmlBr": {
+              "n": 5,
+              "median": 18151,
+              "p75": 18151,
+              "min": 18151,
+              "max": 18151
+            },
+            "cssBr": {
+              "n": 5,
+              "median": 122789,
+              "p75": 122789,
+              "min": 122789,
+              "max": 122789
+            },
+            "jsBr": {
+              "n": 5,
+              "median": 351646,
+              "p75": 351646,
+              "min": 351646,
+              "max": 351646
+            },
+            "totalBr": {
+              "n": 5,
+              "median": 816376,
+              "p75": 816376,
+              "min": 816376,
+              "max": 816376
+            },
+            "ssrWarmMs": {
+              "n": 5,
+              "median": 9.392750000000888,
+              "p75": 8.315542000000278,
+              "min": 8.315542000000278,
+              "max": 20.702667000001384
+            },
+            "ssrColdMs": 13.190042000000176
+          }
+        },
+        "interactions": {
+          "newsToggle": {
+            "commitMs": {
+              "n": 5,
+              "median": 75.39999999850988,
+              "p75": 67.39999999850988,
+              "min": 67.39999999850988,
+              "max": 83.20000000298023
+            },
+            "frameMs": {
+              "n": 5,
+              "median": 71.20000000298023,
+              "p75": 63.5,
+              "min": 63.5,
+              "max": 79.40000000596046
+            }
+          },
+          "dialogOpen": {
+            "commitMs": {
+              "n": 5,
+              "median": 106,
+              "p75": 100.29999999701977,
+              "min": 100.29999999701977,
+              "max": 115.30000000447035
+            },
+            "frameMs": {
+              "n": 5,
+              "median": 112.70000000298023,
+              "p75": 98,
+              "min": 98,
+              "max": 121.39999999850988
+            }
+          },
+          "categorySwitch": {
+            "commitMs": {
+              "n": 5,
+              "median": 8.399999998509884,
+              "p75": 8,
+              "min": 8,
+              "max": 10.300000004470348
+            },
+            "frameMs": {
+              "n": 5,
+              "median": 21.200000002980232,
+              "p75": 18.600000001490116,
+              "min": 18.600000001490116,
+              "max": 22.299999997019768
+            }
+          },
+          "catalogExpand": {
+            "commitMs": {
+              "n": 5,
+              "median": 24,
+              "p75": 20.80000000447035,
+              "min": 20.80000000447035,
+              "max": 27.600000001490116
+            },
+            "frameMs": {
+              "n": 5,
+              "median": 23.899999998509884,
+              "p75": 23.200000002980232,
+              "min": 23.200000002980232,
+              "max": 25.899999998509884
+            }
+          },
+          "lightboxOpen": {
+            "commitMs": {
+              "n": 5,
+              "median": 24.899999998509884,
+              "p75": 18.19999999552965,
+              "min": 18.19999999552965,
+              "max": 27.899999998509884
+            },
+            "frameMs": {
+              "n": 5,
+              "median": 25.799999997019768,
+              "p75": 22.899999998509884,
+              "min": 22.899999998509884,
+              "max": 36.80000000447035
+            }
+          }
+        },
+        "memory": {
+          "homeInitHeapBytes": {
+            "n": 5,
+            "median": 5951620,
+            "p75": 5948328,
+            "min": 5948328,
+            "max": 5970052
+          },
+          "productsInitHeapBytes": {
+            "n": 5,
+            "median": 6330952,
+            "p75": 6329788,
+            "min": 6329788,
+            "max": 6394568
+          },
+          "aboutInitHeapBytes": {
+            "n": 5,
+            "median": 5603768,
+            "p75": 5603608,
+            "min": 5603608,
+            "max": 5608528
+          },
+          "stressPeakHeapBytes": {
+            "n": 5,
+            "median": 12292672,
+            "p75": 12275796,
+            "min": 12275796,
+            "max": 12331496
+          },
+          "stressSettledHeapBytes": {
+            "n": 5,
+            "median": 9128644,
+            "p75": 9123184,
+            "min": 9123184,
+            "max": 9132360
+          },
+          "stressRetentionDeltaBytes": {
+            "n": 5,
+            "median": 3178392,
+            "p75": 3158592,
+            "min": 3158592,
+            "max": 3184032
+          },
+          "initNodes": {
+            "n": 5,
+            "median": 1135,
+            "p75": 1135,
+            "min": 1135,
+            "max": 1136
+          },
+          "afterNodes": {
+            "n": 5,
+            "median": 1274,
+            "p75": 1274,
+            "min": 1274,
+            "max": 1274
+          },
+          "nodesDelta": {
+            "n": 5,
+            "median": 139,
+            "p75": 138,
+            "min": 138,
+            "max": 139
+          },
+          "initListeners": {
+            "n": 5,
+            "median": 118,
+            "p75": 118,
+            "min": 118,
+            "max": 118
+          },
+          "afterListeners": {
+            "n": 5,
+            "median": 131,
+            "p75": 131,
+            "min": 131,
+            "max": 131
+          },
+          "listenersDelta": {
+            "n": 5,
+            "median": 13,
+            "p75": 13,
+            "min": 13,
+            "max": 13
+          }
+        },
+        "totalErrors": {
+          "pageErrors": 0,
+          "consoleErrors": 0,
+          "http5xx": 0
+        },
+        "allAssertionsPassed": true
+      },
+      "rounds": [
+        {
+          "round": 1,
+          "cold": {
+            "home": {
+              "route": "home",
+              "ttfbMs": 150,
+              "fcpMs": 2408,
+              "lcpMs": 2408,
+              "cls": 0,
+              "tbtMs": 63,
+              "reqBeforeLcp": 40,
+              "wire": {
+                "htmlBr": 16141,
+                "cssBr": 122789,
+                "jsBr": 351646,
+                "otherBr": 23973,
+                "totalBr": 514549,
+                "reqTotal": 60
+              },
+              "errors": {
+                "pageErrors": [],
+                "consoleErrors": [],
+                "http5xx": []
+              }
+            },
+            "products": {
+              "route": "products",
+              "ttfbMs": 150.20000000298023,
+              "fcpMs": 3456,
+              "lcpMs": 28936,
+              "cls": 0,
+              "tbtMs": 116,
+              "reqBeforeLcp": 65,
+              "wire": {
+                "htmlBr": 16133,
+                "cssBr": 122789,
+                "jsBr": 351646,
+                "otherBr": 5472962,
+                "totalBr": 5963530,
+                "reqTotal": 65
+              },
+              "errors": {
+                "pageErrors": [],
+                "consoleErrors": [],
+                "http5xx": []
+              }
+            },
+            "about": {
+              "route": "about",
+              "ttfbMs": 150.19999999552965,
+              "fcpMs": 2816,
+              "lcpMs": 4220,
+              "cls": 0,
+              "tbtMs": 57,
+              "reqBeforeLcp": 60,
+              "wire": {
+                "htmlBr": 18151,
+                "cssBr": 122789,
+                "jsBr": 351646,
+                "otherBr": 323790,
+                "totalBr": 816376,
+                "reqTotal": 61
+              },
+              "errors": {
+                "pageErrors": [],
+                "consoleErrors": [],
+                "http5xx": []
+              }
+            }
+          },
+          "interactive": {
+            "timings": {
+              "newsToggle": {
+                "commitMs": 67.39999999850988,
+                "frameMs": 63.5
+              },
+              "dialogOpen": {
+                "commitMs": 106,
+                "frameMs": 110.89999999850988
+              },
+              "categorySwitch": {
+                "commitMs": 8,
+                "frameMs": 22.299999997019768
+              },
+              "catalogExpand": {
+                "commitMs": 20.80000000447035,
+                "frameMs": 23.899999998509884
+              },
+              "lightboxOpen": {
+                "commitMs": 24.899999998509884,
+                "frameMs": 23.399999998509884
+              }
+            },
+            "assertions": {
+              "newsExpanded": true,
+              "selectSwitched": true,
+              "catPressed": true,
+              "catalogExpanded": true,
+              "areaPressed": true,
+              "tabArrowDown": true,
+              "lightboxClosed": true
+            },
+            "errors": {
+              "pageErrors": [],
+              "consoleErrors": [],
+              "http5xx": []
+            }
+          },
+          "memory": {
+            "home": {
+              "heapBytes": 5949304,
+              "nodes": 1135,
+              "listeners": 118
+            },
+            "stress": {
+              "initHeapBytes": 5949304,
+              "peakHeapBytes": 12283672,
+              "settledHeapBytes": 9127696,
+              "retentionDeltaBytes": 3178392,
+              "initNodes": 1135,
+              "afterNodes": 1274,
+              "nodesDelta": 139,
+              "initListeners": 118,
+              "afterListeners": 131,
+              "listenersDelta": 13
+            },
+            "products": {
+              "heapBytes": 6330952,
+              "nodes": 884,
+              "listeners": 134
+            },
+            "about": {
+              "heapBytes": 5603608,
+              "nodes": 1169,
+              "listeners": 87
+            }
+          }
+        },
+        {
+          "round": 2,
+          "cold": {
+            "home": {
+              "route": "home",
+              "ttfbMs": 150.20000000298023,
+              "fcpMs": 2416,
+              "lcpMs": 2416,
+              "cls": 0,
+              "tbtMs": 63,
+              "reqBeforeLcp": 40,
+              "wire": {
+                "htmlBr": 16141,
+                "cssBr": 122789,
+                "jsBr": 351646,
+                "otherBr": 23973,
+                "totalBr": 514549,
+                "reqTotal": 60
+              },
+              "errors": {
+                "pageErrors": [],
+                "consoleErrors": [],
+                "http5xx": []
+              }
+            },
+            "products": {
+              "route": "products",
+              "ttfbMs": 150,
+              "fcpMs": 3480,
+              "lcpMs": 28940,
+              "cls": 0,
+              "tbtMs": 99,
+              "reqBeforeLcp": 65,
+              "wire": {
+                "htmlBr": 16132,
+                "cssBr": 122789,
+                "jsBr": 351646,
+                "otherBr": 5472962,
+                "totalBr": 5963529,
+                "reqTotal": 65
+              },
+              "errors": {
+                "pageErrors": [],
+                "consoleErrors": [],
+                "http5xx": []
+              }
+            },
+            "about": {
+              "route": "about",
+              "ttfbMs": 150.10000000149012,
+              "fcpMs": 2772,
+              "lcpMs": 4176,
+              "cls": 0,
+              "tbtMs": 56,
+              "reqBeforeLcp": 60,
+              "wire": {
+                "htmlBr": 18151,
+                "cssBr": 122789,
+                "jsBr": 351646,
+                "otherBr": 323790,
+                "totalBr": 816376,
+                "reqTotal": 61
+              },
+              "errors": {
+                "pageErrors": [],
+                "consoleErrors": [],
+                "http5xx": []
+              }
+            }
+          },
+          "interactive": {
+            "timings": {
+              "newsToggle": {
+                "commitMs": 83.20000000298023,
+                "frameMs": 79.40000000596046
+              },
+              "dialogOpen": {
+                "commitMs": 115.30000000447035,
+                "frameMs": 121.39999999850988
+              },
+              "categorySwitch": {
+                "commitMs": 8.299999997019768,
+                "frameMs": 21.200000002980232
+              },
+              "catalogExpand": {
+                "commitMs": 22.30000000447035,
+                "frameMs": 23.5
+              },
+              "lightboxOpen": {
+                "commitMs": 25.299999997019768,
+                "frameMs": 22.899999998509884
+              }
+            },
+            "assertions": {
+              "newsExpanded": true,
+              "selectSwitched": true,
+              "catPressed": true,
+              "catalogExpanded": true,
+              "areaPressed": true,
+              "tabArrowDown": true,
+              "lightboxClosed": true
+            },
+            "errors": {
+              "pageErrors": [],
+              "consoleErrors": [],
+              "http5xx": []
+            }
+          },
+          "memory": {
+            "home": {
+              "heapBytes": 5970052,
+              "nodes": 1136,
+              "listeners": 118
+            },
+            "stress": {
+              "initHeapBytes": 5970052,
+              "peakHeapBytes": 12306252,
+              "settledHeapBytes": 9128644,
+              "retentionDeltaBytes": 3158592,
+              "initNodes": 1136,
+              "afterNodes": 1274,
+              "nodesDelta": 138,
+              "initListeners": 118,
+              "afterListeners": 131,
+              "listenersDelta": 13
+            },
+            "products": {
+              "heapBytes": 6394220,
+              "nodes": 884,
+              "listeners": 134
+            },
+            "about": {
+              "heapBytes": 5603700,
+              "nodes": 1169,
+              "listeners": 87
+            }
+          }
+        },
+        {
+          "round": 3,
+          "cold": {
+            "home": {
+              "route": "home",
+              "ttfbMs": 150.10000000149012,
+              "fcpMs": 2416,
+              "lcpMs": 2416,
+              "cls": 0,
+              "tbtMs": 56,
+              "reqBeforeLcp": 40,
+              "wire": {
+                "htmlBr": 16141,
+                "cssBr": 122789,
+                "jsBr": 351646,
+                "otherBr": 23973,
+                "totalBr": 514549,
+                "reqTotal": 60
+              },
+              "errors": {
+                "pageErrors": [],
+                "consoleErrors": [],
+                "http5xx": []
+              }
+            },
+            "products": {
+              "route": "products",
+              "ttfbMs": 150.10000000149012,
+              "fcpMs": 3464,
+              "lcpMs": 28940,
+              "cls": 0,
+              "tbtMs": 87,
+              "reqBeforeLcp": 65,
+              "wire": {
+                "htmlBr": 16133,
+                "cssBr": 122789,
+                "jsBr": 351646,
+                "otherBr": 5472962,
+                "totalBr": 5963530,
+                "reqTotal": 65
+              },
+              "errors": {
+                "pageErrors": [],
+                "consoleErrors": [],
+                "http5xx": []
+              }
+            },
+            "about": {
+              "route": "about",
+              "ttfbMs": 150.10000000149012,
+              "fcpMs": 2768,
+              "lcpMs": 4220,
+              "cls": 0,
+              "tbtMs": 59,
+              "reqBeforeLcp": 60,
+              "wire": {
+                "htmlBr": 18151,
+                "cssBr": 122789,
+                "jsBr": 351646,
+                "otherBr": 323790,
+                "totalBr": 816376,
+                "reqTotal": 61
+              },
+              "errors": {
+                "pageErrors": [],
+                "consoleErrors": [],
+                "http5xx": []
+              }
+            }
+          },
+          "interactive": {
+            "timings": {
+              "newsToggle": {
+                "commitMs": 80.10000000149012,
+                "frameMs": 76.20000000298023
+              },
+              "dialogOpen": {
+                "commitMs": 105.5,
+                "frameMs": 112.70000000298023
+              },
+              "categorySwitch": {
+                "commitMs": 8.399999998509884,
+                "frameMs": 21.799999997019768
+              },
+              "catalogExpand": {
+                "commitMs": 25.30000000447035,
+                "frameMs": 23.200000002980232
+              },
+              "lightboxOpen": {
+                "commitMs": 27.899999998509884,
+                "frameMs": 25.799999997019768
+              }
+            },
+            "assertions": {
+              "newsExpanded": true,
+              "selectSwitched": true,
+              "catPressed": true,
+              "catalogExpanded": true,
+              "areaPressed": true,
+              "tabArrowDown": true,
+              "lightboxClosed": true
+            },
+            "errors": {
+              "pageErrors": [],
+              "consoleErrors": [],
+              "http5xx": []
+            }
+          },
+          "memory": {
+            "home": {
+              "heapBytes": 5953520,
+              "nodes": 1135,
+              "listeners": 118
+            },
+            "stress": {
+              "initHeapBytes": 5953520,
+              "peakHeapBytes": 12275796,
+              "settledHeapBytes": 9123184,
+              "retentionDeltaBytes": 3169664,
+              "initNodes": 1135,
+              "afterNodes": 1274,
+              "nodesDelta": 139,
+              "initListeners": 118,
+              "afterListeners": 131,
+              "listenersDelta": 13
+            },
+            "products": {
+              "heapBytes": 6329932,
+              "nodes": 884,
+              "listeners": 134
+            },
+            "about": {
+              "heapBytes": 5603828,
+              "nodes": 1169,
+              "listeners": 87
+            }
+          }
+        },
+        {
+          "round": 4,
+          "cold": {
+            "home": {
+              "route": "home",
+              "ttfbMs": 150.20000000298023,
+              "fcpMs": 2432,
+              "lcpMs": 2432,
+              "cls": 0,
+              "tbtMs": 83,
+              "reqBeforeLcp": 40,
+              "wire": {
+                "htmlBr": 16141,
+                "cssBr": 122789,
+                "jsBr": 351646,
+                "otherBr": 23973,
+                "totalBr": 514549,
+                "reqTotal": 60
+              },
+              "errors": {
+                "pageErrors": [],
+                "consoleErrors": [],
+                "http5xx": []
+              }
+            },
+            "products": {
+              "route": "products",
+              "ttfbMs": 150.10000000149012,
+              "fcpMs": 3468,
+              "lcpMs": 28940,
+              "cls": 0,
+              "tbtMs": 107,
+              "reqBeforeLcp": 65,
+              "wire": {
+                "htmlBr": 16132,
+                "cssBr": 122789,
+                "jsBr": 351646,
+                "otherBr": 5472962,
+                "totalBr": 5963529,
+                "reqTotal": 65
+              },
+              "errors": {
+                "pageErrors": [],
+                "consoleErrors": [],
+                "http5xx": []
+              }
+            },
+            "about": {
+              "route": "about",
+              "ttfbMs": 150.10000000149012,
+              "fcpMs": 2796,
+              "lcpMs": 4208,
+              "cls": 0,
+              "tbtMs": 61,
+              "reqBeforeLcp": 60,
+              "wire": {
+                "htmlBr": 18151,
+                "cssBr": 122789,
+                "jsBr": 351646,
+                "otherBr": 323790,
+                "totalBr": 816376,
+                "reqTotal": 61
+              },
+              "errors": {
+                "pageErrors": [],
+                "consoleErrors": [],
+                "http5xx": []
+              }
+            }
+          },
+          "interactive": {
+            "timings": {
+              "newsToggle": {
+                "commitMs": 75.39999999850988,
+                "frameMs": 71.20000000298023
+              },
+              "dialogOpen": {
+                "commitMs": 110.89999999850988,
+                "frameMs": 116.89999999850988
+              },
+              "categorySwitch": {
+                "commitMs": 10.300000004470348,
+                "frameMs": 19.100000001490116
+              },
+              "catalogExpand": {
+                "commitMs": 27.600000001490116,
+                "frameMs": 25.200000002980232
+              },
+              "lightboxOpen": {
+                "commitMs": 19.80000000447035,
+                "frameMs": 36.80000000447035
+              }
+            },
+            "assertions": {
+              "newsExpanded": true,
+              "selectSwitched": true,
+              "catPressed": true,
+              "catalogExpanded": true,
+              "areaPressed": true,
+              "tabArrowDown": true,
+              "lightboxClosed": true
+            },
+            "errors": {
+              "pageErrors": [],
+              "consoleErrors": [],
+              "http5xx": []
+            }
+          },
+          "memory": {
+            "home": {
+              "heapBytes": 5948328,
+              "nodes": 1135,
+              "listeners": 118
+            },
+            "stress": {
+              "initHeapBytes": 5948328,
+              "peakHeapBytes": 12331496,
+              "settledHeapBytes": 9132360,
+              "retentionDeltaBytes": 3184032,
+              "initNodes": 1135,
+              "afterNodes": 1274,
+              "nodesDelta": 139,
+              "initListeners": 118,
+              "afterListeners": 131,
+              "listenersDelta": 13
+            },
+            "products": {
+              "heapBytes": 6394568,
+              "nodes": 884,
+              "listeners": 134
+            },
+            "about": {
+              "heapBytes": 5608528,
+              "nodes": 1169,
+              "listeners": 87
+            }
+          }
+        },
+        {
+          "round": 5,
+          "cold": {
+            "home": {
+              "route": "home",
+              "ttfbMs": 150.20000000298023,
+              "fcpMs": 2420,
+              "lcpMs": 2420,
+              "cls": 0,
+              "tbtMs": 66,
+              "reqBeforeLcp": 40,
+              "wire": {
+                "htmlBr": 16141,
+                "cssBr": 122789,
+                "jsBr": 351646,
+                "otherBr": 23973,
+                "totalBr": 514549,
+                "reqTotal": 60
+              },
+              "errors": {
+                "pageErrors": [],
+                "consoleErrors": [],
+                "http5xx": []
+              }
+            },
+            "products": {
+              "route": "products",
+              "ttfbMs": 150.10000000149012,
+              "fcpMs": 3456,
+              "lcpMs": 28940,
+              "cls": 0,
+              "tbtMs": 146,
+              "reqBeforeLcp": 65,
+              "wire": {
+                "htmlBr": 16133,
+                "cssBr": 122789,
+                "jsBr": 351646,
+                "otherBr": 5472962,
+                "totalBr": 5963530,
+                "reqTotal": 65
+              },
+              "errors": {
+                "pageErrors": [],
+                "consoleErrors": [],
+                "http5xx": []
+              }
+            },
+            "about": {
+              "route": "about",
+              "ttfbMs": 150.10000000149012,
+              "fcpMs": 2820,
+              "lcpMs": 4152,
+              "cls": 0,
+              "tbtMs": 47,
+              "reqBeforeLcp": 60,
+              "wire": {
+                "htmlBr": 18151,
+                "cssBr": 122789,
+                "jsBr": 351646,
+                "otherBr": 323790,
+                "totalBr": 816376,
+                "reqTotal": 61
+              },
+              "errors": {
+                "pageErrors": [],
+                "consoleErrors": [],
+                "http5xx": []
+              }
+            }
+          },
+          "interactive": {
+            "timings": {
+              "newsToggle": {
+                "commitMs": 71.39999999850988,
+                "frameMs": 68.79999999701977
+              },
+              "dialogOpen": {
+                "commitMs": 100.29999999701977,
+                "frameMs": 98
+              },
+              "categorySwitch": {
+                "commitMs": 9.899999998509884,
+                "frameMs": 18.600000001490116
+              },
+              "catalogExpand": {
+                "commitMs": 24,
+                "frameMs": 25.899999998509884
+              },
+              "lightboxOpen": {
+                "commitMs": 18.19999999552965,
+                "frameMs": 35.79999999701977
+              }
+            },
+            "assertions": {
+              "newsExpanded": true,
+              "selectSwitched": true,
+              "catPressed": true,
+              "catalogExpanded": true,
+              "areaPressed": true,
+              "tabArrowDown": true,
+              "lightboxClosed": true
+            },
+            "errors": {
+              "pageErrors": [],
+              "consoleErrors": [],
+              "http5xx": []
+            }
+          },
+          "memory": {
+            "home": {
+              "heapBytes": 5951620,
+              "nodes": 1135,
+              "listeners": 118
+            },
+            "stress": {
+              "initHeapBytes": 5951620,
+              "peakHeapBytes": 12292672,
+              "settledHeapBytes": 9131200,
+              "retentionDeltaBytes": 3179580,
+              "initNodes": 1135,
+              "afterNodes": 1274,
+              "nodesDelta": 139,
+              "initListeners": 118,
+              "afterListeners": 131,
+              "listenersDelta": 13
+            },
+            "products": {
+              "heapBytes": 6329788,
+              "nodes": 884,
+              "listeners": 134
+            },
+            "about": {
+              "heapBytes": 5603768,
+              "nodes": 1169,
+              "listeners": 87
+            }
+          }
+        }
+      ]
+    }
+  }
+}

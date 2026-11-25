@@ -1,0 +1,721 @@
+[
+  {
+    "categoryId": "personal-care",
+    "id": "clay-mask",
+    "area": "face",
+    "title": "滋润清洁泥膜",
+    "englishName": "Nourishing Cleansing Clay Mask",
+    "subtitle": "一款含天然黏土的清洁舒缓涂抹泥膜",
+    "overview": [
+      "乳化型清洁泥膜",
+      "325目巴西黏土为核心粉体",
+      "复配多种植物油脂",
+      "清洁同时舒缓，减少拔干紧绷"
+    ],
+    "functions": ["清洁吸附", "保湿滋养", "舒缓修护"],
+    "keyIngredients": [
+      "巴西黏土",
+      "AT Calm-ist™ 植物抗敏剂",
+      "乳木果油",
+      "白池花籽油",
+      "霍霍巴籽油"
+    ],
+    "challenges": ["粉体均匀分散与体系悬浮稳定", "清洁力与保湿舒缓的平衡"],
+    "texture": ["膏状泥质", "柔滑易涂抹"],
+    "applications": ["涂抹式清洁面膜"]
+  },
+  {
+    "categoryId": "personal-care",
+    "id": "rose-mist",
+    "area": "face",
+    "title": "舒缓保湿补水喷雾",
+    "englishName": "Soothing Hydrating Mist",
+    "subtitle": "一款含抗敏活性成分的玫瑰纯露保湿喷雾",
+    "overview": ["大马士革玫瑰纯露，气味香甜纯正", "六重植提抗敏因子协同增效，保湿舒缓，镇定舒缓"],
+    "functions": ["补水保湿", "舒缓镇定"],
+    "keyIngredients": ["大马士革玫瑰纯露", "AT Calm-ist™ 植物抗敏剂"],
+    "challenges": [],
+    "texture": ["水状"],
+    "applications": ["保湿抗敏喷雾/水"]
+  },
+  {
+    "categoryId": "personal-care",
+    "id": "botanical-lotion",
+    "area": "body",
+    "title": "植物精粹身体乳",
+    "englishName": "Botanical Body Lotion",
+    "subtitle": "一款以多重植物油脂与 4D 玻尿酸为核心的滋润型身体乳",
+    "overview": [
+      "乳化型滋润身体乳",
+      "复配四种植物油脂（大花可可脂、鳄梨油、橄榄果渣油、澳洲坚果油）",
+      "4D 多重透明质酸钠体系，多层级保湿",
+      "VC-IP 衍生物提亮，尿囊素舒缓修护"
+    ],
+    "functions": ["深层滋润", "多重保湿", "舒缓提亮"],
+    "keyIngredients": [
+      "4D HA 多重透明质酸钠复合物",
+      "VC-IP 抗坏血酸四异棕榈酸酯",
+      "FM-AT 尿囊素",
+      "大花可可树籽脂 / 鳄梨油 / 橄榄果渣油 / 澳洲坚果油"
+    ],
+    "challenges": [
+      "高含量植物油脂的乳化稳定性",
+      "4D 玻尿酸不同分子量层级的均匀分散",
+      "滋润感与质地清爽的平衡",
+      "多元油脂复配体系的肤感协调"
+    ],
+    "texture": ["轻盈乳状", "易推开吸收快"],
+    "applications": ["身体护理", "日常保湿润肤"]
+  },
+  {
+    "categoryId": "personal-care",
+    "id": "hand-cream",
+    "area": "body",
+    "title": "滋养保湿护手霜",
+    "englishName": "Nourishing Hand Cream",
+    "subtitle": "一款以乳木果油与芒果籽脂为核心的深度滋润型护手霜",
+    "overview": [
+      "乳化型高滋润护手霜",
+      "高含量乳木果油（6%）+ 芒果籽脂（3%），强化滋润修护",
+      "4D 多重透明质酸钠体系，多层级保湿锁水",
+      "黄原胶复配增稠，膏体细腻稳定"
+    ],
+    "functions": ["深度滋养", "持久保湿", "修护干燥"],
+    "keyIngredients": [
+      "4D HA 多重透明质酸钠复合物",
+      "乳木果油（6% 高添加）",
+      "芒果籽脂",
+      "白池花籽油"
+    ],
+    "challenges": [
+      "高含量固态油脂的乳化与膏体稳定性",
+      "厚重膏体与涂抹延展性的平衡",
+      "4D 玻尿酸在高油相体系中的均匀分散",
+      "滋润感与黏腻感的平衡控制"
+    ],
+    "texture": ["厚实膏状", "丰润易推开"],
+    "applications": ["手部护理", "干燥肌深度滋养"]
+  },
+  {
+    "categoryId": "personal-care",
+    "id": "shea-body-cream",
+    "area": "body",
+    "title": "乳木果油身体霜",
+    "englishName": "Shea Butter Body Cream",
+    "subtitle": "一款20% 高含量乳木果油的包裹感舒缓身体霜",
+    "overview": [
+      "高滋润身体霜，添加 20% 液态乳木果油",
+      "包裹感强肤感滋润不腻，为敏感肌提供舒缓防护",
+      "富集三萜类活性分子，具备抗炎舒缓属性",
+      "极简配方，仅 8 种 INCI 成分"
+    ],
+    "functions": ["20% 高含量乳木果油", "包裹舒缓敏感肌", "深度滋养柔肤"],
+    "keyIngredients": ["液态乳木果油", "三萜类活性物"],
+    "challenges": [
+      "20% 高含量油脂的乳化稳定性",
+      "包裹感与黏腻感的平衡",
+      "高活性物的体系兼容性",
+      "极简配方的防腐保障"
+    ],
+    "texture": ["丰润乳霜", "肤感细腻滋润"],
+    "applications": ["身体护理", "敏感肌滋养舒缓"]
+  },
+  {
+    "categoryId": "personal-care",
+    "id": "body-oil",
+    "area": "body",
+    "title": "身体护理精华油",
+    "englishName": "Body Serum Oil",
+    "subtitle": "一款轻质滋养的全油基身体护理精华油",
+    "overview": [
+      "全油基身体护理油，以甜杏仁油为基底",
+      "复配角鲨烷、霍霍巴油等润肤油脂",
+      "添加红没药醇舒缓修护",
+      "轻质油感，滋养不黏腻"
+    ],
+    "functions": ["柔润滋养", "舒缓修护", "轻薄润肤"],
+    "keyIngredients": ["甜杏仁油", "角鲨烷", "霍霍巴油", "红没药醇"],
+    "challenges": [
+      "多种油脂的肤感调和",
+      "全油体系的氧化稳定",
+      "滋润度与清爽感的平衡",
+      "香精与油相的兼容稳定"
+    ],
+    "texture": ["澄清油状液体", "顺滑易延展"],
+    "applications": ["身体护理", "身体精华油、按摩油"]
+  },
+  {
+    "categoryId": "personal-care",
+    "id": "whitening-cream",
+    "area": "face",
+    "title": "多效滋润美白霜",
+    "englishName": "Multi-Action Brightening Cream",
+    "subtitle": "一款4 - 丁基间苯二酚为核心的多效美白面霜",
+    "overview": [
+      "乳化型多效美白面霜",
+      "4 - 丁基间苯二酚为核心美白成分，复配烟酰胺",
+      "4D 玻尿酸多层保湿，乙酰氨基葡萄糖修护",
+      "多种植物油脂润肤，红没药醇舒缓"
+    ],
+    "functions": ["多效美白提亮", "深层保湿修护", "舒缓润肤"],
+    "keyIngredients": [
+      "4 - 丁基间苯二酚",
+      "烟酰胺",
+      "4D HA 多重透明质酸钠",
+      "乙酰氨基葡萄糖",
+      "泛醇、Ⅲ 型胶原蛋白",
+      "白池花籽油、橄榄角鲨烷",
+      "红没药醇"
+    ],
+    "challenges": [
+      "美白活性物的体系兼容与稳定",
+      "4D 玻尿酸在乳化体系中的均匀分散",
+      "多种油脂的乳化稳定",
+      "美白功效与温和性的平衡"
+    ],
+    "texture": ["细腻乳霜", "顺滑易推开"],
+    "applications": ["面部护理", "美白保湿面霜"]
+  },
+  {
+    "categoryId": "personal-care",
+    "id": "shower-oil",
+    "area": "face",
+    "title": "柔润温和沐浴油",
+    "englishName": "Gentle Shower Oil",
+    "subtitle": "一款50% 高含量鳄梨油的无皂基沐浴油",
+    "overview": [
+      "50% 高含量鳄梨油沐浴油，遇水转化为乳状",
+      "无皂基配方，温和清洁同时滋养肌肤",
+      "冷工艺制作，保留植物油脂活性"
+    ],
+    "functions": ["温和滋养清洁", "无皂基配方", "浴后柔润不紧绷"],
+    "keyIngredients": ["鳄梨油", "胡萝卜提取物", "生育酚", "甘油保湿体系"],
+    "challenges": ["遇水转乳的质地表现", "冷配工艺的体系均一", "清洁力与滋养力的平衡"],
+    "texture": ["油状液体", "遇水乳化呈奶白色"],
+    "applications": ["身体清洁", "敏感肌沐浴油"]
+  },
+  {
+    "categoryId": "personal-care",
+    "id": "argan-hair-oil",
+    "area": "hair",
+    "title": "阿甘油护发精华油",
+    "englishName": "Argan Oil Hair Serum",
+    "subtitle": "一款阿甘油复配硅油的修护护发精华油",
+    "overview": [
+      "硅油基护发精华油，添加阿甘油与亚麻籽油",
+      "修护受损发丝，柔顺毛躁",
+      "角鲨烷滋养发丝，提升光泽",
+      "玫瑰精油调香，使用感愉悦"
+    ],
+    "functions": ["修护受损发丝", "柔顺毛躁", "提升发丝光泽"],
+    "keyIngredients": ["阿甘油", "亚麻籽油", "橄榄角鲨烷"],
+    "challenges": [
+      "植物油与硅油的兼容稳定",
+      "修护力与清爽感的平衡",
+      "精油调香的体系稳定",
+      "全油体系的氧化稳定"
+    ],
+    "texture": ["透明油状液体", "轻盈顺滑不黏腻"],
+    "applications": ["头发护理", "护发精华油"]
+  },
+  {
+    "categoryId": "personal-care",
+    "id": "sunscreen",
+    "area": "sun",
+    "title": "SPF50 高倍防晒霜",
+    "englishName": "SPF50 High-Protection Sunscreen",
+    "subtitle": "一款物化结合的高倍户外防晒面霜",
+    "overview": [
+      "高倍防晒面霜，SPF50+、PA++++ 防护等级",
+      "化学 + 物理防晒剂复配，全波段广谱防护",
+      "4D 玻尿酸保湿，尿囊素舒缓防晒刺激",
+      "防水成膜体系，提升持妆力"
+    ],
+    "functions": ["高倍广谱防晒", "防水持妆", "保湿舒缓"],
+    "keyIngredients": [
+      "二氧化钛",
+      "亚甲基双 - 苯并三唑基四甲基丁基苯酚",
+      "对苯二亚甲基二樟脑磺酸",
+      "二乙氨基羟苯甲酰基苯甲酸己酯",
+      "双 - 乙基己氧苯酚甲氧苯基三嗪",
+      "乙基己基三嗪酮",
+      "4D HA 多重透明质酸钠"
+    ],
+    "challenges": [
+      "物理防晒剂的分散与防泛白",
+      "高含量防晒剂的溶解与稳定",
+      "高倍防晒力与清爽肤感的平衡",
+      "防水成膜与配方稳定性"
+    ],
+    "texture": ["细腻乳霜", "成膜快，轻微泛白"],
+    "applications": ["面部防晒", "高倍户外防护"]
+  },
+  {
+    "categoryId": "functional-food",
+    "id": "phgg-yogurt",
+    "area": "dairy",
+    "title": "高纤酸奶",
+    "englishName": "High-Fiber Yogurt",
+    "subtitle": "添加 2.5% InFiber™ PHGG，提升质地与结构稳定性",
+    "overview": [
+      "全脂牛乳体系，经热处理、接种发酵、低温冷藏制备酸奶",
+      "2.5% 添加量赋予酸奶细腻顺滑、厚实口感，无黏腻感",
+      "相比空白对照组，酸奶凝胶结构更稳定，成型效果更好"
+    ],
+    "functions": ["膳食纤维强化", "提升质地", "稳定凝胶结构"],
+    "keyIngredients": ["InFiber™ PHGG（添加量 2.5%）"],
+    "challenges": ["膳食纤维易带来黏腻、颗粒感", "酸奶凝胶结构与成型稳定性"],
+    "texture": ["细腻顺滑", "厚实无黏腻"],
+    "applications": ["高纤型酸奶", "发酵乳甜品"]
+  },
+  {
+    "categoryId": "functional-food",
+    "id": "phgg-cookie",
+    "area": "bakery",
+    "title": "低糖曲奇饼干",
+    "englishName": "Low-Sugar Cookies",
+    "subtitle": "添加 5% InFiber™ PHGG，烘焙高纤添加，保持原有口感",
+    "overview": [
+      "粉体过筛，黄油搅打混合制成面团，冷藏定型后 170℃ 烘烤 18–20 min",
+      "5% 添加不会对饼干口感造成负面影响，无砂砾、异味问题",
+      "辅助烘烤上色，亦可通过微调烘烤参数优化外观"
+    ],
+    "functions": ["膳食纤维强化", "保持原有口感", "辅助烘烤上色"],
+    "keyIngredients": ["InFiber™ PHGG（添加量 5%）"],
+    "challenges": ["高纤添加易带来砂砾感与异味", "烘烤上色与外观控制"],
+    "texture": ["保持原有口感", "无砂砾感"],
+    "applications": ["高纤低糖饼干", "酥饼等烘焙产品"]
+  },
+  {
+    "categoryId": "functional-food",
+    "id": "mock-fiber-tea",
+    "area": "beverage",
+    "title": "【模拟】高纤低糖果茶",
+    "englishName": "High-Fiber Low-Sugar Fruit Tea",
+    "subtitle": "模拟方案：抗性糊精 + 甜菊糖苷，减糖同时补充膳食纤维",
+    "overview": [
+      "绿茶基底复配果汁，pH 3.6 酸性体系，UHT 后热灌装",
+      "添加 3% 抗性糊精，每瓶提供约 15 g 膳食纤维",
+      "甜菊糖苷与赤藓糖醇复配，替代 70% 蔗糖"
+    ],
+    "functions": ["膳食纤维强化", "减糖", "保持清爽口感"],
+    "keyIngredients": ["抗性糊精（添加量 3%）", "甜菊糖苷", "赤藓糖醇"],
+    "challenges": ["高倍甜味剂的后苦味", "酸性体系中纤维的稳定性"],
+    "texture": ["清爽不黏稠", "无沉淀"],
+    "applications": ["即饮果茶", "低糖茶饮"]
+  },
+  {
+    "categoryId": "functional-food",
+    "id": "mock-plant-latte",
+    "area": "beverage",
+    "title": "【模拟】燕麦植物奶拿铁",
+    "englishName": "Oat Milk Latte",
+    "subtitle": "模拟方案：葵花磷脂 + 结冷胶，提升植物蛋白饮品的稳定性",
+    "overview": [
+      "燕麦浆酶解后与咖啡液复配，均质两次后 UHT 灭菌",
+      "0.2% 葵花磷脂改善脂肪分散，减少油圈",
+      "货架期 9 个月内无明显分层"
+    ],
+    "functions": ["乳化稳定", "改善口感", "清洁标签"],
+    "keyIngredients": ["葵花磷脂（添加量 0.2%）", "结冷胶", "燕麦浆"],
+    "challenges": ["咖啡酸性导致蛋白絮凝", "长货架期分层"],
+    "texture": ["丝滑浓郁", "无颗粒感"],
+    "applications": ["即饮咖啡", "植物基饮品"]
+  },
+  {
+    "categoryId": "functional-food",
+    "id": "mock-low-fat-ice-cream",
+    "area": "dairy",
+    "title": "【模拟】低脂高纤冰淇淋",
+    "englishName": "Low-Fat High-Fiber Ice Cream",
+    "subtitle": "模拟方案：菊粉 + 刺槐豆胶，替代部分乳脂并保留奶油感",
+    "overview": [
+      "乳脂含量由 10% 降至 4%，以 5% 菊粉补足固形物",
+      "0.15% 刺槐豆胶抑制冰晶长大，改善抗融性",
+      "老化 4 h 后凝冻，膨胀率 80%–90%"
+    ],
+    "functions": ["脂肪替代", "膳食纤维强化", "抑制冰晶"],
+    "keyIngredients": ["菊粉（添加量 5%）", "刺槐豆胶（添加量 0.15%）"],
+    "challenges": ["降脂后口感变薄", "反复冻融后的冰晶感"],
+    "texture": ["细腻绵密", "抗融性好"],
+    "applications": ["低脂冰淇淋", "冷冻甜品"]
+  },
+  {
+    "categoryId": "functional-food",
+    "id": "mock-fiber-bread",
+    "area": "bakery",
+    "title": "【模拟】高纤全麦吐司",
+    "englishName": "High-Fiber Whole Wheat Toast",
+    "subtitle": "模拟方案：瓜儿豆胶 + 抗性糊精，改善全麦面团的保水与柔软度",
+    "overview": [
+      "全麦粉占比 50%，中种法发酵",
+      "0.3% 瓜儿豆胶提升面团持水，延缓老化",
+      "4% 抗性糊精补充可溶性纤维，不影响体积"
+    ],
+    "functions": ["保水保软", "延缓老化", "膳食纤维强化"],
+    "keyIngredients": ["瓜儿豆胶（添加量 0.3%）", "抗性糊精（添加量 4%）"],
+    "challenges": ["全麦面筋弱导致体积偏小", "货架期内变硬掉渣"],
+    "texture": ["柔软有弹性", "组织均匀"],
+    "applications": ["全麦吐司", "高纤面包"]
+  },
+  {
+    "categoryId": "human-nutrition",
+    "id": "mock-meal-shake",
+    "area": "powder",
+    "title": "【模拟】高纤饱腹代餐奶昔",
+    "englishName": "High-Fiber Meal Replacement Shake",
+    "subtitle": "模拟方案：PHGG + 奇亚籽，延长饱腹并改善冲调体验",
+    "overview": [
+      "每份 50 g，提供 20 g 蛋白质与 8 g 膳食纤维",
+      "PHGG 低黏度，冷水摇匀 30 秒即可分散",
+      "奇亚籽吸水膨胀，增加饮用后的饱腹感"
+    ],
+    "functions": ["饱腹管理", "肠道健康", "均衡营养"],
+    "keyIngredients": ["In-Fiber™ PHGG", "奇亚籽", "乳清蛋白"],
+    "challenges": ["高纤高蛋白带来的黏稠与结块", "冲调后的粉感"],
+    "texture": ["顺滑易冲调", "浓稠适中"],
+    "applications": ["代餐奶昔", "体重管理固体饮料"]
+  },
+  {
+    "categoryId": "human-nutrition",
+    "id": "mock-preworkout",
+    "area": "powder",
+    "title": "【模拟】训练前能量冲剂",
+    "englishName": "Pre-Workout Drink Mix",
+    "subtitle": "模拟方案：肌酸 + L-瓜氨酸 + MCT，支持训练表现",
+    "overview": [
+      "每份含 3 g 一水肌酸、6 g L-瓜氨酸",
+      "MCT 粉提供快速能量，不额外增加糖分",
+      "柠檬风味，酸甜度适配运动场景"
+    ],
+    "functions": ["力量表现", "耐力支持", "快速供能"],
+    "keyIngredients": ["一水肌酸", "L-瓜氨酸", "MCT 粉"],
+    "challenges": ["肌酸在液体中溶解度低", "氨基酸的苦涩味"],
+    "texture": ["细腻易溶", "清爽酸甜"],
+    "applications": ["运动营养冲剂", "训练前补剂"]
+  },
+  {
+    "categoryId": "human-nutrition",
+    "id": "mock-joint-tablet",
+    "area": "capsule",
+    "title": "【模拟】关节养护片",
+    "englishName": "Joint Care Tablets",
+    "subtitle": "模拟方案：硫酸软骨素 + 氨基葡萄糖经典复配",
+    "overview": [
+      "每日 3 片，提供 800 mg 硫酸软骨素与 1500 mg 氨基葡萄糖",
+      "直接压片工艺，片重 1.2 g，硬度 ≥80 N",
+      "薄膜包衣掩盖原料气味"
+    ],
+    "functions": ["关节润滑", "软骨养护", "灵活度支持"],
+    "keyIngredients": ["硫酸软骨素钠", "盐酸氨基葡萄糖"],
+    "challenges": ["高剂量导致片重偏大", "原料吸湿性强"],
+    "texture": ["包衣片", "易吞咽"],
+    "applications": ["中老年关节保健", "运动人群关节养护"]
+  },
+  {
+    "categoryId": "human-nutrition",
+    "id": "mock-mood-gummy",
+    "area": "gummy",
+    "title": "【模拟】舒缓睡眠软糖",
+    "englishName": "Calm and Sleep Gummies",
+    "subtitle": "模拟方案：南非醉茄提取物，以软糖剂型提升日常依从性",
+    "overview": [
+      "每粒 3 g，含 150 mg 南非醉茄提取物",
+      "果胶基底，无明胶，适合素食人群",
+      "浆果风味掩盖植物提取物的苦味"
+    ],
+    "functions": ["缓解压力", "辅助睡眠", "情绪平衡"],
+    "keyIngredients": ["南非醉茄提取物", "果胶", "罗汉果甜苷"],
+    "challenges": ["提取物苦味掩蔽", "活性成分在熬糖高温下的稳定性"],
+    "texture": ["Q 弹不粘牙", "果味清新"],
+    "applications": ["功能性软糖", "情绪健康补充剂"]
+  },
+  {
+    "categoryId": "personal-care",
+    "id": "mock-crack-balm",
+    "area": "special",
+    "title": "【模拟】乳木果皲裂修护膏",
+    "englishName": "Shea Crack Repair Balm",
+    "subtitle": "模拟方案：高含量乳木果油无水膏体，针对手足与唇部干裂",
+    "overview": [
+      "无水膏体，熔点 58–62 ℃",
+      "25% 精制乳木果油提供包裹感",
+      "巴西棕榈蜡调节硬度，夏季不易软塌"
+    ],
+    "functions": ["长效滋润", "修护干裂", "形成保护膜"],
+    "keyIngredients": ["精制乳木果油", "巴西棕榈蜡", "霍霍巴油"],
+    "challenges": ["膏体硬度与涂抹顺滑的平衡", "高温储存下的出汗"],
+    "texture": ["顺滑易推开", "不黏腻"],
+    "applications": ["手足皲裂修护", "多用途修护膏"]
+  },
+  {
+    "categoryId": "personal-care",
+    "id": "mock-sensitive-barrier",
+    "area": "special",
+    "title": "【模拟】敏感肌屏障修护霜",
+    "englishName": "Sensitive Skin Barrier Cream",
+    "subtitle": "模拟方案：AT Calm-ist™ 与白池花籽油，舒缓泛红并修护屏障",
+    "overview": [
+      "无香精、无酒精的精简配方",
+      "白池花籽油补充长链脂肪酸，增强屏障",
+      "AT Calm-ist™ 缓解外界刺激带来的不适"
+    ],
+    "functions": ["舒缓泛红", "屏障修护", "长效保湿"],
+    "keyIngredients": ["AT Calm-ist™ 植物抗敏剂", "白池花籽油", "橄榄角鲨烷"],
+    "challenges": ["低刺激防腐体系", "滋润度与清爽肤感的平衡"],
+    "texture": ["柔润乳霜", "吸收快"],
+    "applications": ["敏感肌面霜", "术后舒缓护理"]
+  },
+  {
+    "categoryId": "personal-care",
+    "id": "mock-natural-foundation",
+    "area": "makeup",
+    "title": "【模拟】植物油脂养肤粉底液",
+    "englishName": "Skincare Foundation with Plant Oils",
+    "subtitle": "模拟方案：霍霍巴油与植物角鲨烷，粉底中兼顾服帖与养肤",
+    "overview": [
+      "油包水体系，粉体占比 18%",
+      "植物角鲨烷改善粉体分散与延展",
+      "霍霍巴油减少卡粉与干纹"
+    ],
+    "functions": ["服帖持妆", "养肤保湿", "轻薄遮瑕"],
+    "keyIngredients": ["霍霍巴油", "橄榄角鲨烷", "二氧化钛"],
+    "challenges": ["粉体分散与防沉降", "持妆力与滋润度的平衡"],
+    "texture": ["轻薄水润", "不拔干"],
+    "applications": ["粉底液", "养肤底妆"]
+  },
+  {
+    "categoryId": "personal-care",
+    "id": "mock-lip-oil",
+    "area": "makeup",
+    "title": "【模拟】巴西莓修护唇油",
+    "englishName": "Açaí Berry Lip Oil",
+    "subtitle": "模拟方案：巴西莓油与玫瑰果油复配，带来天然光泽与修护",
+    "overview": [
+      "全油相配方，无需防腐体系",
+      "巴西莓油提供天然淡紫色调",
+      "玫瑰果油富含亚麻酸，辅助修护唇纹"
+    ],
+    "functions": ["天然光泽", "抗氧化", "淡化唇纹"],
+    "keyIngredients": ["巴西莓油", "玫瑰果油", "橄榄角鲨烷"],
+    "challenges": ["天然油脂的氧化与色泽变化", "唇部肤感的清爽度"],
+    "texture": ["水润透亮", "轻薄不厚重"],
+    "applications": ["唇油", "唇部精华"]
+  },
+  {
+    "categoryId": "personal-care",
+    "id": "mock-baby-cream",
+    "area": "baby",
+    "title": "【模拟】婴童舒缓保湿霜",
+    "englishName": "Baby Soothing Moisturizing Cream",
+    "subtitle": "模拟方案：温和油脂与植物抗敏剂，呵护婴童屏障",
+    "overview": [
+      "极简配方，不含香精与色素",
+      "甜杏仁油与乳木果油补充脂质",
+      "AT Calm-ist™ 舒缓干燥引起的泛红"
+    ],
+    "functions": ["温和保湿", "舒缓泛红", "屏障修护"],
+    "keyIngredients": ["甜杏仁油", "精制乳木果油", "AT Calm-ist™ 植物抗敏剂"],
+    "challenges": ["低刺激与防腐体系的兼顾", "婴童肌肤的耐受性"],
+    "texture": ["柔润乳霜", "易吸收"],
+    "applications": ["婴童面霜", "婴童身体乳"]
+  },
+  {
+    "categoryId": "personal-care",
+    "id": "mock-baby-oil",
+    "area": "baby",
+    "title": "【模拟】婴童抚触油",
+    "englishName": "Baby Massage Oil",
+    "subtitle": "模拟方案：植物角鲨烷 + 葵花籽油，轻柔抚触不黏腻",
+    "overview": [
+      "全植物油相，适合沐浴后抚触",
+      "植物角鲨烷改善铺展性",
+      "维生素 E 辅助抗氧化，延长货架期"
+    ],
+    "functions": ["抚触润滑", "保湿锁水", "温和滋养"],
+    "keyIngredients": ["橄榄角鲨烷", "太阳花油", "维生素 E"],
+    "challenges": ["油脂纯度与安全性控制", "肤感的轻薄与滋润平衡"],
+    "texture": ["轻盈顺滑", "不黏腻"],
+    "applications": ["婴童抚触油", "婴童润肤油"]
+  },
+  {
+    "categoryId": "personal-care",
+    "id": "mock-baby-wash",
+    "area": "baby",
+    "title": "【模拟】婴童洗发沐浴二合一",
+    "englishName": "Baby 2-in-1 Hair and Body Wash",
+    "subtitle": "模拟方案：氨基酸表活搭配甜杏仁油，洗后不紧绷",
+    "overview": [
+      "pH 5.5–6.0 弱酸性体系",
+      "无泪配方，降低对眼部的刺激",
+      "0.5% 甜杏仁油补充洗后流失的脂质"
+    ],
+    "functions": ["温和清洁", "洗后柔润", "头身两用"],
+    "keyIngredients": ["甜杏仁油", "椰油酰甘氨酸钾", "AT Calm-ist™ 植物抗敏剂"],
+    "challenges": ["低刺激与起泡力的平衡", "油脂加入后的体系稳定"],
+    "texture": ["细腻泡沫", "易冲洗"],
+    "applications": ["婴童沐浴露", "婴童洗发水"]
+  },
+  {
+    "categoryId": "personal-care",
+    "id": "mock-nipple-balm",
+    "area": "baby",
+    "title": "【模拟】孕产期乳头修护膏",
+    "englishName": "Nursing Nipple Balm",
+    "subtitle": "模拟方案：高纯乳木果油无水配方，哺乳前无需擦拭",
+    "overview": [
+      "100% 植物来源，无香精、无防腐剂",
+      "精制乳木果油与霍霍巴油形成保护膜",
+      "可食用级原料，降低哺乳期顾虑"
+    ],
+    "functions": ["舒缓干裂", "保护屏障", "温和安心"],
+    "keyIngredients": ["精制乳木果油", "霍霍巴油", "维生素 E"],
+    "challenges": ["原料纯度与安全性证明", "低温下膏体变硬"],
+    "texture": ["柔软膏体", "体温即化"],
+    "applications": ["哺乳期护理", "孕产期修护膏"]
+  },
+  {
+    "categoryId": "personal-care",
+    "id": "mock-cushion-cream",
+    "area": "makeup",
+    "title": "【模拟】养肤气垫霜",
+    "englishName": "Skincare Cushion Cream",
+    "subtitle": "模拟方案：液态乳木果油提升气垫的滋润度，减少浮粉",
+    "overview": [
+      "水包油体系，适配海绵气垫载体",
+      "液态乳木果油高添加不结晶",
+      "复配物理防晒剂，兼顾日常防护"
+    ],
+    "functions": ["滋润服帖", "轻薄遮瑕", "日常防护"],
+    "keyIngredients": ["液态乳木果油", "二氧化钛", "橄榄角鲨烷"],
+    "challenges": ["低黏度体系中的粉体悬浮", "海绵载体的吸放平衡"],
+    "texture": ["水润轻薄", "不卡粉"],
+    "applications": ["气垫霜", "养肤底妆"]
+  },
+  {
+    "categoryId": "personal-care",
+    "id": "mock-cleansing-balm",
+    "area": "makeup",
+    "title": "【模拟】植物卸妆膏",
+    "englishName": "Plant Oil Cleansing Balm",
+    "subtitle": "模拟方案：葡萄籽油与芒果籽脂，溶解彩妆后乳化易冲洗",
+    "overview": [
+      "无水膏体，接触皮肤后化为油状",
+      "葡萄籽油质地轻薄，溶解防水彩妆",
+      "添加乳化剂，遇水乳化不残留"
+    ],
+    "functions": ["溶解彩妆", "温和清洁", "洗后不紧绷"],
+    "keyIngredients": ["葡萄籽油", "芒果籽脂", "甜杏仁油"],
+    "challenges": ["膏体稳定与融化速度", "乳化效率与冲洗感"],
+    "texture": ["固态膏体", "遇热融化"],
+    "applications": ["卸妆膏", "卸妆油"]
+  },
+  {
+    "categoryId": "personal-care",
+    "id": "mock-scar-gel",
+    "area": "special",
+    "title": "【模拟】疤痕淡化护理油",
+    "englishName": "Scar Care Oil",
+    "subtitle": "模拟方案：玫瑰果油与有机猴面包树籽油，改善肌肤纹理",
+    "overview": [
+      "全油相配方，适合局部按摩",
+      "玫瑰果油富含亚油酸与亚麻酸",
+      "猴面包树籽油提升肌肤柔韧度"
+    ],
+    "functions": ["改善纹理", "滋养柔润", "局部修护"],
+    "keyIngredients": ["玫瑰果油", "有机猴面包树籽油", "维生素 E"],
+    "challenges": ["高不饱和油脂的氧化稳定性", "功效宣称的合规边界"],
+    "texture": ["轻盈油状", "吸收快"],
+    "applications": ["疤痕护理", "妊娠纹护理"]
+  },
+  {
+    "categoryId": "personal-care",
+    "id": "mock-foot-cream",
+    "area": "special",
+    "title": "【模拟】足跟角质修护霜",
+    "englishName": "Heel Repair Cream",
+    "subtitle": "模拟方案：可可籽脂与马鲁拉油，软化粗糙足跟",
+    "overview": [
+      "高油相乳霜，油相占比 35%",
+      "可可籽脂提供厚重包裹感",
+      "有机马鲁拉油渗透性好，软化角质"
+    ],
+    "functions": ["软化角质", "修护皲裂", "长效滋润"],
+    "keyIngredients": ["可可籽脂", "有机马鲁拉油", "精制乳木果油"],
+    "challenges": ["高油相乳霜的稳定性", "厚重感与吸收速度的平衡"],
+    "texture": ["浓厚乳霜", "按摩后吸收"],
+    "applications": ["足部护理", "手肘膝盖修护"]
+  },
+  {
+    "categoryId": "personal-care",
+    "id": "mock-colored-oil-serum",
+    "area": "trend",
+    "title": "【模拟】天然彩色油脂精华油",
+    "englishName": "Natural Colored Oil Serum",
+    "subtitle": "模拟方案：以红木籽油与巴西莓油的本色，替代合成色素",
+    "overview": [
+      "全油相精华，不额外添加色素",
+      "红木籽油带来天然橙红色调",
+      "巴西莓油补充多酚，提升抗氧化"
+    ],
+    "functions": ["天然本色", "抗氧化", "滋养修护"],
+    "keyIngredients": ["红木籽油", "巴西莓油", "维生素 E"],
+    "challenges": ["批次间色泽一致性", "光照下的褪色"],
+    "texture": ["清透油状", "轻盈不黏"],
+    "applications": ["面部精华油", "天然概念护肤"]
+  },
+  {
+    "categoryId": "personal-care",
+    "id": "mock-solid-serum-stick",
+    "area": "trend",
+    "title": "【模拟】无水固态精华棒",
+    "englishName": "Waterless Solid Serum Stick",
+    "subtitle": "模拟方案：大花可可树籽脂成型，便携且减少包装",
+    "overview": [
+      "无水配方，无需防腐体系",
+      "大花可可树籽脂提供棒体硬度与熔融肤感",
+      "可替代瓶装精华，减少塑料包装"
+    ],
+    "functions": ["便携补水", "局部滋养", "减塑环保"],
+    "keyIngredients": ["大花可可树籽脂", "巴巴苏籽油", "橄榄角鲨烷"],
+    "challenges": ["棒体硬度与涂抹性的平衡", "运输中的耐温性"],
+    "texture": ["触肤即融", "不油腻"],
+    "applications": ["精华棒", "无水护肤"]
+  },
+  {
+    "categoryId": "personal-care",
+    "id": "mock-green-coffee-eye",
+    "area": "trend",
+    "title": "【模拟】绿咖啡豆油眼部精华",
+    "englishName": "Green Coffee Bean Eye Serum",
+    "subtitle": "模拟方案：绿咖啡豆油的天然咖啡因，主打熬夜人群",
+    "overview": [
+      "滚珠瓶装，冷感按摩头",
+      "绿咖啡豆油提供天然咖啡因与绿原酸",
+      "橄榄角鲨烷减轻眼周干纹"
+    ],
+    "functions": ["舒缓浮肿", "淡化干纹", "抗氧化"],
+    "keyIngredients": ["绿咖啡豆油", "橄榄角鲨烷", "霍霍巴油"],
+    "challenges": ["眼周刺激性控制", "油脂气味的掩蔽"],
+    "texture": ["轻薄精华", "不油腻"],
+    "applications": ["眼部精华", "熬夜修护"]
+  },
+  {
+    "categoryId": "personal-care",
+    "id": "mock-skin-minimalism",
+    "area": "trend",
+    "title": "【模拟】极简三成分面霜",
+    "englishName": "Three-Ingredient Minimal Cream",
+    "subtitle": "模拟方案：以乳木果油、角鲨烷与水，回应“精简护肤”趋势",
+    "overview": [
+      "核心成分仅三种，标签一目了然",
+      "精制乳木果油提供滋润与质地",
+      "橄榄角鲨烷改善肤感，减少厚重"
+    ],
+    "functions": ["基础保湿", "屏障维护", "标签透明"],
+    "keyIngredients": ["精制乳木果油", "橄榄角鲨烷"],
+    "challenges": ["极简体系的乳化稳定", "无防腐剂下的微生物控制"],
+    "texture": ["柔润乳霜", "肤感轻盈"],
+    "applications": ["精简护肤面霜", "敏感肌基础护理"]
+  }
+]

@@ -47,19 +47,6 @@ const styles = stylex.create({
     flexDirection: "column",
     gap: 20,
   },
-  facts: {
-    display: "flex",
-    alignItems: "baseline",
-    gap: 16,
-  },
-  est: {
-    margin: 0,
-    fontFamily: fonts.display,
-    fontSize: 20,
-    fontWeight: 500,
-    letterSpacing: "0.01em",
-    color: palette.ink,
-  },
   figure: {
     position: "relative",
     overflow: "hidden",
@@ -97,10 +84,6 @@ export function Banner() {
           </div>
           <div {...stylex.attrs(styles.metaCell)}>
             <p {...stylex.attrs(shared.body)}>{ABOUT_BANNER.lead}</p>
-            <div lang="en" {...stylex.attrs(styles.facts)}>
-              <p {...stylex.attrs(styles.est)}>{ABOUT_BANNER.established}</p>
-              <p {...stylex.attrs(shared.small)}>{ABOUT_BANNER.place}</p>
-            </div>
           </div>
         </div>
         <figure {...stylex.attrs(styles.figure)}>

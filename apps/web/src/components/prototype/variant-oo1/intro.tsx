@@ -39,9 +39,9 @@ export function IntroOverlay(props: { onImpact: () => void; onLanded: () => void
   onSettled(() => {
     let stop = () => {};
     let impactTimer = 0;
+    const period = document.querySelector("[data-hero-period]");
     const timer = window.setTimeout(() => {
       const dot = dotEl;
-      const period = document.querySelector("[data-hero-period]");
       if (!dot || !period) {
         props.onImpact();
         props.onLanded();

@@ -452,11 +452,8 @@ function SheetBody(props: { item: SolutionItem; index: number }) {
   return (
     <>
       <div {...stylex.attrs(styles.topline)}>
-        <span>
-          方案{" "}
-          <span {...stylex.attrs(styles.numeral)}>
-            {padIndex(props.index)} / {TOTAL_LABEL}
-          </span>
+        <span {...stylex.attrs(styles.numeral)}>
+          {padIndex(props.index)} / {TOTAL_LABEL}
         </span>
       </div>
       <h3 {...stylex.attrs(styles.sheetTitle)}>{item.title}</h3>

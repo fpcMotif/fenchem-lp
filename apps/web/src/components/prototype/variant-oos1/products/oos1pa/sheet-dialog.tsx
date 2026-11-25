@@ -101,17 +101,6 @@ const styles = stylex.create({
     minWidth: 0,
     minHeight: { default: 112, [media.md]: 0 },
   },
-  index: {
-    display: "block",
-    marginBottom: 6,
-    fontFamily: font.numeral,
-    fontSize: 13,
-    fontWeight: 500,
-    lineHeight: "16px",
-    letterSpacing: "0.04em",
-    fontVariantNumeric: "tabular-nums",
-    color: colors.brandGreen700,
-  },
   title: {
     margin: 0,
     fontSize: { default: 20, [media.md]: 24 },
@@ -188,14 +177,6 @@ const styles = stylex.create({
     borderBottomWidth: 1,
     borderBottomStyle: "solid",
     borderBottomColor: tone.ink,
-  },
-  sheetLetter: {
-    fontFamily: font.numeral,
-    fontSize: 13,
-    fontWeight: 500,
-    lineHeight: "20px",
-    letterSpacing: "0.04em",
-    color: colors.brandGreen700,
   },
   sheetTitle: {
     margin: 0,
@@ -373,14 +354,11 @@ function Field(props: { label: string; lines: string[] }) {
   );
 }
 
-function Sheet(props: { letter: string; title: string; children: JSX.Element }) {
+function Sheet(props: { title: string; children: JSX.Element }) {
   const headingId = createUniqueId();
   return (
     <section aria-labelledby={headingId} {...stylex.attrs(styles.sheet)}>
       <header {...stylex.attrs(styles.sheetHead)}>
-        <span aria-hidden="true" {...stylex.attrs(styles.sheetLetter)}>
-          {props.letter}
-        </span>
         <h4 id={headingId} {...stylex.attrs(styles.sheetTitle)}>
           {props.title}
         </h4>
@@ -476,7 +454,6 @@ export function SheetDialog(props: {
                     exit="exit"
                     transition={transition()}
                   >
-                    <span {...stylex.attrs(styles.index)}>{padIndex(current.index)}</span>
                     <h3 id={titleId} {...stylex.attrs(styles.title)}>
                       {current.title}
                     </h3>
@@ -514,12 +491,12 @@ export function SheetDialog(props: {
                   transition={transition()}
                   {...stylex.attrs(styles.sheets)}
                 >
-                  <Sheet letter="A" title="是什么">
+                  <Sheet title="是什么">
                     <Field label="概述" lines={current.overview} />
                     <Field label="功能" lines={current.functions} />
                     <Field label="功能性成分" lines={current.keyIngredients} />
                   </Sheet>
-                  <Sheet letter="B" title="怎么做">
+                  <Sheet title="怎么做">
                     <Field label="配方挑战" lines={current.challenges} />
                     <Field label="质地" lines={current.texture} />
                     <Field label="应用" lines={current.applications} />

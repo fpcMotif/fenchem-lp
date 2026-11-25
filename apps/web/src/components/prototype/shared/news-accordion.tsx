@@ -1,11 +1,8 @@
 import * as stylex from "@stylexjs/stylex";
 import type { StyleXStyles } from "@stylexjs/stylex";
-import { createUniqueId, For, Show } from "solid-js";
+import { Collapsible, CollapsiblePanel, CollapsibleTrigger } from "@ui-sdk/solid/collapsible";
+import { For, Show } from "solid-js";
 import type { JSX } from "@solidjs/web";
-
-import { EASE } from "../motion-constants";
-import { useReducedMotion } from "../use-reduced-motion";
-import { Collapse } from "./collapse";
 
 const URL_PATTERN = /(https?:\/\/\S+)/;
 
@@ -56,8 +53,6 @@ export function NewsAccordion(props: {
     StyleXStyles
   >;
 }) {
-  const panelId = createUniqueId();
-  const reduce = useReducedMotion();
   return (
     <Show
       when={props.item.details.length !== 0}
@@ -69,34 +64,25 @@ export function NewsAccordion(props: {
         </h3>
       }
     >
-      <h3 {...stylex.attrs(props.styles.newsHeading)}>
-        <button
-          type="button"
-          aria-expanded={props.open ? "true" : "false"}
-          aria-controls={panelId}
-          onClick={() => props.onToggle()}
-          {...stylex.attrs(props.styles.newsTrigger)}
-        >
-          <span>{props.item.title}</span>
-          {props.icon}
-        </button>
-      </h3>
-      <Collapse
-        id={panelId}
-        open={props.open}
-        transition={{ duration: reduce() ? 0 : 0.25, ease: EASE }}
-        class={stylex.attrs(props.styles.newsPanel).class}
-      >
-        <div {...stylex.attrs(props.styles.newsPanelInner)}>
-          <For each={props.item.details}>
-            {(detail) => (
-              <p {...stylex.attrs(props.styles.mutedText)}>
-                <DetailText text={detail} />
-              </p>
-            )}
-          </For>
-        </div>
-      </Collapse>
+      <Collapsible open={props.open} onOpenChange={() => props.onToggle()}>
+        <h3 {...stylex.attrs(props.styles.newsHeading)}>
+          <CollapsibleTrigger {...stylex.attrs(props.styles.newsTrigger)}>
+            <span>{props.item.title}</span>
+            {props.icon}
+          </CollapsibleTrigger>
+        </h3>
+        <CollapsiblePanel data-collapsible-animated="" {...stylex.attrs(props.styles.newsPanel)}>
+          <div {...stylex.attrs(props.styles.newsPanelInner)}>
+            <For each={props.item.details}>
+              {(detail) => (
+                <p {...stylex.attrs(props.styles.mutedText)}>
+                  <DetailText text={detail} />
+                </p>
+              )}
+            </For>
+          </div>
+        </CollapsiblePanel>
+      </Collapsible>
     </Show>
   );
 }

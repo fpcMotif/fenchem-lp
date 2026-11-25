@@ -2,7 +2,7 @@
 
 import * as stylex from "@stylexjs/stylex";
 import type { StyleXStyles } from "@stylexjs/stylex";
-import { createSignal, For, onSettled } from "solid-js";
+import { Toast, ToastDescription, ToastRegion, ToastTitle, toast } from "@ui-sdk/solid/toast";
 
 type ToastPosition =
   | "top-left"
@@ -21,31 +21,6 @@ export interface ToastOptions {
   description?: string;
   duration?: number;
 }
-
-type ToastEntry = { id: number; message: string; description?: string; duration: number };
-
-const DEFAULT_DURATION = 4000;
-const [toasts, setToasts] = createSignal<ToastEntry[]>([]);
-let nextId = 0;
-
-function dismiss(id: number) {
-  setToasts((list) => list.filter((entry) => entry.id !== id));
-}
-
-function toast(message: string, options: ToastOptions = {}) {
-  const id = ++nextId;
-  setToasts((list) => [
-    ...list,
-    {
-      id,
-      message,
-      description: options.description,
-      duration: options.duration ?? DEFAULT_DURATION,
-    },
-  ]);
-  return id;
-}
-toast.dismiss = dismiss;
 
 const enter = stylex.keyframes({
   "0%": { opacity: 0, transform: "translateY(0.5rem)" },
@@ -97,59 +72,42 @@ const toasterStyles = stylex.create({
 const sxProps = (...args: ReadonlyArray<StyleXStyles | false | null | undefined>) =>
   stylex.attrs(...args);
 
-function ToastItem(props: { entry: ToastEntry }) {
-  onSettled(() => {
-    const timer = window.setTimeout(() => dismiss(props.entry.id), props.entry.duration);
-    return () => window.clearTimeout(timer);
-  });
-
-  return (
-    <li
-      role="status"
-      aria-live="polite"
-      aria-atomic="true"
-      data-sonner-toast=""
-      class={`cn-toast ${stylex.attrs(toasterStyles.toast).class ?? ""}`}
-    >
-      <div data-title="" {...stylex.attrs(toasterStyles.title)}>
-        {props.entry.message}
-      </div>
-      {props.entry.description ? (
-        <div data-description="" {...stylex.attrs(toasterStyles.description)}>
-          {props.entry.description}
-        </div>
-      ) : null}
-    </li>
-  );
-}
+const ALIGN_BY_POS = { left: "start", center: "center", right: "end" } as const;
 
 const Toaster = (props: ToasterProps) => {
   const position = () => props.position ?? "bottom-right";
-  const vertical = () => (position().startsWith("top") ? "top" : "bottom");
+  const side = () => (position().startsWith("top") ? "top" : "bottom");
   const horizontal = () => position().split("-")[1] as "left" | "center" | "right";
   const attrs = () =>
     sxProps(
       toasterStyles.root,
-      vertical() === "top" ? toasterStyles.top : toasterStyles.bottom,
+      side() === "top" ? toasterStyles.top : toasterStyles.bottom,
       horizontal() === "left" && toasterStyles.left,
       horizontal() === "right" && toasterStyles.right,
       horizontal() === "center" && toasterStyles.center,
     );
 
   return (
-    <section aria-label="Notifications" tabindex={-1}>
-      <ol
-        data-sonner-toaster=""
-        data-theme="dark"
-        data-rich-colors={props.richColors ? "true" : "false"}
-        data-y-position={vertical()}
-        data-x-position={horizontal()}
-        class={`toaster group ${attrs().class ?? ""}`}
-        style={`--normal-bg: var(--popover); --normal-text: var(--popover-foreground); --normal-border: var(--border); --border-radius: var(--radius);${attrs().style ?? ""}`}
-      >
-        <For each={toasts()}>{(entry) => <ToastItem entry={entry} />}</For>
-      </ol>
-    </section>
+    <ToastRegion
+      side={side()}
+      align={ALIGN_BY_POS[horizontal()]}
+      aria-label="Notifications"
+      data-sonner-toaster=""
+      data-theme="dark"
+      data-rich-colors={props.richColors ? "true" : "false"}
+      class={`toaster group ${attrs().class ?? ""}`}
+      style={`--normal-bg: var(--popover); --normal-text: var(--popover-foreground); --normal-border: var(--border); --border-radius: var(--radius);`}
+    >
+      {() => (
+        <Toast
+          data-sonner-toast=""
+          class={`cn-toast ${stylex.attrs(toasterStyles.toast).class ?? ""}`}
+        >
+          <ToastTitle data-title="" {...stylex.attrs(toasterStyles.title)} />
+          <ToastDescription data-description="" {...stylex.attrs(toasterStyles.description)} />
+        </Toast>
+      )}
+    </ToastRegion>
   );
 };
 

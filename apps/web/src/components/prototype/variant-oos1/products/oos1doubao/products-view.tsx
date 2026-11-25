@@ -8,7 +8,7 @@ import { EASE } from "@/components/prototype/motion-constants";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
 import { ContactCta } from "../../contact-cta";
-import { CTA, PRODUCTS_CTA_SUBTITLE } from "../../content";
+import { CTA } from "../../content";
 import { CATEGORIES, FEATURED_PRODUCT } from "../../products-data";
 import { ProductCatalog, ProductSolutions } from "../../products-sections";
 import { kitStyles } from "../../subpage-kit";
@@ -559,11 +559,16 @@ export function ProductsOOS1Doubao(props: { onNavigateHome: (hash?: string) => v
         </div>
       </section>
 
-      <ProductCatalog categoryId={activeTab()} />
-      <ProductSolutions />
+      <Show when={activeTab()} keyed>
+        {(tab) => (
+          <>
+            <ProductCatalog categoryId={tab} />
+            <ProductSolutions categoryId={tab} />
+          </>
+        )}
+      </Show>
 
       <ContactCta
-        subtitle={PRODUCTS_CTA_SUBTITLE}
         actions={[{ label: CTA.action.label, onClick: () => props.onNavigateHome("contact") }]}
       />
     </div>

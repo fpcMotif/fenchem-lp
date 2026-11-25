@@ -1,133 +1,262 @@
-export const NEWS_HEADER = {
-  title: "News & Events",
-  chineseTitle: "新闻与展会资讯",
-  tagline: "Global Industry Insights & Events",
-  lead: "追踪泛成全球学术动态、重磅原料发布与全球展会日程。",
-  englishLead: "Discover our latest product launches, global events, and scientific updates.",
-  meta: ["Latest Updates", "Global Calendar"],
-  image: "/prototype/about/campus-showroom-lg.webp",
-  imageAlt: "泛成前沿科技展厅与国际学术交流中心",
-} as const;
-
-export const NEWS_CATEGORIES = [
-  { id: "all", label: "全部 (All)" },
-  { id: "launch", label: "原料首发 (Launches)" },
-  { id: "events", label: "全球展会 (Events)" },
-  { id: "science", label: "科研前瞻 (Science)" },
-  { id: "corporate", label: "企业与ESG (Corporate)" },
-] as const;
-
-export type NewsItem = {
+export type DomesticShow = {
   id: string;
-  category: "launch" | "events" | "science" | "corporate";
-  categoryLabel: string;
   title: string;
-  date: string;
-  readTime: string;
-  excerpt: string;
-  image: string;
-  featured?: boolean;
-  location?: string;
-  booth?: string;
+  when: string;
+  booth: string;
 };
 
-export const FEATURED_NEWS: NewsItem = {
-  id: "incosmetics-2026",
-  category: "events",
-  categoryLabel: "全球展会 · 巴黎",
-  title: "泛成受邀参展 In-cosmetics® Global 2026 巴黎展，发布新一代活性包裹递送平台",
-  date: "2026-03-28",
-  readTime: "3 min",
-  excerpt:
-    "泛成技术团队将于法国巴黎凡尔赛门展馆展示针对光敏及氧敏感活性物的全新微囊包裹与冷水自乳化技术，现场提供原型配方体验装。",
-  image: "/prototype/about/campus-lounge-lg.webp",
-  featured: true,
-  location: "巴黎 · Paris Expo Porte de Versailles",
-  booth: "Stand D42 (Hall 1)",
-};
-
-export const NEWS_LIST: readonly NewsItem[] = [
-  FEATURED_NEWS,
+/** Append a show here when the next domestic exhibition is confirmed. */
+export const DOMESTIC_SHOWS: readonly DomesticShow[] = [
   {
-    id: "kanu-actives",
-    category: "launch",
-    categoryLabel: "原料首发",
-    title: "发布全新 OptiShield™ 天然植物抗敏屏障修护复配活性物",
-    date: "2026-03-12",
-    readTime: "2 min",
-    excerpt:
-      "基于超临界流体温和提取技术，在不破坏多酚活性前提下实现高纯浓缩，体外细胞测试显示屏障修护基因表达提升 42%。",
-    image: "/prototype/about/campus-lab.webp",
+    id: "pchi-2027",
+    title: "PCHi 2027 中国国际化妆品个人及家庭护理用品原料展览会",
+    when: "2027 年 2 月 24 – 26 日",
+    booth: "展位号 3D39",
   },
   {
-    id: "vitafoods-geneva",
-    category: "events",
-    categoryLabel: "全球展会 · 日内瓦",
-    title: "Vitafoods Europe 2026 瑞士日内瓦展会参展预告",
-    date: "2026-05-12",
-    readTime: "2 min",
-    excerpt:
-      "泛成欧洲团队将展示应用于机能食品、软糖与机能饮品的高分散植物甾醇微粉与生物发酵多糖配料。",
-    image: "/prototype/about/campus-reception.webp",
-    location: "日内瓦 · Palexpo Geneva",
-    booth: "Stand J120",
+    id: "fic-2027",
+    title: "FIC 2027 中国国际食品添加剂和配料展览会",
+    when: "2027 年 3 月 17 – 19 日",
+    booth: "展位号 3Y01",
   },
   {
-    id: "whitepaper-delivery",
-    category: "science",
-    categoryLabel: "科研前瞻",
-    title: "技术白皮书：《脂质体双分子层在活性物透皮吸收中的靶向机制》",
-    date: "2026-02-18",
-    readTime: "4 min",
-    excerpt:
-      "系统梳理磷脂微囊对视黄醇与多肽分子的保活与缓释动力学数据，包含三套标准参考原型配方框架。",
-    image: "/prototype/about/campus-office.webp",
+    id: "fia-2027",
+    title: "FIA 2027 亚洲食品配料中国展",
+    when: "2027 年 6 月 22 – 24 日",
+    booth: "展位号 41H30",
   },
   {
-    id: "ecovadis-silver",
-    category: "corporate",
-    categoryLabel: "企业与ESG",
-    title: "制造基地完成全封闭溶剂循环改造，获 EcoVadis 可持续发展评级",
-    date: "2026-01-25",
-    readTime: "2 min",
-    excerpt: "秉承绿色化学原则，有机溶剂循环利用率达到 98.5%，年减少温室气体碳排放超 1,200 吨。",
-    image: "/prototype/about/csr-campus-lake.webp",
+    id: "pct-2027",
+    title: "PCT 2027 个人护理品技术高峰论坛",
+    when: "2027 年 7 月",
+    booth: "",
   },
   {
-    id: "uk-hub",
-    category: "corporate",
-    categoryLabel: "企业动态",
-    title: "泛成英国曼彻斯特仓储中心正式启用，提供本地化 48 小时极速交付",
-    date: "2025-12-10",
-    readTime: "2 min",
-    excerpt: "进一步完善欧洲三点仓储网络，配备本地温控仓储与快速样品分拨，支持英镑直接结算。",
-    image: "/prototype/about/about-lobby.webp",
+    id: "mock-pet-fair-2027",
+    title: "【模拟】2027 亚洲宠物展览会",
+    when: "2027 年 8 月",
+    booth: "展位号待定",
+  },
+  {
+    id: "mock-cphi-2027",
+    title: "【模拟】CPHI China 2027 世界制药原料中国展",
+    when: "2027 年 9 月",
+    booth: "展位号待定",
+  },
+  {
+    id: "mock-nutrition-forum-2027",
+    title: "【模拟】2027 中国营养健康产业创新论坛",
+    when: "2027 年 10 月",
+    booth: "",
+  },
+  {
+    id: "mock-ipe-2027",
+    title: "【模拟】IPE 2027 中国国际宠物营养与健康展",
+    when: "2027 年 11 月",
+    booth: "展位号待定",
+  },
+  {
+    id: "mock-hi-2027",
+    title: "【模拟】Hi China 2027 健康天然原料中国展",
+    when: "2027 年 12 月",
+    booth: "展位号待定",
+  },
+  {
+    id: "mock-cbe-2028",
+    title: "【模拟】CBE 2028 中国美容博览会",
+    when: "2028 年 5 月",
+    booth: "展位号待定",
   },
 ];
 
-export const UPCOMING_EVENTS = [
+export type CompanyNewsItem = {
+  id: string;
+  title: string;
+  published: string;
+  paragraphs: readonly string[];
+};
+
+const MOCK_NEWS_NOTE = "本条为模拟新闻，仅用于页面排版与内容密度预览，不代表真实事件。";
+
+const MOCK_COMPANY_NEWS: readonly CompanyNewsItem[] = (
+  [
+    [
+      "mock-news-01",
+      "泛成食品应用实验室完成升级，新增饮料与烘焙中试线",
+      "2025年1月",
+      "升级后的实验室可为客户提供小批量打样、UHT 灭菌与感官评估，缩短配方验证周期。",
+    ],
+    [
+      "mock-news-02",
+      "泛成亮相 FIC 2025，发布减糖高纤配方方案集",
+      "2025年3月",
+      "展会期间集中展示了抗性糊精、甜菊糖苷与 PHGG 在饮料、乳品和烘焙中的复配案例。",
+    ],
+    [
+      "mock-news-03",
+      "泛成与宠物食品品牌达成关节营养原料长期合作",
+      "2025年3月",
+      "双方将围绕硫酸软骨素与氨基葡萄糖，共同开发面向中大型犬与老年犬的功能性主粮。",
+    ],
+    [
+      "mock-news-04",
+      "泛成南京研发中心通过 CNAS 实验室认可",
+      "2025年4月",
+      "认可范围覆盖多糖含量、重金属与微生物等常规检测项目，检测报告可获国际互认。",
+    ],
+    [
+      "mock-news-05",
+      "泛成举办 2025 个人护理天然油脂技术交流会",
+      "2025年4月",
+      "来自 60 余家品牌的配方师参与交流，重点讨论天然彩色油脂的批次稳定性管理。",
+    ],
+    [
+      "mock-news-06",
+      "泛成硫酸软骨素产线完成智能化改造",
+      "2025年5月",
+      "新产线引入在线监测与自动配料系统，单批次生产周期缩短约 20%。",
+    ],
+    [
+      "mock-news-07",
+      "泛成获颁年度优秀供应商奖",
+      "2025年6月",
+      "该奖项由合作客户基于交付准时率、质量稳定性与技术服务评估后颁发。",
+    ],
+    [
+      "mock-news-08",
+      "泛成参加 FIA 2025 亚洲食品配料中国展",
+      "2025年6月",
+      "展位以“纤维新视角”为主题，现场提供高纤酸奶与低糖曲奇的试吃体验。",
+    ],
+    [
+      "mock-news-09",
+      "泛成启动“原料溯源”数字化项目",
+      "2025年7月",
+      "项目将为核心原料建立从产地到出厂的批次档案，客户可按批号查询检测数据。",
+    ],
+    [
+      "mock-news-10",
+      "泛成与高校共建功能性多糖联合实验室",
+      "2025年8月",
+      "联合实验室将聚焦膳食纤维结构与肠道菌群调节机制的基础研究。",
+    ],
+    [
+      "mock-news-11",
+      "泛成发布宠物口腔健康原料白皮书",
+      "2025年9月",
+      "白皮书整理了常见口腔健康原料的作用机制、添加量建议与适口性测试方法。",
+    ],
+    [
+      "mock-news-12",
+      "泛成美国子公司仓储中心扩容完成",
+      "2025年9月",
+      "扩容后的仓储面积提升一倍，可覆盖北美客户的小批量快速交付需求。",
+    ],
+    [
+      "mock-news-13",
+      "泛成参加 PCT 2025 个人护理品技术高峰论坛",
+      "2025年10月",
+      "技术团队分享了液态乳木果油在高添加量体系中防止结晶的应用经验。",
+    ],
+    [
+      "mock-news-14",
+      "泛成开展年度安全生产应急演练",
+      "2025年11月",
+      "演练覆盖火灾疏散、化学品泄漏处置等场景，全体员工参与。",
+    ],
+    [
+      "mock-news-15",
+      "泛成员工志愿者走进社区开展营养科普",
+      "2025年12月",
+      "志愿者围绕膳食纤维摄入与均衡饮食，为社区居民提供了 3 场讲座。",
+    ],
+    [
+      "mock-news-16",
+      "泛成 2026 年度客户大会在南京举行",
+      "2026年1月",
+      "大会回顾了年度新品进展，并发布了面向食品与营养健康行业的新一年产品路线。",
+    ],
+    [
+      "mock-news-17",
+      "泛成获评国家级绿色工厂",
+      "2026年2月",
+      "评价涵盖能源利用、资源节约与污染物排放等指标。",
+    ],
+    [
+      "mock-news-18",
+      "泛成发布首份可持续发展报告",
+      "2026年3月",
+      "报告披露了能源使用、包装减量与责任采购方面的阶段性进展与三年目标。",
+    ],
+    [
+      "mock-news-19",
+      "泛成运动营养原料系列正式上市",
+      "2026年4月",
+      "新系列包括一水肌酸与 L-瓜氨酸，配套提供冲剂与软糖剂型的应用参考。",
+    ],
+    [
+      "mock-news-20",
+      "泛成欧洲子公司通过 FSSC 22000 认证",
+      "2026年5月",
+      "认证覆盖原料仓储与分装环节，进一步完善欧洲区的食品安全管理体系。",
+    ],
+    [
+      "mock-news-21",
+      "泛成新园区二期工程正式开工",
+      "2026年6月",
+      "二期工程规划新增中试车间与应用研发中心，预计两年内投入使用。",
+    ],
+  ] as const
+).map(([id, title, published, detail]) => ({
+  id,
+  title: `【模拟】${title}`,
+  published,
+  paragraphs: [MOCK_NEWS_NOTE, detail],
+}));
+
+/**
+ * Company news. Add the next item to this list; an empty list renders the
+ * placeholder in the news page.
+ */
+export const COMPANY_NEWS: readonly CompanyNewsItem[] = [
   {
-    date: "2026.03.31 – 04.02",
-    name: "In-cosmetics® Global 2026",
-    city: "巴黎 · 法国 (Paris, France)",
-    booth: "Stand D42",
+    id: "specialized-sme-2024",
+    title: "泛成获评江苏省专精特新中小企业，主导产品硫酸软骨素获认可",
+    published: "2024年5月",
+    paragraphs: [
+      "我公司成功入选江苏省专精特新中小企业名单，主导产品硫酸软骨素获得认定。",
+      "“专精特新”中小企业是指具备专业化、精细化、特色化、新颖化特征的中小企业，重点考察企业在细分领域的专注程度与创新能力。公司长期深耕硫酸软骨素领域，在原料提取、工艺优化与质量控制方面形成了自身特色。",
+      "此次获评，是对公司专业化发展路径的肯定。公司将继续聚焦硫酸软骨素及相关生物制品的研发与生产，做深做精，巩固在细分领域的技术与市场优势。",
+    ],
   },
   {
-    date: "2026.05.12 – 05.14",
-    name: "Vitafoods Europe 2026",
-    city: "日内瓦 · 瑞士 (Geneva, Switzerland)",
-    booth: "Stand J120",
+    id: "gazelle-2024",
+    title: "泛成获评“江苏省瞪羚企业”",
+    published: "2024年10月",
+    paragraphs: [
+      "近日，我公司成功入选江苏省瞪羚企业名单。",
+      "瞪羚企业是指跨越创业期，以科技创新或商业模式创新为支撑，进入高成长期的中小企业。该资质的获得，是对公司近年来成长速度、创新活力与发展潜力的认可。",
+      "作为一家专注于生物科技领域的企业，公司将持续加大研发投入，保持技术优势，以更优质的产品与服务回馈客户与市场。",
+    ],
   },
   {
-    date: "2026.09.23 – 09.24",
-    name: "In-cosmetics® Latin America",
-    city: "圣保罗 · 巴西 (São Paulo, Brazil)",
-    booth: "Stand E30",
+    id: "high-tech-2024",
+    title: "泛成硫酸软骨素、复合抗氧化剂相关技术获高新技术企业认定",
+    published: "2024年11月",
+    paragraphs: [
+      "我公司凭借在硫酸软骨素及复合抗氧化剂领域的技术积累与创新成果，成功获得高新技术企业认定。",
+      "高新技术企业认定对企业核心自主知识产权、研发投入、科技成果转化能力等方面均有明确要求。此次获评，标志着公司在上述产品方向上的技术实力与规范化管理水平得到了认可。",
+      "未来，公司将继续围绕硫酸软骨素与复合抗氧化剂的核心技术深化研发，推动产品品质与生产工艺的持续提升。",
+    ],
   },
-  {
-    date: "2026.10.28 – 10.29",
-    name: "SupplySide West 2026",
-    city: "拉斯维加斯 · 美国 (Las Vegas, USA)",
-    booth: "Booth #4825",
-  },
-] as const;
+  ...MOCK_COMPANY_NEWS,
+];
+
+export const NEWS_PAGE = {
+  title: "新闻资讯",
+  lead: "展会行程与公司近况，集中在这里。",
+  showsTitle: "国内展会",
+  showsLead: "即将参加的国内展会与论坛。",
+  companyTitle: "公司新闻",
+  companyEmpty: "内容整理中，随后补充。",
+} as const;

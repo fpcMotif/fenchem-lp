@@ -147,12 +147,7 @@ export function Closing(props: { onNavigateHome: (hash?: string) => void }) {
       <div {...stylex.attrs(ui.shell)}>
         <div {...stylex.attrs(ui.grid, ui.ruled)}>
           <div {...stylex.attrs(styles.head)}>
-            <SectionHead
-              num="07"
-              word="Correspondence"
-              title={["留一条泳道，", "给你的项目。"]}
-              titleId="oos1w-closing"
-            />
+            <SectionHead title={["留一条泳道，", "给你的项目。"]} titleId="oos1w-closing" />
           </div>
 
           <div {...stylex.attrs(styles.body)}>

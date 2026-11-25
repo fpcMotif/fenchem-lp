@@ -1,15 +1,10 @@
-import {
-  CTA as OOX_CTA,
-  HERO,
-  PRODUCTS_INTRO as OOX_PRODUCTS_INTRO,
-  STATS,
-} from "../variant-oox/content";
+import { HERO, PRODUCTS_INTRO as OOX_PRODUCTS_INTRO, STATS } from "../variant-oox/content";
 
 export {
   ABOUT,
   CAMPUS,
   COPYRIGHT,
-  ECHO,
+  CTA,
   FOOTER_COLUMNS,
   GLOBAL_INTRO,
   HERO,
@@ -36,19 +31,12 @@ export const HERO_DECK = {
 
 export const DECK_OPEN = {
   title: OOX_PRODUCTS_INTRO.title,
-  echo: OOX_PRODUCTS_INTRO.echo,
   lead: OOX_PRODUCTS_INTRO.lead,
 } as const;
 
 export const DECK_CLOSE = {
   line: HERO.title,
-  echo: "one source",
   cta: { label: "咨询方案", href: "#contact" },
-} as const;
-
-export const CONTACT = {
-  ...OOX_CTA,
-  echo: "let's talk",
 } as const;
 
 export const MARQUEE = [

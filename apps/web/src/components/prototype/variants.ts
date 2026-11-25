@@ -27,8 +27,11 @@ type VariantEntry = {
 
 const ABOUT_NAMES: Record<string, string> = {
   oos1a: "Lattice / misregistered",
+  oos1abandon: "Early about / before the figma pass",
+  oos1album: "Album flow / mirrored campus",
   oos1b: "Portal / pull back",
   oos1c: "Panorama / seam",
+  oos1cover: "Coverflow campus / side peeks",
   oos1d: "Phi / off-by-one",
   oos1e: "Dossier / overprint",
   oos1f: "Strand / twist",
@@ -184,6 +187,13 @@ export const VARIANTS: readonly VariantEntry[] = [
     "VariantOOS1",
     "oos",
   ),
+  page(
+    "oos1taste",
+    "O campus home · taste pass",
+    () => import("./variant-oos1/home/oos1taste/index"),
+    "VariantOOS1Taste",
+    "oos1",
+  ),
   ...ABOUT_VARIANTS,
   page(
     "oos1doubao",
@@ -200,6 +210,13 @@ export const VARIANTS: readonly VariantEntry[] = [
     "oos1",
   ),
   ...PRODUCT_VARIANTS,
+  page(
+    "oos1insightsabandon",
+    "O campus insights · Bookmark rail sidebar / before the sidebar redo",
+    () => import("./variant-oos1/insights/oos1insightsabandon/index"),
+    "VariantOOS1InsightsAbandon",
+    "oos1",
+  ),
   page(
     "oos2",
     "Official site · O campus keep-open",

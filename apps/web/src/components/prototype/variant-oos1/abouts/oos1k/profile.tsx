@@ -11,21 +11,6 @@ type Country = (typeof ABOUT_HERO.countries)[number];
 type Side = "end" | "start";
 type Point = { x: number; y: number; side: Side };
 
-const ENGLISH: Record<Country, string> = {
-  美国: "United States",
-  德国: "Germany",
-  英国: "United Kingdom",
-  捷克: "Czechia",
-  巴西: "Brazil",
-  南非: "South Africa",
-  日本: "Japan",
-  泰国: "Thailand",
-  马来西亚: "Malaysia",
-  印度尼西亚: "Indonesia",
-  菲律宾: "Philippines",
-  印度: "India",
-};
-
 const HUB: Point = { x: 46, y: 44, side: "end" };
 
 const PLACES: Record<Country, Point> = {
@@ -200,13 +185,6 @@ const styles = stylex.create({
     fontSize: { default: 17, [bp.desktop]: 19 },
     fontWeight: 500,
   },
-  en: {
-    gridRow: "2",
-    fontSize: 12,
-    letterSpacing: "0.05em",
-  },
-  enEnd: { gridColumn: "2" },
-  enStart: { gridColumn: "1" },
 });
 
 const anchor = stylex.create({
@@ -218,7 +196,6 @@ function Label(props: {
   point: Point;
   number: number;
   zh: string;
-  en: string;
   hub?: boolean;
   hidden: boolean;
   delay: number;
@@ -247,9 +224,6 @@ function Label(props: {
       {end ? numeral() : null}
       <span {...stylex.attrs(styles.zh, p.hub && styles.hubZh)}>{p.zh}</span>
       {end ? null : numeral()}
-      <span lang="en" {...stylex.attrs(ui.label, styles.en, end ? styles.enEnd : styles.enStart)}>
-        {p.en}
-      </span>
     </Tag>
   );
 }
@@ -265,13 +239,7 @@ export function Profile() {
     >
       <div {...stylex.attrs(styles.grid)}>
         <div {...stylex.attrs(styles.text)}>
-          <ChartHeading
-            id="oos1k-profile"
-            numeral="I"
-            label="Profile"
-            title="企业概况"
-            note="The constellation Fenchem"
-          />
+          <ChartHeading id="oos1k-profile" title="企业概况" />
           <p {...stylex.attrs(styles.company)}>
             <span {...stylex.attrs(styles.companyName)}>{ABOUT_HERO.title}</span>
             <span lang="en" {...stylex.attrs(styles.companyEnglish)}>
@@ -320,14 +288,13 @@ export function Profile() {
                 {...stylex.attrs(styles.point, styles.hubPoint)}
               />
             </svg>
-            <Label point={HUB} number={1} zh="南京" en="Nanjing" hub hidden={hidden()} delay={0} />
+            <Label point={HUB} number={1} zh="南京" hub hidden={hidden()} delay={0} />
             <ol {...stylex.attrs(styles.labels)}>
               {ABOUT_HERO.countries.map((country, index) => (
                 <Label
                   point={PLACES[country]}
                   number={index + 2}
                   zh={country}
-                  en={ENGLISH[country]}
                   hidden={hidden()}
                   delay={260 + index * 70}
                 />

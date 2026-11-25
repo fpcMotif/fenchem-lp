@@ -1,9 +1,13 @@
 import * as stylex from "@stylexjs/stylex";
+import type { JSX } from "@solidjs/web";
 import { ArrowUp, ArrowUpRight } from "@fenchem-lp/ui/components/lucide";
 
 import { corridorDrawing, type Drawing } from "./perspective";
-import { NON_SCALING, UNFOCUSABLE, ui } from "./shared";
+import { ui } from "./shared";
 import { bp, chrome, face, tone } from "./tokens.stylex";
+
+const UNFOCUSABLE = { focusable: "false" } as JSX.SvgSVGAttributes<SVGSVGElement>;
+const NON_SCALING = { "vector-effect": "non-scaling-stroke" } as const;
 
 const PHONE = corridorDrawing(13, false);
 const WIDE = corridorDrawing(22, false);
@@ -45,13 +49,6 @@ const styles = stylex.create({
     letterSpacing: "0.04em",
     color: tone.navy,
     fontFeatureSettings: '"palt"',
-  },
-  subtitle: {
-    margin: 0,
-    marginTop: { default: 10, [bp.desktop]: 14 },
-    fontSize: { default: 19, [bp.desktop]: 24 },
-    lineHeight: 1.35,
-    color: tone.body,
   },
   vestibule: {
     position: "relative",
@@ -117,10 +114,6 @@ const styles = stylex.create({
     transitionDuration: "320ms",
     transitionTimingFunction: chrome.ease,
   },
-  doorNote: {
-    fontSize: { default: 17, [bp.desktop]: 20 },
-    color: "rgba(255, 255, 255, 0.82)",
-  },
   back: {
     display: "inline-flex",
     alignItems: "center",
@@ -160,16 +153,10 @@ export function Closing(props: { onNavigateHome: (hash?: string) => void }) {
       <div {...stylex.attrs(ui.shell, styles.head)}>
         <p {...stylex.attrs(styles.sign)}>
           <span {...stylex.attrs(styles.signChinese)}>出口</span>
-          <span lang="en" {...stylex.attrs(ui.caps)}>
-            Exit
-          </span>
         </p>
         <h2 id="oos1z-closing" {...stylex.attrs(styles.title)}>
           感谢参观
         </h2>
-        <p lang="en" {...stylex.attrs(ui.italic, styles.subtitle)}>
-          Thank you for visiting. This way out leads to contact.
-        </p>
       </div>
       <div {...stylex.attrs(styles.vestibule)}>
         <Lines drawing={PHONE} sx={styles.phone} />
@@ -188,18 +175,12 @@ export function Closing(props: { onNavigateHome: (hash?: string) => void }) {
               {...stylex.attrs(styles.arrow)}
             />
           </span>
-          <span lang="en" {...stylex.attrs(ui.italic, styles.doorNote)}>
-            Contact us
-          </span>
         </button>
       </div>
       <div {...stylex.attrs(styles.backRow)}>
         <a href="#about-top" {...stylex.attrs(ui.focus, styles.back)}>
           <ArrowUp size={14} strokeWidth={1.5} aria-hidden="true" />
           回到入口
-          <span lang="en" {...stylex.attrs(ui.italic)}>
-            Back to the entrance
-          </span>
         </a>
       </div>
     </section>

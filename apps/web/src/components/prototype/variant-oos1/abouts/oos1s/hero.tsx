@@ -3,7 +3,7 @@ import * as stylex from "@stylexjs/stylex";
 
 import { ABOUT_BANNER } from "../../about-data";
 import { ui } from "./shared-values";
-import { font, motionCss, slit, step, tone } from "./tokens.stylex";
+import { motionCss, slit, step, tone } from "./tokens.stylex";
 
 const openSlit = stylex.keyframes({
   "0%": { clipPath: slit.openingClosed },
@@ -33,24 +33,6 @@ const s = stylex.create({
     lineHeight: 1.05,
     letterSpacing: "0.04em",
     color: tone.ink,
-  },
-  opening: {
-    display: "flex",
-    flexDirection: "column",
-    gap: { default: 12, [breakpoints.md]: 16 },
-  },
-  tagline: {
-    margin: 0,
-    fontFamily: font.serif,
-    fontStyle: "italic",
-    fontSize: { default: step.title, [breakpoints.md]: step.display },
-    fontWeight: 400,
-    lineHeight: 1.1,
-    letterSpacing: "0.005em",
-    color: tone.ink,
-  },
-  taglineLine: {
-    display: "block",
   },
   lead: {
     margin: 0,
@@ -84,33 +66,16 @@ const s = stylex.create({
   image: {
     objectPosition: { default: "42% 62%", [breakpoints.lg]: "50% 64%" },
   },
-  subtitle: {
-    margin: 0,
-    paddingBlock: { default: 20, [breakpoints.md]: 24 },
-    textAlign: "center",
-    fontSize: step.label,
-    fontWeight: 400,
-    letterSpacing: "0.14em",
-    color: tone.body,
-  },
 });
 
 export function Hero() {
-  const [taglineLead, taglineClose] = ABOUT_BANNER.tagline.split(", ");
-
   return (
     <section aria-labelledby="about-banner-title" {...stylex.attrs(s.hero)}>
       <div {...stylex.attrs(ui.shell, ui.inset, s.head)}>
         <h1 id="about-banner-title" {...stylex.attrs(s.title)}>
           {ABOUT_BANNER.title}
         </h1>
-        <div {...stylex.attrs(s.opening)}>
-          <p lang="en" {...stylex.attrs(s.tagline)}>
-            <span {...stylex.attrs(s.taglineLine)}>{taglineLead},</span>
-            <span {...stylex.attrs(s.taglineLine)}>{taglineClose}</span>
-          </p>
-          <p {...stylex.attrs(s.lead)}>{ABOUT_BANNER.lead}</p>
-        </div>
+        <p {...stylex.attrs(s.lead)}>{ABOUT_BANNER.lead}</p>
       </div>
       <figure {...stylex.attrs(s.figure)}>
         <div {...stylex.attrs(s.frame)}>
@@ -122,9 +87,6 @@ export function Hero() {
             {...stylex.attrs(ui.fill, s.image)}
           />
         </div>
-        <figcaption lang="en" {...stylex.attrs(s.subtitle)}>
-          {ABOUT_BANNER.established} · {ABOUT_BANNER.place}
-        </figcaption>
       </figure>
     </section>
   );

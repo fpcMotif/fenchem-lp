@@ -111,11 +111,6 @@ const styles = stylex.create({
     fontWeight: 400,
     color: ui.body,
   },
-  place: {
-    fontSize: 12,
-    letterSpacing: "0.12em",
-    color: ui.body,
-  },
   figure: {
     margin: 0,
   },
@@ -170,9 +165,6 @@ export function Hero(props: { onNavigateHome: (hash?: string) => void }) {
               <span {...stylex.attrs(styles.yearUnit)}>年</span>
             </div>
             <HairlineScale />
-            <span lang="en" {...stylex.attrs(styles.place)}>
-              {ABOUT_BANNER.place}
-            </span>
           </div>
         </div>
 

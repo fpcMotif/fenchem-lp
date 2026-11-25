@@ -90,10 +90,6 @@ const styles = stylex.create({
     fontSize: 15,
     color: tone.ink,
   },
-  english: {
-    fontSize: 16,
-    color: tone.body,
-  },
   view: {
     display: "inline-flex",
     alignItems: "center",
@@ -126,9 +122,6 @@ function Caption(props: {
               </span>
               <span aria-hidden="true" {...stylex.attrs(styles.rule)} />
               <span {...stylex.attrs(styles.title)}>{work ? work.caption : LAKE.title}</span>
-              <span lang="en" {...stylex.attrs(ui.italic, styles.english)}>
-                {work ? work.english : LAKE.facing}
-              </span>
               {work ? (
                 <button
                   type="button"

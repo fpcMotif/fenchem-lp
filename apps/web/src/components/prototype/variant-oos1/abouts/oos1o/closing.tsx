@@ -1,7 +1,6 @@
 import * as stylex from "@stylexjs/stylex";
 import { ArrowRight } from "@fenchem-lp/ui/components/lucide";
 
-import { ABOUT_BANNER } from "../../about-data";
 import { SectionHead } from "./section-head";
 import { ui } from "./shared";
 import { bp, chrome, face, tone } from "./tokens.stylex";
@@ -25,13 +24,6 @@ const styles = stylex.create({
     letterSpacing: "0.02em",
     color: tone.ink,
     fontFeatureSettings: '"palt"',
-  },
-  note: {
-    margin: 0,
-    marginTop: { default: 16, [bp.desktop]: 20 },
-    fontSize: { default: 21, [bp.desktop]: 26 },
-    lineHeight: 1.3,
-    color: tone.body,
   },
   actions: {
     gridColumn: { default: "1 / -1", [bp.desktop]: "9 / 13" },
@@ -91,11 +83,8 @@ export function Closing(props: { onNavigateHome: (hash?: string) => void }) {
     <section aria-labelledby="oos1o-closing" {...stylex.attrs(styles.section)}>
       <div {...stylex.attrs(ui.shell, ui.grid)}>
         <div {...stylex.attrs(styles.copy)}>
-          <SectionHead id="oos1o-closing" label="Contact" title="联系泛成" quiet />
+          <SectionHead id="oos1o-closing" title="联系泛成" quiet />
           <p {...stylex.attrs(styles.line)}>这一圈，仍在生长。</p>
-          <p lang="en" {...stylex.attrs(ui.serif, styles.note)}>
-            {ABOUT_BANNER.tagline}
-          </p>
         </div>
         <div {...stylex.attrs(styles.actions)}>
           <button

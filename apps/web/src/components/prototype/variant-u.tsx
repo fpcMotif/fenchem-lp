@@ -320,12 +320,6 @@ const styles = stylex.create({
       [breakpoints.md]: "flex",
     },
   },
-  stripHideMobile: {
-    display: {
-      default: "none",
-      [breakpoints.md]: "inline",
-    },
-  },
   header: {
     position: "sticky",
     top: 0,
@@ -486,16 +480,6 @@ const styles = stylex.create({
     display: "grid",
     gap: 24,
   },
-  heroKicker: {
-    display: "flex",
-    alignItems: "center",
-    gap: 12,
-  },
-  heroRule: {
-    width: 32,
-    height: 2,
-    backgroundColor: colors.brandGreen400,
-  },
   heroActions: {
     display: "flex",
     flexWrap: "wrap",
@@ -575,7 +559,7 @@ const styles = stylex.create({
   },
   specCardFoot: {
     display: "flex",
-    justifyContent: "space-between",
+    justifyContent: "flex-end",
     alignItems: "center",
     paddingBlock: 12,
     paddingInline: 16,
@@ -629,11 +613,6 @@ const styles = stylex.create({
   },
   sectionHeadMain: {
     display: "grid",
-    gap: 10,
-  },
-  sectionIndex: {
-    display: "flex",
-    alignItems: "center",
     gap: 10,
   },
 
@@ -814,12 +793,6 @@ const styles = stylex.create({
     alignContent: "start",
     gap: 10,
   },
-  cardIndex: {
-    fontFamily: typography.tech,
-    fontSize: 11,
-    letterSpacing: "0.08em",
-    color: colors.mute600,
-  },
 
   /* Quality */
   pillarGrid: {
@@ -948,20 +921,6 @@ const styles = stylex.create({
     gap: 12,
     justifyItems: "start",
   },
-  contactMeta: {
-    display: "grid",
-    gap: 8,
-    listStyle: "none",
-    margin: 0,
-    padding: 0,
-  },
-  contactMetaItem: {
-    display: "flex",
-    alignItems: "center",
-    gap: 8,
-    fontSize: 13,
-    color: colors.mute700,
-  },
 
   /* Footer */
   footer: {
@@ -1028,9 +987,6 @@ function UtilityStrip() {
         <div {...stylex.attrs(styles.stripRow)}>
           <div {...stylex.attrs(styles.stripGroup)}>
             <span {...stylex.attrs(styles.mono)}>Q1 index · 08 specimens</span>
-            <span {...stylex.attrs(styles.mono, styles.stripHideMobile)}>
-              ISO 9001 · GMP · FSSC 22000
-            </span>
           </div>
           <div {...stylex.attrs(styles.stripGroup, styles.stripRight)}>
             <span {...stylex.attrs(styles.mono)}>
@@ -1144,14 +1100,6 @@ function HeroSection() {
         <div {...stylex.attrs(styles.heroGrid)}>
           <div {...stylex.attrs(styles.heroLeft)}>
             <Reveal margin="0px">
-              <div {...stylex.attrs(styles.heroKicker)}>
-                <span aria-hidden="true" {...stylex.attrs(styles.heroRule)} />
-                <p {...stylex.attrs(styles.labelSm)}>
-                  {company.legalName} · {company.since}
-                </p>
-              </div>
-            </Reveal>
-            <Reveal delay={STAGGER} margin="0px">
               <h1 {...stylex.attrs(styles.displayLg)}>
                 Specified ingredients for formulators in 40+ countries
               </h1>
@@ -1189,7 +1137,6 @@ function HeroSection() {
             <Reveal delay={STAGGER * 2} margin="0px" sx={styles.heroRight}>
               <article aria-label="Specification card" {...stylex.attrs(styles.specCard)}>
                 <div {...stylex.attrs(styles.specCardHead)}>
-                  <span {...stylex.attrs(styles.labelSm)}>Specification</span>
                   <span {...stylex.attrs(styles.mono)}>{COVER.code}</span>
                 </div>
                 <div {...stylex.attrs(styles.specCardTitle)}>
@@ -1209,10 +1156,6 @@ function HeroSection() {
                   </tbody>
                 </table>
                 <div {...stylex.attrs(styles.specCardFoot)}>
-                  <span {...stylex.attrs(styles.appCell, styles.bodySm)}>
-                    <span aria-hidden="true" {...stylex.attrs(styles.dot)} />
-                    Documentation available
-                  </span>
                   <a href={createInquiryHref("industries")} {...stylex.attrs(styles.link)}>
                     Request dossier
                     <ArrowUpRight aria-hidden="true" size={14} />
@@ -1250,16 +1193,13 @@ function KpiBand() {
 
 /* ─────────────────────────────── Section head ─────────────────────────────── */
 
-function SectionHead(props: { index: string; label: string; title: string; aside?: JSX.Element }) {
+function SectionHead(props: { id: string; title: string; aside?: JSX.Element }) {
   return (
     <Reveal sx={styles.sectionHead}>
       <div {...stylex.attrs(styles.sectionHeadMain)}>
-        <div {...stylex.attrs(styles.sectionIndex)}>
-          <span {...stylex.attrs(styles.mono)}>{props.index}</span>
-          <span aria-hidden="true" {...stylex.attrs(styles.heroRule)} />
-          <p {...stylex.attrs(styles.labelSm)}>{props.label}</p>
-        </div>
-        <h2 {...stylex.attrs(styles.headlineLg)}>{props.title}</h2>
+        <h2 id={props.id} {...stylex.attrs(styles.headlineLg)}>
+          {props.title}
+        </h2>
       </div>
       {props.aside}
     </Reveal>
@@ -1273,8 +1213,7 @@ function LedgerSection() {
     <section id="ledger" aria-labelledby="ledger-title" {...stylex.attrs(styles.band)}>
       <div {...stylex.attrs(styles.container)}>
         <SectionHead
-          index="01"
-          label="Ingredient ledger"
+          id="ledger-title"
           title="Eight actives, one specification each"
           aside={
             <a href={createInquiryHref("industries")} {...stylex.attrs(styles.link)}>
@@ -1370,9 +1309,6 @@ function LedgerSection() {
               ))}
             </ul>
             <div {...stylex.attrs(styles.tableFoot)}>
-              <span {...stylex.attrs(styles.mono)}>
-                {pad(ingredients.length)} rows · assay and form per lot
-              </span>
               <span {...stylex.attrs(styles.mono)}>Documentation before sampling</span>
             </div>
           </div>
@@ -1392,7 +1328,7 @@ function IndustriesSection() {
       {...stylex.attrs(styles.band, styles.bandSurface)}
     >
       <div {...stylex.attrs(styles.container)}>
-        <SectionHead index="02" label="Industries" title="Three markets, one chain of custody" />
+        <SectionHead id="industries-title" title="Three markets, one chain of custody" />
         <div {...stylex.attrs(styles.threeGrid)}>
           {industries.map((industry, i) => (
             <Reveal delay={STAGGER * i} sx={styles.tintCard}>
@@ -1404,9 +1340,6 @@ function IndustriesSection() {
                 {...stylex.attrs(styles.tintCardImg)}
               />
               <div {...stylex.attrs(styles.tintCardBody)}>
-                <span {...stylex.attrs(styles.cardIndex)}>
-                  {pad(i + 1)} / {pad(industries.length)}
-                </span>
                 <h3 {...stylex.attrs(styles.headlineMd)}>{industry.title}</h3>
                 <p {...stylex.attrs(styles.bodyMd)}>{industry.copy}</p>
                 <a href={createInquiryHref("industries")} {...stylex.attrs(styles.link)}>
@@ -1429,15 +1362,13 @@ function QualitySection() {
     <section id="quality" aria-labelledby="quality-title" {...stylex.attrs(styles.band)}>
       <div {...stylex.attrs(styles.container)}>
         <SectionHead
-          index="03"
-          label="Quality"
+          id="quality-title"
           title="Identity, potency and stability validated on every lot"
         />
         <Reveal>
           <div {...stylex.attrs(styles.pillarGrid)}>
-            {pillars.map((pillar, i) => (
+            {pillars.map((pillar) => (
               <div {...stylex.attrs(styles.pillarCard)}>
-                <span {...stylex.attrs(styles.cardIndex)}>{pad(i + 1)}</span>
                 <h3 {...stylex.attrs(styles.headlineMd)}>{pillar.title}</h3>
                 <p {...stylex.attrs(styles.bodyMd)}>{pillar.copy}</p>
               </div>
@@ -1486,16 +1417,7 @@ function GlobalSection() {
       {...stylex.attrs(styles.band, styles.bandSurface)}
     >
       <div {...stylex.attrs(styles.container)}>
-        <SectionHead
-          index="04"
-          label="Global supply"
-          title="Six bases on three continents"
-          aside={
-            <span {...stylex.attrs(styles.mono)}>
-              HQ {company.hq.city} · {company.hq.coords}
-            </span>
-          }
-        />
+        <SectionHead id="global-title" title="Six bases on three continents" />
         <Reveal>
           <div {...stylex.attrs(styles.card)}>
             <div style={{ "overflow-x": "auto" }}>
@@ -1553,11 +1475,6 @@ function ContactSection() {
       <div {...stylex.attrs(styles.container)}>
         <div {...stylex.attrs(styles.contactGrid)}>
           <Reveal sx={styles.contactMain}>
-            <div {...stylex.attrs(styles.sectionIndex)}>
-              <span {...stylex.attrs(styles.mono)}>05</span>
-              <span aria-hidden="true" {...stylex.attrs(styles.heroRule)} />
-              <p {...stylex.attrs(styles.labelSm)}>Contact</p>
-            </div>
             <h2 id="contact-title" {...stylex.attrs(styles.headlineLg)}>
               Send the target specification. We return assay, form and dossier within 24 hours.
             </h2>
@@ -1573,16 +1490,6 @@ function ContactSection() {
             <a href={`mailto:${company.email}`} {...stylex.attrs(styles.link)}>
               {company.email}
             </a>
-            <ul {...stylex.attrs(styles.contactMeta)}>
-              <li {...stylex.attrs(styles.contactMetaItem)}>
-                <span aria-hidden="true" {...stylex.attrs(styles.dot)} />
-                Response &lt; 24h
-              </li>
-              <li {...stylex.attrs(styles.contactMetaItem)}>
-                <span aria-hidden="true" {...stylex.attrs(styles.dot)} />
-                Documentation before sampling
-              </li>
-            </ul>
           </Reveal>
         </div>
       </div>
@@ -1603,9 +1510,7 @@ function FooterSection() {
               <span {...stylex.attrs(styles.brandWord)}>FENCHEM</span>
             </a>
             <p {...stylex.attrs(styles.bodySm)}>{company.tagline}</p>
-            <span {...stylex.attrs(styles.mono)}>
-              {company.legalName} · {company.since}
-            </span>
+            <span {...stylex.attrs(styles.mono)}>{company.since}</span>
           </div>
           <div {...stylex.attrs(styles.footerCol)}>
             <h3 {...stylex.attrs(styles.labelSm)}>Sections</h3>

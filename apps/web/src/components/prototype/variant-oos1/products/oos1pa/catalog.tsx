@@ -6,7 +6,7 @@ import { createSignal, createUniqueId, onSettled, untrack } from "solid-js";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
 import { CATALOG_GROUPS } from "../../products-data";
-import { FLAT_ITEMS, REGION_META, padIndex, type FlatItem } from "../shared/derived";
+import { FLAT_ITEMS, REGION_META, type FlatItem } from "../shared/derived";
 import { font, media, motionCss, tone } from "./tokens.stylex";
 
 const HEADER_HEIGHT = 80;
@@ -256,15 +256,6 @@ const styles = stylex.create({
     gap: 4,
     paddingInlineEnd: { default: 0, [media.lg]: 24 },
   },
-  groupIndex: {
-    fontFamily: font.numeral,
-    fontSize: 13,
-    fontWeight: 500,
-    lineHeight: "16px",
-    letterSpacing: "0.04em",
-    fontVariantNumeric: "tabular-nums",
-    color: colors.brandGreen300,
-  },
   groupLabelRow: {
     display: "flex",
     alignItems: "baseline",
@@ -491,7 +482,6 @@ export function Catalog() {
                   >
                     <div {...stylex.attrs(styles.groupInner)}>
                       <span {...stylex.attrs(styles.groupName)}>
-                        <span {...stylex.attrs(styles.groupIndex)}>{padIndex(region.index)}</span>
                         <span {...stylex.attrs(styles.groupLabelRow)}>
                           <span {...stylex.attrs(styles.groupLabel)}>{region.group.label}</span>
                           <span {...stylex.attrs(styles.groupCount)}>

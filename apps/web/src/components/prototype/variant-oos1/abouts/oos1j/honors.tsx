@@ -7,7 +7,7 @@ import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 import { ABOUT_HONORS } from "../../about-data";
 import { Monument, Reveal, SectionName, useInViewOnce } from "./parts";
 import { base, ty } from "./shared";
-import { font, hue, size } from "./theme.stylex";
+import { hue, size } from "./theme.stylex";
 import { createSignal, merge } from "solid-js";
 
 const LEVEL_LABEL = {
@@ -40,8 +40,8 @@ const styles = stylex.create({
     position: "relative",
     display: "grid",
     gridTemplateColumns: {
-      default: "40px minmax(0, 1fr)",
-      [breakpoints.md]: "56px minmax(0, 1fr) 96px",
+      default: "minmax(0, 1fr)",
+      [breakpoints.md]: "minmax(0, 1fr) 96px",
     },
     alignItems: "baseline",
     columnGap: { default: 12, [breakpoints.md]: 24 },
@@ -68,13 +68,6 @@ const styles = stylex.create({
   ruleShown: {
     transform: "none",
   },
-  numeral: {
-    fontFamily: font.display,
-    fontSize: 11,
-    fontVariantNumeric: "tabular-nums",
-    letterSpacing: "0.14em",
-    color: hue.quiet,
-  },
   title: {
     margin: 0,
     fontSize: "clamp(20px, 2vw, 28px)",
@@ -100,9 +93,6 @@ function HonorRow(props: {
     <Reveal as="li" step={props.index % 3} sx={styles.row}>
       <RowRule />
       {props.last ? <RowRule bottom /> : null}
-      <span aria-hidden="true" lang="en" {...stylex.attrs(styles.numeral)}>
-        {String(props.index + 1).padStart(2, "0")}
-      </span>
       <h3 {...stylex.attrs(styles.title)}>{props.title}</h3>
       <span {...stylex.attrs(ty.quiet, styles.level)}>{LEVEL_LABEL[props.level]}</span>
     </Reveal>

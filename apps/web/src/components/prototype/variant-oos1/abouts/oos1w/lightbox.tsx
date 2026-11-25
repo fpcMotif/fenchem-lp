@@ -12,7 +12,6 @@ export type LightboxPhoto = {
   large: string;
   alt: string;
   caption: string;
-  panel: string;
 };
 
 const fadeIn = stylex.keyframes({
@@ -87,11 +86,6 @@ const styles = stylex.create({
     justifyContent: "space-between",
     gap: 16,
   },
-  captionMain: {
-    display: "flex",
-    alignItems: "baseline",
-    gap: 12,
-  },
   captionText: {
     fontFamily: face.sans,
     fontSize: 15,
@@ -149,10 +143,7 @@ export function Lightbox(props: { lightbox: LightboxState; photos: readonly Ligh
             >
               <img src={photo.large} alt={photo.alt} {...stylex.attrs(styles.image)} />
               <figcaption {...stylex.attrs(ui.micro, styles.caption)}>
-                <span {...stylex.attrs(styles.captionMain)}>
-                  <span lang="en">Fig. 2{photo.panel}</span>
-                  <span {...stylex.attrs(styles.captionText)}>{photo.caption}</span>
-                </span>
+                <span {...stylex.attrs(styles.captionText)}>{photo.caption}</span>
                 <span aria-label={`Photo ${index + 1} of ${props.photos.length}`}>
                   {String(index + 1).padStart(2, "0")} /{" "}
                   {String(props.photos.length).padStart(2, "0")}

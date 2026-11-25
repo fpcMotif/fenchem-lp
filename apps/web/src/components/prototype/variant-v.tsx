@@ -4,7 +4,6 @@ import {
   IngredientDossierDetails,
 } from "./shared/corporate-content-sections";
 import { DivisionBadge } from "./shared/production-navigation";
-import { SectionHeader } from "./shared/production-sections";
 
 /*
  * PROTOTYPE — Variant V: "Production · vivid" — VariantH plus the vivid
@@ -29,7 +28,8 @@ import { SectionHeader } from "./shared/production-sections";
  *
  * Section order: unchanged from VariantH.
  */
-import { createEffect } from "solid-js";
+import { Show, createEffect } from "solid-js";
+import type { JSX } from "@solidjs/web";
 
 import { ArrowRight, ArrowUpRight } from "@fenchem-lp/ui/components/lucide";
 import * as stylex from "@stylexjs/stylex";
@@ -2505,6 +2505,19 @@ const DIVISION_FIELD_KEYS: Record<DivisionKey, keyof typeof styles> = {
 
 /* ─────────────────────────────── Section header helper ─────────────────────────────── */
 
+function SectionHead(props: { id: string; title: string; accent: string; aside?: JSX.Element }) {
+  return (
+    <div {...stylex.attrs(styles.sectionHeaderRow)}>
+      <Reveal>
+        <h2 id={props.id} {...stylex.attrs(styles.sectionHeading)}>
+          {props.title} <span {...stylex.attrs(styles.textGreen600)}>{props.accent}</span>
+        </h2>
+      </Reveal>
+      <Show when={props.aside}>{(aside) => <Reveal delay={STAGGER}>{aside()}</Reveal>}</Show>
+    </div>
+  );
+}
+
 /* ─────────────────────────────── Vivid Industries ─────────────────────────────── */
 
 function IndustriesSection() {
@@ -2515,130 +2528,8 @@ function IndustriesSection() {
       {...stylex.attrs(styles.industriesSection)}
     >
       <div {...stylex.attrs(styles.container)}>
-        <SectionHeader
-          styles={{
-            container: styles.container,
-            header: styles.header,
-            microStrip: styles.microStrip,
-            navLink: styles.navLink,
-            heroSection: styles.heroSection,
-            heroGrid: styles.heroGrid,
-            heroLeft: styles.heroLeft,
-            heroImg: styles.heroImg,
-            footer: styles.footer,
-            footerGrid: styles.footerGrid,
-            footerBrandCol: styles.footerBrandCol,
-            footerNavCol: styles.footerNavCol,
-            heroStatUnit: styles.heroStatUnit,
-            heroStatDesc: styles.heroStatDesc,
-            heroRight: styles.heroRight,
-            standardsSection: styles.standardsSection,
-            standardsGrid: styles.standardsGrid,
-            finaleSection: styles.finaleSection,
-            finaleSecondaryBtn: styles.finaleSecondaryBtn,
-            footerBrandRow: styles.footerBrandRow,
-            footerWordmark: styles.footerWordmark,
-            footerCertBadge: styles.footerCertBadge,
-            microStripItem: styles.microStripItem,
-            liveDotOuter: styles.liveDotOuter,
-            liveDotPing: styles.liveDotPing,
-            liveDotInner: styles.liveDotInner,
-            techLabel: styles.techLabel,
-            navInner: styles.navInner,
-            brandLink: styles.brandLink,
-            brandText: styles.brandText,
-            brandLeaf: styles.brandLeaf,
-            navDesktopLinks: styles.navDesktopLinks,
-            navRight: styles.navRight,
-            ctaPrimaryCompact: styles.ctaPrimaryCompact,
-            progressHairline: styles.progressHairline,
-            heroBadge: styles.heroBadge,
-            heroHeading: styles.heroHeading,
-            textGreen600: styles.textGreen600,
-            heroLead: styles.heroLead,
-            heroActions: styles.heroActions,
-            ctaPrimary: styles.ctaPrimary,
-            ctaOutlineBlue: styles.ctaOutlineBlue,
-            heroStatGrid: styles.heroStatGrid,
-            heroStatItem: styles.heroStatItem,
-            heroStatValue: styles.heroStatValue,
-            heroImgContainer: styles.heroImgContainer,
-            heroImgScrim: styles.heroImgScrim,
-            heroCaptionBadge: styles.heroCaptionBadge,
-            eyebrowGreen: styles.eyebrowGreen,
-            formulationSection: styles.formulationSection,
-            sectionAsideLead: styles.sectionAsideLead,
-            formulationGrid: styles.formulationGrid,
-            formulationLeft: styles.formulationLeft,
-            formulationFieldset: styles.formulationFieldset,
-            chipsWrapRow: styles.chipsWrapRow,
-            processStripOuter: styles.processStripOuter,
-            processOl: styles.processOl,
-            processLi: styles.processLi,
-            processIndex: styles.processIndex,
-            processTitle: styles.processTitle,
-            processCopy: styles.processCopy,
-            formulationRight: styles.formulationRight,
-            specDraftHeader: styles.specDraftHeader,
-            specDraftLabel: styles.specDraftLabel,
-            specDraftCode: styles.specDraftCode,
-            specDraftDl: styles.specDraftDl,
-            specDraftDlRow: styles.specDraftDlRow,
-            specDraftDt: styles.specDraftDt,
-            specDraftDd: styles.specDraftDd,
-            specMatchesList: styles.specMatchesList,
-            specMatchItem: styles.specMatchItem,
-            specSubmitBtn: styles.specSubmitBtn,
-            specDossiersRequestNote: styles.specDossiersRequestNote,
-            originGrid: styles.originGrid,
-            originImgCol: styles.originImgCol,
-            originImg: styles.originImg,
-            originTextCol: styles.originTextCol,
-            originTitle: styles.originTitle,
-            originQuote: styles.originQuote,
-            labImgCol: styles.labImgCol,
-            labImgContainer: styles.labImgContainer,
-            labImg: styles.labImg,
-            labImgScrim: styles.labImgScrim,
-            labCaptionBadge: styles.labCaptionBadge,
-            pillarsCol: styles.pillarsCol,
-            pillarInner: styles.pillarInner,
-            pillarRowBorder: styles.pillarRowBorder,
-            pillarIconBox: styles.pillarIconBox,
-            pillarTitle: styles.pillarTitle,
-            pillarCopy: styles.pillarCopy,
-            pillarCert: styles.pillarCert,
-            finaleThumbImg: styles.finaleThumbImg,
-            finaleScrim: styles.finaleScrim,
-            finaleInner: styles.finaleInner,
-            eyebrowGreen400: styles.eyebrowGreen400,
-            finaleHeading: styles.finaleHeading,
-            finaleLead: styles.finaleLead,
-            finaleActions: styles.finaleActions,
-            ctaPrimaryDark: styles.ctaPrimaryDark,
-            finaleResponseTime: styles.finaleResponseTime,
-            officesOuter: styles.officesOuter,
-            officesGrid: styles.officesGrid,
-            officeCardBg: styles.officeCardBg,
-            officeCardInner: styles.officeCardInner,
-            officeCity: styles.officeCity,
-            officeShort: styles.officeShort,
-            officeCoords: styles.officeCoords,
-            footerBrandTagline: styles.footerBrandTagline,
-            footerEst: styles.footerEst,
-            footerCertsList: styles.footerCertsList,
-            footerNavList: styles.footerNavList,
-            footerNavLink: styles.footerNavLink,
-            footerLegal: styles.footerLegal,
-            sectionHeaderRow: styles.sectionHeaderRow,
-            sectionHeading: styles.sectionHeading,
-            chipBase: styles.chipBase,
-            chipSelected: styles.chipSelected,
-            chipUnselected: styles.chipUnselected,
-          }}
+        <SectionHead
           id="industries-heading"
-          number="01"
-          label="Application Domains"
           title="Built for three"
           accent="industries"
           aside={
@@ -2709,130 +2600,8 @@ function MatrixSection() {
   return (
     <section id="matrix" aria-labelledby="matrix-heading" {...stylex.attrs(styles.matrixSection)}>
       <div {...stylex.attrs(styles.container)}>
-        <SectionHeader
-          styles={{
-            container: styles.container,
-            header: styles.header,
-            microStrip: styles.microStrip,
-            navLink: styles.navLink,
-            heroSection: styles.heroSection,
-            heroGrid: styles.heroGrid,
-            heroLeft: styles.heroLeft,
-            heroImg: styles.heroImg,
-            footer: styles.footer,
-            footerGrid: styles.footerGrid,
-            footerBrandCol: styles.footerBrandCol,
-            footerNavCol: styles.footerNavCol,
-            heroStatUnit: styles.heroStatUnit,
-            heroStatDesc: styles.heroStatDesc,
-            heroRight: styles.heroRight,
-            standardsSection: styles.standardsSection,
-            standardsGrid: styles.standardsGrid,
-            finaleSection: styles.finaleSection,
-            finaleSecondaryBtn: styles.finaleSecondaryBtn,
-            footerBrandRow: styles.footerBrandRow,
-            footerWordmark: styles.footerWordmark,
-            footerCertBadge: styles.footerCertBadge,
-            microStripItem: styles.microStripItem,
-            liveDotOuter: styles.liveDotOuter,
-            liveDotPing: styles.liveDotPing,
-            liveDotInner: styles.liveDotInner,
-            techLabel: styles.techLabel,
-            navInner: styles.navInner,
-            brandLink: styles.brandLink,
-            brandText: styles.brandText,
-            brandLeaf: styles.brandLeaf,
-            navDesktopLinks: styles.navDesktopLinks,
-            navRight: styles.navRight,
-            ctaPrimaryCompact: styles.ctaPrimaryCompact,
-            progressHairline: styles.progressHairline,
-            heroBadge: styles.heroBadge,
-            heroHeading: styles.heroHeading,
-            textGreen600: styles.textGreen600,
-            heroLead: styles.heroLead,
-            heroActions: styles.heroActions,
-            ctaPrimary: styles.ctaPrimary,
-            ctaOutlineBlue: styles.ctaOutlineBlue,
-            heroStatGrid: styles.heroStatGrid,
-            heroStatItem: styles.heroStatItem,
-            heroStatValue: styles.heroStatValue,
-            heroImgContainer: styles.heroImgContainer,
-            heroImgScrim: styles.heroImgScrim,
-            heroCaptionBadge: styles.heroCaptionBadge,
-            eyebrowGreen: styles.eyebrowGreen,
-            formulationSection: styles.formulationSection,
-            sectionAsideLead: styles.sectionAsideLead,
-            formulationGrid: styles.formulationGrid,
-            formulationLeft: styles.formulationLeft,
-            formulationFieldset: styles.formulationFieldset,
-            chipsWrapRow: styles.chipsWrapRow,
-            processStripOuter: styles.processStripOuter,
-            processOl: styles.processOl,
-            processLi: styles.processLi,
-            processIndex: styles.processIndex,
-            processTitle: styles.processTitle,
-            processCopy: styles.processCopy,
-            formulationRight: styles.formulationRight,
-            specDraftHeader: styles.specDraftHeader,
-            specDraftLabel: styles.specDraftLabel,
-            specDraftCode: styles.specDraftCode,
-            specDraftDl: styles.specDraftDl,
-            specDraftDlRow: styles.specDraftDlRow,
-            specDraftDt: styles.specDraftDt,
-            specDraftDd: styles.specDraftDd,
-            specMatchesList: styles.specMatchesList,
-            specMatchItem: styles.specMatchItem,
-            specSubmitBtn: styles.specSubmitBtn,
-            specDossiersRequestNote: styles.specDossiersRequestNote,
-            originGrid: styles.originGrid,
-            originImgCol: styles.originImgCol,
-            originImg: styles.originImg,
-            originTextCol: styles.originTextCol,
-            originTitle: styles.originTitle,
-            originQuote: styles.originQuote,
-            labImgCol: styles.labImgCol,
-            labImgContainer: styles.labImgContainer,
-            labImg: styles.labImg,
-            labImgScrim: styles.labImgScrim,
-            labCaptionBadge: styles.labCaptionBadge,
-            pillarsCol: styles.pillarsCol,
-            pillarInner: styles.pillarInner,
-            pillarRowBorder: styles.pillarRowBorder,
-            pillarIconBox: styles.pillarIconBox,
-            pillarTitle: styles.pillarTitle,
-            pillarCopy: styles.pillarCopy,
-            pillarCert: styles.pillarCert,
-            finaleThumbImg: styles.finaleThumbImg,
-            finaleScrim: styles.finaleScrim,
-            finaleInner: styles.finaleInner,
-            eyebrowGreen400: styles.eyebrowGreen400,
-            finaleHeading: styles.finaleHeading,
-            finaleLead: styles.finaleLead,
-            finaleActions: styles.finaleActions,
-            ctaPrimaryDark: styles.ctaPrimaryDark,
-            finaleResponseTime: styles.finaleResponseTime,
-            officesOuter: styles.officesOuter,
-            officesGrid: styles.officesGrid,
-            officeCardBg: styles.officeCardBg,
-            officeCardInner: styles.officeCardInner,
-            officeCity: styles.officeCity,
-            officeShort: styles.officeShort,
-            officeCoords: styles.officeCoords,
-            footerBrandTagline: styles.footerBrandTagline,
-            footerEst: styles.footerEst,
-            footerCertsList: styles.footerCertsList,
-            footerNavList: styles.footerNavList,
-            footerNavLink: styles.footerNavLink,
-            footerLegal: styles.footerLegal,
-            sectionHeaderRow: styles.sectionHeaderRow,
-            sectionHeading: styles.sectionHeading,
-            chipBase: styles.chipBase,
-            chipSelected: styles.chipSelected,
-            chipUnselected: styles.chipUnselected,
-          }}
+        <SectionHead
           id="matrix-heading"
-          number="02"
-          label="Active Compounds"
           title="Ingredient"
           accent="matrix"
           aside={
@@ -2913,7 +2682,6 @@ function MatrixSection() {
                       techLabel: styles.techLabel,
                       matrixSpecLink: styles.matrixSpecLink,
                     }}
-                    i={i}
                     item={item}
                   />
                 </article>
@@ -2962,130 +2730,8 @@ function DossierSection() {
       {...stylex.attrs(styles.dossierSection)}
     >
       <div {...stylex.attrs(styles.container)}>
-        <SectionHeader
-          styles={{
-            container: styles.container,
-            header: styles.header,
-            microStrip: styles.microStrip,
-            navLink: styles.navLink,
-            heroSection: styles.heroSection,
-            heroGrid: styles.heroGrid,
-            heroLeft: styles.heroLeft,
-            heroImg: styles.heroImg,
-            footer: styles.footer,
-            footerGrid: styles.footerGrid,
-            footerBrandCol: styles.footerBrandCol,
-            footerNavCol: styles.footerNavCol,
-            heroStatUnit: styles.heroStatUnit,
-            heroStatDesc: styles.heroStatDesc,
-            heroRight: styles.heroRight,
-            standardsSection: styles.standardsSection,
-            standardsGrid: styles.standardsGrid,
-            finaleSection: styles.finaleSection,
-            finaleSecondaryBtn: styles.finaleSecondaryBtn,
-            footerBrandRow: styles.footerBrandRow,
-            footerWordmark: styles.footerWordmark,
-            footerCertBadge: styles.footerCertBadge,
-            microStripItem: styles.microStripItem,
-            liveDotOuter: styles.liveDotOuter,
-            liveDotPing: styles.liveDotPing,
-            liveDotInner: styles.liveDotInner,
-            techLabel: styles.techLabel,
-            navInner: styles.navInner,
-            brandLink: styles.brandLink,
-            brandText: styles.brandText,
-            brandLeaf: styles.brandLeaf,
-            navDesktopLinks: styles.navDesktopLinks,
-            navRight: styles.navRight,
-            ctaPrimaryCompact: styles.ctaPrimaryCompact,
-            progressHairline: styles.progressHairline,
-            heroBadge: styles.heroBadge,
-            heroHeading: styles.heroHeading,
-            textGreen600: styles.textGreen600,
-            heroLead: styles.heroLead,
-            heroActions: styles.heroActions,
-            ctaPrimary: styles.ctaPrimary,
-            ctaOutlineBlue: styles.ctaOutlineBlue,
-            heroStatGrid: styles.heroStatGrid,
-            heroStatItem: styles.heroStatItem,
-            heroStatValue: styles.heroStatValue,
-            heroImgContainer: styles.heroImgContainer,
-            heroImgScrim: styles.heroImgScrim,
-            heroCaptionBadge: styles.heroCaptionBadge,
-            eyebrowGreen: styles.eyebrowGreen,
-            formulationSection: styles.formulationSection,
-            sectionAsideLead: styles.sectionAsideLead,
-            formulationGrid: styles.formulationGrid,
-            formulationLeft: styles.formulationLeft,
-            formulationFieldset: styles.formulationFieldset,
-            chipsWrapRow: styles.chipsWrapRow,
-            processStripOuter: styles.processStripOuter,
-            processOl: styles.processOl,
-            processLi: styles.processLi,
-            processIndex: styles.processIndex,
-            processTitle: styles.processTitle,
-            processCopy: styles.processCopy,
-            formulationRight: styles.formulationRight,
-            specDraftHeader: styles.specDraftHeader,
-            specDraftLabel: styles.specDraftLabel,
-            specDraftCode: styles.specDraftCode,
-            specDraftDl: styles.specDraftDl,
-            specDraftDlRow: styles.specDraftDlRow,
-            specDraftDt: styles.specDraftDt,
-            specDraftDd: styles.specDraftDd,
-            specMatchesList: styles.specMatchesList,
-            specMatchItem: styles.specMatchItem,
-            specSubmitBtn: styles.specSubmitBtn,
-            specDossiersRequestNote: styles.specDossiersRequestNote,
-            originGrid: styles.originGrid,
-            originImgCol: styles.originImgCol,
-            originImg: styles.originImg,
-            originTextCol: styles.originTextCol,
-            originTitle: styles.originTitle,
-            originQuote: styles.originQuote,
-            labImgCol: styles.labImgCol,
-            labImgContainer: styles.labImgContainer,
-            labImg: styles.labImg,
-            labImgScrim: styles.labImgScrim,
-            labCaptionBadge: styles.labCaptionBadge,
-            pillarsCol: styles.pillarsCol,
-            pillarInner: styles.pillarInner,
-            pillarRowBorder: styles.pillarRowBorder,
-            pillarIconBox: styles.pillarIconBox,
-            pillarTitle: styles.pillarTitle,
-            pillarCopy: styles.pillarCopy,
-            pillarCert: styles.pillarCert,
-            finaleThumbImg: styles.finaleThumbImg,
-            finaleScrim: styles.finaleScrim,
-            finaleInner: styles.finaleInner,
-            eyebrowGreen400: styles.eyebrowGreen400,
-            finaleHeading: styles.finaleHeading,
-            finaleLead: styles.finaleLead,
-            finaleActions: styles.finaleActions,
-            ctaPrimaryDark: styles.ctaPrimaryDark,
-            finaleResponseTime: styles.finaleResponseTime,
-            officesOuter: styles.officesOuter,
-            officesGrid: styles.officesGrid,
-            officeCardBg: styles.officeCardBg,
-            officeCardInner: styles.officeCardInner,
-            officeCity: styles.officeCity,
-            officeShort: styles.officeShort,
-            officeCoords: styles.officeCoords,
-            footerBrandTagline: styles.footerBrandTagline,
-            footerEst: styles.footerEst,
-            footerCertsList: styles.footerCertsList,
-            footerNavList: styles.footerNavList,
-            footerNavLink: styles.footerNavLink,
-            footerLegal: styles.footerLegal,
-            sectionHeaderRow: styles.sectionHeaderRow,
-            sectionHeading: styles.sectionHeading,
-            chipBase: styles.chipBase,
-            chipSelected: styles.chipSelected,
-            chipUnselected: styles.chipUnselected,
-          }}
+        <SectionHead
           id="product-heading"
-          number="03"
-          label="Product Dossier"
           title="One active,"
           accent="documented to the lot"
           aside={
@@ -3114,10 +2760,7 @@ function DossierSection() {
               {DOSSIER.application}
             </span>
             <div {...stylex.attrs(styles.dossierBadgeBottom)}>
-              <span {...stylex.attrs(styles.techLabel)}>
-                {DOSSIER.category} · {DOSSIER.specification}
-              </span>
-              <span {...stylex.attrs(styles.eyebrowGreen)}>{DOSSIER.code}</span>
+              <span {...stylex.attrs(styles.techLabel)}>{DOSSIER.specification}</span>
             </div>
           </div>
 

@@ -465,15 +465,6 @@ const styles = stylex.create({
     color: tone.accent,
     whiteSpace: "nowrap",
   },
-  english: {
-    overflow: "hidden",
-    textOverflow: "ellipsis",
-    fontFamily: face.display,
-    fontSize: 11,
-    letterSpacing: "0.14em",
-    textTransform: "uppercase",
-    color: tone.tintMuted,
-  },
   stepper: {
     flexShrink: 0,
     display: "flex",
@@ -1000,9 +991,6 @@ export function DropdownVariant() {
             <div {...stylex.attrs(styles.sheetMeta)}>
               <p {...stylex.attrs(styles.eyebrow)}>
                 <span>{selectedArea()?.label}</span>
-                <span lang="en" {...stylex.attrs(styles.english)}>
-                  {selectedArea()?.englishLabel}
-                </span>
               </p>
               <div {...stylex.attrs(styles.stepper)}>
                 <span {...stylex.attrs(styles.counter)}>

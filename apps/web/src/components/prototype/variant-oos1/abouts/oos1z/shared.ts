@@ -1,5 +1,4 @@
 import * as stylex from "@stylexjs/stylex";
-import type { JSX } from "@solidjs/web";
 
 import { ABOUT_CAMPUS, ABOUT_CSR, ABOUT_HERO } from "../../about-data";
 import { bp, face, tone } from "./tokens.stylex";
@@ -12,16 +11,6 @@ export const DWELL_RATIO = 0.7;
 
 export type Wall = "left" | "right";
 type PhotoId = (typeof ABOUT_CAMPUS.photos)[number]["id"];
-
-const ENGLISH: Record<PhotoId, string> = {
-  aerial: "Headquarters",
-  lab: "Laboratory",
-  showroom: "Showroom",
-  reception: "Reception",
-  lounge: "Lounge",
-  office: "Open office",
-  grounds: "Grounds",
-};
 
 const ASPECT: Record<PhotoId, number> = {
   aerial: 1400 / 1048,
@@ -41,7 +30,6 @@ export type Work = {
   alt: string;
   caption: string;
   englishCaption: string;
-  english: string;
   wall: Wall;
   aspect: number;
 };
@@ -54,7 +42,6 @@ export const WORKS: readonly Work[] = ABOUT_CAMPUS.photos.map((photo, index) => 
   alt: photo.alt,
   caption: photo.caption,
   englishCaption: photo.english,
-  english: ENGLISH[photo.id],
   wall: index % 2 === 0 ? "left" : "right",
   aspect: ASPECT[photo.id],
 }));
@@ -62,14 +49,10 @@ export const WORKS: readonly Work[] = ABOUT_CAMPUS.photos.map((photo, index) => 
 export const LAKE = {
   number: "08",
   title: "园区水景",
-  english: "The lake",
-  facing: "The lake, facing you",
   src: ABOUT_CSR.image,
   alt: ABOUT_CSR.imageAlt,
   aspect: 3 / 2,
 } as const;
-
-export const PLACE = "Nanjing";
 
 export function sectionTitle(id: string): string {
   return ABOUT_HERO.navChips.find((chip) => chip.id === id)?.label ?? "";
@@ -148,7 +131,4 @@ export const ui = stylex.create({
   },
 });
 
-export const srOnly = stylex.attrs(ui.srOnly);
-
-export const UNFOCUSABLE = { focusable: "false" } as JSX.SvgSVGAttributes<SVGSVGElement>;
-export const NON_SCALING: Record<string, string> = { "vector-effect": "non-scaling-stroke" };
+export const srOnly = stylex.props(ui.srOnly);

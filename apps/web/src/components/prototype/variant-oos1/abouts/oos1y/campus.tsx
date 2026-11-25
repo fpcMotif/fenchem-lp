@@ -126,7 +126,7 @@ export function CampusWall() {
       {...stylex.attrs(ui.anchor, styles.section)}
     >
       <h2 id="oos1y-campus" {...srOnly}>
-        {ABOUT_CAMPUS.eyebrow}
+        {ABOUT_CAMPUS.title}
       </h2>
       <ul ref={wallRef} {...stylex.attrs(styles.wall)}>
         {ABOUT_CAMPUS.photos.map((photo, index) => (

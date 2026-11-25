@@ -2,16 +2,6 @@ import { ABOUT_CAMPUS } from "../../about-data";
 
 export type CampusPhoto = (typeof ABOUT_CAMPUS.photos)[number];
 
-export const CAMPUS_CAPTION_EN: Record<CampusPhoto["id"], string> = {
-  aerial: "Headquarters",
-  lab: "R&D laboratory",
-  showroom: "Showroom",
-  reception: "Reception hall",
-  lounge: "Staff lounge",
-  office: "Open office",
-  grounds: "Campus green",
-};
-
 const HANG_ORDER: readonly CampusPhoto["id"][] = [
   "aerial",
   "grounds",

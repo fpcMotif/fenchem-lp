@@ -176,9 +176,8 @@ function CampusCell(props: {
   onOpen: () => void;
   onFocusCell: () => void;
 }) {
-  const start = START_BASE + props.index * START_STEP;
   const settled = useTransform(props.progress, (value) =>
-    easeOut(clamp01((value - start) / WINDOW)),
+    easeOut(clamp01((value - (START_BASE + props.index * START_STEP)) / WINDOW)),
   );
   const rise = useTransform(settled, (value) => RISE_PX * (1 - value));
 

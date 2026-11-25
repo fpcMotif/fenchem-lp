@@ -62,15 +62,6 @@ const styles = stylex.create({
     letterSpacing: "0.04em",
     color: color.ink,
   },
-  titleLatin: {
-    marginInlineStart: 14,
-    fontFamily: font.serifAccent,
-    fontSize: "0.8em",
-    fontStyle: "italic",
-    fontWeight: 400,
-    letterSpacing: 0,
-    color: color.muted,
-  },
   meta: {
     margin: 0,
     fontSize: 14,
@@ -354,9 +345,6 @@ export function ContentsVariant(props: SubPageProps) {
         <header {...stylex.attrs(styles.head)}>
           <h2 id="insights-contents-title" {...stylex.attrs(styles.title)}>
             目录
-            <span lang="en" {...stylex.attrs(styles.titleLatin)}>
-              Contents
-            </span>
           </h2>
           <p {...stylex.attrs(styles.meta, labStyles.displayNumber)}>
             {`共 ${articles().length} 篇 · 约 ${totalMinutes()} 分钟`}

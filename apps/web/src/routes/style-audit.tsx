@@ -386,11 +386,11 @@ function ComponentMatrix(props: {
         <div {...stylex.attrs(auditStyles.flexRow)}>
           <DropdownMenu>
             <DropdownMenuTrigger
-              render={
-                <Button variant="outline" id="dd-trigger">
+              render={(triggerProps) => (
+                <Button {...triggerProps} variant="outline" id="dd-trigger">
                   Open Menu <ChevronRight size={16} />
                 </Button>
-              }
+              )}
             />
             <DropdownMenuContent id="dd-content" align="start">
               <DropdownMenuLabel>Account Actions</DropdownMenuLabel>

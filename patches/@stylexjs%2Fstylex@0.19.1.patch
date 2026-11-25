@@ -1,0 +1,26 @@
+diff --git a/lib/cjs/stylex.js b/lib/cjs/stylex.js
+index 66abc96008cfa971bbb48bcb206d217f5f770369..f3ff1443f75c4ed89956424bb40c602b8ae15dee 100644
+--- a/lib/cjs/stylex.js
++++ b/lib/cjs/stylex.js
+@@ -184,7 +184,7 @@ function props(...styles) {
+   }
+   return result;
+ }
+-const toKebabCase = str => str.replace(/([A-Z])/g, '-$1').toLowerCase();
++const toKebabCase = str => str.startsWith('--') ? str : str.replace(/([A-Z])/g, '-$1').toLowerCase();
+ function attrs(...styles) {
+   const {
+     className,
+diff --git a/lib/es/stylex.mjs b/lib/es/stylex.mjs
+index 5a8fe56a45590b80d2334a3d88fe12bbedb0e7c1..9f07ba2f695f0732ffae7110f6846958bdc2a713 100644
+--- a/lib/es/stylex.mjs
++++ b/lib/es/stylex.mjs
+@@ -182,7 +182,7 @@ function props(...styles) {
+   }
+   return result;
+ }
+-const toKebabCase = str => str.replace(/([A-Z])/g, '-$1').toLowerCase();
++const toKebabCase = str => str.startsWith('--') ? str : str.replace(/([A-Z])/g, '-$1').toLowerCase();
+ function attrs(...styles) {
+   const {
+     className,

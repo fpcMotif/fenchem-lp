@@ -43,9 +43,6 @@ const styles = stylex.create({
     fontSize: 16,
     color: tone.ink,
   },
-  captionEnglish: {
-    fontSize: 19,
-  },
   network: {
     paddingTop: { default: 0, [bp.desktop]: 2 },
   },
@@ -84,7 +81,7 @@ export function Profile() {
   const [figureRef, figurePhase] = useEntry<HTMLElement>();
   return (
     <section id="about-profile" aria-labelledby="oos1p-profile" {...stylex.attrs(ui.plate)}>
-      <PlateHead plate={1} english="Profile" title="企业概况" titleId="oos1p-profile" />
+      <PlateHead title="企业概况" titleId="oos1p-profile" />
       <div {...stylex.attrs(ui.shell)}>
         <div {...stylex.attrs(ui.grid)}>
           <p {...stylex.attrs(ui.q2to4, styles.lead)}>{ABOUT_HERO.lead}</p>
@@ -103,9 +100,6 @@ export function Profile() {
             />
             <figcaption {...stylex.attrs(styles.caption)}>
               <span {...stylex.attrs(styles.captionText)}>{ABOUT_HERO.lobbyCaption}</span>
-              <span lang="en" {...stylex.attrs(ui.eyebrow, styles.captionEnglish)}>
-                Lobby
-              </span>
             </figcaption>
           </figure>
 

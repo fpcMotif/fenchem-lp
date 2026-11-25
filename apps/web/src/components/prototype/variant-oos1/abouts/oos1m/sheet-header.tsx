@@ -33,24 +33,9 @@ const styles = stylex.create({
     letterSpacing: "0.03em",
     color: tone.navy,
   },
-  english: {
-    gridColumn: { default: "2", [bp.tabletUp]: "10 / 13" },
-    gridRow: "1",
-    margin: 0,
-    justifySelf: "end",
-    fontSize: { default: 18, [bp.desktop]: 26 },
-    lineHeight: 1.2,
-    color: tone.body,
-    textAlign: "right",
-  },
 });
 
-export function SheetHeader(props: {
-  sheet: number;
-  title: string;
-  english: string;
-  titleId: string;
-}) {
+export function SheetHeader(props: { sheet: number; title: string; titleId: string }) {
   return (
     <header {...stylex.attrs(styles.header)}>
       <p aria-hidden="true" lang="en" {...stylex.attrs(ui.caps, styles.sheet)}>
@@ -59,9 +44,6 @@ export function SheetHeader(props: {
       <h2 id={props.titleId} {...stylex.attrs(styles.title)}>
         {props.title}
       </h2>
-      <p lang="en" {...stylex.attrs(ui.serif, styles.english)}>
-        {props.english}
-      </p>
     </header>
   );
 }

@@ -125,9 +125,6 @@ const styles = stylex.create({
   fulcrumWhenStill: {
     display: { default: "none", [bp.wideStill]: "block" },
   },
-  standLabel: {
-    gridColumn: { default: "auto", [bp.tablet]: "1 / 8", [bp.desktop]: "1 / 3" },
-  },
   standHeading: {
     gridColumn: { default: "auto", [bp.tablet]: "1 / 8", [bp.desktop]: "3 / 8" },
   },
@@ -159,23 +156,11 @@ export function FulcrumMark(props: { sx?: StyleXStyles }) {
   );
 }
 
-export function StandingTitle(props: { id: string; en: string; children: JSX.Element }) {
+export function StandingTitle(props: { id: string; children: JSX.Element }) {
   return (
-    <>
-      <p
-        lang="en"
-        aria-hidden="true"
-        {...stylex.attrs(type.counterweight, type.counterHeading, styles.standLabel, ui.knockout)}
-      >
-        {props.en}
-      </p>
-      <h2
-        id={props.id}
-        {...stylex.attrs(type.light, type.heading, styles.standHeading, ui.knockout)}
-      >
-        {props.children}
-      </h2>
-    </>
+    <h2 id={props.id} {...stylex.attrs(type.light, type.heading, styles.standHeading, ui.knockout)}>
+      {props.children}
+    </h2>
   );
 }
 

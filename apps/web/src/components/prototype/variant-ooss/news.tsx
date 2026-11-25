@@ -12,13 +12,12 @@ const EVENTS_HREF = "#news";
 const FEATURED = {
   title: "In-cosmetics® 拉丁美洲展",
   meta: "2026.09.23–24 · 巴西 圣保罗",
-  body: "欢迎参加 2026 年 In-cosmetics® 拉丁美洲展",
 } as const;
 
 const UPCOMING = [
-  { title: "IFSCC 大会 2026", year: "2026" },
-  { title: "Naturally Kiawah 研讨会 2026", year: "2026" },
-  { title: "In-cosmetics® Global 2026", year: "2026" },
+  { title: "IFSCC 大会 2026" },
+  { title: "Naturally Kiawah 研讨会 2026" },
+  { title: "In-cosmetics® Global 2026" },
 ] as const;
 
 const styles = stylex.create({
@@ -83,13 +82,6 @@ const styles = stylex.create({
     lineHeight: 1.3,
     color: "inherit",
   },
-  featuredBody: {
-    margin: 0,
-    fontSize: 16,
-    fontWeight: 400,
-    lineHeight: 1.6,
-    color: color.inkMuted,
-  },
   compactTitle: {
     margin: 0,
     minWidth: 0,
@@ -97,12 +89,6 @@ const styles = stylex.create({
     fontWeight: 700,
     lineHeight: 1.4,
     color: "inherit",
-  },
-  tail: {
-    display: "flex",
-    alignItems: "center",
-    flexShrink: 0,
-    columnGap: 16,
   },
   arrow: {
     flexShrink: 0,
@@ -157,7 +143,6 @@ export function News() {
               <div {...stylex.attrs(styles.featuredText)}>
                 <p {...stylex.attrs(styles.meta)}>{FEATURED.meta}</p>
                 <h3 {...stylex.attrs(styles.featuredTitle)}>{FEATURED.title}</h3>
-                <p {...stylex.attrs(styles.featuredBody)}>{FEATURED.body}</p>
               </div>
               <RowArrow />
             </a>
@@ -169,10 +154,7 @@ export function News() {
                 {...stylex.attrs(styles.row, styles.rowCompact, stylex.defaultMarker())}
               >
                 <h3 {...stylex.attrs(styles.compactTitle)}>{event.title}</h3>
-                <div {...stylex.attrs(styles.tail)}>
-                  <p {...stylex.attrs(styles.meta)}>{event.year}</p>
-                  <RowArrow />
-                </div>
+                <RowArrow />
               </a>
             </Reveal>
           ))}

@@ -1,10 +1,13 @@
 import * as stylex from "@stylexjs/stylex";
+import type { JSX } from "@solidjs/web";
 import { ArrowDown } from "@fenchem-lp/ui/components/lucide";
 
 import { ABOUT_STRUCTURE } from "../../about-data";
 import { RoomSign } from "./room-sign";
-import { sectionTitle, UNFOCUSABLE, ui } from "./shared";
+import { sectionTitle, ui } from "./shared";
 import { bp, face, tone } from "./tokens.stylex";
+
+const UNFOCUSABLE = { focusable: "false" } as JSX.SvgSVGAttributes<SVGSVGElement>;
 
 const styles = stylex.create({
   plan: {
@@ -223,12 +226,7 @@ export function Structure() {
       {...stylex.attrs(ui.anchor, ui.room)}
     >
       <div {...stylex.attrs(ui.shell)}>
-        <RoomSign
-          numeral="VI"
-          id="oos1z-structure"
-          title={sectionTitle("about-structure")}
-          english="The floor plan"
-        />
+        <RoomSign id="oos1z-structure" title={sectionTitle("about-structure")} />
         <div {...stylex.attrs(styles.plan)}>
           <div {...stylex.attrs(styles.hall)}>
             <span lang="en" {...stylex.attrs(ui.caps, styles.hallNumber)}>
@@ -245,7 +243,7 @@ export function Structure() {
             </span>
             <span aria-hidden="true" {...stylex.attrs(styles.exitGap)} />
             <a href="#oos1z-exit" {...stylex.attrs(ui.caps, ui.focus, styles.exit)}>
-              出口 Exit
+              出口
               <ArrowDown size={13} strokeWidth={1.5} aria-hidden="true" />
             </a>
           </div>

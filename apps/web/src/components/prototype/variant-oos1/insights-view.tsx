@@ -3,17 +3,11 @@ import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
 import { ChevronDown } from "@fenchem-lp/ui/components/lucide";
 import { AnimatePresence, m } from "@/compat/motion";
-import { createMemo, createSignal, Show } from "solid-js";
+import { createSignal, For, Show } from "solid-js";
 
 import { EASE } from "@/components/prototype/motion-constants";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
-import {
-  CodexBookmarkRail,
-  scrollToBookmark,
-  useBookmarkActive,
-  type CodexBookmarkItem,
-} from "./codex-bookmark-rail";
 import { ContactCta } from "./contact-cta";
 import {
   INSIGHTS_ARTICLES,
@@ -22,110 +16,72 @@ import {
   type InsightBlock,
   type InsightSection,
 } from "./insights-data";
-import { SubPageBanner, SubPageNav, kitStyles } from "./subpage-kit";
-import { color, ease, layout, media } from "./tokens.stylex";
+import { ProductsBanner, ProductsBannerImage, ProductsSubBar } from "./products-view";
+import { kitStyles } from "./subpage-kit";
+import { color, ease, media } from "./tokens.stylex";
 
 const HAIRLINE = "rgba(26, 26, 26, 0.12)";
-const SURFACE_ALT = "#f3f5fa";
 const DESKTOP = "@media (min-width: 1280px)";
 
 const styles = stylex.create({
   pageSection: {
-    paddingTop: { default: 48, [DESKTOP]: 80 },
-    paddingBottom: { default: 64, [DESKTOP]: 104 },
+    paddingTop: { default: 32, [DESKTOP]: 48 },
+    paddingBottom: { default: 48, [DESKTOP]: 72 },
     containerType: "inline-size",
   },
   articleWrapper: {
     position: "relative",
-    maxWidth: 800,
-    marginInline: "auto",
-  },
-  railAside: {
-    display: { default: "none", [DESKTOP]: "block" },
-    position: "absolute",
-    right: "100%",
-    top: 0,
-    bottom: 0,
-    width: `calc((min(100cqw, 1440px) - 2 * ${layout.inset120} - 800px) / 2)`,
-    pointerEvents: "none",
-  },
-  railSticky: {
-    position: "sticky",
-    top: `calc(${layout.headerHeight} + ${layout.subBarHeight})`,
-    height: `calc(100vh - ${layout.headerHeight} - ${layout.subBarHeight})`,
-    boxSizing: "border-box",
-    paddingBottom: "10vh",
-    width: "fit-content",
-    marginInline: "auto",
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center",
   },
   articleMain: {
     width: "100%",
     minWidth: 0,
   },
-  article: {
-    maxWidth: 800,
-    marginInline: "auto",
-    display: "flex",
-    flexDirection: "column",
-    gap: { default: 22, [DESKTOP]: 26 },
-  },
-  moreList: {
-    maxWidth: 800,
-    marginInline: "auto",
-    marginTop: { default: 64, [DESKTOP]: 96 },
-  },
-  moreListSingle: {
-    borderTopWidth: 1,
-    borderTopStyle: "solid",
-    borderTopColor: HAIRLINE,
-  },
-  moreHeader: {
-    display: "flex",
-    alignItems: "baseline",
-    justifyContent: "space-between",
-    gap: 16,
-    paddingBottom: 14,
-    borderBottomWidth: 2,
-    borderBottomStyle: "solid",
-    borderBottomColor: color.ink,
-  },
-  moreLabel: {
-    margin: 0,
-    fontSize: 17,
-    fontWeight: 700,
-    letterSpacing: "0.04em",
-    color: color.ink,
-  },
-  moreCount: {
-    margin: 0,
-    fontSize: 14,
-    color: color.muted,
-  },
   compactArticle: {
-    paddingBlock: { default: 28, [DESKTOP]: 36 },
-    borderBottomWidth: 1,
+    paddingBlock: { default: 28, [DESKTOP]: 40 },
+    borderBottomWidth: { default: 1, ":last-child": 0 },
     borderBottomStyle: "solid",
     borderBottomColor: HAIRLINE,
   },
-  compactHead: {
+  articleHead: {
     display: "grid",
     gridTemplateColumns: {
       default: "minmax(0, 1fr)",
-      ["@media (min-width: 768px)"]: "minmax(0, 1fr) auto",
+      ["@media (min-width: 768px)"]: "minmax(0, 5fr) minmax(0, 7fr)",
     },
-    alignItems: { default: "start", ["@media (min-width: 768px)"]: "center" },
-    columnGap: 48,
+    alignItems: "center",
+    columnGap: { default: 0, ["@media (min-width: 768px)"]: 40, [DESKTOP]: 72 },
     rowGap: 20,
+  },
+  articleHeadReverse: {
+    gridTemplateColumns: {
+      default: "minmax(0, 1fr)",
+      ["@media (min-width: 768px)"]: "minmax(0, 7fr) minmax(0, 5fr)",
+    },
+  },
+  articleFigure: {
+    margin: 0,
+    aspectRatio: "16 / 10",
+    overflow: "hidden",
+    backgroundColor: color.pageTint,
+  },
+  articleFigureEnd: {
+    order: { default: 0, ["@media (min-width: 768px)"]: 2 },
+  },
+  articleImage: {
+    display: "block",
+    width: "100%",
+    height: "100%",
+    objectFit: "cover",
   },
   compactText: {
     display: "flex",
     flexDirection: "column",
     gap: 10,
     minWidth: 0,
+    maxWidth: 640,
+  },
+  readingColumn: {
+    maxWidth: 860,
   },
   compactTitle: {
     margin: 0,
@@ -141,8 +97,25 @@ const styles = stylex.create({
     lineHeight: 1.75,
     color: color.bodyText,
   },
+  compactExcerpt: {
+    margin: 0,
+    fontSize: { default: 14, [DESKTOP]: 15 },
+    lineHeight: 1.8,
+    color: color.muted,
+    display: "-webkit-box",
+    WebkitBoxOrient: "vertical",
+    WebkitLineClamp: 2,
+    overflow: "hidden",
+    textWrap: "pretty",
+  },
+  expandRow: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 16,
+    paddingTop: 6,
+  },
   compactButton: {
-    justifySelf: "start",
     whiteSpace: "nowrap",
   },
   compactPreview: {
@@ -152,33 +125,11 @@ const styles = stylex.create({
     paddingTop: { default: 28, [DESKTOP]: 36 },
     paddingBottom: { default: 24, [DESKTOP]: 32 },
   },
-  docCategory: {
-    margin: 0,
-    fontSize: 13,
-    fontWeight: 700,
-    letterSpacing: "0.1em",
-    color: colors.brandBlue700,
-  },
-  docTitle: {
-    margin: 0,
-    fontSize: { default: 30, [media.tablet]: 38, [DESKTOP]: 44 },
-    fontWeight: 800,
-    lineHeight: 1.2,
-    letterSpacing: "-0.01em",
-    color: color.ink,
-  },
-  docSubtitle: {
-    margin: 0,
-    fontSize: { default: 16, [media.tablet]: 18, [DESKTOP]: 19 },
-    fontWeight: 400,
-    lineHeight: 1.65,
-    color: color.bodyText,
-  },
   coreViewBox: {
     marginBlock: 6,
     paddingBlock: { default: 18, [DESKTOP]: 22 },
     paddingInline: { default: 20, [DESKTOP]: 26 },
-    backgroundColor: SURFACE_ALT,
+    backgroundColor: color.pageTint,
   },
   coreViewParagraph: {
     margin: 0,
@@ -202,22 +153,6 @@ const styles = stylex.create({
     lineHeight: 1.9,
     color: color.bodyText,
     textWrap: "pretty",
-  },
-  dropCap: {
-    float: "inline-start",
-    fontSize: { default: 38, [DESKTOP]: 42 },
-    fontWeight: 800,
-    lineHeight: 1.05,
-    color: colors.ink,
-    marginInlineEnd: 10,
-    marginTop: 4,
-  },
-  expandRow: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: 16,
-    paddingTop: 10,
   },
   expandMeta: {
     margin: 0,
@@ -259,8 +194,13 @@ const styles = stylex.create({
     outlineOffset: 2,
   },
   expandButtonOutline: {
-    backgroundColor: { default: "transparent", ":hover": SURFACE_ALT },
+    backgroundColor: { default: "transparent", ":hover": color.pageTint },
     color: colors.brandBlue700,
+  },
+  moreRow: {
+    display: "flex",
+    justifyContent: "center",
+    marginTop: { default: 32, [DESKTOP]: 48 },
   },
   expandIcon: {
     transitionProperty: "transform",
@@ -346,7 +286,7 @@ const styles = stylex.create({
     marginTop: 6,
     paddingBlock: { default: 16, [DESKTOP]: 20 },
     paddingInline: { default: 20, [DESKTOP]: 24 },
-    backgroundColor: SURFACE_ALT,
+    backgroundColor: color.pageTint,
   },
   devPromptParagraph: {
     margin: 0,
@@ -367,169 +307,74 @@ const styles = stylex.create({
   },
 });
 
+const PREVIEW_COUNT = 5;
+
+const NEWEST_FIRST = [...INSIGHTS_ARTICLES].sort((a, b) =>
+  (b.updated ?? "").localeCompare(a.updated ?? ""),
+);
+
+const formatUpdated = (iso: string) => {
+  const [year, month, day] = iso.split("-").map(Number);
+  return `${year}年${month}月${day}日`;
+};
+
 const articleAnchor = (article: InsightArticle) => `${article.id}-article`;
 const sectionAnchor = (article: InsightArticle, section: InsightSection) =>
   `${article.id}-${section.slug}`;
 
-function extractSectionSummary(section: InsightSection): string {
-  for (const block of section.blocks) {
-    if (block.kind === "paragraphs" && block.items[0]) {
-      return block.items[0];
-    }
-    if (block.kind === "terms" && block.items.length > 0) {
-      return block.items.map((t) => t.term).join(" · ");
-    }
-    if (block.kind === "bullets" && block.items.length > 0) {
-      return block.items.slice(0, 2).join("；");
-    }
-  }
-  return "";
-}
-
-function buildBookmarkItems(
-  articles: readonly InsightArticle[],
-  openId: string | null,
-): CodexBookmarkItem[] {
-  if (articles.length === 1 && articles[0]) {
-    const [article] = articles;
-    const items: CodexBookmarkItem[] = [
-      {
-        id: articleAnchor(article),
-        title: article.navLabel ?? article.title,
-        summary: article.thesis?.statement ?? article.lead ?? article.intro[0] ?? "",
-      },
-    ];
-    for (const section of article.sections) {
-      items.push({
-        id: sectionAnchor(article, section),
-        title: section.navLabel || section.title,
-        summary: extractSectionSummary(section),
-      });
-    }
-    return items;
-  }
-
-  const items: CodexBookmarkItem[] = [];
-  for (const article of articles) {
-    items.push({
-      id: articleAnchor(article),
-      title: article.navLabel ?? article.title,
-      summary: article.thesis?.statement ?? article.lead ?? article.intro[0] ?? "",
-    });
-    if (openId === article.id) {
-      for (const section of article.sections) {
-        items.push({
-          id: sectionAnchor(article, section),
-          title: section.navLabel || section.title,
-          summary: extractSectionSummary(section),
-        });
-      }
-    }
-  }
-  return items;
-}
-
 export function InsightsView(props: { onNavigateHome: (target?: string) => void }) {
-  const articles = INSIGHTS_ARTICLES;
-  const [featured, ...more] = articles;
   const [openId, setOpenId] = createSignal<string | null>(null);
-  const [expandedId, setExpandedId] = createSignal<string | null>(null);
-  const reduceMotion = useReducedMotion();
-  const railVisible = () => expandedId() !== null && expandedId() === openId();
+  const [showAll, setShowAll] = createSignal(false);
+  const hiddenCount = NEWEST_FIRST.length - PREVIEW_COUNT;
+  const articles = () => (showAll() ? NEWEST_FIRST : NEWEST_FIRST.slice(0, PREVIEW_COUNT));
 
   const toggleArticle = (id: string) => {
-    setExpandedId(null);
     setOpenId((current) => (current === id ? null : id));
   };
 
-  const bookmarkItems = createMemo(() => buildBookmarkItems(articles, openId()));
-  const bookmarkIds = createMemo(() => bookmarkItems().map((item) => item.id));
-  const activeBookmarkId = useBookmarkActive(bookmarkIds);
-
-  const handleSelectBookmark = (id: string) => {
-    if (featured && openId() !== featured.id) {
-      setExpandedId(null);
-      setOpenId(featured.id);
-      requestAnimationFrame(() => {
-        setTimeout(() => {
-          scrollToBookmark(id);
-        }, 60);
-      });
-    } else {
-      scrollToBookmark(id);
-    }
-  };
   return (
     <div id="insights-top" lang="zh-CN" {...stylex.attrs(kitStyles.root)}>
-      <SubPageBanner
-        eyebrow={INSIGHTS_PAGE.eyebrow}
-        title="行业洞察"
-        tagline={INSIGHTS_PAGE.tagline}
-        lead={INSIGHTS_PAGE.lead}
-        meta={INSIGHTS_PAGE.meta}
-        image="/prototype/official-site/product-human-nutrition.webp"
-        imageAlt={INSIGHTS_PAGE.imageAlt}
-        titleId="insights-banner-title"
-      />
+      <ProductsBanner title="行业洞察" label="Industry insights banner">
+        <ProductsBannerImage
+          src="/products/figma/oos1-insights-banner.jpg"
+          alt={INSIGHTS_PAGE.imageAlt}
+        />
+      </ProductsBanner>
 
-      <SubPageNav current="行业洞察" chips={[]} onNavigateHome={props.onNavigateHome} />
+      <ProductsSubBar current="行业洞察" onNavigateHome={props.onNavigateHome} />
 
       <div {...stylex.attrs(styles.pageSection)}>
         <div {...stylex.attrs(kitStyles.shell, kitStyles.inset120)}>
           <div {...stylex.attrs(styles.articleWrapper)}>
-            <AnimatePresence>
-              <Show when={railVisible() && bookmarkItems().length > 0}>
-                <m.aside
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{
-                    opacity: 0,
-                    transition: { duration: reduceMotion() ? 0 : 0.12, ease: EASE },
-                  }}
-                  transition={{ duration: reduceMotion() ? 0 : 0.2, ease: EASE }}
-                  {...stylex.attrs(styles.railAside)}
-                  aria-label="文章书签"
-                >
-                  <div {...stylex.attrs(styles.railSticky)}>
-                    <CodexBookmarkRail
-                      items={bookmarkItems()}
-                      activeId={activeBookmarkId()}
-                      onSelect={handleSelectBookmark}
-                    />
-                  </div>
-                </m.aside>
-              </Show>
-            </AnimatePresence>
-
             <div {...stylex.attrs(styles.articleMain)}>
-              {featured ? (
-                <InsightArticleView
-                  article={featured}
-                  featured
-                  open={openId() === featured.id}
-                  onToggle={() => toggleArticle(featured.id)}
-                  onExpanded={() => setExpandedId(featured.id)}
-                />
-              ) : null}
-              {more.length > 0 ? (
-                <div {...stylex.attrs(styles.moreList, more.length === 1 && styles.moreListSingle)}>
-                  {more.length > 1 ? (
-                    <div {...stylex.attrs(styles.moreHeader)}>
-                      <p {...stylex.attrs(styles.moreLabel)}>更多洞察</p>
-                      <p {...stylex.attrs(styles.moreCount)}>{`共 ${more.length} 篇`}</p>
-                    </div>
-                  ) : null}
-                  {more.map((article) => (
-                    <InsightArticleView
-                      article={article}
-                      featured={false}
-                      open={openId() === article.id}
-                      onToggle={() => toggleArticle(article.id)}
-                      onExpanded={() => setExpandedId(article.id)}
+              <For each={articles()}>
+                {(article, index) => (
+                  <InsightArticleView
+                    article={article}
+                    coverEnd={index() % 2 === 1}
+                    open={openId() === article.id}
+                    onToggle={() => toggleArticle(article.id)}
+                  />
+                )}
+              </For>
+              <Show when={hiddenCount > 0}>
+                <div {...stylex.attrs(styles.moreRow)}>
+                  <button
+                    type="button"
+                    aria-expanded={showAll() ? "true" : "false"}
+                    onClick={() => setShowAll((current) => !current)}
+                    {...stylex.attrs(styles.expandButton, styles.expandButtonOutline)}
+                  >
+                    <span>{showAll() ? "收起" : "查看更多"}</span>
+                    <ChevronDown
+                      size={16}
+                      strokeWidth={2}
+                      aria-hidden="true"
+                      {...stylex.attrs(styles.expandIcon, showAll() && styles.expandIconRotated)}
                     />
-                  ))}
+                  </button>
                 </div>
-              ) : null}
+              </Show>
             </div>
           </div>
         </div>
@@ -537,8 +382,6 @@ export function InsightsView(props: { onNavigateHome: (target?: string) => void 
       <Flow>
         <ContactCta
           id="insights-bottom-cta"
-          title="需要索取样品或技术资料？"
-          subtitle="我们的应用团队随时为您提供添加量指导与配方参考。"
           actions={[{ label: "联系我们", onClick: () => props.onNavigateHome("contact") }]}
         />
       </Flow>
@@ -569,27 +412,23 @@ function readMinutes(article: InsightArticle) {
   return Math.max(1, Math.round(text.length / CHARS_PER_MINUTE));
 }
 
-function isFullyOpen(definition: unknown) {
-  return (
-    typeof definition === "object" &&
-    definition !== null &&
-    "height" in definition &&
-    definition.height === "auto"
-  );
-}
-
-function InsightArticleView(props: {
+export function InsightArticleView(props: {
   article: InsightArticle;
-  featured: boolean;
+  coverEnd: boolean;
   open: boolean;
   onToggle: () => void;
-  onExpanded: () => void;
 }) {
   const article = props.article;
-  const featured = props.featured;
   const reduce = useReducedMotion();
   const titleId = `${article.id}-article-title`;
   const bodyId = `${article.id}-full-article`;
+  const readMeta = [
+    article.updated && `更新于 ${formatUpdated(article.updated)}`,
+    `全文 ${article.sections.length} 节 · 约 ${readMinutes(article)} 分钟`,
+  ]
+    .filter(Boolean)
+    .join(" · ");
+  const excerpt = article.thesis?.statement ?? article.intro[0];
 
   // Functions, not nodes: the compact preview remounts with each expansion.
   const toggleButton = () => (
@@ -600,8 +439,8 @@ function InsightArticleView(props: {
       onClick={() => props.onToggle()}
       {...stylex.attrs(
         styles.expandButton,
-        (props.open || !featured) && styles.expandButtonOutline,
-        !featured && styles.compactButton,
+        props.open && styles.expandButtonOutline,
+        styles.compactButton,
       )}
     >
       <span>{props.open ? "收起阅读" : "展开阅读"}</span>
@@ -626,17 +465,8 @@ function InsightArticleView(props: {
       ) : null}
 
       <div {...stylex.attrs(styles.paragraphStack)}>
-        {article.intro.map((paragraph, index) => (
-          <p {...stylex.attrs(styles.bodyParagraph)}>
-            {index === 0 ? (
-              <>
-                <span {...stylex.attrs(styles.dropCap)}>{paragraph.slice(0, 1)}</span>
-                {paragraph.slice(1)}
-              </>
-            ) : (
-              paragraph
-            )}
-          </p>
+        {article.intro.map((paragraph) => (
+          <p {...stylex.attrs(styles.bodyParagraph)}>{paragraph}</p>
         ))}
       </div>
     </>
@@ -646,39 +476,43 @@ function InsightArticleView(props: {
     <article
       id={articleAnchor(article)}
       aria-labelledby={titleId}
-      {...stylex.attrs(featured ? styles.article : styles.compactArticle, kitStyles.anchor)}
+      {...stylex.attrs(styles.compactArticle, kitStyles.anchor)}
     >
-      {featured ? (
-        <>
-          <p {...stylex.attrs(styles.docCategory)}>{article.category}</p>
-
-          <h2 id={titleId} {...stylex.attrs(styles.docTitle)}>
+      <div
+        {...stylex.attrs(
+          article.cover && styles.articleHead,
+          article.cover && props.coverEnd && styles.articleHeadReverse,
+        )}
+      >
+        <Show when={article.cover}>
+          {(cover) => (
+            <figure
+              {...stylex.attrs(styles.articleFigure, props.coverEnd && styles.articleFigureEnd)}
+            >
+              <img
+                src={cover().src}
+                alt={cover().alt}
+                loading="lazy"
+                {...stylex.attrs(styles.articleImage)}
+                style={{ "object-position": cover().position }}
+              />
+            </figure>
+          )}
+        </Show>
+        <div {...stylex.attrs(styles.compactText)}>
+          <h2 id={titleId} {...stylex.attrs(styles.compactTitle)}>
             {article.title}
           </h2>
-
-          {article.lead ? <p {...stylex.attrs(styles.docSubtitle)}>{article.lead}</p> : null}
-
-          {preview()}
-
+          {article.lead ? <p {...stylex.attrs(styles.compactLead)}>{article.lead}</p> : null}
+          <Show when={!props.open && excerpt}>
+            <p {...stylex.attrs(styles.compactExcerpt)}>{excerpt}</p>
+          </Show>
           <div {...stylex.attrs(styles.expandRow)}>
-            <p {...stylex.attrs(styles.expandMeta)}>
-              {`全文 ${article.sections.length} 节 · 约 ${readMinutes(article)} 分钟`}
-            </p>
+            <p {...stylex.attrs(styles.expandMeta)}>{readMeta}</p>
             {toggleButton()}
           </div>
-        </>
-      ) : (
-        <div {...stylex.attrs(styles.compactHead)}>
-          <div {...stylex.attrs(styles.compactText)}>
-            <p {...stylex.attrs(styles.docCategory)}>{article.category}</p>
-            <h2 id={titleId} {...stylex.attrs(styles.compactTitle)}>
-              {article.title}
-            </h2>
-            {article.lead ? <p {...stylex.attrs(styles.compactLead)}>{article.lead}</p> : null}
-          </div>
-          {toggleButton()}
         </div>
-      )}
+      </div>
 
       <AnimatePresence initial={false}>
         <Show when={props.open}>
@@ -688,13 +522,10 @@ function InsightArticleView(props: {
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: reduce() ? 0.15 : 0.4, ease: EASE }}
-            onAnimationComplete={(definition) => {
-              if (isFullyOpen(definition)) props.onExpanded();
-            }}
             {...stylex.attrs(styles.expandedWrap)}
           >
-            {featured ? null : <div {...stylex.attrs(styles.compactPreview)}>{preview()}</div>}
-            <div {...stylex.attrs(styles.expandedInner)}>
+            <div {...stylex.attrs(styles.compactPreview, styles.readingColumn)}>{preview()}</div>
+            <div {...stylex.attrs(styles.expandedInner, styles.readingColumn)}>
               {article.sections.map((section) => (
                 <InsightSectionView id={sectionAnchor(article, section)} section={section} />
               ))}

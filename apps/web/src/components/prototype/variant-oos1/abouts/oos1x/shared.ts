@@ -65,9 +65,6 @@ export const type = stylex.create({
     fontVariantNumeric: "lining-nums tabular-nums",
     color: tone.navy,
   },
-  counterTitle: { fontSize: scale.titleCounterweight },
-  counterDisplay: { fontSize: scale.displayCounterweight },
-  counterHeading: { fontSize: scale.headingCounterweight, letterSpacing: "-0.01em" },
   light: {
     margin: 0,
     fontFamily: face.sans,
@@ -99,14 +96,6 @@ export const type = stylex.create({
     color: tone.body,
     textWrap: "pretty",
   },
-  serif: {
-    margin: 0,
-    fontFamily: face.serif,
-    fontStyle: "italic",
-    fontWeight: 400,
-    lineHeight: 1.1,
-    color: tone.body,
-  },
   note: {
     margin: 0,
     fontFamily: face.sans,
@@ -118,4 +107,4 @@ export const type = stylex.create({
   },
 });
 
-export const srOnly = stylex.attrs(ui.srOnly);
+export const srOnly = stylex.props(ui.srOnly);

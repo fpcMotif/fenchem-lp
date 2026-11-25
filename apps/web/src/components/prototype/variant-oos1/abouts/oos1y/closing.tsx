@@ -289,7 +289,7 @@ export function Closing(props: { onNavigateHome: (hash?: string) => void }) {
           {...stylex.attrs(ui.anchor, styles.section, styles.first, styles.toEnd)}
         >
           <h2 id="oos1y-honor" {...srOnly}>
-            {ABOUT_HONORS.eyebrow}
+            {ABOUT_HONORS.title}
           </h2>
           <div {...stylex.attrs(ui.glass, styles.honorsPane)}>
             <Reveal>
@@ -313,7 +313,7 @@ export function Closing(props: { onNavigateHome: (hash?: string) => void }) {
           {...stylex.attrs(ui.anchor, styles.section)}
         >
           <h2 id="oos1y-structure" {...srOnly}>
-            {ABOUT_STRUCTURE.eyebrow}
+            {ABOUT_STRUCTURE.title}
           </h2>
           <div {...stylex.attrs(ui.glass, styles.structurePane)}>
             <Reveal>

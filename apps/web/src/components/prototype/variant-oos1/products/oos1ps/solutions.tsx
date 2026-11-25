@@ -10,7 +10,6 @@ import { EASE } from "@/components/prototype/motion-constants";
 import { useReducedMotion } from "@/components/prototype/use-reduced-motion";
 
 import { SOLUTION_ITEMS, type SolutionItem } from "../../products-data";
-import { padIndex } from "../shared/derived";
 import { font, ink, layout, mq, sheetTone } from "./theme.stylex";
 
 const MD = "@media (min-width: 768px)";
@@ -95,14 +94,14 @@ const styles = stylex.create({
   trigger: {
     display: "grid",
     gridTemplateColumns: {
-      default: "28px minmax(0, 1fr) 40px",
-      [MD]: "40px minmax(0, 1fr) minmax(0, 220px) 40px",
-      [LG]: "40px minmax(0, 3fr) minmax(0, 5fr) minmax(0, 3fr) 40px",
+      default: "minmax(0, 1fr) 40px",
+      [MD]: "minmax(0, 1fr) minmax(0, 220px) 40px",
+      [LG]: "minmax(0, 3fr) minmax(0, 5fr) minmax(0, 3fr) 40px",
     },
     gridTemplateAreas: {
-      default: '"num title icon" "num sub icon" "num tex icon"',
-      [MD]: '"num title tex icon" "num sub tex icon"',
-      [LG]: '"num title sub tex icon"',
+      default: '"title icon" "sub icon" "tex icon"',
+      [MD]: '"title tex icon" "sub tex icon"',
+      [LG]: '"title sub tex icon"',
     },
     columnGap: { default: 12, [MD]: 24 },
     alignItems: "start",
@@ -122,22 +121,6 @@ const styles = stylex.create({
     outlineWidth: 2,
     outlineColor: colors.brandBlue700,
     outlineOffset: -2,
-  },
-  number: {
-    gridArea: "num",
-    fontFamily: font.numeral,
-    fontSize: 13,
-    fontWeight: 500,
-    lineHeight: "24px",
-    letterSpacing: "0.04em",
-    fontVariantNumeric: "tabular-nums",
-    color: ink.muted,
-    transitionProperty: "color",
-    transitionDuration: "150ms",
-    transitionTimingFunction: "ease",
-  },
-  numberOpen: {
-    color: colors.brandGreen700,
   },
   name: {
     gridArea: "title",
@@ -384,7 +367,6 @@ function Spread(props: { item: SolutionItem }) {
 
 function SheetStrip(props: {
   item: SolutionItem;
-  index: number;
   open: boolean;
   reduce: boolean;
   triggerRef: (node: HTMLButtonElement) => void;
@@ -412,12 +394,6 @@ function SheetStrip(props: {
           onKeyDown={(event) => props.onKeyDown(event)}
           {...stylex.attrs(styles.trigger)}
         >
-          <span
-            aria-hidden="true"
-            {...stylex.attrs(styles.number, props.open && styles.numberOpen)}
-          >
-            {padIndex(props.index)}
-          </span>
           <span {...stylex.attrs(styles.name)}>{item.title}</span>
           <span {...stylex.attrs(styles.subtitle)}>{item.subtitle}</span>
           <span {...stylex.attrs(styles.texture)}>
@@ -529,7 +505,6 @@ export function Solutions() {
           {SOLUTION_ITEMS.map((item, index) => (
             <SheetStrip
               item={item}
-              index={index}
               open={openIndex() === index}
               reduce={reduce()}
               triggerRef={(node) => {

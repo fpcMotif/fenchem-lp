@@ -226,9 +226,6 @@ export function HeroSection(props: { styles: ProductionStyles }) {
         <div {...stylex.attrs(styles.heroGrid)}>
           {/* Left: Headline block */}
           <div {...stylex.attrs(styles.heroLeft)}>
-            <Reveal>
-              <p {...stylex.attrs(styles.heroBadge)}>Botanical Intelligence Since 1995</p>
-            </Reveal>
             <Reveal delay={STAGGER}>
               <h1 {...stylex.attrs(styles.heroHeading)}>
                 Nurturing Vitality
@@ -304,11 +301,6 @@ export function HeroSection(props: { styles: ProductionStyles }) {
               />
               <div aria-hidden="true" {...stylex.attrs(styles.heroImgScrim)} />
             </div>
-            {/* Caption badge */}
-            <div {...stylex.attrs(styles.heroCaptionBadge)}>
-              <span {...stylex.attrs(styles.techLabel)}>{company.tagline}</span>
-              <span {...stylex.attrs(styles.eyebrowGreen)}>{company.since}</span>
-            </div>
           </div>
         </div>
       </div>
@@ -336,8 +328,6 @@ export function FormulationSection(props: { styles: ProductionStyles }) {
         <SectionHeader
           styles={styles}
           id="formulation-heading"
-          number="04"
-          label="Formulation"
           title="Your target spec,"
           accent="engineered back to you"
           aside={
@@ -453,7 +443,6 @@ export function FormulationSection(props: { styles: ProductionStyles }) {
               Submit this specification
               <ArrowRight aria-hidden="true" size={16} />
             </a>
-            <p {...stylex.attrs(styles.specDossiersRequestNote)}>Technical dossiers on request</p>
           </div>
         </div>
       </div>
@@ -488,7 +477,6 @@ export function StandardsSection(props: { styles: ProductionStyles }) {
           </div>
           <div {...stylex.attrs(styles.originTextCol)}>
             <Reveal>
-              <p {...stylex.attrs(styles.eyebrowGreen)}>Origin</p>
               <h2 {...stylex.attrs(styles.originTitle)}>
                 Grown with{" "}
                 <em
@@ -516,8 +504,6 @@ export function StandardsSection(props: { styles: ProductionStyles }) {
         <SectionHeader
           styles={styles}
           id="standards-heading"
-          number="05"
-          label="Quality Infrastructure"
           title="Science-backed"
           accent="standards"
           aside={
@@ -566,10 +552,6 @@ export function StandardsSection(props: { styles: ProductionStyles }) {
                     <div>
                       <h3 {...stylex.attrs(styles.pillarTitle)}>{pillar.title}</h3>
                       <p {...stylex.attrs(styles.pillarCopy)}>{pillar.copy}</p>
-                      <div {...stylex.attrs(styles.pillarCert)}>
-                        <CheckCircle2 aria-hidden="true" size={14} />
-                        ISO 9001 · GMP Certified
-                      </div>
                     </div>
                   </div>
                 </Reveal>
@@ -615,7 +597,6 @@ export function FinaleSection(props: { styles: ProductionStyles }) {
 
       <div {...stylex.attrs(styles.container, styles.finaleInner)}>
         <Reveal>
-          <p {...stylex.attrs(styles.eyebrowGreen400)}>06 — Partner with Fenchem</p>
           <h2 id="contact-heading" {...stylex.attrs(styles.finaleHeading)}>
             Your next formulation,{" "}
             <span
@@ -642,12 +623,6 @@ export function FinaleSection(props: { styles: ProductionStyles }) {
               Explore Portfolio
             </a>
           </div>
-        </Reveal>
-
-        <Reveal delay={STAGGER * 3}>
-          <p {...stylex.attrs(styles.finaleResponseTime)}>
-            Response Time &lt; 24h — Technical Dossiers on Request
-          </p>
         </Reveal>
 
         {/* Office nodes */}
@@ -687,8 +662,6 @@ export function FooterSection(props: { styles: ProductionStyles }) {
             </div>
             <p {...stylex.attrs(styles.footerBrandTagline)}>{company.tagline}.</p>
             <p {...stylex.attrs(styles.footerEst)}>
-              ISO 9001 : 2015 · GMP · HACCP
-              <br />
               Est. {company.founded} — {company.hq.city}, {company.hq.country}
             </p>
             <div {...stylex.attrs(styles.footerCertsList)}>
@@ -728,14 +701,7 @@ export function FooterSection(props: { styles: ProductionStyles }) {
               "font-variant-numeric": "tabular-nums",
             }}
           >
-            {company.hq.coords} — Nanjing, China
-          </span>
-          <span
-            style={{
-              color: colors.brandGreen700,
-            }}
-          >
-            Botanical Intelligence Since 1995
+            {company.hq.coords}
           </span>
         </div>
       </div>
@@ -745,8 +711,8 @@ export function FooterSection(props: { styles: ProductionStyles }) {
 export function SectionHeader(props: {
   styles: ProductionStyles;
   id: string;
-  number: string;
-  label: string;
+  number?: string;
+  label?: string;
   title: string;
   accent: string;
   aside?: JSX.Element;
@@ -755,9 +721,6 @@ export function SectionHeader(props: {
   return (
     <div {...stylex.attrs(props.styles.sectionHeaderRow)}>
       <Reveal>
-        <p {...stylex.attrs(props.styles.eyebrowGreen)}>
-          {props.number} — {props.label}
-        </p>
         <h2 id={props.id} {...stylex.attrs(props.styles.sectionHeading)}>
           {props.title} <span {...stylex.attrs(props.styles.textGreen600)}>{props.accent}</span>
         </h2>

@@ -17,7 +17,7 @@ import {
   type SheetRow,
   type SolutionItem,
 } from "../kit";
-import { bp, depth, face, motion, tone } from "../tokens.stylex";
+import { bp, depth, motion, tone } from "../tokens.stylex";
 
 const EASE_OUT: [number, number, number, number] = [0.23, 1, 0.32, 1];
 const TRAILING_NOTE = /^(.+?)\s*[（(]([^（）()]+)[）)]$/;
@@ -104,15 +104,6 @@ const styles = stylex.create({
     lineHeight: "20px",
     letterSpacing: "0.06em",
     color: tone.tintInk,
-  },
-  groupEnglish: {
-    fontFamily: face.display,
-    fontSize: 11,
-    fontWeight: 500,
-    lineHeight: "16px",
-    letterSpacing: "0.14em",
-    textTransform: "uppercase",
-    color: tone.tintMuted,
   },
   groupCount: {
     marginInlineStart: "auto",
@@ -291,12 +282,6 @@ const styles = stylex.create({
     lineHeight: "18px",
     letterSpacing: "0.08em",
     color: tone.tintMuted,
-  },
-  areaEnglish: {
-    fontFamily: face.display,
-    fontSize: 11,
-    letterSpacing: "0.14em",
-    textTransform: "uppercase",
   },
   subtitle: {
     margin: 0,
@@ -500,9 +485,6 @@ function SolutionRow(props: {
             {area && (
               <p {...stylex.attrs(styles.areaLine)}>
                 <span>{area.label}</span>
-                <span lang="en" {...stylex.attrs(styles.areaEnglish)}>
-                  {area.englishLabel}
-                </span>
               </p>
             )}
             <p {...stylex.attrs(styles.subtitle)}>{item.subtitle}</p>
@@ -582,9 +564,6 @@ export function LedgerVariant() {
                       <li {...stylex.attrs(styles.group)}>
                         <h3 {...stylex.attrs(styles.groupHeading, styles.inline)}>
                           <span {...stylex.attrs(styles.groupLabel)}>{group.label}</span>
-                          <span lang="en" {...stylex.attrs(styles.groupEnglish)}>
-                            {group.englishLabel}
-                          </span>
                           <span {...stylex.attrs(styles.groupCount)}>{group.items.length} 款</span>
                         </h3>
                         {renderRows(group.items, "h4")}

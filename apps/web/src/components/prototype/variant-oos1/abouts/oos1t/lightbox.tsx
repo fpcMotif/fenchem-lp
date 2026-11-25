@@ -14,7 +14,6 @@ export type LightboxPhoto = {
   large: string;
   alt: string;
   caption: string;
-  english: string;
 };
 
 const fadeIn = stylex.keyframes({
@@ -78,18 +77,9 @@ const styles = stylex.create({
     height: "auto",
   },
   caption: {
-    display: "flex",
-    alignItems: "baseline",
-    gap: 12,
     fontFamily: face.sans,
     fontSize: 15,
     color: tone.ink,
-  },
-  english: {
-    fontFamily: face.serif,
-    fontStyle: "italic",
-    fontSize: 19,
-    color: tone.quiet,
   },
   button: {
     position: "absolute",
@@ -147,12 +137,7 @@ export function Lightbox(props: { lightbox: LightboxState; photos: readonly Ligh
                 <Cast lift={LIFT.block} />
                 <img src={photo.large} alt={photo.alt} {...stylex.attrs(styles.image)} />
               </span>
-              <figcaption {...stylex.attrs(styles.caption)}>
-                <span>{photo.caption}</span>
-                <span lang="en" {...stylex.attrs(styles.english)}>
-                  {photo.english}
-                </span>
-              </figcaption>
+              <figcaption {...stylex.attrs(styles.caption)}>{photo.caption}</figcaption>
             </figure>
           </LightboxStage>
           <LightboxControls

@@ -1,8 +1,11 @@
-import { Collapse } from "../shared/collapse";
 import { m, useInstantLayoutTransition } from "@/compat/motion";
-import { Plus } from "@fenchem-lp/ui/components/lucide";
+import { ChevronDown, Plus } from "@fenchem-lp/ui/components/lucide";
 import { colors } from "@fenchem-lp/ui/tokens.stylex";
 import * as stylex from "@stylexjs/stylex";
+import type { StyleXStyles } from "@stylexjs/stylex";
+import { Collapsible, CollapsiblePanel, CollapsibleTrigger } from "@ui-sdk/solid/collapsible";
+import { Tabs, TabsList, TabsPanel, TabsTab } from "@ui-sdk/solid/tabs";
+import { Toggle, ToggleGroup } from "@ui-sdk/solid/toggle";
 import {
   createEffect,
   createMemo,
@@ -17,20 +20,18 @@ import type { JSX } from "@solidjs/web";
 import { EASE } from "../motion-constants";
 import { useReducedMotion } from "../use-reduced-motion";
 import {
-  CATEGORIES,
-  SHEET_CATALOG_GROUPS,
-  SOLUTION_AREAS,
-  SOLUTION_ITEMS,
+  CATALOG_BY_CATEGORY,
+  SOLUTIONS_BY_CATEGORY,
   type CatalogGroup,
+  type SolutionArea,
   type SolutionAreaId,
   type SolutionItem,
 } from "./products-data";
 import { kitStyles } from "./subpage-kit";
-import { color, ease, font, layout, media } from "./tokens.stylex";
+import { color, ease, layout, media } from "./tokens.stylex";
 
 type AreaFilter = SolutionAreaId | "all";
 
-const SURFACE = "#f3f5fa";
 const TINT_INK = "oklch(0.26 0.035 261.5)";
 const TINT_BODY = "oklch(0.44 0.025 261.5)";
 const TINT_MUTED = "oklch(0.52 0.02 261.5)";
@@ -55,10 +56,109 @@ const TWELVE = "repeat(12, minmax(0, 1fr))";
 const HEAD_SPACE = { default: 32, [DESKTOP]: 56 } as const;
 const CARD_RADIUS = { default: 12, [DESKTOP]: 16 } as const;
 
-const padIndex = (index: number) => String(index + 1).padStart(2, "0");
+const NO_AREAS: SolutionArea[] = [];
+const NO_GROUPS: CatalogGroup[] = [];
 
-const orderByArea = (items: SolutionItem[]) =>
-  SOLUTION_AREAS.flatMap((area) => items.filter((item) => item.area === area.id));
+const orderByArea = (areas: SolutionArea[], items: SolutionItem[]) =>
+  areas.length === 0
+    ? items
+    : areas.flatMap((area) => items.filter((item) => item.area === area.id));
+
+const EDGE_PX = 52;
+const EDGE_SPEED = 5.5;
+
+const bindEdgeScroll = (node: HTMLElement, reduce: boolean) => {
+  if (reduce) return () => {};
+  let speedX = 0;
+  let speedY = 0;
+  let frame = 0;
+
+  const stop = () => {
+    speedX = 0;
+    speedY = 0;
+    if (frame) cancelAnimationFrame(frame);
+    frame = 0;
+  };
+
+  const tick = () => {
+    if (speedX) node.scrollLeft += speedX;
+    if (speedY) node.scrollTop += speedY;
+    const canX =
+      speedX < 0 ? node.scrollLeft > 0 : node.scrollLeft + node.clientWidth < node.scrollWidth - 1;
+    const canY =
+      speedY < 0 ? node.scrollTop > 0 : node.scrollTop + node.clientHeight < node.scrollHeight - 1;
+    if ((speedX !== 0 && canX) || (speedY !== 0 && canY)) frame = requestAnimationFrame(tick);
+    else frame = 0;
+  };
+
+  const onMove = (event: PointerEvent) => {
+    const box = node.getBoundingClientRect();
+    const x = event.clientX - box.left;
+    const y = event.clientY - box.top;
+    const flow = getComputedStyle(node);
+    const overflowY =
+      node.scrollHeight > node.clientHeight + 1 &&
+      flow.overflowY !== "hidden" &&
+      flow.overflowY !== "visible";
+    const overflowX =
+      node.scrollWidth > node.clientWidth + 1 &&
+      flow.overflowX !== "hidden" &&
+      flow.overflowX !== "visible";
+    speedX = 0;
+    speedY = 0;
+    if (overflowY) {
+      if (y < EDGE_PX) speedY = -EDGE_SPEED * (1 - Math.max(0, y) / EDGE_PX);
+      else if (box.height - y < EDGE_PX) {
+        speedY = EDGE_SPEED * (1 - Math.max(0, box.height - y) / EDGE_PX);
+      }
+    }
+    if (overflowX) {
+      if (x < EDGE_PX) speedX = -EDGE_SPEED * (1 - Math.max(0, x) / EDGE_PX);
+      else if (box.width - x < EDGE_PX) {
+        speedX = EDGE_SPEED * (1 - Math.max(0, box.width - x) / EDGE_PX);
+      }
+    }
+    if ((speedX !== 0 || speedY !== 0) && frame === 0) frame = requestAnimationFrame(tick);
+  };
+
+  node.addEventListener("pointermove", onMove);
+  node.addEventListener("pointerleave", stop);
+  return () => {
+    node.removeEventListener("pointermove", onMove);
+    node.removeEventListener("pointerleave", stop);
+    stop();
+  };
+};
+
+type BrowseState =
+  | { status: "showing"; area: AreaFilter; selectedId: string }
+  | { status: "empty"; area: AreaFilter };
+
+type BrowseEvent = { type: "pickArea"; area: AreaFilter } | { type: "pickSolution"; id: string };
+
+const initialBrowse = (solutions: SolutionItem[]): BrowseState => {
+  const first = solutions[0];
+  return first
+    ? { status: "showing", area: "all", selectedId: first.id }
+    : { status: "empty", area: "all" };
+};
+
+const transition = (
+  solutions: SolutionItem[],
+  state: BrowseState,
+  event: BrowseEvent,
+): BrowseState => {
+  if (event.type === "pickSolution") {
+    return state.status === "showing" ? { ...state, selectedId: event.id } : state;
+  }
+  const inArea = (item: SolutionItem) => event.area === "all" || item.area === event.area;
+  const current =
+    state.status === "showing" ? solutions.find((item) => item.id === state.selectedId) : undefined;
+  const next = current && inArea(current) ? current : solutions.find(inArea);
+  return next
+    ? { status: "showing", area: event.area, selectedId: next.id }
+    : { status: "empty", area: event.area };
+};
 
 const splitParen = (text: string) => {
   const open = text.indexOf(" (");
@@ -73,14 +173,8 @@ const splitNote = (text: string) => {
   return match ? { primary: match[1], note: match[2] } : { primary: text, note: null };
 };
 
-const TAB_STEPS: Record<string, (index: number, count: number) => number> = {
-  ArrowDown: (index, count) => (index + 1) % count,
-  ArrowRight: (index, count) => (index + 1) % count,
-  ArrowUp: (index, count) => (index - 1 + count) % count,
-  ArrowLeft: (index, count) => (index - 1 + count) % count,
-  Home: () => 0,
-  End: (_, count) => count - 1,
-};
+const sxProps = (...args: ReadonlyArray<StyleXStyles | false | null | undefined>) =>
+  stylex.attrs(...args);
 
 const INCI_LATIN = /（[^）]*）/g;
 const NO_BREAK_SPACE = String.fromCharCode(0xa0);
@@ -96,20 +190,10 @@ const styles = stylex.create({
     scrollMarginTop: layout.headerHeight,
   },
   bandSurface: {
-    backgroundColor: SURFACE,
+    backgroundColor: color.pageTint,
   },
   sectionHead: {
     marginBottom: HEAD_SPACE,
-  },
-  sectionEyebrow: {
-    margin: 0,
-    marginBottom: 12,
-    fontFamily: font.display,
-    fontSize: 12,
-    fontWeight: 600,
-    letterSpacing: "0.22em",
-    textTransform: "uppercase",
-    color: ACCENT,
   },
   sectionTitle: {
     margin: 0,
@@ -143,16 +227,6 @@ const styles = stylex.create({
     gridTemplateColumns: { default: "minmax(0, 1fr) 32px", [LG]: TWELVE },
     columnGap: { default: 12, [LG]: GUTTER },
     paddingInline: { default: 20, [LG]: 32 },
-  },
-  ledgerHeader: {
-    display: { default: "none", [LG]: "grid" },
-    paddingBlock: 16,
-    backgroundColor: TINT_HEAD,
-    fontSize: 12,
-    fontWeight: 500,
-    lineHeight: "16px",
-    letterSpacing: "0.08em",
-    color: TINT_MUTED,
   },
   colName: { gridColumn: { default: null, [LG]: "1 / 5" } },
   colPreview: { gridColumn: { default: null, [LG]: "5 / 12" } },
@@ -207,24 +281,20 @@ const styles = stylex.create({
   ledgerTriggerOpen: {
     backgroundColor: "transparent",
   },
-  ledgerName: {
-    display: "flex",
-    alignItems: "baseline",
-    gap: 14,
-    minWidth: 0,
-  },
-  ledgerIndex: {
-    flexShrink: 0,
-    width: 24,
+  ledgerHead: {
+    margin: 0,
+    paddingBlock: 16,
+    backgroundColor: TINT_HEAD,
     fontSize: 12,
-    fontWeight: 400,
-    lineHeight: "24px",
-    fontVariantNumeric: "tabular-nums",
-    letterSpacing: "0.04em",
+    fontWeight: 500,
+    lineHeight: "16px",
+    letterSpacing: "0.08em",
     color: TINT_MUTED,
   },
-  ledgerIndexOpen: {
-    color: ACCENT,
+  ledgerName: {
+    display: "flex",
+    alignItems: "flex-start",
+    minWidth: 0,
   },
   ledgerNames: {
     display: "flex",
@@ -333,10 +403,20 @@ const styles = stylex.create({
     paddingTop: 4,
     paddingBottom: 28,
   },
+  solutionsEmpty: {
+    margin: 0,
+    paddingBlock: 64,
+    paddingInline: 24,
+    borderRadius: CARD_RADIUS,
+    backgroundColor: color.pageTint,
+    fontSize: 15,
+    lineHeight: "26px",
+    textAlign: "center",
+    color: TINT_MUTED,
+  },
   ledgerIntro: {
     gridColumn: { default: "1 / -1", [LG]: "1 / 9" },
     margin: 0,
-    paddingInlineStart: { default: 0, [LG]: 38 },
     fontSize: 15,
     lineHeight: "26px",
     color: TINT_BODY,
@@ -346,7 +426,6 @@ const styles = stylex.create({
     gridColumn: "1 / -1",
     display: "grid",
     gridTemplateColumns: { default: "minmax(0, 1fr)", [LG]: "subgrid" },
-    marginInlineStart: { default: 0, [LG]: 38 },
     overflow: "hidden",
     borderRadius: 10,
     backgroundColor: colors.paper,
@@ -401,11 +480,30 @@ const styles = stylex.create({
     letterSpacing: "0.02em",
     color: TINT_INK,
   },
+  materialPrimaryRow: {
+    display: "flex",
+    flexWrap: "wrap",
+    alignItems: "center",
+    gap: 8,
+  },
+  materialTag: {
+    display: "inline-flex",
+    alignItems: "center",
+    height: 20,
+    paddingInline: 8,
+    borderRadius: 999,
+    backgroundColor: colors.brandBlue100,
+    fontSize: 11,
+    fontWeight: 500,
+    lineHeight: "20px",
+    color: ACCENT,
+  },
   materialInci: {
     margin: 0,
     fontSize: 13,
     lineHeight: "22px",
     color: TINT_MUTED,
+    whiteSpace: "pre-line",
   },
   materialFeatures: {
     margin: 0,
@@ -468,18 +566,6 @@ const styles = stylex.create({
     cursor: "default",
     transform: "none",
   },
-  areaCount: {
-    flexShrink: 0,
-    fontSize: 12,
-    fontWeight: 500,
-    lineHeight: "16px",
-    letterSpacing: "0.04em",
-    fontVariantNumeric: "tabular-nums",
-    color: TINT_MUTED,
-  },
-  areaCountActive: {
-    color: "rgba(255, 255, 255, 0.72)",
-  },
   areaLabel: {
     fontSize: 14,
     fontWeight: 500,
@@ -488,40 +574,145 @@ const styles = stylex.create({
     whiteSpace: "nowrap",
   },
 
+  solutionFilter: {
+    position: "relative",
+    display: { default: "block", [DESKTOP]: "none" },
+    marginTop: 16,
+    zIndex: 2,
+  },
+  solutionFilterButton: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 12,
+    width: "100%",
+    minHeight: 48,
+    paddingInline: 16,
+    boxSizing: "border-box",
+    borderWidth: 1,
+    borderStyle: "solid",
+    borderColor: TINT_RULE,
+    borderRadius: 12,
+    backgroundColor: colors.paper,
+    fontFamily: "inherit",
+    fontSize: 15,
+    fontWeight: 500,
+    lineHeight: "22px",
+    letterSpacing: "0.02em",
+    color: TINT_INK,
+    textAlign: "start",
+    cursor: "pointer",
+    outlineStyle: { default: "none", ":focus-visible": "solid" },
+    outlineWidth: 2,
+    outlineColor: ACCENT,
+    outlineOffset: 2,
+  },
+  solutionFilterLabel: {
+    minWidth: 0,
+    overflow: "hidden",
+    whiteSpace: "nowrap",
+    textOverflow: "ellipsis",
+  },
+  solutionFilterIcon: {
+    flexShrink: 0,
+    color: TINT_MUTED,
+    transitionProperty: "transform",
+    transitionDuration: {
+      default: "0ms",
+      ["@media (prefers-reduced-motion: no-preference)"]: "160ms",
+    },
+    transitionTimingFunction: ease.out,
+  },
+  solutionFilterIconOpen: {
+    transform: "rotate(180deg)",
+  },
+  solutionFilterMenu: {
+    position: "absolute",
+    top: "calc(100% + 6px)",
+    insetInline: 0,
+    zIndex: 3,
+    margin: 0,
+    padding: 6,
+    listStyleType: "none",
+    maxHeight: 320,
+    overflowY: "auto",
+    boxSizing: "border-box",
+    backgroundColor: colors.paper,
+    borderWidth: 1,
+    borderStyle: "solid",
+    borderColor: TINT_RULE,
+    borderRadius: 12,
+    boxShadow: CARD_SHADOW,
+  },
+  solutionFilterOption: {
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "flex-start",
+    gap: 2,
+    width: "100%",
+    paddingBlock: 10,
+    paddingInline: 12,
+    borderWidth: 0,
+    borderRadius: 8,
+    backgroundColor: { default: "transparent", ":hover": TINT_FILL },
+    fontFamily: "inherit",
+    textAlign: "start",
+    cursor: "pointer",
+    color: TINT_INK,
+    outlineStyle: { default: "none", ":focus-visible": "solid" },
+    outlineWidth: 2,
+    outlineColor: ACCENT,
+    outlineOffset: -2,
+  },
+  solutionFilterOptionSelected: {
+    backgroundColor: TINT_FILL,
+    color: ACCENT,
+  },
+  solutionFilterOptionTitle: {
+    fontSize: 14,
+    fontWeight: 500,
+    lineHeight: "22px",
+  },
+  solutionFilterOptionMeta: {
+    fontSize: 12,
+    lineHeight: "18px",
+    color: TINT_MUTED,
+  },
+
   browser: {
     display: "grid",
     gridTemplateColumns: {
       default: "minmax(0, 1fr)",
-      [LG]: "300px minmax(0, 1fr)",
       [DESKTOP]: "320px minmax(0, 1fr)",
     },
     rowGap: 12,
     marginTop: { default: 16, [DESKTOP]: 24 },
-    minHeight: { default: null, [LG]: 600 },
-    overflow: { default: null, [LG]: "hidden" },
-    borderWidth: { default: 0, [LG]: 1 },
+    minHeight: { default: null, [DESKTOP]: 600 },
+    overflow: { default: null, [DESKTOP]: "hidden" },
+    borderWidth: { default: 0, [DESKTOP]: 1 },
     borderStyle: "solid",
     borderColor: TINT_RULE,
-    borderRadius: { default: 0, [LG]: 12, [DESKTOP]: 16 },
-    backgroundColor: { default: null, [LG]: colors.paper },
-    boxShadow: { default: null, [LG]: CARD_SHADOW },
+    borderRadius: { default: 0, [DESKTOP]: 16 },
+    backgroundColor: { default: null, [DESKTOP]: colors.paper },
+    boxShadow: { default: null, [DESKTOP]: CARD_SHADOW },
   },
   railFrame: {
-    position: { default: null, [LG]: "relative" },
+    display: { default: "none", [DESKTOP]: "block" },
+    position: { default: null, [DESKTOP]: "relative" },
     minWidth: 0,
-    backgroundColor: { default: null, [LG]: TINT_FILL },
+    backgroundColor: { default: null, [DESKTOP]: TINT_FILL },
   },
   rail: {
     position: { default: "relative", [LG]: "absolute" },
     inset: { default: null, [LG]: 0 },
     display: { default: "flex", [LG]: "block" },
     gap: 2,
-    paddingTop: { default: 4, [LG]: 0 },
-    paddingBottom: { default: 4, [LG]: 20 },
-    paddingInlineStart: { default: 4, [LG]: 12 },
+    paddingTop: { default: 4, [LG]: 8 },
+    paddingBottom: { default: 4, [LG]: 12 },
+    paddingInlineStart: { default: 4, [LG]: 18 },
     paddingInlineEnd: { default: 4, [LG]: 0 },
     scrollPaddingInline: 4,
-    scrollPaddingTop: { default: null, [LG]: 44 },
+    scrollPaddingTop: { default: null, [LG]: 8 },
     overflowX: { default: "auto", [LG]: "hidden" },
     overflowY: { default: "hidden", [LG]: "auto" },
     scrollbarWidth: "none",
@@ -529,39 +720,43 @@ const styles = stylex.create({
     borderRadius: { default: 12, [LG]: 0 },
     backgroundColor: { default: TINT_FILL, [LG]: "transparent" },
   },
-  railGroup: {
-    display: { default: "contents", [LG]: "block" },
+  railBar: {
+    position: "absolute",
+    top: 18,
+    bottom: 18,
+    left: 11,
+    zIndex: 3,
+    display: { default: "none", [LG]: "block" },
+    width: 1,
+    backgroundImage:
+      "linear-gradient(to bottom, transparent, oklch(0.55 0.1 255 / 0.18) 18%, oklch(0.55 0.1 255 / 0.18) 82%, transparent)",
+    pointerEvents: "none",
   },
-  railHeading: {
-    position: "sticky",
+  railThumb: {
+    position: "absolute",
     top: 0,
-    zIndex: 2,
-    display: { default: "none", [LG]: "flex" },
-    justifyContent: "space-between",
-    gap: 12,
-    margin: 0,
-    paddingTop: 16,
-    paddingBottom: 8,
-    paddingInlineStart: 16,
-    paddingInlineEnd: 24,
-    backgroundColor: TINT_FILL,
-    fontSize: 12,
-    fontWeight: 500,
-    lineHeight: "20px",
-    letterSpacing: "0.08em",
-    color: TINT_MUTED,
-  },
-  railHeadingCount: {
-    fontWeight: 400,
-    letterSpacing: "0.04em",
-    fontVariantNumeric: "tabular-nums",
+    left: -8,
+    width: 17,
+    height: 22,
+    pointerEvents: "auto",
+    cursor: "grab",
+    touchAction: "none",
+    "::before": {
+      content: '""',
+      position: "absolute",
+      top: 0,
+      left: 5.5,
+      width: 6,
+      height: 22,
+      borderRadius: 999,
+      backgroundColor: "oklch(0.5 0.05 255 / 0.85)",
+    },
   },
   solutionTab: {
     position: "relative",
     display: "grid",
-    gridTemplateColumns: { default: "auto auto", [LG]: "22px minmax(0, 1fr)" },
+    gridTemplateColumns: { default: "auto", [LG]: "minmax(0, 1fr)" },
     alignItems: "baseline",
-    columnGap: { default: 6, [LG]: 14 },
     flexShrink: 0,
     width: { default: null, [LG]: "100%" },
     paddingBlock: { default: 8, [LG]: 12 },
@@ -612,17 +807,6 @@ const styles = stylex.create({
       backgroundImage: FLARE_BOTTOM,
     },
   },
-  tabIndex: {
-    position: "relative",
-    fontSize: 12,
-    lineHeight: "22px",
-    letterSpacing: "0.04em",
-    fontVariantNumeric: "tabular-nums",
-    color: TINT_MUTED,
-  },
-  tabIndexSelected: {
-    color: TINT_INK,
-  },
   tabText: {
     position: "relative",
     display: "flex",
@@ -656,24 +840,22 @@ const styles = stylex.create({
   },
   tabMeta: {
     display: { default: "none", [LG]: "block" },
-    overflow: "hidden",
     fontSize: 13,
     lineHeight: "20px",
     color: TINT_MUTED,
-    whiteSpace: "nowrap",
-    textOverflow: "ellipsis",
+    textWrap: "pretty",
   },
   sheet: {
     minWidth: 0,
     paddingInline: { default: 20, [MD]: 40, [DESKTOP]: 48 },
     paddingTop: { default: 28, [MD]: 40, [DESKTOP]: 44 },
     paddingBottom: { default: 12, [MD]: 20 },
-    borderWidth: { default: 1, [LG]: 0 },
+    borderWidth: { default: 1, [DESKTOP]: 0 },
     borderStyle: "solid",
     borderColor: TINT_RULE,
-    borderRadius: { default: 12, [LG]: 0 },
+    borderRadius: { default: 12, [DESKTOP]: 0 },
     backgroundColor: colors.paper,
-    boxShadow: { default: CARD_SHADOW, [LG]: "none" },
+    boxShadow: { default: CARD_SHADOW, [DESKTOP]: "none" },
     outlineStyle: { default: "none", ":focus-visible": "solid" },
     outlineWidth: 2,
     outlineColor: ACCENT,
@@ -687,15 +869,6 @@ const styles = stylex.create({
   },
   sheetHead: {
     paddingBottom: { default: 20, [MD]: 28 },
-  },
-  sheetArea: {
-    margin: 0,
-    marginBottom: 10,
-    fontSize: 13,
-    fontWeight: 500,
-    lineHeight: "20px",
-    letterSpacing: "0.08em",
-    color: ACCENT,
   },
   sheetTitle: {
     margin: 0,
@@ -720,20 +893,16 @@ const styles = stylex.create({
     gridTemplateColumns: { default: "minmax(0, 1fr)", [DESKTOP]: "repeat(2, minmax(0, 1fr))" },
     gridTemplateRows: { default: "none", [DESKTOP]: "repeat(3, auto)" },
     gridAutoFlow: { default: "row", [DESKTOP]: "column" },
-    columnGap: { default: 0, [DESKTOP]: 40 },
+    columnGap: { default: 0, [DESKTOP]: 48 },
     margin: 0,
   },
   field: {
     display: "grid",
-    gridTemplateColumns: {
-      default: "minmax(0, 1fr)",
-      [MD]: "88px minmax(0, 1fr)",
-      [DESKTOP]: "minmax(0, 1fr)",
-    },
+    gridTemplateColumns: { default: "minmax(0, 1fr)", [MD]: "88px minmax(0, 1fr)" },
     alignContent: "start",
     columnGap: 16,
-    rowGap: { default: 6, [DESKTOP]: 4 },
-    paddingBlock: { default: 16, [MD]: 20, [DESKTOP]: 16 },
+    rowGap: 6,
+    paddingBlock: { default: 16, [MD]: 20 },
     borderTopWidth: 1,
     borderTopStyle: "solid",
     borderTopColor: TINT_RULE_SOFT,
@@ -744,6 +913,7 @@ const styles = stylex.create({
     fontWeight: 500,
     lineHeight: "24px",
     letterSpacing: "0.04em",
+    whiteSpace: "nowrap",
     color: TINT_MUTED,
   },
   fieldValue: {
@@ -814,14 +984,55 @@ function ToggleIcon(props: { open: boolean }) {
   );
 }
 
+function MaterialTable(props: {
+  items: CatalogGroup["items"];
+  specLabel: string;
+  featuresLabel: string;
+}) {
+  return (
+    <div {...stylex.attrs(styles.materialTable)}>
+      <div aria-hidden="true" {...stylex.attrs(styles.materialHead)}>
+        <span {...stylex.attrs(styles.colMaterialName)}>产品名称</span>
+        <span {...stylex.attrs(styles.colMaterialInci)}>{props.specLabel}</span>
+        <span {...stylex.attrs(styles.colMaterialFeatures)}>{props.featuresLabel}</span>
+      </div>
+      <ul {...stylex.attrs(styles.materialList)}>
+        <For each={props.items}>
+          {(item) => {
+            const { primary, secondary } = splitParen(item.title);
+            return (
+              <li {...stylex.attrs(styles.material)}>
+                <span {...stylex.attrs(styles.materialName, styles.colMaterialName)}>
+                  <span {...stylex.attrs(styles.materialPrimaryRow)}>
+                    <span>{primary}</span>
+                    {item.tag && <span {...stylex.attrs(styles.materialTag)}>{item.tag}</span>}
+                  </span>
+                  {secondary && <span {...stylex.attrs(styles.ledgerLatin)}>{secondary}</span>}
+                </span>
+                <p {...stylex.attrs(styles.materialInci, styles.colMaterialInci)}>
+                  <Inci text={item.inci.trimEnd()} />
+                </p>
+                <p {...stylex.attrs(styles.materialFeatures, styles.colMaterialFeatures)}>
+                  {item.features}
+                </p>
+              </li>
+            );
+          }}
+        </For>
+      </ul>
+    </div>
+  );
+}
+
 function LedgerRow(props: {
   group: CatalogGroup;
-  index: number;
+  specLabel: string;
+  featuresLabel: string;
   open: boolean;
+  instantClose: boolean;
   onToggle: (trigger: HTMLElement) => void;
 }) {
-  const reduce = useReducedMotion();
-  const panelId = createUniqueId();
+  let triggerRef: HTMLButtonElement | undefined;
 
   return (
     <m.li
@@ -829,85 +1040,59 @@ function LedgerRow(props: {
       transition={{ duration: 0.26, ease: EASE }}
       {...stylex.attrs(styles.ledgerRow, props.open && styles.ledgerRowOpen)}
     >
-      <h3 {...stylex.attrs(styles.ledgerHeading, stylex.defaultMarker())}>
-        <button
-          type="button"
-          aria-expanded={props.open ? "true" : "false"}
-          aria-controls={props.open ? panelId : undefined}
-          onClick={(event) => props.onToggle(event.currentTarget)}
-          {...stylex.attrs(
-            styles.ledgerGrid,
-            styles.ledgerTrigger,
-            props.open && styles.ledgerTriggerOpen,
-          )}
-        >
-          <span {...stylex.attrs(styles.ledgerName, styles.colName)}>
-            <span {...stylex.attrs(styles.ledgerIndex, props.open && styles.ledgerIndexOpen)}>
-              {padIndex(props.index)}
-            </span>
-            <span {...stylex.attrs(styles.ledgerNames)}>
-              <span {...stylex.attrs(styles.ledgerPrimary)}>{props.group.label}</span>
-              <span {...stylex.attrs(styles.ledgerLatin)}>{props.group.items.length} 款原料</span>
-            </span>
-          </span>
-          <span
-            aria-hidden="true"
+      <Collapsible
+        open={props.open}
+        onOpenChange={() => {
+          if (triggerRef) props.onToggle(triggerRef);
+        }}
+      >
+        <h3 {...stylex.attrs(styles.ledgerHeading, stylex.defaultMarker())}>
+          <CollapsibleTrigger
+            ref={(el: HTMLButtonElement) => (triggerRef = el)}
             {...stylex.attrs(
-              styles.ledgerPreview,
-              props.open && styles.ledgerPreviewOpen,
-              styles.colPreview,
+              styles.ledgerGrid,
+              styles.ledgerTrigger,
+              props.open && styles.ledgerTriggerOpen,
             )}
           >
-            <For each={props.group.items}>
-              {(item) => (
-                <span {...stylex.attrs(styles.chip)}>{splitParen(item.title).primary}</span>
+            <span {...stylex.attrs(styles.ledgerName, styles.colName)}>
+              <span {...stylex.attrs(styles.ledgerNames)}>
+                <span {...stylex.attrs(styles.ledgerPrimary)}>{props.group.label}</span>
+                <span {...stylex.attrs(styles.ledgerLatin)}>{props.group.items.length} 款原料</span>
+              </span>
+            </span>
+            <span
+              aria-hidden="true"
+              {...stylex.attrs(
+                styles.ledgerPreview,
+                props.open && styles.ledgerPreviewOpen,
+                styles.colPreview,
               )}
-            </For>
-          </span>
-          <ToggleIcon open={props.open} />
-        </button>
-      </h3>
-      <Collapse
-        id={panelId}
-        {...stylex.attrs(styles.ledgerPanelClip)}
-        open={props.open}
-
-        transition={{ duration: reduce() ? 0 : 0.28, ease: EASE }}
-      >
-        <div {...stylex.attrs(styles.ledgerGrid, styles.ledgerPanel)}>
-          {props.group.intro && <p {...stylex.attrs(styles.ledgerIntro)}>{props.group.intro}</p>}
-          <div {...stylex.attrs(styles.materialTable)}>
-            <div aria-hidden="true" {...stylex.attrs(styles.materialHead)}>
-              <span {...stylex.attrs(styles.colMaterialName)}>产品名称</span>
-              <span {...stylex.attrs(styles.colMaterialInci)}>INCI 名称</span>
-              <span {...stylex.attrs(styles.colMaterialFeatures)}>特性&应用</span>
-            </div>
-            <ul {...stylex.attrs(styles.materialList)}>
+            >
               <For each={props.group.items}>
-                {(item) => {
-                  const { primary, secondary } = splitParen(item.title);
-                  return (
-                    <li {...stylex.attrs(styles.material)}>
-                      <span {...stylex.attrs(styles.materialName, styles.colMaterialName)}>
-                        {primary}
-                        {secondary && (
-                          <span {...stylex.attrs(styles.ledgerLatin)}>{secondary}</span>
-                        )}
-                      </span>
-                      <p {...stylex.attrs(styles.materialInci, styles.colMaterialInci)}>
-                        <Inci text={item.inci} />
-                      </p>
-                      <p {...stylex.attrs(styles.materialFeatures, styles.colMaterialFeatures)}>
-                        {item.features}
-                      </p>
-                    </li>
-                  );
-                }}
+                {(item) => (
+                  <span {...stylex.attrs(styles.chip)}>{splitParen(item.title).primary}</span>
+                )}
               </For>
-            </ul>
+            </span>
+            <ToggleIcon open={props.open} />
+          </CollapsibleTrigger>
+        </h3>
+        <CollapsiblePanel
+          data-collapsible-animated=""
+          data-instant={props.instantClose ? "" : undefined}
+          {...stylex.attrs(styles.ledgerPanelClip)}
+        >
+          <div {...stylex.attrs(styles.ledgerGrid, styles.ledgerPanel)}>
+            {props.group.intro && <p {...stylex.attrs(styles.ledgerIntro)}>{props.group.intro}</p>}
+            <MaterialTable
+              items={props.group.items}
+              specLabel={props.specLabel}
+              featuresLabel={props.featuresLabel}
+            />
           </div>
-        </div>
-      </Collapse>
+        </CollapsiblePanel>
+      </Collapsible>
     </m.li>
   );
 }
@@ -935,9 +1120,6 @@ function FormulaSheet(props: { item: SolutionItem }) {
   return (
     <>
       <header {...stylex.attrs(styles.sheetHead)}>
-        <p {...stylex.attrs(styles.sheetArea)}>
-          {SOLUTION_AREAS.find((area) => area.id === props.item.area)?.label}
-        </p>
         <h3 {...stylex.attrs(styles.sheetTitle)}>{props.item.title}</h3>
         <p {...stylex.attrs(styles.sheetSubtitle)}>{props.item.subtitle}</p>
       </header>
@@ -976,15 +1158,21 @@ function FormulaSheet(props: { item: SolutionItem }) {
 }
 
 export function ProductCatalog(props: { categoryId: string }) {
-  const [openIndex, setOpenIndex] = createSignal<number | null>(null);
+  const catalog = () => CATALOG_BY_CATEGORY[props.categoryId];
+  const groups = () => catalog()?.groups ?? NO_GROUPS;
+  const specLabel = () => catalog()?.specLabel ?? "核心规格/成分";
+  const featuresLabel = () => catalog()?.featuresLabel ?? "产品介绍";
+  const [openIndex, setOpenIndex] = createSignal<number | null>(() =>
+    groups().length === 1 ? 0 : null,
+  );
+  const [instantIndex, setInstantIndex] = createSignal<number | null>(null);
   const startInstantLayout = useInstantLayoutTransition();
-  const categoryLabel = () => CATEGORIES.find((c) => c.id === props.categoryId)?.label;
 
   const toggle = (index: number, trigger: HTMLElement) => {
-    // React reads `openIndex` from the render closure: capture it before any set.
     const current = openIndex();
     if (current !== null && current < index) {
       const triggerTop = trigger.getBoundingClientRect().top;
+      setInstantIndex(current);
       startInstantLayout(() => {
         setOpenIndex(null);
         flush();
@@ -993,6 +1181,8 @@ export function ProductCatalog(props: { categoryId: string }) {
         top: trigger.getBoundingClientRect().top - triggerTop,
         behavior: "instant",
       });
+    } else {
+      setInstantIndex(null);
     }
     setOpenIndex(current === index ? null : index);
     flush();
@@ -1006,29 +1196,26 @@ export function ProductCatalog(props: { categoryId: string }) {
     >
       <div {...stylex.attrs(kitStyles.shell, kitStyles.inset120)}>
         <header {...stylex.attrs(styles.sectionHead)}>
-          <p lang="en" {...stylex.attrs(styles.sectionEyebrow)}>
-            Catalog
-          </p>
           <h2 id="catalog-title" {...stylex.attrs(styles.sectionTitle)}>
             产品目录
           </h2>
-          <p {...stylex.attrs(styles.sectionLead)}>
-            {props.categoryId === "personal-care"
-              ? "精选个人护理全形态天然油脂与经典功效配方方案"
-              : `${categoryLabel()}核心原料与应用定制方案`}
-          </p>
+          <Show when={catalog()?.lead}>
+            {(lead) => <p {...stylex.attrs(styles.sectionLead)}>{lead()}</p>}
+          </Show>
         </header>
         <div {...stylex.attrs(styles.ledgerCard)}>
-          <div aria-hidden="true" {...stylex.attrs(styles.ledgerGrid, styles.ledgerHeader)}>
+          <p {...stylex.attrs(styles.ledgerGrid, styles.ledgerHead)}>
             <span {...stylex.attrs(styles.colName)}>原料分类</span>
-          </div>
+          </p>
           <ul {...stylex.attrs(styles.ledger)}>
-            <For each={SHEET_CATALOG_GROUPS}>
+            <For each={groups()}>
               {(group, index) => (
                 <LedgerRow
                   group={group}
-                  index={index()}
+                  specLabel={specLabel()}
+                  featuresLabel={featuresLabel()}
                   open={openIndex() === index()}
+                  instantClose={instantIndex() === index()}
                   onToggle={(trigger) => toggle(index(), trigger)}
                 />
               )}
@@ -1040,23 +1227,71 @@ export function ProductCatalog(props: { categoryId: string }) {
   );
 }
 
-export function ProductSolutions() {
+export function ProductSolutions(props: { categoryId: string }) {
   const reduce = useReducedMotion();
   const uid = createUniqueId();
   let areaListRef: HTMLDivElement | undefined;
   let railRef: HTMLDivElement | undefined;
-  const solutions = orderByArea(SOLUTION_ITEMS);
-  const [area, setArea] = createSignal<AreaFilter>("all");
-  const [selectedId, setSelectedId] = createSignal<string | undefined>(solutions[0]?.id);
+  let railBarRef: HTMLDivElement | undefined;
+  let railThumbRef: HTMLDivElement | undefined;
+  let filterRef: HTMLDivElement | undefined;
+  const solutionSet = () => SOLUTIONS_BY_CATEGORY[props.categoryId];
+  const areas = createMemo(() => {
+    const set = solutionSet();
+    return (
+      set?.areas.filter((entry) => set.items.some((item) => item.area === entry.id)) ?? NO_AREAS
+    );
+  });
+  const solutions = createMemo(() => {
+    const set = solutionSet();
+    return set ? orderByArea(areas(), set.items) : [];
+  });
+  const [browse, setBrowse] = createSignal<BrowseState>(() => initialBrowse(solutions()));
+  const send = (event: BrowseEvent) => {
+    const list = solutions();
+    setBrowse((state) => transition(list, state, event));
+    flush();
+  };
+  const area = () => browse().area;
+  const selectedId = () => {
+    const state = browse();
+    return state.status === "showing" ? state.selectedId : undefined;
+  };
+  const filterScope = () => `${props.categoryId}:${area()}`;
+  const [filterOpenScope, setFilterOpenScope] = createSignal<string | null>(null);
+  const filterOpen = () => filterOpenScope() === filterScope();
+  const setFilterOpen = (open: boolean) => setFilterOpenScope(open ? filterScope() : null);
+
+  createEffect(filterOpen, (open) => {
+    if (!open) return;
+    const onPointerDown = (event: PointerEvent) => {
+      const target = event.target;
+      if (target instanceof Node && filterRef?.contains(target)) return;
+      setFilterOpenScope(null);
+    };
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setFilterOpenScope(null);
+    };
+    document.addEventListener("pointerdown", onPointerDown);
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.removeEventListener("pointerdown", onPointerDown);
+      document.removeEventListener("keydown", onKeyDown);
+    };
+  });
 
   createEffect(
-    () => [area(), reduce()] as const,
+    () => [area(), reduce(), solutions()] as const,
     ([, reduceNow]) => {
       const list = areaListRef;
-      const chip = list?.querySelector<HTMLElement>('[aria-pressed="true"]');
-      if (!list || !chip || list.scrollWidth <= list.clientWidth) return;
-      const left = chip.offsetLeft - (list.clientWidth - chip.offsetWidth) / 2;
-      list.scrollTo({ left: Math.max(0, left), behavior: reduceNow ? "auto" : "smooth" });
+      if (!list) return;
+      const release = bindEdgeScroll(list, reduceNow);
+      const chip = list.querySelector<HTMLElement>('[aria-pressed="true"]');
+      if (chip && list.scrollWidth > list.clientWidth) {
+        const left = chip.offsetLeft - (list.clientWidth - chip.offsetWidth) / 2;
+        list.scrollTo({ left: Math.max(0, left), behavior: reduceNow ? "auto" : "smooth" });
+      }
+      return release;
     },
   );
 
@@ -1081,9 +1316,69 @@ export function ProductSolutions() {
     },
   );
 
+  createEffect(
+    () => [area(), reduce(), selectedId(), solutions()] as const,
+    ([, reduceNow]) => {
+      const rail = railRef;
+      const bar = railBarRef;
+      const thumb = railThumbRef;
+      if (!rail || !bar || !thumb) return;
+
+      let drag: { pointer: number; startY: number; startScroll: number } | null = null;
+
+      const paint = () => {
+        const overflow = rail.scrollHeight - rail.clientHeight;
+        const vertical = overflow > 1;
+        bar.hidden = !vertical;
+        if (!vertical) return;
+        const track = bar.clientHeight;
+        const thumbHeight = thumb.offsetHeight || 30;
+        const travel = Math.max(0, track - thumbHeight);
+        const y = (rail.scrollTop / overflow) * travel;
+        thumb.style.transform = `translate3d(0, ${y}px, 0)`;
+      };
+
+      const onThumbDown = (event: PointerEvent) => {
+        event.preventDefault();
+        event.stopPropagation();
+        thumb.setPointerCapture(event.pointerId);
+        drag = { pointer: event.pointerId, startY: event.clientY, startScroll: rail.scrollTop };
+      };
+      const onThumbMove = (event: PointerEvent) => {
+        if (!drag || drag.pointer !== event.pointerId) return;
+        const overflow = rail.scrollHeight - rail.clientHeight;
+        const travel = Math.max(1, bar.clientHeight - thumb.offsetHeight);
+        rail.scrollTop = drag.startScroll + ((event.clientY - drag.startY) / travel) * overflow;
+      };
+      const onThumbUp = (event: PointerEvent) => {
+        if (drag?.pointer === event.pointerId) drag = null;
+      };
+
+      paint();
+      const releaseEdge = bindEdgeScroll(rail, reduceNow);
+      const observer = new ResizeObserver(paint);
+      observer.observe(rail);
+      rail.addEventListener("scroll", paint, { passive: true });
+      thumb.addEventListener("pointerdown", onThumbDown);
+      thumb.addEventListener("pointermove", onThumbMove);
+      thumb.addEventListener("pointerup", onThumbUp);
+      thumb.addEventListener("pointercancel", onThumbUp);
+      return () => {
+        releaseEdge();
+        observer.disconnect();
+        rail.removeEventListener("scroll", paint);
+        thumb.removeEventListener("pointerdown", onThumbDown);
+        thumb.removeEventListener("pointermove", onThumbMove);
+        thumb.removeEventListener("pointerup", onThumbUp);
+        thumb.removeEventListener("pointercancel", onThumbUp);
+      };
+    },
+  );
+
   const scope = createMemo(() => {
     const current = area();
-    return current === "all" ? solutions : solutions.filter((item) => item.area === current);
+    const list = solutions();
+    return current === "all" ? list : list.filter((item) => item.area === current);
   });
   const position = createMemo(() =>
     Math.max(
@@ -1091,42 +1386,14 @@ export function ProductSolutions() {
       scope().findIndex((item) => item.id === selectedId()),
     ),
   );
-  const selected = createMemo(() => scope()[position()]);
+  const selected = createMemo(() =>
+    browse().status === "showing" ? scope()[position()] : undefined,
+  );
 
-  const chooseArea = (next: AreaFilter) => {
-    // React reads `selected` from the render closure and batches both updates.
-    const current = selected();
-    setArea(next);
-    if (next !== "all" && current && current.area !== next) {
-      setSelectedId(solutions.find((item) => item.area === next)?.id);
-    }
-    flush();
-  };
-
-  const handleRailKeyDown = (event: KeyboardEvent & { currentTarget: HTMLDivElement }) => {
-    const step = TAB_STEPS[event.key];
-    if (!step) return;
-    event.preventDefault();
-    const items = scope();
-    const next = step(position(), items.length);
-    const nextItem = items[next];
-    if (!nextItem) return;
-    setSelectedId(nextItem.id);
-    event.currentTarget.querySelectorAll<HTMLElement>('[role="tab"]')[next]?.focus();
-  };
-
-  const areaChips = [{ id: "all" as const, label: "全部" }, ...SOLUTION_AREAS]
-    .map((entry) => ({
-      ...entry,
-      count:
-        entry.id === "all"
-          ? solutions.length
-          : solutions.filter((item) => item.area === entry.id).length,
-    }))
-    .filter((entry) => entry.count > 0);
+  const areaChips = createMemo(() => [{ id: "all" as const, label: "全部" }, ...areas()]);
 
   return (
-    <Show when={selected()}>
+    <Show when={solutions().length > 0}>
       <section
         id="products-solutions"
         aria-labelledby="solutions-title"
@@ -1134,143 +1401,175 @@ export function ProductSolutions() {
       >
         <div {...stylex.attrs(kitStyles.shell, kitStyles.inset120)}>
           <header {...stylex.attrs(styles.sectionHead)}>
-            <p lang="en" {...stylex.attrs(styles.sectionEyebrow)}>
-              Solutions
-            </p>
             <h2 id="solutions-title" {...stylex.attrs(styles.sectionTitle)}>
               应用方案
             </h2>
           </header>
-          {solutions.length > 1 && (
-            <div
-              ref={areaListRef}
-              role="group"
+          <Show when={areas().length > 0 && solutions().length > 1}>
+            <ToggleGroup
+              ref={(el: HTMLDivElement) => (areaListRef = el)}
+              value={[area()]}
+              deselectable={false}
+              onValueChange={(vals) => {
+                if (vals[0]) send({ type: "pickArea", area: vals[0] as AreaFilter });
+              }}
               aria-label="按应用领域筛选"
               {...stylex.attrs(styles.areaList)}
             >
-              <For each={areaChips}>
-                {(entry) => {
-                  const isActive = () => area() === entry.id;
-                  return (
-                    <button
-                      type="button"
-                      aria-pressed={isActive() ? "true" : "false"}
-                      onClick={() => chooseArea(entry.id)}
-                      {...stylex.attrs(styles.area, isActive() && styles.areaActive)}
-                    >
-                      <span {...stylex.attrs(styles.areaLabel)}>{entry.label}</span>
-                      <span
-                        {...stylex.attrs(styles.areaCount, isActive() && styles.areaCountActive)}
-                      >
-                        {entry.count}
-                      </span>
-                    </button>
-                  );
-                }}
+              <For each={areaChips()}>
+                {(entry) => (
+                  <Toggle
+                    value={entry.id}
+                    class={(state) =>
+                      sxProps(styles.area, state.pressed && styles.areaActive).class
+                    }
+                  >
+                    <span {...stylex.attrs(styles.areaLabel)}>{entry.label}</span>
+                  </Toggle>
+                )}
               </For>
-            </div>
-          )}
-          <div {...stylex.attrs(styles.browser)}>
-            <div {...stylex.attrs(styles.railFrame)}>
-              <m.div
-                ref={(el: HTMLElement) => (railRef = el as HTMLDivElement)}
-                role="tablist"
-                aria-label="应用方案"
-                aria-orientation="vertical"
-                onKeyDown={handleRailKeyDown}
-                {...stylex.attrs(styles.rail)}
-              >
-                <For each={SOLUTION_AREAS}>
-                  {(group) => {
-                    const items = createMemo(() =>
-                      scope().filter((item) => item.area === group.id),
-                    );
-                    return (
-                      <Show when={items().length > 0}>
-                        <div {...stylex.attrs(styles.railGroup)}>
-                          <p aria-hidden="true" {...stylex.attrs(styles.railHeading)}>
-                            {group.label}
-                            <span {...stylex.attrs(styles.railHeadingCount)}>
-                              {items().length} 款
-                            </span>
-                          </p>
-                          <For each={items()}>
-                            {(item) => {
-                              const isSelected = () => item.id === selected()?.id;
-                              return (
-                                <button
-                                  type="button"
-                                  role="tab"
-                                  id={`${uid}-tab-${item.id}`}
-                                  aria-selected={isSelected() ? "true" : "false"}
-                                  aria-controls={`${uid}-panel`}
-                                  tabindex={isSelected() ? 0 : -1}
-                                  onClick={() => setSelectedId(item.id)}
-                                  {...stylex.attrs(
-                                    styles.solutionTab,
-                                    isSelected() && styles.solutionTabSelected,
-                                    stylex.defaultMarker(),
-                                  )}
-                                >
-                                  <Show when={isSelected()}>
-                                    <m.span
-                                      layoutId={`${uid}-solution-tab`}
-                                      transition={
-                                        reduce()
-                                          ? { duration: 0 }
-                                          : { type: "spring", duration: 0.32, bounce: 0 }
-                                      }
-                                      {...stylex.attrs(styles.tabIndicator)}
-                                    />
-                                  </Show>
-                                  <span
-                                    {...stylex.attrs(
-                                      styles.tabIndex,
-                                      isSelected() && styles.tabIndexSelected,
-                                    )}
-                                  >
-                                    {padIndex(scope().indexOf(item))}
-                                  </span>
-                                  <span {...stylex.attrs(styles.tabText)}>
-                                    <span
-                                      {...stylex.attrs(
-                                        styles.tabTitle,
-                                        isSelected() && styles.tabTitleSelected,
-                                      )}
-                                    >
-                                      {item.title}
-                                    </span>
-                                    <span {...stylex.attrs(styles.tabMeta)}>
-                                      {item.functions.join(" · ")}
-                                    </span>
-                                  </span>
-                                </button>
-                              );
+            </ToggleGroup>
+          </Show>
+          <Show when={scope().length > 1 ? selected() : undefined}>
+            {(current) => (
+              <div ref={filterRef} {...stylex.attrs(styles.solutionFilter)}>
+                <button
+                  type="button"
+                  aria-haspopup="listbox"
+                  aria-expanded={filterOpen() ? "true" : "false"}
+                  aria-controls={`${uid}-solutions`}
+                  onClick={() => setFilterOpen(!filterOpen())}
+                  {...stylex.attrs(styles.solutionFilterButton)}
+                >
+                  <span {...stylex.attrs(styles.solutionFilterLabel)}>{current().title}</span>
+                  <ChevronDown
+                    size={18}
+                    strokeWidth={2}
+                    absoluteStrokeWidth
+                    aria-hidden="true"
+                    {...sxProps(
+                      styles.solutionFilterIcon,
+                      filterOpen() && styles.solutionFilterIconOpen,
+                    )}
+                  />
+                </button>
+                <ul
+                  id={`${uid}-solutions`}
+                  role="listbox"
+                  aria-label="应用方案"
+                  hidden={!filterOpen()}
+                  {...stylex.attrs(styles.solutionFilterMenu)}
+                >
+                  <For each={scope()}>
+                    {(item) => {
+                      const isSelected = () => item.id === current().id;
+                      return (
+                        <li>
+                          <button
+                            type="button"
+                            role="option"
+                            aria-selected={isSelected() ? "true" : "false"}
+                            onClick={() => {
+                              send({ type: "pickSolution", id: item.id });
+                              setFilterOpen(false);
                             }}
-                          </For>
-                        </div>
-                      </Show>
-                    );
-                  }}
-                </For>
-              </m.div>
-            </div>
-            <div
-              role="tabpanel"
-              id={`${uid}-panel`}
-              aria-labelledby={`${uid}-tab-${selected()?.id}`}
-              tabindex={0}
-              {...stylex.attrs(styles.sheet)}
+                            {...sxProps(
+                              styles.solutionFilterOption,
+                              isSelected() && styles.solutionFilterOptionSelected,
+                            )}
+                          >
+                            <span {...stylex.attrs(styles.solutionFilterOptionTitle)}>
+                              {item.title}
+                            </span>
+                            <span {...stylex.attrs(styles.solutionFilterOptionMeta)}>
+                              {item.functions.join(" · ")}
+                            </span>
+                          </button>
+                        </li>
+                      );
+                    }}
+                  </For>
+                </ul>
+              </div>
+            )}
+          </Show>
+          <Show
+            when={selected()}
+            fallback={<p {...stylex.attrs(styles.solutionsEmpty)}>暂无方案</p>}
+          >
+            <Tabs
+              value={selected()?.id ?? null}
+              onValueChange={(next) => {
+                if (next) send({ type: "pickSolution", id: next });
+              }}
+              orientation="vertical"
+              {...stylex.attrs(styles.browser)}
             >
+              <div {...stylex.attrs(styles.railFrame)}>
+                <TabsList
+                  ref={(el: HTMLDivElement) => (railRef = el)}
+                  aria-label="应用方案"
+                  {...stylex.attrs(styles.rail)}
+                >
+                  <For each={scope()}>
+                    {(item) => (
+                      <TabsTab
+                        value={item.id}
+                        class={(state) =>
+                          sxProps(
+                            styles.solutionTab,
+                            state.selected && styles.solutionTabSelected,
+                            stylex.defaultMarker(),
+                          ).class
+                        }
+                      >
+                        {(state) => (
+                          <>
+                            <Show when={state.selected}>
+                              <m.span
+                                layoutId={`${uid}-solution-tab`}
+                                transition={
+                                  reduce()
+                                    ? { duration: 0 }
+                                    : { type: "spring", duration: 0.32, bounce: 0 }
+                                }
+                                {...stylex.attrs(styles.tabIndicator)}
+                              />
+                            </Show>
+                            <span {...stylex.attrs(styles.tabText)}>
+                              <span
+                                {...sxProps(
+                                  styles.tabTitle,
+                                  state.selected && styles.tabTitleSelected,
+                                )}
+                              >
+                                {item.title}
+                              </span>
+                              <span {...stylex.attrs(styles.tabMeta)}>
+                                {item.functions.join(" · ")}
+                              </span>
+                            </span>
+                          </>
+                        )}
+                      </TabsTab>
+                    )}
+                  </For>
+                </TabsList>
+                <div ref={railBarRef} aria-hidden="true" {...stylex.attrs(styles.railBar)}>
+                  <div ref={railThumbRef} {...stylex.attrs(styles.railThumb)} />
+                </div>
+              </div>
               <Show when={selected()} keyed>
                 {(item) => (
-                  <div {...stylex.attrs(styles.panel)}>
-                    <FormulaSheet item={item} />
-                  </div>
+                  <TabsPanel value={item.id} {...stylex.attrs(styles.sheet)}>
+                    <div {...stylex.attrs(styles.panel)}>
+                      <FormulaSheet item={item} />
+                    </div>
+                  </TabsPanel>
                 )}
               </Show>
-            </div>
-          </div>
+            </Tabs>
+          </Show>
         </div>
       </section>
     </Show>

@@ -29,11 +29,7 @@ const VIEW_BOX = `${VIEW.x} ${VIEW.y} ${VIEW.width} ${VIEW.height}`;
 const APEX_VARS = { "--oos1o-apex": `${toX(0)}% ${toY(0)}%` } as JSX.CSSProperties;
 const APEX_POSITION = { left: `${toX(0)}%`, top: `${toY(0)}%` };
 
-const ANATOMY = [
-  { en: "Heartwood", zh: "心材" },
-  { en: "Sapwood", zh: "边材" },
-  { en: "Cambium", zh: "形成层" },
-] as const;
+const ANATOMY = [{ zh: "心材" }, { zh: "边材" }, { zh: "形成层" }] as const;
 
 const ZONES = ABOUT_CULTURE.values.map((value, index) => ({
   ...value,
@@ -55,13 +51,6 @@ const styles = stylex.create({
     justifyContent: "space-between",
     gap: 20,
     marginBottom: { default: 40, [bp.tablet]: 56, [bp.desktop]: 64 },
-  },
-  caption: {
-    margin: 0,
-    maxWidth: "26em",
-    fontSize: { default: 17, [bp.desktop]: 19 },
-    lineHeight: 1.35,
-    color: tone.body,
   },
   plate: {
     position: "relative",
@@ -185,16 +174,11 @@ const styles = stylex.create({
     color: tone.blue,
   },
   anatomy: {
-    fontSize: 21,
-    lineHeight: 1,
-    color: tone.body,
-  },
-  anatomyZh: {
     fontFamily: face.sans,
-    fontStyle: "normal",
     fontSize: 14,
+    lineHeight: 1,
     letterSpacing: "0.06em",
-    marginInlineStart: 8,
+    color: tone.body,
   },
   title: {
     margin: 0,
@@ -266,11 +250,7 @@ export function Culture() {
     <section id="about-culture" aria-labelledby="oos1o-culture" {...stylex.attrs(styles.section)}>
       <div {...stylex.attrs(ui.shell)}>
         <div {...stylex.attrs(styles.intro)}>
-          <SectionHead id="oos1o-culture" label="Culture" title={ABOUT_CULTURE.title} />
-          <p lang="en" {...stylex.attrs(ui.serif, styles.caption)}>
-            Fig. 2 — The same section, magnified: from the pith, through the wood, to the living
-            edge.
-          </p>
+          <SectionHead id="oos1o-culture" title={ABOUT_CULTURE.title} />
         </div>
 
         <div ref={setPlateRef} {...stylex.attrs(styles.plate)}>
@@ -380,12 +360,7 @@ export function Culture() {
                   >
                     {zone.glyph}
                   </span>
-                  <span lang="en" {...stylex.attrs(ui.serif, styles.anatomy)}>
-                    {zone.en}
-                    <span lang="zh-CN" {...stylex.attrs(styles.anatomyZh)}>
-                      {zone.zh}
-                    </span>
-                  </span>
+                  <span {...stylex.attrs(styles.anatomy)}>{zone.zh}</span>
                 </p>
                 <h3 {...stylex.attrs(styles.title)}>{zone.title}</h3>
                 <p {...stylex.attrs(ui.body, styles.desc)}>{zone.desc}</p>

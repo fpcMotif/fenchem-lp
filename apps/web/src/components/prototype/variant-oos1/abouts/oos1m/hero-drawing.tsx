@@ -50,10 +50,6 @@ const styles = stylex.create({
     lineHeight: 1.2,
     color: tone.ink,
   },
-  labelEnglish: {
-    display: { default: "none", [bp.wide]: "inline" },
-    marginInlineStart: 8,
-  },
   delta: {
     position: "absolute",
     top: 0,
@@ -119,12 +115,7 @@ function PlateLabel(props: { progress: MotionValue<number>; id: HeroPartId } & H
       <span {...stylex.attrs(ui.balloon, props.active === props.id && ui.balloonActive)}>
         {part.item}
       </span>
-      <span {...stylex.attrs(styles.labelName)}>
-        {part.name}
-        <span lang="en" {...stylex.attrs(ui.label, styles.labelEnglish)}>
-          {part.english}
-        </span>
-      </span>
+      <span {...stylex.attrs(styles.labelName)}>{part.name}</span>
     </m.div>
   );
 }
@@ -133,11 +124,11 @@ function Leader(props: { progress: MotionValue<number>; id: HeroPartId; active: 
   const d = useTransform(props.progress, (value) => leaderPath(heroPose(value), props.id));
   const cx = useTransform(props.progress, (value) => leaderAnchor(heroPose(value), props.id).x);
   const cy = useTransform(props.progress, (value) => leaderAnchor(heroPose(value), props.id).y);
-  const color = props.active ? "#0743a9" : "rgba(11, 42, 92, 0.92)";
+  const color = () => (props.active ? "#0743a9" : "rgba(11, 42, 92, 0.92)");
   return (
     <>
-      <m.path d={d()} {...STROKE} stroke={color} stroke-width={props.active ? 1.5 : 1} />
-      <m.circle cx={cx()} cy={cy()} r={4.2} fill={color} />
+      <m.path d={d()} {...STROKE} stroke={color()} stroke-width={props.active ? 1.5 : 1} />
+      <m.circle cx={cx()} cy={cy()} r={4.2} fill={color()} />
     </>
   );
 }

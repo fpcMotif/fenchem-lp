@@ -15,7 +15,6 @@ const SHEET_EDGE = "#e2dfd9";
 const SHEET_RULE = "#e9e6e1";
 const CONTROL_EDGE = "#c9c5be";
 const DISABLED = "#a9a59f";
-const ACCENT = colors.brandGreen700;
 const FOCUS = colors.brandBlue700;
 const EASE_OUT_CSS = "cubic-bezier(0.22, 1, 0.36, 1)";
 const BODY_FONT =
@@ -253,17 +252,6 @@ const styles = stylex.create({
     borderBottomStyle: "solid",
     borderBottomColor: SHEET_RULE,
   },
-  sheetIndex: {
-    margin: 0,
-    marginBottom: 8,
-    fontFamily: NUMERAL_FONT,
-    fontSize: 13,
-    fontWeight: 500,
-    lineHeight: "20px",
-    letterSpacing: "0.04em",
-    fontVariantNumeric: "tabular-nums",
-    color: ACCENT,
-  },
   sheetTitle: {
     margin: 0,
     fontSize: { default: 20, [MD]: 22, [DESKTOP]: 24 },
@@ -366,7 +354,7 @@ function FieldRow(props: { label: string; values: string[] }) {
   );
 }
 
-function SheetPage(props: { item: SolutionItem; index: number; active: boolean }) {
+function SheetPage(props: { item: SolutionItem; active: boolean }) {
   const item = props.item;
   return (
     <article
@@ -374,7 +362,6 @@ function SheetPage(props: { item: SolutionItem; index: number; active: boolean }
       {...stylex.attrs(styles.page, props.active && styles.pageActive)}
     >
       <header {...stylex.attrs(styles.sheetHead)}>
-        <p {...stylex.attrs(styles.sheetIndex)}>{padIndex(props.index)}</p>
         <h3 {...stylex.attrs(styles.sheetTitle)}>{item.title}</h3>
         <p {...stylex.attrs(styles.sheetSubtitle)}>{item.subtitle}</p>
       </header>
@@ -475,7 +462,7 @@ export function Solutions() {
         <div id={sheetId} {...stylex.attrs(styles.sheet)}>
           <div {...stylex.attrs(styles.stack)}>
             {SOLUTION_ITEMS.map((item, index) => (
-              <SheetPage item={item} index={index} active={index === activeIndex()} />
+              <SheetPage item={item} active={index === activeIndex()} />
             ))}
           </div>
         </div>
